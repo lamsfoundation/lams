@@ -103,7 +103,7 @@
         </meta>
         <column name="from_activity_id" />
     </many-to-one>
-    
+
     <!-- bi-directional many-to-one association to LearningDesign -->
     <many-to-one
         name="learningDesign"

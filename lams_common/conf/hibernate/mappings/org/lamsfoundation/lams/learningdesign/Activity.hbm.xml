@@ -90,8 +90,8 @@
 
     <!-- Associations -->
     
-    <one-to-one name="transitionTo" class="org.lamsfoundation.lams.learningdesign.Transition" />
-    <one-to-one name="transitionFrom" class="org.lamsfoundation.lams.learningdesign.Transition" />
+    <one-to-one name="transitionTo" class="org.lamsfoundation.lams.learningdesign.Transition" property-ref="toActivity"/>
+    <one-to-one name="transitionFrom" class="org.lamsfoundation.lams.learningdesign.Transition" property-ref="fromActivity"/>
     
     <!-- bi-directional many-to-one association to LearningLibrary -->
     <many-to-one name="learningLibrary" class="org.lamsfoundation.lams.learningdesign.LearningLibrary">
