@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
+	
+	<bean id="authoringServiceTarget" class="org.lamsfoundation.lams.authoring.service.MockAuthoringService">
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+	</bean>
+	
+	<bean id="authoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="authoringServiceTarget"/></property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="insert*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+</beans>

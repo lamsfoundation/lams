@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for lams survey business layer.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+
+
+	<!--
+	  - Lams monitoring primary business object (default implementation), as an inner bean wrapped
+		- by an outer transactional proxy. The two bean definitions could have been separate,
+		- but this is cleaner as there is no need to ever access the unwrapped object.
+	-->   
+	<bean id="monitoringServiceTarget" class="org.lamsfoundation.lams.monitoring.service.MonitoringService"
+		singleton="true"
+	>
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>	
+		<property name="authoringService"><ref bean="authoringService"/></property>			
+		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>			
+	</bean>	
+	
+	<bean id="monitoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref local="monitoringServiceTarget"/></property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="createLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+			</props>
+		</property>
+	</bean>    
+
+</beans>

@@ -156,7 +156,7 @@
    </target>
 	
 	<!-- =================================================================== -->
-	<!-- Survey Database tasks                                               -->
+	<!-- Monitoring Database tasks                                               -->
 	<!-- =================================================================== -->
 	<target name="clean-db"	description="clean survey tool database.">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"

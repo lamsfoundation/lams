@@ -62,7 +62,6 @@
 				<!-- lesson related mapping files-->
 				<value>org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
 				<value>org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
-                <!-- value>com/lamsinternational/lams/lesson/LessonClass.hbm.xml</value-->
 				
 				<!-- Tool related mapping files-->
 				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
