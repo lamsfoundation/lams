@@ -7,13 +7,14 @@ package org.lamsfoundation.lams.web.action;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.web.util.TokenProcessor;
 
 /**
  * @author daveg
  *
  */
-public abstract class Action extends org.apache.struts.action.Action {
+public abstract class LamsDispatchAction extends DispatchAction {
     
     protected static String className = "Action";
 	
