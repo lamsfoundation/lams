@@ -100,14 +100,21 @@ public class LamsToolService implements ILamsToolService,ApplicationContextAware
     }
 
     /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#getToolSession(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity)
+     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#getToolSessionByLearner(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity)
      */
-    public ToolSession getToolSession(User learner, Activity activity) throws LamsToolServiceException
+    public ToolSession getToolSessionByLearner(User learner, Activity activity) throws LamsToolServiceException
     {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#getToolSessionById(java.lang.Long)
+     */
+    public ToolSession getToolSessionById(Long toolSessionId)
+    {
+        return toolSessionDAO.getToolSession(toolSessionId);
+    }
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsToolService#notifyToolsToCreateSession(java.lang.Long, org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
