@@ -1,13 +1,9 @@
 # Connection: ROOT LOCAL
 # Host: localhost
 # Saved: 2005-02-16 16:04:11
-# 
+
 SET FOREIGN_KEY_CHECKS=0;
 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-02-15 11:12:43
-# 
 DROP TABLE IF EXISTS lams_learning_transition;
 DROP TABLE IF EXISTS lams_lesson_learner;
 DROP TABLE IF EXISTS lams_activity_learners;
