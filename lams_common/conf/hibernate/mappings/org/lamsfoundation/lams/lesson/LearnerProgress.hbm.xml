@@ -24,8 +24,8 @@
 
 		<!-- Associations -->
 
-		<!-- bi-directional one-to-many association to attempted acitivities -->
-		<set name="attemptedActivities" lazy="true" inverse="true"
+		<!-- uni-directional one-to-many association to attempted acitivities -->
+		<set name="attemptedActivities" lazy="true"
 			cascade="none" table="lams_progress_attempted">
 			<key>
 				<column name="learner_progress_id" />
@@ -34,8 +34,8 @@
 				class="org.lamsfoundation.lams.learningdesign.Activity" />
 		</set>
 
-		<!-- bi-directional one-to-many association to completed activities -->
-		<set name="completedActivities" lazy="true" inverse="true"
+		<!-- uni-directional one-to-many association to completed activities -->
+		<set name="completedActivities" lazy="true"
 			cascade="none" table="lams_progress_completed">
 			<key>
 				<column name="learner_progress_id" />
