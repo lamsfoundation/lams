@@ -7,7 +7,6 @@
 package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
-import java.util.Set;
 
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -47,7 +46,7 @@ public interface ILearnerService
      * @param lessionID identifies the Lesson to start
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress startLesson(User learner, Lesson lesson) throws ProgressException;
+    public LearnerProgress joinLesson(User learner, Lesson lesson) throws ProgressException;
     
 
     /**

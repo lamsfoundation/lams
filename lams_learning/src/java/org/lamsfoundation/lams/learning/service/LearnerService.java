@@ -6,7 +6,6 @@
 package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
-import java.util.Set;
 
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
@@ -15,9 +14,11 @@ import org.lamsfoundation.lams.learning.web.util.Utils;
 import org.lamsfoundation.lams.learningdesign.Activity;
 
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+
 import org.lamsfoundation.lams.usermanagement.User;
 /**
  * This class is a facade over the Learning middle tier.
@@ -27,10 +28,13 @@ public class LearnerService implements ILearnerService
 {
     private ILearnerProgressDAO learnerProgressDAO = null;
     private ILessonDAO lessonDAO = null;
-    
+    private ProgressEngine progressEngine;
+
+   
     /** Creates a new instance of LearnerService */
-    public LearnerService()
+    public LearnerService(ProgressEngine progressEngine)
     {
+        this.progressEngine = progressEngine;
     }
 
     /**
@@ -51,15 +55,14 @@ public class LearnerService implements ILearnerService
     
  
     /**
-     * Joins a User to a a new lesson as a learner
+     * Joins a User to a new lesson as a learner
      * @param learner the Learner
      * @param lessionID identifies the Lesson to start
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress startLesson(User learner, Lesson lesson) throws ProgressException
+    public LearnerProgress joinLesson(User learner, Lesson lesson) throws ProgressException
     {
-        //return ProgressEngine.startLesson(learner, lesson);
-    	LearnerProgress learnerProgress = new ProgressEngine().getStartPoint(learner, lesson);
+    	LearnerProgress learnerProgress = progressEngine.getStartPoint(learner, lesson);
     	return learnerProgress;
     }
     
@@ -95,7 +98,7 @@ public class LearnerService implements ILearnerService
      */
     public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson) throws ProgressException
     {
-    	return new ProgressEngine().calculateProgress(learner, lesson, completedActivity);
+    	return progressEngine.calculateProgress(learner, lesson, completedActivity);
     }
     
 
@@ -127,4 +130,5 @@ public class LearnerService implements ILearnerService
 	public void setLessonDAO(ILessonDAO lessonDAO) {
 		this.lessonDAO = lessonDAO;
 	}
+
 }
