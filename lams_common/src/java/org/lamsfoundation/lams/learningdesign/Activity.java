@@ -9,7 +9,6 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
 
@@ -460,11 +459,18 @@ public abstract class Activity implements Serializable,Nullable {
 	    
 	}
 	
+	/**
+	 * Return the group information for the requested user when he is running
+	 * current activity instance.
+	 * @param learner the requested user	
+	 * @return the group that this user belongs to.
+	 */
 	public Group getGroupFor(User learner)
 	{
 	    if(this.getGrouping()==null)
 	        throw new IllegalArgumentException("Exception occured in " +
 	        		"getGroupFor, no grouping has been defined");
+	    
 	    for(Iterator i=this.getGrouping().getGroups().iterator();i.hasNext();)
 	    {
 	        Group group = (Group)i.next();

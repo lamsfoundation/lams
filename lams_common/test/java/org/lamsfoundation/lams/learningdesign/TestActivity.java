@@ -27,6 +27,9 @@ public class TestActivity extends AbstractLamsTestCase
 	private static final Long TEST_SEQUENCE_ACTIVITY=new Long(14);
 	
 	private static final Long TEST_SURVEY_ACTIVITY = new Long(20);
+	
+	private static final Long TEST_USER_ID = new Long(2);
+	
     /*
      * @see AbstractLamsTestCase#setUp()
      */
@@ -70,6 +73,11 @@ public class TestActivity extends AbstractLamsTestCase
         
         assertEquals("verify the number tool activity we should get",1,toolActivities.size());
 
+    }
+    
+    public void testGetGroupForUser()
+    {
+        
     }
     /**
      * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()

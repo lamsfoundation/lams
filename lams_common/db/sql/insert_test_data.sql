@@ -130,6 +130,13 @@ insert into lams_tool_content (tool_content_id,tool_id) values (16,5);
 insert into lams_tool_content (tool_content_id,tool_id) values (17,6);
 insert into lams_tool_content (tool_content_id,tool_id) values (18,7);
 insert into lams_tool_content (tool_content_id,tool_id) values (19,8);
+
+--insert a testing grouping
+insert into lams_grouping values(100,100,2,1,10,0,2);		
+
+insert into lams_group values(88,100,1);
+
+insert into lams_user_group values(2,88);
 -- Populates the lams_learning_activity table with default activity templates that would be avaialbe to the
 -- author in the left panel and a default dummy learning_design defination 
 
@@ -364,7 +371,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (19,5,'Message Board Activity','Message Board',10,20,13,
-1,null,1,0,
+1,100,1,0,
 1,5,'20050101','Tool Activity Offline  Instructions ',
 null,null,5,16,
 null,null,null,'image');
@@ -447,8 +454,6 @@ insert into lams_learning_design(learning_design_ui_id,description,title,first_a
 								(1,'Test Learning Design','Test Learning Design title',15,1,1,0,1,
 								'Help Text',1,'20041223','1.0',null,1);		
 								
-insert into lams_grouping values(100,100,2,1,10,0,2);		
-
-insert into lams_group values(88,100,1);
+											
 												
 SET FOREIGN_KEY_CHECKS=1;
