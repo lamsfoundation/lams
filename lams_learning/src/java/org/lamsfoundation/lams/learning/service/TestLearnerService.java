@@ -14,6 +14,9 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.lamsfoundation.lams.learning.progress.ProgressException;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.web.util.Utils;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -76,11 +79,7 @@ public class TestLearnerService implements ILearnerService {
 		return null;
 	}
 
-	public LearnerProgress resumeLesson(User learner, Lesson lesson) {
-		return null;
-	}
-
-	public Lesson getLesson(long lessonID) {
+	public Lesson getLesson(Long lessonID) {
 		return null;
 	}
 
@@ -88,23 +87,42 @@ public class TestLearnerService implements ILearnerService {
 		return null;
 	}
 
-	public void exitLesson(User learner, Lesson lesson) {
-	}
-
 	public LearnerProgress getProgress(User learner, Lesson lesson) {
 		return getProgress();
 	}
 
-	public LearnerProgress calculateProgress(long completedActivityId, User learner, Lesson lesson) {
+	public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson) {
 		LearnerProgress progress = getProgress(learner, lesson);
+		long completedActivityId = completedActivity.getActivityId().longValue();
 		setComplete(completedActivityId, progress);
-		Activity currentActivity = calculateCurrent(progress);
-		progress.setCurrentActivity(currentActivity);
-		setProgress(progress);
 		
-		progress = createNextProgress(completedActivityId, progress);
+		LearnerProgress newProgress = copyProgress(progress);
+		Activity currentActivity = calculateCurrentActivity(newProgress);
+		newProgress.setCurrentActivity(currentActivity);
+		Activity nextActivity = calculateNextActivity(completedActivityId, newProgress);
+		newProgress.setNextActivity(nextActivity);
 		
-		return progress;
+		setProgress(newProgress);
+		
+		return newProgress;
+	}
+
+	public String completeToolActivity(long toolSessionId) {
+    	// get learner, lesson and activity using toolSessionId
+    	User learner = null;
+    	Lesson lesson = null;
+    	//Activity activity = null;
+		LearnerProgress progress = getProgress();
+    	Activity activity = getActivity(toolSessionId, progress);
+    	
+    	String url = null;
+    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
+    	//Activity nextActivity = nextLearnerProgress.getNextActivity();
+    	//ActivityURL activityURL = Utils.generateActivityURL(nextActivity, nextLearnerProgress);
+    	ActivityURL activityURL = Utils.generateNextActivityURL(progress, nextLearnerProgress);
+    	url = activityURL.getUrl();
+    	
+    	return url;
 	}
 
 	
@@ -152,7 +170,7 @@ public class TestLearnerService implements ILearnerService {
 	}
 	
 	
-	private Activity calculateCurrent(LearnerProgress progress) {
+	private Activity calculateCurrentActivity(LearnerProgress progress) {
 		Activity activity = null;
 		if (progress.getProgressState(getActivity(1, progress)) != LearnerProgress.ACTIVITY_COMPLETED) activity = getActivity(1, progress);
 		else if (progress.getProgressState(getActivity(2, progress)) != LearnerProgress.ACTIVITY_COMPLETED) activity = getActivity(2, progress);
@@ -161,6 +179,27 @@ public class TestLearnerService implements ILearnerService {
 		else if (progress.getProgressState(getActivity(10, progress)) != LearnerProgress.ACTIVITY_COMPLETED) activity = getActivity(10, progress);
 		
 		return activity;
+	}
+	
+	private Activity calculateNextActivity(long completedId, LearnerProgress progress) {
+		// nextActivity is the next activity to be attempted after completedId,
+		// usually this will be whatever is now the current
+		Activity nextActivity = progress.getCurrentActivity();
+		
+		if ((completedId == 4) || (completedId == 5)) {
+			nextActivity = null;
+		}
+		else if ((completedId == 7) ||
+				(completedId == 8) ||
+				(completedId == 9)) {
+			nextActivity = null;
+		}
+		
+		if (completedId == 10) {
+			nextActivity = null;
+		}
+		
+		return nextActivity;
 	}
 
 	
@@ -264,6 +303,16 @@ public class TestLearnerService implements ILearnerService {
 		progress.setNextActivity(nextActivity);
 		
 		return progress;
+	}
+	
+	private LearnerProgress copyProgress(LearnerProgress progress) {
+		LearnerProgress newProgress = new LearnerProgress();
+		newProgress.setLesson(progress.getLesson());
+		newProgress.setLessonComplete(progress.isLessonComplete());
+		newProgress.setAttemptedActivities(progress.getAttemptedActivities());
+		newProgress.setCompletedActivities(progress.getCompletedActivities());
+		newProgress.setCurrentActivity(progress.getCurrentActivity());
+		return newProgress;
 	}
 	
 }
