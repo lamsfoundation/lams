@@ -113,5 +113,26 @@ public interface ILamsCoreToolService
      * @param accessMode tool access mode.
      * @return the tool access url with tool session id and access mode.
      */
-    public String getToolURLByMode(ToolActivity activity, User learner, ToolAccessMode accessMode) throws LamsToolServiceException;
+    public String getLearnerToolURLByMode(ToolActivity activity, User learner, ToolAccessMode accessMode) throws LamsToolServiceException;
+
+    /**
+     * <p>Setup target tool url with tool session id parameter based on the tool
+     * activity and learner.</p>
+     * 
+     * @param activity the activity that requested tool session belongs to.
+     * @param learner the user who invloved the tool session.
+     * @param toolURL the target url.
+     * @throws LamsToolServiceException
+     * @return the url with tool session id.
+     */
+    public String setupToolURLWithToolSession(ToolActivity activity,User learner,String toolURL) throws LamsToolServiceException;
+    
+    /**
+     * <p>Setup target tool url with tool content id parameter based on the tool
+     * activity and learner.</p>
+     * @param activity the requested activity.
+     * @param toolURL the target url
+     * @return the url with tool content id.
+     */
+    public String setupToolURLWithToolContent(ToolActivity activity,String toolURL);
 }
