@@ -12,27 +12,6 @@
 		var teachWin = null;
 		var adminWin = null;
 		
-		function openSysAdmin()
-		{
-			var orgId = document.forms[0].orgIdForSysAdmin.value;
-			if(isMac)
-			{
-				adminWin = window.open('home.do?method=sysadmin&orgId='+orgId,'adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
-			}
-			else
-			{
-				if(adminWin && adminWin.open && !adminWin.closed )
-				{
-					adminWin.focus();
-				}
-				else
-				{
-					adminWin = window.open('home.do?method=sysadmin&orgId='+orgId,'adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
-					adminWin.focus();
-				}
-			}
-		}
-		
 		function openAuthor( )
 		{
 			var orgId = document.forms[0].orgIdForAuthor.value;
