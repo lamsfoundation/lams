@@ -77,12 +77,14 @@ CREATE TABLE lams_authentication_method_type (
 
 CREATE TABLE lams_authentication_method (
        authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
+     , authentication_method_name VARCHAR(64) NOT NULL
      , authentication_method_type_id INT(3) NOT NULL DEFAULT 0
      , PRIMARY KEY (authentication_method_id)
      , INDEX (authentication_method_type_id)
      , CONSTRAINT FK_lams_authorization_method_1 FOREIGN KEY (authentication_method_type_id)
                   REFERENCES lams_authentication_method_type (authentication_method_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
+CREATE UNIQUE INDEX UQ_lams_authentication_method_name ON lams_authentication_method (authentication_method_name ASC);
 
 CREATE TABLE lams_workspace_folder (
        workspace_folder_id BIGINT(20) NOT NULL DEFAULT 0
@@ -407,16 +409,5 @@ CREATE TABLE lams_user_group (
      , INDEX (group_id)
      , CONSTRAINT FK_lams_user_group_2 FOREIGN KEY (group_id)
                   REFERENCES lams_group (group_id)
-)TYPE=InnoDB;
-
-CREATE TABLE lams_authentication_method_parameter (
-       authentication_parameter_id BIGINT(20) NOT NULL DEFAULT 0
-     , authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
-     , name VARCHAR(128) NOT NULL
-     , value VARCHAR(255)
-     , PRIMARY KEY (authentication_parameter_id)
-     , INDEX (authentication_method_id)
-     , CONSTRAINT FK_lams_authorization_method_parameter_1 FOREIGN KEY (authentication_method_id)
-                  REFERENCES lams_authentication_method (authentication_method_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
