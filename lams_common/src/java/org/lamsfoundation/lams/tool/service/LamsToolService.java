@@ -83,7 +83,6 @@ public class LamsToolService implements ILamsToolService,ApplicationContextAware
      */
     public List getAllPotentialLearners(long toolContentID) throws LamsToolServiceException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -104,8 +103,7 @@ public class LamsToolService implements ILamsToolService,ApplicationContextAware
      */
     public ToolSession getToolSessionByLearner(User learner, Activity activity) throws LamsToolServiceException
     {
-        // TODO Auto-generated method stub
-        return null;
+        return toolSessionDAO.getToolSessionByLearner(learner,activity);
     }
 
     /**
