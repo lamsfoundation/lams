@@ -138,6 +138,11 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     	newScheduleGateActivity.setXcoord(originalActivity.getXcoord());
     	newScheduleGateActivity.setYcoord(originalActivity.getYcoord());
     	newScheduleGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	
+    	newScheduleGateActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
+    	newScheduleGateActivity.setApplyGrouping(originalActivity.getApplyGrouping());
+    	newScheduleGateActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	
     	newScheduleGateActivity.setGrouping(originalActivity.getGrouping());
     	newScheduleGateActivity.setGroupingUIID(originalActivity.getGroupingUIID());
     	newScheduleGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());    	

@@ -104,6 +104,11 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     	newSequenceActivity.setXcoord(originalActivity.getXcoord());
     	newSequenceActivity.setYcoord(originalActivity.getYcoord());
     	newSequenceActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	
+    	newSequenceActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
+    	newSequenceActivity.setApplyGrouping(originalActivity.getApplyGrouping());
+    	newSequenceActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	
     	newSequenceActivity.setGrouping(originalActivity.getGrouping());
     	newSequenceActivity.setGroupingUIID(originalActivity.getGroupingUIID());
     	newSequenceActivity.setLearningLibrary(originalActivity.getLearningLibrary());

@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.learningdesign;
 import java.io.Serializable;
 import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.strategy.GroupingActivityStrategy;
 
 
 /**
@@ -63,11 +64,13 @@ public class GroupingActivity extends SimpleActivity implements Serializable
 				transitionFrom);
         this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
+        super.simpleActivityStrategy = new GroupingActivityStrategy();
     }
     
     /** default constructor */
     public GroupingActivity()
     {
+    	super.simpleActivityStrategy = new GroupingActivityStrategy();
     }
     
     /** minimal constructor */
@@ -97,6 +100,7 @@ public class GroupingActivity extends SimpleActivity implements Serializable
 				transitionFrom);
         this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
+        super.simpleActivityStrategy = new GroupingActivityStrategy();
     }
     /**
      * This function creates a deep copy of the GroupingActivity passed
@@ -115,6 +119,9 @@ public class GroupingActivity extends SimpleActivity implements Serializable
     	groupingActivity.setXcoord(originalActivity.getXcoord());
     	groupingActivity.setYcoord(originalActivity.getYcoord());    	    
     	groupingActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	groupingActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
+    	groupingActivity.setApplyGrouping(originalActivity.getApplyGrouping());
+    	groupingActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
     	groupingActivity.setDefineLater(originalActivity.getDefineLater());    	
     	groupingActivity.setCreateDateTime(new Date()); 
     	groupingActivity.setRunOffline(originalActivity.getRunOffline());

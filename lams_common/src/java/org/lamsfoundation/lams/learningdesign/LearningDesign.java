@@ -5,9 +5,11 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -222,6 +224,7 @@ public class LearningDesign implements Serializable {
 		newDesign.setDuration(design.getDuration());
 		newDesign.setLicense(design.getLicense());
 		newDesign.setLicenseText(design.getLicenseText());
+		newDesign.setLastModifiedDateTime(new Date());
 		return newDesign;
 	}	
 	public Long getLearningDesignId() {
@@ -329,7 +332,15 @@ public class LearningDesign implements Serializable {
 		this.transitions = transitions;
 	}
 	public Set getActivities() {
-		return this.activities;
+		if(this.activities==null){
+	        setActivities(new TreeSet(new ActivityOrderComparator()));
+	        return this.activities;
+	    }	    
+	    else{
+	    	TreeSet sortedActivities = new TreeSet(new ActivityOrderComparator());
+	    	sortedActivities.addAll(this.activities);
+	    	return sortedActivities;	    	
+	    }		
 	}
 	public void setActivities(Set activities) {
 		this.activities = activities;
@@ -350,6 +361,22 @@ public class LearningDesign implements Serializable {
 	public int hashCode() {
 		return new HashCodeBuilder().append(getReadOnly()).toHashCode();
 	}	
+	public HashMap getActivityTree(){		
+		HashMap parentActivities = new HashMap();
+		Iterator iterator = this.getActivities().iterator();
+		while(iterator.hasNext()){
+			Object object = iterator.next();
+			if(object instanceof ComplexActivity){
+				ComplexActivity complexActivity =(ComplexActivity)object;
+				parentActivities.put(complexActivity.getActivityId(),complexActivity.getActivities());
+			}else{
+				Activity activity = (Activity)object;
+				if(activity.getParentActivity()==null)
+					parentActivities.put(activity.getActivityId(),new HashSet());
+			}
+		}
+		return parentActivities;
+	}
 	public HashSet getParentActivities(){
 		HashSet parentActivities = new HashSet();
 		Iterator iterator = this.getActivities().iterator();
@@ -359,7 +386,7 @@ public class LearningDesign implements Serializable {
 				parentActivities.add(activity);
 		}
 		return parentActivities;
-	}	
+	}
 	public Activity calculateFirstActivity(){
 		Activity firstActivity = null;
 		HashSet parentActivities = this.getParentActivities();
@@ -438,5 +465,5 @@ public class LearningDesign implements Serializable {
 	}
 	public void setLastModifiedDateTime(Date lastModifiedDateTime) {
 		this.lastModifiedDateTime = lastModifiedDateTime;
-	}
+	}	
 }

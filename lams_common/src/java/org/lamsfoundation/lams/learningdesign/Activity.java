@@ -27,11 +27,13 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
+import org.lamsfoundation.lams.learningdesign.dto.MonitoringActivityDTO;
+import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
@@ -64,6 +66,14 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int CATEGORY_ASSESSMENT = 3;
 	public static final int CATEGORY_CONTENT = 4;
 	public static final int CATEGORY_SPLIT = 5;
+	/******************************************************************/
+	
+	/**
+	 * static final variables indicating the grouping_support of activities
+	 *******************************************************************/
+	public static final int GROUPING_SUPPORT_NONE = 1;
+	public static final int GROUPING_SUPPORT_OPTIONAL = 2;
+	public static final int GROUPING_SUPPORT_REQUIRED = 3;
 	/******************************************************************/
 	
 	/** WDDX packet specific attribute created to identify the
@@ -111,7 +121,10 @@ public abstract class Activity implements Serializable,Nullable {
 
 	/** Offline Instruction for this activity*/
 	private String offlineInstructions;
-
+	
+	 /** Online Instructions for this activity*/
+    private String onlineInstructions;
+	
 	/** The image that represents the icon of this 
 	 * activity in the UI*/
 	private String libraryActivityUiImage;
@@ -155,8 +168,37 @@ public abstract class Activity implements Serializable,Nullable {
 	
 	/** the activity_ui_id of the parent activity */
 	private Integer parentUIID;
-		
+	
+	private Boolean applyGrouping;
+	
+	private Integer groupingSupportType;
+	
+	/**
+	 * @return Returns the applyGrouping.
+	 */
+	public Boolean getApplyGrouping() {
+		return applyGrouping;
+	}
+	/**
+	 * @param applyGrouping The applyGrouping to set.
+	 */
+	public void setApplyGrouping(Boolean applyGrouping) {
+		this.applyGrouping = applyGrouping;
+	}
+	/**
+	 * @return Returns the groupingSupportType.
+	 */
+	public Integer getGroupingSupportType() {
+		return groupingSupportType;
+	}
+	/**
+	 * @param groupingSupportType The groupingSupportType to set.
+	 */
+	public void setGroupingSupportType(Integer groupingSupportType) {
+		this.groupingSupportType = groupingSupportType;
+	}
 	protected ActivityStrategy activityStrategy;
+	protected SimpleActivityStrategy simpleActivityStrategy;
 	
 	/** full constructor */
 	public Activity(
@@ -585,6 +627,20 @@ public abstract class Activity implements Serializable,Nullable {
 	{
 	    return getActivityTypeId().intValue()==SEQUENCE_ACTIVITY_TYPE;
 	}
+	public boolean isComplexActivity(){
+		return getActivityTypeId().intValue()== SEQUENCE_ACTIVITY_TYPE || 
+			   getActivityTypeId().intValue()== PARALLEL_ACTIVITY_TYPE ||
+			   getActivityTypeId().intValue()== OPTIONS_ACTIVITY_TYPE;
+	}
+	public boolean isGateActivity(){
+		return getActivityTypeId().intValue()== SCHEDULE_GATE_ACTIVITY_TYPE ||
+			   getActivityTypeId().intValue()== PERMISSION_GATE_ACTIVITY_TYPE ||
+			   getActivityTypeId().intValue()== SYNCH_GATE_ACTIVITY_TYPE;
+				
+	}
+	public boolean isGroupingActivity(){
+		return getActivityTypeId().intValue()== GROUPING_ACTIVITY_TYPE;
+	}
 	/**
 	 * Delegate to activity strategy to check up the status of all children.
 	 * 
@@ -612,6 +668,7 @@ public abstract class Activity implements Serializable,Nullable {
 	public Activity getNextActivityByParent(Activity currentChild)
 	{
 	    return activityStrategy.getNextActivityByParent(this,currentChild);
+	}	
 	}
 	
 	public Integer getActivityCategoryID() {
@@ -619,6 +676,42 @@ public abstract class Activity implements Serializable,Nullable {
 	}
 	public void setActivityCategoryID(Integer activityCategoryID) {
 		this.activityCategoryID = activityCategoryID;
+	}
+	public Integer[] getContributionType(){
+		return simpleActivityStrategy.getContributionType(this);
+	}
+	public MonitoringActivityDTO getMonitoringActivityDTO(){
+		return new MonitoringActivityDTO(this);
+	}
+	public MonitoringActivityDTO getMonitoringActivityDTO(Activity activity){
+		Integer contributionType[]= null;
+		if(activity.isGateActivity() || activity.isToolActivity() || activity.isGroupingActivity()){
+			contributionType = activity.getContributionType();			
+			return new MonitoringActivityDTO(activity,contributionType);
+		}
+		else
+			return new MonitoringActivityDTO(activity);
+	}
+	public Vector getMonitoringActivityDTOSet(Set activities){
+		Vector children = new Vector();		
+		Iterator iterator = activities.iterator();
+		while(iterator.hasNext()){
+			Activity activity = (Activity)iterator.next();
+			children.add(getMonitoringActivityDTO(activity));
+		}
+		return children;
+	}	
+	/**
+	 * @return Returns the onlineInstructions.
+	 */
+	public String getOnlineInstructions() {
+		return onlineInstructions;
+	}
+	/**
+	 * @param onlineInstructions The onlineInstructions to set.
+	 */
+	public void setOnlineInstructions(String onlineInstructions) {
+		this.onlineInstructions = onlineInstructions;
 	}
 	
 	/**

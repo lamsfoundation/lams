@@ -10,7 +10,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public abstract class SimpleActivity extends Activity implements Serializable
 {
-    
     /** full constructor */
     public SimpleActivity(Long activityId, 
             Integer id, 
@@ -84,5 +83,4 @@ public abstract class SimpleActivity extends Activity implements Serializable
         .append("activityId", getActivityId())
         .toString();
     }
-    
 }

@@ -2,10 +2,10 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.strategy.ToolActivityStrategy;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.NonGroupedToolSession;
@@ -27,6 +27,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
     
     /** List of sessions associated with this ToolActivity */
     private Set toolSessions;
+    
+   
        
     /** full constructor */
     public ToolActivity(Long activityId,
@@ -72,10 +74,12 @@ public class ToolActivity extends SimpleActivity implements Serializable
 				transitionFrom);
         this.tool = tool;
         this.toolContentId = toolContentId;
+        super.simpleActivityStrategy = new ToolActivityStrategy();
     }
     
     /** default constructor */
     public ToolActivity(){
+    	super.simpleActivityStrategy = new ToolActivityStrategy();
     }
     
     /** minimal constructor */
@@ -104,6 +108,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
 				transitionFrom);
         this.tool = tool;
         this.toolContentId = toolContentId;
+        super.simpleActivityStrategy = new ToolActivityStrategy();
     }
     
     /**
@@ -117,6 +122,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
     	 
 		newToolActivity.setTool(originalActivity.getTool());
 		
+		
 		/* TODO Generate a new toolContentID for this new ToolActivity
 		*  For now setting it to the contentID of the old activity
 		*/
@@ -129,7 +135,11 @@ public class ToolActivity extends SimpleActivity implements Serializable
     	newToolActivity.setXcoord(originalActivity.getXcoord());
     	newToolActivity.setYcoord(originalActivity.getYcoord());
     	newToolActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	
+    	newToolActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
+    	newToolActivity.setApplyGrouping(originalActivity.getApplyGrouping());
     	newToolActivity.setGrouping(originalActivity.getGrouping());
+    	
     	newToolActivity.setGroupingUIID(originalActivity.getGroupingUIID());
     	newToolActivity.setOrderId(originalActivity.getOrderId());
     	newToolActivity.setDefineLater(originalActivity.getDefineLater());
@@ -137,9 +147,10 @@ public class ToolActivity extends SimpleActivity implements Serializable
     	newToolActivity.setCreateDateTime(new Date());
     	newToolActivity.setRunOffline(originalActivity.getRunOffline());
     	newToolActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	newToolActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
+    	newToolActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
     	newToolActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
     	newToolActivity.setLibraryActivity(originalActivity.getLibraryActivity());
-    	newToolActivity.setToolSessions(new HashSet());    	    	
     	return newToolActivity;
     }    
     
@@ -151,7 +162,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
      */
     public ToolSession createToolSessionForActivity(User learner,Lesson lesson)
     {
-        if(this.getTool().getSupportsGrouping())
+        if(this.getTool().getGroupingSupportType().intValue()!= 1)
             return new GroupedToolSession(this,
                                           new Date(System.currentTimeMillis()),
                                           ToolSession.STARTED_STATE,
@@ -231,5 +242,5 @@ public class ToolActivity extends SimpleActivity implements Serializable
     public boolean isNull()
     {
         return false;
-    }	
+    }    
 }

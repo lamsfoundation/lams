@@ -80,9 +80,15 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	 *  
 	 */
 	public Set getActivities() {
-	    if(this.activities==null)
+	    if(this.activities==null){
 	        setActivities(new TreeSet(new ActivityOrderComparator()));
-		return this.activities;
+	        return this.activities;
+	    }	    
+	    else{
+	    	TreeSet sortedActivities = new TreeSet(new ActivityOrderComparator());
+	    	sortedActivities.addAll(this.activities);
+	    	return sortedActivities;	    	
+	    }
 	}
 
 	public void setActivities(Set activities) {

@@ -103,6 +103,10 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
     	newParallelActivity.setYcoord(originalActivity.getYcoord());
     	newParallelActivity.setActivityTypeId(originalActivity.getActivityTypeId());
     	
+    	newParallelActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
+    	newParallelActivity.setApplyGrouping(originalActivity.getApplyGrouping());
+    	newParallelActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	
     	newParallelActivity.setGrouping(originalActivity.getGrouping());
     	newParallelActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newParallelActivity.setGroupingUIID(originalActivity.getGroupingUIID());

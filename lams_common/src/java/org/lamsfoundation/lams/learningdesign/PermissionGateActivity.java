@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.strategy.PermissionGateActivityStrategy;
 
 
 /**
@@ -54,11 +55,13 @@ public class PermissionGateActivity extends GateActivity implements Serializable
                 transitionTo,
 				transitionFrom,
                 gateActivityLevelId);
+        super.simpleActivityStrategy = new PermissionGateActivityStrategy();
     }
     
     /** default constructor */
     public PermissionGateActivity()
     {
+    	super.simpleActivityStrategy = new PermissionGateActivityStrategy();
     }
     
     /** minimal constructor */
@@ -85,6 +88,7 @@ public class PermissionGateActivity extends GateActivity implements Serializable
                 transitionTo,
 				transitionFrom,
                 gateActivityLevelId);
+        super.simpleActivityStrategy = new PermissionGateActivityStrategy();
     }
     /**
      * Makes a copy of the PermissionGateActivity for authoring, preview and monitoring enviornment 
@@ -105,6 +109,11 @@ public class PermissionGateActivity extends GateActivity implements Serializable
     	newPermissionGateActivity.setXcoord(originalActivity.getXcoord());
     	newPermissionGateActivity.setYcoord(originalActivity.getYcoord());
     	newPermissionGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	
+    	newPermissionGateActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
+    	newPermissionGateActivity.setApplyGrouping(originalActivity.getApplyGrouping());
+    	newPermissionGateActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	
     	newPermissionGateActivity.setGrouping(originalActivity.getGrouping());
     	newPermissionGateActivity.setGroupingUIID(originalActivity.getGroupingUIID());
     	newPermissionGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());    	
