@@ -35,6 +35,10 @@
 		</param-value>
 	</context-param>
 
+   <listener>
+      <listener-class>com.lamsinternational.lams.web.SessionListener</listener-class>
+   </listener>
+
 	<!--
 	  - Loads the root application context of this web app at startup,
 	  - by default from "/WEB-INF/applicationContext.xml".
