@@ -26,7 +26,7 @@ INSERT INTO lams_authentication_method_type VALUES(3, 'LDAP');
 
 INSERT INTO lams_organisation_type VALUES(1, 'ROOT ORGANISATION', 'root all other organisations: controlled by Sysadmin');
 INSERT INTO lams_organisation_type VALUES(2, 'BASE ORGANISATION', 'base organization: represents a real seperate organization sucha s a university ');
-INSERT INTO lams_organisation_type VALUES(3, 'SUB-ORGANIZATION', 'sub organization of a base organization');
+INSERT INTO lams_organisation_type VALUES(3, 'SUB-ORGANISATION', 'sub organization of a base organization');
 
 INSERT INTO lams_grouping_type VALUES (1, 'NORMAL');
 INSERT INTO lams_grouping_type VALUES (2, 'CLASS');
