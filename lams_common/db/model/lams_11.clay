@@ -3132,26 +3132,6 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="license_text" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
-<column-description/>
-<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
-<variant type-name-pattern="TEXT"/>
-</data-type>
-</column>
-<column name="license_url" alias="" remarks="" mandatory="false" column-size="256" decimal-digits="0" default-value="" auto-increment="false">
-<column-description/>
-<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
-<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
-<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
-</data-type>
-</column>
-<column name="pciture_url" alias="" remarks="" mandatory="false" column-size="256" decimal-digits="0" default-value="" auto-increment="false">
-<column-description/>
-<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
-<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
-<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
-</data-type>
-</column>
 <column name="name" alias="" remarks="" mandatory="true" column-size="200" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
@@ -3166,7 +3146,14 @@
 <variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
 </data-type>
 </column>
-<column name="defualt_license" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="0" auto-increment="false">
+<column name="url" alias="" remarks="" mandatory="false" column-size="256" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="default_flag" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="0" auto-increment="false">
 <column-description/>
 <data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
 <variant type-name-pattern="TINYINT"/>
@@ -3177,6 +3164,13 @@
 <variant type-name-pattern="TINYINT UNSIGNED"/>
 <variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
 <variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="picture_url" alias="" remarks="" mandatory="false" column-size="256" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
 </data-type>
 </column>
 </column-list>

@@ -80,12 +80,11 @@ CREATE TABLE lams_tool_session_type (
 
 CREATE TABLE lams_license (
        license_id BIGINT(20) NOT NULL
-     , license_text TEXT NOT NULL
-     , license_url VARCHAR(256)
-     , pciture_url VARCHAR(256)
      , name VARCHAR(200) NOT NULL
      , code VARCHAR(20) NOT NULL
-     , defualt_license TINYINT(1) NOT NULL DEFAULT 0
+     , url VARCHAR(256)
+     , default_flag TINYINT(1) NOT NULL DEFAULT 0
+     , picture_url VARCHAR(256)
      , PRIMARY KEY (license_id)
 )TYPE=InnoDB;
 
