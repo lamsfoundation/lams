@@ -7,6 +7,7 @@
 <%@ page import="com.lamsinternational.lams.usermanagement.*" %>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c_rt" %>
+<%@ page session="true" %>
 
 <html>
 
