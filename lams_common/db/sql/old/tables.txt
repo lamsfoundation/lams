@@ -1,0 +1,43 @@
+# MySQLCC - [ROOT LOCAL] Query Window
+# Connection: ROOT LOCAL
+# Host: localhost
+# Saved: 2004-11-24 14:12:25
+# 
+# Query:
+# show tables
+# 
+'Tables_in_scratch'
+'lams_authentication_method'
+'lams_authentication_method_parameter'
+'lams_authentication_method_type'
+'lams_gate_activity_level'
+'lams_grouping_type'
+'lams_learner_progress'
+'lams_learning_activity'
+'lams_learning_activity_type'
+'lams_learning_design'
+'lams_learning_gate_activity'
+'lams_learning_group'
+'lams_learning_grouping'
+'lams_learning_grouping_activity'
+'lams_learning_library'
+'lams_learning_options_activity'
+'lams_learning_tool_activity'
+'lams_learning_transition'
+'lams_lesson'
+'lams_organisation'
+'lams_organisation_type'
+'lams_progress_completed'
+'lams_progress_current'
+'lams_role'
+'lams_tool'
+'lams_tool_content'
+'lams_tool_session'
+'lams_tool_session_state'
+'lams_user'
+'lams_user_organisation'
+'lams_user_organisation_role'
+'lams_user_tool_session'
+'lams_user_tool_session_state'
+'lams_workspace'
+'lams_workspace_folder'
