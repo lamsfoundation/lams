@@ -1,3 +1,24 @@
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
 package org.lamsfoundation.lams.lesson;
 
 import org.lamsfoundation.lams.usermanagement.User;
@@ -5,6 +26,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -14,20 +36,31 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * Holds data that describes the Users progress through a lesson.       
+ * <p>Holds data that describes the Users progress through a lesson. It records
+ * the exact position that a learner is in regarding a lesson.</p>
+ * 
+ * <p>It also helps lams to rebuild the learner page and progress bar whenever
+ * an unexpected error condition is identified.</p>
+ * 
+ * @author Chris
+ * @author Jacky Fang       
+ * @version 1.1
  *
  */
 public class LearnerProgress implements Serializable
 {
+    //---------------------------------------------------------------------
+    // Class level constants
+    //---------------------------------------------------------------------
     /** Indicates activity has been completed */
     public static final byte ACTIVITY_COMPLETED = 1;
-
     /** Indicates activity has been attempted but not completed */
     public static final byte ACTIVITY_ATTEMPTED = 2;
-
     /** Indicates activity has not been attempted yet */
     public static final byte ACTIVITY_NOT_ATTEMPTED = 3;
-    
+    //---------------------------------------------------------------------
+    // attributes
+    //---------------------------------------------------------------------
     /** Identifier field */
     private Long learnerProgressId;
     
@@ -40,7 +73,10 @@ public class LearnerProgress implements Serializable
     /** Set of attempted activities */
     private Set attemptedActivities;
     
-    /** Set of completed activities */
+    /**
+     *  Set of completed activities that includes all completed activities
+     *  before current activity.
+     */
     private Set completedActivities;
     
     /**
@@ -79,12 +115,25 @@ public class LearnerProgress implements Serializable
      */
     private boolean parallelWaiting;
     
+    /**
+     * A list of completed activities ids before move on to next activity
+     * following transition. This is created to help flash calculation
+     * what has *just* been done.
+     */
+    private List currentCompletedActivitiesList;
     
+    //---------------------------------------------------------------------
+    // Constructors
+    //---------------------------------------------------------------------
     /** default constructor */
     public LearnerProgress()
     {
     }
-    
+    /**
+     * Chain constructor to create new learner progress with minimum data.
+     * @param user the learner.
+     * @param lesson the lesson that currently is running.
+     */
     public LearnerProgress(User user,Lesson lesson)
     {
         this(null,user,lesson,new TreeSet( new ActivityOrderComparator()),new TreeSet( new ActivityOrderComparator()));
@@ -328,5 +377,19 @@ public class LearnerProgress implements Serializable
     public void setParallelWaiting(boolean parallelWaiting)
     {
         this.parallelWaiting = parallelWaiting;
+    }
+    /**
+     * @return Returns the currentCompletedActivitiesList.
+     */
+    public List getCurrentCompletedActivitiesList()
+    {
+        return currentCompletedActivitiesList;
+    }
+    /**
+     * @param currentCompletedActivitiesList The currentCompletedActivitiesList to set.
+     */
+    public void setCurrentCompletedActivitiesList(List currentCompletedActivitiesList)
+    {
+        this.currentCompletedActivitiesList = currentCompletedActivitiesList;
     }
 }
