@@ -32,6 +32,9 @@ public abstract class Grouping implements Serializable
     /** nullable persistent field */
     private Integer maxNumberOfGroups;
     
+    /** nullable persistent field */
+    private Integer groupingUIID;
+    
    
     /** persistent field */
     private Set groups;
@@ -198,4 +201,10 @@ public abstract class Grouping implements Serializable
      */
     public abstract boolean isLearnerGroup(Group group);
 
+	public Integer getGroupingUIID() {
+		return groupingUIID;
+	}
+	public void setGroupingUIID(Integer groupingUIID) {
+		this.groupingUIID = groupingUIID;
+	}
 }
