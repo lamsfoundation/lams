@@ -37,7 +37,7 @@ public class ProgressEngine
      * the learner to the next step.
      * @throws ProgressException if progress cannot be calculated successfully.
      */
-    public Progress calculateProgress(User learner, Lesson lesson, Activity completedActivity) throws ProgressException
+    public LearnerProgress calculateProgress(User learner, Lesson lesson, Activity completedActivity) throws ProgressException
     {
         //mark activity as complete for user
         
@@ -75,7 +75,7 @@ public class ProgressEngine
      * @return Progress - the VO that contains the data needed to send
      * @throws ProgressException if the start point cannot be calculated successfully.
      */
-    public Progress getStartPoint(User learner, Lesson lesson) throws ProgressException
+    public LearnerProgress getStartPoint(User learner, Lesson lesson) throws ProgressException
     {
         
         //get lD from lesson
