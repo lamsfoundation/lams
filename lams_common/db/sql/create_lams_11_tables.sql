@@ -1,7 +1,3 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2004-12-14 16:57:02
-# 
 CREATE TABLE lams_gate_activity_level (
        gate_activity_level_id INT(11) NOT NULL DEFAULT 0
      , description VARCHAR(128) NOT NULL
@@ -118,6 +114,35 @@ CREATE TABLE lams_workspace (
                   REFERENCES lams_workspace_folder (workspace_folder_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
+CREATE TABLE lams_learning_design (
+       learning_design_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+     , id INT(11)
+     , description TEXT
+     , title VARCHAR(255)
+     , first_activity_id BIGINT(20)
+     , max_id INT(11)
+     , valid_design_flag TINYINT(4) NOT NULL
+     , read_only_flag TINYINT(4) NOT NULL
+     , date_read_only DATETIME
+     , read_access BIGINT(20)
+     , write_access BIGINT(20)
+     , user_id BIGINT(20) NOT NULL
+     , help_text TEXT
+     , lesson_copy_flag TINYINT(4) NOT NULL DEFAULT 0
+     , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , version VARCHAR(56) NOT NULL
+     , parent_learning_design_id BIGINT(20)
+     , open_date_time DATETIME
+     , close_date_time DATETIME
+     , PRIMARY KEY (learning_design_id)
+     , INDEX (parent_learning_design_id)
+     , CONSTRAINT FK_lams_learning_design_2 FOREIGN KEY (parent_learning_design_id)
+                  REFERENCES lams_learning_design (learning_design_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (user_id)
+     , CONSTRAINT FK_lams_learning_design_3 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id)
+)TYPE=InnoDB;
+CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
 
 CREATE TABLE lams_grouping (
        grouping_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
@@ -125,6 +150,7 @@ CREATE TABLE lams_grouping (
      , number_of_groups INT(11)
      , learners_per_group INT(11)
      , staff_group_id BIGINT(20) DEFAULT 0
+     , max_number_of_groups INT(3)
      , PRIMARY KEY (grouping_id)
      , INDEX (grouping_type_id)
      , CONSTRAINT FK_lams_learning_grouping_1 FOREIGN KEY (grouping_type_id)
@@ -199,37 +225,6 @@ CREATE TABLE lams_user (
 CREATE UNIQUE INDEX UQ_lams_user_login ON lams_user (login ASC);
 CREATE INDEX login ON lams_user (login ASC);
 
-CREATE TABLE lams_learning_design (
-       learning_design_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
-     , id INT(11)
-     , description TEXT
-     , title VARCHAR(255)
-     , first_activity_id BIGINT(20)
-     , max_id INT(11)
-     , valid_design_flag TINYINT(4) NOT NULL
-     , read_only_flag TINYINT(4) NOT NULL
-     , date_read_only DATETIME
-     , read_access BIGINT(20)
-     , write_access BIGINT(20)
-     , user_id BIGINT(20) NOT NULL
-     , help_text TEXT
-     , lesson_copy_flag TINYINT(4) NOT NULL DEFAULT 0
-     , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
-     , version VARCHAR(56) NOT NULL
-     , parent_learning_design_id BIGINT(20)
-     , open_date_time DATETIME
-     , close_date_time DATETIME
-     , PRIMARY KEY (learning_design_id)
-     , INDEX (parent_learning_design_id)
-     , CONSTRAINT FK_lams_learning_design_2 FOREIGN KEY (parent_learning_design_id)
-                  REFERENCES lams_learning_design (learning_design_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (user_id)
-     , CONSTRAINT FK_lams_learning_design_3 FOREIGN KEY (user_id)
-                  REFERENCES lams_user (user_id)
-)TYPE=InnoDB;
-CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
-
-
 CREATE TABLE lams_learning_activity (
        activity_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
      , id INT(11)
@@ -253,6 +248,7 @@ CREATE TABLE lams_learning_activity (
      , gate_activity_level_id INT(11) DEFAULT 0
      , gate_start_date_time DATETIME
      , gate_end_date_time DATETIME
+     , library_activity_ui_image VARCHAR(255)
      , PRIMARY KEY (activity_id)
      , INDEX (learning_library_id)
      , CONSTRAINT FK_lams_learning_activity_7 FOREIGN KEY (learning_library_id)
