@@ -29,7 +29,8 @@ public class LessonClass extends Grouping {
 	/** full constructor */
 	public LessonClass(Long groupingId, Set groups,
 			Set activities, Group staffGroup, Lesson lesson) {
-		super(groupingId, groups, activities);
+	    //don't think lesson class need perform doGrouping. set grouper to null.
+		super(groupingId, groups, activities,null);
 		this.staffGroup = staffGroup;
 		this.lesson = lesson;
 	}

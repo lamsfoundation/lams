@@ -17,12 +17,13 @@ public class ChosenGrouping extends Grouping
     /** Creates a new instance of ChosenGrouping */
     public ChosenGrouping()
     {
+        super.grouper = new ChosenGrouper();
     }
     
     /** full constructor */
     public ChosenGrouping(Long groupingId, Set groups, Set activities)
     {
-        super(groupingId, groups, activities);
+        super(groupingId, groups, activities,new ChosenGrouper());
     }
     
     /**

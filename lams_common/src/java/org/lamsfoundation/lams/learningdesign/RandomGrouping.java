@@ -8,8 +8,16 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.util.Set;
 /**
- * Grouping formed by random assignment
+ * <p>Grouping formed by random assignment. The random grouping can done in two 
+ * ways:</p>
+ * <li>1. Randomly group learners by the number of groups set by author. </li>
+ * <li>2. Randomly group learners by the number of learners in a group.</li>
+ * 
+ * <p><b>Note:</b> Only one way can be chosen by the author to carry out the
+ * random grouping.</p>
+ * 
  * @author chris
+ * @author Jacky Fang
  */
 public class RandomGrouping extends Grouping
 {
@@ -51,12 +59,13 @@ public class RandomGrouping extends Grouping
     /** Creates a new instance of RandomGrouping */
     public RandomGrouping()
     {
+        super.grouper = new RandomGrouper();
     }
     
     /** full constructor */
     public RandomGrouping(Long groupingId, Set groups, Set activities, Integer numberOfGroups, Integer learnersPerGroup)
     {
-        super(groupingId, groups, activities);
+        super(groupingId, groups, activities,new RandomGrouper());
         this.learnersPerGroup = learnersPerGroup;
         this.numberOfGroups = numberOfGroups;
     }

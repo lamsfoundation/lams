@@ -1,20 +1,24 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.usermanagement.User;
 
-
 /**
- *        @hibernate.class
- *         table="lams_grouping"
- *
+ * 
+ * @hibernate.class table="lams_grouping"
+ * 
+ * @author Jacky Fang
  */
 public abstract class Grouping implements Serializable
 {
@@ -31,7 +35,11 @@ public abstract class Grouping implements Serializable
     /** identifier field */
     private Long groupingId;
     
-    /** nullable persistent field */
+    /** nullable persistent field 
+     *  TODO It make sense only if we want to setup some limits for the number 
+     * 		 of groups the author can setup in the authoring GUI. It might need 
+     * 		 to be deleted if the end user doesn't like this limits.
+     */
     private Integer maxNumberOfGroups;
     
     /** nullable persistent field */
@@ -47,6 +55,7 @@ public abstract class Grouping implements Serializable
     /** non-persistent field */
     protected Set learners;
 
+    protected Grouper grouper;
     /**
      * static final variables indicating the grouping_support of activities
      *******************************************************************/
@@ -58,11 +67,12 @@ public abstract class Grouping implements Serializable
     /******************************************************************/
     
     /** full constructor */
-    public Grouping(Long groupingId, Set groups, Set activities)
+    public Grouping(Long groupingId, Set groups, Set activities,Grouper grouper)
     {
         this.groupingId = groupingId;
         this.groups = groups;
         this.activities = activities;
+        this.grouper = grouper;
     }
     
     /** default constructor */
@@ -112,6 +122,8 @@ public abstract class Grouping implements Serializable
      */
     public Set getGroups()
     {
+        if(this.groups==null)
+            setGroups(new TreeSet());
         return this.groups;
     }
     
@@ -126,6 +138,8 @@ public abstract class Grouping implements Serializable
      */
     public Set getActivities()
     {
+        if(this.activities==null)
+            setActivities(new TreeSet(new ActivityOrderComparator()));
         return this.activities;
     }
     
@@ -164,6 +178,7 @@ public abstract class Grouping implements Serializable
     {
         return maxNumberOfGroups;
     }
+    
     /**
      * @param maxNumberOfGroups The maxNumberOfGroups to set.
      */
@@ -171,7 +186,15 @@ public abstract class Grouping implements Serializable
     {
         this.maxNumberOfGroups = maxNumberOfGroups;
     }
-    
+	public Integer getGroupingUIID() {
+		return groupingUIID;
+	}
+	public void setGroupingUIID(Integer groupingUIID) {
+		this.groupingUIID = groupingUIID;
+	}
+    //---------------------------------------------------------------------
+    // Service methods
+    //---------------------------------------------------------------------
     /**
      * Return the next group order id.
      * @return the next order id.
@@ -193,10 +216,6 @@ public abstract class Grouping implements Serializable
      */
     public Set getLearners()
     {
-        //verify pre-condition
-        if(getGroups()==null)
-            throw new IllegalArgumentException("Fail to get learnings from" +
-            		"a grouping without groups");
         
         learners = new HashSet();
         for(Iterator i = getGroups().iterator();i.hasNext();)
@@ -225,16 +244,47 @@ public abstract class Grouping implements Serializable
     }
     
     /**
+     * Iterate through all the groups in this grouping and figure out the group
+     * with the least members in it. 
+     * @return the group with the least member.
+     */
+    public Group getGroupWithLeastMember()
+    {
+        List groups = new ArrayList(this.getGroups());
+        
+		Group minGroup = (Group) groups.get(0);
+		
+		for (int i = 1; i < groups.size(); i++) 
+		{
+			Group tempGroup = (Group) groups.get(i);
+			if (tempGroup.getUsers().size() < minGroup.getUsers().size()) 
+				minGroup = tempGroup;
+		}
+		return minGroup;
+    }
+    
+    /**
      * Is this group a learner group. It is also possible that the group is a
      * staff group.
      * @return	whether the group is learner group or not.
      */
     public abstract boolean isLearnerGroup(Group group);
-
-	public Integer getGroupingUIID() {
-		return groupingUIID;
+	
+    /**
+     * Create or update groups for this grouping with a list of new learners.
+     * @param learners the list of learners need to be grouped.
+     */
+	public void doGrouping(List learners)
+	{
+	    this.grouper.doGrouping(this,learners);
 	}
-	public void setGroupingUIID(Integer groupingUIID) {
-		this.groupingUIID = groupingUIID;
+	
+	/**
+	 * Create or updates groups for this grouping with a single new learner.
+	 * @param learner the new learner needs to be grouped.
+	 */
+	public void doGrouping(User learner)
+	{
+	    this.grouper.doGrouping(this,learner);
 	}
 }

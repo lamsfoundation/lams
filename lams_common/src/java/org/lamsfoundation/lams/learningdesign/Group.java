@@ -16,7 +16,7 @@ import org.lamsfoundation.lams.util.Nullable;
  *         table="lams_group"
  *     
 */
-public class Group implements Serializable,Nullable {
+public class Group implements Serializable,Nullable,Comparable {
 
     public final static int STAFF_GROUP_ORDER_ID = 1;
     
@@ -194,7 +194,21 @@ public class Group implements Serializable,Nullable {
             .append(getOrderId())
             .toHashCode();
     }
+    
+    /**
+     * Sort the groups using order id.
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(Object o)
+    {
+        Group group = (Group)o;
+        
+        return this.orderId - group.orderId;
+    }
 
+    //---------------------------------------------------------------------
+    // Field Access Methods
+    //---------------------------------------------------------------------
     /**
      * Return whether the target user is in this group or not.
      * @param learner the target user
