@@ -104,6 +104,31 @@ http://www.gnu.org/licenses/gpl.txt
       />
     </action>
     <action
+      path="/grouping"
+      type="org.lamsfoundation.lams.learning.web.action.GroupingAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <exception
+        key="error.system.learner"
+        type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
+        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        path=".systemError"
+        scope="request"
+      />
+      <forward
+        name="viewGrouping"
+        path="/grouping.do?method=viewGrouping"
+        redirect="false"
+      />
+      <forward
+        name="showGroup"
+        path=".grouping"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/LoadToolActivity"
       type="org.lamsfoundation.lams.learning.web.action.LoadToolActivityAction"
       name="activityForm"
@@ -114,26 +139,6 @@ http://www.gnu.org/licenses/gpl.txt
       <forward
         name="displayTool"
         path=".loadToolActivity"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/test/DummyTool"
-      type="org.lamsfoundation.lams.learning.web.action.DummyToolAction"
-      name="dummyToolForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="display"
-        path="/test/dummyTool.jsp"
-        redirect="false"
-      />
-      <forward
-        name="next"
-        path=".requestDisplay"
         redirect="false"
       />
     </action>
@@ -159,6 +164,26 @@ http://www.gnu.org/licenses/gpl.txt
       <forward
         name="welcome"
         path=".welcome"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/test/DummyTool"
+      type="org.lamsfoundation.lams.learning.web.action.DummyToolAction"
+      name="dummyToolForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="display"
+        path="/test/dummyTool.jsp"
+        redirect="false"
+      />
+      <forward
+        name="next"
+        path=".requestDisplay"
         redirect="false"
       />
     </action>

@@ -48,26 +48,23 @@ public class ActivityMappingStrategy implements Serializable {
 	protected String getActivityAction(Activity activity, LearnerProgress progress) {
 		String strutsAction = null;
 		
-		if (activity instanceof ComplexActivity) {
-		    if (activity instanceof ParallelActivity) {
+		if (activity instanceof ComplexActivity) 
+		{
+		    if (activity instanceof ParallelActivity) 
 		        strutsAction = "/DisplayParallelActivity.do";
-		    }
-		    else if (activity instanceof OptionsActivity) {
+		    else if (activity instanceof OptionsActivity) 
 		        strutsAction = "/DisplayOptionsActivity.do";
-		    }
 		}
-		else if (activity instanceof SimpleActivity) {
-			if (activity instanceof GroupingActivity) {
-				// this probably means a wait URL
-			}
+		else if (activity instanceof SimpleActivity) 
+		{
+			if (activity instanceof GroupingActivity) 
+			    strutsAction = "/grouping.do?";
 			if (activity instanceof GateActivity) {
 				// not completed so return wait URL
 			}
-			if (activity instanceof ToolActivity) {
-				// get tool URL
+			if (activity instanceof ToolActivity) 
 			    strutsAction = "/LoadToolActivity.do";
 				//strutsAction = "/DisplayToolActivity.do";
-			}
 		}
 		return strutsAction;
 	}

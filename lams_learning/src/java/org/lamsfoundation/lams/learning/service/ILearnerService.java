@@ -21,7 +21,10 @@ http://www.gnu.org/licenses/gpl.txt
 
 package org.lamsfoundation.lams.learning.service;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
@@ -115,7 +118,32 @@ public interface ILearnerService
      */
     public void exitLesson(LearnerProgress progress);
     
-    
+    /**
+     * Returns an activity according to the activity id.
+     * @param activityId the activity id.
+     * @return the activity requested.
+     */
     public Activity getActivity(Long activityId);
     
+    /**
+     * Returns all the active learners by the lesson id.
+     * @param lessonId the requested lesson id.
+     * @return the list of learners.
+     */
+    public List getActiveLearnersByLesson(long lessonId);
+    
+    /**
+     * Perform random grouping for a list of learners based on the grouping
+     * activity.
+     * @param groupingActivity the activity that has create grouping.
+     * @param learners the list of learners need to be grouped.
+     */
+    public void performGrouping(GroupingActivity groupingActivity, List learners);
+    
+    /**
+     * Perform random grouping a single learner based on the grouping activity.
+     * @param groupingActivity the activity that has create grouping.
+     * @param learner the learner needs to be grouped
+     */
+    public void performGrouping(GroupingActivity groupingActivity, User learner);
 }

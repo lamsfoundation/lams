@@ -24,6 +24,8 @@ import org.lamsfoundation.lams.AbstractLamsTestCase;
 
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -78,7 +80,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     private static final long TEST_SEQUENCE_ACTIVITY_ID = 36;
     private static final long TEST_SR_ACTIVITY_ID = 37;
     private static final long TEST_SQNA_ACTIVITY_ID = 38;
-    private static final String HOST="http://localhost:8080/lams_learning/";
+    private static final String HOST="http://localhost:8080/lams_learning";
     private static final String LOAD_TOOL_URL="/LoadToolActivity.do";
     private static final String PARAM_ACTIVITY_ID="?activityId=";
     /*
@@ -153,7 +155,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         assertNotNull("verify the existance of tool session",toolSession);
         assertEquals("verify tool session state",ToolSession.ENDED_STATE,toolSession.getToolSessionStateId());
         
-        assertEquals("verify the returned url",HOST+LOAD_TOOL_URL+PARAM_ACTIVITY_ID+TEST_NB_ACTIVITY_ID+"progressId=1",urlForNextActivity);
+        assertEquals("verify the returned url",HOST+LOAD_TOOL_URL+PARAM_ACTIVITY_ID+TEST_NB_ACTIVITY_ID+"&progressId=1",urlForNextActivity);
         
     }
     
@@ -262,6 +264,19 @@ public class TestLearnerService extends AbstractLamsTestCase
 
         assertTrue("verify it should be restarting",progress.isRestarting());
         
+    }
+    
+    public void testPerformGrouping()
+    {
+        Activity randomGroupingActivity = learnerService.getActivity(new Long(TEST_RGRP_ACTIVITY_ID));
+        
+        Grouping randomGrouping = ((GroupingActivity)randomGroupingActivity).getCreateGrouping();
+        
+        assertTrue("verify the existance of test user",!randomGrouping.doesLearnerExist(testUser));
+        
+        learnerService.performGrouping((GroupingActivity)randomGroupingActivity,testUser);
+    
+        assertTrue("verify the existance of test user",randomGrouping.doesLearnerExist(testUser));
     }
     /**
      * @param numberOfAttemptedAct 

@@ -20,6 +20,7 @@
 		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="activityMapping"><ref bean="activityMapping"/></property>
 	</bean>
 	

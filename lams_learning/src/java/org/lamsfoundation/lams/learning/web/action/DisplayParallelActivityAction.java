@@ -28,6 +28,7 @@ import java.util.*;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
@@ -40,7 +41,7 @@ import org.lamsfoundation.lams.learning.web.util.ParallelActivityMappingStrategy
  * Action class to display a ParallelActivity.
  * 
  * XDoclet definition:
- * 
+ * @author daveg
  * @struts:action path="/DisplayParallelActivity" name="activityForm"
  *                validate="false" scope="request"
  * 
@@ -60,7 +61,9 @@ public class DisplayParallelActivityAction extends ActivityAction {
 	                             HttpServletResponse response) 
 	{
 		ActivityForm form = (ActivityForm)actionForm;
-		ActivityMapping actionMappings = getActivityMapping();
+		
+		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+		
 		actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request);
@@ -75,9 +78,9 @@ public class DisplayParallelActivityAction extends ActivityAction {
 		form.setActivityId(activity.getActivityId());
 
 		List activityURLs = new ArrayList();
-		Set subActivities = parallelActivity.getActivities();
-		Iterator i = subActivities.iterator();
-		while (i.hasNext()) {
+
+		for(Iterator i = parallelActivity.getActivities().iterator();i.hasNext();)
+		{
 			Activity subActivity = (Activity)i.next();
 			ActivityURL activityURL = new ActivityURL(); 
 			String url = actionMappings.getActivityURL(subActivity, learnerProgress);

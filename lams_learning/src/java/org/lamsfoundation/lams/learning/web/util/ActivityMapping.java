@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -231,8 +230,10 @@ public class ActivityMapping implements Serializable
             }
         }
 
-        return activityURL+"&"+LearningWebUtil.PARAM_PROGRESS_ID+"="
-        	   +progress.getLearnerProgressId();
+        return WebUtil.appendParameterToURL(activityURL,
+                                            LearningWebUtil.PARAM_PROGRESS_ID,
+                                            progress.getLearnerProgressId().toString());
+
     }
 
     /**
@@ -244,23 +245,15 @@ public class ActivityMapping implements Serializable
      */
     public String getLearnerToolURL(ToolActivity activity, User learner)
     {
-
-        ToolSession toolSession;
         try
         {
-            // Get tool session using learner and activity
-            toolSession = toolService.getToolSessionByLearner(learner, activity);
+            return toolService.getLearnerToolURLByMode(activity,learner,ToolAccessMode.LEARNER);
         }
         catch (LamsToolServiceException e)
         {
             //TODO define an exception at web layer
             throw new LearnerServiceException(e.getMessage());
         }
-        // Append toolSessionId to tool URL		
-        return activity.getTool().getLearnerUrl() + "&"
-                + WebUtil.PARAM_TOOL_SESSION_ID + "="
-                + toolSession.getToolSessionId().toString() + "&"
-                + WebUtil.PARAM_MODE + "=" + ToolAccessMode.LEARNER;
     }
 
     /**
@@ -340,7 +333,7 @@ public class ActivityMapping implements Serializable
         }
         else if (activity instanceof GroupingActivity)
             //TODO need to be changed when group action servlet is done
-            return "/viewGrouping.do?";
+            return getActivityURL(activity, null);
 
         throw new LearnerServiceException("Fails to get the progress url view"
                 + " for activity[" + activity.getActivityId().longValue() + "]");

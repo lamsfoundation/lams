@@ -22,9 +22,10 @@
 
 package org.lamsfoundation.lams.learning.web.action;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
-import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 
 /**
@@ -36,12 +37,17 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
  */
 public class TestLearnerAction extends AbstractLamsStrutsTestCase
 {
-   
+    //---------------------------------------------------------------------
+    // Instance variables
+    //---------------------------------------------------------------------
+	private static Logger log = Logger.getLogger(TestLearnerAction.class);
+	
     private static final String TEST_USER_ID = "2";
     private static final String TEST_LESSON_ID = "2";
     private static final String TEST_ACTIVITY_ID = "26";
     
-    private static SessionBean joinedLessonBean = null;
+    //private static SessionBean joinedLessonBean = null;
+    private static LearnerProgress testLearnerProgress = null;
 
     /*
      * @see TestCase#setUp()
@@ -102,16 +108,19 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
         
         verifyNoActionErrors();
         
-        joinedLessonBean = (SessionBean)httpSession.getAttribute(SessionBean.NAME);
-        assertNotNull("verify the session bean",joinedLessonBean);
-        assertEquals("verify the learner in the session bean",TEST_USER_ID,joinedLessonBean.getLearner().getUserId().toString());
-        assertEquals("verify the lesson in the session bean",TEST_LESSON_ID,joinedLessonBean.getLesson().getLessonId().toString());
-        assertNotNull("verify the learner progress",joinedLessonBean.getLearnerProgress());
+        //joinedLessonBean = (SessionBean)httpSession.getAttribute(SessionBean.NAME);
+        testLearnerProgress = (LearnerProgress)httpSession.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+
+        //assertNotNull("verify the session bean",testLearnerProgress);
+        assertNotNull("verify the learner progress",testLearnerProgress);
+        assertEquals("verify the learner in the session bean",TEST_USER_ID,testLearnerProgress.getUser().getUserId().toString());
+        assertEquals("verify the lesson in the session bean",TEST_LESSON_ID,testLearnerProgress.getLesson().getLessonId().toString());
+
     }
 
     public void testGetFlashProgressData()
     {
-        httpSession.setAttribute(SessionBean.NAME,joinedLessonBean);
+        httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,testLearnerProgress);
         addRequestParameter("method", "getFlashProgressData");
         addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);

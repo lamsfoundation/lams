@@ -1,23 +1,24 @@
-/*
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
-*/
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
 
 
 package org.lamsfoundation.lams.learning.service;
@@ -33,8 +34,11 @@ import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 
 import org.lamsfoundation.lams.lesson.Lesson;
 
@@ -63,6 +67,7 @@ public class LearnerService implements ILearnerService
     private ILearnerProgressDAO learnerProgressDAO;
     private ILessonDAO lessonDAO;
     private IActivityDAO activityDAO;
+    private IGroupingDAO groupingDAO;
     private ProgressEngine progressEngine;
     private IToolSessionDAO toolSessionDAO;
     private ILamsCoreToolService lamsCoreToolService;
@@ -122,6 +127,14 @@ public class LearnerService implements ILearnerService
     {
         this.activityDAO = activityDAO;
     }
+    
+    /**
+     * @param groupingDAO The groupingDAO to set.
+     */
+    public void setGroupingDAO(IGroupingDAO groupingDAO)
+    {
+        this.groupingDAO = groupingDAO;
+    }    
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
@@ -154,6 +167,7 @@ public class LearnerService implements ILearnerService
      * we assume tool session will always initialize before it becomes a 
      * current activity.</p
      * 
+     * 
      * @param learner the Learner
      * @param lessionID identifies the Lesson to start
      * @throws LamsToolServiceException
@@ -179,6 +193,14 @@ public class LearnerService implements ILearnerService
             }
             
             learnerProgressDAO.saveLearnerProgress(learnerProgress);
+        }
+        //The restarting flag should be setup when the learner hit the exit
+        //button. But it is possible that user exit by closing the browser,
+        //In this case, we set the restarting flag again.
+        else if(!learnerProgress.isRestarting())
+        {
+            learnerProgress.setRestarting(true);
+            learnerProgressDAO.updateLearnerProgress(learnerProgress);
         }
         
         createToolSessionsIfNecessary(learnerProgress);
@@ -299,6 +321,30 @@ public class LearnerService implements ILearnerService
         return activityDAO.getActivityByActivityId(activityId);
     }
     
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(org.lamsfoundation.lams.learningdesign.GroupingActivity, java.util.List)
+     */
+    public void performGrouping(GroupingActivity groupingActivity, List learners)
+    {
+        Grouping grouping = groupingActivity.getCreateGrouping();
+        
+        grouping.doGrouping(learners);
+        
+        groupingDAO.update(grouping);
+       
+    }
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#performGrouping(org.lamsfoundation.lams.learningdesign.GroupingActivity, org.lamsfoundation.lams.usermanagement.User)
+     */
+    public void performGrouping(GroupingActivity groupingActivity, User learner)
+    {
+        Grouping grouping = groupingActivity.getCreateGrouping();
+        
+        grouping.doGrouping(learner);
+        
+        groupingDAO.update(grouping);
+        
+    }
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------
@@ -344,8 +390,8 @@ public class LearnerService implements ILearnerService
                                             ToolActivity toolActivity)
     {
         ToolSession targetSession = null;
-        //TODO need to be changed according to the change grouping concept
-        if(!toolActivity.getTool().getSupportsGrouping())
+
+        if(!toolActivity.getApplyGrouping().booleanValue())
             targetSession = toolSessionDAO.getToolSessionByLearner(learnerProgress.getUser(),
                                                                    toolActivity);
         else
@@ -393,6 +439,14 @@ public class LearnerService implements ILearnerService
             lessonDTOList.add(currentLesson.getLessonData());
         }
         return (LessonDTO[])lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);   
+    }
+    
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActiveLearnersByLesson(long)
+     */
+    public List getActiveLearnersByLesson(long lessonId)
+    {
+        return this.lessonDAO.getActiveLearnerByLesson(lessonId);
     }
 
 }

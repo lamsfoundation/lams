@@ -22,8 +22,8 @@
 
 package org.lamsfoundation.lams.learning.web.action;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
-import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -38,9 +38,16 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  */
 public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
 {
+    //---------------------------------------------------------------------
+    // Instance variables
+    //---------------------------------------------------------------------
+	private static Logger log = Logger.getLogger(TestDisplayActivityAction.class);
+
+    
     private static final String TEST_USER_ID = "2";
     private static final String TEST_LESSON_ID = "2";
-    private static SessionBean testBean = null;
+    //private static SessionBean testBean = null;
+    private static LearnerProgress learnerProgress = null;
     /**
      * Constructor for TestDisplayActivityAction.
      * @param arg0
@@ -56,9 +63,10 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
     private static String getContextConfigLocation()
     {
         return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
-  			   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
-  			   +"applicationContext.xml "
-  			   +"/WEB-INF/spring/learningApplicationContext.xml";
+		   	   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
+		   	   +"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml "
+		   	   +"applicationContext.xml "
+		   	   +"/WEB-INF/spring/learningApplicationContext.xml";
     }
     
     /*
@@ -91,8 +99,8 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
         addRequestParameter("lessonId", TEST_LESSON_ID);
         actionPerform();
         
-        testBean = (SessionBean)httpSession.getAttribute(SessionBean.NAME);
-
+        //testBean = (SessionBean)httpSession.getAttribute(SessionBean.NAME);
+        learnerProgress = (LearnerProgress)httpSession.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
         //test page loading.
         setRequestPathInfo("/DisplayActivity.do");
         actionPerform();
@@ -102,30 +110,31 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
     public void testDisplayToolActivityFollowingParallelActivity()
     {
         //setup the session bean to display option page.
-        LearnerProgress progress = testBean.getLearnerProgress();
+        //LearnerProgress progress = testBean.getLearnerProgress();
         ParallelActivity parallelActivity= new ParallelActivity();
-        progress.setPreviousActivity(parallelActivity);
-        testBean.setLearnerProgress(progress);
-        httpSession.setAttribute(SessionBean.NAME,testBean);
+        learnerProgress.setPreviousActivity(parallelActivity);
+        //testBean.setLearnerProgress(progress);
+        httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
         
         setRequestPathInfo("/DisplayActivity.do");
         actionPerform();
-        verifyForwardPath("/requestDisplay.do?url=http://localhost:8080/lams_learning//LoadToolActivity.do?activityId=26");
+        verifyForwardPath("/requestDisplay.do?url=http://localhost:8080/lams_learning/LoadToolActivity.do?activityId=26");
         
         //restore the progress
-        progress = testBean.getLearnerProgress();
-        progress.setPreviousActivity(null);
-        testBean.setLearnerProgress(progress);
+        //progress = testBean.getLearnerProgress();
+        learnerProgress.setPreviousActivity(null);
+        //testBean.setLearnerProgress(progress);
     }
     
     public void testDisplayOptionsActivity()
     {
         //setup the session bean to display option page.
-        LearnerProgress progress = testBean.getLearnerProgress();
+        //LearnerProgress progress = testBean.getLearnerProgress();
         OptionsActivity optionActivity= new OptionsActivity();
-        progress.setNextActivity(optionActivity);
-        testBean.setLearnerProgress(progress);
-        httpSession.setAttribute(SessionBean.NAME,testBean);
+        learnerProgress.setNextActivity(optionActivity);
+        //testBean.setLearnerProgress(progress);
+        //httpSession.setAttribute(SessionBean.NAME,testBean);
+        httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
         
         setRequestPathInfo("/DisplayActivity.do");
         actionPerform();
@@ -135,11 +144,12 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
     public void testDisplayParallelActivity()
     {
         //setup the session bean to display option page.
-        LearnerProgress progress = testBean.getLearnerProgress();
+        //LearnerProgress progress = testBean.getLearnerProgress();
         ParallelActivity parallelActivity= new ParallelActivity();
-        progress.setNextActivity(parallelActivity);
-        testBean.setLearnerProgress(progress);
-        httpSession.setAttribute(SessionBean.NAME,testBean);
+        learnerProgress.setNextActivity(parallelActivity);
+        //testBean.setLearnerProgress(progress);
+        //httpSession.setAttribute(SessionBean.NAME,testBean);
+        httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
         
         setRequestPathInfo("/DisplayActivity.do");
         actionPerform();
@@ -151,10 +161,11 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
     public void testDisplayWaitingParallelActivity()
     {
         //setup the session bean to display parallel waiting.
-        LearnerProgress progress = testBean.getLearnerProgress();
-        progress.setParallelWaiting(true);
-        testBean.setLearnerProgress(progress);
-        httpSession.setAttribute(SessionBean.NAME,testBean);
+        //LearnerProgress progress = testBean.getLearnerProgress();
+        learnerProgress.setParallelWaiting(true);
+        //testBean.setLearnerProgress(progress);
+        //httpSession.setAttribute(SessionBean.NAME,testBean);
+        httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
         
         setRequestPathInfo("/DisplayActivity.do");
         actionPerform();
@@ -164,10 +175,11 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
     public void testDisplayCompletionPage()
     {
         //setup the session bean to display completion page.
-        LearnerProgress progress = testBean.getLearnerProgress();
-        progress.setLessonComplete(true);
-        testBean.setLearnerProgress(progress);
-        httpSession.setAttribute(SessionBean.NAME,testBean);
+        //LearnerProgress progress = testBean.getLearnerProgress();
+        learnerProgress.setLessonComplete(true);
+        //testBean.setLearnerProgress(progress);
+        //httpSession.setAttribute(SessionBean.NAME,testBean);
+        httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
         
         setRequestPathInfo("/DisplayActivity.do");
         actionPerform();

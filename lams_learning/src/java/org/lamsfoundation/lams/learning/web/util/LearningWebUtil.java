@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.action.ActivityAction;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -140,4 +141,73 @@ public class LearningWebUtil
         return bean;
     }
 
+	/** 
+	 * Get the current learner progress. The http session attributes are checked
+	 * first, if not in request then a new LearnerProgress is loaded by id using
+	 * the LearnerService. The LearnerProgress is also stored in the
+	 * session so that the Flash requests don't have to reload it.
+	 */
+	public static LearnerProgress getLearnerProgressByID(HttpServletRequest request,ServletContext servletContext) {
+		//TODO need to be retrieved from proper cache when caching done properly.
+	    LearnerProgress learnerProgress = (LearnerProgress)request.getSession().getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+		
+		if (learnerProgress == null) 
+		{
+            //initialize service object
+            ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
+		    
+		    long learnerProgressId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID);
+		    
+		    learnerProgress = learnerService.getProgressById(new Long(learnerProgressId));
+
+            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
+		}
+		return learnerProgress;
+	}
+	/** 
+	 * Get the current learner progress. The http session attributes are checked
+	 * first, if not in request then a new LearnerProgress is loaded by user
+	 * and lesson using the LearnerService. The LearnerProgress is also stored 
+	 * in the session so that the Flash requests don't have to reload it.
+	 */
+	public static LearnerProgress getLearnerProgressByUser(HttpServletRequest request,ServletContext servletContext) {
+		
+	    LearnerProgress learnerProgress = (LearnerProgress)request.getSession().getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+		
+		if (learnerProgress == null) 
+		{
+            //initialize service object
+            ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
+		    
+            User currentLearner = getUserData(request, servletContext);
+            Lesson lesson = getLessonData(request,servletContext);
+            
+            learnerProgress = learnerService.getProgress(currentLearner,lesson);
+
+            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
+		}
+		return learnerProgress;
+	}
+
+    /**
+     * Get the activity from request. We assume there is a parameter coming in
+     * if there is no activity can be found in the http request. Then the 
+     * activity id parameter is used to retrieve from database.
+     * @param request
+     * @return
+     */
+    public static Activity getActivityFromRequest(HttpServletRequest request,
+                                                  ILearnerService learnerService)
+    {
+        Activity activity = (Activity)request.getAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE);
+        
+        if(activity == null)
+        {
+            long activityId = WebUtil.readLongParam(request,PARAM_ACTIVITY_ID);
+            
+            activity = learnerService.getActivity(new Long(activityId));
+            
+        }
+        return activity;
+    }
 }

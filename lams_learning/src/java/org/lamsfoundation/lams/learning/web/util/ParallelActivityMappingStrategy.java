@@ -22,17 +22,8 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.learning.web.util;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
-import org.lamsfoundation.lams.learningdesign.GateActivity;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
-import org.lamsfoundation.lams.learningdesign.NullActivity;
-import org.lamsfoundation.lams.learningdesign.OptionsActivity;
-import org.lamsfoundation.lams.learningdesign.ParallelActivity;
-import org.lamsfoundation.lams.learningdesign.SimpleActivity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.LessonCompleteActivity;
-import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
+
 
 /**
  * @author daveg
@@ -46,14 +37,13 @@ public class ParallelActivityMappingStrategy extends ActivityMappingStrategy {
 	 * @param progress, LearnerProgress for the activity, used to check activity status
 	 * @return String representing a struts action
 	 */
-	protected String getActivityAction(Activity activity, LearnerProgress progress) {
+	protected String getActivityAction(Activity activity, LearnerProgress progress) 
+	{
 		String strutsAction = null;
-		if (progress.getProgressState(activity) == LearnerProgress.ACTIVITY_COMPLETED) {
+		if (progress.getProgressState(activity) == LearnerProgress.ACTIVITY_COMPLETED) 
 	        strutsAction = "/parallelWait.do";
-		}
-		else {
+		else
 			strutsAction = super.getActivityAction(activity, progress);
-		}
 		return strutsAction;
 	}
 	

@@ -33,9 +33,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 
@@ -183,10 +183,14 @@ public class LearnerAction extends LamsDispatchAction
         if(log.isDebugEnabled())
             log.debug("The learner ["+learner.getUserId()+"] joined lesson. The"
                       +"porgress data is:"+learnerProgress.toString());
+        
+        
+        LessonLearnerDataManager.cacheLessonUser(getServlet().getServletContext(),
+                                                 lesson,learner);
         //setup session attributes
-        request.getSession().setAttribute(SessionBean.NAME,new SessionBean(learner,
-                                                                           lesson,
-                                                                           learnerProgress));
+        //request.getSession().setAttribute(SessionBean.NAME,new SessionBean(learner,
+        //                                                                   lesson,
+        //                                                                   learnerProgress));
         request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
 
         //serialize a acknowledgement flash message with the path of display next
@@ -236,13 +240,17 @@ public class LearnerAction extends LamsDispatchAction
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
-        SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
+        //SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
+        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request,getServlet().getServletContext());
         
         if(log.isDebugEnabled())
-            log.debug("Lesson id is: "+sessionBean.getLesson().getLessonId());
+            log.debug("Lesson id is: "+learnerProgress.getLesson().getLessonId());
         
-        learnerService.exitLesson(sessionBean.getLearnerProgress());
+        learnerService.exitLesson(learnerProgress);
         
+        LessonLearnerDataManager.removeLessonUserFromCache(getServlet().getServletContext(),
+                                                           learnerProgress.getLesson(),
+                                                           learnerProgress.getUser());
         //send acknowledgment to flash as it is triggerred by flash
         String lessonExitted = WDDXProcessor.serialize(new FlashMessage("exitLesson",null));
         if(log.isDebugEnabled())
@@ -286,10 +294,11 @@ public class LearnerAction extends LamsDispatchAction
         if(log.isDebugEnabled())
             log.debug("Getting Flash progress data...");
         
-        SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
+        //SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
+        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,getServlet().getServletContext());
         
         String progressData = WDDXProcessor.serialize(new FlashMessage("getFlashProgressData",
-                                                                       sessionBean.getLearnerProgress().getLearnerProgressData()));
+                                                                       learnerProgress.getLearnerProgressData()));
 
         if(log.isDebugEnabled())
             log.debug("Sending learner progress data to flash:"+progressData);

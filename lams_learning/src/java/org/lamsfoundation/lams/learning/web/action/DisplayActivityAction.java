@@ -28,10 +28,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 
 
@@ -72,13 +72,14 @@ public class DisplayActivityAction extends ActivityAction {
 		
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 		
-		SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
-				
+		//SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
+		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,
+		                                                                     getServlet().getServletContext());		
 		if(log.isDebugEnabled())
 		    log.debug("Entering display activity: the session bean is"
-		              + sessionBean.toString());
+		              + learnerProgress.toString());
 		
-		ActionForward forward =actionMappings.getProgressForward(sessionBean.getLearnerProgress(),false,request);
+		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,request);
 	
 		if(log.isDebugEnabled())
 		    log.debug(forward.toString());
