@@ -50,11 +50,13 @@ CREATE TABLE lams_tool (
      , default_tool_content_id BIGINT(20) NOT NULL
      , supports_grouping_flag TINYINT(1) NOT NULL DEFAULT 0
      , supports_define_later_flag TINYINT(1) NOT NULL DEFAULT 0
+     , supports_moderation_flag TINYINT(1) NOT NULL
      , learner_url TEXT NOT NULL
      , author_url TEXT NOT NULL
      , define_later_url TEXT
      , export_portfolio_url TEXT NOT NULL
      , monitor_url TEXT NOT NULL
+     , contribute_url TEXT
      , UNIQUE UQ_lams_tool_sig (tool_signature)
      , UNIQUE UQ_lams_tool_class_name (service_name)
      , PRIMARY KEY (tool_id)
@@ -86,6 +88,12 @@ CREATE TABLE lams_license (
      , default_flag TINYINT(1) NOT NULL DEFAULT 0
      , picture_url VARCHAR(256)
      , PRIMARY KEY (license_id)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_copy_type (
+       copy_type_id TINYINT(4) NOT NULL
+     , description VARCHAR(255) NOT NULL
+     , PRIMARY KEY (copy_type_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_authentication_method_type (
@@ -134,7 +142,6 @@ CREATE TABLE lams_grouping (
      , learners_per_group INT(11)
      , staff_group_id BIGINT(20) DEFAULT 0
      , max_number_of_groups INT(3)
-     , id INT(11)
      , PRIMARY KEY (grouping_id)
      , INDEX (grouping_type_id)
      , CONSTRAINT FK_lams_learning_grouping_1 FOREIGN KEY (grouping_type_id)
@@ -201,7 +208,7 @@ CREATE INDEX login ON lams_user (login ASC);
 
 CREATE TABLE lams_learning_design (
        learning_design_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , id INT(11)
+     , learning_design_ui_id INT(11)
      , description TEXT
      , title VARCHAR(255)
      , first_activity_id BIGINT(20)
@@ -211,7 +218,7 @@ CREATE TABLE lams_learning_design (
      , date_read_only DATETIME
      , user_id BIGINT(20) NOT NULL
      , help_text TEXT
-     , lesson_copy_flag TINYINT(4) NOT NULL DEFAULT 0
+     , copy_type_id TINYINT(4) NOT NULL
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
      , version VARCHAR(56)
      , parent_learning_design_id BIGINT(20)
@@ -232,6 +239,9 @@ CREATE TABLE lams_learning_design (
      , INDEX (license_id)
      , CONSTRAINT FK_lams_learning_design_5 FOREIGN KEY (license_id)
                   REFERENCES lams_license (license_id)
+     , INDEX (copy_type_id)
+     , CONSTRAINT FK_lams_learning_design_6 FOREIGN KEY (copy_type_id)
+                  REFERENCES lams_copy_type (copy_type_id)
 )TYPE=InnoDB;
 CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
 
@@ -291,6 +301,7 @@ CREATE TABLE lams_learning_activity (
      , activity_ui_id INT(11)
      , description TEXT
      , title VARCHAR(255)
+     , help_text TEXT
      , xcoord INT(11)
      , ycoord INT(11)
      , parent_activity_id BIGINT(20)
@@ -310,8 +321,11 @@ CREATE TABLE lams_learning_activity (
      , tool_id BIGINT(20)
      , tool_content_id BIGINT(20)
      , gate_activity_level_id INT(11)
+     , gate_open_flag TINYINT(1)
      , gate_start_time_offset BIGINT(38)
      , gate_end_time_offset BIGINT(38)
+     , gate_start_date_time DATETIME
+     , gate_end_date_time DATETIME
      , library_activity_ui_image VARCHAR(255)
      , create_grouping_id BIGINT(20)
      , create_grouping_ui_id INT(11)

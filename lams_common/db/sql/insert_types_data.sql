@@ -1,5 +1,9 @@
 # Connection: ROOT LOCAL
 # Host: localhost
+# Saved: 2005-02-16 16:03:41
+# 
+# Connection: ROOT LOCAL
+# Host: localhost
 # Saved: 2005-02-15 11:44:49
 # 
 INSERT INTO lams_role VALUES (1, 'SYSADMIN', 'LAMS System Adminstrator', NOW());
@@ -57,6 +61,11 @@ INSERT into lams_license VALUES ('3', 'Attribution-No Derivatives', 'by-nd', 'ht
 INSERT into lams_license VALUES ('4', 'Attribution-Noncommercial-No Derivatives', 'by-nc-nd', 'http://creativecommons.org/licenses/by-nc-nd/2.0/', '');
 INSERT into lams_license VALUES ('5', 'Attribution-Noncommercial', 'by-nc', 'http://creativecommons.org/licenses/by-nc/2.0/', '');
 INSERT into lams_license VALUES ('6', 'Attribution-ShareAlike', 'by-sa', 'http://creativecommons.org/licenses/by-sa/2.0/', ''); 
+
+INSERT into lams_copy_type VALUES ('1', 'NONE');
+INSERT into lams_copy_type VALUES ('2', 'LESSON COPY');
+INSERT into lams_copy_type VALUES ('3', 'PREVIEW COPY');
+
 
 
 
