@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+
+  <!-- ========== Data Sources Definitions =================================== -->
+  <!--
+    Define your Struts data sources in a file called struts-data-sources.xml and place
+    it in your merge directory.
+  -->
+
+  <!-- ========== Form Bean Definitions =================================== -->
+  <form-beans>
+
+    <form-bean
+      name="activityForm"
+      type="org.lamsfoundation.lams.learning.web.form.ActivityForm"
+    />
+    <form-bean
+      name="dummyToolForm"
+      type="org.lamsfoundation.lams.learning.web.form.DummyToolForm"
+    />
+    <form-bean
+      name="testDblSubmitForm"
+      type="org.lamsfoundation.lams.learning.web.form.TestDblSubmitForm"
+    />
+    <form-bean
+      name="optionsActivityForm"
+      type="org.lamsfoundation.lams.learning.web.form.OptionsActivityForm"
+    />
+
+   <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+
+  </form-beans>
+
+  <!-- ========== Global Exceptions Definitions =================================== -->
+  <!--
+    Define your exceptions in a file called global-exceptions.xml and place
+    it in your merge directory.
+  -->
+
+  <!-- ========== Global Forward Definitions =================================== -->
+  <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+
+<global-forwards>
+	<forward name="error" path="/error.jsp" />
+	<forward name="noSessionError" path="/noSessionError.jsp" />
+</global-forwards>
+
+  <!-- ========== Action Mapping Definitions =================================== -->
+   <action-mappings>
+    <action
+      path="/DisplayOptionsActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayOptionsActivityAction"
+      name="optionsActivityForm"
+      scope="request"
+      input="/Activity.do"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayOptions"
+        path=".optionsActivity"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/LoadToolActivity"
+      type="org.lamsfoundation.lams.learning.web.action.LoadToolActivityAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayTool"
+        path=".loadToolActivity"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/test/DummyTool"
+      type="org.lamsfoundation.lams.learning.web.action.DummyToolAction"
+      name="dummyToolForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="display"
+        path="/test/dummyTool.jsp"
+        redirect="false"
+      />
+      <forward
+        name="next"
+        path=".requestDisplay"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/learner"
+      type="org.lamsfoundation.lams.learning.web.action.LearnerAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <exception
+        key="error.system.learner"
+        type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
+        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        path=".systemError"
+        scope="request"
+      />
+      <forward
+        name="displayActivity"
+        path="/DisplayActivity.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/CompleteActivity"
+      type="org.lamsfoundation.lams.learning.web.action.CompleteActivityAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/DisplayToolActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayToolActivityAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/DisplayActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayActivityAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayParallelActivity"
+        path="/DisplayParallelActivity.do"
+        redirect="false"
+      />
+      <forward
+        name="displayOptionsActivity"
+        path="/DisplayOptionsActivity.do"
+        redirect="false"
+      />
+      <forward
+        name="loadToolActivity"
+        path="/LoadToolActivity.do"
+        redirect="false"
+      />
+      <forward
+        name="parallelWait"
+        path="/parallelWait.do"
+        redirect="false"
+      />
+      <forward
+        name="lessonComplete"
+        path="/lessonComplete.do"
+        redirect="false"
+      />
+      <forward
+        name="requestDisplay"
+        path="/requestDisplay.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/test/DblSubmit"
+      type="org.lamsfoundation.lams.learning.web.action.TestDblSubmitAction"
+      name="testDblSubmitForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="display"
+        path="/test/dblSubmitTest.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/DisplayParallelActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayParallelActivityAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayParallel"
+        path=".parallelActivity"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/ChooseActivity"
+      type="org.lamsfoundation.lams.learning.web.action.ChooseActivityAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/test/DummyLesson"
+      type="org.lamsfoundation.lams.learning.web.action.DummyLessonAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayLesson"
+        path="/DisplayActivity.do"
+        redirect="true"
+      />
+    </action>
+
+   <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+
+<action path="/index"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter="/main.jsp" />
+
+<action path="/content"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter="/test/DummyLesson.do" />
+
+<action path="/requestDisplay"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter=".requestDisplay"/>
+<action path="/parallelWait"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter=".parallelWait"/>
+<action path="/lessonComplete"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter=".lessonComplete"/>
+
+  </action-mappings>
+
+   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
+
+  <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+
+<message-resources parameter="org.lamsfoundation.lams.learning.LearningResources" />
+
+  <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+
+<plug-in className="org.apache.struts.tiles.TilesPlugin">
+	<set-property property="definitions-config" value="/WEB-INF/struts/tiles-defs.xml" />
+	<set-property property="definitions-debug" value="0" />
+	<set-property property="definitions-parser-details" value="0" />
+	<set-property property="definitions-parser-validate" value="true" />
+</plug-in>
+
+</struts-config>

@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
+import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * This class contains the standard struts action mappings for errors as
@@ -254,9 +255,12 @@ public class ActivityMapping implements Serializable {
 		if (redirect) {
 			String activityURL = strutsActionToURL(strutsAction, activity, false);
 			actionForward = new RedirectingActionForward(activityURL);
+			actionForward.setName(WebUtil.getStrutsForwardNameFromPath(strutsAction));
 		}
 		else {
 		    actionForward = new ForwardingActionForward(strutsAction);
+			actionForward.setName(WebUtil.getStrutsForwardNameFromPath(strutsAction));
+
 		}
 		
 		return actionForward;
@@ -277,4 +281,6 @@ public class ActivityMapping implements Serializable {
 	public void setActivityMappingStrategy(ActivityMappingStrategy activityMappingStrategy) {
 		this.activityMappingStrategy = activityMappingStrategy;
 	}
+	
+	
 }

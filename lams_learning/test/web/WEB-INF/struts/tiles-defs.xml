@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+
+<!DOCTYPE tiles-definitions PUBLIC
+   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
+   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
+ 
+<tiles-definitions>
+	
+	<!-- Standard layout with css. -->
+	<definition name=".layout" path="/layout/layout.jsp">
+		<put name="title" value="LAMS"/>
+		<put name="body" value=""/>
+		<put name="includeBodyTag" value="true"/>
+	</definition>
+
+	<!-- Standard layout for message or tool. This probably needs to be done using
+	included header and footer though because tools need this. -->
+	<definition name=".activityLayout" path="/layout/activityLayout.jsp">
+		<put name="pageTitle" value="LAMS"/>
+		<put name="title" value="LAMS"/>
+		<put name="body" value=""/>
+	</definition>
+	
+	<!--  Activity definitions -->
+	
+	<definition name=".loadToolActivity" extends=".layout">
+		<put name="title" value="Loading..."/>
+		<put name="body" value="/loadToolActivity.jsp"/>
+		<put name="includeBodyTag" value="false"/>
+	</definition>
+	<definition name=".parallelActivity" extends=".layout">
+		<put name="body" value="/parallelActivity.jsp"/>
+		<put name="includeBodyTag" value="false"/>
+	</definition>
+	<definition name=".optionsActivity" extends=".activityLayout">
+		<put name="title" value="Optional Activity"/>
+		<put name="body" value="/optionsActivity.jsp"/>
+	</definition>
+	<definition name=".requestDisplay" path="/requestURL.jsp" />
+	<definition name=".parallelWait" extends=".activityLayout">
+		<put name="title" value="Wait..."/>
+		<put name="body" value="/partialCompleted.jsp"/>
+	</definition>
+	<definition name=".lessonComplete" extends=".activityLayout">
+		<put name="title" value="Lesson Complete"/>
+		<put name="body" value="/lessonComplete.jsp"/>
+	</definition>
+	
+	<!-- Journal definitions -->
+	
+	<definition name=".journalDetail" extends=".activityLayout">
+		<put name="pageTitle" value="Journal - Detail" />
+		<put name="title" value="Journal" />
+		<put name="body" value="/notebook/detail.jsp"/>
+	</definition>
+	
+</tiles-definitions>

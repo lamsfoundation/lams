@@ -25,10 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.web.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.web.action.LamsAction;
 
 /** 
  * MyEclipse Struts
@@ -39,7 +39,7 @@ import org.apache.struts.action.ActionMapping;
  *                validate="false" scope="request"
  * @struts:action-forward name="display" path="/test/dblSubmitTest.jsp"
  */
-public class TestDblSubmitAction extends Action {
+public class TestDblSubmitAction extends LamsAction {
 
 
     public ActionForward execute(

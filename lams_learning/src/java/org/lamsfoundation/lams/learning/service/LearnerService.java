@@ -23,14 +23,14 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.learning.service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-
-
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
@@ -55,6 +56,8 @@ public class LearnerService implements ILearnerService
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
+	private static Logger log = Logger.getLogger(LearnerService.class);
+    
     private ILearnerProgressDAO learnerProgressDAO;
     private ILessonDAO lessonDAO;
     private ProgressEngine progressEngine;
@@ -115,9 +118,10 @@ public class LearnerService implements ILearnerService
      * Delegate to lesson dao to load up the lessons.
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActiveLessonsFor(org.lamsfoundation.lams.usermanagement.User)
      */
-    public List getActiveLessonsFor(User learner)
+    public LessonDTO[] getActiveLessonsFor(User learner)
     {
-        return this.lessonDAO.getActiveLessonsForLearner(learner);
+        List activeLessons = this.lessonDAO.getActiveLessonsForLearner(learner);
+        return getLessonDataFor(activeLessons);
     }
     
     public Lesson getLesson(Long lessonId)
@@ -144,7 +148,7 @@ public class LearnerService implements ILearnerService
      * @throws LamsToolServiceException
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress joinLesson(User learner, Lesson lesson) throws ProgressException, LamsToolServiceException
+    public LearnerProgress joinLesson(User learner, Lesson lesson) 
     {
         LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
     	
@@ -153,7 +157,15 @@ public class LearnerService implements ILearnerService
             //create a new learner progress for new learner
             learnerProgress = new LearnerProgress(learner,lesson);
             
-            progressEngine.setUpStartPoint(learner, lesson,learnerProgress);
+            try
+            {
+                progressEngine.setUpStartPoint(learner, lesson,learnerProgress);
+            }
+            catch (ProgressException e)
+            {
+                log.error("error occurred in 'setUpStartPoint':"+e.getMessage());
+        		throw new LearnerServiceException(e.getMessage());
+            }
             
             learnerProgressDAO.saveLearnerProgress(learnerProgress);
         }
@@ -242,6 +254,7 @@ public class LearnerService implements ILearnerService
     	}
         catch (UnsupportedEncodingException e)
         {
+            log.error("error occurred in 'getProgressURL':"+e.getMessage());
     		throw new LearnerServiceException(e.getMessage());
         }
     }
@@ -258,7 +271,7 @@ public class LearnerService implements ILearnerService
      * @param learnerProgress the learner progress we are processing.
      * @throws LamsToolServiceException
      */
-    private void createToolSessionsIfNecessary(LearnerProgress learnerProgress) throws LamsToolServiceException
+    private void createToolSessionsIfNecessary(LearnerProgress learnerProgress) 
     {
         if(learnerProgress.getNextActivity()==null)
             throw new LearnerServiceException("Error occurs in [" +
@@ -266,12 +279,19 @@ public class LearnerService implements ILearnerService
             		"sessions without knowing the activity.");
         
         Activity nextActivity = learnerProgress.getNextActivity();
-        
-        for(Iterator i = nextActivity.getAllToolActivitiesFrom(nextActivity).iterator();i.hasNext();)
+        try
         {
-            ToolActivity toolActivity = (ToolActivity)i.next();
-            if(shouldCreateToolSession(learnerProgress,toolActivity))
-                createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
+            for(Iterator i = nextActivity.getAllToolActivitiesFrom(nextActivity).iterator();i.hasNext();)
+            {
+                ToolActivity toolActivity = (ToolActivity)i.next();
+                if(shouldCreateToolSession(learnerProgress,toolActivity))
+                    createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
+            }
+        }
+        catch (LamsToolServiceException e)
+        {
+            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
+    		throw new LearnerServiceException(e.getMessage());
         }
     }
     
@@ -316,4 +336,21 @@ public class LearnerService implements ILearnerService
         
         lamsToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), toolActivity);
     }
+    
+    
+    /**
+     * Create an array of lesson dto based a list of lessons.
+     * @param lessons the list of lessons.
+     * @return the lesson dto array.
+     */
+    private LessonDTO[] getLessonDataFor(List lessons)
+    {
+        List lessonDTOList = new ArrayList();
+        for(Iterator i=lessons.iterator();i.hasNext();)
+        {
+            Lesson currentLesson = (Lesson)i.next();
+            lessonDTOList.add(currentLesson.getLessonData());
+        }
+        return (LessonDTO[])lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);   
+    }       
 }

@@ -21,13 +21,10 @@ http://www.gnu.org/licenses/gpl.txt
 
 package org.lamsfoundation.lams.learning.service;
 
-import java.util.List;
-
-import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
+import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
  *
@@ -51,7 +48,7 @@ public interface ILearnerService
      * @param lessionID identifies the Lesson to start
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress joinLesson(User learner, Lesson lesson) throws ProgressException,LamsToolServiceException;
+    public LearnerProgress joinLesson(User learner, Lesson lesson) ;
     
 
     /**
@@ -103,5 +100,5 @@ public interface ILearnerService
      * @param learner the user who intend to start a lesson
      * @return a list of active lessons.
      */
-    public List getActiveLessonsFor(User learner);
+    public LessonDTO[] getActiveLessonsFor(User learner);
 }

@@ -46,8 +46,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class ActivityAction extends LamsAction {
 	
-	protected static final String ACTIVITY_REQUEST_ATTRIBUTE = "activity";
-	protected static final String LEARNER_PROGRESS_REQUEST_ATTRIBUTE = "learnerprogress";
+	public static final String ACTIVITY_REQUEST_ATTRIBUTE = "activity";
+	public static final String LEARNER_PROGRESS_REQUEST_ATTRIBUTE = "learnerprogress";
 	
 	/**
 	 * Get the learner service.

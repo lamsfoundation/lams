@@ -36,6 +36,16 @@ public class SessionBean implements java.io.Serializable {
 	private Lesson lesson;
 	private LearnerProgress progress;
 	
+	public SessionBean(User learner,
+	                   Lesson lesson,
+	                   LearnerProgress progress)
+	{
+	    this.learner = learner;
+	    this.lesson = lesson;
+	    this.progress = progress;
+	}
+	
+	
 	public User getLearner() {
 		return learner;
 	}
