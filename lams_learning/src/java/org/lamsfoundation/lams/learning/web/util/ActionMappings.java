@@ -54,8 +54,10 @@ import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
  */
 public class ActionMappings {
 
+	/* These are global struts forwards. */
     public static final String ERROR = "error";
     public static final String NO_SESSION_ERROR = "noSessionError";
+    public static final String NO_ACCESS_ERROR = "noAccessError";
     public static final String DOUBLE_SUBMIT_ERROR = "doubleSubmitError";
     
     private ILamsToolService toolService;
@@ -184,6 +186,7 @@ public class ActionMappings {
 			toolSession = toolService.getToolSession(progress.getUser(), activity);
 		}
 		catch (LamsToolServiceException e) {
+		    // TODO: should throw exception here
 			return null;
 		}
 		
