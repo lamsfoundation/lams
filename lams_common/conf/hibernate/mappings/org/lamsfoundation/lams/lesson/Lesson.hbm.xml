@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+
+
+<class 
+    name="org.lamsfoundation.lams.lesson.Lesson" 
+    table="lams_lesson"
+>
+
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="lessonId"
+        type="java.lang.Long"
+        column="lesson_id"
+    >
+
+        <generator class="identity" />
+    </id>
+
+    <property
+        name="createDateTime"
+        type="java.sql.Timestamp"
+        column="create_date_time"
+        not-null="true"
+        length="19"
+    >
+   
+    </property>
+    <property
+        name="startDateTime"
+        type="java.sql.Timestamp"
+        column="start_date_time"
+        length="19"
+    >
+  
+    </property>
+    <property
+        name="endDateTime"
+        type="java.sql.Timestamp"
+        column="end_date_time"
+        length="19"
+    >
+   
+    </property>
+    
+    <property
+        name="lessonStateId"
+        type="java.lang.Integer"
+        column="lesson_state_id"
+        length="3"
+    >
+   
+    </property>
+
+    <!-- Associations -->
+    <!-- bi-directional many-to-many association to User as learners -->
+    <set
+        name="learners"
+        lazy="true"
+        inverse="true"
+        cascade="none"
+        table="lams_lesson_learner"
+    >
+        <key>
+            <column name="lesson_id" />
+        </key>
+        <many-to-many 
+            column="user_id"
+            class="org.lamsfoundation.lams.usermanagement.User"
+        />
+    </set>
+    
+    
+    <!-- bi-directional many-to-one association to User -->
+    <many-to-one
+        name="user"
+        class="org.lamsfoundation.lams.usermanagement.User"
+        not-null="true"
+    >
+        <column name="user_id" />
+    </many-to-one>
+   
+    <!-- bi-directional many-to-one association to LearningDesign -->
+    <many-to-one
+        name="learningDesign"
+        class="org.lamsfoundation.lams.learningdesign.LearningDesign"
+        not-null="true"
+    >
+
+        <column name="learning_design_id" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to LearnerProgress -->
+    <set
+        name="learnerProgresses"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+
+        <key>
+            <column name="lesson_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.lesson.LearnerProgress"
+        />
+    </set>
+    <!-- bi-directional many-to-one association to LessonClass -->
+    <many-to-one
+        name="lessonClass"
+        class="org.lamsfoundation.lams.lesson.LessonClass"
+        not-null="true"
+    >
+
+        <column name="class_grouping_id" />
+    </many-to-one>
+    <!-- bi-directional many-to-one association to Organisation -->
+    <many-to-one
+        name="organisation"
+        class="org.lamsfoundation.lams.usermanagement.Organisation"
+        not-null="true"
+    >
+
+        <column name="organisation_id" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.lesson.LessonState" 
+    table="lams_lesson_state"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_lesson_state"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="lamsLessonStateId"
+        type="java.lang.Integer"
+        column="lams_lesson_state_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="assigned"
+            type="java.lang.Integer"
+            column="lams_lesson_state_id"
+
+
+        </meta>
+        <generator class="assigned" />
+    </id>
+
+    <property
+        name="description"
+        type="java.lang.String"
+        column="description"
+        not-null="true"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="description"
+            length="255"
+            not-null="true"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to Lesson -->
+    <set
+        name="lessons"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="lams_lesson_state_id"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.lesson.Lesson"
+        </meta>
+        <key>
+            <column name="lams_lesson_state_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.lesson.Lesson"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

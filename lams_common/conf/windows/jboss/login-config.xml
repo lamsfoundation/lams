@@ -150,7 +150,7 @@ $Revision$
 
 	<application-policy name = "lams">
        <authentication>
-          <login-module code = "com.lamsinternational.lams.security.UniversalLoginModule" flag = "required">
+          <login-module code = "org.lamsfoundation.lams.security.UniversalLoginModule" flag = "required">
              <module-option name="authenticationPropertyFile">c:/lamsconf/authentication.xml</module-option>
           </login-module>
        </authentication>

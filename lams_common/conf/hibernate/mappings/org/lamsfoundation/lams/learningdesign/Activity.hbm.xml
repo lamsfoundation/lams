@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class name="org.lamsfoundation.lams.learningdesign.Activity" table="lams_learning_activity" discriminator-value="0">
+    <meta attribute="class-description" inherit="false">@hibernate.class table="lams_learning_activity"</meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id name="activityId" type="java.lang.Long" column="activity_id">
+        <meta attribute="field-description">@hibernate.id generator-class="identity" type="java.lang.Long" column="activity_id"</meta>
+        <generator class="identity" />
+    </id>
+    
+    <discriminator column="learning_activity_type_id" insert="false"/>
+
+    <property name="id" type="java.lang.Integer" column="id" length="11">
+        <meta attribute="field-description">@hibernate.property column="id" length="11" </meta>    
+    </property>
+    
+    <property name="description" type="java.lang.String" column="description" length="65535">
+        <meta attribute="field-description">@hibernate.property column="description" length="65535" </meta>    
+    </property>
+    
+    <property name="title" type="java.lang.String" column="title" length="255" >
+        <meta attribute="field-description">@hibernate.property column="title" length="255" </meta>    
+    </property>
+
+    <property name="xcoord" type="java.lang.Integer" column="xcoord" length="11" >
+        <meta attribute="field-description">@hibernate.property column="xcoord" length="11" </meta>    
+    </property>
+
+    <property name="ycoord" type="java.lang.Integer" column="ycoord" length="11">
+        <meta attribute="field-description">@hibernate.property column="ycoord" length="11"</meta>    
+    </property>
+
+    <property name="orderId" type="java.lang.Integer"  column="order_id" length="11">
+        <meta attribute="field-description">@hibernate.property column="order_id" length="11"</meta>    
+    </property>
+
+    <property name="defineLater" type="java.lang.Boolean" column="define_later_flag" not-null="true" length="4">
+        <meta attribute="field-description">@hibernate.property column="define_later_flag" length="4" not-null="true"</meta>    
+    </property>
+
+    <property name="createDateTime" type="java.sql.Timestamp" column="create_date_time" not-null="true" length="19">
+        <meta attribute="field-description">@hibernate.property column="create_date_time" length="19" not-null="true"</meta>    
+    </property>
+
+    <property name="offlineInstructions" type="java.lang.String" column="offline_instructions" length="65535" >
+        <meta attribute="field-description">@hibernate.property column="offline_instructions" length="65535"</meta>    
+    </property>
+    
+    <property name="activityTypeId" type="java.lang.Integer" column="learning_activity_type_id" length="11">
+    	        <meta attribute="field-description">@hibernate.property column="learning_activity_type_id" length="11"</meta>    
+   	</property>
+    <property name="libraryActivityUiImage" type="java.lang.String" column="library_activity_ui_image" length="255">
+        <meta attribute="field-description">@hibernate.property column="library_activity_ui_image" length="255"</meta>    
+    </property>
+    
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to LearningLibrary -->
+    <many-to-one name="learningLibrary" class="org.lamsfoundation.lams.learningdesign.LearningLibrary" not-null="true">
+        <meta attribute="field-description">@hibernate.many-to-one not-null="true" 
+        									@hibernate.column name="learning_library_id"         
+        </meta>
+        <column name="learning_library_id" />
+    </many-to-one>
+    
+    <!-- bi-directional one-to-many association to Transition -->
+    <set name="transitionsByToActivityId" lazy="false" inverse="true" cascade="none">
+        <meta attribute="field-description">@hibernate.set lazy="false" inverse="true" cascade="none" 
+        						            @hibernate.collection-key column="to_activity_id"
+        						            @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Transition"
+        </meta>
+        <key><column name="to_activity_id" /></key>
+        <one-to-many class="org.lamsfoundation.lams.learningdesign.Transition"/>
+    </set>
+    
+    <!-- bi-directional one-to-many association to Transition -->
+    <set name="transitionsByFromActivityId" lazy="false" inverse="true" cascade="none" >
+        <meta attribute="field-description">@hibernate.set lazy="false" inverse="true" cascade="none"
+        							        @hibernate.collection-key column="from_activity_id"
+        							        @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Transition"
+        </meta>
+        <key><column name="from_activity_id" /></key>
+        <one-to-many class="org.lamsfoundation.lams.learningdesign.Transition"/>
+    </set>
+    
+    <!-- bi-directional many-to-one association to Activity -->
+    <many-to-one name="parentActivity" class="org.lamsfoundation.lams.learningdesign.Activity" not-null="true">
+        <meta attribute="field-description">@hibernate.many-to-one not-null="true"
+									        @hibernate.column name="parent_activity_id"         
+        </meta>
+        <column name="parent_activity_id" />
+    </many-to-one>
+        
+    <!-- bi-directional many-to-one association to LearningDesign -->
+    <many-to-one name="learningDesign" class="org.lamsfoundation.lams.learningdesign.LearningDesign" not-null="true">
+        <meta attribute="field-description">@hibernate.many-to-one not-null="true" 
+        									@hibernate.column name="learning_design_id"         
+        </meta>
+        <column name="learning_design_id" />
+    </many-to-one>
+    
+    <!-- bi-directional many-to-one association to Grouping -->
+    <many-to-one name="grouping" class="org.lamsfoundation.lams.learningdesign.Grouping" not-null="true">
+        <meta attribute="field-description">@hibernate.many-to-one not-null="true"
+        									@hibernate.column name="grouping_id"         
+        </meta>
+        <column name="grouping_id" />
+    </many-to-one>
+    
+    <!-- Subclass definations for polymorphic persistence -->
+    <subclass name="org.lamsfoundation.lams.learningdesign.SimpleActivity">
+     	 <meta attribute="class-description" inherit="false">@hibernate.class </meta>
+         <meta attribute="scope-class" inherit="false">public abstract</meta>
+			<subclass name="org.lamsfoundation.lams.learningdesign.ToolActivity" discriminator-value="1">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+				<property name="toolContentId" type="java.lang.Long" column="tool_content_id" length="20" />
+                 
+                 <!-- bi-directional many-to-one association to Tool -->
+                 <many-to-one name="tool" class="org.lamsfoundation.lams.tool.Tool" >
+                 	<column name="tool_id" />
+                 </many-to-one>
+			</subclass>
+			
+			<subclass name="org.lamsfoundation.lams.learningdesign.GroupingActivity">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+				
+				 <!-- bi-directional many-to-one association to Grouping >
+                  <many-to-one name="createGrouping" class="org.lamsfoundation.lams.learningdesign.Grouping" not-null="true">
+                  	<column name="grouping_id" />
+                  </many-to-one-->					                  
+			</subclass>
+			<subclass name="org.lamsfoundation.lams.learningdesign.GateActivity">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+				<property name="gateActivityLevelId" type="java.lang.Integer" column="gate_activity_level_id" length="11"/>
+				<subclass name="org.lamsfoundation.lams.learningdesign.ScheduleGateActivity" discriminator-value="5">
+					<meta attribute="class-description" inherit="false">@hibernate.class </meta>					
+					<property name="gateStartDateTime" type="java.sql.Timestamp" column="gate_start_date_time" length="19">
+        				<meta attribute="field-description">@hibernate.property column="gate_start_date_time" length="19"</meta>    
+	        			<meta attribute="use-in-toString">true</meta>
+				    </property>
+				    <property name="gateEndDateTime" type="java.sql.Timestamp" column="gate_end_date_time" length="19" >
+				    	<meta attribute="field-description">@hibernate.property column="gate_end_date_time" length="19" </meta>    
+			    		<meta attribute="use-in-toString">true</meta>
+				    </property>
+				</subclass>
+				<subclass name="org.lamsfoundation.lams.learningdesign.SynchGateActivity" discriminator-value="4">
+					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+				</subclass>
+				<subclass name="org.lamsfoundation.lams.learningdesign.PermissionGateActivity" discriminator-value="6">
+					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+				</subclass>
+			</subclass>			
+	</subclass>
+
+	<subclass name="org.lamsfoundation.lams.learningdesign.ComplexActivity">
+		<meta attribute="class-description" inherit="false">@hibernate.class </meta>			
+	    <meta attribute="scope-class" inherit="false">public abstract</meta>
+	    
+	    <!-- bi-directional one-to-many association to Activity-->
+	    <set name="activities" lazy="true" inverse="true" cascade="none" >
+    		<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="none"
+    										@hibernate.collection-key column="parent_activity_id" 
+    										@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"
+			</meta>    										
+            <key><column name="parent_activity_id" /></key>
+            <one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"/>
+		</set>
+		
+         <subclass name="org.lamsfoundation.lams.learningdesign.OptionsActivity" discriminator-value="8">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+				<property name="maxNumberOfOptions" type="java.lang.Integer" column="max_number_of_options" length="5">
+					<meta attribute="field-description">@hibernate.property column="max_number_of_options" length="5"</meta>    
+					<meta attribute="use-in-toString">true</meta>
+				</property>
+			    <property name="minNumberOfOptions" type="java.lang.Integer" column="min_number_of_options" length="5">
+					<meta attribute="field-description">@hibernate.property column="min_number_of_options" length="5"</meta> 
+					<meta attribute="use-in-toString">true</meta>
+			    </property>
+			</subclass>
+			<subclass name="org.lamsfoundation.lams.learningdesign.SequenceActivity" discriminator-value="9">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+			</subclass>
+			<subclass name="org.lamsfoundation.lams.learningdesign.ParallelActivity" discriminator-value="7">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+			</subclass>
+	</subclass>
+
+</class>
+</hibernate-mapping>
