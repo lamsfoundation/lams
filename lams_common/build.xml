@@ -195,6 +195,11 @@ Ant build file.
 			</fileset>
 		</copy>
 	</target>
+        <!-- effectively a synonym for lams-jar 
+            required by the master build script
+        -->
+        <target name="build-jar" depends="lams-jar"/>
+        
 	<!-- ================================================================ -->
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
