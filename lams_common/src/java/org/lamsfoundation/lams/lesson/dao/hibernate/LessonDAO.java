@@ -13,6 +13,7 @@ import net.sf.hibernate.FetchMode;
 import net.sf.hibernate.HibernateException;
 import net.sf.hibernate.Query;
 import net.sf.hibernate.Session;
+import net.sf.hibernate.expression.Expression;
 
 import org.springframework.orm.hibernate.HibernateCallback;
 import org.springframework.orm.hibernate.HibernateTemplate;
@@ -39,7 +40,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
     }
     
     
-    public Lesson getLessonWithEagerlyFetchedProgress(Long lessonId)
+    public Lesson getLessonWithEagerlyFetchedProgress(final Long lessonId)
     {
         HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
@@ -49,6 +50,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
                  public Object doInHibernate(Session session) throws HibernateException 
                  {
                      return session.createCriteria(Lesson.class)
+                     			   .add(Expression.like("lessonId",lessonId))
                      			   .setFetchMode("learnerProgresses",FetchMode.EAGER)
                      			   .uniqueResult();
                  }
