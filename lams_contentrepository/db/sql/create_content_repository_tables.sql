@@ -63,6 +63,7 @@ CREATE TABLE lams_cr_node (
   path varchar(255),
   type varchar(255) NOT NULL,
   created_date_time timestamp(14) NOT NULL,
+  next_version_id bigint(20) unsigned NOT NULL default '1',
   PRIMARY KEY  (node_id),
   UNIQUE KEY node_id (node_id),
   KEY workspace_id (workspace_id),
