@@ -236,7 +236,7 @@ values
 null,4,'20050101','Offline  Instructions ',0,
 null,null,4,4,
 null,null,null,'QAImage',
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
@@ -250,7 +250,7 @@ values
 null,5,'20050101','Offline  Instructions ',0,
 null,null,5,5,
 null,null,null,'MBImage',
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
@@ -278,7 +278,7 @@ values
 null,7,'20050101','Offline  Instructions ',0,
 null,null,7,7,
 null,null,null,'ChatImage',
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
@@ -292,7 +292,7 @@ values
 null,8,'20050101','Offline  Instructions ',0,
 null,null,8,8,
 null,null,null,'SRImage',
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
@@ -306,7 +306,7 @@ values
 null,9,'20050101','Offline  Instructions ',0,
 null,null,9,9,
 null,null,null,'VotingImage',
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
@@ -439,7 +439,7 @@ values
 1,4,'20050101','Tool Activity Offline  Instructions ',0,
 null,null,4,15,
 null,null,null,'image',
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -454,7 +454,7 @@ values
 1,5,'20050101','Tool Activity Offline  Instructions ',0,
 null,null,5,16,
 null,null,null,'image',
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -504,7 +504,7 @@ null,null,
 'ChatImage',
 null,null,
 7,
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -519,7 +519,7 @@ values
 1,8,'20050101','Tool Activity Offline  Instructions ',0,
 null,null,8,19,
 null,null,null,'image',
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 -- Sample GroupingActivity with RandomGrouping 
 
@@ -591,7 +591,7 @@ null,null,
 'QNAImage',
 null,null,
 4,
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,
@@ -626,7 +626,7 @@ null,null,
 'QNAImage',
 null,null,
 4,
-1,0,'Online Instructions',1);
+1,1,'Online Instructions',1);
 
 -- Populates the lams_learning_transition table with various transitions for the dummy design 
 
