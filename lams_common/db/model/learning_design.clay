@@ -181,7 +181,7 @@
 <variant type-name-pattern="INT"/>
 </data-type>
 </column>
-<column name="description" alias="" remarks="" mandatory="false" column-size="65535" decimal-digits="0" default-value="" auto-increment="false">
+<column name="description" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="LONGVARCHAR" jdbc-type="-1" selected-variant-pattern="LONGVARCHAR">
 <variant type-name-pattern="LONGVARCHAR"/>
