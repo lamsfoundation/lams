@@ -312,14 +312,16 @@ Ant build file.
 			<classpath>
 				<pathelement location="${database.driver.file}"/>
 			</classpath>
-			<transaction src="${sql}/create_lams_db.sql"/>
+			<transaction src="${sql}/drop_lams_11_tables.sql"/>
+			<transaction src="${sql}/create_lams_11_tables.sql"/>
+			<transaction src="${sql}/insert_types_data.sql"/>
 		</sql>
 	</target>
 
 	<!-- =================================================================== -->
 	<!-- Insert test data to lams database                                   -->
 	<!-- =================================================================== -->
-	<target name="insert-test-data"
+	<target name="insert-test-data" depends="rebuild-db"
 		description="insert test data to lams database">
 		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
 				password="${database.password}">
