@@ -12,13 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.learningdesign.LamsLearningDesign" 
+    name="com.lamsinternational.lams.learningdesign.LearningDesign" 
     table="lams_learning_design"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_learning_design"
     </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
         name="learningDesignId"
@@ -30,6 +31,7 @@
             generator-class="assigned"
             type="java.lang.Long"
             column="learning_design_id"
+
 
         </meta>
         <generator class="assigned" />
@@ -71,11 +73,18 @@
             length="255"
         </meta>    
     </property>
-    
-    
-    
-    
-    
+    <property
+        name="firstActivityId"
+        type="java.lang.Long"
+        column="first_activity_id"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="first_activity_id"
+            length="20"
+        </meta>    
+    </property>
     <property
         name="maxId"
         type="java.lang.Integer"
@@ -89,39 +98,31 @@
         </meta>    
     </property>
     <property
-        name="objectType"
-        type="java.lang.String"
-        column="object_type"
-        length="255"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="object_type"
-            length="255"
-        </meta>    
-    </property>
-    <property
         name="validDesign"
-        type="boolean"
+        type="java.lang.Boolean"
         column="valid_design_flag"
+        not-null="true"
         length="4"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="valid_design_flag"
             length="4"
+            not-null="true"
         </meta>    
     </property>
     <property
         name="readOnly"
-        type="boolean"
+        type="java.lang.Boolean"
         column="read_only_flag"
+        not-null="true"
         length="4"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="read_only_flag"
             length="4"
+            not-null="true"
         </meta>    
     </property>
     <property
@@ -174,7 +175,7 @@
     </property>
     <property
         name="lessonCopy"
-        type="boolean"
+        type="java.lang.Boolean"
         column="lesson_copy_flag"
         not-null="true"
         length="4"
@@ -241,23 +242,9 @@
 
     <!-- Associations -->
   
-    <property 
-        name="userId" 
-        column="user_id" 
-        type="long"
-        length="20"
-        not-null="true"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="user_id"
-            length="20"
-            not-null="true"
-        </meta> 
-    </property>
-    <!-- bi-directional one-to-many association to LamsLearningDesign -->
+    <!-- bi-directional one-to-many association to LearningDesign -->
     <set
-        name="lamsLearningDesigns"
+        name="learningDesigns"
         lazy="true"
         inverse="true"
 		cascade="none"
@@ -272,21 +259,18 @@
             column="parent_learning_design_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.learningdesign.LamsLearningDesign"
+            class="com.lamsinternational.lams.learningdesign.LearningDesign"
         </meta>
         <key>
             <column name="parent_learning_design_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.learningdesign.LamsLearningDesign"
+            class="com.lamsinternational.lams.learningdesign.LearningDesign"
         />
     </set>
-    
-    <many-to-one name="firstActivity" class="com.lamsinternational.lams.learningdesign.Activity" column="first_activity_id" unique="true"/>
-    
-    <!-- bi-directional many-to-one association to LamsLearningDesign -->
+    <!-- bi-directional many-to-one association to LearningDesign -->
     <many-to-one
-        name="parentLearningDesign"
+        name="learningDesign"
         class="com.lamsinternational.lams.learningdesign.LearningDesign"
         not-null="true"
     >
@@ -297,22 +281,7 @@
         </meta>
         <column name="parent_learning_design_id" />
     </many-to-one>
-    
-    <set
-        name="childLearningDesigns"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <key>
-            <column name="parent_learning_design_id" />
-        </key>
-        <one-to-many 
-            class="com.lamsinternational.lams.learningdesign.LearningDesign"
-        />
-    </set>
-    
-    <!-- bi-directional one-to-many association to LamsLearningTransition -->
+    <!-- bi-directional one-to-many association to Transition -->
     <set
         name="transitions"
         lazy="true"
@@ -338,7 +307,7 @@
             class="com.lamsinternational.lams.learningdesign.Transition"
         />
     </set>
-    <!-- bi-directional one-to-many association to LamsLearningActivity -->
+    <!-- bi-directional one-to-many association to Activity -->
     <set
         name="activities"
         lazy="true"

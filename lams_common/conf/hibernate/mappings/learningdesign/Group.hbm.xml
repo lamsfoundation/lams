@@ -9,17 +9,15 @@
 
     http://boss.bekk.no/boss/middlegen/
     http://www.hibernate.org/
-    
-    modified by Chris Perfect
 -->
 
 <class 
     name="com.lamsinternational.lams.learningdesign.Group" 
-    table="lams_learning_group"
+    table="lams_group"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
-        table="lams_learning_group"
+        table="lams_group"
     </meta>
 
     <id
@@ -33,37 +31,41 @@
             type="java.lang.Long"
             column="group_id"
 
+
         </meta>
         <generator class="assigned" />
     </id>
 
+    <property
+        name="orderId"
+        type="int"
+        column="order_id"
+        not-null="true"
+        length="6"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="order_id"
+            length="6"
+            not-null="true"
+        </meta>    
+    </property>
 
     <!-- Associations -->
   
-   <set
-        name="users"
-        table="lams_user_group"
-        lazy="true"
-   >
+    <!-- bi-directional many-to-one association to Grouping -->
+    <many-to-one
+        name="grouping"
+        class="com.lamsinternational.lams.learningdesign.Grouping"
+        not-null="true"
+    >
         <meta attribute="field-description">
-           @hibernate.set
-            role="users"
-            table="lams_user-group"
-            lazy="true"
-           
-           @hibernate.collection-key
-            column="group_id"
-            
-           @hibernate.collection-many-to-many
-            class="com.lamsinternational.lams.usermanagement.User"
-            column="user_id"
-
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="grouping_id"         
         </meta>
-        <key>
-            <column name="group_id"/>
-        </key>
-        <many-to-many class="com.lamsinternational.lams.usermanagement.User" column="user_id"/>
-   </set> 
+        <column name="grouping_id" />
+    </many-to-one>
 
 </class>
 </hibernate-mapping>
