@@ -13,6 +13,8 @@ SET FOREIGN_KEY_CHECKS=1;
 INSERT INTO lams_cr_credential (credential_id, name, password) VALUES (1, 'atool','atool');
 INSERT INTO lams_cr_workspace  (workspace_id, name) VALUES (1, 'atoolWorkspace');
 INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (1, 1,1);
+INSERT INTO lams_cr_workspace  (workspace_id, name) VALUES (2, 'atoolWorkspace2');
+INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (2, 2,1);
 
 INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path, next_version_id) VALUES (1, 1, 'DATANODE', 20050106103100, "/test",3);
 INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, created_date_time)
