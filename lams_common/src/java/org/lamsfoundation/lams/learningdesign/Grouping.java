@@ -18,6 +18,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public abstract class Grouping implements Serializable
 {
+    
     /** Grouping type id of random grouping */
     public static final Integer RANDOM_GROUPING_TYPE = new Integer(1);
     
@@ -45,6 +46,16 @@ public abstract class Grouping implements Serializable
     
     /** non-persistent field */
     protected Set learners;
+
+    /**
+     * static final variables indicating the grouping_support of activities
+     *******************************************************************/
+    public static final int GROUPING_SUPPORT_NONE = 1;
+    
+    public static final int GROUPING_SUPPORT_OPTIONAL = 2;
+
+    public static final int GROUPING_SUPPORT_REQUIRED = 3;
+    /******************************************************************/
     
     /** full constructor */
     public Grouping(Long groupingId, Set groups, Set activities)

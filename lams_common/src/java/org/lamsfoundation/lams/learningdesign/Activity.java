@@ -67,15 +67,7 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int CATEGORY_ASSESSMENT = 3;
 	public static final int CATEGORY_CONTENT = 4;
 	public static final int CATEGORY_SPLIT = 5;
-	/******************************************************************/
-	
-	/**
-	 * static final variables indicating the grouping_support of activities
-	 *******************************************************************/
-	public static final int GROUPING_SUPPORT_NONE = 1;
-	public static final int GROUPING_SUPPORT_OPTIONAL = 2;
-	public static final int GROUPING_SUPPORT_REQUIRED = 3;
-	/******************************************************************/
+    /*******************************************************************/
 	
 	/** WDDX packet specific attribute created to identify the
 	 * type of object being passed.*/
