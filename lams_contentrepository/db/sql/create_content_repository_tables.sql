@@ -1,4 +1,4 @@
-USE lams11;
+USE lams;
 
 SET FOREIGN_KEY_CHECKS=0;
 
