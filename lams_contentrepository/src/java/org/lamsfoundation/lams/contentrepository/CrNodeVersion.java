@@ -31,23 +31,20 @@ public class CrNodeVersion implements Serializable {
     /** persistent field */
     private org.lamsfoundation.lams.contentrepository.CrNode node;
 
-    /** persistent field */
-    private org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion;
-
-    /** persistent field */
-    private Set childNodeVersions;
+    /* child Nodes. persistent field 
+    private Set childNodes;
+    */
 
     /** persistent field */
     private Set crNodeVersionProperties;
 
     /** full constructor */
-    public CrNodeVersion(Long versionId, Date createdDateTime, org.lamsfoundation.lams.contentrepository.CrNode node, org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set crNodeVersionProperties, Set childNodeVersions) {
+    public CrNodeVersion(Long versionId, Date createdDateTime, org.lamsfoundation.lams.contentrepository.CrNode node, Set crNodeVersionProperties) {
         this.versionId = versionId;
         this.createdDateTime = createdDateTime;
         this.node = node;
-        this.parentNodeVersion = parentNodeVersion;
         this.crNodeVersionProperties = crNodeVersionProperties;
-        this.childNodeVersions = childNodeVersions;
+        //this.childNodes = childNodes;
     }
 
     /** default constructor */
@@ -55,12 +52,11 @@ public class CrNodeVersion implements Serializable {
     }
 
     /** minimal constructor */
-    public CrNodeVersion(Long versionId, org.lamsfoundation.lams.contentrepository.CrNode node, org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set crNodeVersionProperties, Set childNodeVersions) {
+    public CrNodeVersion(Long versionId, org.lamsfoundation.lams.contentrepository.CrNode node,Set crNodeVersionProperties) {
         this.versionId = versionId;
         this.node = node;
-        this.parentNodeVersion = parentNodeVersion;
         this.crNodeVersionProperties = crNodeVersionProperties;
-        this.childNodeVersions = childNodeVersions;
+        //this.childNodes = childNodes;
     }
 
     /** 
@@ -123,20 +119,6 @@ public class CrNodeVersion implements Serializable {
     }
 
     /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="parent_nv_id"         
-     *         
-     */
-    public org.lamsfoundation.lams.contentrepository.CrNodeVersion getParentNodeVersion() {
-        return this.parentNodeVersion;
-    }
-
-    public void setParentNodeVersion(org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion) {
-        this.parentNodeVersion = parentNodeVersion;
-    }
-
-    /** 
      *            @hibernate.set
      *             lazy="false"
      *             inverse="true"
@@ -155,10 +137,13 @@ public class CrNodeVersion implements Serializable {
         this.crNodeVersionProperties = crNodeVersionProperties;
     }
 
-    /** 
+    /* 
      * Gets the set of child nodes. Do not use this method if you can use
-     * addChildNodeVersion(), removeChildNodeVersion() or 
-     * getChildNodeVersion() instead.
+     * addChildNode(), removeChildNode() or 
+     * getChildNode() instead.
+     * 
+     * This is lazy loaded, so will need special care when you need these
+     * details.
      * 
      *            @hibernate.set
      *             lazy="false"
@@ -169,81 +154,80 @@ public class CrNodeVersion implements Serializable {
      *            @hibernate.collection-one-to-many
      *             class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
      *         
+    public Set getChildNodes() {
+        return this.childNodes;
+    }
      */
-    public Set getChildNodeVersions() {
-        return this.childNodeVersions;
-    }
 
-    /**
+    /*
     * Assigns a new set of child nodes. Do not use this method if 
-    * you can use addChildNodeVersion(), removeChildNodeVersion() or 
-    * getChildNodeVersion() instead.
-    */
-    public void setChildNodeVersions(Set childNodeVersions) {
-        this.childNodeVersions = childNodeVersions;
+    * you can use addChildNode(), removeChildNode() or 
+    * getChildNode() instead.
+    public void setChildNodes(Set childNodes) {
+        this.childNodes = childNodes;
     }
+    */
 
-    /** Add a child node to the childNodeVersions collection. 
-     * Use this method rather than calling getChildNodeVersions()
-     * and adding to the set. See also removeChildNodeVersion() 
-     * and getChildNodeVersion();
+    /** Add a child node to the child collection. 
+     * Use this method rather than calling getChildNodes()
+     * and adding to the set. See also removeChildNode() 
+     * and getChildNode();
      * 
      * @param childNode
-     */
-    public void addChildNodeVersion(CrNodeVersion childNode) {
-    	Set set = getChildNodeVersions();
+    public void addChildNode(CrNode childNode) {
+    	Set set = getChildNodes();
     	
     	if ( set == null ) {
     		set = new HashSet();
-    		setChildNodeVersions(set);
+    		setChildNodes(set);
     	}
     	
-    	getChildNodeVersions().add(childNode);
+    	getChildNodes().add(childNode);
     }
+     */
 
-    /** Remove a child node to the childNodeVersions collection. 
-     * Use this method rather than calling getChildNodeVersions()
-     * and iterating through the set. See also addChildNodeVersion() 
-     * and getChildNodeVersion();
+    /** Remove a child node to the childNodes collection. 
+     * Use this method rather than calling getChildNodes()
+     * and iterating through the set. See also addChildNode() 
+     * and getChildNode();
      * 
      * Uses equals method defined in this class.
      * 
      * Not tested!!!!
      * 
      * @param childNode
-     */
-    public void removeChildNodeVersion(CrNodeVersion childNode) {
-    	Set set = getChildNodeVersions();
+    public void removeChildNode(CrNode childNode) {
+    	Set set = getChildNodes();
     	
     	if ( set != null ) {
     		Iterator iter = set.iterator();
     		boolean removed = false;
     		while ( iter.hasNext() && ! removed ) {
-				CrNodeVersion element = (CrNodeVersion) iter.next();
+    			CrNode element = (CrNode) iter.next();
 				if ( element.equals(childNode) ) {
 					iter.remove();
 				}
 			}
     	}
     }
+     */
 
-    /** Remove a child node to the childNodeVersions collection. 
-     * Use this method rather than calling getChildNodeVersions()
-     * and iterating through the set. See also addChildNodeVersion() 
-     * and removeChildNodeVersion();
+    /** Get a child node from the childNodes collection. 
+     * Use this method rather than calling getChildNodes()
+     * and iterating through the set. See also addChildNode() 
+     * and removeChildNode();
      * 
      * @param relPath of child
-     */
-    public CrNodeVersion getChildNodeVersion(String relPath) {
+    public CrNode getChildNode(String relPath) {
     	 
-    	if ( getChildNodeVersions() == null )
+    	if ( getChildNodes() == null )
     		return null;
     
-    	CrNodeVersion childNode = null;
-   		Iterator iter = getChildNodeVersions().iterator();
+    	CrNode childNode = null;
+   		Iterator iter = getChildNodes().iterator();
 		while (iter.hasNext() && childNode == null) {
-			CrNodeVersion element = (CrNodeVersion) iter.next();
-	    	String path = element.getNode().getPath();
+			CrNode element = (CrNode) iter.next();
+	    	String path = element.getPath();
 	    	if ( ( relPath == null && path == null ) || 
 				 ( relPath != null && relPath.equals(path)) ) {
 	    		childNode = element;
@@ -251,6 +235,7 @@ public class CrNodeVersion implements Serializable {
 		}
 		return childNode;
     }
+     */
 
     public String toString() {
         return new ToStringBuilder(this)
@@ -269,7 +254,6 @@ public class CrNodeVersion implements Serializable {
             .append(this.getVersionId(), castOther.getVersionId())
             .append(this.getCreatedDateTime(), castOther.getCreatedDateTime())
             .append(this.getNode(), castOther.getNode())
-            .append(this.getParentNodeVersion(), castOther.getParentNodeVersion())
             .isEquals();
     }
 
@@ -279,7 +263,6 @@ public class CrNodeVersion implements Serializable {
             .append(getVersionId())
             .append(getCreatedDateTime())
             .append(getNode())
-            .append(getParentNodeVersion())
             .toHashCode();
     }
     

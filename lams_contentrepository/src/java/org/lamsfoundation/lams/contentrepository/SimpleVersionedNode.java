@@ -63,6 +63,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 
 	private CrNode node = null;
 	private CrNodeVersion nodeVersion = null;
+	private List childNodes = null;
 	private InputStream newIStream = null;
 	private String filePath = null; // transient data - set when the input stream is written out.
 	private ITicket ticket = null; // transient data - using for grouping nodes in a session
@@ -111,11 +112,16 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		CrNodeVersion parentNodeVersion = parentNode != null ? parentNode.nodeVersion : null; 
 		createCrNode(relPath, nodeTypeName, workspace, parentNodeVersion); 
 		if ( parentNode != null ) {
-			parentNode.nodeVersion.addChildNodeVersion(this.nodeVersion);
+			parentNode.addChildNode(this.node);
 		}
-		
 	}
 
+	private void addChildNode(CrNode newChild) {
+		if ( childNodes == null ) {
+			childNodes = new ArrayList();
+		}
+		childNodes.add(newChild);
+	}
 	/** Load the data from the database (or other datastore).
 	 * Creates the CrNode and CrNodeVersion objects. 
 	 * Equivalent of initialiseNode for existing nodes
@@ -126,6 +132,8 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 	 * crNode and crNodeVersion objects will be disconnected
 	 * from the session, as the session will have been ended
 	 * with the Spring transaction.
+	 * 
+	 * If versionId is null, then gets the latest version
 	 */
 	protected void loadData(Long workspaceId, Long uuid, Long versionId) throws ItemNotFoundException {
 
@@ -137,12 +145,15 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 			throw new ItemNotFoundException("Workspace Id is null, unable to find node.");
 		}
 
-		// If version id is null, then get latest version!
 		node = null;
 		nodeVersion = null;
 
+		long start = System.currentTimeMillis();
+		String key = "loadData "+uuid;
+
 		try {
 			node = (CrNode) nodeDAO.find(CrNode.class, uuid);
+			log.error(key+" nodeRetrieved "+(System.currentTimeMillis()-start));
 		} catch (HibernateObjectRetrievalFailureException e ) {
 		}
 
@@ -165,6 +176,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		 * to be created? 
 		 */
 		nodeVersion = node.getNodeVersion(versionId);
+		log.error(key+" versionsRetrieved "+(System.currentTimeMillis()-start));
 		if ( nodeVersion == null ) {
 			throw new ItemNotFoundException("No version " 
 					+ ( versionId != null ? "#"+versionId.toString() : "")
@@ -200,9 +212,9 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		// get next version id
 		Long nextVersionId = this.node.incrementNextVersionId();
 		
+		this.node.setParentNodeVersion(existingNode.node.getParentNodeVersion());
 		nodeVersion = createCrNodeVersion(node.getType(), 
-						new Date(System.currentTimeMillis()), nextVersionId,
-						existingNode.nodeVersion.getParentNodeVersion());
+						new Date(System.currentTimeMillis()), nextVersionId);
 		node.getCrNodeVersions().add(nodeVersion);
 	}
 
@@ -461,8 +473,8 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		Date createdDate = new Date(System.currentTimeMillis());
 
 		// start the next version id at 1, which is used straight away by incrementNextVersionId()
-		node = new CrNode(relPath, nodeTypeName, createdDate, new Long(1), workspace, null);
-		nodeVersion = createCrNodeVersion(nodeTypeName, createdDate, node.incrementNextVersionId(), parentNode);  
+		node = new CrNode(relPath, nodeTypeName, createdDate, new Long(1), workspace, parentNode, null);
+		nodeVersion = createCrNodeVersion(nodeTypeName, createdDate, node.incrementNextVersionId());  
 		
 		HashSet versions = new HashSet();
 		versions.add(nodeVersion);
@@ -473,13 +485,12 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 	/** Create a version part of a node. 
 	 */
 	protected CrNodeVersion createCrNodeVersion(String nodeTypeName,  
-				Date createdDate, Long versionId, CrNodeVersion parentNode) {
+				Date createdDate, Long versionId) {
 		
 		nodeVersion = new CrNodeVersion();
 		nodeVersion.setCreatedDateTime(createdDate);
 		nodeVersion.setNode(node);
 		nodeVersion.setVersionId(versionId);
-		nodeVersion.setParentNodeVersion(parentNode);
 		// nvId is set automatically on save.
 		// ??nodeId is set automatically on save
 		return nodeVersion; 
@@ -616,9 +627,9 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 					}
 				}
 				String msg = "Result of rolling back file changes:";
-				if ( deleted.length() > 0 )
+				if ( deleted != null && deleted.length() > 0 )
 					msg = msg + "   deleted file(s) "+deleted;
-				if ( failedDeleted.length() > 0)
+				if ( failedDeleted != null && failedDeleted.length() > 0)
 					msg = msg + "   unable to delete file(s) "+failedDeleted;
 				log.error(msg);
 			}
@@ -646,6 +657,18 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 			nodeVersion.setVersionDescription(versionDescription);
 	
 		nodeDAO.insert(node);
+		
+		// child nodes are done manually as the set is lazy loaded
+		// and can't work out how to do that properly using the DAO template!
+		// 'cause the session goes away.
+		if ( childNodes != null ) {
+			Iterator iter = childNodes.iterator();
+			while ( iter.hasNext() ) {
+				CrNode node = (CrNode) iter.next();
+				nodeDAO.insert(node);
+			}
+		}
+
 	}
 
 	/** Write the file out (if one exists). Sets the private attribute filePath.
@@ -681,18 +704,24 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
     public IVersionedNode getNode(String relPath) 
     	throws ItemNotFoundException {
     	
+		String key = "getNode "+getUUID();
+		long start = System.currentTimeMillis();
+		log.error(key+" start 0");
+
 		nodeObjectInitilised("Unable to get child node.");
 		
     	if ( log.isDebugEnabled() ) {
     		log.debug("getNode for path "+relPath+" start.");
     	}
 
-		CrNodeVersion childNodeVersion = nodeVersion.getChildNodeVersion(relPath);
+		CrNode childNode = nodeDAO.findChildNode(nodeVersion, relPath);
+		log.error(key+" childNodeDB"+(System.currentTimeMillis()-start));
 		
-		if ( childNodeVersion != null ) {
+		if ( childNode != null ) {
 			SimpleVersionedNode newNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
-			newNode.node = childNodeVersion.getNode();
-			newNode.nodeVersion = childNodeVersion;
+			newNode.node = childNode;
+			newNode.nodeVersion = childNode.getNodeVersion(null); // get latest and only version
+			log.error(key+" returningNode"+(System.currentTimeMillis()-start));
 			return (IVersionedNode) newNode;
 		} else {
     		throw new ItemNotFoundException("Unable to find node with path "+relPath
@@ -705,16 +734,16 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#getChildNodes()
      */
     public Set getChildNodes() {
-    	Set childCrNodeVersions = nodeVersion.getChildNodeVersions();
+    	List childCrNodes = nodeDAO.findChildNodes(nodeVersion);
     	Set childNodes = new HashSet(); 
     		
-    	if ( childCrNodeVersions != null ) {
-    		Iterator iter = childCrNodeVersions.iterator();
+    	if ( childCrNodes != null ) {
+    		Iterator iter = childCrNodes.iterator();
     		while (iter.hasNext()) {
-				CrNodeVersion element = (CrNodeVersion) iter.next();
+    			CrNode element = (CrNode) iter.next();
 				SimpleVersionedNode newNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
-				newNode.node = element.getNode();
-				newNode.nodeVersion = element;
+				newNode.node = element;
+				newNode.nodeVersion = element.getNodeVersion(null);
 				childNodes.add(newNode);
 			}
     	}
@@ -734,7 +763,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 
     	nodeObjectInitilised("Unable to check if there is a parent node.");
 		
-		return (nodeVersion.getParentNodeVersion() != null);
+		return (node.getParentNodeVersion() != null);
 
     }
 
@@ -756,7 +785,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#hasNodes()
      */
     public boolean hasNodes() {
-    	Set childNodes = nodeVersion.getChildNodeVersions();
+    	List childNodes = nodeDAO.findChildNodes(nodeVersion);
     	return (childNodes != null && childNodes.size() > 0);
     }
 

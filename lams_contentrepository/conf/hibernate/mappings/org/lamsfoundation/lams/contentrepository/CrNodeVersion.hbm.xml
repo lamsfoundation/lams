@@ -88,46 +88,35 @@
         <column name="node_id" />
     </many-to-one>
 
-    <!-- bi-directional many-to-one association to CrNodeVersion - which is my parent node? -->
-    <many-to-one
-        name="parentNodeVersion"
-        class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
-        not-null="true"
-    >
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="parent_nv_id"         
-        </meta>
-        <column name="parent_nv_id" />
-    </many-to-one>
     <!-- bi-directional one-to-many association to CrNodeVersion - what are my child nodes? -->
-    <set
-        name="childNodeVersions"
-        lazy="false"
-        inverse="true"
-		cascade="all-delete-orphan"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="false"
-            cascade="all-delete-orphan"
+<!-- don't use this at present - would want to lazy load but can't work out how I actually -->
+<!--  get the set later. So do everything manually for the moment -->
+<!--  <set																 -->
+<!--          name="childNodes"											 -->
+<!--          lazy="false"												 -->
+<!--          inverse="true"										 	 -->
+<!--  		cascade="all-delete-orphan"									 -->
+<!--      >										 					 	 -->
+<!--          <meta attribute="field-description">						 -->
+<!--             @hibernate.set											 -->
+<!--              lazy="true"											 -->
+<!--              inverse="false"										 -->
+<!--              cascade="all-delete-orphan"							 -->
+<!--  																	 -->
+<!--             @hibernate.collection-key								 -->
+<!--              column="parent_nv_id"									 -->
+<!--  																	 -->
+<!--             @hibernate.collection-one-to-many						 -->
+<!--              class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"	-->
+<!--          </meta>													 -->
+<!--          <key>														 -->
+<!--              <column name="parent_nv_id" />						 -->
+<!--          </key>													 -->
+<!--          <one-to-many 												 -->
+<!--              class="org.lamsfoundation.lams.contentrepository.CrNode"		-->
+<!--          />														 -->
+<!--      </set>														 -->
 
-           @hibernate.collection-key
-            column="parent_nv_id"
-
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
-        </meta>
-        <key>
-            <column name="parent_nv_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
-        />
-    </set>
      <!-- bi-directional one-to-many association to CrNodeVersionProperty -->
     <set
         name="crNodeVersionProperties"

@@ -140,6 +140,19 @@
         </meta>
         <column name="workspace_id" />
     </many-to-one>
-
+    <!-- bi-directional many-to-one association to CrNodeVersion - which is my parent node? -->
+    <many-to-one
+        name="parentNodeVersion"
+        class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
+        not-null="true"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="parent_nv_id"         
+        </meta>
+        <column name="parent_nv_id" />
+    </many-to-one>
 </class>
 </hibernate-mapping>

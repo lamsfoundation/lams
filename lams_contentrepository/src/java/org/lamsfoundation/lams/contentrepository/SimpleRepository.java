@@ -320,8 +320,12 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 	 * Does not cache the node. If versionId is null, then gets the latest version.
 	 * @throws ItemNotFoundException*/
 	private SimpleVersionedNode getNode(Long workspaceId, Long uuid, Long versionId) throws ItemNotFoundException {
+		long start = System.currentTimeMillis();
+		String key = "getNode "+uuid;
 		SimpleVersionedNode dbNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
+		log.error(key+" beanCreated "+(System.currentTimeMillis()-start));
 		dbNode.loadData(workspaceId, uuid,versionId);
+		log.error(key+" loadedData "+(System.currentTimeMillis()-start));
 		return dbNode;
 	}
 	
@@ -543,7 +547,10 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 			String relPath) throws AccessDeniedException,
 			ItemNotFoundException, FileException {
 
-		IVersionedNodeAdmin latestNodeVersion = getNode(ticket.getWorkspaceId(),uuid,version);
+		long start = System.currentTimeMillis();
+
+		IVersionedNode latestNodeVersion = getNode(ticket.getWorkspaceId(),uuid,version);
+		log.error("getFileItem latestNodeVersion "+(System.currentTimeMillis()-start));
 		
 		if ( relPath == null ) {
 			
@@ -554,7 +561,9 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 		} else {
     	
    			// find the node indicated by the relPath
-   			return latestNodeVersion.getNode(relPath);
+			IVersionedNode childNode = latestNodeVersion.getNode(relPath); 
+			log.error("getFileItem latestNodeVersion.getNode "+(System.currentTimeMillis()-start));
+   			return childNode;
 		}
 	}
 	
@@ -564,15 +573,19 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 	public List getPackageNodes(ITicket ticket, Long uuid, Long version) throws AccessDeniedException,
 			ItemNotFoundException, FileException {
 
+		long start = System.currentTimeMillis();
 		IVersionedNodeAdmin latestNodeVersion = getNode(ticket.getWorkspaceId(),uuid,version);
+		log.error("getPackageNodes latestNodeVersion "+(System.currentTimeMillis()-start));
 		
 		Set childNodes = latestNodeVersion.getChildNodes();
 		int childNodesSize = childNodes != null ? childNodes.size() : 0;
+		log.error("getPackageNodes getChildNodes "+(System.currentTimeMillis()-start));
 		
 		ArrayList list = new ArrayList(1+childNodesSize);
 		list.add(latestNodeVersion);
 		list.addAll(childNodes);
 
+		log.error("getPackageNodes end "+(System.currentTimeMillis()-start));
 		return list;
 	}
 

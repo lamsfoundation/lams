@@ -57,14 +57,6 @@ public class WorkspaceDAO extends HibernateDaoSupport implements IWorkspaceDAO  
 	 * the necessary info when workspace is returned to the calling 
 	 * code. 
 	 * 
-	 * In fact, doing getNodes() here still doesn't work - there isn't
-	 * a session! So as a hack, I'll look up the nodes directly.
-	 * Yuck. The only other solution I can find easily doing a google
-	 * search is using OpenSessionInViewInterceptor/OpenSessionInViewFilter
-	 * but they seem to be designed for using when the whole item is beind
-	 * passed to a webapp - and we don't necessarily have a webapp here.
-	 * Maybe I'm just missing something in HibernateDaoSupport!
-	 * 
 	 * @param workspaceId
 	 * @return Set of CrNodes applicable to this workspace. 
 	 */
