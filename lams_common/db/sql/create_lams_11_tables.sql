@@ -36,7 +36,7 @@ CREATE TABLE lams_role (
        role_id INT(6) NOT NULL DEFAULT 0
      , name VARCHAR(64) NOT NULL
      , description TEXT
-     , create_date DATETIME 
+     , create_date BIGINT(20)
      , PRIMARY KEY (role_id)
 )TYPE=InnoDB;
 CREATE INDEX gname ON lams_role (name ASC);
@@ -102,6 +102,22 @@ CREATE TABLE lams_activity_category (
      , PRIMARY KEY (activity_category_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_cr_workspace (
+       workspace_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT
+     , name VARCHAR(255) NOT NULL
+     , PRIMARY KEY (workspace_id)
+)TYPE=InnoDB;
+ALTER TABLE lams_cr_workspace COMMENT='Content repository workspace';
+
+CREATE TABLE lams_cr_credential (
+       credential_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT
+     , name VARCHAR(255) NOT NULL
+     , password VARCHAR(255) NOT NULL
+     , wc_id BIGINT(20) UNSIGNED NOT NULL
+     , PRIMARY KEY (credential_id)
+)TYPE=InnoDB;
+ALTER TABLE lams_cr_credential COMMENT='Records the identification properties for a tool.';
+
 CREATE TABLE lams_authentication_method_type (
        authentication_method_type_id INT(3) NOT NULL
      , description VARCHAR(64) NOT NULL
@@ -138,20 +154,6 @@ CREATE TABLE lams_workspace (
      , INDEX (root_folder_id)
      , CONSTRAINT FK_lams_workspace_1 FOREIGN KEY (root_folder_id)
                   REFERENCES lams_workspace_folder (workspace_folder_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
-CREATE TABLE lams_grouping (
-       grouping_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , grouping_ui_id INT(11)
-     , grouping_type_id INT(11) NOT NULL
-     , number_of_groups INT(11)
-     , learners_per_group INT(11)
-     , staff_group_id BIGINT(20) DEFAULT 0
-     , max_number_of_groups INT(3)
-     , PRIMARY KEY (grouping_id)
-     , INDEX (grouping_type_id)
-     , CONSTRAINT FK_lams_learning_grouping_1 FOREIGN KEY (grouping_type_id)
-                  REFERENCES lams_grouping_type (grouping_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
 CREATE TABLE lams_organisation (
@@ -251,6 +253,20 @@ CREATE TABLE lams_learning_design (
 )TYPE=InnoDB;
 CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
 
+CREATE TABLE lams_grouping (
+       grouping_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , grouping_ui_id INT(11)
+     , grouping_type_id INT(11) NOT NULL
+     , number_of_groups INT(11)
+     , learners_per_group INT(11)
+     , staff_group_id BIGINT(20) DEFAULT 0
+     , max_number_of_groups INT(3)
+     , PRIMARY KEY (grouping_id)
+     , INDEX (grouping_type_id)
+     , CONSTRAINT FK_lams_learning_grouping_1 FOREIGN KEY (grouping_type_id)
+                  REFERENCES lams_grouping_type (grouping_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+)TYPE=InnoDB;
+
 CREATE TABLE lams_group (
        group_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , grouping_id BIGINT(20) NOT NULL
@@ -305,7 +321,6 @@ CREATE TABLE lams_lesson (
 CREATE TABLE lams_learning_activity (
        activity_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , activity_ui_id INT(11)
-     , activity_category_id INT(3) NOT NULL
      , description TEXT
      , title VARCHAR(255)
      , help_text TEXT
@@ -328,6 +343,7 @@ CREATE TABLE lams_learning_activity (
      , options_instructions TEXT
      , tool_id BIGINT(20)
      , tool_content_id BIGINT(20)
+     , activity_category_id INT(3)
      , gate_activity_level_id INT(11)
      , gate_open_flag TINYINT(1)
      , gate_start_time_offset BIGINT(38)
@@ -399,6 +415,35 @@ CREATE TABLE lams_learner_progress (
      , CONSTRAINT FK_lams_learner_progress_5 FOREIGN KEY (previous_activity_id)
                   REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
+
+CREATE TABLE lams_cr_node (
+       node_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT
+     , workspace_id BIGINT(20) UNSIGNED NOT NULL
+     , path VARCHAR(255)
+     , type VARCHAR(255) NOT NULL
+     , created_date_time DATETIME NOT NULL
+     , next_version_id BIGINT(20) UNSIGNED NOT NULL DEFAULT 1
+     , parent_nv_id BIGINT(20) UNSIGNED
+     , nv_id BIGINT(20) UNSIGNED NOT NULL
+     , PRIMARY KEY (node_id)
+     , INDEX (workspace_id)
+     , CONSTRAINT FK_lams_cr_node_1 FOREIGN KEY (workspace_id)
+                  REFERENCES lams_cr_workspace (workspace_id)
+)TYPE=InnoDB;
+ALTER TABLE lams_cr_node COMMENT='The main table containing the node definition';
+
+CREATE TABLE lams_cr_node_version (
+       nv_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT
+     , node_id BIGINT(20) UNSIGNED NOT NULL
+     , version_id BIGINT(20) UNSIGNED NOT NULL
+     , created_date_time DATETIME NOT NULL
+     , id BIGINT(20) UNSIGNED NOT NULL
+     , PRIMARY KEY (nv_id)
+     , INDEX (node_id)
+     , CONSTRAINT FK_lams_cr_node_version_2 FOREIGN KEY (node_id)
+                  REFERENCES lams_cr_node (node_id)
+)TYPE=InnoDB;
+ALTER TABLE lams_cr_node_version COMMENT='Represents a version of a node';
 
 CREATE TABLE lams_user_organisation_role (
        user_organisation_role_id BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -510,6 +555,32 @@ CREATE TABLE lams_lesson_learner (
      , INDEX (user_id)
      , CONSTRAINT FK_lams_lesson_learner_2 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_cr_workspace_credential (
+       wc_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT
+     , workspace_id BIGINT(20) UNSIGNED NOT NULL
+     , credential_id BIGINT(20) UNSIGNED NOT NULL
+     , PRIMARY KEY (wc_id)
+     , INDEX (workspace_id)
+     , CONSTRAINT FK_lams_cr_workspace_credential_1 FOREIGN KEY (workspace_id)
+                  REFERENCES lams_cr_workspace (workspace_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (credential_id)
+     , CONSTRAINT FK_lams_cr_workspace_credential_2 FOREIGN KEY (credential_id)
+                  REFERENCES lams_cr_credential (credential_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+)TYPE=InnoDB;
+ALTER TABLE lams_cr_workspace_credential COMMENT='Maps tools access to workspaces';
+
+CREATE TABLE lams_cr_node_version_property (
+       id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT
+     , nv_id BIGINT(20) UNSIGNED NOT NULL
+     , name VARCHAR(255) NOT NULL
+     , value VARCHAR(255) NOT NULL
+     , type TINYINT NOT NULL
+     , PRIMARY KEY (id)
+     , INDEX (nv_id)
+     , CONSTRAINT FK_lams_cr_node_version_property_1 FOREIGN KEY (nv_id)
+                  REFERENCES lams_cr_node_version (nv_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learning_transition (
