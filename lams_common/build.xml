@@ -195,7 +195,7 @@ Ant build file.
   				webxml="${webinf}/web.xml">
 			<webinf dir="${webinf}">
 				<include name="*.xml"/>
-				<include name="*.properties"/>
+				<!--include name="*.properties"/-->
 				<include name="struts/*"/>
 				<include name="jstl/*"/>
 				<exclude name="web.xml"/>
