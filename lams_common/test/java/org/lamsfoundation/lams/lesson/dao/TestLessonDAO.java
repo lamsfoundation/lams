@@ -51,8 +51,10 @@ public class TestLessonDAO extends LessonDataAccessTestCase
     {
         Lesson createdLesson = this.lessonDao.getLessonWithEagerlyFetchedProgress(this.testLesson.getLessonId());
         
-        super.assertLessonClass();
-        super.assertLesson();
+        //assert the data retrieved.
+        super.assertLesson(createdLesson);
+        
+        
     }
     
 }

@@ -54,6 +54,7 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
     protected IOrganisationDAO orgDao;
     protected ILessonDAO lessonDao;
     protected ILessonClassDAO lessonClassDao;    
+    
     //---------------------------------------------------------------------
     // Domain Object instances
     //---------------------------------------------------------------------
@@ -223,7 +224,7 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
                                 testLearningDesign,
                                 testLessonClass,//lesson class
                                 testOrg,
-                                new HashSet());
+                                new HashSet());//learner progress
     }
   
 
@@ -233,30 +234,31 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
     /**
      * Helper method to validate the created lesson class. This validation
      * method can be reused by sub-classes.
+     * @param lessonClass TODO
      */
-    protected void assertLessonClass()
+    protected void assertLessonClass(LessonClass lessonClass)
     {
-        LessonClass createdLessonClass = lessonClassDao.getLessonClass(this.testLessonClass.getGroupingId());
-        assertEquals("check up number of activities",1,createdLessonClass.getActivities().size());
-        assertEquals("check up staff groups",1,createdLessonClass.getStaffGroup().getUsers().size());
-        assertEquals("check up grouping types, should be class grouping",Grouping.CLASS_GROUPING_TYPE,createdLessonClass.getGroupingTypeId());
-        assertEquals("check up learner groups",1,createdLessonClass.getGroups().size());
+        assertEquals("check up number of activities",1,lessonClass.getActivities().size());
+        assertEquals("check up staff groups",1,lessonClass.getStaffGroup().getUsers().size());
+        assertEquals("check up grouping types, should be class grouping",Grouping.CLASS_GROUPING_TYPE,lessonClass.getGroupingTypeId());
+        assertEquals("check up learner groups",1,lessonClass.getGroups().size());
     }
     /**
      * Helper method to validate the created lesson. This validation
      * method can be reused by sub-classes.
+     * @param lesson TODO
      */
-    protected void assertLesson()
+    protected void assertLesson(Lesson lesson)
     {
-        Lesson createdLesson = lessonDao.getLesson(this.testLesson.getLessonId());
         assertEquals("check up creation time",testLesson.getCreateDateTime().toString(),
-                     						  createdLesson.getCreateDateTime().toString());
-        assertEquals("check up user who created this lesson",testUser.getLogin(),createdLesson.getUser().getLogin());
-        assertEquals("check up the lesson state",Lesson.NOT_STARTED_STATE,createdLesson.getLessonStateId());
+                     						  lesson.getCreateDateTime().toString());
+        assertEquals("check up user who created this lesson",testUser.getLogin(),lesson.getUser().getLogin());
+        assertEquals("check up the lesson state",Lesson.NOT_STARTED_STATE,lesson.getLessonStateId());
         assertEquals("check up the learning design that used to create lesson",
                      							testLearningDesign.getTitle(),
-                     							createdLesson.getLearningDesign().getTitle());
-        assertEquals("check up the organization", testOrg.getName(),createdLesson.getOrganisation().getName());
+                     							lesson.getLearningDesign().getTitle());
+        assertEquals("check up the organization", testOrg.getName(),lesson.getOrganisation().getName());
+        assertEquals("check up the learner progresses",0,lesson.getLearnerProgresses().size());
         
     }
 }
