@@ -566,29 +566,32 @@ values(4,4,'Chat to QNA','Chat to QNA',24,21,1,'20050207',24,7);
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
 values(5,5,'QNA to OptionsActivity','QNA to OptionsActivity',12,24,1,'20050207',12,24);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(6,6,'OptionsActivity to Notebook','OptionsActivity to Notebook',16,12,1,'20050207',2,12);
+--insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+--values(6,6,'OptionsActivity to Notebook','OptionsActivity to Notebook',16,12,1,'20050207',2,12);
+
+--insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+--values(7,7,'Notebook to MultipleChoice','Notebook to MultipleChoice',17,16,1,'20050207',3,2);
+
+--insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+--values(8,8,'MultipleChoice to ParallelActivity','MultipleChoice to ParallelActivity',13,17,1,'20050207',13,3);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(7,7,'Notebook to MultipleChoice','Notebook to MultipleChoice',17,16,1,'20050207',3,2);
+values(6,6,'OptionsActivity to ParallelActivity','OptionsActivity to ParallelActivity',13,12,1,'20050207',13,12);
+
+--insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+--values(9,9,'ParallelActivity to QNA','ParallelActivity to QNA',18,13,1,'20050207',4,13);
+
+--insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+--values(10,10,'QNA to MessageBoard','QNA to MessageBoard',19,18,1,'20050207',5,4);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(8,8,'MultipleChoice to ParallelActivity','MultipleChoice to ParallelActivity',13,17,1,'20050207',13,3);
+values(7,7,'ParallelActivity to SequenceActivity','ParallelActivity to SequenceActivity',14,13,1,'20050207',14,14);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(9,9,'ParallelActivity to QNA','ParallelActivity to QNA',18,13,1,'20050207',4,13);
+--insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+--values(12,12,'SequenceActivity to Shared Resources','SequenceActivity to Shared Resources',22,14,1,'20050207',8,14);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(10,10,'QNA to MessageBoard','QNA to MessageBoard',19,18,1,'20050207',5,4);
-
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(11,11,'MessageBoard to SequenceActivity','MessageBoard to SequenceActivity',14,19,1,'20050207',14,5);
-
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(12,12,'SequenceActivity to Shared Resources','SequenceActivity to Shared Resources',22,14,1,'20050207',8,14);
-
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(13,13,'Shared Resources to QNA','Shared Resources to QNA',25,22,1,'20050207',25,8);
+--insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+--values(13,13,'Shared Resources to QNA','Shared Resources to QNA',25,22,1,'20050207',25,8);
 
 
 insert into lams_learning_design(learning_design_ui_id,description,title,first_activity_id,max_id,valid_design_flag,
