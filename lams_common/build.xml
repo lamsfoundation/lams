@@ -158,7 +158,7 @@ Ant build file.
 	<target name="preparedirs">
 		<mkdir dir="${build}"/>
 		<mkdir dir="${build.classes}"/>
-		<mkdir dir="${build.classes.test}"/>
+		<mkdir dir="${build.test}"/>
 		<mkdir dir="${build.lib}"/>
 	</target>
 
@@ -182,14 +182,14 @@ Ant build file.
 	</target>
 
 	<target name="compile.test" depends="compile">
-		<javac destdir="${build.classes.test}" compiler="modern">
+		<javac destdir="${build.test}" compiler="modern">
 			<src path="${src.test.java}"/>
 			<classpath>
 				<pathelement location="${build.classes}"/>
 				<path refid="project.classpath"/>
 			</classpath>
 		</javac>
-		<copy overwrite="yes" todir="${build.classes.test}">
+		<copy overwrite="yes" todir="${build.test}">
 			<fileset dir="${src.test.java}">
 				<include name="**/*.xml"/>
 			</fileset>
@@ -198,11 +198,13 @@ Ant build file.
 	<!-- ================================================================ -->
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
-	<target name="lams-jar" depends="compile" description="creates jar file">
+	<target name="lams-jar" depends="compile,compile.test" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
 		<jar jarfile="${build.lib}/${product}.jar">
 			<fileset dir="${build.classes}">
 			</fileset>
+			<fileset dir="${build.test}">
+			</fileset>			
 			<fileset dir="${hbm}">
 			</fileset>
 		</jar>

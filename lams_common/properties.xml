@@ -46,7 +46,7 @@
 	<property name="build"                         value="${basedir}/build"/>
 	<property name="build.classes"                 value="${build}/classes"/>
 	<property name="build.report"                 value="${build}/report"/>
-	<property name="build.classes.test"            value="${build}/classes/test"/>
+	<property name="build.test"            value="${build}/test"/>
 	
 	<property name="build.lib"                     value="${build}/lib"/>
 	
