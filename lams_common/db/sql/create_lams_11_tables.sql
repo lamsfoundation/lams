@@ -99,7 +99,7 @@ CREATE TABLE lams_workspace_folder (
        workspace_folder_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
      , parent_folder_id BIGINT(20)
      , name VARCHAR(64) NOT NULL
-     , workspace_id BIGINT(20) NOT NULL DEFAULT 0
+     , workspace_id BIGINT(20) NOT NULL
      , PRIMARY KEY (workspace_folder_id)
      , INDEX (parent_folder_id)
      , CONSTRAINT FK_lams_workspace_folder_2 FOREIGN KEY (parent_folder_id)
@@ -108,7 +108,7 @@ CREATE TABLE lams_workspace_folder (
 
 CREATE TABLE lams_workspace (
        workspace_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
-     , root_folder_id BIGINT(20) NOT NULL DEFAULT 0
+     , root_folder_id BIGINT(20) NOT NULL
      , PRIMARY KEY (workspace_id)
      , INDEX (root_folder_id)
      , CONSTRAINT FK_lams_workspace_1 FOREIGN KEY (root_folder_id)
@@ -220,7 +220,7 @@ CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC
 
 CREATE TABLE lams_group (
        group_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
-     , grouping_id BIGINT(20) NOT NULL DEFAULT 0
+     , grouping_id BIGINT(20) NOT NULL
      , order_id INT(6) NOT NULL DEFAULT 1
      , PRIMARY KEY (group_id)
      , INDEX (grouping_id)
@@ -230,8 +230,8 @@ CREATE TABLE lams_group (
 
 CREATE TABLE lams_user_organisation (
        user_organisation_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
-     , organisation_id BIGINT(20) NOT NULL DEFAULT 0
-     , user_id BIGINT(20) NOT NULL DEFAULT 0
+     , organisation_id BIGINT(20) NOT NULL
+     , user_id BIGINT(20) NOT NULL
      , PRIMARY KEY (user_organisation_id)
      , INDEX (user_id)
      , CONSTRAINT u_user_organisation_ibfk_1 FOREIGN KEY (user_id)
@@ -243,14 +243,14 @@ CREATE TABLE lams_user_organisation (
 
 CREATE TABLE lams_lesson (
        lesson_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , learning_design_id BIGINT(20) NOT NULL DEFAULT 0
-     , user_id BIGINT(20) NOT NULL DEFAULT 0
+     , learning_design_id BIGINT(20) NOT NULL
+     , user_id BIGINT(20) NOT NULL
      , create_date_time DATETIME NOT NULL
-     , organisation_id BIGINT(20) NOT NULL DEFAULT 0
+     , organisation_id BIGINT(20) NOT NULL
      , lesson_state_id INT(3) NOT NULL
      , start_date_time DATETIME
      , end_date_time DATETIME
-     , class_grouping_id BIGINT(20) NOT NULL DEFAULT 0
+     , class_grouping_id BIGINT(20) NOT NULL
      , PRIMARY KEY (lesson_id)
      , INDEX (learning_design_id)
      , CONSTRAINT FK_lams_lesson_1_1 FOREIGN KEY (learning_design_id)
@@ -321,30 +321,34 @@ CREATE TABLE lams_learning_activity (
                   REFERENCES lams_grouping (grouping_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams_learner_progress (
-       learner_progress_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , user_id BIGINT(20) NOT NULL DEFAULT 0
-     , lesson_id BIGINT(20) NOT NULL
-     , lesson_completed_flag TINYINT(1) NOT NULL DEFAULT 0
-     , start_date_time DATETIME NOT NULL
-     , finish_date_time DATETIME
-     , activity_id BIGINT(20) NOT NULL DEFAULT 0
-     , PRIMARY KEY (learner_progress_id)
-     , INDEX (user_id)
-     , CONSTRAINT FK_lams_learner_progress_1 FOREIGN KEY (user_id)
-                  REFERENCES lams_user (user_id)
-     , INDEX (lesson_id)
-     , CONSTRAINT FK_lams_learner_progress_2 FOREIGN KEY (lesson_id)
-                  REFERENCES lams_lesson (lesson_id)
-     , INDEX (activity_id)
-     , CONSTRAINT FK_lams_learner_progress_3 FOREIGN KEY (activity_id)
-                  REFERENCES lams_learning_activity (activity_id)
+CREATE TABLE lams_learner_progress ( 
+       learner_progress_id BIGINT(20) NOT NULL AUTO_INCREMENT 
+     , user_id BIGINT(20) NOT NULL 
+     , lesson_id BIGINT(20) NOT NULL 
+     , lesson_completed_flag TINYINT(1) NOT NULL DEFAULT 0 
+     , start_date_time DATETIME NOT NULL 
+     , finish_date_time DATETIME 
+     , current_activity_id BIGINT(20) 
+     , next_activity_id BIGINT(20) 
+     , PRIMARY KEY (learner_progress_id) 
+     , INDEX (user_id) 
+     , CONSTRAINT FK_lams_learner_progress_1 FOREIGN KEY (user_id) 
+                  REFERENCES lams_user (user_id) 
+     , INDEX (lesson_id) 
+     , CONSTRAINT FK_lams_learner_progress_2 FOREIGN KEY (lesson_id) 
+                  REFERENCES lams_lesson (lesson_id) 
+     , INDEX (current_activity_id) 
+     , CONSTRAINT FK_lams_learner_progress_3 FOREIGN KEY (current_activity_id) 
+                  REFERENCES lams_learning_activity (activity_id) 
+     , INDEX (next_activity_id) 
+     , CONSTRAINT FK_lams_learner_progress_4 FOREIGN KEY (next_activity_id) 
+                  REFERENCES lams_learning_activity (activity_id) 
 )TYPE=InnoDB;
 
 CREATE TABLE lams_tool_session (
        tool_session_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , group_id BIGINT(20) DEFAULT 0
-     , activity_id BIGINT(20) NOT NULL DEFAULT 0
+     , activity_id BIGINT(20) NOT NULL
      , tool_session_key BIGINT(20) NOT NULL
      , tool_session_state_id INT(3) NOT NULL
      , create_date_time DATETIME NOT NULL
