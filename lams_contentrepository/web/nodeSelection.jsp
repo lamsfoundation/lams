@@ -8,6 +8,18 @@
 <%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts/struts-logic.tld" prefix="logic" %>
+
+<script language="JavaScript" type="text/JavaScript">
+<!--
+
+ function setActionSubmit(methodSelected, uuidSelected, versionSelected){
+	document.forms[0].method.value = methodSelected;
+	document.forms[0].uuid.value = uuidSelected;
+	document.forms[0].version.value = versionSelected;
+	document.forms[0].submit();
+ }
+ //-->
+</script>
  
 <html> 
 	<head>
@@ -23,34 +35,33 @@
 		name is known to the application cache (in the session). The rest of the nodes have been added to the 
 		workspace at some other time. </p>
 		
-		<P>Note: Node 1 for the atool workspace does not have a file in the repository so it will generate an error.
+		<P>Note: Nodes 1 thru 2 for the atool workspace does not have a file in the repository so it will generate an error.
 		 This is due to the data being designed for unit testing, not demonstration.</p>
 		 
-		<form>
-			<INPUT TYPE="button" VALUE="Add File/Package" onClick="parent.location='addNode.jsp'">
-		</form>
-		<html:form action="/nodeSelection?method=logout">
-			<html:submit value = "Logout"/>
-		</html:form>
-		
-		<html:form action="/nodeSelection?method=getNode">
-		<p><html:errors/></p>
-		<p>
+
+		<html:form action="/nodeSelection">
+			<p><html:errors/></p>
+			<!-- hidden parameters - used for input on submit -->
+			<p><input type="hidden" name="method" value="">
+			<input type="hidden" name="version" value="">
+			<input type="hidden" name="uuid" value="">
+
+			<p><INPUT name="upload" onClick="parent.location='addNode.jsp'" TYPE="button" size="50" VALUE="Add File/Package" > 
+			<input name="logout" onClick="setActionSubmit('logout', '', '')" type="button" size="50" value="Logout"/></p>
+
 			<jsp:useBean id="nodeMap" type="java.util.Map" scope="request"/>
-			<TABLE>
-				<TR>
-					<TD>Version</TD>
-					<TD>Created Date Time</TD>
-					<TD>Version Description</TD>
-					<TD>File Name ( Application Cache )</TD>
-				</TR>
+			<TABLE cellspacing="10">
 
 			<% Iterator iter = nodeMap.keySet().iterator();
 			   Map nodeCache = (Map) session.getAttribute(RepositoryDispatchAction.NODE_CACHE);
  			   while ( iter.hasNext()) {
 					Long key = (Long) iter.next();
 			%>
-						<TR><TD colspan="4"><STRONG>Node </STRONG><html:submit property="uuid" value="<%=key.toString()%>"/></TD></TR>
+				<TR><TD colspan="6"><STRONG>Node <%=key.toString()%>:</STRONG>
+				<input name="getNode" onClick="setActionSubmit('getNode', '<%=key.toString()%>', '')" type="button" size="50" value="Get Latest Version"/>
+				<input name="uploadNewVersion" onClick="parent.location='addNode.jsp?uuid=<%=key.toString()%>'" type="button" size="50" value="Upload New Version"/>
+				<input name="deleteNode" onClick="setActionSubmit('deleteNode', '<%=key.toString()%>', '')" type="button" size="50" value="Delete Node (All Versions)"/>
+				</TD></TR>
 			<%						
 					Set versionDetails = (Set) nodeMap.get(key);
 					Iterator setIter = versionDetails.iterator();
@@ -60,15 +71,17 @@
 						String nodeName = nodeCache != null ? (String)nodeCache.get(nodeKey) : "";
 			%>
 						<TR>
-							<TD><%=detail.getVersionId()%></TD>
-							<TD><%=detail.getCreatedDateTime()%></TD>
-							<TD><%=detail.getDescription()%></TD>
-							<TD><%=nodeName!=null?nodeName:""%></TD>
+							<TD>Version: <%=detail.getVersionId()%></TD>
+							<TD><input name="getNode" onClick="setActionSubmit('getNode', '<%=key.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Get File"/></TD>
+							<TD><input name="deleteVersion" onClick="setActionSubmit('deleteNode', '<%=key.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Delete Version"/>
+							<TD>Created Date Time: <%=detail.getCreatedDateTime()%></TD>
+							<TD>Version Description: <%=detail.getDescription()%></TD>
+							<TD>File Name (Application Cache):<%=nodeName!=null?nodeName:""%></TD>
 						</TR>
 			<%
 					} // end version details iterator
 			%>
-						<TR><TD colspan="4">&nbsp;</TD></TR>
+						<TR><TD colspan="6">&nbsp;</TD></TR>
 			<%
 				}// end node iterator
 			%>

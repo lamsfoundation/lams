@@ -20,6 +20,16 @@
 			 in the node list below.</p>
 			 
 		<html:form action="/addFileContent" method="POST" enctype="multipart/form-data">
+ 			<% String uuid = request.getParameter("uuid");
+			   if ( uuid != null && uuid.length() > 0 ) {
+			%>
+				<p>Adding a new version for Node <%=uuid%>. If the original node was a package,
+				then please upload another package. If the original node was a file, please
+				upload a file. 	<html:hidden property="uuid" value="<%=uuid%>"/> 
+				</p>
+			<% } %>
+
+				
 			<p>Version Description (Required for both): <html:text property="description" size="100"/></P>
 			<H3>Single File:</H3>
 			<p>File to upload?&nbsp;<html:file property="theFile"/><html:errors property="theFile"/> 
