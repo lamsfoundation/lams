@@ -125,7 +125,6 @@ public class FileTokenReplacerTest extends TestCase
         return suite;
     }
     
-    // TODO add test methods here. The name must begin with 'test'. For example:
-    // public void testHello() {}
+    
     
 }
