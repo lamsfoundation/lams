@@ -42,7 +42,15 @@ public class DummyToolAction extends DispatchAction {
 		ActionForward forward = mapping.findForward("display");
 		return forward;
 	}
-
+	
+	public ActionForward unspecified(
+			ActionMapping mapping,
+			ActionForm form,
+			HttpServletRequest request,
+			HttpServletResponse response) {
+		return display(mapping, form, request, response);
+	}
+	
 	public ActionForward finish(
 			ActionMapping mapping,
 			ActionForm form,
@@ -50,14 +58,14 @@ public class DummyToolAction extends DispatchAction {
 			HttpServletResponse response) {
 		DummyToolForm testForm = (DummyToolForm)form;
 		
-		if (testForm.getActivityId() == null) {
+		if (testForm.getToolSessionId() == null) {
 			return null;
 		}
-		long activityId = testForm.getActivityId().longValue();
+		long toolSessionId = testForm.getToolSessionId().longValue();
 		
 		DummyLearnerService learnerService = (DummyLearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
 		learnerService.setRequest(request);
-		String url = learnerService.completeToolActivity(activityId);
+		String url = learnerService.completeToolActivity(toolSessionId);
 		try {
 			response.sendRedirect(url);
 		}

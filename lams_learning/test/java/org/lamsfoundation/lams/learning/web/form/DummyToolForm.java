@@ -15,13 +15,13 @@ import org.apache.struts.action.ActionForm;
  */
 public class DummyToolForm extends ActionForm {
 	
-	private Long activityId;
+	private Long toolSessionId;
 
-	public Long getActivityId() {
-		return activityId;
+	public Long getToolSessionId() {
+		return toolSessionId;
 	}
-	public void setActivityId(Long activityId) {
-		this.activityId = activityId;
+	public void setToolSessionId(Long toolSessionId) {
+		this.toolSessionId = toolSessionId;
 	}
 	
 }
