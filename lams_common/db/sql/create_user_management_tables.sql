@@ -1,6 +1,8 @@
 CREATE TABLE lams_organisation_type (
        organisation_type_id INT(3) NOT NULL
-     , description VARCHAR(64) NOT NULL
+     , name VARCHAR(64) NOT NULL
+     , description VARCHAR(255) NOT NULL
+     , UNIQUE UQ_lams_organisation_type_name (name)
      , PRIMARY KEY (organisation_type_id)
 )TYPE=InnoDB;
 
@@ -70,6 +72,7 @@ CREATE TABLE lams_user (
      , create_date DATETIME NOT NULL
      , authentication_method_id INT(11) NOT NULL
      , workspace_id INT(11)
+     , UNIQUE UQ_lams_user_login (login)
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)

@@ -1,5 +1,9 @@
 # Connection: ROOT LOCAL
 # Host: localhost
+# Saved: 2004-11-22 11:44:40
+# 
+# Connection: ROOT LOCAL
+# Host: localhost
 # Saved: 2004-11-09 15:04:37
 # 
 # Connection: ROOT LOCAL
@@ -16,7 +20,7 @@ INSERT INTO lams_authentication_method_type VALUES(1, 'LAMS');
 INSERT INTO lams_authentication_method_type VALUES(2, 'WEB_AUTH');
 INSERT INTO lams_authentication_method_type VALUES(3, 'LDAP');
 
-INSERT INTO lams_organisation_type VALUES(1, 'ROOT ORGANISATION');
-INSERT INTO lams_organisation_type VALUES(2, 'BASE ORGANISATION');
-INSERT INTO lams_organisation_type VALUES(3, 'SUB-ORGANIZATION');
+INSERT INTO lams_organisation_type VALUES(1, 'ROOT ORGANISATION', 'root all other organisations: controlled by Sysadmin');
+INSERT INTO lams_organisation_type VALUES(2, 'BASE ORGANISATION', 'base organization: represents a real seperate organization sucha s a university ');
+INSERT INTO lams_organisation_type VALUES(3, 'SUB-ORGANIZATION', 'sub organization of a base organization');
 

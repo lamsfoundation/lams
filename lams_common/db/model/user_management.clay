@@ -240,7 +240,12 @@
 <primary-key-description/>
 <primary-key-column name="user_id"/>
 </primary-key>
-<unique-key-list/>
+<unique-key-list>
+<unique-key name="UQ_lams_user_login" alias="" remarks="">
+<unique-key-description/>
+<unique-key-column name="login"/>
+</unique-key>
+</unique-key-list>
 <foreign-key-list>
 <foreign-key name="FK_lams_user_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_authentication_method" referenced-key="PK_LAMS_AUTHENTICATION_METHOD" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
@@ -477,7 +482,14 @@ sub (child org of a the base org)</table-description>
 <variant type-name-pattern="INT ZEROFILL"/>
 </data-type>
 </column>
-<column name="description" alias="" remarks="" mandatory="true" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column name="name" alias="" remarks="" mandatory="true" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="true" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
@@ -489,7 +501,12 @@ sub (child org of a the base org)</table-description>
 <primary-key-description/>
 <primary-key-column name="organisation_type_id"/>
 </primary-key>
-<unique-key-list/>
+<unique-key-list>
+<unique-key name="UQ_lams_organisation_type_name" alias="" remarks="">
+<unique-key-description/>
+<unique-key-column name="name"/>
+</unique-key>
+</unique-key-list>
 <foreign-key-list/>
 <index-list/>
 </table>

@@ -1,0 +1,2140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<clay-model clay-version="1.0.5">
+<database-model name="lams_11" alias="" remarks="" author="" version="1.0" sql-dialect-id="jp.azzurri.clay.model.physical.dialect.MySQL_4_0_Dialect" begin-script="" end-script="">
+<database-model-description/>
+<schema-list>
+<schema name="DEFAULT_SCHEMA" alias="" remarks="">
+<schema-description/>
+<domain-list/>
+<table-list>
+<table name="lams_authentication_method" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="922" y="137" width="-1" height="-1"/>
+<column-list>
+<column name="authentication_method_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="authentication_method_type_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="authentication_method_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_authorization_method_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_authentication_method_type" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="authentication_method_type_id" referenced-key-column-name="authentication_method_type_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="authentication_method_id" sort="ASC"/>
+</index>
+<index name="authentication_method_type_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="authentication_method_type_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_authentication_method_parameter" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="361" y="41" width="-1" height="-1"/>
+<column-list>
+<column name="authentication_parameter_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="authentication_method_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="name" alias="" remarks="" mandatory="true" column-size="128" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="value" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="authentication_parameter_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_authorization_method_parameter_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_authentication_method" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="authentication_method_id" referenced-key-column-name="authentication_method_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="authentication_parameter_id" sort="ASC"/>
+</index>
+<index name="authentication_method_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="authentication_method_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_authentication_method_type" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="767" y="7" width="-1" height="-1"/>
+<column-list>
+<column name="authentication_method_type_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="true" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="authentication_method_type_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="authentication_method_type_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_gate_activity_level" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="1200" y="1184" width="-1" height="-1"/>
+<column-list>
+<column name="gate_activity_level_id" alias="" remarks="" mandatory="true" column-size="11" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="true" column-size="128" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="gate_activity_level_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="gate_activity_level_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_grouping_type" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="874" y="1659" width="-1" height="-1"/>
+<column-list>
+<column name="grouping_type_id" alias="" remarks="" mandatory="true" column-size="11" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="true" column-size="128" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="grouping_type_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="grouping_type_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_activity" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="505" y="1189" width="-1" height="-1"/>
+<column-list>
+<column name="activity_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="id" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="false" column-size="65535" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column name="title" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="xcoord" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="ycoord" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="parent_activity_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="learning_activity_type_id" alias="" remarks="" mandatory="true" column-size="11" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="learning_grouping_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="order_id" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="define_later_flag" alias="" remarks="" mandatory="true" column-size="4" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="learning_design_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="learning_library_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="offline_instructions" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="activity_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_learning_activity_7" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_library" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="learning_library_id" referenced-key-column-name="learning_library_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_learning_activity_6" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_design" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="learning_design_id" referenced-key-column-name="learning_design_id"/>
+</foreign-key>
+<foreign-key name="FK_learning_activity_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_activity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="parent_activity_id" referenced-key-column-name="activity_id"/>
+</foreign-key>
+<foreign-key name="FK_learning_activity_3" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_activity_type" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="learning_activity_type_id" referenced-key-column-name="learning_activity_type_id"/>
+</foreign-key>
+<foreign-key name="FK_learning_activity_6" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_grouping" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="learning_grouping_id" referenced-key-column-name="learning_grouping_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="activity_id" sort="ASC"/>
+</index>
+<index name="idx_activity_library_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="learning_library_id" sort="ASC"/>
+</index>
+<index name="idx_activity_design_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="learning_design_id" sort="ASC"/>
+</index>
+<index name="idx_activity_grouping_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="learning_grouping_id" sort="ASC"/>
+</index>
+<index name="idx_activity_activity_type_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="learning_activity_type_id" sort="ASC"/>
+</index>
+<index name="idx_activity_parent_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="parent_activity_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_activity_type" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="381" y="1075" width="-1" height="-1"/>
+<column-list>
+<column name="learning_activity_type_id" alias="" remarks="" mandatory="true" column-size="11" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="true" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="learning_activity_type_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="learning_activity_type_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_design" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="26" y="1064" width="-1" height="-1"/>
+<column-list>
+<column name="learning_design_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="id" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="false" column-size="65535" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column name="title" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="first_activity_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="max_id" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="object_type" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="valid_design_flag" alias="" remarks="" mandatory="false" column-size="4" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="read_only_flag" alias="" remarks="" mandatory="false" column-size="4" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="date_read_only" alias="" remarks="" mandatory="false" column-size="19" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="read_access" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="write_access" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="user_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="help_text" alias="" remarks="" mandatory="false" column-size="65535" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column name="lesson_copy_flag" alias="" remarks="" mandatory="true" column-size="4" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="version" alias="" remarks="" mandatory="true" column-size="56" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="parent_learning_design_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="open_date_time" alias="" remarks="" mandatory="false" column-size="19" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="close_date_time" alias="" remarks="" mandatory="false" column-size="19" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="learning_design_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_learning_design_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_design" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="parent_learning_design_id" referenced-key-column-name="learning_design_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_learning_design_3" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_user" referenced-key="PRIMARY" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="user_id" referenced-key-column-name="user_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="learning_design_id" sort="ASC"/>
+</index>
+<index name="idx_design_parent_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="parent_learning_design_id" sort="ASC"/>
+</index>
+<index name="idx_design_user_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="user_id" sort="ASC"/>
+</index>
+<index name="idx_design_first_act" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="first_activity_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_gate_activity" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="1019" y="1025" width="-1" height="-1"/>
+<column-list>
+<column name="activity_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="start_date_time" alias="" remarks="" mandatory="false" column-size="19" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="end_date_time" alias="" remarks="" mandatory="false" column-size="19" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="gate_activity_level_id" alias="" remarks="" mandatory="true" column-size="11" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="activity_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_learning_gate_activity_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_gate_activity_level" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="gate_activity_level_id" referenced-key-column-name="gate_activity_level_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_learning_gate_activity_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_activity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="activity_id" referenced-key-column-name="activity_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="activity_id" sort="ASC"/>
+</index>
+<index name="idx_gate_act_activity" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="activity_id" sort="ASC"/>
+</index>
+<index name="idx_gate_act_level" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="gate_activity_level_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_group" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="566" y="1724" width="-1" height="-1"/>
+<column-list>
+<column name="learning_group_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="learning_grouping_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="learning_group_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_learning_group_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_grouping" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="learning_grouping_id" referenced-key-column-name="learning_grouping_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="learning_group_id" sort="ASC"/>
+</index>
+<index name="idx_group_grouping" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="learning_grouping_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_grouping" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="265" y="1635" width="-1" height="-1"/>
+<column-list>
+<column name="learning_grouping_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="grouping_type_id" alias="" remarks="" mandatory="true" column-size="11" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="number_of_groups" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="learners_per_group" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="learning_grouping_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_learning_grouping_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_grouping_type" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="grouping_type_id" referenced-key-column-name="grouping_type_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="learning_grouping_id" sort="ASC"/>
+</index>
+<index name="idx_grouping_grouping_type" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="grouping_type_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_grouping_activity" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="559" y="1576" width="-1" height="-1"/>
+<column-list>
+<column name="activity_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="learning_grouping_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="activity_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_learning_grouping_activity_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_grouping" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="learning_grouping_id" referenced-key-column-name="learning_grouping_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_learning_grouping_activity_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_activity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="activity_id" referenced-key-column-name="activity_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="activity_id" sort="ASC"/>
+</index>
+<index name="idx_grouping_act_activity" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="activity_id" sort="ASC"/>
+</index>
+<index name="idx_grouping_act_grouping" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="learning_grouping_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_library" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="792" y="1514" width="-1" height="-1"/>
+<column-list>
+<column name="learning_library_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="false" column-size="65535" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column name="title" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="learning_library_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="learning_library_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_options_activity" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="1051" y="1443" width="-1" height="-1"/>
+<column-list>
+<column name="activity_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="min_number_of_options" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="max_number_of_options" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="activity_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_learning_options_activity_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_activity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="activity_id" referenced-key-column-name="activity_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="activity_id" sort="ASC"/>
+</index>
+<index name="idx_options_act_activity" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="activity_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_tool_activity" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="1216" y="1308" width="-1" height="-1"/>
+<column-list>
+<column name="activity_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="tool_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="tool_content_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="activity_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_learning_tool_activity_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_activity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="activity_id" referenced-key-column-name="activity_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="activity_id" sort="ASC"/>
+</index>
+<index name="idx_toole_act_activity" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="activity_id" sort="ASC"/>
+</index>
+<index name="idx_toole_act_tool" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="tool_id" sort="ASC"/>
+</index>
+<index name="idx_toole_act_tool_content" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="tool_content_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_learning_transition" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="7" y="1489" width="-1" height="-1"/>
+<column-list>
+<column name="transition_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="id" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="false" column-size="65535" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column name="title" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="to_activity_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="from_activity_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="learning_design_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="transition_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_learning_transition_3" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_activity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="from_activity_id" referenced-key-column-name="activity_id"/>
+</foreign-key>
+<foreign-key name="FK_learning_transition_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_activity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="to_activity_id" referenced-key-column-name="activity_id"/>
+</foreign-key>
+<foreign-key name="lddefn_transition_ibfk_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_design" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="learning_design_id" referenced-key-column-name="learning_design_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="transition_id" sort="ASC"/>
+</index>
+<index name="ldId" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="learning_design_id" sort="ASC"/>
+</index>
+<index name="idx_transition_to_activity" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="to_activity_id" sort="ASC"/>
+</index>
+<index name="idx_transition_from_activity" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="from_activity_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_organisation" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="163" y="184" width="-1" height="-1"/>
+<column-list>
+<column name="organisation_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="name" alias="" remarks="" mandatory="false" column-size="250" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="false" column-size="250" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="parent_organisation_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="organisation_type_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="create_date" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="workspace_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="organisation_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_organisation_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_organisation_type" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="organisation_type_id" referenced-key-column-name="organisation_type_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_organisation_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_workspace" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="workspace_id" referenced-key-column-name="workspace_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_organisation_3" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_organisation" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="parent_organisation_id" referenced-key-column-name="organisation_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="organisation_id" sort="ASC"/>
+</index>
+<index name="organisation_type_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="organisation_type_id" sort="ASC"/>
+</index>
+<index name="workspace_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="workspace_id" sort="ASC"/>
+</index>
+<index name="parent_organisation_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="parent_organisation_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_organisation_type" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="663" y="189" width="-1" height="-1"/>
+<column-list>
+<column name="organisation_type_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="name" alias="" remarks="" mandatory="true" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="true" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="organisation_type_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="organisation_type_id" sort="ASC"/>
+</index>
+<index name="UQ_lams_organisation_type_name" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="name" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_role" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="228" y="855" width="-1" height="-1"/>
+<column-list>
+<column name="role_id" alias="" remarks="" mandatory="true" column-size="6" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="name" alias="" remarks="" mandatory="true" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="false" column-size="65535" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column name="create_date" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="role_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="role_id" sort="ASC"/>
+</index>
+<index name="gname" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="name" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_user" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="904" y="304" width="-1" height="-1"/>
+<column-list>
+<column name="user_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="login" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="password" alias="" remarks="" mandatory="true" column-size="50" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="title" alias="" remarks="" mandatory="false" column-size="32" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="first_name" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="last_name" alias="" remarks="" mandatory="false" column-size="128" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="address_line_1" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="address_line_2" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="address_line_3" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="city" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="state" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="country" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="day_phone" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="evening_phone" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="mobile_phone" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="fax" alias="" remarks="" mandatory="false" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="email" alias="" remarks="" mandatory="false" column-size="128" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="disabled_flag" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="create_date" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="authentication_method_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="workspace_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="user_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_user_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_authentication_method" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="authentication_method_id" referenced-key-column-name="authentication_method_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_user_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_workspace" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="workspace_id" referenced-key-column-name="workspace_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="user_id" sort="ASC"/>
+</index>
+<index name="UQ_lams_user_login" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="login" sort="ASC"/>
+</index>
+<index name="authentication_method_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="authentication_method_id" sort="ASC"/>
+</index>
+<index name="workspace_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="workspace_id" sort="ASC"/>
+</index>
+<index name="login" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="login" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_user_organisation" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="239" y="677" width="-1" height="-1"/>
+<column-list>
+<column name="user_organisation_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="organisation_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="user_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="user_organisation_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="u_user_organisation_ibfk_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_user" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="user_id" referenced-key-column-name="user_id"/>
+</foreign-key>
+<foreign-key name="u_user_organisation_ibfk_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_organisation" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="organisation_id" referenced-key-column-name="organisation_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="user_organisation_id" sort="ASC"/>
+</index>
+<index name="user_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="user_id" sort="ASC"/>
+</index>
+<index name="organisation_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="organisation_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_user_organisation_role" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="674" y="849" width="-1" height="-1"/>
+<column-list>
+<column name="user_organisation_role_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="user_organisation_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="role_id" alias="" remarks="" mandatory="true" column-size="6" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="user_organisation_role_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_user_organisation_role_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_role" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="role_id" referenced-key-column-name="role_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_user_organisation_role_3" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_user_organisation" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="user_organisation_id" referenced-key-column-name="user_organisation_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="user_organisation_role_id" sort="ASC"/>
+</index>
+<index name="role_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="role_id" sort="ASC"/>
+</index>
+<index name="user_organisation_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="user_organisation_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_workspace" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="677" y="426" width="-1" height="-1"/>
+<column-list>
+<column name="workspace_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="root_folder_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="workspace_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_workspace_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_workspace_folder" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="root_folder_id" referenced-key-column-name="workspace_folder_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="workspace_id" sort="ASC"/>
+</index>
+<index name="root_folder_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="root_folder_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table name="lams_workspace_folder" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="357" y="386" width="-1" height="-1"/>
+<column-list>
+<column name="workspace_folder_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="parent_folder_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="name" alias="" remarks="" mandatory="true" column-size="64" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="workspace_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PRIMARY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="workspace_folder_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_workspace_folder_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_workspace_folder" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="parent_folder_id" referenced-key-column-name="workspace_folder_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index name="PRIMARY" alias="" remarks="" unique="true">
+<index-description/>
+<index-column name="workspace_folder_id" sort="ASC"/>
+</index>
+<index name="parent_folder_id" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="parent_folder_id" sort="ASC"/>
+</index>
+</index-list>
+</table>
+</table-list>
+</schema>
+</schema-list>
+</database-model>
+</clay-model>
