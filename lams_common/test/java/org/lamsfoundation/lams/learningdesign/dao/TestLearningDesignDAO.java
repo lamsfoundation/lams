@@ -7,7 +7,9 @@ import org.lamsfoundation.lams.learningdesign.BaseTestCase;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
+import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 
 /**
  * @author MMINHAS
@@ -18,12 +20,14 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 public class TestLearningDesignDAO extends BaseTestCase {
 	
 	private LearningDesignDAO learningDesignDAO;	
+	protected WorkspaceFolderDAO workspaceFolderDAO;
 	private UserDAO userDAO;
 	private User user;
 	private LearningDesign learningDesign;
 	
 	public void setUp() throws Exception{
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");
+		workspaceFolderDAO =(WorkspaceFolderDAO)context.getBean("workspaceFolderDAO");
 	}
 	/*public void testGetLearningDesignByUserId(){
 		List list = learningDesignDAO.getLearningDesignByUserId(new Long(1));
@@ -70,9 +74,14 @@ public class TestLearningDesignDAO extends BaseTestCase {
 	}
 	/*public void testDeleteLearningDesign(){
 		learningDesignDAO.delete(learningDesignDAO.getLearningDesignById(new Long(20)));		
-	}	*/
+	}	
 	public void testGetLearningDesignByID(){
 		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
 		assertNotNull(learningDesign);		
+	}*/
+	public void testWorkspaceFolderDAO(){
+		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(new Integer(1));
+		System.out.print(workspaceFolder.getName());		
+		
 	}
 }
