@@ -49,17 +49,20 @@ public abstract class UpdateApplicationXmlTask implements Task
     /**
      * The application.xml file.
      */
-    protected File appxml;
+    protected File lamsEarPath;
     
     /**
      * The value of the web-uri element.
      */
-    protected String weburi;
+    protected String webUri;
     
     /**
      * The value of the context root element.
      */
-    protected String contextroot;
+    protected String contextRoot;
+    
+    
+    private String applicationXmlPath;
     
     /** Creates a new instance of UpdateApplicationXmlTask */
     public UpdateApplicationXmlTask()
@@ -71,31 +74,30 @@ public abstract class UpdateApplicationXmlTask implements Task
      * Sets the location of the application xml file to be modified.
      * @param appxml New value of property appxml.
      */
-    public void setAppxml(final File appxml)
-    
+    public void setLamsEarPath(final String lasmEarPath)
     {
-        
-        this.appxml = appxml;
+        this.lamsEarPath = lamsEarPath;
+        this.applicationXmlPath = lamsEarPath+"/META-INF/application.xml";
     }
     
     /**
      * Sets the uri of the web app to be added.
      * @param weburi New value of property weburi.
      */
-    public void setWeburi(final String weburi)
-    {
-        
-        this.weburi = weburi;
+    public void setWebUri(final java.lang.String webUri)
+    { 
+        this.webUri = webUri;
     }
     
     /**
      * Sets the context root of the web app to be added.
      * @param contextroot New value of property contextroot.
      */
-    public void setContextroot(final String contextroot)
+    public void setContextRoot(final java.lang.String contextRoot)
+    
     {
         
-        this.contextroot = contextroot;
+        this.contextRoot = contextRoot;
     }
     
     /**
@@ -128,7 +130,7 @@ public abstract class UpdateApplicationXmlTask implements Task
             DOMSource source = new DOMSource(doc);
             
             // Prepare the output file
-            StreamResult result = new StreamResult(appxml);
+            StreamResult result = new StreamResult(applicationXmlPath);
             
             // Write the DOM document to the file
             // Get Transformer
@@ -175,7 +177,7 @@ public abstract class UpdateApplicationXmlTask implements Task
             //get application xml as dom doc
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            return builder.parse(appxml);
+            return builder.parse(applicationXmlPath);
         }
         catch (ParserConfigurationException pex)
         {
@@ -248,4 +250,6 @@ public abstract class UpdateApplicationXmlTask implements Task
      * @throws org.apache.tools.ant.DeployException in case of errors
      */
     protected abstract void updateApplicationXml(Document doc, Element webElement) throws DeployException;
+    
+    
 }

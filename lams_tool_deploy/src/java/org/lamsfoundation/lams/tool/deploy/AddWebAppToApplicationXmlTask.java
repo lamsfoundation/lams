@@ -46,12 +46,12 @@ public class AddWebAppToApplicationXmlTask extends UpdateApplicationXmlTask
         
         //create new web-uri element in the web element
         Element webUriElement = doc.createElement("web-uri");
-        webUriElement.appendChild(doc.createTextNode(weburi));
+        webUriElement.appendChild(doc.createTextNode(webUri));
         webElement.appendChild(webUriElement);
         
         //create new context root element in the web element
         Element contextRootElement = doc.createElement("context-root");
-        contextRootElement.appendChild(doc.createTextNode(contextroot));
+        contextRootElement.appendChild(doc.createTextNode(contextRoot));
         webElement.appendChild(contextRootElement);
         
     }

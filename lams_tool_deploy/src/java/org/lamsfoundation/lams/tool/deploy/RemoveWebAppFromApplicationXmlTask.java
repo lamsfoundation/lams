@@ -46,12 +46,12 @@ public class RemoveWebAppFromApplicationXmlTask extends UpdateApplicationXmlTask
          
         //find & remove web uri element
         NodeList webUriNodeList = webElement.getElementsByTagName("web-uri");
-        Element matchingWebUriElement = findElementWithMatchingText(weburi, webUriNodeList);
+        Element matchingWebUriElement = findElementWithMatchingText(webUri, webUriNodeList);
         webElement.removeChild(matchingWebUriElement);
         
         //find & remove context root element
         NodeList contextRootNodeList = webElement.getElementsByTagName("context-root");
-        Element matchingContextRootElement = findElementWithMatchingText(contextroot, contextRootNodeList);
+        Element matchingContextRootElement = findElementWithMatchingText(contextRoot, contextRootNodeList);
         webElement.removeChild(matchingContextRootElement);
         
     }

@@ -23,8 +23,28 @@ public class Deploy
      */
     public static void main(String[] args) throws Exception
     {
-        
+       if (args.length != 1)
+       {
+           throw new Exception("Usage: Deployer <properties_file_path>");
+       }
        DeployConfig config =  new DeployConfig(args[1]);
+       
+       //db deploy
+       
+       //add required elements to the application xml
+       AddWebAppToApplicationXmlTask addWebAppTask =  new AddWebAppToApplicationXmlTask();
+       addWebAppTask.setLamsEarPath(config.getLamsEarPath());
+       addWebAppTask.setContextRoot(config.getToolContextRoot());
+       addWebAppTask.setWebUri(config.getToolWebUri());
+       addWebAppTask.execute();
+       
+       //deploy files
+       DeployFilesTask deployFilesTask = new DeployFilesTask();
+       deployFilesTask.setLamsEarPath(config.getLamsEarPath());
+       deployFilesTask.setDeployFiles(config.getDeployFiles());
+       deployFilesTask.execute();
+       
+       //db activation
     }
     
 }
