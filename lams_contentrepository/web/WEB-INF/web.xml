@@ -21,5 +21,17 @@
       <servlet-name>action</servlet-name>
       <url-pattern>*.do</url-pattern>
    </servlet-mapping>
+
+  <servlet>
+    <description>Download file(s)</description>
+    <display-name>Download file</display-name>
+    <servlet-name>Download</servlet-name>
+    <servlet-class>com.lamsinternational.lams.contentrepository.struts.action.Download</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Download</servlet-name>
+    <url-pattern>/download/*</url-pattern>
+  </servlet-mapping>
+
 </web-app>
 

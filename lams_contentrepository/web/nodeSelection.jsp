@@ -58,7 +58,7 @@
 					Long key = (Long) iter.next();
 			%>
 				<TR><TD colspan="6"><STRONG>Node <%=key.toString()%>:</STRONG>
-				<input name="getNode" onClick="setActionSubmit('getNode', '<%=key.toString()%>', '')" type="button" size="50" value="Get Latest Version"/>
+				<input name="getNode" onClick="parent.location='download?uuid=<%=key.toString()%>'" type="button" size="50" value="Get Latest Version"/>
 				<input name="uploadNewVersion" onClick="parent.location='addNode.jsp?uuid=<%=key.toString()%>'" type="button" size="50" value="Upload New Version"/>
 				<input name="deleteNode" onClick="setActionSubmit('deleteNode', '<%=key.toString()%>', '')" type="button" size="50" value="Delete Node (All Versions)"/>
 				</TD></TR>
@@ -72,7 +72,7 @@
 			%>
 						<TR>
 							<TD>Version: <%=detail.getVersionId()%></TD>
-							<TD><input name="getNode" onClick="setActionSubmit('getNode', '<%=key.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Get File"/></TD>
+							<TD><input name="getNode" onClick="parent.location='download?uuid=<%=key.toString()%>&version=<%=detail.getVersionId()%>'" type="button" size="50" value="Get File"/></TD>
 							<TD><input name="deleteVersion" onClick="setActionSubmit('deleteNode', '<%=key.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Delete Version"/>
 							<TD>Created&nbsp;Date&nbsp;Time: <%=detail.getCreatedDateTime()%></TD>
 							<TD>Version&nbsp;Description: <%=detail.getDescription()%></TD>
