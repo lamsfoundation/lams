@@ -18,7 +18,7 @@ public class BaseTestCase extends TestCase {
 	protected ApplicationContext context;
 	
 	public BaseTestCase(){
-		String path ="/com/lamsinternational/lams/learningdesign/learningDesignApplicationContext.xml";
+		String path ="/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml";
 		context = new ClassPathXmlApplicationContext(path);		
 	}
 }

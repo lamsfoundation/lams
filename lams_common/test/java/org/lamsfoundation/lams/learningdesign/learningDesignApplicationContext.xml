@@ -12,7 +12,7 @@
 	<!-- (in this case, JDBC-related settings for the dataSource definition below) -->
 	
 	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location"><value>/com/lamsinternational/lams/learningdesign/dbConnection.properties</value></property>
+		<property name="location"><value>/org/lamsfoundation/lams/learningdesign/dbConnection.properties</value></property>
 	</bean>
 
 	<!-- Message source for this context, loaded from localized "messages_xx" files -->
@@ -39,44 +39,36 @@
 		<property name="mappingResources">
 			<list>	
 				<!-- learning design related mapping files -->
-				<value>com/lamsinternational/lams/learningdesign/Activity.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/ActivityType.hbm.xml</value>				
-				<value>com/lamsinternational/lams/learningdesign/Group.hbm.xml</value>				
-				<value>com/lamsinternational/lams/learningdesign/Grouping.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/GroupingType.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/GateActivityLevel.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/LearningDesign.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/LearningLibrary.hbm.xml</value>	
-				<value>com/lamsinternational/lams/learningdesign/Transition.hbm.xml</value>	
+				<value>org/lamsfoundation/lams/learningdesign/Activity.hbm.xml</value>
+				<value>org/lamsfoundation/lams/learningdesign/Group.hbm.xml</value>				
+				<value>org/lamsfoundation/lams/learningdesign/Grouping.hbm.xml</value>
+				<value>org/lamsfoundation/lams/learningdesign/LearningDesign.hbm.xml</value>
+				<value>org/lamsfoundation/lams/learningdesign/LearningLibrary.hbm.xml</value>	
+				<value>org/lamsfoundation/lams/learningdesign/Transition.hbm.xml</value>	
 				
 				
 				<!-- lesson related mapping files-->
-				<value>com/lamsinternational/lams/lesson/LearnerProgress.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/Lesson.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/LessonLearner.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/LessonState.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/ProgressCompleted.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/ProgressCurrent.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/UserGroup.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/UserToolSession.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/UserToolSessionState.hbm.xml</value>
+				<value>org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
+				<value>org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>				
 				
 				<!-- Tool related mapping files-->
-				<value>com/lamsinternational/lams/tool/Tool.hbm.xml</value>
-				<value>com/lamsinternational/lams/tool/ToolSession.hbm.xml</value>
-				<value>com/lamsinternational/lams/tool/ToolsessionState.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/ToolSessionState.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
+				
 				
 				<!-- usermanagement related mapping files-->
-				<value>com/lamsinternational/lams/usermanagement/AuthenticationMethod.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/AuthenticationMethodType.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/Organisation.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/OrganisationType.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/Role.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/User.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/UserOrganisation.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/UserOrganisationRole.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/Workspace.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/WorkspaceFolder.hbm.xml</value>				
+				<value>org/lamsfoundation/lams/usermanagement/AuthenticationMethod.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/AuthenticationMethodType.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/Organisation.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/OrganisationType.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/Role.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/User.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/UserOrganisation.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/UserOrganisationRole.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/Workspace.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/WorkspaceFolder.hbm.xml</value>				
 				
 			</list>
 		</property>
@@ -101,28 +93,6 @@
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
 	
-	<bean id="authoringServiceTarget" class ="org.lamsfoundation.lams.learningdesign.service.AuthoringService">
-		<property name="learningDesignDAO">
-			<ref local="learningDesignDAO"/>
-		</property>
-	</bean>
-	
-	<bean id="authoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-		<property name ="transactionManager">
-			<ref local ="transactionManager"/>
-		</property>
-		<property name ="target">
-			<ref local="authoringServiceTarget"/>
-		</property>
-		<property name="transactionAttributes">
-			<props>
-				<prop key="insert*">PROPAGATION_REQUIRED</prop>
-				<prop key="delete*">PROPAGATION_REQUIRED</prop>
-				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
-			</props>
-		</property>
-	</bean>
-
 	<!-- Learning Design related beans-->
 	
 	<bean id="activityDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO">
@@ -134,6 +104,9 @@
 	<bean id="learningDesignDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
 	</bean>	
+	<bean id="groupingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>
 	
 	<!-- Usermanagement realted beans -->
 	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
