@@ -1903,19 +1903,6 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="user_organisation_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
-<column-description/>
-<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
-<variant type-name-pattern="BIGINT"/>
-<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
-<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
-<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
 <column name="base_organisation_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
@@ -2161,8 +2148,8 @@
 <column name="root_folder_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
@@ -2717,11 +2704,11 @@
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
-<column name="learning_library_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column name="learning_library_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
@@ -2730,11 +2717,11 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="default_tool_content_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column name="default_tool_content_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>

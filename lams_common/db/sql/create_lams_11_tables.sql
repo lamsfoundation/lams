@@ -87,6 +87,7 @@ CREATE TABLE lams_cr_workspace (
      , name VARCHAR(255) NOT NULL
      , PRIMARY KEY (workspace_id)
 )TYPE=InnoDB;
+ALTER TABLE lams_cr_workspace COMMENT='Content repository workspace';
 
 CREATE TABLE lams_cr_credential (
        credential_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT
@@ -95,6 +96,7 @@ CREATE TABLE lams_cr_credential (
      , wc_id BIGINT(20) UNSIGNED NOT NULL
      , PRIMARY KEY (credential_id)
 )TYPE=InnoDB;
+ALTER TABLE lams_cr_credential COMMENT='Records the identification properties for a tool.';
 
 CREATE TABLE lams_workspace_folder_type (
        lams_workspace_folder_type_id INT(3) NOT NULL
@@ -138,7 +140,7 @@ CREATE TABLE lams_workspace_folder (
      , workspace_id BIGINT(20) NOT NULL
      , user_id BIGINT(20) NOT NULL
      , create_date_time DATETIME NOT NULL
-     , last_modified_date_time DATETIME 
+     , last_modified_date_time DATETIME
      , lams_workspace_folder_type_id INT(3) NOT NULL
      , PRIMARY KEY (workspace_folder_id)
      , INDEX (parent_folder_id)
@@ -201,7 +203,6 @@ CREATE TABLE lams_user (
      , create_date DATETIME NOT NULL
      , authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
      , workspace_id BIGINT(20)
-     , user_organisation_id BIGINT(20) NOT NULL DEFAULT 0
      , base_organisation_id BIGINT(20) NOT NULL DEFAULT 0
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
@@ -242,7 +243,7 @@ CREATE TABLE lams_learning_design (
      , lesson_id BIGINT(20)
      , lesson_start_date_time DATETIME
      , lesson_name VARCHAR(255)
-     , last_modified_date_time DATETIME 
+     , last_modified_date_time DATETIME
      , PRIMARY KEY (learning_design_id)
      , INDEX (parent_learning_design_id)
      , CONSTRAINT FK_lams_learning_design_2 FOREIGN KEY (parent_learning_design_id)
@@ -337,8 +338,8 @@ CREATE TABLE lams_tool (
      , service_name VARCHAR(255) NOT NULL
      , tool_display_name VARCHAR(255) NOT NULL
      , description TEXT
-     , learning_library_id BIGINT(20) NOT NULL
-     , default_tool_content_id BIGINT(20) NOT NULL
+     , learning_library_id BIGINT(20)
+     , default_tool_content_id BIGINT(20)
      , valid_flag TINYINT(1) NOT NULL DEFAULT 1
      , grouping_support_type_id INT(3) NOT NULL
      , supports_define_later_flag TINYINT(1) NOT NULL DEFAULT 0
@@ -483,6 +484,7 @@ CREATE TABLE lams_cr_node (
      , CONSTRAINT FK_lams_cr_node_1 FOREIGN KEY (workspace_id)
                   REFERENCES lams_cr_workspace (workspace_id)
 )TYPE=InnoDB;
+ALTER TABLE lams_cr_node COMMENT='The main table containing the node definition';
 
 CREATE TABLE lams_cr_node_version (
        nv_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT
@@ -495,6 +497,7 @@ CREATE TABLE lams_cr_node_version (
      , CONSTRAINT FK_lams_cr_node_version_2 FOREIGN KEY (node_id)
                   REFERENCES lams_cr_node (node_id)
 )TYPE=InnoDB;
+ALTER TABLE lams_cr_node_version COMMENT='Represents a version of a node';
 
 CREATE TABLE lams_user_organisation_role (
        user_organisation_role_id BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -620,6 +623,7 @@ CREATE TABLE lams_cr_workspace_credential (
      , CONSTRAINT FK_lams_cr_workspace_credential_2 FOREIGN KEY (credential_id)
                   REFERENCES lams_cr_credential (credential_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
+ALTER TABLE lams_cr_workspace_credential COMMENT='Maps tools access to workspaces';
 
 CREATE TABLE lams_cr_node_version_property (
        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT

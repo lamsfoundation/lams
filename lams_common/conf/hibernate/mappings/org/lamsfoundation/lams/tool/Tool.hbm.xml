@@ -168,14 +168,14 @@
         name="defaultToolContentId"
         type="long"
         column="default_tool_content_id"
-        not-null="true"
+        not-null="false"
         length="20"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="default_tool_content_id"
             length="20"
-            not-null="true"
+            not-null="false"
         </meta>    
     </property>
     <property

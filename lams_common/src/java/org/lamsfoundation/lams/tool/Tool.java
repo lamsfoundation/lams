@@ -44,7 +44,7 @@ public class Tool implements Serializable {
     /** nullable persistent field */
     private String defineLaterUrl;
 
-    /** persistent field */
+    /** nullable persistent field */
     private long defaultToolContentId;
 
     /** persistent field */
@@ -290,7 +290,7 @@ public class Tool implements Serializable {
 
     /** 
      * @hibernate.property column="default_tool_content_id" length="20"
-     *             		   not-null="true"       
+     *             		   not-null="false"       
      */
     public long getDefaultToolContentId() {
         return this.defaultToolContentId;
