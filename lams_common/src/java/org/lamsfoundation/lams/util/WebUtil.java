@@ -25,7 +25,7 @@ public class WebUtil
     public static final String PARAM_CONTENT_ID = "content_id";
     public static final String PARAM_USER_ID = "user_id";
     public static final String PARAM_LESSON_ID = "lesson_id";
-    
+    public static final String PARAM_TOOL_CONTENT_ID = "contentId";
     
     public static final String ATTR_MODE = "mode";
     public static final String ATTR_USERNAME = "username";
@@ -345,4 +345,36 @@ public class WebUtil
         return StringUtils.uncapitalize(orginalForwardName);
         
     }
+
+    /**
+     * Append a parameter to a requested url.
+     * @param parameterName the name of the parameter
+     * @param parameterValue the value of the parameter
+     * @param learnerUrl the target url
+     * @return the url with parameter appended.
+     */
+    public static String appendParameterToURL(String url, String parameterName, String parameterValue)
+    {
+        return appendParameterDeliminator(url)
+        	   + parameterName
+        	   + "="
+        	   + parameterValue;
+    }
+    
+    /**
+     * <p>This helper append the parameter deliminator for a url.</p> 
+     * It is using a null safe String util method to checkup the url String and 
+     * append proper deliminator if necessary.
+     * @param url the url needs to append deliminator.
+     * @return target url with the deliminator;
+     */
+    public static String appendParameterDeliminator(String url)
+    {
+        if(StringUtils.containsNone(url,"?"))
+            return url+"?";
+        else
+            return url+"&";
+    }
+
+
 }
