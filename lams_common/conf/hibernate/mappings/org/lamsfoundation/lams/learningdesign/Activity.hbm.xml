@@ -125,11 +125,20 @@
 			<subclass name="org.lamsfoundation.lams.learningdesign.ToolActivity" discriminator-value="1" >
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 				<property name="toolContentId" type="java.lang.Long" column="tool_content_id" length="20" />
+				
+				<set name="toolSessions" lazy="false" inverse="true" cascade="none" >
+			        <meta attribute="field-description">@hibernate.set lazy="false" inverse="true" cascade="none"
+        												@hibernate.collection-key column="tool_session_id"
+        										        @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.ToolSession"
+			        </meta>
+			        <key><column name="tool_session_id" /></key>
+			        <one-to-many class="org.lamsfoundation.lams.tool.ToolSession"/>
+			    </set>
                  
                  <!-- bi-directional many-to-one association to Tool-->
                  <many-to-one name="tool" class="org.lamsfoundation.lams.tool.Tool" >
                  	<column name="tool_id" not-null="false"/>
-                 </many-to-one>
+                 </many-to-one>                 
 			</subclass>
 			
 			<subclass name="org.lamsfoundation.lams.learningdesign.GroupingActivity" >
@@ -202,3 +211,5 @@
 
 </class>
 </hibernate-mapping>
+
+    
