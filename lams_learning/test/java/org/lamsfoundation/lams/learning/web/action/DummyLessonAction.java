@@ -21,6 +21,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 package org.lamsfoundation.lams.learning.web.action;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -29,10 +30,15 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.service.DummyLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -79,6 +85,9 @@ public class DummyLessonAction extends Action {
 		ActivityForm activityForm = (ActivityForm) form;
 		
 		SessionBean sessionBean = new SessionBean();
+		IUserManagementService userService = getUserService(this.servlet.getServletContext());
+		User user = userService.getUserById(new Integer(1));
+		sessionBean.setLearner(user);
 		setSessionBean(sessionBean, request);
 
 		DummyLearnerService learnerService = (DummyLearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
@@ -89,5 +98,15 @@ public class DummyLessonAction extends Action {
 		ActionForward forward = mapping.findForward("displayLesson");
 		return forward;
 	}
+	
+
+    private IUserManagementService getUserService(ServletContext servletContext) {
+        return (IUserManagementService)getDomainService("userManagementService", servletContext);
+    }
+    
+    private static Object getDomainService(String name, ServletContext servletContext) {
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        return wac.getBean(name);
+    }
 	
 }
