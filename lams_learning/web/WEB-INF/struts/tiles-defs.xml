@@ -36,13 +36,16 @@ http://www.gnu.org/licenses/gpl.txt
 	<!-- Standard layout for message or tool. This probably needs to be done using
 	included header and footer though because tools need this. -->
 	<definition name=".activityLayout" path="/layout/activityLayout.jsp">
+		<put name="pageTitle" value="LAMS"/>
 		<put name="title" value="LAMS"/>
 		<put name="body" value=""/>
 	</definition>
 	
-	<definition name=".toolActivity" extends=".layout">
+	<!--  Activity definitions -->
+	
+	<definition name=".loadToolActivity" extends=".layout">
 		<put name="title" value="Loading..."/>
-		<put name="body" value="/toolActivity.jsp"/>
+		<put name="body" value="/loadToolActivity.jsp"/>
 		<put name="includeBodyTag" value="false"/>
 	</definition>
 	<definition name=".parallelActivity" extends=".layout">
@@ -61,6 +64,14 @@ http://www.gnu.org/licenses/gpl.txt
 	<definition name=".lessonComplete" extends=".activityLayout">
 		<put name="title" value="Lesson Complete"/>
 		<put name="body" value="/lessonComplete.jsp"/>
+	</definition>
+	
+	<!-- Journal definitions -->
+	
+	<definition name=".journalDetail" extends=".activityLayout">
+		<put name="pageTitle" value="Journal - Detail" />
+		<put name="title" value="Journal" />
+		<put name="body" value="/notebook/detail.jsp"/>
 	</definition>
 	
 </tiles-definitions>
