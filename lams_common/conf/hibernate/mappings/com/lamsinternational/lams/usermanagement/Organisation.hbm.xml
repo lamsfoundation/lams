@@ -14,7 +14,6 @@
 <class 
     name="com.lamsinternational.lams.usermanagement.Organisation" 
     table="lams_organisation"
-    proxy="com.lamsinternational.lams.usermanagement.Organisation"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
@@ -147,13 +146,13 @@
             cascade="none"
 
            @hibernate.collection-key
-            column="parent_folder_id"
+            column="parent_organisation_id"
 
            @hibernate.collection-one-to-many
             class="com.lamsinternational.lams.usermanagement.Organisation"
         </meta>
         <key>
-            <column name="parent_folder_id" />
+            <column name="parent_organisation_id" />
         </key>
         <one-to-many 
             class="com.lamsinternational.lams.usermanagement.Organisation"
@@ -166,9 +165,9 @@
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
-           @hibernate.column name="parent_folder_id"         
+           @hibernate.column name="parent_organisation_id"         
         </meta>
-        <column name="parent_folder_id" />
+        <column name="parent_organisation_id" />
     </many-to-one>
     <!-- bi-directional one-to-many association to User -->
     <set

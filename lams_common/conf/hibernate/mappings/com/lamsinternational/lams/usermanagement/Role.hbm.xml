@@ -14,7 +14,6 @@
 <class 
     name="com.lamsinternational.lams.usermanagement.Role" 
     table="lams_role"
-    proxy="com.lamsinternational.lams.usermanagement.Role"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class

@@ -14,7 +14,6 @@
 <class 
     name="com.lamsinternational.lams.usermanagement.UserOrganisation" 
     table="lams_user_organisation"
-    proxy="com.lamsinternational.lams.usermanagement.UserOrganisation"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
@@ -59,13 +58,13 @@
     <!-- bi-directional one-to-many association to UserOrganisationRole -->
     <set
         name="userOrganisationRoles"
-        lazy="true"
+        lazy="false"
         inverse="true"
 		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
-            lazy="true"
+            lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
 
