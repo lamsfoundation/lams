@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+    
+    Modified by Chris Perfect
+-->
+
+<class 
+    name="com.lamsinternational.lams.learningdesign.Grouping" 
+    table="lams_learning_grouping"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_learning_grouping"
+    </meta>
+    <discriminator column="grouping_type_id" type="int"/>
+    
+    <id
+        name="groupingId"
+        type="java.lang.Long"
+        column="grouping_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="assigned"
+            type="java.lang.Long"
+            column="grouping_id"
+
+        </meta>
+        <generator class="assigned" />
+    </id>
+
+    <property
+        name="numberOfGroups"
+        type="java.lang.Integer"
+        column="number_of_groups"
+        length="11"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="number_of_groups"
+            length="11"
+        </meta>    
+    </property>
+    <property
+        name="learnersPerGroup"
+        type="java.lang.Integer"
+        column="learners_per_group"
+        length="11"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="learners_per_group"
+            length="11"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to LamsLearningGroup -->
+    <set
+        name="groups"
+        lazy="true"
+        inverse="true"
+	cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.list
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="grouping_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.learningdesign.Group"
+        </meta>
+        <index>
+            <column name="order_id"/>
+        <index>
+        <key>
+            <column name="grouping_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.learningdesign.Group"
+        />
+    </set>
+    
+    <subclass name="com.lamsinternational.lams.lesson.Class" discriminator-value="2">
+        <many-to-one name="staffGroup" class="com.lamsinternational.lams.learningdesign.Group" column="staff_group_id" unique="true"/>
+    </sublcass>
+    
+
+</class>
+</hibernate-mapping>

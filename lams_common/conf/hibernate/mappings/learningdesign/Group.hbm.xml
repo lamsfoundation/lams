@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+    
+    modified by Chris Perfect
+-->
+
+<class 
+    name="com.lamsinternational.lams.learningdesign.Group" 
+    table="lams_learning_group"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_learning_group"
+    </meta>
+
+    <id
+        name="groupId"
+        type="java.lang.Long"
+        column="group_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="assigned"
+            type="java.lang.Long"
+            column="group_id"
+
+        </meta>
+        <generator class="assigned" />
+    </id>
+
+
+    <!-- Associations -->
+  
+   <set
+        name="users"
+        table="lams_user_group"
+        lazy="true"
+   >
+        <meta attribute="field-description">
+           @hibernate.set
+            role="users"
+            table="lams_user-group"
+            lazy="true"
+           
+           @hibernate.collection-key
+            column="group_id"
+            
+           @hibernate.collection-many-to-many
+            class="com.lamsinternational.lams.usermanagement.User"
+            column="user_id"
+
+        </meta>
+        <key>
+            <column name="group_id"/>
+        </key>
+        <many-to-many class="com.lamsinternational.lams.usermanagement.User" column="user_id"/>
+   </set> 
+
+</class>
+</hibernate-mapping>
