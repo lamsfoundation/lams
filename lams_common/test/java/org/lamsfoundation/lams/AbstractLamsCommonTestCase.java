@@ -29,7 +29,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public abstract class AbstractLamsCommonTestCase extends TestCase
 {
-    protected ApplicationContext ac;
+    protected ApplicationContext context;
     
     /**
      * 
@@ -45,7 +45,7 @@ public abstract class AbstractLamsCommonTestCase extends TestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        ac = new ClassPathXmlApplicationContext(getContextConfigLocation());
+        context = new ClassPathXmlApplicationContext(getContextConfigLocation());
         initializeHibernateSession();
     }
     
@@ -66,7 +66,7 @@ public abstract class AbstractLamsCommonTestCase extends TestCase
     protected void initializeHibernateSession() throws HibernateException
     {
         //hold the hibernate session
-		SessionFactory sessionFactory = (SessionFactory) this.ac.getBean("coreSessionFactory");
+		SessionFactory sessionFactory = (SessionFactory) this.context.getBean("coreSessionFactory");
 		Session s = sessionFactory.openSession();
 		TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(s));
     }    
@@ -76,7 +76,7 @@ public abstract class AbstractLamsCommonTestCase extends TestCase
     protected void finalizeHibernateSession() throws HibernateException
     {
         //clean the hibernate session
-		SessionFactory sessionFactory = (SessionFactory)this.ac.getBean("coreSessionFactory");
+		SessionFactory sessionFactory = (SessionFactory)this.context.getBean("coreSessionFactory");
 	    SessionHolder holder = (SessionHolder)TransactionSynchronizationManager.getResource(sessionFactory);
 	    if (holder != null) {
 	    	Session s = holder.getSession(); 
@@ -88,7 +88,7 @@ public abstract class AbstractLamsCommonTestCase extends TestCase
 
     protected Session getSession()
     {
-		SessionFactory sessionFactory = (SessionFactory)this.ac.getBean("coreSessionFactory");
+		SessionFactory sessionFactory = (SessionFactory)this.context.getBean("coreSessionFactory");
 	    SessionHolder holder = (SessionHolder)TransactionSynchronizationManager.getResource(sessionFactory);
 	    if (holder != null) 
 	    	return holder.getSession(); 

@@ -90,9 +90,9 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
     {
         super.setUp();
 
-        userDao = (UserDAO) this.ac.getBean("userDAO");
-        learningDesignDao = (LearningDesignDAO) this.ac.getBean("learningDesignDAO");
-        orgDao = (OrganisationDAO) this.ac.getBean("organisationDAO");
+        userDao = (UserDAO) this.context.getBean("userDAO");
+        learningDesignDao = (LearningDesignDAO) this.context.getBean("learningDesignDAO");
+        orgDao = (OrganisationDAO) this.context.getBean("organisationDAO");
 
         //retrieve test domain data
         testUser = userDao.getUserById(TEST_USER_ID);
@@ -100,8 +100,8 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
         testOrg = orgDao.getOrganisationById(TEST_ORGANIZATION_ID);
    
         //get lesson related daos
-        lessonDao = (LessonDAO)this.ac.getBean("lessonDAO");
-        lessonClassDao = (LessonClassDAO)this.ac.getBean("lessonClassDAO");
+        lessonDao = (LessonDAO)this.context.getBean("lessonDAO");
+        lessonClassDao = (LessonClassDAO)this.context.getBean("lessonClassDAO");
     }
 
     /**

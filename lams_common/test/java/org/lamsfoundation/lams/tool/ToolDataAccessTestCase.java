@@ -37,8 +37,8 @@ public class ToolDataAccessTestCase extends AbstractLamsCommonTestCase
     {
         super.setUp();
         
-        toolContentDao = (ToolContentDAO)this.ac.getBean("toolContentDAO");
-        toolDao = (ToolDAO)this.ac.getBean("toolDAO");
+        toolContentDao = (ToolContentDAO)this.context.getBean("toolContentDAO");
+        toolDao = (ToolDAO)this.context.getBean("toolDAO");
         
     }
 
@@ -66,6 +66,5 @@ public class ToolDataAccessTestCase extends AbstractLamsCommonTestCase
         return new String[] { "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
                 			  "applicationContext.xml"};
     }
-    
     
 }

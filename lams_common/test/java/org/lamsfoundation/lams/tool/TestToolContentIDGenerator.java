@@ -26,7 +26,7 @@ public class TestToolContentIDGenerator extends ToolDataAccessTestCase
     {
         super.setUp();
         testTool = toolDao.getToolByID(super.TEST_TOOL_ID);
-        toolContentIDGenerator = (ToolContentIDGenerator)this.ac.getBean("toolContentIDGenerator");
+        toolContentIDGenerator = (ToolContentIDGenerator)this.context.getBean("toolContentIDGenerator");
     }
 
     /*
@@ -50,10 +50,10 @@ public class TestToolContentIDGenerator extends ToolDataAccessTestCase
     {
         long id;
         long nextId;
-        Long newId = toolContentIDGenerator.getToolContentIDFor(testTool);
+        Long newId = toolContentIDGenerator.getNextToolContentIDFor(testTool);
         assertNotNull("verify the new id has been created",newId);
         id = newId.longValue();
-        newId = toolContentIDGenerator.getToolContentIDFor(testTool);
+        newId = toolContentIDGenerator.getNextToolContentIDFor(testTool);
         assertNotNull("verify the new id has been created",newId);
         nextId = newId.longValue();
         assertTrue("verify the new id is larger than old one",nextId==id+1);        
