@@ -19,7 +19,7 @@ INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, parent_nv_id, crea
 VALUES ('1', '1', '1', null, 20050106103000);
 INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (1,1,"VERSIONDESC","Initial Version","STRING");
 
-INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time) VALUES ('2', '1', 'FILENODE', 20050106103100);
+INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path) VALUES ('2', '1', 'FILENODE', 20050106103100, "/test");
 INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, parent_nv_id, created_date_time)
 VALUES ('2', '2', '1', '1', 20050106103100);
 INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, parent_nv_id, created_date_time)
