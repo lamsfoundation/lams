@@ -12,14 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.usermanagement.model.UserOrganisation" 
+    name="com.lamsinternational.lams.usermanagement.UserOrganisation" 
     table="lams_user_organisation"
-    proxy="com.lamsinternational.lams.usermanagement.model.UserOrganisation"
+    proxy="com.lamsinternational.lams.usermanagement.UserOrganisation"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_user_organisation"
-        proxy="com.lamsinternational.lams.usermanagement.model.UserOrganisation"
+        proxy="com.lamsinternational.lams.usermanagement.UserOrganisation"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -45,7 +45,7 @@
     <!-- bi-directional many-to-one association to User -->
     <many-to-one
         name="user"
-        class="com.lamsinternational.lams.usermanagement.model.User"
+        class="com.lamsinternational.lams.usermanagement.User"
         not-null="true"
     >
         <meta attribute="use-in-equals">true</meta>
@@ -73,19 +73,19 @@
             column="user_organisation_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.UserOrganisationRole"
+            class="com.lamsinternational.lams.usermanagement.UserOrganisationRole"
         </meta>
         <key>
             <column name="user_organisation_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.UserOrganisationRole"
+            class="com.lamsinternational.lams.usermanagement.UserOrganisationRole"
         />
     </set>
     <!-- bi-directional many-to-one association to Organisation -->
     <many-to-one
         name="organisation"
-        class="com.lamsinternational.lams.usermanagement.model.Organisation"
+        class="com.lamsinternational.lams.usermanagement.Organisation"
         not-null="true"
     >
         <meta attribute="use-in-equals">true</meta>

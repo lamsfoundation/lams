@@ -12,14 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodType" 
+    name="com.lamsinternational.lams.usermanagement.AuthenticationMethodType" 
     table="lams_authentication_method_type"
-    proxy="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodType"
+    proxy="com.lamsinternational.lams.usermanagement.AuthenticationMethodType"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_authentication_method_type"
-        proxy="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodType"
+        proxy="com.lamsinternational.lams.usermanagement.AuthenticationMethodType"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -74,13 +74,13 @@
             column="authentication_method_type_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod"
+            class="com.lamsinternational.lams.usermanagement.AuthenticationMethod"
         </meta>
         <key>
             <column name="authentication_method_type_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod"
+            class="com.lamsinternational.lams.usermanagement.AuthenticationMethod"
         />
     </set>
 

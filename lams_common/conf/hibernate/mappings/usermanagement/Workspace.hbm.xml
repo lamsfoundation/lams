@@ -12,14 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.usermanagement.model.Workspace" 
+    name="com.lamsinternational.lams.usermanagement.Workspace" 
     table="lams_workspace"
-    proxy="com.lamsinternational.lams.usermanagement.model.Workspace"
+    proxy="com.lamsinternational.lams.usermanagement.Workspace"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_workspace"
-        proxy="com.lamsinternational.lams.usermanagement.model.Workspace"
+        proxy="com.lamsinternational.lams.usermanagement.Workspace"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -60,13 +60,13 @@
             column="workspace_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.User"
+            class="com.lamsinternational.lams.usermanagement.User"
         </meta>
         <key>
             <column name="workspace_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.User"
+            class="com.lamsinternational.lams.usermanagement.User"
         />
     </set>
     <!-- bi-directional one-to-many association to Organisation -->
@@ -86,19 +86,19 @@
             column="workspace_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.Organisation"
+            class="com.lamsinternational.lams.usermanagement.Organisation"
         </meta>
         <key>
             <column name="workspace_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.Organisation"
+            class="com.lamsinternational.lams.usermanagement.Organisation"
         />
     </set>
     <!-- bi-directional many-to-one association to WorkspaceFolder -->
     <many-to-one
         name="workspaceFolder"
-        class="com.lamsinternational.lams.usermanagement.model.WorkspaceFolder"
+        class="com.lamsinternational.lams.usermanagement.WorkspaceFolder"
         not-null="true"
     >
         <meta attribute="field-description">

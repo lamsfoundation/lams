@@ -12,14 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.usermanagement.model.Organisation" 
+    name="com.lamsinternational.lams.usermanagement.Organisation" 
     table="lams_organisation"
-    proxy="com.lamsinternational.lams.usermanagement.model.Organisation"
+    proxy="com.lamsinternational.lams.usermanagement.Organisation"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_organisation"
-        proxy="com.lamsinternational.lams.usermanagement.model.Organisation"
+        proxy="com.lamsinternational.lams.usermanagement.Organisation"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -84,7 +84,7 @@
     <!-- bi-directional many-to-one association to Workspace -->
     <many-to-one
         name="workspace"
-        class="com.lamsinternational.lams.usermanagement.model.Workspace"
+        class="com.lamsinternational.lams.usermanagement.Workspace"
         not-null="true"
     >
         <meta attribute="field-description">
@@ -97,7 +97,7 @@
     <!-- bi-directional many-to-one association to OrganisationType -->
     <many-to-one
         name="organisationType"
-        class="com.lamsinternational.lams.usermanagement.model.OrganisationType"
+        class="com.lamsinternational.lams.usermanagement.OrganisationType"
         not-null="true"
     >
         <meta attribute="field-description">
@@ -124,13 +124,13 @@
             column="organisation_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.UserOrganisation"
+            class="com.lamsinternational.lams.usermanagement.UserOrganisation"
         </meta>
         <key>
             <column name="organisation_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.UserOrganisation"
+            class="com.lamsinternational.lams.usermanagement.UserOrganisation"
         />
     </set>
     <!-- bi-directional one-to-many association to WorkspaceFolder -->
@@ -150,19 +150,19 @@
             column="parent_folder_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.Organisation"
+            class="com.lamsinternational.lams.usermanagement.Organisation"
         </meta>
         <key>
             <column name="parent_folder_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.Organisation"
+            class="com.lamsinternational.lams.usermanagement.Organisation"
         />
     </set>
     <!-- bi-directional many-to-one association to Organisation -->
     <many-to-one
         name="parentOrganisation"
-        class="com.lamsinternational.lams.usermanagement.model.Organisation"
+        class="com.lamsinternational.lams.usermanagement.Organisation"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one

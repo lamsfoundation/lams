@@ -12,14 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodParameter" 
+    name="com.lamsinternational.lams.usermanagement.AuthenticationMethodParameter" 
     table="lams_authentication_method_parameter"
-    proxy="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodParameter"
+    proxy="com.lamsinternational.lams.usermanagement.AuthenticationMethodParameter"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_authentication_method_parameter"
-        proxy="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodParameter"
+        proxy="com.lamsinternational.lams.usermanagement.AuthenticationMethodParameter"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -72,7 +72,7 @@
     <!-- bi-directional many-to-one association to AuthenticationMethod -->
     <many-to-one
         name="authenticationMethod"
-        class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod"
+        class="com.lamsinternational.lams.usermanagement.AuthenticationMethod"
         not-null="true"
     >
         <meta attribute="use-in-equals">true</meta>

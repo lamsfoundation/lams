@@ -12,14 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.usermanagement.model.OrganisationType" 
+    name="com.lamsinternational.lams.usermanagement.OrganisationType" 
     table="lams_organisation_type"
-    proxy="com.lamsinternational.lams.usermanagement.model.OrganisationType"
+    proxy="com.lamsinternational.lams.usermanagement.OrganisationType"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_organisation_type"
-        proxy="com.lamsinternational.lams.usermanagement.model.OrganisationType"
+        proxy="com.lamsinternational.lams.usermanagement.OrganisationType"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -30,27 +30,43 @@
     >
         <meta attribute="field-description">
            @hibernate.id
-            generator-class="native"
+            generator-class="increment"
             type="java.lang.Integer"
             column="organisation_type_id"
 
 
         </meta>
         <meta attribute="use-in-equals">true</meta>
-        <generator class="native" />
+        <generator class="increment" />
     </id>
 
+    <property
+        name="name"
+        type="java.lang.String"
+        column="name"
+        not-null="true"
+        unique="true"
+        length="64"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="name"
+            unique="true"
+            length="64"
+            not-null="true"
+        </meta>    
+    </property>
     <property
         name="description"
         type="java.lang.String"
         column="description"
         not-null="true"
-        length="64"
+        length="255"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="description"
-            length="64"
+            length="255"
             not-null="true"
         </meta>    
     </property>
@@ -74,13 +90,13 @@
             column="organisation_type_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.Organisation"
+            class="com.lamsinternational.lams.usermanagement.Organisation"
         </meta>
         <key>
             <column name="organisation_type_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.Organisation"
+            class="com.lamsinternational.lams.usermanagement.Organisation"
         />
     </set>
 

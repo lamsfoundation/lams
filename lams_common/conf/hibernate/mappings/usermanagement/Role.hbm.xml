@@ -12,14 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.usermanagement.model.Role" 
+    name="com.lamsinternational.lams.usermanagement.Role" 
     table="lams_role"
-    proxy="com.lamsinternational.lams.usermanagement.model.Role"
+    proxy="com.lamsinternational.lams.usermanagement.Role"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_role"
-        proxy="com.lamsinternational.lams.usermanagement.model.Role"
+        proxy="com.lamsinternational.lams.usermanagement.Role"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -86,13 +86,13 @@
             column="role_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.UserOrganisationRole"
+            class="com.lamsinternational.lams.usermanagement.UserOrganisationRole"
         </meta>
         <key>
             <column name="role_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.UserOrganisationRole"
+            class="com.lamsinternational.lams.usermanagement.UserOrganisationRole"
         />
     </set>
 

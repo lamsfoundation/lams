@@ -12,14 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.usermanagement.model.User" 
+    name="com.lamsinternational.lams.usermanagement.User" 
     table="lams_user"
-    proxy="com.lamsinternational.lams.usermanagement.model.User"
+    proxy="com.lamsinternational.lams.usermanagement.User"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_user"
-        proxy="com.lamsinternational.lams.usermanagement.model.User"
+        proxy="com.lamsinternational.lams.usermanagement.User"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -44,12 +44,14 @@
         type="java.lang.String"
         column="login"
         not-null="true"
+        unique="true"
         length="20"
     >
         <meta attribute="use-in-equals">true</meta>
         <meta attribute="field-description">
            @hibernate.property
             column="login"
+            unique="true"
             length="20"
             not-null="true"
         </meta>    
@@ -270,7 +272,7 @@
     <!-- bi-directional many-to-one association to Workspace -->
     <many-to-one
         name="workspace"
-        class="com.lamsinternational.lams.usermanagement.model.Workspace"
+        class="com.lamsinternational.lams.usermanagement.Workspace"
         not-null="true"
     >
         <meta attribute="field-description">
@@ -297,19 +299,19 @@
             column="user_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.UserOrganisation"
+            class="com.lamsinternational.lams.usermanagement.UserOrganisation"
         </meta>
         <key>
             <column name="user_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.UserOrganisation"
+            class="com.lamsinternational.lams.usermanagement.UserOrganisation"
         />
     </set>
     <!-- bi-directional many-to-one association to AuthenticationMethod -->
     <many-to-one
         name="authenticationMethod"
-        class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod"
+        class="com.lamsinternational.lams.usermanagement.AuthenticationMethod"
         not-null="true"
     >
         <meta attribute="field-description">

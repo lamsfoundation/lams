@@ -12,14 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod" 
+    name="com.lamsinternational.lams.usermanagement.AuthenticationMethod" 
     table="lams_authentication_method"
-    proxy="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod"
+    proxy="com.lamsinternational.lams.usermanagement.AuthenticationMethod"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_authentication_method"
-        proxy="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod"
+        proxy="com.lamsinternational.lams.usermanagement.AuthenticationMethod"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -46,7 +46,7 @@
     <!-- bi-directional many-to-one association to AuthenticationMethodType -->
     <many-to-one
         name="authenticationMethodType"
-        class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodType"
+        class="com.lamsinternational.lams.usermanagement.AuthenticationMethodType"
         not-null="true"
     >
         <meta attribute="field-description">
@@ -73,18 +73,18 @@
             column="authentication_method_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.User"
+            class="com.lamsinternational.lams.usermanagement.User"
         </meta>
         <key>
             <column name="authentication_method_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.User"
+            class="com.lamsinternational.lams.usermanagement.User"
         />
     </set>
     <!-- bi-directional one-to-many association to AuthenticationMethodParameter -->
     <set
-        name="authenticationMethodType"
+        name="authenticationMethodParameters"
         lazy="true"
         inverse="true"
 		cascade="none"
@@ -99,13 +99,13 @@
             column="authentication_method_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodParameter"
+            class="com.lamsinternational.lams.usermanagement.AuthenticationMethodParameter"
         </meta>
         <key>
             <column name="authentication_method_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodParameter"
+            class="com.lamsinternational.lams.usermanagement.AuthenticationMethodParameter"
         />
     </set>
 

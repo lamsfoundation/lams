@@ -12,14 +12,14 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.usermanagement.model.WorkspaceFolder" 
+    name="com.lamsinternational.lams.usermanagement.WorkspaceFolder" 
     table="lams_workspace_folder"
-    proxy="com.lamsinternational.lams.usermanagement.model.WorkspaceFolder"
+    proxy="com.lamsinternational.lams.usermanagement.WorkspaceFolder"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_workspace_folder"
-        proxy="com.lamsinternational.lams.usermanagement.model.WorkspaceFolder"
+        proxy="com.lamsinternational.lams.usermanagement.WorkspaceFolder"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -87,13 +87,13 @@
             column="root_folder_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.Workspace"
+            class="com.lamsinternational.lams.usermanagement.Workspace"
         </meta>
         <key>
             <column name="root_folder_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.Workspace"
+            class="com.lamsinternational.lams.usermanagement.Workspace"
         />
     </set>
     <!-- bi-directional one-to-many association to WorkspaceFolder -->
@@ -113,19 +113,19 @@
             column="parent_folder_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.model.WorkspaceFolder"
+            class="com.lamsinternational.lams.usermanagement.WorkspaceFolder"
         </meta>
         <key>
             <column name="parent_folder_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.model.WorkspaceFolder"
+            class="com.lamsinternational.lams.usermanagement.WorkspaceFolder"
         />
     </set>
     <!-- bi-directional many-to-one association to WorkspaceFolder -->
     <many-to-one
         name="parentWorkspaceFolder"
-        class="com.lamsinternational.lams.usermanagement.model.WorkspaceFolder"
+        class="com.lamsinternational.lams.usermanagement.WorkspaceFolder"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
