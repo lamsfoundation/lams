@@ -107,7 +107,7 @@
         name="crNodeVersionProperties"
         lazy="false"
         inverse="true"
-		cascade="none"
+		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
