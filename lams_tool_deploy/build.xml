@@ -31,8 +31,27 @@
         <property name="test.src.dir" value="test/java"/>
         <property name="jar.file" value="${build.dir}/lams_tool_util.jar"/>
         <property name="test.dir" value="test"/>
+        <property name="test.file.dir" value="test/file"/>
+        <property name="debug" value="on"/>
         
+        <path id="src.class.path">
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
         
+        <path id="test.class.path">
+            <pathelement location="${classes.dir}"/> 
+            <path refid="src.class.path"/>
+        </path>
+        
+        <path id="junit.class.path">
+            <pathelement location="${test.classes.dir}"/> 
+            <path refid="test.class.path"/>
+            <fileset dir="${test.file.dir}">
+                <include name="**/*"/>
+            </fileset>
+        </path>
 
         <target name="usage">
 	</target> 
@@ -58,21 +77,8 @@
         </target>
         
         <target name="compile" depends="clean">
-            <javac srcdir="${src.dir}" destdir="${classes.dir}">
-                <classpath>
-                    <fileset dir="${lib.dir}">
-                        <include name="**/*.jar"/>
-                    </fileset>
-                </classpath>
-            </javac>
-            <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}">
-                <classpath>
-                    <pathelement location="${classes.dir}"/> 
-                    <fileset dir="${lib.dir}">
-                        <include name="**/*.jar"/>
-                    </fileset>
-                </classpath>
-            </javac>
+            <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="src.class.path" debug="${debug}"/>
+            <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" classpathref="test.class.path" debug="${debug}"/>
         </target>
         
         <target name="build" depends="compile">
@@ -80,18 +86,16 @@
         </target>
         
         
-        <target name="test-token-replacer" >
+        <target name="junit" >
         <!-- NOTE: needs fork adn dir so it can find test files! -->
             <junit printsummary="withOutAndErr" showoutput="on" fork="on" dir="${basedir}">
                 <classpath>
-                    <pathelement location="${classes.dir}"/> 
-                    <pathelement location="${test.classes.dir}"/> 
-                    <fileset dir="${lib.dir}">
-                        <include name="**/*.jar"/>
-                    </fileset>
+                    <path refid="junit.class.path"/>
                 </classpath>
                 <formatter type="plain"/>
                 <test name="org.lamsfoundation.lams.tool.deploy.FileTokenReplacerTest" todir="${basedir}/test/results" outfile="FileTokenReplacer"/>
+                <test name="org.lamsfoundation.lams.tool.deploy.DeployConfigTest" todir="${basedir}/test/results" outfile="DeployConfig"/>
+                <test name="org.lamsfoundation.lams.tool.deploy.DeployFilesTaskTest" todir="${basedir}/test/results" outfile="DeployFilesTask"/>
             </junit>
         </target>
 </project>

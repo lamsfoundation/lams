@@ -34,13 +34,23 @@ import java.io.File;
  *
  * @author chris
  */
-public class ToolDBDeployTask //extends DBTask
+public class ToolDBDeployTask extends DBTask
 {
 
     /**
-     * Holds value of property toolLibraryScript.
+     * Holds value of property toolInsertScript.
      */
-    private File toolLibraryScript;
+    private File toolInsertScript;
+
+    /**
+     * Holds value of property toolLibraryInsertScript.
+     */
+    private File toolLibraryInsertScript;
+
+    /**
+     * Holds value of property toolTablesCreatScript.
+     */
+    private File toolTablesCreatScript;
 
     /**
      * Holds value of property toolId.
@@ -48,104 +58,15 @@ public class ToolDBDeployTask //extends DBTask
     private long toolId;
 
     /**
-     * Holds value of property defaultContentId.
+     * Holds value of property learningLibraryId.
      */
-    private long defaultContentId;
+    private long learningLibraryId;
 
     /**
-     * Holds value of property toolSignature.
+     * Holds value of property toolActivityInsertScript.
      */
-    private String toolSignature;
+    private File toolActivityInsertScript;
 
-    /**
-     * Holds value of property serviceName.
-     */
-    private String serviceName;
-
-    /**
-     * Holds value of property displayName.
-     */
-    private String displayName;
-
-    /**
-     * Holds value of property learningLibraryid.
-     */
-    private long learningLibraryid;
-
-    /**
-     * Holds value of property groupingSupportTypeId.
-     */
-    private int groupingSupportTypeId;
-
-    /**
-     * Holds value of property supportsDefineLater.
-     */
-    private boolean supportsDefineLater;
-
-    /**
-     * Holds value of property supportsRunOffline.
-     */
-    private boolean supportsRunOffline;
-
-    /**
-     * Holds value of property supportsModeration.
-     */
-    private boolean supportsModeration;
-
-    /**
-     * Holds value of property supportsContribution.
-     */
-    private boolean supportsContribution;
-
-    /**
-     * Holds value of property learnerUrl.
-     */
-    private String learnerUrl;
-
-    /**
-     * Holds value of property auythorUrl.
-     */
-    private String auythorUrl;
-
-    /**
-     * Holds value of property defineLaterUrl.
-     */
-    private String defineLaterUrl;
-
-    /**
-     * Holds value of property exportPortfolioUrl.
-     */
-    private String exportPortfolioUrl;
-
-    /**
-     * Holds value of property monitorUrl.
-     */
-    private String monitorUrl;
-
-    /**
-     * Holds value of property contributeUrl.
-     */
-    private String contributeUrl;
-
-    /**
-     * Holds value of property moderationUrl.
-     */
-    private String moderationUrl;
-
-    /**
-     * Holds value of property toolDBCreateScript.
-     */
-    private File toolDBCreateScript;
-
-    /**
-     * Holds value of property toolDBInsertScript.
-     */
-    private File toolDBInsertScript;
-
-    /**
-     * Holds value of property toolActivityScript.
-     */
-    private File toolActivityScript;
     
     /** Creates a new instance of ToolDBActivateTask */
     public ToolDBDeployTask()
@@ -153,13 +74,57 @@ public class ToolDBDeployTask //extends DBTask
     }
 
     /**
-     * Setter for property toolLibraryScript.
-     * @param toolLibraryScript New value of property toolLibraryScript.
+     * Setter for property toolInsertFile.
+     * @param toolInsertFile New value of property toolInsertFile.
      */
-    public void setToolLibraryScript(File toolLibraryScript)
+    public void setToolInsertScript(java.io.File toolInsertScript)
+    
     {
 
-        this.toolLibraryScript = toolLibraryScript;
+        this.toolInsertScript = toolInsertScript;
+    }
+
+    /**
+     * Setter for property toolLibraryInsertFile.
+     * @param toolLibraryInsertFile New value of property toolLibraryInsertFile.
+     */
+    public void setToolLibraryInsertScript(java.io.File toolLibraryInsertScript)
+    
+    {
+
+        this.toolLibraryInsertScript = toolLibraryInsertScript;
+    }
+
+    /**
+     * Setter for property toolTablesCreatScript.
+     * @param toolTablesCreatScript New value of property toolTablesCreatScript.
+     */
+    public void setToolTablesCreatScript(File toolTablesCreatScript)
+    {
+
+        this.toolTablesCreatScript = toolTablesCreatScript;
+    }
+
+    public void execute() throws DeployException
+    {
+        //get a tool content id
+        
+        //put the tool content id into the tool insert file
+        
+        //run tool insert and get tool id back
+        
+        //put the tool id into the tool library script
+        
+        //run tool library script and get the library id back
+        
+        //put the library id into the activity insert script
+        
+        //run the activity insert script
+        
+        //put the tool id and and defualt content id into
+        //the tool tables script
+        
+        //run the tool table script
     }
 
     /**
@@ -173,217 +138,23 @@ public class ToolDBDeployTask //extends DBTask
     }
 
     /**
-     * Getter for property defaultContentId.
-     * @return Value of property defaultContentId.
+     * Getter for property learningLibraryId.
+     * @return Value of property learningLibraryId.
      */
-    public long getDefaultContentId()
+    public long getLearningLibraryId()
     {
 
-        return this.defaultContentId;
+        return this.learningLibraryId;
     }
 
     /**
-     * Setter for property toolSignature.
-     * @param toolSignature New value of property toolSignature.
+     * Setter for property toolActivityInsertScript.
+     * @param toolActivityInsertScript New value of property toolActivityInsertScript.
      */
-    public void setToolSignature(String toolSignature)
+    public void setToolActivityInsertScript(File toolActivityInsertScript)
     {
 
-        this.toolSignature = toolSignature;
-    }
-
-    /**
-     * Setter for property serviceName.
-     * @param serviceName New value of property serviceName.
-     */
-    public void setServiceName(String serviceName)
-    {
-
-        this.serviceName = serviceName;
-    }
-
-    /**
-     * Setter for property displayName.
-     * @param displayName New value of property displayName.
-     */
-    public void setDisplayName(String displayName)
-    {
-
-        this.displayName = displayName;
-    }
-//
-//    /**
-//     * Getter for property description.
-//     * @return Value of property description.
-//     */
-//    public String getDescription()
-//    {
-//    }
-
-    /**
-     * Setter for property description.
-     * @param description New value of property description.
-     */
-    public void setDescription(String description)
-    {
-    }
-
-    /**
-     * Setter for property groupingSupportTypeId.
-     * @param groupingSupportTypeId New value of property groupingSupportTypeId.
-     */
-    public void setGroupingSupportTypeId(int groupingSupportTypeId)
-    {
-
-        this.groupingSupportTypeId = groupingSupportTypeId;
-    }
-
-    /**
-     * Setter for property supportsDefineLater.
-     * @param supportsDefineLater New value of property supportsDefineLater.
-     */
-    public void setSupportsDefineLater(boolean supportsDefineLater)
-    {
-
-        this.supportsDefineLater = supportsDefineLater;
-    }
-
-    /**
-     * Setter for property supportsRunOffline.
-     * @param supportsRunOffline New value of property supportsRunOffline.
-     */
-    public void setSupportsRunOffline(boolean supportsRunOffline)
-    {
-
-        this.supportsRunOffline = supportsRunOffline;
-    }
-
-    /**
-     * Setter for property supportsModeration.
-     * @param supportsModeration New value of property supportsModeration.
-     */
-    public void setSupportsModeration(boolean supportsModeration)
-    {
-
-        this.supportsModeration = supportsModeration;
-    }
-
-    /**
-     * Setter for property supportsContribution.
-     * @param supportsContribution New value of property supportsContribution.
-     */
-    public void setSupportsContribution(boolean supportsContribution)
-    {
-
-        this.supportsContribution = supportsContribution;
-    }
-
-    /**
-     * Setter for property learnerUrl.
-     * @param learnerUrl New value of property learnerUrl.
-     */
-    public void setLearnerUrl(String learnerUrl)
-    {
-
-        this.learnerUrl = learnerUrl;
-    }
-
-    /**
-     * Setter for property auythorUrl.
-     * @param auythorUrl New value of property auythorUrl.
-     */
-    public void setAuythorUrl(String auythorUrl)
-    {
-
-        this.auythorUrl = auythorUrl;
-    }
-
-    /**
-     * Setter for property defineLaterUrl.
-     * @param defineLaterUrl New value of property defineLaterUrl.
-     */
-    public void setDefineLaterUrl(String defineLaterUrl)
-    {
-
-        this.defineLaterUrl = defineLaterUrl;
-    }
-
-    /**
-     * Setter for property exportPortfolioUrl.
-     * @param exportPortfolioUrl New value of property exportPortfolioUrl.
-     */
-    public void setExportPortfolioUrl(String exportPortfolioUrl)
-    {
-
-        this.exportPortfolioUrl = exportPortfolioUrl;
-    }
-
-    /**
-     * Setter for property monitorUrl.
-     * @param monitorUrl New value of property monitorUrl.
-     */
-    public void setMonitorUrl(String monitorUrl)
-    {
-
-        this.monitorUrl = monitorUrl;
-    }
-
-    /**
-     * Setter for property contributeUrl.
-     * @param contributeUrl New value of property contributeUrl.
-     */
-    public void setContributeUrl(String contributeUrl)
-    {
-
-        this.contributeUrl = contributeUrl;
-    }
-
-    /**
-     * Setter for property moderationUrl.
-     * @param moderationUrl New value of property moderationUrl.
-     */
-    public void setModerationUrl(String moderationUrl)
-    {
-
-        this.moderationUrl = moderationUrl;
-    }
-
-    /**
-     * Getter for property learningLibraryid.
-     * @return Value of property learningLibraryid.
-//     */
-//    public long getLearningLibraryid()
-//    {
-//    }
-
-    /**
-     * Setter for property toolDBCreateScript.
-     * @param toolDBCreateScript New value of property toolDBCreateScript.
-     */
-    public void setToolDBCreateScript(File toolDBCreateScript)
-    {
-
-        this.toolDBCreateScript = toolDBCreateScript;
-    }
-
-    /**
-     * Setter for property toolDBInsertScript.
-     * @param toolDBInsertScript New value of property toolDBInsertScript.
-     */
-    public void setToolDBInsertScript(File toolDBInsertScript)
-    {
-
-        this.toolDBInsertScript = toolDBInsertScript;
-    }
-
-    /**
-     * Setter for property toolActivityScript.
-     * @param toolActivityScript New value of property toolActivityScript.
-     */
-    public void setToolActivityScript(File toolActivityScript)
-    {
-
-        this.toolActivityScript = toolActivityScript;
+        this.toolActivityInsertScript = toolActivityInsertScript;
     }
     
 }
