@@ -41,9 +41,9 @@
 	<property name="database.driver.file"          value="${lib}/mysql/mysql-connector-java-3.0.16-ga-bin.jar"/>   
 	<property name="database.driver.classpath"     value="${database.driver.file}"/>
 	<property name="database.driver"               value="org.gjt.mm.mysql.Driver"/>
-	<property name="database.url"                  value="jdbc:mysql://localhost/lams"/>
-	<property name="database.userid"               value="root"/>
-	<property name="database.password"             value="rootpwd"/>
+	<property name="database.url"                  value="jdbc:mysql://localhost/lams11"/>
+	<property name="database.userid"               value="lams"/>
+	<property name="database.password"             value="lamsdemo"/>
 	<property name="database.schema"               value=""/>
 	<property name="database.catalog"              value=""/>
 
