@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
-import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -56,7 +56,7 @@ public class DummyLearnerService implements ILearnerService {
 	private HttpServletRequest request;
 	private static String NAME = "lams.learning.testlearnerservice";
 	
-	private ActionMappings actionMappings;
+	private ActivityMapping activityMapping;
 	
 	private ILessonDAO lessonDAO;
 	
@@ -72,8 +72,8 @@ public class DummyLearnerService implements ILearnerService {
 		this.request = request;
 	}
 	
-	public void setActionMappings(ActionMappings actionMappings) {
-		this.actionMappings = actionMappings;
+	public void setActivityMapping(ActivityMapping actionMappings) {
+		this.activityMapping = actionMappings;
 	}
 
 	private LearnerProgress getProgress() {
@@ -126,6 +126,9 @@ public class DummyLearnerService implements ILearnerService {
 		long completedActivityId = completedActivity.getActivityId().longValue();
 		setComplete(completedActivityId, progress);
 		
+		progress.setParallelWaiting(false);
+		progress.setLessonComplete(false);
+		
 		Activity nextActivity = null;
 		Activity previousActivity = null;
 		Activity currentActivity = progress.getCurrentActivity();
@@ -148,8 +151,10 @@ public class DummyLearnerService implements ILearnerService {
 			    currentActivity = nextActivity;
 		    }
 		    else {
-		        nextActivity = new ParallelWaitActivity();
+		        //nextActivity = new ParallelWaitActivity();
+		    	nextActivity = null;
 			    previousActivity = completedActivity;
+			    progress.setParallelWaiting(true);
 		    }
 		}
 		else if (completedActivityId == 6) {
@@ -170,9 +175,11 @@ public class DummyLearnerService implements ILearnerService {
 		    }
 		}
 		else if (completedActivityId == 10) {
-		    nextActivity = new LessonCompleteActivity();
+		    //nextActivity = new LessonCompleteActivity();
+			nextActivity = null;
 		    previousActivity = currentActivity;
 		    currentActivity = nextActivity;
+		    progress.setLessonComplete(true);
 		}
 
 		progress.setCurrentActivity(currentActivity);
@@ -193,7 +200,7 @@ public class DummyLearnerService implements ILearnerService {
     	Activity activity = getActivity(toolSessionId, progress);
     	
     	progress = calculateProgress(activity, learner, lesson);
-    	String url = actionMappings.getProgressURL(progress);
+    	String url = activityMapping.getProgressURL(progress);
     	
     	return url;
 	}
