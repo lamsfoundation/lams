@@ -3,7 +3,13 @@
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
 <%@ page session="true" %>
 <%@ page import="com.lamsinternational.lams.util.JspRedirectStrategy" %>
+<%@ page import="com.lamsinternational.lams.security.Global" %>
 <%	
+
+	//FIXME: temporary solution
+	if (Global.getServletContext() == null) 
+		Global.setServletContext( request.getSession().getServletContext() );
+
 	String failed = request.getParameter("failed");
 	if (failed == null)
 	{
@@ -15,6 +21,13 @@
 		if (JspRedirectStrategy.errorPageRedirected(request,response))
 			return;	
 	}
+	
+	String webAuthUser = (String) session.getAttribute("WEBAUTH_USER");
+	if (webAuthUser != null)
+		{
+		response.sendRedirect("j_security_check?j_username=" + webAuthUser + "&j_password=Dummy");	
+		}
+			
 %>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -104,11 +117,27 @@ j_security_login_page
 										<input type="submit" value="Login" class="button" onmouseover="pviiClassNew(this,'buttonover')" onmouseout="pviiClassNew(this,'button')" />
 									</td>
 								</tr>
+								
+								<tr>
+									<td colspan="3" align="center">
+									<br><br><br>
+									</td>
+								</tr>
+
+								<!-- TODO: show "webauth login" only if webauth is enabled -->
+								<tr>
+									<td colspan="3" align="left" class="smallText">
+										  <a href="https://array00.melcoe.mq.edu.au/lams/webauth">WebAuth Users: click here</a> 
+									</td>
+							  </tr>
+								
 							</table>
 						</form>
 						<img height="1" src="images/spacer.gif" width="200" />
 					</td>
-				</tr>
+					</tr>
+					
+				
 				<tr valign="bottom" class="lightNote">
 					<td>
 						<a href="javascript:alert('LAMS&#8482; &copy; 2002-2005 LAMS Foundation. 
