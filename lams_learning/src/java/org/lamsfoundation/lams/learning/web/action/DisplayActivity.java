@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
 import org.lamsfoundation.lams.usermanagement.*;
-import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
 
@@ -58,12 +58,12 @@ public class DisplayActivity extends ActivityAction {
 			HttpServletRequest request,
 			HttpServletResponse response) {
 		ActivityForm form = (ActivityForm) actionForm;
-		ActionMappings actionMappings = getActionMappings();
+		ActivityMapping actionMappings = getActivityMapping();
 		
 		SessionBean sessionBean = getSessionBean(request);
 		if (sessionBean == null) {
 			// forward to the no session error page
-			return mapping.findForward(ActionMappings.NO_SESSION_ERROR);
+			return mapping.findForward(ActivityMapping.NO_SESSION_ERROR);
 		}
 		
 		// Get learner

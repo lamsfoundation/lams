@@ -33,8 +33,8 @@ import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.service.DummyLearnerService;
 import org.lamsfoundation.lams.learning.web.form.DummyToolForm;
-import org.lamsfoundation.lams.learning.web.util.ActionMappings;
-import org.lamsfoundation.lams.learning.web.util.ActionMappingsWithToolWait;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.ActivityMappingWithToolWait;
 
 
 /**

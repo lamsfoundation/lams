@@ -29,7 +29,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.NotebookForm;
-import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.notebook.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.INotebookService;
 import org.lamsfoundation.lams.notebook.service.NotebookServiceProxy;
@@ -59,7 +59,7 @@ public class DisplayNotebookEntry extends NotebookAction {
 		SessionBean sessionBean = getSessionBean(request);
 		if (sessionBean == null) {
 			// forward to the no session error page
-			return mapping.findForward(ActionMappings.NO_SESSION_ERROR);
+			return mapping.findForward(ActivityMapping.NO_SESSION_ERROR);
 		}
 
 		NotebookEntry notebookEntry;
@@ -72,7 +72,7 @@ public class DisplayNotebookEntry extends NotebookAction {
 			// check whether user in session has access to this notebook entry
 			if (!notebookEntry.isViewable(sessionBean.getLearner())) {
 				log.error(className+": User with Id "+sessionBean.getLearner().getUserId()+" does not have access to NotebookEntry with Id "+notebookEntry.getNotebookEntryId());
-				return mapping.findForward(ActionMappings.NO_ACCESS_ERROR);
+				return mapping.findForward(ActivityMapping.NO_ACCESS_ERROR);
 			}
 		}
 		notebookForm.setNotebookEntry(notebookEntry);

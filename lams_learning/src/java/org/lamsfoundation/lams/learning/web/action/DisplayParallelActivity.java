@@ -33,7 +33,8 @@ import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
-import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.ParallelActivityMappingStrategy;
 
 /** 
  * Action class to display a ParallelActivity.
@@ -59,13 +60,14 @@ public class DisplayParallelActivity extends ActivityAction {
 			HttpServletRequest request,
 			HttpServletResponse response) {
 		ActivityForm form = (ActivityForm)actionForm;
-		ActionMappings actionMappings = getActionMappings();
+		ActivityMapping actionMappings = getActivityMapping();
+		actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request, form);
 		Activity activity = getActivity(request, form, learnerProgress);
 		if (!(activity instanceof ParallelActivity)) {
 		    log.error(className+": activity not ParallelActivity "+activity.getActivityId());
-			return mapping.findForward(ActionMappings.ERROR);
+			return mapping.findForward(ActivityMapping.ERROR);
 		}
 
 		ParallelActivity parallelActivity = (ParallelActivity)activity;
@@ -84,7 +86,7 @@ public class DisplayParallelActivity extends ActivityAction {
 		}
 		if (activityURLs.size() == 0) {
 		    log.error(className+": No sub-activity URLs for activity "+activity.getActivityId());
-			return mapping.findForward(ActionMappings.ERROR);
+			return mapping.findForward(ActivityMapping.ERROR);
 		}
 		form.setActivityURLs(activityURLs);
 		

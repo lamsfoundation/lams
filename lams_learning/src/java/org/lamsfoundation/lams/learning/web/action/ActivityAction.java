@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.service.DummyLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
-import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 
 import org.lamsfoundation.lams.usermanagement.*;
 import org.lamsfoundation.lams.lesson.*;
@@ -61,9 +61,9 @@ public class ActivityAction extends LearnerAction {
 	/**
 	 * Get the ActionMappings.
 	 */
-	protected ActionMappings getActionMappings() {
+	protected ActivityMapping getActivityMapping() {
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-        return (ActionMappings)wac.getBean("actionMappings");
+        return (ActivityMapping)wac.getBean("activityMapping");
 	}
 	
 	/** 

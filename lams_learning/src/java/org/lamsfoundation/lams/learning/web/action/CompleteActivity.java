@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 
 /**
  * @author daveg
@@ -62,19 +62,19 @@ public class CompleteActivity extends ActivityAction {
 			HttpServletRequest request,
 			HttpServletResponse response) {
 		ActivityForm form = (ActivityForm)actionForm;
-		ActionMappings actionMappings = getActionMappings();
+		ActivityMapping actionMappings = getActivityMapping();
 		
 		SessionBean sessionBean = getSessionBean(request);
 		if (sessionBean == null) {
 			// forward to the no session error page
-			return mapping.findForward(ActionMappings.NO_SESSION_ERROR);
+			return mapping.findForward(ActivityMapping.NO_SESSION_ERROR);
 		}
 		
 		// check token
 		if (!this.isTokenValid(request, true)) {
 			// didn't come here from options page
 		    log.info(className+": No valid token in request");
-			return mapping.findForward(ActionMappings.DOUBLE_SUBMIT_ERROR);
+			return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
 		}
 		
 		// Get learner
@@ -86,7 +86,7 @@ public class CompleteActivity extends ActivityAction {
 		
 		if (activity == null) {
 		    log.error(className+": No activity in request or session");
-			return mapping.findForward(ActionMappings.ERROR);
+			return mapping.findForward(ActivityMapping.ERROR);
 		}
 
 		ILearnerService learnerService = getLearnerService(request);

@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
-import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 
 /** 
  * Action class to forward the user to a Tool using an intermediate loading page.
@@ -58,13 +58,13 @@ public class DisplayLoadToolActivity extends ActivityAction {
 			HttpServletRequest request,
 			HttpServletResponse response) {
 		ActivityForm form = (ActivityForm)actionForm;
-		ActionMappings actionMappings = getActionMappings();
+		ActivityMapping actionMappings = getActivityMapping();
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request, form);
 		Activity activity = getActivity(request, form, learnerProgress);
 		if (!(activity instanceof ToolActivity)) {
 		    log.error(className+": activity not ToolActivity");
-			return mapping.findForward(ActionMappings.ERROR);
+			return mapping.findForward(ActivityMapping.ERROR);
 		}
 		
 		ToolActivity toolActivity = (ToolActivity)activity;
