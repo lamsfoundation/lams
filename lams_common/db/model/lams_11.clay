@@ -1291,7 +1291,7 @@
 <variant type-name-pattern="DATETIME"/>
 </data-type>
 </column>
-<column name="to_ui_id" alias="" remarks="" mandatory="true" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column name="to_ui_id" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
 <variant type-name-pattern="INT"/>
@@ -1304,7 +1304,7 @@
 <variant type-name-pattern="INT ZEROFILL"/>
 </data-type>
 </column>
-<column name="from_ui_id" alias="" remarks="" mandatory="true" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
+<column name="from_ui_id" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
 <variant type-name-pattern="INT"/>

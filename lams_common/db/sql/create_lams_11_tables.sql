@@ -509,8 +509,8 @@ CREATE TABLE lams_learning_transition (
      , from_activity_id BIGINT(20) NOT NULL
      , learning_design_id BIGINT(20) NOT NULL DEFAULT 0
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
-     , to_ui_id INT(11) NOT NULL
-     , from_ui_id INT(11) NOT NULL
+     , to_ui_id INT(11)
+     , from_ui_id INT(11)
      , PRIMARY KEY (transition_id)
      , INDEX (from_activity_id)
      , CONSTRAINT FK_learning_transition_3 FOREIGN KEY (from_activity_id)
