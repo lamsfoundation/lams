@@ -67,6 +67,6 @@
 	<classpathentry kind="lib" path="lib/jakarta-commons/commons-digester.jar"/>
 	<classpathentry kind="lib" path="lib/jakarta-commons/commons-fileupload-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/jakarta-poi/poi-2.5.1-final-20040804.jar"/>
-	<classpathentry kind="lib" path="lib/wddx/wddx-1.0a-webmcq-0.2.jar"/>
+	<classpathentry kind="lib" path="lib/wddx/wddx-1.0a-lfl-0.2.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
