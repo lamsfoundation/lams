@@ -30,11 +30,20 @@
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
-	<definition name=".admin.sysadmin" path="/template.jsp">
+	<definition name=".admin.error" path="/template.jsp">
+		<put name="title" value="LAMS ::Admin Error"/>
+		<put name="pageHeader" value="Admin Error"/>
+		<put name="header" value="header.jsp"/>
+		<put name="content" value="/admin/errorContent.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
+
+
+	<definition name=".admin" path="/template.jsp">
 		<put name="title" value="LAMS :: Maintain Organisations/Users"/>
 		<put name="pageHeader" value="Maintain Organisations/Users"/>
 		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/admin/sysadminContent.jsp" />	
+		<put name="content" value="/admin/adminContent.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
