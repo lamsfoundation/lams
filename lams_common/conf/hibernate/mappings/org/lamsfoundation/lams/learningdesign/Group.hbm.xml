@@ -58,7 +58,6 @@
     <set
         name="users"
         lazy="true"
-        inverse="true"
         cascade="none"
         table="lams_user_group"
     >

@@ -40,7 +40,7 @@ public abstract class Grouping implements Serializable
     private Set activities;
     
     /** non-persistent field */
-    private Set learners;
+    protected Set learners;
     
     /** full constructor */
     public Grouping(Long groupingId, Set groups, Set activities)
@@ -179,16 +179,23 @@ public abstract class Grouping implements Serializable
     public Set getLearners()
     {
         //verify pre-condition
-        if(groups==null)
+        if(getGroups()==null)
             throw new IllegalArgumentException("Fail to get learnings from" +
             		"a grouping without groups");
         
         learners = new HashSet();
-        for(Iterator i = groups.iterator();i.hasNext();)
+        for(Iterator i = getGroups().iterator();i.hasNext();)
         {
             Group group = (Group)i.next();
-            learners.addAll(group.getUsers());
+            if(isLearnerGroup(group))
+                learners.addAll(group.getUsers());
         }
         return learners;
     }
+
+    /**
+     * @return
+     */
+    protected abstract boolean isLearnerGroup(Group group);
+
 }

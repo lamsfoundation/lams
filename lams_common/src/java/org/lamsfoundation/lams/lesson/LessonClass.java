@@ -48,4 +48,17 @@ public class LessonClass extends Grouping {
 	public void setLesson(Lesson lesson) {
 		this.lesson = lesson;
 	}
+
+    /**
+     * @see org.lamsfoundation.lams.learningdesign.Grouping#isLearnerGroup(org.lamsfoundation.lams.learningdesign.Group)
+     */
+    protected boolean isLearnerGroup(Group group)
+    {
+        if(group.getGroupId()==null||staffGroup.getGroupId()==null)
+            throw new IllegalArgumentException("Can't check up whether group" +
+            		" is learner group without group id.");
+        
+        return staffGroup.getGroupId()!=group.getGroupId();
+    }
+
 }

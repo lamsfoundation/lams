@@ -61,4 +61,13 @@ public class RandomGrouping extends Grouping
         this.numberOfGroups = numberOfGroups;
     }
     
+    /**
+     * This type of grouping doesn't have groups other than learner groups.
+     * So it always return <code>true</code>.
+     * @see org.lamsfoundation.lams.learningdesign.Grouping#isLearnerGroup(org.lamsfoundation.lams.learningdesign.Group)
+     */
+    protected boolean isLearnerGroup(Group group)
+    {
+        return true;
+    }
 }
