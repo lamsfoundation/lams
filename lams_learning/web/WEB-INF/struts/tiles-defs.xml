@@ -56,7 +56,7 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="title" value="Optional Activity"/>
 		<put name="body" value="/optionsActivity.jsp"/>
 	</definition>
-	<definition name=".requestDisplay" path="/requestDisplayActivity.jsp" />
+	<definition name=".requestDisplay" path="/requestURL.jsp" />
 	<definition name=".parallelWait" extends=".activityLayout">
 		<put name="title" value="Wait..."/>
 		<put name="body" value="/partialCompleted.jsp"/>
