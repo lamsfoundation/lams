@@ -26,6 +26,10 @@
       type="org.lamsfoundation.lams.learning.web.form.TestDblSubmitForm"
     />
     <form-bean
+      name="notebookForm"
+      type="org.lamsfoundation.lams.learning.web.form.NotebookForm"
+    />
+    <form-bean
       name="optionsActivityForm"
       type="org.lamsfoundation.lams.learning.web.form.OptionsActivityForm"
     />
@@ -89,6 +93,20 @@ http://www.gnu.org/licenses/gpl.txt
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
+      path="/notebook/DisplayEntry"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayNotebookEntry"
+      name="notebookForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayEntry"
+        path=".journalDetail"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/DisplayActivity"
       type="org.lamsfoundation.lams.learning.web.action.DisplayActivity"
       name="activityForm"
@@ -107,7 +125,7 @@ http://www.gnu.org/licenses/gpl.txt
     >
       <forward
         name="displayTool"
-        path=".toolActivity"
+        path=".loadToolActivity"
         redirect="false"
       />
     </action>
@@ -179,6 +197,20 @@ http://www.gnu.org/licenses/gpl.txt
     >
     </action>
     <action
+      path="/notebook/SaveEntry"
+      type="org.lamsfoundation.lams.learning.web.action.SaveNotebookEntry"
+      name="notebookForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayEntry"
+        path="/DisplayEntry"
+        redirect="true"
+      />
+    </action>
+    <action
       path="/test/DblSubmit"
       type="org.lamsfoundation.lams.learning.web.action.TestDblSubmitAction"
       name="testDblSubmitForm"
@@ -236,6 +268,10 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
+
+<action path="/index"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter="/main.jsp" />
 
 <action path="/content"
 	type="org.apache.struts.actions.ForwardAction"
