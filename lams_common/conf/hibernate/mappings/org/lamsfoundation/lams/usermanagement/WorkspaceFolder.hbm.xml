@@ -131,6 +131,17 @@
         </meta>
         <column name="parent_folder_id" />
     </many-to-one>
+    
+    <!-- bi-directional one-to-many association to LearningDesign -->
+    <set name="learningDesigns" lazy="false" inverse="true" cascade="none">
+        <meta attribute="field-description">@hibernate.set lazy="false" inverse="true" cascade="none"
+        								    @hibernate.collection-key column="user_id"
+        								    @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.LearningDesign"
+        </meta>
+        <key><column name="workspace_folder_id" /></key>
+        <one-to-many class="org.lamsfoundation.lams.learningdesign.LearningDesign"/>
+    </set>
+    
 
 </class>
 </hibernate-mapping>

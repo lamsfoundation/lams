@@ -1,6 +1,8 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -86,6 +88,9 @@ public class LearningDesign implements Serializable {
 
     /** persistent field */
     private Set activities;
+    
+    /** persistent field */
+    private WorkspaceFolder workspaceFolder;
     
     /** non-persistent field containing a list
      * of optional activities in the design*/
@@ -523,4 +528,16 @@ public class LearningDesign implements Serializable {
 		
 	}
 
+	/**
+	 * @return Returns the workspaceFolder.
+	 */
+	public WorkspaceFolder getWorkspaceFolder() {
+		return workspaceFolder;
+	}
+	/**
+	 * @param workspaceFolder The workspaceFolder to set.
+	 */
+	public void setWorkspaceFolder(WorkspaceFolder workspaceFolder) {
+		this.workspaceFolder = workspaceFolder;
+	}
 }

@@ -30,7 +30,21 @@ public class WorkspaceFolder implements Serializable {
 
     /** persistent field */
     private Set childWorkspaceFolders;
+    
+    private Set learningDesigns;
 
+	/**
+	 * @return Returns the learningDesigns.
+	 */
+	public Set getLearningDesigns() {
+		return learningDesigns;
+	}
+	/**
+	 * @param learningDesigns The learningDesigns to set.
+	 */
+	public void setLearningDesigns(Set learningDesigns) {
+		this.learningDesigns = learningDesigns;
+	}
     /** full constructor */
     public WorkspaceFolder(String name, int workspaceId, WorkspaceFolder parentWorkspaceFolder, Set workspaces, Set childWorkspaceFolders) {
         this.name = name;

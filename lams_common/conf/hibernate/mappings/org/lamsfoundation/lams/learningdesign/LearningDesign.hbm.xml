@@ -169,13 +169,16 @@
     </many-to-one>
     			 
     <!-- bi-directional many-to-one association to User -->
-    <many-to-one
-        name="user"
-        class="org.lamsfoundation.lams.usermanagement.User"
-        not-null="true"
-    >
+    <many-to-one name="user" class="org.lamsfoundation.lams.usermanagement.User" not-null="true">
         <column name="user_id" />
     </many-to-one>
+    
+    <!-- bi-directional many-to-one association to WorkspaceFolder-->
+    <many-to-one name="workspaceFolder" class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder" not-null="true">
+        <column name="workspace_folder_id" />
+    </many-to-one>
+    
+    
     <!-- bi-directional one-to-many association to LearningDesign -->
     <set
         name="childLearningDesigns"

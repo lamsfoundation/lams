@@ -358,84 +358,18 @@
             class="org.lamsfoundation.lams.lesson.LearnerProgress"
         />
     </set>
-    <!-- bi-directional one-to-many association to UserToolSession -->
-    <!-- set
-        name="userToolSessions"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="user_id"
-
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.lesson.UserToolSession"
-        </meta>
-        <key>
-            <column name="user_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.lesson.UserToolSession"
-        />
-    </set-->
-    <!-- bi-directional one-to-many association to UserGroup -->
-    <!-- set
-        name="userGroups"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="user_id"
-
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.lesson.UserGroup"
-        </meta>
-        <key>
-            <column name="user_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.lesson.UserGroup"
-        />
-    </set-->
+    
+   
     <!-- bi-directional one-to-many association to LearningDesign -->
-    <set
-        name="learningDesigns"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="user_id"
-
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.learningdesign.LearningDesign"
+    <set name="learningDesigns" lazy="true" inverse="true" cascade="none">
+        <meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="none"
+        								    @hibernate.collection-key column="user_id"
+        								    @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.LearningDesign"
         </meta>
-        <key>
-            <column name="user_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.learningdesign.LearningDesign"
-        />
+        <key><column name="user_id" /></key>
+        <one-to-many class="org.lamsfoundation.lams.learningdesign.LearningDesign"/>
     </set>
+    
     <!-- bi-directional one-to-many association to Lesson -->
     <set
         name="lessons"
