@@ -67,7 +67,7 @@
 
 	<!-- ========================= DAO DEFINITIONS ========================= -->
 
-	<!-- bean id="surveyContentDAO" class="com.lamsinternational.lams.tool.survey.dao.hibernate.SurveyContentDAO">
+	<!-- bean id="surveyContentDAO" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyContentDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
 	</bean-->
 	
