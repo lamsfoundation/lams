@@ -102,6 +102,12 @@ CREATE TABLE lams_workspace_folder_type (
      , PRIMARY KEY (lams_workspace_folder_type_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_grouping_support_type (
+       grouping_support_type_id INT(3) NOT NULL
+     , description VARCHAR(64) NOT NULL
+     , PRIMARY KEY (grouping_support_type_id)
+)TYPE=InnoDB;
+
 CREATE TABLE lams_authentication_method_type (
        authentication_method_type_id INT(3) NOT NULL
      , description VARCHAR(64) NOT NULL
@@ -228,9 +234,11 @@ CREATE TABLE lams_tool (
      , learning_library_id BIGINT(20) NOT NULL
      , default_tool_content_id BIGINT(20) NOT NULL
      , valid_flag TINYINT(1) NOT NULL DEFAULT 1
-     , supports_grouping_flag TINYINT(1) NOT NULL DEFAULT 0
+     , grouping_support_type_id INT(3) NOT NULL
      , supports_define_later_flag TINYINT(1) NOT NULL DEFAULT 0
+     , supports_run_offline_flag TINYINT(1) NOT NULL
      , supports_moderation_flag TINYINT(1) NOT NULL
+     , supports_contribute_flag TINYINT(1) NOT NULL
      , learner_url TEXT NOT NULL
      , author_url TEXT NOT NULL
      , define_later_url TEXT
@@ -244,6 +252,9 @@ CREATE TABLE lams_tool (
      , INDEX (learning_library_id)
      , CONSTRAINT FK_lams_tool_1 FOREIGN KEY (learning_library_id)
                   REFERENCES lams_learning_library (learning_library_id)
+     , INDEX (grouping_support_type_id)
+     , CONSTRAINT FK_lams_tool_2 FOREIGN KEY (grouping_support_type_id)
+                  REFERENCES lams_grouping_support_type (grouping_support_type_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learning_design (
@@ -268,7 +279,6 @@ CREATE TABLE lams_learning_design (
      , license_text TEXT
      , lesson_org_id BIGINT(20)
      , lesson_org_name VARCHAR(255)
-     , lesson_name VARCHAR(255)
      , lesson_id BIGINT(20)
      , lesson_start_date_time DATETIME
      , last_modified_date_time DATETIME NOT NULL
@@ -357,6 +367,7 @@ CREATE TABLE lams_learning_activity (
      , parent_activity_id BIGINT(20)
      , parent_ui_id INT(11)
      , learning_activity_type_id INT(11) NOT NULL DEFAULT 0
+     , grouping_support_type_id INT(3) NOT NULL
      , grouping_id BIGINT(20)
      , grouping_ui_id INT(11)
      , order_id INT(11)
@@ -366,6 +377,7 @@ CREATE TABLE lams_learning_activity (
      , create_date_time DATETIME NOT NULL 
      , run_offline_flag TINYINT(1) NOT NULL
      , offline_instructions TEXT
+     , online_instructions TEXT
      , max_number_of_options INT(5)
      , min_number_of_options INT(5)
      , options_instructions TEXT
@@ -413,6 +425,9 @@ CREATE TABLE lams_learning_activity (
      , INDEX (activity_category_id)
      , CONSTRAINT FK_lams_learning_activity_12 FOREIGN KEY (activity_category_id)
                   REFERENCES lams_activity_category (activity_category_id)
+     , INDEX (grouping_support_type_id)
+     , CONSTRAINT FK_lams_learning_activity_13 FOREIGN KEY (grouping_support_type_id)
+                  REFERENCES lams_grouping_support_type (grouping_support_type_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learner_progress (

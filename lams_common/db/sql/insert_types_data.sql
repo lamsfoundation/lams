@@ -1,3 +1,7 @@
+# Connection: ROOT LOCAL
+# Host: localhost
+# Saved: 2005-03-15 13:54:28
+# 
 INSERT INTO lams_role VALUES (1, 'SYSADMIN', 'LAMS System Adminstrator', NOW());
 INSERT INTO lams_role VALUES (2, 'ADMIN', 'Organization Adminstrator', NOW());
 INSERT INTO lams_role VALUES (3, 'AUTHOR', 'Authors Learning Designs', NOW());
@@ -69,6 +73,10 @@ INSERT INTO lams_activity_category VALUES (2 ,'COLLABORATION');
 INSERT INTO lams_activity_category VALUES (3 ,'ASSESSMENT');
 INSERT INTO lams_activity_category VALUES (4 ,'CONTENT');
 INSERT INTO lams_activity_category VALUES (5 ,'SPLIT');
+
+INSERT INTO lams_grouping_support_type VALUES (1 ,'NONE');
+INSERT INTO lams_grouping_support_type VALUES (2 ,'OPTIONAL');
+INSERT INTO lams_grouping_support_type VALUES (3 ,'REQUIRED');
 
 
 
