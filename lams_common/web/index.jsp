@@ -5,12 +5,6 @@
 <%JspRedirectStrategy.welcomePageStatusUpdate(request,response);%>
 <%HttpSessionManager.getInstance().updateHttpSessionByLogin(request.getSession(),request.getRemoteUser()); %>
 
-<html>
-<head>
-	<script language="JavaScript" type="text/javascript" src="getSysInfo.js"></script>
-	<script language="JavaScript" type="text/javascript" src="openUrls.js"></script>
-</head>
-
 <tiles:insert page="template.jsp" flush="true">
 	<tiles:put name="title" value="Welcome :: LAMS"/>
 	<tiles:put name="pageHeader" value="Welcome"/>
@@ -18,4 +12,3 @@
 	<tiles:put name="content" value="indexContent.jsp" />	
 	<tiles:put name="footer" value="footer.jsp"/>	
 </tiles:insert>
-</html>
