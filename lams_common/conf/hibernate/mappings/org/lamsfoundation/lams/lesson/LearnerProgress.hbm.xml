@@ -22,6 +22,8 @@
 		<property name="lessonComplete" type="java.lang.Boolean"
 			column="lesson_completed_flag" />
 
+		<property name="parallelWaiting" type="java.lang.Boolean"
+			column="waiting_flag" />
 		<!-- Associations -->
 
 		<!-- uni-directional one-to-many association to attempted acitivities -->

@@ -156,7 +156,7 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
         assertNotNull("we should have a next activity",nextActivity);
 
         assertTrue("It should be kind of null activity",nextActivity.isNull());
-        assertTrue("It should waiting activity",nextActivity instanceof ParallelWaitActivity);
+        assertTrue("It should waiting activity",nextActivity.getActivityTypeId().intValue()==ParallelWaitActivity.PARALLEL_WAIT_ACTIVITY_TYPE);
 
     }
 }

@@ -73,6 +73,13 @@ public class LearnerProgress implements Serializable
      */
     private boolean lessonComplete;
     
+    /**
+     * Indicates the learner progress is in a incomplete parallel activity
+     * or not.
+     */
+    private boolean parallelWaiting;
+    
+    
     /** default constructor */
     public LearnerProgress()
     {
@@ -307,5 +314,19 @@ public class LearnerProgress implements Serializable
     public void setPreviousActivity(Activity previousActivity)
     {
         this.previousActivity = previousActivity;
+    }
+    /**
+     * @return Returns the isParallelWaiting.
+     */
+    public boolean isParallelWaiting()
+    {
+        return parallelWaiting;
+    }
+    /**
+     * @param isParallelWaiting The isParallelWaiting to set.
+     */
+    public void setParallelWaiting(boolean parallelWaiting)
+    {
+        this.parallelWaiting = parallelWaiting;
     }
 }
