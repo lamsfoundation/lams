@@ -52,11 +52,8 @@
 				
 				<!-- learning design related mapping files -->
 				<value>com/lamsinternational/lams/learningdesign/Activity.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/ActivityType.hbm.xml</value>				
 				<value>com/lamsinternational/lams/learningdesign/Group.hbm.xml</value>				
 				<value>com/lamsinternational/lams/learningdesign/Grouping.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/GroupingType.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/GateActivityLevel.hbm.xml</value>
 				<value>com/lamsinternational/lams/learningdesign/LearningDesign.hbm.xml</value>
 				<value>com/lamsinternational/lams/learningdesign/LearningLibrary.hbm.xml</value>	
 				<value>com/lamsinternational/lams/learningdesign/Transition.hbm.xml</value>	
@@ -65,12 +62,7 @@
 				<!-- lesson related mapping files-->
 				<value>com/lamsinternational/lams/lesson/LearnerProgress.hbm.xml</value>
 				<value>com/lamsinternational/lams/lesson/Lesson.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/LessonState.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/ProgressCompleted.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/ProgressCurrent.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/UserGroup.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/UserToolSession.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/UserToolSessionState.hbm.xml</value>
+                                <value>com/lamsinternational/lams/lesson/LessonClass.hbm.xml</value>
 				
 				<!-- Tool related mapping files-->
 				<value>com/lamsinternational/lams/tool/Tool.hbm.xml</value>
