@@ -1,4 +1,4 @@
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+/*Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+
 import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
