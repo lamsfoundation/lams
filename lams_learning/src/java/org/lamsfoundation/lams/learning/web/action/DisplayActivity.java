@@ -4,34 +4,33 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import javax.servlet.http.*;
+
 import java.util.*;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.Action;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
 import org.lamsfoundation.lams.usermanagement.*;
+import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
 
 /** 
  * MyEclipse Struts
  * Creation date: 01-12-2005
- *  
+ * 
+ * XDoclet definition:
+ * 
+ * @struts:action path="/DisplayActivity" name="activityForm"
+ *                validate="false" scope="request"
+ * 
  */
-public abstract class DisplayActivity extends Action {
-	
-	protected SessionBean getSessionBean(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-		SessionBean sessionBean = (SessionBean)session.getAttribute(SessionBean.NAME);
-		return sessionBean;
-	}
+public class DisplayActivity extends ActivityAction {
+    
+    protected static String className = "DisplayActivity";
 
 	/** display
 	 * Gets an activity from the request (attribute) and forwards onto the required
@@ -39,48 +38,56 @@ public abstract class DisplayActivity extends Action {
 	 */
 	public ActionForward execute(
 			ActionMapping mapping,
-			ActionForm form,
+			ActionForm actionForm,
 			HttpServletRequest request,
 			HttpServletResponse response) {
-		ActivityForm displayForm = (ActivityForm) form;
+		ActivityForm form = (ActivityForm) actionForm;
 		
-		// TODO: should we use a page forward or throw an exception for no session?
-		SessionBean sessionBean = getSessionBean(request);
+		SessionBean sessionBean = ActivityAction.getSessionBean(request);
 		if (sessionBean == null) {
 			// forward to the no session error page
-			return mapping.findForward("noSessionError");
+			return mapping.findForward(ActionMappings.NO_SESSION_ERROR);
 		}
 		
 		// Get learner
 		User learner = sessionBean.getLeaner();
-		// Get learnerProgress
-		LearnerProgress progress = sessionBean.getLearnerProgress();
-
-		Long activityId = (Long)request.getAttribute("activityId");
-		if (activityId == null) {
-			// check the request for an activityId
-			activityId = displayForm.getActivityId();
-			if (activityId == null) {
-				return mapping.findForward("error");
-			}
+		Lesson lesson = sessionBean.getLesson();
+		
+		LearnerProgress learnerProgress = getLearnerProgress(request, form);
+		Activity activity = getActivity(request, form, learnerProgress);
+		
+		if (activity == null) {
+		    log.error(className+": No activity in request or session");
+			return mapping.findForward(ActionMappings.ERROR);
 		}
 		
-		// Find requested activity
-		// May need special processing if activity is not current
-		Activity activity = getActivity(activityId.longValue(), progress);
-		
-		ActionForward forward = displayActivity(activity, progress, mapping, displayForm, request, response);
+		ActionForward forward = displayActivity(activity, learnerProgress, mapping, form, request, response);
 		return forward;
 	}
 	
 	/**
-	 * Returns an ActionForward to display an activity based on its type. The form bean
-	 * also has its values set for display. Note that this method is over-ridden by the
-	 * DisplayOptionsActivity sub-class.
+	 * Returns an ActionForward to display an activity. The forward returned is
+	 * displayToolActivity for a ToolActivity, displayParallelActivity for a
+	 * ParallelActivity and displayOptionsActivity for an OptionsActivity. The
+	 * activity ID is also set as a request attribute (read by DisplayActivity).
 	 */
-	protected abstract ActionForward displayActivity(Activity activity, LearnerProgress progress,
-			ActionMapping mapping, ActivityForm form, HttpServletRequest request, HttpServletResponse response);
+	private ActionForward displayActivity(Activity activity, LearnerProgress progress,
+			ActionMapping mapping, ActivityForm activityForm, HttpServletRequest request, HttpServletResponse response) {
+		String forwardName = null;
 
+		// This should not be done with instanceof, perhaps should use the class name
+		if (activity instanceof ComplexActivity) {
+			if (activity instanceof OptionsActivity) forwardName = "displayOptionsActivity";
+			else if (activity instanceof ParallelActivity) forwardName = "displayParallelActivity";
+		}
+		else if (activity instanceof SimpleActivity) {
+			forwardName = "displayToolActivity";
+		}
+		
+		ActionForward forward = mapping.findForward(forwardName);
+		return forward;
+	}
+	
 	
 	private Activity getActivity(long activityId, LearnerProgress progress) {
 		Set activities = progress.getLesson().getLearningDesign().getActivities();

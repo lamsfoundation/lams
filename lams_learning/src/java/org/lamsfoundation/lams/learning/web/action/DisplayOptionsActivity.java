@@ -1,8 +1,7 @@
 /*
  * Created on 14/01/2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+
  */
 package org.lamsfoundation.lams.learning.web.action;
 
@@ -14,16 +13,17 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
 import org.lamsfoundation.lams.learning.web.util.Utils;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 
 /**
  * @author daveg
@@ -36,30 +36,26 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  * @struts:action-forward name="displayOptions" path=".optionsActivity"
  * 
  */
-public class DisplayOptionsActivity extends DisplayActivity {
+public class DisplayOptionsActivity extends ActivityAction {
 	
-	/**
-	 * Returns an ActionForward to display an activity and sets the form bean values.
-	 */
-	protected ActionForward displayActivity(Activity activity, LearnerProgress progress,
-			ActionMapping mapping, ActivityForm activityForm, HttpServletRequest request, HttpServletResponse response) {
-		String forward = null;
 
+	public ActionForward execute(
+			ActionMapping mapping,
+			ActionForm actionForm,
+			HttpServletRequest request,
+			HttpServletResponse response) {
+		OptionsActivityForm form = (OptionsActivityForm)actionForm;
+		
+		LearnerProgress learnerProgress = getLearnerProgress(request, form);
+		Activity activity = getActivity(request, form, learnerProgress);
 		if (!(activity instanceof OptionsActivity)) {
-			// error
-			return mapping.findForward("error");
+		    log.error(className+": activity not OptionsActivity "+activity.getActivityId());
+			return mapping.findForward(ActionMappings.ERROR);
 		}
-		
-		OptionsActivityForm form = (OptionsActivityForm)activityForm;
-		
-		forward = "displayOptions";
 
 		OptionsActivity optionsActivity = (OptionsActivity)activity;
+
 		form.setActivityId(activity.getActivityId());
-		form.setTitle(activity.getTitle());
-		form.setDescription(activity.getDescription());
-		form.setMinimum(optionsActivity.getMinNumberOfOptions().intValue());
-		form.setMaximum(optionsActivity.getMaxNumberOfOptions().intValue());
 
 		List activityURLs = new ArrayList();
 		// TODO: Need to get order somehow
@@ -68,9 +64,9 @@ public class DisplayOptionsActivity extends DisplayActivity {
 		int completedCount = 0;
 		while (i.hasNext()) {
 			Activity subActivity = (Activity)i.next();
-			ActivityURL url = Utils.generateActivityURL(subActivity, progress);
+			ActivityURL url = Utils.getActivityURL(subActivity, learnerProgress);
 			activityURLs.add(url);
-			if (progress.getProgressState(subActivity) == LearnerProgress.ACTIVITY_COMPLETED) {
+			if (learnerProgress.getProgressState(subActivity) == LearnerProgress.ACTIVITY_COMPLETED) {
 				completedCount++;
 			}
 		}
@@ -79,10 +75,9 @@ public class DisplayOptionsActivity extends DisplayActivity {
 			form.setFinished(true);
 		}
 		
-		if (activityURLs.size() == 0) {
-			// TODO: error
-		}
+		this.saveToken(request);
 		
+		String forward = "displayOptions";
 		return mapping.findForward(forward);
 	}
 	

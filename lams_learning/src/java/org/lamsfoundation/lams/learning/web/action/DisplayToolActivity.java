@@ -4,8 +4,10 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import javax.servlet.http.*;
+
 import java.util.*;
 
+import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
@@ -14,6 +16,7 @@ import org.lamsfoundation.lams.learning.web.util.Utils;
 
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
+import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 
 /** 
  * MyEclipse Struts
@@ -24,37 +27,39 @@ import org.lamsfoundation.lams.lesson.*;
  * @struts:action path="/DisplayToolActivity" name="activityForm"
  *                validate="false" scope="request"
  * 
- * -- Load one or more URLs to display an activity
  * @struts:action-forward name="displayTool" path=".toolActivity"
  * 
  */
-public class DisplayToolActivity extends DisplayActivity {
-		
+public class DisplayToolActivity extends ActivityAction {
+
 	/**
-	 * Returns an ActionForward to display an activity based on its type. The form bean
-	 * also has its values set for display. Note that this method is over-ridden by the
-	 * DisplayOptionsActivity sub-class.
+	 * Gets an activity from the request (attribute) and forwards onto the required
+	 * jsp (SingleActivity or ParallelActivity).
 	 */
-	protected ActionForward displayActivity(Activity activity, LearnerProgress progress,
-			ActionMapping mapping, ActivityForm form, HttpServletRequest request, HttpServletResponse response) {
-
-		if (!(activity instanceof ToolActivity)) {
-			// error
-			return mapping.findForward("error");
-		}
-		ToolActivity toolActivity = (ToolActivity)activity;
+	public ActionForward execute(
+			ActionMapping mapping,
+			ActionForm actionForm,
+			HttpServletRequest request,
+			HttpServletResponse response) {
+		ActivityForm form = (ActivityForm)actionForm;
 		
-		List activityURLs = new ArrayList();
-		String forward = null;
-
-		forward = "displayTool";
+		LearnerProgress learnerProgress = getLearnerProgress(request, form);
+		Activity activity = getActivity(request, form, learnerProgress);
+		if (!(activity instanceof ToolActivity)) {
+		    log.error(className+": activity not ToolActivity");
+			return mapping.findForward(ActionMappings.ERROR);
+		}
+		
+		ToolActivity toolActivity = (ToolActivity)activity;
 
 		form.setActivityId(activity.getActivityId());
-		//ActivityURL url = Utils.generateActivityURL(activity, progress);
-		ActivityURL url = Utils.getToolURL(toolActivity, progress);
+		
+		List activityURLs = new ArrayList();
+		ActivityURL url = Utils.getToolURL(toolActivity, learnerProgress);
 		activityURLs.add(url);
 		form.setActivityURLs(activityURLs);
 		
+		String forward = "displayTool";
 		return mapping.findForward(forward);
 	}
 
