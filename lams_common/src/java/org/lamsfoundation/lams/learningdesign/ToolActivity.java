@@ -2,10 +2,10 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-
 import org.lamsfoundation.lams.tool.Tool;
 
 /**
@@ -14,19 +14,15 @@ import org.lamsfoundation.lams.tool.Tool;
 public class ToolActivity extends SimpleActivity implements Serializable
 {
     
-    /**
-     * Holds value of property toolContentId.
-     */
+    /** Holds value of property toolContentId. */
     private Long toolContentId;
     
-    /**
-     * Holds value of property tool.
-     */
+    /** Holds value of property tool.*/
     private Tool tool;
     
     /** List of sessions associated with this ToolActivity */
     private Set toolSessions;
-    
+       
     /** full constructor */
     public ToolActivity(Long activityId,
             Integer id,
@@ -74,8 +70,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
     }
     
     /** default constructor */
-    public ToolActivity()
-    {
+    public ToolActivity(){
     }
     
     /** minimal constructor */
@@ -105,28 +100,40 @@ public class ToolActivity extends SimpleActivity implements Serializable
         this.tool = tool;
         this.toolContentId = toolContentId;
     }
-    public static ToolActivity createCopy(ToolActivity originalActivity){
-    	
+    
+    /**
+     * Makes a copy of the ToolActivity for authoring, preview and monitoring enviornment 
+     * 
+     * @param originalActivity The activity that needs to be deep-copied
+     * @return ToolActivity Returns a deep-copy of the originalActivity
+     */
+    public static ToolActivity createCopy(ToolActivity originalActivity){    	
     	ToolActivity newToolActivity = new ToolActivity();
-    	newToolActivity.setActivityUIID(originalActivity.getActivityUIID());
+    	 
+		newToolActivity.setTool(originalActivity.getTool());
+		
+		/* TODO Generate a new toolContentID for this new ToolActivity
+		*  For now setting it to the contentID of the old activity
+		*/
+		newToolActivity.setToolContentId(originalActivity.getToolContentId());
+    	
+		newToolActivity.setActivityUIID(originalActivity.getActivityUIID());
     	newToolActivity.setDescription(originalActivity.getDescription());
     	newToolActivity.setTitle(originalActivity.getTitle());
+    	newToolActivity.setHelpText(originalActivity.getHelpText());
     	newToolActivity.setXcoord(originalActivity.getXcoord());
     	newToolActivity.setYcoord(originalActivity.getYcoord());
+    	newToolActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newToolActivity.setOrderId(originalActivity.getOrderId());
     	newToolActivity.setDefineLater(originalActivity.getDefineLater());
+    	newToolActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newToolActivity.setCreateDateTime(new Date());
     	newToolActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newToolActivity.setLearningLibrary(originalActivity.getLearningLibrary());
-    	newToolActivity.setActivityTypeId(originalActivity.getActivityTypeId());
-    	/**
-    	 * TODO calculate how these two values would be set for COPY 
-    	 * */
-    	//newToolActivity.setTransitionTo();
-    	//newToolActivity.setTransitionFrom();
-    	newToolActivity.setTool(originalActivity.getTool());    	
+    	newToolActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
+    	newToolActivity.setLibraryActivity(originalActivity.getLibraryActivity());
+    	newToolActivity.setToolSessions(new HashSet());    	    	
     	return newToolActivity;
-    }
-    
+    }    
     public String toString()
     {
         return new ToStringBuilder(this)
@@ -185,5 +192,5 @@ public class ToolActivity extends SimpleActivity implements Serializable
 	 */
 	public void setToolSessions(Set toolSessions) {
 		this.toolSessions = toolSessions;
-	}
+	}	
 }
