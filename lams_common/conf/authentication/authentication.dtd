@@ -1,8 +1,6 @@
-<!DOCTYPE Authentication [
-	<!ELEMENT Authentication (Method+)>
-	<!ELEMENT Method (Param*)>
-	<!ATTLIST Method Name CDATA #REQUIRED>
-	<!ATTLIST Method Enabled CDATA "true">
-	<!ELEMENT Param (#CDATA)>
-	<!ATTLIST Param Name CDATA #REQUIRED>
-]>
+<!ELEMENT Authentication (Method+)>
+<!ELEMENT Method (Param*)>
+<!ATTLIST Method Name CDATA #REQUIRED>
+<!ATTLIST Method Enabled CDATA "true">
+<!ELEMENT Param (#PCDATA)>
+<!ATTLIST Param Name CDATA #REQUIRED>
