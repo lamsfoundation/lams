@@ -3,14 +3,31 @@
 <!DOCTYPE tiles-definitions PUBLIC
    "-//Apache Software Foundation//DTD Tiles Configuration//EN"
    "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
- 
+
 <tiles-definitions>
-<!-- ============= template Definitions ====================== -->
-	<definition name=".loginDef" path="template.jsp">
-		<put name="title" value="Login - LAMS :: Learning Activity Management System"/>
-		<put name="pageHeader" value = "Base Template"/>
+
+	<definition name=".passwordChange" path="/template.jsp">
+		<put name="title" value="LAMS :: Change Password"/>
+		<put name="pageHeader" value="Change Password"/>
 		<put name="header" value="header.jsp"/>
-		<put name="content" value="loginContent.jsp" />	
+		<put name="content" value="passwordChangeContent.jsp"/>	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
+	
+	<definition name=".passwordChangeOk" path="/template.jsp">
+		<put name="title" value="LAMS :: Password Changed"/>
+		<put name="pageHeader" value="Password Changed"/>
+		<put name="header" value="header.jsp"/>
+		<put name="content" value="passwordChangeOkContent.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
+
+	<definition name=".error" path="/template.jsp">
+		<put name="title" value="LAMS :: Error"/>
+		<put name="pageHeader" value="Error"/>
+		<put name="header" value="header.jsp"/>
+		<put name="content" value="errorContent.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
+	
 </tiles-definitions>
