@@ -102,26 +102,26 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
     public static OptionsActivity createCopy(OptionsActivity originalActivity){
     	OptionsActivity newOptionsActivity = new OptionsActivity();
     	
+    	/** OptionsActivity Specific Attributes */
     	newOptionsActivity.setMaxNumberOfOptions(originalActivity.getMaxNumberOfOptions());
     	newOptionsActivity.setMinNumberOfOptions(originalActivity.getMinNumberOfOptions());
     	newOptionsActivity.setOptionsInstructions(originalActivity.getOptionsInstructions());
     	
+    	/** Generic Activity Attributes */
     	newOptionsActivity.setActivityUIID(originalActivity.getActivityUIID());
     	newOptionsActivity.setDescription(originalActivity.getDescription());
     	newOptionsActivity.setTitle(originalActivity.getTitle());
+    	newOptionsActivity.setHelpText(originalActivity.getHelpText());
     	newOptionsActivity.setXcoord(originalActivity.getXcoord());
     	newOptionsActivity.setYcoord(originalActivity.getYcoord());
+    	newOptionsActivity.setActivityTypeId(originalActivity.getActivityTypeId());    	
     	newOptionsActivity.setDefineLater(originalActivity.getDefineLater());
+    	newOptionsActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newOptionsActivity.setCreateDateTime(new Date());
     	newOptionsActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newOptionsActivity.setLearningLibrary(originalActivity.getLearningLibrary());
-    	newOptionsActivity.setActivityTypeId(originalActivity.getActivityTypeId());
-    	newOptionsActivity.setActivities(new HashSet());
-    	
-    	/** TODO */
-    	//newOptionsActivity.setTransitionTo();
-		//newOptionsActivity.setTransitionFrom();
-    	
+    	newOptionsActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
+    	newOptionsActivity.setLibraryActivity(originalActivity.getLibraryActivity());
+    	newOptionsActivity.setActivities(new HashSet());    	
     	return newOptionsActivity;
     }
 
