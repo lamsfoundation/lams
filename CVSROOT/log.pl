@@ -26,7 +26,7 @@ my $users;
 my $login;
 my @files;
 my $logfile;
-my $viewcvs = "http://colis03.elceap.mq.edu.au/cgi-bin/viewcvs.cgi";
+my $viewcvs = "http://lamscvs.melcoe.mq.edu.au/cgi-bin/viewcvs.cgi";
 
 sub print_usage()
 {
