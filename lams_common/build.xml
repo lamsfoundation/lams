@@ -34,6 +34,8 @@ Ant build file.
 		<echo message="Among the available targets are:"/>
 		<echo message=""/>
 		<echo message="deploy-lams  --> Deploy lams project"/>
+		<echo message="rebuild-db   --> Clean and rebuild the database"/>
+		<echo message="insert-test-data --> Insert test data to database"/>
 		<echo message="lams-jar  --> Make jar archive for deployment"/>
 		<echo message="lams-war  --> Make war archive for deployment"/>
 		<echo message="copyfiles --> Copy the third party jar files and cofiguration files for deployment"/>
@@ -277,5 +279,33 @@ Ant build file.
 				todir="${jboss.deploy}"/>
 	</target>
 
+	<!-- =================================================================== -->
+	<!-- Clean and rebuild the database                                      -->
+	<!-- =================================================================== -->
+	<target name="rebuild-db"
+		description="rebuild LAMS database. Mysql has to be running first">
+		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
+				password="${database.password}">
+			<classpath>
+				<pathelement location="${database.driver.file}"/>
+			</classpath>
+			<transaction src="${sql}/create_lams_db.sql"/>
+		</sql>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Insert test data to lams database                                   -->
+	<!-- =================================================================== -->
+	<target name="insert-test-data"
+		description="insert test data to lams database">
+		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
+				password="${database.password}">
+			<classpath>
+				<pathelement location="${database.driver.file}"/>
+			</classpath>
+			<transaction src="${sql}/insert_test_data.sql"/>
+		</sql>
+	</target>
+	
 </project>
 
