@@ -23,10 +23,10 @@ package org.lamsfoundation.lams.contentrepository.struts.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
 import org.apache.struts.upload.FormFile;
 
 /** 
@@ -64,18 +64,18 @@ public class AddFileContentForm extends ActionForm {
 		if ( errors == null ) errors = new ActionErrors();
 		
 		if ( isEmpty(method) ) {
-			errors.add(ActionErrors.GLOBAL_ERROR, new ActionError("errors.mandatory", "Method"));
+			errors.add(ActionErrors.GLOBAL_MESSAGE, new ActionMessage( "errors.mandatory", "Method"));
 		}
 
 		if ( isEmpty(description) ) {
-			errors.add(ActionErrors.GLOBAL_ERROR, new ActionError("errors.mandatory", "Description"));
+			errors.add(ActionErrors.GLOBAL_MESSAGE, new ActionMessage( "errors.mandatory", "Description"));
 		}
 		if ( "uploadFile".equals(method) && theFile==null ) {
-			errors.add(ActionErrors.GLOBAL_ERROR, new ActionError("errors.mandatory", "File"));
+			errors.add(ActionErrors.GLOBAL_MESSAGE, new ActionMessage( "errors.mandatory", "File"));
 		}
 		
 		if ( "uploadPackage".equals(method) && isEmpty(dirName) ) {
-			errors.add(ActionErrors.GLOBAL_ERROR, new ActionError("errors.mandatory", "Directory Name"));
+			errors.add(ActionErrors.GLOBAL_MESSAGE, new ActionMessage( "errors.mandatory", "Directory Name"));
 		}
 
 		if ( errors.size() == 0 ) return null;

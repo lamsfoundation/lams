@@ -23,10 +23,10 @@ package org.lamsfoundation.lams.contentrepository.struts.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
 
 /** 
  * MyEclipse Struts
@@ -64,15 +64,15 @@ public class LoginRepositoryForm extends ActionForm {
 		if ( errors == null ) errors = new ActionErrors();
 		
 		if ( getToolName() == null || getToolName().length() < 1 ) {
-			errors.add(ActionErrors.GLOBAL_ERROR, new ActionError("errors.mandatory","Tool Name"));
+			errors.add(ActionErrors.GLOBAL_MESSAGE, new ActionMessage( "errors.mandatory","Tool Name"));
 		}
 		
 		if ( getWorkspaceName() == null || getWorkspaceName().length() < 1 ) {
-			errors.add(ActionErrors.GLOBAL_ERROR, new ActionError("errors.mandatory","Tool Name"));
+			errors.add(ActionErrors.GLOBAL_MESSAGE, new ActionMessage( "errors.mandatory","Tool Name"));
 		}
 
 		if ( getIndentificationString() == null || getIndentificationString().length() < 1 ) {
-			errors.add(ActionErrors.GLOBAL_ERROR, new ActionError("errors.mandatory","Tool Name"));
+			errors.add(ActionErrors.GLOBAL_MESSAGE, new ActionMessage( "errors.mandatory","Tool Name"));
 		}
 
 		if ( errors.size() == 0 ) return null;

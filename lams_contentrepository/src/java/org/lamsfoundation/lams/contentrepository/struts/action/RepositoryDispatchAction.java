@@ -25,11 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionError;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -58,10 +57,11 @@ public class RepositoryDispatchAction extends DispatchAction {
 	
 	/** Adds this error to the errors, then goes to the error forward */
 	protected ActionForward returnError(ActionMapping mapping, 
-			HttpServletRequest request, ActionError error) {
-		ActionErrors errors = new ActionErrors();
-		errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-		saveErrors(request,errors);		
+			HttpServletRequest request, String errorKey) {
+		ActionMessages am = new ActionMessages(); 
+		am.add( ActionMessages.GLOBAL_MESSAGE,  
+	           new ActionMessage( errorKey ) ); 
+		saveErrors( request, am ); 
 		return mapping.findForward(ERROR_PATH);
 	}
 
@@ -101,8 +101,7 @@ public class RepositoryDispatchAction extends DispatchAction {
 		log.debug("In getNode, ticket is "+ticket);
 		if ( ticket == null ) {
 			log.error("Ticket missing from session");
-        	return returnError(mapping, request, 
-        			new ActionError("error.noTicket"));
+        	return returnError(mapping, request, "error.noTicket");
 		} 
 
 		log.debug("About to logout");

@@ -26,7 +26,6 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -76,8 +75,7 @@ public class AddFileContentAction extends RepositoryDispatchAction {
 		log.debug("In getNode, ticket is "+ticket);
 		if ( ticket == null ) {
 			log.error("Ticket missing from session");
-        	return returnError(mapping, request, 
-        			new ActionError("error.noTicket"));
+        	return returnError(mapping, request, "error.noTicket");
 		} 
 		
 		AddFileContentForm addFileContentForm = (AddFileContentForm) form;
@@ -100,8 +98,7 @@ public class AddFileContentAction extends RepositoryDispatchAction {
 			is = theFile.getInputStream();
 		} catch (Exception e) {
 			log.error("Error getting file from input form.", e);
-	       	return returnError(mapping, request, 
-        			new ActionError("exception.file"));
+	       	return returnError(mapping, request, "exception.file");
 		} 
 
 		
@@ -164,8 +161,7 @@ public class AddFileContentAction extends RepositoryDispatchAction {
 		log.debug("In getNode, ticket is "+ticket);
 		if ( ticket == null ) {
 			log.error("Ticket missing from session");
-        	return returnError(mapping, request, 
-        			new ActionError("error.noTicket"));
+        	return returnError(mapping, request,"error.noTicket");
 		} 
 		
 		AddFileContentForm addFileContentForm = (AddFileContentForm) form;

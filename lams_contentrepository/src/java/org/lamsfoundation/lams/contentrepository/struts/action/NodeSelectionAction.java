@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -78,8 +77,7 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 		log.debug("In getList, ticket is "+ticket);
 		if ( ticket == null ) {
 			log.error("Ticket missing from session");
-        	return returnError(mapping, request, 
-        			new ActionError("error.noTicket"));
+        	return returnError(mapping, request, "error.noTicket");
 		} 
 		
 		// get the map of nodes and put it in the request,
@@ -163,8 +161,7 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 		log.debug("In getList, ticket is "+ticket);
 		if ( ticket == null ) {
 			log.error("Ticket missing from session");
-        	return returnError(mapping, request, 
-        			new ActionError("error.noTicket"));
+        	return returnError(mapping, request,"error.noTicket");
 		}
 		
 		Long uuid = getLong(request.getParameter(UUID_NAME));
@@ -172,8 +169,7 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 
 		if ( uuid == null ) {
 			log.error("UUID missing");
-        	return returnError(mapping, request, 
-        			new ActionError("error.uuidMissing"));
+        	return returnError(mapping, request,"error.uuidMissing");
 		} 
 
 		log.debug("Deleting node "+uuid+" version "+version);
@@ -221,8 +217,7 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 		log.debug("In deleteNode, ticket is "+ticket);
 		if ( ticket == null ) {
 			log.error("Ticket missing from session");
-        	return returnError(mapping, request, 
-        			new ActionError("error.noTicket"));
+        	return returnError(mapping, request, "error.noTicket");
 		} 
 		
 		Long uuid = getLong(request.getParameter(UUID_NAME));
@@ -230,8 +225,7 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 	
 		if ( uuid == null ) {
 			log.error("UUID missing");
-        	return returnError(mapping, request, 
-        			new ActionError("error.uuidMissing"));
+        	return returnError(mapping, request, "error.uuidMissing");
 		} 
 
 
