@@ -174,7 +174,7 @@
 				<property name="gateActivityLevelId" type="java.lang.Integer" column="gate_activity_level_id" length="11" />
 				<property name="gateOpen" type="java.lang.Boolean" column="gate_open_flag" length="4" />
 				
-				<subclass name="org.lamsfoundation.lams.learningdesign.ScheduleGateActivity" discriminator-value="5">
+				<subclass name="org.lamsfoundation.lams.learningdesign.ScheduleGateActivity" discriminator-value="4">
 					<meta attribute="class-description" inherit="false">@hibernate.class </meta>					
 					
 					<property name="gateStartTimeOffset" type="java.lang.Long" column="gate_start_time_offset" length="20">
@@ -198,10 +198,10 @@
 				    </property>
 				    
 				</subclass>
-				<subclass name="org.lamsfoundation.lams.learningdesign.SynchGateActivity" discriminator-value="4">
+				<subclass name="org.lamsfoundation.lams.learningdesign.SynchGateActivity" discriminator-value="3">
 					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 				</subclass>
-				<subclass name="org.lamsfoundation.lams.learningdesign.PermissionGateActivity" discriminator-value="6">
+				<subclass name="org.lamsfoundation.lams.learningdesign.PermissionGateActivity" discriminator-value="5">
 					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 				</subclass>
 			</subclass>			
@@ -221,7 +221,7 @@
             <one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"/>
 		</set>
 		
-         <subclass name="org.lamsfoundation.lams.learningdesign.OptionsActivity" discriminator-value="8">
+         <subclass name="org.lamsfoundation.lams.learningdesign.OptionsActivity" discriminator-value="7">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 				
 				<property name="maxNumberOfOptions" type="java.lang.Integer" column="max_number_of_options" length="5">
@@ -239,10 +239,10 @@
 			    </property>
     
 			</subclass>
-			<subclass name="org.lamsfoundation.lams.learningdesign.SequenceActivity" discriminator-value="9">
+			<subclass name="org.lamsfoundation.lams.learningdesign.SequenceActivity" discriminator-value="8">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 			</subclass>
-			<subclass name="org.lamsfoundation.lams.learningdesign.ParallelActivity" discriminator-value="7">
+			<subclass name="org.lamsfoundation.lams.learningdesign.ParallelActivity" discriminator-value="6">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 			</subclass>
 	</subclass>
