@@ -1,3 +1,7 @@
+# Connection: ROOT LOCAL
+# Host: localhost
+# Saved: 2005-03-10 17:19:17
+# 
 SET FOREIGN_KEY_CHECKS=0;
 
 INSERT INTO lams_organisation VALUES (1, 'Root', 'Root Organisation',null,1,NOW(),null);
@@ -32,15 +36,7 @@ INSERT INTO lams_user_organisation_role VALUES (12, 5, 4);
 INSERT INTO lams_user_organisation_role VALUES (13, 5, 5);
 INSERT INTO lams_user_organisation_role VALUES (14, 6, 3);
 
-INSERT INTO lams_authentication_method VALUES (1, 1, 'LAMS-Database');
-INSERT INTO lams_authentication_method VALUES (2, 2, 'Oxford-WebAuth');
-INSERT INTO lams_authentication_method VALUES (3, 3, 'MQ-LDAP');
 
-INSERT INTO lams_activity_category VALUES (1 ,'SYSTEM');
-INSERT INTO lams_activity_category VALUES (2 ,'COLLABORATION');
-INSERT INTO lams_activity_category VALUES (3 ,'ASSESSMENT');
-INSERT INTO lams_activity_category VALUES (4 ,'CONTENT');
-INSERT INTO lams_activity_category VALUES (5 ,'SPLIT');
 
 insert into lams_workspace_folder (parent_folder_id,name,workspace_id) values(null,'Trial',1);
 
