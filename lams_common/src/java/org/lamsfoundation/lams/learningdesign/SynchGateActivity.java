@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.strategy.SynchGateActivityStrategy;
 
 
 /** 
@@ -55,10 +56,12 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 				transitionFrom,
                 gateActivityLevelId,
                 waitingLearners);
+        super.simpleActivityStrategy = new SynchGateActivityStrategy();
     }
 
     /** default constructor */
     public SynchGateActivity() {
+        super.simpleActivityStrategy = new SynchGateActivityStrategy();
     }
 
     /** minimal constructor */
@@ -87,6 +90,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 			  transitionFrom,
               gateActivityLevelId,
               waitingLearners);
+      super.simpleActivityStrategy = new SynchGateActivityStrategy();
     }
     
     /**

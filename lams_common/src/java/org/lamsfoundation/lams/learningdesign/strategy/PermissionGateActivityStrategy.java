@@ -21,8 +21,10 @@
 package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 
 /**
  * Activity strategy that deals with the calculation specific to gate activity.
@@ -44,6 +46,18 @@ public class PermissionGateActivityStrategy extends GateActivityStrategy {
     protected void setUpContributionType(Activity activity, ArrayList contributionTypes)
     {
         contributionTypes.add(PERMISSION_GATE);
+    }
+
+    /**
+     * Regarding permission gate, we don't validate the open condition for the 
+     * learner because the decision of opening the gate or not comes from the 
+     * teacher. The teacher may open or close the gate at monitoring interface.
+     * 
+     * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#isOpenConditionMet()
+     */
+    protected boolean isOpenConditionMet(GateActivity activity,List lessonLearners)
+    {
+        return activity.getGateOpen().booleanValue();
     }
 
 }

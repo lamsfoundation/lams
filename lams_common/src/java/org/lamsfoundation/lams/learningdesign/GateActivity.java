@@ -2,9 +2,12 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy;
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -25,6 +28,9 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     /** persistent field */
     private Boolean gateOpen;
     
+    /**
+     * The learners who are waiting at the gate.
+     */
     private Set waitingLearners;
     
     /** full constructor */
@@ -138,13 +144,6 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
         this.waitingLearners = waitingLearners;
     }
     
-    public String toString()
-    {
-        return new ToStringBuilder(this)
-        .append("activityId", getActivityId())
-        .toString();
-    }
-    
 	public Boolean getGateOpen() 
 	{
 		return gateOpen;
@@ -155,9 +154,47 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 		this.gateOpen = gateOpen;
 	}
 	
-	public boolean shouldOpen()
+    //---------------------------------------------------------------------
+    // Domain service methods
+    //---------------------------------------------------------------------
+
+	/**
+	 * Add a learner into the waiting list. 
+	 * @param learner the new waiting learner.
+	 */
+	public void addWaitingLeaner(User learner)
 	{
-	    return false;
+	    if(this.waitingLearners == null)
+	        this.setWaitingLearners(new HashSet());
+	    
+	    //only add the learner if we have never added him before.
+	    if(!this.waitingLearners.contains(learner))
+	        this.waitingLearners.add(learner);	    
 	}
+	
+	/**
+	 * Delegate to strategy class to calculate whether we should open the 
+	 * gate for this learner.
+	 * @param learner the learner who wants to go through the gate.
+	 * @return the gate should be open or closed.
+	 */
+	public boolean shouldOpenGateFor(User learner, List lessonLearners)
+	{
+        //by default, we close the gate
+        if(getGateOpen()==null)
+            this.setGateOpen(new Boolean(false));
+        
+	    return ((GateActivityStrategy)simpleActivityStrategy).shouldOpenGateFor(learner,lessonLearners,this);
+	}
+	
+    //---------------------------------------------------------------------
+    // Helper methods
+    //---------------------------------------------------------------------
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+        .append("activityId", getActivityId())
+        .toString();
+    }
 
 }

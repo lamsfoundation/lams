@@ -23,8 +23,11 @@
 package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -38,8 +41,47 @@ import org.lamsfoundation.lams.learningdesign.Activity;
  */
 public abstract class GateActivityStrategy extends SimpleActivityStrategy
 {
+    //---------------------------------------------------------------------
+    // Template methods
+    //---------------------------------------------------------------------
+    /**
+     * Returns wether we should open the gate or close the gate. It's 
+     * implementation depends on the type of the gate we are dealing with. 
+     * Generally, it needs the check up the current gate status. If the gate
+     * is already opened, we will keep it open for current learner. Otherwise,
+     * we need to validate the open condition for this learner.
+     * 
+     * @param learner the learner who just arrived at the gate.
+     * @param activity the gate activity.
+     * @param lessonLearners all learners who are currently in the lesson.
+     * @return whether we should open it or not.
+     */
+    public boolean shouldOpenGateFor(User learner,List lessonLearners,GateActivity activity)
+    {
+        activity.addWaitingLeaner(learner);
+        
+        if(!activity.getGateOpen().booleanValue())
+        {
+            if( isOpenConditionMet(activity, lessonLearners))
+            {
+            	activity.setGateOpen(new Boolean(true));
+            	activity.getWaitingLearners().clear();
+            }
+
+        }
+
+        return activity.getGateOpen().booleanValue();
+    }
     
-    
+    //---------------------------------------------------------------------
+    // Abstract methods
+    //---------------------------------------------------------------------
+    /**
+     * Check up the open condition according the gate type.
+     * @return return true if the condition is met.
+     */
+    protected abstract boolean isOpenConditionMet(GateActivity activity,
+                                                  List lessonLearners);
     //---------------------------------------------------------------------
     // Overidden methods
     //---------------------------------------------------------------------

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
 
 
 /**
@@ -110,10 +111,12 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
                 waitingLearners);
         this.gateStartTimeOffset = gateStartTimeOffset;
         this.gateEndTimeOffset = gateEndTimeOffset;
+        this.simpleActivityStrategy = new ScheduleGateActivityStrategy();
     }
 
     /** default constructor */
     public ScheduleGateActivity() {
+        this.simpleActivityStrategy = new ScheduleGateActivityStrategy();
     }
 
     /** minimal constructor */
@@ -145,6 +148,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
                 waitingLearners);
       this.gateStartTimeOffset = gateStartTimeOffset;
       this.gateEndTimeOffset = gateEndTimeOffset;
+      this.simpleActivityStrategy = new ScheduleGateActivityStrategy();
     }
     /**
      * Makes a copy of the ScheduleGateActivity for authoring, preview and monitoring enviornment 
