@@ -26,7 +26,7 @@
 	<!-- Local DataSource that works in any environment -->
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
-		<property name="url"><value>jdbc:mysql://localhost/lams</value></property>
+		<property name="url"><value>jdbc:mysql://localhost/lams?characterEncoding=utf8</value></property>
 		<property name="username"><value>lams</value></property>
 		<property name="password"><value>lamsdemo</value></property>
 	</bean>
@@ -57,6 +57,7 @@
 				<value>org/lamsfoundation/lams/learningdesign/LearningDesign.hbm.xml</value>
 				<value>org/lamsfoundation/lams/learningdesign/LearningLibrary.hbm.xml</value>	
 				<value>org/lamsfoundation/lams/learningdesign/Transition.hbm.xml</value>	
+				<value>org/lamsfoundation/lams/learningdesign/License.hbm.xml</value>	
 				
 				
 				<!-- lesson related mapping files-->
@@ -147,21 +148,6 @@
 
 	<bean id="userOrganisationRoleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationRoleDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
-	<!-- learningdesign package -->
-
-	<bean id="learningDesignDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="groupDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="groupingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
+	</bean>	
 
 </beans>

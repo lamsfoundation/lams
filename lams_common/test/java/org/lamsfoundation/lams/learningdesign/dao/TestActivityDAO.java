@@ -48,11 +48,16 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 		System.out.print("SIZE:" + list.size());
 	}*/
 	public void test(){
-		activity = activityDAO.getActivityByActivityId(new Long(22));
+		activity = activityDAO.getActivityByActivityId(new Long(18));
 		Transition transition = activity.getTransitionTo();
 		System.out.println("Transition TO:" + transition.getTransitionId());
 		transition = activity.getTransitionFrom();
 		System.out.println("Transition FROM:" + transition.getActivityByToActivityId());
+	}
+	public void testGetFirstDesignActivity(){
+		Activity activity = activityDAO.getActivityByUIID(new Integer(3),learningDesignDAO.getLearningDesignById(new Long(1)));
+		assertNotNull(activity.getTitle());
+		System.out.println("ActivityID: " + activity.getActivityId());
 	}
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()

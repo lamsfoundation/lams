@@ -3,11 +3,11 @@
  */
 package org.lamsfoundation.lams.learningdesign.dao;
 
+import java.util.Date;
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 
@@ -31,63 +31,18 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 	}	
 	public void setUp() throws Exception{
 		super.setUp();
-		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");
-		workspaceFolderDAO =(WorkspaceFolderDAO)context.getBean("workspaceFolderDAO");
-	}
-	/*public void testGetLearningDesignByUserId(){
-		List list = learningDesignDAO.getLearningDesignByUserId(new Long(1));
-		LearningDesign d = (LearningDesign) list.get(0);
-		System.out.println("Size: " + list.size());
-		System.out.println("Title: " + d.getTitle());
-		assertNotNull(list);
-	}*/
-	/*public TestLearningDesignDAO(){
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");		
-		userDAO =(UserDAO)context.getBean("userDAO");
-		initUserData();
-		initLearningDesignData();
-		
-	}
-	public void initUserData(){
-		user = userDAO.getUserById(new Integer(1));
-	}
-	public void initLearningDesignData(){
-		learningDesign = new LearningDesign();
-		learningDesign.setId(new Integer(20));		
-		learningDesign.setTitle("Title for 20");	
-		learningDesign.setDescription("Description for 20");
-		learningDesign.setFirstActivityId(new Long(1));
-		learningDesign.setMaxId(new Integer(4));
-		learningDesign.setDateReadOnly(new Date());
-		learningDesign.setReadAccess(new Long(1));
-		learningDesign.setWriteAccess(new Long(1));
-		learningDesign.setHelpText("Help");
-		learningDesign.setOpenDateTime(new Date());
-		learningDesign.setCloseDateTime(new Date());
-		learningDesign.setValidDesign(new Boolean(true));
-		learningDesign.setReadOnly(new Boolean(false));
-		learningDesign.setLessonCopy(new Boolean(false));
-		learningDesign.setCreateDateTime(new Date());
-		learningDesign.setVersion("1.1");
-		learningDesign.setLearningDesign(null);
-		learningDesign.setUser(user);		
-	}
-	
-	public void testSaveLearningDesign(){		
-		learningDesignDAO.insert(learningDesign);		
-		//assertNotNull(learningDesignDAO.getLearningDesignById(new Long(20)));
-	}
-	/*public void testDeleteLearningDesign(){
-		learningDesignDAO.delete(learningDesignDAO.getLearningDesignById(new Long(20)));		
+		userDAO = (UserDAO)context.getBean("userDAO");
 	}	
-	public void testGetLearningDesignByID(){
-		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
-		assertNotNull(learningDesign);		
-	}*/
-	public void testWorkspaceFolderDAO(){
-		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(new Integer(1));
-		System.out.print(workspaceFolder.getName());		
-		
+	public void testInsertLearningDesign(){
+		LearningDesign design = new LearningDesign();
+				
+		design.setValidDesign(new Boolean (true));
+		design.setReadOnly(new Boolean (false));
+		design.setUser(userDAO.getUserById(new Integer(1)));
+		design.setCopyTypeID(new Integer(1));
+		design.setCreateDateTime(new Date());		
+		learningDesignDAO.insert(design);		
 	}
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
