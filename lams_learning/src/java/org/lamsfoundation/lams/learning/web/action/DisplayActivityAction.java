@@ -73,7 +73,7 @@ public class DisplayActivityAction extends ActivityAction {
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 		
 		SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
-		
+				
 		if(log.isDebugEnabled())
 		    log.debug("Entering display activity: the session bean is"
 		              + sessionBean.toString());

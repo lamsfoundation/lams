@@ -41,7 +41,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 	<frameset rows="*" cols="178,*">
 		<frame src="controlFrame.jsp" name="controlFrame" scrolling="NO">
-		<frame src="learner.do?method=joinLesson&userId=2&lessonId=2" name="contentFrame" scrolling="YES">
+		<frame src="content.do" name="contentFrame" scrolling="YES">
 	</frameset>
 	
 	<noframes>

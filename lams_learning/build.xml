@@ -107,7 +107,18 @@ http://www.gnu.org/licenses/gpl.txt
 			</fileset>
 		</copy>
 	</target>
-
+	<!-- ================================================================ -->
+	<!-- Make jar archive for deployment        		    	          -->
+	<!-- ================================================================ -->
+	<target name="build-jar" depends="compile.java" description="creates jar file">
+		<delete file="${build.lib}/${product}.jar"/>
+		<jar jarfile="${build.lib}/${product}.jar">
+			<fileset dir="${build.classes.java}">
+			</fileset>
+			<fileset dir="${build.classes.test}">
+			</fileset>			
+		</jar>
+	</target>
 	<!-- =================================================================== -->
 	<!-- Fails if XDoclet 1.2.x is not on classpath                          -->
 	<!-- =================================================================== -->
@@ -202,7 +213,7 @@ http://www.gnu.org/licenses/gpl.txt
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<!-- Make the war archive  for deployment             -->
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
-	<target name="lams-war" depends="compile.java, webdoclet" description="creates war file">
+	<target name="build-war" depends="compile.java, webdoclet" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
 		<war warfile="${build.lib}/${product}.war" 
   				webxml="${conf.webinf.dir}/web.xml">

@@ -187,6 +187,7 @@ public class LearnerAction extends LamsDispatchAction
         request.getSession().setAttribute(SessionBean.NAME,new SessionBean(learner,
                                                                            lesson,
                                                                            learnerProgress));
+        request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,learnerProgress);
 
         //serialize a acknowledgement flash message with the path of display next
         //activity

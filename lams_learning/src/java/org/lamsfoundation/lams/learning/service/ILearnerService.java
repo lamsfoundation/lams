@@ -60,6 +60,12 @@ public interface ILearnerService
      */
     public LearnerProgress getProgress(User learner, Lesson lesson);
     
+    /**
+     * Return the current progress data against progress id.
+     * @param progressId
+     * @return
+     */
+    public LearnerProgress getProgressById(Long progressId);
     
     /**
      * Marks an activity as attempted. Called when a user selects an OptionsActivity.
@@ -87,11 +93,11 @@ public interface ILearnerService
      * the learning design. This method is for tools to redirect the client on 
      * complete.
      * @param toolSessionId, session ID for completed tool
-     * @param learner TODO
+     * @param learner the learne who is completing the tool session.
      * @return the URL for the next activity
      * @throws LearnerServiceException in case of problems.
      */
-    public String completeToolSession(long toolSessionId, User learner);
+    public String completeToolSession(Long toolSessionId, User learner);
     
     /**
      * Retrieve all lessons that has been started, suspended or finished. All

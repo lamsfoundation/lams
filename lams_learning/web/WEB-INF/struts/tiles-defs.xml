@@ -67,7 +67,7 @@ http://www.gnu.org/licenses/gpl.txt
 	</definition>
 	<definition name=".welcome" extends=".activityLayout">
 		<put name="title" value="Welcome"/>
-		<put name="body" value="welcome.jsp"/>
+		<put name="body" value="/welcome.jsp"/>
 	</definition>
 	
 	<!-- Journal definitions -->

@@ -45,7 +45,8 @@ import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
-import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
@@ -64,7 +65,7 @@ public class LearnerService implements ILearnerService
     private IActivityDAO activityDAO;
     private ProgressEngine progressEngine;
     private IToolSessionDAO toolSessionDAO;
-    private ILamsToolService lamsToolService;
+    private ILamsCoreToolService lamsCoreToolService;
     private ActivityMapping activityMapping;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -105,9 +106,9 @@ public class LearnerService implements ILearnerService
     /**
      * @param lamsToolService The lamsToolService to set.
      */
-    public void setLamsToolService(ILamsToolService lamsToolService)
+    public void setLamsCoreToolService(ILamsCoreToolService lamsToolService)
     {
-        this.lamsToolService = lamsToolService;
+        this.lamsCoreToolService = lamsToolService;
     }
     
     public void setActivityMapping(ActivityMapping activityMapping) {
@@ -198,8 +199,19 @@ public class LearnerService implements ILearnerService
         return learnerProgressDAO.getLearnerProgressByLearner(learner, lesson);
     }
     
-
-    public LearnerProgress chooseActivity(User learner, Lesson lesson, Activity activity) {
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getProgressById(java.lang.Long)
+     */
+    public LearnerProgress getProgressById(Long progressId)
+    {
+        return learnerProgressDAO.getLearnerProgress(progressId);
+    }
+    
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.lesson.Lesson, org.lamsfoundation.lams.learningdesign.Activity)
+     */
+    public LearnerProgress chooseActivity(User learner, Lesson lesson, Activity activity) 
+    {
     	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learner, lesson);
     	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED);
     	learnerProgressDAO.saveLearnerProgress(progress);
@@ -248,14 +260,14 @@ public class LearnerService implements ILearnerService
      * 
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeToolSession(long, User)
      */
-    public String completeToolSession(long toolSessionId, User learner) 
+    public String completeToolSession(Long toolSessionId, User learner) 
     {
         //update tool session state in lams
-        ToolSession toolSession = lamsToolService.getToolSessionById(new Long(toolSessionId));
+        ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
     	
         toolSession.setToolSessionStateId(ToolSession.ENDED_STATE);
         
-        lamsToolService.updateToolSession(toolSession);
+        lamsCoreToolService.updateToolSession(toolSession);
         //build up the url for next activity.
     	try 
     	{
@@ -359,11 +371,11 @@ public class LearnerService implements ILearnerService
      */
     private void createToolSessionFor(ToolActivity toolActivity,User learner,Lesson lesson) throws LamsToolServiceException
     {
-        ToolSession toolSession = lamsToolService.createToolSession(learner,toolActivity,lesson);
+        ToolSession toolSession = lamsCoreToolService.createToolSession(learner,toolActivity,lesson);
         
         toolActivity.getToolSessions().add(toolSession);
         
-        lamsToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), toolActivity);
+        lamsCoreToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), toolActivity);
     }
     
     
@@ -382,8 +394,5 @@ public class LearnerService implements ILearnerService
         }
         return (LessonDTO[])lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);   
     }
-
-
-   
 
 }

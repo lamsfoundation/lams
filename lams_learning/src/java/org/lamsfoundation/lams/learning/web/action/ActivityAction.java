@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learningdesign.*;
@@ -72,13 +73,16 @@ public class ActivityAction extends LamsAction {
 	 */
 	protected LearnerProgress getLearnerProgress(HttpServletRequest request) {
 		
-	    LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+	    LearnerProgress learnerProgress = (LearnerProgress)request.getSession().getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
 		
 		if (learnerProgress == null) 
 		{
+		    long learnerProgressId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_PROGRESS_ID);
+		    learnerProgress = getLearnerService().getProgressById(new Long(learnerProgressId));
+		    /**
 		    SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
 		    learnerProgress = sessionBean.getLearnerProgress();
-		    setSessionBean(sessionBean, request);
+		    setSessionBean(sessionBean, request);*/
 		}
 		return learnerProgress;
 	}

@@ -81,7 +81,7 @@ public class DummyToolAction extends DispatchAction {
 		
 		ILearnerService learnerService = (LearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
 		//learnerService.setRequest(request);
-		String url = learnerService.completeToolSession(toolSessionId, null);
+		String url = learnerService.completeToolSession(new Long(toolSessionId), null);
 		try {
 			response.sendRedirect(url);
 		}

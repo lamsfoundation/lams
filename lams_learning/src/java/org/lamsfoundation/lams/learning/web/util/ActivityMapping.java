@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -66,7 +66,7 @@ public class ActivityMapping implements Serializable
 
     private ActivityMappingStrategy activityMappingStrategy = new ActivityMappingStrategy();
 
-    private ILamsToolService toolService;
+    private ILamsCoreToolService toolService;
     private String baseURL;
 
     /**
@@ -199,7 +199,7 @@ public class ActivityMapping implements Serializable
             // cause a client request to clear ALL frames.
             String strutsAction = this.getActivityMappingStrategy()
                                       .getLessonCompleteAction();
-            activityURL = strutsActionToURL(strutsAction, null, true);
+            return activityURL = strutsActionToURL(strutsAction, null, true);
         }
         else
         {
@@ -231,7 +231,8 @@ public class ActivityMapping implements Serializable
             }
         }
 
-        return activityURL;
+        return activityURL+"&"+LearningWebUtil.PARAM_PROGRESS_ID+"="
+        	   +progress.getLearnerProgressId();
     }
 
     /**
@@ -345,7 +346,7 @@ public class ActivityMapping implements Serializable
                 + " for activity[" + activity.getActivityId().longValue() + "]");
     }
 
-    public void setToolService(ILamsToolService toolService)
+    public void setToolService(ILamsCoreToolService toolService)
     {
         this.toolService = toolService;
     }

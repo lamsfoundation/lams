@@ -146,14 +146,14 @@ public class TestLearnerService extends AbstractLamsTestCase
 
     public void testCompleteToolSession()
     {
-        String urlForNextActivity = learnerService.completeToolSession(TEST_TOOL_SESSION_ID,testUser);
+        String urlForNextActivity = learnerService.completeToolSession(new Long(TEST_TOOL_SESSION_ID),testUser);
         
         ToolSession toolSession = toolSessionDao.getToolSession(new Long(TEST_TOOL_SESSION_ID));
         
         assertNotNull("verify the existance of tool session",toolSession);
         assertEquals("verify tool session state",ToolSession.ENDED_STATE,toolSession.getToolSessionStateId());
         
-        assertEquals("verify the returned url",HOST+LOAD_TOOL_URL+PARAM_ACTIVITY_ID+TEST_NB_ACTIVITY_ID,urlForNextActivity);
+        assertEquals("verify the returned url",HOST+LOAD_TOOL_URL+PARAM_ACTIVITY_ID+TEST_NB_ACTIVITY_ID+"progressId=1",urlForNextActivity);
         
     }
     

@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.action.ActivityAction;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -51,8 +52,10 @@ public class LearningWebUtil
     //---------------------------------------------------------------------
 	public static final String PARAM_USER_ID = "userId";
 	public static final String PARAM_LESSON_ID = "lessonId";
-	public static final String ATTR_USERDATA = "user";
+	public static final String ATTR_USER_DATA = "user";
+	public static final String ATTR_LESSON_DATA ="lesson";
 	public static final String PARAM_ACTIVITY_ID = "activityId";
+	public static final String PARAM_PROGRESS_ID = "progressId";
     
     /**
      * Helper method to retrieve the user data. We always load up from http
@@ -67,7 +70,7 @@ public class LearningWebUtil
     {
         //retrieve complete user data from http session
         User currentUser = (User) request.getSession()
-                                              .getAttribute(ATTR_USERDATA);
+                                              .getAttribute(ATTR_USER_DATA);
         if(log.isDebugEnabled()&&currentUser!=null)
             log.debug("user retrieved from http session:"+currentUser.getUserId());
         
@@ -81,7 +84,7 @@ public class LearningWebUtil
                 log.debug("user retrieved from database:"+currentUser.getUserId());
             
             //create session cache
-            request.getSession().setAttribute(ATTR_USERDATA, currentUser);
+            request.getSession().setAttribute(ATTR_USER_DATA, currentUser);
         }
         return currentUser;
     }
@@ -96,11 +99,17 @@ public class LearningWebUtil
      */
     public static Lesson getLessonData(HttpServletRequest request, ServletContext servletContext)
     {
-        //initialize service object
-        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
-
-        long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
-        return learnerService.getLesson(new Long(lessonId));
+        Lesson lesson = (Lesson)request.getAttribute(ATTR_LESSON_DATA);
+        
+        if(lesson ==null)
+        {
+            //initialize service object
+            ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
+            long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
+            lesson = learnerService.getLesson(new Long(lessonId));
+            request.getSession().setAttribute(ATTR_LESSON_DATA,lesson);
+        }
+        return lesson;
     }
     
     /**
@@ -123,8 +132,10 @@ public class LearningWebUtil
             User currentLearner = getUserData(request, servletContext);
             Lesson lesson = getLessonData(request,servletContext);
             LearnerProgress progress = learnerService.getProgress(currentLearner,lesson);
-            
             bean = new SessionBean(currentLearner,lesson,progress);
+            
+            request.getSession().setAttribute(SessionBean.NAME,bean);
+            request.getSession().setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,progress);
         }
         return bean;
     }
