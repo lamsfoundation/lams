@@ -117,6 +117,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     	newSequenceActivity.setRunOffline(originalActivity.getRunOffline());
     	
     	newSequenceActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	newSequenceActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
+    	
     	newSequenceActivity.setLibraryActivity(originalActivity.getLibraryActivity());
 		newSequenceActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
     	

@@ -119,9 +119,14 @@ public class GroupingActivity extends SimpleActivity implements Serializable
     	groupingActivity.setXcoord(originalActivity.getXcoord());
     	groupingActivity.setYcoord(originalActivity.getYcoord());    	    
     	groupingActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	
     	groupingActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
     	groupingActivity.setApplyGrouping(originalActivity.getApplyGrouping());
     	groupingActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	
+    	groupingActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	groupingActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
+    	
     	groupingActivity.setDefineLater(originalActivity.getDefineLater());    	
     	groupingActivity.setCreateDateTime(new Date()); 
     	groupingActivity.setRunOffline(originalActivity.getRunOffline());

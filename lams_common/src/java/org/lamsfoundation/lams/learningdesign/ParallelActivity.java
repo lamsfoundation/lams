@@ -116,6 +116,8 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
     	newParallelActivity.setRunOffline(originalActivity.getRunOffline());
     	
     	newParallelActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	newParallelActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
+    	
     	newParallelActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
     	newParallelActivity.setLibraryActivity(originalActivity.getLibraryActivity());		
     	

@@ -149,7 +149,10 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     	newScheduleGateActivity.setDefineLater(originalActivity.getDefineLater());
     	newScheduleGateActivity.setCreateDateTime(new Date());
     	newScheduleGateActivity.setRunOffline(originalActivity.getRunOffline());
-    	newScheduleGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());    	
+    	
+    	newScheduleGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	newScheduleGateActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
+    	
     	newScheduleGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
     	newScheduleGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
     	
