@@ -1,24 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="_generation_" name="XDoclet Generator">
 <path id="xdoclet.classpath">
-<fileset dir="G:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.jboss.ide.eclipse.xdoclet.core_3.8.1">
+<fileset dir="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.jboss.ide.eclipse.xdoclet.core_3.8.1">
 <include name="*.jar"/>
-</fileset><pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/build"/>
-<pathelement location="C:/Program Files/Java/j2re1.4.2_06/lib/rt.jar"/>
-<pathelement location="C:/Program Files/Java/j2re1.4.2_06/lib/sunrsasign.jar"/>
-<pathelement location="C:/Program Files/Java/j2re1.4.2_06/lib/jsse.jar"/>
-<pathelement location="C:/Program Files/Java/j2re1.4.2_06/lib/jce.jar"/>
-<pathelement location="C:/Program Files/Java/j2re1.4.2_06/lib/charsets.jar"/>
-<pathelement location="C:/Program Files/Java/j2re1.4.2_06/lib/ext/dnsns.jar"/>
-<pathelement location="C:/Program Files/Java/j2re1.4.2_06/lib/ext/ldapsec.jar"/>
-<pathelement location="C:/Program Files/Java/j2re1.4.2_06/lib/ext/localedata.jar"/>
-<pathelement location="C:/Program Files/Java/j2re1.4.2_06/lib/ext/sunjce_provider.jar"/>
-<pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/lib/spring/spring.jar"/>
-<pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/lib/log4j/log4j-1.2.9.jar"/>
-<pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/lib/junit/junit.jar"/>
-<pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/lib/hibernate/hibernate2.jar"/>
-<pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/lib/hibernate/hibernate-tools.jar"/>
-<pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/lib/jakarta-commons/commons-lang-2.0.jar"/>
+</fileset><pathelement location="D:/eclipse/workspace/lams_contentrepository/build"/>
+<pathelement location="D:/Java/j2sdk1.4.2_03/jre/lib/rt.jar"/>
+<pathelement location="D:/Java/j2sdk1.4.2_03/jre/lib/sunrsasign.jar"/>
+<pathelement location="D:/Java/j2sdk1.4.2_03/jre/lib/jsse.jar"/>
+<pathelement location="D:/Java/j2sdk1.4.2_03/jre/lib/jce.jar"/>
+<pathelement location="D:/Java/j2sdk1.4.2_03/jre/lib/charsets.jar"/>
+<pathelement location="D:/Java/j2sdk1.4.2_03/jre/lib/ext/dnsns.jar"/>
+<pathelement location="D:/Java/j2sdk1.4.2_03/jre/lib/ext/ldapsec.jar"/>
+<pathelement location="D:/Java/j2sdk1.4.2_03/jre/lib/ext/localedata.jar"/>
+<pathelement location="D:/Java/j2sdk1.4.2_03/jre/lib/ext/sunjce_provider.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/spring/spring.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/log4j/log4j-1.2.9.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/junit/junit.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/hibernate/hibernate2.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/hibernate/hibernate-tools.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/jakarta-commons/commons-lang-2.0.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/jakarta-commons/commons-logging.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/mysql/mysql-connector-java-3.0.16-ga-bin.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/j2ee/j2ee.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/dom4j/dom4j-1.5.2.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/aopalliance/aopalliance.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/cglib/cglib-full-2.0.2.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/jakarta-commons/commons-collections-3.1.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/odmg/odmg-3.0.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/jdom/jdom.jar"/>
+<pathelement location="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.2/data/libraryset/1.4/activation.jar"/>
+<pathelement location="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.2/data/libraryset/1.4/javax.servlet.jar"/>
+<pathelement location="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.2/data/libraryset/1.4/javax.servlet.jsp.jar"/>
+<pathelement location="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.2/data/libraryset/1.4/jboss-j2ee.jar"/>
+<pathelement location="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.2/data/libraryset/1.4/jboss-jaxrpc.jar"/>
+<pathelement location="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.2/data/libraryset/1.4/jboss-jsr77.jar"/>
+<pathelement location="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.2/data/libraryset/1.4/jboss-saaj.jar"/>
+<pathelement location="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.2/data/libraryset/1.4/mail.jar"/>
+<pathelement location="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.2/data/libraryset/1.4/namespace.jar"/>
+<pathelement location="D:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.2/data/libraryset/1.4/xml-apis.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/struts/struts.jar"/>
+<pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/jakarta-taglibs/standard.jar"/>
 </path>
 <target name="_generation_" depends=""/>
 </project>

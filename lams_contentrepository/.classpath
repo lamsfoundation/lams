@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry output="WEB-INF/classes" kind="src" path="src/java"/>
-	<classpathentry output="WEB-INF/classes" kind="src" path="conf/hibernate/mappings"/>
-	<classpathentry output="WEB-INF/classes" kind="src" path="test/java"/>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="conf/hibernate/mappings"/>
+	<classpathentry kind="src" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/spring/spring.jar"/>
 	<classpathentry kind="lib" path="lib/log4j/log4j-1.2.9.jar"/>

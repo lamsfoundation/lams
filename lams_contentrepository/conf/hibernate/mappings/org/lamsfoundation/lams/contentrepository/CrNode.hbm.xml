@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.contentrepository.CrNode" 
+    table="lams_cr_node"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_cr_node"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="nodeId"
+        type="java.lang.Long"
+        column="node_id"
+        unsaved-value="0"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="identity"
+            type="java.lang.Long"
+            column="node_id"
+            unsaved-value="0"
+
+
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+
+    <property
+        name="path"
+        type="java.lang.String"
+        column="path"
+        length="255"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="path"
+            length="255"
+        </meta>    
+    </property>
+    <property
+        name="type"
+        type="java.lang.String"
+        column="type"
+        not-null="true"
+        length="255"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="type"
+            length="255"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="createdDateTime"
+        type="java.sql.Timestamp"
+        column="created_date_time"
+        length="14"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="created_date_time"
+            length="14"
+        </meta>    
+    </property>
+    <property
+        name="nextVersionId"
+        type="java.lang.Long"
+        column="next_version_id"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            type="java.lang.Long"
+            column="next_version_id"
+        </meta>    
+    </property>
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to CrNodeVersion -->
+    <set
+        name="crNodeVersions"
+        lazy="false"
+        inverse="true"
+		cascade="all-delete-orphan"
+    >
+    
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="false"
+            inverse="true"
+            cascade="all-delete-orphan"
+
+           @hibernate.collection-key
+            column="node_id"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
+        </meta>
+        <key>
+            <column name="node_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
+        />
+    </set>
+    <!-- bi-directional many-to-one association to CrWorkspace -->
+    <many-to-one
+        name="crWorkspace"
+        class="org.lamsfoundation.lams.contentrepository.CrWorkspace"
+        not-null="true"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="workspace_id"         
+        </meta>
+        <column name="workspace_id" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

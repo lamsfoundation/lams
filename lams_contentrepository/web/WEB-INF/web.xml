@@ -22,15 +22,30 @@
       <url-pattern>*.do</url-pattern>
    </servlet-mapping>
 
+	<!--  the download servlet contains the link to the repository for -->
+	<!--  all other servlets (including the struts one) so it must be -->
+	<!--  loaded on startup, to create the context and get the repository -->
   <servlet>
     <description>Download file(s)</description>
     <display-name>Download file</display-name>
     <servlet-name>Download</servlet-name>
-    <servlet-class>com.lamsinternational.lams.contentrepository.struts.action.Download</servlet-class>
+    <servlet-class>org.lamsfoundation.lams.contentrepository.struts.action.Download</servlet-class>
+      <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>Download</servlet-name>
     <url-pattern>/download/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <description>Test Login</description>
+    <display-name>Test Login</display-name>
+    <servlet-name>TestLogin</servlet-name>
+    <servlet-class>org.lamsfoundation.lams.contentrepository.struts.action.TestLogin</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TestLogin</servlet-name>
+    <url-pattern>/testlogin</url-pattern>
   </servlet-mapping>
 
 </web-app>

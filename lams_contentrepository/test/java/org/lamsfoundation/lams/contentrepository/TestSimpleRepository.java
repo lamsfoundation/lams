@@ -1,0 +1,596 @@
+package org.lamsfoundation.lams.contentrepository;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.FileException;
+import org.lamsfoundation.lams.contentrepository.ICredentials;
+import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.IVersionDetail;
+import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.LoginException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.NodeType;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.SimpleCredentials;
+import org.lamsfoundation.lams.contentrepository.SimpleVersionedNode;
+import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.dao.IFileDAO;
+import org.lamsfoundation.lams.contentrepository.dao.file.FileDAO;
+
+
+/**
+ * Test SimpleRepository and the Credentials code.
+ * 
+ * @author Fiona Malikoff
+ */
+public class TestSimpleRepository extends BaseTestCase {
+
+	protected Logger log = Logger.getLogger(TestSimpleRepository.class);	
+
+	String wrongWorkspaceExists = "btoolWorkspace";
+	String wrongWorkspaceDoesNotExist = "ctoolWorkspace";
+	String newWorkspace = "newtoolWorkspace";
+	String workspaceAlreadyExistsMessage = "Workspace newtoolWorkspace already exists, cannot add workspace.";
+	String wrongUser = "btool";
+	String newUser = "ctool";
+	String userAlreadyExistsMessage = "Credential name ctool already exists - cannot create credential.";
+	char[] wrongPassword = {'b','t','o','o','l'};
+	char[] newPassword1 = {'c','t','o','o','l','x'};
+	char[] newPassword2 = {'d','t','o','o','l','x'};
+	
+	Long one = new Long(1);
+	Long two = new Long(2);
+	String v1Description = "Draft";
+	String v2Description = "Final";
+	
+	/**
+	 * Constructor for SimpleRepositoryTest.
+	 * @param arg0
+	 */
+	public TestSimpleRepository() {
+		super();
+	}
+
+	public void testLoginPass() {
+		// get a credential from the bean factory
+		// setup credential with known username/password
+		ICredentials cred = new SimpleCredentials(INITIAL_WORKSPACE_USER, INITIAL_WORKSPACE_PASSWORD);
+		try { 
+			ITicket ticket = repository.login(cred, INITIAL_WORKSPACE);
+			assertNotNull("Login succeeded, ticket returned.", ticket);
+		} catch ( Exception e ) {
+			failUnexpectedException(e);
+		}
+	}
+
+	public void testLoginFailWrongUser() {
+		// get a credential from the bean factory
+		// setup credential with known username/password
+		ICredentials cred = new SimpleCredentials(wrongUser, INITIAL_WORKSPACE_PASSWORD);
+		try { 
+			ITicket ticket = repository.login(cred, INITIAL_WORKSPACE);
+			fail("Login succeeded but expected it to fail as username was wrong. Ticket is "+ticket);
+		} catch ( LoginException le ) {
+			assertTrue("Login exception thrown as expected. Exception was "+le.getMessage(),true);
+		} catch ( Exception e ) {
+			failUnexpectedException(e);
+		}
+	}
+
+	public void testLoginFailWrongPassword() {
+		// get a credential from the bean factory
+		// setup credential with known username/password
+		ICredentials cred = new SimpleCredentials(INITIAL_WORKSPACE_USER, wrongPassword);
+		try { 
+			ITicket ticket = repository.login(cred, INITIAL_WORKSPACE);
+			fail("Login succeeded but expected it to fail as password was wrong. Ticket is "+ticket);
+		} catch ( LoginException le ) {
+			assertTrue("Login exception thrown as expected. Exception was "+le.getMessage(),true);
+		} catch ( Exception e ) {
+			failUnexpectedException(e);
+		}
+	}
+
+	public void testLoginFailWrongWorkspaceExists() {
+		// get a credential from the bean factory
+		// setup credential with known username/password
+		try { 
+			ICredentials cred = new SimpleCredentials(INITIAL_WORKSPACE_USER, INITIAL_WORKSPACE_PASSWORD);
+			ITicket ticket = repository.login(cred, wrongWorkspaceExists);
+			fail("Login succeeded but expected it to fail as password was wrong. Ticket is "+ticket);
+		} catch ( WorkspaceNotFoundException we ) {
+			assertTrue("Workspace not found exception thrown as expected.",true);
+		} catch ( Exception e ) {
+			failUnexpectedException(e);
+		}
+	}
+
+	public void testLoginFailWrongWorkspaceDoesNotExist() {
+		// get a credential from the bean factory
+		// setup credential with known username/password
+		try { 
+			ICredentials cred = new SimpleCredentials(INITIAL_WORKSPACE_USER, INITIAL_WORKSPACE_PASSWORD);
+			ITicket ticket = repository.login(cred, wrongWorkspaceDoesNotExist);
+			fail("Login succeeded but expected it to fail as password was wrong. Ticket is "+ticket);
+		} catch ( WorkspaceNotFoundException we ) {
+			assertTrue("Workspace not found exception thrown as expected. Exception was "+we.getMessage(), true);
+		} catch ( Exception e ) {
+			failUnexpectedException(e);
+		}
+	}
+
+	public void testAddWorkspace() {
+		ICredentials cred = new SimpleCredentials(INITIAL_WORKSPACE_USER, INITIAL_WORKSPACE_PASSWORD);
+		try { 
+			repository.addWorkspace(cred,newWorkspace);
+			ITicket ticket = repository.login(cred, newWorkspace);
+			assertNotNull("Add workspace succeeded - can login to workspace. Ticket is "+ticket, ticket);
+		} catch ( AccessDeniedException ae ) {
+			assertTrue("Access denied exception thrown as expected. Exception was "+ae.getMessage(), true);
+		} catch ( Exception e ) {
+			failUnexpectedException(e);
+		}
+
+		// repeat the add - should fail as the workspace name already exists
+		try { 
+			repository.addWorkspace(cred,newWorkspace);
+			ITicket ticket = repository.login(cred, newWorkspace);
+			fail("Add workspace suceeded but it should have failed as workspace already exists.");
+		} catch ( RepositoryCheckedException re ) {
+			assertTrue("Repository exception thrown was due to name duplication as expected: "+re.getMessage(), 
+						re.getMessage() != null && re.getMessage().equals(workspaceAlreadyExistsMessage));
+		} catch ( Exception e ) {
+			failUnexpectedException(e);
+		}
+}
+
+	/** Tests adding a new user and changing a password */
+	public void testUserAdmin() {
+		// try creating a new user.
+		// setup credential with known username/password
+		ICredentials cred1 = new SimpleCredentials(newUser, newPassword1);
+		ICredentials cred2 = new SimpleCredentials(newUser, newPassword2);
+		try { 
+			repository.createCredential(cred1);
+			repository.assignCredentials(cred1, INITIAL_WORKSPACE);
+			ITicket newTicket = repository.login(cred1, INITIAL_WORKSPACE);
+			assertTrue("Login succeeded for new user to original workspace.",true);
+		} catch ( LoginException le ) {
+			assertTrue("Login exception unexpectededly - user newly created. Exception was "+le.getMessage(),true);
+		} catch ( Exception e ) {
+			failUnexpectedException(e);
+		}
+		
+		try {
+			// resetup the credential as the password will have been cleared by login.
+			cred1 = new SimpleCredentials(newUser, newPassword1);
+			repository.updateCredentials(cred1,cred2);
+			ITicket newTicket = repository.login(cred2, INITIAL_WORKSPACE);
+			assertTrue("Login succeeded for new user to original workspace with new password.",true);
+		} catch ( LoginException le ) {
+			assertTrue("Login exception unexpectededly - user password changed. Exception was "+le.getMessage(),true);
+		} catch ( Exception e ) {
+			failUnexpectedException(e);
+		}
+		
+		// try recreating a new user - should fail
+		// setup credential with known username/password
+		try { 
+			repository.createCredential(cred1);
+			fail("User creation should have failed due to duplicate username");
+		} catch ( RepositoryCheckedException re ) {
+			assertTrue("Repository exception thrown was due to name duplication as expected: "+re.getMessage(), 
+					re.getMessage() != null && re.getMessage().equals(userAlreadyExistsMessage));
+		} catch ( Exception e ) {
+			failUnexpectedException(e);
+		}
+	}
+
+	/** create a node with two versions and test deleting them using delete version */
+	public void testFileItemDeleteVersion() {
+		IFileDAO fileDAO = (FileDAO)context.getBean("fileDAO", FileDAO.class);
+		
+		NodeKey keys = testAddFileItem(TEXT_FILEPATH, TEXT_FILENAME,null,one);
+		checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+		keys = testAddFileItem(BINARY_FILEPATH, BINARY_FILENAME,keys.getUuid(),two);
+		checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
+		
+		deleteVersion(keys.getUuid(), two);
+		checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 1);
+				
+		deleteVersion(keys.getUuid(), one);
+		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
+		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 0);
+	}
+	
+	/** create a node with two versions and test deleting them using delete node */
+	public void testFileItemDeleteNode() {
+
+		IFileDAO fileDAO = (FileDAO)context.getBean("fileDAO", FileDAO.class);
+
+		NodeKey keys = testAddFileItem(TEXT_FILEPATH, TEXT_FILENAME,null,one);
+		checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+		testAddFileItem(BINARY_FILEPATH, BINARY_FILENAME,keys.getUuid(),two);
+		checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
+
+		deleteNode(keys.getUuid());
+		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
+		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 0);
+	}
+	
+	/** create a node with two versions and test deleting them using delete node 
+	  * but first rig the files so one of them is already gone and the other one is 
+	  * read only. Note: java can delete a read only file - the status just
+	  * stops you from writing it.
+	  */
+	public void testFileItemDeleteNodeFileProb() {
+
+		IFileDAO fileDAO = (FileDAO)context.getBean("fileDAO", FileDAO.class);
+
+		NodeKey keys = testAddFileItem(TEXT_FILEPATH, TEXT_FILENAME,null,one);
+		checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+		testAddFileItem(BINARY_FILEPATH, BINARY_FILENAME,keys.getUuid(),two);
+		checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
+		
+		String expectProbPath = null;
+		try { 
+			File file = new File(fileDAO.getFilePath(keys.getUuid(), one));
+			boolean success = file.delete();
+			assertTrue("Fudge deletion worked.", success);
+			file = new File(fileDAO.getFilePath(keys.getUuid(), two));
+			file.setReadOnly();
+		} catch (RepositoryCheckedException re) {
+			failUnexpectedException("testTextFileItem",re);
+		}
+
+		deleteNode(keys.getUuid());
+		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
+		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 0);
+
+	}
+	
+	private void checkFileNodeExist(IFileDAO fileDAO, Long uuid, Long version, int expectNumVersions) {
+		
+		InputStream isOut = null;
+		try {
+			IVersionedNode node = repository.getFileItem(ticket, uuid, version); 
+			isOut = node.getFile(); 
+			assertTrue("Input stream is returned.", isOut != null);
+			int ch = isOut.read();
+			assertTrue("Input stream can be read, first byte is "+ch, ch != -1);
+			
+			SortedSet history = repository.getVersionHistory(ticket, uuid);
+			assertTrue("History contains "+history.size()+" objects, expected "+expectNumVersions,
+					history != null && history.size()==expectNumVersions);
+			Iterator iter = history.iterator();
+			while (iter.hasNext()) {
+				IVersionDetail element = (IVersionDetail) iter.next();
+				if ( element.getVersionId().longValue() == 1)
+					assertTrue("Description is "+element.getDescription()
+							+" as expected "+v1Description,
+							v1Description.equals(element.getDescription()));
+				else 
+					assertTrue("Description is "+element.getDescription()
+							+" as expected "+v2Description,
+							v2Description.equals(element.getDescription()));
+			}
+			
+			String filepath = fileDAO.getFilePath(uuid, version);
+			File file = new File(filepath);
+			assertTrue("File "+filepath+" exists. ", file.exists() );
+			
+		} catch (RepositoryCheckedException re) {
+			failUnexpectedException("checkFileNode",re);
+		} catch (IOException ioe) {
+			failUnexpectedException("checkFileNode",ioe);
+		} finally {
+			try {
+				if ( isOut != null ) {
+					isOut.close();
+				} 
+			} catch (IOException ioe1) {
+					System.err.println("Unable to close file");
+					ioe1.printStackTrace();
+			}
+		}
+	}
+	
+	private void checkFileNodeDoesNotExist(IFileDAO fileDAO, Long uuid, Long version, int expectNumVersions) {
+		
+		try {
+			try {
+				IVersionedNode node;
+				node = repository.getFileItem(ticket, uuid, version);
+				fail("Should have thrown ItemNotFoundException exception for uuid "
+					+uuid+" version "+version+" got node "+node);
+			} catch ( ItemNotFoundException e ) {
+				assertTrue("ItemNotFoundException thrown as expected", true);
+			}
+		
+			try {
+
+				SortedSet history = repository.getVersionHistory(ticket, uuid);
+				if ( expectNumVersions > 0 )
+					assertTrue("History contains "+history.size()+" objects, expected "+expectNumVersions,
+						history != null && history.size()==expectNumVersions);
+				else 
+					fail("Should have thrown ItemNotFoundException exception for uuid "
+							+uuid+" as all versions have been deleted so node should have been deleted.");
+
+			} catch ( ItemNotFoundException e ) {
+				if ( expectNumVersions > 0 )
+					fail("ItemNotFoundException thrown unexpectedly - there should be other versions! ");
+				else 
+					assertTrue("ItemNotFoundException thrown as expected", true);
+			}
+	
+			String filepath = fileDAO.getFilePath(uuid, version);
+			File file = new File(filepath);
+			assertTrue("File "+filepath+" does not exist. ", ! file.exists() );
+		
+			// should the directory still be there?
+			int pos = file.getPath().lastIndexOf(File.separator+version);
+			String dirPath = file.getPath().substring(0,pos);
+			System.out.println("Checking dir path "+dirPath);
+			File dir = new File(dirPath);
+			if ( expectNumVersions > 0 ) {
+				assertTrue("Directory still exists for other files", dir.exists());
+			} else {
+				assertTrue("Directory removed", ! dir.exists());
+			}
+
+		} catch (RepositoryCheckedException re) {
+			re.printStackTrace();
+			failUnexpectedException("checkFileNodeDoesNotExist",re);
+		}
+
+		
+	}
+	
+	private void deleteVersion(Long uuid, Long version) {
+		try {
+			String[] problemFiles = repository.deleteVersion(ticket,uuid,version);
+			assertTrue("No problematic files should be found. "
+					+(problemFiles!=null ? problemFiles.length+" found":"")
+					,problemFiles==null || problemFiles.length==0);
+		} catch (RepositoryCheckedException re) {
+			re.printStackTrace();
+			failUnexpectedException("checkFileNodeDoesNotExist",re);
+		}
+	}
+
+	private void deleteNode(Long uuid) {
+		try {
+			String[] problemFiles = repository.deleteNode(ticket,uuid);
+			assertTrue("No problematic files should be found. "
+					+(problemFiles!=null ? problemFiles.length+" found":"")
+					,problemFiles==null || problemFiles.length==0);
+		} catch (RepositoryCheckedException re) {
+			re.printStackTrace();
+			failUnexpectedException("checkFileNodeDoesNotExist",re);
+		}
+	}
+	
+	private NodeKey testAddFileItem(String filePath, String filename, Long uuid, Long expectedVersion) {
+		
+		InputStream isIn = null;
+		NodeKey keys = null;
+		try {
+			File file = new File(filePath);
+			if ( ! file.exists() || file.isDirectory() ) {
+				fail("File "+filePath+" not found on computer or is a directory. Please set this variable to a known file that may be read on this computer."
+						+" Note: this is a shortcoming in the test, it is not a failure of the repository.");
+			}
+
+			isIn = new FileInputStream(file);
+
+			if ( uuid == null ) {
+				// new file
+				keys = repository.addFileItem(ticket, isIn, filename, null, v1Description);
+				assertTrue("File save returns uuid",keys != null && keys.getUuid() != null);
+				assertTrue("File save got expected version "+expectedVersion,
+					keys != null && keys.getVersion() != null 
+					&& keys.getVersion().equals(expectedVersion));
+			} else {
+				// update existing node
+				keys = repository.updateFileItem(ticket, uuid, filename, 
+    					isIn, null, v2Description);
+				assertTrue("File save returns same uuid",keys != null && keys.getUuid().equals(uuid));
+				assertTrue("File save got expected version "+expectedVersion,
+					keys != null && keys.getVersion() != null 
+					&& keys.getVersion().equals(expectedVersion));
+			}
+			
+
+		} catch (RepositoryCheckedException re) {
+			failUnexpectedException("testAddFileItem",re);
+		} catch (IOException ioe) {
+			failUnexpectedException("testAddFileItem",ioe);
+		} finally {
+			try {
+				if ( isIn != null ) {
+					isIn.close();
+				}
+			} catch (IOException ioe1) {
+				System.err.println("Unable to close file");
+				ioe1.printStackTrace();
+			}
+		}
+		
+		return keys;
+
+
+	}
+
+	public void testPackageItem() {
+		NodeKey keys = testPackageItem(null);
+		testPackageItem(keys.getUuid());
+	}
+
+	private NodeKey testPackageItem(Long uuid) {
+		
+		String v1Description = "Draft";
+		String v2Description = "Final";
+		NodeKey keys = null;
+		try {
+			File directory = new File(PACKAGE_DIR_PATH);
+			if ( ! directory.exists() || ! directory.isDirectory() ) {
+				fail("Directory "+PACKAGE_DIR_PATH+" not found on computer or is not a directory. Please set this variable to a directory containing an index.html file and related files."
+						+" Note: this is a shortcoming in the test, it is not a failure of the repository.");
+			}
+			String[] filenames = directory.list();
+
+			if ( uuid == null ) {
+				keys = repository.addPackageItem(ticket,  PACKAGE_DIR_PATH, "index.html", v1Description);
+				assertTrue("Package save returns uuid",keys != null && keys.getUuid() != null);
+				assertTrue("Package save got version 1",
+						keys != null && keys.getVersion() != null 
+						&& keys.getVersion().longValue() == 1);
+			} else {
+				keys = repository.updatePackageItem(ticket, uuid, PACKAGE_DIR_PATH, "index.html", v2Description);
+				assertTrue("Package save returns uuid",keys != null && keys.getUuid() != null);
+				assertTrue("Package save got version >1",
+						keys != null && keys.getVersion() != null 
+						&& keys.getVersion().longValue() > 1);
+			}
+
+			// try getting the start file - index.html
+			checkFileInPackage(keys, null);
+			
+			// now try another file in the package
+			checkFileInPackage(keys, PACKAGE_TEST_FILE);
+			
+			// check that there is the expected number of files in pacakge.
+			// expect an extra node over the number of files (for the package node)
+			List nodes = repository.getPackageNodes(ticket, keys.getUuid(), null);
+			assertTrue("Expected number of nodes found. Expected " 
+					+(PACKAGE_NUM_FILES+1)+" got "
+					+(nodes != null ? nodes.size() : 0 ),
+					nodes != null && nodes.size() == (PACKAGE_NUM_FILES+1));
+			Iterator iter = nodes.iterator();
+			if ( iter.hasNext() ) {
+				SimpleVersionedNode packageNode = (SimpleVersionedNode) iter.next();
+				assertTrue("First node is the package node.",
+					packageNode.isNodeType(NodeType.PACKAGENODE));
+			}
+			while ( iter.hasNext() ) {
+				SimpleVersionedNode childNode = (SimpleVersionedNode) iter.next();
+				assertTrue("Child node is a file node.",
+						childNode.isNodeType(NodeType.FILENODE));
+			}
+					
+		} catch (RepositoryCheckedException re) {
+			failUnexpectedException("testPackageItem",re);
+		} catch (IOException ioe) {
+			failUnexpectedException("testPackageItem",ioe);
+		}
+		return keys;
+	}
+
+	/**
+	 * @param keys
+	 * @param relPath
+	 * @throws AccessDeniedException
+	 * @throws ItemNotFoundException
+	 * @throws FileException
+	 * @throws IOException
+	 */
+	private void checkFileInPackage(NodeKey keys, String relPath) throws AccessDeniedException, ItemNotFoundException, FileException, IOException {
+		IVersionedNode node = repository.getFileItem(ticket, keys.getUuid(), keys.getVersion()); 
+		InputStream isOut = node.getFile(); 
+		assertTrue("Input stream is returned for file path "+relPath, isOut != null);
+		try {
+			int ch = isOut.read();
+			assertTrue("Input stream can be read, first byte is "+ch, ch != -1);
+		} catch ( IOException e ) {
+			throw e;
+		} finally {
+			if (isOut != null)
+				isOut.close();
+		}
+	}
+
+	public void testLogout() {
+		// relogin then logout so that we don't affect the other tests.
+		ICredentials cred = new SimpleCredentials(INITIAL_WORKSPACE_USER, INITIAL_WORKSPACE_PASSWORD);
+		ITicket localTicket = null;
+		try {
+			localTicket = repository.login(cred, INITIAL_WORKSPACE);
+			assertTrue("Login okay",localTicket != null);
+			SortedSet history = repository.getVersionHistory(ticket, TEST_DATA_NODE_ID);
+			assertTrue("History can be accessed before logging out",true);
+			repository.logout(ticket);
+		} catch (RepositoryCheckedException e) {
+			failUnexpectedException("testLogout",e);
+		}
+		
+		try {
+			Long id = ticket.getWorkspaceId();
+			assertTrue("Workspace id is not avaiable after logging out",id==null);
+			try {
+				SortedSet history = repository.getVersionHistory(ticket, TEST_DATA_NODE_ID);
+				fail("History shouldn't be available after logging out");
+			} catch (AccessDeniedException ade ) {
+				assertTrue("AccessDeniedException thrown as expected - can't get history after logging out",true);
+			}
+		} catch (RepositoryCheckedException e) {
+			failUnexpectedException("testLogout",e);
+		}
+	}
+	
+	/** Checks that the system will give us an error if we get try to
+	 * get a node that belongs to a different workspace to our ticket.
+	 */
+	public void testWrongWorkspaceAccess() {
+		// relogin then logout so that we don't affect the other tests.
+		ICredentials cred = new SimpleCredentials(INITIAL_WORKSPACE_USER, INITIAL_WORKSPACE_PASSWORD);
+		ITicket localTicket = null;
+		try {
+			localTicket = repository.login(cred, SECONDARY_WORKSPACE);
+			assertTrue("Login okay",localTicket != null);
+		} catch (RepositoryCheckedException e) {
+			failUnexpectedException("testWrongWorkspaceAccess",e);
+		}
+
+		try {
+			// should fail as this node is in the INITIAL_WORKSPACE,
+			// not the SECONDARY_WORKSPACE
+			IVersionedNode node = repository.getFileItem(localTicket, TEST_DATA_NODE_ID, null);
+			fail("Node can be accessed for the wrong workspace.");
+		} catch (ItemNotFoundException e) {
+			assertTrue("ItemNotFoundException thrown as expected when getting node from wrong workspace.", true);
+		} catch (RepositoryCheckedException e) {
+			failUnexpectedException("testWrongWorkspaceAccess",e);
+		}
+
+		try {
+			// should fail as this node is in the INITIAL_WORKSPACE,
+			// not the SECONDARY_WORKSPACE
+			SortedSet history = repository.getVersionHistory(localTicket, TEST_DATA_NODE_ID);
+			fail("History can be accessed for the wrong workspace.");
+		} catch (ItemNotFoundException e) {
+			assertTrue("ItemNotFoundException thrown as expected when getting history for node from wrong workspace.", true);
+		} catch (RepositoryCheckedException e) {
+			failUnexpectedException("testWrongWorkspaceAccess",e);
+		}
+		
+		try {
+			// be nice and clean up.
+			repository.logout(localTicket);
+		} catch (RepositoryCheckedException e) {
+			failUnexpectedException("testWrongWorkspaceAccess",e);
+		}
+	}
+
+
+}

@@ -1,11 +1,11 @@
 <%@ page language="java"%>
 
 <%@ page import="java.util.*"%>
-<%@ page import="com.lamsinternational.lams.contentrepository.IValue"%>
-<%@ page import="com.lamsinternational.lams.contentrepository.IVersionDetail"%>
-<%@ page import="com.lamsinternational.lams.contentrepository.IVersionedNode"%>
-<%@ page import="com.lamsinternational.lams.contentrepository.PropertyName"%>
-<%@ page import="com.lamsinternational.lams.contentrepository.NodeType"%>
+<%@ page import="org.lamsfoundation.lams.contentrepository.IValue"%>
+<%@ page import="org.lamsfoundation.lams.contentrepository.IVersionDetail"%>
+<%@ page import="org.lamsfoundation.lams.contentrepository.IVersionedNode"%>
+<%@ page import="org.lamsfoundation.lams.contentrepository.PropertyName"%>
+<%@ page import="org.lamsfoundation.lams.contentrepository.NodeType"%>
 
 <%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>

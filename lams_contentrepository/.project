@@ -3,7 +3,6 @@
 	<name>lams_contentrepository</name>
 	<comment></comment>
 	<projects>
-		<project>lams_common</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

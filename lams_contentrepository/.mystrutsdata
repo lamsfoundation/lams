@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <MyEclipseStrutsProperties>
     <strutsVersion>1</strutsVersion>
-    <basePackage>com.lamsinternational.lams.struts</basePackage>
+    <basePackage>org.lamsfoundation.lams.struts</basePackage>
     <strutsPattern>0</strutsPattern>
     <servletName>action</servletName>
 </MyEclipseStrutsProperties>

@@ -3,9 +3,9 @@
 <struts-config>
    <data-sources />
    <form-beans >
-      <form-bean name="loginRepositoryForm" type="com.lamsinternational.lams.contentrepository.struts.form.LoginRepositoryForm" />
-      <form-bean name="nodeSelectionForm" type="com.lamsinternational.lams.contentrepository.struts.form.NodeSelectionForm" />
-      <form-bean name="addFileContentForm" type="com.lamsinternational.lams.contentrepository.struts.form.AddFileContentForm" />
+      <form-bean name="loginRepositoryForm" type="org.lamsfoundation.lams.contentrepository.struts.form.LoginRepositoryForm" />
+      <form-bean name="nodeSelectionForm" type="org.lamsfoundation.lams.contentrepository.struts.form.NodeSelectionForm" />
+      <form-bean name="addFileContentForm" type="org.lamsfoundation.lams.contentrepository.struts.form.AddFileContentForm" />
    </form-beans>
 
    <global-exceptions>
@@ -13,35 +13,35 @@
    	<!-- in a real application, the exceptions should be caught and handled -->
 	<!--	   <exception-->
 	<!--	        key="exception.accessDenied"-->
-	<!--    	    type="com.lamsinternational.lams.contentrepository.AccessDeniedException"-->
+	<!--    	    type="org.lamsfoundation.lams.contentrepository.AccessDeniedException"-->
 	<!--        	path="/error.jsp"/>-->
 	<!--	   <exception-->
 	<!--	        key="exception.loginFailed"-->
-	<!--    	    type="com.lamsinternational.lams.contentrepository.LoginException"-->
+	<!--    	    type="org.lamsfoundation.lams.contentrepository.LoginException"-->
 	<!--        	path="/error.jsp"/>-->
 	<!--	   <exception-->
 	<!--	        key="exception.workspaceNotFound"-->
-	<!--    	    type="com.lamsinternational.lams.contentrepository.WorkspaceNotFoundException"-->
+	<!--    	    type="org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException"-->
 	<!--        	path="/error.jsp"/>-->
 	<!--	   <exception-->
 	<!--	        key="exception.itemNotFound"-->
-	<!--    	    type="com.lamsinternational.lams.contentrepository.ItemNotFoundException"-->
+	<!--    	    type="org.lamsfoundation.lams.contentrepository.ItemNotFoundException"-->
 	<!--        	path="/error.jsp"/>-->
 	<!--	   <exception-->
 	<!--	        key="exception.itemExists"-->
-	<!--    	    type="com.lamsinternational.lams.contentrepository.ItemExistsException"-->
+	<!--    	    type="org.lamsfoundation.lams.contentrepository.ItemExistsException"-->
 	<!--        	path="/error.jsp"/>-->
 	<!--	   <exception-->
 	<!--	        key="exception.file"-->
-	<!--    	    type="com.lamsinternational.lams.contentrepository.FileException"-->
+	<!--    	    type="org.lamsfoundation.lams.contentrepository.FileException"-->
 	<!--        	path="/error.jsp"/>-->
 	<!--	   <exception-->
 	<!--	        key="exception.valueformat"-->
-	<!--    	    type="com.lamsinternational.lams.contentrepository.ValueFormatException"-->
+	<!--    	    type="org.lamsfoundation.lams.contentrepository.ValueFormatException"-->
 	<!--        	path="/error.jsp"/>-->
 	<!--	   <exception-->
 	<!--	        key="exception.repository"-->
-	<!--    	    type="com.lamsinternational.lams.contentrepository.RepositoryCheckedException"-->
+	<!--    	    type="org.lamsfoundation.lams.contentrepository.RepositoryCheckedException"-->
 	<!--        	path="/error.jsp"/>-->
 	<!--	   <exception-->
 	<!--	        key="exception.repository"-->
@@ -57,7 +57,7 @@
    <action-mappings >
       <action
          path="/loginRepository"
-         type="com.lamsinternational.lams.contentrepository.struts.action.LoginRepositoryAction"
+         type="org.lamsfoundation.lams.contentrepository.struts.action.LoginRepositoryAction"
          name="loginRepositoryForm"
          validate="true"
          scope="request"
@@ -69,7 +69,7 @@
       </action>
       <action
          path="/nodeSelection"
-         type="com.lamsinternational.lams.contentrepository.struts.action.NodeSelectionAction"
+         type="org.lamsfoundation.lams.contentrepository.struts.action.NodeSelectionAction"
          name="nodeSelectionForm"
          input="/nodeSelection.jsp"
          parameter="method">
@@ -79,7 +79,7 @@
       </action>
       <action
          path="/addFileContent"
-         type="com.lamsinternational.lams.contentrepository.struts.action.AddFileContentAction"
+         type="org.lamsfoundation.lams.contentrepository.struts.action.AddFileContentAction"
          name="addFileContentForm"
          input="/addNode.jsp"
          parameter="method">
@@ -89,6 +89,6 @@
    </action-mappings>
 
    <controller bufferSize="4096" debug="0" />
-   <message-resources parameter="com.lamsinternational.lams.contentrepository.struts.ApplicationResources"/>
+   <message-resources parameter="org.lamsfoundation.lams.contentrepository.struts.ApplicationResources"/>
 </struts-config>
 
