@@ -34,10 +34,10 @@ public class Transition implements Serializable {
 	private Date createDateTime;
 
 	/** persistent field */
-	Activity activityByToActivityId;
+	Activity toActivity;
 
 	/** persistent field */
-	Activity activityByFromActivityId;
+	Activity fromActivity;
 
 	/** persistent field */
 	LearningDesign learningDesign;
@@ -49,8 +49,8 @@ public class Transition implements Serializable {
 			String description,
 			String title,
 			Date createDateTime,
-			Activity activityByToActivityId,
-			Activity activityByFromActivityId,
+			Activity toActivity,
+			Activity fromActivity,
 			LearningDesign learningDesign,
 			Integer toUIID,
 			Integer fromUIID) {
@@ -59,8 +59,8 @@ public class Transition implements Serializable {
 		this.description = description;
 		this.title = title;
 		this.createDateTime = createDateTime;
-		this.activityByToActivityId = activityByToActivityId;
-		this.activityByFromActivityId = activityByFromActivityId;
+		this.toActivity = toActivity;
+		this.fromActivity = fromActivity;
 		this.learningDesign = learningDesign;
 		this.toUIID = toUIID;
 		this.fromUIID = fromUIID;
@@ -74,13 +74,13 @@ public class Transition implements Serializable {
 	public Transition(
 			Long transitionId,
 			Date createDateTime,
-			Activity activityByToActivityId,
-			Activity activityByFromActivityId,
+			Activity toActivity,
+			Activity fromActivity,
 			LearningDesign learningDesign) {
 		this.transitionId = transitionId;
 		this.createDateTime = createDateTime;
-		this.activityByToActivityId = activityByToActivityId;
-		this.activityByFromActivityId = activityByFromActivityId;
+		this.toActivity = toActivity;
+		this.fromActivity = fromActivity;
 		this.learningDesign = learningDesign;
 	}
 	
@@ -168,13 +168,13 @@ public class Transition implements Serializable {
 	 * @hibernate.column name="to_activity_id"
 	 *  
 	 */
-	public org.lamsfoundation.lams.learningdesign.Activity getActivityByToActivityId() {
-		return this.activityByToActivityId;
+	public org.lamsfoundation.lams.learningdesign.Activity getToActivity() {
+		return this.toActivity;
 	}
 
 	public void setActivityByToActivityId(
-			org.lamsfoundation.lams.learningdesign.Activity activityByToActivityId) {
-		this.activityByToActivityId = activityByToActivityId;
+			org.lamsfoundation.lams.learningdesign.Activity toActivity) {
+		this.toActivity = toActivity;
 	}
 
 	/**
@@ -182,13 +182,13 @@ public class Transition implements Serializable {
 	 * @hibernate.column name="from_activity_id"
 	 *  
 	 */
-	public org.lamsfoundation.lams.learningdesign.Activity getActivityByFromActivityId() {
-		return this.activityByFromActivityId;
+	public org.lamsfoundation.lams.learningdesign.Activity getFromActivity() {
+		return this.fromActivity;
 	}
 
-	public void setActivityByFromActivityId(
-			org.lamsfoundation.lams.learningdesign.Activity activityByFromActivityId) {
-		this.activityByFromActivityId = activityByFromActivityId;
+	public void setFromActivity(
+			org.lamsfoundation.lams.learningdesign.Activity fromActivity) {
+		this.fromActivity = fromActivity;
 	}
 
 	/**

@@ -89,7 +89,7 @@
     <!-- Associations -->
   
     <!-- bi-directional many-to-one association to Activity -->
-    <many-to-one name="activityByToActivityId" class="org.lamsfoundation.lams.learningdesign.Activity" unique="true">
+    <many-to-one name="toActivity" class="org.lamsfoundation.lams.learningdesign.Activity" unique="true">
         <meta attribute="field-description">@hibernate.many-to-one unique="true" 
         									@hibernate.column name="to_activity_id"         
         </meta>
@@ -97,7 +97,7 @@
     </many-to-one>
     
     <!-- bi-directional many-to-one association to Activity -->
-    <many-to-one name="activityByFromActivityId" class="org.lamsfoundation.lams.learningdesign.Activity" unique="true">
+    <many-to-one name="fromActivity" class="org.lamsfoundation.lams.learningdesign.Activity" unique="true">
         <meta attribute="field-description">@hibernate.many-to-one unique="true"
         							        @hibernate.column name="from_activity_id"         
         </meta>
