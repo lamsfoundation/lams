@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.lesson.ParallelActivityStrategy;
@@ -103,15 +102,19 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
     	newParallelActivity.setXcoord(originalActivity.getXcoord());
     	newParallelActivity.setYcoord(originalActivity.getYcoord());
     	newParallelActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	
     	newParallelActivity.setGrouping(originalActivity.getGrouping());
-    	newParallelActivity.setGroupingUIID(originalActivity.getGroupingUIID());
-    	newParallelActivity.setDefineLater(originalActivity.getDefineLater());
     	newParallelActivity.setLearningLibrary(originalActivity.getLearningLibrary());
+    	newParallelActivity.setGroupingUIID(originalActivity.getGroupingUIID());
+    	
+    	newParallelActivity.setDefineLater(originalActivity.getDefineLater());
     	newParallelActivity.setCreateDateTime(new Date());
+    	newParallelActivity.setRunOffline(originalActivity.getRunOffline());
+    	
     	newParallelActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
     	newParallelActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
     	newParallelActivity.setLibraryActivity(originalActivity.getLibraryActivity());		
-    	newParallelActivity.setActivities(new HashSet());    	
+    	
     	return newParallelActivity;
     }
 

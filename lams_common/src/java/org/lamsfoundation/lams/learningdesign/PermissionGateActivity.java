@@ -110,6 +110,7 @@ public class PermissionGateActivity extends GateActivity implements Serializable
     	newPermissionGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());    	
     	newPermissionGateActivity.setDefineLater(originalActivity.getDefineLater());
     	newPermissionGateActivity.setCreateDateTime(new Date());
+    	newPermissionGateActivity.setRunOffline(originalActivity.getRunOffline());
     	newPermissionGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
     	newPermissionGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
     	newPermissionGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	

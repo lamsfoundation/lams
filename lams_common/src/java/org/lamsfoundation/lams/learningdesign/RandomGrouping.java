@@ -84,8 +84,7 @@ public class RandomGrouping extends Grouping
     	randomGrouping.setGroupingUIID(originalGrouping.getGroupingUIID());
     	
     	randomGrouping.setNumberOfGroups(originalGrouping.getNumberOfGroups());
-    	randomGrouping.setLearnersPerGroup(originalGrouping.getLearnersPerGroup());
-    	
+    	randomGrouping.setLearnersPerGroup(originalGrouping.getLearnersPerGroup());    	
     	return randomGrouping;
     }
 

@@ -113,19 +113,14 @@ public class GroupingActivity extends SimpleActivity implements Serializable
     	groupingActivity.setTitle(originalActivity.getTitle());
     	groupingActivity.setHelpText(originalActivity.getHelpText());
     	groupingActivity.setXcoord(originalActivity.getXcoord());
-    	groupingActivity.setYcoord(originalActivity.getYcoord());    	    	
+    	groupingActivity.setYcoord(originalActivity.getYcoord());    	    
+    	groupingActivity.setActivityTypeId(originalActivity.getActivityTypeId());
     	groupingActivity.setDefineLater(originalActivity.getDefineLater());    	
-    	groupingActivity.setCreateDateTime(new Date());    	
-    	groupingActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
-    	Grouping oldGrouping = originalActivity.getGrouping();
-    	
-    	if(oldGrouping.getGroupingTypeId()==Grouping.CHOSEN_GROUPING_TYPE)
-    		groupingActivity.setGrouping(ChosenGrouping.createCopy((ChosenGrouping)oldGrouping));
-    	else
-    		groupingActivity.setGrouping(RandomGrouping.createCopy((RandomGrouping)oldGrouping));
-    	
+    	groupingActivity.setCreateDateTime(new Date()); 
+    	groupingActivity.setRunOffline(originalActivity.getRunOffline());
+    	groupingActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
     	return groupingActivity;    	
-    }    
+    }
     public String toString()
     {
         return new ToStringBuilder(this)

@@ -2,8 +2,6 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.lesson.OptionsActivityStrategy;
 
@@ -123,10 +121,10 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
     	newOptionsActivity.setDefineLater(originalActivity.getDefineLater());
     	newOptionsActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newOptionsActivity.setCreateDateTime(new Date());
+    	newOptionsActivity.setRunOffline(originalActivity.getRunOffline());
     	newOptionsActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
     	newOptionsActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
     	newOptionsActivity.setLibraryActivity(originalActivity.getLibraryActivity());
-    	newOptionsActivity.setActivities(new HashSet());    	
     	return newOptionsActivity;
     }
 
