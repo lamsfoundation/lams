@@ -5,7 +5,7 @@
 	<tr bgcolor="#282871"> 
 		<td width="50%" height="15" align="left">
 			<img height=8 width=8 src="images/spacer.gif" alt="spacer.gif"/>
-			<font color="#FFFFFF" size="1" face="Verdana, Arial, Helvetica, sans-serif"><c:out value="${pageHeader}" default="Welcome"></font>
+			<font color="#FFFFFF" size="1" face="Verdana, Arial, Helvetica, sans-serif"><c:out value="${pageHeader}" default="Welcome"/></font>
 		</td>
 		<td width="50%" height="15" align="right" > 
 			<a href="doc/LAMS_Learner_Guide_b60.pdf" target = 0>
