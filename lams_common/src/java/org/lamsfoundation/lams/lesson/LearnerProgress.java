@@ -201,6 +201,31 @@ public class LearnerProgress implements Serializable
             return ACTIVITY_NOT_ATTEMPTED;
         }
     }
+    
+    /**
+     * Sets the progress state for an activity.
+     * @param activity whose progress is to be set
+     * @param state one of <code>ACTIVITY_COMPLETED</code>, <code>ACTIVITY_ATTEMPTED</code> or <code>ACTIVITY_NOT_ATTEMPTED</code>.
+     */
+    public void setProgressState(Activity activity, byte state) {
+    	// remove activity from current set
+    	byte oldState = getProgressState(activity);
+    	if (oldState == LearnerProgress.ACTIVITY_NOT_ATTEMPTED);
+    	else if (oldState == LearnerProgress.ACTIVITY_ATTEMPTED) {
+    		this.attemptedActivities.remove(activity);
+    	}
+    	else if (oldState == LearnerProgress.ACTIVITY_COMPLETED) {
+    		this.completedActivities.remove(activity);
+    	}
+    	// add activity to new set
+    	if (state == LearnerProgress.ACTIVITY_NOT_ATTEMPTED);
+    	else if (state == LearnerProgress.ACTIVITY_ATTEMPTED) {
+    		this.attemptedActivities.add(activity);
+    	}
+    	else if (state == LearnerProgress.ACTIVITY_COMPLETED) {
+    		this.completedActivities.add(activity);
+    	}
+    }
 
     /**
      * Getter for property lessonComplete.
