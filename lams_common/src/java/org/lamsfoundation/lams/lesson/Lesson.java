@@ -428,8 +428,8 @@ public class Lesson implements Serializable {
     public LessonDTO getLessonData()
     {
         return new LessonDTO(this.lessonId,
-                             this.getLearningDesign().getTitle(),
-                             this.getLearningDesign().getDescription(),
+                             this.getLessonName(),
+                             this.getLessonDescription(),
                              this.lessonStateId);
     }
 }

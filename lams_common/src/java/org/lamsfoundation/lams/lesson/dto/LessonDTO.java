@@ -42,8 +42,8 @@ public class LessonDTO
     // attributes
     //---------------------------------------------------------------------
     private Long lessonId;
-    private String lessonTitle;
-    private String learningDesignDescription;
+    private String lessonName;
+    private String lessonDescription;
     private Integer lessonStateId;
 
     //---------------------------------------------------------------------
@@ -53,13 +53,13 @@ public class LessonDTO
      * Full constructor 
      */
     public LessonDTO(Long lessonId,
-                         String learningDesignTitle,
-                         String learningDesignDescription,
+                         String lessonName,
+                         String lessonDescription,
                          Integer lessonStateId)
     {
         this.lessonId = lessonId;
-        this.lessonTitle = learningDesignTitle;
-        this.learningDesignDescription = learningDesignDescription;
+        this.lessonName = lessonName;
+        this.lessonDescription = lessonDescription;
         this.lessonStateId = lessonStateId;
 
     }
@@ -67,12 +67,12 @@ public class LessonDTO
     // Getters
     //---------------------------------------------------------------------
     /**
-     * Returns the learning design description that current lesson is based on.
+     * Returns the lesson description.
      * @return Returns the description.
      */
-    public String getLearningDesignDescription()
+    public String getLessonDescription()
     {
-        return learningDesignDescription;
+        return lessonDescription;
     }
     /**
      * Returns the lesson id.
@@ -92,11 +92,11 @@ public class LessonDTO
         return lessonStateId;
     }
     /**
-     * Returns the learning design title that current lesson is based on.
+     * Returns the name of the lesson..
      * @return Returns the title.
      */
-    public String getLearningDesignTitle()
+    public String getLessonName()
     {
-        return lessonTitle;
+        return lessonName;
     }
 }
