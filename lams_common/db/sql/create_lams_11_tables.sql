@@ -21,7 +21,7 @@ CREATE TABLE lams_learning_library (
      , description TEXT
      , title VARCHAR(255)
      , valid_flag TINYINT(1) NOT NULL DEFAULT 1
-     , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , create_date_time DATETIME NOT NULL 
      , PRIMARY KEY (learning_library_id)
 )TYPE=InnoDB;
 
@@ -153,7 +153,7 @@ CREATE TABLE lams_organisation (
      , description VARCHAR(250)
      , parent_organisation_id BIGINT(20)
      , organisation_type_id INT(3) NOT NULL DEFAULT 0
-     , create_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , create_date DATETIME NOT NULL 
      , workspace_id BIGINT(20)
      , PRIMARY KEY (organisation_id)
      , INDEX (organisation_type_id)
@@ -186,7 +186,7 @@ CREATE TABLE lams_user (
      , fax VARCHAR(64)
      , email VARCHAR(128)
      , disabled_flag TINYINT(1) NOT NULL DEFAULT 0
-     , create_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , create_date DATETIME NOT NULL 
      , authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
      , workspace_id BIGINT(20)
      , user_organisation_id BIGINT(20) NOT NULL DEFAULT 0
@@ -259,7 +259,7 @@ CREATE TABLE lams_learning_design (
      , user_id BIGINT(20) NOT NULL
      , help_text TEXT
      , copy_type_id TINYINT(4) NOT NULL
-     , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , create_date_time DATETIME NOT NULL 
      , version VARCHAR(56)
      , parent_learning_design_id BIGINT(20)
      , workspace_folder_id BIGINT(20)
@@ -363,7 +363,7 @@ CREATE TABLE lams_learning_activity (
      , define_later_flag TINYINT(4) NOT NULL DEFAULT 0
      , learning_design_id BIGINT(20)
      , learning_library_id BIGINT(20)
-     , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , create_date_time DATETIME NOT NULL 
      , run_offline_flag TINYINT(1) NOT NULL
      , offline_instructions TEXT
      , max_number_of_options INT(5)
@@ -617,7 +617,7 @@ CREATE TABLE lams_learning_transition (
      , to_activity_id BIGINT(20) NOT NULL
      , from_activity_id BIGINT(20) NOT NULL
      , learning_design_id BIGINT(20) NOT NULL DEFAULT 0
-     , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , create_date_time DATETIME NOT NULL 
      , to_ui_id INT(11)
      , from_ui_id INT(11)
      , PRIMARY KEY (transition_id)
