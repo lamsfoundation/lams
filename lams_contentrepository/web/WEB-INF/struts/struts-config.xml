@@ -36,6 +36,10 @@
 	<!--    	    type="com.lamsinternational.lams.contentrepository.FileException"-->
 	<!--        	path="/error.jsp"/>-->
 	<!--	   <exception-->
+	<!--	        key="exception.valueformat"-->
+	<!--    	    type="com.lamsinternational.lams.contentrepository.ValueFormatException"-->
+	<!--        	path="/error.jsp"/>-->
+	<!--	   <exception-->
 	<!--	        key="exception.repository"-->
 	<!--    	    type="com.lamsinternational.lams.contentrepository.RepositoryCheckedException"-->
 	<!--        	path="/error.jsp"/>-->
