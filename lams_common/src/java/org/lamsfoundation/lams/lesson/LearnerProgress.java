@@ -39,6 +39,8 @@ public class LearnerProgress implements Serializable
     /** Set of completed activities */
     private Set completedActivities;
     
+    private Activity previousActivity;
+    
     /** The current activity */
     private Activity currentActivity;
 
@@ -113,7 +115,6 @@ public class LearnerProgress implements Serializable
      */
     public Set getAttemptedActivities()
     {
-        
         return this.attemptedActivities;
     }
     
@@ -269,4 +270,18 @@ public class LearnerProgress implements Serializable
 
     
     
+    /**
+     * @return Returns the previousActivity.
+     */
+    public Activity getPreviousActivity()
+    {
+        return previousActivity;
+    }
+    /**
+     * @param previousActivity The previousActivity to set.
+     */
+    public void setPreviousActivity(Activity previousActivity)
+    {
+        this.previousActivity = previousActivity;
+    }
 }
