@@ -32,15 +32,15 @@ public class SessionBean implements java.io.Serializable {
 	
 	public static String NAME = "lams.learning.session";
 	
-	private User leaner;
+	private User learner;
 	private Lesson lesson;
 	private LearnerProgress progress;
 	
-	public User getLeaner() {
-		return leaner;
+	public User getLearner() {
+		return learner;
 	}
-	public void setLeaner(User leaner) {
-		this.leaner = leaner;
+	public void setLearner(User leaner) {
+		this.learner = leaner;
 	}
 	public Lesson getLesson() {
 		return lesson;
