@@ -2281,7 +2281,7 @@
 <variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
 </data-type>
 </column>
-<column name="class_name" alias="" remarks="" mandatory="true" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column name="service_name" alias="" remarks="" mandatory="true" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
@@ -2382,7 +2382,7 @@
 </unique-key>
 <unique-key name="UQ_lams_tool_class_name" alias="" remarks="">
 <unique-key-description/>
-<unique-key-column name="class_name"/>
+<unique-key-column name="service_name"/>
 </unique-key>
 </unique-key-list>
 <foreign-key-list/>

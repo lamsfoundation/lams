@@ -44,7 +44,7 @@ CREATE INDEX gname ON lams_role (name ASC);
 CREATE TABLE lams_tool (
        tool_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , tool_signature VARCHAR(64) NOT NULL
-     , class_name VARCHAR(255) NOT NULL
+     , service_name VARCHAR(255) NOT NULL
      , tool_display_name VARCHAR(255) NOT NULL
      , description TEXT
      , default_tool_content_id BIGINT(20) NOT NULL
@@ -56,7 +56,7 @@ CREATE TABLE lams_tool (
      , export_portfolio_url TEXT NOT NULL
      , monitor_url TEXT NOT NULL
      , UNIQUE UQ_lams_tool_sig (tool_signature)
-     , UNIQUE UQ_lams_tool_class_name (class_name)
+     , UNIQUE UQ_lams_tool_class_name (service_name)
      , PRIMARY KEY (tool_id)
 )TYPE=InnoDB;
 
