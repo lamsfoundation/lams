@@ -22,6 +22,14 @@ package org.lamsfoundation.lams.learning.service;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 
+import org.lamsfoundation.lams.learning.progress.ProgressException;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+
+
 /**
  * 
  * @author Jacky Fang 2005-2-22
@@ -29,13 +37,31 @@ import org.lamsfoundation.lams.AbstractLamsTestCase;
  */
 public class TestLearnerService extends AbstractLamsTestCase
 {
-
+    private ILearnerService learnerService;
+    private IUserManagementService usermanageService;
+    private ILessonDAO lessonDao; 
+    //---------------------------------------------------------------------
+    // Testing Data - Constants
+    //---------------------------------------------------------------------
+    private final Integer TEST_USER_ID = new Integer(1);
+    private final Long Test_Lesson_ID = new Long(1);
+    //---------------------------------------------------------------------
+    // Testing Data - Instance Variables
+    //---------------------------------------------------------------------
+    private User testUser;
+    private Lesson testLesson;
     /*
      * @see TestCase#setUp()
      */
     protected void setUp() throws Exception
     {
         super.setUp();
+        learnerService = (ILearnerService)this.context.getBean("learnerService");
+        usermanageService = (IUserManagementService)this.context.getBean("userManagementService");
+        lessonDao = (LessonDAO)this.context.getBean("lessonDAO");
+        
+        testUser = usermanageService.getUserById(TEST_USER_ID);
+        testLesson = lessonDao.getLesson(Test_Lesson_ID);
     }
 
     /*
@@ -57,10 +83,14 @@ public class TestLearnerService extends AbstractLamsTestCase
     protected String[] getContextConfigLocation()
     {
         return new String[] { "/WEB-INF/spring/learningApplicationContext.xml",
-        					  "/WEB-INF/spring/applicationContext.xml"};
+  			  				  "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+  			  				  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",					  
+        					  "applicationContext.xml"};
     }
-    public void testJoinLesson()
+    public void testJoinLesson() throws ProgressException
     {
+        learnerService.joinLesson(testUser,testLesson);
+        assertTrue(true);
     }
 
 }

@@ -56,7 +56,7 @@ public class LearnerService implements ILearnerService
     private ProgressEngine progressEngine;
     private IToolSessionDAO toolSessionDAO;
     
-   private ActionMappings actionMappings;
+    private ActionMappings actionMappings;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
     //---------------------------------------------------------------------
@@ -122,7 +122,7 @@ public class LearnerService implements ILearnerService
     {
         LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
     	
-        if(learnerProgress!=null)
+        if(learnerProgress==null)
         {
             //create a new learner progress for new learner
             learnerProgress = new LearnerProgress(learner,lesson);
@@ -137,6 +137,69 @@ public class LearnerService implements ILearnerService
     }
     
 
+
+    /**
+     * Returns the current progress data of the User.
+     * @param learner the Learner
+     * @param lesson the Lesson to get progress from.
+     * @return LearnerProgess contains the learner's progress for the lesson.
+     * @throws LearnerServiceException in case of problems.
+     */
+    public LearnerProgress getProgress(User learner, Lesson lesson)
+    {
+        return learnerProgressDAO.getLearnerProgressByLearner(learner, lesson);
+    }
+    
+
+    public LearnerProgress chooseActivity(User learner, Lesson lesson, Activity activity) {
+    	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learner, lesson);
+    	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED);
+    	learnerProgressDAO.saveLearnerProgress(progress);
+    	return progress;
+    }
+    
+    
+    /**
+     * Calculates learner progress and returns the data required to be displayed to the learner (including URL(s)).
+     * @param completedActivityID identifies the activity just completed
+     * @param learner the Learner
+     * @param lesson the Lesson in progress.
+     * @return the bean containing the display data for the Learner
+     * @throws LearnerServiceException in case of problems.
+     */
+    public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson) throws ProgressException
+    {
+    	return progressEngine.calculateProgress(learner, lesson, completedActivity);
+    }
+    
+
+    public String completeToolActivity(long toolSessionId) {
+    	// get learner, lesson and activity using toolSessionId
+    	User learner = null;
+    	Lesson lesson = null;
+    	Activity activity = null;
+    	
+    	String url = null;
+    	try {
+	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
+	    	Activity nextActivity = nextLearnerProgress.getNextActivity();
+	    	url = actionMappings.getActivityURL(nextActivity, nextLearnerProgress);
+    	}
+    	catch (ProgressException e) {
+    		// log e
+    		throw new LearnerServiceException(e.getMessage());
+    	}
+    	
+    	return url;
+    }
+    
+    public void setActionMappings(ActionMappings actionMappings) {
+		this.actionMappings = actionMappings;
+	}
+
+    //---------------------------------------------------------------------
+    // Helper Methods
+    //---------------------------------------------------------------------
     /**
      * This method navigate through all the tool activities included inside
      * the next activity. For each tool activity, we look up the database
@@ -200,63 +263,4 @@ public class LearnerService implements ILearnerService
         toolSessionDAO.saveToolSession(toolSession);
     }
 
-    /**
-     * Returns the current progress data of the User.
-     * @param learner the Learner
-     * @param lesson the Lesson to get progress from.
-     * @return LearnerProgess contains the learner's progress for the lesson.
-     * @throws LearnerServiceException in case of problems.
-     */
-    public LearnerProgress getProgress(User learner, Lesson lesson)
-    {
-        return learnerProgressDAO.getLearnerProgressByLearner(learner, lesson);
-    }
-    
-
-    public LearnerProgress chooseActivity(User learner, Lesson lesson, Activity activity) {
-    	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learner, lesson);
-    	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED);
-    	learnerProgressDAO.saveLearnerProgress(progress);
-    	return progress;
-    }
-    
-    
-    /**
-     * Calculates learner progress and returns the data required to be displayed to the learner (including URL(s)).
-     * @param completedActivityID identifies the activity just completed
-     * @param learner the Learner
-     * @param lesson the Lesson in progress.
-     * @return the bean containing the display data for the Learner
-     * @throws LearnerServiceException in case of problems.
-     */
-    public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson) throws ProgressException
-    {
-    	return progressEngine.calculateProgress(learner, lesson, completedActivity);
-    }
-    
-
-    public String completeToolActivity(long toolSessionId) {
-    	// get learner, lesson and activity using toolSessionId
-    	User learner = null;
-    	Lesson lesson = null;
-    	Activity activity = null;
-    	
-    	String url = null;
-    	try {
-	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
-	    	Activity nextActivity = nextLearnerProgress.getNextActivity();
-	    	url = actionMappings.getActivityURL(nextActivity, nextLearnerProgress);
-    	}
-    	catch (ProgressException e) {
-    		// log e
-    		throw new LearnerServiceException(e.getMessage());
-    	}
-    	
-    	return url;
-    }
-    
-    public void setActionMappings(ActionMappings actionMappings) {
-		this.actionMappings = actionMappings;
-	}
-    
 }
