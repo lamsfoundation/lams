@@ -58,4 +58,6 @@ public interface ILamsToolService
     public void notifyToolsToCreateSession(Long toolSessionId, ToolActivity activity);
     
     public Long copyToolContent(ToolActivity toolActivity);
+    
+    public void updateToolSession(ToolSession toolSession);
 }

@@ -13,7 +13,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Inteface defines Lesson DAO Methods
- * @author chris
+ * @author chris, Jacky
  */
 public interface IToolSessionDAO
 {
@@ -32,4 +32,6 @@ public interface IToolSessionDAO
 	public ToolSession getToolSessionByLearner(final User learner,final Activity activity);
 
 	public ToolSession getToolSessionByGroup(final Group group, final Activity activity);
+
+	public void updateToolSession(ToolSession toolSession);
 }

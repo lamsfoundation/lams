@@ -85,4 +85,16 @@ public class TestToolSessionDAO extends ToolDataAccessTestCase
         toolSessionDao.saveToolSession(this.ngToolSession);
     }
 
+    public void testUpdateToolSession()
+    {
+        ToolSession toolSession = toolSessionDao.getToolSessionByGroup(testGroup,testGroupedActivity);
+        assertEquals("verify original state",ToolSession.STARTED_STATE,toolSession.getToolSessionStateId());
+        
+        toolSession.setToolSessionStateId(ToolSession.ENDED_STATE);
+        toolSessionDao.updateToolSession(toolSession);
+        ToolSession updatedToolSession = toolSessionDao.getToolSessionByGroup(testGroup,testGroupedActivity);
+        
+        assertEquals("verify new state",ToolSession.ENDED_STATE,updatedToolSession.getToolSessionStateId());
+
+    }
 }

@@ -148,6 +148,13 @@ public class LamsToolService implements ILamsToolService,ApplicationContextAware
         return newToolcontentID;
     }
     
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#updateToolSession(org.lamsfoundation.lams.tool.ToolSession)
+     */
+    public void updateToolSession(ToolSession toolSession)
+    {
+        toolSessionDAO.updateToolSession(toolSession);        
+    }
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------
@@ -173,4 +180,6 @@ public class LamsToolService implements ILamsToolService,ApplicationContextAware
     {
         return toolActivity.getTool().getServiceName().equals("surveyService");
     }
+
+
 }
