@@ -61,7 +61,7 @@ if (!($users || $logfile) || ! defined $ARGV[0])
 # the first argument is the module location relative to $CVSROOT
 my $modulepath = shift @files;
 
-my $mailcmd = "| mail -s 'CVS update: $modulepath'";
+my $mailcmd = "| Mail -s 'CVS update: $modulepath'";
 
 # Initialise some date and time arrays
 my @mos = ("January","February","March","April","May","June","July",
