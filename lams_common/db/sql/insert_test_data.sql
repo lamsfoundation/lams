@@ -133,11 +133,11 @@ insert into lams_tool_content (tool_content_id,tool_id) values (19,8);
 -- Populates the lams_learning_activity table with default activity templates that would be avaialbe to the
 -- author in the left panel and a default dummy learning_design defination 
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (1,1,'Notebook Template','Notebook',10,20,null,
 1,null,null,0,
@@ -145,11 +145,11 @@ null,1,'20050101','Offline  Instructions ',
 null,null,1,1,
 null,null,null,'NotebookImage');
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (2,2,'NoticeBoard Template','NoticeBoard',10,20,null,
 1,null,null,0,
@@ -157,11 +157,11 @@ null,2,'20050101','Offline  Instructions ',
 null,null,2,2,
 null,null,null,'NoticeBoardImage');
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (3,3,'Multiple Choice Template','Multiple Choice',10,20,null,
 1,null,null,0,
@@ -169,11 +169,11 @@ null,3,'20050101','Offline  Instructions ',
 null,null,3,3,
 null,null,null,'MultipleChoiceImage');
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (4,4,'Question and Answer Template','Question and Answer',10,20,null,
 1,null,null,0,
@@ -181,11 +181,11 @@ null,4,'20050101','Offline  Instructions ',
 null,null,4,4,
 null,null,null,'QAImage');
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (5,5,'MessageBoard Template','MessageBoard',10,20,null,
 1,null,null,0,
@@ -193,11 +193,11 @@ null,5,'20050101','Offline  Instructions ',
 null,null,5,5,
 null,null,null,'MBImage');
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (6,6,'Survey Template','Survey',10,20,null,
 1,null,null,0,
@@ -205,11 +205,11 @@ null,6,'20050101','Offline  Instructions ',
 null,null,6,6,
 null,null,null,'SurveyImage');
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (7,7,'Chat Template','Chat',10,20,null,
 1,null,null,0,
@@ -217,11 +217,11 @@ null,7,'20050101','Offline  Instructions ',
 null,null,7,7,
 null,null,null,'ChatImage');
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (8,8,'Shared Resources Template','Shared Resources',10,20,null,
 1,null,null,0,
@@ -229,11 +229,11 @@ null,8,'20050101','Offline  Instructions ',
 null,null,8,8,
 null,null,null,'SRImage');
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (9,9,'Voting Template','Voting',10,20,null,
 1,null,null,0,
@@ -241,11 +241,11 @@ null,9,'20050101','Offline  Instructions ',
 null,null,9,9,
 null,null,null,'VotingImage');
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (10,10,'Submit Files Template','Submit Files',10,20,null,
 1,null,null,0,
@@ -253,11 +253,11 @@ null,10,'20050101','Offline  Instructions ',
 null,null,10,10,
 null,null,null,'SubmitFilesImage');
 
-insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (11,11,'Instant Messaging Template','Instant Messaging',10,20,null,
 1,null,null,0,
@@ -266,11 +266,11 @@ null,null,11,11,
 null,null,null,'IMImage');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (12,12,'Optional Activity Description','Optional Activity Title',10,20,null,
 8,null,1,0,
@@ -279,11 +279,11 @@ values
 null,'20050101','20050101','image');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (13,13,'Parallel Activity Description','Parallel Activity Title',10,20,null,
 7,null,1,0,
@@ -292,11 +292,11 @@ null,null,null,null,
 null,null,null,'image');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (14,14,'Sequence Activity Description','Sequence Activity Title',10,20,null,
 9,null,1,0,
@@ -305,11 +305,11 @@ null,null,null,null,
 null,null,null,'image');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (15,1,'Notebook Activity Description','Notebook Activity Title',10,20,null,
 1,null,1,0,
@@ -318,11 +318,11 @@ null,null,1,12,
 null,null,null,'image');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (16,2,'NoticeBoard Activity','NoticeBoard Activity',10,20,12,
 1,null,0,0,
@@ -331,11 +331,11 @@ null,null,2,13,
 null,null,null,'image');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (17,3,'Multiple Choice Activity ','Multiple Choice',10,20,12,
 1,null,1,0,
@@ -344,11 +344,11 @@ null,null,3,14,
 null,null,null,'image');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (18,4,'Question and Answer Activity','Question and Answer',10,20,13,
 1,null,0,0,
@@ -357,11 +357,11 @@ null,null,4,15,
 null,null,null,'image');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (19,5,'Message Board Activity','Message Board',10,20,13,
 1,null,1,0,
@@ -370,11 +370,11 @@ null,null,5,16,
 null,null,null,'image');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (20,6,'Survey Activity','Survey Title',10,20,14,
 1,null,0,0,
@@ -383,11 +383,11 @@ null,null,6,17,
 null,null,null,'image');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (21,7,'Chat Activity','Chat Title',10,20,14,
 1,null,1,0,
@@ -396,11 +396,11 @@ null,null,7,18,
 null,null,null,'image');
 
 insert into lams_learning_activity
-(activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
+(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
 learning_design_id,learning_library_id,create_date_time,offline_instructions,
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (22,8,'Shared Resources Activity','Shared Resources',10,20,14,
 1,null,2,0,
@@ -410,37 +410,37 @@ null,null,null,'image');
 
 -- Populates the lams_learning_transition table with various transitions for the dummy design 
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(1,1,'NoteBook to Optional Activity','Notebook to Optional Activity',12,null,1,'20050207');
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(2,2,'Optional to Child Activity','To NoticeBoard',16,12,1,'20050207');
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(3,3,'To Multiple Choice','To Multiple Choice',17,16,1,'20050207');
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(4,4,'To Parallel Activity','To Parallel Activity',13,17,1,'20050207');
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(5,5,'To Question and Answer','To Question and Answer',18,13,1,'20050207');
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(6,6,'To Messageboard','To Messageboard',19,18,1,'20050207');
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(7,7,'To Sequence Activity','To Sequence Activity',14,19,1,'20050207');
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(8,8,'To Survey','To Survey',20,14,1,'20050207');
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(9,9,'To Chat','To Chat',21,20,1,'20050207');
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(10,10,'To Shared Resourcese','To Shared Resourcese',22,21,1,'20050207');
 
-insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(11,11,'To End','To End',null,22,1,'20050207');
 
 insert into lams_learning_design(id,description,title,first_activity_id,max_id,valid_design_flag,
