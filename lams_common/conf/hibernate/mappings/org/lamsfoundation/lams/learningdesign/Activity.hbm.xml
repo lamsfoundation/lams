@@ -140,7 +140,7 @@
                  </many-to-one>                 
 			</subclass>
 			
-			<subclass name="org.lamsfoundation.lams.learningdesign.GroupingActivity" >
+			<subclass name="org.lamsfoundation.lams.learningdesign.GroupingActivity" discriminator-value="2">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>					
 				<property name="groupingUIID" type="java.lang.Integer" column="grouping_ui_id" length="11">
 				        <meta attribute="field-description">@hibernate.property column="grouping_ui_id" length="11"</meta>    
