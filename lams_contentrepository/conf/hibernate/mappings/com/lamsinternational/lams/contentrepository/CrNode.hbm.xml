@@ -44,7 +44,6 @@
         name="path"
         type="java.lang.String"
         column="path"
-        not-null="true"
         length="255"
     >
         <meta attribute="use-in-tostring">true</meta>
@@ -53,7 +52,36 @@
            @hibernate.property
             column="path"
             length="255"
+        </meta>    
+    </property>
+    <property
+        name="type"
+        type="java.lang.String"
+        column="type"
+        not-null="true"
+        length="255"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="type"
+            length="255"
             not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="createdDateTime"
+        type="java.sql.Timestamp"
+        column="created_date_time"
+        length="14"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="created_date_time"
+            length="14"
         </meta>    
     </property>
 
@@ -73,13 +101,13 @@
             cascade="none"
 
            @hibernate.collection-key
-            column="parent_node_id"
+            column="node_id"
 
            @hibernate.collection-one-to-many
             class="com.lamsinternational.lams.contentrepository.CrNodeVersion"
         </meta>
         <key>
-            <column name="parent_node_id" />
+            <column name="node_id" />
         </key>
         <one-to-many 
             class="com.lamsinternational.lams.contentrepository.CrNodeVersion"

@@ -20,6 +20,7 @@
         table="lams_cr_node_version_property"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
+    <meta attribute="implements" inherit="false">IValue</meta>
 
     <id
         name="id"
@@ -73,9 +74,9 @@
         </meta>    
     </property>
     <property
-        name="valueType"
-        type="byte"
-        column="value_type"
+        name="type"
+        type="int"
+        column="type"
         not-null="true"
         length="3"
     >
@@ -83,7 +84,7 @@
         <meta attribute="use-in-equals">true</meta>
         <meta attribute="field-description">
            @hibernate.property
-            column="value_type"
+            column="type"
             length="3"
             not-null="true"
         </meta>    

@@ -41,22 +41,6 @@
     </id>
 
     <property
-        name="nodeId"
-        type="long"
-        column="node_id"
-        not-null="true"
-        length="20"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
-            column="node_id"
-            length="20"
-            not-null="true"
-        </meta>    
-    </property>
-    <property
         name="versionId"
         type="long"
         column="version_id"
@@ -86,26 +70,12 @@
             length="14"
         </meta>    
     </property>
-    <property
-        name="parentVersionId"
-        type="java.lang.Long"
-        column="parent_version_id"
-        length="20"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
-            column="parent_version_id"
-            length="20"
-        </meta>    
-    </property>
 
     <!-- Associations -->
   
     <!-- bi-directional many-to-one association to CrNode -->
     <many-to-one
-        name="crNode"
+        name="node"
         class="com.lamsinternational.lams.contentrepository.CrNode"
         not-null="true"
     >
@@ -113,9 +83,24 @@
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
-           @hibernate.column name="parent_node_id"         
+           @hibernate.column name="node_id"         
         </meta>
-        <column name="parent_node_id" />
+        <column name="node_id" />
+    </many-to-one>
+
+    <!-- bi-directional many-to-one association to CrNodeVersion -->
+    <many-to-one
+        name="parentNodeVersion"
+        class="com.lamsinternational.lams.contentrepository.CrNodeVersion"
+        not-null="true"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="parent_nv_id"         
+        </meta>
+        <column name="parent_nv_id" />
     </many-to-one>
     <!-- bi-directional one-to-many association to CrNodeVersionProperty -->
     <set

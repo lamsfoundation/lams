@@ -39,7 +39,7 @@ Ant build file.
 		<echo message="lamscr-jar  --> Make jar archive for deployment"/>
 		<echo message="lamscr-war  --> Make war archive for deployment"/>
 <!--		<echo message="copyfiles --> <!--Copy the third party jar files and cofiguration files for deployment"/> -->
-		<echo message="middlegen-cr --> Run middlegen for content repository tables"/>
+<!--		<echo message="middlegen-cr --> <!-- Run middlegen for content repository tables"/> -->
 		<echo message="hbm2java-cr--> Run hbm2java for content repository mapping files"/>
 		<echo message=""/>
 	</target>
@@ -81,6 +81,8 @@ Ant build file.
 
 	<!-- =================================================================== -->
 	<!-- Run Middlegen For Content Repository                                -->
+	<!-- Don't run this target for any more as changes have been made.       -->
+	<!-- running middlegen would remove the changes.						 -->
 	<!-- =================================================================== -->
 	<target 
       name="middlegen-cr" 
@@ -114,17 +116,18 @@ Ant build file.
             javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
             />
 
-			<table name="lams_cr_node"/>
-			<table name="lams_cr_node_version"/>
-			<table name="lams_cr_node_version_property"/>
-			<table name="lams_cr_credential"/>
-			<table name="lams_cr_workspace"/>
-			<table name="lams_cr_workspace_credential"/>
+			<!-- <table name="lams_cr_node"/> -->
+			<!-- <table name="lams_cr_node_version"/> -->
+			<!-- <table name="lams_cr_node_version_property"/> -->
+			<!-- <table name="lams_cr_credential"/> -->
+			<!-- <table name="lams_cr_workspace"/> -->
+			<!-- <table name="lams_cr_workspace_credential"/> -->
 
 		</middlegen-cr>
 
 	</target>
-
+	
+	
 	<!-- =================================================================== -->
 	<!-- Run hbm2java for Content Repository                                 -->
 	<!-- =================================================================== -->
