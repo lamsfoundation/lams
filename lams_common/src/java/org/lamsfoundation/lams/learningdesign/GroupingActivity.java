@@ -29,8 +29,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
             org.lamsfoundation.lams.learningdesign.Grouping grouping, 
             Integer activityTypeId,  
-            java.util.Set transitionsByToActivityId, 
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             Grouping createGrouping)
     {
         super(activityId, 
@@ -48,8 +48,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable
                 learningDesign, 
                 grouping, 
                 activityTypeId, 
-                transitionsByToActivityId, 
-                transitionsByFromActivityId);
+                transitionTo,
+				transitionFrom);
         this.createGrouping = createGrouping;
     }
     
@@ -67,8 +67,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
             org.lamsfoundation.lams.learningdesign.Grouping grouping,
             Integer activityTypeId,
-            java.util.Set transitionsByToActivityId,
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             Grouping createGrouping)
     {
         super(activityId,
@@ -79,8 +79,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable
                 learningDesign,
                 grouping,
                 activityTypeId,
-                transitionsByToActivityId,
-                transitionsByFromActivityId);
+                transitionTo,
+				transitionFrom);
         this.createGrouping = createGrouping;
     }
     

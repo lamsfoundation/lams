@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -81,11 +80,11 @@ public abstract class Activity implements Serializable {
 	private Integer activityTypeId;
 
 	/** persistent field */
-	private Set transitionsByToActivityId;
-
-	/** persistent field */
-	private Set transitionsByFromActivityId;
+	private Transition transitionTo; 
 	
+	/** persistent field */
+	private Transition transitionFrom;
+		
 	/** full constructor */
 	public Activity(
 			Long activityId,
@@ -102,8 +101,9 @@ public abstract class Activity implements Serializable {
 			org.lamsfoundation.lams.learningdesign.Activity parentActivity,
 			org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
 			org.lamsfoundation.lams.learningdesign.Grouping grouping,
-			Integer activityTypeId, Set transitionsByToActivityId,
-			Set transitionsByFromActivityId) {
+			Integer activityTypeId, 
+			Transition transitionTo,
+			Transition transitionFrom) {
 		this.activityId = activityId;
 		this.id = id;
 		this.description = description;
@@ -119,8 +119,8 @@ public abstract class Activity implements Serializable {
 		this.learningDesign = learningDesign;
 		this.grouping = grouping;
 		this.activityTypeId = activityTypeId;
-		this.transitionsByToActivityId = transitionsByToActivityId;
-		this.transitionsByFromActivityId = transitionsByFromActivityId;
+		this.transitionTo = transitionTo;
+		this.transitionFrom = transitionFrom;
 	}
 
 	/** default constructor */
@@ -137,8 +137,9 @@ public abstract class Activity implements Serializable {
 			org.lamsfoundation.lams.learningdesign.Activity parentActivity,
 			org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
 			org.lamsfoundation.lams.learningdesign.Grouping grouping,
-			Integer activityTypeId, Set transitionsByToActivityId,
-			Set transitionsByFromActivityId) {
+			Integer activityTypeId,
+			Transition transitionTo,
+			Transition transitionFrom) {
 		this.activityId = activityId;
 		this.defineLater = defineLater;
 		this.createDateTime = createDateTime;
@@ -147,8 +148,8 @@ public abstract class Activity implements Serializable {
 		this.learningDesign = learningDesign;
 		this.grouping = grouping;
 		this.activityTypeId = activityTypeId;
-		this.transitionsByToActivityId = transitionsByToActivityId;
-		this.transitionsByFromActivityId = transitionsByFromActivityId;
+		this.transitionTo = transitionTo;
+		this.transitionFrom = transitionFrom;
 	}
 
 	/**
@@ -329,35 +330,6 @@ public abstract class Activity implements Serializable {
 	public void setActivityTypeId(Integer activityTypeId) {
 		this.activityTypeId = activityTypeId;
 	}
-
-	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="none"
-	 * @hibernate.collection-key column="to_activity_id"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Transition"
-	 *  
-	 */
-	public Set getTransitionsByToActivityId() {
-		return this.transitionsByToActivityId;
-	}
-
-	public void setTransitionsByToActivityId(Set transitionsByToActivityId) {
-		this.transitionsByToActivityId = transitionsByToActivityId;
-	}
-
-	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="none"
-	 * @hibernate.collection-key column="from_activity_id"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Transition"
-	 *  
-	 */
-	public Set getTransitionsByFromActivityId() {
-		return this.transitionsByFromActivityId;
-	}
-
-	public void setTransitionsByFromActivityId(Set transitionsByFromActivityId) {
-		this.transitionsByFromActivityId = transitionsByFromActivityId;
-	}
-
 	public String toString() {
 		return new ToStringBuilder(this).append("activityId", getActivityId())
 				.toString();
@@ -392,4 +364,28 @@ public abstract class Activity implements Serializable {
 	public void setLibraryActivityUiImage(String libraryActivityUiImage) {
 		this.libraryActivityUiImage = libraryActivityUiImage;
 	}	
+	/**
+	 * @return Returns the transitionFrom.
+	 */
+	public Transition getTransitionFrom() {
+		return transitionFrom;
+	}
+	/**
+	 * @param transitionFrom The transitionFrom to set.
+	 */
+	public void setTransitionFrom(Transition transitionFrom) {
+		this.transitionFrom = transitionFrom;
+	}
+	/**
+	 * @return Returns the transitionTo.
+	 */
+	public Transition getTransitionTo() {
+		return transitionTo;
+	}
+	/**
+	 * @param transitionTo The transitionTo to set.
+	 */
+	public void setTransitionTo(Transition transitionTo) {
+		this.transitionTo = transitionTo;
+	}
 }

@@ -29,13 +29,14 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 			Activity parentActivity,
 			LearningDesign learningDesign,
 			Grouping grouping,
-			Integer activityTypeId, Set transitionsByToActivityId,
-			Set transitionsByFromActivityId, Set activities) {
+			Integer activityTypeId, 
+			Transition transitionTo,
+			Transition transitionFrom,
+			Set activities) {
 		super(activityId, id, description, title, xcoord, ycoord, orderId,
 				defineLater, createDateTime, offlineInstructions,
 				learningLibrary, parentActivity, learningDesign, grouping,
-				activityTypeId, transitionsByToActivityId,
-				transitionsByFromActivityId);
+				activityTypeId, transitionTo,transitionFrom);
 		this.activities = activities;
 	}
 
@@ -53,11 +54,12 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 			Activity parentActivity,
 			LearningDesign learningDesign,
 			Grouping grouping,
-			Integer activityTypeId, Set transitionsByToActivityId,
-			Set transitionsByFromActivityId, Set activities) {
+			Integer activityTypeId, 
+			Transition transitionTo,
+			Transition transitionFrom,Set activities) {
 		super(activityId, defineLater, createDateTime, learningLibrary,
 				parentActivity, learningDesign, grouping, activityTypeId,
-				transitionsByToActivityId, transitionsByFromActivityId);
+				transitionTo,transitionFrom);
 		this.activities = activities;
 	}
 

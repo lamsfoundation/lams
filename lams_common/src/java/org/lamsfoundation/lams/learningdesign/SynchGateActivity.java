@@ -25,8 +25,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
             org.lamsfoundation.lams.learningdesign.Grouping grouping, 
             Integer activityTypeId, 
-            java.util.Set transitionsByToActivityId, 
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             Integer gateActivityLevelId) {
         super(activityId, 
                 id, 
@@ -43,8 +43,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
                 learningDesign, 
                 grouping, 
                 activityTypeId,  
-                transitionsByToActivityId, 
-                transitionsByFromActivityId,
+                transitionTo,
+				transitionFrom,
                 gateActivityLevelId);
     }
 
@@ -61,8 +61,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
             org.lamsfoundation.lams.learningdesign.Grouping grouping, 
             Integer activityTypeId, 
-            java.util.Set transitionsByToActivityId, 
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             Integer gateActivityLevelId) {
       super(activityId, 
               defineLater, 
@@ -72,8 +72,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
               learningDesign, 
               grouping, 
               activityTypeId,  
-              transitionsByToActivityId, 
-              transitionsByFromActivityId,
+              transitionTo,
+			  transitionFrom,
               gateActivityLevelId);
     }
 

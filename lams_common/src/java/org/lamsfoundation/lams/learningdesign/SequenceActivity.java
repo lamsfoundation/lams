@@ -25,8 +25,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
             org.lamsfoundation.lams.learningdesign.Grouping grouping, 
             Integer activityTypeId,  
-            java.util.Set transitionsByToActivityId, 
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             java.util.Set activities) {
         super(activityId, 
                 id, 
@@ -43,8 +43,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
                 learningDesign, 
                 grouping, 
                 activityTypeId,  
-                transitionsByToActivityId,
-                transitionsByFromActivityId, 
+                transitionTo,
+				transitionFrom,
                 activities);
     }
 
@@ -62,8 +62,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
             org.lamsfoundation.lams.learningdesign.Grouping grouping, 
             Integer activityTypeId,  
-            java.util.Set transitionsByToActivityId, 
-            java.util.Set transitionsByFromActivityId, 
+            Transition transitionTo,
+            Transition transitionFrom,
             java.util.Set activities) {
       super(activityId, 
               defineLater, 
@@ -73,8 +73,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
               learningDesign, 
               grouping, 
               activityTypeId, 
-              transitionsByToActivityId, 
-              transitionsByFromActivityId, 
+              transitionTo,
+			  transitionFrom,
               activities);
     }
 

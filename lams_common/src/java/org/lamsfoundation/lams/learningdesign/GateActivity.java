@@ -35,8 +35,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
             org.lamsfoundation.lams.learningdesign.Grouping grouping,
             Integer activityTypeId,
-            java.util.Set transitionsByToActivityId,
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             Integer gateActivityLevelId)
     {
         super(activityId,
@@ -54,8 +54,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
                 learningDesign,
                 grouping,
                 activityTypeId,
-                transitionsByToActivityId,
-                transitionsByFromActivityId);
+                transitionTo,
+				transitionFrom);
         this.gateActivityLevelId = gateActivityLevelId;
     }
     
@@ -73,8 +73,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
             org.lamsfoundation.lams.learningdesign.Grouping grouping,
             Integer activityTypeId,
-            java.util.Set transitionsByToActivityId,
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             Integer gateActivityLevelId)
     {
         super(activityId,
@@ -85,8 +85,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
                 learningDesign,
                 grouping,
                 activityTypeId,
-                transitionsByToActivityId,
-                transitionsByFromActivityId);
+                transitionTo,
+				transitionFrom);
         this.gateActivityLevelId = gateActivityLevelId;
     }
     

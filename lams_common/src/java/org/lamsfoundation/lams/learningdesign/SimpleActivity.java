@@ -1,9 +1,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
-import org.lamsfoundation.lams.tool.Tool;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -28,9 +26,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
             org.lamsfoundation.lams.learningdesign.Activity parentActivity, 
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
             org.lamsfoundation.lams.learningdesign.Grouping grouping, 
-            Integer activityTypeId, Set transitionsByToActivityId, 
-            Set transitionsByFromActivityId)
-    {
+            Integer activityTypeId, Transition transitionTo,
+			Transition transitionFrom){
         super(activityId, 
                 id, 
                 description, 
@@ -46,8 +43,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
                 learningDesign, 
                 grouping, 
                 activityTypeId, 
-                transitionsByToActivityId, 
-                transitionsByFromActivityId);
+                transitionTo,
+				transitionFrom);
     }
     
     /** default constructor */
@@ -64,9 +61,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
             org.lamsfoundation.lams.learningdesign.Grouping grouping, 
             Integer activityTypeId, 
-            Set transitionsByToActivityId, 
-            Set transitionsByFromActivityId)
-    {
+            Transition transitionTo,
+			Transition transitionFrom){
         super(activityId, 
                 defineLater, 
                 createDateTime, 
@@ -75,8 +71,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
                 learningDesign, 
                 grouping, 
                 activityTypeId, 
-                transitionsByToActivityId, 
-                transitionsByFromActivityId);
+                transitionTo,
+				transitionFrom);
     }
     
     public String toString()

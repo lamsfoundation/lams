@@ -42,8 +42,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
             org.lamsfoundation.lams.learningdesign.Grouping grouping,
             Integer activityTypeId,
-            java.util.Set transitionsByToActivityId,
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             Tool tool,
             Long toolContentId)
     {
@@ -62,8 +62,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
                 learningDesign,
                 grouping,
                 activityTypeId,
-                transitionsByToActivityId,
-                transitionsByFromActivityId);
+                transitionTo,
+				transitionFrom);
         this.tool = tool;
         this.toolContentId = toolContentId;
     }
@@ -82,8 +82,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
             org.lamsfoundation.lams.learningdesign.Grouping grouping,
             Integer activityTypeId,
-            java.util.Set transitionsByToActivityId,
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             Tool tool,
             Long toolContentId)
     {
@@ -95,8 +95,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
                 learningDesign,
                 grouping,
                 activityTypeId,
-                transitionsByToActivityId,
-                transitionsByFromActivityId);
+                transitionTo,
+				transitionFrom);
         this.tool = tool;
         this.toolContentId = toolContentId;
     }

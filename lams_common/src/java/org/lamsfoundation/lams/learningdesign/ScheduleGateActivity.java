@@ -32,8 +32,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
             org.lamsfoundation.lams.learningdesign.Grouping grouping,
             Integer activityTypeId,
-            java.util.Set transitionsByToActivityId,
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             Integer gateActivityLevelId,
             Date gateStartDateTime, 
             Date gateEndDateTime) {
@@ -52,8 +52,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
                 learningDesign,
                 grouping,
                 activityTypeId,
-                transitionsByToActivityId,
-                transitionsByFromActivityId,
+                transitionTo,
+				transitionFrom,
                 gateActivityLevelId);
         this.gateStartDateTime = gateStartDateTime;
         this.gateEndDateTime = gateEndDateTime;
@@ -72,8 +72,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
             org.lamsfoundation.lams.learningdesign.Grouping grouping,
             Integer activityTypeId,
-            java.util.Set transitionsByToActivityId,
-            java.util.Set transitionsByFromActivityId,
+            Transition transitionTo,
+            Transition transitionFrom,
             Integer gateActivityLevelId,
             Date gateStartDateTime, 
             Date gateEndDateTime) {
@@ -85,8 +85,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
                 learningDesign,
                 grouping,
                 activityTypeId,
-                transitionsByToActivityId,
-                transitionsByFromActivityId,
+                transitionTo,
+				transitionFrom,
                 gateActivityLevelId);
       this.gateStartDateTime = gateStartDateTime;
       this.gateEndDateTime = gateEndDateTime;
