@@ -137,7 +137,8 @@ $Revision$
        </authentication>
     </application-policy>
 
-	<application-policy name = "lams">
+
+	<application-policy name = "lams-DB">
        <authentication>
           <login-module code = "org.jboss.security.auth.spi.DatabaseServerLoginModule" flag = "required">
              <module-option name="dsJndiName">java:/MySqlDS</module-option>
@@ -146,6 +147,15 @@ $Revision$
           </login-module>
        </authentication>
     </application-policy>
+
+	<application-policy name = "lams">
+       <authentication>
+          <login-module code = "com.lamsinternational.lams.security.UniversalLoginModule" flag = "required">
+             <module-option name="authenticationPropertyFile">D:/authentication.xml</module-option>
+          </login-module>
+       </authentication>
+    </application-policy>
+
 
 </policy>
 
