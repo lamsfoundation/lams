@@ -29,8 +29,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 
 /** 
- * MyEclipse Struts
- * Creation date: 01-12-2005
+ * @author daveg
  * 
  * XDoclet definition:
  * @struts:form name="activityForm"
