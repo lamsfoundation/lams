@@ -11,7 +11,7 @@
     <jndi-name>MySqlDS</jndi-name>
     <connection-url>jdbc:mysql://localhost:3306/lams</connection-url>
     <driver-class>com.mysql.jdbc.Driver</driver-class>
-    <user-name>root</user-name>
-    <password></password>
+    <user-name>lams</user-name>
+    <password>lamsdemo</password>
   </local-tx-datasource>
 </datasources>
