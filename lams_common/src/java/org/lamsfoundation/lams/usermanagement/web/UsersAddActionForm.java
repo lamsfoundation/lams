@@ -144,6 +144,18 @@ public class UsersAddActionForm extends ActionForm {
 	}
 
 	/**
+	 * @return Returns the allRoleNames.
+	 */
+	public String[] getAllRoleNames() {
+		return allRoleNames;
+	}
+	/**
+	 * @param allRoleNames The allRoleNames to set.
+	 */
+	public void setAllRoleNames(String[] allRoleNames) {
+		this.allRoleNames = allRoleNames;
+	}
+	/**
 	 * @return Returns the potentialRoleNames.
 	 */
 	public String[] getPotentialRoleNames() {

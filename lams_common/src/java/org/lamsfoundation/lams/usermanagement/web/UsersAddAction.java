@@ -171,14 +171,13 @@ public class UsersAddAction extends Action {
 			if ( users != null )
 			{
 				//remove users who already exists in current organisation
-				Iterator iter = users.iterator();
-				while(iter.hasNext()){
-					User user = (User)iter.next();
+				for(int i=0; i<users.size(); i++ ){
+					User user = (User)users.get(i);
 					Iterator iter2 = existingUsers.iterator();
 					while(iter2.hasNext()){
 						User existingUser = (User)iter2.next();
 						if(user.getUserId().equals(existingUser.getUserId())){
-							users.remove(user);
+							users.remove(i);
 						}
 					}
 				}

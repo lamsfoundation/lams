@@ -45,7 +45,7 @@
 		<tr> 
 			<td valign="top">
 				<H2>Add Existing Users To <bean:write name="UsersAddActionForm" property="name"/></H2>
-				<html:hidden name="UsersAddActionForm" property="organisationId"/>
+				<html:hidden name="UsersAddActionForm" property="orgId"/>
 				<html:errors/>							
 				<p class="body"><strong>Select an organisation from which to pick new users: </strong></p>
 				<select name="selectedOrgId" onchange="showName(this)">
@@ -71,7 +71,7 @@
 					<p class="body"><strong>Select Users and Assign Roles </strong></p>
 					<table>
 						<c:set var="me" value="${remoteUser}"/>
-						<logic:iterate id="user" indexId="index" name="UsersAddActionForm" property="potentialUsers" type="User" >
+						<logic:iterate id="user" name="UsersAddActionForm" property="potentialUsers" type="User" >
 							<logic:present name="user">
 								<TR>
 									<TD class="body" valign="top">
@@ -82,9 +82,9 @@
 									<TD class="body" >							  
 										<c:if test="${not ( user.login eq me)}">
 											<c:forEach var="item" items="${UsersAddActionForm.allRoleNames}">
-												<!--<input type="checkbox" name="potentialRoleNames" value="<c:out value="${user.login}">_<c:out value="${item}"/>">-->
+												<input type="checkbox" name="potentialRoleNames" value="<c:out value="${user.login}"/>_<c:out value="${item}"/>">						
 												<c:out value="${item}"/>
-											</c:forEach>	
+			  								</c:forEach>	
 										</c:if>
 									</TD>
 								</TR>
