@@ -281,15 +281,15 @@ CREATE TABLE lams_learning_activity (
      , grouping_id BIGINT(20)
      , order_id INT(11)
      , define_later_flag TINYINT(4) NOT NULL DEFAULT 0
-     , learning_design_id BIGINT(20) DEFAULT 0
-     , learning_library_id BIGINT(20) DEFAULT 0
+     , learning_design_id BIGINT(20)
+     , learning_library_id BIGINT(20)
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
      , offline_instructions TEXT
      , max_number_of_options INT(5)
      , min_number_of_options INT(5)
      , tool_id BIGINT(20)
      , tool_content_id BIGINT(20)
-     , gate_activity_level_id INT(11) DEFAULT 0
+     , gate_activity_level_id INT(11)
      , gate_start_date_time DATETIME
      , gate_end_date_time DATETIME
      , library_activity_ui_image VARCHAR(255)
