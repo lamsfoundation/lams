@@ -70,4 +70,23 @@ public class RandomGrouping extends Grouping
     {
         return true;
     }
+    /**
+     * This method creates a deep copy of the Grouping passed
+     * as an argument.
+     * 
+     * @param originalGrouping The Grouping object to be deep copied
+     * @return RandomGrouping The deep copied Grouping object
+     */
+    public static RandomGrouping createCopy(RandomGrouping originalGrouping){
+    	RandomGrouping randomGrouping = new RandomGrouping();
+    	
+    	randomGrouping.setMaxNumberOfGroups(originalGrouping.getMaxNumberOfGroups());
+    	randomGrouping.setGroupingUIID(originalGrouping.getGroupingUIID());
+    	
+    	randomGrouping.setNumberOfGroups(originalGrouping.getNumberOfGroups());
+    	randomGrouping.setLearnersPerGroup(originalGrouping.getLearnersPerGroup());
+    	
+    	return randomGrouping;
+    }
+
 }

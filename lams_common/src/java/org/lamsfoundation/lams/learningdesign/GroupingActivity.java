@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -97,7 +98,34 @@ public class GroupingActivity extends SimpleActivity implements Serializable
         this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
     }
-    
+    /**
+     * This function creates a deep copy of the GroupingActivity passed
+     * as an argument. However each time a GroupingActivity is deep copied
+     * it would result in creation of new Groups as well.
+     * @param originalActivity
+     * @return
+     */
+    public static GroupingActivity createCopy(GroupingActivity originalActivity){
+    	GroupingActivity groupingActivity = new GroupingActivity();
+    	
+    	groupingActivity.setActivityUIID(originalActivity.getActivityUIID());
+    	groupingActivity.setDescription(originalActivity.getDescription());
+    	groupingActivity.setTitle(originalActivity.getTitle());
+    	groupingActivity.setHelpText(originalActivity.getHelpText());
+    	groupingActivity.setXcoord(originalActivity.getXcoord());
+    	groupingActivity.setYcoord(originalActivity.getYcoord());    	    	
+    	groupingActivity.setDefineLater(originalActivity.getDefineLater());    	
+    	groupingActivity.setCreateDateTime(new Date());    	
+    	groupingActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
+    	Grouping oldGrouping = originalActivity.getGrouping();
+    	
+    	if(oldGrouping.getGroupingTypeId()==Grouping.CHOSEN_GROUPING_TYPE)
+    		groupingActivity.setGrouping(ChosenGrouping.createCopy((ChosenGrouping)oldGrouping));
+    	else
+    		groupingActivity.setGrouping(RandomGrouping.createCopy((RandomGrouping)oldGrouping));
+    	
+    	return groupingActivity;    	
+    }    
     public String toString()
     {
         return new ToStringBuilder(this)

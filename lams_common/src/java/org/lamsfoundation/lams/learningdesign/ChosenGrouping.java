@@ -24,6 +24,20 @@ public class ChosenGrouping extends Grouping
     {
         super(groupingId, groups, activities);
     }
+    
+    /**
+     * This method creates a deep copy of the Grouping passed
+     * as an argument.
+     * 
+     * @param originalGrouping The Grouping object to be deep copied
+     * @return ChosenGrouping The deep copied Grouping object
+     */
+    public static ChosenGrouping createCopy(ChosenGrouping originalGrouping){
+    	ChosenGrouping chosenGrouping = new ChosenGrouping();
+    	chosenGrouping.setMaxNumberOfGroups(originalGrouping.getMaxNumberOfGroups());
+    	chosenGrouping.setGroupingUIID(originalGrouping.getGroupingUIID());
+    	return chosenGrouping;
+    }
 
     /**
      * This type of grouping doesn't have groups other than learner groups.
