@@ -6,22 +6,26 @@
 package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
-import org.lamsfoundation.lams.learning.progress.dao.IProgressDAO;
+import org.lamsfoundation.lams.learning.progress.ProgressException;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+import org.lamsfoundation.lams.learning.web.util.Utils;
+import org.lamsfoundation.lams.learningdesign.Activity;
 
-
-import com.lamsinternational.lams.lesson.Lesson;
-import com.lamsinternational.lams.lesson.dao.ILessonDAO;
-import com.lamsinternational.lams.lesson.LearnerProgress;
-import com.lamsinternational.lams.usermanagement.User;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
+import org.lamsfoundation.lams.usermanagement.User;
 /**
  * This class is a facade over the Learning middle tier.
  * @author chris
  */
 public class LearnerService implements ILearnerService
 {
-    private IProgressDAO progressDAO = null;
+    private ILearnerProgressDAO learnerProgressDAO = null;
     private ILessonDAO lessonDAO = null;
     
     /** Creates a new instance of LearnerService */
@@ -37,25 +41,12 @@ public class LearnerService implements ILearnerService
      */
     public List getActiveLessons(User learner)
     {
-        
-        return lessonDAO.getActiveLessons(learner);
-        
-    }
-
-    /**
-     * Used to allow a User to resume a Lesson they have already started
-     * @param learner the Learner
-     * @param the lesson to resume
-     * @throws LearnerServiceException in case of problems.
-     */
-    public LearnerProgress resumeLesson(User learner, Lesson lesson)
-    {
-        return ProgressEngine.resumeLesson(learner, lesson);
+        return lessonDAO.getActiveLessonsForLearner(learner);
     }
     
-    public Lesson getLesson(long lessonID)
+    public Lesson getLesson(Long lessonId)
     {
-        return lessonDAO.getLession(lessionID);
+        return lessonDAO.getLesson(lessonId);
     }
     
  
@@ -65,34 +56,11 @@ public class LearnerService implements ILearnerService
      * @param lessionID identifies the Lesson to start
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress startLesson(User learner, Lesson lesson)
+    public LearnerProgress startLesson(User learner, Lesson lesson) throws ProgressException
     {
-        return ProgressEngine.startLesson(leaner, lesson);
-    }
-    
-
-    /**
-     * Used to view a completed activity (read only?).
-     * @param activityID identifies the activity to view
-     * @param learner the Learner in the activity
-     * @param lesson the Lesson in which the activity took place
-     * @throws LearnerServiceException in case of problems.
-     * @return bean containing Learner Display data for the activity.
-     */
-//    public Bean viewFinishedActivity(long activityID, User learner, Lesson lesson)
-//    {
-//        return ProgressEngine.viewFinishedActivity(activityID, learner, lesson);
-//    }
-    
-
-    /**
-     * Used to indicate when a Learner leaves a lesson.
-     * @param learner the Learner
-     * @param lesson the Lesson to exit from.
-     */
-    public void exitLesson(User learner, Lesson lesson)
-    {
-        ProgressEngine.exitLesson(learner, lesson);
+        //return ProgressEngine.startLesson(learner, lesson);
+    	LearnerProgress learnerProgress = ProgressEngine.getStartPoint(learner, lesson);
+    	return learnerProgress;
     }
     
 
@@ -105,8 +73,9 @@ public class LearnerService implements ILearnerService
      */
     public LearnerProgress getProgress(User learner, Lesson lesson)
     {
-        return progressDAO.getProgress(learner, lesson);
+        return lessonDAO.getLearnerProgress(learner, lesson);
     }
+    
     
     /**
      * Calculates learner progress and returns the data required to be displayed to the learner (including URL(s)).
@@ -116,8 +85,38 @@ public class LearnerService implements ILearnerService
      * @return the bean containing the display data for the Learner
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress calculateProgress(long completedActivityID, User learner, Lesson lesson)
+    public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson) throws ProgressException
     {
-        return ProgressEngine.getNextActivity(completedActivityID, learner, lesson);
+    	return ProgressEngine.calculateProgress(learner, lesson, completedActivity);
     }
+    
+
+    public String completeToolActivity(long toolSessionId) {
+    	// get learner, lesson and activity using toolSessionId
+    	User learner = null;
+    	Lesson lesson = null;
+    	Activity activity = null;
+    	
+    	String url = null;
+    	try {
+	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
+	    	Activity nextActivity = nextLearnerProgress.getNextActivity();
+	    	ActivityURL activityURL = Utils.generateActivityURL(nextActivity, nextLearnerProgress);
+	    	url = activityURL.getUrl();
+    	}
+    	catch (ProgressException e) {
+    		// log e
+    		throw new LearnerServiceException(e.getMessage());
+    	}
+    	
+    	return url;
+    }
+    
+	public ILessonDAO getLessonDAO() {
+		return lessonDAO;
+	}
+	
+	public void setLessonDAO(ILessonDAO lessonDAO) {
+		this.lessonDAO = lessonDAO;
+	}
 }

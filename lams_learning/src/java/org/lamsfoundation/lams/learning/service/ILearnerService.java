@@ -7,7 +7,10 @@
 package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
+import java.util.Set;
 
+import org.lamsfoundation.lams.learning.progress.ProgressException;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -29,20 +32,12 @@ public interface ILearnerService
     public List getActiveLessons(User learner);
 
 
-    /**
-     * Used to allow a User to resume a Lesson they have already started
-     * @param learner the Learner
-     * @param the lesson to resume
-     * @throws LearnerServiceException in case of problems.
-     */
-    public LearnerProgress resumeLesson(User learner, Lesson lesson);
-
     
     /**
      * Gets the lesson object for the given key.
      *
      */
-    public Lesson getLesson(long lessonID);
+    public Lesson getLesson(Long lessonID);
 
     
  
@@ -52,29 +47,7 @@ public interface ILearnerService
      * @param lessionID identifies the Lesson to start
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress startLesson(User learner, Lesson lesson);
-
-    
-
-    /**
-     * Used to view a completed activity (read only?).
-     * @param activityID identifies the activity to view
-     * @param learner the Learner in the activity
-     * @param lesson the Lesson in which the activity took place
-     * @throws LearnerServiceException in case of problems.
-     * @return bean containing Learner Display data for the activity.
-     */
-    //public Bean viewFinishedActivity(long activityID, User learner, Lesson lesson);
-
-    
-
-    /**
-     * Used to indicate when a Learner leaves a lesson.
-     * @param learner the Learner
-     * @param lesson the Lesson to exit from.
-     */
-    public void exitLesson(User learner, Lesson lesson);
-
+    public LearnerProgress startLesson(User learner, Lesson lesson) throws ProgressException;
     
 
     /**
@@ -95,6 +68,16 @@ public interface ILearnerService
      * @return the bean containing the display data for the Learner
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress calculateProgress(long completedActivityID, User learner, Lesson lesson);
+    public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson) throws ProgressException;
 
+    
+    /**
+     * Marks an activity as complete and calculates the next URL. This method is for
+     * tools to redirect the client on complete.
+     * @param toolSessionId, session ID for completed tool
+     * @return the URL for the next activity
+     * @throws LearnerServiceException in case of problems.
+     */
+    public String completeToolActivity(long toolSessionId);
+    
 }
