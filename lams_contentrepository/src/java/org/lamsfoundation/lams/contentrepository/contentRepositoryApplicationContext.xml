@@ -34,10 +34,8 @@
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
-	<!--  copied from lams common! -->
-
 	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
-	<!-- (in this case, JDBC-related settings for the dataSource definition below) -->
+	<!-- (in this case, hibernate-related settings for the session factory definition below) -->
 	
 	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location"><value>/org/lamsfoundation/lams/contentrepository/dbConnection.properties</value></property>
@@ -51,19 +49,14 @@
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 
-	<!--  copied from lams common! -->
-  
-	<!-- Local DataSource that works in any environment -->
-	<bean id="crDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName"><value>${jdbc.driverClassName}</value></property>
-		<property name="url"><value>${jdbc.url}</value></property>
-		<property name="username"><value>${jdbc.username}</value></property>
-		<property name="password"><value>${jdbc.password}</value></property>
+	<!-- JNDI DataSource  - ises tool-ds Datasource set up in the app-server -->
+	<bean id="lamsDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName"><value>java:jdbc/lams-ds</value></property>
 	</bean>
 
 	<!-- Hibernate SessionFactory -->
 	<bean id="crSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
-		<property name="dataSource"><ref local="crDataSource"/></property>
+		<property name="dataSource"><ref local="lamsDataSource"/></property>
 		<property name="mappingResources">
 			<list>	
 				<value>org/lamsfoundation/lams/contentrepository/CrCredential.hbm.xml</value>
@@ -82,7 +75,7 @@
 				<prop key="hibernate.c3p0.maxPoolSize">${hibernate.c3p0.maxPoolSize}</prop>
 				<prop key="hibernate.c3p0.timeout">${hibernate.c3p0.timeout}</prop>
 				<prop key="hibernate.c3p0.max_statement">${hibernate.c3p0.max_statement}</prop>
-				<prop key="hibernate.cache.provider_class">net.sf.hibernate.cache.TreeCacheProvider</prop>
+				<prop key="hibernate.cache.provider_class">${hibernate.cache}</prop>
 			</props>
 		</property>
 	</bean>

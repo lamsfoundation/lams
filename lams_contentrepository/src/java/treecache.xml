@@ -44,12 +44,13 @@
 
 
 	<!-- Use DefaultCache to bind the cache into JNDI. The proxy returned as part of the lookup can be used both
-            by local (e.g. servlet) and remote (e.g. RMI) clients -->
+            by local (e.g. servlet) and remote (e.g. RMI) clients 
+            ?? Doe the jndi stuff even work - Chris said something about it not working.
        <attribute name="JndiName">
            name=DefaultCache
            locatorURI=socket://:5555
        </attribute>
-
+	-->
         <!-- Configure the TransactionManager -->
         <attribute name="TransactionManagerLookupClass">org.jboss.cache.JBossTransactionManagerLookup</attribute>
 
