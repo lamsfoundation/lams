@@ -14,43 +14,10 @@ import org.apache.commons.io.FileUtils;
  * Copies the required file to the lams ear directory.
  * @author chris
  */
-public class DeployFilesTask implements Task
+public class DeployFilesTask extends FilesTask
 {
     
-    /**
-     * Holds value of property lamsEarPath.
-     */
-    private String lamsEarPath;
-    
-    /**
-     * Holds value of property deployFiles.
-     */
-    private List deployFiles;
-    
-    /** Creates a new instance of DeployWarTask */
-    public DeployFilesTask()
-    {
-    }
-    
-    /**
-     * Setter for property lamsEarPath.
-     * @param lamsEarPath New value of property lamsEarPath.
-     */
-    public void setLamsEarPath(String lamsEarPath)
-    {
-        
-        this.lamsEarPath = lamsEarPath;
-    }
-    
-    /**
-     * Setter for property deployFiles.
-     * @param deployFiles New value of property deployFiles.
-     */
-    public void setDeployFiles(List deployFiles)
-    {
-        
-        this.deployFiles = deployFiles;
-    }
+
     
     /**
      *Executes the task

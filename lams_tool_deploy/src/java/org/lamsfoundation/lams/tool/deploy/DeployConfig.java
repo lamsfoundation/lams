@@ -17,14 +17,14 @@ import org.apache.commons.configuration.ConfigurationException;
  */
 public class DeployConfig
 {
-    //public static final String PROPERTIES_FILE_NAME = "/home/chris/workspace/lams_tool_deploy/test/file/deploy.properties";
+    //public static final String PROPERTIES_FILE_PATH = "/home/chris/workspace/lams_tool_deploy/test/file/deploy.properties";
     public static final String TOOL_WEB_URI_KEY = "toolWebUri";
     public static final String TOOL_CONTEXT_KEY = "toolContext";
     public static final String LAMS_EAR_PATH_KEY = "lamsEarPath";
-    public static final String TOOL_INSERT_SCRIPT_NAME_KEY = "toolInsertScriptName";
-    public static final String TOOL_LIBRARY_INSERT_SCRIPT_NAME_KEY = "toolLibraryInsertScriptName";
-    public static final String TOOL_ACTIVITY_INSERT_SCRIPT_NAME_KEY = "toolActivityInsertScriptName";
-    public static final String TOOL_TABLES_SCRIPT_NAME_KEY = "toolTablesScriptName";
+    public static final String TOOL_INSERT_SCRIPT_PATH_KEY = "toolInsertScriptPath";
+    public static final String TOOL_LIBRARY_INSERT_SCRIPT_PATH_KEY = "toolLibraryInsertScriptPath";
+    public static final String TOOL_ACTIVITY_INSERT_SCRIPT_PATH_KEY = "toolActivityInsertScriptPath";
+    public static final String TOOL_TABLES_SCRIPT_PATH_KEY = "toolTablesScriptPath";
     public static final String DB_USERNAME_KEY = "dbUsername";
     public static final String DB_PASSWORD_KEY = "dbPassword";
     public static final String DB_DRIVER_CLASS_KEY = "dbDriverClass";
@@ -48,24 +48,24 @@ public class DeployConfig
     private String lamsEarPath;
     
     /**
-     * Holds value of property toolInsertScriptName.
+     * Holds value of property toolInsertScriptPath.
      */
-    private String toolInsertScriptName;
+    private String toolInsertScriptPath;
     
     /**
-     * Holds value of property toolLibraryInsertScriptName.
+     * Holds value of property toolLibraryInsertScriptPath.
      */
-    private String toolLibraryInsertScriptName;
+    private String toolLibraryInsertScriptPath;
     
     /**
-     * Holds value of property toolActivityInsertScriptName.
+     * Holds value of property toolActivityInsertScriptPath.
      */
-    private String toolActivityInsertScriptName;
+    private String toolActivityInsertScriptPath;
     
     /**
-     * Holds value of property toolTablesScriptName.
+     * Holds value of property toolTablesScriptPath.
      */
-    private String toolTablesScriptName;
+    private String toolTablesScriptPath;
     
     /**
      * Holds value of property deployFiles.
@@ -101,10 +101,10 @@ public class DeployConfig
             toolWebUri = getProperty(TOOL_WEB_URI_KEY);
             toolContextRoot = getProperty(TOOL_CONTEXT_KEY);
             lamsEarPath = getProperty(LAMS_EAR_PATH_KEY);
-            toolInsertScriptName = getProperty(TOOL_INSERT_SCRIPT_NAME_KEY);
-            toolLibraryInsertScriptName = getProperty(TOOL_LIBRARY_INSERT_SCRIPT_NAME_KEY);
-            toolActivityInsertScriptName = getProperty(TOOL_ACTIVITY_INSERT_SCRIPT_NAME_KEY);
-            toolTablesScriptName = getProperty(TOOL_TABLES_SCRIPT_NAME_KEY);
+            toolInsertScriptPath = getProperty(TOOL_INSERT_SCRIPT_PATH_KEY);
+            toolLibraryInsertScriptPath = getProperty(TOOL_LIBRARY_INSERT_SCRIPT_PATH_KEY);
+            toolActivityInsertScriptPath = getProperty(TOOL_ACTIVITY_INSERT_SCRIPT_PATH_KEY);
+            toolTablesScriptPath = getProperty(TOOL_TABLES_SCRIPT_PATH_KEY);
             dbUsername = getProperty(DB_USERNAME_KEY);
             dbPassword = getProperty(DB_PASSWORD_KEY);
             dbDriverClass = getProperty(DB_DRIVER_CLASS_KEY);
@@ -119,8 +119,8 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property toolWebAppName.
-     * @return Value of property toolWebAppName.
+     * Getter for property toolWebAppPath.
+     * @return Value of property toolWebAppPath.
      */
     public String getToolWebUri()
     
@@ -154,46 +154,46 @@ public class DeployConfig
      * Getter for property toolIinsertScriptPath.
      * @return Value of property toolIinsertScriptPath.
      */
-    public String getToolInsertScriptName()
+    public String getToolInsertScriptPath()
     
     
     {
 
-        return this.toolInsertScriptName;
+        return this.toolInsertScriptPath;
     }
     
     /**
      * Getter for property libraryInsertScriptPath.
      * @return Value of property libraryInsertScriptPath.
      */
-    public String getToolLibraryInsertScriptName()
+    public String getToolLibraryInsertScriptPath()
     
     
     {
         
-        return this.toolLibraryInsertScriptName;
+        return this.toolLibraryInsertScriptPath;
     }
     
     /**
      * Getter for property toolActivityInsertScriptPath.
      * @return Value of property toolActivityInsertScriptPath.
      */
-    public String getToolActivityInsertScriptName()
+    public String getToolActivityInsertScriptPath()
     
     {
         
-        return this.toolActivityInsertScriptName;
+        return this.toolActivityInsertScriptPath;
     }
     
     /**
      * Getter for property toolTablesScriptPath.
      * @return Value of property toolTablesScriptPath.
      */
-    public String getToolTablesScriptName()
+    public String getToolTablesScriptPath()
     
     {
         
-        return this.toolTablesScriptName;
+        return this.toolTablesScriptPath;
     }
     
     /**

@@ -6,6 +6,14 @@
 
 package org.lamsfoundation.lams.tool.deploy;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Driver;
+import java.sql.SQLException;
+import java.io.File;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
+
 /**
  *
  * @author chris
@@ -14,14 +22,14 @@ public abstract class DBTask implements Task
 {
 
     /**
-     * Holds value of property jdbcDriverClass.
+     * Holds value of property dbDriverClass.
      */
-    private String jdbcDriverClass;
+    private String dbDriverClass;
 
     /**
-     * Holds value of property jdbcUrl.
+     * Holds value of property dbDriverUrl.
      */
-    private String jdbcUrl;
+    private String dbDriverUrl;
 
     /**
      * Holds value of property dbUsername.
@@ -44,21 +52,23 @@ public abstract class DBTask implements Task
      * Setter for property jdbcDriver.
      * @param jdbcDriver New value of property jdbcDriver.
      */
-    public void setJdbcDriverClass(java.lang.String jdbcDriverClass)
+    public void setDbDriverClass(java.lang.String dbDriverClass)
+    
     
     {
 
-        this.jdbcDriverClass = jdbcDriverClass;
+        this.dbDriverClass = dbDriverClass;
     }
 
     /**
      * Setter for property jdbcUrl.
      * @param jdbcUrl New value of property jdbcUrl.
      */
-    public void setJdbcUrl(String jdbcUrl)
+    public void setDbDriverUrl(java.lang.String dbDriverUrl)
+    
     {
 
-        this.jdbcUrl = jdbcUrl;
+        this.dbDriverUrl = dbDriverUrl;
     }
 
     /**
@@ -79,6 +89,38 @@ public abstract class DBTask implements Task
     {
 
         this.dbPassword = dbPassword;
+    }
+    
+    /**
+     * Get a JDBC Connection from the set properties.
+     * @return Connection
+     * @throws DeployException if the connection cannot be established.
+     */
+    protected Connection getConnection() throws DeployException
+    {
+        try
+        {
+            Class.forName(dbDriverClass);
+            return DriverManager.getConnection(dbDriverUrl, dbUsername, dbPassword);
+        }
+        catch (Exception ex)
+        {
+            throw new DeployException("Could not get connection", ex);
+        }
+    }
+    
+    protected String readFile(File file) throws DeployException
+    {
+        
+        try
+        {
+            return FileUtils.readFileToString(file, "UTF8");
+        }
+        catch (IOException ioex)
+        {
+            throw new DeployException("Could not read file", ioex);
+        }
+
     }
     
 }

@@ -87,7 +87,7 @@
         
         
         <target name="junit" >
-        <!-- NOTE: needs fork adn dir so it can find test files! -->
+        <!-- NOTE: needs fork and dir so it can find test files! -->
             <junit printsummary="withOutAndErr" showoutput="on" fork="on" dir="${basedir}">
                 <classpath>
                     <path refid="junit.class.path"/>
@@ -96,6 +96,7 @@
                 <test name="org.lamsfoundation.lams.tool.deploy.FileTokenReplacerTest" todir="${basedir}/test/results" outfile="FileTokenReplacer"/>
                 <test name="org.lamsfoundation.lams.tool.deploy.DeployConfigTest" todir="${basedir}/test/results" outfile="DeployConfig"/>
                 <test name="org.lamsfoundation.lams.tool.deploy.DeployFilesTaskTest" todir="${basedir}/test/results" outfile="DeployFilesTask"/>
+                <test name="org.lamsfoundation.lams.tool.deploy.ScriptRunnerTest" todir="${basedir}/test/results" outfile="ScriptRunner"/>
             </junit>
         </target>
 </project>

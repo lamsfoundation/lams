@@ -21,9 +21,9 @@ public class DeployConfigTest extends TestCase
 {
     private DeployConfig config = null;
     
-    public DeployConfigTest(String testName)
+    public DeployConfigTest(String testPath)
     {
-        super(testName);
+        super(testPath);
     }
     
     protected void setUp() throws java.lang.Exception
@@ -78,30 +78,30 @@ public class DeployConfigTest extends TestCase
         
     }
     //#nameof SQL script file to create and populate the tool tables
-    //toolTablesScriptName=create_imscp_db.sql
+    //toolTablesScriptPath=create_imscp_db.sql
     
-    public void testGetToolTablesScriptName()
+    public void testGetToolTablesScriptPath()
     {
-        assertEquals(config.getToolTablesScriptName(), "create_imscp_db.sql");
+        assertEquals(config.getToolTablesScriptPath(), "create_imscp_db.sql");
     }
-    //#Name of SQL script file to create the tool library activity
-    //toolActivityInsertScriptName=insert_imscp_activity.sql
-    public void testGetToolActivityInsertScriptName()
+    //#Path of SQL script file to create the tool library activity
+    //toolActivityInsertScriptPath=insert_imscp_activity.sql
+    public void testGetToolActivityInsertScriptPath()
     {
-        assertEquals(config.getToolActivityInsertScriptName(), "insert_imscp_activity.sql");
+        assertEquals(config.getToolActivityInsertScriptPath(), "insert_imscp_activity.sql");
     }
     
-    //#Name of SQL script to insert the library record
-    //toolLibraryInsertScriptName=insert_imscp_library.sql
-    public void testGetToolLibraryInsertScriptName()
+    //#Path of SQL script to insert the library record
+    //toolLibraryInsertScriptPath=insert_imscp_library.sql
+    public void testGetToolLibraryInsertScriptPath()
     {
-        assertEquals(config.getToolLibraryInsertScriptName(), "insert_imscp_library.sql");
+        assertEquals(config.getToolLibraryInsertScriptPath(), "insert_imscp_library.sql");
     }
     //#name of SQL script that inserts the lams_tool record
-    //toolInsertScriptName=insert_imscp_tool.sql
-    public void testGetToolInsertScriptName()
+    //toolInsertScriptPath=insert_imscp_tool.sql
+    public void testGetToolInsertScriptPath()
     {
-        assertEquals(config.getToolInsertScriptName(), "insert_imscp_tool.sql");
+        assertEquals(config.getToolInsertScriptPath(), "insert_imscp_tool.sql");
     }
     //#path to lams ear dir
     //lamsEarPath=/var/jboss/server/default/deploy/lams.ear

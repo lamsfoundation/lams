@@ -8,14 +8,13 @@ package org.lamsfoundation.lams.tool.deploy;
         
 import java.io.File;
 import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
+import org.apache.commons.io.FileUtils;
 /**
  * Parsers a file and does token replacement
  * @author chris
@@ -109,36 +108,16 @@ public class FileTokenReplacer
     
     protected String readFile() throws DeployException
     {
-        StringBuffer buf = new StringBuffer();
-        BufferedReader reader = null;
+        
         try
         {
-            reader = new BufferedReader(new FileReader(file));
-            String line = null;
-            while((line = reader.readLine()) != null)
-            {
-                buf.append(line);
-            }
+            return FileUtils.readFileToString(file, "UTF8");
         }
         catch (IOException ioex)
         {
             throw new DeployException("Could not read file", ioex);
         }
-        finally
-        {
-            if (reader != null)
-            {
-                try
-                {
-                    reader.close();
-                }
-                catch (IOException ioex)
-                {
-                    //not much we can do here
-                }
-            }
-        }
-        return buf.toString();
+
     }
 }
 
