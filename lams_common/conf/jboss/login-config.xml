@@ -1,0 +1,40 @@
+<?xml version='1.0'?>
+<!DOCTYPE policy PUBLIC
+      "-//JBoss//DTD JBOSS Security Config 3.0//EN"
+      "http://www.jboss.org/j2ee/dtd/security_config.dtd">
+
+<!-- The XML based JAAS login configuration read by the
+org.jboss.security.auth.login.XMLLoginConfig mbean. Add
+an application-policy element for each security domain.
+
+The outline of the application-policy is:
+<application-policy name="security-domain-name">
+  <authentication>
+    <login-module code="login.module1.class.name" flag="control_flag">
+      <module-option name = "option1-name">option1-value</module-option>
+      <module-option name = "option2-name">option2-value</module-option>
+      ...
+    </login-module>
+
+    <login-module code="login.module2.class.name" flag="control_flag">
+      ...
+    </login-module>
+    ...
+  </authentication>
+</application-policy>
+
+$Revision$
+-->
+
+<policy>
+	<application-policy name = "lams">
+       <authentication>
+          <login-module code = "org.jboss.security.auth.spi.DatabaseServerLoginModule" flag = "required">
+             <module-option name="dsJndiName">java:/MySqlDS</module-option>
+             <module-option name="principalsQuery">select password from lams_user where login=?</module-option>
+             <module-option name="rolesQuery">select name,'Roles' from lams_role</module-option>
+          </login-module>
+       </authentication>
+    </application-policy>
+</policy>
+

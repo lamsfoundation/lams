@@ -18,7 +18,18 @@ Ant build file.
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
-
+	
+	<path id="project.classpath">
+		<!-- If Eclipse is not used, this should be ${build.classes} -->
+		<pathelement location="${classes}" />
+		<path refid="all-libs"/>
+		<!-- Java CLASSPATH should be added as the last item -->
+		<!-- This property is supposed to be set in .ant.properties file -->
+		<!-- Currently this is not set properly but it does not matter
+			as long as ${classes} is used in the project.classpath -->
+		<pathelement location="${java.class.path}" />
+	</path>
+	
 	<target name="usage">
 		<echo message=""/>
 		<echo message="${project.name} build file"/>
@@ -128,5 +139,92 @@ Ant build file.
 		</hbm2java-learningdesign>
 	</target>
 
+	<target name="print-classpath">
+		<echo message="java.class.path = ${java.class.path}"/>
+	</target>
+
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+	<target name="preparedirs">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.dist}"/>
+		<mkdir dir="${build.lib}"/>
+		<mkdir dir="${build.web}"/>
+	</target>
+
+
+	<target name="clean" depends="preparedirs" description="removes all class files">
+		<delete>
+	  		<fileset dir="${build.classes}"/>
+	  		<fileset dir="${build.lib}"/>
+		</delete>
+		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.lib}"/>
+	</target>
+	
+	<!-- ================================================================ -->
+	<!-- making packages for deployment					    	          -->
+	<!-- ================================================================ -->
+	<target name="web-jar" description="creates jar file">
+    	<delete file="${build.lib}/${product.name}.jar"/>
+    	<jar jarfile="${build.lib}/${product.name}.jar">
+    		<fileset dir="${basedir}/classes">
+      		</fileset>
+    	</jar>
+	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - - - - - - - - -  -->
+	<!-- Creates the war archive                          -->
+	<!-- - - - - - - - - - - - - - - - - - - - - - - - -  --> 
+	<target name="war" depends="web-jar" description="creates war file">
+  		<delete file="${build.lib}/${product.name}.war"/>
+  		<war warfile="${build.lib}/${product.name}.war" 
+  				webxml="${webinf}/web.xml">
+  			<webinf dir="${webinf}">
+  				<include name="jboss-web.xml"/>
+  				<include name="struts/*"/>
+  				<include name="jstl/*"/>
+  			</webinf>
+  			<lib dir="${build.lib}">
+  				<include name="${product.name}.jar"/>
+  			</lib>
+  			<fileset dir="${web}">
+  				<include name="*"/>
+  				<include name="admin/*"/>
+  			</fileset>
+  		</war>
+  	</target>
+
+	<target name="deploy-jar-war" depends="web-jar,war">
+		<copy file="${build.lib}/${product.name}.jar"
+				todir="${jboss-home}/server/default/deploy"/>
+		<copy file="${build.lib}/${product.name}.war"
+				todir="${jboss-home}/server/default/deploy"/>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- copy jar files and cofigure files                                   -->
+	<!-- =================================================================== -->
+  	<target name="copyfiles" depends="" description="copy lib and config files">
+  		<copy overwrite="yes" todir="${jboss-home}/server/default/lib/">
+  			<fileset dir="${lib.dir}">
+  				<include name="**/*.jar"/>
+  			</fileset>
+  		</copy>
+  		<copy overwrite="yes" todir="${jboss-home}/server/default/conf/">
+  			<fileset dir="${conf.jboss.dir}/">
+  				<include name="login-config.xml"/>
+  			</fileset>
+  		</copy>
+  		<copy overwrite="yes" todir="${jboss-home}/server/default/deploy/">
+  			<fileset dir="${conf.jboss.dir}/service">
+  				<include name="mysql*.xml"/>
+  			</fileset>
+  		</copy>
+
+  	</target>
+	
 </project>
 

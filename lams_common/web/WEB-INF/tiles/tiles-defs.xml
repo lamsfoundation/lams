@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
+   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
+ 
+<tiles-definitions>
+<!-- ============= template Definitions ====================== -->
+	<definition name=".loginDef" path="template.jsp">
+		<put name="title" value="Login - LAMS :: Learning Activity Management System"/>
+		<put name="pageHeader" value = "Base Template"/>
+		<put name="header" value="header.jsp"/>
+		<put name="content" value="loginContent.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
+</tiles-definitions>

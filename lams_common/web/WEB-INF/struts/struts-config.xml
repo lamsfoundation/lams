@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+
+<struts-config>
+
+	<!-- ========== Data Sources Definitions =================================== -->
+	<!--
+		Define your Struts data sources in a file called struts-data-sources.xml and place
+		it in your merge directory.
+	-->
+
+	<!-- ========== Form Bean Definitions =================================== -->
+
+	<!-- ========== Global Exceptions Definitions =================================== -->
+	<!--
+		Define your exceptions in a file called global-exceptions.xml and place
+		it in your merge directory.
+	-->
+
+	<!-- ========== Global Forward Definitions =================================== -->
+	<!--
+		Define your forwards in a file called global-forwards.xml and place
+		it in your merge directory.
+	-->
+
+	<!-- ========== Action Mapping Definitions =================================== -->
+	<action-mappings>
+
+		<!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
+	</action-mappings>
+
+	<!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
+
+	<!-- ===================== Plugin Definition  ======================== -->
+	<plug-in className="org.apache.struts.tiles.TilesPlugin">
+		<set-property property="definitions-config"
+			value="/WEB-INF/tiles/tiles-defs.xml" />
+		<set-property property="definitions-debug" value="0" />
+		<set-property property="definitions-parser-details" value="0" />
+		<set-property property="definitions-parser-validate" value="true" />
+	</plug-in>
+
+</struts-config>
