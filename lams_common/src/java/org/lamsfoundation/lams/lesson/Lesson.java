@@ -1,6 +1,28 @@
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
 package org.lamsfoundation.lams.lesson;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import java.io.Serializable;
@@ -12,7 +34,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 /** 
  * A Lesson is a learning sequence that is assocated with
- * a number of users for use in learning.        
+ * a number of users for use in learning. A lesson needs a run time copy of
+ * learning design to interact with.         
+ * 
  * 
  * Hibernate definition:
  * 
@@ -20,6 +44,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  */
 public class Lesson implements Serializable {
+
+    //---------------------------------------------------------------------
+    // Class level constants
+    //---------------------------------------------------------------------
     //The state for newly created lesson
     public static final Integer CREATED = new Integer(1);
     //The state for lessons that have been scheduled
@@ -34,6 +62,9 @@ public class Lesson implements Serializable {
     //The state for lesssons that are no longer visible to the learners.
     public static final Integer ARCHIVED_STATE = new Integer(6);
     
+    //---------------------------------------------------------------------
+    // attributes
+    //---------------------------------------------------------------------
     /** identifier field */
     private Long lessonId;
 
@@ -63,15 +94,17 @@ public class Lesson implements Serializable {
 
     /** persistent field */
     private Set learnerProgresses;
-
+    
+    //---------------------------------------------------------------------
+    // constructors
+    //---------------------------------------------------------------------
     /** default constructor */
     public Lesson() {
     }
-
     /** 
      * Minimum constructor that includes all not null attributes to create
      * a new Lesson object.
-     * Chain construtor implementation. 
+     * Chain construtor pattern implementation. 
      */
     public Lesson(Date createDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) {
 
@@ -92,13 +125,20 @@ public class Lesson implements Serializable {
         this.learnerProgresses = learnerProgresses;        
     }
     /**
-     * @param user
-     * @param organisation
-     * @param ld
-     * @param newLessonClass
-     * @return
+     * Factory method that create a new lesson. It initialized all necessary
+     * data for a new lesson. It is design for monitor side to create a lesson
+     * by teacher.
+     * 
+     * @param user the teacher who created this lesson
+     * @param organisation the organisation associated with this lesson.
+     * @param ld the learning design associated with this lesson.
+     * @param newLessonClass the lesson class that will run this lesson.
+     * @return the new lesson object.
      */
-    public static Lesson createNewLesson(User user, Organisation organisation, LearningDesign ld, LessonClass newLessonClass)
+    public static Lesson createNewLesson(User user, 
+                                         Organisation organisation, 
+                                         LearningDesign ld, 
+                                         LessonClass newLessonClass)
     {
         //setup new lesson
         return new Lesson(new Date(System.currentTimeMillis()),
@@ -110,7 +150,9 @@ public class Lesson implements Serializable {
                                    new HashSet());//learner progress
     }
 
-
+    //---------------------------------------------------------------------
+    // Getters and Setters
+    //---------------------------------------------------------------------
     /** 
      * @hibernate.id  generator-class="identity" type="java.lang.Long"
      *                column="lesson_id"
@@ -234,7 +276,7 @@ public class Lesson implements Serializable {
         this.learnerProgresses = learnerProgresses;
     }
 
-       public String toString() {
+    public String toString() {
         return new ToStringBuilder(this)
             .append("lessonId", getLessonId())
             .toString();
@@ -259,5 +301,18 @@ public class Lesson implements Serializable {
     {
         return lessonClass.getLearners();
     }
-
+    //---------------------------------------------------------------------
+    // Domain service methods
+    //---------------------------------------------------------------------
+    /**
+     * Create lesson data transfer object for flash and java interaction.
+     * @return the lesson data transfer object.
+     */
+    public LessonDTO getLessonData()
+    {
+        return new LessonDTO(this.lessonId,
+                             this.getLearningDesign().getTitle(),
+                             this.getLearningDesign().getDescription(),
+                             this.lessonStateId);
+    }
 }
