@@ -9,7 +9,6 @@ package org.lamsfoundation.lams.tool.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.tool.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
@@ -35,11 +34,11 @@ public interface ILamsToolService
      * @param learner
      * @param activity
      */
-    public ToolSession createToolSession(User learner, Activity activity);
+    public ToolSession createToolSession(User learner, Activity activity) throws LamsToolServiceException;
     
     /**
      * Returns the previously created ToolSession for a learner and activity.
      */
-    public ToolSession getToolSession(User learner, Activity activity);
+    public ToolSession getToolSession(User learner, Activity activity) throws LamsToolServiceException;
     
 }
