@@ -61,8 +61,8 @@
 	<property name="database.driver.classpath"     value="${database.driver.file}"/>
 	<property name="database.driver"               value="org.gjt.mm.mysql.Driver"/>
 	<property name="database.url"                  value="jdbc:mysql://localhost/lams"/>
-	<property name="database.userid"               value="root"/>
-	<property name="database.password"             value=""/>
+	<property name="database.userid"               value="lams"/>
+	<property name="database.password"             value="lamsdemo"/>
 	<property name="database.schema"               value=""/>
 	<property name="database.catalog"              value=""/>
 

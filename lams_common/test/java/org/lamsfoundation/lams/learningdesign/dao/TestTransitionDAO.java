@@ -8,7 +8,7 @@ package org.lamsfoundation.lams.learningdesign.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.learningdesign.BaseTestCase;
+import org.lamsfoundation.lams.AbstractLamsCommonTestCase;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 
@@ -18,10 +18,15 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class TestTransitionDAO extends BaseTestCase{
+public class TestTransitionDAO extends AbstractLamsCommonTestCase{
 	
 	protected TransitionDAO transitionDAO;
 	protected Transition transition;
+	
+	
+	public TestTransitionDAO(String name) {
+		super(name);	
+	}
 	
 	public void setUp() throws Exception {
 		super.setUp();
@@ -33,6 +38,14 @@ public class TestTransitionDAO extends BaseTestCase{
 		System.out.println("SIZE: " + list.size());
 		System.out.println(transition.getTitle());
 		
+	}
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.AbstractLamsCommonTestCase#getContextConfigLocation()
+	 */
+	protected String[] getContextConfigLocation() {
+		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
+		 "applicationContext.xml"};
 	}
 
 }

@@ -3,7 +3,7 @@
  */
 package org.lamsfoundation.lams.learningdesign.dao;
 
-import org.lamsfoundation.lams.learningdesign.BaseTestCase;
+import org.lamsfoundation.lams.AbstractLamsCommonTestCase;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -17,7 +17,8 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class TestLearningDesignDAO extends BaseTestCase {
+public class TestLearningDesignDAO extends AbstractLamsCommonTestCase {
+	
 	
 	private LearningDesignDAO learningDesignDAO;	
 	protected WorkspaceFolderDAO workspaceFolderDAO;
@@ -25,7 +26,11 @@ public class TestLearningDesignDAO extends BaseTestCase {
 	private User user;
 	private LearningDesign learningDesign;
 	
+	public TestLearningDesignDAO(String name) {
+		super(name);
+	}	
 	public void setUp() throws Exception{
+		super.setUp();
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");
 		workspaceFolderDAO =(WorkspaceFolderDAO)context.getBean("workspaceFolderDAO");
 	}
@@ -83,5 +88,12 @@ public class TestLearningDesignDAO extends BaseTestCase {
 		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(new Integer(1));
 		System.out.print(workspaceFolder.getName());		
 		
+	}
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.AbstractLamsCommonTestCase#getContextConfigLocation()
+	 */
+	protected String[] getContextConfigLocation() {
+		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
+		 "applicationContext.xml"};
 	}
 }
