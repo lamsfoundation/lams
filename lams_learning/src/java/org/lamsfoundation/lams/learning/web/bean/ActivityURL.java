@@ -5,6 +5,9 @@
 package org.lamsfoundation.lams.learning.web.bean;
 
 /**
+ * Display bean for an activity. Holds the URL used to display the activity along
+ * with title, description and a completion flag.
+ * 
  * @author daveg
  *
  */

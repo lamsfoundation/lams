@@ -21,7 +21,7 @@ public class LearnerServiceProxy
      * Return the learner domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.
      * @param servletContext the servletContext for current application
-     * @return survey service object.
+     * @return learner service object.
      */
     public static final ILearnerService getLearnerService(ServletContext servletContext)
     {
