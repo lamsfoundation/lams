@@ -53,8 +53,19 @@ public class TestLessonDAO extends LessonDataAccessTestCase
         
         //assert the data retrieved.
         super.assertLesson(createdLesson);
-        
-        
     }
-    
+
+    public void testUpdateLesson()
+    {
+        Lesson createdLesson = this.lessonDao.getLesson(this.testLesson.getLessonId());
+        
+        assertEquals("should be created state now",Lesson.CREATED,createdLesson.getLessonStateId());
+        createdLesson.setLessonStateId(Lesson.STARTED_STATE);
+        
+        lessonDao.updateLesson(createdLesson);
+        
+        Lesson updatedLesson = lessonDao.getLesson(testLesson.getLessonId());
+        
+        assertEquals("verify the updated lesson state",Lesson.STARTED_STATE,updatedLesson.getLessonStateId());
+    }
 }

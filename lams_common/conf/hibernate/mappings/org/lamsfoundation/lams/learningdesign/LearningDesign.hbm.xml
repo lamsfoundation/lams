@@ -224,7 +224,7 @@
         />
     </set>
     <!-- bi-directional one-to-many association to Activity -->
-    <set name="activities" lazy="false" inverse="true" cascade="none">
+    <set name="activities" lazy="false" inverse="true" cascade="save-update">
        	<key><column name="learning_design_id" /></key>
         <one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"/>
     </set>

@@ -123,4 +123,14 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
         return (LearnerProgress) ((getHibernateTemplate().find(queryString, new Object[]{learner, lesson})).get(0));//shoud only ever be one of these   
     }
 
+
+    /**
+     * Update the lesson data
+     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#updateLesson(org.lamsfoundation.lams.lesson.Lesson)
+     */
+    public void updateLesson(Lesson lesson)
+    {
+        getHibernateTemplate().update(lesson);
+    }
+
 }

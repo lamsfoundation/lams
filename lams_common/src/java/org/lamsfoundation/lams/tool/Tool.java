@@ -21,13 +21,13 @@ public class Tool implements Serializable {
     private String learnerUrl;
 
     /** persistent field */
-    private Boolean supportsGrouping;
+    private boolean supportsGrouping;
 
     /** nullable persistent field */
     private String authorUrl;
 
     /** persistent field */
-    private Boolean supportsDefineLater;
+    private boolean supportsDefineLater;
 
     /** nullable persistent field */
     private String defineLaterUrl;
@@ -54,7 +54,7 @@ public class Tool implements Serializable {
     private Set activities;
 
     /** full constructor */
-    public Tool(Long toolId, String learnerUrl, Boolean supportsGrouping, String authorUrl, Boolean supportsDefineLater, String defineLaterUrl, long defaultToolContentId, String toolSignature, String toolDisplayName, String description, String className, String exportPortfolioUrl, Set activities) {
+    public Tool(Long toolId, String learnerUrl, boolean supportsGrouping, String authorUrl, boolean supportsDefineLater, String defineLaterUrl, long defaultToolContentId, String toolSignature, String toolDisplayName, String description, String className, String exportPortfolioUrl, Set activities) {
         this.toolId = toolId;
         this.learnerUrl = learnerUrl;
         this.supportsGrouping = supportsGrouping;
@@ -75,7 +75,7 @@ public class Tool implements Serializable {
     }
 
     /** minimal constructor */
-    public Tool(Long toolId, String learnerUrl, Boolean supportsGrouping, Boolean supportsDefineLater, long defaultToolContentId, String toolSignature, String toolDisplayName, String className, String exportPortfolioUrl, Set activities) {
+    public Tool(Long toolId, String learnerUrl, boolean supportsGrouping, boolean supportsDefineLater, long defaultToolContentId, String toolSignature, String toolDisplayName, String className, String exportPortfolioUrl, Set activities) {
         this.toolId = toolId;
         this.learnerUrl = learnerUrl;
         this.supportsGrouping = supportsGrouping;
@@ -125,11 +125,11 @@ public class Tool implements Serializable {
      *             not-null="true"
      *         
      */
-    public Boolean getSupportsGrouping() {
+    public boolean getSupportsGrouping() {
         return this.supportsGrouping;
     }
 
-    public void setSupportsGrouping(Boolean supportsGrouping) {
+    public void setSupportsGrouping(boolean supportsGrouping) {
         this.supportsGrouping = supportsGrouping;
     }
 
@@ -154,11 +154,11 @@ public class Tool implements Serializable {
      *             not-null="true"
      *         
      */
-    public Boolean getSupportsDefineLater() {
+    public boolean getSupportsDefineLater() {
         return this.supportsDefineLater;
     }
 
-    public void setSupportsDefineLater(Boolean supportsDefineLater) {
+    public void setSupportsDefineLater(boolean supportsDefineLater) {
         this.supportsDefineLater = supportsDefineLater;
     }
 

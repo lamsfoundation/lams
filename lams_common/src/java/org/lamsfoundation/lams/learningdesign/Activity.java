@@ -388,4 +388,9 @@ public abstract class Activity implements Serializable {
 	public void setTransitionTo(Transition transitionTo) {
 		this.transitionTo = transitionTo;
 	}
+	
+	public boolean isToolActivity()
+	{
+	    return getActivityTypeId().intValue()==TOOL_ACTIVITY_TYPE;
+	}
 }

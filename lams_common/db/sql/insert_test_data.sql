@@ -76,7 +76,7 @@ values(4,'question_answer_signature','questionAnswerService','Question and Answe
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(5,'message_board_signature','messageBoardService','Message Board','Message Board Description',5,0,0,
+values(5,'message_board_signature','messageBoardService','Message Board','Message Board Description',5,1,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
@@ -86,7 +86,7 @@ values(6,'survey_signature','surveyService','Survey','Survey Description',6,0,0,
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(7,'chat_signature','chatService','Chat','Chat Description',7,0,0,
+values(7,'chat_signature','chatService','Chat','Chat Description',7,1,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
@@ -96,7 +96,7 @@ values(8,'shared_resources_signature','sharedResourcesService','Shared Resources
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(9,'voting_signature','votingService','Voting','Voting Description',9,0,0,
+values(9,'voting_signature','votingService','Voting','Voting Description',9,1,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,

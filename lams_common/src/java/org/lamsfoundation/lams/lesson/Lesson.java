@@ -255,6 +255,9 @@ public class Lesson implements Serializable {
             .toHashCode();
     }
 
-
+    public Set getAllLearners()
+    {
+        return lessonClass.getLearners();
+    }
 
 }

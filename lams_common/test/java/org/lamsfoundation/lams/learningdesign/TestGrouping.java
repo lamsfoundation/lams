@@ -11,6 +11,9 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.util.HashSet;
 
+import org.lamsfoundation.lams.usermanagement.User;
+
+
 import junit.framework.TestCase;
 
 
@@ -67,5 +70,35 @@ public class TestGrouping extends TestCase
         group2.setOrderId(grouping.getNextGroupOrderId());
         grouping.getGroups().add(group2);
         assertEquals(3,grouping.getNextGroupOrderId());
+    }
+    
+    public void testGetLearners()
+    {
+        grouping.setGroups(new HashSet());
+        
+        User user1 = new User();
+        user1.setUserId(new Integer(1));
+        Group group1 = new Group();
+        insertUserIntoGroup(user1, group1);
+        
+        
+        User user2 = new User();
+        user2.setUserId(new Integer(2));
+        Group group2 = new Group();
+        insertUserIntoGroup(user2, group2);
+        
+        assertEquals("verify number of learners",2,grouping.getLearners().size());
+    }
+
+    /**
+     * @param user1
+     * @param group1
+     */
+    private void insertUserIntoGroup(User user, Group group)
+    {
+        group.setUsers(new HashSet());
+        group.getUsers().add(user);
+        group.setOrderId(grouping.getNextGroupOrderId());
+        grouping.getGroups().add(group);
     }
 }

@@ -1,6 +1,8 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -26,8 +28,6 @@ public abstract class Grouping implements Serializable
     /** identifier field */
     private Long groupingId;
     
-    
-    
     /** nullable persistent field */
     private Integer maxNumberOfGroups;
     
@@ -39,6 +39,9 @@ public abstract class Grouping implements Serializable
     
     /** persistent field */
     private Set activities;
+    
+    /** non-persistent field */
+    private Set learners;
     
     /** full constructor */
     public Grouping(Long groupingId, Integer groupingTypeId, Set groups, Set activities)
@@ -157,6 +160,10 @@ public abstract class Grouping implements Serializable
         this.maxNumberOfGroups = maxNumberOfGroups;
     }
     
+    /**
+     * Return the next group order id.
+     * @return the next order id.
+     */
     public synchronized int getNextGroupOrderId()
     {
         int order =0;
@@ -166,5 +173,25 @@ public abstract class Grouping implements Serializable
             return ++order;
         }
         else return ++order;
+    }
+    
+    /**
+     * Return all the learners who participate this grouping.
+     * @return the learners set.
+     */
+    public Set getLearners()
+    {
+        //verify pre-condition
+        if(groups==null)
+            throw new IllegalArgumentException("Fail to get learnings from" +
+            		"a grouping without groups");
+        
+        learners = new HashSet();
+        for(Iterator i = groups.iterator();i.hasNext();)
+        {
+            Group group = (Group)i.next();
+            learners.addAll(group.getUsers());
+        }
+        return learners;
     }
 }

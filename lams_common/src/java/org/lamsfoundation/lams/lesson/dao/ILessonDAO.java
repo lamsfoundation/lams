@@ -55,6 +55,12 @@ public interface ILessonDAO
      * @return LearnerProgess object containing the progress and state data.
      */
     public LearnerProgress getLearnerProgress(User learner, Lesson lesson);
+
+    /**
+     * Update a requested lesson.
+     * @param createdLesson
+     */
+    public void updateLesson(Lesson lesson);
     
 
 }
