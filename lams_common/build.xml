@@ -215,6 +215,7 @@ Ant build file.
 				<include name="*"/>
 				<include name="admin/*"/>
 				<include name="images/*"/>
+				<include name="admin/file/*"/>
 			</fileset>
 		</war>
 	</target>
@@ -258,6 +259,9 @@ Ant build file.
 				<include name="*.jar"/>
 			</fileset>
 			<fileset dir="${lib}/jakarta-taglibs/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/jakarta-poi/">
 				<include name="*.jar"/>
 			</fileset>
 		</copy>
