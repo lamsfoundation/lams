@@ -16,9 +16,6 @@ import org.lamsfoundation.lams.contentrepository.CrNodeVersion;
  */
 public interface INodeDAO {
 
-	/** Finds an object. Return null if not found (note: this
-	 * is not the standard behaviour for Spring and Hibernate combined.)
-	 */
 	public Object find(Class objClass, Serializable id);
 
 	public void insert(Object object);		
