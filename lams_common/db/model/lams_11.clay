@@ -186,7 +186,7 @@
 </table>
 <table name="lams_learning_activity" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="513" y="1172" width="-1" height="-1"/>
+<table-figure-bounds x="494" y="1196" width="-1" height="-1"/>
 <column-list>
 <column name="activity_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="true">
 <column-description/>
@@ -440,6 +440,19 @@
 <variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
 </data-type>
 </column>
+<column name="create_grouping_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key name="PRIMARY" alias="" remarks="">
 <primary-key-description/>
@@ -495,6 +508,13 @@
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="gate_activity_level_id" referenced-key-column-name="gate_activity_level_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_learning_activity_9" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_grouping" referenced-key="PRIMARY" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="create_grouping_id" referenced-key-column-name="grouping_id"/>
 </foreign-key>
 </foreign-key-list>
 <index-list>
@@ -759,6 +779,19 @@
 <variant type-name-pattern="DATETIME"/>
 </data-type>
 </column>
+<column name="workspace_folder_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key name="PRIMARY" alias="" remarks="">
 <primary-key-description/>
@@ -779,6 +812,13 @@
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="user_id" referenced-key-column-name="user_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_learning_design_4" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_workspace_folder" referenced-key="PRIMARY" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="workspace_folder_id" referenced-key-column-name="workspace_folder_id"/>
 </foreign-key>
 </foreign-key-list>
 <index-list>
@@ -802,7 +842,7 @@
 </table>
 <table name="lams_group" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="355" y="1655" width="-1" height="-1"/>
+<table-figure-bounds x="270" y="1657" width="-1" height="-1"/>
 <column-list>
 <column name="group_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="true">
 <column-description/>
@@ -871,7 +911,7 @@
 </table>
 <table name="lams_grouping" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="271" y="1091" width="-1" height="-1"/>
+<table-figure-bounds x="308" y="1040" width="-1" height="-1"/>
 <column-list>
 <column name="grouping_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="true">
 <column-description/>
@@ -941,8 +981,8 @@
 <column name="max_number_of_groups" alias="" remarks="" mandatory="false" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
@@ -1651,7 +1691,7 @@
 </table>
 <table name="lams_user_organisation" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="239" y="677" width="-1" height="-1"/>
+<table-figure-bounds x="343" y="668" width="-1" height="-1"/>
 <column-list>
 <column name="user_organisation_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="true">
 <column-description/>
@@ -1811,7 +1851,7 @@
 </table>
 <table name="lams_workspace" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="677" y="426" width="-1" height="-1"/>
+<table-figure-bounds x="726" y="306" width="-1" height="-1"/>
 <column-list>
 <column name="workspace_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="true">
 <column-description/>
@@ -1867,7 +1907,7 @@
 </table>
 <table name="lams_workspace_folder" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="357" y="386" width="-1" height="-1"/>
+<table-figure-bounds x="364" y="430" width="-1" height="-1"/>
 <column-list>
 <column name="workspace_folder_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="true">
 <column-description/>
@@ -2628,7 +2668,7 @@
 </table>
 <table name="lams_user_tool_session_state" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="543" y="1598" width="-1" height="-1"/>
+<table-figure-bounds x="469" y="1710" width="-1" height="-1"/>
 <column-list>
 <column name="user_tool_session_state_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
@@ -2754,8 +2794,8 @@
 <column name="tool_content_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="true">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
@@ -2790,6 +2830,59 @@
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="tool_id" referenced-key-column-name="tool_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list/>
+</table>
+<table name="lams_activity_learners" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="738" y="921" width="-1" height="-1"/>
+<column-list>
+<column name="user_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="activity_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PK_LAMS_ACTIVITY_LEARNERS" alias="" remarks="">
+<primary-key-description/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_TABLE_32_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_user" referenced-key="PRIMARY" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="user_id" referenced-key-column-name="user_id"/>
+</foreign-key>
+<foreign-key name="FK_TABLE_32_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_learning_activity" referenced-key="PRIMARY" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="activity_id" referenced-key-column-name="activity_id"/>
 </foreign-key>
 </foreign-key-list>
 <index-list/>

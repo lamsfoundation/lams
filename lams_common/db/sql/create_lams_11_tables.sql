@@ -87,13 +87,12 @@ CREATE TABLE lams_authentication_method_type (
 CREATE TABLE lams_authentication_method (
        authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
      , authentication_method_type_id INT(3) NOT NULL DEFAULT 0
-     , authentication_method_name VARCHAR(255) NOT NULL
+     , parameters_file_name VARCHAR(255) NOT NULL
      , PRIMARY KEY (authentication_method_id)
      , INDEX (authentication_method_type_id)
      , CONSTRAINT FK_lams_authorization_method_1 FOREIGN KEY (authentication_method_type_id)
                   REFERENCES lams_authentication_method_type (authentication_method_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
-CREATE UNIQUE INDEX UQ_lams_authentication_method_name ON lams_authentication_method (authentication_method_name ASC);
 
 CREATE TABLE lams_workspace_folder (
        workspace_folder_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
@@ -115,36 +114,6 @@ CREATE TABLE lams_workspace (
                   REFERENCES lams_workspace_folder (workspace_folder_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
-CREATE TABLE lams_learning_design (
-       learning_design_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
-     , id INT(11)
-     , description TEXT
-     , title VARCHAR(255)
-     , first_activity_id BIGINT(20)
-     , max_id INT(11)
-     , valid_design_flag TINYINT(4) NOT NULL
-     , read_only_flag TINYINT(4) NOT NULL
-     , date_read_only DATETIME
-     , read_access BIGINT(20)
-     , write_access BIGINT(20)
-     , user_id BIGINT(20) NOT NULL
-     , help_text TEXT
-     , lesson_copy_flag TINYINT(4) NOT NULL DEFAULT 0
-     , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
-     , version VARCHAR(56) NOT NULL
-     , parent_learning_design_id BIGINT(20)
-     , open_date_time DATETIME
-     , close_date_time DATETIME
-     , PRIMARY KEY (learning_design_id)
-     , INDEX (parent_learning_design_id)
-     , CONSTRAINT FK_lams_learning_design_2 FOREIGN KEY (parent_learning_design_id)
-                  REFERENCES lams_learning_design (learning_design_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (user_id)
-     , CONSTRAINT FK_lams_learning_design_3 FOREIGN KEY (user_id)
-                  REFERENCES lams_user (user_id)
-)TYPE=InnoDB;
-CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
-
 CREATE TABLE lams_grouping (
        grouping_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
      , grouping_type_id INT(11) NOT NULL DEFAULT 0
@@ -156,16 +125,6 @@ CREATE TABLE lams_grouping (
      , INDEX (grouping_type_id)
      , CONSTRAINT FK_lams_learning_grouping_1 FOREIGN KEY (grouping_type_id)
                   REFERENCES lams_grouping_type (grouping_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
-CREATE TABLE lams_group (
-       group_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
-     , grouping_id BIGINT(20) NOT NULL DEFAULT 0
-     , order_id INT(6) NOT NULL DEFAULT 1
-     , PRIMARY KEY (group_id)
-     , INDEX (grouping_id)
-     , CONSTRAINT FK_lams_learning_group_1 FOREIGN KEY (grouping_id)
-                  REFERENCES lams_grouping (grouping_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
 CREATE TABLE lams_organisation (
@@ -210,7 +169,8 @@ CREATE TABLE lams_user (
      , create_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
      , authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
      , workspace_id BIGINT(20)
-     , base_organisation_id BIGINT(20)
+     , user_organisation_id BIGINT(20) NOT NULL DEFAULT 0
+     , base_organisation_id BIGINT(20) NOT NULL DEFAULT 0
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
@@ -225,52 +185,48 @@ CREATE TABLE lams_user (
 CREATE UNIQUE INDEX UQ_lams_user_login ON lams_user (login ASC);
 CREATE INDEX login ON lams_user (login ASC);
 
-CREATE TABLE lams_learning_activity (
-       activity_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+CREATE TABLE lams_learning_design (
+       learning_design_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
      , id INT(11)
      , description TEXT
      , title VARCHAR(255)
-     , xcoord INT(11)
-     , ycoord INT(11)
-     , parent_activity_id BIGINT(20)
-     , learning_activity_type_id INT(11) NOT NULL DEFAULT 0
-     , grouping_id BIGINT(20)
-     , order_id INT(11)
-     , define_later_flag TINYINT(4) NOT NULL DEFAULT 0
-     , learning_design_id BIGINT(20) DEFAULT 0
-     , learning_library_id BIGINT(20) DEFAULT 0
+     , first_activity_id BIGINT(20)
+     , max_id INT(11)
+     , valid_design_flag TINYINT(4) NOT NULL
+     , read_only_flag TINYINT(4) NOT NULL
+     , date_read_only DATETIME
+     , read_access BIGINT(20)
+     , write_access BIGINT(20)
+     , user_id BIGINT(20) NOT NULL
+     , help_text TEXT
+     , lesson_copy_flag TINYINT(4) NOT NULL DEFAULT 0
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
-     , offline_instructions TEXT
-     , max_number_of_options INT(5)
-     , min_number_of_options INT(5)
-     , tool_id BIGINT(20)
-     , tool_content_id BIGINT(20)
-     , gate_activity_level_id INT(11) DEFAULT 0
-     , gate_start_date_time DATETIME
-     , gate_end_date_time DATETIME
-     , library_activity_ui_image VARCHAR(255)
-     , PRIMARY KEY (activity_id)
-     , INDEX (learning_library_id)
-     , CONSTRAINT FK_lams_learning_activity_7 FOREIGN KEY (learning_library_id)
-                  REFERENCES lams_learning_library (learning_library_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (learning_design_id)
-     , CONSTRAINT FK_lams_learning_activity_6 FOREIGN KEY (learning_design_id)
+     , version VARCHAR(56) NOT NULL
+     , parent_learning_design_id BIGINT(20)
+     , open_date_time DATETIME
+     , close_date_time DATETIME
+     , workspace_folder_id BIGINT(20) NOT NULL DEFAULT 0
+     , PRIMARY KEY (learning_design_id)
+     , INDEX (parent_learning_design_id)
+     , CONSTRAINT FK_lams_learning_design_2 FOREIGN KEY (parent_learning_design_id)
                   REFERENCES lams_learning_design (learning_design_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (parent_activity_id)
-     , CONSTRAINT FK_learning_activity_2 FOREIGN KEY (parent_activity_id)
-                  REFERENCES lams_learning_activity (activity_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (learning_activity_type_id)
-     , CONSTRAINT FK_learning_activity_3 FOREIGN KEY (learning_activity_type_id)
-                  REFERENCES lams_learning_activity_type (learning_activity_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (user_id)
+     , CONSTRAINT FK_lams_learning_design_3 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id)
+     , INDEX (workspace_folder_id)
+     , CONSTRAINT FK_lams_learning_design_4 FOREIGN KEY (workspace_folder_id)
+                  REFERENCES lams_workspace_folder (workspace_folder_id)
+)TYPE=InnoDB;
+CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
+
+CREATE TABLE lams_group (
+       group_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+     , grouping_id BIGINT(20) NOT NULL DEFAULT 0
+     , order_id INT(6) NOT NULL DEFAULT 1
+     , PRIMARY KEY (group_id)
      , INDEX (grouping_id)
-     , CONSTRAINT FK_learning_activity_6 FOREIGN KEY (grouping_id)
+     , CONSTRAINT FK_lams_learning_group_1 FOREIGN KEY (grouping_id)
                   REFERENCES lams_grouping (grouping_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (tool_id)
-     , CONSTRAINT FK_lams_learning_activity_8 FOREIGN KEY (tool_id)
-                  REFERENCES lams_tool (tool_id)
-     , INDEX (gate_activity_level_id)
-     , CONSTRAINT FK_lams_learning_activity_10 FOREIGN KEY (gate_activity_level_id)
-                  REFERENCES lams_gate_activity_level (gate_activity_level_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_user_organisation (
@@ -311,6 +267,58 @@ CREATE TABLE lams_lesson (
                   REFERENCES lams_lesson_state (lams_lesson_state_id)
      , INDEX (class_grouping_id)
      , CONSTRAINT FK_lams_lesson_5 FOREIGN KEY (class_grouping_id)
+                  REFERENCES lams_grouping (grouping_id)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_learning_activity (
+       activity_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+     , id INT(11)
+     , description TEXT
+     , title VARCHAR(255)
+     , xcoord INT(11)
+     , ycoord INT(11)
+     , parent_activity_id BIGINT(20)
+     , learning_activity_type_id INT(11) NOT NULL DEFAULT 0
+     , grouping_id BIGINT(20)
+     , order_id INT(11)
+     , define_later_flag TINYINT(4) NOT NULL DEFAULT 0
+     , learning_design_id BIGINT(20) DEFAULT 0
+     , learning_library_id BIGINT(20) DEFAULT 0
+     , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , offline_instructions TEXT
+     , max_number_of_options INT(5)
+     , min_number_of_options INT(5)
+     , tool_id BIGINT(20)
+     , tool_content_id BIGINT(20)
+     , gate_activity_level_id INT(11) DEFAULT 0
+     , gate_start_date_time DATETIME
+     , gate_end_date_time DATETIME
+     , library_activity_ui_image VARCHAR(255)
+     , create_grouping_id BIGINT(20)
+     , PRIMARY KEY (activity_id)
+     , INDEX (learning_library_id)
+     , CONSTRAINT FK_lams_learning_activity_7 FOREIGN KEY (learning_library_id)
+                  REFERENCES lams_learning_library (learning_library_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (learning_design_id)
+     , CONSTRAINT FK_lams_learning_activity_6 FOREIGN KEY (learning_design_id)
+                  REFERENCES lams_learning_design (learning_design_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (parent_activity_id)
+     , CONSTRAINT FK_learning_activity_2 FOREIGN KEY (parent_activity_id)
+                  REFERENCES lams_learning_activity (activity_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (learning_activity_type_id)
+     , CONSTRAINT FK_learning_activity_3 FOREIGN KEY (learning_activity_type_id)
+                  REFERENCES lams_learning_activity_type (learning_activity_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (grouping_id)
+     , CONSTRAINT FK_learning_activity_6 FOREIGN KEY (grouping_id)
+                  REFERENCES lams_grouping (grouping_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (tool_id)
+     , CONSTRAINT FK_lams_learning_activity_8 FOREIGN KEY (tool_id)
+                  REFERENCES lams_tool (tool_id)
+     , INDEX (gate_activity_level_id)
+     , CONSTRAINT FK_lams_learning_activity_10 FOREIGN KEY (gate_activity_level_id)
+                  REFERENCES lams_gate_activity_level (gate_activity_level_id)
+     , INDEX (create_grouping_id)
+     , CONSTRAINT FK_lams_learning_activity_9 FOREIGN KEY (create_grouping_id)
                   REFERENCES lams_grouping (grouping_id)
 )TYPE=InnoDB;
 
@@ -418,6 +426,17 @@ CREATE TABLE lams_tool_content (
      , INDEX (tool_id)
      , CONSTRAINT FK_lams_tool_content_1 FOREIGN KEY (tool_id)
                   REFERENCES lams_tool (tool_id)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_activity_learners (
+       user_id BIGINT(20) NOT NULL DEFAULT 0
+     , activity_id BIGINT(20) NOT NULL DEFAULT 0
+     , INDEX (user_id)
+     , CONSTRAINT FK_TABLE_32_1 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id)
+     , INDEX (activity_id)
+     , CONSTRAINT FK_TABLE_32_2 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learning_transition (
