@@ -82,15 +82,6 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
                 }
             }
         );
-    	/*Session session = this.getSession();
-    	try {
-	    	Query query = session.getNamedQuery("activeLessons");
-	    	query.setInteger("userId", learner.getUserId().intValue());
-	    	lessons = query.list();
-    	}
-    	catch (HibernateException e) {
-    		throw new DataRetrievalFailureException(e.getMessage(), e);
-    	}*/
         return lessons;
     }
     

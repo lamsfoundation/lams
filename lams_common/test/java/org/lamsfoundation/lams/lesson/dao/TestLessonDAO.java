@@ -9,6 +9,8 @@
 
 package org.lamsfoundation.lams.lesson.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;
 
@@ -56,6 +58,13 @@ public class TestLessonDAO extends LessonDataAccessTestCase
         
     }
 
+    public void testGetActiveLessonsForLearner()
+    {
+        List lessons = this.lessonDao.getActiveLessonsForLearner(this.testUser);
+        
+        assertEquals("verify the number of lesson we get",0,lessons.size());
+    }
+    
     public void testUpdateLesson()
     {
         Lesson createdLesson = this.lessonDao.getLesson(this.testLesson.getLessonId());
@@ -68,5 +77,10 @@ public class TestLessonDAO extends LessonDataAccessTestCase
         Lesson updatedLesson = lessonDao.getLesson(testLesson.getLessonId());
         
         assertEquals("verify the updated lesson state",Lesson.STARTED_STATE,updatedLesson.getLessonStateId());
+    
+        List lessons = this.lessonDao.getActiveLessonsForLearner(this.testUser);
+        
+        assertEquals("verify the number of lesson we get",1,lessons.size());
+
     }
 }

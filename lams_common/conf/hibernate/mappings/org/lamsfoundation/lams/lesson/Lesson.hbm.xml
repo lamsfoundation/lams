@@ -80,7 +80,9 @@
 		  WHERE ({lesson}.class_grouping_id = lams_grouping.grouping_id)
 		    AND (lams_grouping.grouping_id = lams_group.grouping_id)
 		    AND (lams_group.group_id = lams_user_group.group_id)
+		    AND ({lesson}.lesson_state_id IN (3,4,5))		    
 		    AND (lams_user_group.user_id = :userId)
+
 	</sql-query>
 	
 </hibernate-mapping>
