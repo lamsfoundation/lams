@@ -55,17 +55,12 @@ INSERT INTO lams_lesson_state VALUES (4, 'SUSPENDED');
 INSERT INTO lams_lesson_state VALUES (5, 'FINISHED');
 INSERT INTO lams_lesson_state VALUES (6, 'ARCHIVED');
 
-INSERT into lams_license VALUES ('1', 'Attribution-Noncommercial-ShareAlike', 'by-nc-sa', 'http://creativecommons.org/licenses/by-nc-sa/2.0/', 'true', '');
-INSERT into lams_license VALUES ('2', 'Other Licensing Agreement', 'other', '', '');
-INSERT into lams_license VALUES ('3', 'Attribution-No Derivatives', 'by-nd', 'http://creativecommons.org/licenses/by-nd/2.0/', '');
-INSERT into lams_license VALUES ('4', 'Attribution-Noncommercial-No Derivatives', 'by-nc-nd', 'http://creativecommons.org/licenses/by-nc-nd/2.0/', '');
-INSERT into lams_license VALUES ('5', 'Attribution-Noncommercial', 'by-nc', 'http://creativecommons.org/licenses/by-nc/2.0/', '');
-INSERT into lams_license VALUES ('6', 'Attribution-ShareAlike', 'by-sa', 'http://creativecommons.org/licenses/by-sa/2.0/', ''); 
-
-INSERT into lams_copy_type VALUES ('1', 'NONE');
-INSERT into lams_copy_type VALUES ('2', 'LESSON COPY');
-INSERT into lams_copy_type VALUES ('3', 'PREVIEW COPY');
-
+INSERT into lams_license VALUES (1, 'Attribution-Noncommercial-ShareAlike', 'by-nc-sa', 'http://creativecommons.org/licenses/by-nc-sa/2.0/', 'true', '');
+INSERT into lams_license VALUES (2, 'Other Licensing Agreement', 'other', '','false', '');
+INSERT into lams_license VALUES (3, 'Attribution-No Derivatives', 'by-nd', 'http://creativecommons.org/licenses/by-nd/2.0/','false','');
+INSERT into lams_license VALUES (4, 'Attribution-Noncommercial-No Derivatives', 'by-nc-nd', 'http://creativecommons.org/licenses/by-nc-nd/2.0/','false', '');
+INSERT into lams_license VALUES (5, 'Attribution-Noncommercial', 'by-nc', 'http://creativecommons.org/licenses/by-nc/2.0/','false','');
+INSERT into lams_license VALUES (6, 'Attribution-ShareAlike', 'by-sa', 'http://creativecommons.org/licenses/by-sa/2.0/','false',''); 
 
 
 
