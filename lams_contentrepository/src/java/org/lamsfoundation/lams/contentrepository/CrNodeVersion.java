@@ -14,6 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *        @hibernate.class
  *         table="lams_cr_node_version"
  *     
+ * 		  @hibernate.cache usage = "transactional"
 */
 public class CrNodeVersion implements Serializable {
 
@@ -78,6 +79,7 @@ public class CrNodeVersion implements Serializable {
     /** 
      *            @hibernate.property
      *             column="version_id"
+     *             type="java.lang.Long"
      *             length="20"
      *             not-null="true"
      *         
@@ -93,6 +95,7 @@ public class CrNodeVersion implements Serializable {
     /** 
      *            @hibernate.property
      *             column="created_date_time"
+     *             type="java.sql.Timestamp"
      *             length="14"
      *         
      */
@@ -105,6 +108,8 @@ public class CrNodeVersion implements Serializable {
     }
 
     /** 
+     * bi-directional many-to-one association to CrNode
+     * 
      *            @hibernate.many-to-one
      *             not-null="true"
      *            @hibernate.column name="node_id"         
@@ -119,6 +124,8 @@ public class CrNodeVersion implements Serializable {
     }
 
     /** 
+     * bi-directional one-to-many association to CrNodeVersionProperty
+     * 
      *            @hibernate.set
      *             lazy="false"
      *             inverse="true"
@@ -127,7 +134,8 @@ public class CrNodeVersion implements Serializable {
      *             column="nv_id"
      *            @hibernate.collection-one-to-many
      *             class="org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty"
-     *         
+     *         	  @hibernate.collection-cache	
+     * 			   usage = "transactional"
      */
     public Set getCrNodeVersionProperties() {
         return this.crNodeVersionProperties;

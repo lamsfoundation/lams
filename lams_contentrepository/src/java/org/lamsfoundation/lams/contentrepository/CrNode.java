@@ -14,8 +14,9 @@ import org.apache.log4j.Logger;
 
 
 /** 
- *        @hibernate.class
- *         table="lams_cr_node"
+ *        @hibernate.class table="lams_cr_node"
+ * 
+ * 		  @hibernate.cache usage = "transactional"
  *     
 */
 public class CrNode implements Serializable {
@@ -124,6 +125,7 @@ public class CrNode implements Serializable {
     /** 
      *            @hibernate.property
      *             column="created_date_time"
+     * 			   type="java.sql.Timestamp"
      *             length="14"
      *         
      */
@@ -149,7 +151,9 @@ public class CrNode implements Serializable {
         this.nextVersionId = nextVersionId;
     }
 
-    /** 
+    /**
+     * bi-directional many-to-one association to CrWorkspace
+     *  
      *            @hibernate.many-to-one
      *             not-null="true"
      *            @hibernate.column name="workspace_id"         
@@ -165,9 +169,12 @@ public class CrNode implements Serializable {
 
     /**
      * Get the parent node/version to this node.
+     * bi-directional many-to-one association to CrNodeVersion.
      *  
      *            @hibernate.many-to-one
      *             not-null="true"
+     * 			   lazy="false"
+     * 			   inversion="true"
      *            @hibernate.column name="parent_nv_id"         
      *         
      */
@@ -181,6 +188,8 @@ public class CrNode implements Serializable {
 
 
     /** 
+     * bi-directional one-to-many association to CrNodeVersion
+     * 
      *            @hibernate.set
      *             lazy="false"
      *             inverse="true"
@@ -189,6 +198,8 @@ public class CrNode implements Serializable {
      *             column="node_id"
      *            @hibernate.collection-one-to-many
      *             class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
+     *         	  @hibernate.collection-cache	
+     * 			   usage = "transactional"
      *         
      */
     public Set getCrNodeVersions() {
@@ -290,12 +301,8 @@ public class CrNode implements Serializable {
 	public CrNodeVersion getNodeVersion(Long versionId) 
 		{
 
-		long start = System.currentTimeMillis();
-		String key = "getNodeVersion "+versionId;
-
 		CrNodeVersion nodeVersion = null;
 		Set nodeVersionSet = getCrNodeVersions();
-		log.error(key+" gotSet "+(System.currentTimeMillis()-start));
 		
 		if ( nodeVersionSet != null ) {
 			Iterator iter = nodeVersionSet.iterator();
@@ -305,7 +312,6 @@ public class CrNode implements Serializable {
 				nodeVersion = findLatestVersion(iter);
 			}
 		} 
-		log.error(key+" gotVersion "+(System.currentTimeMillis()-start));
 		return nodeVersion;
 	}
 	

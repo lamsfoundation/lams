@@ -53,7 +53,7 @@ public class BaseTestCase extends TestCase {
 		// this is run for each test so once we have it, we don't
 		// want to get it again!
 		if ( context == null ) {
-			context = new ClassPathXmlApplicationContext(IRepository.REPOSITORY_CONTEXT_PATH);
+			context = new ClassPathXmlApplicationContext("/org/lamsfoundation/lams/contentrepository/testContentRepositoryApplicationContext.xml");
 		}
 		
 		if ( repository == null ) {

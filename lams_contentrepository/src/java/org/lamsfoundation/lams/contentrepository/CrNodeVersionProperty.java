@@ -16,7 +16,8 @@ import org.apache.log4j.Logger;
 /** 
  *        @hibernate.class
  *         table="lams_cr_node_version_property"
- *     
+ * 
+ * 		  @hibernate.cache usage = "transactional"
 */
 public class CrNodeVersionProperty implements IValue,Serializable {
 
@@ -109,6 +110,8 @@ public class CrNodeVersionProperty implements IValue,Serializable {
     }
 
     /** 
+     * bi-directional many-to-one association to CrNodeVersion
+     * 
      *            @hibernate.many-to-one
      *             not-null="true"
      *            @hibernate.column name="nv_id"         

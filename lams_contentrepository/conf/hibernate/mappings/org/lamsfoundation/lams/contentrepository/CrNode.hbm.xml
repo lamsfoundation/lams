@@ -1,161 +1,132 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
-    
-<hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
-
-<class 
-    name="org.lamsfoundation.lams.contentrepository.CrNode" 
-    table="lams_cr_node"
+<hibernate-mapping
 >
-
-    <meta attribute="class-description" inherit="false">
-       @hibernate.class
+    <class
+        name="org.lamsfoundation.lams.contentrepository.CrNode"
         table="lams_cr_node"
-    </meta>
-    <meta attribute="implement-equals" inherit="false">true</meta>
-
-	<cache usage="transactional"/>
-
-    <id
-        name="nodeId"
-        type="java.lang.Long"
-        column="node_id"
-        unsaved-value="0"
+        dynamic-update="false"
+        dynamic-insert="false"
+        select-before-update="false"
+        optimistic-lock="version"
     >
-        <meta attribute="field-description">
-           @hibernate.id
-            generator-class="identity"
-            type="java.lang.Long"
+        <cache usage="transactional" />
+
+        <id
+            name="nodeId"
             column="node_id"
+            type="java.lang.Long"
             unsaved-value="0"
+        >
+            <generator class="identity">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-CrNode.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
 
-
-        </meta>
-        <meta attribute="use-in-equals">true</meta>
-        <generator class="identity" />
-    </id>
-
-    <property
-        name="path"
-        type="java.lang.String"
-        column="path"
-        length="255"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        <property
+            name="path"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
             column="path"
             length="255"
-        </meta>    
-    </property>
-    <property
-        name="type"
-        type="java.lang.String"
-        column="type"
-        not-null="true"
-        length="255"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="type"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
             column="type"
             length="255"
             not-null="true"
-        </meta>    
-    </property>
-    <property
-        name="createdDateTime"
-        type="java.sql.Timestamp"
-        column="created_date_time"
-        length="14"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="createdDateTime"
+            type="java.sql.Timestamp"
+            update="true"
+            insert="true"
+            access="property"
             column="created_date_time"
             length="14"
-        </meta>    
-    </property>
-    <property
-        name="nextVersionId"
-        type="java.lang.Long"
-        column="next_version_id"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
+        />
+
+        <property
+            name="nextVersionId"
             type="java.lang.Long"
+            update="true"
+            insert="true"
+            access="property"
             column="next_version_id"
-        </meta>    
-    </property>
-    <!-- Associations -->
-  
-    <!-- bi-directional one-to-many association to CrNodeVersion -->
-    <set
-        name="crNodeVersions"
-        lazy="false"
-        inverse="true"
-		cascade="all-delete-orphan"
-    >
-    
-        <meta attribute="field-description">
-           @hibernate.set
+        />
+
+        <many-to-one
+            name="crWorkspace"
+            class="org.lamsfoundation.lams.contentrepository.CrWorkspace"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            access="property"
+        >
+            <column
+                name="workspace_id" 
+            />
+        </many-to-one>
+
+        <many-to-one
+            name="parentNodeVersion"
+            class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            access="property"
+        >
+            <column
+                name="parent_nv_id" 
+            />
+        </many-to-one>
+
+        <set
+            name="crNodeVersions"
             lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+            <cache 
+                usage="transactional" 
+             />
 
-           @hibernate.collection-key
-            column="node_id"
+              <key
+                  column="node_id"
+              >
+              </key>
 
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
-        </meta>
-        <key>
-            <column name="node_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
-        />
-    </set>
-    <!-- bi-directional many-to-one association to CrWorkspace -->
-    <many-to-one
-        name="crWorkspace"
-        class="org.lamsfoundation.lams.contentrepository.CrWorkspace"
-        not-null="true"
-    >
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="workspace_id"         
-        </meta>
-        <column name="workspace_id" />
-    </many-to-one>
-    <!-- bi-directional many-to-one association to CrNodeVersion - which is my parent node? -->
-    <many-to-one
-        name="parentNodeVersion"
-        class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
-        not-null="true"
-    >
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="parent_nv_id"         
-        </meta>
-        <column name="parent_nv_id" />
-    </many-to-one>
-</class>
+              <one-to-many
+                  class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
+              />
+
+        </set>
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-CrNode.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
 </hibernate-mapping>

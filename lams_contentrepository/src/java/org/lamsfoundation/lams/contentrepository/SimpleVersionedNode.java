@@ -148,12 +148,9 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		node = null;
 		nodeVersion = null;
 
-		long start = System.currentTimeMillis();
-		String key = "loadData "+uuid;
-
 		try {
 			node = (CrNode) nodeDAO.find(CrNode.class, uuid);
-			log.error(key+" nodeRetrieved "+(System.currentTimeMillis()-start));
+			
 		} catch (HibernateObjectRetrievalFailureException e ) {
 		}
 
@@ -176,13 +173,12 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		 * to be created? 
 		 */
 		nodeVersion = node.getNodeVersion(versionId);
-		log.error(key+" versionsRetrieved "+(System.currentTimeMillis()-start));
 		if ( nodeVersion == null ) {
 			throw new ItemNotFoundException("No version " 
 					+ ( versionId != null ? "#"+versionId.toString() : "")
 					+ "found for node");
 		}
-		
+
 	}
 
 
@@ -704,10 +700,6 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
     public IVersionedNode getNode(String relPath) 
     	throws ItemNotFoundException {
     	
-		String key = "getNode "+getUUID();
-		long start = System.currentTimeMillis();
-		log.error(key+" start 0");
-
 		nodeObjectInitilised("Unable to get child node.");
 		
     	if ( log.isDebugEnabled() ) {
@@ -715,13 +707,11 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
     	}
 
 		CrNode childNode = nodeDAO.findChildNode(nodeVersion, relPath);
-		log.error(key+" childNodeDB "+(System.currentTimeMillis()-start));
 		
 		if ( childNode != null ) {
 			SimpleVersionedNode newNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
 			newNode.node = childNode;
 			newNode.nodeVersion = childNode.getNodeVersion(null); // get latest and only version
-			log.error(key+" returningNode "+(System.currentTimeMillis()-start));
 			return (IVersionedNode) newNode;
 		} else {
     		throw new ItemNotFoundException("Unable to find node with path "+relPath

@@ -49,8 +49,10 @@ public class CrWorkspaceCredential implements Serializable {
     }
 
     /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
+     * bi-directional many-to-one association to CrWorkspace
+     * 
+     *            @hibernate.many-to-one not-null="true"
+     * 
      *            @hibernate.column name="workspace_id"         
      *         
      */
@@ -63,8 +65,10 @@ public class CrWorkspaceCredential implements Serializable {
     }
 
     /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
+     * bi-directional many-to-one association to CrCredential
+     * 
+     *            @hibernate.many-to-one not-null="true"
+     * 
      *            @hibernate.column name="credential_id"         
      *         
      */

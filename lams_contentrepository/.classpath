@@ -22,5 +22,10 @@
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/struts/struts.jar"/>
 	<classpathentry kind="lib" path="lib/jakarta-taglibs/standard.jar"/>
+	<classpathentry kind="lib" path="lib/xdoclet/xdoclet-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/xdoclet/xdoclet-hibernate-module-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/xdoclet/xdoclet-spring-module-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/xdoclet/xjavadoc-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/ehcache/ehcache-1.1.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

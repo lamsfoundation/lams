@@ -10,7 +10,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /** 
  *        @hibernate.class
  *         table="lams_cr_workspace"
- *     
+ * 
+ * 		  @hibernate.cache usage = "transactional"
 */
 public class CrWorkspace implements IWorkspace,Serializable {
 
@@ -69,10 +70,9 @@ public class CrWorkspace implements IWorkspace,Serializable {
     }
 
     /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
+     * bi-directional one-to-many association to CrWorkspaceCredential
+     * 
+     *            @hibernate.set lazy="true" inverse="true" cascade="none"
      *            @hibernate.collection-key
      *             column="workspace_id"
      *            @hibernate.collection-one-to-many
@@ -88,10 +88,9 @@ public class CrWorkspace implements IWorkspace,Serializable {
     }
 
     /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
+     * bi-directional one-to-many association to CrNode
+     * 
+     *            @hibernate.set lazy="true" inverse="true" cascade="none"
      *            @hibernate.collection-key
      *             column="workspace_id"
      *            @hibernate.collection-one-to-many

@@ -85,6 +85,8 @@ public class CrCredential implements Serializable {
     }
 
     /** 
+     * bi-directional one-to-many association to CrWorkspaceCredential 
+     * 
      *            @hibernate.set
      *             lazy="true"
      *             inverse="true"

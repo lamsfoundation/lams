@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for content repository application context.
+  - Some of this may need to move to the main context so that everyone can
+  - access it.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!--  copied from lams common! -->
+
+	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+	<!-- (in this case, JDBC-related settings for the dataSource definition below) -->
+	
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location"><value>/org/lamsfoundation/lams/contentrepository/dbConnection.properties</value></property>
+	</bean>
+
+	<!-- Message source for this context, loaded from localized "messages_xx" files -->
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>messages</value></property>										
+	</bean>
+
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+
+	<!--  copied from lams common! -->
+  
+	<!-- Local DataSource that works in any environment -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"><value>${jdbc.driverClassName}</value></property>
+		<property name="url"><value>${jdbc.url}</value></property>
+		<property name="username"><value>${jdbc.username}</value></property>
+		<property name="password"><value>${jdbc.password}</value></property>
+	</bean>
+
+	<!-- Hibernate SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+		<property name="dataSource"><ref local="dataSource"/></property>
+		<property name="mappingResources">
+			<list>	
+				<value>org/lamsfoundation/lams/contentrepository/CrCredential.hbm.xml</value>
+ 				<value>org/lamsfoundation/lams/contentrepository/CrNode.hbm.xml</value>
+				<value>org/lamsfoundation/lams/contentrepository/CrNodeVersion.hbm.xml</value>
+				<value>org/lamsfoundation/lams/contentrepository/CrNodeVersionProperty.hbm.xml</value>
+				<value>org/lamsfoundation/lams/contentrepository/CrWorkspace.hbm.xml</value>
+				<value>org/lamsfoundation/lams/contentrepository/CrWorkspaceCredential.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.c3p0.minPoolSize">${hibernate.c3p0.minPoolSize}</prop>
+				<prop key="hibernate.c3p0.maxPoolSize">${hibernate.c3p0.maxPoolSize}</prop>
+				<prop key="hibernate.c3p0.timeout">${hibernate.c3p0.timeout}</prop>
+				<prop key="hibernate.c3p0.max_statement">${hibernate.c3p0.max_statement}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>
+
+
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+
+	<!--
+		- A parent bean definition which is a base definition for transaction proxies.
+		- It's marked as abstract, since it's not supposed to be instantiated itself.
+		- We set shared transaction attributes here, following our naming patterns.
+		- The attributes can still be overridden in child bean definitions.
+	-->
+<!-- 	<bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" >
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="insert*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+-->
+
+	<!--  repository (as repositoryAdminService) and ticket are the two main interfaces -->
+	<!--  into the repository and as such have transaction definitions on their interfaces -->
+
+	<!--  don't actually have to specify to roll back on RepositoryRuntimeException (as Runtime exceptions roll back -->
+	<!--  automatically, but put then in here as documentation	-->
+	<bean id="repositoryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager">
+			<ref local ="transactionManager"/>
+		</property>
+		<property name ="target">
+			<ref local="repositoryTarget"/>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="login">PROPAGATION_SUPPORTS,readOnly,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="addWorkspace">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="createCredentials">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="assignCredentials">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="updateCredentials">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="addFileItem">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="addPackageItem">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="updateFileItem">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="updatePackageItem">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="deleteVersion">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="deleteNode">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="logout">PROPAGATION_SUPPORTS,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<!--  Read only methods -->
+				<prop key="getFileItem">PROPAGATION_REQUIRED,readOnly,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="getVersionHistory">PROPAGATION_REQUIRED,readOnly,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="getNodeList">PROPAGATION_REQUIRED,readOnly,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+			</props>
+		</property>
+		<property name="preInterceptors">
+			<list>
+				<ref local="checkCredentialTicketBeforeAdvice"/>
+			</list>
+		</property>
+		
+	</bean>
+
+	<bean id="repositoryTarget" class="org.lamsfoundation.lams.contentrepository.SimpleRepository">
+		<property name="workspaceDAO"><ref bean="workspaceDAO"/></property>
+		<property name="credentialDAO"><ref bean="credentialDAO"/></property>
+	</bean>
+
+	<bean id="checkCredentialTicketBeforeAdvice" class="org.lamsfoundation.lams.contentrepository.CheckCredentialTicketBeforeAdvice">
+	</bean>
+
+	<bean id="node" class="org.lamsfoundation.lams.contentrepository.SimpleVersionedNode"
+		singleton="false" destroy-method="destroy">
+		<property name="nodeDAO"><ref bean="nodeDAO"/></property>
+		<property name="fileDAO"><ref bean="fileDAO"/></property>
+	</bean>
+
+	<!--  DAO classes -->
+	<bean id="workspaceDAO" class="org.lamsfoundation.lams.contentrepository.dao.hibernate.WorkspaceDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>  
+
+	<bean id="credentialDAO" class="org.lamsfoundation.lams.contentrepository.dao.hibernate.CredentialDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>  
+
+	<bean id="nodeDAO" class="org.lamsfoundation.lams.contentrepository.dao.hibernate.NodeDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>  
+
+	<!--  Most DAO's are for Hibernate. fileDAO manages reading and writing files to the filesystem -->
+	<bean id="fileDAO" class="org.lamsfoundation.lams.contentrepository.dao.file.FileDAO">
+		<property name="repositoryLocation"><value>D:\repository</value></property>
+	</bean>  
+
+</beans>

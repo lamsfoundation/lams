@@ -83,16 +83,11 @@ public class NodeDAO extends HibernateDaoSupport implements INodeDAO  {
 	 */
 	public CrNode findChildNode(CrNodeVersion parentNodeVersion, String relPath) {
 
-		long start = System.currentTimeMillis();
-
 		if ( log.isDebugEnabled() )
 			log.debug("Getting child node from "+parentNodeVersion+" path "+relPath);
 		
-		
 		String queryString = "from CrNode as n where n.parentNodeVersion = ? and n.path = ? ";
 		List nodes = getHibernateTemplate().find(queryString,new Object[] {parentNodeVersion, relPath});
-		
-		log.error("findChildNodeDBLookup"+(System.currentTimeMillis()-start));
 		
 		if(nodes.size() == 0){
 			log.debug("No nodes found");

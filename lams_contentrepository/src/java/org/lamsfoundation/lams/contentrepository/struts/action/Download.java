@@ -148,7 +148,8 @@ public class Download extends HttpServlet {
 			version = RepositoryDispatchAction.getLong(request.getParameter(RepositoryDispatchAction.VERSION_NAME));
 			
 			IVersionedNode node = getFileItem(ticket, uuid, version,null);
-			log.error(callId+" getFileItem1 "+(System.currentTimeMillis()-start));
+			log.debug(callId+" getFileItem1 "+(System.currentTimeMillis()-start));
+			
 			// update versionId in case it was null and we got the latest version...
 			version = node.getVersion();
 			
@@ -208,9 +209,9 @@ public class Download extends HttpServlet {
 				return;
 			}
 
-			log.error(callId+" beforeGetFileItem2 "+(System.currentTimeMillis()-start));
+			log.debug(callId+" beforeGetFileItem2 "+(System.currentTimeMillis()-start));
 			IVersionedNode node = getFileItem(ticket, uuid, version, relPathString);
-			log.error(callId+" getFileItem2 "+(System.currentTimeMillis()-start));
+			log.debug(callId+" getFileItem2 "+(System.currentTimeMillis()-start));
 			if ( ! node.isNodeType(NodeType.FILENODE) ) {
 				errorInContent(request, response,"Unexpected type of node "
 						+node.getNodeType()+" Expected File node. Data is "+node,null);
@@ -220,7 +221,7 @@ public class Download extends HttpServlet {
 
 		}
 		
-		log.error(callId+" handleFileNode "+(System.currentTimeMillis()-start));
+		log.debug(callId+" handleFileNode "+(System.currentTimeMillis()-start));
 		
 	}
 

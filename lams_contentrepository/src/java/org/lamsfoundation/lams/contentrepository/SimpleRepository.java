@@ -320,12 +320,8 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 	 * Does not cache the node. If versionId is null, then gets the latest version.
 	 * @throws ItemNotFoundException*/
 	private SimpleVersionedNode getNode(Long workspaceId, Long uuid, Long versionId) throws ItemNotFoundException {
-		long start = System.currentTimeMillis();
-		String key = "getNode "+uuid;
 		SimpleVersionedNode dbNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
-		log.error(key+" beanCreated "+(System.currentTimeMillis()-start));
 		dbNode.loadData(workspaceId, uuid,versionId);
-		log.error(key+" loadedData "+(System.currentTimeMillis()-start));
 		return dbNode;
 	}
 	

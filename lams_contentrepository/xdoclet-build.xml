@@ -41,5 +41,17 @@
 <pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/struts/struts.jar"/>
 <pathelement location="D:/eclipse/workspace/lams_contentrepository/lib/jakarta-taglibs/standard.jar"/>
 </path>
-<target name="_generation_" depends=""/>
+
+<target name="_generation_" depends="">
+	<echo message="Building hbm.xml files using XDoclet"/>
+	<xdoclet sourcepath="${basedir}/src/java" 
+			destdir="${basedir}/conf/hibernate/mappings" 
+			classpathref="xdoclet.classpath">
+		<fileset dir="${basedir}/src/java">
+			<include name="**/Cr*.java"/>
+		</fileset>
+	</xdoclet>		
+	
+	
+</target>
 </project>
