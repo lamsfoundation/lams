@@ -220,7 +220,7 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
     {
         testLesson = new Lesson(new Date(System.currentTimeMillis()),
                                 testUser,
-                                Lesson.NOT_STARTED_STATE,
+                                Lesson.CREATED,
                                 testLearningDesign,
                                 testLessonClass,//lesson class
                                 testOrg,
