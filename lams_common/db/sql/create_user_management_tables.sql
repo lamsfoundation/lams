@@ -95,6 +95,9 @@ CREATE TABLE lams_organisation (
      , INDEX (workspace_id)
      , CONSTRAINT FK_lams_organisation_2 FOREIGN KEY (workspace_id)
                   REFERENCES lams_workspace (workspace_id)
+     , INDEX (parent_organisation_id)
+     , CONSTRAINT FK_lams_organisation_3 FOREIGN KEY (parent_organisation_id)
+                  REFERENCES lams_organisation (organisation_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_user_organisation (
