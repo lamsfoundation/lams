@@ -216,7 +216,7 @@ Ant build file.
 	<!-- ================================================================ -->
 	<target name="lamscr-jar" depends="compile" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
-		<jar jarfile="${build.lib}/${product}.jar">
+		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf}/META-INF/MANIFEST.MF">
 			<fileset dir="${build.classes}">
 			</fileset>
 			<fileset dir="${hbm}">
