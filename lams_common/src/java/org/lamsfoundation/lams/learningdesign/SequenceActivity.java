@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.lesson.SequenceActivityStrategy;
@@ -110,11 +109,13 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     	newSequenceActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newSequenceActivity.setDefineLater(originalActivity.getDefineLater());
     	newSequenceActivity.setCreateDateTime(new Date());
+    	newSequenceActivity.setRunOffline(originalActivity.getRunOffline());
+    	
     	newSequenceActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
     	newSequenceActivity.setLibraryActivity(originalActivity.getLibraryActivity());
 		newSequenceActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
-    	newSequenceActivity.setActivities(new HashSet());
-    	return newSequenceActivity;
+    	
+		return newSequenceActivity;
     }
 
     /**

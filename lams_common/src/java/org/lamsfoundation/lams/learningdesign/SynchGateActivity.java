@@ -107,6 +107,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
     	newSynchGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newSynchGateActivity.setDefineLater(originalActivity.getDefineLater());
     	newSynchGateActivity.setCreateDateTime(new Date());
+    	newSynchGateActivity.setRunOffline(originalActivity.getRunOffline());
     	newSynchGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
     	newSynchGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
     	newSynchGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
