@@ -40,9 +40,10 @@ CREATE TABLE lams_cr_credential (
 --
 
 CREATE TABLE lams_cr_workspace_credential (
+  wc_id bigint(20) unsigned NOT NULL auto_increment,
   workspace_id bigint(20) unsigned NOT NULL default '0',
   credential_id bigint(20) unsigned NOT NULL default '0',
-  PRIMARY KEY  (credential_id,workspace_id),
+  PRIMARY KEY  (wc_id),
   INDEX (credential_id),
   INDEX (workspace_id),
   CONSTRAINT FK_lams_cr_workspace_credential_1 
@@ -103,17 +104,16 @@ CREATE TABLE lams_cr_node_version (
 
 CREATE TABLE lams_cr_node_version_property (
   id bigint(20) unsigned NOT NULL auto_increment,
-  node_id bigint(20) unsigned NOT NULL default '0',
-  version_id bigint(20) unsigned NOT NULL default '0',
+  nv_id bigint(20) unsigned NOT NULL default '0', 
   name varchar(255) NOT NULL default '',
   value varchar(255) NOT NULL default '',
   value_type tinyint(3) unsigned NOT NULL default '1',
   PRIMARY KEY  (id),
   UNIQUE KEY id (id),
-  INDEX (node_id, version_id),
+  INDEX (nv_id),
   CONSTRAINT FK_lams_version_property_1 
-  		FOREIGN KEY (node_id, version_id) 
-  		REFERENCES lams_cr_node_version (node_id, version_id) 
+  		FOREIGN KEY (nv_id) 
+  		REFERENCES lams_cr_node_version (nv_id) 
   		ON DELETE NO ACTION ON UPDATE NO ACTION
 ) TYPE=InnoDB COMMENT='Records the property for a node';
 

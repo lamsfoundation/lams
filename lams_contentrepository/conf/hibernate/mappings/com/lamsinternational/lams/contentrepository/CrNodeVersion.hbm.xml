@@ -131,16 +131,13 @@
             cascade="none"
 
            @hibernate.collection-key
-            column="node_id"
-           @hibernate.collection-key
-            column="version_id"
+            column="nv_id"
 
            @hibernate.collection-one-to-many
             class="com.lamsinternational.lams.contentrepository.CrNodeVersionProperty"
         </meta>
         <key>
-            <column name="node_id" />
-            <column name="version_id" />
+            <column name="nv_id" />
         </key>
         <one-to-many 
             class="com.lamsinternational.lams.contentrepository.CrNodeVersionProperty"

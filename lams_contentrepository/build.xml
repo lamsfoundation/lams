@@ -268,15 +268,16 @@ Ant build file.
 	<!-- =================================================================== -->
 	<!-- Deploy the project                                                  -->
 	<!-- =================================================================== -->
-	<target name="deploy-lamscr" depends="lamscr-jar,lamscr-war">
+<!--	<target name="deploy-lamscr" depends="lamscr-jar,lamscr-war" description="removes all class files">-->
+	<target name="deploy-lamscr" depends="lamscr-jar" description="deploy project to jboss">
 		<delete quiet="true">
 			<fileset dir="${jboss.deploy}/tmp"/>
 			<fileset dir="${jboss.deploy}/work"/>
 		</delete>
 		<copy file="${build.lib}/${product}.jar"
 				todir="${jboss.deploy}"/>
-		<copy file="${build.lib}/${product}.war"
-				todir="${jboss.deploy}"/>
+<!--		<copy file="${build.lib}/${product}.war"
+				todir="${jboss.deploy}"/> -->
 	</target>
 
 	<!-- =================================================================== -->
