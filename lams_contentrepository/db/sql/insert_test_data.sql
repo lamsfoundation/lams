@@ -19,13 +19,21 @@ INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, parent_nv_id, crea
 VALUES ('1', '1', '1', null, 20050106103000);
 INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (1,1,"VERSIONDESC","Initial Version","STRING");
 
-INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path) VALUES ('2', '1', 'FILENODE', 20050106103100, "/test");
+INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path) VALUES ('2', '1', 'DATANODE', 20050106103100, "/test");
 INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, parent_nv_id, created_date_time)
 VALUES ('2', '2', '1', '1', 20050106103100);
 INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, parent_nv_id, created_date_time)
 VALUES ('3', '2', '2', '1', 20050106110000);
 
-INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (2,2,"MIMETYPE","application/octet-stream","STRING");
+INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (2,2,"APPSPEC","abcd","STRING");
 INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (3,2,"VERSIONDESC","Initial Version.","STRING");
-INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (4,3,"MIMETYPE","application/octet-stream","STRING");
+INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (4,3,"APPSEC","The quick brown fox jumped over the lazy dog.","STRING");
 INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (5,3,"VERSIONDESC","The second version.","STRING");
+
+-- Note : this file node is missing its file as can't setup the repository
+INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path) VALUES ('3', '1', 'FILENODE', 20050106103100, "");
+INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, parent_nv_id, created_date_time)
+VALUES ('4', '3', '1', '1', 20050106103100);
+INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (3,2,"VERSIONDESC","Initial Version.","STRING");
+INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (3,2,"FILENAME","nofile.txt","STRING");
+INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (3,2,"MIMETYPE","unknown/unknown","STRING");
