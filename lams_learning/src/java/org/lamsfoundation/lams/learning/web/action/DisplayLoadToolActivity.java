@@ -18,19 +18,21 @@ import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 
 /** 
- * Action class to forward the user to a Tool.
+ * Action class to forward the user to a Tool using an intermediate loading page.
  * 
  * XDoclet definition:
  * 
- * @struts:action path="/DisplayToolActivity" name="activityForm"
+ * @struts:action path="/DisplayLoadToolActivity" name="activityForm"
  *                validate="false" scope="request"
  * 
+ * @struts:action-forward name="displayTool" path=".toolActivity"
+ * 
  */
-public class DisplayToolActivity extends ActivityAction {
+public class DisplayLoadToolActivity extends ActivityAction {
 
 	/**
-	 * Gets a tool activity from the request (attribute) and uses a redirect
-	 * to forward the user to the tool.
+	 * Gets an activity from the request (attribute) and forwards onto a
+	 * loading page.
 	 */
 	public ActionForward execute(
 			ActionMapping mapping,
@@ -49,14 +51,15 @@ public class DisplayToolActivity extends ActivityAction {
 		
 		ToolActivity toolActivity = (ToolActivity)activity;
 
-		ActivityURL activityURL = actionMappings.getToolURL(toolActivity, learnerProgress);
-		try {
-		    response.sendRedirect(activityURL.getUrl());
-		}
-		catch (java.io.IOException e) {
-		    return mapping.findForward(actionMappings.ERROR);
-		}
-		return null;
+		form.setActivityId(activity.getActivityId());
+		
+		List activityURLs = new ArrayList();
+		ActivityURL url = actionMappings.getToolURL(toolActivity, learnerProgress);
+		activityURLs.add(url);
+		form.setActivityURLs(activityURLs);
+		
+		String forward = "displayTool";
+		return mapping.findForward(forward);
 	}
 
 }

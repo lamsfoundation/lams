@@ -12,11 +12,15 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.service.DummyLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
+import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+import org.lamsfoundation.lams.learning.web.util.ActionMappingsWithToolWait;
 
 import org.lamsfoundation.lams.usermanagement.*;
 import org.lamsfoundation.lams.web.action.Action;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learningdesign.*;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /** 
  * MyEclipse Struts
@@ -27,6 +31,9 @@ public class ActivityAction extends Action {
 	
 	protected static final String ACTIVITY_REQUEST_ATTRIBUTE = "activity";
 	protected static final String LEARNER_PROGRESS_REQUEST_ATTRIBUTE = "learnerprogress";
+	
+	//protected ActionMappings actionMappings = new ActionMappingsWithToolWait();
+	//protected ActionMappings actionMappings;
 	
 	/**
 	 * Gets the session bean from session.
@@ -52,12 +59,30 @@ public class ActivityAction extends Action {
 		session.setAttribute(SessionBean.NAME, sessionBean);
 	}
 	
+	/**
+	 * Get the learner service.
+	 */
 	protected ILearnerService getLearnerService(HttpServletRequest request) {
 		DummyLearnerService learnerService = (DummyLearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
 		learnerService.setRequest(request);
+		//learnerService.setActionMappings(actionMappings);
 		return learnerService;
 	}
 	
+	/**
+	 * Get the ActionMappings.
+	 */
+	protected ActionMappings getActionMappings() {
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
+        return (ActionMappings)wac.getBean("actionMappings");
+	}
+	
+	/** 
+	 * Get the current learner progress. The request attributes are checked
+	 * first, if not in request then a new LearnerProgress is loaded using
+	 * the LearnerService. The LearnerProgress is also stored in the
+	 * session so that the Flash requests don't have to reload it.
+	 */
 	protected LearnerProgress getLearnerProgress(HttpServletRequest request, ActivityForm form) {
 		LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
 		if (learnerProgress == null) {
@@ -65,8 +90,6 @@ public class ActivityAction extends Action {
 			User learner = sessionBean.getLeaner();
 			Lesson lesson = sessionBean.getLesson();
 			
-			//TestLearnerService learnerService = (TestLearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
-			//learnerService.setRequest(request);
 			ILearnerService learnerService = getLearnerService(request);
 			learnerProgress = learnerService.getProgress(learner, lesson);
 			
@@ -77,6 +100,10 @@ public class ActivityAction extends Action {
 		return learnerProgress;
 	}
 	
+	/**
+	 * Sets the LearnerProgress in session so that the Flash requests don't
+	 * have to reload it.
+	 */
 	protected void setLearnerProgress(HttpServletRequest request, LearnerProgress learnerProgress) {
 		request.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE, learnerProgress);
 
@@ -86,21 +113,33 @@ public class ActivityAction extends Action {
 		setSessionBean(sessionBean, request);
 	}
 	
+	/**
+	 * Convenience method to get the requested activity. First check the
+	 * request attribute to see if it has been loaded already this request.
+	 * If not in request then load from the LearnerProgress using the forms
+	 * activityId. If no activityId specified then return null.
+	 * @param request
+	 * @param form
+	 * @param learnerProgress, the current LearerProgress
+	 * @return Activity in request
+	 */
 	protected Activity getActivity(HttpServletRequest request, ActivityForm form, LearnerProgress learnerProgress) {
 		Activity activity = (Activity)request.getAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE);
 		if (activity == null) {
 			Long activityId = form.getActivityId();
-			if (activityId == null) {
-				// TODO: should this be current or next?
-				activity = learnerProgress.getCurrentActivity();
-			}
-			else {
+			if (activityId != null) {
 				activity = getActivity(activityId.longValue(), learnerProgress);
 			}
 		}
 		return activity;
 	}
 	
+	/**
+	 * Sets an Activity in the request attributes so that it can be used by
+	 * actions forwarded to without reloading it.
+	 * @param request
+	 * @param activity
+	 */
 	protected void setActivity(HttpServletRequest request, Activity activity) {
 		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, activity);
 	}

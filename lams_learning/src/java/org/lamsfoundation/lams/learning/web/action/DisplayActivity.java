@@ -19,8 +19,7 @@ import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
 
 /** 
- * MyEclipse Struts
- * Creation date: 01-12-2005
+ * Action class to display an activity.
  * 
  * XDoclet definition:
  * 
@@ -32,9 +31,10 @@ public class DisplayActivity extends ActivityAction {
     
     protected static String className = "DisplayActivity";
 
-	/** display
-	 * Gets an activity from the request (attribute) and forwards onto the required
-	 * jsp (SingleActivity or ParallelActivity).
+	/** 
+	 * Gets an activity from the request (attribute) and forwards onto a
+	 * display action using the ActionMappings class. If no activity is
+	 * in request then use the current activity in learnerProgress.
 	 */
 	public ActionForward execute(
 			ActionMapping mapping,
@@ -42,11 +42,12 @@ public class DisplayActivity extends ActivityAction {
 			HttpServletRequest request,
 			HttpServletResponse response) {
 		ActivityForm form = (ActivityForm) actionForm;
+		ActionMappings actionMappings = getActionMappings();
 		
 		SessionBean sessionBean = ActivityAction.getSessionBean(request);
 		if (sessionBean == null) {
 			// forward to the no session error page
-			return mapping.findForward(ActionMappings.NO_SESSION_ERROR);
+			return mapping.findForward(actionMappings.NO_SESSION_ERROR);
 		}
 		
 		// Get learner
@@ -57,48 +58,15 @@ public class DisplayActivity extends ActivityAction {
 		Activity activity = getActivity(request, form, learnerProgress);
 		
 		if (activity == null) {
-		    log.error(className+": No activity in request or session");
-			return mapping.findForward(ActionMappings.ERROR);
+		    /*log.error(className+": No activity in request or session");
+			return mapping.findForward(actionMappings.ERROR);*/
+		    // Get current activity from learnerProgress
+		    activity = learnerProgress.getCurrentActivity();
 		}
+	    setActivity(request, activity);
 		
-		ActionForward forward = displayActivity(activity, learnerProgress, mapping, form, request, response);
+		ActionForward forward = actionMappings.getActivityForward(activity, learnerProgress, false);
 		return forward;
-	}
-	
-	/**
-	 * Returns an ActionForward to display an activity. The forward returned is
-	 * displayToolActivity for a ToolActivity, displayParallelActivity for a
-	 * ParallelActivity and displayOptionsActivity for an OptionsActivity. The
-	 * activity ID is also set as a request attribute (read by DisplayActivity).
-	 */
-	private ActionForward displayActivity(Activity activity, LearnerProgress progress,
-			ActionMapping mapping, ActivityForm activityForm, HttpServletRequest request, HttpServletResponse response) {
-		String forwardName = null;
-
-		// This should not be done with instanceof, perhaps should use the class name
-		if (activity instanceof ComplexActivity) {
-			if (activity instanceof OptionsActivity) forwardName = "displayOptionsActivity";
-			else if (activity instanceof ParallelActivity) forwardName = "displayParallelActivity";
-		}
-		else if (activity instanceof SimpleActivity) {
-			forwardName = "displayToolActivity";
-		}
-		
-		ActionForward forward = mapping.findForward(forwardName);
-		return forward;
-	}
-	
-	
-	private Activity getActivity(long activityId, LearnerProgress progress) {
-		Set activities = progress.getLesson().getLearningDesign().getActivities();
-		Iterator i = activities.iterator();
-		while (i.hasNext()) {
-			Activity activity = (Activity)i.next();
-			if (activity.getActivityId().longValue() == activityId) {
-				return activity;
-			}
-		}
-		return null;
 	}
 	
 }

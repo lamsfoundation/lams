@@ -13,7 +13,6 @@ import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
-import org.lamsfoundation.lams.learning.web.util.Utils;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -46,18 +45,19 @@ public class CompleteActivity extends ActivityAction {
 			HttpServletRequest request,
 			HttpServletResponse response) {
 		ActivityForm form = (ActivityForm)actionForm;
+		ActionMappings actionMappings = getActionMappings();
 		
 		SessionBean sessionBean = ActivityAction.getSessionBean(request);
 		if (sessionBean == null) {
 			// forward to the no session error page
-			return mapping.findForward(ActionMappings.NO_SESSION_ERROR);
+			return mapping.findForward(actionMappings.NO_SESSION_ERROR);
 		}
 		
 		// check token
 		if (!this.isTokenValid(request, true)) {
 			// didn't come here from options page
 		    log.info(className+": No valid token in request");
-			return mapping.findForward(ActionMappings.DOUBLE_SUBMIT_ERROR);
+			return mapping.findForward(actionMappings.DOUBLE_SUBMIT_ERROR);
 		}
 		
 		// Get learner
@@ -69,26 +69,25 @@ public class CompleteActivity extends ActivityAction {
 		
 		if (activity == null) {
 		    log.error(className+": No activity in request or session");
-			return mapping.findForward(ActionMappings.ERROR);
+			return mapping.findForward(actionMappings.ERROR);
 		}
 
 		ILearnerService learnerService = getLearnerService(request);
 		
 		// Set activity as complete
-		LearnerProgress nextProgress = null;
 		try {
-			nextProgress = learnerService.calculateProgress(activity, learner, lesson);
+			progress = learnerService.calculateProgress(activity, learner, lesson);
 		}
 		catch (ProgressException e) {
 			return mapping.findForward("error");
 		}
-		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, nextProgress.getNextActivity());
+		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, progress.getNextActivity());
 
 		// Save progress in session for Flash request
-		sessionBean.setLearnerProgress(nextProgress);
+		sessionBean.setLearnerProgress(progress);
 		setSessionBean(sessionBean, request);
 
-		ActionForward forward = Utils.getNextActivityForward(progress, nextProgress, true);
+		ActionForward forward = actionMappings.getNextActivityForward(progress, true);
 		
 		return forward;
 	}

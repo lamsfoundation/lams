@@ -12,15 +12,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
-import org.lamsfoundation.lams.learning.web.util.Utils;
 
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 
 /** 
- * MyEclipse Struts
- * Creation date: 01-12-2005
+ * Action class to display a ParallelActivity.
  * 
  * XDoclet definition:
  * 
@@ -33,18 +31,23 @@ import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 public class DisplayParallelActivity extends ActivityAction {
 	
 
+	/**
+	 * Gets a parallel activity from the request (attribute) and forwards to
+	 * the display JSP.
+	 */
 	public ActionForward execute(
 			ActionMapping mapping,
 			ActionForm actionForm,
 			HttpServletRequest request,
 			HttpServletResponse response) {
 		ActivityForm form = (ActivityForm)actionForm;
+		ActionMappings actionMappings = getActionMappings();
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request, form);
 		Activity activity = getActivity(request, form, learnerProgress);
 		if (!(activity instanceof ParallelActivity)) {
 		    log.error(className+": activity not ParallelActivity "+activity.getActivityId());
-			return mapping.findForward(ActionMappings.ERROR);
+			return mapping.findForward(actionMappings.ERROR);
 		}
 
 		ParallelActivity parallelActivity = (ParallelActivity)activity;
@@ -57,12 +60,12 @@ public class DisplayParallelActivity extends ActivityAction {
 		Iterator i = subActivities.iterator();
 		while (i.hasNext()) {
 			Activity subActivity = (Activity)i.next();
-			ActivityURL url = Utils.getActivityURL(subActivity, learnerProgress);
+			ActivityURL url = actionMappings.getActivityURL(subActivity, learnerProgress);
 			activityURLs.add(url);
 		}
 		if (activityURLs.size() == 0) {
 		    log.error(className+": No sub-activity URLs for activity "+activity.getActivityId());
-			return mapping.findForward(ActionMappings.ERROR);
+			return mapping.findForward(actionMappings.ERROR);
 		}
 		form.setActivityURLs(activityURLs);
 		
