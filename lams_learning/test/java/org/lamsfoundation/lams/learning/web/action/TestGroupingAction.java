@@ -124,7 +124,7 @@ public class TestGroupingAction extends AbstractLamsStrutsTestCase
         actionPerform();
     
         verifyNoActionErrors();
-        verifyForwardPath(".grouping");
+        verifyTilesForward("showGroup",".grouping");
         
         List groups = (List)httpSession.getAttribute("groups");
         assertNotNull("verify groups",groups);

@@ -77,5 +77,11 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="title" value="Journal" />
 		<put name="body" value="/notebook/detail.jsp"/>
 	</definition>
+	<!-- Grouping definitions -->
+	<definition name=".grouping" extends=".activityLayout">
+		<put name="pageTitle" value="Grouping Result" />
+		<put name="title" value="Grouping" />
+		<put name="body" value="/grouping/grouping.jsp"/>
+	</definition>
 	
 </tiles-definitions>

@@ -18,3 +18,5 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
+<form-bean name="GroupingForm"  type="org.apache.struts.validator.DynaValidatorForm">
+</form-bean>

@@ -57,7 +57,8 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/grouping" 
+ * @struts:action name = "GroupingForm"
+ * 				  path="/grouping" 
  *                parameter="method" 
  *                validate="false"
  * @struts.action-exception key="error.system.learner" scope="request"
