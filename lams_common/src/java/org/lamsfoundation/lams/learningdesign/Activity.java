@@ -56,6 +56,16 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int SEQUENCE_ACTIVITY_TYPE = 9;
 	/******************************************************************/
 	
+	/**
+	* static final variables indicating the the category of activities
+    *******************************************************************/
+	public static final int CATEGORY_SYSTEM = 1;
+	public static final int CATEGORY_COLLABORATION = 2;
+	public static final int CATEGORY_ASSESSMENT = 3;
+	public static final int CATEGORY_CONTENT = 4;
+	public static final int CATEGORY_SPLIT = 5;
+	/******************************************************************/
+	
 	/** WDDX packet specific attribute created to identify the
 	 * type of object being passed.*/
 	public static final String OBJECT_TYPE ="Activity";
@@ -133,6 +143,9 @@ public abstract class Activity implements Serializable,Nullable {
 
 	/** The type of activity */
 	private Integer activityTypeId;
+	
+	/** The category of activity */
+	private Integer activityCategoryID;
 
 	/** persistent field */
 	private Transition transitionTo; 
@@ -594,5 +607,11 @@ public abstract class Activity implements Serializable,Nullable {
 	public Activity getNextActivityByParent(Activity currentChild)
 	{
 	    return activityStrategy.getNextActivityByParent(this,currentChild);
+	}
+	public Integer getActivityCategoryID() {
+		return activityCategoryID;
+	}
+	public void setActivityCategoryID(Integer activityCategoryID) {
+		this.activityCategoryID = activityCategoryID;
 	}
 }

@@ -79,6 +79,11 @@
     <property name="activityTypeId" type="java.lang.Integer" column="learning_activity_type_id" length="11" not-null="true">
     	        <meta attribute="field-description">@hibernate.property column="learning_activity_type_id" length="11"</meta>    
    	</property>
+   	
+   	<property name="activityCategoryID" type="java.lang.Integer" column="activity_category_id" length="11">
+    	        <meta attribute="field-description">@hibernate.property column="activity_category_id" length="11"</meta>    
+   	</property>
+   	
     <property name="libraryActivityUiImage" type="java.lang.String" column="library_activity_ui_image" length="255">
         <meta attribute="field-description">@hibernate.property column="library_activity_ui_image" length="255"</meta>    
     </property>
