@@ -12,7 +12,10 @@
 	<bean id="toolDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-
+	<bean id="toolSessionDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
 	<bean id="toolContentIDGeneratorTarget" class="org.lamsfoundation.lams.tool.ToolContentIDGenerator"
 		singleton="true"
 	>

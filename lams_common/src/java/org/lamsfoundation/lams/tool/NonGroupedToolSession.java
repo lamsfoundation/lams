@@ -6,6 +6,9 @@
  */
 package org.lamsfoundation.lams.tool;
 
+import java.util.Date;
+
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -19,9 +22,22 @@ public class NonGroupedToolSession extends ToolSession {
     /** persistent field */
     private User user;
 
-	public User getUser() {
+    public NonGroupedToolSession(ToolActivity toolActivity,
+                                 Date createDateTime,
+                                 int toolSessionStateId,
+                                 User user)
+    {
+        super(null,toolActivity,createDateTime,toolSessionStateId);
+        this.user=user;
+    }
+    /**default constructor*/
+    public NonGroupedToolSession(){}
+    
+	public User getUser() 
+	{
 		return user;
 	}
+	
 	public void setUser(User user) {
 		this.user = user;
 	}

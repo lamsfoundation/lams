@@ -365,9 +365,7 @@ CREATE TABLE lams_user_organisation_role (
 CREATE TABLE lams_tool_session (
        tool_session_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , tool_session_type_id INT(3) NOT NULL
-     , lesson_id BIGINT(20) NOT NULL
      , activity_id BIGINT(20) NOT NULL
-     , tool_session_key BIGINT(20) NOT NULL
      , tool_session_state_id INT(3) NOT NULL
      , create_date_time DATETIME NOT NULL
      , group_id BIGINT(20)
@@ -387,9 +385,6 @@ CREATE TABLE lams_tool_session (
      , INDEX (user_id)
      , CONSTRAINT FK_lams_tool_session_5 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id)
-     , INDEX (lesson_id)
-     , CONSTRAINT FK_lams_tool_session_6 FOREIGN KEY (lesson_id)
-                  REFERENCES lams_lesson (lesson_id)
      , INDEX (tool_session_type_id)
      , CONSTRAINT FK_lams_tool_session_7 FOREIGN KEY (tool_session_type_id)
                   REFERENCES lams_tool_session_type (tool_session_type_id)

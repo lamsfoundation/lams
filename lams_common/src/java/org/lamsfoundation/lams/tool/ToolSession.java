@@ -1,11 +1,9 @@
 package org.lamsfoundation.lams.tool;
 
-import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -35,21 +33,22 @@ public abstract class ToolSession implements Serializable {
     private ToolActivity toolActivity;
 
     /** persistent field */
-    private long toolSessionKey;
-
-    /** persistent field */
     private Date createDateTime;
 
     /** persistent field */
     private int toolSessionStateId;
     
     private int toolSessionTypeId;
+    
+    private String uniqueKey;
 
     /** full constructor */
-    public ToolSession(Long toolSessionId, ToolActivity toolActivity, long toolSessionKey, Date createDateTime, Group group, int toolSessionStateId, Set userToolSessions) {
+    public ToolSession(Long toolSessionId, 
+                       ToolActivity toolActivity, 
+                       Date createDateTime, 
+                       int toolSessionStateId) {
         this.toolSessionId = toolSessionId;
         this.toolActivity = toolActivity;
-        this.toolSessionKey = toolSessionKey;
         this.createDateTime = createDateTime;
         this.toolSessionStateId = toolSessionStateId;
     }
@@ -87,26 +86,8 @@ public abstract class ToolSession implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="tool_session_key"
-     *             length="20"
-     *             not-null="true"
-     *         
-     */
-    public long getToolSessionKey() {
-        return this.toolSessionKey;
-    }
-
-    public void setToolSessionKey(long toolSessionKey) {
-        this.toolSessionKey = toolSessionKey;
-    }
-
-    /** 
-     *            @hibernate.property
-     *             column="create_date_time"
-     *             length="19"
-     *             not-null="true"
-     *         
+     * @hibernate.property column="create_date_time" length="19"
+     *             		   not-null="true"
      */
     public Date getCreateDateTime() {
         return this.createDateTime;
@@ -115,7 +96,22 @@ public abstract class ToolSession implements Serializable {
     public void setCreateDateTime(Date createDateTime) {
         this.createDateTime = createDateTime;
     }
-
+    /**
+     * @hibernate.property column="unique_key" length="128"
+     *             not-null="true"
+     * @return Returns the uniqueKey.
+     */
+    public String getUniqueKey()
+    {
+        return uniqueKey;
+    }
+    /**
+     * @param uniqueKey The uniqueKey to set.
+     */
+    public void setUniqueKey(String uniqueKey)
+    {
+        this.uniqueKey = uniqueKey;
+    }
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
@@ -157,4 +153,5 @@ public abstract class ToolSession implements Serializable {
 	public void setToolSessionTypeId(int toolSessionTypeId) {
 		this.toolSessionTypeId = toolSessionTypeId;
 	}
+
 }

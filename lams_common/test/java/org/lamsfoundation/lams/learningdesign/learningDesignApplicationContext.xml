@@ -26,13 +26,4 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
-	<!-- Usermanagement realted beans -->
-	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	<bean id="workspaceFolderDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
-	
 </beans>

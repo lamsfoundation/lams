@@ -24,4 +24,5 @@ public interface IToolSessionDAO
     
     public void saveToolSession(ToolSession toolSession);
 
+    public void removeToolSession(ToolSession toolSession);
 }

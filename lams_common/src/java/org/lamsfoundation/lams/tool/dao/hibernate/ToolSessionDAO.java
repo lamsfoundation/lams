@@ -31,5 +31,13 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
     {
         getHibernateTemplate().save(toolSession);
     }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#removeToolSession(org.lamsfoundation.lams.tool.ToolSession)
+     */
+    public void removeToolSession(ToolSession toolSession)
+    {
+        getHibernateTemplate().delete(toolSession);
+    }
     
 }
