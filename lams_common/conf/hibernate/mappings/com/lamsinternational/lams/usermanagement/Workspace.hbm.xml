@@ -14,12 +14,10 @@
 <class 
     name="com.lamsinternational.lams.usermanagement.Workspace" 
     table="lams_workspace"
-    proxy="com.lamsinternational.lams.usermanagement.Workspace"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_workspace"
-        proxy="com.lamsinternational.lams.usermanagement.Workspace"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 

@@ -14,12 +14,10 @@
 <class 
     name="com.lamsinternational.lams.usermanagement.AuthenticationMethod" 
     table="lams_authentication_method"
-    proxy="com.lamsinternational.lams.usermanagement.AuthenticationMethod"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_authentication_method"
-        proxy="com.lamsinternational.lams.usermanagement.AuthenticationMethod"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 

@@ -18,7 +18,6 @@
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_user_organisation"
-        proxy="com.lamsinternational.lams.usermanagement.UserOrganisation"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 

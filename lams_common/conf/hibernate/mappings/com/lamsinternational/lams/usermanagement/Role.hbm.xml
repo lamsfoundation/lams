@@ -18,7 +18,6 @@
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_role"
-        proxy="com.lamsinternational.lams.usermanagement.Role"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 

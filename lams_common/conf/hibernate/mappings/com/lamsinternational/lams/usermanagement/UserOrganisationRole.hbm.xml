@@ -14,12 +14,10 @@
 <class 
     name="com.lamsinternational.lams.usermanagement.UserOrganisationRole" 
     table="lams_user_organisation_role"
-    proxy="com.lamsinternational.lams.usermanagement.UserOrganisationRole"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_user_organisation_role"
-        proxy="com.lamsinternational.lams.usermanagement.UserOrganisationRole"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
