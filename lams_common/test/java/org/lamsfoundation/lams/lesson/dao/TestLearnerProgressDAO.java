@@ -11,6 +11,9 @@ package org.lamsfoundation.lams.lesson.dao;
 
 import net.sf.hibernate.HibernateException;
 
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;
 
@@ -22,7 +25,13 @@ import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;
  */
 public class TestLearnerProgressDAO extends LessonDataAccessTestCase
 {
-
+    private IActivityDAO activityDAO;
+    private Activity testToolActivity;
+    private Activity testComplexActivity;
+    
+    //this is survey id we inserted in test data sql script
+    private static final Long TEST_TOOL_ACTIVITY_ID = new Long(20);
+    private static final Long TEST_COMPLEX_ACTIVITY_ID = new Long(13);
     /*
      * @see LessonDataAccessTestCase#setUp()
      */
@@ -31,6 +40,10 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         super.setUp();
         super.initializeTestLesson();
         super.initLearnerProgressData();
+        
+		activityDAO =(ActivityDAO) context.getBean("activityDAO");
+		testToolActivity = activityDAO.getActivityByActivityId(TEST_TOOL_ACTIVITY_ID);
+		testComplexActivity = activityDAO.getActivityByActivityId(TEST_COMPLEX_ACTIVITY_ID);
     }
 
     /*
@@ -100,8 +113,18 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         super.learnerProgressDao.saveLearnerProgress(this.testLearnerProgress);
         LearnerProgress progress= learnerProgressDao.getLearnerProgressByLeaner(testUser,testLesson);
 
+        Activity firstActivity = this.testLesson.getLearningDesign().getFirstActivity();
         
+        progress.setProgressState(firstActivity,LearnerProgress.ACTIVITY_COMPLETED);
+        progress.setProgressState(testComplexActivity,LearnerProgress.ACTIVITY_COMPLETED);
+        progress.setProgressState(testToolActivity,LearnerProgress.ACTIVITY_ATTEMPTED);
         
+        super.learnerProgressDao.updateLearnerProgress(progress);
+        
+        LearnerProgress updatedProgress= learnerProgressDao.getLearnerProgressByLeaner(testUser,testLesson);
+        assertLearnerProgressInitialization(progress);
+        assertEquals("verify completed activity",2,updatedProgress.getCompletedActivities().size());
+        assertEquals("verify attempted activity",1,updatedProgress.getAttemptedActivities().size());
         
     }
 
