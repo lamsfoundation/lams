@@ -192,5 +192,13 @@ public class ToolActivity extends SimpleActivity implements Serializable
 	 */
 	public void setToolSessions(Set toolSessions) {
 		this.toolSessions = toolSessions;
-	}	
+	}
+
+    /**
+     * @see org.lamsfoundation.lams.util.Nullable#isNull()
+     */
+    public boolean isNull()
+    {
+        return false;
+    }	
 }

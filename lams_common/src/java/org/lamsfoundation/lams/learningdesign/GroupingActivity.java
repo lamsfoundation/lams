@@ -132,4 +132,12 @@ public class GroupingActivity extends SimpleActivity implements Serializable
 	public void setCreateGroupingUIID(Integer create_grouping_ui_id) {
 		this.createGroupingUIID = create_grouping_ui_id;
 	}
+
+    /**
+     * @see org.lamsfoundation.lams.util.Nullable#isNull()
+     */
+    public boolean isNull()
+    {
+        return false;
+    }
 }

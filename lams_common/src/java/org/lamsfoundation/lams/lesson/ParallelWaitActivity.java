@@ -6,6 +6,8 @@
  */
 package org.lamsfoundation.lams.lesson;
 
+import org.lamsfoundation.lams.learningdesign.NullActivity;
+
 /**
  * @author dgarth
  *

@@ -115,4 +115,12 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
             .toString();
     }
 
+    /**
+     * @see org.lamsfoundation.lams.util.Nullable#isNull()
+     */
+    public boolean isNull()
+    {
+        return false;
+    }
+
 }

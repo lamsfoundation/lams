@@ -118,4 +118,12 @@ public class SynchGateActivity extends GateActivity implements Serializable {
             .toString();
     }
 
+    /**
+     * @see org.lamsfoundation.lams.util.Nullable#isNull()
+     */
+    public boolean isNull()
+    {
+        return false;
+    }
+
 }

@@ -174,5 +174,12 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             .append("activityId", getActivityId())
             .toString();
     }
+    /**
+     * @see org.lamsfoundation.lams.util.Nullable#isNull()
+     */
+    public boolean isNull()
+    {
+        return false;
+    }
 
 }

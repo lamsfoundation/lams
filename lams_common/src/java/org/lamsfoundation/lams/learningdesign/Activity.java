@@ -5,11 +5,12 @@ import java.util.Date;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.util.Nullable;
 
 /**
  * @hibernate.class table="lams_learning_activity"
  */
-public abstract class Activity implements Serializable {
+public abstract class Activity implements Serializable,Nullable {
 
 	public static final int TOOL_ACTIVITY_TYPE = 1;
 

@@ -159,4 +159,12 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
 	public void setOptionsInstructions(String options_instructions) {
 		this.optionsInstructions = options_instructions;
 	}
+
+    /**
+     * @see org.lamsfoundation.lams.util.Nullable#isNull()
+     */
+    public boolean isNull()
+    {
+        return false;
+    }
 }

@@ -117,4 +117,13 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             .toString();
     }
 
+
+    /**
+     * @see org.lamsfoundation.lams.util.Nullable#isNull()
+     */
+    public boolean isNull()
+    {
+        return false;
+    }
+
 }
