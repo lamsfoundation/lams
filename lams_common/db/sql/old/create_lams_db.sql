@@ -5,8 +5,8 @@
 -- 13/DEC/2004
 
 SET FOREIGN_KEY_CHECKS=0;
-DROP DATABASE IF EXISTS lams;
-CREATE DATABASE lams;
+DROP DATABASE IF EXISTS lams1;
+CREATE DATABASE lams1;
 SET FOREIGN_KEY_CHECKS=1;
 
 USE mysql;
@@ -35,7 +35,7 @@ GRANT ALL PRIVILEGES ON lams.* TO lams@'%' IDENTIFIED BY 'lamsdemo' WITH GRANT O
 	
 FLUSH PRIVILEGES;
 
-USE lams;
+USE lams1;
 
 -- Drop, Create and Populate LAMS Tables
 
@@ -553,11 +553,9 @@ INSERT INTO lams_gate_activity_level VALUES (1, 'LEARNER');
 INSERT INTO lams_gate_activity_level VALUES (2, 'GROUP');
 INSERT INTO lams_gate_activity_level VALUES (3, 'CLASS');
 
-INSERT INTO lams_tool_session_state VALUES  (1, 'STARTED');
-INSERT INTO lams_tool_session_state VALUES  (2, 'FINISHED');
-INSERT INTO lams_tool_session_state VALUES  (3, 'SUSPENDED');
-INSERT INTO lams_tool_session_state VALUES  (4, 'RESUMED');
-INSERT INTO lams_tool_session_state VALUES  (5, 'ERROR');
+INSERT INTO lams_tool_session_state VALUES  (1, 'NOT ATTEMPTED');
+INSERT INTO lams_tool_session_state VALUES  (2, 'INCOMPLETE');
+INSERT INTO lams_tool_session_state VALUES  (3, 'COMPLETED');
 
 INSERT INTO lams_user_tool_session_state VALUES (1, 'JOINED');
 INSERT INTO lams_user_tool_session_state VALUES (2, 'LEFT' );
