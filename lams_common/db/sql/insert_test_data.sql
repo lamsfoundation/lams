@@ -130,6 +130,8 @@ insert into lams_tool_content (tool_content_id,tool_id) values (16,5);
 insert into lams_tool_content (tool_content_id,tool_id) values (17,6);
 insert into lams_tool_content (tool_content_id,tool_id) values (18,7);
 insert into lams_tool_content (tool_content_id,tool_id) values (19,8);
+insert into lams_tool_content (tool_content_id,tool_id) values (20,4);
+insert into lams_tool_content (tool_content_id,tool_id) values (21,4);
 
 --insert a testing grouping
 insert into lams_grouping values(99,99,1,1,10,0,2);
@@ -387,24 +389,44 @@ learning_design_id,learning_library_id,create_date_time,offline_instructions,run
 max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
-(20,6,'Survey Activity','Survey Title',10,20,14,'Help Text for Activity',
+(20,6,'Survey Activity','Survey Title',10,20,null,'Help Text for Activity',
 1,null,0,0,
 1,6,'20050101','Tool Activity Offline  Instructions ',0,
 null,null,6,17,
 null,null,null,'image');
 
 insert into lams_learning_activity
-(activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
-learning_activity_type_id,grouping_id,order_id,define_later_flag,
-learning_design_id,learning_library_id,create_date_time,offline_instructions,run_offline_flag,
-max_number_of_options,min_number_of_options,tool_id,tool_content_id,
-gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
+(activity_id,activity_ui_id,
+description,title,help_text,
+xcoord,ycoord,
+parent_activity_id,parent_ui_id,learning_activity_type_id,
+grouping_id,grouping_ui_id,order_id,define_later_flag,
+learning_design_id,learning_library_id,create_date_time,
+run_offline_flag,offline_instructions,
+max_number_of_options,min_number_of_options,options_instructions,
+tool_id,tool_content_id,
+gate_activity_level_id,gate_open_flag,
+gate_start_time_offset,gate_end_time_offset,
+gate_start_date_time,gate_end_date_time,
+library_activity_ui_image,
+create_grouping_id,create_grouping_ui_id,
+library_activity_id)
 values
-(21,7,'Chat Activity','Chat Title',10,20,14,'Help Text for Activity',
-1,99,1,0,
-1,7,'20050101','Tool Activity Offline  Instructions ',0,
-null,null,7,18,
-null,null,null,'image');
+(21,7,
+'Chat Activity Description','Chat Title','Help Text for Chat Activity',
+10,20,
+null,null,1,
+99,99,0,0,
+1,7,'20050101',
+1,'Tool Activity Offline  Instructions ',
+null,null,null,
+7,18,
+null,null,
+null,null,
+null,null,
+'ChatImage',
+null,null,
+7);
 
 insert into lams_learning_activity
 (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -414,42 +436,153 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (22,8,'Shared Resources Activity','Shared Resources',10,20,14,'Help Text for Activity',
-1,null,2,0,
+1,null,0,0,
 1,8,'20050101','Tool Activity Offline  Instructions ',0,
 null,null,8,19,
 null,null,null,'image');
 
+-- Sample GroupingActivity with RandomGrouping 
+
+insert into lams_learning_activity
+(activity_id,activity_ui_id,
+description,title,help_text,
+xcoord,ycoord,
+parent_activity_id,parent_ui_id,learning_activity_type_id,
+grouping_id,grouping_ui_id,order_id,define_later_flag,
+learning_design_id,learning_library_id,create_date_time,
+run_offline_flag,offline_instructions,
+max_number_of_options,min_number_of_options,options_instructions,
+tool_id,tool_content_id,
+gate_activity_level_id,gate_open_flag,
+gate_start_time_offset,gate_end_time_offset,
+gate_start_date_time,gate_end_date_time,
+library_activity_ui_image,
+create_grouping_id,create_grouping_ui_id,
+library_activity_id)
+values
+(23,23,
+'Random Grouping Activity Description','RandomGroupingActivity Title','Help Text for RandomGroupingActivity',
+10,20,
+null,null,2,
+null,null,null,0,
+1,null,'20050101',
+0,null,
+null,null,null,
+null,null,
+null,null,
+null,null,
+null,null,
+'RandomGroupingActivityImage',
+99,99,
+null);
+
+insert into lams_learning_activity
+(activity_id,activity_ui_id,
+description,title,help_text,
+xcoord,ycoord,
+parent_activity_id,parent_ui_id,learning_activity_type_id,
+grouping_id,grouping_ui_id,order_id,define_later_flag,
+learning_design_id,learning_library_id,create_date_time,
+run_offline_flag,offline_instructions,
+max_number_of_options,min_number_of_options,options_instructions,
+tool_id,tool_content_id,
+gate_activity_level_id,gate_open_flag,
+gate_start_time_offset,gate_end_time_offset,
+gate_start_date_time,gate_end_date_time,
+library_activity_ui_image,
+create_grouping_id,create_grouping_ui_id,
+library_activity_id)
+values
+(24,24,
+'QNA Activity Description','QNA Activity Title','Help Text for QNA Activity',
+10,20,
+null,null,1,
+99,99,null,0,
+1,4,'20050101',
+1,'QNA Activity Offline  Instructions ',
+null,null,null,
+4,20,
+null,null,
+null,null,
+null,null,
+'QNAImage',
+null,null,
+4);
+
+insert into lams_learning_activity
+(activity_id,activity_ui_id,
+description,title,help_text,
+xcoord,ycoord,
+parent_activity_id,parent_ui_id,learning_activity_type_id,
+grouping_id,grouping_ui_id,order_id,define_later_flag,
+learning_design_id,learning_library_id,create_date_time,
+run_offline_flag,offline_instructions,
+max_number_of_options,min_number_of_options,options_instructions,
+tool_id,tool_content_id,
+gate_activity_level_id,gate_open_flag,
+gate_start_time_offset,gate_end_time_offset,
+gate_start_date_time,gate_end_date_time,
+library_activity_ui_image,
+create_grouping_id,create_grouping_ui_id,
+library_activity_id)
+values
+(25,25,
+'QNA Activity Description','QNA Activity Title','Help Text for QNA Activity',
+10,20,
+14,14,1,
+null,null,1,0,
+1,4,'20050101',
+1,'QNA Activity Offline  Instructions ',
+null,null,null,
+4,21,
+null,null,
+null,null,
+null,null,
+'QNAImage',
+null,null,
+4);
+
 -- Populates the lams_learning_transition table with various transitions for the dummy design 
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(1,1,'NoteBook to Optional Activity','Notebook to Optional Activity',12,15,1,'20050207',12,1);
+values(1,1,'Survey to NoteBook','Survey to NoteBook',15,20,1,'20050207',1,6);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(2,2,'Optional to Child Activity','To NoticeBoard',16,12,1,'20050207',2,12);
+values(2,2,'Notebook to GroupingActivity','Notebook to GroupingActivity',23,15,1,'20050207',23,1);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(3,3,'To Multiple Choice','To Multiple Choice',17,16,1,'20050207',3,2);
+values(3,3,'GroupingActivity to Chat','GroupingActivity to Chat',21,23,1,'20050207',7,23);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(4,4,'To Parallel Activity','To Parallel Activity',13,17,1,'20050207',13,3);
+values(4,4,'Chat to QNA','Chat to QNA',24,21,1,'20050207',24,7);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(5,5,'To Question and Answer','To Question and Answer',18,13,1,'20050207',4,13);
+values(5,5,'QNA to OptionsActivity','QNA to OptionsActivity',12,24,1,'20050207',12,24);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(6,6,'To Messageboard','To Messageboard',19,18,1,'20050207',5,4);
+values(6,6,'OptionsActivity to Notebook','OptionsActivity to Notebook',16,12,1,'20050207',2,12);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(7,7,'To Sequence Activity','To Sequence Activity',14,19,1,'20050207',14,5);
+values(7,7,'Notebook to MultipleChoice','Notebook to MultipleChoice',17,16,1,'20050207',3,2);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(8,8,'To Survey','To Survey',20,14,1,'20050207',6,14);
+values(8,8,'MultipleChoice to ParallelActivity','MultipleChoice to ParallelActivity',13,17,1,'20050207',13,3);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(9,9,'To Chat','To Chat',21,20,1,'20050207',7,6);
+values(9,9,'ParallelActivity to QNA','ParallelActivity to QNA',18,13,1,'20050207',4,13);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(10,10,'To Shared Resourcese','To Shared Resourcese',22,21,1,'20050207',8,7);
+values(10,10,'QNA to MessageBoard','QNA to MessageBoard',19,18,1,'20050207',5,4);
+
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(11,11,'MessageBoard to SequenceActivity','MessageBoard to SequenceActivity',14,19,1,'20050207',14,5);
+
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(12,12,'SequenceActivity to Shared Resources','SequenceActivity to Shared Resources',22,14,1,'20050207',8,14);
+
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(13,13,'Shared Resources to QNA','Shared Resources to QNA',25,22,1,'20050207',25,8);
+
 
 insert into lams_learning_design(learning_design_ui_id,description,title,first_activity_id,max_id,valid_design_flag,
 								 read_only_flag,user_id,help_text,copy_type_id,create_date_time,version,
