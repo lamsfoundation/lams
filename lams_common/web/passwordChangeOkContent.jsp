@@ -11,8 +11,8 @@
 			<p class=body>	
 				<input name="Ok" type="button" class="button" id="Ok" 
 					onClick="javascript:document.location='passwordChangeOk.do';" 		
-					onMouseOver="pviiClassNew(this,'buttonover')"
-					onMouseOut="pviiClassNew(this,'button')" 
+					onMouseOver="changeStyle(this,'buttonover')"
+					onMouseOut="changeStyle(this,'button')" 
 					value="Ok" />
 			</p>
 		</td>
