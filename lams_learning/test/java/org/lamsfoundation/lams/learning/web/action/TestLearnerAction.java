@@ -94,7 +94,6 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
         
         actionPerform();
         
-        verifyForward("displayActivity");
         verifyNoActionErrors();
         
         SessionBean bean = (SessionBean)httpSession.getAttribute(SessionBean.NAME);

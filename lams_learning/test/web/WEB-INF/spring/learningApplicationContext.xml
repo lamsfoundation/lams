@@ -30,6 +30,7 @@
 				<prop key="joinLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
 				<prop key="calculateProgress">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
 				<prop key="completeToolSession">PROPAGATION_REQUIRES_NEW,ISOLATION_READ_COMMITTED</prop>
+				<prop key="exitLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
 			</props>
 		</property>
 	</bean> 

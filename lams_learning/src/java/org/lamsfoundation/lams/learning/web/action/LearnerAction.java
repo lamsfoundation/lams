@@ -90,6 +90,7 @@ public class LearnerAction extends LamsDispatchAction
     private static final String PARAM_LESSON_ID = "lessonId";
     private static final String ATTR_USERDATA = "user";
 
+    //private static final String PARAM_LEARNER_PROGRESS="?learnerProgressId=";
     //---------------------------------------------------------------------
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
@@ -176,19 +177,94 @@ public class LearnerAction extends LamsDispatchAction
             log.debug("The learner ["+learner.getUserId()+"],["+learner.getFullName()
                       +"is joining the lesson ["+lessonId+"],["+lesson.getLessonName()+"]");
 
-        
+        //join user to the lesson on the server
         LearnerProgress learnerProgress = learnerService.joinLesson(learner,lesson);
         
         if(log.isDebugEnabled())
             log.debug("The learner ["+learner.getUserId()+"] joined lesson. The"
                       +"porgress data is:"+learnerProgress.toString());
-        
+        //setup session attributes
         request.getSession().setAttribute(SessionBean.NAME,new SessionBean(learner,
                                                                            lesson,
                                                                            learnerProgress));
-       
-        return mapping.findForward(DISPLAY_ACTIVITY);
+        
+        //serialize a acknowledgement flash message with the path of display next
+        //activity
+        String lessonJoined = WDDXProcessor.serialize(new FlashMessage("joinLesson",
+                                                                       mapping.findForward(DISPLAY_ACTIVITY).getPath()));
+
+        if(log.isDebugEnabled())
+            log.debug("Sending Lesson joined acknowledge message to flash:"+lessonJoined);
+
+        //we hand over the control to flash. 
+        response.getWriter().print(lessonJoined);
+        //as flash is called the next struts action, we don't need to forward to
+        //anything.
+        return null;
     }
+    
+    /**
+     * <p>Exit the current lesson that is running in the leaner window. It 
+     * expects lesson id passed as parameter from flash component.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     * 
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * 
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward exitLesson(ActionMapping mapping,
+                                    ActionForm form,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+        
+        return null;
+    }
+    
+    /**
+     * <p>The struts dispatch action to retrieve the progress data from the 
+     * server and tailor it into the object struture that expected by flash.
+     * A wddx packet with object data struture is sent back in the end of this 
+     * call. It is used to construct or restore the flash learner progress
+     * bar</p>
+     * 
+     * <p>As this process is expensive, the server is only expecting this call
+     * whenever is necessary. For example, starting, resuming and restoring
+     * a new lesson. And it should not happen every time that learner is
+     * progressing to next activity.</p>
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     * 
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward getFlashProgressData(ActionMapping mapping,
+                                              ActionForm form,
+                                              HttpServletRequest request,
+                                              HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+        
+        return null;
+    }
+    
+    
     
     /**
      * Helper method to retrieve the user data. We always load up from http

@@ -258,7 +258,17 @@ public class LearnerService implements ILearnerService
     		throw new LearnerServiceException(e.getMessage());
         }
     }
-
+    
+    /**
+     * Exit a lesson.
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#exitLesson(org.lamsfoundation.lams.lesson.LearnerProgress)
+     */
+    public void exitLesson(LearnerProgress progress)
+    {
+       progress.setRestarting(true);
+       learnerProgressDAO.updateLearnerProgress(progress);
+    }
+    
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------
@@ -352,5 +362,6 @@ public class LearnerService implements ILearnerService
             lessonDTOList.add(currentLesson.getLessonData());
         }
         return (LessonDTO[])lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);   
-    }       
+    }
+   
 }

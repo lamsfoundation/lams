@@ -54,11 +54,11 @@ public class DisplayParallelActivityAction extends ActivityAction {
 	 * Gets a parallel activity from the request (attribute) and forwards to
 	 * the display JSP.
 	 */
-	public ActionForward execute(
-			ActionMapping mapping,
-			ActionForm actionForm,
-			HttpServletRequest request,
-			HttpServletResponse response) {
+	public ActionForward execute(ActionMapping mapping,
+	                             ActionForm actionForm,
+	                             HttpServletRequest request,
+	                             HttpServletResponse response) 
+	{
 		ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
 		actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
@@ -90,8 +90,7 @@ public class DisplayParallelActivityAction extends ActivityAction {
 		}
 		form.setActivityURLs(activityURLs);
 		
-		String forward = "displayParallel";
-		return mapping.findForward(forward);
+		return mapping.findForward("displayParallel");
 	}
 
 }

@@ -23,6 +23,10 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
+import org.lamsfoundation.lams.learning.web.bean.SessionBean;
+import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 
 /**
@@ -36,7 +40,7 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
 {
     private static final String TEST_USER_ID = "2";
     private static final String TEST_LESSON_ID = "2";
-
+    private static SessionBean testBean = null;
     /**
      * Constructor for TestDisplayActivityAction.
      * @param arg0
@@ -87,10 +91,87 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
         addRequestParameter("lessonId", TEST_LESSON_ID);
         actionPerform();
         
+        testBean = (SessionBean)httpSession.getAttribute(SessionBean.NAME);
+
         //test page loading.
         setRequestPathInfo("/DisplayActivity.do");
         actionPerform();
         verifyForward("loadToolActivity");
     }
+    
+    public void testDisplayToolActivityFollowingParallelActivity()
+    {
+        //setup the session bean to display option page.
+        LearnerProgress progress = testBean.getLearnerProgress();
+        ParallelActivity parallelActivity= new ParallelActivity();
+        progress.setPreviousActivity(parallelActivity);
+        testBean.setLearnerProgress(progress);
+        httpSession.setAttribute(SessionBean.NAME,testBean);
+        
+        setRequestPathInfo("/DisplayActivity.do");
+        actionPerform();
+        verifyForwardPath("/requestDisplay.do?url=http://localhost:8080/lams_learning//LoadToolActivity.do?activityId=26");
+        
+        //restore the progress
+        progress = testBean.getLearnerProgress();
+        progress.setPreviousActivity(null);
+        testBean.setLearnerProgress(progress);
+    }
+    
+    public void testDisplayOptionsActivity()
+    {
+        //setup the session bean to display option page.
+        LearnerProgress progress = testBean.getLearnerProgress();
+        OptionsActivity optionActivity= new OptionsActivity();
+        progress.setNextActivity(optionActivity);
+        testBean.setLearnerProgress(progress);
+        httpSession.setAttribute(SessionBean.NAME,testBean);
+        
+        setRequestPathInfo("/DisplayActivity.do");
+        actionPerform();
+        verifyForward("displayOptionsActivity");
+    }
 
+    public void testDisplayParallelActivity()
+    {
+        //setup the session bean to display option page.
+        LearnerProgress progress = testBean.getLearnerProgress();
+        ParallelActivity parallelActivity= new ParallelActivity();
+        progress.setNextActivity(parallelActivity);
+        testBean.setLearnerProgress(progress);
+        httpSession.setAttribute(SessionBean.NAME,testBean);
+        
+        setRequestPathInfo("/DisplayActivity.do");
+        actionPerform();
+        verifyForward("displayParallelActivity");
+    }
+    
+    
+    
+    public void testDisplayWaitingParallelActivity()
+    {
+        //setup the session bean to display parallel waiting.
+        LearnerProgress progress = testBean.getLearnerProgress();
+        progress.setParallelWaiting(true);
+        testBean.setLearnerProgress(progress);
+        httpSession.setAttribute(SessionBean.NAME,testBean);
+        
+        setRequestPathInfo("/DisplayActivity.do");
+        actionPerform();
+        verifyForward("parallelWait");
+    }
+
+    public void testDisplayCompletionPage()
+    {
+        //setup the session bean to display completion page.
+        LearnerProgress progress = testBean.getLearnerProgress();
+        progress.setLessonComplete(true);
+        testBean.setLearnerProgress(progress);
+        httpSession.setAttribute(SessionBean.NAME,testBean);
+        
+        setRequestPathInfo("/DisplayActivity.do");
+        actionPerform();
+        verifyForward("lessonComplete");
+        
+    }
 }

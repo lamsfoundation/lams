@@ -47,7 +47,6 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
  * @struts:action-forward name="loadToolActivity" path="/LoadToolActivity.do"
  * @struts:action-forward name="parallelWait" path="/parallelWait.do"
  * @struts:action-forward name="lessonComplete" path="/lessonComplete.do"
- * @struts:action-forward name="requestDisplay" path="/requestDisplay.do"
  * 
  * 
  * ----------------XDoclet Tags--------------------
@@ -74,6 +73,7 @@ public class DisplayActivityAction extends ActivityAction {
 		ActivityForm form = (ActivityForm) actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
 		
+		//TODO check up the learner progress, if not present, get it from db.
 		SessionBean sessionBean = getSessionBean(request);
 		// forward to the no session error page
 		if (sessionBean == null) 

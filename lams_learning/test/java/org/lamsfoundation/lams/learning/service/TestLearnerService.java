@@ -253,6 +253,15 @@ public class TestLearnerService extends AbstractLamsTestCase
         assertEquals("verify temp completed activities",1,testProgress.getCurrentCompletedActivitiesList().size());
     }
 
+    public void testExitLesson()
+    {
+        learnerService.exitLesson(testProgress);
+        
+        LearnerProgress progress = learnerProgressDao.getLearnerProgressByLearner(testUser,testLesson);
+
+        assertTrue("verify it should be restarting",progress.isRestarting());
+        
+    }
     /**
      * @param numberOfAttemptedAct 
      * @param testCompletedActivity

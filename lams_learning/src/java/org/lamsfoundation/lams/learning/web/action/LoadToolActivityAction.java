@@ -52,11 +52,11 @@ public class LoadToolActivityAction extends ActivityAction {
 	 * Gets an activity from the request (attribute) and forwards onto a
 	 * loading page.
 	 */
-	public ActionForward execute(
-			ActionMapping mapping,
-			ActionForm actionForm,
-			HttpServletRequest request,
-			HttpServletResponse response) {
+	public ActionForward execute(ActionMapping mapping,
+	                             ActionForm actionForm,
+	                             HttpServletRequest request,
+	                             HttpServletResponse response) 
+	{
 		ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
 		
@@ -78,8 +78,7 @@ public class LoadToolActivityAction extends ActivityAction {
 		activityURLs.add(activityURL);
 		form.setActivityURLs(activityURLs);
 		
-		String forward = "displayTool";
-		return mapping.findForward(forward);
+		return mapping.findForward("displayTool");
 	}
 
 }

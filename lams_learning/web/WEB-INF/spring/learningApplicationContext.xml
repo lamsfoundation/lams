@@ -11,11 +11,6 @@
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
-	<!-- bean id="learnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
-		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
-		<property name="activityMapping"><ref local="activityMapping"/></property>
-	</bean-->
-	
 	<bean id="learnerServiceTarget" class="org.lamsfoundation.lams.learning.service.LearnerService" singleton="false">
 		<constructor-arg>
 			<ref bean="progressEngine"/>
@@ -35,9 +30,11 @@
 				<prop key="joinLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
 				<prop key="calculateProgress">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
 				<prop key="completeToolSession">PROPAGATION_REQUIRES_NEW,ISOLATION_READ_COMMITTED</prop>
+				<prop key="exitLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
 			</props>
 		</property>
 	</bean> 
+	
 	<!-- bean id="toolService" class="org.lamsfoundation.lams.tool.service.DummyToolService" singleton="false">
 	</bean-->
 
@@ -45,7 +42,7 @@
 	</bean>
 	
 	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">
-		<property name="toolService"><ref bean="lamsToolService"/></property>
+		<!-- property name="lamsToolService"><ref bean="lamsToolService"/></property-->
 		<property name="baseURL"><value>http://localhost:8080/lams_learning/</value></property>
 	</bean>
 	

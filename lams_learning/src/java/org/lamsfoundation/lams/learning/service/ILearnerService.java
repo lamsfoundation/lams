@@ -101,4 +101,13 @@ public interface ILearnerService
      * @return a list of active lessons.
      */
     public LessonDTO[] getActiveLessonsFor(User learner);
+    
+    /**
+     * Mark the learner progress as restarting to indicate the current learner
+     * has exit the lesson
+     * @param progress the current learner progress.
+     */
+    public void exitLesson(LearnerProgress progress);
+    
+    
 }
