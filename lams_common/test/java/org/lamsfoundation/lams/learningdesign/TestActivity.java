@@ -13,6 +13,9 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
+import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 
 
 /**
@@ -23,12 +26,15 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 public class TestActivity extends AbstractLamsTestCase
 {
 	protected ActivityDAO activityDAO;
+	protected IUserDAO userDAO; 
+	protected User testUser;
+	
 	
 	private static final Long TEST_SEQUENCE_ACTIVITY=new Long(14);
-	
 	private static final Long TEST_SURVEY_ACTIVITY = new Long(20);
+	private static final Long TEST_MB_ACTIVITY = new Long(19);
+	private static final Integer TEST_USER_ID = new Integer(2);
 	
-	private static final Long TEST_USER_ID = new Long(2);
 	
     /*
      * @see AbstractLamsTestCase#setUp()
@@ -37,6 +43,9 @@ public class TestActivity extends AbstractLamsTestCase
     {
         super.setUp();
 		activityDAO =(ActivityDAO) context.getBean("activityDAO");
+		userDAO = (UserDAO)context.getBean("userDAO");
+		testUser = userDAO.getUserById(TEST_USER_ID);
+		
     }
 
     /*
@@ -77,6 +86,14 @@ public class TestActivity extends AbstractLamsTestCase
     
     public void testGetGroupForUser()
     {
+        Activity groupingAwareActivity = activityDAO.getActivityByActivityId(TEST_MB_ACTIVITY);
+        
+        Group testGroup = groupingAwareActivity.getGroupFor(testUser);
+        
+        assertNotNull(testGroup);
+        assertEquals("verify group id",88,testGroup.getGroupId().longValue());
+        assertEquals("verify the grouping this group belongs to",100,testGroup.getGrouping().getGroupingId().longValue());
+        assertEquals("verify the order of this group",1,testGroup.getOrderId());
         
     }
     /**
