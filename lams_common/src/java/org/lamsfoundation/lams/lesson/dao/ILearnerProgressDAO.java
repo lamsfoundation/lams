@@ -29,7 +29,7 @@ public interface ILearnerProgressDAO
      * @param user the user who owns the learner progress data.
      * @return the user's progress data
      */
-    public LearnerProgress getLearnerProgressByLeaner(final User learner,
+    public LearnerProgress getLearnerProgressByLearner(final User learner,
                                                       final Lesson lesson);
         
     /**

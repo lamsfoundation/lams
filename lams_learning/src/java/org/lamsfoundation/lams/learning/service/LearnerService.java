@@ -76,12 +76,12 @@ public class LearnerService implements ILearnerService
      */
     public LearnerProgress getProgress(User learner, Lesson lesson)
     {
-        return lessonDAO.getLearnerProgress(learner, lesson);
+        return learnerProgressDAO.getLearnerProgressByLearner(learner, lesson);
     }
     
 
     public LearnerProgress chooseActivity(User learner, Lesson lesson, Activity activity) {
-    	LearnerProgress progress = lessonDAO.getLearnerProgress(learner, lesson);
+    	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learner, lesson);
     	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED);
     	learnerProgressDAO.saveLearnerProgress(progress);
     	return progress;

@@ -58,7 +58,7 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
     /**
      * @see org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO#getLearnerProgressByLeaner(org.lamsfoundation.lams.usermanagement.User)
      */
-    public LearnerProgress getLearnerProgressByLeaner(final User learner, final Lesson lesson)
+    public LearnerProgress getLearnerProgressByLearner(final User learner, final Lesson lesson)
     {
         HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
