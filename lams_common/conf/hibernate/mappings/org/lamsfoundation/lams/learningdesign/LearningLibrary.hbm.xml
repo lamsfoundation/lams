@@ -52,6 +52,11 @@
     >
  
     </property>
+    <property name="validLibrary" 
+    		  type="java.lang.Boolean" 
+    		  column="valid_flag" 
+    		  not-null="true" 
+    		  length="4" />
 
     <!-- Associations -->
   
