@@ -142,7 +142,7 @@ $Revision$
           <login-module code = "org.jboss.security.auth.spi.DatabaseServerLoginModule" flag = "required">
              <module-option name="dsJndiName">java:/MySqlDS</module-option>
              <module-option name="principalsQuery">select password from lams_user where login=?</module-option>
-             <module-option name="rolesQuery">select name,'Roles' from lams_role</module-option>
+             <module-option name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</module-option>
           </login-module>
        </authentication>
     </application-policy>
