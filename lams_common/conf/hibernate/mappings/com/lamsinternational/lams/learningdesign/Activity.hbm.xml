@@ -169,7 +169,7 @@
 		<meta attribute="class-description" inherit="false">@hibernate.class </meta>			
 	    <meta attribute="scope-class" inherit="false">public abstract</meta>
 	    
-	    <!-- bi-directional one-to-many association to Activity -->
+	    <!-- bi-directional one-to-many association to Activity-->
 	    <set name="activities" lazy="true" inverse="true" cascade="none" >
     		<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="none"
     										@hibernate.collection-key column="parent_activity_id" 
