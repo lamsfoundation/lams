@@ -278,13 +278,18 @@ public class WebUtil
 	{
 		return checkBoolean(attrName, (String)req.getSession().getAttribute(attrName));
 	}
+
 	/**
 	 * TODO default proper exception at lams level to replace RuntimeException
+	 * TODO isTesting should be removed when login is done properly.
 	 * @param req -
 	 * @return username from principal object
 	 */
-	public static String getUsername(HttpServletRequest req) throws RuntimeException
+	public static String getUsername(HttpServletRequest req,boolean isTesting) throws RuntimeException
 	{
+	    if(isTesting)
+	        return "test";
+	    
 		Principal prin = req.getUserPrincipal();
 		if (prin == null)
 			throw new RuntimeException("Trying to get username but principal object missing. Request is "
