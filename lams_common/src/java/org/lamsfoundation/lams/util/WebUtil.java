@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * helper methods useful for servlets
@@ -15,14 +16,19 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 public class WebUtil
 {
     
-    public static final String CURRENT_TASK_ID = "currentTaskId";
-    public static final String COMPLETED_TASK_ID = "completedTaskId";
-    public static final String TASK_TO_DISPLAY = "tasktodisplay";
-    public static final String SEQUENCE_COMPLETED = "sequenceCompleted";
-    public static final String REFRESH_PROGRESS_DATA = "refresh";
-    public static final String IS_REUSABLE="isReusable";
+    //---------------------------------------------------------------------
+    // Class level constants - Session attributs
+    //---------------------------------------------------------------------
+    public static final String PARAM_MODE = "mode";
+    public static final String PARAM_SESSION_STATUS = "sessionStatus";
+    public static final String PARAM_CONTENT_ID = "content_id";
     
-
+    public static final String ATTR_MODE = "mode";
+    public static final String ATTR_USERNAME = "username";
+    public static final String ATTR_UPDATE_PROGRESS_BAR = "updateProgressBar";
+    public static final String ATTR_SESSION_STATUS = "sessionStatus";
+    public static final String ATTR_LESSON_ID = "lesson_id";
+    
 	private static Logger log = Logger.getLogger(WebUtil.class);
 
 	/**
@@ -65,35 +71,6 @@ public class WebUtil
 				req.setAttribute("urlB", urls[1]);
 			}
 		}
-	}
-
-	/**
-	 * 
-	 * 
-	 * @param HttpServletRequest
-	 */
-	public static void setRefresh(HttpServletRequest req, boolean refreshValue)
-	{
-		req.getSession().setAttribute(REFRESH_PROGRESS_DATA,
-									  Boolean.toString(refreshValue));
-	}
-
-	/**
-	 * This method is called each time a task has to be displayed. In this
-	 * method we are setting some attributes in the Http Session.
-	 * 
-	 * @param HttpServletRequest
-	 * @param DisplayTaskData -
-	 *            contains the data's task.
-	 */
-	public static void initTaskAttributes(HttpServletRequest req)
-	{
-		req.getSession().setAttribute(CURRENT_TASK_ID, "-1");
-		req.getSession().setAttribute(COMPLETED_TASK_ID, "-1");
-		req.getSession().setAttribute(TASK_TO_DISPLAY, null);
-		req.getSession().setAttribute(SEQUENCE_COMPLETED, "false");
-		req.getSession().setAttribute(REFRESH_PROGRESS_DATA, "false");
-		req.getSession().setAttribute(IS_REUSABLE,"false");
 	}
 
 	/**
@@ -290,7 +267,12 @@ public class WebUtil
 			return defaultValue;
 		}
 	}
-
+	
+	public static boolean readBooleanAttr(HttpServletRequest req,
+										   String attrName)
+	{
+		return checkBoolean(attrName, (String)req.getSession().getAttribute(attrName));
+	}
 	/**
 	 * TODO default proper exception at lams level to replace RuntimeException
 	 * @param req -
@@ -331,7 +313,26 @@ public class WebUtil
         else
             throw new IllegalArgumentException("["+mode+"] is not a legal mode" +
             		"in LAMS");
-        
     }
 
+    /**
+     * <p>This helper method create the struts action forward name using the path.
+     * It will chop all path related characters, such as "/" and ".do".</p>
+     * 
+     * <p>For example: 
+     * 	  <li><code>getStrutsForwardNameFromPath("/DisplayParallelActivity.do")<code>
+     * 	  = displayParallelActivity</li>
+     * </p>
+     * 
+     * @param path
+     * @return
+     */
+    public static String getStrutsForwardNameFromPath(String path)
+    {
+        String pathWithoutSlash = StringUtils.substringAfter(path,"/");
+        String orginalForwardName = StringUtils.chomp(pathWithoutSlash,".do");
+        
+        return StringUtils.uncapitalize(orginalForwardName);
+        
+    }
 }

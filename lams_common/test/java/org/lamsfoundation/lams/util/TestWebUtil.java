@@ -76,6 +76,7 @@ public class TestWebUtil extends MockStrutsTestCase
                 fail("IllegalArgumentException expected");
         }
     }
+    
     public void testReadNullToolAccessModeParam()
     {
         try
@@ -90,5 +91,26 @@ public class TestWebUtil extends MockStrutsTestCase
             else
                 fail("IllegalArgumentException expected");
         }
+    }
+    
+    public void testGetStrutsForwardNameFromPath()
+    {
+        String name = WebUtil.getStrutsForwardNameFromPath("/DisplayParallelActivity.do");
+        assertEquals("displayParallelActivity",name);
+
+        name = WebUtil.getStrutsForwardNameFromPath("/DisplayOptionsActivity.do");
+        assertEquals("displayOptionsActivity",name);
+        
+        name = WebUtil.getStrutsForwardNameFromPath("/LoadToolActivity.do");
+        assertEquals("loadToolActivity",name);
+        
+        name = WebUtil.getStrutsForwardNameFromPath("/parallelWait.do");
+        assertEquals("parallelWait",name);
+
+        name = WebUtil.getStrutsForwardNameFromPath("/lessonComplete.do");
+        assertEquals("lessonComplete",name);
+        
+        name = WebUtil.getStrutsForwardNameFromPath("/requestDisplay.do");
+        assertEquals("requestDisplay",name);
     }
 }
