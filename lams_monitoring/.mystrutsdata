@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MyEclipseStrutsProperties>
+    <strutsVersion>1</strutsVersion>
+    <basePackage>org.lamsfoundation.lams.monitoring</basePackage>
+    <strutsPattern>0</strutsPattern>
+    <servletName>action</servletName>
+    <useWorkspaceSettings>false</useWorkspaceSettings>
+    <disableDesigner>false</disableDesigner>
+</MyEclipseStrutsProperties>

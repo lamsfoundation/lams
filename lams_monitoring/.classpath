@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="test/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/jstl.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/standard.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-beanutils.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-collections.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-digester.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-fileupload.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-lang.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-validator.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/jakarta-oro.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/struts-legacy.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/struts.jar"/>
+	<classpathentry kind="output" path="web/WEB-INF/classes"/>
+</classpath>
