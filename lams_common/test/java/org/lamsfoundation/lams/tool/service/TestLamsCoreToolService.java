@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolDataAccessTestCase;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
+import org.lamsfoundation.lams.util.WebUtil;
 
 
 /**
@@ -36,9 +37,9 @@ import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
  * @version
  * 
  */
-public class TestLamsToolService extends ToolDataAccessTestCase
+public class TestLamsCoreToolService extends ToolDataAccessTestCase
 {
-	private static Logger log = Logger.getLogger(TestLamsToolService.class);
+	private static Logger log = Logger.getLogger(TestLamsCoreToolService.class);
     private ILamsCoreToolService toolService;
     
     /*
@@ -70,7 +71,7 @@ public class TestLamsToolService extends ToolDataAccessTestCase
      * Constructor for TestLamsToolService.
      * @param arg0
      */
-    public TestLamsToolService(String arg0)
+    public TestLamsCoreToolService(String arg0)
     {
         super(arg0);
     }
@@ -91,25 +92,57 @@ public class TestLamsToolService extends ToolDataAccessTestCase
     
     public void testGetToolURLByLearnerMode() throws LamsToolServiceException
     {
-        String learnerUrl = toolService.getToolURLByMode(testNonGroupedActivity,testUser,ToolAccessMode.LEARNER);
+        String learnerUrl = toolService.getLearnerToolURLByMode(testNonGroupedActivity,testUser,ToolAccessMode.LEARNER);
         
         assertNotNull(learnerUrl);
+        assertTrue(learnerUrl.indexOf("?")>0);
+        assertTrue(learnerUrl.indexOf(ToolAccessMode.LEARNER.toString())>0);
+        assertTrue(learnerUrl.indexOf(WebUtil.PARAM_MODE)>0);
         log.info("learner url:"+learnerUrl);
     }
     
     public void testGetToolURLByTeacherMode() throws LamsToolServiceException
     {
-        String monitorUrl = toolService.getToolURLByMode(testNonGroupedActivity,testUser,ToolAccessMode.TEACHER);
+        String monitorUrl = toolService.getLearnerToolURLByMode(testNonGroupedActivity,testUser,ToolAccessMode.TEACHER);
         
         assertNotNull(monitorUrl);
-        log.info("learner url:"+monitorUrl);
+        log.info("monitor url:"+monitorUrl);
+        assertTrue(monitorUrl.indexOf("?")>0);
+        assertTrue(monitorUrl.indexOf(ToolAccessMode.TEACHER.toString())>0);
+        assertTrue(monitorUrl.indexOf(WebUtil.PARAM_MODE)>0);
+
     }
     
     public void testGetToolURLByAuthorMode() throws LamsToolServiceException
     {
-        String authorUrl = toolService.getToolURLByMode(testNonGroupedActivity,testUser,ToolAccessMode.AUTHOR);
+        String authorUrl = toolService.getLearnerToolURLByMode(testNonGroupedActivity,testUser,ToolAccessMode.AUTHOR);
         
         assertNotNull(authorUrl);
-        log.info("learner url:"+authorUrl);
+        log.info("author url:"+authorUrl);
+        assertTrue(authorUrl.indexOf("?")>0);
+        assertTrue(authorUrl.indexOf(ToolAccessMode.AUTHOR.toString())>0);
+        assertTrue(authorUrl.indexOf(WebUtil.PARAM_MODE)>0);        
+
+    }
+    
+    public void testGetToolURLByLearnerModeForGroupedTool() throws LamsToolServiceException
+    {
+        String learnerUrl = toolService.getLearnerToolURLByMode(testGroupedActivity,testUser,ToolAccessMode.LEARNER);
+        
+        assertNotNull(learnerUrl);
+        log.info("Non grouped activity learner url:"+learnerUrl);
+        assertTrue(learnerUrl.indexOf("?")>0);
+        assertTrue(learnerUrl.indexOf(ToolAccessMode.LEARNER.toString())!=-1);
+        assertTrue(learnerUrl.indexOf(WebUtil.PARAM_MODE)>0);
+
+    }
+    
+    public void testSetupToolURLWithToolContent()
+    {
+        String testUrl = "http://localhost:8080/lams/test.do?method=test";
+        String testUrlWithContent = toolService.setupToolURLWithToolContent(testNonGroupedActivity,testUrl);
+        log.info("test url with content id:"+testUrlWithContent);
+        assertTrue(testUrlWithContent.indexOf(WebUtil.PARAM_CONTENT_ID)>0);
+
     }
 }
