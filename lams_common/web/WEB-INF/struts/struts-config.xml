@@ -15,6 +15,10 @@
 	
     <form-bean name="PasswordChangeActionForm"
                type="com.lamsinternational.lams.web.PasswordChangeActionForm" />
+    
+    <form-bean name="OrganisationActionForm"
+               type="com.lamsinternational.lams.usermanagement.web.OrganisationActionForm" />
+               
                
 	</form-beans>
 	<!-- ========== Global Exceptions Definitions =================================== -->
@@ -38,11 +42,8 @@
     <action path="/home"
             type="com.lamsinternational.lams.web.HomeAction"
             parameter="method">
-      <forward name="sysadmin"
-               path=".admin.sysadmin">
-      </forward>
       <forward name="admin"
-               path="/admin.jsp">
+               path=".admin">
       </forward>
       <forward name="staff"
                path="/staff.jsp">
@@ -63,6 +64,23 @@
             parameter="method">
       <forward name="organisation"
                path=".admin.organisation">
+      </forward>
+      <forward name="error"
+               path=".admin.error">
+      </forward>
+	</action>
+
+    <action path="/organisation"
+            type="com.lamsinternational.lams.usermanagement.web.OrganisationAction"
+            name="OrganisationActionForm"
+            scope="session"
+            input=".admin.organisation"
+            validate="true">
+      <forward name="admin"
+               path=".admin">
+      </forward>
+      <forward name="error"
+               path=".admin.error">
       </forward>
 	</action>
 
