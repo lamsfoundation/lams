@@ -74,13 +74,13 @@
         name="userOrganisationRoles"
         lazy="true"
         inverse="true"
-		cascade="none"
+		cascade="delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
             lazy="true"
             inverse="true"
-            cascade="none"
+            cascade="delete-orphan"
 
            @hibernate.collection-key
             column="role_id"
