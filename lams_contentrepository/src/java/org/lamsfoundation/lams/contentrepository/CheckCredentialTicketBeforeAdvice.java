@@ -31,27 +31,34 @@ public class CheckCredentialTicketBeforeAdvice implements MethodBeforeAdvice {
 		// assume that the first argument is the ticket or credential
 
 		if ( log.isDebugEnabled() ) {
-			log.debug("Method "+m.getName()+" Checking credential/ticket "+args[0]);
+			log.debug("Method "
+					+( m!=null ? m.getName() : "null")
+					+" Checking credential/ticket "
+					+( args != null && args.length > 0 ? args[0] : "null"));
 		}
 		
-		if (  args[0] == null ) { 
+		if ( args == null || args[0] == null ) { 
 
 			throw new AccessDeniedException("No ticket/credential supplied. Access to repository denied.");
 
 		} else {
 
-			if ( ITicket.class.isInstance(args[0]) ) {
+			Object obj = args[0];
+			if ( ITicket.class.isInstance(obj) ) {
 
 				IRepositoryAdmin repository = (IRepositoryAdmin) target;
-				if ( ! repository.isTicketOkay((ITicket) args[0]) ) {
+				if ( ! repository.isTicketOkay((ITicket) obj) ) {
 					log.error("Supplied ticket not recognised. It may have timed out. Please log in again.");
 					throw new AccessDeniedException("Supplied ticket not recognised. It may have timed out. Please log in again.");
 				}
 
-			} else if ( ! ICredentials.class.isInstance(args[0]) ) {
+			} else if ( ! ICredentials.class.isInstance(obj) ) {
 				
-				String error = "Method has wrong signature. Method "+m.getName()+" has CheckCredentialTicketBeforeAdvice applied to it, but the first argument is a "
-					+args[0].getClass().getName()+". It must be either a ICredential or a ITicket";
+				String error = "Method has wrong signature. Method "
+					+( m!=null ? m.getName() : "null")
+					+" has CheckCredentialTicketBeforeAdvice applied to it, but the first argument is a "
+					+obj.getClass().getName()
+					+". It must be either a ICredential or a ITicket";
 				log.error(error);
 				throw new RepositoryRuntimeException(error);
 				
