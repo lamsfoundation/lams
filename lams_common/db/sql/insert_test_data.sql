@@ -88,7 +88,7 @@ values(5,'message_board_signature','messageBoardService','Message Board','Messag
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(6,'survey_signature','surveyService','Survey','Survey Description',6,0,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,6);
+'/lams_tool_survey/tool/survey/survey.do?method=loadQuestionnaire','/lams_tool_survey/tool/survey/authoring.do?method=loadSurvey','define_later_url','export_portfolio_url','/lams_tool_survey/tool/survey/report.do?method=loadMonitorReport',1,6);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
@@ -150,6 +150,7 @@ insert into lams_group values(89, 101, 1);
 insert into lams_group values(90, 101, 1);
 
 insert into lams_user_group values(1,87);
+insert into lams_user_group values(1,88);
 insert into lams_user_group values(2,88);
 insert into lams_user_group values(2, 90);
 insert into lams_user_group values(3, 89);
