@@ -63,6 +63,11 @@
         <meta attribute="field-description">@hibernate.property column="offline_instructions" length="65535"</meta>    
     </property>
     
+    <property name="onlineInstructions" type="java.lang.String" column="online_instructions" length="65535">
+		<meta attribute="field-description">@hibernate.property column="online_instructions" length="65535"</meta>    
+	</property>
+    
+    
     <property name="runOffline" type="java.lang.Boolean" column="run_offline_flag" not-null="true" length="4">
         <meta attribute="field-description">@hibernate.property column="run_offline_flag" length="4" not-null="true"</meta>    
     </property>
@@ -73,8 +78,6 @@
     <property name="groupingUIID" type="java.lang.Integer" column="grouping_ui_id" length="11">
 				        <meta attribute="field-description">@hibernate.property column="grouping_ui_id" length="11"</meta>    
 	</property>				
-    
-    
     
     <property name="activityTypeId" type="java.lang.Integer" column="learning_activity_type_id" length="11" not-null="true">
     	        <meta attribute="field-description">@hibernate.property column="learning_activity_type_id" length="11"</meta>    
@@ -87,6 +90,9 @@
     <property name="libraryActivityUiImage" type="java.lang.String" column="library_activity_ui_image" length="255">
         <meta attribute="field-description">@hibernate.property column="library_activity_ui_image" length="255"</meta>    
     </property>
+    
+    <property name="applyGrouping" type="java.lang.Boolean" column="apply_grouping_flag" not-null="true" length="4"/>
+    <property name="groupingSupportType" type="java.lang.Integer" column="grouping_support_type_id" length="11"/>
 
     <!-- Associations -->
     

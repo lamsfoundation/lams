@@ -33,6 +33,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.MonitoringActivityDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -669,7 +670,6 @@ public abstract class Activity implements Serializable,Nullable {
 	{
 	    return activityStrategy.getNextActivityByParent(this,currentChild);
 	}	
-	}
 	
 	public Integer getActivityCategoryID() {
 		return activityCategoryID;
