@@ -110,7 +110,7 @@ public class ToolDBDeployTask extends DBTask
             defaultContentId = getNewToolContentId(toolId, conn);
             
             //add the default content id to the tool record
-            insertDefaultContentId(conn);
+            updateToolDefaultContentId(toolId, defaultContentId, conn);
             
             //put the tool id into the tool library script
             Map replacementMap = new HashMap(1);
@@ -120,6 +120,9 @@ public class ToolDBDeployTask extends DBTask
             
             //run tool library script and get the library id back
             learningLibraryId = runLibraryScript(libraryScriptSQL, conn);
+            
+            //update tool record to include library id
+            updateToolLibraryId(toolId, learningLibraryId, conn);
             
             //put the library id into the activity insert script
             replacementMap = new HashMap(1);
@@ -237,7 +240,7 @@ public class ToolDBDeployTask extends DBTask
         }
     }
     
-    private void insertDefaultContentId(Connection conn) throws DeployException
+    private void updateToolDefaultContentId(long toolId, long defaultContentId, Connection conn) throws DeployException
     {
         PreparedStatement stmt = null;
         try
@@ -250,7 +253,28 @@ public class ToolDBDeployTask extends DBTask
         }
         catch (SQLException sqlex)
         {
-            throw new DeployException("Could not insert defualt content id", sqlex);
+            throw new DeployException("Could not update default content id into tool", sqlex);
+        }
+        finally
+        {
+            DbUtils.closeQuietly(stmt);
+        }
+    }
+    
+    private void updateToolLibraryId(long toolId, long libraryId, Connection conn) throws DeployException
+    {
+        PreparedStatement stmt = null;
+        try
+        {
+            stmt = conn.prepareStatement("UPDATE lams_tool SET learning_library_id = ? WHERE tool_id = ?");
+            stmt.setLong(1, libraryId);
+            stmt.setLong(2, toolId);
+            stmt.execute();
+            
+        }
+        catch (SQLException sqlex)
+        {
+            throw new DeployException("Could not update library id into tool", sqlex);
         }
         finally
         {
