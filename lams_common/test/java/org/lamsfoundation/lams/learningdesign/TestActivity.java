@@ -71,7 +71,7 @@ public class TestActivity extends AbstractLamsTestCase
         
         Set toolActivities = complexActivity.getAllToolActivitiesFrom(complexActivity);
         
-        assertEquals("verify the number tool activity we should get",3,toolActivities.size());
+        assertEquals("verify the number tool activity we should get",2,toolActivities.size());
     }
 
     public void testGetAllToolActivitiesFromToolActivity()
