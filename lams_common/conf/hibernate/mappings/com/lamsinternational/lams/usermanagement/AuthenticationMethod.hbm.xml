@@ -98,32 +98,6 @@
             class="com.lamsinternational.lams.usermanagement.User"
         />
     </set>
-    <!-- bi-directional one-to-many association to AuthenticationMethodParameter -->
-    <set
-        name="authenticationMethodParameters"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="authentication_method_id"
-
-           @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.usermanagement.AuthenticationMethodParameter"
-        </meta>
-        <key>
-            <column name="authentication_method_id" />
-        </key>
-        <one-to-many 
-            class="com.lamsinternational.lams.usermanagement.AuthenticationMethodParameter"
-        />
-    </set>
 
 </class>
 </hibernate-mapping>
