@@ -170,6 +170,58 @@
         </meta>
         <column name="parent_folder_id" />
     </many-to-one>
+    <!-- bi-directional one-to-many association to User -->
+    <set
+        name="users"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="base_organisation_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.usermanagement.User"
+        </meta>
+        <key>
+            <column name="base_organisation_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.usermanagement.User"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to Lesson -->
+    <set
+        name="lessons"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="organisation_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.lesson.Lesson"
+        </meta>
+        <key>
+            <column name="organisation_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.lesson.Lesson"
+        />
+    </set>
 
 
 </class>

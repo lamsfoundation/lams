@@ -321,6 +321,149 @@
         </meta>
         <column name="authentication_method_id" />
     </many-to-one>
+    <!-- bi-directional many-to-one association to Organisation -->
+    <many-to-one
+        name="lamsOrganisation"
+        class="com.lamsinternational.lams.usermanagement.Organisation"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="base_organisation_id"         
+        </meta>
+        <column name="base_organisation_id" />
+    </many-to-one>
+	<!-- bi-directional one-to-many association to LearnerProgress -->
+    <set
+        name="learnerProgresses"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="user_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.lesson.LearnerProgress"
+        </meta>
+        <key>
+            <column name="user_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.lesson.LearnerProgress"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to UserToolSession -->
+    <set
+        name="userToolSessions"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="user_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.lesson.UserToolSession"
+        </meta>
+        <key>
+            <column name="user_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.lesson.UserToolSession"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to UserGroup -->
+    <set
+        name="userGroups"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="user_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.lesson.UserGroup"
+        </meta>
+        <key>
+            <column name="user_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.lesson.UserGroup"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to LearningDesign -->
+    <set
+        name="learningDesigns"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="user_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.learningdesign.LearningDesign"
+        </meta>
+        <key>
+            <column name="user_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.learningdesign.LearningDesign"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to Lesson -->
+    <set
+        name="lessons"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="user_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.lesson.Lesson"
+        </meta>
+        <key>
+            <column name="user_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.lesson.Lesson"
+        />
+    </set>
 
 </class>
 </hibernate-mapping>
