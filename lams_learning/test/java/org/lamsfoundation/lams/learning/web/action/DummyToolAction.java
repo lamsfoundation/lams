@@ -30,8 +30,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.service.DummyLearnerService;
 import org.lamsfoundation.lams.learning.web.form.DummyToolForm;
 
 
@@ -78,8 +79,8 @@ public class DummyToolAction extends DispatchAction {
 		}
 		long toolSessionId = testForm.getToolSessionId().longValue();
 		
-		DummyLearnerService learnerService = (DummyLearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
-		learnerService.setRequest(request);
+		ILearnerService learnerService = (LearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
+		//learnerService.setRequest(request);
 		String url = learnerService.completeToolSession(toolSessionId, null);
 		try {
 			response.sendRedirect(url);

@@ -60,7 +60,7 @@ public class LearnerService implements ILearnerService
     private ProgressEngine progressEngine;
     private IToolSessionDAO toolSessionDAO;
     private ILamsToolService lamsToolService;
-    private ActivityMapping activityMappings;
+    private ActivityMapping activityMapping;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
     //---------------------------------------------------------------------
@@ -105,8 +105,8 @@ public class LearnerService implements ILearnerService
         this.lamsToolService = lamsToolService;
     }
     
-    public void setActivityMappings(ActivityMapping activityMappings) {
-		this.activityMappings = activityMappings;
+    public void setActivityMapping(ActivityMapping activityMapping) {
+		this.activityMapping = activityMapping;
 	}
     //---------------------------------------------------------------------
     // Service Methods
@@ -129,7 +129,18 @@ public class LearnerService implements ILearnerService
     
  
     /**
-     * Joins a User to a new lesson as a learner
+     * <p>Joins a User to a lesson as a learner. It could either be a new lesson
+     * or a lesson that has been started.</p>
+     * 
+     * <p>In terms of new lesson, a new learner progress would be initialized.
+     * Tool session for the next activity will be initialized if necessary.</p>
+     * 
+     * <p>In terms of an started lesson, the learner progress will be returned
+     * without calculation. Tool session will be initialized if necessary.
+     * Note that we won't initialize tool session for current activity because
+     * we assume tool session will always initialize before it becomes a 
+     * current activity.</p
+     * 
      * @param learner the Learner
      * @param lessionID identifies the Lesson to start
      * @throws LamsToolServiceException
@@ -179,22 +190,37 @@ public class LearnerService implements ILearnerService
     /**
      * Calculates learner progress and returns the data required to be displayed 
      * to the learner.
+     * TODO need to initialize tool session for next activity if necessary.
      * @param completedActivityID identifies the activity just completed
      * @param learner the Learner
      * @param lesson the Lesson in progress.
      * @return the bean containing the display data for the Learner
+     * @throws LamsToolServiceException
      * @throws LearnerServiceException in case of problems.
      */
     public LearnerProgress calculateProgress(Activity completedActivity, 
                                              User learner, 
-                                             Lesson lesson) throws ProgressException
+                                             Lesson lesson) 
     {
         LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
 
-        learnerProgress = progressEngine.calculateProgress(learner, lesson, completedActivity,learnerProgress);
+        try
+        {
+            learnerProgress = progressEngine.calculateProgress(learner, lesson, completedActivity,learnerProgress);
+            learnerProgressDAO.updateLearnerProgress(learnerProgress);
+            
+            createToolSessionsIfNecessary(learnerProgress);
+        }
+        catch (ProgressException e)
+        {
+            throw new LearnerServiceException(e.getMessage());
+        }
+        catch (LamsToolServiceException e)
+        {
+            throw new LearnerServiceException(e.getMessage());
+        }
 
-        learnerProgressDAO.updateLearnerProgress(learnerProgress);
-        
+
         return learnerProgress;
     }
     
@@ -214,11 +240,7 @@ public class LearnerService implements ILearnerService
     	try 
     	{
 	    	LearnerProgress nextLearnerProgress = calculateProgress(toolSession.getToolActivity(), learner, toolSession.getLesson());
-	    	return activityMappings.getProgressURL(nextLearnerProgress);
-    	}
-    	catch (ProgressException e) 
-    	{
-    		throw new LearnerServiceException(e.getMessage());
+	    	return activityMapping.getProgressURL(nextLearnerProgress);
     	}
         catch (UnsupportedEncodingException e)
         {

@@ -73,4 +73,31 @@ public class DummyToolService implements ILamsToolService {
         return null;
     }
 
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#getToolSessionByLearner(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity)
+     */
+    public ToolSession getToolSessionByLearner(User arg0, Activity arg1) throws LamsToolServiceException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#getToolSessionById(java.lang.Long)
+     */
+    public ToolSession getToolSessionById(Long arg0)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#updateToolSession(org.lamsfoundation.lams.tool.ToolSession)
+     */
+    public void updateToolSession(ToolSession arg0)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

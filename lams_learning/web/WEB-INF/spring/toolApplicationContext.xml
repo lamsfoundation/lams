@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for LAMS.
+-->
+<beans>
+
+	<bean id="toolContentDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolContentDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="toolDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="toolSessionDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="toolContentIDGeneratorTarget" class="org.lamsfoundation.lams.tool.ToolContentIDGenerator"
+		singleton="true"
+	>
+		<property name="toolContentDao"><ref local="toolContentDAO"/></property>
+	</bean>	
+	
+	<bean id="toolContentIDGenerator" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref local="toolContentIDGeneratorTarget"/></property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="getNextToolContentIDFor">PROPAGATION_REQUIRES_NEW,ISOLATION_READ_COMMITTED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="lamsToolServiceTarget" class="org.lamsfoundation.lams.tool.service.LamsToolService"
+		singleton="false"
+	>
+		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
+		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>	
+	</bean>	
+	
+	<bean id="lamsToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref local="lamsToolServiceTarget"/></property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="createToolSession">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="notifyToolsToCreateSession">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+			    <prop key="update*">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+			    <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>   	
+	
+</beans>

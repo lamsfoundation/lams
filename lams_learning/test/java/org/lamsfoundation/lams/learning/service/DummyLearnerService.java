@@ -70,8 +70,8 @@ public class DummyLearnerService implements ILearnerService {
 		this.request = request;
 	}
 	
-	public void setActivityMapping(ActivityMapping actionMappings) {
-		this.activityMapping = actionMappings;
+	public void setActivityMapping(ActivityMapping actionMapping) {
+		this.activityMapping = actionMapping;
 	}
 
 	private LearnerProgress getProgress() {

@@ -28,6 +28,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -89,13 +90,13 @@ public class CompleteActivityAction extends ActivityAction {
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
 
-		ILearnerService learnerService = getLearnerService(request);
+		ILearnerService learnerService = getLearnerService();
 		
 		// Set activity as complete
 		try {
 			progress = learnerService.calculateProgress(activity, learner, lesson);
 		}
-		catch (ProgressException e) {
+		catch (LearnerServiceException e) {
 			return mapping.findForward("error");
 		}
 		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, progress.getNextActivity());

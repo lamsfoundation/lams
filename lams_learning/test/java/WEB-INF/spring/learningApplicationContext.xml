@@ -19,7 +19,7 @@
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
 		<property name="lamsToolService"><ref bean="lamsToolService"/></property>
-		<property name="activityMappings"><ref bean="activityMappings"/></property>
+		<property name="activityMapping"><ref bean="activityMapping"/></property>
 	</bean>
 	
 	<bean id="learnerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -34,21 +34,21 @@
 		</property>
 	</bean> 
 	
-	<bean id="toolService" class="org.lamsfoundation.lams.tool.service.DummyToolService" singleton="false">
-	</bean>
+	<!-- bean id="toolService" class="org.lamsfoundation.lams.tool.service.DummyToolService" singleton="false">
+	</bean-->
 
 	<bean id="progressEngine" class="org.lamsfoundation.lams.learning.progress.ProgressEngine" singleton="false">
 	</bean>
 	
-	<bean id="activityMappings" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">
-		<property name="toolService"><ref bean="toolService"/></property>
+	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">
+		<property name="toolService"><ref bean="lamsToolService"/></property>
 		<property name="baseURL"><value>http://localhost:8080/lams_learning/</value></property>
 	</bean>
 	
-	<bean id="dummyLearnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
+	<!-- bean id="dummyLearnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
 		<constructor-arg>
 			<ref bean="progressEngine"/>
 		</constructor-arg>
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
-	</bean>	
+	</bean-->	
 </beans>

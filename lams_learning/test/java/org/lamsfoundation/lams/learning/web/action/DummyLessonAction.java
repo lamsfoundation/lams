@@ -32,7 +32,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.service.DummyLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -53,6 +52,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class DummyLessonAction extends Action {
 	
+    
+    private static final Integer TEST_USER_ID = new Integer(1);
+    private static final Long TEST_ACTIVITY_ID = new Long(36);
+    
 	/**
 	 * Gets the session bean from session.
 	 * @return SessionBean for this request, null if no session.
@@ -86,14 +89,14 @@ public class DummyLessonAction extends Action {
 		
 		SessionBean sessionBean = new SessionBean();
 		IUserManagementService userService = getUserService(this.servlet.getServletContext());
-		User user = userService.getUserById(new Integer(1));
+		User user = userService.getUserById(TEST_USER_ID);
 		sessionBean.setLearner(user);
 		setSessionBean(sessionBean, request);
 
-		DummyLearnerService learnerService = (DummyLearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
-		learnerService.setRequest(request);
-		learnerService.clearProgress();
-		activityForm.setActivityId(new Long(1));
+		ILearnerService learnerService = LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
+		//learnerService.setRequest(request);
+		//learnerService.clearProgress();
+		activityForm.setActivityId(TEST_ACTIVITY_ID);
 		
 		ActionForward forward = mapping.findForward("displayLesson");
 		return forward;

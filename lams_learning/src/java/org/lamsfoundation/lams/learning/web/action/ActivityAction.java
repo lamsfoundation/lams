@@ -26,8 +26,8 @@ import javax.servlet.http.*;
 import java.util.*;
 
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.service.DummyLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -51,9 +51,9 @@ public class ActivityAction extends LearnerAction {
 	/**
 	 * Get the learner service.
 	 */
-	protected ILearnerService getLearnerService(HttpServletRequest request) {
-		DummyLearnerService learnerService = (DummyLearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
-		learnerService.setRequest(request);
+	protected ILearnerService getLearnerService() {
+		ILearnerService learnerService = (LearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
+		//learnerService.setRequest(request);
 		//learnerService.setActionMappings(actionMappings);
 		return learnerService;
 	}
@@ -79,7 +79,7 @@ public class ActivityAction extends LearnerAction {
 			User learner = sessionBean.getLearner();
 			Lesson lesson = sessionBean.getLesson();
 			
-			ILearnerService learnerService = getLearnerService(request);
+			ILearnerService learnerService = getLearnerService();
 			learnerProgress = learnerService.getProgress(learner, lesson);
 			
 			// Save progress in session for Flash request

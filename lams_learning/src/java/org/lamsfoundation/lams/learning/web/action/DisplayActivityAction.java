@@ -29,7 +29,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
-import org.lamsfoundation.lams.usermanagement.*;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
@@ -67,8 +66,8 @@ public class DisplayActivityAction extends ActivityAction {
 		}
 		
 		// Get learner
-		User learner = sessionBean.getLearner();
-		Lesson lesson = sessionBean.getLesson();
+		//User learner = sessionBean.getLearner();
+		//Lesson lesson = sessionBean.getLesson();
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request, form);
 		Activity activity = getActivity(request, form, learnerProgress);

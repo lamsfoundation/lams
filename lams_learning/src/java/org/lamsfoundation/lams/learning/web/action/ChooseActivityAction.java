@@ -86,7 +86,7 @@ public class ChooseActivityAction extends ActivityAction {
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
 
-		ILearnerService learnerService = getLearnerService(request);
+		ILearnerService learnerService = getLearnerService();
 		learnerService.chooseActivity(learner, lesson, activity);
 		
 		ActionForward forward = actionMappings.getActivityForward(activity, progress, true);

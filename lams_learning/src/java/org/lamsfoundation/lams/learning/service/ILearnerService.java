@@ -93,7 +93,7 @@ public interface ILearnerService
      * @return the bean containing the display data for the Learner
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson) throws ProgressException;
+    public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson); 
 
     
     /**

@@ -1,50 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
+<!--
+  - Application context definition for lams survey business layer.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
 <beans>
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
-	<bean id="learnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
+	<!-- bean id="learnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 		<property name="activityMapping"><ref local="activityMapping"/></property>
+	</bean-->
+	
+	<bean id="learnerServiceTarget" class="org.lamsfoundation.lams.learning.service.LearnerService" singleton="false">
+		<constructor-arg>
+			<ref bean="progressEngine"/>
+		</constructor-arg>
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
+		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
+		<property name="lamsToolService"><ref bean="lamsToolService"/></property>
+		<property name="activityMapping"><ref bean="activityMapping"/></property>
 	</bean>
 	
-	<bean id="toolService" class="org.lamsfoundation.lams.tool.service.DummyToolService" singleton="false">
-	</bean>
+	<bean id="learnerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref local="learnerServiceTarget"/></property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="joinLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="calculateProgress">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="completeToolSession">PROPAGATION_REQUIRES_NEW,ISOLATION_READ_COMMITTED</prop>
+			</props>
+		</property>
+	</bean> 
+	<!-- bean id="toolService" class="org.lamsfoundation.lams.tool.service.DummyToolService" singleton="false">
+	</bean-->
 
 	<bean id="progressEngine" class="org.lamsfoundation.lams.learning.progress.ProgressEngine" singleton="false">
 	</bean>
 	
 	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">
-		<property name="toolService"><ref bean="toolService" /></property>
+		<property name="toolService"><ref bean="lamsToolService"/></property>
 		<property name="baseURL"><value>http://localhost:8080/lams_learning/</value></property>
 	</bean>
 	
-
-	<!-- bean id="notebookService" class="org.lamsfoundation.lams.notebook.service.NotebookService" singleton="false">
-		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO"/></property>
-	</bean-->
-
+	<!-- bean id="dummyLearnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
+		<constructor-arg>
+			<ref bean="progressEngine"/>
+		</constructor-arg>
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+	</bean-->	
 </beans>
