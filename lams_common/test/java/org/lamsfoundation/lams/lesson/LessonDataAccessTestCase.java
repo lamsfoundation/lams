@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 
 import net.sf.hibernate.HibernateException;
 
-import org.lamsfoundation.lams.AbstractLamsCommonTestCase;
+import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
  * @author Jacky Fang 2/02/2005
  * 
  */
-public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
+public class LessonDataAccessTestCase extends AbstractLamsTestCase
 {
 
     //---------------------------------------------------------------------
@@ -114,7 +114,7 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
     }
 
     /**
-     * @see org.lamsfoundation.lams.AbstractLamsCommonTestCase#getContextConfigLocation()
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
      */
     protected String[] getContextConfigLocation()
     {

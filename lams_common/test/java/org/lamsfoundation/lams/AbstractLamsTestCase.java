@@ -27,14 +27,14 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Jacky Fang 2/02/2005
  * 
  */
-public abstract class AbstractLamsCommonTestCase extends TestCase
+public abstract class AbstractLamsTestCase extends TestCase
 {
     protected ApplicationContext context;
     
     /**
      * 
      */
-    public AbstractLamsCommonTestCase(String name)
+    public AbstractLamsTestCase(String name)
     {
         super(name);
     }

@@ -369,7 +369,7 @@ Ant build file.
 			</batchtest>
 			<classpath>
 				<pathelement location="${build.classes}"/>
-				<pathelement location="${build.classes.test}"/>
+				<pathelement location="${build.test}"/>
 				<pathelement location="${hbm}"/>
 				<pathelement location="${testweb}"/>
 				<path refid="project.classpath"/>

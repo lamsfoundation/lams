@@ -3,7 +3,7 @@
  */
 package org.lamsfoundation.lams.learningdesign.dao;
 
-import org.lamsfoundation.lams.AbstractLamsCommonTestCase;
+import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -17,7 +17,7 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class TestLearningDesignDAO extends AbstractLamsCommonTestCase {
+public class TestLearningDesignDAO extends AbstractLamsTestCase {
 	
 	
 	private LearningDesignDAO learningDesignDAO;	
@@ -90,7 +90,7 @@ public class TestLearningDesignDAO extends AbstractLamsCommonTestCase {
 		
 	}
 	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsCommonTestCase#getContextConfigLocation()
+	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
 	 */
 	protected String[] getContextConfigLocation() {
 		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",

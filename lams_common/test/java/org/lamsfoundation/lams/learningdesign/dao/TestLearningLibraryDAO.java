@@ -5,7 +5,7 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.lamsfoundation.lams.learningdesign.dao;
-import org.lamsfoundation.lams.AbstractLamsCommonTestCase;
+import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
 
@@ -13,7 +13,7 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
 /**
  * @author manpreet
  */
-public class TestLearningLibraryDAO extends AbstractLamsCommonTestCase {
+public class TestLearningLibraryDAO extends AbstractLamsTestCase {
 	
 	protected LearningLibraryDAO libraryDAO;
 	protected LearningLibrary library;
@@ -33,7 +33,7 @@ public class TestLearningLibraryDAO extends AbstractLamsCommonTestCase {
 	}
 	/**
 	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsCommonTestCase#getContextConfigLocation()
+	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
 	 */
 	protected String[] getContextConfigLocation() {
 		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",

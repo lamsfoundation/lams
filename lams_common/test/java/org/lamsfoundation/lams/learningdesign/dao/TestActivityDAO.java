@@ -1,6 +1,6 @@
 package org.lamsfoundation.lams.learningdesign.dao;
 
-import org.lamsfoundation.lams.AbstractLamsCommonTestCase;
+import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
@@ -20,7 +20,7 @@ import org.lamsfoundation.lams.learningdesign.*;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class TestActivityDAO extends AbstractLamsCommonTestCase {
+public class TestActivityDAO extends AbstractLamsTestCase {
 	
 	protected ActivityDAO activityDAO;
 	protected Activity activity;
@@ -55,7 +55,7 @@ public class TestActivityDAO extends AbstractLamsCommonTestCase {
 		System.out.println("Transition FROM:" + transition.getActivityByToActivityId());
 	}
 	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsCommonTestCase#getContextConfigLocation()
+	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
 	 */
 	protected String[] getContextConfigLocation() {
 		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",

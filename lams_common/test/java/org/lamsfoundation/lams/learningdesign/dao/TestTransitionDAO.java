@@ -8,7 +8,7 @@ package org.lamsfoundation.lams.learningdesign.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.AbstractLamsCommonTestCase;
+import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 
@@ -18,7 +18,7 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class TestTransitionDAO extends AbstractLamsCommonTestCase{
+public class TestTransitionDAO extends AbstractLamsTestCase{
 	
 	protected TransitionDAO transitionDAO;
 	protected Transition transition;
@@ -41,7 +41,7 @@ public class TestTransitionDAO extends AbstractLamsCommonTestCase{
 	}
 	/**
 	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsCommonTestCase#getContextConfigLocation()
+	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
 	 */
 	protected String[] getContextConfigLocation() {
 		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",

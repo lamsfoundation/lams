@@ -9,7 +9,7 @@
 
 package org.lamsfoundation.lams.tool;
 
-import org.lamsfoundation.lams.AbstractLamsCommonTestCase;
+import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolContentDAO;
@@ -21,7 +21,7 @@ import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
  * @author Jacky Fang 8/02/2005
  * 
  */
-public class ToolDataAccessTestCase extends AbstractLamsCommonTestCase
+public class ToolDataAccessTestCase extends AbstractLamsTestCase
 {
 
     protected IToolContentDAO toolContentDao;
@@ -59,7 +59,7 @@ public class ToolDataAccessTestCase extends AbstractLamsCommonTestCase
         super(arg0);
     }
     /**
-     * @see org.lamsfoundation.lams.AbstractLamsCommonTestCase#getContextConfigLocation()
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
      */
     protected String[] getContextConfigLocation()
     {
