@@ -130,7 +130,7 @@
         												@hibernate.collection-key column="tool_session_id"
         										        @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.ToolSession"
 			        </meta>
-			        <key><column name="tool_session_id" /></key>
+			        <key><column name="activity_id" /></key>
 			        <one-to-many class="org.lamsfoundation.lams.tool.ToolSession"/>
 			    </set>
                  
