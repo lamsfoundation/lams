@@ -52,12 +52,6 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
     protected void setUp() throws Exception
     {
         super.setUp();
-        testSubOptionsActivityNB = activityDAO.getActivityByActivityId(TEST_NB_ACTIVITY_ID);
-        testSubOptionsActivityMC = activityDAO.getActivityByActivityId(TEST_MC_ACTIVITY_ID);
-        testSubParallelActivityQA = activityDAO.getActivityByActivityId(TEST_QA_ACTIVITY_ID);
-        testSubParallelActivityMB = activityDAO.getActivityByActivityId(TEST_MB_ACTIVITY_ID);
-        testSubSeuquencActivitySR = activityDAO.getActivityByActivityId(TEST_SR_ACTIVITY_ID);
-        testSubSeuqenceActivityQNA = activityDAO.getActivityByActivityId(TEST_QNA_ACTIVITY_ID);
     }
 
     /*
@@ -79,6 +73,9 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
     
     public void testChildrenCompletedForParallelActivity()
     {
+        testSubParallelActivityQA = activityDAO.getActivityByActivityId(TEST_QA_ACTIVITY_ID);
+        testSubParallelActivityMB = activityDAO.getActivityByActivityId(TEST_MB_ACTIVITY_ID);
+        
         super.testLearnerProgress.setProgressState(testSubParallelActivityQA,LearnerProgress.ACTIVITY_COMPLETED);
         super.testLearnerProgress.setProgressState(testSubParallelActivityMB,LearnerProgress.ACTIVITY_COMPLETED);
         
@@ -87,6 +84,8 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
 
     public void testChildrenInCompletedForParallelActivity()
     {
+        testSubParallelActivityQA = activityDAO.getActivityByActivityId(TEST_QA_ACTIVITY_ID);
+       
         super.testLearnerProgress.setProgressState(testSubParallelActivityQA,LearnerProgress.ACTIVITY_COMPLETED);
 
         assertTrue("should not be completed",!this.testParallelActivity.areChildrenCompleted(super.testLearnerProgress));
@@ -94,6 +93,10 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
     
     public void testChildrenCompletedForSequenceActivity()
     {
+        testSubSeuquencActivitySR = activityDAO.getActivityByActivityId(TEST_SR_ACTIVITY_ID);
+        testSubSeuqenceActivityQNA = activityDAO.getActivityByActivityId(TEST_QNA_ACTIVITY_ID);
+
+        
         super.testLearnerProgress.setProgressState(testSubSeuquencActivitySR,LearnerProgress.ACTIVITY_COMPLETED);
         super.testLearnerProgress.setProgressState(testSubSeuqenceActivityQNA,LearnerProgress.ACTIVITY_COMPLETED);
         assertTrue("should be completed",this.testSequenceActivity.areChildrenCompleted(super.testLearnerProgress));
@@ -101,12 +104,17 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
     
     public void testChildrenInCompletedForSequenceActivity()
     {
+        testSubSeuquencActivitySR = activityDAO.getActivityByActivityId(TEST_SR_ACTIVITY_ID);
+        
         super.testLearnerProgress.setProgressState(testSubSeuquencActivitySR,LearnerProgress.ACTIVITY_COMPLETED);
         assertTrue("should not be completed",!this.testSequenceActivity.areChildrenCompleted(super.testLearnerProgress));
     }
     
     public void testChildrenCompletedForOptionsActivity()
     {
+        testSubOptionsActivityNB = activityDAO.getActivityByActivityId(TEST_NB_ACTIVITY_ID);
+        testSubOptionsActivityMC = activityDAO.getActivityByActivityId(TEST_MC_ACTIVITY_ID);
+        
         super.testLearnerProgress.setProgressState(testSubOptionsActivityNB,LearnerProgress.ACTIVITY_COMPLETED);
         assertTrue("should be completed",this.testOptionsActivity.areChildrenCompleted(super.testLearnerProgress));
     }
@@ -116,4 +124,39 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
         assertTrue("should not be completed",!this.testOptionsActivity.areChildrenCompleted(super.testLearnerProgress));
     }
     
+    public void testGetNextActivityBySequenceParentActivity()
+    {
+        testSubSeuquencActivitySR = activityDAO.getActivityByActivityId(TEST_SR_ACTIVITY_ID);
+        testSubSeuqenceActivityQNA = activityDAO.getActivityByActivityId(TEST_QNA_ACTIVITY_ID);
+        
+        Activity nextActivity = this.testSequenceActivity.getNextActivityByParent(testSubSeuquencActivitySR);
+        
+        assertNotNull("we should have a next activity",nextActivity);
+        assertEquals("it should be qna",this.testSubSeuqenceActivityQNA.getActivityId().longValue(),nextActivity.getActivityId().longValue());
+    }
+    
+    public void testGetNextActivityByOptionsParentActivity()
+    {
+        testSubOptionsActivityNB = activityDAO.getActivityByActivityId(TEST_NB_ACTIVITY_ID);
+
+        Activity nextActivity = this.testOptionsActivity.getNextActivityByParent(testSubOptionsActivityNB);
+
+        assertNotNull("we should have a next activity",nextActivity);
+        assertEquals("it should be option activity itself",
+                     this.testOptionsActivity.getActivityId().longValue(),
+                     nextActivity.getActivityId().longValue());
+    }
+    
+    public void testGetNextActivityByParallelParentActivity()
+    {
+        testSubParallelActivityQA = activityDAO.getActivityByActivityId(TEST_QA_ACTIVITY_ID);
+
+        Activity nextActivity = this.testParallelActivity.getNextActivityByParent(testSubParallelActivityQA);
+        
+        assertNotNull("we should have a next activity",nextActivity);
+
+        assertTrue("It should be kind of null activity",nextActivity.isNull());
+        assertTrue("It should waiting activity",nextActivity instanceof ParallelWaitActivity);
+
+    }
 }

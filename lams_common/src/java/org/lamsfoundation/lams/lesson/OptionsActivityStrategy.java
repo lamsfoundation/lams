@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 
 /**
  * 
+ * Progress calculation strategy for options activity.
  * @author Jacky Fang 2005-2-24
  * 
  */
@@ -34,15 +35,23 @@ public class OptionsActivityStrategy extends ActivityStrategy
 {
 
     /**
-     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#getNextActivityFromParent(Activity)
+     * Return the next activity for a incomplete options activity. In terms of 
+     * incomplete option activity, the next activity will always be the option
+     * activity itself so as to display the options page again when the user
+     * finish one option.
+     *  
+     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
-    public Activity getNextActivityFromParent(Activity activity)
+    public Activity getNextActivityByParent(Activity parent, Activity currentChild)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return parent;
     }
 
     /**
+     * Return the completion status of children activities within a options 
+     * activity. A option activity is marked as complete if the maximum
+     * number of options requirement is met.
+     * 
      * @see org.lamsfoundation.lams.lesson.ActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
      */
     protected boolean isComplete(int numOfCompletedActivities, ComplexActivity complexActivity)

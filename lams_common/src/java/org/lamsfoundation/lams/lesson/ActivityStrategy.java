@@ -38,10 +38,13 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 public abstract class ActivityStrategy
 {
     /**
-     * Check up all children status for a complex activity.
-     * @param activity
-     * @param learnerProgress
-     * @return
+     * <p>Check up all children completion status for a complex activity. </p>
+     * Precondition: the activity should a complex activity that has children.
+     * 
+     * @param activity the complex activity
+     * @param learnerProgress the progress data that record what has been 
+     * 						  completed
+     * @return true if all children are completed.
      */
     public boolean areChildrenCompleted(Activity activity, LearnerProgress learnerProgress)
     {
@@ -60,13 +63,23 @@ public abstract class ActivityStrategy
     }
 
     /**
-     * @param numOfCompletedActivities
-     * @return
+     * Check up the children activity completion status against number of
+     * activities that has been completed within target complex activity. 
+     * @param numOfCompletedActivities the number of completed activities in the 	
+     * 								   progress data
+     * @return true if the completion condition is met.
      */
     protected abstract boolean isComplete(int numOfCompletedActivities,ComplexActivity complexActivity);
 
- 
 
-    public abstract Activity getNextActivityFromParent(Activity activity);
+    /**
+     * This method get next activity that should be progressed against the
+     * requested incomplete parent activity.
+     * @param parent The requested incomplete parent activity.
+     * @param currentChild the current children we have just completed.
+     * 
+     * @return the activity we should progress to.
+     */
+    public abstract Activity getNextActivityByParent(Activity parent, Activity currentChild);
     
 }

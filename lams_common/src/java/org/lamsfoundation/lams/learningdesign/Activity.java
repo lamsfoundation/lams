@@ -514,5 +514,16 @@ public abstract class Activity implements Serializable,Nullable {
 	    return activityStrategy.areChildrenCompleted(this,learnerProgress);
 	}
 	
-	
+	/**
+	 * Delegate to activity strategy to calculate what is the next activity
+	 * within the parent activity.
+	 * 
+     * @param learnerProgress the progress data that record what has been 
+     * 						  completed
+     * @return true if all children are completed.
+	 */
+	public Activity getNextActivityByParent(Activity currentChild)
+	{
+	    return activityStrategy.getNextActivityByParent(this,currentChild);
+	}
 }

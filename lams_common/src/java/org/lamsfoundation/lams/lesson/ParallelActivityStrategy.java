@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 
 
 /**
+ * The progress calculation strategy for parallel activity.
  * 
  * @author Jacky Fang 2005-2-24
  * 
@@ -33,15 +34,22 @@ import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 public class ParallelActivityStrategy extends ActivityStrategy
 {
     /**
-     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#getNextActivityFromParent(Activity)
+     * Regarding incomplete parallel activity, the next activity will always
+     * be a waiting activity, which will finally translated into waiting
+     * message.
+     * 
+     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
-    public Activity getNextActivityFromParent(Activity activity)
+    public Activity getNextActivityByParent(Activity activity, Activity currentChild)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new ParallelWaitActivity();
     }
 
     /**
+     * Return the completion status of children activities within a parallel
+     * activity. A parallel activity is marked as complete if all children
+     * activities are completed.
+     * 
      * @see org.lamsfoundation.lams.lesson.ActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
      */
     protected boolean isComplete(int numOfCompletedActivities, ComplexActivity complexActivity)

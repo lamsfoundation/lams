@@ -20,25 +20,48 @@
  */
 package org.lamsfoundation.lams.lesson;
 
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 
 /**
- * Activity calculation strategy for sequence activity.
+ * Progress calculation strategy for sequence activity.
  * 
  * @author Jacky Fang 2005-2-24
  * 
  */
 public class SequenceActivityStrategy extends ActivityStrategy
 {
+    
     /**
-     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#getNextActivityFromParent(Activity)
+     * <p>Return the next activity for a incomplete options activity. For a 
+     * sequence activity, the activity should be the next activity in the
+     * children activity set ordered by activity id.</p>
+     * 
+     * Pre-condition: the parent must have some incomplete children
+     * 
+     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
-    public Activity getNextActivityFromParent(Activity activity)
+    public Activity getNextActivityByParent(Activity parent, Activity currentChild)
     {
-        // TODO Auto-generated method stub
-        return null;
+        Set children = new TreeSet(new ActivityOrderComparator());
+        
+        children.addAll(((ComplexActivity)parent).getActivities());
+        
+        for(Iterator i=children.iterator();i.hasNext();)
+        {
+            Activity curChild = (Activity)i.next();
+            
+            if(curChild.getActivityId().longValue()==currentChild.getActivityId().longValue())
+                return (Activity)i.next();
+        }
+        return new NullActivity();
     }
 
     /**
