@@ -14,9 +14,10 @@
 		
 		function openSysAdmin()
 		{
+			var orgId = document.forms[0].orgIdForSysAdmin.value;
 			if(isMac)
 			{
-				adminWin = window.open('home.do?method=sysadmin&orgId="javascript:document.forms[0].orgIdForSysAdmin.value;"','adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+				adminWin = window.open('home.do?method=sysadmin&orgId='+orgId,'adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
 			}
 			else
 			{
@@ -26,7 +27,7 @@
 				}
 				else
 				{
-					adminWin = window.open('home.do?method=admin&orgId="javascript:document.forms[0].orgIdForSysAdmin.value;"','adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+					adminWin = window.open('home.do?method=sysadmin&orgId='+orgId,'adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
 					adminWin.focus();
 				}
 			}
@@ -34,13 +35,10 @@
 		
 		function openAuthor( )
 		{
-			//alert( "open author" );
-			
-			//cannot check if window is still open on macIE 5
-			//<c:set value=document.forms[0].orgIdForAuthor.value var=orgIdForAuthor>
+			var orgId = document.forms[0].orgIdForAuthor.value;
 			if(isMac)
 			{
-				authorWin = window.open('home.do?method=author','aWindow','width=796,height=570,resizable');
+				authorWin = window.open('home.do?method=author&orgId='+orgId,'aWindow','width=796,height=570,resizable');
 			}
 			else
 			{
@@ -50,7 +48,7 @@
 				}
 				else
 				{
-					authorWin = window.open('home.do?method=author','aWindow','width=796,height=570,resizable');
+					authorWin = window.open('home.do?method=author&orgId='+orgId,'aWindow','width=796,height=570,resizable');
 					authorWin.focus();
 				}
 			}
@@ -58,16 +56,16 @@
 		
 		function openStaff( )
 		{
-			//<c:set value=document.forms[0].orgIdForStaff.value var=orgIdForStaff>
+			var orgId = document.forms[0].orgIdForStaff.value;
 			if(isMac)
 			{
 				if(belowMinRes)
 				{
-					teachWin = window.open('home.do?method=staff','tWindow','width=796,height=575,resizable,scrollbars');
+					teachWin = window.open('home.do?method=staff&orgId='+orgId,'tWindow','width=796,height=575,resizable,scrollbars');
 				}
 				else
 				{
-					teachWin = window.open('home.do?method=staff','tWindow','width=779,height=575');
+					teachWin = window.open('home.do?method=staff&orgId='+orgId,'tWindow','width=779,height=575');
 				}
 			}
 			else
@@ -78,17 +76,17 @@
 				}
 				else
 				{
-					teachWin = window.open('home.do?method=staff','tWindow','width=779,height=575,resizable');
+					teachWin = window.open('home.do?method=staff&orgId='+orgId,'tWindow','width=779,height=575,resizable');
 				}
 			}
 		}
 		
 		function openLearner()
 		{
-			//<c:set value=document.forms[0].orgIdForLearner.value var=orgIdForLearner>
+			var orgId = document.forms[0].orgIdForStaff.value;
 			if(isMac)
 			{
-				learnWin = window.open('home.do?method=learner','lWindow','width=796,height=570,resizable,status=yes');
+				learnWin = window.open('home.do?method=learner&orgId='+orgId,'lWindow','width=796,height=570,resizable,status=yes');
 			}
 			else
 			{
@@ -98,17 +96,17 @@
 				}
 				else
 				{
-					learnWin = window.open('home.do?method=learner','lWindow','width=796,height=570,resizable,status=yes');
+					learnWin = window.open('home.do?method=learner&orgId='+orgId,'lWindow','width=796,height=570,resizable,status=yes');
 				}
 			}
 		}
 		
 		function openAdmin()
 		{
-			//<c:set value=document.forms[0].orgIdForAdmin.value var=orgIdForAdmin>
+			var orgId = document.forms[0].orgIdForAdmin.value;
 			if(isMac)
 			{
-				adminWin = window.open('home.do?method=admin','adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+				adminWin = window.open('home.do?method=admin&orgId='+orgId,'adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
 			}
 			else
 			{
@@ -118,7 +116,7 @@
 				}
 				else
 				{
-					adminWin = window.open('home.do?method=admin','adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+					adminWin = window.open('home.do?method=admin&orgId='+orgId,'adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
 					adminWin.focus();
 				}
 			}
