@@ -9,6 +9,8 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.lesson.LessonClass;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
 
 /**
@@ -456,5 +458,20 @@ public abstract class Activity implements Serializable,Nullable {
 
 	    return toolActivities;
 	    
+	}
+	
+	public Group getGroupFor(User learner)
+	{
+	    if(this.getGrouping()==null)
+	        throw new IllegalArgumentException("Exception occured in " +
+	        		"getGroupFor, no grouping has been defined");
+	    for(Iterator i=this.getGrouping().getGroups().iterator();i.hasNext();)
+	    {
+	        Group group = (Group)i.next();
+	        if(this.getGrouping().isLearnerGroup(group)&&group.hasLearner(learner))
+	            return group;
+	    }
+	    
+	    return new NullGroup();
 	}
 }

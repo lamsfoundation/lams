@@ -66,7 +66,7 @@ public class RandomGrouping extends Grouping
      * So it always return <code>true</code>.
      * @see org.lamsfoundation.lams.learningdesign.Grouping#isLearnerGroup(org.lamsfoundation.lams.learningdesign.Group)
      */
-    protected boolean isLearnerGroup(Group group)
+    public boolean isLearnerGroup(Group group)
     {
         return true;
     }

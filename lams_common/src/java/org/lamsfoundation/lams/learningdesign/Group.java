@@ -2,10 +2,13 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.Nullable;
 
 
 /** 
@@ -13,7 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *         table="lams_group"
  *     
 */
-public class Group implements Serializable {
+public class Group implements Serializable,Nullable {
 
     public final static int STAFF_GROUP_ORDER_ID = 1;
     
@@ -190,6 +193,30 @@ public class Group implements Serializable {
         	.append(getGroupId())
             .append(getOrderId())
             .toHashCode();
+    }
+
+    /**
+     * Return whether the target user is in this group or not.
+     * @param learner the target user
+     * @return boolean value to indicate whether the user is in.
+     */
+    public boolean hasLearner(User learner)
+    {
+        for(Iterator i=this.getUsers().iterator();i.hasNext();)
+        {
+            User user = (User)i.next();
+            if(user.getUserId().intValue()==learner.getUserId().intValue())
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.util.Nullable#isNull()
+     */
+    public boolean isNull()
+    {
+        return false;
     }
 
 }

@@ -52,7 +52,7 @@ public class LessonClass extends Grouping {
     /**
      * @see org.lamsfoundation.lams.learningdesign.Grouping#isLearnerGroup(org.lamsfoundation.lams.learningdesign.Group)
      */
-    protected boolean isLearnerGroup(Group group)
+    public boolean isLearnerGroup(Group group)
     {
         if(group.getGroupId()==null||staffGroup.getGroupId()==null)
             throw new IllegalArgumentException("Can't check up whether group" +

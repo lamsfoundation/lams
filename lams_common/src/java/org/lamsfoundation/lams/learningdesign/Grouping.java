@@ -196,6 +196,6 @@ public abstract class Grouping implements Serializable
     /**
      * @return
      */
-    protected abstract boolean isLearnerGroup(Group group);
+    public abstract boolean isLearnerGroup(Group group);
 
 }
