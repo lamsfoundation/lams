@@ -1,0 +1,230 @@
+MagicDrawUML "7.5"
+(RTManager
+	(RTManagerOptions
+		CODE_GENERATION_REVERSE_OPTION 2
+		DELETED_ELEMENT_GENERATION_OPTION 0
+		USE_CLASSPATH_FOR_JAVA_REVERSE TRUE
+		LAUNCH_WIZARD TRUE
+		MERGE_AFTER_REVERSE FALSE
+		CREATE_ATTRIBUTES TRUE
+		DEFAULT_WORKING_DIRECTORY "/opt/MagicDraw_UML"
+		DEFAULT_LANGUAGE "Java"
+		(JavaLanguageOptions
+			mGenEmptyDoc FALSE
+			mBracketInNewLine TRUE
+			mAddSpaces TRUE
+			mUseJavaDoc FALSE
+			mDefaultHeader "@(#) $FILE_NAME"
+			COLLECT_IMPORTS_ON_DEMAND TRUE
+			mGenerateDocumentation TRUE
+			(DocumentationProperties
+				DefaultDocumentationProcessor "STANDARD_PROCESSOR"
+				mCommentStyle 0
+				(Processors
+					(JAVA_DOC_PROCESSOR
+						(mDocumentationTagManager
+							(CLASSIFIER
+								(DocumentationTagProperty
+									mName "DESCRIPTION"
+									mGenerate "true"
+								)
+							)
+							(OPERARTION
+								(DocumentationTagProperty
+									mName "DESCRIPTION"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "@param"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "@return"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "@throws"
+									mGenerate "true"
+								)
+							)
+							(ATTRIBUTE
+								(DocumentationTagProperty
+									mName "DESCRIPTION"
+									mGenerate "true"
+								)
+							)
+						)
+					)
+				)
+			)
+			mUseClassPath TRUE
+			mClassPath "lib/xalan.jar:/usr/java/j2sdk1.4.2_05/jre/lib/rt.jar:/usr/java/j2sdk1.4.2_05/jre/lib/i18n.jar:/usr/java/j2sdk1.4.2_05/jre/lib/sunrsasign.jar:/usr/java/j2sdk1.4.2_05/jre/lib/jsse.jar:/usr/java/j2sdk1.4.2_05/jre/lib/jce.jar:/usr/java/j2sdk1.4.2_05/jre/lib/charsets.jar:/usr/java/j2sdk1.4.2_05/jre/classes"
+			mClassCountForImportOnDemand 10
+		)
+		(CppLanguageOptions
+			mGenEmptyDoc FALSE
+			mBracketInNewLine TRUE
+			mAddSpaces TRUE
+			mUseJavaDoc FALSE
+			mDefaultHeader "@(#) $FILE_NAME"
+			mGenerateDocumentation TRUE
+			(DocumentationProperties
+				DefaultDocumentationProcessor "STANDARD_PROCESSOR"
+				mCommentStyle 0
+				(Processors
+				)
+			)
+			mDocumentationOption FALSE
+			mGenerateMethodBodyInClass FALSE
+			mUseIncludePath FALSE
+			mUseMacros TRUE
+			mIncludePath ""
+		)
+		(DDLLanguageOptions
+			mGenerateDocumentation TRUE
+			mGenEmptyDoc FALSE
+			mBracketInNewLine TRUE
+			mAddSpaces TRUE
+			mUseJavaDoc FALSE
+			mDefaultHeader "@(#) $FILE_NAME"
+			mGenerateDocumentation TRUE
+			(DocumentationProperties
+				DefaultDocumentationProcessor "STANDARD_PROCESSOR"
+				mCommentStyle 0
+				(Processors
+				)
+			)
+		)
+		DEFAULT_WORKING_DIRECTORY "/opt/MagicDraw_UML"
+		TEMP_DIRECTORY "Active Directory"
+		(C#LanguageOptions
+			mGenEmptyDoc FALSE
+			mBracketInNewLine TRUE
+			mAddSpaces TRUE
+			mUseJavaDoc FALSE
+			mDefaultHeader "@(#) $FILE_NAME"
+			mGenerateDocumentation TRUE
+			CSH_CONCAT_NAMESPACE_NAMES TRUE
+			(DocumentationProperties
+				DefaultDocumentationProcessor "STANDARD_PROCESSOR"
+				mCommentStyle 0
+				(Processors
+					(CSH_XML_PROCESSOR
+						(mDocumentationTagManager
+							(CLASSIFIER
+								(DocumentationTagProperty
+									mName "summary"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "remarks"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "permission"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "example"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "seealso"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "include"
+									mGenerate "true"
+								)
+							)
+							(OPERARTION
+								(DocumentationTagProperty
+									mName "summary"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "value"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "param"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "returns"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "exception"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "permission"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "example"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "seealso"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "include"
+									mGenerate "true"
+								)
+							)
+							(ATTRIBUTE
+								(DocumentationTagProperty
+									mName "summary"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "permission"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "example"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "seealso"
+									mGenerate "true"
+								)
+								(DocumentationTagProperty
+									mName "include"
+									mGenerate "true"
+								)
+							)
+						)
+					)
+				)
+			)
+			CSH_COLLECT_USINGS TRUE
+			mDefines( list
+			)
+		)
+		mResultToDiagram 2
+		(CORBAIDLLanguageOptions
+			mGenEmptyDoc FALSE
+			mBracketInNewLine TRUE
+			mAddSpaces TRUE
+			mUseJavaDoc FALSE
+			mDefaultHeader "@(#) $FILE_NAME"
+			mGenerateDocumentation TRUE
+			(DocumentationProperties
+				DefaultDocumentationProcessor "STANDARD_PROCESSOR"
+				mCommentStyle 0
+				(Processors
+				)
+			)
+			mUseIncludePath TRUE
+			mGenerateImports FALSE
+		)
+	)
+	(RTProjectGroupObject
+		mID "_62f021a_1100063226645_358511_82"
+		mName "Code engineering sets"
+	)
+)
