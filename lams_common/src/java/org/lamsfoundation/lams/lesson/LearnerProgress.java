@@ -2,8 +2,12 @@ package org.lamsfoundation.lams.lesson;
 
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+
 import java.io.Serializable;
 import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -68,7 +72,16 @@ public class LearnerProgress implements Serializable
      * Indicates is the User has completed this lesson.
      */
     private boolean lessonComplete;
-
+    
+    /** default constructor */
+    public LearnerProgress()
+    {
+    }
+    
+    public LearnerProgress(User user,Lesson lesson)
+    {
+        this(null,user,lesson,new TreeSet( new ActivityOrderComparator()),new TreeSet( new ActivityOrderComparator()));
+    }
     
     /** full constructor */
     public LearnerProgress(Long learnerProgressId, User user, Lesson lesson, Set attemptedActivities, Set completedActivities)
@@ -78,11 +91,6 @@ public class LearnerProgress implements Serializable
         this.lesson = lesson;
         this.attemptedActivities = attemptedActivities;
         this.completedActivities = completedActivities;
-    }
-    
-    /** default constructor */
-    public LearnerProgress()
-    {
     }
     
     /**
@@ -126,7 +134,7 @@ public class LearnerProgress implements Serializable
     }
     
     /**
-     *           
+     *            
      *
      */
     public Set getAttemptedActivities()

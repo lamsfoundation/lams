@@ -9,7 +9,6 @@ package org.lamsfoundation.lams.lesson.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -48,14 +47,6 @@ public interface ILessonDAO
      */
     public void deleteLesson(Lesson lesson);
     
-    /**
-     * Retrieves the LearnerProgress
-     * @param learner the User in the Lesson
-     * @param lesson the Lesson
-     * @return LearnerProgess object containing the progress and state data.
-     */
-    public LearnerProgress getLearnerProgress(User learner, Lesson lesson);
-
     /**
      * Update a requested lesson.
      * @param createdLesson

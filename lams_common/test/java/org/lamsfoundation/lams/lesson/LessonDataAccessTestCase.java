@@ -23,8 +23,10 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
+import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -53,7 +55,8 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
     protected ILearningDesignDAO learningDesignDao;
     protected IOrganisationDAO orgDao;
     protected ILessonDAO lessonDao;
-    protected ILessonClassDAO lessonClassDao;    
+    protected ILessonClassDAO lessonClassDao;
+    protected ILearnerProgressDAO learnerProgressDao;
     
     //---------------------------------------------------------------------
     // Domain Object instances
@@ -63,6 +66,8 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
     protected LearningDesign testLearningDesign;
     protected Organisation testOrg;
     protected LessonClass testLessonClass;
+    protected LearnerProgress testLearnerProgress;
+    
     //---------------------------------------------------------------------
     // Class level constants
     //---------------------------------------------------------------------
@@ -102,6 +107,7 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
         //get lesson related daos
         lessonDao = (LessonDAO)this.context.getBean("lessonDAO");
         lessonClassDao = (LessonClassDAO)this.context.getBean("lessonClassDAO");
+        learnerProgressDao = (LearnerProgressDAO)this.context.getBean("learnerProgressDAO");
     }
 
     /**
@@ -229,6 +235,18 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
     }
   
 
+    /**
+     * This init method is called when we need to learner progress testing.
+     *
+     */
+    protected void initLearnerProgressData()
+    {
+        //pre-condition
+        if(testLesson == null)
+            throw new IllegalArgumentException("Can't initialize progress without " +
+            		"lesson");
+        testLearnerProgress = new LearnerProgress(testUser,testLesson);
+    }
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------

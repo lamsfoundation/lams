@@ -20,7 +20,6 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
  * Hibernate implementation of ILessonDAO
@@ -111,17 +110,6 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
         getHibernateTemplate().delete(lesson);
     }
     
-    /**
-     * Retrieves the LearnerProgress
-     * @param learner the User in the Lesson
-     * @param lesson the Lesson
-     * @return LearnerProgess object containing the progress and state data.
-     */
-    public LearnerProgress getLearnerProgress(User learner, Lesson lesson)
-    {
-        String queryString = "from LearnerProgress l where l.user = ? and l.lesson ! = ?";
-        return (LearnerProgress) ((getHibernateTemplate().find(queryString, new Object[]{learner, lesson})).get(0));//shoud only ever be one of these   
-    }
 
 
     /**

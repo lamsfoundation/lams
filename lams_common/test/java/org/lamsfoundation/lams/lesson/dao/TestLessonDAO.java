@@ -18,7 +18,6 @@ import junit.framework.TestCase;
 /**
  * 
  * @author Jacky Fang 2/02/2005
- * 
  */
 public class TestLessonDAO extends LessonDataAccessTestCase
 {

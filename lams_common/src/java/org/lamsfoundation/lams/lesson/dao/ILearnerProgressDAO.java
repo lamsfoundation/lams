@@ -7,6 +7,7 @@
 package org.lamsfoundation.lams.lesson.dao;
 
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -22,6 +23,14 @@ public interface ILearnerProgressDAO
      * @return the lesson
      */
     public LearnerProgress getLearnerProgress(Long learnerProgressId);
+    
+    /**
+     * Retrieves the learner progress object for user in a lesson.
+     * @param user the user who owns the learner progress data.
+     * @return the user's progress data
+     */
+    public LearnerProgress getLearnerProgressByLeaner(final User learner,
+                                                      final Lesson lesson);
         
     /**
      * Saves or Updates learner progress data.
@@ -34,4 +43,10 @@ public interface ILearnerProgressDAO
      * @param learnerProgress 
      */
     public void deleteLearnerProgress(LearnerProgress learnerProgress);
+    
+    /**
+     * Update learner progress data.
+     * @param learnerProgress
+     */
+    public void updateLearnerProgress(LearnerProgress learnerProgress);
 }
