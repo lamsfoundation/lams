@@ -54,8 +54,8 @@
 		}
 		//-->
 	</script>
-	<html:form action="/Activity" method="POST">
-		<input type="hidden" name="method" value="display" />
+	<html:form action="/ChooseActivity" method="POST">
+		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
 		
 		<table width="100%" height="231" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes">
 			<tr> 
@@ -154,8 +154,8 @@
   			</tr>
 		</table>
 	</html:form>
-	<html:form action="/Activity" method="POST">
-		<input type="hidden" name="method" value="complete" />
+	<html:form action="/CompleteActivity" method="POST">
+		<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />" />
 		<input type="hidden" name="activityId" value="<c:out value="${optionsActivityForm.activityId}" />" />
 	</html:form>
 </div>
