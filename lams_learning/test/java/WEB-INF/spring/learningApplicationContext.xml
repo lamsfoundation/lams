@@ -18,6 +18,7 @@
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
+		<property name="lamsToolService"><ref bean="lamsToolService"/></property>
 	</bean>
 	
 	<bean id="learnerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

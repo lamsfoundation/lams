@@ -23,9 +23,14 @@ package org.lamsfoundation.lams.learning.service;
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 
 import org.lamsfoundation.lams.learning.progress.ProgressException;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
+import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
@@ -40,16 +45,18 @@ public class TestLearnerService extends AbstractLamsTestCase
     private ILearnerService learnerService;
     private IUserManagementService usermanageService;
     private ILessonDAO lessonDao; 
+    private ILearnerProgressDAO learnerProgressDao;
     //---------------------------------------------------------------------
     // Testing Data - Constants
     //---------------------------------------------------------------------
-    private final Integer TEST_USER_ID = new Integer(1);
+    private final Integer TEST_USER_ID = new Integer(2);
     private final Long Test_Lesson_ID = new Long(1);
     //---------------------------------------------------------------------
     // Testing Data - Instance Variables
     //---------------------------------------------------------------------
     private User testUser;
     private Lesson testLesson;
+    private LearnerProgress testProgress;
     /*
      * @see TestCase#setUp()
      */
@@ -59,6 +66,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         learnerService = (ILearnerService)this.context.getBean("learnerService");
         usermanageService = (IUserManagementService)this.context.getBean("userManagementService");
         lessonDao = (LessonDAO)this.context.getBean("lessonDAO");
+        learnerProgressDao = (LearnerProgressDAO)this.context.getBean("learnerProgressDAO");
         
         testUser = usermanageService.getUserById(TEST_USER_ID);
         testLesson = lessonDao.getLesson(Test_Lesson_ID);
@@ -85,11 +93,28 @@ public class TestLearnerService extends AbstractLamsTestCase
         return new String[] { "/WEB-INF/spring/learningApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",					  
+                              "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
+                              "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",          					  
         					  "applicationContext.xml"};
     }
-    public void testJoinLesson() throws ProgressException
+    
+    public void testJoinLesson() throws ProgressException,LamsToolServiceException
     {
         learnerService.joinLesson(testUser,testLesson);
+        
+        testProgress=learnerProgressDao.getLearnerProgressByLearner(testUser,testLesson);
+        
+        assertNotNull(testProgress);
+        assertNotNull("verify next activity",testProgress.getNextActivity());
+        assertEquals("verify id of next activity-survey",20,testProgress.getNextActivity().getActivityId().longValue());
+        assertNotNull("verify current activity",testProgress.getCurrentActivity());
+        assertEquals("verify id of current activity-survey",20,testProgress.getCurrentActivity().getActivityId().longValue());
+        assertEquals("verify attempted activity",1,testProgress.getAttemptedActivities().size());
+        assertEquals("verify completed activity",0,testProgress.getCompletedActivities().size());
+        assertNotNull("verify correspondent tool session for next activity",
+                      ((ToolActivity)testProgress.getNextActivity()).getToolSessions());
+        assertEquals("verify number of tool sessions created",1,
+                     ((ToolActivity)testProgress.getNextActivity()).getToolSessions().size());
         assertTrue(true);
     }
 

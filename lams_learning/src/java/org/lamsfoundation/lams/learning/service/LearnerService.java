@@ -41,6 +41,8 @@ import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
  * This class is a facade over the Learning middle tier.
@@ -55,7 +57,7 @@ public class LearnerService implements ILearnerService
     private ILessonDAO lessonDAO;
     private ProgressEngine progressEngine;
     private IToolSessionDAO toolSessionDAO;
-    
+    private ILamsToolService lamsToolService;
     private ActionMappings actionMappings;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -92,6 +94,13 @@ public class LearnerService implements ILearnerService
         this.learnerProgressDAO = learnerProgressDAO;
     }
 
+    /**
+     * @param lamsToolService The lamsToolService to set.
+     */
+    public void setLamsToolService(ILamsToolService lamsToolService)
+    {
+        this.lamsToolService = lamsToolService;
+    }
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
@@ -116,9 +125,10 @@ public class LearnerService implements ILearnerService
      * Joins a User to a new lesson as a learner
      * @param learner the Learner
      * @param lessionID identifies the Lesson to start
+     * @throws LamsToolServiceException
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress joinLesson(User learner, Lesson lesson) throws ProgressException
+    public LearnerProgress joinLesson(User learner, Lesson lesson) throws ProgressException, LamsToolServiceException
     {
         LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
     	
@@ -127,7 +137,7 @@ public class LearnerService implements ILearnerService
             //create a new learner progress for new learner
             learnerProgress = new LearnerProgress(learner,lesson);
             
-            progressEngine.getStartPoint(learner, lesson,learnerProgress);
+            progressEngine.setUpStartPoint(learner, lesson,learnerProgress);
             
             learnerProgressDAO.saveLearnerProgress(learnerProgress);
         }
@@ -207,8 +217,9 @@ public class LearnerService implements ILearnerService
      * session doesn't exist, we create a new tool session instance.
      * 
      * @param learnerProgress the learner progress we are processing.
+     * @throws LamsToolServiceException
      */
-    private void createToolSessionsIfNecessary(LearnerProgress learnerProgress)
+    private void createToolSessionsIfNecessary(LearnerProgress learnerProgress) throws LamsToolServiceException
     {
         if(learnerProgress.getNextActivity()==null)
             throw new LearnerServiceException("Error occurs in [" +
@@ -240,7 +251,7 @@ public class LearnerService implements ILearnerService
         else
             targetSession = toolSessionDAO.getToolSessionByGroup(toolActivity.getGroupFor(learnerProgress.getUser()),
                                                                  toolActivity);
-        return targetSession!=null?true:false;
+        return targetSession!=null?false:true;
     }
     
     /**
@@ -253,14 +264,14 @@ public class LearnerService implements ILearnerService
      *  
      * @param toolActivity
      * @param learner
+     * @throws LamsToolServiceException
      */
-    private void createToolSessionFor(ToolActivity toolActivity,User learner)
+    private void createToolSessionFor(ToolActivity toolActivity,User learner) throws LamsToolServiceException
     {
-        ToolSession toolSession = toolActivity.createToolSessionForActivity(learner);
-       
+        ToolSession toolSession = lamsToolService.createToolSession(learner,toolActivity);
+        
         toolActivity.getToolSessions().add(toolSession);
         
-        toolSessionDAO.saveToolSession(toolSession);
+        lamsToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), toolActivity);
     }
-
 }

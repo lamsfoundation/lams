@@ -87,18 +87,19 @@ public class ProgressEngine
      * Method determines the start point for a learner when they begin a Lesson.
      * @param learner the <CODE>User</CODE> who is starting the <CODE>Lesson</CODE>.
      * @param lesson the <CODE>Lesson</CODE> the learner is starting.
-     * @return Progress - the VO that contains the data needed to send
      * @throws ProgressException if the start point cannot be calculated successfully.
      */
-    public LearnerProgress getStartPoint(User learner, Lesson lesson,
-                                         LearnerProgress progress) throws ProgressException
+    public void setUpStartPoint(User learner, Lesson lesson,
+                                LearnerProgress progress) throws ProgressException
     {
         
         LearningDesign ld = lesson.getLearningDesign();
         
+        progress.setCurrentActivity(ld.getFirstActivity());
+        
         progress.setNextActivity(ld.getFirstActivity());
     
-    	return progress;
+        progress.setProgressState(ld.getFirstActivity(),LearnerProgress.ACTIVITY_ATTEMPTED);
     }
     
 }

@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
  *
@@ -61,7 +62,7 @@ public interface ILearnerService
      * @param lessionID identifies the Lesson to start
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress joinLesson(User learner, Lesson lesson) throws ProgressException;
+    public LearnerProgress joinLesson(User learner, Lesson lesson) throws ProgressException,LamsToolServiceException;
     
 
     /**
