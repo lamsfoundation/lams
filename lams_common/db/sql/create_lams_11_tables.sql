@@ -20,6 +20,7 @@ CREATE TABLE lams_learning_library (
        learning_library_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , description TEXT
      , title VARCHAR(255)
+     , valid_flag TINYINT(1) NOT NULL DEFAULT 1
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
      , PRIMARY KEY (learning_library_id)
 )TYPE=InnoDB;
@@ -40,27 +41,6 @@ CREATE TABLE lams_role (
      , PRIMARY KEY (role_id)
 )TYPE=InnoDB;
 CREATE INDEX gname ON lams_role (name ASC);
-
-CREATE TABLE lams_tool (
-       tool_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , tool_signature VARCHAR(64) NOT NULL
-     , service_name VARCHAR(255) NOT NULL
-     , tool_display_name VARCHAR(255) NOT NULL
-     , description TEXT
-     , default_tool_content_id BIGINT(20) NOT NULL
-     , supports_grouping_flag TINYINT(1) NOT NULL DEFAULT 0
-     , supports_define_later_flag TINYINT(1) NOT NULL DEFAULT 0
-     , supports_moderation_flag TINYINT(1) NOT NULL
-     , learner_url TEXT NOT NULL
-     , author_url TEXT NOT NULL
-     , define_later_url TEXT
-     , export_portfolio_url TEXT NOT NULL
-     , monitor_url TEXT NOT NULL
-     , contribute_url TEXT
-     , UNIQUE UQ_lams_tool_sig (tool_signature)
-     , UNIQUE UQ_lams_tool_class_name (service_name)
-     , PRIMARY KEY (tool_id)
-)TYPE=InnoDB;
 
 CREATE TABLE lams_tool_session_state (
        tool_session_state_id INT(3) NOT NULL
@@ -116,6 +96,12 @@ CREATE TABLE lams_cr_credential (
      , PRIMARY KEY (credential_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_workspace_folder_type (
+       lams_workspace_folder_type_id INT(3) NOT NULL
+     , description VARCHAR(255) NOT NULL
+     , PRIMARY KEY (lams_workspace_folder_type_id)
+)TYPE=InnoDB;
+
 CREATE TABLE lams_authentication_method_type (
        authentication_method_type_id INT(3) NOT NULL
      , description VARCHAR(64) NOT NULL
@@ -138,10 +124,17 @@ CREATE TABLE lams_workspace_folder (
      , parent_folder_id BIGINT(20)
      , name VARCHAR(64) NOT NULL
      , workspace_id BIGINT(20) NOT NULL
+     , user_id BIGINT(20) NOT NULL
+     , create_date_time DATETIME NOT NULL
+     , last_modified_date_time DATETIME NOT NULL
+     , lams_workspace_folder_type_id INT(3) NOT NULL
      , PRIMARY KEY (workspace_folder_id)
      , INDEX (parent_folder_id)
      , CONSTRAINT FK_lams_workspace_folder_2 FOREIGN KEY (parent_folder_id)
                   REFERENCES lams_workspace_folder (workspace_folder_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (lams_workspace_folder_type_id)
+     , CONSTRAINT FK_lams_workspace_folder_4 FOREIGN KEY (lams_workspace_folder_type_id)
+                  REFERENCES lams_workspace_folder_type (lams_workspace_folder_type_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_workspace (
@@ -212,6 +205,47 @@ CREATE TABLE lams_user (
 CREATE UNIQUE INDEX UQ_lams_user_login ON lams_user (login ASC);
 CREATE INDEX login ON lams_user (login ASC);
 
+CREATE TABLE lams_grouping (
+       grouping_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , grouping_ui_id INT(11)
+     , grouping_type_id INT(11) NOT NULL
+     , number_of_groups INT(11)
+     , learners_per_group INT(11)
+     , staff_group_id BIGINT(20) DEFAULT 0
+     , max_number_of_groups INT(3)
+     , PRIMARY KEY (grouping_id)
+     , INDEX (grouping_type_id)
+     , CONSTRAINT FK_lams_learning_grouping_1 FOREIGN KEY (grouping_type_id)
+                  REFERENCES lams_grouping_type (grouping_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+)TYPE=InnoDB;
+
+CREATE TABLE lams_tool (
+       tool_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , tool_signature VARCHAR(64) NOT NULL
+     , service_name VARCHAR(255) NOT NULL
+     , tool_display_name VARCHAR(255) NOT NULL
+     , description TEXT
+     , learning_library_id BIGINT(20) NOT NULL
+     , default_tool_content_id BIGINT(20) NOT NULL
+     , valid_flag TINYINT(1) NOT NULL DEFAULT 1
+     , supports_grouping_flag TINYINT(1) NOT NULL DEFAULT 0
+     , supports_define_later_flag TINYINT(1) NOT NULL DEFAULT 0
+     , supports_moderation_flag TINYINT(1) NOT NULL
+     , learner_url TEXT NOT NULL
+     , author_url TEXT NOT NULL
+     , define_later_url TEXT
+     , export_portfolio_url TEXT NOT NULL
+     , monitor_url TEXT NOT NULL
+     , contribute_url TEXT
+     , moderation_url TEXT
+     , UNIQUE UQ_lams_tool_sig (tool_signature)
+     , UNIQUE UQ_lams_tool_class_name (service_name)
+     , PRIMARY KEY (tool_id)
+     , INDEX (learning_library_id)
+     , CONSTRAINT FK_lams_tool_1 FOREIGN KEY (learning_library_id)
+                  REFERENCES lams_learning_library (learning_library_id)
+)TYPE=InnoDB;
+
 CREATE TABLE lams_learning_design (
        learning_design_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , learning_design_ui_id INT(11)
@@ -237,6 +271,8 @@ CREATE TABLE lams_learning_design (
      , lesson_name VARCHAR(255)
      , lesson_id BIGINT(20)
      , lesson_start_date_time DATETIME
+     , lesson_name VARCHAR(255)
+     , last_modified_date_time DATETIME NOT NULL
      , PRIMARY KEY (learning_design_id)
      , INDEX (parent_learning_design_id)
      , CONSTRAINT FK_lams_learning_design_2 FOREIGN KEY (parent_learning_design_id)
@@ -255,20 +291,6 @@ CREATE TABLE lams_learning_design (
                   REFERENCES lams_copy_type (copy_type_id)
 )TYPE=InnoDB;
 CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
-
-CREATE TABLE lams_grouping (
-       grouping_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , grouping_ui_id INT(11)
-     , grouping_type_id INT(11) NOT NULL
-     , number_of_groups INT(11)
-     , learners_per_group INT(11)
-     , staff_group_id BIGINT(20) DEFAULT 0
-     , max_number_of_groups INT(3)
-     , PRIMARY KEY (grouping_id)
-     , INDEX (grouping_type_id)
-     , CONSTRAINT FK_lams_learning_grouping_1 FOREIGN KEY (grouping_type_id)
-                  REFERENCES lams_grouping_type (grouping_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
 
 CREATE TABLE lams_group (
        group_id BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -297,7 +319,7 @@ CREATE TABLE lams_lesson (
        lesson_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , learning_design_id BIGINT(20) NOT NULL
      , user_id BIGINT(20) NOT NULL
-     , name VARCHAR(255)
+     , name VARCHAR(255) NOT NULL
      , description TEXT
      , create_date_time DATETIME NOT NULL
      , organisation_id BIGINT(20)
@@ -405,6 +427,7 @@ CREATE TABLE lams_learner_progress (
      , current_activity_id BIGINT(20)
      , next_activity_id BIGINT(20)
      , previous_activity_id BIGINT(20)
+     , requires_restart_flag TINYINT(1) NOT NULL
      , PRIMARY KEY (learner_progress_id)
      , INDEX (user_id)
      , CONSTRAINT FK_lams_learner_progress_1 FOREIGN KEY (user_id)

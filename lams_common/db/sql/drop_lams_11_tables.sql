@@ -1,5 +1,9 @@
 # Connection: ROOT LOCAL
 # Host: localhost
+# Saved: 2005-03-10 14:16:48
+# 
+# Connection: ROOT LOCAL
+# Host: localhost
 # Saved: 2005-02-16 16:04:11
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -45,5 +49,6 @@ DROP TABLE IF EXISTS lams_cr_node;
 DROP TABLE IF EXISTS lams_cr_workspace_credential;
 DROP TABLE IF EXISTS lams_cr_workspace;
 DROP TABLE IF EXISTS lams_cr_credential;
+DROP TABLE IF EXISTS lams_workspace_folder_type;
 
 SET FOREIGN_KEY_CHECKS=1;

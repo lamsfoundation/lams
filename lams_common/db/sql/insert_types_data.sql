@@ -1,5 +1,21 @@
 # Connection: ROOT LOCAL
 # Host: localhost
+# Saved: 2005-03-10 14:27:37
+# 
+# Connection: ROOT LOCAL
+# Host: localhost
+# Saved: 2005-03-10 14:24:25
+# 
+# Connection: ROOT LOCAL
+# Host: localhost
+# Saved: 2005-03-10 14:22:28
+# 
+# Connection: ROOT LOCAL
+# Host: localhost
+# Saved: 2005-03-10 14:01:01
+# 
+# Connection: ROOT LOCAL
+# Host: localhost
 # Saved: 2005-02-16 16:03:41
 # 
 # Connection: ROOT LOCAL
@@ -64,6 +80,21 @@ INSERT into lams_license VALUES (6, 'Attribution-ShareAlike', 'by-sa', 'http://c
 INSERT into lams_copy_type VALUES(1,'NONE');
 INSERT into lams_copy_type VALUES(2,'LESSON');
 INSERT into lams_copy_type VALUES(3,'PREVIEW');
+
+INSERT into lams_workspace_folder_type VALUES (1, 'NORMAL');
+INSERT into lams_workspace_folder_type VALUES (2, 'RUN SEQUENCES');
+
+INSERT INTO lams_authentication_method VALUES (1, 1, 'LAMS-Database');
+INSERT INTO lams_authentication_method VALUES (2, 2, 'Oxford-WebAuth');
+INSERT INTO lams_authentication_method VALUES (3, 3, 'MQ-LDAP');
+
+INSERT INTO lams_activity_category VALUES (1 ,'SYSTEM');
+INSERT INTO lams_activity_category VALUES (2 ,'COLLABORATION');
+INSERT INTO lams_activity_category VALUES (3 ,'ASSESSMENT');
+INSERT INTO lams_activity_category VALUES (4 ,'CONTENT');
+INSERT INTO lams_activity_category VALUES (5 ,'SPLIT');
+
+
 
 
 
