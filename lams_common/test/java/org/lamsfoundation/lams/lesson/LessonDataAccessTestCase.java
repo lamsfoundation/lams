@@ -235,7 +235,7 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
     /**
      * Helper method to validate the created lesson class. This validation
      * method can be reused by sub-classes.
-     * @param lessonClass TODO
+     * @param lessonClass 
      */
     protected void assertLessonClass(LessonClass lessonClass)
     {
@@ -247,7 +247,7 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
     /**
      * Helper method to validate the created lesson. This validation
      * method can be reused by sub-classes.
-     * @param lesson TODO
+     * @param lesson 
      */
     protected void assertLesson(Lesson lesson)
     {

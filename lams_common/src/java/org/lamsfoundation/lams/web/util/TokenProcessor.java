@@ -23,7 +23,7 @@ public class TokenProcessor {
 	/**
 	 * The session token key
 	 */
-	public static String TRANSACTION_TOKEN_KEY = "org.lamsinternational.lams.action.TOKEN";
+	public static String TRANSACTION_TOKEN_KEY = "org.lamsfoundation.lams.action.TOKEN";
 	/**
 	 * The request token key
 	 */
@@ -31,7 +31,7 @@ public class TokenProcessor {
 	/**
 	 * The session forwards key
 	 */
-	public static String TRANSACTION_FORWARDS = "org.lamsinternational.lams.action.FORWARD";
+	public static String TRANSACTION_FORWARDS = "org.lamsfoundation.lams.action.FORWARD";
 
     /**
      * The timestamp used most recently to generate a token value.
