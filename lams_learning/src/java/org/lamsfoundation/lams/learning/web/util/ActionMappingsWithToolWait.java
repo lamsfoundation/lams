@@ -22,19 +22,13 @@ import org.lamsfoundation.lams.lesson.NullActivity;
 import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
 
 /**
- * This class contains the standard struts action mappings for errors as
- * well as methods that get required Action/URL to display an Activity or
- * LearnerProgress. 
+ * This class replaces the activity display actions in ActionMappings so
+ * that ToolActivity has a loading page.
  * 
  * @author daveg
  *
  */
-public class ActionMappings {
-
-    public static final String ERROR = "error";
-    public static final String NO_SESSION_ERROR = "noSessionError";
-    public static final String DOUBLE_SUBMIT_ERROR = "doubleSubmitError";
-
+public class ActionMappingsWithToolWait extends ActionMappings {
 
 	/**
 	 * Creates a Struts ActionForward to display an activity.
@@ -45,14 +39,7 @@ public class ActionMappings {
 	    ActionForward actionForward = null;
 
 	    String strutsAction = getActivityAction(activity, progress);
-		if (activity instanceof ToolActivity) {
-		    // always use redirect false for a ToolActivity as ToolDisplayActivity
-		    // does it's own redirect
-			actionForward = strutsActionToForward(strutsAction, activity, false);
-		}
-		else {
-			actionForward = strutsActionToForward(strutsAction, activity, redirect);
-		}
+		actionForward = strutsActionToForward(strutsAction, activity, redirect);
 		
 		return actionForward;
 	}
@@ -66,7 +53,8 @@ public class ActionMappings {
 	 * @return
 	 */
 	public ActionForward getNextActivityForward(LearnerProgress progress, boolean redirect) {
-	    ActionForward actionForward = null;
+	    return super.getNextActivityForward(progress, redirect);
+	    /*ActionForward actionForward = null;
 
 		Activity nextActivity = progress.getNextActivity();
 		Activity previousActivity = progress.getPreviousActivity();
@@ -81,7 +69,7 @@ public class ActionMappings {
 			actionForward = getActivityForward(nextActivity, progress, redirect);
 		}
 
-		return actionForward;
+		return actionForward;*/
 	}
 	
 	/**
@@ -94,16 +82,10 @@ public class ActionMappings {
 	public ActivityURL getActivityURL(Activity activity, LearnerProgress progress) {
 	    ActivityURL activityURL = null;
 		
-		// TODO: remove instanceof
-		if (activity instanceof ToolActivity) {
-		    activityURL = getToolURL((ToolActivity)activity, progress);
-		}
-		else {
-		    // use LAMS action
-		    String strutsAction = null;
-		    strutsAction = getActivityAction(activity, progress);
-			activityURL = strutsActionToURL(strutsAction, activity, true);
-		}
+	    // use LAMS action
+	    String strutsAction = null;
+	    strutsAction = getActivityAction(activity, progress);
+		activityURL = strutsActionToURL(strutsAction, activity, true);
 		
 		return activityURL;
 	}
@@ -131,33 +113,10 @@ public class ActionMappings {
 		    activityURL = strutsActionToURL(strutsAction, nextActivity, true);
 		}
 		else {
-			if (nextActivity instanceof ToolActivity) {
-			    activityURL = getToolURL((ToolActivity)nextActivity, progress);
-			}
-			else {
-				String strutsAction = getActivityAction(nextActivity, progress);
-			    activityURL = strutsActionToURL(strutsAction, nextActivity, true);
-			}
+			String strutsAction = getActivityAction(nextActivity, progress);
+		    activityURL = strutsActionToURL(strutsAction, nextActivity, true);
 		}
 		
-		return activityURL;
-	}
-	
-
-	/** TODO: getToolURL()
-	 * Generates an ActivityURL for a Tool Activity. The URL is for the tool and
-	 * not for the tool loading page. The URL also includes toolSessionId and all
-	 * other required data.
-	 */
-	public ActivityURL getToolURL(ToolActivity activity, LearnerProgress progress) {
-		ActivityURL activityURL = new ActivityURL();
-		activityURL.setTitle("activity "+activity.getActivityId());
-		activityURL.setDescription("description for activity with id "+activity.getActivityId());
-		activityURL.setComplete(progress.getProgressState(activity) == LearnerProgress.ACTIVITY_COMPLETED);
-
-		activityURL.setActivityId(activity.getActivityId());
-		activityURL.setUrl("/lams_learning/test/DummyTool.do?method=display&activityId="+activity.getActivityId()+"&progressState="+progress.getProgressState(activity));
-
 		return activityURL;
 	}
 	
@@ -169,7 +128,7 @@ public class ActionMappings {
 	 * @return String representing a struts action
 	 */
 	protected String getActivityAction(Activity activity, LearnerProgress progress) {
-		String strutsAction = null;
+	    String strutsAction = null;
 		
 		// TODO: remove instanceof
 		if (activity instanceof NullActivity) {
@@ -198,39 +157,10 @@ public class ActionMappings {
 			if (activity instanceof ToolActivity) {
 				// get tool URL
 				//activityAction = new ActivityAction("/DisplayActivity.do", activity);
-			    strutsAction = "/DisplayToolActivity.do";
+			    strutsAction = "/DisplayLoadToolActivity.do";
 			}
 		}
 		return strutsAction;
-	}
-	
-	protected ActivityURL strutsActionToURL(String strutsAction, Activity activity, boolean useContext) {
-	    ActivityURL activityURL = new ActivityURL();
-	    activityURL.setActivityId(activity.getActivityId());
-	    // TODO: don't hardcode
-		String query = "?activityId="+activity.getActivityId();
-		String url = strutsAction+query;
-		if (useContext) {
-			String context = "/lams_learning";
-		    url = context+url;
-		}
-		activityURL.setUrl(url);
-		
-		return activityURL;
-	}
-	
-	protected ActionForward strutsActionToForward(String strutsAction, Activity activity, boolean redirect) {
-		ActionForward actionForward;
-		if (redirect) {
-			ActivityURL activityURL = strutsActionToURL(strutsAction, activity, false);
-			String path = activityURL.getUrl();
-			actionForward = new RedirectingActionForward(path);
-		}
-		else {
-		    actionForward = new ForwardingActionForward(strutsAction);
-		}
-		
-		return actionForward;
 	}
 	
 }
