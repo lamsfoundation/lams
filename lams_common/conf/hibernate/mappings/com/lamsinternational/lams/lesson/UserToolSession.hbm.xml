@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="com.lamsinternational.lams.lesson.UserToolSession" 
+    table="lams_user_tool_session"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_user_tool_session"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <composite-id name="comp_id" class="com.lamsinternational.lams.lesson.UserToolSessionPK">
+        <meta attribute="field-description" inherit="false">
+           @hibernate.id
+            generator-class="assigned"
+        </meta>
+        <key-property 
+            name="toolSessionId" 
+            column="tool_session_id" 
+            type="java.lang.Long"
+            length="20"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="tool_session_id"
+                length="20"
+            </meta> 
+        </key-property>
+        <key-property 
+            name="userId" 
+            column="user_id" 
+            type="java.lang.Long"
+            length="20"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="user_id"
+                length="20"
+            </meta> 
+        </key-property>
+    </composite-id>    
+
+
+    <!-- Associations -->
+    <!-- derived association(s) for compound key -->
+    <!-- bi-directional many-to-one association to User -->
+    <many-to-one
+        name="user"
+	    class="com.lamsinternational.lams.usermanagement.User"
+	    update="false"
+	    insert="false"
+	>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            update="false"
+            insert="false"
+        </meta>
+        <meta attribute="field-description">
+           @hibernate.column
+            name="user_id"
+        </meta>
+    	<column name="user_id" />
+	</many-to-one>
+	
+    <!-- bi-directional many-to-one association to ToolSession -->
+    <many-to-one
+        name="toolSession"
+	    class="com.lamsinternational.lams.tool.ToolSession"
+	    update="false"
+	    insert="false"
+	>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            update="false"
+            insert="false"
+        </meta>
+        <meta attribute="field-description">
+           @hibernate.column
+            name="tool_session_id"
+        </meta>
+    	<column name="tool_session_id" />
+	</many-to-one>
+	
+    <!-- end of derived association(s) -->
+  
+    <!-- bi-directional many-to-one association to UserToolSessionState -->
+    <many-to-one
+        name="userToolSessionState"
+        class="com.lamsinternational.lams.lesson.UserToolSessionState"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="user_tool_session_state_id"         
+        </meta>
+        <column name="user_tool_session_state_id" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

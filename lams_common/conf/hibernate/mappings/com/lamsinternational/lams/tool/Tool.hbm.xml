@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="com.lamsinternational.lams.tool.Tool" 
+    table="lams_tool"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_tool"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="toolId"
+        type="java.lang.Long"
+        column="tool_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="assigned"
+            type="java.lang.Long"
+            column="tool_id"
+
+
+        </meta>
+        <generator class="assigned" />
+    </id>
+
+    <property
+        name="learnerUrl"
+        type="java.lang.String"
+        column="learner_url"
+        not-null="true"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="learner_url"
+            length="65535"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="supportsGrouping"
+        type="java.lang.Boolean"
+        column="supports_grouping_flag"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="supports_grouping_flag"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="authorUrl"
+        type="java.lang.String"
+        column="author_url"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="author_url"
+            length="65535"
+        </meta>    
+    </property>
+    <property
+        name="supportsDefineLater"
+        type="java.lang.Boolean"
+        column="supports_define_later_flag"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="supports_define_later_flag"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="defineLaterUrl"
+        type="java.lang.String"
+        column="define_later_url"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="define_later_url"
+            length="65535"
+        </meta>    
+    </property>
+    <property
+        name="defaultToolContentId"
+        type="long"
+        column="default_tool_content_id"
+        not-null="true"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="default_tool_content_id"
+            length="20"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="toolSignature"
+        type="java.lang.String"
+        column="tool_signature"
+        not-null="true"
+        length="64"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="tool_signature"
+            length="64"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="toolDisplayName"
+        type="java.lang.String"
+        column="tool_display_name"
+        not-null="true"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="tool_display_name"
+            length="255"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="description"
+        type="java.lang.String"
+        column="description"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="description"
+            length="65535"
+        </meta>    
+    </property>
+    <property
+        name="className"
+        type="java.lang.String"
+        column="class_name"
+        not-null="true"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="class_name"
+            length="65535"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="exportPortfolioUrl"
+        type="java.lang.String"
+        column="export_portfolio_url"
+        not-null="true"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="export_portfolio_url"
+            length="65535"
+            not-null="true"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to Activity -->
+    <set
+        name="activities"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="tool_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.learningdesign.Activity"
+        </meta>
+        <key>
+            <column name="tool_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.learningdesign.Activity"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

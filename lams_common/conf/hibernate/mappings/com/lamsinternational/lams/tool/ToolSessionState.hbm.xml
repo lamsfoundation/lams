@@ -12,25 +12,25 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.learningdesign.ActivityType" 
-    table="lams_learning_activity_type"
+    name="com.lamsinternational.lams.tool.ToolSessionState" 
+    table="lams_tool_session_state"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
-        table="lams_learning_activity_type"
+        table="lams_tool_session_state"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
-        name="learningActivityTypeId"
+        name="toolSessionStateId"
         type="java.lang.Integer"
-        column="learning_activity_type_id"
+        column="tool_session_state_id"
     >
         <meta attribute="field-description">
            @hibernate.id
             generator-class="assigned"
             type="java.lang.Integer"
-            column="learning_activity_type_id"
+            column="tool_session_state_id"
 
 
         </meta>
@@ -54,9 +54,9 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional one-to-many association to Activity -->
+    <!-- bi-directional one-to-many association to ToolSession -->
     <set
-        name="activities"
+        name="toolSessions"
         lazy="true"
         inverse="true"
 		cascade="none"
@@ -68,16 +68,16 @@
             cascade="none"
 
            @hibernate.collection-key
-            column="learning_activity_type_id"
+            column="tool_session_state_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.learningdesign.Activity"
+            class="com.lamsinternational.lams.tool.ToolSession"
         </meta>
         <key>
-            <column name="learning_activity_type_id" />
+            <column name="tool_session_state_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.learningdesign.Activity"
+            class="com.lamsinternational.lams.tool.ToolSession"
         />
     </set>
 

@@ -76,6 +76,19 @@
 
     <!-- Associations -->
   
+    <!-- bi-directional many-to-one association to GroupingType -->
+    <many-to-one
+        name="groupingType"
+        class="com.lamsinternational.lams.learningdesign.GroupingType"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="grouping_type_id"         
+        </meta>
+        <column name="grouping_type_id" />
+    </many-to-one>
     <!-- bi-directional one-to-many association to Group -->
     <set
         name="groups"
@@ -100,6 +113,32 @@
         </key>
         <one-to-many 
             class="com.lamsinternational.lams.learningdesign.Group"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to Lesson -->
+    <set
+        name="lessons"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="class_grouping_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.lesson.Lesson"
+        </meta>
+        <key>
+            <column name="class_grouping_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.lesson.Lesson"
         />
     </set>
     <!-- bi-directional one-to-many association to Activity -->

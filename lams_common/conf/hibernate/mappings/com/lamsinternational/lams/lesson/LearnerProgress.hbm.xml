@@ -12,51 +12,37 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.learningdesign.Group" 
-    table="lams_group"
+    name="com.lamsinternational.lams.lesson.LearnerProgress" 
+    table="lams_learner_progress"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
-        table="lams_group"
+        table="lams_learner_progress"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
-        name="groupId"
+        name="learnerProgressId"
         type="java.lang.Long"
-        column="group_id"
+        column="learner_progress_id"
     >
         <meta attribute="field-description">
            @hibernate.id
             generator-class="assigned"
             type="java.lang.Long"
-            column="group_id"
+            column="learner_progress_id"
 
 
         </meta>
         <generator class="assigned" />
     </id>
 
-    <property
-        name="orderId"
-        type="int"
-        column="order_id"
-        not-null="true"
-        length="6"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="order_id"
-            length="6"
-            not-null="true"
-        </meta>    
-    </property>
 
     <!-- Associations -->
   
-    <!-- bi-directional one-to-many association to UserGroup -->
+    <!-- bi-directional one-to-many association to ProgressCurrent -->
     <set
-        name="userGroups"
+        name="progressCurrents"
         lazy="true"
         inverse="true"
 		cascade="none"
@@ -68,21 +54,21 @@
             cascade="none"
 
            @hibernate.collection-key
-            column="group_id"
+            column="learner_progress_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.lesson.UserGroup"
+            class="com.lamsinternational.lams.lesson.ProgressCurrent"
         </meta>
         <key>
-            <column name="group_id" />
+            <column name="learner_progress_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.lesson.UserGroup"
+            class="com.lamsinternational.lams.lesson.ProgressCurrent"
         />
     </set>
-    <!-- bi-directional one-to-many association to ToolSession -->
+    <!-- bi-directional one-to-many association to ProgressCompleted -->
     <set
-        name="toolSessions"
+        name="progressCompleteds"
         lazy="true"
         inverse="true"
 		cascade="none"
@@ -94,30 +80,43 @@
             cascade="none"
 
            @hibernate.collection-key
-            column="group_id"
+            column="learner_progress_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.tool.ToolSession"
+            class="com.lamsinternational.lams.lesson.ProgressCompleted"
         </meta>
         <key>
-            <column name="group_id" />
+            <column name="learner_progress_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.tool.ToolSession"
+            class="com.lamsinternational.lams.lesson.ProgressCompleted"
         />
     </set>
-    <!-- bi-directional many-to-one association to Grouping -->
+    <!-- bi-directional many-to-one association to User -->
     <many-to-one
-        name="grouping"
-        class="com.lamsinternational.lams.learningdesign.Grouping"
+        name="user"
+        class="com.lamsinternational.lams.usermanagement.User"
         not-null="true"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
-           @hibernate.column name="grouping_id"         
+           @hibernate.column name="user_id"         
         </meta>
-        <column name="grouping_id" />
+        <column name="user_id" />
+    </many-to-one>
+    <!-- bi-directional many-to-one association to Lesson -->
+    <many-to-one
+        name="lesson"
+        class="com.lamsinternational.lams.lesson.Lesson"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="lesson_id"         
+        </meta>
+        <column name="lesson_id" />
     </many-to-one>
 
 </class>

@@ -90,19 +90,6 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional many-to-one association to LearningDesign -->
-    <many-to-one
-        name="learningDesign"
-        class="com.lamsinternational.lams.learningdesign.LearningDesign"
-        not-null="true"
-    >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="learning_design_id"         
-        </meta>
-        <column name="learning_design_id" />
-    </many-to-one>
     <!-- bi-directional many-to-one association to Activity -->
     <many-to-one
         name="activityByToActivityId"
@@ -128,6 +115,19 @@
            @hibernate.column name="from_activity_id"         
         </meta>
         <column name="from_activity_id" />
+    </many-to-one>
+    <!-- bi-directional many-to-one association to LearningDesign -->
+    <many-to-one
+        name="learningDesign"
+        class="com.lamsinternational.lams.learningdesign.LearningDesign"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="learning_design_id"         
+        </meta>
+        <column name="learning_design_id" />
     </many-to-one>
 
 </class>
