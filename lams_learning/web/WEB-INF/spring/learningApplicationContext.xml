@@ -41,6 +41,10 @@ http://www.gnu.org/licenses/gpl.txt
 		<property name="toolService"><ref bean="toolService" /></property>
 		<property name="baseURL"><value>http://127.0.0.1:8080/lams_learning/</value></property>
 	</bean>
+	
 
+	<bean id="notebookService" class="org.lamsfoundation.lams.notebook.service.NotebookService" singleton="false">
+		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO"/></property>
+	</bean>
 
 </beans>
