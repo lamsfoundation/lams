@@ -146,7 +146,7 @@ public class RandomGrouper implements Grouper , Serializable
         for(Iterator i=learners.iterator();i.hasNext();)
         {
             User learner = (User)i.next();
-            if(randomGrouping.doesLearnerExist(learner))
+            if(!randomGrouping.doesLearnerExist(learner))
             {
                 Group selectedGroup = selectGroupToJoin((RandomGrouping)randomGrouping);
                 selectedGroup.getUsers().add(learner);
@@ -185,7 +185,7 @@ public class RandomGrouper implements Grouper , Serializable
         for(Iterator i = learners.iterator();i.hasNext();)
         {
             User learner = (User)i.next();
-            if(randomGrouping.getGroupBy(learner).isNull())
+            if(!randomGrouping.doesLearnerExist(learner))
                 newLearners++;
         }
         

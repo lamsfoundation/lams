@@ -288,8 +288,13 @@ public abstract class Grouping implements Serializable
 	    this.grouper.doGrouping(this,learner);
 	}
 	
+	/**
+	 * Return whether a learner is a existing learner for this grouping or not.
+	 * @param learner the current leaner
+	 * @return the boolean result
+	 */
 	public boolean doesLearnerExist(User learner)
 	{
-	    return getGroupBy(learner).isNull();
+	    return !getGroupBy(learner).isNull();
 	}
 }
