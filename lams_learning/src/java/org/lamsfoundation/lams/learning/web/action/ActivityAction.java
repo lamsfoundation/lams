@@ -31,10 +31,8 @@ import org.lamsfoundation.lams.learning.service.DummyLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActionMappings;
-import org.lamsfoundation.lams.learning.web.util.ActionMappingsWithToolWait;
 
 import org.lamsfoundation.lams.usermanagement.*;
-import org.lamsfoundation.lams.web.action.Action;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learningdesign.*;
 import org.springframework.web.context.WebApplicationContext;
@@ -45,37 +43,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * Creation date: 01-12-2005
  * 
  */
-public class ActivityAction extends Action {
+public class ActivityAction extends LearnerAction {
 	
 	protected static final String ACTIVITY_REQUEST_ATTRIBUTE = "activity";
 	protected static final String LEARNER_PROGRESS_REQUEST_ATTRIBUTE = "learnerprogress";
-	
-	//protected ActionMappings actionMappings = new ActionMappingsWithToolWait();
-	//protected ActionMappings actionMappings;
-	
-	/**
-	 * Gets the session bean from session.
-	 * @return SessionBean for this request, null if no session.
-	 */
-	protected static SessionBean getSessionBean(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-		SessionBean sessionBean = (SessionBean)session.getAttribute(SessionBean.NAME);
-		return sessionBean;
-	}
-	
-	/**
-	 * Sets the session bean for this session.
-	 */
-	protected static void setSessionBean(SessionBean sessionBean, HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return;
-		}
-		session.setAttribute(SessionBean.NAME, sessionBean);
-	}
 	
 	/**
 	 * Get the learner service.
@@ -105,7 +76,7 @@ public class ActivityAction extends Action {
 		LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
 		if (learnerProgress == null) {
 			SessionBean sessionBean = getSessionBean(request);
-			User learner = sessionBean.getLeaner();
+			User learner = sessionBean.getLearner();
 			Lesson lesson = sessionBean.getLesson();
 			
 			ILearnerService learnerService = getLearnerService(request);
