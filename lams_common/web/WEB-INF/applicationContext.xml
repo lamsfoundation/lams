@@ -95,19 +95,19 @@
 	</bean>
 	-->
 	
-	<bean id="userDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserDAOHibernate">
+	<bean id="userDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
 	</bean>
 
-	<bean id="roleDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.RoleDAOHibernate">
+	<bean id="roleDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.RoleDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
 	</bean>
 	
-	<bean id="organisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationDAOHibernate">
+	<bean id="organisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
 	</bean>
 
-	<bean id="organisationTypeDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationTypeDAOHibernate">
+	<bean id="organisationTypeDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationTypeDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
 	</bean>
 
