@@ -38,6 +38,8 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
    
     private static final String TEST_USER_ID = "2";
     private static final String TEST_LESSON_ID = "2";
+    
+    private static SessionBean joinedLessonBean = null;
     /*
      * @see TestCase#setUp()
      */
@@ -96,11 +98,35 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
         
         verifyNoActionErrors();
         
-        SessionBean bean = (SessionBean)httpSession.getAttribute(SessionBean.NAME);
-        assertNotNull("verify the session bean",bean);
-        assertEquals("verify the learner in the session bean",TEST_USER_ID,bean.getLearner().getUserId().toString());
-        assertEquals("verify the lesson in the session bean",TEST_LESSON_ID,bean.getLesson().getLessonId().toString());
-        assertNotNull("verify the learner progress",bean.getLearnerProgress());
+        joinedLessonBean = (SessionBean)httpSession.getAttribute(SessionBean.NAME);
+        assertNotNull("verify the session bean",joinedLessonBean);
+        assertEquals("verify the learner in the session bean",TEST_USER_ID,joinedLessonBean.getLearner().getUserId().toString());
+        assertEquals("verify the lesson in the session bean",TEST_LESSON_ID,joinedLessonBean.getLesson().getLessonId().toString());
+        assertNotNull("verify the learner progress",joinedLessonBean.getLearnerProgress());
+    }
+
+    public void testGetFlashProgressData()
+    {
+        httpSession.setAttribute(SessionBean.NAME,joinedLessonBean);
+        addRequestParameter("method", "getFlashProgressData");
+        addRequestParameter("userId", TEST_USER_ID);
+        addRequestParameter("lessonId", TEST_LESSON_ID);
+        
+        actionPerform();
+        verifyNoActionErrors();
+    }
+    
+    public void testExitLesson()
+    {
+        addRequestParameter("method", "exitLesson");
+        addRequestParameter("userId", TEST_USER_ID);
+        addRequestParameter("lessonId", TEST_LESSON_ID);
+        
+        actionPerform();
+        
+        verifyForward("welcome");
+        verifyTilesForward("welcome",".welcome");
+        verifyNoActionErrors();
     }
 
 }

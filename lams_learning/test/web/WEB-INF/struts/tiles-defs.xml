@@ -65,6 +65,10 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="title" value="Lesson Complete"/>
 		<put name="body" value="/lessonComplete.jsp"/>
 	</definition>
+	<definition name=".welcome" extends=".activityLayout">
+		<put name="title" value="Welcome"/>
+		<put name="body" value="welcome.jsp"/>
+	</definition>
 	
 	<!-- Journal definitions -->
 	

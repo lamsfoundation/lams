@@ -34,12 +34,13 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.WebUtil;
+
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -72,6 +73,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
+ * @struts:action-forward name="welcome" path=".welcome"
  * 
  * ----------------XDoclet Tags--------------------
  * 
@@ -82,20 +84,15 @@ public class LearnerAction extends LamsDispatchAction
     // Instance variables
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(LearnerAction.class);
-    
-    //---------------------------------------------------------------------
-    // Class level constants - session attributes
-    //---------------------------------------------------------------------
 	private static final String PARAM_USER_ID = "userId";
     private static final String PARAM_LESSON_ID = "lessonId";
     private static final String ATTR_USERDATA = "user";
-
     //private static final String PARAM_LEARNER_PROGRESS="?learnerProgressId=";
     //---------------------------------------------------------------------
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
     private static final String DISPLAY_ACTIVITY = "displayActivity";
-    
+    private static final String WELCOME = "welcome";
     /**
      * <p>The Struts dispatch method that retrieves all active lessons for a 
      * requested user from flash. The returned is structured as dto format 
@@ -124,7 +121,7 @@ public class LearnerAction extends LamsDispatchAction
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //get learner.
-        User learner = getUserData(request);
+        User learner = LearningWebUtil.getUserData(request, getServlet().getServletContext());
         if(log.isDebugEnabled())
             log.debug("Getting active lessons for leaner:"+learner.getFullName()+"["+learner.getUserId()+"]");
 
@@ -169,13 +166,14 @@ public class LearnerAction extends LamsDispatchAction
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //get user and lesson based on request.
-        User learner = getUserData(request);
-        long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
-        Lesson lesson = learnerService.getLesson(new Long(lessonId));
+        User learner = LearningWebUtil.getUserData(request, getServlet().getServletContext());
+        
+        Lesson lesson = LearningWebUtil.getLessonData(request,getServlet().getServletContext());
+
         
         if(log.isDebugEnabled())
             log.debug("The learner ["+learner.getUserId()+"],["+learner.getFullName()
-                      +"is joining the lesson ["+lessonId+"],["+lesson.getLessonName()+"]");
+                      +"is joining the lesson ["+lesson.getLessonId()+"],["+lesson.getLessonName()+"]");
 
         //join user to the lesson on the server
         LearnerProgress learnerProgress = learnerService.joinLesson(learner,lesson);
@@ -203,6 +201,8 @@ public class LearnerAction extends LamsDispatchAction
         return null;
     }
     
+
+
     /**
      * <p>Exit the current lesson that is running in the leaner window. It 
      * expects lesson id passed as parameter from flash component.
@@ -226,8 +226,27 @@ public class LearnerAction extends LamsDispatchAction
                                     HttpServletResponse response) throws IOException,
                                                                           ServletException
     {
+        if(log.isDebugEnabled())
+            log.debug("Exiting lesson...");
+
+        //initialize service object
+        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+
+        SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
         
-        return null;
+        if(log.isDebugEnabled())
+            log.debug("Lesson id is: "+sessionBean.getLesson().getLessonId());
+        
+        learnerService.exitLesson(sessionBean.getLearnerProgress());
+        
+        //send acknowledgment to flash as it is triggerred by flash
+        String lessonExitted = WDDXProcessor.serialize(new FlashMessage("exitLesson",null));
+        if(log.isDebugEnabled())
+            log.debug("Sending Exit Lesson acknowledge message to flash:"+lessonExitted);
+        response.getWriter().print(lessonExitted);
+        
+        //forward to welcome page
+        return mapping.findForward(WELCOME);
     }
     
     /**
@@ -260,41 +279,48 @@ public class LearnerAction extends LamsDispatchAction
                                               HttpServletResponse response) throws IOException,
                                                                           ServletException
     {
+        if(log.isDebugEnabled())
+            log.debug("Getting Flash progress data...");
+        
+        SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
+        
+        String progressData = WDDXProcessor.serialize(new FlashMessage("getFlashProgressData",
+                                                                       sessionBean.getLearnerProgress().getLearnerProgressData()));
+
+        if(log.isDebugEnabled())
+            log.debug("Sending learner progress data to flash:"+progressData);
+        response.getWriter().print(progressData);
+
+        //don't need to return a action forward because it sent the wddx packet
+        //back already.
+        return null;
+    }
+   
+    /**
+     * <p>The struts dispatch action to view the activity. This will be called 
+     * by flash progress bar to check up the activity component. The lams side 
+     * will calculate the url and send a flash message back to the 
+     * flash component.</p>
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     * 
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward getLearnerActivityURL(ActionMapping mapping,
+                                               ActionForm form,
+                                               HttpServletRequest request,
+                                               HttpServletResponse response) throws IOException,
+                                                                          	ServletException
+    {
         
         return null;
     }
-    
-    
-    
-    /**
-     * Helper method to retrieve the user data. We always load up from http
-     * session first to optimize the performance. If no session cache available,
-     * we load it from data source.
-     * @param request A standard Servlet HttpServletRequest class.
-     * @param surveyService the service facade of survey tool
-     * @return the user data value object
-     */
-    private User getUserData(HttpServletRequest request)
-    {
-        //retrieve complete user data from http session
-        User currentUser = (User) request.getSession()
-                                              .getAttribute(ATTR_USERDATA);
-        if(log.isDebugEnabled()&&currentUser!=null)
-            log.debug("user retrieved from http session:"+currentUser.getUserId());
-        
-        //if no session cache available, retrieve it from data source
-        if (currentUser == null)
-        {
-            int userId = WebUtil.readIntParam(request,PARAM_USER_ID);
-            currentUser = LearnerServiceProxy.getUserManagementService(getServlet().getServletContext())
-            								 .getUserById(new Integer(userId));
-            if(log.isDebugEnabled()&&currentUser!=null)
-                log.debug("user retrieved from database:"+currentUser.getUserId());
-            
-            //create session cache
-            request.getSession().setAttribute(ATTR_USERDATA, currentUser);
-        }
-        return currentUser;
-    }
- 
 }

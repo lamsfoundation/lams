@@ -87,7 +87,7 @@ public class DummyLessonAction extends Action {
 			HttpServletResponse response) {
 		ActivityForm activityForm = (ActivityForm) form;
 		
-		SessionBean sessionBean = new SessionBean();
+		SessionBean sessionBean = new SessionBean(null,null,null);
 		IUserManagementService userService = getUserService(this.servlet.getServletContext());
 		User user = userService.getUserById(TEST_USER_ID);
 		sessionBean.setLearner(user);

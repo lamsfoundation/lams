@@ -156,6 +156,11 @@ http://www.gnu.org/licenses/gpl.txt
         path="/DisplayActivity.do"
         redirect="false"
       />
+      <forward
+        name="welcome"
+        path=".welcome"
+        redirect="false"
+      />
     </action>
     <action
       path="/CompleteActivity"
@@ -206,11 +211,6 @@ http://www.gnu.org/licenses/gpl.txt
       <forward
         name="lessonComplete"
         path="/lessonComplete.do"
-        redirect="false"
-      />
-      <forward
-        name="requestDisplay"
-        path="/requestDisplay.do"
         redirect="false"
       />
     </action>
