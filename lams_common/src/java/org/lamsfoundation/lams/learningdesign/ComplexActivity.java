@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -78,11 +80,13 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	 *  
 	 */
 	public Set getActivities() {
+	    if(this.activities==null)
+	        setActivities(new TreeSet(new ActivityOrderComparator()));
 		return this.activities;
 	}
 
 	public void setActivities(Set activities) {
-		this.activities = activities;
+	    this.activities=activities;
 	}
 	public void addActivity(Activity activity){
 		this.activities.add(activity);
