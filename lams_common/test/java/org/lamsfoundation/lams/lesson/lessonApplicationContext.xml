@@ -6,117 +6,20 @@
 -->
 <beans>
 
-	<!-- ========================= GENERAL DEFINITIONS ========================= -->
-
-	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
-	<!-- (in this case, JDBC-related settings for the dataSource definition below) -->
-	<!-- 
-	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location"><value>/WEB-INF/dbConnection.properties</value></property>
-	</bean>
-	-->
-	<!-- Message source for this context, loaded from localized "messages_xx" files -->
-	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-		<property name="basename"><value>messages</value></property>										
-	</bean>
-
-
-	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
-  
-	<!-- Local DataSource that works in any environment -->
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
-		<property name="url"><value>jdbc:mysql://localhost/lams</value></property>
-		<property name="username"><value>lams</value></property>
-		<property name="password"><value>lamsdemo</value></property>
-	</bean>
-
-
-
-	<!-- Hibernate SessionFactory -->
-	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
-		<property name="dataSource"><ref local="dataSource"/></property>
-		<property name="mappingResources">
-			<list>
-				<!-- usermanagement related mapping files -->	
-				<value>org/lamsfoundation/lams/usermanagement/AuthenticationMethod.hbm.xml</value>
-				<value>org/lamsfoundation/lams/usermanagement/AuthenticationMethodType.hbm.xml</value>
-				<value>org/lamsfoundation/lams/usermanagement/Organisation.hbm.xml</value>
-				<value>org/lamsfoundation/lams/usermanagement/OrganisationType.hbm.xml</value>
-				<value>org/lamsfoundation/lams/usermanagement/Role.hbm.xml</value>
-				<value>org/lamsfoundation/lams/usermanagement/User.hbm.xml</value>
-				<value>org/lamsfoundation/lams/usermanagement/UserOrganisation.hbm.xml</value>
-				<value>org/lamsfoundation/lams/usermanagement/UserOrganisationRole.hbm.xml</value>
-				<value>org/lamsfoundation/lams/usermanagement/Workspace.hbm.xml</value>
-				<value>org/lamsfoundation/lams/usermanagement/WorkspaceFolder.hbm.xml</value>
-				
-				<!-- learning design related mapping files -->
-				<value>org/lamsfoundation/lams/learningdesign/Activity.hbm.xml</value>
-				<value>org/lamsfoundation/lams/learningdesign/Group.hbm.xml</value>				
-				<value>org/lamsfoundation/lams/learningdesign/Grouping.hbm.xml</value>
-				<value>org/lamsfoundation/lams/learningdesign/LearningDesign.hbm.xml</value>
-				<value>org/lamsfoundation/lams/learningdesign/LearningLibrary.hbm.xml</value>	
-				<value>org/lamsfoundation/lams/learningdesign/Transition.hbm.xml</value>	
-				
-				
-				<!-- lesson related mapping files-->
-				<value>org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
-				<value>org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
-				
-				<!-- Tool related mapping files-->
-				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>
-			</list>
-		</property>
-		<property name="hibernateProperties">
-			<props>
-				<prop key="hibernate.dialect">net.sf.hibernate.dialect.MySQLDialect</prop>
-				<prop key="hibernate.show_sql">true</prop>
-				<prop key="hibernate.c3p0.minPoolSize">5</prop>
-				<prop key="hibernate.c3p0.maxPoolSize">20</prop>
-				<prop key="hibernate.c3p0.timeout">1800</prop>
-				<prop key="hibernate.c3p0.max_statement">50</prop>
-			</props>
-		</property>
-	</bean>
-
-	<!-- If we really use multiple SessionFactory, we have to change to JTA Transaction Manager -->
-	<!-- bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"/-->
-	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
-	<bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-
-
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
 	
 	<!-- lesson package -->
 
 	<bean id="lessonDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
 	<bean id="lessonClassDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonClassDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
 	<bean id="learnerProgressDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
-	<!-- Usermanagement realted beans -->
-	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="learningDesignDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>	
-	
-	<bean id="organisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 </beans>

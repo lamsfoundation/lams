@@ -24,4 +24,6 @@ public interface ILamsToolService
      * @exception in case of any problems.
      */
     public List getAllPotentialLearners(long toolContentID) throws LamsToolServiceException;
+    
+    
 }

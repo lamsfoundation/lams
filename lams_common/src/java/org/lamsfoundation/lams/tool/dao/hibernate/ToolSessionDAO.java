@@ -7,7 +7,6 @@
 package org.lamsfoundation.lams.tool.dao.hibernate;
 
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 

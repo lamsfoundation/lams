@@ -118,7 +118,8 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
      */
     protected String[] getContextConfigLocation()
     {
-        return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml" };
+        return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+                			  "applicationContext.xml"};
     }
 
     //---------------------------------------------------------------------

@@ -62,13 +62,11 @@
 				<!-- lesson related mapping files-->
 				<value>org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
 				<value>org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
-                <!-- value>com/lamsinternational/lams/lesson/LessonClass.hbm.xml</value-->
-				
+ 				
 				<!-- Tool related mapping files-->
 				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/ToolSessionState.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -164,19 +162,6 @@
 	<bean id="groupingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
-	
-	<!-- lesson package -->
 
-	<bean id="lessonDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="lessonClassDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonClassDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="learnerProgressDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
 
 </beans>

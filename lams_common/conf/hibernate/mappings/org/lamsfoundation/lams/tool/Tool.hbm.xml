@@ -158,7 +158,7 @@
         </meta>    
     </property>
     <property
-        name="className"
+        name="serviceName"
         type="java.lang.String"
         column="service_name"
         not-null="true"

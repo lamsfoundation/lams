@@ -45,7 +45,7 @@ public class Tool implements Serializable {
     private String description;
 
     /** persistent field */
-    private String className;
+    private String serviceName;
 
     /** persistent field */
     private String exportPortfolioUrl;
@@ -65,7 +65,7 @@ public class Tool implements Serializable {
         this.toolSignature = toolSignature;
         this.toolDisplayName = toolDisplayName;
         this.description = description;
-        this.className = className;
+        this.serviceName = className;
         this.exportPortfolioUrl = exportPortfolioUrl;
         this.activities = activities;
     }
@@ -83,7 +83,7 @@ public class Tool implements Serializable {
         this.defaultToolContentId = defaultToolContentId;
         this.toolSignature = toolSignature;
         this.toolDisplayName = toolDisplayName;
-        this.className = className;
+        this.serviceName = className;
         this.exportPortfolioUrl = exportPortfolioUrl;
         this.activities = activities;
     }
@@ -237,17 +237,17 @@ public class Tool implements Serializable {
 
     /** 
      *            @hibernate.property
-     *             column="class_name"
+     *             column="service_name"
      *             length="65535"
      *             not-null="true"
      *         
      */
-    public String getClassName() {
-        return this.className;
+    public String getServiceName() {
+        return this.serviceName;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     /** 
