@@ -12,11 +12,32 @@
 		var teachWin = null;
 		var adminWin = null;
 		
+		function openSysAdmin()
+		{
+			if(isMac)
+			{
+				adminWin = window.open('home.do?method=sysadmin&orgId="javascript:document.forms[0].orgIdForSysAdmin.value;"','adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+			}
+			else
+			{
+				if(adminWin && adminWin.open && !adminWin.closed )
+				{
+					adminWin.focus();
+				}
+				else
+				{
+					adminWin = window.open('home.do?method=admin&orgId="javascript:document.forms[0].orgIdForSysAdmin.value;"','adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+					adminWin.focus();
+				}
+			}
+		}
+		
 		function openAuthor( )
 		{
 			//alert( "open author" );
 			
 			//cannot check if window is still open on macIE 5
+			//<c:set value=document.forms[0].orgIdForAuthor.value var=orgIdForAuthor>
 			if(isMac)
 			{
 				authorWin = window.open('home.do?method=author','aWindow','width=796,height=570,resizable');
@@ -31,13 +52,13 @@
 				{
 					authorWin = window.open('home.do?method=author','aWindow','width=796,height=570,resizable');
 					authorWin.focus();
-					//parent.close();
 				}
 			}
 		}
 		
 		function openStaff( )
 		{
+			//<c:set value=document.forms[0].orgIdForStaff.value var=orgIdForStaff>
 			if(isMac)
 			{
 				if(belowMinRes)
@@ -64,6 +85,7 @@
 		
 		function openLearner()
 		{
+			//<c:set value=document.forms[0].orgIdForLearner.value var=orgIdForLearner>
 			if(isMac)
 			{
 				learnWin = window.open('home.do?method=learner','lWindow','width=796,height=570,resizable,status=yes');
@@ -83,9 +105,10 @@
 		
 		function openAdmin()
 		{
+			//<c:set value=document.forms[0].orgIdForAdmin.value var=orgIdForAdmin>
 			if(isMac)
 			{
-				adminWin = window.open('admin/adminMenu.jsp','adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+				adminWin = window.open('home.do?method=admin','adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
 			}
 			else
 			{
@@ -95,7 +118,7 @@
 				}
 				else
 				{
-					adminWin = window.open('admin/adminMenu.jsp','adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
+					adminWin = window.open('home.do?method=admin','adWindow','width=796,height=570,resizable,location,menubar,scrollbars,dependent,status,toolbar');
 					adminWin.focus();
 				}
 			}
