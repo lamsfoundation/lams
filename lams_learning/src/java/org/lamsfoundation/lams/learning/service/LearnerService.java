@@ -5,13 +5,15 @@
  */
 package org.lamsfoundation.lams.learning.service;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
-import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+import org.lamsfoundation.lams.learning.web.util.Utils;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
 import org.lamsfoundation.lams.lesson.Lesson;
 
@@ -19,6 +21,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 
+import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
  * This class is a facade over the Learning middle tier.
@@ -26,17 +29,52 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class LearnerService implements ILearnerService
 {
-    private ILearnerProgressDAO learnerProgressDAO = null;
-    private ILessonDAO lessonDAO = null;
+    //---------------------------------------------------------------------
+    // Instance variables
+    //---------------------------------------------------------------------
+    private ILearnerProgressDAO learnerProgressDAO;
+    private ILessonDAO lessonDAO;
     private ProgressEngine progressEngine;
-
+    private IToolSessionDAO toolSessionDAO;
    
+    //---------------------------------------------------------------------
+    // Inversion of Control Methods - Constructor injection
+    //---------------------------------------------------------------------
     /** Creates a new instance of LearnerService */
     public LearnerService(ProgressEngine progressEngine)
     {
         this.progressEngine = progressEngine;
     }
+    //---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    //---------------------------------------------------------------------
+    /**
+     * @param toolSessionDAO The toolSessionDAO to set.
+     */
+    public void setToolSessionDAO(IToolSessionDAO toolSessionDAO)
+    {
+        this.toolSessionDAO = toolSessionDAO;
+    }
+    
+    /**
+     * @param lessonDAO The lessonDAO to set.
+     */
+	public void setLessonDAO(ILessonDAO lessonDAO) 
+	{
+		this.lessonDAO = lessonDAO;
+	}
 
+    /**
+     * @param learnerProgressDAO The learnerProgressDAO to set.
+     */
+    public void setLearnerProgressDAO(ILearnerProgressDAO learnerProgressDAO)
+    {
+        this.learnerProgressDAO = learnerProgressDAO;
+    }
+
+    //---------------------------------------------------------------------
+    // Service Methods
+    //---------------------------------------------------------------------
     /**
      * Returns a list of all the active Lessons a User is a Learner in.
      * @param User the learner
@@ -62,10 +100,63 @@ public class LearnerService implements ILearnerService
      */
     public LearnerProgress joinLesson(User learner, Lesson lesson) throws ProgressException
     {
-    	LearnerProgress learnerProgress = progressEngine.getStartPoint(learner, lesson);
+        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLeaner(learner,lesson);
+    	
+        if(learnerProgress!=null)
+        {
+            //create a new learner progress for new learner
+            learnerProgress = new LearnerProgress(learner,lesson);
+            
+            progressEngine.getStartPoint(learner, lesson,learnerProgress);
+            
+            learnerProgressDAO.saveLearnerProgress(learnerProgress);
+        }
+        
+        createToolSessionsIfNecessary(learnerProgress);
     	return learnerProgress;
     }
     
+
+    /**
+     * @param learnerProgress
+     */
+    private void createToolSessionsIfNecessary(LearnerProgress learnerProgress)
+    {
+        if(learnerProgress.getNextActivity()==null)
+            throw new LearnerServiceException("Error occurs in [" +
+            		"createToolSessionsIfNecessary], Can't initialize tool " +
+            		"sessions without knowing the activity.");
+        
+        Activity nextActivity = learnerProgress.getNextActivity();
+        
+        for(Iterator i = nextActivity.getAllToolActivitiesFrom(nextActivity).iterator();i.hasNext();)
+        {
+            ToolActivity toolActivity = (ToolActivity)i.next();
+            if(shouldCreateToolSession(learnerProgress,toolActivity))
+                createToolSessionFor(toolActivity);
+        }
+    }
+    
+    /**
+     * @return
+     */
+    private boolean shouldCreateToolSession(LearnerProgress learnerProgress,
+                                            ToolActivity toolActivity)
+    {
+        if(!toolActivity.getTool().getSupportsGrouping())
+        {
+            //ToolSession nonGroupedToolSession = toolSessionDAO.get
+        }
+        return false;
+    }
+    /**
+     * @param toolActivity
+     */
+    private void createToolSessionFor(ToolActivity toolActivity)
+    {
+        // TODO Auto-generated method stub
+        
+    }
 
     /**
      * Returns the current progress data of the User.
@@ -112,8 +203,7 @@ public class LearnerService implements ILearnerService
     	try {
 	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
 	    	Activity nextActivity = nextLearnerProgress.getNextActivity();
-	    	ActionMappings actionMappings = new ActionMappings();
-	    	ActivityURL activityURL = actionMappings.getActivityURL(nextActivity, nextLearnerProgress);
+	    	ActivityURL activityURL = Utils.getActivityURL(nextActivity, nextLearnerProgress);
 	    	url = activityURL.getUrl();
     	}
     	catch (ProgressException e) {
@@ -123,13 +213,4 @@ public class LearnerService implements ILearnerService
     	
     	return url;
     }
-    
-	public ILessonDAO getLessonDAO() {
-		return lessonDAO;
-	}
-	
-	public void setLessonDAO(ILessonDAO lessonDAO) {
-		this.lessonDAO = lessonDAO;
-	}
-
 }

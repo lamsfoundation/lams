@@ -44,7 +44,7 @@ public class ProgressEngine
         //if activity has transition
         
             //follow transition to get next activity
-        
+                                                     
             //mark next activit as current act for user
         
             //fill in VO with right data for next act.
@@ -75,16 +75,15 @@ public class ProgressEngine
      * @return Progress - the VO that contains the data needed to send
      * @throws ProgressException if the start point cannot be calculated successfully.
      */
-    public LearnerProgress getStartPoint(User learner, Lesson lesson) throws ProgressException
+    public LearnerProgress getStartPoint(User learner, Lesson lesson,
+                                         LearnerProgress progress) throws ProgressException
     {
         
-        //get lD from lesson
+        LearningDesign ld = lesson.getLearningDesign();
         
-        //get first activity from ld
-        
-        //fill in VO based on first activity
+        progress.setNextActivity(ld.getFirstActivity());
     
-    	return null;
+    	return progress;
     }
     
 }
