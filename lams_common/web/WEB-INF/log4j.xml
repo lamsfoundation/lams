@@ -151,10 +151,6 @@
     <appender-ref ref="LAMSCONSOLE"/>
   </category>
   
-  <category name="com.webmcq.ld.activities">
-    <priority value="DEBUG"/>
-  </category>
-  
   <!--   
   <category name="net.sf.hibernate" additivity="false">
     <priority value="INFO"/>
