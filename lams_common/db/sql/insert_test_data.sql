@@ -38,13 +38,6 @@ INSERT INTO lams_authentication_method VALUES (3, 3, 'MQ-LDAP');
 
 insert into lams_workspace_folder (parent_folder_id,name,workspace_id) values(null,'Trial',1);
 
-insert into lams_learning_design(id,description,title,first_activity_id,max_id,valid_design_flag,
-								 read_only_flag,user_id,help_text,lesson_copy_flag,create_date_time,version,
-								 parent_learning_design_id,open_date_time,close_date_time,workspace_folder_id)
-								values
-								(1,'Test Learning Design','Test Learning Design title',1,1,1,0,1,
-								'Help Text',0,'20041223','1.0',null,'20041223','20041223',1);
-
 -- Populates the lams_learning_library table with default libraries
 
 insert into lams_learning_library (learning_library_id,description,title,create_date_time) values (1,'Notebook','Notebook','20050207');
@@ -442,5 +435,11 @@ values(10,10,'To Multiple Choice','To Multiple Choice',22,21,1,'20050207');
 
 insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(11,11,'To Multiple Choice','To Multiple Choice',null,22,1,'20050207');
-								
+
+insert into lams_learning_design(id,description,title,first_activity_id,max_id,valid_design_flag,
+								 read_only_flag,user_id,help_text,lesson_copy_flag,create_date_time,version,
+								 parent_learning_design_id,open_date_time,close_date_time,workspace_folder_id)
+								values
+								(1,'Test Learning Design','Test Learning Design title',15,1,1,0,1,
+								'Help Text',0,'20041223','1.0',null,'20041223','20041223',1);																
 SET FOREIGN_KEY_CHECKS=1;
