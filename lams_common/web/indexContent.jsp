@@ -4,8 +4,13 @@
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="com.lamsinternational.lams.usermanagement.service.UserManagementService" %>
 <%@ page import="com.lamsinternational.lams.usermanagement.*" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
-
+<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
+<html>
+<head>
+	<script language="JavaScript" type="text/javascript" src="getSysInfo.js"></script>
+	<script language="JavaScript" type="text/javascript" src="openUrls.js"></script>
+</head>
+<form name="form" method="post">
 <table width="98%" height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
 	<tr>
 		<td align="center" valign="middle"><img height="7" src="images/spacer.gif" width="10" /></td>
@@ -25,7 +30,10 @@
 				<tr>
 					<td width="50%" align="left" valign="top" >
 						<p class="mainHeader">Welcome <%=user.getFirstName()%></p>
-						<p class="body">You are logged into LAMS.Please choose a workspace from the buttons on the right.</p>
+						<p class="body">
+							You are logged into LAMS.Please choose a workspace from the buttons on the right or
+							<a href="home.do?method=passwordChange"> Change Password </a>here.			
+						</p>
 						<script language="JavaScript" type="text/javascript">
 						<!--
 							// if it's a mac i can't just focus as i don't know if the window is open or not,
@@ -45,11 +53,11 @@
 							<%List list = service.getOrganisationsForUserByRole(user,Role.SYSADMIN);
 							if(list.size()>0){%>
 								<tr>
-									<td align="center">
-										<input name="sysadmin" type="button" id="sysadmin" onClick="openAuthor();" value="SysAdmin" style="width:100" />
+									<td align="left">
+										<input name="sysadmin" type="button" id="sysadmin" onClick="openSysAdmin();" value="SysAdmin" style="width:100" />
 									</td>
 									<td align="left">
-										<select name="selectedOrgId">
+										<select name="orgIdForSysAdmin">
 										<%for(int i=0;i<list.size();i++){
 											Organisation org = (Organisation)list.get(i);%>
 											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
@@ -61,11 +69,11 @@
 							<%list = service.getOrganisationsForUserByRole(user,Role.ADMIN);
 								if(list.size()>0){%>
 								<tr>
-									<td align="center">
+									<td align="left">
 										<input name="admin" type="button" id="admin" onClick="openAdmin();" value="Admin" style="width:100" />
 									</td>
-									<td align="center">
-										<select name="selectedOrgId">
+									<td align="left">
+										<select name="orgIdForAdmin">
 										<%for(int i=0;i<list.size();i++){
 											Organisation org = (Organisation)list.get(i);%>
 											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
@@ -77,11 +85,11 @@
 							<%list = service.getOrganisationsForUserByRole(user,Role.STAFF);
 								if(list.size()>0){%>
 								<tr>
-									<td align="center">
+									<td align="left">
 										<input name="staff" type="button" id="staff" onClick="openStaff();" value="Staff" style="width:100" />
 									</td>
-									<td align="center">
-										<select name="selectedOrgId">
+									<td align="left">
+										<select name="orgIdForStaff">
 										<%for(int i=0;i<list.size();i++){
 											Organisation org = (Organisation)list.get(i);%>
 											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
@@ -93,11 +101,11 @@
 							<%list = service.getOrganisationsForUserByRole(user,Role.AUTHOR);
 								if(list.size()>0){%>
 								<tr>
-									<td align="center">
+									<td align="left">
 										<input name="author" type="button" id="author" onClick="openAuthor();" value="Author" style="width:100" />
 									</td>
-									<td align="center">
-										<select name="selectedOrgId">
+									<td align="left">
+										<select name="orgIdForAuthor">
 										<%for(int i=0;i<list.size();i++){
 											Organisation org = (Organisation)list.get(i);%>
 											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
@@ -109,11 +117,11 @@
 							<%list = service.getOrganisationsForUserByRole(user,Role.LEARNER);
 							if(list.size()>0){%>
 								<tr>
-									<td align="center">
+									<td align="left">
 										<input name="learner" type="button" id="learner" onClick="openLearner();" value="Learner" style="width:100" />
 									</td>
-									<td align="center">
-										<select name="selectedOrgId">
+									<td align="left">
+										<select name="orgIdForLearner">
 										<%for(int i=0;i<list.size();i++){
 											Organisation org = (Organisation)list.get(i);%>
 											<option value="<%=org.getOrganisationId()%>"><%=org.getName()%></option>
@@ -122,15 +130,6 @@
 									</td>
 								</tr>
 							<%}%>
-							<tr></tr>
-							<tr>
-								<td class="body" align="left">
-									<input name="changePassword" type="button" class="longButton" id="changePassword" value="Change Password"
-				 						onClick="javascript:document.location='home.do?method=getPasswordChange';" 
-				 						onMouseOver="changStyle(this,'longButtonover')"
-				 						onMouseOut="changStyle(this,'longButton')"  />
-								</td>
-							</tr>
 						</table>
 					</td>
 				</tr>
@@ -161,3 +160,5 @@
 		</td>
 	</tr>
 </table>
+</form>
+</html>
