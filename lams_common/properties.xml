@@ -1,0 +1,43 @@
+   	<!-- =================================================================== -->
+   	<!-- note: This is not a proper xml file (there is no root element)      -->
+   	<!--       It defines properties for ant build.xml file                  -->
+   	<!--       It is intended to be imported to ant build.xml file           -->
+   	<!-- =================================================================== -->
+	
+	<!-- progect-wide properties -->
+	<property name="project.name" value="LAMS"/>
+	<property name="product.name" value="LAMS"/>
+	<property name="version" value="1.1"/>
+
+	<!-- xdoclet properties-->	
+	<property name="xdoclet.version" value="1.2.2"/>
+	
+	<!-- path properties -->
+	<property name="lib.dir"                        value="${basedir}/lib"/>
+	<property name="src.dir"                       value="${basedir}/src"/>
+	<property name="src.java.dir"                       value="${basedir}/src/java"/>
+	<property name="conf.dir"                      value="${basedir}/conf"/>
+	<property name="hbm.dir"                 value="${conf.dir}/hibernate/mappings"/>
+	
+	<property name="package.dir"                    value="com/lamsinternational/lams"/>
+	<property name="package.learningdesign.dir"                   value="${package.dir}/learningdesign"/>
+	<property name="package.usermanagement.dir"                   value="${package.dir}/usermanagement"/>
+	
+	<property name="package.name"                        value="com.lamsinternational.lams"/>
+	<property name="package.learningdesign.name"         value="${package.name}.learningdesign"/>
+	<property name="package.usermanagement.name"         value="${package.name}.usermanagement"/>
+	
+	<!--  database related properties -->
+	<property name="database.script.file"           value="${script.dir}/${script_file}.sql"/>
+	<property name="database.driver.file"           value="${lib.dir}/mysql/mysql-connector-java-3.0.16-ga-bin.jar"/>   
+	<property name="database.driver.classpath"      value="${database.driver.file}"/>
+	<property name="database.driver"                value="org.gjt.mm.mysql.Driver"/>
+	<property name="database.url"                   value="jdbc:mysql://localhost/lams"/>
+	<property name="database.userid"                value="root"/>
+	<property name="database.password"              value=""/>
+	<property name="database.schema"                value=""/>
+	<property name="database.catalog"               value=""/>
+
+	<!-- middlegen properties -->
+	<property name="middlegen.dir" value="${conf.dir}/middlegen"/>
+	<property name="gui"                            value="true"/>	
