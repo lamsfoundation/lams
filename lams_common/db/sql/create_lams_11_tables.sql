@@ -1,11 +1,3 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2004-11-26 11:10:27
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2004-11-26 11:09:02
-# 
 CREATE TABLE lams_gate_activity_level (
        gate_activity_level_id INT(11) NOT NULL DEFAULT 0
      , description VARCHAR(128) NOT NULL
@@ -112,6 +104,26 @@ CREATE TABLE lams_workspace (
                   REFERENCES lams_workspace_folder (workspace_folder_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
+CREATE TABLE lams_organisation (
+       organisation_id BIGINT(20) NOT NULL DEFAULT 0
+     , name VARCHAR(250)
+     , description VARCHAR(250)
+     , parent_organisation_id BIGINT(20)
+     , organisation_type_id INT(3) NOT NULL DEFAULT 0
+     , create_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , workspace_id BIGINT(20)
+     , PRIMARY KEY (organisation_id)
+     , INDEX (organisation_type_id)
+     , CONSTRAINT FK_lams_organisation_1 FOREIGN KEY (organisation_type_id)
+                  REFERENCES lams_organisation_type (organisation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (workspace_id)
+     , CONSTRAINT FK_lams_organisation_2 FOREIGN KEY (workspace_id)
+                  REFERENCES lams_workspace (workspace_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (parent_organisation_id)
+     , CONSTRAINT FK_lams_organisation_3 FOREIGN KEY (parent_organisation_id)
+                  REFERENCES lams_organisation (organisation_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+)TYPE=InnoDB;
+
 CREATE TABLE lams_user (
        user_id BIGINT(20) NOT NULL DEFAULT 0
      , login VARCHAR(20) NOT NULL
@@ -134,6 +146,8 @@ CREATE TABLE lams_user (
      , create_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
      , authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
      , workspace_id BIGINT(20)
+     , user_organisation_id BIGINT(20) NOT NULL DEFAULT 0
+     , base_organisation_id BIGINT(20) NOT NULL DEFAULT 0
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
@@ -141,10 +155,12 @@ CREATE TABLE lams_user (
      , INDEX (workspace_id)
      , CONSTRAINT FK_lams_user_2 FOREIGN KEY (workspace_id)
                   REFERENCES lams_workspace (workspace_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (base_organisation_id)
+     , CONSTRAINT FK_lams_user_3 FOREIGN KEY (base_organisation_id)
+                  REFERENCES lams_organisation (organisation_id)
 )TYPE=InnoDB;
 CREATE UNIQUE INDEX UQ_lams_user_login ON lams_user (login ASC);
 CREATE INDEX login ON lams_user (login ASC);
-
 
 CREATE TABLE lams_learning_design (
        learning_design_id BIGINT(20) NOT NULL DEFAULT 0
@@ -176,9 +192,6 @@ CREATE TABLE lams_learning_design (
 )TYPE=InnoDB;
 CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
 
-
-
-
 CREATE TABLE lams_grouping (
        grouping_id BIGINT(20) NOT NULL DEFAULT 0
      , grouping_type_id INT(11) NOT NULL DEFAULT 0
@@ -199,6 +212,37 @@ CREATE TABLE lams_group (
      , INDEX (grouping_id)
      , CONSTRAINT FK_lams_learning_group_1 FOREIGN KEY (grouping_id)
                   REFERENCES lams_grouping (grouping_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+)TYPE=InnoDB;
+
+CREATE TABLE lams_user_organisation (
+       user_organisation_id BIGINT(20) NOT NULL DEFAULT 0
+     , organisation_id BIGINT(20) NOT NULL DEFAULT 0
+     , user_id BIGINT(20) NOT NULL DEFAULT 0
+     , PRIMARY KEY (user_organisation_id)
+     , INDEX (user_id)
+     , CONSTRAINT u_user_organisation_ibfk_1 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX (organisation_id)
+     , CONSTRAINT u_user_organisation_ibfk_2 FOREIGN KEY (organisation_id)
+                  REFERENCES lams_organisation (organisation_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+)TYPE=InnoDB;
+
+CREATE TABLE lams_lesson (
+       lesson_id BIGINT(20) NOT NULL
+     , learning_design_id BIGINT(20) NOT NULL DEFAULT 0
+     , user_id BIGINT(20) NOT NULL DEFAULT 0
+     , create_date_time DATETIME NOT NULL
+     , organisation_id BIGINT(20) NOT NULL DEFAULT 0
+     , PRIMARY KEY (lesson_id)
+     , INDEX (learning_design_id)
+     , CONSTRAINT FK_lams_lesson_1_1 FOREIGN KEY (learning_design_id)
+                  REFERENCES lams_learning_design (learning_design_id)
+     , INDEX (user_id)
+     , CONSTRAINT FK_lams_lesson_2 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id)
+     , INDEX (organisation_id)
+     , CONSTRAINT FK_lams_lesson_3 FOREIGN KEY (organisation_id)
+                  REFERENCES lams_organisation (organisation_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learning_activity (
@@ -249,55 +293,6 @@ CREATE TABLE lams_learning_activity (
      , INDEX (gate_activity_level_id)
      , CONSTRAINT FK_lams_learning_activity_10 FOREIGN KEY (gate_activity_level_id)
                   REFERENCES lams_gate_activity_level (gate_activity_level_id)
-)TYPE=InnoDB;
-
-CREATE TABLE lams_organisation (
-       organisation_id BIGINT(20) NOT NULL DEFAULT 0
-     , name VARCHAR(250)
-     , description VARCHAR(250)
-     , parent_organisation_id BIGINT(20)
-     , organisation_type_id INT(3) NOT NULL DEFAULT 0
-     , create_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
-     , workspace_id BIGINT(20)
-     , PRIMARY KEY (organisation_id)
-     , INDEX (organisation_type_id)
-     , CONSTRAINT FK_lams_organisation_1 FOREIGN KEY (organisation_type_id)
-                  REFERENCES lams_organisation_type (organisation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (workspace_id)
-     , CONSTRAINT FK_lams_organisation_2 FOREIGN KEY (workspace_id)
-                  REFERENCES lams_workspace (workspace_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (parent_organisation_id)
-     , CONSTRAINT FK_lams_organisation_3 FOREIGN KEY (parent_organisation_id)
-                  REFERENCES lams_organisation (organisation_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
-
-
-CREATE TABLE lams_user_organisation (
-       user_organisation_id BIGINT(20) NOT NULL DEFAULT 0
-     , organisation_id BIGINT(20) NOT NULL DEFAULT 0
-     , user_id BIGINT(20) NOT NULL DEFAULT 0
-     , PRIMARY KEY (user_organisation_id)
-     , INDEX (user_id)
-     , CONSTRAINT u_user_organisation_ibfk_1 FOREIGN KEY (user_id)
-                  REFERENCES lams_user (user_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (organisation_id)
-     , CONSTRAINT u_user_organisation_ibfk_2 FOREIGN KEY (organisation_id)
-                  REFERENCES lams_organisation (organisation_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
-CREATE TABLE lams_lesson (
-       lesson_id BIGINT(20) NOT NULL
-     , learning_design_id BIGINT(20) NOT NULL DEFAULT 0
-     , user_id BIGINT(20) NOT NULL DEFAULT 0
-     , create_date_time DATETIME NOT NULL
-     , PRIMARY KEY (lesson_id)
-     , INDEX (learning_design_id)
-     , CONSTRAINT FK_lams_lesson_1_1 FOREIGN KEY (learning_design_id)
-                  REFERENCES lams_learning_design (learning_design_id)
-     , INDEX (user_id)
-     , CONSTRAINT FK_lams_lesson_2 FOREIGN KEY (user_id)
-                  REFERENCES lams_user (user_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learner_progress (
