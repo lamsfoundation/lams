@@ -6,7 +6,7 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 DROP DATABASE IF EXISTS lams;
-CREATE DATABASE lams;
+CREATE DATABASE lams DEFAULT CHARACTER SET utf8;
 SET FOREIGN_KEY_CHECKS=1;
 
 USE mysql;
@@ -20,8 +20,9 @@ DELETE FROM db WHERE user='';
 GRANT ALL PRIVILEGES ON *.* TO lams@localhost IDENTIFIED BY 'lamsdemo';
 REVOKE PROCESS,SUPER ON *.* from lams@localhost;
 
-GRANT ALL PRIVILEGES ON *.* TO lams@developer02 IDENTIFIED BY 'lamsdemo';
-REVOKE PROCESS,SUPER ON *.* from lams@developer02;
+--The hostname below should be replaced with the actual host name
+GRANT ALL PRIVILEGES ON *.* TO lams@'mams-yoichi' IDENTIFIED BY 'lamsdemo';
+REVOKE PROCESS,SUPER ON *.* from lams@'mams-yoichi';
 
 GRANT ALL PRIVILEGES ON *.* TO lams@'%' IDENTIFIED BY 'lamsdemo';
 REVOKE PROCESS,SUPER ON *.* from lams@'%';
@@ -29,8 +30,8 @@ REVOKE PROCESS,SUPER ON *.* from lams@'%';
 FLUSH PRIVILEGES;
 
 GRANT ALL PRIVILEGES ON lams.* TO lams@localhost IDENTIFIED BY 'lamsdemo' WITH GRANT OPTION;
---The line below should be uncommented and 'developer02' should be replaced with the actual host name
---GRANT ALL PRIVILEGES ON lams.* TO lams@developer02 IDENTIFIED BY 'lamsdemo' WITH GRANT OPTION;
+--The hostname below should be replaced with the actual host name
+GRANT ALL PRIVILEGES ON lams.* TO lams@'mams-yoichi' IDENTIFIED BY 'lamsdemo' WITH GRANT OPTION;
 GRANT ALL PRIVILEGES ON lams.* TO lams@'%' IDENTIFIED BY 'lamsdemo' WITH GRANT OPTION;
 	
 FLUSH PRIVILEGES;
@@ -69,7 +70,7 @@ CREATE TABLE lams_learning_activity_type (
 
 DROP TABLE IF EXISTS lams_learning_library;
 CREATE TABLE lams_learning_library (
-       learning_library_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       learning_library_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , description TEXT
      , title VARCHAR(255)
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
@@ -157,7 +158,7 @@ CREATE UNIQUE INDEX UQ_lams_authentication_method_name ON lams_authentication_me
 
 DROP TABLE IF EXISTS lams_workspace_folder;
 CREATE TABLE lams_workspace_folder (
-       workspace_folder_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       workspace_folder_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , parent_folder_id BIGINT(20)
      , name VARCHAR(64) NOT NULL
      , workspace_id BIGINT(20) NOT NULL DEFAULT 0
@@ -169,7 +170,7 @@ CREATE TABLE lams_workspace_folder (
 
 DROP TABLE IF EXISTS lams_workspace;
 CREATE TABLE lams_workspace (
-       workspace_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       workspace_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , root_folder_id BIGINT(20) NOT NULL DEFAULT 0
      , PRIMARY KEY (workspace_id)
      , INDEX (root_folder_id)
@@ -179,7 +180,7 @@ CREATE TABLE lams_workspace (
 
 DROP TABLE IF EXISTS lams_grouping;
 CREATE TABLE lams_grouping (
-       grouping_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       grouping_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , grouping_type_id INT(11) NOT NULL DEFAULT 0
      , number_of_groups INT(11)
      , learners_per_group INT(11)
@@ -193,7 +194,7 @@ CREATE TABLE lams_grouping (
 
 DROP TABLE IF EXISTS lams_group;
 CREATE TABLE lams_group (
-       group_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       group_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , grouping_id BIGINT(20) NOT NULL DEFAULT 0
      , order_id INT(6) NOT NULL DEFAULT 1
      , PRIMARY KEY (group_id)
@@ -204,7 +205,7 @@ CREATE TABLE lams_group (
 
 DROP TABLE IF EXISTS lams_organisation;
 CREATE TABLE lams_organisation (
-       organisation_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       organisation_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , name VARCHAR(250)
      , description VARCHAR(250)
      , parent_organisation_id BIGINT(20)
@@ -225,7 +226,7 @@ CREATE TABLE lams_organisation (
 
 DROP TABLE IF EXISTS lams_user;
 CREATE TABLE lams_user (
-       user_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       user_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , login VARCHAR(20) NOT NULL
      , password VARCHAR(50) NOT NULL
      , title VARCHAR(32)
@@ -263,7 +264,7 @@ CREATE INDEX login ON lams_user (login ASC);
 
 DROP TABLE IF EXISTS lams_learning_design;
 CREATE TABLE lams_learning_design (
-       learning_design_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       learning_design_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , id INT(11)
      , description TEXT
      , title VARCHAR(255)
@@ -294,7 +295,7 @@ CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC
 
 DROP TABLE IF EXISTS lams_learning_activity;
 CREATE TABLE lams_learning_activity (
-       activity_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       activity_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , id INT(11)
      , description TEXT
      , title VARCHAR(255)
@@ -343,7 +344,7 @@ CREATE TABLE lams_learning_activity (
 
 DROP TABLE IF EXISTS lams_user_organisation;
 CREATE TABLE lams_user_organisation (
-       user_organisation_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       user_organisation_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , organisation_id BIGINT(20) NOT NULL DEFAULT 0
      , user_id BIGINT(20) NOT NULL DEFAULT 0
      , PRIMARY KEY (user_organisation_id)
@@ -420,7 +421,7 @@ CREATE TABLE lams_tool_session (
 
 DROP TABLE IF EXISTS lams_user_organisation_role;
 CREATE TABLE lams_user_organisation_role (
-       user_organisation_role_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       user_organisation_role_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , user_organisation_id BIGINT(20) NOT NULL DEFAULT 0
      , role_id INT(6) NOT NULL DEFAULT 0
      , PRIMARY KEY (user_organisation_role_id)
@@ -490,7 +491,7 @@ CREATE TABLE lams_user_group (
 
 DROP TABLE IF EXISTS lams_tool_content;
 CREATE TABLE lams_tool_content (
-       tool_content_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       tool_content_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , tool_id BIGINT(20) NOT NULL
      , PRIMARY KEY (tool_content_id)
      , INDEX (tool_id)
@@ -500,7 +501,7 @@ CREATE TABLE lams_tool_content (
 
 DROP TABLE IF EXISTS lams_learning_transition;
 CREATE TABLE lams_learning_transition (
-       transition_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       transition_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , id INT(11)
      , description TEXT
      , title VARCHAR(255)
