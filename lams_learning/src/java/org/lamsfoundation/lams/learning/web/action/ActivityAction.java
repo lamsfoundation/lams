@@ -129,6 +129,9 @@ public class ActivityAction extends DispatchAction {
 		
 		// Find requested activity
 		Long activityId = activityForm.getActivityId();
+		if (activityId == null) {
+			return mapping.findForward("error");
+		}
 		Activity activity = getActivity(activityId.longValue(), progress);
 		if (activity == null) {
 			// TODO: log error
@@ -241,7 +244,7 @@ public class ActivityAction extends DispatchAction {
 		}
 		
 		// Set activity as complete
-		LearnerProgress nextProgress = learnerService.calculateProgress(activity.getActivityId().longValue(), learner, lesson);
+		LearnerProgress nextProgress = learnerService.calculateProgress(activity, learner, lesson);
 
 		//ActionForward forward = displayNextActivity(activity, nextProgress, mapping, activityForm, request, response);
 		ActionForward forward = displayNextActivity(progress, nextProgress, mapping, activityForm, request, response);
