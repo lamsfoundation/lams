@@ -42,7 +42,7 @@ public class LessonDTO
     // attributes
     //---------------------------------------------------------------------
     private Long lessonId;
-    private String learningDesignTitle;
+    private String lessonTitle;
     private String learningDesignDescription;
     private Integer lessonStateId;
 
@@ -58,7 +58,7 @@ public class LessonDTO
                          Integer lessonStateId)
     {
         this.lessonId = lessonId;
-        this.learningDesignTitle = learningDesignTitle;
+        this.lessonTitle = learningDesignTitle;
         this.learningDesignDescription = learningDesignDescription;
         this.lessonStateId = lessonStateId;
 
@@ -97,6 +97,6 @@ public class LessonDTO
      */
     public String getLearningDesignTitle()
     {
-        return learningDesignTitle;
+        return lessonTitle;
     }
 }

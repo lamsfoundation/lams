@@ -225,7 +225,9 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
      */
     protected void initLessonData()
     {
-        testLesson = new Lesson(new Date(System.currentTimeMillis()),
+        testLesson = new Lesson("Test Lesson",
+                                "Test lesson description",
+                                new Date(System.currentTimeMillis()),
                                 testUser,
                                 Lesson.CREATED,
                                 testLearningDesign,
@@ -269,6 +271,8 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
      */
     protected void assertLesson(Lesson lesson)
     {
+        assertEquals("check up the lesson name","Test Lesson",lesson.getLessonName());
+        assertEquals("check up the lesson description","Test lesson description",lesson.getLessonDescription());
         assertEquals("check up creation time",testLesson.getCreateDateTime().toString(),
                      						  lesson.getCreateDateTime().toString());
         assertEquals("check up user who created this lesson",testUser.getLogin(),lesson.getUser().getLogin());

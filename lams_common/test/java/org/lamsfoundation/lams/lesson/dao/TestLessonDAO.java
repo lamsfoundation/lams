@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;
+import org.springframework.orm.hibernate.HibernateSystemException;
 
 import junit.framework.TestCase;
 
@@ -91,6 +92,25 @@ public class TestLessonDAO extends LessonDataAccessTestCase
         List lessons = this.lessonDao.getActiveLessonsForLearner(this.testUser);
         
         assertEquals("verify the number of lesson we get",1,lessons.size());
-
     }
+    
+    public void testCreateLessonWithoutName()
+    {
+        Lesson lessonWithoutName = Lesson.createNewLessonWithoutClass(null,
+                                                                      null,
+                                                                      testUser,
+                                                                      testLearningDesign);
+        
+        try
+        {
+            this.lessonDao.saveLesson(lessonWithoutName);
+            fail("we are meant to get failure of inserting a lesson without name");
+        }
+        catch (HibernateSystemException e)
+        {
+            assertTrue("excpetion expected.",true);
+            this.setShouldFlush(false);
+        }
+    }
+  
 }

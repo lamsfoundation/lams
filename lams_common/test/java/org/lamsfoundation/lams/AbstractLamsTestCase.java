@@ -31,6 +31,7 @@ public abstract class AbstractLamsTestCase extends TestCase
 {
     protected ApplicationContext context;
     
+    private boolean shouldFlush = true;
     /**
      * 
      */
@@ -78,7 +79,7 @@ public abstract class AbstractLamsTestCase extends TestCase
         //clean the hibernate session
 		SessionFactory sessionFactory = (SessionFactory)this.context.getBean("coreSessionFactory");
 	    SessionHolder holder = (SessionHolder)TransactionSynchronizationManager.getResource(sessionFactory);
-	    if (holder != null) {
+	    if (holder != null&&shouldFlush) {
 	    	Session s = holder.getSession(); 
 		    s.flush();
 		    TransactionSynchronizationManager.unbindResource(sessionFactory);
@@ -95,5 +96,12 @@ public abstract class AbstractLamsTestCase extends TestCase
 	    else
 	        return null;
 
+    }
+    /**
+     * @param shouldFlush The shouldFlush to set.
+     */
+    public void setShouldFlush(boolean shouldFlush)
+    {
+        this.shouldFlush = shouldFlush;
     }
 }

@@ -14,7 +14,12 @@
 		<id name="lessonId" type="java.lang.Long" column="lesson_id">
 			<generator class="identity" />
 		</id>
-
+    	<property name="lessonDescription" type="java.lang.String" 
+    			 column="description" length="65535">
+	    </property>
+    	<property name="lessonName" type="java.lang.String" not-null="true"
+        	 	 column="name" length="255">
+     	</property>
 		<property name="createDateTime" type="java.sql.Timestamp"
 			column="create_date_time" not-null="true" length="19">
 		</property>

@@ -67,7 +67,13 @@ public class Lesson implements Serializable {
     //---------------------------------------------------------------------
     /** identifier field */
     private Long lessonId;
-
+    
+    /** persistent field */
+    private String lessonName;
+    
+    /** persistent field */
+    private String lessonDescription;
+    
     /** persistent field */
     private Date createDateTime;
 
@@ -113,9 +119,9 @@ public class Lesson implements Serializable {
      * organization and class information.
      * Cain constructor pattern implementation.
      */
-    public Lesson(Date createDateTime, User user, Integer lessonStateId, LearningDesign learningDesign,Set learnerProgresses) 
+    public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, LearningDesign learningDesign,Set learnerProgresses) 
     {
-        this(null,createDateTime,null,null,user,lessonStateId,learningDesign,null,null,learnerProgresses);
+        this(null,name,description,createDateTime,null,null,user,lessonStateId,learningDesign,null,null,learnerProgresses);
     }     
     
     /** 
@@ -123,15 +129,17 @@ public class Lesson implements Serializable {
      * information.
      * Chain construtor pattern implementation. 
      */
-    public Lesson(Date createDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) 
+    public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) 
     {
-        this(null,createDateTime,null,null,user,lessonStateId,learningDesign,lessonClass,organisation,learnerProgresses);
+        this(null,name,description,createDateTime,null,null,user,lessonStateId,learningDesign,lessonClass,organisation,learnerProgresses);
     }    
     
     /** full constructor */
-    public Lesson(Long lessonId, Date createDateTime, Date startDateTime, Date endDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) 
+    public Lesson(Long lessonId,String name,String description, Date createDateTime, Date startDateTime, Date endDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) 
     {
         this.lessonId = lessonId;
+        this.lessonName = name;
+        this.lessonDescription = description;
         this.createDateTime = createDateTime;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
@@ -153,19 +161,23 @@ public class Lesson implements Serializable {
      * @param newLessonClass the lesson class that will run this lesson.
      * @return the new lesson object.
      */
-    public static Lesson createNewLesson(User user, 
+    public static Lesson createNewLesson(String lessonName,
+                                         String lessonDescription,
+                                         User user, 
                                          Organisation organisation, 
                                          LearningDesign ld, 
                                          LessonClass newLessonClass)
     {
         //setup new lesson
-        return new Lesson(new Date(System.currentTimeMillis()),
-                                   user,
-                                   Lesson.CREATED,
-                                   ld,
-                                   newLessonClass,//lesson class
-                                   organisation,
-                                   new HashSet());//learner progress
+        return new Lesson(lessonName,
+                          lessonDescription,
+                          new Date(System.currentTimeMillis()),
+                          user,
+                          Lesson.CREATED,
+                          ld,
+                          newLessonClass,//lesson class
+                          organisation,
+                          new HashSet());//learner progress
     }
 
     /**
@@ -177,10 +189,14 @@ public class Lesson implements Serializable {
      * @param ld the learning design that this lesson is based on.
      * @return the lesson created.
      */
-    public static Lesson createNewLessonWithoutClass(User user,
+    public static Lesson createNewLessonWithoutClass(String lessonName,
+                                                     String lessonDescription,
+                                                     User user,
                                                      LearningDesign ld)
     {
-        return new Lesson(new Date(System.currentTimeMillis()),
+        return new Lesson(lessonName,
+                          lessonDescription,
+                          new Date(System.currentTimeMillis()),
                           user,
                           Lesson.CREATED,
                           ld,
@@ -199,6 +215,38 @@ public class Lesson implements Serializable {
 
     public void setLessonId(Long lessonId) {
         this.lessonId = lessonId;
+    }
+
+    /**
+	 * @hibernate.property column="name" length="255" not-null="true"
+     * @return Returns the lessonName.
+     */
+    public String getLessonName()
+    {
+        return lessonName;
+    }
+    /**
+     * @param lessonName The lessonName to set.
+     */
+    public void setLessonName(String lessonName)
+    {
+        this.lessonName = lessonName;
+    }
+    
+    /**
+	 * @hibernate.property column="description" length="65535"
+     * @return Returns the lessonDescription.
+     */
+    public String getLessonDescription()
+    {
+        return lessonDescription;
+    }
+    /**
+     * @param lessonDescription The lessonDescription to set.
+     */
+    public void setLessonDescription(String lessonDescription)
+    {
+        this.lessonDescription = lessonDescription;
     }
 
     /** 
@@ -384,5 +432,4 @@ public class Lesson implements Serializable {
                              this.getLearningDesign().getDescription(),
                              this.lessonStateId);
     }
-
 }
