@@ -19,13 +19,12 @@
 		- but this is cleaner as there is no need to ever access the unwrapped object.
 	-->   
 	<bean id="monitoringServiceTarget" class="org.lamsfoundation.lams.monitoring.service.MonitoringService"
-		singleton="true"
+		singleton="false"
 	>
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>	
-		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
+		<property name="lamsToolService"><ref bean="lamsToolService"/></property>
 		<property name="authoringService"><ref bean="authoringService"/></property>			
-		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>			
 	</bean>	
 	
 	<bean id="monitoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

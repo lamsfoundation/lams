@@ -11,6 +11,7 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -40,7 +41,7 @@ public interface IMonitoringService
      * service.
      * @param lessonId the specified the lesson id.
      */
-    public void startlesson(long lessonId);
+    public void startlesson(long lessonId)throws LamsToolServiceException;
     
     /**
      * Force the learner to complete all the activities for current lesson.

@@ -16,6 +16,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
+import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -89,6 +90,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
         return new String[] { "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
                 			  "/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
                 			  "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+                			  "/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
                 			  "/org/lamsfoundation/lams/authoring/mockAuthoringApplicationContext.xml",
                               "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
                               "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",        					  
@@ -124,7 +126,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
         //lessonDao.deleteLesson(createdLesson);
     }
 
-    public void testStartlesson()
+    public void testStartlesson() throws LamsToolServiceException
     {
         monitoringService.startlesson(TEST_LESSON_ID.longValue());
         assertTrue(true);

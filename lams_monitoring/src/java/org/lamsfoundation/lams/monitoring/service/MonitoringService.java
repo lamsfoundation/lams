@@ -9,7 +9,6 @@
 
 package org.lamsfoundation.lams.monitoring.service;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -24,12 +23,9 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
-import org.lamsfoundation.lams.tool.NonGroupedToolSession;
-import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
-import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
-import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.beans.BeansException;
@@ -56,10 +52,10 @@ public class MonitoringService implements
     //---------------------------------------------------------------------
     private ILessonDAO lessonDAO;
     private ILessonClassDAO lessonClassDAO;
-    private IToolSessionDAO toolSessionDAO;
+    private ILamsToolService lamsToolService;
     private IAuthoringService authoringService;
     private ApplicationContext context;
-    private ToolContentIDGenerator contentIDGenerator;
+
 
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -97,19 +93,11 @@ public class MonitoringService implements
     }
 
     /**
-     * @param contentIDGenerator The contentIDGenerator to set.
+     * @param lamsToolService The lamsToolService to set.
      */
-    public void setContentIDGenerator(ToolContentIDGenerator contentIDGenerator)
+    public void setLamsToolService(ILamsToolService lamsToolService)
     {
-        this.contentIDGenerator = contentIDGenerator;
-    }
-
-    /**
-     * @param toolSessionDAO The toolSessionDAO to set.
-     */
-    public void setToolSessionDAO(IToolSessionDAO toolSessionDAO)
-    {
-        this.toolSessionDAO = toolSessionDAO;
+        this.lamsToolService = lamsToolService;
     }
 
     //---------------------------------------------------------------------
@@ -142,7 +130,7 @@ public class MonitoringService implements
             Activity currentActivity = (Activity) i.next();
             if (currentActivity.isToolActivity())
             {
-                Long newContentId = copyToolContent((ToolActivity) currentActivity);
+                Long newContentId = lamsToolService.copyToolContent((ToolActivity) currentActivity);
                 ((ToolActivity) currentActivity).setToolContentId(newContentId);
             }
         }
@@ -157,9 +145,10 @@ public class MonitoringService implements
     }
 
     /**
+     * @throws LamsToolServiceException
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startlesson(long)
      */
-    public void startlesson(long lessonId)
+    public void startlesson(long lessonId) throws LamsToolServiceException
     {
         //we get the lesson just created
         Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -169,6 +158,8 @@ public class MonitoringService implements
                                          .iterator(); i.hasNext();)
         {
             Activity activity = (Activity) i.next();
+            //TODO this is for testing purpose as survey is the only tool available
+            //so far.
             if (shouldInitToolSessionFor(activity)&&this.isSurvey((ToolActivity)activity))
             {
                 initToolSessionFor((ToolActivity) activity,
@@ -249,38 +240,6 @@ public class MonitoringService implements
     }
 
     /**
-     * Make a copy of all tools content which belongs to this learning design.
-     * 
-     * @param toolActivity the tool activity defined in the design.
-     */
-    private Long copyToolContent(ToolActivity toolActivity)
-    {
-        Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
-        //This is just for testing purpose because surveyService is the only 
-        //service is available at the moment. 
-        //TODO we need to remove this once all done.
-        if (isSurvey(toolActivity))
-        {
-            ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
-            contentManager.copyToolContent(toolActivity.getToolContentId(),
-                                           newToolcontentID);
-        }
-        return newToolcontentID;
-    }
-
-    /**
-     * Find a tool's service registered inside lams. It is implemented using
-     * Spring now. We might need to extract this method to a proxy class to
-     * find different service such as EJB or Web service. 
-     * @param toolActivity the tool activity defined in the design.
-     * @return the service object from tool.
-     */
-    private Object findToolService(ToolActivity toolActivity)
-    {
-        return context.getBean(toolActivity.getTool().getServiceName());
-    }
-
-    /**
      * This is more for testing purpose. 
      * @param toolActivity the tool activity defined in the design.
      * @return
@@ -292,36 +251,21 @@ public class MonitoringService implements
 
     /**
      * @param activity
+     * @throws LamsToolServiceException
      */
-    private void initToolSessionFor(ToolActivity activity, Set learners)
+    private void initToolSessionFor(ToolActivity activity, Set learners) throws LamsToolServiceException
     {
         activity.setToolSessions(new HashSet());
         for (Iterator i = learners.iterator(); i.hasNext();)
         {
             User learner = (User) i.next();
-            ToolSession toolSession = new NonGroupedToolSession(activity,
-                                                                new Date(System.currentTimeMillis()),
-                                                                ToolSession.STARTED_STATE,
-                                                                learner);
-            toolSessionDAO.saveToolSession(toolSession);
+
+            ToolSession toolSession = lamsToolService.createToolSession(learner,activity);
             //ask tool to create their own tool sessions using the given id.
-            notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
+            lamsToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
             //update the hibernate persistent object
             activity.getToolSessions().add(toolSession);
         }
-    }
-
-    /**
-     * @param toolSessionId
-     */
-    private void notifyToolsToCreateSession(Long toolSessionId,
-                                            ToolActivity activity)
-    {
-        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity);
-        //TODO this is for testing purpose as survey is the only tool available
-        //so far.
-        sessionManager.createToolSession(toolSessionId,
-                                         activity.getToolContentId());
     }
 
     /**
@@ -333,5 +277,6 @@ public class MonitoringService implements
         return activity.isToolActivity()
                 && !((ToolActivity) activity).getTool().getSupportsGrouping();
     }
+
 
 }
