@@ -61,11 +61,12 @@ INSERT INTO lams_tool_session_state VALUES  (3, 'COMPLETED');
 INSERT INTO lams_tool_session_type VALUES  (1, 'GROUPED');
 INSERT INTO lams_tool_session_type VALUES  (2, 'NON_GROUPED');
 
-INSERT INTO lams_lesson_state VALUES (1, 'NOT_STARTED');
-INSERT INTO lams_lesson_state VALUES (2, 'STARTED');
-INSERT INTO lams_lesson_state VALUES (3, 'SUSPENDED');
-INSERT INTO lams_lesson_state VALUES (4, 'FINISHED');
-INSERT INTO lams_lesson_state VALUES (5, 'ARCHIVED');
+INSERT INTO lams_lesson_state VALUES (1, 'CREATED');
+INSERT INTO lams_lesson_state VALUES (2, 'NOT_STARTED');
+INSERT INTO lams_lesson_state VALUES (3, 'STARTED');
+INSERT INTO lams_lesson_state VALUES (4, 'SUSPENDED');
+INSERT INTO lams_lesson_state VALUES (5, 'FINISHED');
+INSERT INTO lams_lesson_state VALUES (6, 'ARCHIVED');
 
 
 
