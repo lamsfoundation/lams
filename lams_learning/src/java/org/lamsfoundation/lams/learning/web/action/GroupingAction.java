@@ -42,6 +42,8 @@ import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 
@@ -123,6 +125,10 @@ public class GroupingAction extends LamsDispatchAction
                                        currentLearners);
         
         request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE,learnerProgress.getNextActivity());
+        request.getSession().setAttribute(LearningWebUtil.ATTR_USER_DATA, 
+                                          learnerProgress.getUser());
+        request.getSession().setAttribute(LearningWebUtil.ATTR_LESSON_DATA,
+                                          learnerProgress.getLesson());
         
         return mapping.findForward(VIEW_GROUPING);
     }
@@ -146,16 +152,56 @@ public class GroupingAction extends LamsDispatchAction
     {
         //initialize service object
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-
+        //get current user and lesson data via http. It ensures they are availabe
+        //in the http session. If not, we assume parameters are coming from 
+        //request or falsh and we can create learner and lesson objects.
+        User learner = LearningWebUtil.getUserData(request,getServlet().getServletContext());
+        Lesson lesson = LearningWebUtil.getLessonData(request,getServlet().getServletContext());
+        
         Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);
         
         List groups = new ArrayList(((GroupingActivity)groupingActivity).getCreateGrouping()
                                     									.getGroups());
         request.getSession().setAttribute(GROUPS,groups);
+        request.setAttribute(LearningWebUtil.PARAM_ACTIVITY_ID,
+                             groupingActivity.getActivityId());
         
         return mapping.findForward(SHOW_GROUP);
     }
     
+    /**
+     * Complete the current tool activity and forward to the url of next activity
+     * in the learning design.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward completeActivity(ActionMapping mapping,
+                                          ActionForm form,
+                                          HttpServletRequest request,
+                                          HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request,
+                                                                                 getServlet().getServletContext());
+        //initialize service object
+        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);
+
+        
+        String nextActivityUrl = learnerService.completelActivity(learnerProgress.getUser(),
+                                                                  groupingActivity,
+                                                                  learnerProgress.getLesson());
+        
+		response.sendRedirect(nextActivityUrl);
+		
+        return null;
+    }
     //---------------------------------------------------------------------
     // Helper method
     //---------------------------------------------------------------------

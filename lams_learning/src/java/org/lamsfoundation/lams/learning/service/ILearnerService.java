@@ -103,6 +103,22 @@ public interface ILearnerService
     public String completeToolSession(Long toolSessionId, User learner);
     
     /**
+     * Complete the activity in the progress engine and delegate to the progress 
+     * engine to calculate the next activity in the learning design. This 
+     * process might be triggerred by system controlled the activity, such as
+     * grouping and gate. It might also be triggerred by complete tool session
+     * progress from tool. Therefore, the transaction demarcation needs to be 
+     * configured as <code>REQURIED</code>.
+     * 
+     * 
+     * @param learner the learner who are running this activity in the design.
+     * @param activity the activity is being runned.
+     * @param lesson the lesson this learner is currently in.
+     * @return the url for next activity.
+     */
+    public String completelActivity(User learner,Activity activity,Lesson lesson);
+  
+    /**
      * Retrieve all lessons that has been started, suspended or finished. All
      * finished but archived lesson should not be loaded.
      * 
@@ -146,4 +162,6 @@ public interface ILearnerService
      * @param learner the learner needs to be grouped
      */
     public void performGrouping(GroupingActivity groupingActivity, User learner);
+    
+    
 }

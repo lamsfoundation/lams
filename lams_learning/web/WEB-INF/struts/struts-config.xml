@@ -50,7 +50,8 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-
+<form-bean name="GroupingForm"  type="org.apache.struts.validator.DynaValidatorForm">
+</form-bean>
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -106,6 +107,8 @@ http://www.gnu.org/licenses/gpl.txt
     <action
       path="/grouping"
       type="org.lamsfoundation.lams.learning.web.action.GroupingAction"
+      name="GroupingForm"
+      scope="request"
       parameter="method"
       unknown="false"
       validate="false"

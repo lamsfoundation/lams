@@ -34,8 +34,15 @@ http://www.gnu.org/licenses/gpl.txt
 		<title><c:out value="${pageTitle}" /></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<link href="<c:url value="/css/learner.css" />" rel="stylesheet" type="text/css" />
-		<script language="javascript" src="<c:url value="/javascript/learning.js" />"></script>
-	</head>
+	  <script language="JavaScript" type="text/JavaScript">
+	        <!--
+	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
+	            obj.className=new_style;
+	        }
+	        //-->
+	  </script>	
+	  
+	  </head>
 
 	<body bgcolor="#9DC5EC">
 		<div align="center">

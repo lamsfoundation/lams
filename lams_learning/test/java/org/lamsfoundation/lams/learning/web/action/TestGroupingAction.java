@@ -119,6 +119,8 @@ public class TestGroupingAction extends AbstractLamsStrutsTestCase
     public void testViewGrouping()
     {
         addRequestParameter("method", "viewGrouping");
+        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
+        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE,groupingActivity);
         
         actionPerform();
@@ -131,6 +133,17 @@ public class TestGroupingAction extends AbstractLamsStrutsTestCase
         assertEquals("verify number of groups",2,groups.size());
     }
 
+    public void testCompleteActivity()
+    {
+        addRequestParameter("method", "completeActivity");
+        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
+        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
+        request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE,groupingActivity);
+
+        actionPerform();
+        
+        verifyNoActionErrors();
+    }
     /**
      * 
      */

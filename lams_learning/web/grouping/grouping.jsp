@@ -27,7 +27,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 <div align="center">
 
-	<html-el:form action="/grouping.do?method=completeActivity" method="GET">
+	<html-el:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityId=${activityId}" target="_self">
 
 		<span class="error">
 			<%-- Struts error messages --%>

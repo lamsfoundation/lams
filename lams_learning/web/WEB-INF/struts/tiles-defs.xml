@@ -67,7 +67,7 @@ http://www.gnu.org/licenses/gpl.txt
 	</definition>
 	<definition name=".welcome" extends=".activityLayout">
 		<put name="title" value="Welcome"/>
-		<put name="body" value="/welcome.jsp"/>
+		<put name="body" value="welcome.jsp"/>
 	</definition>
 	
 	<!-- Journal definitions -->
@@ -76,6 +76,12 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageTitle" value="Journal - Detail" />
 		<put name="title" value="Journal" />
 		<put name="body" value="/notebook/detail.jsp"/>
+	</definition>
+	<!-- Grouping definitions -->
+	<definition name=".grouping" extends=".activityLayout">
+		<put name="pageTitle" value="Grouping Result" />
+		<put name="title" value="Grouping" />
+		<put name="body" value="/grouping/grouping.jsp"/>
 	</definition>
 	
 </tiles-definitions>

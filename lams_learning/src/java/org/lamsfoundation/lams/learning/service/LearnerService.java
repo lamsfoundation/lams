@@ -279,7 +279,6 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * 
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeToolSession(long, User)
      */
     public String completeToolSession(Long toolSessionId, User learner) 
@@ -290,10 +289,19 @@ public class LearnerService implements ILearnerService
         toolSession.setToolSessionStateId(ToolSession.ENDED_STATE);
         
         lamsCoreToolService.updateToolSession(toolSession);
+        
+        return completelActivity(learner, toolSession.getToolActivity(), toolSession.getLesson());
+    }
+    
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completelActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.lesson.Lesson)
+     */
+    public String completelActivity(User learner,Activity activity,Lesson lesson)
+    {
         //build up the url for next activity.
     	try 
     	{
-	    	LearnerProgress nextLearnerProgress = calculateProgress(toolSession.getToolActivity(), learner, toolSession.getLesson());
+	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner,lesson);
 	    	return activityMapping.getProgressURL(nextLearnerProgress);
     	}
         catch (UnsupportedEncodingException e)

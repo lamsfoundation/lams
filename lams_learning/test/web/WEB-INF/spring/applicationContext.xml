@@ -112,7 +112,6 @@
 		<property name="target"><ref local="userManagementServiceTarget"/></property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="get*">PROPAGATION_REQUIRES_NEW,readOnly</prop>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>

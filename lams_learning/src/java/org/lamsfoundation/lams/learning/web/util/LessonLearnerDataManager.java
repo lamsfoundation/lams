@@ -55,10 +55,10 @@ public class LessonLearnerDataManager
     
     
     /**
-     * 
-     * @param context
-     * @param lesson
-     * @param learner
+     * Cache the user who are running the lesson into the hashmap.
+     * @param context the context of the servlet container.
+     * @param lesson the running lesson.
+     * @param learner the learner who is participating the lesson.
      */
     public static void cacheLessonUser(ServletContext context,
                                        Lesson lesson,
@@ -82,10 +82,10 @@ public class LessonLearnerDataManager
     }
     
     /**
-     * 
-     * @param context
-     * @param lesson
-     * @param learner
+     * Remove the user cache from the hashmap if the learner exit the lesson.
+     * @param context the context of the servlet container.
+     * @param lesson the running lesson.
+     * @param learner the learner who is exitting the lesson.
      */
     public static void removeLessonUserFromCache(ServletContext context,
                                                  Lesson lesson,
@@ -109,9 +109,10 @@ public class LessonLearnerDataManager
     }
     
     /**
-     * 
-     * @param context
-     * @param lessonId
+     * Return all the learners who are doing the requested lesson at the moment.
+     * @param context the context of the servlet container. 
+     * @param lessonId the requested lesson.
+     * @param learnerService the learner service object.
      */
     public static List getAllLessonLearners(ServletContext context,
                                             long lessonId,
@@ -136,13 +137,12 @@ public class LessonLearnerDataManager
 		return lessonUsers;
     }
 
-
     /**
-     * 
-     * @param learnerService
-     * @param lessonId
-     * @param context
-     * @return
+     * Restore hashmap by querying active learners from database. 
+     * @param learnerService the learner service object.
+     * @param lessonId the requested lesson.
+     * @param context the context of the servlet container. 
+     * @return the restored hashmap cache. 
      */
     private static HashMap restoreMapFromDatabase(ILearnerService learnerService,
                                                   long lessonId,
@@ -161,6 +161,5 @@ public class LessonLearnerDataManager
 
         return learnersMap;
     }
-
     
 }
