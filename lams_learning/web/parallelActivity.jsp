@@ -3,6 +3,7 @@
 <%@ taglib uri="http://jakarta.apache.org/struts/struts-bean" prefix="bean"%> 
 <%@ taglib uri="http://jakarta.apache.org/struts/struts-html" prefix="html"%>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jstl/fmt" prefix="fmt" %>
 
 
 <%-- TODO: use type --%>
@@ -18,7 +19,7 @@
 
 <noframes>
 	<body>
-		Your browser does not handle frames!
+		<fmt:message key="message.activity.parallel.noFrames" />
 	</body>
 </noframes>
 

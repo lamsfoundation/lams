@@ -3,6 +3,7 @@
 <%@ taglib uri="http://jakarta.apache.org/struts/struts-bean" prefix="bean"%> 
 <%@ taglib uri="http://jakarta.apache.org/struts/struts-html" prefix="html"%>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jstl/fmt" prefix="fmt" %>
 	
 <div align="center">
 	<script language="JavaScript" type="text/JavaScript"><!--
@@ -38,7 +39,7 @@
 			}
 			if (!validated) {
 				//TODO: this should come from messages
-				alert("Please select an activity from the list");
+				alert("<fmt:message key="message.activity.options.noActivitySelected" />");
 			}
 			else {
 				form.submit();
@@ -83,8 +84,10 @@
 						<tr>
 							<td colspan="3">
 								<div align="center" class="bodyBold">
-									You must complete at lease <c:out value="${optionsActivityForm.minimum}"/>
-									of these <c:out value="${optionsActivityForm.maximum}"/> activities.
+									<fmt:message key="message.activity.options.activityCount">
+										<fmt:param value="${optionsActivityForm.minimum}" />
+										<fmt:param value="${optionsActivityForm.maximum}" />
+									</fmt:message>
 								</div>
 							</td>
 						</tr>
@@ -128,8 +131,7 @@
 					<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0" summary="This table is being used for layout purposes">
 						<tr>
 							<td colspan="3" class="body">
-								<p><font size="1"><u><b>Note</b></u>: Once you finish any of the above activities
-									you can revisit them by using the progress bar on the left.</font>
+								<p><font size="1"><fmt:message key="message.activity.options.note" /></font>
 								</p>
 								<p>&nbsp;</p>
 							</td>
@@ -138,12 +140,12 @@
 							<td width="28%">
 								<%--input name="submit" type="button" id="submit" class="button" onClick="validateSubmit()" onMouseOver="pviiClassNew(this,'buttonover')" onMouseOut="pviiClassNew(this,'button')" value="Finish"--%>
 								<%--html:submit value="Choose" styleClass="button" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" /--%>
-								<input name="chooseBtn" type="button" class="button" id="chooseBtn" onClick="submitChoose()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="Choose">
+								<input name="chooseBtn" type="button" class="button" id="chooseBtn" onClick="submitChoose()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="<fmt:message key="label.activity.options.choose" />">
 							</td>
               				<td width="31%" align="right" valign="bottom">&nbsp;</td>
               				<td width="41%" align="right" valign="bottom">
               					<c:if test="${optionsActivityForm.finished}">
-									<input name="finishBtn" type="button" class="button" id="finishBtn" onClick="submitFinish()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="Finish">
+									<input name="finishBtn" type="button" class="button" id="finishBtn" onClick="submitFinish()" onmouseover="setClass(this,'buttonover')" onmouseout="setClass(this,'button')" value="<fmt:message key="label.activity.finish" />">
 								</c:if>
               				</td>
       					</tr>
@@ -154,7 +156,7 @@
 	</html:form>
 	<html:form action="/Activity" method="POST">
 		<input type="hidden" name="method" value="complete" />
-		<html:hidden property="activityId" />
+		<input type="hidden" name="activityId" value="<c:out value="${optionsActivityForm.activityId}" />" />
 	</html:form>
 </div>
 

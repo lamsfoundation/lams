@@ -3,6 +3,7 @@
 <%@ taglib uri="http://jakarta.apache.org/struts/struts-bean" prefix="bean"%> 
 <%@ taglib uri="http://jakarta.apache.org/struts/struts-html" prefix="html"%>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jstl/fmt" prefix="fmt" %>
 
 <body bgcolor="#9DC5EC">
 	<c:if test="${!empty activityForm.activityURLs}">
@@ -24,7 +25,7 @@
 				<tr>
 					<td valign="top">
 						<div align="center" class="heading">
-							The next task is loading. Please wait....
+							<fmt:message key="message.activity.loading" />
 						</div>
 					</td>
 				</tr>
