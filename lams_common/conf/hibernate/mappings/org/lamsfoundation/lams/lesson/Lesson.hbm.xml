@@ -93,7 +93,14 @@
 		    AND (lams_group.group_id = lams_user_group.group_id)
 		    AND ({lesson}.lesson_state_id IN (3,4,5))		    
 		    AND (lams_user_group.user_id = :userId)
-
 	</sql-query>
 	
+	<sql-query name="activeLearners">
+		<return alias="learner" class="org.lamsfoundation.lams.usermanagement.User" />
+		SELECT DISTINCT {learner.*}
+		  FROM lams_user {learner},
+		       lams_learner_progress
+		  WHERE ({learner}.user_id = lams_learner_progress.user_id)
+		  AND   (lams_learner_progress.lesson_id  = :lessonId)
+	</sql-query>
 </hibernate-mapping>
