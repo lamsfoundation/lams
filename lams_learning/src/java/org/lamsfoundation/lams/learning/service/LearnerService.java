@@ -112,14 +112,12 @@ public class LearnerService implements ILearnerService
     // Service Methods
     //---------------------------------------------------------------------
     /**
-     * Returns a list of all the active Lessons a User is a Learner in.
-     * @param User the learner
-     * @return List of Lessons
-     * @throws LearnerServiceException in case of problems.
+     * Delegate to lesson dao to load up the lessons.
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActiveLessonsFor(org.lamsfoundation.lams.usermanagement.User)
      */
-    public List getActiveLessons(User learner)
+    public List getActiveLessonsFor(User learner)
     {
-        return lessonDAO.getActiveLessonsForLearner(learner);
+        return this.lessonDAO.getActiveLessonsForLearner(learner);
     }
     
     public Lesson getLesson(Long lessonId)
@@ -209,17 +207,17 @@ public class LearnerService implements ILearnerService
             learnerProgress = progressEngine.calculateProgress(learner, lesson, completedActivity,learnerProgress);
             learnerProgressDAO.updateLearnerProgress(learnerProgress);
             
-            createToolSessionsIfNecessary(learnerProgress);
+            //createToolSessionsIfNecessary(learnerProgress);
         }
         catch (ProgressException e)
         {
             throw new LearnerServiceException(e.getMessage());
         }
-        catch (LamsToolServiceException e)
+/*        catch (LamsToolServiceException e)
         {
             throw new LearnerServiceException(e.getMessage());
         }
-
+*/
 
         return learnerProgress;
     }

@@ -37,17 +37,6 @@ public interface ILearnerService
 {
 
 
-
-    /**
-     * Returns a list of all the active Lessons a User is a Learner in.
-     * @param User the learner
-     * @return List of Lessons
-     * @throws LearnerServiceException in case of problems.
-     */
-    public List getActiveLessons(User learner);
-
-
-    
     /**
      * Gets the lesson object for the given key.
      *
@@ -107,4 +96,12 @@ public interface ILearnerService
      */
     public String completeToolSession(long toolSessionId, User learner);
     
+    /**
+     * Retrieve all lessons that has been started, suspended or finished. All
+     * finished but archived lesson should not be loaded.
+     * 
+     * @param learner the user who intend to start a lesson
+     * @return a list of active lessons.
+     */
+    public List getActiveLessonsFor(User learner);
 }

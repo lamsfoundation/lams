@@ -21,40 +21,118 @@ http://www.gnu.org/licenses/gpl.txt
 
 package org.lamsfoundation.lams.learning.web.action;
 
-import javax.servlet.http.*;
+import java.io.IOException;
+import java.util.List;
 
-import org.lamsfoundation.lams.learning.web.bean.SessionBean;
-import org.lamsfoundation.lams.web.action.Action;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+
 
 /** 
- * MyEclipse Struts
- * Creation date: 01-12-2005
+ * 
+ * <p>The action servlet that interacts with learner to start a lams learner
+ * module, join a user to the lesson and allows a user to exit a lesson.</p>
+ * 
+ * <p>It is also responsible for the interaction between lams server and 
+ * flash. Flash will call method implemented in this class to get progress
+ * data or trigger a lams server calculation here</p>
+ * 
+ * <b>Note:</b>It needs to extend the <code>LamsDispatchAction</code> which has
+ * been customized to accomodate struts features to solve duplicate 
+ * submission problem.
+ * 
+ * @author Jacky Fang
+ * @since 3/03/2005
+ * @version 1.1
+ * 
+ * ----------------XDoclet Tags--------------------
+ * 
+ * @struts:action path="/learner" 
+ *                parameter="method" 
+ *                validate="false"
+ * @struts.action-exception key="error.system.survey" scope="request"
+ *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
+ *                          path=".systemError"
+ * 							handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+ * @struts:action-forward name="" path=""
+ * 
+ * ----------------XDoclet Tags--------------------
  * 
  */
-public class LearnerAction extends Action {
+public class LearnerAction extends LamsDispatchAction 
+{
 	
-	/**
-	 * Gets the session bean from session.
-	 * @return SessionBean for this request, null if no session.
-	 */
-	protected SessionBean getSessionBean(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-		SessionBean sessionBean = (SessionBean)session.getAttribute(SessionBean.NAME);
-		return sessionBean;
-	}
-	
-	/**
-	 * Sets the session bean for this session.
-	 */
-	protected void setSessionBean(SessionBean sessionBean, HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return;
-		}
-		session.setAttribute(SessionBean.NAME, sessionBean);
-	}
-	
+    
+    private static final String PARAM_USERDATA = "userId";
+    private static final String ATTR_USERDATA = "user";
+
+
+    /**
+     * 
+     * 
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     *
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward getActiveLessons(ActionMapping mapping,
+                                          ActionForm form,
+                                          HttpServletRequest request,
+                                          HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+
+        User learner = getUserData(request);
+        
+        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        
+        List lessons = learnerService.getActiveLessonsFor(learner);
+        
+        
+        return null;
+    }
+
+    
+    /**
+     * Helper method to retrieve the user data. We always load up from http
+     * session first to optimize the performance. If no session cache available,
+     * we load it from data source.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param surveyService the service facade of survey tool
+     * @return the user data value object
+     */
+    private User getUserData(HttpServletRequest request)
+    {
+        //retrieve complete user data from http session
+        User currentUser = (User) request.getSession()
+                                              .getAttribute(ATTR_USERDATA);
+        //if no session cache available, retrieve it from data source
+        if (currentUser == null)
+        {
+            int userId = WebUtil.readIntParam(request,PARAM_USERDATA);
+            currentUser = LearnerServiceProxy.getUserManagementService(getServlet().getServletContext())
+            								 .getUserById(new Integer(userId));
+            //create session cache
+            request.getSession().setAttribute(ATTR_USERDATA, currentUser);
+        }
+        return currentUser;
+    }
 }

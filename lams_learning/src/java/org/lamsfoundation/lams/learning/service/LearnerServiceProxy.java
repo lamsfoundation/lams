@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.learning.service;
 
 import javax.servlet.ServletContext;
 
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -46,7 +47,19 @@ public class LearnerServiceProxy
      */
     public static final ILearnerService getLearnerService(ServletContext servletContext)
     {
-        return (ILearnerService)getLearnerDomainService(servletContext);
+        return (ILearnerService)getDomainService(servletContext,"learnerService");
+    }
+    
+    /**
+     * Return the user management domain service object. It will delegate to 
+     * the Spring helper method to retrieve the proper bean from Spring bean
+     * factory
+     * @param servletContext the servletContext for current application
+     * @return user management service object
+     */
+    public static final IUserManagementService getUserManagementService(ServletContext servletContext)
+    {
+        return (IUserManagementService)getDomainService(servletContext,"userManagementService");
     }
     
     /**
@@ -54,10 +67,10 @@ public class LearnerServiceProxy
      * @param servletContext the servletContext for current application
      * @return the Spring service bean.
      */
-    private static Object getLearnerDomainService(ServletContext servletContext)
+    private static Object getDomainService(ServletContext servletContext,String serviceName)
     {
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        return wac.getBean("learnerService");
+        return wac.getBean(serviceName);
     }
 
     

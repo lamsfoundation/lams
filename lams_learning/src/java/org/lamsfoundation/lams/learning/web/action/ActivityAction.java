@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 
 import org.lamsfoundation.lams.usermanagement.*;
+import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learningdesign.*;
 import org.springframework.web.context.WebApplicationContext;
@@ -43,7 +44,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * Creation date: 01-12-2005
  * 
  */
-public class ActivityAction extends LearnerAction {
+public class ActivityAction extends LamsAction {
 	
 	protected static final String ACTIVITY_REQUEST_ATTRIBUTE = "activity";
 	protected static final String LEARNER_PROGRESS_REQUEST_ATTRIBUTE = "learnerprogress";
@@ -152,4 +153,27 @@ public class ActivityAction extends LearnerAction {
 		return null;
 	}
 
+	/**
+	 * Gets the session bean from session.
+	 * @return SessionBean for this request, null if no session.
+	 */
+	protected SessionBean getSessionBean(HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return null;
+		}
+		SessionBean sessionBean = (SessionBean)session.getAttribute(SessionBean.NAME);
+		return sessionBean;
+	}
+	
+	/**
+	 * Sets the session bean for this session.
+	 */
+	protected void setSessionBean(SessionBean sessionBean, HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return;
+		}
+		session.setAttribute(SessionBean.NAME, sessionBean);
+	}
 }
