@@ -82,25 +82,32 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 			  transitionFrom,
               gateActivityLevelId);
     }
+    
+    /**
+     * Makes a copy of the SynchGateActivity for authoring, preview and monitoring enviornment 
+     * 
+     * @param originalActivity The activity that needs to be deep-copied
+     * @return SynchGateActivity Returns a deep-copy of the originalActivity
+     */    
     public static SynchGateActivity createCopy(SynchGateActivity originalActivity){
     	SynchGateActivity newSynchGateActivity = new SynchGateActivity();
+    	
+    	newSynchGateActivity.setGateActivityLevelId(originalActivity.getGateActivityLevelId());
+    	newSynchGateActivity.setGateOpen(new Boolean(false));
     	
     	newSynchGateActivity.setActivityUIID(originalActivity.getActivityUIID());
     	newSynchGateActivity.setDescription(originalActivity.getDescription());
     	newSynchGateActivity.setTitle(originalActivity.getTitle());
+    	newSynchGateActivity.setHelpText(originalActivity.getHelpText());    	
     	newSynchGateActivity.setXcoord(originalActivity.getXcoord());
     	newSynchGateActivity.setYcoord(originalActivity.getYcoord());
+    	newSynchGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newSynchGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newSynchGateActivity.setDefineLater(originalActivity.getDefineLater());
     	newSynchGateActivity.setCreateDateTime(new Date());
     	newSynchGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newSynchGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());
-    	newSynchGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
-    	newSynchGateActivity.setGateActivityLevelId(originalActivity.getGateActivityLevelId());
-    	/**
-    	 * TODO calculate how these two values would be set for COPY 
-    	 * */
-    	//newSynchGateActivity.setTransitionTo();
-    	//newSynchGateActivity.setTransitionFrom();
+    	newSynchGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
+    	newSynchGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
     	
     	return newSynchGateActivity;    	
     }
