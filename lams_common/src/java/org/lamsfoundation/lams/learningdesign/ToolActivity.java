@@ -1,6 +1,8 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Set;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import org.lamsfoundation.lams.tool.Tool;
@@ -20,6 +22,9 @@ public class ToolActivity extends SimpleActivity implements Serializable
      * Holds value of property tool.
      */
     private Tool tool;
+    
+    /** List of sessions associated with this ToolActivity */
+    private Set toolSessions;
     
     /** full constructor */
     public ToolActivity(Long activityId,
@@ -143,4 +148,16 @@ public class ToolActivity extends SimpleActivity implements Serializable
         this.tool = tool;
     }
     
+	/**
+	 * @return Returns the toolSessions.
+	 */
+	public Set getToolSessions() {
+		return toolSessions;
+	}
+	/**
+	 * @param toolSessions The toolSessions to set.
+	 */
+	public void setToolSessions(Set toolSessions) {
+		this.toolSessions = toolSessions;
+	}
 }
