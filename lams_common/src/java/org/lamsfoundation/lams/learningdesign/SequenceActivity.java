@@ -84,25 +84,30 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
 			  transitionFrom,
               activities);
     }
+    
+    /**
+     * Makes a copy of the ToolActivity for authoring, preview and monitoring enviornment
+     * 
+     * @param originalActivity The activity that needs to be deep-copied
+     * @return SequenceActivity Returns a deep-copy of the originalActivity
+     */
     public static SequenceActivity createCopy(SequenceActivity originalActivity){
     	SequenceActivity newSequenceActivity = new SequenceActivity();
     	
     	newSequenceActivity.setActivityUIID(originalActivity.getActivityUIID());
     	newSequenceActivity.setDescription(originalActivity.getDescription());
     	newSequenceActivity.setTitle(originalActivity.getTitle());
+    	newSequenceActivity.setHelpText(originalActivity.getHelpText());
     	newSequenceActivity.setXcoord(originalActivity.getXcoord());
     	newSequenceActivity.setYcoord(originalActivity.getYcoord());
+    	newSequenceActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newSequenceActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newSequenceActivity.setDefineLater(originalActivity.getDefineLater());
     	newSequenceActivity.setCreateDateTime(new Date());
     	newSequenceActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newSequenceActivity.setLearningLibrary(originalActivity.getLearningLibrary());
-    	newSequenceActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newSequenceActivity.setLibraryActivity(originalActivity.getLibraryActivity());
+		newSequenceActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
     	newSequenceActivity.setActivities(new HashSet());
-    	
-    	/** TODO */
-    	//newSequenceActivity.setTransitionTo();
-		//newSequenceActivity.setTransitionFrom();
-    	
     	return newSequenceActivity;
     }
 

@@ -82,6 +82,12 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
 			  transitionFrom,
               activities);
     }
+    /**
+     * Makes a copy of the ToolActivity for authoring, preview and monitoring enviornment 
+     * 
+     * @param originalActivity The activity that needs to be deep-copied
+     * @return ParallelActivity Returns a deep-copy of the originalActivity
+     */
     public static ParallelActivity createCopy(ParallelActivity originalActivity){
     	
     	ParallelActivity newParallelActivity = new ParallelActivity();
@@ -89,19 +95,17 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
     	newParallelActivity.setActivityUIID(originalActivity.getActivityUIID());
     	newParallelActivity.setDescription(originalActivity.getDescription());
     	newParallelActivity.setTitle(originalActivity.getTitle());
+    	newParallelActivity.setHelpText(originalActivity.getHelpText());
     	newParallelActivity.setXcoord(originalActivity.getXcoord());
     	newParallelActivity.setYcoord(originalActivity.getYcoord());
+    	newParallelActivity.setActivityTypeId(originalActivity.getActivityTypeId());
     	newParallelActivity.setDefineLater(originalActivity.getDefineLater());
+    	newParallelActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newParallelActivity.setCreateDateTime(new Date());
     	newParallelActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newParallelActivity.setLearningLibrary(originalActivity.getLearningLibrary());
-    	newParallelActivity.setActivityTypeId(originalActivity.getActivityTypeId());
-    	newParallelActivity.setActivities(new HashSet());
-    	
-    	/** TODO */
-    	//newParallelActivity.setTransitionTo();
-		//newParallelActivity.setTransitionFrom();
-    	
+    	newParallelActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
+    	newParallelActivity.setLibraryActivity(originalActivity.getLibraryActivity());		
+    	newParallelActivity.setActivities(new HashSet());    	
     	return newParallelActivity;
     }
 
