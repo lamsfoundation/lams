@@ -56,13 +56,16 @@ Ant build file.
 		<echo message=""/>
 		<echo message="deploy-lamscr-jar  --> Deploy the content repository jar"/>
 		<echo message="deploy-lamscr-jarwar  --> Deploy the content repository jar and web example"/>
-		<echo message="create-db-tables   --> (Re)create the content repository tables"/>
-		<echo message="insert-test-data --> Insert test data to database"/>
 		<echo message="lamscr-jar  --> Make jar archive for deployment"/>
 		<echo message="lamscr-war  --> Make war archive for deployment"/>
 		<echo message="copyfiles --> Copy the third party jar files and cofiguration files for deployment"/> 
+		<echo message="test-report --> Run the junit tests"/> 
 <!--		<echo message="middlegen-cr --> <!-- Run middlegen for content repository tables"/>  -->
 <!--		<echo message="hbm2java-cr --> <!-- Run hbm2java for content repository mapping files"/> -->
+		<echo message="------------------------------------------------------"/>
+		<echo message="The tables and test data are created as part of the lams_common db setup."/>
+		<echo message="------------------------------------------------------"/>
+		
 		<echo message=""/>
 	</target>
 
@@ -211,6 +214,22 @@ Ant build file.
 		</copy>
 	</target>
 
+	<target name="compile.test" depends="compile">
+		<mkdir dir="${build.test}"/>
+		<javac destdir="${build.test}" compiler="modern">
+			<src path="${test.java}"/>
+			<classpath>
+				<pathelement location="${build.classes}"/>
+				<path refid="project.classpath"/>
+			</classpath>
+		</javac>
+		<copy overwrite="yes" todir="${build.test}">
+			<fileset dir="${test.java}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+
 	<!-- ================================================================ -->
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
@@ -330,34 +349,6 @@ Ant build file.
 				todir="${jboss.deploy}"/> 
 	</target>
 
-	<!-- =================================================================== -->
-	<!-- Clean and rebuild the database                                      -->
-	<!-- =================================================================== -->
-	<target name="create-db-tables"
-		description="(re)create content repository tables. Mysql has to be running first and the database should exist.">
-		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
-				password="${database.password}">
-			<classpath>
-				<pathelement location="${database.driver.file}"/>
-			</classpath>
-			<transaction src="${sql}/create_content_repository_tables.sql"/>
-		</sql>
-	</target>
-
-	<!-- =================================================================== -->
-	<!-- Insert test data to lams database                                   -->
-	<!-- =================================================================== -->
-	<target name="insert-test-data"
-		description="insert test data to lams database">
-		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
-				password="${database.password}">
-			<classpath>
-				<pathelement location="${database.driver.file}"/>
-			</classpath>
-			<transaction src="${sql}/insert_test_data.sql"/>
-		</sql>
-	</target>
-	
 	<target name="generate-hbm-files" 
 			description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)"
 			depends="init">
@@ -377,6 +368,40 @@ Ant build file.
 				</fileset>
 			<hibernate version="2.0"/>
 		</hibernatedoclet>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Run JUnit Tests                                                     -->
+	<!-- =================================================================== -->
+	<target name="test-report" depends="test">
+		<mkdir dir="${build.report}/html"/> 
+		<junitreport todir="${build.report}"> 
+			<fileset dir="${build.report}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report todir="${build.report}/html"/> 
+		</junitreport>
+	</target>	
+	
+	<target name="test" depends="compile.test"> 
+		<mkdir dir="${build.report}"/>
+		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
+			   fork="yes">
+			<formatter type="plain" usefile="false"/>
+			<formatter type="xml"/>
+			<batchtest todir="${build.report}">
+				<fileset dir="${test.java}">
+					<include name="**/Test*.java"/>
+					<exclude name="**/AllTests.java"/>
+				</fileset>
+			</batchtest> 
+			<classpath>
+				<pathelement location="${build.classes}"/>
+				<pathelement location="${build.test}"/>
+				<pathelement location="${hbm}"/>
+				<path refid="project.classpath"/>
+			</classpath>
+		</junit>
 	</target>
 
 </project>

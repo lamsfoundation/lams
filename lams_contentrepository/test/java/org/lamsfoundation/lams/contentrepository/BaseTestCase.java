@@ -23,7 +23,6 @@ package org.lamsfoundation.lams.contentrepository;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.BasicConfigurator;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.IRepository;
 import org.lamsfoundation.lams.contentrepository.IRepositoryAdmin;

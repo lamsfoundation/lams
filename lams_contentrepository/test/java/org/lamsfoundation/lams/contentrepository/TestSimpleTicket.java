@@ -61,6 +61,7 @@ public class TestSimpleTicket extends BaseTestCase {
 	}
 
 	public void testGetWorkspaceId() {
+		assertTrue("Ticket exists.", ticket != null );
 		Long id = ticket.getWorkspaceId();
 		assertTrue("Ticket has workspaceId.", id != null );
 		assertTrue("Workspace id is "+id
@@ -69,6 +70,7 @@ public class TestSimpleTicket extends BaseTestCase {
 	}
 
 	public void testGetTicketId() {
+		assertTrue("Ticket exists.", ticket != null );
 		String id = ticket.getTicketId();
 		assertTrue("Ticket has a ticketId.", id != null );
 	}

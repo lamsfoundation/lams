@@ -38,6 +38,8 @@
 	<property name="sql"                       value="${basedir}/db/sql"/>
 	<property name="src"                       value="${basedir}/src"/>
 	<property name="src.java"                  value="${basedir}/src/java"/>
+	<property name="test"                       value="${basedir}/test"/>
+	<property name="test.java"                  value="${basedir}/test/java"/>
 	<property name="conf"                      value="${basedir}/conf"/>
 	<property name="conf.jboss"                value="${conf}/jboss"/>
 	<property name="hbm"                       value="${conf}/hibernate/mappings"/>
@@ -50,7 +52,9 @@
 
 	<property name="build"                         value="${basedir}/build"/>
 	<property name="build.classes"                 value="${build}/classes"/>
+	<property name="build.report"                  value="${build}/report"/>
 	<property name="build.lib"                     value="${build}/lib"/>
+	<property name="build.test"                    value="${build}/test"/>
 	
 	<property name="package"                   value="org/lamsfoundation/lams"/>
 	<property name="package.contentrepository"    value="${package}/contentrepository"/>

@@ -137,7 +137,7 @@ public class FileDAO implements IFileDAO {
 			throw new FileException(message, e);
 			
 		} finally {
-			// always want to close is
+
 			try {
 				if ( is != null )
 					is.close();
@@ -146,13 +146,12 @@ public class FileDAO implements IFileDAO {
 				log.error(message,e1);
 				new FileException(message, e1);
 			}
-			// only try to close os if an error occured
+
 			try {
-				if ( writeErrorOccured && os != null )
+				if ( os != null )
 					os.close();
 			} catch (IOException e2) {
-				String message = "Unable to close output filestream due to IOException. This may be due to the previous exception "
-	                +". Original filename ";
+				String message = "Unable to close file in repository due to IOException";
 				log.error(message,e2);
 				new FileException(message, e2);
 			}
