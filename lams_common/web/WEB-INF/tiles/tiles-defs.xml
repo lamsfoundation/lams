@@ -54,5 +54,13 @@
 		<put name="content" value="/admin/organisationContent.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
+
+	<definition name=".admin.user" path="/template.jsp">
+		<put name="title" value="LAMS :: User Entry"/>
+		<put name="pageHeader" value="User Entry"/>
+		<put name="header" value="adminHeader.jsp"/>
+		<put name="content" value="/admin/userContent.jsp" />	
+		<put name="footer" value="footer.jsp"/>	
+	</definition>
 	
 </tiles-definitions>
