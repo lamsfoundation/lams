@@ -32,7 +32,6 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
 	private final static String FIND_BY_USER="from " + TABLENAME + 
 											 " in class " + Lesson.class.getName() +
 											 " where user_id=?";
-    
     /**
      * Retrieves the Lesson
      * @param lessonId identifies the lesson to get
@@ -89,6 +88,26 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
         return lessons;
     }
     
+    /**
+     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long)
+     */
+    public List getActiveLearnerByLesson(final long lessonId)
+    {
+    	List learners = null;
+    	
+        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+        learners = (List)hibernateTemplate.execute(
+            new HibernateCallback() {
+                public Object doInHibernate(Session session) throws HibernateException {
+        	    	Query query = session.getNamedQuery("activeLearners");
+        	    	query.setLong("lessonId", lessonId);
+        	    	List result = query.list();
+                    return result;
+                }
+            }
+        );
+        return learners;
+    }
     /**
      * Saves or Updates a Lesson.
      * @param lesson

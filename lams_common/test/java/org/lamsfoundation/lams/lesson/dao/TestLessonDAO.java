@@ -74,6 +74,12 @@ public class TestLessonDAO extends LessonDataAccessTestCase
         assertEquals("verify the number of lesson we get",0,lessons.size());
     }
     
+    public void testGetActiveLearnersByLesson()
+    {
+        List learners = this.lessonDao.getActiveLearnerByLesson(2);
+        assertNotNull(learners);
+    }
+    
     public void testUpdateLesson()
     {
         Lesson createdLesson = this.lessonDao.getLesson(this.testLesson.getLessonId());

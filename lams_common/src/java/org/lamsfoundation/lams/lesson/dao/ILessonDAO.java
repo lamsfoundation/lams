@@ -62,5 +62,11 @@ public interface ILessonDAO
      */
     public List getLessonsForUser(Integer userID);
     
-
+    /**
+     * Returns the all the learners that have started the requested lesson.
+     * 
+     * @param lessonId the id of the requested lesson.
+     * @return the list of learners.
+     */
+    public List getActiveLearnerByLesson(final long lessonId);
 }
