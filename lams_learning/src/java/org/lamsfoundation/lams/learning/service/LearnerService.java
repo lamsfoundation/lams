@@ -59,7 +59,7 @@ public class LearnerService implements ILearnerService
     public LearnerProgress startLesson(User learner, Lesson lesson) throws ProgressException
     {
         //return ProgressEngine.startLesson(learner, lesson);
-    	LearnerProgress learnerProgress = ProgressEngine.getStartPoint(learner, lesson);
+    	LearnerProgress learnerProgress = new ProgressEngine().getStartPoint(learner, lesson);
     	return learnerProgress;
     }
     
@@ -76,6 +76,14 @@ public class LearnerService implements ILearnerService
         return lessonDAO.getLearnerProgress(learner, lesson);
     }
     
+
+    public LearnerProgress chooseActivity(User learner, Lesson lesson, Activity activity) {
+    	LearnerProgress progress = lessonDAO.getLearnerProgress(learner, lesson);
+    	progress.setProgressState(activity, LearnerProgress.ACTIVITY_ATTEMPTED);
+    	learnerProgressDAO.saveLearnerProgress(progress);
+    	return progress;
+    }
+    
     
     /**
      * Calculates learner progress and returns the data required to be displayed to the learner (including URL(s)).
@@ -87,7 +95,7 @@ public class LearnerService implements ILearnerService
      */
     public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson) throws ProgressException
     {
-    	return ProgressEngine.calculateProgress(learner, lesson, completedActivity);
+    	return new ProgressEngine().calculateProgress(learner, lesson, completedActivity);
     }
     
 
@@ -101,7 +109,7 @@ public class LearnerService implements ILearnerService
     	try {
 	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
 	    	Activity nextActivity = nextLearnerProgress.getNextActivity();
-	    	ActivityURL activityURL = Utils.generateActivityURL(nextActivity, nextLearnerProgress);
+	    	ActivityURL activityURL = Utils.getActivityURL(nextActivity, nextLearnerProgress);
 	    	url = activityURL.getUrl();
     	}
     	catch (ProgressException e) {

@@ -58,6 +58,16 @@ public interface ILearnerService
      * @throws LearnerServiceException in case of problems.
      */
     public LearnerProgress getProgress(User learner, Lesson lesson);
+    
+    
+    /**
+     * Marks an activity as attempted. Called when a user selects an OptionsActivity.
+     * @param learner the Learner
+     * @param lesson the Lesson to get progress from.
+     * @param activity the activity being attempted.
+     * @return LearnerProgress
+     */
+    public LearnerProgress chooseActivity(User learner, Lesson lesson, Activity activity);
 
     
     /**
