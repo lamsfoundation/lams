@@ -54,59 +54,59 @@ insert into lams_learning_library (learning_library_id,description,title,create_
 
 -- Populates the lams_tool table with default tools corresponding to each of the above libraries
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(1,'notebook_signature','notebook_classname','Notebook','Notebook Description',1,0,0,
+values(1,'notebook_signature','notebookService','Notebook','Notebook Description',1,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(2,'noticeboard_signature','noticeboard_classname','Noticeboard','Noticeboard Description',2,0,0,
+values(2,'noticeboard_signature','noticeboardService','Noticeboard','Noticeboard Description',2,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(3,'multiple_choice_signature','multiple_choice_classname','Multiple Choice','Multiple Coice Description',3,0,0,
+values(3,'multiple_choice_signature','multipleChoiceService','Multiple Choice','Multiple Coice Description',3,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(4,'question_answer_signature','question_answer_classname','Question and Answers','Question and Answers Description',4,0,0,
+values(4,'question_answer_signature','questionAnswerService','Question and Answers','Question and Answers Description',4,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(5,'message_board_signature','message_board_classname','Message Board','Message Board Description',5,0,0,
+values(5,'message_board_signature','messageBoardService','Message Board','Message Board Description',5,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(6,'survey_signature','survey_classname','Survey','Survey Description',6,0,0,
+values(6,'survey_signature','surveyService','Survey','Survey Description',6,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(7,'chat_signature','chat_classname','Chat','Chat Description',7,0,0,
+values(7,'chat_signature','chatService','Chat','Chat Description',7,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(8,'shared_resources_signature','shared_resources_classname','Shared Resources','Shared Resources Description',8,0,0,
+values(8,'shared_resources_signature','sharedResourcesService','Shared Resources','Shared Resources Description',8,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(9,'voting_signature','voting_classname','Voting','Voting Description',9,0,0,
+values(9,'voting_signature','votingService','Voting','Voting Description',9,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(10,'submit_files_signature','submit_files_classname','Submit Files','Submit Files Description',10,0,0,
+values(10,'submit_files_signature','submitFilesService','Submit Files','Submit Files Description',10,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
+insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
-values(11,'instant_messaging_signature','instant_messaging_classname','Instant Messaging','Instant Messaging Description',11,0,0,
+values(11,'instant_messaging_signature','instantMessagingService','Instant Messaging','Instant Messaging Description',11,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
 -- Populates the lams_tool_content table with dummy default content for all above tools
