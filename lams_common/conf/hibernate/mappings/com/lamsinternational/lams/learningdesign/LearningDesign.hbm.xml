@@ -19,7 +19,6 @@
        @hibernate.class
         table="lams_learning_design"
     </meta>
-    <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
         name="learningDesignId"
@@ -98,8 +97,8 @@
         </meta>    
     </property>
     <property
-        name="validDesign"
-        type="java.lang.Boolean"
+        name="validDesignFlag"
+        type="byte"
         column="valid_design_flag"
         not-null="true"
         length="4"
@@ -112,8 +111,8 @@
         </meta>    
     </property>
     <property
-        name="readOnly"
-        type="java.lang.Boolean"
+        name="readOnlyFlag"
+        type="byte"
         column="read_only_flag"
         not-null="true"
         length="4"
@@ -174,8 +173,8 @@
         </meta>    
     </property>
     <property
-        name="lessonCopy"
-        type="java.lang.Boolean"
+        name="lessonCopyFlag"
+        type="byte"
         column="lesson_copy_flag"
         not-null="true"
         length="4"

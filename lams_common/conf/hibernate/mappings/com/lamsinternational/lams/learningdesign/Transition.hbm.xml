@@ -19,7 +19,6 @@
        @hibernate.class
         table="lams_learning_transition"
     </meta>
-    <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
         name="transitionId"
