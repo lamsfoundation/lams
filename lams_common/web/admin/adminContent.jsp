@@ -186,8 +186,8 @@
 				
 			<p class="body"></p>
 		
-			<jsp:useBean id="organisation" type="Organisation" scope="request"/>
-			<jsp:useBean id="users" type="List" scope="request"/>
+			<jsp:useBean id="organisation" type="Organisation" scope="session"/>
+			<jsp:useBean id="users" type="List" scope="session"/>
 		
 			<table width="95%" border="0" align="center" class="lightTableBorders">
 				<tr bgcolor="#333366">
