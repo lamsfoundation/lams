@@ -21,6 +21,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 package org.lamsfoundation.lams.learning.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
@@ -41,8 +41,6 @@ import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.LessonCompleteActivity;
-import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -191,18 +189,25 @@ public class DummyLearnerService implements ILearnerService {
 		return progress;
 	}
 
-	public String completeToolActivity(long toolSessionId) {
+	public String completeToolSession(long toolSessionId, User learner) {
     	// get learner, lesson and activity using toolSessionId
-    	User learner = null;
+    	//User learner = null;
     	Lesson lesson = null;
     	//Activity activity = null;
 		LearnerProgress progress = getProgress();
     	Activity activity = getActivity(toolSessionId, progress);
     	
     	progress = calculateProgress(activity, learner, lesson);
-    	String url = activityMapping.getProgressURL(progress);
-    	
-    	return url;
+        try
+        {
+            return activityMapping.getProgressURL(progress);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+
 	}
 
 	

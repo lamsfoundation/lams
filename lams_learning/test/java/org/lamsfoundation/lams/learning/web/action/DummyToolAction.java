@@ -33,8 +33,8 @@ import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.service.DummyLearnerService;
 import org.lamsfoundation.lams.learning.web.form.DummyToolForm;
-import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-import org.lamsfoundation.lams.learning.web.util.ActivityMappingWithToolWait;
+
+
 
 
 /**
@@ -80,7 +80,7 @@ public class DummyToolAction extends DispatchAction {
 		
 		DummyLearnerService learnerService = (DummyLearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
 		learnerService.setRequest(request);
-		String url = learnerService.completeToolActivity(toolSessionId);
+		String url = learnerService.completeToolSession(toolSessionId, null);
 		try {
 			response.sendRedirect(url);
 		}

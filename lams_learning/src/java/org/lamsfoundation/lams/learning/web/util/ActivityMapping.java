@@ -22,6 +22,7 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.learning.web.util;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.apache.struts.action.ActionForward;
@@ -31,7 +32,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
@@ -137,20 +137,10 @@ public class ActivityMapping implements Serializable {
 	 * @param activity, the Activity to be displayed
 	 * @param progress, the LearnerProgress associated with the Activity and learner
 	 */
-	public String getActivityURL(Activity activity, LearnerProgress progress) {
-	    String activityURL = null;
-		
-		if (activity instanceof ToolActivity) {
-		    activityURL = getToolURL((ToolActivity)activity, progress);
-		}
-		else {
-		    // use LAMS action
-		    String strutsAction = null;
-		    strutsAction = this.activityMappingStrategy.getActivityAction(activity, progress);
-			activityURL = strutsActionToURL(strutsAction, activity, true);
-		}
-		
-		return activityURL;
+	public String getActivityURL(Activity activity, LearnerProgress progress) 
+	{
+	    String strutsAction = this.activityMappingStrategy.getActivityAction(activity, progress);
+		return strutsActionToURL(strutsAction, activity, true);
 	}
 	
 	/**
@@ -160,36 +150,40 @@ public class ActivityMapping implements Serializable {
 	 * the URL will be the action for displaying the tool.
 	 * Note that the URL could also be a wait message or a jsp to clear the frames.
 	 * @param progress, the current LearnerProgress.
+	 * @throws UnsupportedEncodingException
 	 */
-	public String getProgressURL(LearnerProgress progress) {
+	public String getProgressURL(LearnerProgress progress) throws UnsupportedEncodingException {
 		String activityURL = null;
 		
 	    // TODO: lesson complete
-	    if (progress.isLessonComplete()) {
+	    if (progress.isLessonComplete()) 
+	    {
 		    // If lesson complete forward to lesson complete action. This action will
 	    	// cause a client request to clear ALL frames.
 			String strutsAction = this.getActivityMappingStrategy().getLessonCompleteAction();
 			activityURL = strutsActionToURL(strutsAction, null, true);
 		}
-	    else {
-			Activity nextActivity = progress.getNextActivity();
-			Activity previousActivity = progress.getPreviousActivity();
-			Activity currentActivity = progress.getCurrentActivity();
+	    else 
+	    {
+			//Activity currentActivity = progress.getCurrentActivity();
 			
-			if (progress.isParallelWaiting()) {
+			if (progress.isParallelWaiting()) 
+			{
 				// progress is waiting, goto waiting page
 				String strutsAction = this.getActivityMappingStrategy().getWaitingAction();
 				activityURL = strutsActionToURL(strutsAction, null, true);
 			}
-			else {
+			else 
+			{
 				// display next activity
-				activityURL = this.getActivityURL(nextActivity, progress);
-				if (previousActivity instanceof ParallelActivity) {
+				activityURL = this.getActivityURL(progress.getNextActivity(), progress);
+				if (progress.getPreviousActivity() instanceof ParallelActivity) 
+				{
 					// if previous activity was a parallel activity then we need to
 					// clear frames.
 				    String strutsAction = "/requestDisplay.do";
 				    String redirectURL = strutsActionToURL(strutsAction, null, true);
-				    activityURL = URLEncoder.encode(activityURL);
+				    activityURL = URLEncoder.encode(activityURL,"UTF-8");
 				    activityURL = redirectURL+"?url="+activityURL;
 				}
 			}
@@ -207,24 +201,19 @@ public class ActivityMapping implements Serializable {
 	 * @param progress, the current LearnerProgress, used to get activity status
 	 */
 	public String getToolURL(ToolActivity activity, LearnerProgress progress) {
-		Tool tool = activity.getTool();
-		String url = tool.getLearnerUrl();
 
 		ToolSession toolSession;
-		try {
+		try 
+		{
 			// Get tool session using learner and activity
-			toolSession = toolService.getToolSession(progress.getUser(), activity);
+			toolSession = toolService.getToolSessionByLearner(progress.getUser(), activity);
 		}
 		catch (LamsToolServiceException e) {
 		    // TODO: should throw exception here
 			return null;
 		}
-		
-		// Append toolSessionId to tool URL
-		Long toolSessionId = toolSession.getToolSessionId();
-		url += "?toolSessionId="+toolSessionId;
-		
-		return url;
+		// Append toolSessionId to tool URL		
+		return activity.getTool().getLearnerUrl()+"?toolSessionId="+toolSession.getToolSessionId();
 	}
 	
 	

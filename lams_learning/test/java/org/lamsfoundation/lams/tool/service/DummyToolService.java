@@ -24,6 +24,8 @@ package org.lamsfoundation.lams.tool.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -38,14 +40,37 @@ public class DummyToolService implements ILamsToolService {
 		return null;
 	}
 
-    public ToolSession createToolSession(User learner, Activity activity) throws LamsToolServiceException {
-    	return null;
-    }
-
 	public ToolSession getToolSession(User learner, Activity activity) throws LamsToolServiceException {
 		ToolSession toolSession = new NonGroupedToolSession();
 		toolSession.setToolSessionId(activity.getActivityId());
 		return toolSession;
 	}
+
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#createToolSession(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.lesson.Lesson)
+     */
+    public ToolSession createToolSession(User learner, ToolActivity activity, Lesson lesson) throws LamsToolServiceException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#notifyToolsToCreateSession(java.lang.Long, org.lamsfoundation.lams.learningdesign.ToolActivity)
+     */
+    public void notifyToolsToCreateSession(Long toolSessionId, ToolActivity activity)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#copyToolContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
+     */
+    public Long copyToolContent(ToolActivity toolActivity)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

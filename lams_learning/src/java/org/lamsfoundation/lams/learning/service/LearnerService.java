@@ -22,6 +22,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 package org.lamsfoundation.lams.learning.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -176,7 +177,8 @@ public class LearnerService implements ILearnerService
     
     
     /**
-     * Calculates learner progress and returns the data required to be displayed to the learner (including URL(s)).
+     * Calculates learner progress and returns the data required to be displayed 
+     * to the learner.
      * @param completedActivityID identifies the activity just completed
      * @param learner the Learner
      * @param lesson the Lesson in progress.
@@ -196,25 +198,32 @@ public class LearnerService implements ILearnerService
         return learnerProgress;
     }
     
-
-    public String completeToolActivity(long toolSessionId) {
-    	// get learner, lesson and activity using toolSessionId
-    	User learner = null;
-    	Lesson lesson = null;
-    	Activity activity = null;
+    /**
+     * 
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeToolSession(long, User)
+     */
+    public String completeToolSession(long toolSessionId, User learner) 
+    {
+        //update tool session state in lams
+        ToolSession toolSession = lamsToolService.getToolSessionById(new Long(toolSessionId));
     	
-    	String url = null;
-    	try {
-	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
-	    	Activity nextActivity = nextLearnerProgress.getNextActivity();
-	    	url = activityMappings.getActivityURL(nextActivity, nextLearnerProgress);
+        toolSession.setToolSessionStateId(ToolSession.ENDED_STATE);
+        
+        lamsToolService.updateToolSession(toolSession);
+        //build up the url for next activity.
+    	try 
+    	{
+	    	LearnerProgress nextLearnerProgress = calculateProgress(toolSession.getToolActivity(), learner, toolSession.getLesson());
+	    	return activityMappings.getProgressURL(nextLearnerProgress);
     	}
-    	catch (ProgressException e) {
-    		// log e
+    	catch (ProgressException e) 
+    	{
     		throw new LearnerServiceException(e.getMessage());
     	}
-    	
-    	return url;
+        catch (UnsupportedEncodingException e)
+        {
+    		throw new LearnerServiceException(e.getMessage());
+        }
     }
 
     //---------------------------------------------------------------------

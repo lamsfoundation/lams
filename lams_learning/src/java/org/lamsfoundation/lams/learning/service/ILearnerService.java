@@ -97,12 +97,14 @@ public interface ILearnerService
 
     
     /**
-     * Marks an activity as complete and calculates the next URL. This method is for
-     * tools to redirect the client on complete.
+     * Marks an tool session as complete and calculates the next activity against
+     * the learning design. This method is for tools to redirect the client on 
+     * complete.
      * @param toolSessionId, session ID for completed tool
+     * @param learner TODO
      * @return the URL for the next activity
      * @throws LearnerServiceException in case of problems.
      */
-    public String completeToolActivity(long toolSessionId);
+    public String completeToolSession(long toolSessionId, User learner);
     
 }

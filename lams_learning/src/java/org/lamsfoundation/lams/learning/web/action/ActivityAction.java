@@ -112,13 +112,14 @@ public class ActivityAction extends LearnerAction {
 	 * @param learnerProgress, the current LearerProgress
 	 * @return Activity in request
 	 */
-	protected Activity getActivity(HttpServletRequest request, ActivityForm form, LearnerProgress learnerProgress) {
+	protected Activity getActivity(HttpServletRequest request, ActivityForm form, LearnerProgress learnerProgress) 
+	{
 		Activity activity = (Activity)request.getAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE);
-		if (activity == null) {
+		if (activity == null) 
+		{
 			Long activityId = form.getActivityId();
-			if (activityId != null) {
+			if (activityId != null) 
 				activity = getActivity(activityId.longValue(), learnerProgress);
-			}
 		}
 		return activity;
 	}
@@ -129,7 +130,8 @@ public class ActivityAction extends LearnerAction {
 	 * @param request
 	 * @param activity
 	 */
-	protected void setActivity(HttpServletRequest request, Activity activity) {
+	protected void setActivity(HttpServletRequest request, Activity activity) 
+	{
 		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, activity);
 	}
 	

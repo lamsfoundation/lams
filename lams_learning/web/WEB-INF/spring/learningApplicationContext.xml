@@ -39,7 +39,7 @@ http://www.gnu.org/licenses/gpl.txt
 	
 	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">
 		<property name="toolService"><ref bean="toolService" /></property>
-		<property name="baseURL"><value>http://127.0.0.1:8080/lams_learning/</value></property>
+		<property name="baseURL"><value>http://localhost:8080/lams_learning/</value></property>
 	</bean>
 	
 
