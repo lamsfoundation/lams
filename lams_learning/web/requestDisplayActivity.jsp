@@ -12,15 +12,15 @@
 		<title>LAMS</title>
 	</head>
 	
-		<c:if test="${empty url}">
-			<bean:parameter id="url" name="url" />
+		<c:if test="${empty activityId}">
+			<bean:parameter id="activityId" name="activityId" />
 		</c:if>
 	
 		<script language="JavaScript" type="text/JavaScript"><!--
 				function doRedirect() {
 					var parentWindow = window.parent;
-					//parentWindow.location.href = "Activity.do?method=display&activityId=<c:out value='${activityId}' />";
-					parentWindow.location.href = "<c:out value='${url}' escapeXml='false' />";
+					parentWindow.location.href = "DisplayActivity.do?activityId=<c:out value='${activityId}' />";
+					//parentWindow.location.href = "<c:out value='${url}' escapeXml='false' />";
 				}
 				window.onload = doRedirect;
 				//-->
