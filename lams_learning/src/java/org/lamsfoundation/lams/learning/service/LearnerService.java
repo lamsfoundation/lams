@@ -206,8 +206,7 @@ public class LearnerService implements ILearnerService
     	try {
 	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
 	    	Activity nextActivity = nextLearnerProgress.getNextActivity();
-	    	ActivityURL activityURL = actionMappings.getActivityURL(nextActivity, nextLearnerProgress);
-	    	url = activityURL.getUrl();
+	    	url = actionMappings.getActivityURL(nextActivity, nextLearnerProgress);
     	}
     	catch (ProgressException e) {
     		// log e
