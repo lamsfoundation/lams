@@ -155,7 +155,7 @@ insert into lams_user_group values(2,88);
 insert into lams_user_group values(2, 90);
 insert into lams_user_group values(3, 89);
 
-insert into lams_lesson values (1, 1, 1, '2005-02-23 17:37:25', 1, 3, NULL, NULL, 101);
+insert into lams_lesson values (1, 1, 1, 'Test Lesson','Description','2005-02-23 17:37:25', 1, 3, 1, NULL, 101,null,null);
 
 -- Populates the lams_learning_activity table with default activity templates that would be avaialbe to the
 -- author in the left panel and a default dummy learning_design defination 
@@ -167,7 +167,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (1,1,'Notebook Template','Notebook',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,1,'20050101','Offline  Instructions ',0,
 null,null,1,1,
 null,null,null,'NotebookImage');
@@ -179,7 +179,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (2,2,'NoticeBoard Template','NoticeBoard',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,2,'20050101','Offline  Instructions ',0,
 null,null,2,2,
 null,null,null,'NoticeBoardImage');
@@ -191,7 +191,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (3,3,'Multiple Choice Template','Multiple Choice',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,3,'20050101','Offline  Instructions ',0,
 null,null,3,3,
 null,null,null,'MultipleChoiceImage');
@@ -203,7 +203,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (4,4,'Question and Answer Template','Question and Answer',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,4,'20050101','Offline  Instructions ',0,
 null,null,4,4,
 null,null,null,'QAImage');
@@ -215,7 +215,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (5,5,'MessageBoard Template','MessageBoard',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,5,'20050101','Offline  Instructions ',0,
 null,null,5,5,
 null,null,null,'MBImage');
@@ -227,7 +227,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (6,6,'Survey Template','Survey',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,6,'20050101','Offline  Instructions ',0,
 null,null,6,6,
 null,null,null,'SurveyImage');
@@ -239,7 +239,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (7,7,'Chat Template','Chat',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,7,'20050101','Offline  Instructions ',0,
 null,null,7,7,
 null,null,null,'ChatImage');
@@ -251,7 +251,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (8,8,'Shared Resources Template','Shared Resources',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,8,'20050101','Offline  Instructions ',0,
 null,null,8,8,
 null,null,null,'SRImage');
@@ -263,7 +263,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (9,9,'Voting Template','Voting',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,9,'20050101','Offline  Instructions ',0,
 null,null,9,9,
 null,null,null,'VotingImage');
@@ -275,7 +275,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (10,10,'Submit Files Template','Submit Files',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,10,'20050101','Offline  Instructions ',0,
 null,null,10,10,
 null,null,null,'SubmitFilesImage');
@@ -287,7 +287,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (11,11,'Instant Messaging Template','Instant Messaging',10,20,null,'Help Text for Activity',
-1,null,null,0,
+1,null,0,0,
 null,11,'20050101','Offline  Instructions ',0,
 null,null,11,11,
 null,null,null,'IMImage');
@@ -478,7 +478,7 @@ values
 'Random Grouping Activity Description','RandomGroupingActivity Title','Help Text for RandomGroupingActivity',
 10,20,
 null,null,2,
-null,null,null,0,
+null,null,0,0,
 1,null,'20050101',
 0,null,
 null,null,null,
@@ -511,7 +511,7 @@ values
 'QNA Activity Description','QNA Activity Title','Help Text for QNA Activity',
 10,20,
 null,null,1,
-99,99,null,0,
+99,99,0,0,
 1,4,'20050101',
 1,'QNA Activity Offline  Instructions ',
 null,null,null,

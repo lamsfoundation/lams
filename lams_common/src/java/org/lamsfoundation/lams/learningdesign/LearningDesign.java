@@ -5,9 +5,9 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -346,19 +346,19 @@ public class LearningDesign implements Serializable {
 	public int hashCode() {
 		return new HashCodeBuilder().append(getReadOnly()).toHashCode();
 	}	
-	public TreeSet getParentActivities(){
-		TreeSet parentActivities = new TreeSet(new ActivityOrderComparator());
+	public HashSet getParentActivities(){
+		HashSet parentActivities = new HashSet();
 		Iterator iterator = this.getActivities().iterator();
 		while(iterator.hasNext()){
 			Activity activity = (Activity)iterator.next();
-			if(activity.getParentActivity()==null)
+			if(activity.getParentActivity()==null)				
 				parentActivities.add(activity);
 		}
 		return parentActivities;
 	}	
 	public Activity calculateFirstActivity(){
 		Activity firstActivity = null;
-		TreeSet parentActivities = this.getParentActivities();
+		HashSet parentActivities = this.getParentActivities();
 		Iterator parentIterator = parentActivities.iterator();
 		while(parentIterator.hasNext()){
 			Activity activity = (Activity)parentIterator.next();
