@@ -1,9 +1,4 @@
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
-<%@ page import="javax.servlet.jsp.JspWriter" %>
-<%@ page import="javax.servlet.http.HttpServletRequest" %>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.springframework.web.context.WebApplicationContext" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.service.UserManagementService" %>
 <%@ page import="com.lamsinternational.lams.usermanagement.UserOrganisation" %>
 <%@ page import="com.lamsinternational.lams.usermanagement.Organisation" %>
 <%@ page import="com.lamsinternational.lams.usermanagement.Role" %>
@@ -12,9 +7,8 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
-<%@ taglib uri="/WEB-INF/struts-template.tld" prefix="template" %>
 
-<html:form action="/user" method="post">
+<html:form action="/user.do?orgId='<c:out value="${organisation.organisationId}">'" method="post">
 	<table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" class="body">
 		<tr> 
 			<td valign="top">
@@ -75,7 +69,12 @@
 						</td>
 						<td class="body" align="left">
 							<logic:equal name="UserActionForm" property="createNew" value="true">
-								<html:text name="UserActionForm" property="authMethodName" size="32" maxlength="255" styleClass="textField" /> *
+								<logic:iterate id="authMethod" name="UserActionForm" property="allAuthMethods">
+									<html:radio property="authMethodName" name="UserActionForm" value="authMethod.authenticationMethodName">
+										<bean:write name="authMethod" property="authenticationMethodName"/>
+									</html:radio>
+									<bean:write name="authMethod" property="authenticationMethodName"/>
+								</logic:iterate>
 							</logic:equal>
 							<logic:notEqual name="UserActionForm" property="createNew" value="true">
 								<logic:iterate id="authMethod" name="UserActionForm" property="allAuthMethods">
