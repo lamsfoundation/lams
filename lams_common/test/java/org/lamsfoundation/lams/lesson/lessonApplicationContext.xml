@@ -72,7 +72,7 @@
 		<property name="hibernateProperties">
 			<props>
 				<prop key="hibernate.dialect">net.sf.hibernate.dialect.MySQLDialect</prop>
-				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.c3p0.minPoolSize">5</prop>
 				<prop key="hibernate.c3p0.maxPoolSize">20</prop>
 				<prop key="hibernate.c3p0.timeout">1800</prop>
@@ -105,5 +105,18 @@
 	<bean id="learnerProgressDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
-
+	
+	<!-- Usermanagement realted beans -->
+	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="learningDesignDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>	
+	
+	<bean id="organisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
 </beans>

@@ -56,7 +56,7 @@
   
     <!-- bi-directional one-to-many association to User -->
     <set
-        name="userGroups"
+        name="users"
         lazy="true"
         inverse="true"
         cascade="none"

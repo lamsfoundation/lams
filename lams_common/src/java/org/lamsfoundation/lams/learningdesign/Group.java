@@ -24,7 +24,7 @@ public class Group implements Serializable {
     private org.lamsfoundation.lams.learningdesign.Grouping grouping;
 
     /** persistent field */
-    private Set userGroups;
+    private Set users;
 
     /** persistent field */
     private Set toolSessions;
@@ -34,7 +34,7 @@ public class Group implements Serializable {
         this.groupId = groupId;
         this.orderId = orderId;
         this.grouping = grouping;
-        this.userGroups = userGroups;
+        this.users = userGroups;
         this.toolSessions = toolSessions;
     }
 
@@ -86,23 +86,19 @@ public class Group implements Serializable {
         this.grouping = grouping;
     }
 
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="group_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.lesson.UserGroup"
-     *         
+    /**
+     * @hibernate.set lazy="true" inverse="true" cascade="none"
+     * 				  table = "lams_user_group"
+     * @hibernate.collection-key column="group_id"
+     * @hibernate.collection-many-to-many
+     *            class="org.lamsfoundation.lams.usermanagement.User"
      */
-    public Set getUserGroups() {
-        return this.userGroups;
+    public Set getUsers() {
+        return this.users;
     }
 
-    public void setUserGroups(Set userGroups) {
-        this.userGroups = userGroups;
+    public void setUsers(Set userGroups) {
+        this.users = userGroups;
     }
 
     /** 

@@ -53,7 +53,7 @@
 		</many-to-one>
 		
 		<!-- bi-directional one-to-many association to LearnerProgress -->
-		<set name="learnerProgresses" lazy="true" inverse="true"
+		<set name="learnerProgresses" lazy="false" inverse="true"
 			cascade="none">
 			<key>
 				<column name="lesson_id" />
@@ -77,7 +77,8 @@
 		<many-to-one name="lessonClass"
 			class="org.lamsfoundation.lams.lesson.LessonClass"
 			column="class_grouping_id"
-			unique="true" />
+			unique="true" 
+			cascade = "save-update"/>
 
 		<!-- bi-directional many-to-one association to Organisation -->
 		<many-to-one name="organisation"

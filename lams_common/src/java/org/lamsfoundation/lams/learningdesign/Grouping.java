@@ -15,13 +15,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public abstract class Grouping implements Serializable
 {
     /** Grouping type id of random grouping */
-    public static final int RANDOM_GROUPING_TYPE = 1;
+    public static final Integer RANDOM_GROUPING_TYPE = new Integer(1);
     
     /** Grouping type id of chosen grouping */
-    public static final int CHOSEN_GROUPING_TYPE = 2;
+    public static final Integer CHOSEN_GROUPING_TYPE = new Integer(2);
     
     /** Grouping type id for lesson class grouping */
-    public static final int CLASS_GROUPING_TYPE = 3;
+    public static final Integer CLASS_GROUPING_TYPE = new Integer(3);
     
     /** identifier field */
     private Long groupingId;
