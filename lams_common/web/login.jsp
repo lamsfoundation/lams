@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <%@ taglib uri="/WEB-INF/struts/struts-tiles.tld" prefix="tiles" %>
-<%@ page import="com.lamsinternational.lams.security.JspRedirectStrategy" %>
+<%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy" %>
 <%	
 	if (JspRedirectStrategy.loginPageRedirected(request,response))
 	{

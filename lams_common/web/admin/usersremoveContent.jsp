@@ -5,25 +5,30 @@
 <%@ page import="javax.servlet.http.HttpServletRequest" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.service.UserManagementService" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.Role" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.User" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.service.UserManagementService" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.User" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.Organisation" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.web.UsersRemoveActionForm" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 
 <%!
 	/* Display ther user map, for a particular right */
-	public void displayUsers( List users, javax.servlet.jsp.JspWriter out, UserManagementService service )
+	public void displayUsers( List users, Organisation org, javax.servlet.jsp.JspWriter out, UserManagementService service )
 	{
-		if ( userMap == null )
+		if ( users == null )
 			return;
 			
 		try {
-			out.println("<table border=\"1\" width=\"100%\">");
-			out.println("<tr><td width=\"10%\">Remove?</td><td width=\"30%\">User</td><td>LAMS Roles</td></tr>");
+			out.println("<table border=\"0\" width=\"100%\" class=\"lightTableBorders\">");
+			out.println("<tr bgcolor=\"#333366\" class=\"tableHeader\"><th width=\"10%\">Remove?</th><th width=\"30%\">User</th><th>LAMS Roles</th></tr>");
 			Iterator iter = users.iterator();
 			while ( iter.hasNext() )
 			{
-				displayUser((User)iter.next(), out,service );
+				displayUser((User)iter.next(),org,out,service );
 			}
 			out.println("</TABLE>");
 		} catch ( java.io.IOException e ) {
@@ -34,7 +39,7 @@
 	}
 	
 	/* Display the user details, in a single column table row */
-	public void displayUser( User user, javax.servlet.jsp.JspWriter out, UserManagementService service) throws java.io.IOException
+	public void displayUser( User user, Organisation org, javax.servlet.jsp.JspWriter out, UserManagementService service) throws java.io.IOException
 	{
 		out.println("<TR>");
 
@@ -55,33 +60,30 @@
 	}
 %>
 
-	<html:form action="/usersremove" name="<%=UsersRemoveActionForm.formName%>" type="com.webmcq.ld.usermanagement.sysadmin.web.UsersRemoveActionForm">
-
-          <table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
-            <tr> 
-              <td valign="top">
-				<H2>Remove Users: <bean:write name="<%=UsersRemoveActionForm.formName%>" property="name"/></H2>
-
-				<p>Select the users that you wish to remove from the organisation.</p>
-				
-				<html:errors/>							
-				
-				<hr>
-				
-				<bean:define id="users" name="<%=UsersRemoveActionForm.formName%>" property="users" type="List"/>
+<html:form action="/usersremove" method="post">
+	<table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
+		<tr> 
+			<td valign="top">
+				<bean:define id="orgId" name="<%=UsersRemoveActionForm.formName%>" property="orgId" type="Integer"/>
 				<% 
-				WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext()); 
-				UserManagementService service = (UserManagementService)ctx.getBean("userManagementServiceTarget");
-				displayUsers(users,out,service); 
+					WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext()); 
+					UserManagementService service = (UserManagementService)ctx.getBean("userManagementServiceTarget");
+					Organisation org = service.getOrganisationById(orgId);
 				%>
-
+				<H2>Remove Users From <%=org.getName()%></H2>
+				<p>Select the users that you wish to remove from the organisation.</p>
+				<html:errors/>							
 				<hr>
-				
-				<p><html:cancel>Cancel</html:cancel> &nbsp;
+				<bean:define id="users" name="<%=UsersRemoveActionForm.formName%>" property="users" type="List"/>
+				<%	
+					displayUsers(users,org,out,service); 
+				%>
+				<hr>
+				<p>
 					<html:submit>Remove Users</html:submit> &nbsp; 	
-			</p>
-		   </td>
-			 </tr>
-			</table>
-         
-  </html:form>
+					<html:cancel>Cancel</html:cancel> &nbsp;
+				</p>
+			</td>
+		</tr>
+	</table>
+</html:form>

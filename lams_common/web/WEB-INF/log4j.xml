@@ -145,7 +145,7 @@
     </layout>	    
   </appender>
   
-  <category name="com.lamsinternational.lams" additivity="false">
+  <category name="org.lamsfoundation.lams" additivity="false">
     <priority value="DEBUG"/>
     <appender-ref ref="LAMSFILE"/>
     <appender-ref ref="LAMSCONSOLE"/>

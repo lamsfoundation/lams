@@ -1,14 +1,14 @@
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.UserOrganisation" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.Organisation" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.Role" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.User" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.UserOrganisation" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.Organisation" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.User" %>
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<html:form action="/user.do?orgId='<c:out value="${organisation.organisationId}">'" method="post">
+<html:form action="/user" method="post">
 	<table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" class="body">
 		<tr> 
 			<td valign="top">
@@ -50,11 +50,11 @@
 						<td class="body" align="right">
 							<html:hidden name="UserActionForm" property="userId"/>
 							<html:hidden name="UserActionForm" property="createNew"/>
-							Username (Login name):
+							Login: *
 						</td>
 						<td class="body" align="left">
 							<logic:equal name="UserActionForm" property="createNew" value="true">
-								<html:text name="UserActionForm" property="login" size="20" maxlength="20" styleClass="textField" /> *
+								<html:text name="UserActionForm" property="login" size="20" maxlength="20" styleClass="textField" /> 
 							</logic:equal>
 							<logic:notEqual name="UserActionForm" property="createNew" value="true">
 								<html:hidden name="UserActionForm"  property="login"/>
@@ -65,25 +65,14 @@
 
 					<tr>
 						<td class="body" align="right">
-							Authentication Method:
+							Authentication Method: *
 						</td>
 						<td class="body" align="left">
-							<logic:equal name="UserActionForm" property="createNew" value="true">
-								<logic:iterate id="authMethod" name="UserActionForm" property="allAuthMethods">
-									<html:radio property="authMethodName" name="UserActionForm" value="authMethod.authenticationMethodName">
-										<bean:write name="authMethod" property="authenticationMethodName"/>
-									</html:radio>
+							<logic:iterate id="authMethod" name="UserActionForm" property="allAuthMethods">
+								<html:radio property="authMethodName" name="UserActionForm" idName="authMethod" value="authenticationMethodName">
 									<bean:write name="authMethod" property="authenticationMethodName"/>
-								</logic:iterate>
-							</logic:equal>
-							<logic:notEqual name="UserActionForm" property="createNew" value="true">
-								<logic:iterate id="authMethod" name="UserActionForm" property="allAuthMethods">
-									<html:radio property="authMethodName" name="UserActionForm" value="authMethod.authenticationMethodName">
-										<bean:write name="authMethod" property="authenticationMethodName"/>
-									</html:radio>
-									<bean:write name="authMethod" property="authenticationMethodName"/>
-								</logic:iterate>
-							</logic:notEqual>
+								</html:radio>
+							</logic:iterate>
 						</td>
 					</tr>
 

@@ -63,14 +63,6 @@
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
 
-	<definition name=".admin.userview" path="/template.jsp">
-		<put name="title" value="LAMS :: User View"/>
-		<put name="pageHeader" value="User View"/>
-		<put name="header" value="adminHeader.jsp"/>
-		<put name="content" value="/admin/userviewContent.jsp" />	
-		<put name="footer" value="footer.jsp"/>	
-	</definition>
-
 	<definition name=".admin.usersadd" path="/template.jsp">
 		<put name="title" value="LAMS :: Add Users To Organisation"/>
 		<put name="pageHeader" value="Add Users To Organisation"/>

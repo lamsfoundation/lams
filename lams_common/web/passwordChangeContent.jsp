@@ -1,8 +1,8 @@
-<%@page import="com.lamsinternational.lams.web.PasswordChangeActionForm" %>
+<%@page import="org.lamsfoundation.lams.web.PasswordChangeActionForm" %>
 <%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
 
-<html:form action="/passwordChanged" name="<%=PasswordChangeActionForm.formName%>" type="com.lamsinternational.lams.web.PasswordChangeActionForm">
+<html:form action="/passwordChanged" method="post">
 <table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
 	<tr> 
 		<td valign="top">

@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.web.OrganisationActionForm" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.web.OrganisationActionForm" %>
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 <%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
 

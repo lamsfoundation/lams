@@ -1,6 +1,6 @@
 <%@ taglib uri="/WEB-INF/struts/struts-tiles.tld" prefix="tiles" %>
-<%@ page import="com.lamsinternational.lams.security.JspRedirectStrategy" %>
-<%@ page import="com.lamsinternational.lams.web.HttpSessionManager" %>
+<%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy" %>
+<%@ page import="org.lamsfoundation.lams.web.HttpSessionManager" %>
 
 <%JspRedirectStrategy.welcomePageStatusUpdate(request,response);%>
 <%HttpSessionManager.getInstance().updateHttpSessionByLogin(request.getSession(),request.getRemoteUser()); %>

@@ -43,11 +43,11 @@
 	<property name="build.classes"                 value="${build}/classes"/>
 	<property name="build.lib"                     value="${build}/lib"/>
 	
-	<property name="package"                   value="com/lamsinternational/lams"/>
+	<property name="package"                   value="org/lamsfoundation/lams"/>
 	<property name="package.learningdesign"    value="${package}/learningdesign"/>
 	<property name="package.usermanagement"    value="${package}/usermanagement"/>
 	
-	<property name="package.name"                  value="com.lamsinternational.lams"/>
+	<property name="package.name"                  value="org.lamsfoundation.lams"/>
 	<property name="package.learningdesign.name"   value="${package}.learningdesign"/>
 	<property name="package.usermanagement.name"   value="${package}.usermanagement"/>
 	

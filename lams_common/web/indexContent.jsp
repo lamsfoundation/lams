@@ -2,8 +2,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.service.UserManagementService" %>
-<%@ page import="com.lamsinternational.lams.usermanagement.*" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.service.UserManagementService" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.*" %>
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 <html>
 <head>
@@ -13,7 +13,7 @@
 <form name="form" method="post">
 <table width="98%" height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
 	<tr>
-		<td align="center" valign="middle"><img height="7" src="images/spacer.gif" width="10" /></td>
+		<td align="center" valign="middle"><img height="7" src="images/spacer.gif" width="10" alt="spacer.gif"/></td>
 	</tr>
 	<tr>
 		<td height="100%" valign="top">
@@ -118,7 +118,7 @@
 					</td>
 				</tr>
 				<tr align="center" valign="bottom">
-					<td colspan="2" ><img height="274" src="images/launch_page_graphic.jpg" width="587"></td>
+					<td colspan="2" ><img height="274" src="images/launch_page_graphic.jpg" width="587" alt="launch_page_graphic.jpg"></td>
 				</tr>
 			</table>
 		</td>

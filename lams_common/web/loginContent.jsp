@@ -2,12 +2,12 @@
 <table width="100%" height="100%" border="0" align="center" cellpadding="2" cellspacing="0">
 	<tr>
 		<td colspan="3" align="center" valign="middle">
-			<img width="10" height="7" src="images/spacer.gif"/>
+			<img width="10" height="7" src="images/spacer.gif" alt="spacer.gif"/>
 		</td>
 	</tr>
 	<tr>
 		<td align="center" valign="middle"> 
-			<p><img height="300" src="images/customer_logo.gif" width="300" /></p>
+			<p><img height="300" src="images/customer_logo.gif" width="300" alt="customer_logo.gif"/></p>
 		</td>
 		<td width="100%">
 			&nbsp;
@@ -56,7 +56,7 @@
 							
 				</table>
 			</form>
-			<img height="1" src="images/spacer.gif" width="200" />
+			<img height="1" src="images/spacer.gif" width="200" alt="spacer.gif"/>
 		</td>
 	</tr>
 	<tr valign="bottom" class="lightNote">
