@@ -355,6 +355,7 @@ CREATE TABLE lams_learner_progress (
      , finish_date_time DATETIME
      , current_activity_id BIGINT(20)
      , next_activity_id BIGINT(20)
+     , previous_activity_id BIGINT(20)
      , PRIMARY KEY (learner_progress_id)
      , INDEX (user_id)
      , CONSTRAINT FK_lams_learner_progress_1 FOREIGN KEY (user_id)
@@ -367,6 +368,9 @@ CREATE TABLE lams_learner_progress (
                   REFERENCES lams_learning_activity (activity_id)
      , INDEX (next_activity_id)
      , CONSTRAINT FK_lams_learner_progress_4 FOREIGN KEY (next_activity_id)
+                  REFERENCES lams_learning_activity (activity_id)
+     , INDEX (previous_activity_id)
+     , CONSTRAINT FK_lams_learner_progress_5 FOREIGN KEY (previous_activity_id)
                   REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
 
