@@ -37,10 +37,10 @@ INSERT INTO lams_authentication_method VALUES (2, 2, 'Oxford-WebAuth');
 INSERT INTO lams_authentication_method VALUES (3, 3, 'MQ-LDAP');
 
 INSERT INTO lams_activity_category VALUES (1 ,'SYSTEM');
-INSERT INTO lams_activity_category VALUES (1 ,'COLLABORATION');
-INSERT INTO lams_activity_category VALUES (1 ,'ASSESSMENT');
-INSERT INTO lams_activity_category VALUES (1 ,'CONTENT');
-INSERT INTO lams_activity_category VALUES (1 ,'SPLIT');
+INSERT INTO lams_activity_category VALUES (2 ,'COLLABORATION');
+INSERT INTO lams_activity_category VALUES (3 ,'ASSESSMENT');
+INSERT INTO lams_activity_category VALUES (4 ,'CONTENT');
+INSERT INTO lams_activity_category VALUES (5 ,'SPLIT');
 
 insert into lams_workspace_folder (parent_folder_id,name,workspace_id) values(null,'Trial',1);
 

@@ -36,7 +36,7 @@ CREATE TABLE lams_role (
        role_id INT(6) NOT NULL DEFAULT 0
      , name VARCHAR(64) NOT NULL
      , description TEXT
-     , create_date BIGINT(20)
+     , create_date DATETIME 
      , PRIMARY KEY (role_id)
 )TYPE=InnoDB;
 CREATE INDEX gname ON lams_role (name ASC);

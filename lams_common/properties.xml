@@ -59,7 +59,7 @@
 	<property name="package.usermanagement.name"   value="${package}.usermanagement"/>
 	
 	<!--  database related properties -->
-	<property name="database.driver.file"          value="${lib}/mysql/mysql-connector-java-3.0.16-ga-bin.jar"/>   
+	<property name="database.driver.file"          value="${lib}/mysql/mysql-connector-java-3.1.7-bin.jar"/>   
 	<property name="database.driver.classpath"     value="${database.driver.file}"/>
 	<property name="database.driver"               value="org.gjt.mm.mysql.Driver"/>
 	<property name="database.url"                  value="jdbc:mysql://localhost/lams"/>

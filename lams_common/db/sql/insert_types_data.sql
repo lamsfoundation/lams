@@ -5,7 +5,7 @@
 # Connection: ROOT LOCAL
 # Host: localhost
 # Saved: 2005-02-15 11:44:49
-# 
+ 
 INSERT INTO lams_role VALUES (1, 'SYSADMIN', 'LAMS System Adminstrator', NOW());
 INSERT INTO lams_role VALUES (2, 'ADMIN', 'Organization Adminstrator', NOW());
 INSERT INTO lams_role VALUES (3, 'AUTHOR', 'Authors Learning Designs', NOW());
@@ -55,12 +55,12 @@ INSERT INTO lams_lesson_state VALUES (4, 'SUSPENDED');
 INSERT INTO lams_lesson_state VALUES (5, 'FINISHED');
 INSERT INTO lams_lesson_state VALUES (6, 'ARCHIVED');
 
-INSERT into lams_license VALUES (1, 'Attribution-Noncommercial-ShareAlike', 'by-nc-sa', 'http://creativecommons.org/licenses/by-nc-sa/2.0/', 'true', '');
-INSERT into lams_license VALUES (2, 'Other Licensing Agreement', 'other', '','false', '');
-INSERT into lams_license VALUES (3, 'Attribution-No Derivatives', 'by-nd', 'http://creativecommons.org/licenses/by-nd/2.0/','false','');
-INSERT into lams_license VALUES (4, 'Attribution-Noncommercial-No Derivatives', 'by-nc-nd', 'http://creativecommons.org/licenses/by-nc-nd/2.0/','false', '');
-INSERT into lams_license VALUES (5, 'Attribution-Noncommercial', 'by-nc', 'http://creativecommons.org/licenses/by-nc/2.0/','false','');
-INSERT into lams_license VALUES (6, 'Attribution-ShareAlike', 'by-sa', 'http://creativecommons.org/licenses/by-sa/2.0/','false',''); 
+INSERT into lams_license VALUES (1, 'Attribution-Noncommercial-ShareAlike', 'by-nc-sa', 'http://creativecommons.org/licenses/by-nc-sa/2.0/', 1, '');
+INSERT into lams_license VALUES (2, 'Other Licensing Agreement', 'other', '',0, '');
+INSERT into lams_license VALUES (3, 'Attribution-No Derivatives', 'by-nd', 'http://creativecommons.org/licenses/by-nd/2.0/',0,'');
+INSERT into lams_license VALUES (4, 'Attribution-Noncommercial-No Derivatives', 'by-nc-nd', 'http://creativecommons.org/licenses/by-nc-nd/2.0/',0, '');
+INSERT into lams_license VALUES (5, 'Attribution-Noncommercial', 'by-nc', 'http://creativecommons.org/licenses/by-nc/2.0/',0,'');
+INSERT into lams_license VALUES (6, 'Attribution-ShareAlike', 'by-sa', 'http://creativecommons.org/licenses/by-sa/2.0/',0,''); 
 
 INSERT into lams_copy_type VALUES(1,'NONE');
 INSERT into lams_copy_type VALUES(2,'LESSON');
