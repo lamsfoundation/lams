@@ -46,7 +46,7 @@ import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
  * This class is a facade over the Learning middle tier.
- * @author chris
+ * @author chris, Jacky Fang
  */
 public class LearnerService implements ILearnerService
 {
@@ -62,6 +62,7 @@ public class LearnerService implements ILearnerService
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
     //---------------------------------------------------------------------
+    
     /** Creates a new instance of LearnerService */
     public LearnerService(ProgressEngine progressEngine)
     {
@@ -177,9 +178,13 @@ public class LearnerService implements ILearnerService
      * @return the bean containing the display data for the Learner
      * @throws LearnerServiceException in case of problems.
      */
-    public LearnerProgress calculateProgress(Activity completedActivity, User learner, Lesson lesson) throws ProgressException
+    public LearnerProgress calculateProgress(Activity completedActivity, 
+                                             User learner, 
+                                             Lesson lesson) throws ProgressException
     {
-    	return progressEngine.calculateProgress(learner, lesson, completedActivity);
+        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
+
+        return progressEngine.calculateProgress(learner, lesson, completedActivity,learnerProgress);
     }
     
 
@@ -232,7 +237,7 @@ public class LearnerService implements ILearnerService
         {
             ToolActivity toolActivity = (ToolActivity)i.next();
             if(shouldCreateToolSession(learnerProgress,toolActivity))
-                createToolSessionFor(toolActivity, learnerProgress.getUser());
+                createToolSessionFor(toolActivity, learnerProgress.getUser(),learnerProgress.getLesson());
         }
     }
     
@@ -255,20 +260,23 @@ public class LearnerService implements ILearnerService
     }
     
     /**
-     * Create a tool session for learner against a tool activity. This will
+     * <p>Create a lams tool session for learner against a tool activity. This will
      * have concurrency issues interms of grouped tool session because it might 
      * be inserting some tool session that has already been inserted by other
      * member in the group. If the unique_check is broken, we need to query
      * the database to get the instance instead of inserting it. It should be
-     * done in the Spring rollback strategy.
-     *  
+     * done in the Spring rollback strategy. </p>
+     *
+     * Once lams tool session is inserted, we need to notify the tool to its
+     * own session. 
+     * 
      * @param toolActivity
      * @param learner
      * @throws LamsToolServiceException
      */
-    private void createToolSessionFor(ToolActivity toolActivity,User learner) throws LamsToolServiceException
+    private void createToolSessionFor(ToolActivity toolActivity,User learner,Lesson lesson) throws LamsToolServiceException
     {
-        ToolSession toolSession = lamsToolService.createToolSession(learner,toolActivity);
+        ToolSession toolSession = lamsToolService.createToolSession(learner,toolActivity,lesson);
         
         toolActivity.getToolSessions().add(toolSession);
         

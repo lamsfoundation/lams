@@ -52,37 +52,43 @@ public class ProgressEngine
      * the learner to the next step.
      * @throws ProgressException if progress cannot be calculated successfully.
      */
-    public LearnerProgress calculateProgress(User learner, Lesson lesson, Activity completedActivity) throws ProgressException
+    public LearnerProgress calculateProgress(User learner, 
+                                             Lesson lesson, 
+                                             Activity completedActivity,
+                                             LearnerProgress learnerProgress) throws ProgressException
     {
-        //mark activity as complete for user
+        learnerProgress.setProgressState(completedActivity,LearnerProgress.ACTIVITY_COMPLETED);
         
-        //if activity has transition
+        Transition transition = completedActivity.getTransitionTo();
         
-            //follow transition to get next activity
-                                                     
-            //mark next activit as current act for user
-        
-            //fill in VO with right data for next act.
-        
-        //else if activity has a parent activity
-        
-            //get parent
-        
-            //notify parent activity that child is complete
-        
-            //if parent is now complete
-        
-                //recurse
-        
-        //else (if no parent and no transtions)
-            
-            //mark learner as having finished sequence
-        
-            //fill in VO with right data for the end of sequence
-    	
+        if(transition !=null)
+            return progressCompletedActivity(completedActivity, learnerProgress, transition);
+    	else
+    	{
+    	    Activity parent = completedActivity.getParentActivity();
+    	    //if(parent!=null)
+    	        
+    	        
+    	}
     	return null;
     }
     
+    /**
+     * @param completedActivity
+     * @param learnerProgress
+     * @param transition
+     * @return
+     */
+    private LearnerProgress progressCompletedActivity(Activity completedActivity, LearnerProgress learnerProgress, Transition transition)
+    {
+        learnerProgress.setPreviousActivity(completedActivity);
+        learnerProgress.setCurrentActivity(transition.getActivityByToActivityId());
+        learnerProgress.setNextActivity(transition.getActivityByToActivityId());
+        learnerProgress.setProgressState(transition.getActivityByToActivityId(),
+                                         LearnerProgress.ACTIVITY_ATTEMPTED);
+        return learnerProgress;
+    }
+
     /**
      * Method determines the start point for a learner when they begin a Lesson.
      * @param learner the <CODE>User</CODE> who is starting the <CODE>Lesson</CODE>.

@@ -111,11 +111,11 @@ public class MonitoringService implements IMonitoringService
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLesson(long, org.lamsfoundation.lams.usermanagement.User, java.util.List, java.util.List)
      */
-    public void createLesson(long learningDesignId,
-                             User user,
-                             Organisation organisation,
-                             List organizationUsers,
-                             List staffs)
+    public Lesson createLesson(long learningDesignId,
+                               User user,
+                               Organisation organisation,
+                               List organizationUsers,
+                               List staffs)
     {
         LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
         //copy the current learning design
@@ -133,11 +133,11 @@ public class MonitoringService implements IMonitoringService
         }
         authoringService.updateLearningDesign(copiedLearningDesign);
         //create the new lesson
-        createNewLesson(user,
-                        organisation,
-                        organizationUsers,
-                        staffs,
-                        copiedLearningDesign);
+        return createNewLesson(user,
+                               organisation,
+                               organizationUsers,
+                               staffs,
+                               copiedLearningDesign);
 
     }
 
@@ -160,7 +160,8 @@ public class MonitoringService implements IMonitoringService
             if (shouldInitToolSessionFor(activity)&&this.isSurvey((ToolActivity)activity))
             {
                 initToolSessionFor((ToolActivity) activity,
-                                   requestedLesson.getAllLearners());
+                                   requestedLesson.getAllLearners(),
+                                   requestedLesson);
             }
         }
         //update lesson status
@@ -191,11 +192,11 @@ public class MonitoringService implements IMonitoringService
      * @param copiedLearningDesign the new run-time learning design copy 
      * 							   for this lesson.
      */
-    private void createNewLesson(User user,
-                                 Organisation organisation,
-                                 List organizationUsers,
-                                 List staffs,
-                                 LearningDesign copiedLearningDesign)
+    private Lesson createNewLesson(User user,
+                                   Organisation organisation,
+                                   List organizationUsers,
+                                   List staffs,
+                                   LearningDesign copiedLearningDesign)
     {
         //create a new lesson object
         LessonClass newLessonClass = createNewLessonClass(copiedLearningDesign);
@@ -217,6 +218,8 @@ public class MonitoringService implements IMonitoringService
                                                   newLessonClass);
         newLessonClass.setLesson(newLesson);
         lessonDAO.saveLesson(newLesson);
+        
+        return newLesson;
     }
 
     /**
@@ -250,14 +253,14 @@ public class MonitoringService implements IMonitoringService
      * @param activity
      * @throws LamsToolServiceException
      */
-    private void initToolSessionFor(ToolActivity activity, Set learners) throws LamsToolServiceException
+    private void initToolSessionFor(ToolActivity activity, Set learners,Lesson lesson) throws LamsToolServiceException
     {
         activity.setToolSessions(new HashSet());
         for (Iterator i = learners.iterator(); i.hasNext();)
         {
             User learner = (User) i.next();
 
-            ToolSession toolSession = lamsToolService.createToolSession(learner,activity);
+            ToolSession toolSession = lamsToolService.createToolSession(learner,activity,lesson);
             //ask tool to create their own tool sessions using the given id.
             lamsToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
             //update the hibernate persistent object

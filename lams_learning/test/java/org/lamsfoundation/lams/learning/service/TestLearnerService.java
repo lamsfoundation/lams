@@ -115,7 +115,6 @@ public class TestLearnerService extends AbstractLamsTestCase
                       ((ToolActivity)testProgress.getNextActivity()).getToolSessions());
         assertEquals("verify number of tool sessions created",1,
                      ((ToolActivity)testProgress.getNextActivity()).getToolSessions().size());
-        assertTrue(true);
     }
 
 }

@@ -22,6 +22,7 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -45,7 +46,7 @@ public interface IMonitoringService
      * @param organizationUsers a list of learner will be in this new lessons.
      * @param staffs a list of staffs who will be in charge of this lesson.
      */
-    public void createLesson(long learningDesignId,User user,Organisation organisation,List organizationUsers,List staffs);;
+    public Lesson createLesson(long learningDesignId,User user,Organisation organisation,List organizationUsers,List staffs);;
     
     /**
      * Start the specified the lesson. It must be created before calling this
