@@ -6,8 +6,6 @@
  */
 package org.lamsfoundation.lams.learningdesign.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
@@ -33,9 +31,7 @@ public class TestTransitionDAO extends AbstractLamsTestCase{
 		transitionDAO =(TransitionDAO) context.getBean("transitionDAO");		
 	}
 	public void testGetTransitionByToActivityID(){
-		List list = transitionDAO.getTransitionByToActivityID(new Long(13));
-		transition = (Transition)list.get(0);
-		System.out.println("SIZE: " + list.size());
+		transition = transitionDAO.getTransitionByToActivityID(new Long(13));		
 		System.out.println(transition.getTitle());
 		
 	}
@@ -47,5 +43,4 @@ public class TestTransitionDAO extends AbstractLamsTestCase{
 		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
 		 "applicationContext.xml"};
 	}
-
 }

@@ -29,6 +29,7 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 	protected LearningDesignDAO learningDesignDAO;
 	protected LearningLibraryDAO learningLibraryDAO;
 	protected GroupingDAO groupingDAO;
+	protected LearningDesign learningDesign;
 
 	/**
 	 * @param name
@@ -44,6 +45,7 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 		learningLibraryDAO =(LearningLibraryDAO)context.getBean("learningLibraryDAO");
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");
 		groupingDAO = (GroupingDAO)context.getBean("groupingDAO");
+		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
 	}
 	public void testGetActivitiesByParentActivityId() {
 		List list = activityDAO.getActivitiesByParentActivityId(new Long(14));
@@ -72,6 +74,54 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 		List activities = activityDAO.getActivitiesByLibraryID(new Long(1));
 		assertNotNull(activities);
 		System.out.println("SIZE:" + activities.size());
+	}	
+	public void testIsComplexActivity(){
+		activity = activityDAO.getActivityByActivityId(new Long(14));
+		boolean result = activity.isComplexActivity();
+		assertTrue(result);		
 	}
+	public void testGetContributionType(){
+		activity = activityDAO.getActivityByActivityId(new Long(18));
+		Integer as[]=activity.getContributionType();
+		for(int i=0;i<as.length;i++)
+			System.out.println(as[i]);
+		
+	}
+	public void testCreateToolActivityCopy(){
+		activity = activityDAO.getActivityByActivityId(new Long(20));		
+		ToolActivity newToolActivity =null;
+		if(activity.isToolActivity()){			
+			newToolActivity = ToolActivity.createCopy((ToolActivity)activity);						
+			activityDAO.insert(newToolActivity);
+		}
+		assertNotNull(newToolActivity.getActivityId());
+	}
+	public void testCreateGroupingActivityCopy(){
+		activity = activityDAO.getActivityByActivityId(new Long(23));		
+		GroupingActivity newGroupingActivity = null;
+		if(activity.isGroupingActivity()){			
+			newGroupingActivity = GroupingActivity.createCopy((GroupingActivity)activity);			
+			activityDAO.insert(newGroupingActivity);
+		}
+		assertNotNull(newGroupingActivity.getActivityId());
+	}
+	public void testCreateOptionsActivityCopy(){
+		activity = activityDAO.getActivityByActivityId(new Long(12));
+		OptionsActivity optionsActivity =null;
+		if(activity.getActivityTypeId().intValue()== Activity.OPTIONS_ACTIVITY_TYPE){
+			optionsActivity = OptionsActivity.createCopy((OptionsActivity)activity);
+			activityDAO.insert(optionsActivity);
+		}
+		assertNotNull(optionsActivity.getActivityId());		
+	}
+	public void testCreateParallelActivityCopy(){
+		activity = activityDAO.getActivityByActivityId(new Long(13));
+		ParallelActivity parallelActivity = null;
+		if(activity.getActivityTypeId().intValue()==Activity.PARALLEL_ACTIVITY_TYPE){
+			parallelActivity = ParallelActivity.createCopy((ParallelActivity)activity);
+			activityDAO.insert(parallelActivity);
+		}
+		assertNotNull(parallelActivity.getActivityId());
+	}	
 }
 
