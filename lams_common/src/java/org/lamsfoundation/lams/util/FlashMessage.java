@@ -85,20 +85,11 @@ public class FlashMessage implements Serializable {
 	}
 	public String getMessageKey() {
 		return messageKey;
-	}
-	public void setMessageKey(String messageKey) {
-		this.messageKey = messageKey;
-	}
+	}	
 	public int getMessageType() {
 		return messageType;
 	}
-	public void setMessageType(int messageType) {
-		this.messageType = messageType;
-	}
 	public Object getMessageValue() {
 		return messageValue;
-	}
-	public void setMessageValue(Object messageValue) {
-		this.messageValue = messageValue;
-	}
+	}	
 }
