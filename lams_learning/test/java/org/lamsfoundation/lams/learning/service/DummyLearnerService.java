@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonCompleteActivity;
 import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -174,10 +175,8 @@ public class DummyLearnerService implements ILearnerService {
 		LearnerProgress progress = getProgress();
     	Activity activity = getActivity(toolSessionId, progress);
     	
-    	String url = null;
     	progress = calculateProgress(activity, learner, lesson);
-    	ActivityURL activityURL = actionMappings.getProgressURL(progress);
-    	url = activityURL.getUrl();
+    	String url = actionMappings.getProgressURL(progress);
     	
     	return url;
 	}
@@ -241,57 +240,68 @@ public class DummyLearnerService implements ILearnerService {
 		Set activities = new HashSet();
 		learningDesign.setActivities(activities);
 		
-		Activity activity = new ToolActivity();
-		activity.setActivityId(new Long(1));
-		activities.add(activity);
-		activity = new ToolActivity();
-		activity.setActivityId(new Long(2));
-		activities.add(activity);
-		activity = new ParallelActivity();
-		activity.setActivityId(new Long(3));
-		Set subActivities = new HashSet();
-		((ComplexActivity)activity).setActivities(subActivities);
-		activities.add(activity);
+		Tool tool = new Tool();
+		tool.setLearnerUrl("http://127.0.0.1:8080/lams_learning/test/DummyTool.do");
 		
-		activity = new ToolActivity();
-		activity.setActivityId(new Long(4));
-		subActivities.add(activity);
-		activities.add(activity);
-		activity = new ToolActivity();
-		activity.setActivityId(new Long(5));
-		subActivities.add(activity);
-		activities.add(activity);
+		ToolActivity toolActivity = new ToolActivity();
+		toolActivity.setTool(tool);
+		toolActivity.setActivityId(new Long(1));
+		activities.add(toolActivity);
+		toolActivity = new ToolActivity();
+		toolActivity.setActivityId(new Long(2));
+		toolActivity.setTool(tool);
+		activities.add(toolActivity);
+		Activity parallelActivity = new ParallelActivity();
+		parallelActivity.setActivityId(new Long(3));
+		Set subActivities = new HashSet();
+		((ComplexActivity)parallelActivity).setActivities(subActivities);
+		activities.add(parallelActivity);
+		
+		toolActivity = new ToolActivity();
+		toolActivity.setActivityId(new Long(4));
+		toolActivity.setTool(tool);
+		subActivities.add(toolActivity);
+		activities.add(toolActivity);
+		toolActivity = new ToolActivity();
+		toolActivity.setActivityId(new Long(5));
+		toolActivity.setTool(tool);
+		subActivities.add(toolActivity);
+		activities.add(toolActivity);
 
-		activity = new OptionsActivity();
-		activity.setActivityId(new Long(6));
-		activity.setTitle("foo");
-		activity.setDescription("activities for foo");
-		((OptionsActivity)activity).setMinNumberOfOptions(new Integer(2));
-		((OptionsActivity)activity).setMaxNumberOfOptions(new Integer(3));
+		OptionsActivity optionsActivity = new OptionsActivity();
+		optionsActivity.setActivityId(new Long(6));
+		optionsActivity.setTitle("foo");
+		optionsActivity.setDescription("activities for foo");
+		((OptionsActivity)optionsActivity).setMinNumberOfOptions(new Integer(2));
+		((OptionsActivity)optionsActivity).setMaxNumberOfOptions(new Integer(3));
 		//subActivities = new HashSet();
 		subActivities = new TreeSet(new ActivityOrderComparator());
-		((ComplexActivity)activity).setActivities(subActivities);
-		activities.add(activity);
+		((ComplexActivity)optionsActivity).setActivities(subActivities);
+		activities.add(optionsActivity);
 		
-		activity = new ToolActivity();
-		activity.setActivityId(new Long(7));
-		activity.setTitle("activity 7");
-		subActivities.add(activity);
-		activities.add(activity);
-		activity = new ToolActivity();
-		activity.setActivityId(new Long(8));
-		activity.setTitle("activity 8");
-		subActivities.add(activity);
-		activities.add(activity);
-		activity = new ToolActivity();
-		activity.setActivityId(new Long(9));
-		activity.setTitle("activity 9");
-		subActivities.add(activity);
-		activities.add(activity);
+		toolActivity = new ToolActivity();
+		toolActivity.setActivityId(new Long(7));
+		toolActivity.setTool(tool);
+		toolActivity.setTitle("activity 7");
+		subActivities.add(toolActivity);
+		activities.add(toolActivity);
+		toolActivity = new ToolActivity();
+		toolActivity.setActivityId(new Long(8));
+		toolActivity.setTool(tool);
+		toolActivity.setTitle("activity 8");
+		subActivities.add(toolActivity);
+		activities.add(toolActivity);
+		toolActivity = new ToolActivity();
+		toolActivity.setActivityId(new Long(9));
+		toolActivity.setTool(tool);
+		toolActivity.setTitle("activity 9");
+		subActivities.add(toolActivity);
+		activities.add(toolActivity);
 
-		activity = new ToolActivity();
-		activity.setActivityId(new Long(10));
-		activities.add(activity);
+		toolActivity = new ToolActivity();
+		toolActivity.setActivityId(new Long(10));
+		toolActivity.setTool(tool);
+		activities.add(toolActivity);
 		
 		progress.setAttemptedActivities(attempted);
 		progress.setCompletedActivities(complete);
