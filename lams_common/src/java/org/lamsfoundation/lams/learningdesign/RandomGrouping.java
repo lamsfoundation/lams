@@ -54,9 +54,9 @@ public class RandomGrouping extends Grouping
     }
     
     /** full constructor */
-    public RandomGrouping(Long groupingId, Integer groupingTypeId, Set groups, Set activities, Integer numberOfGroups, Integer learnersPerGroup)
+    public RandomGrouping(Long groupingId, Set groups, Set activities, Integer numberOfGroups, Integer learnersPerGroup)
     {
-        super(groupingId, groupingTypeId, groups, activities);
+        super(groupingId, groups, activities);
         this.learnersPerGroup = learnersPerGroup;
         this.numberOfGroups = numberOfGroups;
     }

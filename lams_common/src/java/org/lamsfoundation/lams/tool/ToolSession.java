@@ -26,6 +26,7 @@ public abstract class ToolSession implements Serializable {
     /** Tool session state id for completed tool session */
     public static final int ENDED_STATE = 2;
 
+    public static final String UNIQUE_KEY_PREFIX = "uq_";
     /** identifier field */
     private Long toolSessionId;
 
@@ -37,8 +38,6 @@ public abstract class ToolSession implements Serializable {
 
     /** persistent field */
     private int toolSessionStateId;
-    
-    private int toolSessionTypeId;
     
     private String uniqueKey;
 
@@ -148,10 +147,9 @@ public abstract class ToolSession implements Serializable {
     }
 
 	public int getToolSessionTypeId() {
-		return toolSessionTypeId;
+	    if(this instanceof NonGroupedToolSession)
+	        return NON_GROUPED_TYPE;
+	    else
+	        return GROUPED_TYPE;
 	}
-	public void setToolSessionTypeId(int toolSessionTypeId) {
-		this.toolSessionTypeId = toolSessionTypeId;
-	}
-
 }

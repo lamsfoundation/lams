@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.lesson.LessonClass;
 
 
 /**
@@ -31,9 +32,7 @@ public abstract class Grouping implements Serializable
     /** nullable persistent field */
     private Integer maxNumberOfGroups;
     
-    /** persistent field */
-    private Integer groupingTypeId;
-    
+   
     /** persistent field */
     private Set groups;
     
@@ -44,10 +43,9 @@ public abstract class Grouping implements Serializable
     private Set learners;
     
     /** full constructor */
-    public Grouping(Long groupingId, Integer groupingTypeId, Set groups, Set activities)
+    public Grouping(Long groupingId, Set groups, Set activities)
     {
         this.groupingId = groupingId;
-        this.groupingTypeId = groupingTypeId;
         this.groups = groups;
         this.activities = activities;
     }
@@ -58,10 +56,9 @@ public abstract class Grouping implements Serializable
     }
     
     /** minimal constructor */
-    public Grouping(Long groupingId, Integer groupingTypeId)
+    public Grouping(Long groupingId)
     {
         this.groupingId = groupingId;
-        this.groupingTypeId = groupingTypeId;
     }
     
     /**
@@ -86,14 +83,14 @@ public abstract class Grouping implements Serializable
      */
     public Integer getGroupingTypeId()
     {
-        return this.groupingTypeId;
+        if(this instanceof LessonClass)
+            return CLASS_GROUPING_TYPE;
+        else if(this instanceof ChosenGrouping)
+            return CHOSEN_GROUPING_TYPE;
+        else
+            return RANDOM_GROUPING_TYPE;
     }
-    
-    public void setGroupingTypeId(Integer groupingTypeId)
-    {
-        this.groupingTypeId = groupingTypeId;
-    }
-    
+
     /**
      *            
      *

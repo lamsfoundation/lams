@@ -20,9 +20,9 @@ public class ChosenGrouping extends Grouping
     }
     
     /** full constructor */
-    public ChosenGrouping(Long groupingId, Integer groupingTypeId, Set groups, Set activities)
+    public ChosenGrouping(Long groupingId, Set groups, Set activities)
     {
-        super(groupingId, groupingTypeId, groups, activities);
+        super(groupingId, groups, activities);
     }
     
 }

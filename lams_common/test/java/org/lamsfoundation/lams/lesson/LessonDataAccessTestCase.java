@@ -178,7 +178,6 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
         //make a copy of lazily initialized activities
         Set activities = new HashSet(testLearningDesign.getActivities());
         testLessonClass = new LessonClass(null, //grouping id
-                                          Grouping.CLASS_GROUPING_TYPE,
                                           new HashSet(),//groups
                                           activities,
                                           null, //staff group 

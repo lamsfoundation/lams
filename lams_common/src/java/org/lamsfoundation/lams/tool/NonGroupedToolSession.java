@@ -28,6 +28,9 @@ public class NonGroupedToolSession extends ToolSession {
                                  User user)
     {
         super(null,toolActivity,createDateTime,toolSessionStateId);
+        super.setUniqueKey(UNIQUE_KEY_PREFIX
+                           +toolActivity.getActivityId().toString()
+                           +user.getUserId().toString());
         this.user=user;
     }
     /**default constructor*/

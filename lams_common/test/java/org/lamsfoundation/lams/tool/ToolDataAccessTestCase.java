@@ -104,9 +104,6 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
                                                   new Date(System.currentTimeMillis()),
                                                   ToolSession.STARTED_STATE,
                                                   testUser);
-        toolSession.setUniqueKey("uq_"
-                                   +testActivity.getActivityId().toString()
-                                   +testUser.getUserId().toString());
         return toolSession;
     }
     

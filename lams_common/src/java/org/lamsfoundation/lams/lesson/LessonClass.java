@@ -27,9 +27,9 @@ public class LessonClass extends Grouping {
 	}
 	
 	/** full constructor */
-	public LessonClass(Long groupingId, Integer groupingTypeId, Set groups,
+	public LessonClass(Long groupingId, Set groups,
 			Set activities, Group staffGroup, Lesson lesson) {
-		super(groupingId, groupingTypeId, groups, activities);
+		super(groupingId, groups, activities);
 		this.staffGroup = staffGroup;
 		this.lesson = lesson;
 	}

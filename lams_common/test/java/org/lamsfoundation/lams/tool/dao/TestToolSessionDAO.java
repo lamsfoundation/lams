@@ -58,7 +58,7 @@ public class TestToolSessionDAO extends ToolDataAccessTestCase
         
         assertNotNull(toolSession);
         assertEquals("verify tool session state",ToolSession.STARTED_STATE,toolSession.getToolSessionStateId());
-        //assertEquals("verify tool session type",ToolSession.NON_GROUPED_TYPE,toolSession.getToolSessionTypeId());
+        assertEquals("verify tool session type",ToolSession.NON_GROUPED_TYPE,toolSession.getToolSessionTypeId());
         assertNotNull(toolSession.getUser());
     }
 
