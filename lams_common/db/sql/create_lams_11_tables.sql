@@ -470,8 +470,8 @@ CREATE TABLE lams_learning_transition (
      , id INT(11)
      , description TEXT
      , title VARCHAR(255)
-     , to_activity_id BIGINT(20) NOT NULL DEFAULT 0
-     , from_activity_id BIGINT(20) NOT NULL DEFAULT 0
+     , to_activity_id BIGINT(20)
+     , from_activity_id BIGINT(20)
      , learning_design_id BIGINT(20) NOT NULL DEFAULT 0
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
      , PRIMARY KEY (transition_id)
