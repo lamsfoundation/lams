@@ -23,12 +23,10 @@ public abstract class ToolSession implements Serializable {
     /** Tool session type id for non-grouped */
     public static final int NON_GROUPED_TYPE = 2;
     
-    /** Tool session state id for not attempted */
-    public static final int NON_ATTEMPTED_STATE = 1;
-    /** Tool session state id for attempted */
-    public static final int ATTEMPTED_STATE = 2;
-    /** Tool session state id for completed */
-    public static final int COMPLETED_STATE = 3;
+    /** Tool session state id for started tool session */
+    public static final int STARTED_STATE = 1;
+    /** Tool session state id for completed tool session */
+    public static final int ENDED_STATE = 2;
 
     /** identifier field */
     private Long toolSessionId;
