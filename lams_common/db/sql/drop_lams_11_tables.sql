@@ -1,4 +1,3 @@
-USE lams11;
 DROP TABLE lams_learning_transition;
 DROP TABLE lams_lesson_learner;
 DROP TABLE lams_activity_learners;
