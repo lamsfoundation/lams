@@ -10,6 +10,7 @@ package org.lamsfoundation.lams.tool.service;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -29,7 +30,6 @@ public interface ILamsCoreToolService
      * @param activity
      */
     public ToolSession createToolSession(User learner, ToolActivity activity,Lesson lesson) throws LamsToolServiceException;
-    
     
     /**
      * Returns the previously created ToolSession for a learner and activity.
@@ -62,4 +62,5 @@ public interface ILamsCoreToolService
     
     public void updateToolSession(ToolSession toolSession);
 
+    public String getToolURLByMode(ToolActivity activity, User learner, ToolAccessMode accessMode);
 }

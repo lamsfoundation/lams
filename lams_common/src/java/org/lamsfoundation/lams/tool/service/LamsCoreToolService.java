@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -172,6 +173,15 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     {
         toolSessionDAO.updateToolSession(toolSession);        
     }
+    
+    /**
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolURLByMode(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.tool.ToolAccessMode)
+     */
+    public String getToolURLByMode(ToolActivity activity, User learner, ToolAccessMode accessMode)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }    
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------
@@ -197,4 +207,6 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     {
         return toolActivity.getTool().getServiceName().equals("surveyService");
     }
+
+
 }
