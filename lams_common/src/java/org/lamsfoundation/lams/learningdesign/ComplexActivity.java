@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -85,5 +86,21 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	}
 	public void addActivity(Activity activity){
 		this.activities.add(activity);
+	}
+	
+	/**
+	 * Return the requested child activity based on the id.
+	 * @param activityId the requested activity id.
+	 * @return the child activity.
+	 */
+	public Activity getChildActivityById(long activityId)
+	{
+	    for(Iterator i = this.activities.iterator();i.hasNext();)
+	    {
+	        Activity child = (Activity)i.next();
+	        if(child.getActivityId().longValue()==activityId)
+	            return child;
+	    }
+	    return new NullActivity();
 	}
 }

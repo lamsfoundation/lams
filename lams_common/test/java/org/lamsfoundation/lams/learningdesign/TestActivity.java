@@ -34,7 +34,7 @@ public class TestActivity extends AbstractLamsTestCase
 	private static final Long TEST_SURVEY_ACTIVITY = new Long(20);
 	private static final Long TEST_MB_ACTIVITY = new Long(19);
 	private static final Integer TEST_USER_ID = new Integer(2);
-	
+	private static final long TEST_CHILD_QNA_ACTIVITY_ID = 22;
 	
     /*
      * @see AbstractLamsTestCase#setUp()
@@ -95,6 +95,15 @@ public class TestActivity extends AbstractLamsTestCase
         assertEquals("verify the grouping this group belongs to",100,testGroup.getGrouping().getGroupingId().longValue());
         assertEquals("verify the order of this group",1,testGroup.getOrderId());
         
+    }
+    
+    public void testGetChildActivityById()
+    {
+        Activity complexActivity = activityDAO.getActivityByActivityId(TEST_SEQUENCE_ACTIVITY);
+        
+        Activity child = ((ComplexActivity)complexActivity).getChildActivityById(TEST_CHILD_QNA_ACTIVITY_ID);
+        assertNotNull(child);
+        assertEquals("verify id",TEST_CHILD_QNA_ACTIVITY_ID,child.getActivityId().longValue());
     }
     /**
      * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
