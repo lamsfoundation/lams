@@ -11,10 +11,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class ScheduleGateActivity extends GateActivity implements Serializable {
 
     /** nullable persistent field */
-    private Date gateStartTimeOffset;
+    private Long gateStartTimeOffset;
 
     /** nullable persistent field */
-    private Date gateEndTimeOffset;
+    private Long gateEndTimeOffset;
     
     /** nullable persistent field */
     private Date gateStartDateTime;
@@ -22,7 +22,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     /** nullable persistent field */
     private Date gateEndDateTime;
 
-	public Date getGateEndDateTime() {
+
+    public Date getGateEndDateTime() {
 		return gateEndDateTime;
 	}
 	public void setGateEndDateTime(Date gateEndDateTime) {
@@ -55,8 +56,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             Transition transitionTo,
             Transition transitionFrom,
             Integer gateActivityLevelId,
-            Date gateStartTimeOffset, 
-            Date gateEndTimeOffset) {
+            Long gateStartTimeOffset, 
+            Long gateEndTimeOffset) {
         super(activityId, 
                 id,
                 description,
@@ -97,8 +98,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             Transition transitionTo,
             Transition transitionFrom,
             Integer gateActivityLevelId,
-            Date gateStartTimeOffset, 
-            Date gateEndTimeOffset) {
+            Long gateStartTimeOffset, 
+            Long gateEndTimeOffset) {
       super(activityId,
                 defineLater,
                 createDateTime,
@@ -137,6 +138,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     	newScheduleGateActivity.setXcoord(originalActivity.getXcoord());
     	newScheduleGateActivity.setYcoord(originalActivity.getYcoord());
     	newScheduleGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newScheduleGateActivity.setGrouping(originalActivity.getGrouping());
+    	newScheduleGateActivity.setGroupingUIID(originalActivity.getGroupingUIID());
     	newScheduleGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());    	
     	newScheduleGateActivity.setDefineLater(originalActivity.getDefineLater());
     	newScheduleGateActivity.setCreateDateTime(new Date());
@@ -148,24 +151,24 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     }
 
     /** 
-     * @hibernate.property column="gate_start_date_time" length="19"
+     * @hibernate.property column="gate_start_date_time" length="20"
      */
-    public Date getGateStartTimeOffset() {
+    public Long getGateStartTimeOffset() {
         return this.gateStartTimeOffset;
     }
 
-    public void setGateStartTimeOffset(Date gateStartTimeOffset) {
+    public void setGateStartTimeOffset(Long gateStartTimeOffset) {
         this.gateStartTimeOffset = gateStartTimeOffset;
     }
 
     /** 
-     * @hibernate.property column="gate_end_date_time" length="19" 
+     * @hibernate.property column="gate_end_date_time" length="20" 
      */
-    public Date getGateEndTimeOffset() {
+    public Long getGateEndTimeOffset() {
         return this.gateEndTimeOffset;
     }
 
-    public void setGateEndTimeOffset(Date gateEndTimeOffset) {
+    public void setGateEndTimeOffset(Long gateEndTimeOffset) {
         this.gateEndTimeOffset = gateEndTimeOffset;
     }
 

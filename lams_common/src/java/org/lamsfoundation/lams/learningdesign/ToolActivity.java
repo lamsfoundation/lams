@@ -128,6 +128,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
     	newToolActivity.setXcoord(originalActivity.getXcoord());
     	newToolActivity.setYcoord(originalActivity.getYcoord());
     	newToolActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newToolActivity.setGrouping(originalActivity.getGrouping());
+    	newToolActivity.setGroupingUIID(originalActivity.getGroupingUIID());
     	newToolActivity.setOrderId(originalActivity.getOrderId());
     	newToolActivity.setDefineLater(originalActivity.getDefineLater());
     	newToolActivity.setLearningLibrary(originalActivity.getLearningLibrary());

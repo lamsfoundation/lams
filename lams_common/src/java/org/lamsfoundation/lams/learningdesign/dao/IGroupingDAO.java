@@ -15,5 +15,11 @@ public interface IGroupingDAO extends IBaseDAO {
 	 * @return Grouping populated Grouping object
 	 */
 	public Grouping getGroupingById(Long groupingID);	
+	
+	/**
+	 * @param groupingUIID
+	 * @return Grouping populated Grouping object
+	 */
+	public Grouping getGroupingByUIID(Integer groupingUIID);
 
 }

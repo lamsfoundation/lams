@@ -102,6 +102,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
     	newSynchGateActivity.setXcoord(originalActivity.getXcoord());
     	newSynchGateActivity.setYcoord(originalActivity.getYcoord());
     	newSynchGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newSynchGateActivity.setGrouping(originalActivity.getGrouping());
+    	newSynchGateActivity.setGroupingUIID(originalActivity.getGroupingUIID());
     	newSynchGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newSynchGateActivity.setDefineLater(originalActivity.getDefineLater());
     	newSynchGateActivity.setCreateDateTime(new Date());

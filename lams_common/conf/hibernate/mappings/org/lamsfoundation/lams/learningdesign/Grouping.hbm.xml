@@ -20,6 +20,10 @@
     </id>
     
     <discriminator column="grouping_type_id" type="int"/>
+    
+    <property name="groupingUIID" type="java.lang.Integer" column="grouping_ui_id" length="11">
+        <meta attribute="field-description">@hibernate.property column="grouping_ui_id" length="11"</meta>    
+	</property>				
 
     <property name="maxNumberOfGroups" type="java.lang.Integer" column="max_number_of_groups" length="3"/>
 

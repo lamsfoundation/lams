@@ -114,7 +114,9 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
     	newOptionsActivity.setHelpText(originalActivity.getHelpText());
     	newOptionsActivity.setXcoord(originalActivity.getXcoord());
     	newOptionsActivity.setYcoord(originalActivity.getYcoord());
-    	newOptionsActivity.setActivityTypeId(originalActivity.getActivityTypeId());    	
+    	newOptionsActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newOptionsActivity.setGrouping(originalActivity.getGrouping());
+    	newOptionsActivity.setGroupingUIID(originalActivity.getGroupingUIID());
     	newOptionsActivity.setDefineLater(originalActivity.getDefineLater());
     	newOptionsActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newOptionsActivity.setCreateDateTime(new Date());

@@ -9,6 +9,8 @@
 
 package org.lamsfoundation.lams.tool.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.ToolDataAccessTestCase;
 
 
@@ -54,6 +56,10 @@ public class TestToolDAO extends ToolDataAccessTestCase
         assertEquals("verify default content id",6,testTool.getDefaultToolContentId());
         assertTrue("verify support grouping",!testTool.getSupportsGrouping());
         assertTrue("verify support define later",!testTool.getSupportsDefineLater());
+    }
+    public void testGetAllTools(){
+    	List list = toolDao.getAllTools();
+    	assertNotNull(list);    	
     }
 
 }

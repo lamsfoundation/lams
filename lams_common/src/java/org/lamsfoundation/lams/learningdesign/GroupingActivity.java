@@ -6,16 +6,15 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * @hibernate.class
+ * 
+ * A GroupingActivity creates Grouping.
  */
 public class GroupingActivity extends SimpleActivity implements Serializable
 {
-	/** persistent field */
-	private Integer groupingUIID;
-	
-	/** persistent field */
+	/** The grouping_ui_id of the Grouping that this activity creates */
 	private Integer createGroupingUIID;
 	
-    /** persistent field */
+    /** The grouping that this activity creates */
     public Grouping createGrouping;
     
     /** full constructor */
@@ -61,8 +60,7 @@ public class GroupingActivity extends SimpleActivity implements Serializable
                 activityTypeId, 
                 transitionTo,
 				transitionFrom);
-        this.createGrouping = createGrouping;
-        this.groupingUIID = grouping_ui_id;
+        this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
     }
     
@@ -96,8 +94,7 @@ public class GroupingActivity extends SimpleActivity implements Serializable
                 activityTypeId,
                 transitionTo,
 				transitionFrom);
-        this.createGrouping = createGrouping;
-        this.groupingUIID = grouping_ui_id;
+        this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
     }
     
@@ -119,12 +116,6 @@ public class GroupingActivity extends SimpleActivity implements Serializable
 	 */
 	public void setCreateGrouping(Grouping createGrouping) {
 		this.createGrouping = createGrouping;
-	}
-	public Integer getGroupingUIID() {
-		return groupingUIID;
-	}
-	public void setGroupingUIID(Integer grouping_ui_id) {
-		this.groupingUIID = grouping_ui_id;
 	}
 	public Integer getCreateGroupingUIID() {
 		return createGroupingUIID;

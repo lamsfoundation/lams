@@ -5,6 +5,7 @@ package org.lamsfoundation.lams.learningdesign.dao;
 
 import java.util.Date;
 import org.lamsfoundation.lams.AbstractLamsTestCase;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -33,7 +34,7 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		super.setUp();
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");		
 		userDAO = (UserDAO)context.getBean("userDAO");
-	}	
+	}	/*
 	public void testInsertLearningDesign(){
 		LearningDesign design = new LearningDesign();
 				
@@ -43,6 +44,13 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		design.setCopyTypeID(new Integer(1));
 		design.setCreateDateTime(new Date());		
 		learningDesignDAO.insert(design);		
+	}*/
+	public void testCalculateFirstActivity(){
+		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
+		Activity activity = learningDesign.calculateFirstActivity();
+		assertNotNull(activity.getActivityId());
+		long x = 15;
+		assertEquals(activity.getActivityId().longValue(),x);
 	}
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()

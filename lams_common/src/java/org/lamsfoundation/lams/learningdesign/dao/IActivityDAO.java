@@ -46,4 +46,18 @@ public interface IActivityDAO extends IBaseDAO{
 	 */	
 	public List getActivitiesByLearningDesignId(Long learningDesignId);	
 	
+	/**
+	 * Returns a list of activities associated with the LearningLibrary.
+	 * It only returns the template activities and not all activities 
+	 * with learning_library_id =libraryID. Template activity is one which
+	 * is not a part of any learning Design but is used as a blue-print/
+	 * template for creating new activities. Single LearningLibrary can 
+	 * have one or more activities associated with it. 
+	 * 
+	 * @param libraryID The learning_library_id of the LearningLibrary 
+	 * @return List List of activities that belong to 
+	 * 		   the given LearningLibrary 
+	 */
+	public List getActivitiesByLibraryID(Long libraryID);
+	
 }

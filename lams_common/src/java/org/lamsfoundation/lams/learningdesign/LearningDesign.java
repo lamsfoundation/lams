@@ -340,6 +340,19 @@ public class LearningDesign implements Serializable {
 				parentActivities.add(activity);
 		}
 		return parentActivities;
+	}	
+	public Activity calculateFirstActivity(){
+		Activity firstActivity = null;
+		HashSet parentActivities = this.getParentActivities();
+		Iterator parentIterator = parentActivities.iterator();
+		while(parentIterator.hasNext()){
+			Activity activity = (Activity)parentIterator.next();
+			if(activity.getTransitionTo()==null){
+				firstActivity = activity;
+				break;
+			}
+		}
+		return firstActivity;
 	}
 	public WorkspaceFolder getWorkspaceFolder() {
 		return workspaceFolder;

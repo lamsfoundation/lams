@@ -9,6 +9,8 @@
 
 package org.lamsfoundation.lams.tool.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
@@ -21,6 +23,7 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
  */
 public class ToolDAO extends HibernateDaoSupport implements IToolDAO
 {
+	private static final String FIND_ALL = "from obj in class " + Tool.class.getName();
 
     /**
      * @see org.lamsfoundation.lams.tool.dao.IToolDAO#getToolByID(java.lang.Long)
@@ -28,6 +31,9 @@ public class ToolDAO extends HibernateDaoSupport implements IToolDAO
     public Tool getToolByID(Long toolID)
     {
         return (Tool)getHibernateTemplate().get(Tool.class,toolID);
+    }
+    public List getAllTools(){    	
+    	return this.getHibernateTemplate().find(FIND_ALL);
     }
 
 }

@@ -5,6 +5,10 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.lamsfoundation.lams.learningdesign.dao;
+
+
+import java.util.Set;
+
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
@@ -29,7 +33,9 @@ public class TestLearningLibraryDAO extends AbstractLamsTestCase {
 	public void testGetAllLibraries(){
 		LearningLibrary lib = libraryDAO.getLearningLibraryById(new Long(8));
 		assertNotNull(lib.getTitle());
-		System.out.println(lib.getTitle());		
+		Set set = lib.getActivities();		
+		System.out.println(lib.getTitle());
+		System.out.println(set.size());
 	}
 	/**
 	 * (non-Javadoc)
