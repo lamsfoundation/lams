@@ -57,23 +57,9 @@
             not-null="true"
         </meta>    
     </property>
-    <property
-        name="rootNodeId"
-        type="java.lang.Long"
-        column="root_node_id"
-        length="20"
-    >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">
-           @hibernate.property
-            column="root_node_id"
-            length="20"
-        </meta>    
-    </property>
 
     <!-- Associations -->
-  
+
     <!-- bi-directional one-to-many association to CrWorkspaceCredential -->
     <set
         name="crWorkspaceCredentials"

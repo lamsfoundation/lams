@@ -12,15 +12,12 @@ DROP TABLE IF EXISTS lams_cr_workspace;
 
 --
 -- Table structure for table 'lams_cr_workspace'
---
 
 CREATE TABLE lams_cr_workspace (
   workspace_id bigint(20) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL default '0',
-  root_node_id bigint(20) unsigned,
   PRIMARY KEY  (workspace_id),
-  UNIQUE KEY workspace_id (workspace_id,name),
-  KEY name (name)
+  UNIQUE KEY workspace_id (workspace_id,name)
 ) TYPE=InnoDB COMMENT='Content repository workspace';
 
 --
