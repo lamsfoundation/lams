@@ -65,7 +65,6 @@
 				<!-- lesson related mapping files-->
 				<value>com/lamsinternational/lams/lesson/LearnerProgress.hbm.xml</value>
 				<value>com/lamsinternational/lams/lesson/Lesson.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/LessonLearner.hbm.xml</value>
 				<value>com/lamsinternational/lams/lesson/LessonState.hbm.xml</value>
 				<value>com/lamsinternational/lams/lesson/ProgressCompleted.hbm.xml</value>
 				<value>com/lamsinternational/lams/lesson/ProgressCurrent.hbm.xml</value>
