@@ -1,7 +1,3 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-10 17:19:17
-# 
 SET FOREIGN_KEY_CHECKS=0;
 
 INSERT INTO lams_organisation VALUES (1, 'Root', 'Root Organisation',null,1,NOW(),null);
@@ -38,7 +34,14 @@ INSERT INTO lams_user_organisation_role VALUES (14, 6, 3);
 
 
 
-insert into lams_workspace_folder (parent_folder_id,name,workspace_id) values(null,'Trial',1);
+insert into lams_workspace_folder 
+(parent_folder_id,name,workspace_id,
+user_id,create_date_time,last_modified_date_time,
+lams_workspace_folder_type_id)
+ values
+(null,'Test Workspace',1,
+1,'20042312','20042312',
+1);
 
 
 -- Populates the lams_learning_library table with default libraries
@@ -58,59 +61,59 @@ insert into lams_learning_library (learning_library_id,description,title,create_
 -- Populates the lams_tool table with default tools corresponding to each of the above libraries
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(1,'notebook_signature','notebookService','Notebook','Notebook Description',1,0,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,1);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(2,'noticeboard_signature','noticeboardService','Noticeboard','Noticeboard Description',2,0,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,2);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(3,'multiple_choice_signature','multipleChoiceService','Multiple Choice','Multiple Coice Description',3,0,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,3);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(4,'question_answer_signature','questionAnswerService','Question and Answers','Question and Answers Description',4,0,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,4);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(5,'message_board_signature','messageBoardService','Message Board','Message Board Description',5,1,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,5);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(6,'survey_signature','surveyService','Survey','Survey Description',6,0,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,6);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(7,'chat_signature','chatService','Chat','Chat Description',7,1,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,7);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(8,'shared_resources_signature','sharedResourcesService','Shared Resources','Shared Resources Description',8,0,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,8);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(9,'voting_signature','votingService','Voting','Voting Description',9,1,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,9);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(10,'submit_files_signature','submitFilesService','Submit Files','Submit Files Description',10,0,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,10);
 
 insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
-learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
+learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,valid_flag,learning_library_id)
 values(11,'instant_messaging_signature','instantMessagingService','Instant Messaging','Instant Messaging Description',11,0,0,
-'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
+'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url',1,11);
 
 -- Populates the lams_tool_content table with dummy default content for all above tools
 
@@ -164,7 +167,7 @@ gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activ
 values
 (1,1,'Notebook Template','Notebook',10,20,null,'Help Text for Activity',
 1,null,0,0,
-null,1,'20050101','Offline  Instructions ',0,
+null,1,'20050101','Offline Instructions ',0,
 null,null,1,1,
 null,null,null,'NotebookImage');
 
