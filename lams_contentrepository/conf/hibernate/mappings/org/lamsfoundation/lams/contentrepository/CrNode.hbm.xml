@@ -15,11 +15,14 @@
     name="org.lamsfoundation.lams.contentrepository.CrNode" 
     table="lams_cr_node"
 >
+
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_cr_node"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
+
+	<cache usage="transactional"/>
 
     <id
         name="nodeId"

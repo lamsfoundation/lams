@@ -60,6 +60,7 @@
 				<prop key="hibernate.c3p0.maxPoolSize">${hibernate.c3p0.maxPoolSize}</prop>
 				<prop key="hibernate.c3p0.timeout">${hibernate.c3p0.timeout}</prop>
 				<prop key="hibernate.c3p0.max_statement">${hibernate.c3p0.max_statement}</prop>
+				<prop key="hibernate.cache.provider_class">net.sf.hibernate.cache.TreeCacheProvider</prop>
 			</props>
 		</property>
 	</bean>

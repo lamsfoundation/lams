@@ -548,9 +548,10 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 			ItemNotFoundException, FileException {
 
 		long start = System.currentTimeMillis();
+		String key = "getFileItem "+uuid;
 
 		IVersionedNode latestNodeVersion = getNode(ticket.getWorkspaceId(),uuid,version);
-		log.error("getFileItem latestNodeVersion "+(System.currentTimeMillis()-start));
+		log.error(key+" latestNodeVersion "+(System.currentTimeMillis()-start));
 		
 		if ( relPath == null ) {
 			
@@ -562,7 +563,7 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
     	
    			// find the node indicated by the relPath
 			IVersionedNode childNode = latestNodeVersion.getNode(relPath); 
-			log.error("getFileItem latestNodeVersion.getNode "+(System.currentTimeMillis()-start));
+			log.error(key+" latestNodeVersion.getNode "+(System.currentTimeMillis()-start));
    			return childNode;
 		}
 	}

@@ -15,6 +15,7 @@
     name="org.lamsfoundation.lams.contentrepository.CrWorkspace" 
     table="lams_cr_workspace"
 >
+
     <meta attribute="class-description" inherit="false">
        @hibernate.class
         table="lams_cr_workspace"
@@ -22,6 +23,8 @@
     <meta attribute="implement-equals" inherit="false">true</meta>
     <meta attribute="implements" inherit="false">IWorkspace</meta>
 
+	<cache usage="transactional"/>
+	
     <id
         name="workspaceId"
         type="java.lang.Long"

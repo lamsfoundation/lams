@@ -175,6 +175,12 @@ Ant build file.
 				<path refid="project.classpath"/>
 			</classpath>
 		</javac>
+		<!-- JBOSS cache file -->
+		<copy overwrite="yes" todir="${build.classes}">
+			<fileset dir="${src.java}">
+					<include name="*.xml"/>
+			</fileset>
+		</copy>
 		<!-- Spring files -->
 		<copy overwrite="yes" todir="${build.classes}/org/lamsfoundation/lams/contentrepository/">
 			<fileset dir="${src.java}/org/lamsfoundation/lams/contentrepository">

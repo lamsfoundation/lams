@@ -715,13 +715,13 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
     	}
 
 		CrNode childNode = nodeDAO.findChildNode(nodeVersion, relPath);
-		log.error(key+" childNodeDB"+(System.currentTimeMillis()-start));
+		log.error(key+" childNodeDB "+(System.currentTimeMillis()-start));
 		
 		if ( childNode != null ) {
 			SimpleVersionedNode newNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
 			newNode.node = childNode;
 			newNode.nodeVersion = childNode.getNodeVersion(null); // get latest and only version
-			log.error(key+" returningNode"+(System.currentTimeMillis()-start));
+			log.error(key+" returningNode "+(System.currentTimeMillis()-start));
 			return (IVersionedNode) newNode;
 		} else {
     		throw new ItemNotFoundException("Unable to find node with path "+relPath

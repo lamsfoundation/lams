@@ -21,6 +21,8 @@
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
+	<cache usage="transactional"/>
+
     <id
         name="nvId"
         type="java.lang.Long"
@@ -99,7 +101,7 @@
 <!--      >										 					 	 -->
 <!--          <meta attribute="field-description">						 -->
 <!--             @hibernate.set											 -->
-<!--              lazy="true"											 -->
+<!--              lazy="false"											 -->
 <!--              inverse="false"										 -->
 <!--              cascade="all-delete-orphan"							 -->
 <!--  																	 -->

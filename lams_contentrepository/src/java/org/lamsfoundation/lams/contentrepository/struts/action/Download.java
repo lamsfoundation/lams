@@ -131,8 +131,10 @@ public class Download extends HttpServlet {
 		long start = System.currentTimeMillis();
 
 		ITicket ticket = RepositoryDispatchAction.getTicket(request);
-		if ( ticket == null )
+		if ( ticket == null ) {
 			errorInContent(request, response,"No ticket found in session. Unable to access repository.",null);
+			return;
+		}
 
 		Long uuid = RepositoryDispatchAction.getLong(request.getParameter(RepositoryDispatchAction.UUID_NAME));
 		Long version = null;
@@ -153,7 +155,12 @@ public class Download extends HttpServlet {
 			if ( node.isNodeType(NodeType.PACKAGENODE) ) {
 			
 				// now get the path of the initial page in the package
-				String initialPage = getInitialPage(request, response, node);
+				IValue value = node.getProperty(PropertyName.INITIALPATH);
+				String initialPage = value != null ? value.getString() : null;
+				if ( initialPage == null || initialPage.length() ==0 ) {
+					errorInContent(request, response,"No initial page found for this set of content. Node Data is "+node.toString(),null);
+					return;
+				}
 
 				// redirect to the initial path
 				// prepend with servlet and id - initial call doesn't include the id
@@ -172,6 +179,7 @@ public class Download extends HttpServlet {
 			} else {
 				errorInContent(request, response,"Unsupported node type "
 						+node.getNodeType()+". Node Data is "+node.toString(),null);
+				return;
 			}
 			
 		} else {
@@ -185,14 +193,20 @@ public class Download extends HttpServlet {
 			
 			callId = "download "+Math.random()+" "+uuid;
 			
-			if ( uuid == null ) 
+			if ( uuid == null ) { 
 				errorInContent(request, response, "UUID value is missing. "+expectedFormat,null);
+				return;
+			}
 		
-			if ( version == null )
+			if ( version == null ) {
 				errorInContent(request, response, "Version value is missing. "+expectedFormat,null);
+				return;
+			}
 
-			if ( relPathString == null )
+			if ( relPathString == null ) {
 				errorInContent(request, response, "Filename is missing. "+expectedFormat,null);
+				return;
+			}
 
 			log.error(callId+" beforeGetFileItem2 "+(System.currentTimeMillis()-start));
 			IVersionedNode node = getFileItem(ticket, uuid, version, relPathString);
@@ -200,6 +214,7 @@ public class Download extends HttpServlet {
 			if ( ! node.isNodeType(NodeType.FILENODE) ) {
 				errorInContent(request, response,"Unexpected type of node "
 						+node.getNodeType()+" Expected File node. Data is "+node,null);
+				return;
 			}
 			handleFileNode(request, response, node);
 
@@ -231,26 +246,6 @@ public class Download extends HttpServlet {
 					+uuid+","+version+","+relPathString+"). "+e.getMessage(), e);
 			throw e;
 		}
-	}
-
-	/**
-	 * @param request
-	 * @param response
-	 * @param node
-	 * @param value
-	 * @return
-	 * @throws ValueFormatException
-	 * @throws IOException
-	 */
-	private String getInitialPage(HttpServletRequest request, HttpServletResponse response, IVersionedNode node) 
-				throws ValueFormatException, IOException {
-		
-		IValue value = node.getProperty(PropertyName.INITIALPATH);
-		String initialPage = value != null ? value.getString() : null;
-		if ( initialPage == null || initialPage.length() ==0 ) {
-			errorInContent(request, response,"No initial page found for this set of content. Node Data is "+node.toString(),null);
-		}
-		return initialPage;
 	}
 
 	/**
