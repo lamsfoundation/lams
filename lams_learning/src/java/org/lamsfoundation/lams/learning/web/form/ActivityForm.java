@@ -19,13 +19,14 @@ import org.apache.struts.action.ActionMapping;
  */
 public class ActivityForm extends ActionForm {
 
-	/** List of ActivityURL, will only contain one if a simple activity */
-	private List activityURLs;
 	/** Unique identifier specifying the session for this activity, maps back to
 	 * LearnerProgress (or Learner) and Activity. Note that the activity may already
 	 * be complete.
 	 */
 	private Long activityId;
+		
+	/** List of ActivityURL, will only contain one if a simple activity */
+	private List activityURLs;
 	
 
 	/** 
@@ -48,7 +49,6 @@ public class ActivityForm extends ActionForm {
 	 */
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 		activityURLs = null;
-		//throw new UnsupportedOperationException("Generated method 'reset(...)' not implemented.");
 	}
 
 	public List getActivityURLs() {
