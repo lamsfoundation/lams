@@ -413,28 +413,28 @@ insert into lams_learning_transition(transition_id,id,description,title,to_activ
 values(3,3,'To Multiple Choice','To Multiple Choice',17,16,1,'20050207');
 
 insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(4,4,'To Multiple Choice','To Multiple Choice',13,17,1,'20050207');
+values(4,4,'To Parallel Activity','To Parallel Activity',13,17,1,'20050207');
 
 insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(5,5,'To Multiple Choice','To Multiple Choice',18,13,1,'20050207');
+values(5,5,'To Question and Answer','To Question and Answer',18,13,1,'20050207');
 
 insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(6,6,'To Multiple Choice','To Multiple Choice',19,18,1,'20050207');
+values(6,6,'To Messageboard','To Messageboard',19,18,1,'20050207');
 
 insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(7,7,'To Multiple Choice','To Multiple Choice',14,19,1,'20050207');
+values(7,7,'To Sequence Activity','To Sequence Activity',14,19,1,'20050207');
 
 insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(8,8,'To Multiple Choice','To Multiple Choice',20,14,1,'20050207');
+values(8,8,'To Survey','To Survey',20,14,1,'20050207');
 
 insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(9,9,'To Multiple Choice','To Multiple Choice',21,20,1,'20050207');
+values(9,9,'To Chat','To Chat',21,20,1,'20050207');
 
 insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(10,10,'To Multiple Choice','To Multiple Choice',22,21,1,'20050207');
+values(10,10,'To Shared Resourcese','To Shared Resourcese',22,21,1,'20050207');
 
 insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(11,11,'To Multiple Choice','To Multiple Choice',null,22,1,'20050207');
+values(11,11,'To End','To End',null,22,1,'20050207');
 
 insert into lams_learning_design(id,description,title,first_activity_id,max_id,valid_design_flag,
 								 read_only_flag,user_id,help_text,lesson_copy_flag,create_date_time,version,
