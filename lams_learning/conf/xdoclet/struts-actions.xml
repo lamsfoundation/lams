@@ -19,6 +19,14 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 -->
 
+<action path="/index"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter="/main.jsp" />
+
+<action path="/content"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter="/test/DummyLesson.do" />
+
 <action path="/requestDisplay"
 	type="org.apache.struts.actions.ForwardAction"
 	parameter=".requestDisplay"/>
