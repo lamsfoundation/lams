@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="com.lamsinternational.lams.learningdesign.ToolContent" 
+    table="lams_tool_content"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_tool_content"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="toolContentId"
+        type="java.lang.Long"
+        column="tool_content_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="identity"
+            type="java.lang.Long"
+            column="tool_content_id"
+
+
+        </meta>
+        <generator class="identity" />
+    </id>
+
+    <property
+        name="toolContentKey"
+        type="long"
+        column="tool_content_key"
+        not-null="true"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="tool_content_key"
+            length="20"
+            not-null="true"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to Activity -->
+    <set
+        name="activities"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="tool_content_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.learningdesign.Activity"
+        </meta>
+        <key>
+            <column name="tool_content_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.learningdesign.Activity"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>
