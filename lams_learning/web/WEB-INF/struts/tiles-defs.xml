@@ -30,6 +30,7 @@
 		<put name="includeBodyTag" value="false"/>
 	</definition>
 	<definition name=".optionsActivity" extends=".activityLayout">
+		<put name="title" value="Optional Activity"/>
 		<put name="body" value="/optionsActivity.jsp"/>
 	</definition>
 	<definition name=".requestDisplay" path="/requestDisplayActivity.jsp" />
@@ -38,6 +39,7 @@
 		<put name="body" value="/partialCompleted.jsp"/>
 	</definition>
 	<definition name=".lessonComplete" extends=".activityLayout">
+		<put name="title" value="Lesson Complete"/>
 		<put name="body" value="/lessonComplete.jsp"/>
 	</definition>
 	
