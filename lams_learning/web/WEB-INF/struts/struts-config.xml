@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+<struts-config>
+	<data-sources />
+	<form-beans>
+		<form-bean name="activity" type="com.lamsinternational.lams.learning.web.form.ActivityForm" />
+	</form-beans>
+	<global-exceptions />
+	<global-forwards />
+	<action-mappings>
+		<!-- Methods for ActivityAction are display, displayCurrent and complete. -->
+		<action path="/Activity"
+				type="com.lamsinternational.lams.learning.web.action.ActivityAction"
+				name="activity"
+				parameter="method"
+				scope="request"
+				validate="false">
+				
+			<!-- Load one or more URLs for the activity -->
+			<forward name="displaySingleActivity" path="/SingleActivity.jsp" />
+			<forward name="displayParallelActivity" path="/ParallelActivity.jsp" />
+			<forward name="displayOptionsActivity" path="/OptionsActivity.jsp" />
+			
+			<!-- Tell browser to request next activity. Not needed -->
+			<!-- forward name="singleActivityCompleted" path="/SingleActivityCompleted.jsp" /-->
+			<!-- Tell browser to request next activity. Needed because the parallel
+			activity frames need to be cleared. -->
+			<forward name="parallelActivityCompleted" path="/ParallelActivityCompleted.jsp" />
+			<!-- Display "Complete other activity" message -->
+			<forward name="partialCompleted" path="/MultiPartialCompleted.jsp" />
+			<!-- Display wait message -->
+			<forward name="syncWait" path="/SyncWait.jsp" />
+			
+			<forward name="sequenceComplete" path="/SequenceCompleted.jsp" />
+			
+			<!-- forward name="error" path="/Error.jsp" /-->
+		</action>
+	</action-mappings>
+	<controller bufferSize="4096" debug="0" />
+</struts-config>
+
