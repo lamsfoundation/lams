@@ -34,8 +34,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.MonitoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
-import org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
 /**
@@ -630,37 +628,7 @@ public abstract class Activity implements Serializable,Nullable {
 	public boolean isGroupingActivity(){
 		return getActivityTypeId().intValue()== GROUPING_ACTIVITY_TYPE;
 	}
-	
-	/**
-	 * Delegate to activity strategy to check up the status of all children.
-	 * 
-     * @param learnerProgress the progress data that record what has been 
-     * 						  completed
-     * @return true if all children are completed.
 
-	 */
-/**	public boolean areChildrenCompleted(LearnerProgress learnerProgress)
-	{
-	    //return activityStrategy.areChildrenCompleted(this,learnerProgress);
-	    return ((ComplexActivity)this).areChildrenCompleted(learnerProgress);
-	}
-	
-	/**
-	 * <p>Delegate to activity strategy to calculate what is the next activity
-	 * within the parent activity.</p>
-	 * 
-	 * <b>Note:</b> The logic of what is the next activity here is progress
-	 * 				enigne specific now. Please see the <code>ActivityStrategy</code>
-	 * 				for details explaination of what is next.
-	 * 
-	 * @param currentChild the current child activity in a complex activity.
-	 * @return the next activity within a parent activity
-	 */
-/**	public Activity getNextActivityByParent(Activity currentChild)
-	{
-	    return ((ComplexActivity)this).getNextActivityByParent(currentChild);
-	}	
-	*/
 	public Integer getActivityCategoryID() {
 		return activityCategoryID;
 	}
