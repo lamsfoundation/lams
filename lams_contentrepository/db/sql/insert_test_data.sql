@@ -1,3 +1,5 @@
+use lams11;
+
 SET FOREIGN_KEY_CHECKS=0;
 
 DELETE from lams_cr_node_version_property;
