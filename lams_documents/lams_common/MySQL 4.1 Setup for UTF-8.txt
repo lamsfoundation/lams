@@ -1,3 +1,50 @@
+# =============
+# Windows version
+# =============
+* Windows version of MySQL 4.1 now comes with 3 installation packages.
+
+* If you used Windows-installer versions, they ask about the language setting.
+  Choose the "most internatioanl" option, which uses UTF-8.
+  
+* You should use the standard installation version
+  (not the "essentail" version) for development, since
+  it installs the bebug codes in case you need it.
+
+* Then, create the lams database as the Chris' instruction below.
+
+* my.ini or my.conf used to be located in C:\
+  but now it is located where your copy of MySQL is installed
+  (typically C:\Program Files\MySQL\MySQL Server 4.1).
+  This allows different instances of MySQL to run with
+  config files of their own, if you have not installed it
+  as a Service (which you should not for a development environment).
+  Add the line in the my.ini as Chris' instruction to 
+  change the default transaction isolation level.
+
+# =============
+# Linux/Solaris version
+# =============
+* my.conf file is located at /etc/my.conf
+* If it does not exist, you have to create one by
+* copying a sample config file included in the MySQL
+  home directory
+
+# =============
+# Securing the initial database
+# =============
+* Set the root password as:
+  mysqladmin -u root password "yoursecret"
+  mysqladmin -u root -h "yourhost" password "yoursecret"
+  mysqladmin -u root -h "yourhost@melcoe.mq.edu.au" password "yoursecret"
+
+* As usual, delete the "test" database which has the anonymous user
+  drop database test;
+  
+* Also, delete the anonymous user (user=' ' and password is ' ');
+  delete from user where user=' ';
+
+  
+
 From: Chris Perfect [chris@e-plus.com.au]
 Sent: Tuesday, 8 February 2005 4:04 PM
 To: LAMS Dev
@@ -16,9 +63,12 @@ To achieve this:
 
 
 Secondly the transaction isolation level for InnoDB should be set to
-READ-COMMITTED: this seems to occur out of the box for Win32 (which is good because there doesn't seem to be a way of altering it that works on
-4.1 in Windows) but the linux version (and I am assumeing other UNIX-like OSs) defaults to REPEATABLE-READ.  In order to change this for linux you need to create or edit the config file /etc/my.cnf like the
-following:
+READ-COMMITTED: this seems to occur out of the box for Win32 
+(which is good because there doesn't seem to be a way of altering it
+that works on 4.1 in Windows) but the linux version 
+(and I am assumeing other UNIX-like OSs) defaults to REPEATABLE-READ.
+In order to change this for linux you need to create or edit the 
+config file /etc/my.cnf like the following:
 
 [mysqld]
 transaction-isolation=READ-COMMITTED
