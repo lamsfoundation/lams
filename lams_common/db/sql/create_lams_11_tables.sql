@@ -209,7 +209,7 @@ CREATE TABLE lams_user (
      , create_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
      , authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
      , workspace_id BIGINT(20)
-     , base_organisation_id BIGINT(20) NOT NULL DEFAULT 0
+     , base_organisation_id BIGINT(20)
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
