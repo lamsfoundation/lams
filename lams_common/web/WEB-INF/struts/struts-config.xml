@@ -22,6 +22,11 @@
     <form-bean name="UserActionForm"
                type="com.lamsinternational.lams.usermanagement.web.UserActionForm" />
                
+    <form-bean name="UsersAddActionForm"
+               type="com.lamsinternational.lams.usermanagement.web.UsersAddActionForm" />
+
+    <form-bean name="UsersRemoveActionForm"
+               type="com.lamsinternational.lams.usermanagement.web.UsersRemoveActionForm" />
                
 	</form-beans>
 	<!-- ========== Global Exceptions Definitions =================================== -->
@@ -74,6 +79,9 @@
       <forward name="user"
                path=".admin.user">
       </forward>
+      <forward name="usersadd"
+               path=".admin.usersadd">
+      </forward>
       <forward name="error"
                path=".admin.error">
       </forward>
@@ -99,6 +107,40 @@
             scope="session"
             input=".admin.user"
             validate="true">
+      <forward name="admin"
+               path=".admin">
+      </forward>
+      <forward name="userview"
+               path=".admin.userview">
+      </forward>
+      <forward name="error"
+               path=".admin.error">
+      </forward>
+	</action>
+
+    <action path="/usersadd"
+            type="com.lamsinternational.lams.usermanagement.web.UsersAddAction"
+            name="UsersAddActionForm"
+            scope="session"
+            input=".admin.usersadd"
+            validate="true">
+      <forward name="admin"
+               path=".admin">
+      </forward>
+      <forward name="usersadd"
+               path=".admin.usersadd">
+      </forward>
+      <forward name="error"
+               path=".admin.error">
+      </forward>
+	</action>
+
+    <action path="/usersremove"
+            type="com.lamsinternational.lams.usermanagement.web.UsersRemoveAction"
+            name="UsersRemoveActionForm"
+            scope="session"
+            input=".admin.usersremove"
+            validate="false">
       <forward name="admin"
                path=".admin">
       </forward>

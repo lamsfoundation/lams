@@ -27,7 +27,10 @@
 				error +="\n- Please choose an Excel format file";
 		}
 		if(error == ""){
-			document.forms[1].submit();
+			if(document.forms[0].checkbox.checked){
+				document.forms[0].action = "admin.do?method=importUsersFromFile&orgId=<c:out value="${organisation.organisationId}"/>&existingUsersOnly=true" ;
+			}
+			document.forms[0].submit();
 		}else{
 			alert(error);
 			return false;
@@ -73,7 +76,7 @@
 		}
 		out.println("</TD><TD align=\"center\">");
 		out.println("<input name=\"updateUser\" type=\"button\" class=\"button\" id=\"updateUser\"");
-		out.println("onClick=\"javascript:document.location='admin.do?method=getUserEdit&userid="+user.getUserId()+"&organisationid="+org.getOrganisationId()+"';\"");
+		out.println("onClick=\"javascript:document.location='admin.do?method=getUserEdit&userid="+user.getUserId()+"&orgId="+org.getOrganisationId()+"';\"");
 		out.println("onMouseOver=\"changeStyle(this,'buttonover')\"");
 		out.println("onMouseOut=\"changeStyle(this,'button')\"");
 		out.println("value=\"Update\" />");
@@ -167,19 +170,19 @@
 	
 			<p>
 				<input name="createUser" type="button" class="extendingButton" id="createUser" 
-					onClick="javascript:document.location='admin.do?method=getUserEdit&organisationid=<c:out value="${organisation.organisationId}"/>';" 		
+					onClick="javascript:document.location='admin.do?method=getUserEdit&orgId=<c:out value="${organisation.organisationId}"/>';" 		
 					onMouseOver="changeStyle(this,'extendingButtonover')"
 					onMouseOut="changeStyle(this,'extendingButton')" 
 					value="Create new user" /></input>
 				&nbsp;			
 				<input name="addUsers" type="button" class="extendingButton" id="addUsers" 
-					onClick="javascript:document.location='admin.do?method=getOrganisationAddUsers&organisationid=<c:out value="${organisation.organisationId}"/>';" 		
+					onClick="javascript:document.location='admin.do?method=getUsersAdd&orgId=<c:out value="${organisation.organisationId}"/>';" 		
 					onMouseOver="changeStyle(this,'extendingButtonover')"
 					onMouseOut="changeStyle(this,'extendingButton')" 
 					value="Add existing user" />
 				&nbsp;			
 				<input name="removeUsers" type="button" class="extendingButton" id="removeUsers" 
-					onClick="javascript:document.location='admin.do?method=getOrganisationRemoveUsers&organisationid=<c:out value="${organisation.organisationId}"/>';" 		
+					onClick="javascript:document.location='admin.do?method=getUsersRemove&orgId=<c:out value="${organisation.organisationId}"/>';" 		
 					onMouseOver="changeStyle(this,'extendingButtonover')"
 					onMouseOut="changeStyle(this,'extendingButton')" 
 					value="Remove Users" />
