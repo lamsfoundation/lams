@@ -33,7 +33,7 @@ public class TestTransitionDAO extends AbstractLamsTestCase{
 		transitionDAO =(TransitionDAO) context.getBean("transitionDAO");		
 	}
 	public void testGetTransitionByToActivityID(){
-		List list = transitionDAO.getTransitionByToActivityID(new Long(18));
+		List list = transitionDAO.getTransitionByToActivityID(new Long(13));
 		transition = (Transition)list.get(0);
 		System.out.println("SIZE: " + list.size());
 		System.out.println(transition.getTitle());

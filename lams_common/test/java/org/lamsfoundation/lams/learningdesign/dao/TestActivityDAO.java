@@ -50,7 +50,7 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 		System.out.print("SIZE:" + list.size());
 	}
 	public void test(){
-		activity = activityDAO.getActivityByActivityId(new Long(18));		
+		activity = activityDAO.getActivityByActivityId(new Long(13));		
 		Transition transition = activity.getTransitionTo();
 		System.out.println("Transition TO:" + transition.getTransitionId());
 		transition = activity.getTransitionFrom();
