@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.tool;
 
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -40,6 +41,8 @@ public abstract class ToolSession implements Serializable {
     private int toolSessionStateId;
     
     private String uniqueKey;
+    
+    private Lesson lesson;
 
     /** full constructor */
     public ToolSession(Long toolSessionId, 
@@ -152,4 +155,10 @@ public abstract class ToolSession implements Serializable {
 	    else
 	        return GROUPED_TYPE;
 	}
+    public Lesson getLesson() {
+        return lesson;
+    }
+    public void setLesson(Lesson lesson) {
+        this.lesson = lesson;
+    }
 }
