@@ -43,8 +43,8 @@ http://www.gnu.org/licenses/gpl.txt
 	</bean>
 	
 
-	<bean id="notebookService" class="org.lamsfoundation.lams.notebook.service.NotebookService" singleton="false">
+	<!-- bean id="notebookService" class="org.lamsfoundation.lams.notebook.service.NotebookService" singleton="false">
 		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO"/></property>
-	</bean>
+	</bean-->
 
 </beans>

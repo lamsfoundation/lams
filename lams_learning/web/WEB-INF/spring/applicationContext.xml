@@ -81,7 +81,7 @@ http://www.gnu.org/licenses/gpl.txt
 				<value>org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>
  				
 				<!-- Notebook related mapping files-->
-				<value>org/lamsfoundation/lams/notebook/NotebookEntry.hbm.xml</value>
+				<!-- value>org/lamsfoundation/lams/notebook/NotebookEntry.hbm.xml</value-->
 				
 			</list>
 		</property>
@@ -201,9 +201,9 @@ http://www.gnu.org/licenses/gpl.txt
 	
 	<!-- notebook package -->
 
-	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
+	<!-- bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
+	</bean-->
 
 
 </beans>
