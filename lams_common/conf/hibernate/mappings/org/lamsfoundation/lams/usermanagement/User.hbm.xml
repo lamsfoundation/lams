@@ -359,7 +359,7 @@
         />
     </set>
     <!-- bi-directional one-to-many association to UserToolSession -->
-    <set
+    <!-- set
         name="userToolSessions"
         lazy="true"
         inverse="true"
@@ -383,9 +383,9 @@
         <one-to-many 
             class="org.lamsfoundation.lams.lesson.UserToolSession"
         />
-    </set>
+    </set-->
     <!-- bi-directional one-to-many association to UserGroup -->
-    <set
+    <!-- set
         name="userGroups"
         lazy="true"
         inverse="true"
@@ -409,7 +409,7 @@
         <one-to-many 
             class="org.lamsfoundation.lams.lesson.UserGroup"
         />
-    </set>
+    </set-->
     <!-- bi-directional one-to-many association to LearningDesign -->
     <set
         name="learningDesigns"
