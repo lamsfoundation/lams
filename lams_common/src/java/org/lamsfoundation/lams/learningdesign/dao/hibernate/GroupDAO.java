@@ -21,8 +21,7 @@ public class GroupDAO extends BaseDAO implements IGroupDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IGroupDAO#getGroupById(java.lang.Long)
 	 */
 	public Group getGroupById(Long groupID) {
-		// TODO Auto-generated method stub
-		return null;
+		return (Group)super.find(Group.class,groupID);
 	}
 
 }
