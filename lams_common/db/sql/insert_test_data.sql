@@ -162,8 +162,8 @@ insert into lams_tool_content (tool_content_id,tool_id) values (20,4);
 insert into lams_tool_content (tool_content_id,tool_id) values (21,4);
 
 --insert a testing grouping
-insert into lams_grouping values(99,99,1,1,10,0,2);
-insert into lams_grouping values(100,100,2,1,10,0,2);		
+insert into lams_grouping values(99,99,1,2,-1,0,-1);
+insert into lams_grouping values(100,100,2,1,-1,0,-1);		
 INSERT INTO lams_grouping values(101, NULL, 3, NULL, NULL, 89, NULL);
 
 insert into lams_group values(87,99,1);
