@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for lams survey business layer.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="learnerService" class="org.lamsfoundation.lams.learning.service.TestLearnerService" singleton="false">
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+	</bean>
+
+
+</beans>

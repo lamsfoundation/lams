@@ -11,11 +11,11 @@
 	  - This means that its beans are automatically available in these child contexts,
 	  - both for getBean(name) calls and (external) bean references.
 		-->
-	<!-- servlet>
+	<servlet>
 		<servlet-name>context</servlet-name>
 		<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
-	</servlet-->
+	</servlet>
 	<servlet>
 	    <servlet-name>action</servlet-name>
 	    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
