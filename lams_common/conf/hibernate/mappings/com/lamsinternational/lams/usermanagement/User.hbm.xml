@@ -323,7 +323,7 @@
     </many-to-one>
     <!-- bi-directional many-to-one association to Organisation -->
     <many-to-one
-        name="lamsOrganisation"
+        name="baseOrganisation"
         class="com.lamsinternational.lams.usermanagement.Organisation"
         not-null="true"
     >
