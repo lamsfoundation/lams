@@ -89,10 +89,8 @@ public class Tool implements Serializable {
     }
 
     /** 
-     *            @hibernate.id
-     *             generator-class="identity"
-     *             type="java.lang.Long"
-     *             column="tool_id"
+     * @hibernate.id generator-class="identity" type="java.lang.Long"
+     *             	 column="tool_id"
      *         
      */
     public Long getToolId() {

@@ -150,9 +150,9 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      * Make a copy of all tools content which belongs to this learning design.
      * 
      * @param toolActivity the tool activity defined in the design.
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#copyToolContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
+     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long copyToolContent(ToolActivity toolActivity)
+    public Long notifyToolToCopyContent(ToolActivity toolActivity)
     {
         Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
         //This is just for testing purpose because surveyService is the only 
