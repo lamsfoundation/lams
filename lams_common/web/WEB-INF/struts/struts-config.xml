@@ -18,6 +18,9 @@
     
     <form-bean name="OrganisationActionForm"
                type="com.lamsinternational.lams.usermanagement.web.OrganisationActionForm" />
+
+    <form-bean name="UserActionForm"
+               type="com.lamsinternational.lams.usermanagement.web.UserActionForm" />
                
                
 	</form-beans>
@@ -62,8 +65,14 @@
     <action path="/admin"
             type="com.lamsinternational.lams.usermanagement.web.AdminAction"
             parameter="method">
+      <forward name="admin"
+               path=".admin">
+      </forward>
       <forward name="organisation"
                path=".admin.organisation">
+      </forward>
+      <forward name="user"
+               path=".admin.user">
       </forward>
       <forward name="error"
                path=".admin.error">
@@ -75,6 +84,20 @@
             name="OrganisationActionForm"
             scope="session"
             input=".admin.organisation"
+            validate="true">
+      <forward name="admin"
+               path=".admin">
+      </forward>
+      <forward name="error"
+               path=".admin.error">
+      </forward>
+	</action>
+
+    <action path="/user"
+            type="com.lamsinternational.lams.usermanagement.web.UserAction"
+            name="UserActionForm"
+            scope="session"
+            input=".admin.user"
             validate="true">
       <forward name="admin"
                path=".admin">

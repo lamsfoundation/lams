@@ -39,7 +39,7 @@
 
 <%!
 	/* Display the user map */
-	public void displayUsers( List users, Organisation org, JspWriter out, HttpServletRequest request)
+	public void displayUsers( List users, Organisation org, JspWriter out, HttpServletRequest request, UserManagementService service)
 	{
 		if ( users == null)
 			return;
@@ -49,7 +49,7 @@
 			while ( iter.hasNext() )
 			{
 				User user = (User) iter.next();
-				displayUser(user, org, out, request);
+				displayUser(user, org, out, request,service);
 			}
 		} catch (IOException e ) {
 			System.err.println("Internal Error: Unable to show user details");
@@ -58,16 +58,12 @@
 	}
 	
 	/* Display the user details, in a single column table row */
-	public void displayUser( User user,Organisation org, JspWriter out, HttpServletRequest request) throws IOException
+	public void displayUser( User user,Organisation org, JspWriter out, HttpServletRequest request,UserManagementService service) throws IOException
 	{
 		out.println("<TR>");
 	
 		out.println("<TD class=\"body\">"+user.getLogin()+": "+user.getFirstName()+" "+user.getLastName());
 		out.println("</TD>");
-		
-		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext()); 
-		UserManagementService service = (UserManagementService)ctx.getBean("userManagementServiceTarget");
-		
 		out.print("<TD class=\"body\">");
 		Iterator iter = service.getRolesForUserByOrganisation(user,org.getOrganisationId()).iterator();
 		while ( iter.hasNext() )
@@ -136,12 +132,11 @@
 			</span>
 			<br><br>
 		
-			<!--Added by Fei Yang on 25/07/04-->
-			<form action="admin.do?method=importFile&organisationid=<c:out value='${organisation.organisationId}'/>" onsubmit="return validateForm()" method="post" ENCTYPE='multipart/form-data' name="form1" id="form1">										
+			<form action="admin.do?method=importUsersFromFile&orgId=<c:out value="${organisation.organisationId}"/>" onsubmit="return validateForm()" method="post" ENCTYPE='multipart/form-data' name="form1" id="form1">										
 				<c:if test="${!empty errormsg}">
-					<p align="center"  class="error"><c:out value="{errormsg}"/></p>
+					<p align="center"  class="error"><c:out value="${errormsg}"/></p>
 				</c:if>	
-				<p align="center" class="body">If you are not sure of the file format, please <a href="..\sysadmin\file\tmpl_sysadmin.xls">download template file</a> </p>										
+				<p align="center" class="body">If you are not sure of the file format, please <a href="..\lams\admin\file\tmpl_admin.xls">download template file</a> </p>										
 				<table width="95" border="0" align="center">
 					<tr>
 						<td class="body"> <span class="bodyBold">Import Users From File:</span><br>
@@ -153,16 +148,22 @@
 					</tr>
 					<tr>
 						<td align="center" valign="top">
-							<input name="createUsers" type="submit" size="100" class="button" id="createUsers" onMouseOver="changeStyle(this,'buttonover')" onMouseOut="changeStyle(this,'button')" value="Create Users">
-							<input name="addUsers" type="submit" class="longButton" id="addUsers" onMouseOver="changeStyle(this,'longButtonover')" onMouseOut="changeStyle(this,'longButton')" value="Add Existing Users">
+							<input name="addUsers" 
+								type="submit" size="100" 
+								class="button" 
+								id="addUsers" 
+								onMouseOver="changeStyle(this,'buttonover')" 
+								onMouseOut="changeStyle(this,'button')" 
+								value="Add Users">
+							<input name="checkbox" 
+								type="checkbox" 
+								value="existing users only"><span class="body">existing users only</span>
 						</td>
 					</tr>
 				</table>
 				<br>
 				<br>
 			</form>
-			<!--Added by Fei Yang on 25/07/04-->
-	
 	
 			<p>
 				<input name="createUser" type="button" class="extendingButton" id="createUser" 
@@ -186,9 +187,6 @@
 				
 			<p class="body"></p>
 		
-			<jsp:useBean id="organisation" type="Organisation" scope="session"/>
-			<jsp:useBean id="users" type="List" scope="session"/>
-		
 			<table width="95%" border="0" align="center" class="lightTableBorders">
 				<tr bgcolor="#333366">
 					<td height="24" colspan="2" class="subHeader"><font color="#FFFFFF">Users</td>
@@ -203,7 +201,14 @@
 					<!-- Comment out temporarily for beta 6 release -->
 					<!-- <td width="8%">&nbsp;</td> -->
 				</tr>
-				<% displayUsers(users, organisation, out, request); %>
+
+				<jsp:useBean id="organisation" type="Organisation" scope="request"/>
+				<%
+				WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext()); 
+				UserManagementService service = (UserManagementService)ctx.getBean("userManagementServiceTarget");
+				List users = service.getUsersFromOrganisation(organisation.getOrganisationId()); 
+				displayUsers(users, organisation, out, request,service); 
+				%>
 			</table>
 		
 			<br><br>
