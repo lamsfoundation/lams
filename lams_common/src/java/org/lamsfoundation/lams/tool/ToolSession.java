@@ -14,7 +14,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *         table="lams_tool_session"
  *     
 */
-public class ToolSession implements Serializable {
+public abstract class ToolSession implements Serializable {
+    
+    /** Tool session type id for grouped */
+    public static final int GROUPED_TYPE = 1;
+    /** Tool session type id for non-grouped */
+    public static final int NON_GROUPED_TYPE = 2;
 
     /** identifier field */
     private Long toolSessionId;
@@ -29,13 +34,9 @@ public class ToolSession implements Serializable {
     private Date createDateTime;
 
     /** persistent field */
-    private Group group;
-
-    /** persistent field */
     private org.lamsfoundation.lams.tool.ToolSessionState toolSessionState;
-
-    /** persistent field */
-    private Set userToolSessions;
+    
+    private int toolSessionTypeId;
 
     /** full constructor */
     public ToolSession(Long toolSessionId, long activityId, long toolSessionKey, Date createDateTime, Group group, org.lamsfoundation.lams.tool.ToolSessionState toolSessionState, Set userToolSessions) {
@@ -43,9 +44,7 @@ public class ToolSession implements Serializable {
         this.activityId = activityId;
         this.toolSessionKey = toolSessionKey;
         this.createDateTime = createDateTime;
-        this.group = group;
         this.toolSessionState = toolSessionState;
-        this.userToolSessions = userToolSessions;
     }
 
     /** default constructor */
@@ -115,20 +114,6 @@ public class ToolSession implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
-     *            @hibernate.column name="group_id"         
-     *         
-     */
-    public Group getGroup() {
-        return this.group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
      *            @hibernate.column name="tool_session_state_id"         
      *         
      */
@@ -138,25 +123,6 @@ public class ToolSession implements Serializable {
 
     public void setToolSessionState(org.lamsfoundation.lams.tool.ToolSessionState toolSessionState) {
         this.toolSessionState = toolSessionState;
-    }
-
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="tool_session_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.lesson.UserToolSession"
-     *         
-     */
-    public Set getUserToolSessions() {
-        return this.userToolSessions;
-    }
-
-    public void setUserToolSessions(Set userToolSessions) {
-        this.userToolSessions = userToolSessions;
     }
 
     public String toString() {
@@ -180,4 +146,10 @@ public class ToolSession implements Serializable {
             .toHashCode();
     }
 
+	public int getToolSessionTypeId() {
+		return toolSessionTypeId;
+	}
+	public void setToolSessionTypeId(int toolSessionTypeId) {
+		this.toolSessionTypeId = toolSessionTypeId;
+	}
 }
