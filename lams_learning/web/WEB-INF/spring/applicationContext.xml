@@ -22,16 +22,6 @@
 
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
-  
-	<!-- Local DataSource that works in any environment -->
-	<!--bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
-		<property name="url"><value>jdbc:mysql://localhost/lams11</value></property>
-		<property name="username"><value>lams</value></property>
-		<property name="password"><value>lamsdemo</value></property>
-	</bean-->
-
-
 
 	<!-- Hibernate SessionFactory -->
 	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
@@ -57,12 +47,13 @@
 				<value>org/lamsfoundation/lams/learningdesign/LearningDesign.hbm.xml</value>
 				<value>org/lamsfoundation/lams/learningdesign/LearningLibrary.hbm.xml</value>	
 				<value>org/lamsfoundation/lams/learningdesign/Transition.hbm.xml</value>	
+				<value>org/lamsfoundation/lams/learningdesign/License.hbm.xml</value>	
 				
 				
 				<!-- lesson related mapping files-->
 				<value>org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
 				<value>org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
-				
+ 				
 				<!-- Tool related mapping files-->
 				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
@@ -182,5 +173,6 @@
 	<bean id="toolSessionDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
+
 
 </beans>
