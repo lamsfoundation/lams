@@ -25,7 +25,7 @@
 		<!-- Associations -->
 
 		<!-- uni-directional one-to-many association to attempted acitivities -->
-		<set name="attemptedActivities" lazy="true"
+		<set name="attemptedActivities" lazy="true" batch-size="20"
 			cascade="none" table="lams_progress_attempted">
 			<key>
 				<column name="learner_progress_id" />
@@ -35,7 +35,7 @@
 		</set>
 
 		<!-- uni-directional one-to-many association to completed activities -->
-		<set name="completedActivities" lazy="true"
+		<set name="completedActivities" lazy="true" batch-size="20"
 			cascade="none" table="lams_progress_completed">
 			<key>
 				<column name="learner_progress_id" />
