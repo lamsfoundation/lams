@@ -234,6 +234,7 @@ CREATE TABLE lams_learning_design (
      , license_text TEXT
      , lesson_org_id BIGINT(20)
      , lesson_org_name VARCHAR(255)
+     , lesson_name VARCHAR(255)
      , lesson_id BIGINT(20)
      , lesson_start_date_time DATETIME
      , PRIMARY KEY (learning_design_id)
