@@ -113,30 +113,36 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
       this.gateStartTimeOffset = gateStartTimeOffset;
       this.gateEndTimeOffset = gateEndTimeOffset;
     }
+    /**
+     * Makes a copy of the ScheduleGateActivity for authoring, preview and monitoring enviornment 
+     * 
+     * @param originalActivity The activity that needs to be deep-copied
+     * @return ScheduleGateActivity Returns a deep-copy of the originalActivity
+     */
     public static ScheduleGateActivity createCopy(ScheduleGateActivity originalActivity){
     	ScheduleGateActivity newScheduleGateActivity = new ScheduleGateActivity();
     	
+    	newScheduleGateActivity.setGateActivityLevelId(originalActivity.getGateActivityLevelId());
+    	newScheduleGateActivity.setGateOpen(new Boolean(false));
+    	
     	newScheduleGateActivity.setGateEndTimeOffset(originalActivity.getGateEndTimeOffset());
     	newScheduleGateActivity.setGateStartTimeOffset(originalActivity.getGateStartTimeOffset());
-    	
+    	newScheduleGateActivity.setGateEndDateTime(originalActivity.getGateEndDateTime());
+		newScheduleGateActivity.setGateStartDateTime(originalActivity.getGateStartDateTime());
+		
     	newScheduleGateActivity.setActivityUIID(originalActivity.getActivityUIID());
     	newScheduleGateActivity.setDescription(originalActivity.getDescription());
     	newScheduleGateActivity.setTitle(originalActivity.getTitle());
+    	newScheduleGateActivity.setHelpText(originalActivity.getHelpText());
     	newScheduleGateActivity.setXcoord(originalActivity.getXcoord());
     	newScheduleGateActivity.setYcoord(originalActivity.getYcoord());
+    	newScheduleGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newScheduleGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());    	
     	newScheduleGateActivity.setDefineLater(originalActivity.getDefineLater());
     	newScheduleGateActivity.setCreateDateTime(new Date());
-    	newScheduleGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newScheduleGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());
-    	newScheduleGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
-    	newScheduleGateActivity.setGateActivityLevelId(originalActivity.getGateActivityLevelId());
-    	
-    	
-    	/**
-    	 * TODO calculate how these two values would be set for COPY 
-    	 * */
-    	//newScheduleGateActivity.setTransitionTo();
-    	//newScheduleGateActivity.setTransitionFrom();
+    	newScheduleGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());    	
+    	newScheduleGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
+    	newScheduleGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
     	
     	return newScheduleGateActivity;
     }

@@ -95,6 +95,9 @@ public class PermissionGateActivity extends GateActivity implements Serializable
     public static PermissionGateActivity createCopy(PermissionGateActivity originalActivity){
     	PermissionGateActivity newPermissionGateActivity = new PermissionGateActivity();
     	
+    	newPermissionGateActivity.setGateOpen(new Boolean(false));
+    	newPermissionGateActivity.setGateActivityLevelId(originalActivity.getGateActivityLevelId());
+    	
     	newPermissionGateActivity.setActivityUIID(originalActivity.getActivityUIID());
     	newPermissionGateActivity.setDescription(originalActivity.getDescription());
     	newPermissionGateActivity.setTitle(originalActivity.getTitle());
