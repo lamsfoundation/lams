@@ -37,7 +37,8 @@
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
 		<property name="dataSource"><ref local="dataSource"/></property>
 		<property name="mappingResources">
-			<list>	
+			<list>
+				<!-- usermanagement related mapping files -->	
 				<value>com/lamsinternational/lams/usermanagement/AuthenticationMethod.hbm.xml</value>
 				<value>com/lamsinternational/lams/usermanagement/AuthenticationMethodType.hbm.xml</value>
 				<value>com/lamsinternational/lams/usermanagement/Organisation.hbm.xml</value>
@@ -48,6 +49,34 @@
 				<value>com/lamsinternational/lams/usermanagement/UserOrganisationRole.hbm.xml</value>
 				<value>com/lamsinternational/lams/usermanagement/Workspace.hbm.xml</value>
 				<value>com/lamsinternational/lams/usermanagement/WorkspaceFolder.hbm.xml</value>
+				
+				<!-- learning design related mapping files -->
+				<value>com/lamsinternational/lams/learningdesign/Activity.hbm.xml</value>
+				<value>com/lamsinternational/lams/learningdesign/ActivityType.hbm.xml</value>				
+				<value>com/lamsinternational/lams/learningdesign/Group.hbm.xml</value>				
+				<value>com/lamsinternational/lams/learningdesign/Grouping.hbm.xml</value>
+				<value>com/lamsinternational/lams/learningdesign/GroupingType.hbm.xml</value>
+				<value>com/lamsinternational/lams/learningdesign/GateActivityLevel.hbm.xml</value>
+				<value>com/lamsinternational/lams/learningdesign/LearningDesign.hbm.xml</value>
+				<value>com/lamsinternational/lams/learningdesign/LearningLibrary.hbm.xml</value>	
+				<value>com/lamsinternational/lams/learningdesign/Transition.hbm.xml</value>	
+				
+				
+				<!-- lesson related mapping files-->
+				<value>com/lamsinternational/lams/lesson/LearnerProgress.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/Lesson.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/LessonLearner.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/LessonState.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/ProgressCompleted.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/ProgressCurrent.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/UserGroup.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/UserToolSession.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/UserToolSessionState.hbm.xml</value>
+				
+				<!-- Tool related mapping files-->
+				<value>com/lamsinternational/lams/tool/Tool.hbm.xml</value>
+				<value>com/lamsinternational/lams/tool/ToolSession.hbm.xml</value>
+				<value>com/lamsinternational/lams/tool/ToolSessionState.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -72,17 +101,15 @@
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
 
 	<!-- LAMS primary business object: Hibernate implementation -->
-	<!-- 
-	<bean id="userManagementServiceTarget" class="com.lamsinternational.lams.usermanagement.service.UserManagementServiceImpl"
+	<bean id="userManagementServiceTarget" class="com.lamsinternational.lams.usermanagement.service.UserManagementService"
 		singleton="false"
 	>
 		<property name="userDAO"><ref local="userDAO"/></property>
 		<property name="organisationDAO"><ref local="organisationDAO"/></property>
+		<property name="userOrganisationDAO"><ref local="userOrganisationDAO"/></property>
 	</bean>	
-	-->
 	
 	<!-- Transactional proxy for the user management primary business object -->
-	<!-- 
 	<bean id="userManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref local="transactionManager"/></property>
 		<property name="target"><ref local="userManagementServiceTarget"/></property>
@@ -93,7 +120,6 @@
 			</props>
 		</property>
 	</bean>
-	-->
 	
 	<bean id="userDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
@@ -104,6 +130,10 @@
 	</bean>
 	
 	<bean id="organisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>
+
+	<bean id="userOrganisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
 	</bean>
 

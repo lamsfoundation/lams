@@ -159,7 +159,7 @@ Ant build file.
 	</target>
 
 	<target name="compile" depends="clean" description="compile java sources">
-		<javac srcdir="${src.java}"
+		<javac srcdir="${src.java}" compiler="javac1.5"
 	         	 	destdir="${build.classes}" deprecation="on" debug="on">
 			<classpath>
 				<path refid="project.classpath"/>
@@ -180,9 +180,9 @@ Ant build file.
 		</jar>
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - - - - - - - -  -->
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<!-- Creates the war archive                          -->
-	<!-- - - - - - - - - - - - - - - - - - - - - - - - -  -->
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<target name="lams-war" depends="lams-jar" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
 		<war warfile="${build.lib}/${product}.war" 
@@ -192,6 +192,7 @@ Ant build file.
 				<include name="*.properties"/>
 				<include name="struts/*"/>
 				<include name="jstl/*"/>
+				<exclude name="web.xml"/>
 			</webinf>
 			<lib dir="${build.lib}">
 				<include name="${product}.jar"/>
@@ -203,18 +204,11 @@ Ant build file.
 		</war>
 	</target>
 
-	<target name="deploy-lams" depends="lams-jar,lams-war">
-		<copy file="${build.lib}/${product}.jar"
-				todir="${jboss-home}/server/default/deploy"/>
-		<copy file="${build.lib}/${product}.war"
-				todir="${jboss-home}/server/default/deploy"/>
-	</target>
-
 	<!-- =================================================================== -->
 	<!-- copy jar files and cofiguration files                               -->
 	<!-- =================================================================== -->
-	<target name="copyfiles" depends="" description="copy lib and config files">
-		<copy overwrite="yes" todir="${jboss-home}/server/default/lib/">
+	<target name="copyfiles" description="copy lib and config files">
+		<copy overwrite="yes" todir="${jboss.home}/server/default/lib/">
 			<fileset dir="${lib}/cglib/">
 				<include name="*.jar"/>
 			</fileset>
@@ -245,18 +239,37 @@ Ant build file.
 			<fileset dir="${lib}/struts/">
 				<include name="*.jar"/>
 			</fileset>
+			<fileset dir="${lib}/aopalliance/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/jakarta-taglibs/">
+				<include name="*.jar"/>
+			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${jboss-home}/server/default/conf/">
+		<copy overwrite="yes" todir="${jboss.home}/server/default/conf/">
 			<fileset dir="${conf.jboss}/">
 				<include name="login-config.xml"/>
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${jboss-home}/server/default/deploy/">
+		<copy overwrite="yes" todir="${jboss.deploy}">
 			<fileset dir="${conf.jboss}/service">
 				<include name="mysql*.xml"/>
 			</fileset>
 		</copy>
+	</target>
 
+	<!-- =================================================================== -->
+	<!-- deploy the project                                                  -->
+	<!-- =================================================================== -->
+	<target name="deploy-lams" depends="lams-jar,lams-war,copyfiles">
+		<delete quiet="true">
+			<fileset dir="${jboss.deploy}/tmp"/>
+			<fileset dir="${jboss.deploy}/work"/>
+		</delete>
+		<copy file="${build.lib}/${product}.jar"
+				todir="${jboss.deploy}"/>
+		<copy file="${build.lib}/${product}.war"
+				todir="${jboss.deploy}"/>
 	</target>
 
 </project>
