@@ -23,8 +23,6 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import javax.servlet.http.*;
 
-import java.util.*;
-
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
@@ -105,7 +103,7 @@ public class ActivityAction extends LamsAction {
 		{
 			Long activityId = form.getActivityId();
 			if (activityId != null) 
-				activity = getActivity(activityId.longValue(), learnerProgress);
+			    activity = getLearnerService().getActivity(activityId);
 		}
 		return activity;
 	}
@@ -122,22 +120,6 @@ public class ActivityAction extends LamsAction {
 	}
 	
 	
-	/** TODO: replace method
-	 * A quick method to get an activity from within a progress. This method is
-	 * temporary.
-	 */
-	private Activity getActivity(long activityId, LearnerProgress progress) {
-		Set activities = progress.getLesson().getLearningDesign().getActivities();
-		Iterator i = activities.iterator();
-		while (i.hasNext()) {
-			Activity activity = (Activity)i.next();
-			if (activity.getActivityId().longValue() == activityId) {
-				return activity;
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Gets the session bean from session.
 	 * @return SessionBean for this request, null if no session.
