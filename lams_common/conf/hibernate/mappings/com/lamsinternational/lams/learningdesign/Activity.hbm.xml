@@ -11,7 +11,7 @@
     http://www.hibernate.org/
 -->
 
-<class name="com.lamsinternational.lams.learningdesign.Activity" table="lams_learning_activity">
+<class name="com.lamsinternational.lams.learningdesign.Activity" table="lams_learning_activity" discriminator-value="0">
     <meta attribute="class-description" inherit="false">@hibernate.class table="lams_learning_activity"</meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -137,17 +137,10 @@
 			<subclass name="com.lamsinternational.lams.learningdesign.GroupingActivity">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 				
-				 <!-- bi-directional many-to-one association to Grouping -->
+				 <!-- bi-directional many-to-one association to Grouping >
                   <many-to-one name="createGrouping" class="com.lamsinternational.lams.learningdesign.Grouping" not-null="true">
-                  	<column name="create_grouping_id" />
-                  </many-to-one>					
-                  
-				<subclass name="com.lamsinternational.lams.learningdesign.ChosenGroupingActivity" discriminator-value="3">
-					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
-				</subclass>
-				<subclass name="com.lamsinternational.lams.learningdesign.RandomGroupingActivity" discriminator-value="2">
-					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
-				</subclass>				
+                  	<column name="grouping_id" />
+                  </many-to-one-->					                  
 			</subclass>
 			<subclass name="com.lamsinternational.lams.learningdesign.GateActivity">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
@@ -175,14 +168,18 @@
 	<subclass name="com.lamsinternational.lams.learningdesign.ComplexActivity">
 		<meta attribute="class-description" inherit="false">@hibernate.class </meta>			
 	    <meta attribute="scope-class" inherit="false">public abstract</meta>
+	    
 	    <!-- bi-directional one-to-many association to Activity -->
-        <list name="activities" lazy="true" inverse="true" cascade="none" >
-        	<index column="order_id"/>                                  
+	    <set name="activities" lazy="true" inverse="true" cascade="none" >
+    		<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="none"
+    										@hibernate.collection-key column="parent_activity_id" 
+    										@hibernate.collection-one-to-many class="com.lamsinternational.lams.learningdesign.Activity"
+			</meta>    										
             <key><column name="parent_activity_id" /></key>
             <one-to-many class="com.lamsinternational.lams.learningdesign.Activity"/>
-        </list>
+		</set>
 		
-			<subclass name="com.lamsinternational.lams.learningdesign.OptionsActivity" discriminator-value="8">
+         <subclass name="com.lamsinternational.lams.learningdesign.OptionsActivity" discriminator-value="8">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 				<property name="maxNumberOfOptions" type="java.lang.Integer" column="max_number_of_options" length="5">
 					<meta attribute="field-description">@hibernate.property column="max_number_of_options" length="5"</meta>    

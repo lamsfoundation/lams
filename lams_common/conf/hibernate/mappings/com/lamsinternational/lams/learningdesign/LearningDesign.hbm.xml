@@ -49,15 +49,7 @@
         column="title"
         length="255"
     >
-    </property>
-    <property
-        name="firstActivityId"
-        type="java.lang.Long"
-        column="first_activity_id"
-        length="20"
-    >
-         
-    </property>
+    </property>    
     <property
         name="maxId"
         type="java.lang.Integer"
@@ -173,9 +165,29 @@
     >
         
     </property>
+    
+    
 
     <!-- Associations -->
-  
+    
+    <!-- bi-directional many-to-one association to Activity-->    
+    
+    <many-to-one name="firstActivity" class="com.lamsinternational.lams.learningdesign.Activity" not-null="true">
+        <meta attribute="field-description">@hibernate.many-to-one not-null="true"
+        						            @hibernate.column name="first_activity_id"         
+      	</meta>
+        <column name="first_activity_id" />
+    </many-to-one>
+    
+    <!-- bi-directional many-to-one association to LearningDesign -->
+    
+    <many-to-one name="parentLearningDesign" class="com.lamsinternational.lams.learningdesign.LearningDesign" not-null="true">
+        <meta attribute="field-description">@hibernate.many-to-one not-null="true"
+        						            @hibernate.column name="parent_learning_design_id"         
+      	</meta>
+        <column name="parent_learning_design_id" />
+    </many-to-one>
+    			 
     <!-- bi-directional many-to-one association to User -->
     <many-to-one
         name="user"
@@ -198,14 +210,6 @@
             class="com.lamsinternational.lams.learningdesign.LearningDesign"
         />
     </set>
-    <!-- bi-directional many-to-one association to LearningDesign -->
-    <many-to-one
-        name="parentLearningDesign"
-        class="com.lamsinternational.lams.learningdesign.LearningDesign"
-
-    >
-        <column name="parent_learning_design_id" />
-    </many-to-one>
     <!-- bi-directional one-to-many association to Lesson -->
     <set
         name="lessons"
@@ -224,7 +228,7 @@
     <!-- bi-directional one-to-many association to Transition -->
     <set
         name="transitions"
-        lazy="true"
+        lazy="false"
         inverse="true"
 		cascade="none"
     >
@@ -237,23 +241,10 @@
         />
     </set>
     <!-- bi-directional one-to-many association to Activity -->
-    <list
-        name="activities"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-       
-        <key>
-            <column name="learning_design_id" />
-        </key>
-        <one-to-many 
-            class="com.lamsinternational.lams.learningdesign.Activity"
-        />
-        <index
-            column="order_id"                                     
-        />
-    </list>
+    <set name="activities" lazy="false" inverse="true" cascade="none">
+       	<key><column name="learning_design_id" /></key>
+        <one-to-many class="com.lamsinternational.lams.learningdesign.Activity"/>
+    </set>
 
 </class>
 </hibernate-mapping>

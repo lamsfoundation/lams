@@ -38,60 +38,7 @@
     </id>
 
 
-    <!-- Associations -->
-  
-    <!-- bi-directional one-to-many association to ProgressCurrent -->
-    <set
-        name="progressCurrents"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="learner_progress_id"
-
-           @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.lesson.ProgressCurrent"
-        </meta>
-        <key>
-            <column name="learner_progress_id" />
-        </key>
-        <one-to-many 
-            class="com.lamsinternational.lams.lesson.ProgressCurrent"
-        />
-    </set>
-    <!-- bi-directional one-to-many association to ProgressCompleted -->
-    <set
-        name="progressCompleteds"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="learner_progress_id"
-
-           @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.lesson.ProgressCompleted"
-        </meta>
-        <key>
-            <column name="learner_progress_id" />
-        </key>
-        <one-to-many 
-            class="com.lamsinternational.lams.lesson.ProgressCompleted"
-        />
-    </set>
+    <!-- Associations -->  
     <!-- bi-directional many-to-one association to User -->
     <many-to-one
         name="user"

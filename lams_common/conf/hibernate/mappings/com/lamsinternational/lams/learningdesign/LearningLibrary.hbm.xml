@@ -56,9 +56,9 @@
     <!-- Associations -->
   
     <!-- bi-directional one-to-many association to Activity -->
-    <list
+    <set
         name="activities"
-        lazy="true"
+        lazy="false"
         inverse="true"
 		cascade="none"
     >
@@ -69,8 +69,7 @@
         <one-to-many 
             class="com.lamsinternational.lams.learningdesign.Activity"
         />
-        <index column="order_id"/>
-    </list>
+    </set>
 
 </class>
 </hibernate-mapping>

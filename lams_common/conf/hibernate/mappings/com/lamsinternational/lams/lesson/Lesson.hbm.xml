@@ -4,21 +4,13 @@
     "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
     
 <hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
 
 <class 
     name="com.lamsinternational.lams.lesson.Lesson" 
     table="lams_lesson"
 >
-    <meta attribute="class-description" inherit="false">
-       @hibernate.class
-        table="lams_lesson"
-    </meta>
+
     <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
@@ -26,14 +18,7 @@
         type="java.lang.Long"
         column="lesson_id"
     >
-        <meta attribute="field-description">
-           @hibernate.id
-            generator-class="identity"
-            type="java.lang.Long"
-            column="lesson_id"
 
-
-        </meta>
         <generator class="identity" />
     </id>
 
@@ -44,12 +29,7 @@
         not-null="true"
         length="19"
     >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="create_date_time"
-            length="19"
-            not-null="true"
-        </meta>    
+   
     </property>
     <property
         name="startDateTime"
@@ -57,11 +37,7 @@
         column="start_date_time"
         length="19"
     >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="start_date_time"
-            length="19"
-        </meta>    
+  
     </property>
     <property
         name="endDateTime"
@@ -69,52 +45,53 @@
         column="end_date_time"
         length="19"
     >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="end_date_time"
-            length="19"
-        </meta>    
+   
+    </property>
+    
+    <property
+        name="lessonStateId"
+        type="java.lang.Integer"
+        column="lesson_state_id"
+        length="3"
+    >
+   
     </property>
 
     <!-- Associations -->
-  
+    <!-- bi-directional many-to-many association to User as learners -->
+    <set
+        name="learners"
+        lazy="true"
+        inverse="true"
+        cascade="none"
+        table="lams_lesson_learner"
+    >
+        <key>
+            <column name="lesson_id" />
+        </key>
+        <many-to-many 
+            column="user_id"
+            class="com.lamsinternational.lams.usermanagement.User"
+        />
+    </set>
+    
+    
     <!-- bi-directional many-to-one association to User -->
     <many-to-one
         name="user"
         class="com.lamsinternational.lams.usermanagement.User"
         not-null="true"
     >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="user_id"         
-        </meta>
         <column name="user_id" />
     </many-to-one>
-    <!-- bi-directional many-to-one association to LessonState -->
-    <many-to-one
-        name="lessonState"
-        class="com.lamsinternational.lams.lesson.LessonState"
-        not-null="true"
-    >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="lams_lesson_state_id"         
-        </meta>
-        <column name="lams_lesson_state_id" />
-    </many-to-one>
+   
     <!-- bi-directional many-to-one association to LearningDesign -->
     <many-to-one
         name="learningDesign"
         class="com.lamsinternational.lams.learningdesign.LearningDesign"
         not-null="true"
     >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="learning_design_id"         
-        </meta>
+
         <column name="learning_design_id" />
     </many-to-one>
     <!-- bi-directional one-to-many association to LearnerProgress -->
@@ -124,18 +101,7 @@
         inverse="true"
 		cascade="none"
     >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
 
-           @hibernate.collection-key
-            column="lesson_id"
-
-           @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.lesson.LearnerProgress"
-        </meta>
         <key>
             <column name="lesson_id" />
         </key>
@@ -143,17 +109,13 @@
             class="com.lamsinternational.lams.lesson.LearnerProgress"
         />
     </set>
-    <!-- bi-directional many-to-one association to Grouping -->
+    <!-- bi-directional many-to-one association to LessonClass -->
     <many-to-one
-        name="grouping"
-        class="com.lamsinternational.lams.learningdesign.Grouping"
+        name="lessonClass"
+        class="com.lamsinternational.lams.lesson.LessonClass"
         not-null="true"
     >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="class_grouping_id"         
-        </meta>
+
         <column name="class_grouping_id" />
     </many-to-one>
     <!-- bi-directional many-to-one association to Organisation -->
@@ -162,11 +124,7 @@
         class="com.lamsinternational.lams.usermanagement.Organisation"
         not-null="true"
     >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="organisation_id"         
-        </meta>
+
         <column name="organisation_id" />
     </many-to-one>
 

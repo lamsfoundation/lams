@@ -9,8 +9,8 @@
 <class 
     name="com.lamsinternational.lams.learningdesign.Grouping" 
     table="lams_grouping"
+    discriminator-value="0"
 >
-    <discriminator column="grouping_type_id" type="int"/>
     <id
         name="groupingId"
         type="java.lang.Long"
@@ -18,27 +18,21 @@
     >
         <generator class="identity" />
     </id>
+    
+    <discriminator column="grouping_type_id" type="int"/>
 
     <property name="maxNumberOfGroups" type="java.lang.Integer" column="max_number_of_groups" length="3"/>
 
     <!-- Associations -->
-
-    <list
-        name="groups"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <key>
-            <column name="grouping_id" />
-        </key>
-        <one-to-many 
-            class="com.lamsinternational.lams.learningdesign.Group"
-        />
-        <index
-            column="order_id"                                     
-        />
-    </list>
+    <!-- bi-directional one-to-many association to Group -->
+    <set name="groups" lazy="true" inverse="true" cascade="none">
+    	<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="none"
+    										@hibernate.collection-key column="grouping_id" 
+    										@hibernate.collection-one-to-many class="com.lamsinternational.lams.learningdesign.Group"
+    	</meta>
+        <key><column name="grouping_id" /></key>
+        <one-to-many class="com.lamsinternational.lams.learningdesign.Group"/>        
+    </set>
    
     <!-- bi-directional one-to-many association to Activity -->
     <set

@@ -12,7 +12,7 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.learningdesign.ToolContent" 
+    name="com.lamsinternational.lams.tool.ToolContent" 
     table="lams_tool_content"
 >
     <meta attribute="class-description" inherit="false">
