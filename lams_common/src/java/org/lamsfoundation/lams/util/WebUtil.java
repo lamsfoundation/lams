@@ -22,12 +22,15 @@ public class WebUtil
     public static final String PARAM_MODE = "mode";
     public static final String PARAM_SESSION_STATUS = "sessionStatus";
     public static final String PARAM_CONTENT_ID = "content_id";
+    public static final String PARAM_USER_ID = "user_id";
+    public static final String PARAM_LESSON_ID = "lesson_id";
     
     public static final String ATTR_MODE = "mode";
     public static final String ATTR_USERNAME = "username";
     public static final String ATTR_UPDATE_PROGRESS_BAR = "updateProgressBar";
     public static final String ATTR_SESSION_STATUS = "sessionStatus";
     public static final String ATTR_LESSON_ID = "lesson_id";
+
     
 	private static Logger log = Logger.getLogger(WebUtil.class);
 
@@ -330,7 +333,7 @@ public class WebUtil
     public static String getStrutsForwardNameFromPath(String path)
     {
         String pathWithoutSlash = StringUtils.substringAfter(path,"/");
-        String orginalForwardName = StringUtils.chomp(pathWithoutSlash,".do");
+        String orginalForwardName = StringUtils.substringBeforeLast(pathWithoutSlash,".do");
         
         return StringUtils.uncapitalize(orginalForwardName);
         
