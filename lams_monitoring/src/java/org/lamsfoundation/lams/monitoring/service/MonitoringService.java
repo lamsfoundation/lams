@@ -111,7 +111,9 @@ public class MonitoringService implements IMonitoringService
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLesson(long, org.lamsfoundation.lams.usermanagement.User, java.util.List, java.util.List)
      */
-    public Lesson createLesson(long learningDesignId,
+    public Lesson createLesson(String lessonName,
+                               String lessonDescription,
+                               long learningDesignId,
                                User user,
                                Organisation organisation,
                                List organizationUsers,
@@ -136,7 +138,9 @@ public class MonitoringService implements IMonitoringService
         }
         authoringService.updateLearningDesign(copiedLearningDesign);
         //create the new lesson
-        return createNewLesson(user,
+        return createNewLesson(lessonName,
+                               lessonDescription,
+                               user,
                                organisation,
                                organizationUsers,
                                staffs,
@@ -195,7 +199,9 @@ public class MonitoringService implements IMonitoringService
      * @param copiedLearningDesign the new run-time learning design copy 
      * 							   for this lesson.
      */
-    private Lesson createNewLesson(User user,
+    private Lesson createNewLesson(String lessonName,
+                                   String lessonDescription,
+                                   User user,
                                    Organisation organisation,
                                    List organizationUsers,
                                    List staffs,
@@ -215,7 +221,9 @@ public class MonitoringService implements IMonitoringService
         lessonClassDAO.updateLessonClass(newLessonClass);
 
         //create new Lesson object
-        Lesson newLesson = Lesson.createNewLesson(user,
+        Lesson newLesson = Lesson.createNewLesson(lessonName,
+                                                  lessonDescription,
+                                                  user,
                                                   organisation,
                                                   copiedLearningDesign,
                                                   newLessonClass);

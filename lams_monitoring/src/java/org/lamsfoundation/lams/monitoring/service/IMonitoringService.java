@@ -40,13 +40,15 @@ public interface IMonitoringService
      * notify lams which learning design it belongs to and who will be 
      * involved in this lesson.
      * 
+     * @param lessonName the name of the lesson
+     * @param lessonDescription the description of the lesson.
      * @param learningDesignId the selected learning design
      * @param user user the user who want to create this lesson.
      * @param organisation  the organization this lesson belongs to.
      * @param organizationUsers a list of learner will be in this new lessons.
      * @param staffs a list of staffs who will be in charge of this lesson.
      */
-    public Lesson createLesson(long learningDesignId,User user,Organisation organisation,List organizationUsers,List staffs);;
+    public Lesson createLesson(String lessonName, String lessonDescription,long learningDesignId,User user,Organisation organisation,List organizationUsers,List staffs);;
     
     /**
      * Start the specified the lesson. It must be created before calling this

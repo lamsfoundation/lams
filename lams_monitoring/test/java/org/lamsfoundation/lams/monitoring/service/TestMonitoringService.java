@@ -116,7 +116,9 @@ public class TestMonitoringService extends AbstractLamsTestCase
         LinkedList staffs = new LinkedList();
         staffs.add(testStaff);
         
-        Lesson testLesson = monitoringService.createLesson(TEST_LEARNING_DESIGN_ID,
+        Lesson testLesson = monitoringService.createLesson("Test_Lesson",
+                                                           "Test_Description",
+                                                           TEST_LEARNING_DESIGN_ID,
                                                            testUser,
                                                            testOrganisation,
                                                            learners,
