@@ -79,7 +79,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     private static final long TEST_SR_ACTIVITY_ID = 33;
     private static final long TEST_SQNA_ACTIVITY_ID = 34;
     private static final String HOST="http://localhost:8080/lams_learning/";
-    private static final String LOAD_TOOL_URL="/DisplayLoadToolActivity.do";
+    private static final String LOAD_TOOL_URL="/LoadToolActivity.do";
     private static final String PARAM_ACTIVITY_ID="?activityId=";
     /*
      * @see TestCase#setUp()

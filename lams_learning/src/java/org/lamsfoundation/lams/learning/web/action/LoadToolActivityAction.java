@@ -40,13 +40,13 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
  * 
  * XDoclet definition:
  * 
- * @struts:action path="/DisplayLoadToolActivity" name="activityForm"
+ * @struts:action path="/LoadToolActivity" name="activityForm"
  *                validate="false" scope="request"
  * 
  * @struts:action-forward name="displayTool" path=".loadToolActivity"
  * 
  */
-public class DisplayLoadToolActivity extends ActivityAction {
+public class LoadToolActivityAction extends ActivityAction {
 
 	/**
 	 * Gets an activity from the request (attribute) and forwards onto a

@@ -23,31 +23,36 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import javax.servlet.http.*;
 
+import java.util.*;
+
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.ParallelActivityMappingStrategy;
 
 /** 
- * Action class to forward the user to a Tool.
- * 
- * @author daveg
+ * Action class to display a ParallelActivity.
  * 
  * XDoclet definition:
  * 
- * @struts:action path="/DisplayToolActivity" name="activityForm"
+ * @struts:action path="/DisplayParallelActivity" name="activityForm"
  *                validate="false" scope="request"
  * 
+ * @struts:action-forward name="displayParallel" path=".parallelActivity"
+ * 
  */
-public class DisplayToolActivity extends ActivityAction {
+public class DisplayParallelActivityAction extends ActivityAction {
+	
 
 	/**
-	 * Gets a tool activity from the request (attribute) and uses a redirect
-	 * to forward the user to the tool.
+	 * Gets a parallel activity from the request (attribute) and forwards to
+	 * the display JSP.
 	 */
 	public ActionForward execute(
 			ActionMapping mapping,
@@ -56,24 +61,37 @@ public class DisplayToolActivity extends ActivityAction {
 			HttpServletResponse response) {
 		ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
+		actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request, form);
 		Activity activity = getActivity(request, form, learnerProgress);
-		if (!(activity instanceof ToolActivity)) {
-		    log.error(className+": activity not ToolActivity");
+		if (!(activity instanceof ParallelActivity)) {
+		    log.error(className+": activity not ParallelActivity "+activity.getActivityId());
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
-		
-		ToolActivity toolActivity = (ToolActivity)activity;
 
-		String url = actionMappings.getToolURL(toolActivity, learnerProgress);
-		try {
-		    response.sendRedirect(url);
+		ParallelActivity parallelActivity = (ParallelActivity)activity;
+
+		form.setActivityId(activity.getActivityId());
+
+		List activityURLs = new ArrayList();
+		Set subActivities = parallelActivity.getActivities();
+		Iterator i = subActivities.iterator();
+		while (i.hasNext()) {
+			Activity subActivity = (Activity)i.next();
+			ActivityURL activityURL = new ActivityURL(); 
+			String url = actionMappings.getActivityURL(subActivity, learnerProgress);
+			activityURL.setUrl(url);
+			activityURLs.add(activityURL);
 		}
-		catch (java.io.IOException e) {
-		    return mapping.findForward(ActivityMapping.ERROR);
+		if (activityURLs.size() == 0) {
+		    log.error(className+": No sub-activity URLs for activity "+activity.getActivityId());
+			return mapping.findForward(ActivityMapping.ERROR);
 		}
-		return null;
+		form.setActivityURLs(activityURLs);
+		
+		String forward = "displayParallel";
+		return mapping.findForward(forward);
 	}
 
 }

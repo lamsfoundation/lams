@@ -45,7 +45,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
  *                validate="false" scope="request"
  * 
  */
-public class CompleteActivity extends ActivityAction {
+public class CompleteActivityAction extends ActivityAction {
     
     protected static String className = "CompleteActivity";
 	

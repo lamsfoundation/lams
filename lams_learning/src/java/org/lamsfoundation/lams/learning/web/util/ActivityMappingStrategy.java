@@ -65,7 +65,7 @@ public class ActivityMappingStrategy implements Serializable {
 			}
 			if (activity instanceof ToolActivity) {
 				// get tool URL
-			    strutsAction = "/DisplayLoadToolActivity.do";
+			    strutsAction = "/LoadToolActivity.do";
 				//strutsAction = "/DisplayToolActivity.do";
 			}
 		}

@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
  * @struts:action-forward name="displayOptions" path=".optionsActivity"
  * 
  */
-public class DisplayOptionsActivity extends ActivityAction {
+public class DisplayOptionsActivityAction extends ActivityAction {
 	
 
 	/**

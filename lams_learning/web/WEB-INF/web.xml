@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
+
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app >
+ <!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
 This program is free software; you can redistribute it and/or modify
@@ -20,10 +24,7 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 -->
 
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
-
-<web-app >
- <context-param>
+<context-param>
   	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
   	<param-value>org.lamsfoundation.lams.learning.LearningResources</param-value>
 </context-param>
@@ -33,6 +34,27 @@ http://www.gnu.org/licenses/gpl.txt
 		/WEB-INF/spring/dataAccessContext.xml  /WEB-INF/spring/applicationContext.xml /WEB-INF/spring/learningApplicationContext.xml
 	</param-value>
 </context-param>
+
+  <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
 
 <filter>
 	<filter-name>HibernateFilter</filter-name>
@@ -47,6 +69,26 @@ http://www.gnu.org/licenses/gpl.txt
 	</init-param>
 </filter>
 
+  <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
 <filter-mapping>
 	<filter-name>HibernateFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
@@ -62,50 +104,79 @@ http://www.gnu.org/licenses/gpl.txt
     project's merge dir.
     -->
 
-     	<!--
-	  - Loads the root application context of this web app at startup,
-	  - by default from "/WEB-INF/applicationContext.xml".
-		- Note that it is preferable to use ContextLoaderListener in a servlet container
-		- that follows the Servlet 2.4 initialization order (most Servlet 2.3 containers do).
-		-
-	  - Use WebApplicationContextUtils.getWebApplicationContext(servletContext)
-	  - to access it anywhere in the web application, outside of the framework.
-	  -
-	  - The root context is the parent of all servlet-specific contexts.
-	  - This means that its beans are automatically available in these child contexts,
-	  - both for getBean(name) calls and (external) bean references.
-		-->
-	<servlet>
-		<servlet-name>context</servlet-name>
-		<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet>
-	    <servlet-name>action</servlet-name>
-	    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-	    <init-param>
-	      <param-name>config</param-name>
-	      <param-value>/WEB-INF/struts/struts-config.xml</param-value>
-	    </init-param>
-	    <init-param>
-	      <param-name>debug</param-name>
-	      <param-value>999</param-value>
-	    </init-param>
-	    <init-param>
-	      <param-name>detail</param-name>
-	      <param-value>2</param-value>
-	    </init-param>
-	    <init-param>
-	      <param-name>validate</param-name>
-	      <param-value>true</param-value>
-	    </init-param>
-	    <load-on-startup>2</load-on-startup>
-    </servlet>
+ <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
-  	<servlet-mapping>
-		<servlet-name>action</servlet-name>
-	    <url-pattern>*.do</url-pattern>
-	</servlet-mapping>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+
+<servlet>
+	<servlet-name>context</servlet-name>
+	<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
+	<load-on-startup>1</load-on-startup>
+</servlet>
+<servlet>
+    <servlet-name>action</servlet-name>
+    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <init-param>
+      <param-name>config</param-name>
+      <param-value>/WEB-INF/struts/struts-config.xml</param-value>
+    </init-param>
+    <init-param>
+      <param-name>debug</param-name>
+      <param-value>999</param-value>
+    </init-param>
+    <init-param>
+      <param-name>detail</param-name>
+      <param-value>2</param-value>
+    </init-param>
+    <init-param>
+      <param-name>validate</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+</servlet>
+
+  <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+
+<servlet-mapping>
+	<servlet-name>action</servlet-name>
+    <url-pattern>*.do</url-pattern>
+</servlet-mapping>
 
    <session-config>
       <session-timeout>120</session-timeout>
@@ -125,6 +196,26 @@ http://www.gnu.org/licenses/gpl.txt
    <!ELEMENT error-page ((error-code | exception-type), location)>
    -->
 
+  <!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
 <!-- Struts Tag Library Defintions -->
 <taglib>
 	<taglib-uri>http://jakarta.apache.org/struts/struts-bean</taglib-uri>

@@ -26,10 +26,6 @@
       type="org.lamsfoundation.lams.learning.web.form.TestDblSubmitForm"
     />
     <form-bean
-      name="notebookForm"
-      type="org.lamsfoundation.lams.learning.web.form.NotebookForm"
-    />
-    <form-bean
       name="optionsActivityForm"
       type="org.lamsfoundation.lams.learning.web.form.OptionsActivityForm"
     />
@@ -93,31 +89,23 @@ http://www.gnu.org/licenses/gpl.txt
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/notebook/DisplayEntry"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayNotebookEntry"
-      name="notebookForm"
+      path="/DisplayOptionsActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayOptionsActivityAction"
+      name="optionsActivityForm"
       scope="request"
+      input="/Activity.do"
       unknown="false"
       validate="false"
     >
       <forward
-        name="displayEntry"
-        path=".journalDetail"
+        name="displayOptions"
+        path=".optionsActivity"
         redirect="false"
       />
     </action>
     <action
-      path="/DisplayActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayActivity"
-      name="activityForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-    </action>
-    <action
-      path="/DisplayLoadToolActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayLoadToolActivity"
+      path="/LoadToolActivity"
+      type="org.lamsfoundation.lams.learning.web.action.LoadToolActivityAction"
       name="activityForm"
       scope="request"
       unknown="false"
@@ -128,15 +116,6 @@ http://www.gnu.org/licenses/gpl.txt
         path=".loadToolActivity"
         redirect="false"
       />
-    </action>
-    <action
-      path="/DisplayToolActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayToolActivity"
-      name="activityForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
     </action>
     <action
       path="/test/DummyTool"
@@ -159,37 +138,8 @@ http://www.gnu.org/licenses/gpl.txt
       />
     </action>
     <action
-      path="/DisplayParallelActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayParallelActivity"
-      name="activityForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="displayParallel"
-        path=".parallelActivity"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/DisplayOptionsActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayOptionsActivity"
-      name="optionsActivityForm"
-      scope="request"
-      input="/Activity.do"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="displayOptions"
-        path=".optionsActivity"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/CompleteActivity"
-      type="org.lamsfoundation.lams.learning.web.action.CompleteActivity"
+      type="org.lamsfoundation.lams.learning.web.action.CompleteActivityAction"
       name="activityForm"
       scope="request"
       unknown="false"
@@ -197,18 +147,22 @@ http://www.gnu.org/licenses/gpl.txt
     >
     </action>
     <action
-      path="/notebook/SaveEntry"
-      type="org.lamsfoundation.lams.learning.web.action.SaveNotebookEntry"
-      name="notebookForm"
+      path="/DisplayToolActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayToolActivityAction"
+      name="activityForm"
       scope="request"
       unknown="false"
       validate="false"
     >
-      <forward
-        name="displayEntry"
-        path="/DisplayEntry"
-        redirect="true"
-      />
+    </action>
+    <action
+      path="/DisplayActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayActivityAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
     </action>
     <action
       path="/test/DblSubmit"
@@ -225,8 +179,22 @@ http://www.gnu.org/licenses/gpl.txt
       />
     </action>
     <action
+      path="/DisplayParallelActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayParallelActivityAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayParallel"
+        path=".parallelActivity"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/ChooseActivity"
-      type="org.lamsfoundation.lams.learning.web.action.ChooseActivity"
+      type="org.lamsfoundation.lams.learning.web.action.ChooseActivityAction"
       name="activityForm"
       scope="request"
       unknown="false"

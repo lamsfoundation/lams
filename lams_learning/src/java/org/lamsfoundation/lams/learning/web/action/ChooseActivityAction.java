@@ -21,36 +21,37 @@ http://www.gnu.org/licenses/gpl.txt
 
 package org.lamsfoundation.lams.learning.web.action;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
-
-import org.lamsfoundation.lams.usermanagement.*;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-import org.lamsfoundation.lams.learningdesign.*;
-import org.lamsfoundation.lams.lesson.*;
 
-/** 
- * Action class to display an activity.
+/**
+ * @author daveg
  * 
  * XDoclet definition:
  * 
- * @struts:action path="/DisplayActivity" name="activityForm"
+ * @struts:action path="/ChooseActivity" name="activityForm"
  *                validate="false" scope="request"
- * 
+ *  
  */
-public class DisplayActivity extends ActivityAction {
-    
-    protected static String className = "DisplayActivity";
+public class ChooseActivityAction extends ActivityAction {
 
-	/** 
-	 * Gets an activity from the request (attribute) and forwards onto a
-	 * display action using the ActionMappings class. If no activity is
-	 * in request then use the current activity in learnerProgress.
+    protected static String className = "ChooseActivity";
+    
+	/**
+	 * Gets an activity from the request (attribute) and forwards onto the required
+	 * jsp (SingleActivity or ParallelActivity).
 	 */
 	public ActionForward execute(
 			ActionMapping mapping,
@@ -66,23 +67,30 @@ public class DisplayActivity extends ActivityAction {
 			return mapping.findForward(ActivityMapping.NO_SESSION_ERROR);
 		}
 		
+		// check token
+		if (!this.isTokenValid(request, true)) {
+			// didn't come here from options page
+		    log.info(className+": No valid token in request");
+			return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
+		}
+		
 		// Get learner
 		User learner = sessionBean.getLearner();
 		Lesson lesson = sessionBean.getLesson();
 		
-		LearnerProgress learnerProgress = getLearnerProgress(request, form);
-		Activity activity = getActivity(request, form, learnerProgress);
+		LearnerProgress progress = getLearnerProgress(request, form);
+		Activity activity = getActivity(request, form, progress);
 		
 		if (activity == null) {
-		    /*log.error(className+": No activity in request or session");
-			return mapping.findForward(actionMappings.ERROR);*/
-		    // Get current activity from learnerProgress
-		    activity = learnerProgress.getCurrentActivity();
+		    log.error(className+": No activity in request or session");
+			return mapping.findForward(ActivityMapping.ERROR);
 		}
-	    setActivity(request, activity);
+
+		ILearnerService learnerService = getLearnerService(request);
+		learnerService.chooseActivity(learner, lesson, activity);
 		
-		ActionForward forward = actionMappings.getActivityForward(activity, learnerProgress, false);
+		ActionForward forward = actionMappings.getActivityForward(activity, progress, true);
 		return forward;
 	}
-	
+
 }
