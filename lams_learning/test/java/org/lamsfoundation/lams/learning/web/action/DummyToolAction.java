@@ -18,6 +18,8 @@ import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.service.DummyLearnerService;
 import org.lamsfoundation.lams.learning.web.form.DummyToolForm;
+import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+import org.lamsfoundation.lams.learning.web.util.ActionMappingsWithToolWait;
 
 
 /**
@@ -31,7 +33,7 @@ import org.lamsfoundation.lams.learning.web.form.DummyToolForm;
  * 
  */
 public class DummyToolAction extends DispatchAction {
-
+	
 	public ActionForward display(
 			ActionMapping mapping,
 			ActionForm form,
