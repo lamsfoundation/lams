@@ -1,8 +1,6 @@
 
 <%@ taglib uri="/WEB-INF/struts/struts-tiles.tld" prefix="tiles" %>
 <%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html:html locale = "true">
