@@ -12,4 +12,4 @@
 #
 # comment lines begin with '#'
 cvs-log.py	cvs-log.py cannot be checked out
-#log.pl	log.pl filed to check out
+#log.pl	log.pl failed to check out
