@@ -9,5 +9,24 @@
 	<bean id="toolContentDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolContentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
+	<bean id="toolDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
 
+	<bean id="toolContentIDGeneratorTarget" class="org.lamsfoundation.lams.tool.ToolContentIDGenerator"
+		singleton="true"
+	>
+		<property name="toolContentDao"><ref local="toolContentDAO"/></property>
+	</bean>	
+	
+	<bean id="toolContentIDGenerator" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref local="toolContentIDGeneratorTarget"/></property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="getToolContentIDFor">PROPAGATION_REQUIRES_NEW,ISOLATION_READ_UNCOMMITTED</prop>
+			</props>
+		</property>
+	</bean>
+	
 </beans>

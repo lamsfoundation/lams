@@ -11,7 +11,9 @@ package org.lamsfoundation.lams.tool;
 
 import org.lamsfoundation.lams.AbstractLamsCommonTestCase;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
+import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolContentDAO;
+import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 
 
 /**
@@ -23,6 +25,11 @@ public class ToolDataAccessTestCase extends AbstractLamsCommonTestCase
 {
 
     protected IToolContentDAO toolContentDao;
+    protected IToolDAO toolDao;
+    
+    //Test tool id - survey tool
+    protected final Long TEST_TOOL_ID = new Long(6);
+    protected Tool testTool;
     /*
      * @see AbstractLamsCommonTestCase#setUp()
      */
@@ -31,6 +38,8 @@ public class ToolDataAccessTestCase extends AbstractLamsCommonTestCase
         super.setUp();
         
         toolContentDao = (ToolContentDAO)this.ac.getBean("toolContentDAO");
+        toolDao = (ToolDAO)this.ac.getBean("toolDAO");
+        
     }
 
     /*

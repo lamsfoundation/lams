@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.tool;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -18,15 +19,18 @@ public class ToolContent implements Serializable {
     private Long toolContentId;
 
     /** persistent field */
-    private long toolContentKey;
+    private Tool tool;
 
     /** persistent field */
     private Set activities;
 
+    public ToolContent(Tool tool){
+        this(null,tool,new HashSet());
+    }
     /** full constructor */
-    public ToolContent(Long toolContentId, long toolContentKey, Set activities) {
+    public ToolContent(Long toolContentId, Tool tool, Set activities) {
         this.toolContentId = toolContentId;
-        this.toolContentKey = toolContentKey;
+        this.tool = tool;
         this.activities = activities;
     }
 
@@ -50,18 +54,15 @@ public class ToolContent implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="tool_content_key"
-     *             length="20"
-     *             not-null="true"
-     *         
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="tool_id"     
      */
-    public long getToolContentKey() {
-        return this.toolContentKey;
+    public Tool getTool() {
+        return this.tool;
     }
 
-    public void setToolContentKey(long toolContentKey) {
-        this.toolContentKey = toolContentKey;
+    public void setTool(Tool tool) {
+        this.tool = tool;
     }
 
     /** 

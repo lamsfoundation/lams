@@ -4,34 +4,32 @@
  * This file contains propriety information of LAMS Foundation. 
  * Copying or reproduction with prior written permission is prohibited.
  * Copyright (c) 2005 
- * Created on 8/02/2005
+ * Created on 9/02/2005
  ******************************************************************************** */
 
 package org.lamsfoundation.lams.tool.dao;
 
-import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolDataAccessTestCase;
 
 
 /**
  * 
- * @author Jacky Fang 8/02/2005
+ * @author Jacky Fang 9/02/2005
  * 
  */
-public class TestToolContentDAO extends ToolDataAccessTestCase
+public class TestToolDAO extends ToolDataAccessTestCase
 {
 
     /*
-     * @see AbstractLamsCommonTestCase#setUp()
+     * @see ToolDataAccessTestCase#setUp()
      */
     protected void setUp() throws Exception
     {
         super.setUp();
-        testTool = toolDao.getToolByID(super.TEST_TOOL_ID);
     }
 
     /*
-     * @see AbstractLamsCommonTestCase#tearDown()
+     * @see ToolDataAccessTestCase#tearDown()
      */
     protected void tearDown() throws Exception
     {
@@ -39,19 +37,21 @@ public class TestToolContentDAO extends ToolDataAccessTestCase
     }
 
     /**
-     * Constructor for TestToolContentDAO.
+     * Constructor for TestToolDAO.
      * @param arg0
      */
-    public TestToolContentDAO(String arg0)
+    public TestToolDAO(String arg0)
     {
         super(arg0);
     }
 
-    public void testSaveToolContent()
+    public void testGetToolByID()
     {
-        ToolContent newContent = new ToolContent(testTool);
-        toolContentDao.saveToolContent(newContent);
-        assertNotNull(newContent.getToolContentId());
+        testTool = toolDao.getToolByID(super.TEST_TOOL_ID);
+        assertEquals("verify signature","survey_signature",testTool.getToolSignature());
+        assertEquals("verify service name","surveyService",testTool.getServiceName());
+        assertEquals("verify display name","Survey",testTool.getToolDisplayName());
+        assertEquals("verify default content id",6,testTool.getDefaultToolContentId());
     }
 
 }

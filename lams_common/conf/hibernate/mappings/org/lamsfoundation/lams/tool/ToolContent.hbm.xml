@@ -37,20 +37,11 @@
         <generator class="identity" />
     </id>
 
-    <property
-        name="toolContentKey"
-        type="long"
-        column="tool_content_key"
-        not-null="true"
-        length="20"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="tool_content_key"
-            length="20"
-            not-null="true"
-        </meta>    
-    </property>
+	<many-to-one name="tool"
+			class="org.lamsfoundation.lams.tool.Tool"
+			not-null="true" cascade="none">
+			<column name="tool_id" />
+	</many-to-one>
 
     <!-- Associations -->
   
