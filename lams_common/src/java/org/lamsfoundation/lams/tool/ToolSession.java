@@ -1,6 +1,8 @@
 package org.lamsfoundation.lams.tool;
 
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
@@ -32,7 +34,7 @@ public abstract class ToolSession implements Serializable {
     private Long toolSessionId;
 
     /** persistent field */
-    private long activityId;
+    private ToolActivity toolActivity;
 
     /** persistent field */
     private long toolSessionKey;
@@ -46,9 +48,9 @@ public abstract class ToolSession implements Serializable {
     private int toolSessionTypeId;
 
     /** full constructor */
-    public ToolSession(Long toolSessionId, long activityId, long toolSessionKey, Date createDateTime, Group group, int toolSessionStateId, Set userToolSessions) {
+    public ToolSession(Long toolSessionId, ToolActivity toolActivity, long toolSessionKey, Date createDateTime, Group group, int toolSessionStateId, Set userToolSessions) {
         this.toolSessionId = toolSessionId;
-        this.activityId = activityId;
+        this.toolActivity = toolActivity;
         this.toolSessionKey = toolSessionKey;
         this.createDateTime = createDateTime;
         this.toolSessionStateId = toolSessionStateId;
@@ -74,18 +76,16 @@ public abstract class ToolSession implements Serializable {
     }
 
     /** 
-     *            @hibernate.property
-     *             column="activity_id"
-     *             length="20"
-     *             not-null="true"
-     *         
+     * 
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="activity_id"      
      */
-    public long getActivityId() {
-        return this.activityId;
+    public ToolActivity getToolActivity() {
+        return this.toolActivity;
     }
 
-    public void setActivityId(long activityId) {
-        this.activityId = activityId;
+    public void setToolActivity(ToolActivity toolActivity) {
+        this.toolActivity = toolActivity;
     }
 
     /** 
