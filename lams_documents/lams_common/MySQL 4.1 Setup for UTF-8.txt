@@ -34,8 +34,6 @@
 # =============
 * Set the root password as:
   mysqladmin -u root password "yoursecret"
-  mysqladmin -u root -h "yourhost" password "yoursecret"
-  mysqladmin -u root -h "yourhost@melcoe.mq.edu.au" password "yoursecret"
 
 * As usual, delete the "test" database which has the anonymous user
   drop database test;
