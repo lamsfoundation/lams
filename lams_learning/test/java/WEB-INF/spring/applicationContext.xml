@@ -39,35 +39,34 @@
 		<property name="mappingResources">
 			<list>
 				<!-- usermanagement related mapping files -->	
-				<value>com/lamsinternational/lams/usermanagement/AuthenticationMethod.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/AuthenticationMethodType.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/Organisation.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/OrganisationType.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/Role.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/User.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/UserOrganisation.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/UserOrganisationRole.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/Workspace.hbm.xml</value>
-				<value>com/lamsinternational/lams/usermanagement/WorkspaceFolder.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/AuthenticationMethod.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/AuthenticationMethodType.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/Organisation.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/OrganisationType.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/Role.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/User.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/UserOrganisation.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/UserOrganisationRole.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/Workspace.hbm.xml</value>
+				<value>org/lamsfoundation/lams/usermanagement/WorkspaceFolder.hbm.xml</value>
 				
 				<!-- learning design related mapping files -->
-				<value>com/lamsinternational/lams/learningdesign/Activity.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/Group.hbm.xml</value>				
-				<value>com/lamsinternational/lams/learningdesign/Grouping.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/LearningDesign.hbm.xml</value>
-				<value>com/lamsinternational/lams/learningdesign/LearningLibrary.hbm.xml</value>	
-				<value>com/lamsinternational/lams/learningdesign/Transition.hbm.xml</value>	
+				<value>org/lamsfoundation/lams/learningdesign/Activity.hbm.xml</value>
+				<value>org/lamsfoundation/lams/learningdesign/Group.hbm.xml</value>				
+				<value>org/lamsfoundation/lams/learningdesign/Grouping.hbm.xml</value>
+				<value>org/lamsfoundation/lams/learningdesign/LearningDesign.hbm.xml</value>
+				<value>org/lamsfoundation/lams/learningdesign/LearningLibrary.hbm.xml</value>	
+				<value>org/lamsfoundation/lams/learningdesign/Transition.hbm.xml</value>	
 				
 				
 				<!-- lesson related mapping files-->
-				<value>com/lamsinternational/lams/lesson/LearnerProgress.hbm.xml</value>
-				<value>com/lamsinternational/lams/lesson/Lesson.hbm.xml</value>
-                <!-- value>com/lamsinternational/lams/lesson/LessonClass.hbm.xml</value-->
+				<value>org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
+				<value>org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
 				
 				<!-- Tool related mapping files-->
-				<value>com/lamsinternational/lams/tool/Tool.hbm.xml</value>
-				<value>com/lamsinternational/lams/tool/ToolSession.hbm.xml</value>
-				<value>com/lamsinternational/lams/tool/ToolSessionState.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -94,7 +93,7 @@
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
 
 	<!-- LAMS primary business object: Hibernate implementation -->
-	<bean id="userManagementServiceTarget" class="com.lamsinternational.lams.usermanagement.service.UserManagementService"
+	<bean id="userManagementServiceTarget" class="org.lamsfoundation.lams.usermanagement.service.UserManagementService"
 		singleton="false"
 	>
 		<property name="userDAO"><ref local="userDAO"/></property>
@@ -122,80 +121,66 @@
 		</property>
 	</bean>
 	
-	<bean id="userDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserDAO">
+	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
-	<bean id="roleDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.RoleDAO">
+	<bean id="roleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.RoleDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
-	<bean id="organisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationDAO">
+	<bean id="organisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
-	<bean id="organisationTypeDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationTypeDAO">
+	<bean id="organisationTypeDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationTypeDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
-	<bean id="authenticationMethodDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.AuthenticationMethodDAO">
+	<bean id="authenticationMethodDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.AuthenticationMethodDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
-	<bean id="userOrganisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
+	<bean id="userOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
-	<bean id="userOrganisationRoleDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserOrganisationRoleDAO">
+	<bean id="userOrganisationRoleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationRoleDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<!-- Learning Design related beans-->
-	
-	<bean id="activityDAO" class="com.lamsinternational.lams.learningdesign.dao.hibernate.ActivityDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	<bean id="learningLibraryDAO" class="com.lamsinternational.lams.learningdesign.dao.hibernate.LearningLibraryDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	<bean id="learningDesignDAO" class="com.lamsinternational.lams.learningdesign.dao.hibernate.LearningDesignDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	<bean id="groupDAO" class="com.lamsinternational.lams.learningdesign.dao.hibernate.GroupDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	<bean id="groupingDAO" class="com.lamsinternational.lams.learningdesign.dao.hibernate.GroupingDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	<bean id="lessonDAO" class="com.lamsinternational.lams.lesson.dao.hibernate.LessonDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>	
-
-
-	<!-- bean id="lessonTarget" class="com.lamsinternational.lams.lesson.Lesson">
-		<property name="lessonId"><value>12</value></property>
 	</bean>
 	
-	
-	<bean id="hibernateInterceptor" class="org.springframework.orm.hibernate.HibernateInterceptor">
-		<property name="sessionFactory">
-			<ref bean="coreSessionFactory"/>
-		</property>
+	<!-- learningdesign package -->
+
+	<bean id="learningDesignDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
-	<bean id="hibernateInterceptorCreator"  class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
-		<property name="proxyTargetClass">
-			<value>true</value>
-		</property>
-		<property name="interceptorNames">
-			<list>
-				<value>hibernateInterceptor</value>
-			</list>
-		</property>
-		<property name="beanNames">
-			<list>
-				<value>lessonTarget</value>
-			</list>
-		</property>
-	</bean-->
+
+	<bean id="groupDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="groupingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<!-- lesson package -->
+
+	<bean id="lessonDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="lessonClassDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonClassDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="learnerProgressDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<!-- tool package -->
+
+	<bean id="toolSessionDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
 
 </beans>
