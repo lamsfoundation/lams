@@ -107,6 +107,7 @@
 		<property name="userDAO"><ref local="userDAO"/></property>
 		<property name="organisationDAO"><ref local="organisationDAO"/></property>
 		<property name="userOrganisationDAO"><ref local="userOrganisationDAO"/></property>
+		<property name="authenticationMethodDAO"><ref local="authenticationMethodDAO"/></property>
 	</bean>	
 	
 	<!-- Transactional proxy for the user management primary business object -->
@@ -130,6 +131,10 @@
 	</bean>
 	
 	<bean id="organisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>
+
+	<bean id="authenticationMethodDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.AuthenticationMethodDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
 	</bean>
 
