@@ -27,7 +27,7 @@
 	
 	<!-- progect-wide properties -->
 	<property name="project"                  value="LAMS"/>
-	<property name="product"                  value="lamscr"/>
+	<property name="product"                  value="lams_contentrepository"/>
 	<property name="version"                       value="1.1"/>
 
 	<!-- xdoclet properties-->	
