@@ -205,6 +205,7 @@ Ant build file.
 				<!--include name="*.properties"/-->
 				<include name="struts/*"/>
 				<include name="jstl/*"/>
+				<include name="tiles/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
 			<lib dir="${build.lib}">
