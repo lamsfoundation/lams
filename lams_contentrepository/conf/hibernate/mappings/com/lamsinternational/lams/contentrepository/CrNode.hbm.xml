@@ -90,15 +90,16 @@
     <!-- bi-directional one-to-many association to CrNodeVersion -->
     <set
         name="crNodeVersions"
-        lazy="true"
+        lazy="false"
         inverse="true"
 		cascade="none"
     >
+    
         <meta attribute="field-description">
            @hibernate.set
-            lazy="true"
+            lazy="false"
             inverse="true"
-            cascade="none"
+            cascade="all-delete-orphan"
 
            @hibernate.collection-key
             column="node_id"
