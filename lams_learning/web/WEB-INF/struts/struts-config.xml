@@ -42,11 +42,6 @@
   <global-forwards>
 	<forward name="error" path="/error.jsp" />
 	<forward name="noSessionError" path="/noSessionError.jsp" />
-	<forward name="displayActivity" path="/DisplayActivity.do" />
-	<forward name="displayToolActivity" path="/DisplayToolActivity.do" />
-	<forward name="displayParallelActivity" path="/DisplayParallelActivity.do" />
-	<forward name="displayOptionsActivity" path="/DisplayOptionsActivity.do" />
-	<!-- forward name="displayGateActivity" path="/DisplayGateActivity.do" /-->
 </global-forwards>
 
   <!-- ========== Action Mapping Definitions =================================== -->
@@ -61,8 +56,8 @@
     >
     </action>
     <action
-      path="/DisplayToolActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayToolActivity"
+      path="/DisplayLoadToolActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayLoadToolActivity"
       name="activityForm"
       scope="request"
       unknown="false"
@@ -73,6 +68,15 @@
         path=".toolActivity"
         redirect="false"
       />
+    </action>
+    <action
+      path="/DisplayToolActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayToolActivity"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
     </action>
     <action
       path="/test/DummyTool"
