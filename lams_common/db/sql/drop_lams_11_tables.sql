@@ -38,5 +38,6 @@ DROP TABLE IF EXISTS lams_grouping_type;
 DROP TABLE IF EXISTS lams_gate_activity_level;
 DROP TABLE IF EXISTS lams_license;
 DROP TABLE IF EXISTS lams_copy_type;
+DROP TABLE IF EXISTS lams_activity_category;
 
 SET FOREIGN_KEY_CHECKS=1;

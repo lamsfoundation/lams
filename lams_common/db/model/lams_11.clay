@@ -464,6 +464,19 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
+<column name="activity_category_id" alias="" remarks="" mandatory="false" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
 <column name="gate_activity_level_id" alias="" remarks="" mandatory="false" column-size="11" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
@@ -643,6 +656,13 @@
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="library_activity_id" referenced-key-column-name="activity_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_learning_activity_12" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_activity_category" referenced-key="PK_LAMS_ACTIVITY_CATEGORY" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="activity_category_id" referenced-key-column-name="activity_category_id"/>
 </foreign-key>
 </foreign-key-list>
 <index-list>
@@ -2367,8 +2387,8 @@
 <column name="waiting_flag" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
@@ -3300,6 +3320,39 @@
 <primary-key name="PK_LAMS_COPY_TYPE" alias="" remarks="">
 <primary-key-description/>
 <primary-key-column name="copy_type_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list/>
+</table>
+<table name="lams_activity_category" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="951" y="1519" width="-1" height="-1"/>
+<column-list>
+<column name="activity_category_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="true" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PK_LAMS_ACTIVITY_CATEGORY" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="activity_category_id"/>
 </primary-key>
 <unique-key-list/>
 <foreign-key-list/>

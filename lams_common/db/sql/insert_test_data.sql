@@ -36,7 +36,14 @@ INSERT INTO lams_authentication_method VALUES (1, 1, 'LAMS-Database');
 INSERT INTO lams_authentication_method VALUES (2, 2, 'Oxford-WebAuth');
 INSERT INTO lams_authentication_method VALUES (3, 3, 'MQ-LDAP');
 
+INSERT INTO lams_activity_category VALUES (1 ,'SYSTEM');
+INSERT INTO lams_activity_category VALUES (1 ,'COLLABORATION');
+INSERT INTO lams_activity_category VALUES (1 ,'ASSESSMENT');
+INSERT INTO lams_activity_category VALUES (1 ,'CONTENT');
+INSERT INTO lams_activity_category VALUES (1 ,'SPLIT');
+
 insert into lams_workspace_folder (parent_folder_id,name,workspace_id) values(null,'Trial',1);
+
 
 -- Populates the lams_learning_library table with default libraries
 

@@ -96,6 +96,12 @@ CREATE TABLE lams_copy_type (
      , PRIMARY KEY (copy_type_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_activity_category (
+       activity_category_id INT(3) NOT NULL
+     , description VARCHAR(255) NOT NULL
+     , PRIMARY KEY (activity_category_id)
+)TYPE=InnoDB;
+
 CREATE TABLE lams_authentication_method_type (
        authentication_method_type_id INT(3) NOT NULL
      , description VARCHAR(64) NOT NULL
@@ -299,6 +305,7 @@ CREATE TABLE lams_lesson (
 CREATE TABLE lams_learning_activity (
        activity_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , activity_ui_id INT(11)
+     , activity_category_id INT(3) NOT NULL
      , description TEXT
      , title VARCHAR(255)
      , help_text TEXT
@@ -359,6 +366,9 @@ CREATE TABLE lams_learning_activity (
      , INDEX (library_activity_id)
      , CONSTRAINT FK_lams_learning_activity_11 FOREIGN KEY (library_activity_id)
                   REFERENCES lams_learning_activity (activity_id)
+     , INDEX (activity_category_id)
+     , CONSTRAINT FK_lams_learning_activity_12 FOREIGN KEY (activity_category_id)
+                  REFERENCES lams_activity_category (activity_category_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learner_progress (
