@@ -11,7 +11,7 @@
     http://www.hibernate.org/
 -->
 
-<class name="org.lamsfoundation.lams.learningdesign.Activity" table="lams_learning_activity" discriminator-value="0" >
+<class name="org.lamsfoundation.lams.learningdesign.Activity" table="lams_learning_activity" discriminator-value="0">
     <meta attribute="class-description" inherit="false">@hibernate.class table="lams_learning_activity"</meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
@@ -84,8 +84,9 @@
     </property>
 
     <!-- Associations -->
-    <one-to-one name="transitionTo" class="org.lamsfoundation.lams.learningdesign.Transition" property-ref="toActivity"/>
-    <one-to-one name="transitionFrom" class="org.lamsfoundation.lams.learningdesign.Transition" property-ref="fromActivity"/>
+    
+    <one-to-one name="transitionTo" class="org.lamsfoundation.lams.learningdesign.Transition" />
+    <one-to-one name="transitionFrom" class="org.lamsfoundation.lams.learningdesign.Transition" />
     
     <!-- bi-directional many-to-one association to LearningLibrary -->
     <many-to-one name="learningLibrary" class="org.lamsfoundation.lams.learningdesign.LearningLibrary">
