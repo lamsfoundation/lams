@@ -6,7 +6,9 @@
 
 package org.lamsfoundation.lams.tool.dao;
 
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Inteface defines Lesson DAO Methods
@@ -25,4 +27,7 @@ public interface IToolSessionDAO
     public void saveToolSession(ToolSession toolSession);
 
     public void removeToolSession(ToolSession toolSession);
+    
+	public ToolSession getToolSessionByLearner(final User learner,final Activity activity);
+
 }

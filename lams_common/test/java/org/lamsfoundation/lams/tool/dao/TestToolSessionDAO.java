@@ -62,10 +62,19 @@ public class TestToolSessionDAO extends ToolDataAccessTestCase
         assertNotNull(toolSession.getUser());
     }
 
+    public void testGetToolSessionByLearner()
+    {
+        ToolSession toolSession = toolSessionDao.getToolSessionByLearner(testUser,testActivity);
+        
+        assertNotNull(toolSession);
+    }
+    
     public void testSaveNonGroupedToolSession()
     {
         ToolSession testToolSession=initNGToolSession();
         toolSessionDao.saveToolSession(this.ngToolSession);
     }
 
+
+    
 }
