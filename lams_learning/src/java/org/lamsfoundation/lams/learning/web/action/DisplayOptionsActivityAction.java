@@ -68,7 +68,7 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		OptionsActivityForm form = (OptionsActivityForm)actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
 		
-		LearnerProgress learnerProgress = getLearnerProgress(request, form);
+		LearnerProgress learnerProgress = getLearnerProgress(request);
 		Activity activity = getActivity(request, form, learnerProgress);
 		if (!(activity instanceof OptionsActivity)) {
 		    log.error(className+": activity not OptionsActivity "+activity.getActivityId());

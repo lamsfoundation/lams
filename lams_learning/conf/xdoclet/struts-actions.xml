@@ -25,7 +25,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 <action path="/content"
 	type="org.apache.struts.actions.ForwardAction"
-	parameter="/test/DummyLesson.do" />
+	parameter="/learner.do?method=joinLesson&amp;userId=2&amp;lessonId=2" />
 
 <action path="/requestDisplay"
 	type="org.apache.struts.actions.ForwardAction"

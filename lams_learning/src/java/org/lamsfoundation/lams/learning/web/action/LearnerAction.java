@@ -187,7 +187,7 @@ public class LearnerAction extends LamsDispatchAction
         request.getSession().setAttribute(SessionBean.NAME,new SessionBean(learner,
                                                                            lesson,
                                                                            learnerProgress));
-        
+
         //serialize a acknowledgement flash message with the path of display next
         //activity
         String lessonJoined = WDDXProcessor.serialize(new FlashMessage("joinLesson",
@@ -198,9 +198,10 @@ public class LearnerAction extends LamsDispatchAction
 
         //we hand over the control to flash. 
         response.getWriter().print(lessonJoined);
-        //as flash is called the next struts action, we don't need to forward to
-        //anything.
-        return null;
+
+        //TODO this should return null once flash side is done, it should be 
+        //called by flash side
+        return mapping.findForward(DISPLAY_ACTIVITY);
     }
     
 

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - LearningDesign Application context definition for LAMS.
+-->
+<beans>
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
+	
+	<!-- Learning Design related beans-->
+	
+	<bean id="activityDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="learningLibraryDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="learningDesignDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="groupingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="groupDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="transitionDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="workspaceFolderDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+</beans>

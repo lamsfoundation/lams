@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
@@ -82,7 +81,7 @@ public class CompleteActivityAction extends ActivityAction {
 		User learner = sessionBean.getLearner();
 		Lesson lesson = sessionBean.getLesson();
 		
-		LearnerProgress progress = getLearnerProgress(request, form);
+		LearnerProgress progress = getLearnerProgress(request);
 		Activity activity = getActivity(request, form, progress);
 		
 		if (activity == null) {
@@ -105,7 +104,7 @@ public class CompleteActivityAction extends ActivityAction {
 		sessionBean.setLearnerProgress(progress);
 		setSessionBean(sessionBean, request);
 
-		ActionForward forward = actionMappings.getProgressForward(progress, true);
+		ActionForward forward = actionMappings.getProgressForward(progress,true,request);
 		
 		return forward;
 	}

@@ -63,7 +63,7 @@ public class DisplayParallelActivityAction extends ActivityAction {
 		ActivityMapping actionMappings = getActivityMapping();
 		actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 		
-		LearnerProgress learnerProgress = getLearnerProgress(request, form);
+		LearnerProgress learnerProgress = getLearnerProgress(request);
 		Activity activity = getActivity(request, form, learnerProgress);
 		if (!(activity instanceof ParallelActivity)) {
 		    log.error(className+": activity not ParallelActivity "+activity.getActivityId());

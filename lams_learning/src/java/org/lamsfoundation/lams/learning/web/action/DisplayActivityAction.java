@@ -27,12 +27,13 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-//import org.lamsfoundation.lams.learningdesign.*;
-//import org.lamsfoundation.lams.lesson.*;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+
+
 
 /** 
  * Action class to display an activity.
@@ -57,8 +58,6 @@ public class DisplayActivityAction extends ActivityAction {
     // Instance variables
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(DisplayActivityAction.class);
-    
-    //protected static String className = "DisplayActivity";
 
 	/** 
 	 * Gets an activity from the request (attribute) and forwards onto a
@@ -70,41 +69,20 @@ public class DisplayActivityAction extends ActivityAction {
 	                             HttpServletRequest request,
 	                             HttpServletResponse response) 
 	{
-		ActivityForm form = (ActivityForm) actionForm;
-		ActivityMapping actionMappings = getActivityMapping();
 		
-		//TODO check up the learner progress, if not present, get it from db.
-		SessionBean sessionBean = getSessionBean(request);
-		// forward to the no session error page
-		if (sessionBean == null) 
-			return mapping.findForward(ActivityMapping.NO_SESSION_ERROR);
+		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+		
+		SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
 		
 		if(log.isDebugEnabled())
 		    log.debug("Entering display activity: the session bean is"
 		              + sessionBean.toString());
-		// Get learner
-		//User learner = sessionBean.getLearner();
-		//Lesson lesson = sessionBean.getLesson();
 		
-		//LearnerProgress learnerProgress = getLearnerProgress(request, form);
-		//Activity activity = getActivity(request, form, learnerProgress);
-		
-		//if (activity == null) {
-		    /*log.error(className+": No activity in request or session");
-			return mapping.findForward(actionMappings.ERROR);*/
-		    // Get current activity from learnerProgress
-		//    activity = learnerProgress.getCurrentActivity();
-		//}
-	    //setActivity(request, activity);
-		
-		//ActionForward forward = actionMappings.getActivityForward(activity, learnerProgress, false);
-		//return forward;
-		ActionForward forward =actionMappings.getProgressForward(sessionBean.getLearnerProgress(),false);
+		ActionForward forward =actionMappings.getProgressForward(sessionBean.getLearnerProgress(),false,request);
 	
 		if(log.isDebugEnabled())
 		    log.debug(forward.toString());
 		    
 		return 	forward;
 	}
-	
 }

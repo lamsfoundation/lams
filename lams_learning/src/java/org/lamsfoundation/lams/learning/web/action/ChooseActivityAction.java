@@ -78,7 +78,7 @@ public class ChooseActivityAction extends ActivityAction {
 		User learner = sessionBean.getLearner();
 		Lesson lesson = sessionBean.getLesson();
 		
-		LearnerProgress progress = getLearnerProgress(request, form);
+		LearnerProgress progress = getLearnerProgress(request);
 		Activity activity = getActivity(request, form, progress);
 		
 		if (activity == null) {

@@ -21,13 +21,14 @@ http://www.gnu.org/licenses/gpl.txt
 
 package org.lamsfoundation.lams.learning.web.action;
 
-import javax.servlet.http.*;
 
-import java.util.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
@@ -58,25 +59,24 @@ public class LoadToolActivityAction extends ActivityAction {
 	                             HttpServletResponse response) 
 	{
 		ActivityForm form = (ActivityForm)actionForm;
-		ActivityMapping actionMappings = getActivityMapping();
+		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 		
-		LearnerProgress learnerProgress = getLearnerProgress(request, form);
+		LearnerProgress learnerProgress = getLearnerProgress(request);
 		Activity activity = getActivity(request, form, learnerProgress);
-		if (!(activity instanceof ToolActivity)) {
+		
+		if (!(activity instanceof ToolActivity)) 
+		{
 		    log.error(className+": activity not ToolActivity");
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
 		
 		ToolActivity toolActivity = (ToolActivity)activity;
-
+		
 		form.setActivityId(activity.getActivityId());
 		
-		List activityURLs = new ArrayList();
-		String url = actionMappings.getToolURL(toolActivity, learnerProgress);
-		ActivityURL activityURL = new ActivityURL();
-		activityURL.setUrl(url);
-		activityURLs.add(activityURL);
-		form.setActivityURLs(activityURLs);
+		String url = actionMappings.getLearnerToolURL(toolActivity, learnerProgress.getUser());
+
+		form.addActivityURL(new ActivityURL(activity.getActivityId(),url));
 		
 		return mapping.findForward("displayTool");
 	}

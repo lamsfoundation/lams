@@ -36,6 +36,15 @@ public class ActivityURL {
 	private String description;
 	private boolean complete;
 
+	public ActivityURL(){}
+	
+	public ActivityURL(Long activityId,
+	                   String url)
+	{
+	    this.activityId = activityId;
+	    this.url = url;
+	}
+	
 	public boolean isComplete() {
 		return complete;
 	}

@@ -27,6 +27,7 @@ import java.util.*;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 
 /** 
  * @author daveg
@@ -79,5 +80,12 @@ public class ActivityForm extends ActionForm {
 	}
 	public void setActivityId(Long activityId) {
 		this.activityId = activityId;
+	}
+	
+	public void addActivityURL(ActivityURL activityUrl)
+	{
+	    if(this.activityURLs ==null)
+	        this.activityURLs = new ArrayList();
+	    this.activityURLs.add(activityUrl);	    
 	}
 }

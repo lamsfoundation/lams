@@ -1,25 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
-
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
@@ -43,10 +22,20 @@ http://www.gnu.org/licenses/gpl.txt
 
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+  
+	<!-- Local DataSource that works in any environment -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
+		<property name="url"><value>jdbc:mysql://localhost/lams?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull</value></property>
+		<property name="username"><value>lams</value></property>
+		<property name="password"><value>lamsdemo</value></property>
+	</bean>
+
+
 
 	<!-- Hibernate SessionFactory -->
 	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="dataSource"/></property>
+		<property name="dataSource"><ref local="dataSource"/></property>
 		<property name="mappingResources">
 			<list>
 				<!-- usermanagement related mapping files -->	
@@ -79,10 +68,6 @@ http://www.gnu.org/licenses/gpl.txt
 				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>
- 				
-				<!-- Notebook related mapping files-->
-				<!-- value>org/lamsfoundation/lams/notebook/NotebookEntry.hbm.xml</value-->
-				
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -163,47 +148,6 @@ http://www.gnu.org/licenses/gpl.txt
 
 	<bean id="userOrganisationRoleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationRoleDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
-	<!-- learningdesign package -->
-
-	<bean id="learningDesignDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="groupDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="groupingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
-	<!-- lesson package -->
-
-	<bean id="lessonDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="lessonClassDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonClassDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="learnerProgressDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
-	<!-- tool package -->
-
-	<bean id="toolSessionDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
-	<!-- notebook package -->
-
-	<!-- bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean-->
-
+	</bean>	
 
 </beans>

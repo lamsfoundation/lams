@@ -49,28 +49,31 @@ public class DisplayToolActivityAction extends ActivityAction {
 	 * Gets a tool activity from the request (attribute) and uses a redirect
 	 * to forward the user to the tool.
 	 */
-	public ActionForward execute(
-			ActionMapping mapping,
-			ActionForm actionForm,
-			HttpServletRequest request,
-			HttpServletResponse response) {
+	public ActionForward execute(ActionMapping mapping,
+	                             ActionForm actionForm,
+	                             HttpServletRequest request,
+	                             HttpServletResponse response) 
+	{
 		ActivityForm form = (ActivityForm)actionForm;
 		ActivityMapping actionMappings = getActivityMapping();
 		
-		LearnerProgress learnerProgress = getLearnerProgress(request, form);
+		LearnerProgress learnerProgress = getLearnerProgress(request);
 		Activity activity = getActivity(request, form, learnerProgress);
-		if (!(activity instanceof ToolActivity)) {
+		if (!(activity instanceof ToolActivity)) 
+		{
 		    log.error(className+": activity not ToolActivity");
 			return mapping.findForward(ActivityMapping.ERROR);
 		}
 		
 		ToolActivity toolActivity = (ToolActivity)activity;
 
-		String url = actionMappings.getToolURL(toolActivity, learnerProgress);
-		try {
+		String url = actionMappings.getLearnerToolURL(toolActivity, learnerProgress.getUser());
+		try 
+		{
 		    response.sendRedirect(url);
 		}
-		catch (java.io.IOException e) {
+		catch (java.io.IOException e) 
+		{
 		    return mapping.findForward(ActivityMapping.ERROR);
 		}
 		return null;

@@ -26,13 +26,12 @@ import javax.servlet.http.*;
 import java.util.*;
 
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learning.service.LearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 
-import org.lamsfoundation.lams.usermanagement.*;
 import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learningdesign.*;
@@ -53,9 +52,7 @@ public class ActivityAction extends LamsAction {
 	 * Get the learner service.
 	 */
 	protected ILearnerService getLearnerService() {
-		ILearnerService learnerService = (LearnerService)LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
-		//learnerService.setRequest(request);
-		//learnerService.setActionMappings(actionMappings);
+		ILearnerService learnerService = LearnerServiceProxy.getLearnerService(this.getServlet().getServletContext());
 		return learnerService;
 	}
 	
@@ -73,19 +70,15 @@ public class ActivityAction extends LamsAction {
 	 * the LearnerService. The LearnerProgress is also stored in the
 	 * session so that the Flash requests don't have to reload it.
 	 */
-	protected LearnerProgress getLearnerProgress(HttpServletRequest request, ActivityForm form) {
-		LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
-		if (learnerProgress == null) {
-			SessionBean sessionBean = getSessionBean(request);
-			User learner = sessionBean.getLearner();
-			Lesson lesson = sessionBean.getLesson();
-			
-			ILearnerService learnerService = getLearnerService();
-			learnerProgress = learnerService.getProgress(learner, lesson);
-			
-			// Save progress in session for Flash request
-			sessionBean.setLearnerProgress(learnerProgress);
-			setSessionBean(sessionBean, request);
+	protected LearnerProgress getLearnerProgress(HttpServletRequest request) {
+		
+	    LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+		
+		if (learnerProgress == null) 
+		{
+		    SessionBean sessionBean = LearningWebUtil.getSessionBean(request,getServlet().getServletContext());
+		    learnerProgress = sessionBean.getLearnerProgress();
+		    setSessionBean(sessionBean, request);
 		}
 		return learnerProgress;
 	}

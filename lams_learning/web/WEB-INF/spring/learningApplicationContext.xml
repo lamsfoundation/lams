@@ -19,6 +19,7 @@
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
 		<property name="lamsToolService"><ref bean="lamsToolService"/></property>
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="activityMapping"><ref bean="activityMapping"/></property>
 	</bean>
 	
@@ -42,7 +43,7 @@
 	</bean>
 	
 	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">
-		<!-- property name="lamsToolService"><ref bean="lamsToolService"/></property-->
+		<property name="toolService"><ref bean="lamsToolService"/></property>
 		<property name="baseURL"><value>http://localhost:8080/lams_learning/</value></property>
 	</bean>
 	
