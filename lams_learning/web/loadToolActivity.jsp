@@ -30,10 +30,9 @@ http://www.gnu.org/licenses/gpl.txt
 		
 		<script language="JavaScript" type="text/JavaScript"><!--
 			function redirectPage() {
-				setTimeout("doRedirect()", 1000);
+				setTimeout("doRedirect()", 500);
 			}
 			function doRedirect() {
-				//top.frames['LDContent'].location.href = "<c:out value='${activityForm.activityURLs[0].url}' />";
 				window.location.href = "<c:out value='${activityForm.activityURLs[0].url}' escapeXml="false" />";
 			}
 			window.onload = redirectPage;
