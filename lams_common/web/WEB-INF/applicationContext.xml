@@ -62,12 +62,7 @@
 				<!-- lesson related mapping files-->
 				<value>org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
 				<value>org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
-				<value>org/lamsfoundation/lams/lesson/LessonState.hbm.xml</value>
-				<value>org/lamsfoundation/lams/lesson/ProgressCompleted.hbm.xml</value>
-				<value>org/lamsfoundation/lams/lesson/ProgressCurrent.hbm.xml</value>
-                <value>org/lamsfoundation/lams/lesson/UserToolSession.hbm.xml</value>
-                <value>org/lamsfoundation/lams/lesson/UserGroup.hbm.xml</value>
-                <value>org/lamsfoundation/lams/lesson/UserToolSessionState.hbm.xml</value>
+                <!-- value>com/lamsinternational/lams/lesson/LessonClass.hbm.xml</value-->
 				
 				<!-- Tool related mapping files-->
 				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
@@ -153,6 +148,10 @@
 	</bean>
 
 	<bean id="userOrganisationRoleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationRoleDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="lessonDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
