@@ -77,6 +77,7 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         assertNull("should not get any progress data",progress);
     }
 
+    
     public void testSaveLearnerProgress() throws HibernateException
     {
         super.learnerProgressDao.saveLearnerProgress(this.testLearnerProgress);
@@ -134,6 +135,7 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         progress.setProgressState(firstActivity,LearnerProgress.ACTIVITY_COMPLETED);
         progress.setProgressState(testParallelActivity,LearnerProgress.ACTIVITY_COMPLETED);
         progress.setProgressState(testToolActivity,LearnerProgress.ACTIVITY_ATTEMPTED);
+        progress.setRestarting(true);
         
         super.learnerProgressDao.updateLearnerProgress(progress);
         
@@ -141,11 +143,12 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         assertLearnerProgressInitialization(progress);
         assertEquals("verify completed activity",2,updatedProgress.getCompletedActivities().size());
         assertEquals("verify attempted activity",1,updatedProgress.getAttemptedActivities().size());
-        
+        assertTrue("is restarting",updatedProgress.isRestarting());
         super.learnerProgressDao.deleteLearnerProgress(testLearnerProgress);
         super.getSession().flush();
     }
 
+  
     /**
      * @param progress
      */

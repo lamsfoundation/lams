@@ -24,8 +24,11 @@ package org.lamsfoundation.lams.lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -123,6 +126,9 @@ public class LearnerProgress implements Serializable
      */
     private List currentCompletedActivitiesList;
     
+    /**Indicate whether the learning progress is restarting or not*/
+    private boolean restarting;
+    
     //---------------------------------------------------------------------
     // Constructors
     //---------------------------------------------------------------------
@@ -149,7 +155,9 @@ public class LearnerProgress implements Serializable
         this.attemptedActivities = attemptedActivities;
         this.completedActivities = completedActivities;
     }
-    
+    //---------------------------------------------------------------------
+    // Getters and Setters
+    //---------------------------------------------------------------------
     /**
      *          
      *
@@ -393,5 +401,60 @@ public class LearnerProgress implements Serializable
     {
         this.currentCompletedActivitiesList = new LinkedList();
         this.currentCompletedActivitiesList.addAll(completedActivitiesList);
+    }
+    /**
+     * @return Returns the isRestarting.
+     */
+    public boolean isRestarting()
+    {
+        return restarting;
+    }
+    /**
+     * @param isRestarting The isRestarting to set.
+     */
+    public void setRestarting(boolean restarting)
+    {
+        this.restarting = restarting;
+    }
+    //---------------------------------------------------------------------
+    // Service methods
+    //---------------------------------------------------------------------
+    /**
+     * Returns the learner progress data transfer object.
+     */
+    public LearnerProgressDTO getLearnerProgressData()
+    {
+        
+        return new LearnerProgressDTO(this.lesson.getLessonId(),
+                                      this.lesson.getLessonName(),
+                                      this.user.getLogin(),
+                                      this.user.getUserId(),
+                                      this.currentActivity.getActivityId(),
+                                      this.createIdArrayFrom(this.attemptedActivities),
+                                      this.createIdArrayFrom(this.completedActivities));
+    }
+    
+    //---------------------------------------------------------------------
+    // Helper methods
+    //---------------------------------------------------------------------
+    /**
+     * Extract the Id from activities and set them into an array.
+     * @param activities the activities that is being used to create the 
+     * 					 array.
+     */
+    private Long[] createIdArrayFrom(Set activities)
+    {
+        if(activities == null)
+            throw new IllegalArgumentException("Fail to create id array" +
+            		" from null activity set");
+        
+        ArrayList activitiesIds = new ArrayList();
+        for(Iterator i= activities.iterator();i.hasNext();)
+        {
+            Activity activity = (Activity)i.next();
+            activitiesIds.add(activity.getActivityId());
+        }
+        
+        return (Long [])activitiesIds.toArray(new Long[activitiesIds.size()]);
     }
 }

@@ -26,6 +26,9 @@
 			column="waiting_flag" />
 		<!-- Associations -->
 
+		<property name="restarting" type="java.lang.Boolean"
+			column="requires_restart_flag" />
+
 		<!-- uni-directional one-to-many association to attempted acitivities -->
 		<set name="attemptedActivities" lazy="true" batch-size="20"
 			cascade="none" table="lams_progress_attempted">
