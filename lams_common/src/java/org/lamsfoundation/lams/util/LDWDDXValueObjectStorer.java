@@ -148,7 +148,10 @@ public class LDWDDXValueObjectStorer {
 			learningDesignDAO.insert(learningDesign);			
 			updateDesignActivities(table,learningDesign);		
 		}
-		calculateFirstActivity(firstID,learningDesign);
+		/** The first activity of the design would be calculated only if
+		 *  it is a valid design */
+		if(learningDesign.getValidDesign().booleanValue())
+			calculateFirstActivity(firstID,learningDesign);
 		return learningDesign.getLearningDesignId();		
 	}	
 	/**
