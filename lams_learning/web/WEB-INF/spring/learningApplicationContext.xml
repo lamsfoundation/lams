@@ -13,6 +13,10 @@
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 	<bean id="learnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+		<property name="actionMappings"><ref local="actionMappings"/></property>
+	</bean>
+	
+	<bean id="actionMappings" class="org.lamsfoundation.lams.learning.web.util.ActionMappingsWithToolWait" singleton="false">
 	</bean>
 
 
