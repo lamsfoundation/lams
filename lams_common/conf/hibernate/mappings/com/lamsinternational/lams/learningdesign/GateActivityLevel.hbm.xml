@@ -12,25 +12,25 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.learningdesign.LearningLibrary" 
-    table="lams_learning_library"
+    name="com.lamsinternational.lams.learningdesign.GateActivityLevel" 
+    table="lams_gate_activity_level"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
-        table="lams_learning_library"
+        table="lams_gate_activity_level"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
-        name="learningLibraryId"
-        type="java.lang.Long"
-        column="learning_library_id"
+        name="gateActivityLevelId"
+        type="java.lang.Integer"
+        column="gate_activity_level_id"
     >
         <meta attribute="field-description">
            @hibernate.id
             generator-class="assigned"
-            type="java.lang.Long"
-            column="learning_library_id"
+            type="java.lang.Integer"
+            column="gate_activity_level_id"
 
 
         </meta>
@@ -41,37 +41,13 @@
         name="description"
         type="java.lang.String"
         column="description"
-        length="65535"
+        not-null="true"
+        length="128"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="description"
-            length="65535"
-        </meta>    
-    </property>
-    <property
-        name="title"
-        type="java.lang.String"
-        column="title"
-        length="255"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="title"
-            length="255"
-        </meta>    
-    </property>
-    <property
-        name="createDateTime"
-        type="java.sql.Timestamp"
-        column="create_date_time"
-        not-null="true"
-        length="19"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="create_date_time"
-            length="19"
+            length="128"
             not-null="true"
         </meta>    
     </property>
@@ -92,13 +68,13 @@
             cascade="none"
 
            @hibernate.collection-key
-            column="learning_library_id"
+            column="gate_activity_level_id"
 
            @hibernate.collection-one-to-many
             class="com.lamsinternational.lams.learningdesign.Activity"
         </meta>
         <key>
-            <column name="learning_library_id" />
+            <column name="gate_activity_level_id" />
         </key>
         <one-to-many 
             class="com.lamsinternational.lams.learningdesign.Activity"

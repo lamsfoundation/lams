@@ -12,25 +12,25 @@
 -->
 
 <class 
-    name="com.lamsinternational.lams.learningdesign.Grouping" 
-    table="lams_grouping"
+    name="com.lamsinternational.lams.learningdesign.Tool" 
+    table="lams_tool"
 >
     <meta attribute="class-description" inherit="false">
        @hibernate.class
-        table="lams_grouping"
+        table="lams_tool"
     </meta>
     <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
-        name="groupingId"
+        name="toolId"
         type="java.lang.Long"
-        column="grouping_id"
+        column="tool_id"
     >
         <meta attribute="field-description">
            @hibernate.id
             generator-class="assigned"
             type="java.lang.Long"
-            column="grouping_id"
+            column="tool_id"
 
 
         </meta>
@@ -38,70 +38,74 @@
     </id>
 
     <property
-        name="numberOfGroups"
-        type="java.lang.Integer"
-        column="number_of_groups"
-        length="11"
+        name="learnerUrl"
+        type="java.lang.String"
+        column="learner_url"
+        not-null="true"
+        length="65535"
     >
         <meta attribute="field-description">
            @hibernate.property
-            column="number_of_groups"
-            length="11"
+            column="learner_url"
+            length="65535"
+            not-null="true"
         </meta>    
     </property>
     <property
-        name="learnersPerGroup"
-        type="java.lang.Integer"
-        column="learners_per_group"
-        length="11"
+        name="supportsGrouping"
+        type="java.lang.Boolean"
+        column="supports_grouping_flag"
+        not-null="true"
+        length="1"
     >
         <meta attribute="field-description">
            @hibernate.property
-            column="learners_per_group"
-            length="11"
+            column="supports_grouping_flag"
+            length="1"
+            not-null="true"
         </meta>    
     </property>
     <property
-        name="staffGroupId"
-        type="java.lang.Long"
-        column="staff_group_id"
-        length="20"
+        name="authorUrl"
+        type="java.lang.String"
+        column="author_url"
+        length="65535"
     >
         <meta attribute="field-description">
            @hibernate.property
-            column="staff_group_id"
-            length="20"
+            column="author_url"
+            length="65535"
+        </meta>    
+    </property>
+    <property
+        name="supportsDefineLater"
+        type="java.lang.Boolean"
+        column="supports_define_later_flag"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="supports_define_later_flag"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="defineLaterUrl"
+        type="java.lang.String"
+        column="define_later_url"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="define_later_url"
+            length="65535"
         </meta>    
     </property>
 
     <!-- Associations -->
   
-    <!-- bi-directional one-to-many association to Group -->
-    <set
-        name="groups"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="grouping_id"
-
-           @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.learningdesign.Group"
-        </meta>
-        <key>
-            <column name="grouping_id" />
-        </key>
-        <one-to-many 
-            class="com.lamsinternational.lams.learningdesign.Group"
-        />
-    </set>
     <!-- bi-directional one-to-many association to Activity -->
     <set
         name="activities"
@@ -116,13 +120,13 @@
             cascade="none"
 
            @hibernate.collection-key
-            column="grouping_id"
+            column="tool_id"
 
            @hibernate.collection-one-to-many
             class="com.lamsinternational.lams.learningdesign.Activity"
         </meta>
         <key>
-            <column name="grouping_id" />
+            <column name="tool_id" />
         </key>
         <one-to-many 
             class="com.lamsinternational.lams.learningdesign.Activity"
