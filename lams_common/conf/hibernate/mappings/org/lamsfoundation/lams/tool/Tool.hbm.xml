@@ -160,7 +160,7 @@
     <property
         name="className"
         type="java.lang.String"
-        column="class_name"
+        column="service_name"
         not-null="true"
         length="65535"
     >
