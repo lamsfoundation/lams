@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/java"/>
-	<classpathentry kind="src" path="conf/hibernate/mappings"/>
-	<classpathentry kind="src" path="test/java"/>
+	<classpathentry output="WEB-INF/classes" kind="src" path="src/java"/>
+	<classpathentry output="WEB-INF/classes" kind="src" path="conf/hibernate/mappings"/>
+	<classpathentry output="WEB-INF/classes" kind="src" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/spring/spring.jar"/>
 	<classpathentry kind="lib" path="lib/log4j/log4j-1.2.9.jar"/>
@@ -19,5 +19,8 @@
 	<classpathentry kind="lib" path="lib/jakarta-commons/commons-collections-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/odmg/odmg-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/jdom/jdom.jar"/>
-	<classpathentry kind="output" path="build"/>
+	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/struts/struts.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta-taglibs/standard.jar"/>
+	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

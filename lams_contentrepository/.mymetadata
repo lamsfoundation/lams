@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+   type="WEB"
+   name="lams_contentrepository"
+   id="myeclipse.1105588098424"
+   context-root="/lams_contentrepository"
+   j2ee-spec="1.3"
+   archive="lams_contentrepository.war">
+   <attributes>
+      <attribute name="webrootdir" value="&lt;prjroot&gt;" />
+   </attributes>
+</project-module>
+

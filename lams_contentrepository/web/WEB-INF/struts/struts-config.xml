@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+<struts-config>
+   <data-sources />
+   <form-beans >
+      <form-bean name="loginRepositoryForm" type="com.lamsinternational.lams.contentrepository.struts.form.LoginRepositoryForm" />
+      <form-bean name="nodeSelectionForm" type="com.lamsinternational.lams.contentrepository.struts.form.NodeSelectionForm" />
+   </form-beans>
+
+   <global-exceptions>
+	   <exception
+	        key="exception.accessDenied"
+    	    type="com.lamsinternational.lams.contentrepository.AccessDeniedException"
+        	path="/error.jsp"/>
+	   <exception
+	        key="exception.loginFailed"
+    	    type="com.lamsinternational.lams.contentrepository.LoginException"
+        	path="/error.jsp"/>
+	   <exception
+	        key="exception.workspaceNotFound"
+    	    type="com.lamsinternational.lams.contentrepository.WorkspaceNotFoundException"
+        	path="/error.jsp"/>
+	   <exception
+	        key="exception.itemNotFound"
+    	    type="com.lamsinternational.lams.contentrepository.ItemNotFoundException"
+        	path="/error.jsp"/>
+	   <exception
+	        key="exception.file"
+    	    type="com.lamsinternational.lams.contentrepository.FileException"
+        	path="/error.jsp"/>
+	   <exception
+	        key="exception.repository"
+    	    type="com.lamsinternational.lams.contentrepository.RepositoryCheckedException"
+        	path="/error.jsp"/>
+	   <exception
+	        key="exception.repository"
+    	    type="java.lang.Exception"
+        	path="/error.jsp"/>
+    </global-exceptions>
+   
+    
+   <global-forwards >
+      <forward name="error" path="/error.do" />
+   </global-forwards>
+
+   <action-mappings >
+      <action
+         path="/loginRepository"
+         type="com.lamsinternational.lams.contentrepository.struts.action.LoginRepositoryAction"
+         name="loginRepositoryForm"
+         validate="true"
+         scope="request"
+         attribute="loginRepositoryForm"
+         input="/loginRepository.jsp"
+         parameter="method">
+         <forward name="success" path="/nodeSelection.jsp"/>
+      </action>
+      <action
+         path="/nodeSelection"
+         type="com.lamsinternational.lams.contentrepository.struts.action.NodeSelectionAction"
+         name="nodeSelectionForm"
+         input="/nodeSelection.jsp"
+         parameter="method" />
+      <action
+         path="/error"
+         forward="/error.jsp"
+         />
+   </action-mappings>
+
+   <controller bufferSize="4096" debug="0" />
+   <message-resources parameter="com.lamsinternational.lams.contentrepository.struts.ApplicationResources"/>
+</struts-config>
+
