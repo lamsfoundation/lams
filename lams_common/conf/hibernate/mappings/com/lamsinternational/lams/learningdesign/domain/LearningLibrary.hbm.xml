@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="com.lamsinternational.lams.learningdesign.domain.LearningLibrary" 
+    table="lams_learning_library"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_learning_library"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="learningLibraryId"
+        type="java.lang.Long"
+        column="learning_library_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="assigned"
+            type="java.lang.Long"
+            column="learning_library_id"
+
+
+        </meta>
+        <generator class="assigned" />
+    </id>
+
+    <property
+        name="description"
+        type="java.lang.String"
+        column="description"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="description"
+            length="65535"
+        </meta>    
+    </property>
+    <property
+        name="title"
+        type="java.lang.String"
+        column="title"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="title"
+            length="255"
+        </meta>    
+    </property>
+    <property
+        name="createDateTime"
+        type="java.sql.Timestamp"
+        column="create_date_time"
+        not-null="true"
+        length="19"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="create_date_time"
+            length="19"
+            not-null="true"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to Activity -->
+    <set
+        name="activities"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="learning_library_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.learningdesign.domain.Activity"
+        </meta>
+        <key>
+            <column name="learning_library_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.learningdesign.domain.Activity"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>
