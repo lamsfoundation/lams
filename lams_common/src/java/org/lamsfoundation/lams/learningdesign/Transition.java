@@ -172,7 +172,7 @@ public class Transition implements Serializable {
 		return this.toActivity;
 	}
 
-	public void setActivityByToActivityId(
+	public void setToActivity(
 			org.lamsfoundation.lams.learningdesign.Activity toActivity) {
 		this.toActivity = toActivity;
 	}

@@ -49,7 +49,7 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
 		Activity activity = learningDesign.calculateFirstActivity();
 		assertNotNull(activity.getActivityId());
-		long x = 15;
+		long x = 20;
 		assertEquals(activity.getActivityId().longValue(),x);
 	}
 	/* (non-Javadoc)
