@@ -24,7 +24,7 @@
 		<property name="target"><ref local="toolContentIDGeneratorTarget"/></property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="getNextToolContentIDFor">PROPAGATION_REQUIRES_NEW,ISOLATION_READ_UNCOMMITTED</prop>
+				<prop key="getNextToolContentIDFor">PROPAGATION_REQUIRES_NEW,ISOLATION_READ_COMMITTED</prop>
 			</props>
 		</property>
 	</bean>
