@@ -35,6 +35,9 @@ public class LearningLibrary implements Serializable {
 
     /** persistent field */
     private Set activities;
+    
+    /** persistent field */
+    private Boolean validLibrary;
 
     /** full constructor */
     public LearningLibrary(Long learningLibraryId, String description, String title, Date createDateTime, Set activities) {
@@ -153,4 +156,10 @@ public class LearningLibrary implements Serializable {
             .append(getLearningLibraryId())
             .toHashCode();
     }
+	public Boolean getValidLibrary() {
+		return validLibrary;
+	}
+	public void setValidLibrary(Boolean validLibrary) {
+		this.validLibrary = validLibrary;
+	}
 }
