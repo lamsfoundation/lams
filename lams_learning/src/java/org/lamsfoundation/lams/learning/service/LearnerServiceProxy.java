@@ -23,6 +23,8 @@ package org.lamsfoundation.lams.learning.service;
 
 import javax.servlet.ServletContext;
 
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -62,6 +64,26 @@ public class LearnerServiceProxy
         return (IUserManagementService)getDomainService(servletContext,"userManagementService");
     }
     
+    /**
+     * Return the lams tool domain service object. It will delegate to the 
+     * Spring helper method to retrieve the proper bean from Spring bean factory.
+     * @param serlvetContext the servletContext for current application
+     * @return tool service object
+     */
+    public static final ILamsToolService getLamsToolService(ServletContext serlvetContext)
+    {
+        return (ILamsToolService)getDomainService(serlvetContext,"lamsToolService");
+    }
+    
+    /**
+     * Return the activity mapping service object.
+     * @param serlvetContext the servletContext for current application
+     * @return the activity mapping service object.
+     */
+    public static final ActivityMapping getActivityMapping(ServletContext serlvetContext)
+    {
+        return (ActivityMapping)getDomainService(serlvetContext,"activityMapping");
+    }
     /**
      * Retrieve the proper Spring bean from bean factory. 
      * @param servletContext the servletContext for current application

@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 
 
 /**
@@ -38,8 +39,10 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
    
     private static final String TEST_USER_ID = "2";
     private static final String TEST_LESSON_ID = "2";
+    private static final String TEST_ACTIVITY_ID = "26";
     
     private static SessionBean joinedLessonBean = null;
+
     /*
      * @see TestCase#setUp()
      */
@@ -65,6 +68,7 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
     {
         return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
   			   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
+  			   +"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml "
   			   +"applicationContext.xml "
   			   +"/WEB-INF/spring/learningApplicationContext.xml";
     }
@@ -81,7 +85,7 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
     public void testGetActiveLessons()
     {
         addRequestParameter("method", "getActiveLessons");
-        addRequestParameter("userId", TEST_USER_ID);
+        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
 
         actionPerform();
 
@@ -91,8 +95,8 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
     public void testJoinLesson()
     {
         addRequestParameter("method", "joinLesson");
-        addRequestParameter("userId", TEST_USER_ID);
-        addRequestParameter("lessonId", TEST_LESSON_ID);
+        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
+        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         actionPerform();
         
@@ -109,8 +113,8 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
     {
         httpSession.setAttribute(SessionBean.NAME,joinedLessonBean);
         addRequestParameter("method", "getFlashProgressData");
-        addRequestParameter("userId", TEST_USER_ID);
-        addRequestParameter("lessonId", TEST_LESSON_ID);
+        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
+        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         actionPerform();
         verifyNoActionErrors();
@@ -119,8 +123,8 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
     public void testExitLesson()
     {
         addRequestParameter("method", "exitLesson");
-        addRequestParameter("userId", TEST_USER_ID);
-        addRequestParameter("lessonId", TEST_LESSON_ID);
+        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
+        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         actionPerform();
         
@@ -129,4 +133,14 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
         verifyNoActionErrors();
     }
 
+    public void testGetLearnerActivityURL()
+    {
+        addRequestParameter("method", "getLearnerActivityURL");
+        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_USER_ID);
+        addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID, TEST_ACTIVITY_ID);
+        
+        actionPerform();
+        
+        verifyNoActionErrors();
+    }
 }

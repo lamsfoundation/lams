@@ -34,13 +34,19 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
+
+
 
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -84,10 +90,7 @@ public class LearnerAction extends LamsDispatchAction
     // Instance variables
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(LearnerAction.class);
-	private static final String PARAM_USER_ID = "userId";
-    private static final String PARAM_LESSON_ID = "lessonId";
-    private static final String ATTR_USERDATA = "user";
-    //private static final String PARAM_LEARNER_PROGRESS="?learnerProgressId=";
+	
     //---------------------------------------------------------------------
     // Class level constants - Struts forward
     //---------------------------------------------------------------------
@@ -167,7 +170,6 @@ public class LearnerAction extends LamsDispatchAction
 
         //get user and lesson based on request.
         User learner = LearningWebUtil.getUserData(request, getServlet().getServletContext());
-        
         Lesson lesson = LearningWebUtil.getLessonData(request,getServlet().getServletContext());
 
         
@@ -320,7 +322,31 @@ public class LearnerAction extends LamsDispatchAction
                                                HttpServletResponse response) throws IOException,
                                                                           	ServletException
     {
+        if(log.isDebugEnabled())
+            log.debug("Getting url for learner activity...");
+        //get parameter
+        long activityId = WebUtil.readLongParam(request,LearningWebUtil.PARAM_ACTIVITY_ID);
         
+        //initialize service object
+        ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+
+        //getting requested object according to coming parameters
+        User learner = LearningWebUtil.getUserData(request, getServlet().getServletContext());
+        Activity requestedActivity = learnerService.getActivity(new Long(activityId));
+        
+        //preparing tranfer object for flash
+        ProgressActivityDTO activityDTO = new ProgressActivityDTO(new Long(activityId),
+                                                                  activityMapping.calculateActivityURLForProgressView(learner,requestedActivity));
+        //send data back to flash.
+        String learnerActivityURL = WDDXProcessor.serialize(new FlashMessage("getLearnerActivityURL",
+                                                                             activityDTO));
+
+        if(log.isDebugEnabled())
+            log.debug("Sending learner activity url data to flash:"+learnerActivityURL);
+        
+        //don't need to return a action forward because it sent the wddx packet
+        //back already.
         return null;
     }
 }

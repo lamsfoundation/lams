@@ -117,6 +117,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     {
         return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+  			  				"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
                               "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
                               "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",          					  
         					  "applicationContext.xml",

@@ -28,13 +28,17 @@ import java.net.URLEncoder;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ForwardingActionForward;
 import org.apache.struts.action.RedirectingActionForward;
+import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 
 /**
@@ -266,6 +270,44 @@ public class ActivityMapping implements Serializable {
 		return actionForward;
 	}
 	
+	/**
+	 * Calculate the activity url for progress view at learner side.
+	 * @param learner the learner who owns the progress data
+	 * @param activity the activity the learner want to view
+	 * @return the url for that tool.
+	 */
+	public String calculateActivityURLForProgressView(User learner, Activity activity)
+	{
+	    //Activity activity = learnerService.getActivity(activityId);
+        try
+        {
+            if(activity instanceof ToolActivity)
+            {
+                ToolSession toolSession = toolService.getToolSessionByActivity(learner,(ToolActivity) activity);
+                return ((ToolActivity)activity).getTool().getLearnerUrl()
+                		+"&"
+                		+WebUtil.PARAM_TOOL_SESSION_ID
+                		+"="
+                		+toolSession.getToolSessionId().toString()
+                		+"&"
+                		+WebUtil.PARAM_MODE
+                		+"="
+                		+ToolAccessMode.LEARNER;
+            }
+            else if(activity instanceof GroupingActivity)
+                //TODO need to be changed when group action servlet is done
+                return "/viewGrouping.do?";
+        }
+        catch (LamsToolServiceException e)
+        {
+            //TODO define an exception at web layer
+            throw new LearnerServiceException(e.getMessage());
+        }
+        
+        throw new LearnerServiceException("Fails to get the progress url view" +
+        		" for activity["+activity.getActivityId().longValue()+"]");
+	}
+	
 	public void setToolService(ILamsToolService toolService) {
 		this.toolService = toolService;
 	}
@@ -281,6 +323,4 @@ public class ActivityMapping implements Serializable {
 	public void setActivityMappingStrategy(ActivityMappingStrategy activityMappingStrategy) {
 		this.activityMappingStrategy = activityMappingStrategy;
 	}
-	
-	
 }

@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 
 import org.lamsfoundation.lams.lesson.Lesson;
 
@@ -60,6 +61,7 @@ public class LearnerService implements ILearnerService
     
     private ILearnerProgressDAO learnerProgressDAO;
     private ILessonDAO lessonDAO;
+    private IActivityDAO activityDAO;
     private ProgressEngine progressEngine;
     private IToolSessionDAO toolSessionDAO;
     private ILamsToolService lamsToolService;
@@ -111,6 +113,14 @@ public class LearnerService implements ILearnerService
     public void setActivityMapping(ActivityMapping activityMapping) {
 		this.activityMapping = activityMapping;
 	}
+    
+    /**
+     * @param activityDAO The activityDAO to set.
+     */
+    public void setActivityDAO(IActivityDAO activityDAO)
+    {
+        this.activityDAO = activityDAO;
+    }
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
@@ -269,6 +279,14 @@ public class LearnerService implements ILearnerService
        learnerProgressDAO.updateLearnerProgress(progress);
     }
     
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActivity(java.lang.Long)
+     */
+    public Activity getActivity(Long activityId)
+    {
+        return activityDAO.getActivityByActivityId(activityId);
+    }
+    
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------
@@ -314,6 +332,7 @@ public class LearnerService implements ILearnerService
                                             ToolActivity toolActivity)
     {
         ToolSession targetSession = null;
+        //TODO need to be changed according to the change grouping concept
         if(!toolActivity.getTool().getSupportsGrouping())
             targetSession = toolSessionDAO.getToolSessionByLearner(learnerProgress.getUser(),
                                                                    toolActivity);
@@ -363,5 +382,8 @@ public class LearnerService implements ILearnerService
         }
         return (LessonDTO[])lessonDTOList.toArray(new LessonDTO[lessonDTOList.size()]);   
     }
+
+
    
+
 }

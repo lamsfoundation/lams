@@ -110,4 +110,6 @@ public interface ILearnerService
     public void exitLesson(LearnerProgress progress);
     
     
+    public Activity getActivity(Long activityId);
+    
 }

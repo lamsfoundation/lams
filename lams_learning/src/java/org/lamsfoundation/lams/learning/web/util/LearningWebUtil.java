@@ -49,9 +49,10 @@ public class LearningWebUtil
     //---------------------------------------------------------------------
     // Class level constants - session attributes
     //---------------------------------------------------------------------
-	private static final String PARAM_USER_ID = "userId";
-    private static final String PARAM_LESSON_ID = "lessonId";
-    private static final String ATTR_USERDATA = "user";
+	public static final String PARAM_USER_ID = "userId";
+	public static final String PARAM_LESSON_ID = "lessonId";
+	public static final String ATTR_USERDATA = "user";
+	public static final String PARAM_ACTIVITY_ID = "activityId";
     
     /**
      * Helper method to retrieve the user data. We always load up from http
