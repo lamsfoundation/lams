@@ -151,7 +151,7 @@ CREATE TABLE lams_workspace_folder (
 
 CREATE TABLE lams_workspace (
        workspace_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , root_folder_id BIGINT(20) NOT NULL
+     , root_folder_id BIGINT(20)
      , name VARCHAR(255)
      , PRIMARY KEY (workspace_id)
      , INDEX (root_folder_id)

@@ -306,8 +306,8 @@
 <column name="grouping_support_type_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
@@ -319,8 +319,8 @@
 <column name="apply_grouping_flag" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
@@ -499,8 +499,8 @@
 <column name="activity_category_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
@@ -1019,7 +1019,7 @@
 <variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
 </data-type>
 </column>
-<column name="last_modified_date_time" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column name="last_modified_date_time" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="DATETIME"/>
@@ -2158,11 +2158,11 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="root_folder_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column name="root_folder_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
@@ -2273,7 +2273,7 @@
 <variant type-name-pattern="DATETIME"/>
 </data-type>
 </column>
-<column name="last_modified_date_time" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column name="last_modified_date_time" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="DATETIME"/>
@@ -2759,8 +2759,8 @@
 <column name="grouping_support_type_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
@@ -2785,8 +2785,8 @@
 <column name="supports_run_offline_flag" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
@@ -2811,8 +2811,8 @@
 <column name="supports_contribute_flag" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
@@ -4077,8 +4077,8 @@ It is the node_id and version_id combination that is the "real" key for this tab
 <column name="grouping_support_type_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
@@ -4110,8 +4110,8 @@ It is the node_id and version_id combination that is the "real" key for this tab
 <column name="log_event_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="true">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
@@ -4123,8 +4123,8 @@ It is the node_id and version_id combination that is the "real" key for this tab
 <column name="log_event_type_id" alias="" remarks="" mandatory="true" column-size="5" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
@@ -4136,8 +4136,8 @@ It is the node_id and version_id combination that is the "real" key for this tab
 <column name="user_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
@@ -4155,8 +4155,8 @@ It is the node_id and version_id combination that is the "real" key for this tab
 <column name="ref_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
 <variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
@@ -4196,8 +4196,8 @@ It is the node_id and version_id combination that is the "real" key for this tab
 <column name="log_event_type_id" alias="" remarks="" mandatory="true" column-size="5" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT"/>
 <variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
