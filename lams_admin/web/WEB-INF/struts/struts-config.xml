@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+
+<struts-config>
+
+	<!-- ========== Data Sources Definitions =================================== -->
+	<!--
+		Define your Struts data sources in a file called struts-data-sources.xml and place
+		it in your merge directory.
+	-->
+
+	<!-- ========== Form Bean Definitions =================================== -->
+	<form-beans>
+	
+    <form-bean name="PasswordChangeActionForm"
+               type="org.lamsfoundation.lams.admin.login.web.PasswordChangeActionForm" />
+    
+    <form-bean name="OrganisationActionForm"
+               type="org.lamsfoundation.lams.admin.web.OrganisationActionForm" />
+
+    <form-bean name="UserActionForm"
+               type="org.lamsfoundation.lams.admin.web.UserActionForm" />
+               
+    <form-bean name="UsersAddActionForm"
+               type="org.lamsfoundation.lams.admin.web.UsersAddActionForm" />
+
+    <form-bean name="UsersRemoveActionForm"
+               type="org.lamsfoundation.lams.admin.web.UsersRemoveActionForm" />
+               
+	</form-beans>
+	<!-- ========== Global Exceptions Definitions =================================== -->
+	<!--
+		Define your exceptions in a file called global-exceptions.xml and place
+		it in your merge directory.
+	-->
+
+	<!-- ========== Global Forward Definitions =================================== -->
+	<!--
+		Define your forwards in a file called global-forwards.xml and place
+		it in your merge directory.
+	-->
+	<global-forwards>
+		<forward name="error" path=".error"/>
+	</global-forwards>
+
+	<!-- ========== Action Mapping Definitions =================================== -->
+	<action-mappings>
+
+    <action path="/home"
+            type="org.lamsfoundation.lams.admin.login.web.HomeAction"
+            parameter="method">
+      <forward name="admin"
+               path=".admin">
+      </forward>
+      <forward name="staff"
+               path="/staff.jsp">
+      </forward>
+      <forward name="author"
+               path="/author.jsp">
+      </forward>
+      <forward name="learner"
+               path="/learner.jsp">
+      </forward>
+      <forward name="passwordChange"
+               path=".passwordChange">
+      </forward>
+	</action>
+
+    <action path="/admin"
+            type="org.lamsfoundation.lams.admin.web.AdminAction"
+            parameter="method">
+      <forward name="admin"
+               path=".admin">
+      </forward>
+      <forward name="organisation"
+               path=".admin.organisation">
+      </forward>
+      <forward name="user"
+               path=".admin.user">
+      </forward>
+      <forward name="usersadd"
+               path=".admin.usersadd">
+      </forward>
+      <forward name="usersremove"
+               path=".admin.usersremove">
+      </forward>
+      <forward name="error"
+               path=".admin.error">
+      </forward>
+	</action>
+
+    <action path="/organisation"
+            type="org.lamsfoundation.lams.admin.web.OrganisationAction"
+            name="OrganisationActionForm"
+            scope="session"
+            input=".admin.organisation"
+            validate="true">
+      <forward name="admin"
+               path=".admin">
+      </forward>
+      <forward name="error"
+               path=".admin.error">
+      </forward>
+	</action>
+
+    <action path="/user"
+            type="org.lamsfoundation.lams.admin.web.UserAction"
+            name="UserActionForm"
+            scope="session"
+            input=".admin.user"
+            validate="true">
+      <forward name="admin"
+               path=".admin">
+      </forward>
+      <forward name="error"
+               path=".admin.error">
+      </forward>
+	</action>
+
+    <action path="/usersadd"
+            type="org.lamsfoundation.lams.admin.web.UsersAddAction"
+            name="UsersAddActionForm"
+            scope="session"
+            input=".admin.usersadd"
+            validate="true">
+      <forward name="admin"
+               path=".admin">
+      </forward>
+      <forward name="usersadd"
+               path=".admin.usersadd">
+      </forward>
+      <forward name="error"
+               path=".admin.error">
+      </forward>
+	</action>
+
+    <action path="/usersremove"
+            type="org.lamsfoundation.lams.admin.web.UsersRemoveAction"
+            name="UsersRemoveActionForm"
+            scope="session"
+            input=".admin.usersremove"
+            validate="false">
+      <forward name="admin"
+               path=".admin">
+      </forward>
+      <forward name="error"
+               path=".admin.error">
+      </forward>
+	</action>
+
+
+    <action path="/passwordChanged"
+            type="org.lamsfoundation.lams.admin.login.web.PasswordChangeAction"
+            name="PasswordChangeActionForm"
+            scope="session"
+            input=".passwordChange"
+            validate="true">
+      <forward name="okay"
+               path=".passwordChangeOk">
+      </forward>
+      <forward name="cancelled"
+               path="/index.jsp">
+      </forward>
+	</action>
+	
+	<action path="/passwordChangeOk"
+			parameter="/index.jsp"
+			type="org.apache.struts.actions.ForwardAction"
+			scope="request"
+			validate="false">
+	</action>
+		<!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
+	</action-mappings>
+
+	<!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
+
+   <message-resources parameter="org.lamsfoundation.lams.admin.application" />
+
+	<!-- ===================== Plugin Definition  ======================== -->
+	<plug-in className="org.apache.struts.tiles.TilesPlugin">
+		<set-property property="definitions-config"
+			value="/WEB-INF/tiles/tiles-defs.xml" />
+		<set-property property="definitions-debug" value="0" />
+		<set-property property="definitions-parser-details" value="0" />
+		<set-property property="definitions-parser-validate" value="true" />
+	</plug-in>
+
+
+</struts-config>

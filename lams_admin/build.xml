@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+
+<!-- -->
+<!DOCTYPE project [
+]>
+
+
+<project name="lams_admin" default="usage" basedir=".">
+
+	<property file="build.properties" />
+
+	<path id="all-libs">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${common.lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement location="${common.build.dir}" />
+	</path>
+
+	<path id="project.classpath">
+		<path refid="all-libs" />
+		<!-- Java CLASSPATH should be added as the last item -->
+		<!-- This property is supposed to be set in eclipse  -->
+		<pathelement location="${java.class.path}" />
+	</path>
+
+	<target name="usage">
+		<echo message="" />
+		<echo message="${name} build file" />
+		<echo
+			message="------------------------------------------------------" />
+		<echo message="" />
+		<echo message="Among the available targets are:" />
+		<echo message="" />
+		<echo message="build    --> build all; don't create JARs" />
+		<echo message="alljars  --> create all JAR files" />
+		<echo message="tests    --> run tests" />
+		<echo message="" />
+	</target>
+
+	<target name="init">
+		<available property="xdoclet-jars-installed"
+			file="lib/xdoclet/xdoclet-${xdoclet.version}.jar" />
+	</target>
+
+
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+	<target name="preparedirs">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build.classes.java}" />
+		<mkdir dir="${build.classes.test}" />
+		<mkdir dir="${build.lib}" />
+	</target>
+
+	<target name="clean" depends="preparedirs"
+		description="removes all class files">
+		<delete>
+			<fileset dir="${build.classes.java}" />
+			<fileset dir="${build.classes.test}" />
+			<fileset dir="${build.lib}" />
+		</delete>
+	</target>
+
+	<target name="compile.java" depends="clean"
+		description="compile java sources">
+		<javac srcdir="${src.dir.java}" compiler="modern"
+			destdir="${build.classes.java}" deprecation="on" debug="on">
+			<classpath>
+				<path refid="project.classpath" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="compile.test" depends="compile.java">
+		<javac destdir="${build.classes.test}" compiler="modern">
+			<src path="${test.dir.java}" />
+			<classpath>
+				<pathelement location="${build.classes.java}" />
+				<path refid="project.classpath" />
+			</classpath>
+		</javac>
+	</target>
+	
+	
+	<target name="prepareconfdir-windows">
+		<delete quiet="true">
+			<fileset dir="${lamsconf.windows.dir}"/>
+		</delete>
+		<mkdir dir="${lamsconf.windows.dir}"/>
+	</target>
+	
+	<target name="copyconf-windows" depends="prepareconfdir-windows" description="copy lib and config files">
+		<copy overwrite="yes" todir="${jboss.home.windows.dir}/server/default/conf/">
+			<fileset dir="${conf.jboss.windows.dir}/">
+				<include name="login-config.xml"/>
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${lamsconf.windows.dir}">
+			<fileset dir="${conf.auth.windows.dir}/">
+				<include name="*.xml"/>
+				<include name="*.dtd"/>
+			</fileset>
+			<fileset dir="${conf.lams.windows.dir}/">
+				<include name="*.xml"/>
+				<include name="*.dtd"/>
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${jboss.deploy.windows.dir}">
+			<fileset dir="${conf.jboss.windows.dir}/service">
+				<include name="mysql*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Fails if XDoclet 1.2.x is not on classpath                          -->
+	<!-- =================================================================== -->
+	<target name="fail-if-no-xdoclet-1.2"
+		unless="xdoclet-jars-installed">
+		<fail>
+			You must download several jar files before you can build
+			Middlegen. Execute the "download-deps" target. Then try to
+			build again.
+
+			If you are behind a proxy, you should define the properties
+			http.proxyHost and http.proxyPort. Example:
+
+			ant -Dhttp.proxyHost=foo.com -Dhttp.proxyPort=8080
+
+			It's also possible to download the jars manually.
+		</fail>
+	</target>
+
+
+	<!-- =================================================================== -->
+	<!-- Run webdoclet                                                       -->
+	<!-- =================================================================== -->
+
+
+	<!-- the webdoclet target is commented out as the web.xml and
+	struts-config.xml are not auto-generated -->
+	<!--taskdef name="webdoclet"
+		classname="xdoclet.modules.web.WebDocletTask">
+		<classpath refid="all-libs" />
+	</taskdef>
+
+	<target name="webdoclet" depends="preparedirs">
+		<webdoclet destdir="${generated.java}"
+			force="${xdoclet.force}">
+
+			<fileset dir="${src.dir.java}">
+	            <include name="**/*Action.java" />
+	            <include name="**/*Form.java" />
+			</fileset>
+			<fileset dir="${test.dir.java}">
+	            <include name="**/*Action.java" />
+	            <include name="**/*Form.java" />
+			</fileset>
+
+			<deploymentdescriptor servletspec="2.3"
+				destdir="${conf.webinf.dir}" mergedir="${conf.xdoclet.dir}"
+				sessiontimeout="${sessiontimeout}" />
+
+			<strutsconfigxml destdir="${conf.struts.dir}"
+				mergedir="${conf.xdoclet.dir}" version="1.2" />
+		</webdoclet>
+	</target-->
+
+
+	<!-- =================================================================== -->
+	<!-- Run JUnit Tests                                                     -->
+	<!-- =================================================================== -->
+	<!-- target name="test" depends="compile.test,build-db">
+		<mkdir dir="${build.report}" />
+		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
+			fork="yes">
+			<formatter type="plain" usefile="false" />
+			<formatter type="xml" />
+			<batchtest todir="${build.report}">
+				<fileset dir="${src.dir.test}">
+					<include name="**/Test*.java" />
+					<exclude name="**/Test*All.java" />
+					<exclude name="**/TestInitSurveySession.java" />
+					<exclude name="**/*Action.java" />
+				</fileset>
+			</batchtest>
+			<classpath>
+				<pathelement location="${build.classes.java}" />
+				<pathelement location="${build.classes.test}" />
+				<pathelement location="${conf.hibernate.mapping.dir}" />
+				<pathelement location="${conf.web.dir}" />
+				<path refid="project.classpath" />
+			</classpath>
+		</junit>
+	</target>
+
+	<target name="test-report" depends="test">
+		<mkdir dir="${build.report}/html" />
+		<junitreport todir="${build.report}">
+			<fileset dir="${build.report}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report todir="${build.report}/html" />
+		</junitreport>
+	</target-->
+
+</project>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "file:///usr/local/lamsconf/authentication.dtd">
+
+<Authentication>
+
+<Method Name="MQ-LDAP" Enabled="true">
+	<Param Name="java.naming.factory.initial">com.sun.jndi.ldap.LdapCtxFactory</Param>
+	<Param Name="java.naming.provider.url">ldap://mams.melcoe.mq.edu.au:636</Param>
+	<Param Name="java.naming.security.authentication">simple</Param>
+	<Param Name="java.naming.security.protocol">ssl</Param>
+	<Param Name="principalDNPrefix">uid=</Param>
+	<Param Name="principalDNSuffix">,ou=mams,dc=melcoe,dc=mq,dc=edu,dc=au</Param>
+	<Param Name="dsJndiName">java:/MySqlDS</Param>
+	<Param Name="principalsQuery">select password from lams_user where login=?</Param>
+	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
+	<Param Name="truststore.path">D:/MQLdapTrustStore</Param>
+	<Param Name="truststore.password">webauth</Param>
+</Method>
+
+
+<Method Name="LAMS-Database" Enabled="true">
+	<Param Name="dsJndiName">java:/MySqlDS</Param>
+	<Param Name="principalsQuery">select password from lams_user where login=?</Param>
+	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
+</Method>
+
+<Method Name="Oxford-WebAuth" Enabled="true">
+	<Param Name="WebAuthTokenName">WEBAUTH_USER</Param>
+	<Param Name="WebAuthTriggerPage">https://array00.melcoe.mq.edu.au/webauth.html</Param>
+	<Param Name="DummyPasswordForWebAuthUser">dummy</Param>
+	<Param Name="dsJndiName">java:/MySqlDS</Param>
+	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
+</Method>
+
+<!-- NOT in USE -->
+<Method Name="MQ-LDAP-BULK-IMPORT" Enabled="true">
+	<Param Name="com.lams.naming.import.ldap.provider.url">ldap://mams.melcoe.mq.edu.au:636</Param>
+	<Param Name="com.lams.naming.import.ldap.security.protocol">ssl</Param>
+	<!--giving name only means it can be found under classpath -->
+	<Param Name="truststore.path">MQLdapTrustStore</Param>
+	<Param Name="com.lams.naming.import.ldap.security.authentication">simple</Param>
+	<Param Name="com.lams.naming.import.ldap.security.principal">cn=admin,dc=melcoe,dc=mq,dc=edu,dc=au</Param>
+	<Param Name="com.lams.naming.import.ldap.security.credentials">KingKong</Param>
+	<Param Name="com.lams.naming.import.ldap.searchbase">ou=mams,dc=melcoe,dc=mq,dc=edu,dc=au</Param>
+	<!-- Schema Mapping Format: ApplicationPropertyName=LDAPSchemaAttributeName -->
+	<Param Name="com.lams.naming.import.ldap.mapping">login=uid,firstName=givenName,lastName=sn,email=mail</Param>
+	<Param Name="com.lams.naming.import.ldap.factory.initial">com.sun.jndi.ldap.LdapCtxFactory</Param>
+	<Param Name="dsJndiName">java:/MySqlDS</Param>
+	<Param Name="principalsQuery">select password from lams_user where login=?</Param>
+	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
+</Method>
+
+</Authentication>
