@@ -30,14 +30,13 @@ INSERT INTO lams_tool_session_type VALUES (2, 'GROUPED');
 
 
 INSERT INTO lams_learning_activity_type VALUES (1, 'TOOL');
-INSERT INTO lams_learning_activity_type VALUES (2, 'GROUPING_RANDOM');
-INSERT INTO lams_learning_activity_type VALUES (3, 'GROUPING_CHOSEN');
-INSERT INTO lams_learning_activity_type VALUES (4, 'GATE_SYNCH');
-INSERT INTO lams_learning_activity_type VALUES (5, 'GATE_SCHEDULE');
-INSERT INTO lams_learning_activity_type VALUES (6, 'GATE_PERMISSION');
-INSERT INTO lams_learning_activity_type VALUES (7, 'PARALLEL');
-INSERT INTO lams_learning_activity_type VALUES (8, 'OPTIONS');
-INSERT INTO lams_learning_activity_type VALUES (9, 'SEQUENCE');
+INSERT INTO lams_learning_activity_type VALUES (2, 'GROUPING');
+INSERT INTO lams_learning_activity_type VALUES (3, 'GATE_SYNCH');
+INSERT INTO lams_learning_activity_type VALUES (4, 'GATE_SCHEDULE');
+INSERT INTO lams_learning_activity_type VALUES (5, 'GATE_PERMISSION');
+INSERT INTO lams_learning_activity_type VALUES (6, 'PARALLEL');
+INSERT INTO lams_learning_activity_type VALUES (7, 'OPTIONS');
+INSERT INTO lams_learning_activity_type VALUES (8, 'SEQUENCE');
 
 
 INSERT INTO lams_gate_activity_level VALUES (1, 'LEARNER');

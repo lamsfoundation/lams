@@ -155,7 +155,7 @@ insert into lams_user_group values(2,88);
 insert into lams_user_group values(2, 90);
 insert into lams_user_group values(3, 89);
 
-insert into lams_lesson values (1, 1, 1, 'Test Lesson','Description','2005-02-23 17:37:25', 1, 3, 1, NULL, 101,null,null);
+insert into lams_lesson values (1, 1, 1,'Test_Lesson','This is for testing', '2005-02-23 17:37:25', 1, 101,3, NULL,'2005-02-25 17:37:25',NULL,'2005-02-26 17:37:25' );
 
 -- Populates the lams_learning_activity table with default activity templates that would be avaialbe to the
 -- author in the left panel and a default dummy learning_design defination 
@@ -300,9 +300,9 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (12,12,'Optional Activity Description','Optional Activity Title',10,20,null,'Help Text for Activity',
-8,null,1,0,
+7,null,1,0,
 1,null,'20050101','Offline Instructions ',0,
-1,3,null,null,
+1,1,null,null,
 null,'20050101','20050101','image');
 
 insert into lams_learning_activity
@@ -313,7 +313,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (13,13,'Parallel Activity Description','Parallel Activity Title',10,20,null,'Help Text for Activity',
-7,null,1,0,
+6,null,1,0,
 1,null,'20050101','Parallel Activity Offline  Instructions ',0,
 null,null,null,null,
 null,null,null,'image');
@@ -326,7 +326,7 @@ max_number_of_options,min_number_of_options,tool_id,tool_content_id,
 gate_activity_level_id,gate_start_time_offset,gate_end_time_offset,library_activity_ui_image)
 values
 (14,14,'Sequence Activity Description','Sequence Activity Title',10,20,null,'Help Text for Activity',
-9,null,1,0,
+8,null,1,0,
 1,null,'20050101','Sequence Activity Offline  Instructions ',0,
 null,null,null,null,
 null,null,null,'image');
