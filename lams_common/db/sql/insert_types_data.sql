@@ -62,7 +62,9 @@ INSERT into lams_license VALUES (4, 'Attribution-Noncommercial-No Derivatives', 
 INSERT into lams_license VALUES (5, 'Attribution-Noncommercial', 'by-nc', 'http://creativecommons.org/licenses/by-nc/2.0/','false','');
 INSERT into lams_license VALUES (6, 'Attribution-ShareAlike', 'by-sa', 'http://creativecommons.org/licenses/by-sa/2.0/','false',''); 
 
-
+INSERT into lams_copy_type VALUES(1,'NONE');
+INSERT into lams_copy_type VALUES(2,'LESSON');
+INSERT into lams_copy_type VALUES(3,'PREVIEW');
 
 
 
