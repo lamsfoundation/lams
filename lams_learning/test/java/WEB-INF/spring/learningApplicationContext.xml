@@ -11,13 +11,21 @@
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
-	<bean id="learnerService" class="org.lamsfoundation.lams.learning.service.TestLearnerService" singleton="false">
-		<construtor-arg>
+	<bean id="learnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
+		<constructor-arg>
 			<ref bean="progressEngine"/>
-		</construtor-arg>
+		</constructor-arg>
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 	</bean>
-
-	<bean id="progressEngine" class="org.lamsfoundation.lams.learning.ProgressEngine.java" singleton="false">
+	
+	<bean id="toolService" class="org.lamsfoundation.lams.tool.service.DummyToolService" singleton="false">
 	</bean>
+
+	<bean id="progressEngine" class="org.lamsfoundation.lams.learning.progress.ProgressEngine" singleton="false">
+	</bean>
+	
+	<bean id="actionMappings" class="org.lamsfoundation.lams.learning.web.util.ActionMappingsWithToolWait" singleton="false">
+		<property name="toolService"><ref bean="toolService"/></property>
+	</bean>
+	
 </beans>
