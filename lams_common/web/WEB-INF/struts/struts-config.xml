@@ -33,6 +33,7 @@
 	<!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
 	<!-- ===================== Plugin Definition  ======================== -->
+	<!-- 
 	<plug-in className="org.apache.struts.tiles.TilesPlugin">
 		<set-property property="definitions-config"
 			value="/WEB-INF/tiles/tiles-defs.xml" />
@@ -40,5 +41,6 @@
 		<set-property property="definitions-parser-details" value="0" />
 		<set-property property="definitions-parser-validate" value="true" />
 	</plug-in>
+	-->
 
 </struts-config>
