@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod" 
+    table="lams_authentication_method"
+    proxy="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_authentication_method"
+        proxy="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="authenticationMethodId"
+        type="java.lang.Integer"
+        column="authentication_method_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Integer"
+            column="authentication_method_id"
+
+
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="native" />
+    </id>
+
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to AuthenticationMethodType -->
+    <many-to-one
+        name="authenticationMethodType"
+        class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodType"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="authentication_method_type_id"         
+        </meta>
+        <column name="authentication_method_type_id" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to User -->
+    <set
+        name="users"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="authentication_method_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.usermanagement.model.User"
+        </meta>
+        <key>
+            <column name="authentication_method_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.usermanagement.model.User"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to AuthenticationMethodParameter -->
+    <set
+        name="authenticationMethodType"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="authentication_method_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodParameter"
+        </meta>
+        <key>
+            <column name="authentication_method_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodParameter"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

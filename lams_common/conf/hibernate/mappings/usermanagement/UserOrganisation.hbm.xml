@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="com.lamsinternational.lams.usermanagement.model.UserOrganisation" 
+    table="lams_user_organisation"
+    proxy="com.lamsinternational.lams.usermanagement.model.UserOrganisation"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_user_organisation"
+        proxy="com.lamsinternational.lams.usermanagement.model.UserOrganisation"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="userOrganisationId"
+        type="java.lang.Integer"
+        column="user_organisation_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Integer"
+            column="user_organisation_id"
+
+
+        </meta>
+        <generator class="native" />
+    </id>
+
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to User -->
+    <many-to-one
+        name="user"
+        class="com.lamsinternational.lams.usermanagement.model.User"
+        not-null="true"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="user_id"         
+        </meta>
+        <column name="user_id" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to UserOrganisationRole -->
+    <set
+        name="userOrganisationRoles"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="user_organisation_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.usermanagement.model.UserOrganisationRole"
+        </meta>
+        <key>
+            <column name="user_organisation_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.usermanagement.model.UserOrganisationRole"
+        />
+    </set>
+    <!-- bi-directional many-to-one association to Organisation -->
+    <many-to-one
+        name="organisation"
+        class="com.lamsinternational.lams.usermanagement.model.Organisation"
+        not-null="true"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="organisation_id"         
+        </meta>
+        <column name="organisation_id" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

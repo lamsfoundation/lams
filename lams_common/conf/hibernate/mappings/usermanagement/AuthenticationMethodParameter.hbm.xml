@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodParameter" 
+    table="lams_authentication_method_parameter"
+    proxy="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodParameter"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_authentication_method_parameter"
+        proxy="com.lamsinternational.lams.usermanagement.model.AuthenticationMethodParameter"
+    </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="authenticationParameterId"
+        type="java.lang.Integer"
+        column="authentication_parameter_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Integer"
+            column="authentication_parameter_id"
+
+
+        </meta>
+        <generator class="native" />
+    </id>
+
+    <property
+        name="name"
+        type="java.lang.String"
+        column="name"
+        not-null="true"
+        length="128"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="name"
+            length="128"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="value"
+        type="java.lang.String"
+        column="value"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="value"
+            length="255"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to AuthenticationMethod -->
+    <many-to-one
+        name="authenticationMethod"
+        class="com.lamsinternational.lams.usermanagement.model.AuthenticationMethod"
+        not-null="true"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="authentication_method_id"         
+        </meta>
+        <column name="authentication_method_id" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>
