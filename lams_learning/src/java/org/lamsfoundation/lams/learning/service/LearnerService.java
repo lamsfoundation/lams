@@ -1,4 +1,5 @@
-/*Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+/*
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -137,7 +138,12 @@ public class LearnerService implements ILearnerService
     
 
     /**
-     * @param learnerProgress
+     * This method navigate through all the tool activities included inside
+     * the next activity. For each tool activity, we look up the database
+     * to check up the existance of correspondent tool session. If the tool 
+     * session doesn't exist, we create a new tool session instance.
+     * 
+     * @param learnerProgress the learner progress we are processing.
      */
     private void createToolSessionsIfNecessary(LearnerProgress learnerProgress)
     {
@@ -152,12 +158,14 @@ public class LearnerService implements ILearnerService
         {
             ToolActivity toolActivity = (ToolActivity)i.next();
             if(shouldCreateToolSession(learnerProgress,toolActivity))
-                createToolSessionFor(toolActivity);
+                createToolSessionFor(toolActivity, learnerProgress.getUser());
         }
     }
     
     /**
-     * @return
+     * Check up the database to see whether there is an existing tool session
+     * has been created already.
+     * @return the check up result.
      */
     private boolean shouldCreateToolSession(LearnerProgress learnerProgress,
                                             ToolActivity toolActivity)
@@ -166,16 +174,30 @@ public class LearnerService implements ILearnerService
         if(!toolActivity.getTool().getSupportsGrouping())
             targetSession = toolSessionDAO.getToolSessionByLearner(learnerProgress.getUser(),
                                                                    toolActivity);
-        
+        else
+            targetSession = toolSessionDAO.getToolSessionByGroup(toolActivity.getGroupFor(learnerProgress.getUser()),
+                                                                 toolActivity);
         return targetSession!=null?true:false;
     }
+    
     /**
+     * Create a tool session for learner against a tool activity. This will
+     * have concurrency issues interms of grouped tool session because it might 
+     * be inserting some tool session that has already been inserted by other
+     * member in the group. If the unique_check is broken, we need to query
+     * the database to get the instance instead of inserting it. It should be
+     * done in the Spring rollback strategy.
+     *  
      * @param toolActivity
+     * @param learner
      */
-    private void createToolSessionFor(ToolActivity toolActivity)
+    private void createToolSessionFor(ToolActivity toolActivity,User learner)
     {
-        // TODO Auto-generated method stub
+        ToolSession toolSession = toolActivity.createToolSessionForActivity(learner);
+       
+        toolActivity.getToolSessions().add(toolSession);
         
+        toolSessionDAO.saveToolSession(toolSession);
     }
 
     /**
