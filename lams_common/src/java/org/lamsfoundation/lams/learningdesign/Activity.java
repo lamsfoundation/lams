@@ -556,14 +556,22 @@ public abstract class Activity implements Serializable,Nullable {
 	    return new NullGroup();
 	}
 	/**
-	 * Check up whether a is tool activity or not.
-	 * @return
+	 * Check up whether an activity is tool activity or not.
+	 * @return is this activity a tool activity?
 	 */
 	public boolean isToolActivity()
 	{
 	    return getActivityTypeId().intValue()==TOOL_ACTIVITY_TYPE;
 	}
 	
+	/**
+	 * Check up whether an activity is sequence activity or not.
+	 * @return is this activity a sequence activity?
+	 */
+	public boolean isSequenceActivity()
+	{
+	    return getActivityTypeId().intValue()==SEQUENCE_ACTIVITY_TYPE;
+	}
 	/**
 	 * Delegate to activity strategy to check up the status of all children.
 	 * @param learnerProgress the current learner progress that record the

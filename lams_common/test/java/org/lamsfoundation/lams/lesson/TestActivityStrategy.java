@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.lesson;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.lesson.dao.TestLearnerProgressDAO;
 
 
@@ -134,6 +135,17 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
         assertNotNull("we should have a next activity",nextActivity);
         assertEquals("it should be qna",this.testSubSeuqenceActivityQNA.getActivityId().longValue(),nextActivity.getActivityId().longValue());
     }
+    
+    public void testGetFirstActivityWithinSequenceParentActivity()
+    {
+        testSubSeuquencActivitySR = activityDAO.getActivityByActivityId(TEST_SR_ACTIVITY_ID);
+
+        Activity nextActivity = this.testSequenceActivity.getNextActivityByParent(new NullActivity());
+        
+        assertNotNull("we should have a next activity",nextActivity);
+        assertEquals("it should be share resource",this.testSubSeuquencActivitySR.getActivityId().longValue(),nextActivity.getActivityId().longValue());
+    }
+    
     
     public void testGetNextActivityByOptionsParentActivity()
     {

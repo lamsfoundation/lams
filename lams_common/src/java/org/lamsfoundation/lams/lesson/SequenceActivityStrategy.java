@@ -57,6 +57,9 @@ public class SequenceActivityStrategy extends ActivityStrategy
         for(Iterator i=children.iterator();i.hasNext();)
         {
             Activity curChild = (Activity)i.next();
+            //if no current child, we should return the first one.
+            if(currentChild.isNull())
+                return curChild;
             
             if(curChild.getActivityId().longValue()==currentChild.getActivityId().longValue())
                 return (Activity)i.next();

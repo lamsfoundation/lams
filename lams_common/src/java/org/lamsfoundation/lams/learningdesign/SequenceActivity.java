@@ -117,6 +117,15 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     	return newSequenceActivity;
     }
 
+    /**
+     * Retrieve the first activity in current sequence activity;
+     * @return the first activity;
+     */
+    public Activity getFirstActivityInSequenceActivity()
+    {
+        return this.getNextActivityByParent(new NullActivity()); 
+    }
+    
     public String toString() {
         return new ToStringBuilder(this)
             .append("activityId", getActivityId())
