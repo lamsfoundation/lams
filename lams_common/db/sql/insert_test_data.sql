@@ -36,4 +36,24 @@ INSERT INTO lams_authentication_method VALUES (1, 1, 'LAMS-Database');
 INSERT INTO lams_authentication_method VALUES (2, 2, 'Oxford-WebAuth');
 INSERT INTO lams_authentication_method VALUES (3, 3, 'MQ-LDAP');
 
+insert into lams_workspace_folder (parent_folder_id,name,workspace_id) values(null,'Trial',1);
+
+insert into lams_learning_design(id,description,title,first_activity_id,max_id,valid_design_flag,
+								 read_only_flag,user_id,help_text,lesson_copy_flag,create_date_time,version,
+								 parent_learning_design_id,open_date_time,close_date_time,workspace_folder_id)
+								values
+								(1,'Test Learning Design','Test Learning Design title',1,1,1,0,1,
+								'Help Text',0,'20041223','1.0',null,'20041223','20041223',1);
+
+insert into lams_learning_library (description,title,create_date_time) values('Library Description','Library Title','20040101');
+
+insert into lams_learning_activity (id,description,title,xcoord,ycoord,parent_activity_id,
+									learning_activity_type_id,grouping_id,order_id,define_later_flag,
+									learning_design_id,learning_library_id,create_date_time,offline_instructions,
+									max_number_of_options,min_number_of_options,tool_id,tool_content_id,
+									gate_activity_level_id,gate_start_date_time,gate_end_date_time,library_activity_ui_image)
+									values
+									(1,'test optional activity','test title',0,0,null,8,null,1,0,1,1,
+									'20050101','Instructions',5,3,null,null,1,'20050101','20050102','image');
+
 SET FOREIGN_KEY_CHECKS=1;
