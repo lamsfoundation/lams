@@ -46,7 +46,7 @@
 		
 		<!-- bi-directional one-to-many association to LearnerProgress -->
 		<set name="learnerProgresses" lazy="true" inverse="true"
-			cascade="none">
+			cascade="all-delete-orphan">
 			<key>
 				<column name="lesson_id" />
 			</key>
@@ -55,17 +55,6 @@
 		</set>
 		
 		<!-- bi-directional many-to-one association to LessonClass -->
-		<!-- many-to-one name="lessonClass"
-			class="org.lamsfoundation.lams.lesson.LessonClass"
-			not-null="true"
-			unique="true">
-			<column name="class_grouping_id" />
-		</many-to-one-->
-		<!-- one-to-one name="lessonClass"
-			class="org.lamsfoundation.lams.lesson.LessonClass"
-			constrained="true"
-			foreign-key="class_grouping_id"
-			/-->
 		<many-to-one name="lessonClass"
 			class="org.lamsfoundation.lams.lesson.LessonClass"
 			column="class_grouping_id"
