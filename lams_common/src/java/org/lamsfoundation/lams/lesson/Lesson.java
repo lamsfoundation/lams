@@ -15,7 +15,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /** 
  * A Lesson is a learning sequence that is assocated with
  * a number of users for use in learning.        
- *     
+ * 
+ * Hibernate definition:
+ * 
+ * @hibernate.class table="tool_lasr10_survey_session"
+ * 
  */
 public class Lesson implements Serializable {
 
@@ -63,7 +67,7 @@ public class Lesson implements Serializable {
     /**
      * Holds value of property learners.
      */
-    private User learners;
+    private Set learners;
     
     
 
@@ -99,8 +103,10 @@ public class Lesson implements Serializable {
     }
 
     /** 
-     *           
-     *         
+     * @hibernate.id
+     *            generator-class="assigned"
+     *            type="java.lang.Long"
+     *            column="lesson_id"
      */
     public Long getLessonId() {
         return this.lessonId;
@@ -111,8 +117,10 @@ public class Lesson implements Serializable {
     }
 
     /** 
-     *           
-     *         
+     * @hibernate.property
+     *            type="java.sql.Timestamp"
+     *            column="create_date_time"
+     *            length="10"
      */
     public Date getCreateDateTime() {
         return this.createDateTime;
@@ -123,7 +131,10 @@ public class Lesson implements Serializable {
     }
 
     /** 
-     *           
+     * @hibernate.property
+     *            type="java.sql.Timestamp"
+     *            column="start_date_time"
+     *            length="10"
      */
     public Date getStartDateTime() {
         return this.startDateTime;
@@ -134,8 +145,10 @@ public class Lesson implements Serializable {
     }
 
     /** 
-     *           
-     *         
+     * @hibernate.property
+     *            type="java.sql.Timestamp"
+     *            column="end_date_time"
+     *            length="10"
      */
     public Date getEndDateTime() {
         return this.endDateTime;
@@ -146,8 +159,9 @@ public class Lesson implements Serializable {
     }
 
     /** 
-     *              
-     *         
+     * @hibernate.many-to-one
+     *            not-null="true"
+     *            @hibernate.column name="user_id"     
      */
     public User getUser() {
         return this.user;
@@ -239,10 +253,12 @@ public class Lesson implements Serializable {
     }
 
     /**
-     * Getter for property learners.
-     * @return Value of property learners.
+     * @hibernate.set lazy="true" inverse="true" cascade="none"
+     * @hibernate.collection-key column="lesson_id"
+     * @hibernate.collection-many-to-many
+     *            class="org.lamsfoundation.lams.usermanagement.User"
      */
-    public User getLearners()
+    public Set getLearners()
     {
 
         return this.learners;
@@ -252,7 +268,7 @@ public class Lesson implements Serializable {
      * Setter for property learners.
      * @param learners New value of property learners.
      */
-    public void setLearners(User learners)
+    public void setLearners(Set learners)
     {
 
         this.learners = learners;
