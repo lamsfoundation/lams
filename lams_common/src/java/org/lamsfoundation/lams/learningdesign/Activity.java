@@ -2,6 +2,10 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -418,5 +422,39 @@ public abstract class Activity implements Serializable,Nullable {
 	}
 	public void setHelpText(String helpText) {
 		this.helpText = helpText;
+	}
+	
+	/**
+	 * This method that get all tool activities belong to a particular activity. 
+	 * 
+	 * As the activity object structure might be infinite, we recursively loop
+	 * through the entire structure and added all tool activities into the set 
+	 * that we want to return.
+	 * 
+	 * @param activity the requested activity.
+	 * @return the set of all tool activities.
+	 */
+	public Set getAllToolActivitiesFrom(Activity activity)
+	{
+	    Set toolActivities = new TreeSet(new ActivityOrderComparator());
+	    //tool activity is usually leaf node activity, we return it right away
+	    if(activity.getActivityTypeId().intValue()==Activity.TOOL_ACTIVITY_TYPE)
+	    {
+	        toolActivities.add(activity);
+	        return toolActivities;
+	    }
+	    //recursively get tool activity from its children if it is complex activity.
+	    else if(activity instanceof ComplexActivity)
+	    {
+	        ComplexActivity cActivity = (ComplexActivity)activity;
+	        for(Iterator i = cActivity.getActivities().iterator();i.hasNext();)
+	        {
+	            Activity child = (Activity)i.next();
+	            toolActivities.addAll(getAllToolActivitiesFrom(child));
+	        }
+	    }
+
+	    return toolActivities;
+	    
 	}
 }

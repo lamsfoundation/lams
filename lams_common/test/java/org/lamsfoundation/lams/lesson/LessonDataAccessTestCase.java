@@ -16,7 +16,6 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import net.sf.hibernate.HibernateException;
-import net.sf.hibernate.LockMode;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Group;
