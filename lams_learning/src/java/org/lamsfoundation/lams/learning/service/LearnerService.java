@@ -11,7 +11,7 @@ import java.util.List;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
-import org.lamsfoundation.lams.learning.web.util.Utils;
+import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
@@ -36,6 +36,9 @@ public class LearnerService implements ILearnerService
     private ILessonDAO lessonDAO;
     private ProgressEngine progressEngine;
     private IToolSessionDAO toolSessionDAO;
+
+	
+	private ActionMappings actionMappings;
    
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -100,7 +103,7 @@ public class LearnerService implements ILearnerService
      */
     public LearnerProgress joinLesson(User learner, Lesson lesson) throws ProgressException
     {
-        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLeaner(learner,lesson);
+        LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
     	
         if(learnerProgress!=null)
         {
@@ -203,7 +206,7 @@ public class LearnerService implements ILearnerService
     	try {
 	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
 	    	Activity nextActivity = nextLearnerProgress.getNextActivity();
-	    	ActivityURL activityURL = Utils.getActivityURL(nextActivity, nextLearnerProgress);
+	    	ActivityURL activityURL = actionMappings.getActivityURL(nextActivity, nextLearnerProgress);
 	    	url = activityURL.getUrl();
     	}
     	catch (ProgressException e) {
@@ -213,4 +216,9 @@ public class LearnerService implements ILearnerService
     	
     	return url;
     }
+	
+	public void setActionMappings(ActionMappings actionMappings) {
+		this.actionMappings = actionMappings;
+	}
+	
 }
