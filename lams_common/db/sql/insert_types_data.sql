@@ -39,7 +39,7 @@ INSERT INTO lams_learning_activity_type VALUES (5, 'GATE_SCHEDULE');
 INSERT INTO lams_learning_activity_type VALUES (6, 'GATE_PERMISSION');
 INSERT INTO lams_learning_activity_type VALUES (7, 'PARALLEL');
 INSERT INTO lams_learning_activity_type VALUES (8, 'OPTIONS');
-INSERT INTO lams_learning_activity_type VALUES (8, 'SEQUENCE');
+INSERT INTO lams_learning_activity_type VALUES (9, 'SEQUENCE');
 INSERT INTO lams_learning_activity_type VALUES (10, 'BRANCH_GROUP_CONTENT');
 
 INSERT INTO lams_gate_activity_level VALUES (1, 'LEARNER');
