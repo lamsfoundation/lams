@@ -27,7 +27,16 @@ import javax.servlet.http.HttpSession;
 import junit.framework.TestCase;
 
 
+import net.sf.hibernate.HibernateException;
+import net.sf.hibernate.Session;
+import net.sf.hibernate.SessionFactory;
+
+import org.springframework.orm.hibernate.SessionFactoryUtils;
+import org.springframework.orm.hibernate.SessionHolder;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import servletunit.HttpServletRequestSimulator;
@@ -35,10 +44,14 @@ import servletunit.struts.MockStrutsTestCase;
 
 
 /**
+ * The abstract test case that initialize the Spring context using context
+ * loader. It also use a session holder to simulate the 
+ * <code>OpenSessionInViewFilter</code>. Without this session holder, we can
+ * not run integration testing with lazy loading hibernate object configured.
  * 
  * @author Jacky Fang
  * @since  2005-3-8
- * @version
+ * @version 1.0
  * 
  */
 public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
@@ -47,6 +60,7 @@ public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
     private final String CONFIG_LOCATIONS;
     protected HttpServletRequestSimulator httpRequest;
     protected HttpSession httpSession ; 
+    protected WebApplicationContext wac;
     
     /**
      * @param arg0
@@ -59,6 +73,9 @@ public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
     }
     
     /**
+     * Set up spring context and hibernate session holder into mock servlet
+     * context.
+     * 
      * @see TestCase#setUp()
      */
     protected void setUp() throws Exception
@@ -71,15 +88,44 @@ public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
                                  CONFIG_LOCATIONS);
         ctxLoader.initWebApplicationContext(context);
         
+        wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
+        initializeHibernateSession();
         httpRequest = (HttpServletRequestSimulator)getRequest();
         httpSession = getSession();
     }
 
-    /*
+    /**
      * @see MockStrutsTestCase#tearDown()
      */
     protected void tearDown() throws Exception
     {
         super.tearDown();
+    }
+    
+	/**
+     * @throws HibernateException
+     */
+    protected void initializeHibernateSession() throws HibernateException
+    {
+        //hold the hibernate session
+		SessionFactory sessionFactory = (SessionFactory) this.wac.getBean("coreSessionFactory");
+		Session s = sessionFactory.openSession();
+		TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(s));
+    }   
+    
+    /**
+     * @throws HibernateException
+     */
+    protected void finalizeHibernateSession() throws HibernateException
+    {
+        //clean the hibernate session
+		SessionFactory sessionFactory = (SessionFactory)this.wac           .getBean("coreSessionFactory");
+	    SessionHolder holder = (SessionHolder)TransactionSynchronizationManager.getResource(sessionFactory);
+	    if (holder != null) {
+	    	Session s = holder.getSession(); 
+		    s.flush();
+		    TransactionSynchronizationManager.unbindResource(sessionFactory);
+		    SessionFactoryUtils.closeSessionIfNecessary(s, sessionFactory);
+	    }
     }
 }

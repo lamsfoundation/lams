@@ -98,6 +98,14 @@ public class LearnerProgressDTO
     }
     
     /**
+     * @return Returns the attemptedActivities.
+     */
+    public Long[] getAttemptedActivities()
+    {
+        return attemptedActivities;
+    }
+    
+    /**
      * @return Returns the completedActivities.
      */
     public Long[] getCompletedActivities()
