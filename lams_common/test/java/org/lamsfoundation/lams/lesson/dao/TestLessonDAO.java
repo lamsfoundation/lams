@@ -42,8 +42,9 @@ public class TestLessonDAO extends LessonDataAccessTestCase
      */
     protected void tearDown() throws Exception
     {
-        super.tearDown();
         super.cleanUpTestLesson();
+        super.tearDown();
+
     }
     
     public void testGetLessonWithEagerlyFetchedProgress()
@@ -52,6 +53,7 @@ public class TestLessonDAO extends LessonDataAccessTestCase
         
         //assert the data retrieved.
         super.assertLesson(createdLesson);
+        
     }
 
     public void testUpdateLesson()

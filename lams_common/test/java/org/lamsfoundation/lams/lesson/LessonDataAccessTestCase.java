@@ -16,6 +16,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import net.sf.hibernate.HibernateException;
+import net.sf.hibernate.LockMode;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -145,10 +146,10 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
     {
         this.initLessonClassData();
         lessonClassDao.saveLessonClass(this.testLessonClass);
-        
+
         this.setUpGroupsForClass();
         lessonClassDao.updateLessonClass(this.testLessonClass);
-        
+
         this.initLessonData();
         lessonDao.saveLesson(testLesson);
         
@@ -164,18 +165,17 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
      */
     protected void cleanUpLesson(Lesson lesson)
     {
-        lesson.getLessonClass().getGroups().clear();
+
         lessonDao.deleteLesson(lesson);
     }
     
     protected void cleanUpTestLesson() throws HibernateException
     {
-        super.initializeHibernateSession();
+        //super.initializeHibernateSession();
+
+        this.cleanUpLesson(testLesson);
         
-        Lesson lesson = lessonDao.getLesson(this.testLesson.getLessonId());
-        this.cleanUpLesson(lesson);
-        
-        super.finalizeHibernateSession();
+        //super.finalizeHibernateSession();
     }
     /**
      * Create a lesson class with empty group information.
@@ -217,7 +217,9 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
                                             new HashSet());//tool session, should be empty now
 
         learnergroups.add(learnerClassGroup);
+        learnergroups.add(staffGroup);
         testLessonClass.setGroups(learnergroups);
+
     }
     
     /**
