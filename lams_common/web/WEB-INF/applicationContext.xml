@@ -106,8 +106,10 @@
 		singleton="false"
 	>
 		<property name="userDAO"><ref local="userDAO"/></property>
+		<property name="roleDAO"><ref local="roleDAO"/></property>
 		<property name="organisationDAO"><ref local="organisationDAO"/></property>
 		<property name="userOrganisationDAO"><ref local="userOrganisationDAO"/></property>
+		<property name="userOrganisationRoleDAO"><ref local="userOrganisationRoleDAO"/></property>
 		<property name="authenticationMethodDAO"><ref local="authenticationMethodDAO"/></property>
 	</bean>	
 	
@@ -140,6 +142,10 @@
 	</bean>
 
 	<bean id="userOrganisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="userOrganisationRoleDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserOrganisationRoleDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
