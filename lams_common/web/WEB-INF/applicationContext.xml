@@ -10,11 +10,11 @@
 
 	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
 	<!-- (in this case, JDBC-related settings for the dataSource definition below) -->
-	
+	<!-- 
 	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location"><value>/WEB-INF/dbConnection.properties</value></property>
 	</bean>
-
+	-->
 	<!-- Message source for this context, loaded from localized "messages_xx" files -->
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>messages</value></property>										
@@ -25,16 +25,16 @@
   
 	<!-- Local DataSource that works in any environment -->
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName"><value>${jdbc.driverClassName}</value></property>
-		<property name="url"><value>${jdbc.url}</value></property>
-		<property name="username"><value>${jdbc.username}</value></property>
-		<property name="password"><value>${jdbc.password}</value></property>
+		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
+		<property name="url"><value>jdbc:mysql://localhost/lams</value></property>
+		<property name="username"><value>lams</value></property>
+		<property name="password"><value>lamsdemo</value></property>
 	</bean>
 
 
 
 	<!-- Hibernate SessionFactory -->
-	<bean id="sessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
 		<property name="dataSource"><ref local="dataSource"/></property>
 		<property name="mappingResources">
 			<list>
@@ -81,19 +81,21 @@
 		</property>
 		<property name="hibernateProperties">
 			<props>
-				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
-				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
-				<prop key="hibernate.c3p0.minPoolSize">${hibernate.c3p0.minPoolSize}</prop>
-				<prop key="hibernate.c3p0.maxPoolSize">${hibernate.c3p0.maxPoolSize}</prop>
-				<prop key="hibernate.c3p0.timeout">${hibernate.c3p0.timeout}</prop>
-				<prop key="hibernate.c3p0.max_statement">${hibernate.c3p0.max_statement}</prop>
+				<prop key="hibernate.dialect">net.sf.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.c3p0.minPoolSize">5</prop>
+				<prop key="hibernate.c3p0.maxPoolSize">20</prop>
+				<prop key="hibernate.c3p0.timeout">1800</prop>
+				<prop key="hibernate.c3p0.max_statement">50</prop>
 			</props>
 		</property>
 	</bean>
 
+	<!-- If we really use multiple SessionFactory, we have to change to JTA Transaction Manager -->
+	<!-- bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"/-->
 	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
 	<bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
-		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
 
@@ -123,27 +125,27 @@
 	</bean>
 	
 	<bean id="userDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserDAO">
-		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
 	<bean id="roleDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.RoleDAO">
-		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="organisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationDAO">
-		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
 	<bean id="authenticationMethodDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.AuthenticationMethodDAO">
-		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
 	<bean id="userOrganisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
-		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
 	<bean id="organisationTypeDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationTypeDAO">
-		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 
 </beans>
