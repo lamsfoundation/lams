@@ -17,7 +17,13 @@ public interface IActivityDAO extends IBaseDAO{
 	 * @param activityId The activityId of the activity
 	 * @return Activity populated Activity object
 	 */
-	public Activity getActivityById(Long activityId);
+	public Activity getActivityByActivityId(Long activityId);
+	
+	/**
+	 * @param id The id of the activity
+	 * @return Activity populated Activity object
+	 */
+	public List getActivityByID(Integer id);
 	
 	/**
 	 * @param parentActivityId The activityId of the parent activity

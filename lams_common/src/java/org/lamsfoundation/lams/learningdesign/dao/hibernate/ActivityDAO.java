@@ -17,6 +17,8 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 		
 	private static final String FIND_BY_PARENT = "from " + TABLENAME +" in class " + Activity.class.getName() + " where parent_activity_id=?" ;
 	
+	private static final String FIND_BY_ID = "from " + TABLENAME +" in class " + Activity.class.getName() + " where id=?" ;
+	
 	private static final String FIND_BY_LEARNING_DESIGN_ID = "from " + TABLENAME +
 															 " in class " + Activity.class.getName() +
 															 " where learning_design_id=?" ;
@@ -25,7 +27,7 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	/* 
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#getActivityById(java.lang.Long)
 	 */
-	public Activity getActivityById(Long activityId) {
+	public Activity getActivityByActivityId(Long activityId) {
 		return (Activity) super.find(Activity.class,activityId);		
 	}
 
@@ -48,7 +50,7 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#getActivitiesByLearningDesignId(java.lang.Long)
 	 */
 	public List getActivitiesByLearningDesignId(Long learningDesignId) {
-		return this.getHibernateTemplate().find(FIND_BY_LEARNING_DESIGN_ID,learningDesignId);		
+		return this.getHibernateTemplate().find(FIND_BY_LEARNING_DESIGN_ID,learningDesignId);
 	}
 
 	/* 
@@ -74,6 +76,13 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	 */
 	public void deleteActivity(Activity activity) {
 		this.getHibernateTemplate().delete(activity);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getActivityByID(java.lang.Integer)
+	 */
+	public List getActivityByID(Integer id) {
+		return this.getHibernateTemplate().find(FIND_BY_ID,id);		
 	}
 
 }
