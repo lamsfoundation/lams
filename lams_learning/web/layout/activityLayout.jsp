@@ -6,6 +6,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 
+	<tiles:useAttribute name="title" ignore="false" />
+	
 	<head>
 		<title>LAMS</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -28,11 +30,11 @@
 							<tr bgcolor="#282871"> 
 								<td width="50%" height="18" align="left">
 									<html:img height="8" width="8" page="/images/spacer.gif" />
-									<font color="#FFFFFF" size="1" face="Verdana, Arial, Helvetica, sans-serif">Wait...</font>
+									<font color="#FFFFFF" size="1" face="Verdana, Arial, Helvetica, sans-serif"><c:out value="${title}" /></font>
 								</td>
 								<td width="50%" height="18" align="right" > 
 									<html:link page="/doc/LAMS_Learner_Guide_b60.pdf">
-									<font color="#FFFFFF" size="1" face="Verdana, Arial, Helvetica, sans-serif">[HELP]</font>
+										<font color="#FFFFFF" size="1" face="Verdana, Arial, Helvetica, sans-serif">[HELP]</font>
 									</html:link>
 									<html:img height="8" width="8" page="/images/spacer.gif" />
 								</td>
