@@ -24,20 +24,30 @@
 			   if ( uuid != null && uuid.length() > 0 ) {
 			%>
 				<p>Adding a new version for Node <%=uuid%>. If the original node was a package,
-				then please upload another package. If the original node was a file, please
-				upload a file. 	<html:hidden property="uuid" value="<%=uuid%>"/> 
+				then you can only upload another package. If the original node was a file, you can
+				only upload a file. <html:hidden property="uuid" value="<%=uuid%>"/> 
 				</p>
 			<% } %>
 
 				
 			<p>Version Description (Required for both): <html:text property="description" size="100"/></P>
-			<H3>Single File:</H3>
-			<p>File to upload?&nbsp;<html:file property="theFile"/><html:errors property="theFile"/> 
-				<html:submit property="method" value="uploadFile"/>
-			<H3>Package:</H3>
-			<p>Directory name:&nbsp;<html:text property="dirName" size="50"/> 
-			Name&nbsp;of&nbsp;initial&nbsp;file&nbsp;in&nbsp;directory.&nbsp;<html:text property="entryString"/>
-			<html:submit property="method" value="uploadPackage"/>
+			<% String type = request.getParameter("type");
+				if ( type == null || type.equals("FILENODE") ) {
+			%>
+					<H3>Single File:</H3>
+					<p>File to upload?&nbsp;<html:file property="theFile"/><html:errors property="theFile"/> 
+					<html:submit property="method" value="uploadFile"/>
+			<%
+				} 
+				if ( type == null || type.equals("PACKAGENODE") ) {
+			%>
+					<H3>Package:</H3>
+					<p>Directory name:&nbsp;<html:text property="dirName" size="50"/> 
+					Name&nbsp;of&nbsp;initial&nbsp;file&nbsp;in&nbsp;directory.&nbsp;<html:text property="entryString"/>
+					<html:submit property="method" value="uploadPackage"/>
+			<% 
+				}
+			%>
 
 		<p>&nbsp;</p>
 		<p>

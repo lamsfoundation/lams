@@ -1,9 +1,10 @@
 <%@ page language="java"%>
 
 <%@ page import="java.util.*"%>
+<%@ page import="com.lamsinternational.lams.contentrepository.IValue"%>
 <%@ page import="com.lamsinternational.lams.contentrepository.IVersionDetail"%>
-<%@ page import="com.lamsinternational.lams.contentrepository.NodeKey"%>
-<%@ page import="com.lamsinternational.lams.contentrepository.struts.action.RepositoryDispatchAction"%>
+<%@ page import="com.lamsinternational.lams.contentrepository.IVersionedNode"%>
+<%@ page import="com.lamsinternational.lams.contentrepository.PropertyName"%>
 
 <%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
@@ -35,8 +36,7 @@
 		name is known to the application cache (in the session). The rest of the nodes have been added to the 
 		workspace at some other time. </p>
 		
-		<P>Note: Nodes 1 thru 2 for the atool workspace does not have a file in the repository so it will generate an error.
-		 This is due to the data being designed for unit testing, not demonstration.</p>
+		<P>Note: Nodes 1 thru 4 for the atool workspace may have been generated in unit testing so they may result in errors. Best to add your own nodes and test them.</p>
 		 
 
 		<html:form action="/nodeSelection">
@@ -49,34 +49,43 @@
 			<p><INPUT name="upload" onClick="parent.location='addNode.jsp'" TYPE="button" size="50" VALUE="Add File/Package" > 
 			<input name="logout" onClick="setActionSubmit('logout', '', '')" type="button" size="50" value="Logout"/></p>
 
-			<jsp:useBean id="nodeMap" type="java.util.Map" scope="request"/>
+			<jsp:useBean id="nodeList" type="java.util.List" scope="request"/>
 			<TABLE cellspacing="10">
 
-			<% Iterator iter = nodeMap.keySet().iterator();
-			   Map nodeCache = (Map) session.getAttribute(RepositoryDispatchAction.NODE_CACHE);
+			<% Iterator iter = nodeList.iterator();
  			   while ( iter.hasNext()) {
-					Long key = (Long) iter.next();
+					IVersionedNode node = (IVersionedNode) iter.next();
+					Set versionDetails = (Set) iter.next();
+					Long uuid = node.getUUID();
+					String nodeType = node.getNodeType();
 			%>
-				<TR><TD colspan="6"><STRONG>Node <%=key.toString()%>:</STRONG>
-				<input name="getNode" onClick="parent.location='download?uuid=<%=key.toString()%>'" type="button" size="50" value="Get Latest Version"/>
-				<input name="uploadNewVersion" onClick="parent.location='addNode.jsp?uuid=<%=key.toString()%>'" type="button" size="50" value="Upload New Version"/>
-				<input name="deleteNode" onClick="setActionSubmit('deleteNode', '<%=key.toString()%>', '')" type="button" size="50" value="Delete Node (All Versions)"/>
+				<TR><TD colspan="6"><STRONG><%=nodeType%> Node <%=uuid.toString()%>:</STRONG>
+				<input name="getNode" onClick="parent.location='download?uuid=<%=uuid.toString()%>'" type="button" size="50" value="Get Latest Version"/>
+				<input name="uploadNewVersion" onClick="parent.location='addNode.jsp?uuid=<%=uuid.toString()%>&type=<%=nodeType%>'" type="button" size="50" value="Upload New Version"/>
+				<input name="deleteNode" onClick="setActionSubmit('deleteNode', '<%=uuid.toString()%>', '')" type="button" size="50" value="Delete Node (All Versions)"/>
 				</TD></TR>
+				<TR>
+					<TD>Version</TD>
+					<TD>Created Date Time</TD>
+					<TD>Version Description</TD>
+					<TD>File Name
+					<TD>&nbsp;</TD>
+					<TD>&nbsp;</TD>
+				</TR>
 			<%						
-					Set versionDetails = (Set) nodeMap.get(key);
 					Iterator setIter = versionDetails.iterator();
 					while ( setIter.hasNext() ) {
 						IVersionDetail detail = (IVersionDetail) setIter.next();
-						NodeKey nodeKey = new NodeKey(key, detail.getVersionId());
-						String nodeName = nodeCache != null ? (String)nodeCache.get(nodeKey) : "";
+						IValue filenameProperty = node.getProperty(PropertyName.FILENAME);
+						String filename = filenameProperty != null ? filenameProperty.getString() : "";
 			%>
 						<TR>
-							<TD>Version: <%=detail.getVersionId()%></TD>
-							<TD><input name="getNode" onClick="parent.location='download?uuid=<%=key.toString()%>&version=<%=detail.getVersionId()%>'" type="button" size="50" value="Get File"/></TD>
-							<TD><input name="deleteVersion" onClick="setActionSubmit('deleteNode', '<%=key.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Delete Version"/>
-							<TD>Created&nbsp;Date&nbsp;Time: <%=detail.getCreatedDateTime()%></TD>
-							<TD>Version&nbsp;Description: <%=detail.getDescription()%></TD>
-							<TD>File&nbsp;Name&nbsp;(Application&nbsp;Cache):<%=nodeName!=null?nodeName:""%></TD>
+							<TD><%=detail.getVersionId()%></TD>
+							<TD><%=detail.getCreatedDateTime()%></TD>
+							<TD><%=detail.getDescription()%></TD>
+							<TD><%=filename%></TD>
+							<TD><input name="getNode" onClick="parent.location='download?uuid=<%=uuid.toString()%>&version=<%=detail.getVersionId()%>'" type="button" size="50" value="Get File"/></TD>
+							<TD><input name="deleteVersion" onClick="setActionSubmit('deleteNode', '<%=uuid.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Delete Version"/>
 						</TR>
 			<%
 					} // end version details iterator
