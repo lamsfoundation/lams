@@ -151,7 +151,7 @@ $Revision$
 	<application-policy name = "lams">
        <authentication>
           <login-module code = "com.lamsinternational.lams.security.UniversalLoginModule" flag = "required">
-             <module-option name="authenticationPropertyFile">D:/authentication.xml</module-option>
+             <module-option name="authenticationPropertyFile">/usr/local/lamsconf/authentication.xml</module-option>
           </login-module>
        </authentication>
     </application-policy>

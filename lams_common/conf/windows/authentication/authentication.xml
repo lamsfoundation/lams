@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "D:/authentication.dtd">
+<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "file:///C:/lamsconf/authentication.dtd">
 
 <Authentication>
 
