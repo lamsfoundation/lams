@@ -19,7 +19,7 @@ import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.service.TestLearnerService;
-import org.lamsfoundation.lams.learning.web.form.TestForm;
+import org.lamsfoundation.lams.learning.web.form.ToolTestForm;
 
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * 
  * XDoclet definition:
  * 
- * @struts:action path="/toolTest" name="testForm" parameter="method"
+ * @struts:action path="/toolTest" name="toolTestForm" parameter="method"
  *                validate="false" scope="request"
  * @struts:action-forward name="display" path="/toolTest.jsp"
  * @struts:action-forward name="next" path=".requestDisplay"
@@ -52,7 +52,7 @@ public class ToolTestAction extends DispatchAction {
 			ActionForm form,
 			HttpServletRequest request,
 			HttpServletResponse response) {
-		TestForm testForm = (TestForm)form;
+		ToolTestForm testForm = (ToolTestForm)form;
 		
 		if (testForm.getActivityId() == null) {
 			System.out.println("foobar");

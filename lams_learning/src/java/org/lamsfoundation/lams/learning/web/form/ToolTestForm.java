@@ -11,8 +11,17 @@ import org.apache.struts.action.ActionForm;
 /**
  * 
  * XDoclet definition:
- * @struts:form name="testForm"
+ * @struts:form name="toolTestForm"
  */
-public class TestForm extends ActionForm {
+public class ToolTestForm extends ActionForm {
+	
+	private Long activityId;
 
+	public Long getActivityId() {
+		return activityId;
+	}
+	public void setActivityId(Long activityId) {
+		this.activityId = activityId;
+	}
+	
 }

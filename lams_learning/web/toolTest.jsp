@@ -21,7 +21,8 @@
 			this activity has already been completed<br />
 		</c:if>
 		
-		<a href="Activity.do?method=complete&activityId=<c:out value="${activityId}"/>">Finish</a>
+		<!--a href="Activity.do?method=complete&activityId=<c:out value="${activityId}"/>">Finish</a-->
+		<a href="toolTest.do?method=finish&activityId=<c:out value="${activityId}"/>">Finish</a>
 
 	</body>
 </html:html>
