@@ -135,7 +135,7 @@ values
 (1,1,'Notebook Template','Notebook',10,20,null,
 1,null,null,0,
 null,1,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,1,null,
 null,null,null,'NotebookImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -147,7 +147,7 @@ values
 (2,2,'NoticeBoard Template','NoticeBoard',10,20,null,
 1,null,null,0,
 null,2,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,2,null,
 null,null,null,'NoticeBoardImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -159,7 +159,7 @@ values
 (3,3,'Multiple Choice Template','Multiple Choice',10,20,null,
 1,null,null,0,
 null,3,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,3,null,
 null,null,null,'MultipleChoiceImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -171,7 +171,7 @@ values
 (4,4,'Question and Answer Template','Question and Answer',10,20,null,
 1,null,null,0,
 null,4,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,4,null,
 null,null,null,'QAImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -183,7 +183,7 @@ values
 (5,5,'MessageBoard Template','MessageBoard',10,20,null,
 1,null,null,0,
 null,5,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,5,null,
 null,null,null,'MBImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -195,7 +195,7 @@ values
 (6,6,'Survey Template','Survey',10,20,null,
 1,null,null,0,
 null,6,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,6,null,
 null,null,null,'SurveyImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -207,7 +207,7 @@ values
 (7,7,'Chat Template','Chat',10,20,null,
 1,null,null,0,
 null,7,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,7,null,
 null,null,null,'ChatImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -219,7 +219,7 @@ values
 (8,8,'Shared Resources Template','Shared Resources',10,20,null,
 1,null,null,0,
 null,8,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,8,null,
 null,null,null,'SRImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -231,7 +231,7 @@ values
 (9,9,'Voting Template','Voting',10,20,null,
 1,null,null,0,
 null,9,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,9,null,
 null,null,null,'VotingImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -243,7 +243,7 @@ values
 (10,10,'Submit Files Template','Submit Files',10,20,null,
 1,null,null,0,
 null,10,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,10,null,
 null,null,null,'SubmitFilesImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -255,7 +255,7 @@ values
 (11,11,'Instant Messaging Template','Instant Messaging',10,20,null,
 1,null,null,0,
 null,11,'20050101','Offline  Instructions ',
-null,null,null,null,
+null,null,11,null,
 null,null,null,'IMImage');
 
 insert into lams_learning_activity
