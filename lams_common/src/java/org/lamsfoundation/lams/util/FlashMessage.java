@@ -30,66 +30,89 @@ import java.io.Serializable;
  * Flash client.
  * 
  */
-public class FlashMessage implements Serializable {
-	
-	/** Message type indicating that operation was
-	 * unsuccessful due to some error on FLASH side. 
-	 * For example the WDDX packet contains a null value 
-	 */
-	public static final int ERROR = 1;
+public class FlashMessage implements Serializable
+{
 
-	/**
-	 *  Message type indicating that operation failed 
-	 * due to some system eror. For example, the client
-	 * was unable to serilaize the WDDX packet 
-	 */
-	public static final int CRITICAL_ERROR = 2;
-	
-	/**
-	 *  Message type indicating that operation 
-	 * was executed successfully
-	 */
-	public static final int OBJECT_MESSAGE = 3;
+    /** Message type indicating that operation was
+     * unsuccessful due to some error on FLASH side. 
+     * For example the WDDX packet contains a null value 
+     */
+    public static final int ERROR = 1;
 
-	/** Usually the name of the method that was called by the flash */
-	private String messageKey;
-	
-	/**
-	 *  The response to the flash's request. Normally a string either 
-	 * stating the error message or the WDDX packet
-	 */
-	private Object messageValue;
-	
-	/**
-	 * Represents the type of message being sent to Flash. Can be one of 
-	 * the following values
-	 * <ul><b>
-	 * 		<li>ERROR</li>
-	 * 		<li>CRITICAL_ERROR</li>
-	 * 		<li>OBJECT_MESSAGE</li>
-	 * </b></ul> 
-	 */
-	private int messageType;
-	
-	/** Minimal Constructor */
-	public FlashMessage(String messageKey, Object messageValue) {
-		this.messageKey = messageKey;
-		this.messageValue = messageValue;
-		this.messageType = OBJECT_MESSAGE;
-	}
-	/** Full Constructor*/
-	public FlashMessage(String messageKey, Object messageValue, int messageType) {
-		this.messageKey = messageKey;
-		this.messageValue = messageValue;
-		this.messageType = messageType;
-	}
-	public String getMessageKey() {
-		return messageKey;
-	}	
-	public int getMessageType() {
-		return messageType;
-	}
-	public Object getMessageValue() {
-		return messageValue;
-	}	
+    /**
+     *  Message type indicating that operation failed 
+     * due to some system eror. For example, the client
+     * was unable to serilaize the WDDX packet 
+     */
+    public static final int CRITICAL_ERROR = 2;
+
+    /**
+     *  Message type indicating that operation 
+     * was executed successfully
+     */
+    public static final int OBJECT_MESSAGE = 3;
+
+    /** Usually the name of the method that was called by the flash */
+    private String messageKey;
+
+    /**
+     *  The response to the flash's request. Normally a string either 
+     * stating the error message or the WDDX packet
+     */
+    private Object messageValue;
+
+    /**
+     * Represents the type of message being sent to Flash. Can be one of 
+     * the following values
+     * <ul><b>
+     * 		<li>ERROR</li>
+     * 		<li>CRITICAL_ERROR</li>
+     * 		<li>OBJECT_MESSAGE</li>
+     * </b></ul> 
+     */
+    private int messageType;
+
+    /** Minimal Constructor */
+    public FlashMessage(String messageKey, Object messageValue)
+    {
+        this.messageKey = messageKey;
+        this.messageValue = messageValue;
+        this.messageType = OBJECT_MESSAGE;
+    }
+
+    /** Full Constructor*/
+    public FlashMessage(String messageKey, Object messageValue, int messageType)
+    {
+        this.messageKey = messageKey;
+        this.messageValue = messageValue;
+        this.messageType = messageType;
+    }
+
+    public String getMessageKey()
+    {
+        return messageKey;
+    }
+
+    public int getMessageType()
+    {
+        return messageType;
+    }
+
+    public Object getMessageValue()
+    {
+        return messageValue;
+    }
+
+    /**
+     * Return String representation of the message that will be sent to flash.
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer(getClass().getName() + ": ");
+        sb.append("messageKey='" + getMessageKey() + "'; ");
+        sb.append("messageType='" + getMessageType()+"';");
+        sb.append("messageValue='" + getMessageValue() + "'; ");
+        return sb.toString();
+    }
 }
