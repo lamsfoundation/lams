@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
@@ -35,7 +36,7 @@ public interface ILamsToolService
      * @param learner
      * @param activity
      */
-    public ToolSession createToolSession(User learner, ToolActivity activity) throws LamsToolServiceException;
+    public ToolSession createToolSession(User learner, ToolActivity activity,Lesson lesson) throws LamsToolServiceException;
     
     
     /**

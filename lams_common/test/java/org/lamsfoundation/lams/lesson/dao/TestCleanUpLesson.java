@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;
+import org.lamsfoundation.lams.tool.ToolDataAccessTestCase;
 
 
 /**
@@ -23,7 +24,6 @@ import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;
  */
 public class TestCleanUpLesson extends LessonDataAccessTestCase
 {
-    private static Long TEST_LESSON_ID = new Long(1);
     /**
      * @param name
      */
@@ -55,9 +55,10 @@ public class TestCleanUpLesson extends LessonDataAccessTestCase
         for(Iterator i = lessons.iterator();i.hasNext();)
         {
             Lesson curLesson = (Lesson)i.next();
-            super.cleanUpLesson(curLesson);
+            if(curLesson.getLessonId().longValue()!=ToolDataAccessTestCase.TEST_LESSON_ID.longValue())
+                super.cleanUpLesson(curLesson);
         }
         List cleanedLessons = lessonDao.getAllLessons();
-        assertEquals("There should be a lesson in the db",0,cleanedLessons.size());
+        assertEquals("There should be only one lesson in the db",1,cleanedLessons.size());
     }
 }

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
@@ -147,18 +148,20 @@ public class ToolActivity extends SimpleActivity implements Serializable
      * @param learner the user who should be using this tool session.
      * @return the new tool session.
      */
-    public ToolSession createToolSessionForActivity(User learner)
+    public ToolSession createToolSessionForActivity(User learner,Lesson lesson)
     {
         if(this.getTool().getSupportsGrouping())
             return new GroupedToolSession(this,
                                           new Date(System.currentTimeMillis()),
                                           ToolSession.STARTED_STATE,
-                                          this.getGroupFor(learner));
+                                          this.getGroupFor(learner),
+                                          lesson);
         else
             return new NonGroupedToolSession(this,
                                              new Date(System.currentTimeMillis()),
                                              ToolSession.STARTED_STATE,
-                                             learner);
+                                             learner,
+                                             lesson);
     }
     
     public String toString()

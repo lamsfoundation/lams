@@ -66,7 +66,7 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
     private final static Long TEST_NON_GROUP_ACTIVITY_ID = new Long(20);
     private static final Long TEST_GROUPED_ACTIVITY_ID = new Long(19);
     private static final Long TEST_GROUP_ID = new Long(88);
-    private static final Long TEST_LESSON_ID = new Long(1);
+    public static final Long TEST_LESSON_ID = new Long(1);
     
     /*
      * @see AbstractLamsCommonTestCase#setUp()

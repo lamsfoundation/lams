@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -89,9 +90,9 @@ public class LamsToolService implements ILamsToolService,ApplicationContextAware
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsToolService#createToolSession(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity)
      */
-    public ToolSession createToolSession(User learner, ToolActivity activity) throws LamsToolServiceException
+    public ToolSession createToolSession(User learner, ToolActivity activity,Lesson lesson) throws LamsToolServiceException
     {
-        ToolSession toolSession = activity.createToolSessionForActivity(learner);
+        ToolSession toolSession = activity.createToolSessionForActivity(learner,lesson);
         
         toolSessionDAO.saveToolSession(toolSession);
         
