@@ -24,7 +24,14 @@
     <property name="maxNumberOfGroups" type="java.lang.Integer" column="max_number_of_groups" length="3"/>
 
     <!-- Associations -->
-    <!-- bi-directional one-to-many association to Group -->
+    
+    <!-- list name="groups" lazy="true" inverse="true" cascade="none">
+        <key><column name="grouping_id" /></key>
+        <index column="order_id"/>
+        <one-to-many class="org.lamsfoundation.lams.learningdesign.Group"/>        
+    </list-->
+    
+    <!-- bi-directional one-to-many association to Group-->
     <set name="groups" lazy="true" inverse="true" cascade="none">
     	<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="none"
     										@hibernate.collection-key column="grouping_id" 

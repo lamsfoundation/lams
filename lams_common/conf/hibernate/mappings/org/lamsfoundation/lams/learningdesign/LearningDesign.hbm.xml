@@ -90,26 +90,6 @@
        
     </property>
     <property
-        name="readAccess"
-        type="java.lang.Long"
-        column="read_access"
-        length="20"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="read_access"
-            length="20"
-        </meta>    
-    </property>
-    <property
-        name="writeAccess"
-        type="java.lang.Long"
-        column="write_access"
-        length="20"
-    >
-         
-    </property>
-    <property
         name="helpText"
         type="java.lang.String"
         column="help_text"
