@@ -146,7 +146,7 @@ public class CrNode implements Serializable {
     /** 
      *            @hibernate.property
      *             column="created_date_time"
-     * 			   type="java.sql.Timestamp"
+     * 			   type="java.sql.Date"
      *             length="14"
      *         
      */
