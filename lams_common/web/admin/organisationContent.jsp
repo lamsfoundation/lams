@@ -3,7 +3,7 @@
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 <%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
 
-<html:form action="/organisation" name="<%=OrganisationActionForm.formName%>" type="com.lamsinternational.lams.usermanagement.web.OrganisationActionForm">
+<html:form action="/organisation" method="post">
 	<table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
 		<tr> 
 			<td valign="top">
