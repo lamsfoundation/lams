@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="LAMS" default="usage" basedir=".">
 
-    <property name="jboss.home" value="/var/jboss"/>
+    <!--  <property name="jboss.home" value="/var/jboss"/> -->
+    <property name="jboss.home" value="D:/jboss-3.2.6"/>
+    <property name="jboss.deploy.dir" value="${jboss.home}/server/default/deploy"/>
     <property name="assembly.dir" value="assembly"/>
-    <property name="lams.ear" value="${assembly.dir}/lams.ear"/>
-    <property name="temp.ear" value="${assembly.dir}/temp.ear"/>
+    <property name="lams.ear" value="lams.ear"/>
+    <property name="assembly.lams.ear" value="${assembly.dir}/lams.ear"/>
+    <property name="assembly.temp.ear" value="${assembly.dir}/temp.ear"/>
     <property name="lib.dir" value="lib"/>
     <property name="app.xml" value="conf/j2ee/application.xml"/>
     <property name="lams_common" value="lams_common"/>
@@ -37,16 +40,16 @@
     </target>
     
     <!-- clean dirs for this script only -->
-    <target name="clean" descriptions="cleans assembly">
+    <target name="clean" description="cleans assembly">
         <delete includeEmptyDirs="true" dir="${assembly.dir}" includes="**/*"/>
     </target>
     
     <!-- clean all projects -->
-    <target name="clean-subporjects" descriptions="cleans sub projects">
+    <target name="clean-subporjects" description="cleans sub projects">
     </target>
     
     <!-- build sub-projects -->
-    <target name="build-subprojects" descriptions="builds sub porjects">
+    <target name="build-subprojects" description="builds sub porjects">
         <ant antfile="../${lams_common}/build.xml" target="build-jar" inheritAll="false"/>
         <ant antfile="../${lams_contentrepository}/build.xml"  target="build-jar" inheritAll="false"/>
         <!--
@@ -59,7 +62,7 @@
     </target>
     
     <!-- assemble ear -->
-    <target name="assemble-ear" depends="init, clean, build-subprojects" descriptions="Assemble lasm ear in exploded form">
+    <target name="assemble-ear" depends="init, clean, build-subprojects" description="Assemble lasm ear in exploded form">
         <!-- have to copy the libs etc. to a temp location otherwise we end up with all the directories under lib as well-->
         <mkdir dir="${assembly.dir}/temp"/>
         <copy todir="${assembly.dir}/temp" failonerror="true" flatten="true">
@@ -86,22 +89,25 @@
             </fileset>
         </copy>
         <!-- create a temporary ear -->
-        <ear destfile="${temp.ear}" compress="false" appxml="${app.xml}">
+        <ear destfile="${assembly.temp.ear}" compress="false" appxml="${app.xml}">
             <fileset dir="${assembly.dir}/temp" includes="*"/>
         </ear>
         <!-- remove temp lib -->
         <delete dir="${assembly.dir}/temp" includeEmptyDirs="true"/>
         <!-- explode the ear (Why doesn't the EAR task support exploded format?) -->
-        <unjar src="${temp.ear}" dest="${lams.ear}"/>
+        <unjar src="${assembly.temp.ear}" dest="${assembly.lams.ear}"/>
         <!-- delete temp.ear -->
-        <delete file="${temp.ear}"/>
+        <delete file="${assembly.temp.ear}"/>
     </target>
     
     
     <!-- deploy -->
-    <target name="deploy-ear" descriptions="Assembles and deploy to jboss">
-        <copy todir="${jboss.deploy.dir}" overwrite="true" failonerror="true">
-            <fileset dir="${assembly.dir}/${lams.ear}"/>
+    <target name="deploy-ear" description="Assembles and deploy to jboss">
+        <copy todir="${jboss.deploy.dir}" overwrite="true" failonerror="true" verbose="true">
+            <fileset dir="${assembly.dir}">
+            	<include name="${lams.ear}/**/*.*"/>
+            </fileset>
+            
         </copy>
     </target>
     
