@@ -67,6 +67,23 @@ public class LessonDTO
     // Getters
     //---------------------------------------------------------------------
     /**
+     * Returns the lesson id.
+     * @return Returns the lessonId.
+     */
+    public Long getLessonId()
+    {
+        return lessonId;
+    }    
+    
+    /**
+     * Returns the name of the lesson..
+     * @return Returns the title.
+     */
+    public String getLessonName()
+    {
+        return lessonName;
+    }   
+    /**
      * Returns the lesson description.
      * @return Returns the description.
      */
@@ -74,14 +91,7 @@ public class LessonDTO
     {
         return lessonDescription;
     }
-    /**
-     * Returns the lesson id.
-     * @return Returns the lessonId.
-     */
-    public Long getLessonId()
-    {
-        return lessonId;
-    }
+
     /**
      * Returns the lesson state. Plese refer to the lesson object for lesson
      * state.
@@ -91,12 +101,18 @@ public class LessonDTO
     {
         return lessonStateId;
     }
+
     /**
-     * Returns the name of the lesson..
-     * @return Returns the title.
+     * Returns the String representation of lesson data transfer object.
+     * @see java.lang.Object#toString()
      */
-    public String getLessonName()
+    public String toString()
     {
-        return lessonName;
+        StringBuffer sb = new StringBuffer(getClass().getName() + ": ");
+        sb.append("lessonId='" + getLessonId() + "'; ");
+        sb.append("lessonName='" + getLessonName()+"';");
+        sb.append("lessonDescription='" + getLessonDescription() + "'; ");
+        sb.append("lessonStateId='" + getLessonStateId() + "'; ");
+        return sb.toString();
     }
 }
