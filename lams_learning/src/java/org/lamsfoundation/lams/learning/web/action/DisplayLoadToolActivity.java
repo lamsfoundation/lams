@@ -54,8 +54,10 @@ public class DisplayLoadToolActivity extends ActivityAction {
 		form.setActivityId(activity.getActivityId());
 		
 		List activityURLs = new ArrayList();
-		ActivityURL url = actionMappings.getToolURL(toolActivity, learnerProgress);
-		activityURLs.add(url);
+		String url = actionMappings.getToolURL(toolActivity, learnerProgress);
+		ActivityURL activityURL = new ActivityURL();
+		activityURL.setUrl(url);
+		activityURLs.add(activityURL);
 		form.setActivityURLs(activityURLs);
 		
 		String forward = "displayTool";

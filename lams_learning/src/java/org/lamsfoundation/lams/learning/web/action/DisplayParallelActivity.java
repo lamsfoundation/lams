@@ -60,8 +60,10 @@ public class DisplayParallelActivity extends ActivityAction {
 		Iterator i = subActivities.iterator();
 		while (i.hasNext()) {
 			Activity subActivity = (Activity)i.next();
-			ActivityURL url = actionMappings.getActivityURL(subActivity, learnerProgress);
-			activityURLs.add(url);
+			ActivityURL activityURL = new ActivityURL(); 
+			String url = actionMappings.getActivityURL(subActivity, learnerProgress);
+			activityURL.setUrl(url);
+			activityURLs.add(activityURL);
 		}
 		if (activityURLs.size() == 0) {
 		    log.error(className+": No sub-activity URLs for activity "+activity.getActivityId());

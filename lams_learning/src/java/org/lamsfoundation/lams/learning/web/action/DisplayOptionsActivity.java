@@ -64,13 +64,15 @@ public class DisplayOptionsActivity extends ActivityAction {
 		form.setActivityId(activity.getActivityId());
 
 		List activityURLs = new ArrayList();
-		// TODO: Need to get order somehow
 		Set subActivities = optionsActivity.getActivities();
 		Iterator i = subActivities.iterator();
 		int completedCount = 0;
 		while (i.hasNext()) {
 			Activity subActivity = (Activity)i.next();
-			ActivityURL activityURL = actionMappings.getActivityURL(subActivity, learnerProgress);
+			ActivityURL activityURL = new ActivityURL();
+			String url = actionMappings.getActivityURL(subActivity, learnerProgress);
+			activityURL.setUrl(url);
+			activityURL.setActivityId(subActivity.getActivityId());
 			activityURL.setTitle(subActivity.getTitle());
 			activityURL.setDescription(subActivity.getDescription());
 			if (learnerProgress.getProgressState(subActivity) == LearnerProgress.ACTIVITY_COMPLETED) {

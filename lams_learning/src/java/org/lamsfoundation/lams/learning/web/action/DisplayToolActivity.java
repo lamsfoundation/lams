@@ -49,9 +49,9 @@ public class DisplayToolActivity extends ActivityAction {
 		
 		ToolActivity toolActivity = (ToolActivity)activity;
 
-		ActivityURL activityURL = actionMappings.getToolURL(toolActivity, learnerProgress);
+		String url = actionMappings.getToolURL(toolActivity, learnerProgress);
 		try {
-		    response.sendRedirect(activityURL.getUrl());
+		    response.sendRedirect(url);
 		}
 		catch (java.io.IOException e) {
 		    return mapping.findForward(actionMappings.ERROR);
