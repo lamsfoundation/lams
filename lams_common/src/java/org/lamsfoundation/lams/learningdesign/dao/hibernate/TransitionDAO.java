@@ -11,6 +11,7 @@ import java.util.List;
 import net.sf.hibernate.Hibernate;
 import net.sf.hibernate.type.Type;
 
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 
@@ -46,22 +47,31 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO#getTransitionByToActivityID(java.lang.Long)
 	 */
-	public List getTransitionByToActivityID(Long toActivityID) {		
+	public Transition getTransitionByToActivityID(Long toActivityID) {		
 		List list = this.getHibernateTemplate().find(FIND_BY_TO_ACTIVITY,new Object[]{toActivityID}, new Type[]{Hibernate.LONG});
-		return list;
+		return (Transition)list.get(0);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO#getTransitionByfromActivityID(java.lang.Long)
 	 */
-	public List getTransitionByfromActivityID(Long fromActivityID) {
+	public Transition getTransitionByfromActivityID(Long fromActivityID) {
 		List list = this.getHibernateTemplate().find(FIND_BY_FROM_ACTIVITY,new Object[]{fromActivityID}, new Type[]{Hibernate.LONG});
-		return list;
+		if(list.size()!=0)
+			return (Transition)list.get(0);
+		else
+			return null;
 	}
 	
 	public List getTransitionsByLearningDesignID(Long learningDesignID){
 		List list = this.getHibernateTemplate().find(FIND_BY_LEARNING_DESIGN_ID, new Object[]{learningDesignID}, new Type[]{Hibernate.LONG});
 		return list;
 	}
-
+	public Activity getNextActivity(Long fromActivityID){
+		Transition transition = getTransitionByfromActivityID(fromActivityID);
+		if(transition!=null)
+			return transition.getToActivity();
+		else
+			return null;
+	}	
 }

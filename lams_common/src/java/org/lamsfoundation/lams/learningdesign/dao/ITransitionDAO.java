@@ -7,6 +7,7 @@ package org.lamsfoundation.lams.learningdesign.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 
 /**
@@ -30,14 +31,24 @@ public interface ITransitionDAO extends IBaseDAO {
 	 * @param toActivityID The to_activity_id of the required Transition
 	 * @return Returns the list of Transition objects where to_activity_id = activityID
 	 */
-	public List getTransitionByToActivityID(Long toActivityID);
+	public Transition getTransitionByToActivityID(Long toActivityID);
 	
 	/**
 	 * @param fromActivityID The from_activity_id of the required Transition
 	 * @return Returns the list of Transition objects where from_activity_id = activityID
 	 */
-	public List getTransitionByfromActivityID(Long fromActivityID);
+	public Transition getTransitionByfromActivityID(Long fromActivityID);
 	
 	public List getTransitionsByLearningDesignID(Long learningDesignID);
+	
+	/**
+	 * This method returns the next activity corresponding to the given
+	 * activityID.
+	 * 
+	 * @param fromActivityID The activityID of the activity, whose
+	 * 						 next activity has to be fetched
+	 * @return Activity The activity that comes after fromActivityID 
+	 */
+	public Activity getNextActivity(Long fromActivityID);
 
 }
