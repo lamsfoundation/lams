@@ -1,3 +1,7 @@
+# Connection: ROOT LOCAL
+# Host: localhost
+# Saved: 2005-02-15 11:12:43
+# 
 DROP TABLE IF EXISTS lams_learning_transition;
 DROP TABLE IF EXISTS lams_lesson_learner;
 DROP TABLE IF EXISTS lams_activity_learners;
@@ -30,6 +34,7 @@ DROP TABLE IF EXISTS lams_learning_library;
 DROP TABLE IF EXISTS lams_learning_activity_type;
 DROP TABLE IF EXISTS lams_grouping_type;
 DROP TABLE IF EXISTS lams_gate_activity_level;
+DROP TABLE IF EXISTS lams_license;
 
 
 

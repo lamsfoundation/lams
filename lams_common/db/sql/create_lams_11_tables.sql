@@ -78,6 +78,17 @@ CREATE TABLE lams_tool_session_type (
      , PRIMARY KEY (tool_session_type_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_license (
+       license_id BIGINT(20) NOT NULL
+     , license_text TEXT NOT NULL
+     , license_url VARCHAR(256)
+     , pciture_url VARCHAR(256)
+     , name VARCHAR(200) NOT NULL
+     , code VARCHAR(20) NOT NULL
+     , defualt_license TINYINT(1) NOT NULL DEFAULT 0
+     , PRIMARY KEY (license_id)
+)TYPE=InnoDB;
+
 CREATE TABLE lams_authentication_method_type (
        authentication_method_type_id INT(3) NOT NULL
      , description VARCHAR(64) NOT NULL
@@ -207,6 +218,8 @@ CREATE TABLE lams_learning_design (
      , parent_learning_design_id BIGINT(20)
      , workspace_folder_id BIGINT(20)
      , duration BIGINT(38)
+     , license_id BIGINT(20)
+     , license_text TEXT
      , PRIMARY KEY (learning_design_id)
      , INDEX (parent_learning_design_id)
      , CONSTRAINT FK_lams_learning_design_2 FOREIGN KEY (parent_learning_design_id)
@@ -217,6 +230,9 @@ CREATE TABLE lams_learning_design (
      , INDEX (workspace_folder_id)
      , CONSTRAINT FK_lams_learning_design_4 FOREIGN KEY (workspace_folder_id)
                   REFERENCES lams_workspace_folder (workspace_folder_id)
+     , INDEX (license_id)
+     , CONSTRAINT FK_lams_learning_design_5 FOREIGN KEY (license_id)
+                  REFERENCES lams_license (license_id)
 )TYPE=InnoDB;
 CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
 
