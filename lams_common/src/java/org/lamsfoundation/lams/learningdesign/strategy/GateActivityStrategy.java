@@ -69,7 +69,9 @@ public abstract class GateActivityStrategy extends SimpleActivityStrategy
             }
 
         }
-
+        //always clear waiting list if the gate is already opened.
+        else
+            activity.getWaitingLearners().clear();
         return activity.getGateOpen().booleanValue();
     }
     
