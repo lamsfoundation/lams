@@ -28,13 +28,13 @@
     >
         <meta attribute="field-description">
            @hibernate.id
-            generator-class="assigned"
+            generator-class="identity"
             type="java.lang.Long"
             column="transition_id"
 
 
         </meta>
-        <generator class="assigned" />
+        <generator class="identity" />
     </id>
 
     <property
