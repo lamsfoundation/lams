@@ -10,7 +10,7 @@ import java.util.List;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
-import org.lamsfoundation.lams.learning.web.util.Utils;
+import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 import org.lamsfoundation.lams.learningdesign.Activity;
 
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -112,7 +112,8 @@ public class LearnerService implements ILearnerService
     	try {
 	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
 	    	Activity nextActivity = nextLearnerProgress.getNextActivity();
-	    	ActivityURL activityURL = Utils.getActivityURL(nextActivity, nextLearnerProgress);
+	    	ActionMappings actionMappings = new ActionMappings();
+	    	ActivityURL activityURL = actionMappings.getActivityURL(nextActivity, nextLearnerProgress);
 	    	url = activityURL.getUrl();
     	}
     	catch (ProgressException e) {
