@@ -330,7 +330,6 @@ Ant build file.
 			<transaction src="${sql}/drop_lams_11_tables.sql"/>
 			<transaction src="${sql}/create_lams_11_tables.sql"/>
 			<transaction src="${sql}/insert_types_data.sql"/>
-			<transaction src="${sql}/insert_test_data.sql"/>
 		</sql>
 	</target>
 
