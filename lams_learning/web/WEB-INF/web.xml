@@ -14,20 +14,6 @@
 	</param-value>
 </context-param>
 
-<!-- The hibernate filter configuration -->
-<!-- context-param>
-	<param-name>HIBERNATE_FILTER_SESSION_FACTORY_JNDI</param-name>
-	<param-value>java:comp/env/hibernate/SessionFactory</param-value>
-</context-param>
-<context-param>
-	<param-name>HIBERNATE_FILTER_REQUEST_ATTRIBUTE_ID</param-name>
-	<param-value>HibernateSession</param-value>
-</context-param>
-<context-param>
-	<param-name>HIBERNATE_FILTER_USE_PROXY</param-name>
-	<param-value>true</param-value>
-</context-param-->
-
 <filter>
 	<filter-name>HibernateFilter</filter-name>
 	<filter-class>org.springframework.orm.hibernate.support.OpenSessionInViewFilter</filter-class>

@@ -14,8 +14,8 @@
   <form-beans>
 
     <form-bean
-      name="testForm"
-      type="org.lamsfoundation.lams.learning.web.form.TestForm"
+      name="toolTestForm"
+      type="org.lamsfoundation.lams.learning.web.form.ToolTestForm"
     />
     <form-bean
       name="activityForm"
@@ -68,6 +68,26 @@
       <forward
         name="displayOptions"
         path=".optionsActivity"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/toolTest"
+      type="org.lamsfoundation.lams.learning.web.action.ToolTestAction"
+      name="toolTestForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="display"
+        path="/toolTest.jsp"
+        redirect="false"
+      />
+      <forward
+        name="next"
+        path=".requestDisplay"
         redirect="false"
       />
     </action>
@@ -140,7 +160,16 @@
       />
     </action>
 
-    <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
+<action path="/requestDisplay"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter=".requestDisplay"/>
+<action path="/parallelWait"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter=".parallelWait"/>
+<action path="/lessonComplete"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter=".lessonComplete"/>
+
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
