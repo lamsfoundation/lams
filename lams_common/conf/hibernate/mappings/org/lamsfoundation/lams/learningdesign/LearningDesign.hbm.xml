@@ -28,9 +28,9 @@
     </id>
 
     <property
-        name="id"
+        name="learningDesignUIID"
         type="java.lang.Integer"
-        column="id"
+        column="learning_design_ui_id"
         length="11"
     >
          
@@ -98,11 +98,11 @@
           
     </property>
     <property
-        name="lessonCopy"
-        type="java.lang.Boolean"
-        column="lesson_copy_flag"
+        name="copyTypeID"
+        type="java.lang.Integer"
+        column="copy_type_id"
         not-null="true"
-        length="4"
+        length="11"
     >
           
     </property>
@@ -118,52 +118,43 @@
     <property
         name="version"
         type="java.lang.String"
-        column="version"
-        not-null="true"
+        column="version"        
         length="56"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="version"
-            length="56"
-            not-null="true"
+            length="56"            
         </meta>    
     </property>
-    <property
-        name="openDateTime"
-        type="java.sql.Timestamp"
-        column="open_date_time"
-        length="19"
-    >
-      
-    </property>
-    <property
-        name="closeDateTime"
-        type="java.sql.Timestamp"
-        column="close_date_time"
-        length="19"
-    >
-        
-    </property>
     
-    
+    <property name="duration" type="java.lang.Long" column="duration">
+    	<meta attribute="field-description">@hibernate.property column ="duration"</meta>
+    </property>
+    <property name="licenseText" type="java.lang.String" column="license_text">
+		<meta attribute="field-description">@hibernate.property column ="license_text"</meta>
+    </property>
 
     <!-- Associations -->
     
+    <!-- bi-directional many-to-one association to License-->  
+    <many-to-one name="license" class="org.lamsfoundation.lams.learningdesign.License">
+    	<meta attribute="field-description"> @hibernate.column name="license_id"</meta>
+    	<column name ="license_id"/>
+    </many-to-one>
+    
     <!-- bi-directional many-to-one association to Activity-->    
     
-    <many-to-one name="firstActivity" class="org.lamsfoundation.lams.learningdesign.Activity" not-null="true">
-        <meta attribute="field-description">@hibernate.many-to-one not-null="true"
-        						            @hibernate.column name="first_activity_id"         
+    <many-to-one name="firstActivity" class="org.lamsfoundation.lams.learningdesign.Activity">
+        <meta attribute="field-description">@hibernate.column name="first_activity_id"         
       	</meta>
         <column name="first_activity_id" />
     </many-to-one>
     
     <!-- bi-directional many-to-one association to LearningDesign -->
     
-    <many-to-one name="parentLearningDesign" class="org.lamsfoundation.lams.learningdesign.LearningDesign" not-null="true">
-        <meta attribute="field-description">@hibernate.many-to-one not-null="true"
-        						            @hibernate.column name="parent_learning_design_id"         
+    <many-to-one name="parentLearningDesign" class="org.lamsfoundation.lams.learningdesign.LearningDesign">
+        <meta attribute="field-description">@hibernate.column name="parent_learning_design_id"         
       	</meta>
         <column name="parent_learning_design_id" />
     </many-to-one>
@@ -174,7 +165,7 @@
     </many-to-one>
     
     <!-- bi-directional many-to-one association to WorkspaceFolder-->
-    <many-to-one name="workspaceFolder" class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder" not-null="true">
+    <many-to-one name="workspaceFolder" class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder">
         <column name="workspace_folder_id" />
     </many-to-one>
     

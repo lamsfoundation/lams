@@ -35,13 +35,16 @@ public abstract class Activity implements Serializable {
 	private Long activityId;
 
 	/** nullable persistent field */
-	private Integer id;
+	private Integer activityUIID;
 
 	/** nullable persistent field */
 	private String description;
 
 	/** nullable persistent field */
 	private String title;
+	
+	/** nullable persistent field */
+	private String helpText;
 
 	/** nullable persistent field */
 	private Integer xcoord;
@@ -69,6 +72,9 @@ public abstract class Activity implements Serializable {
 
 	/** persistent field */
 	private Activity parentActivity;
+	
+	/** persistent field */
+	private Activity libraryActivity;
 
 	/** persistent field */
 	private LearningDesign learningDesign;
@@ -84,6 +90,9 @@ public abstract class Activity implements Serializable {
 	
 	/** persistent field */
 	private Transition transitionFrom;
+	
+	/** persistent field */
+	private Integer parentUIID;
 		
 	/** full constructor */
 	public Activity(
@@ -97,15 +106,17 @@ public abstract class Activity implements Serializable {
 			Boolean defineLater,
 			Date createDateTime,
 			String offlineInstructions,
-			org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-			org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-			org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-			org.lamsfoundation.lams.learningdesign.Grouping grouping,
+			LearningLibrary learningLibrary,
+			Activity parentActivity,
+			Activity libraryActivity,
+			Integer parentUIID,
+			LearningDesign learningDesign,
+			Grouping grouping,
 			Integer activityTypeId, 
 			Transition transitionTo,
 			Transition transitionFrom) {
 		this.activityId = activityId;
-		this.id = id;
+		this.activityUIID = id;
 		this.description = description;
 		this.title = title;
 		this.xcoord = xcoord;
@@ -116,13 +127,14 @@ public abstract class Activity implements Serializable {
 		this.offlineInstructions = offlineInstructions;
 		this.learningLibrary = learningLibrary;
 		this.parentActivity = parentActivity;
+		this.parentUIID = parentUIID;
+		this.libraryActivity = libraryActivity;
 		this.learningDesign = learningDesign;
 		this.grouping = grouping;
 		this.activityTypeId = activityTypeId;
 		this.transitionTo = transitionTo;
 		this.transitionFrom = transitionFrom;
-	}
-
+	}	
 	/** default constructor */
 	public Activity() {
 		this.grouping = null;		
@@ -133,10 +145,10 @@ public abstract class Activity implements Serializable {
 			Long activityId,
 			Boolean defineLater,
 			Date createDateTime,
-			org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-			org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-			org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-			org.lamsfoundation.lams.learningdesign.Grouping grouping,
+			LearningLibrary learningLibrary,
+			Activity parentActivity,
+			LearningDesign learningDesign,
+			Grouping grouping,
 			Integer activityTypeId,
 			Transition transitionTo,
 			Transition transitionFrom) {
@@ -153,7 +165,7 @@ public abstract class Activity implements Serializable {
 	}
 
 	/**
-	 * @hibernate.id generator-class="identity" type="java.lang.Long"
+	 * @hibernate.activityUIID generator-class="identity" type="java.lang.Long"
 	 *               column="activity_id"
 	 */
 	public Long getActivityId() {
@@ -165,14 +177,14 @@ public abstract class Activity implements Serializable {
 	}
 
 	/**
-	 * @hibernate.property column="id" length="11"
+	 * @hibernate.property column="activityUIID" length="11"
 	 */
-	public Integer getId() {
-		return this.id;
+	public Integer getActivityUIID() {
+		return this.activityUIID;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setActivityUIID(Integer id) {
+		this.activityUIID = id;
 	}
 
 	/**
@@ -387,10 +399,23 @@ public abstract class Activity implements Serializable {
 	 */
 	public void setTransitionTo(Transition transitionTo) {
 		this.transitionTo = transitionTo;
+	}	
+	public Integer getParentUIID() {
+		return parentUIID;
 	}
-	
-	public boolean isToolActivity()
-	{
-	    return getActivityTypeId().intValue()==TOOL_ACTIVITY_TYPE;
+	public void setParentUIID(Integer parent_ui_id) {
+		this.parentUIID = parent_ui_id;
+	}	
+	public Activity getLibraryActivity() {
+		return libraryActivity;
+	}
+	public void setLibraryActivity(Activity libraryActivity) {
+		this.libraryActivity = libraryActivity;
+	}
+	public String getHelpText() {
+		return helpText;
+	}
+	public void setHelpText(String helpText) {
+		this.helpText = helpText;
 	}
 }

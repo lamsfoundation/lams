@@ -37,18 +37,16 @@
         <generator class="identity" />
     </id>
 
-    <property
-        name="id"
-        type="java.lang.Integer"
-        column="id"
-        length="11"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="id"
-            length="11"
-        </meta>    
+    <property name="transitionUIID" type="java.lang.Integer" column="transition_ui_id" length="11">
+    	<meta attribute="field-description">@hibernate.property column="transition_ui_id" length="11"</meta>
     </property>
+    <property name="toUIID" type="java.lang.Integer" column="to_ui_id" length="11">
+    	<meta attribute="field-description">@hibernate.property column="to_ui_id" length="11"</meta>
+    </property>
+    <property name="fromUIID" type="java.lang.Integer" column="from_ui_id" length="11">
+    	<meta attribute="field-description">@hibernate.property column="from_ui_id" length="11"</meta>
+    </property>
+    
     <property
         name="description"
         type="java.lang.String"

@@ -1,6 +1,8 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -20,10 +22,12 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
             Boolean defineLater, 
             java.util.Date createDateTime, 
             String offlineInstructions, 
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity, 
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
-            org.lamsfoundation.lams.learningdesign.Grouping grouping, 
+            LearningLibrary learningLibrary, 
+            Activity parentActivity,
+            Activity libraryActivity,
+			Integer parentUIID,
+            LearningDesign learningDesign, 
+            Grouping grouping, 
             Integer activityTypeId,  
             Transition transitionTo,
             Transition transitionFrom,
@@ -40,6 +44,8 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
                 offlineInstructions, 
                 learningLibrary, 
                 parentActivity, 
+				libraryActivity,
+				parentUIID,
                 learningDesign, 
                 grouping, 
                 activityTypeId,  
@@ -75,6 +81,28 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
               transitionTo,
 			  transitionFrom,
               activities);
+    }
+    public static ParallelActivity createCopy(ParallelActivity originalActivity){
+    	
+    	ParallelActivity newParallelActivity = new ParallelActivity();
+    	
+    	newParallelActivity.setActivityUIID(originalActivity.getActivityUIID());
+    	newParallelActivity.setDescription(originalActivity.getDescription());
+    	newParallelActivity.setTitle(originalActivity.getTitle());
+    	newParallelActivity.setXcoord(originalActivity.getXcoord());
+    	newParallelActivity.setYcoord(originalActivity.getYcoord());
+    	newParallelActivity.setDefineLater(originalActivity.getDefineLater());
+    	newParallelActivity.setCreateDateTime(new Date());
+    	newParallelActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	newParallelActivity.setLearningLibrary(originalActivity.getLearningLibrary());
+    	newParallelActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newParallelActivity.setActivities(new HashSet());
+    	
+    	/** TODO */
+    	//newParallelActivity.setTransitionTo();
+		//newParallelActivity.setTransitionFrom();
+    	
+    	return newParallelActivity;
     }
 
     public String toString() {

@@ -27,6 +27,8 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 			String offlineInstructions,
 			LearningLibrary learningLibrary,
 			Activity parentActivity,
+			Activity libraryActivity,
+			Integer parentUIID,
 			LearningDesign learningDesign,
 			Grouping grouping,
 			Integer activityTypeId, 
@@ -35,7 +37,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 			Set activities) {
 		super(activityId, id, description, title, xcoord, ycoord, orderId,
 				defineLater, createDateTime, offlineInstructions,
-				learningLibrary, parentActivity, learningDesign, grouping,
+				learningLibrary, parentActivity, libraryActivity,parentUIID,learningDesign, grouping,
 				activityTypeId, transitionTo,transitionFrom);
 		this.activities = activities;
 	}

@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -39,6 +40,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
             String offlineInstructions,
             LearningLibrary learningLibrary,
             Activity parentActivity,
+            Activity libraryActivity,
+			Integer parentUIID,
             LearningDesign learningDesign,
             Grouping grouping,
             Integer activityTypeId,
@@ -59,6 +62,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
                 offlineInstructions,
                 learningLibrary,
                 parentActivity,
+				libraryActivity,
+				parentUIID,
                 learningDesign,
                 grouping,
                 activityTypeId,
@@ -99,6 +104,27 @@ public class ToolActivity extends SimpleActivity implements Serializable
 				transitionFrom);
         this.tool = tool;
         this.toolContentId = toolContentId;
+    }
+    public static ToolActivity createCopy(ToolActivity originalActivity){
+    	
+    	ToolActivity newToolActivity = new ToolActivity();
+    	newToolActivity.setActivityUIID(originalActivity.getActivityUIID());
+    	newToolActivity.setDescription(originalActivity.getDescription());
+    	newToolActivity.setTitle(originalActivity.getTitle());
+    	newToolActivity.setXcoord(originalActivity.getXcoord());
+    	newToolActivity.setYcoord(originalActivity.getYcoord());
+    	newToolActivity.setDefineLater(originalActivity.getDefineLater());
+    	newToolActivity.setCreateDateTime(new Date());
+    	newToolActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	newToolActivity.setLearningLibrary(originalActivity.getLearningLibrary());
+    	newToolActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	/**
+    	 * TODO calculate how these two values would be set for COPY 
+    	 * */
+    	//newToolActivity.setTransitionTo();
+    	//newToolActivity.setTransitionFrom();
+    	newToolActivity.setTool(originalActivity.getTool());    	
+    	return newToolActivity;
     }
     
     public String toString()

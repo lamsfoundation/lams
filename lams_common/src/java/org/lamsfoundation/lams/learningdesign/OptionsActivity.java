@@ -1,6 +1,9 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -14,6 +17,9 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
 
     /** nullable persistent field */
     private Integer minNumberOfOptions;
+    
+    /** nullable persistent field */
+    private String optionsInstructions;
 
     /** full constructor */
     public OptionsActivity(Long activityId, 
@@ -28,6 +34,8 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
             String offlineInstructions, 
             LearningLibrary learningLibrary, 
             Activity parentActivity, 
+            Activity libraryActivity,
+			Integer parentUIID,
             LearningDesign learningDesign, 
             Grouping grouping, 
             Integer activityTypeId,  
@@ -35,7 +43,8 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
             Transition transitionFrom,
             java.util.Set activities, 
             Integer maxNumberOfOptions, 
-            Integer minNumberOfOptions) {
+            Integer minNumberOfOptions,
+			String options_instructions) {
         super(activityId, 
                 id, 
                 description, 
@@ -48,6 +57,8 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
                 offlineInstructions, 
                 learningLibrary, 
                 parentActivity, 
+				libraryActivity,
+				parentUIID,
                 learningDesign, 
                 grouping, 
                 activityTypeId,  
@@ -56,6 +67,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
                 activities);
         this.maxNumberOfOptions = maxNumberOfOptions;
         this.minNumberOfOptions = minNumberOfOptions;
+        this.optionsInstructions = options_instructions;
     }
 
     /** default constructor */
@@ -87,6 +99,31 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
               transitionFrom,
               activities);
     }
+    public static OptionsActivity createCopy(OptionsActivity originalActivity){
+    	OptionsActivity newOptionsActivity = new OptionsActivity();
+    	
+    	newOptionsActivity.setMaxNumberOfOptions(originalActivity.getMaxNumberOfOptions());
+    	newOptionsActivity.setMinNumberOfOptions(originalActivity.getMinNumberOfOptions());
+    	newOptionsActivity.setOptionsInstructions(originalActivity.getOptionsInstructions());
+    	
+    	newOptionsActivity.setActivityUIID(originalActivity.getActivityUIID());
+    	newOptionsActivity.setDescription(originalActivity.getDescription());
+    	newOptionsActivity.setTitle(originalActivity.getTitle());
+    	newOptionsActivity.setXcoord(originalActivity.getXcoord());
+    	newOptionsActivity.setYcoord(originalActivity.getYcoord());
+    	newOptionsActivity.setDefineLater(originalActivity.getDefineLater());
+    	newOptionsActivity.setCreateDateTime(new Date());
+    	newOptionsActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	newOptionsActivity.setLearningLibrary(originalActivity.getLearningLibrary());
+    	newOptionsActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newOptionsActivity.setActivities(new HashSet());
+    	
+    	/** TODO */
+    	//newOptionsActivity.setTransitionTo();
+		//newOptionsActivity.setTransitionFrom();
+    	
+    	return newOptionsActivity;
+    }
 
     /** 
      * @hibernate.property column="max_number_of_options" length="5"
@@ -116,4 +153,10 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
             .toString();
     }
 
+	public String getOptionsInstructions() {
+		return optionsInstructions;
+	}
+	public void setOptionsInstructions(String options_instructions) {
+		this.optionsInstructions = options_instructions;
+	}
 }

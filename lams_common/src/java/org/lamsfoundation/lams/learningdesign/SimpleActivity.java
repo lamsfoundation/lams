@@ -22,10 +22,12 @@ public abstract class SimpleActivity extends Activity implements Serializable
             Boolean defineLater, 
             Date createDateTime, 
             String offlineInstructions, 
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity, 
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
-            org.lamsfoundation.lams.learningdesign.Grouping grouping, 
+            LearningLibrary learningLibrary, 
+            Activity parentActivity,
+            Activity libraryActivity,
+			Integer parentUIID,
+            LearningDesign learningDesign, 
+            Grouping grouping, 
             Integer activityTypeId, Transition transitionTo,
 			Transition transitionFrom){
         super(activityId, 
@@ -40,6 +42,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
                 offlineInstructions, 
                 learningLibrary, 
                 parentActivity, 
+				libraryActivity,
+				parentUIID,
                 learningDesign, 
                 grouping, 
                 activityTypeId, 
@@ -73,8 +77,7 @@ public abstract class SimpleActivity extends Activity implements Serializable
                 activityTypeId, 
                 transitionTo,
 				transitionFrom);
-    }
-    
+    }    
     public String toString()
     {
         return new ToStringBuilder(this)

@@ -1,6 +1,8 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Date;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -21,10 +23,12 @@ public class PermissionGateActivity extends GateActivity implements Serializable
             Boolean defineLater,
             java.util.Date createDateTime,
             String offlineInstructions,
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-            org.lamsfoundation.lams.learningdesign.Grouping grouping,
+            LearningLibrary learningLibrary,
+            Activity parentActivity,
+            Activity libraryActivity,
+			Integer parentUIID,
+            LearningDesign learningDesign,
+            Grouping grouping,
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
@@ -42,6 +46,8 @@ public class PermissionGateActivity extends GateActivity implements Serializable
                 offlineInstructions,
                 learningLibrary,
                 parentActivity,
+				libraryActivity,
+				parentUIID,
                 learningDesign,
                 grouping,
                 activityTypeId,
@@ -79,6 +85,29 @@ public class PermissionGateActivity extends GateActivity implements Serializable
                 transitionTo,
 				transitionFrom,
                 gateActivityLevelId);
+    }
+    public static PermissionGateActivity createCopy(PermissionGateActivity originalActivity){
+    	PermissionGateActivity newPermissionGateActivity = new PermissionGateActivity();
+    	
+    	newPermissionGateActivity.setActivityUIID(originalActivity.getActivityUIID());
+    	newPermissionGateActivity.setDescription(originalActivity.getDescription());
+    	newPermissionGateActivity.setTitle(originalActivity.getTitle());
+    	newPermissionGateActivity.setXcoord(originalActivity.getXcoord());
+    	newPermissionGateActivity.setYcoord(originalActivity.getYcoord());
+    	newPermissionGateActivity.setDefineLater(originalActivity.getDefineLater());
+    	newPermissionGateActivity.setCreateDateTime(new Date());
+    	newPermissionGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	newPermissionGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());
+    	newPermissionGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	
+    	/**
+    	 * TODO calculate how these two values would be set for COPY 
+    	 * */
+    	//newPermissionGateActivity.setTransitionTo();
+    	//newPermissionGateActivity.setTransitionFrom();
+    	
+    	return newPermissionGateActivity;
+    	
     }
     
     public String toString()

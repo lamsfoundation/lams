@@ -9,9 +9,14 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class GroupingActivity extends SimpleActivity implements Serializable
 {
-    
+	/** persistent field */
+	private Integer groupingUIID;
+	
+	/** persistent field */
+	private Integer createGroupingUIID;
+	
     /** persistent field */
-    public org.lamsfoundation.lams.learningdesign.Grouping createGrouping;
+    public Grouping createGrouping;
     
     /** full constructor */
     public GroupingActivity(Long activityId, 
@@ -24,14 +29,18 @@ public class GroupingActivity extends SimpleActivity implements Serializable
             Boolean defineLater, 
             java.util.Date createDateTime, 
             String offlineInstructions, 
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity, 
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
-            org.lamsfoundation.lams.learningdesign.Grouping grouping, 
+			LearningLibrary learningLibrary, 
+            Activity parentActivity, 
+            Activity libraryActivity,
+			Integer parentUIID,
+            LearningDesign learningDesign, 
+            Grouping grouping, 
             Integer activityTypeId,  
             Transition transitionTo,
             Transition transitionFrom,
-            Grouping createGrouping)
+            Grouping createGrouping,
+			Integer grouping_ui_id,
+			Integer create_grouping_ui_id)
     {
         super(activityId, 
                 id, 
@@ -45,12 +54,16 @@ public class GroupingActivity extends SimpleActivity implements Serializable
                 offlineInstructions,  
                 learningLibrary, 
                 parentActivity, 
+				libraryActivity,
+				parentUIID,
                 learningDesign, 
                 grouping, 
                 activityTypeId, 
                 transitionTo,
 				transitionFrom);
         this.createGrouping = createGrouping;
+        this.groupingUIID = grouping_ui_id;
+        this.createGroupingUIID = create_grouping_ui_id;
     }
     
     /** default constructor */
@@ -69,7 +82,9 @@ public class GroupingActivity extends SimpleActivity implements Serializable
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
-            Grouping createGrouping)
+            Grouping createGrouping,
+			Integer grouping_ui_id,
+			Integer create_grouping_ui_id)
     {
         super(activityId,
                 defineLater,
@@ -82,6 +97,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable
                 transitionTo,
 				transitionFrom);
         this.createGrouping = createGrouping;
+        this.groupingUIID = grouping_ui_id;
+        this.createGroupingUIID = create_grouping_ui_id;
     }
     
     public String toString()
@@ -102,5 +119,17 @@ public class GroupingActivity extends SimpleActivity implements Serializable
 	 */
 	public void setCreateGrouping(Grouping createGrouping) {
 		this.createGrouping = createGrouping;
+	}
+	public Integer getGroupingUIID() {
+		return groupingUIID;
+	}
+	public void setGroupingUIID(Integer grouping_ui_id) {
+		this.groupingUIID = grouping_ui_id;
+	}
+	public Integer getCreateGroupingUIID() {
+		return createGroupingUIID;
+	}
+	public void setCreateGroupingUIID(Integer create_grouping_ui_id) {
+		this.createGroupingUIID = create_grouping_ui_id;
 	}
 }

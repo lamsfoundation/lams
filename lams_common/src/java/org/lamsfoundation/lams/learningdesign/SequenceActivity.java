@@ -1,6 +1,9 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -20,10 +23,12 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             Boolean defineLater, 
             java.util.Date createDateTime, 
             String offlineInstructions, 
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity, 
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
-            org.lamsfoundation.lams.learningdesign.Grouping grouping, 
+            LearningLibrary learningLibrary, 
+            Activity parentActivity, 
+            Activity libraryActivity,
+			Integer parentUIID,
+            LearningDesign learningDesign, 
+            Grouping grouping, 
             Integer activityTypeId,  
             Transition transitionTo,
             Transition transitionFrom,
@@ -40,6 +45,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
                 offlineInstructions, 
                 learningLibrary, 
                 parentActivity, 
+				libraryActivity,
+				parentUIID,
                 learningDesign, 
                 grouping, 
                 activityTypeId,  
@@ -76,6 +83,27 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
               transitionTo,
 			  transitionFrom,
               activities);
+    }
+    public static SequenceActivity createCopy(SequenceActivity originalActivity){
+    	SequenceActivity newSequenceActivity = new SequenceActivity();
+    	
+    	newSequenceActivity.setActivityUIID(originalActivity.getActivityUIID());
+    	newSequenceActivity.setDescription(originalActivity.getDescription());
+    	newSequenceActivity.setTitle(originalActivity.getTitle());
+    	newSequenceActivity.setXcoord(originalActivity.getXcoord());
+    	newSequenceActivity.setYcoord(originalActivity.getYcoord());
+    	newSequenceActivity.setDefineLater(originalActivity.getDefineLater());
+    	newSequenceActivity.setCreateDateTime(new Date());
+    	newSequenceActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	newSequenceActivity.setLearningLibrary(originalActivity.getLearningLibrary());
+    	newSequenceActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newSequenceActivity.setActivities(new HashSet());
+    	
+    	/** TODO */
+    	//newSequenceActivity.setTransitionTo();
+		//newSequenceActivity.setTransitionFrom();
+    	
+    	return newSequenceActivity;
     }
 
     public String toString() {

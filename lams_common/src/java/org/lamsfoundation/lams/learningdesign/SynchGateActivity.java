@@ -1,6 +1,8 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.Date;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -20,9 +22,11 @@ public class SynchGateActivity extends GateActivity implements Serializable {
             Boolean defineLater,
             java.util.Date createDateTime, 
             String offlineInstructions,  
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity,  
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
+            LearningLibrary learningLibrary, 
+            Activity parentActivity,  
+            Activity libraryActivity,
+			Integer parentUIID,
+            LearningDesign learningDesign, 
             org.lamsfoundation.lams.learningdesign.Grouping grouping, 
             Integer activityTypeId, 
             Transition transitionTo,
@@ -39,7 +43,9 @@ public class SynchGateActivity extends GateActivity implements Serializable {
                 createDateTime, 
                 offlineInstructions, 
                 learningLibrary,  
-                parentActivity, 
+                parentActivity,
+				libraryActivity,
+				parentUIID,
                 learningDesign, 
                 grouping, 
                 activityTypeId,  
@@ -75,6 +81,28 @@ public class SynchGateActivity extends GateActivity implements Serializable {
               transitionTo,
 			  transitionFrom,
               gateActivityLevelId);
+    }
+    public static SynchGateActivity createCopy(SynchGateActivity originalActivity){
+    	SynchGateActivity newSynchGateActivity = new SynchGateActivity();
+    	
+    	newSynchGateActivity.setActivityUIID(originalActivity.getActivityUIID());
+    	newSynchGateActivity.setDescription(originalActivity.getDescription());
+    	newSynchGateActivity.setTitle(originalActivity.getTitle());
+    	newSynchGateActivity.setXcoord(originalActivity.getXcoord());
+    	newSynchGateActivity.setYcoord(originalActivity.getYcoord());
+    	newSynchGateActivity.setDefineLater(originalActivity.getDefineLater());
+    	newSynchGateActivity.setCreateDateTime(new Date());
+    	newSynchGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
+    	newSynchGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());
+    	newSynchGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newSynchGateActivity.setGateActivityLevelId(originalActivity.getGateActivityLevelId());
+    	/**
+    	 * TODO calculate how these two values would be set for COPY 
+    	 * */
+    	//newSynchGateActivity.setTransitionTo();
+    	//newSynchGateActivity.setTransitionFrom();
+    	
+    	return newSynchGateActivity;    	
     }
 
     public String toString() {

@@ -19,6 +19,9 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     /** persistent field */
     private Integer gateActivityLevelId;
     
+    /** persistent field */
+    private Boolean gateOpen;
+    
     /** full constructor */
     public GateActivity(Long activityId,
             Integer id,
@@ -30,10 +33,12 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
             Boolean defineLater,
             java.util.Date createDateTime,
             String offlineInstructions,
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary,
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity,
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign,
-            org.lamsfoundation.lams.learningdesign.Grouping grouping,
+            LearningLibrary learningLibrary,
+            Activity parentActivity,
+            Activity libraryActivity,
+			Integer parentUIID,
+            LearningDesign learningDesign,
+            Grouping grouping,
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
@@ -51,6 +56,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
                 offlineInstructions,
                 learningLibrary,
                 parentActivity,
+				libraryActivity,
+				parentUIID,
                 learningDesign,
                 grouping,
                 activityTypeId,
@@ -112,4 +119,10 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
         .toString();
     }
     
+	public Boolean getGateOpen() {
+		return gateOpen;
+	}
+	public void setGateOpen(Boolean gateOpen) {
+		this.gateOpen = gateOpen;
+	}
 }

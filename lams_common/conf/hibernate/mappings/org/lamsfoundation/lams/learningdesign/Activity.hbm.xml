@@ -23,8 +23,8 @@
     <discriminator column="learning_activity_type_id" insert="false"/>
 
 
-    <property name="id" type="java.lang.Integer" column="id" length="11">
-        <meta attribute="field-description">@hibernate.property column="id" length="11" </meta>    
+    <property name="activityUIID" type="java.lang.Integer" column="activity_ui_id" length="11">
+        <meta attribute="field-description">@hibernate.property column="activity_ui_id" length="11" </meta>    
     </property>
     
     <property name="description" type="java.lang.String" column="description" length="65535">
@@ -33,6 +33,10 @@
     
     <property name="title" type="java.lang.String" column="title" length="255" >
         <meta attribute="field-description">@hibernate.property column="title" length="255" </meta>    
+    </property>
+    
+    <property name="helpText" type="java.lang.String" column="help_text" length="65535">
+        <meta attribute="field-description">@hibernate.property column="help_text" length="65535" </meta>    
     </property>
 
     <property name="xcoord" type="java.lang.Integer" column="xcoord" length="11" >
@@ -59,6 +63,12 @@
         <meta attribute="field-description">@hibernate.property column="offline_instructions" length="65535"</meta>    
     </property>
     
+    <property name="parentUIID" type="java.lang.Integer" column="parent_ui_id" length="11">
+        <meta attribute="field-description">@hibernate.property column="parent_ui_id" length="11" </meta>    
+    </property>
+    
+    
+    
     <property name="activityTypeId" type="java.lang.Integer" column="learning_activity_type_id" length="11" not-null="true">
     	        <meta attribute="field-description">@hibernate.property column="learning_activity_type_id" length="11"</meta>    
    	</property>
@@ -83,6 +93,13 @@
         <meta attribute="field-description">@hibernate.column name="parent_activity_id"         
         </meta>
         <column name="parent_activity_id" />
+    </many-to-one>
+    
+    <!-- bi-directional many-to-one association to Activity -->
+    <many-to-one name="libraryActivity" class="org.lamsfoundation.lams.learningdesign.Activity">
+        <meta attribute="field-description">@hibernate.column name="libraryActivity"         
+        </meta>
+        <column name="library_activity_id" />
     </many-to-one>
         
     <!-- bi-directional many-to-one association to LearningDesign -->
@@ -124,8 +141,14 @@
 			</subclass>
 			
 			<subclass name="org.lamsfoundation.lams.learningdesign.GroupingActivity" >
-				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
-				
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>					
+				<property name="groupingUIID" type="java.lang.Integer" column="grouping_ui_id" length="11">
+				        <meta attribute="field-description">@hibernate.property column="grouping_ui_id" length="11"</meta>    
+				</property>				
+				<property name="createGroupingUIID" type="java.lang.Integer" column="create_grouping_ui_id" length="11">
+				        <meta attribute="field-description">@hibernate.property column="create_grouping_ui_id" length="11" </meta>    
+				</property>
+								
 				 <!-- bi-directional many-to-one association to Grouping-->
                   <many-to-one name="createGrouping" class="org.lamsfoundation.lams.learningdesign.Grouping" >
                   	<column name="create_grouping_id" />
@@ -135,17 +158,31 @@
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 				
 				<property name="gateActivityLevelId" type="java.lang.Integer" column="gate_activity_level_id" length="11" />
+				<property name="gateOpen" type="java.lang.Boolean" column="gate_open_flag" length="4" />
 				
 				<subclass name="org.lamsfoundation.lams.learningdesign.ScheduleGateActivity" discriminator-value="5" >
 					<meta attribute="class-description" inherit="false">@hibernate.class </meta>					
-					<property name="gateStartDateTime" type="java.sql.Timestamp" column="gate_start_date_time" length="19">
+					
+					<property name="gateStartTimeOffset" type="java.sql.Timestamp" column="gate_start_time_offset" length="19">
+        				<meta attribute="field-description">@hibernate.property column="gate_start_time_offset" length="19"</meta>    
+	        			<meta attribute="use-in-toString">true</meta>
+				    </property>
+				    
+				    <property name="gateEndTimeOffset" type="java.sql.Timestamp" column="gate_end_time_offset" length="19" >
+				    	<meta attribute="field-description">@hibernate.property column="gate_end_time_offset" length="19" </meta>    
+			    		<meta attribute="use-in-toString">true</meta>
+				    </property>
+				    
+				    <property name="gateStartDateTime" type="java.sql.Timestamp" column="gate_start_date_time" length="19">
         				<meta attribute="field-description">@hibernate.property column="gate_start_date_time" length="19"</meta>    
 	        			<meta attribute="use-in-toString">true</meta>
 				    </property>
+				    
 				    <property name="gateEndDateTime" type="java.sql.Timestamp" column="gate_end_date_time" length="19" >
 				    	<meta attribute="field-description">@hibernate.property column="gate_end_date_time" length="19" </meta>    
 			    		<meta attribute="use-in-toString">true</meta>
 				    </property>
+				    
 				</subclass>
 				<subclass name="org.lamsfoundation.lams.learningdesign.SynchGateActivity" discriminator-value="4" >
 					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
@@ -182,6 +219,11 @@
 					<meta attribute="field-description">@hibernate.property column="min_number_of_options" length="5"</meta> 
 					<meta attribute="use-in-toString">true</meta>
 			    </property>
+			    
+			    <property name="optionsInstructions" type="java.lang.String" column="options_instructions" length="65535">
+    			    <meta attribute="field-description">@hibernate.property column="options_instructions" length="65535"</meta>    
+			    </property>
+    
 			</subclass>
 			<subclass name="org.lamsfoundation.lams.learningdesign.SequenceActivity" discriminator-value="9" >
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
