@@ -34,7 +34,9 @@
 	
 	<property name="web"                           value="${basedir}/web"/>
 	<property name="webinf"                        value="${web}/WEB-INF"/>
-	<property name="conf.struts"                        value="${web}/WEB-INF/struts/struts-config.xml"/>
+	<property name="testweb"                       value="${basedir}/test/web"/>
+	<property name="testwebinf"                    value="${testweb}/WEB-INF"/>
+
 	
 	<property name="jboss.home.windows"                    value="D:/jboss-3.2.6"/>
 	<property name="jboss.deploy.windows"                    value="${jboss.home.windows}/server/default/deploy"/>
