@@ -194,7 +194,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param activities
 	 * @param activity
 	 */
-	private void processActivityType(Hashtable activities, Object activity){		
+	private  void processActivityType(Hashtable activities, Object activity){		
 		String className = activity.getClass().getName();
 		if(activity instanceof GroupingActivity)
 			buildGroupingActivityObject(activities,activity);
@@ -214,34 +214,15 @@ public class LDWDDXValueObjectFactory {
 	 * @param objActivity The object to be converted
 	 * @return Hashtable
 	 */
-	private Hashtable buildActivityObject(Object objActivity){
-		Hashtable activities = new Hashtable();	
+	public  Hashtable buildActivityObject(Object objActivity){
 		
-		activities.put(WDDXTAGS.OBJECT_TYPE,"Activity");
-		
+		Hashtable activities = getCutDownActivityDetails(objActivity);		
 		processActivityType(activities,objActivity);
 		
-		Activity activity =(Activity)objActivity;		
-		
-		activities.put(WDDXTAGS.ACTIVITY_ID,activity.getActivityId());
-		
-		activities.put(WDDXTAGS.ACTIVITY_UIID,
-					   (activity.getActivityUIID()!=null?activity.getActivityUIID():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
-		
-		activities.put(WDDXTAGS.DESCRIPTION,
-					  (activity.getDescription()!=null?activity.getDescription():WDDXTAGS.STRING_NULL_VALUE));
-		
-		activities.put(WDDXTAGS.TITLE,
-					  (activity.getTitle()!=null?activity.getTitle():WDDXTAGS.STRING_NULL_VALUE));
+		Activity activity =(Activity)objActivity;
 		
 		activities.put(WDDXTAGS.HELP_TEXT,
-					  (activity.getHelpText()!=null?activity.getHelpText():WDDXTAGS.STRING_NULL_VALUE));
-		
-		activities.put(WDDXTAGS.XCOORD,
-		  			  (activity.getXcoord()!=null?activity.getXcoord():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
-		
-		activities.put(WDDXTAGS.YCOORD,
-					   (activity.getYcoord()!=null?activity.getYcoord():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
+					  (activity.getHelpText()!=null?activity.getHelpText():WDDXTAGS.STRING_NULL_VALUE));		
 		
 		activities.put(WDDXTAGS.PARENT_ACTIVITY_ID,
 					   (activity.getParentActivity()!=null?activity.getParentActivity().getActivityId():WDDXTAGS.NUMERIC_NULL_VALUE_LONG));
@@ -291,7 +272,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param activities
 	 * @param activity
 	 */
-	private void buildGroupingActivityObject(Hashtable activities, Object activity){
+	private  void buildGroupingActivityObject(Hashtable activities, Object activity){
 		
 		GroupingActivity groupingActivity = (GroupingActivity)activity;
 		Grouping grouping = groupingActivity.getCreateGrouping();
@@ -321,7 +302,7 @@ public class LDWDDXValueObjectFactory {
 	 * 						 populated into the hashtable
 	 * @return Hashtable The populated hashtable to be passed on to FLASH 
 	 */
-	private Hashtable addChosenGroupingAttributes(ChosenGrouping chosenGrouping){
+	private  Hashtable addChosenGroupingAttributes(ChosenGrouping chosenGrouping){
 		return new Hashtable();
 	}
 	/**
@@ -332,7 +313,7 @@ public class LDWDDXValueObjectFactory {
 	 * 						 populated into the hashtable
 	 * @return Hashtable The populated hashtable to be passed on to FLASH
 	 */
-	private Hashtable addRandomGroupingAttributes(RandomGrouping randomGrouping){
+	private  Hashtable addRandomGroupingAttributes(RandomGrouping randomGrouping){
 		Hashtable groupingTable = new Hashtable();		
 		groupingTable.put(WDDXTAGS.NUMBER_OF_GROUPS,randomGrouping.getNumberOfGroups());
 		groupingTable.put(WDDXTAGS.LEARNERS_PER_GROUP,randomGrouping.getLearnersPerGroup());
@@ -345,7 +326,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param activities
 	 * @param toolActivity
 	 */
-	private void buildToolActivity(Hashtable activities, ToolActivity toolActivity){		
+	private  void buildToolActivity(Hashtable activities, ToolActivity toolActivity){		
 		
 		activities.put(WDDXTAGS.ORDER_ID,
 					  (toolActivity.getOrderId()!=null?toolActivity.getOrderId():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
@@ -359,7 +340,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param activities
 	 * @param optActivity
 	 */
-	private void buildOptionsActivityObject(Hashtable activities, OptionsActivity optActivity){
+	private  void buildOptionsActivityObject(Hashtable activities, OptionsActivity optActivity){
 		
 		if(optActivity.getMaxNumberOfOptions()!=null)
 			activities.put(WDDXTAGS.MAX_OPTIONS,optActivity.getMaxNumberOfOptions());
@@ -382,7 +363,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param activities
 	 * @param sequenceActivity
 	 */
-	private void buildSequenceActivityObject(Hashtable activities,SequenceActivity sequenceActivity){
+	private  void buildSequenceActivityObject(Hashtable activities,SequenceActivity sequenceActivity){
 		
 	}
 	
@@ -395,7 +376,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param activities
 	 * @param parallelActivity
 	 */
-	private void buildParallelActivityObject(Hashtable activities,ParallelActivity parallelActivity){
+	private  void buildParallelActivityObject(Hashtable activities,ParallelActivity parallelActivity){
 		
 	}
 	/**
@@ -403,7 +384,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param activities
 	 * @param schActivity
 	 */
-	private void buildScheduleGateActivityObject(Hashtable activities, ScheduleGateActivity schActivity){
+	private  void buildScheduleGateActivityObject(Hashtable activities, ScheduleGateActivity schActivity){
 
 		if(schActivity.getGateEndTimeOffset()!=null)
 			activities.put(WDDXTAGS.GATE_END_OFFSET,schActivity.getGateEndTimeOffset());
@@ -422,7 +403,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param activities
 	 * @param activity
 	 */
-	private void buildGateActivityObject(Hashtable activities, Object activity){
+	private  void buildGateActivityObject(Hashtable activities, Object activity){
 		
 		if(activity instanceof PermissionGateActivity)
 			buildPermissionGateActivityObject(activities,(PermissionGateActivity)activity);
@@ -439,10 +420,10 @@ public class LDWDDXValueObjectFactory {
 		activities.put(WDDXTAGS.GATE_OPEN,
 				   (gateActivity.getGateOpen()!=null?gateActivity.getGateOpen():WDDXTAGS.BOOLEAN_NULL_VALUE));			
 	}
-	private void buildPermissionGateActivityObject(Hashtable activities,PermissionGateActivity permissionGateActivity){
+	private  void buildPermissionGateActivityObject(Hashtable activities,PermissionGateActivity permissionGateActivity){
 		
 	}
-	private void buildSynchGateActivityObject(Hashtable activities,SynchGateActivity synchGateActivity){
+	private  void buildSynchGateActivityObject(Hashtable activities,SynchGateActivity synchGateActivity){
 		
 	}
 	
@@ -451,7 +432,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param activities
 	 * @param activity
 	 */
-	private void buildComplexActivityObject(Hashtable activities, Object activity){
+	private  void buildComplexActivityObject(Hashtable activities, Object activity){
 		
 		if(activity instanceof OptionsActivity)
 			buildOptionsActivityObject(activities,(OptionsActivity)activity);
@@ -468,7 +449,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param activities
 	 * @param iter
 	 */
-	private void addChildActivities(Hashtable activities,Iterator iter){
+	private  void addChildActivities(Hashtable activities,Iterator iter){
 		Vector childActivities = new Vector();
 		while(iter.hasNext()){
 			Object object = iter.next();
@@ -484,7 +465,7 @@ public class LDWDDXValueObjectFactory {
 	 * @param trans
 	 * @return Hashtable
 	 */
-	private Hashtable buildTransitionObject(Transition trans){
+	public static Hashtable buildTransitionObject(Transition trans){
 		Hashtable transitions = new Hashtable();
 		
 		transitions.put(WDDXTAGS.TRANSITION_ID,trans.getTransitionId());
@@ -506,10 +487,6 @@ public class LDWDDXValueObjectFactory {
 		
 		transitions.put(WDDXTAGS.LEARNING_DESIGN_ID,
 					   (trans.getLearningDesign()!=null?trans.getLearningDesign().getLearningDesignId():WDDXTAGS.NUMERIC_NULL_VALUE_LONG));
-		
-		if(trans.getCreateDateTime()!=null)
-			transitions.put(WDDXTAGS.CREATION_DATE,trans.getCreateDateTime());
-		
 		transitions.put(WDDXTAGS.TO_ACTIVITY_UIID,
 					   (trans.getToUIID()!=null?trans.getToUIID():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
 		
@@ -552,30 +529,11 @@ public class LDWDDXValueObjectFactory {
 	 * @return Hashtable
 	 */
 	public Hashtable buildLearningDesignObject(LearningDesign design){
-		Hashtable designs = new Hashtable();
+		Hashtable designs = getCutDownLearningDesignDetails(design);
 		
-		designs.put(WDDXTAGS.OBJECT_TYPE,LearningDesign.DESIGN_OBJECT);
-		
-		designs.put(WDDXTAGS.LEARNING_DESIGN_ID,
-				   (design.getLearningDesignId()!=null?design.getLearningDesignId():WDDXTAGS.NUMERIC_NULL_VALUE_LONG));
 		
 		designs.put(WDDXTAGS.LEARNING_DESIGN_UIID,
 					(design.getLearningDesignUIID()!=null?design.getLearningDesignUIID():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
-		
-		designs.put(WDDXTAGS.DESCRIPTION,
-				   (design.getDescription()!=null?design.getDescription():WDDXTAGS.STRING_NULL_VALUE));
-		
-		designs.put(WDDXTAGS.TITLE,
-				   (design.getTitle()!=null?design.getTitle():WDDXTAGS.STRING_NULL_VALUE));
-		
-		designs.put(WDDXTAGS.FIRST_ACTIVITY_ID,
-				   (design.getFirstActivity()!=null?design.getFirstActivity().getActivityId():WDDXTAGS.NUMERIC_NULL_VALUE_LONG));
-		
-		designs.put(WDDXTAGS.FIRST_ACTIVITY_UIID,
-				   (design.getFirstActivity()!=null?design.getFirstActivity().getActivityUIID():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
-		
-		designs.put(WDDXTAGS.MAX_ID,
-				    (design.getMaxId()!=null?design.getMaxId():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
 		
 		designs.put(WDDXTAGS.VALID_DESIGN,design.getValidDesign());
 		
@@ -585,10 +543,6 @@ public class LDWDDXValueObjectFactory {
 			designs.put(WDDXTAGS.DATE_READ_ONLY,design.getDateReadOnly());
 		
 		designs.put(WDDXTAGS.USER_ID,design.getUser().getUserId());
-		
-		
-		designs.put(WDDXTAGS.HELP_TEXT,
-					(design.getHelpText()!=null?design.getHelpText():WDDXTAGS.STRING_NULL_VALUE));
 		
 		designs.put(WDDXTAGS.VERSION,
 					(design.getVersion()!=null?design.getVersion():WDDXTAGS.STRING_NULL_VALUE));
@@ -600,12 +554,6 @@ public class LDWDDXValueObjectFactory {
 		
 		designs.put(WDDXTAGS.DURATION,
 				   (design.getDuration()!=null?design.getDuration():WDDXTAGS.NUMERIC_NULL_VALUE_LONG));
-		
-		designs.put(WDDXTAGS.LICENCE_ID,
-					(design.getLicense()!=null?design.getLicense().getLicenseID():WDDXTAGS.NUMERIC_NULL_VALUE_LONG));
-		
-		designs.put(WDDXTAGS.LICENSE_TEXT,
-				   (design.getLicenseText()!=null?design.getLicenseText():WDDXTAGS.STRING_NULL_VALUE));
 		
 		Collection coll = design.getActivities();
 		HashSet parentActivities = new HashSet();
@@ -640,6 +588,71 @@ public class LDWDDXValueObjectFactory {
 		}
 		designs.put(WDDXTAGS.TRANSITIONS,transitions);
 		
+		return designs;
+	}
+	
+	public static Hashtable getCutDownActivityDetails(Object objActivity){
+		Hashtable activities = new Hashtable();	
+		
+		activities.put(WDDXTAGS.OBJECT_TYPE,"Activity");		
+		Activity activity =(Activity)objActivity;		
+		activities.put(WDDXTAGS.ACTIVITY_ID,activity.getActivityId());
+		
+		activities.put(WDDXTAGS.ACTIVITY_TYPE_ID,
+				      (activity.getActivityCategoryID()!=null?activity.getActivityCategoryID():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
+		
+		activities.put(WDDXTAGS.ACTIVITY_UIID,
+					   (activity.getActivityUIID()!=null?activity.getActivityUIID():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
+		
+		activities.put(WDDXTAGS.DESCRIPTION,
+					  (activity.getDescription()!=null?activity.getDescription():WDDXTAGS.STRING_NULL_VALUE));
+		
+		activities.put(WDDXTAGS.TITLE,
+					  (activity.getTitle()!=null?activity.getTitle():WDDXTAGS.STRING_NULL_VALUE));
+		
+		activities.put(WDDXTAGS.XCOORD,
+		  			  (activity.getXcoord()!=null?activity.getXcoord():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
+		
+		activities.put(WDDXTAGS.YCOORD,
+					   (activity.getYcoord()!=null?activity.getYcoord():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));		
+			
+		return activities;
+	}
+	
+	public static Hashtable getCutDownLearningDesignDetails(LearningDesign design){
+		Hashtable designs = new Hashtable();
+		
+		designs.put(WDDXTAGS.OBJECT_TYPE,LearningDesign.DESIGN_OBJECT);
+		
+		designs.put(WDDXTAGS.LEARNING_DESIGN_ID,
+				   (design.getLearningDesignId()!=null?design.getLearningDesignId():WDDXTAGS.NUMERIC_NULL_VALUE_LONG));
+		
+		designs.put(WDDXTAGS.DESCRIPTION,
+				   (design.getDescription()!=null?design.getDescription():WDDXTAGS.STRING_NULL_VALUE));
+		
+		designs.put(WDDXTAGS.TITLE,
+				   (design.getTitle()!=null?design.getTitle():WDDXTAGS.STRING_NULL_VALUE));
+		
+		designs.put(WDDXTAGS.FIRST_ACTIVITY_ID,
+				   (design.getFirstActivity()!=null?design.getFirstActivity().getActivityId():WDDXTAGS.NUMERIC_NULL_VALUE_LONG));
+		
+		designs.put(WDDXTAGS.FIRST_ACTIVITY_UIID,
+				   (design.getFirstActivity()!=null?design.getFirstActivity().getActivityUIID():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
+		
+		designs.put(WDDXTAGS.MAX_ID,
+				    (design.getMaxId()!=null?design.getMaxId():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));
+		
+		designs.put(WDDXTAGS.HELP_TEXT,
+					(design.getHelpText()!=null?design.getHelpText():WDDXTAGS.STRING_NULL_VALUE));
+		
+		designs.put(WDDXTAGS.VERSION,
+					(design.getVersion()!=null?design.getVersion():WDDXTAGS.STRING_NULL_VALUE));
+		
+		designs.put(WDDXTAGS.LICENCE_ID,
+					(design.getLicense()!=null?design.getLicense().getLicenseID():WDDXTAGS.NUMERIC_NULL_VALUE_LONG));
+		
+		designs.put(WDDXTAGS.LICENSE_TEXT,
+				   (design.getLicenseText()!=null?design.getLicenseText():WDDXTAGS.STRING_NULL_VALUE));
 		return designs;
 	}	
 }

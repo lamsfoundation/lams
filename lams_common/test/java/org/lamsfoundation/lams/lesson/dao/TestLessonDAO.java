@@ -112,5 +112,4 @@ public class TestLessonDAO extends LessonDataAccessTestCase
             this.setShouldFlush(false);
         }
     }
-  
 }

@@ -28,6 +28,10 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
 {
+	private static final String TABLENAME ="lams_lesson";
+	private final static String FIND_BY_USER="from " + TABLENAME + 
+											 " in class " + Lesson.class.getName() +
+											 " where user_id=?";
     
     /**
      * Retrieves the Lesson
@@ -112,6 +116,10 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
     public void updateLesson(Lesson lesson)
     {
         getHibernateTemplate().update(lesson);
+    }
+    public List getLessonsForUser(Integer userID){
+    	List lessons = this.getHibernateTemplate().find(FIND_BY_USER,userID);
+    	return lessons;
     }
 
 }

@@ -53,5 +53,14 @@ public interface ILessonDAO
      */
     public void updateLesson(Lesson lesson);
     
+    /**
+     * Returns the list of available Lessons for
+     * a given user.
+     * 
+     * @param userID The user_id of the user
+     * @return List The list of Lessons for the given user
+     */
+    public List getLessonsForUser(Integer userID);
+    
 
 }

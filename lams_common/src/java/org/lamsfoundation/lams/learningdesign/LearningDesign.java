@@ -12,7 +12,7 @@ import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
+
 
 /**
  * @hibernate.class table="lams_learning_design"
@@ -232,19 +232,19 @@ public class LearningDesign implements Serializable {
 		this.learningDesignId = learningDesignId;
 	}
 	public Integer getLearningDesignUIID() {
-		return this.learningDesignUIID!=null?this.learningDesignUIID : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;		
+		return this.learningDesignUIID;		
 	}
 	public void setLearningDesignUIID(Integer id) {
 		this.learningDesignUIID = id;
 	}
 	public String getDescription() {
-		return this.description!=null?this.description:WDDXTAGS.STRING_NULL_VALUE;
+		return this.description;
 	}
 	public void setDescription(String description) {
 		this.description = description;
 	}
 	public String getTitle() {
-		return this.title!=null?this.title:WDDXTAGS.STRING_NULL_VALUE;
+		return this.title;
 	}
 	public void setTitle(String title) {
 		this.title = title;
@@ -256,43 +256,43 @@ public class LearningDesign implements Serializable {
 		this.firstActivity = firstActivity;
 	}
 	public Integer getMaxId() {
-		return maxId!=null?maxId:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return maxId;
 	}
 	public void setMaxId(Integer maxId) {
 		this.maxId = maxId;
 	}
 	public Boolean getValidDesign() {
-		return validDesign!=null?validDesign:WDDXTAGS.BOOLEAN_NULL_VALUE;
+		return validDesign;
 	}
 	public void setValidDesign(Boolean validDesign) {
 		this.validDesign = validDesign;
 	}
 	public Boolean getReadOnly() {
-		return readOnly!=null?readOnly:WDDXTAGS.BOOLEAN_NULL_VALUE;
+		return readOnly;
 	}
 	public void setReadOnly(Boolean readOnly) {
 		this.readOnly = readOnly;
 	}
 	public Date getDateReadOnly() {
-		return dateReadOnly!=null?dateReadOnly:WDDXTAGS.DATE_NULL_VALUE;
+		return dateReadOnly;
 	}
 	public void setDateReadOnly(Date dateReadOnly) {
 		this.dateReadOnly = dateReadOnly;
 	}
 	public String getHelpText() {
-		return helpText!=null?helpText:WDDXTAGS.STRING_NULL_VALUE;
+		return helpText;
 	}
 	public void setHelpText(String helpText) {
 		this.helpText = helpText;
 	}
 	public Date getCreateDateTime() {
-		return createDateTime!=null?createDateTime:WDDXTAGS.DATE_NULL_VALUE;
+		return createDateTime;
 	}
 	public void setCreateDateTime(Date createDateTime) {
 		this.createDateTime = createDateTime;
 	}
 	public String getVersion() {
-		return version!=null?version:WDDXTAGS.STRING_NULL_VALUE;
+		return version;
 	}
 	public void setVersion(String version) {
 		this.version = version;
@@ -380,19 +380,19 @@ public class LearningDesign implements Serializable {
 		this.workspaceFolder = workspaceFolder;
 	}
 	public Long getDuration() {
-		return duration!=null?duration:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return duration;
 	}
 	public void setDuration(Long duration) {
 		this.duration = duration;
 	}
 	public String getLicenseText() {
-		return licenseText!=null?licenseText:WDDXTAGS.STRING_NULL_VALUE;
+		return licenseText;
 	}
 	public void setLicenseText(String licenseText) {
 		this.licenseText = licenseText;
 	}
 	public Integer getCopyTypeID() {
-		return copyTypeID!=null?copyTypeID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return copyTypeID;
 	}
 	public void setCopyTypeID(Integer copyTypeID) {
 		this.copyTypeID = copyTypeID;
@@ -404,31 +404,31 @@ public class LearningDesign implements Serializable {
 		this.license = license;
 	}
 	public Long getLessonID() {
-		return lessonID!=null?lessonID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return lessonID;
 	}
 	public void setLessonID(Long lessonID) {
 		this.lessonID = lessonID;
 	}
 	public String getLessonName() {
-		return lessonName!=null?lessonName:WDDXTAGS.STRING_NULL_VALUE;
+		return lessonName;
 	}
 	public void setLessonName(String lessonName) {
 		this.lessonName = lessonName;
 	}
 	public Long getLessonOrgID() {
-		return lessonOrgID!=null?lessonOrgID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return lessonOrgID;
 	}
 	public void setLessonOrgID(Long lessonOrgID) {
 		this.lessonOrgID = lessonOrgID;
 	}
 	public String getLessonOrgName() {
-		return lessonOrgName!=null?lessonOrgName:WDDXTAGS.STRING_NULL_VALUE;
+		return lessonOrgName;
 	}
 	public void setLessonOrgName(String lessonOrgName) {
 		this.lessonOrgName = lessonOrgName;
 	}
 	public Date getLessonStartDateTime() {
-		return lessonStartDateTime!=null?lessonStartDateTime:WDDXTAGS.DATE_NULL_VALUE;
+		return lessonStartDateTime;
 	}
 	public void setLessonStartDateTime(Date lessonStartDateTime) {
 		this.lessonStartDateTime = lessonStartDateTime;
