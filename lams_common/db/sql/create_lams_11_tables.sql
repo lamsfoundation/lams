@@ -87,7 +87,8 @@ CREATE TABLE lams_authentication_method_type (
 CREATE TABLE lams_authentication_method (
        authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
      , authentication_method_type_id INT(3) NOT NULL DEFAULT 0
-     , parameters_file_name VARCHAR(255) NOT NULL
+     , authentication_method_name VARCHAR(255) NOT NULL
+     , UNIQUE UQ_lams_authentication_method_1 (authentication_method_name)
      , PRIMARY KEY (authentication_method_id)
      , INDEX (authentication_method_type_id)
      , CONSTRAINT FK_lams_authorization_method_1 FOREIGN KEY (authentication_method_type_id)
@@ -439,6 +440,17 @@ CREATE TABLE lams_activity_learners (
      , INDEX (activity_id)
      , CONSTRAINT FK_TABLE_32_2 FOREIGN KEY (activity_id)
                   REFERENCES lams_learning_activity (activity_id)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_lesson_learner (
+       lesson_id BIGINT(20) NOT NULL
+     , user_id BIGINT(20) NOT NULL DEFAULT 0
+     , INDEX (lesson_id)
+     , CONSTRAINT FK_lams_lesson_learner_1 FOREIGN KEY (lesson_id)
+                  REFERENCES lams_lesson (lesson_id)
+     , INDEX (user_id)
+     , CONSTRAINT FK_lams_lesson_learner_2 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learning_transition (
