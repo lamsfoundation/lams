@@ -13,11 +13,14 @@ import java.util.Date;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
@@ -66,6 +69,7 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
     private final static Long TEST_NON_GROUP_ACTIVITY_ID = new Long(20);
     private static final Long TEST_GROUPED_ACTIVITY_ID = new Long(19);
     private static final Long TEST_GROUP_ID = new Long(88);
+    private static final Long TEST_GROUPING_ID = new Long(100);
     public static final Long TEST_LESSON_ID = new Long(1);
     
     /*

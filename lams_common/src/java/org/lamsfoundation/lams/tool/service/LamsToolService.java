@@ -23,7 +23,9 @@ package org.lamsfoundation.lams.tool.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -49,6 +51,7 @@ public class LamsToolService implements ILamsToolService,ApplicationContextAware
     //---------------------------------------------------------------------
     private ApplicationContext context;
     private IToolSessionDAO toolSessionDAO;
+    private IActivityDAO activityDAO;
     private ToolContentIDGenerator contentIDGenerator;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -76,6 +79,7 @@ public class LamsToolService implements ILamsToolService,ApplicationContextAware
     {
         this.contentIDGenerator = contentIDGenerator;
     }
+
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
@@ -114,6 +118,29 @@ public class LamsToolService implements ILamsToolService,ApplicationContextAware
     {
         return toolSessionDAO.getToolSession(toolSessionId);
     }
+    
+    /**
+     * Get the tool session based on the activity id and the learner.
+     * @throws LamsToolServiceException
+     * @see org.lamsfoundation.lams.tool.service.ILamsToolService#getToolSessionByActivity(org.lamsfoundation.lams.usermanagement.User, ToolActivity)
+     */
+    public ToolSession getToolSessionByActivity(User learner, ToolActivity toolActivity) throws LamsToolServiceException
+    {
+        //TODO need to be changed to grouping flag when grouping activity is mapped
+        //properly.
+        if(toolActivity.getGrouping()!=null)
+        {
+            Group learnerGroup = toolActivity.getGrouping().getGroupBy(learner);
+            
+            if(learnerGroup.isNull())
+                throw new LamsToolServiceException("Fail to get grouped tool session: No group found for this learner.");
+
+            return this.toolSessionDAO.getToolSessionByGroup(learnerGroup,toolActivity);
+        }
+        else
+            return this.toolSessionDAO.getToolSessionByLearner(learner,toolActivity);
+    }
+    
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsToolService#notifyToolsToCreateSession(java.lang.Long, org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
@@ -179,6 +206,4 @@ public class LamsToolService implements ILamsToolService,ApplicationContextAware
     {
         return toolActivity.getTool().getServiceName().equals("surveyService");
     }
-
-
 }

@@ -31,6 +31,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
@@ -586,9 +587,11 @@ public abstract class Activity implements Serializable,Nullable {
 	}
 	/**
 	 * Delegate to activity strategy to check up the status of all children.
-	 * @param learnerProgress the current learner progress that record the
-	 * 						  all completed activities.
-	 * @return the boolean to indicate the status of children.
+	 * 
+     * @param learnerProgress the progress data that record what has been 
+     * 						  completed
+     * @return true if all children are completed.
+
 	 */
 	public boolean areChildrenCompleted(LearnerProgress learnerProgress)
 	{
@@ -596,21 +599,34 @@ public abstract class Activity implements Serializable,Nullable {
 	}
 	
 	/**
-	 * Delegate to activity strategy to calculate what is the next activity
-	 * within the parent activity.
+	 * <p>Delegate to activity strategy to calculate what is the next activity
+	 * within the parent activity.</p>
 	 * 
-     * @param learnerProgress the progress data that record what has been 
-     * 						  completed
-     * @return true if all children are completed.
+	 * <b>Note:</b> The logic of what is the next activity here is progress
+	 * 				enigne specific now. Please see the <code>ActivityStrategy</code>
+	 * 				for details explaination of what is next.
+	 * 
+	 * @param currentChild the current child activity in a complex activity.
+	 * @return the next activity within a parent activity
 	 */
 	public Activity getNextActivityByParent(Activity currentChild)
 	{
 	    return activityStrategy.getNextActivityByParent(this,currentChild);
 	}
+	
 	public Integer getActivityCategoryID() {
 		return activityCategoryID;
 	}
 	public void setActivityCategoryID(Integer activityCategoryID) {
 		this.activityCategoryID = activityCategoryID;
+	}
+	
+	/**
+	 * Return the activity dto for progress view.
+	 * @return the activity dto.
+	 */
+	public ProgressActivityDTO getProgressActivityData()
+	{
+	    return new ProgressActivityDTO(this.activityId);
 	}
 }

@@ -8,6 +8,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.lesson.LessonClass;
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -197,7 +198,25 @@ public abstract class Grouping implements Serializable
     }
 
     /**
-     * @return
+     * Returns the group that current learner is in.
+     * @param learner the user in the group
+     * @return the group that has the learner
+     */
+    public Group getGroupBy(User learner)
+    {
+        for(Iterator i = getGroups().iterator();i.hasNext();)
+        {
+            Group group = (Group)i.next();
+            if(isLearnerGroup(group)&&group.hasLearner(learner))
+                return group;
+        }
+        return new NullGroup();
+    }
+    
+    /**
+     * Is this group a learner group. It is also possible that the group is a
+     * staff group.
+     * @return	whether the group is learner group or not.
      */
     public abstract boolean isLearnerGroup(Group group);
 

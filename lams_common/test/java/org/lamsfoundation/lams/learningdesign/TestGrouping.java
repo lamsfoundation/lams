@@ -91,6 +91,38 @@ public class TestGrouping extends TestCase
         assertEquals("verify number of learners",2,grouping.getLearners().size());
     }
 
+    public void testGetGroupByLearner()
+    {
+        grouping.setGroups(new HashSet());
+        User user1 = new User();
+        user1.setUserId(new Integer(1));
+        Group group1 = new Group();
+        insertUserIntoGroup(user1, group1);
+         
+        User user2 = new User();
+        user2.setUserId(new Integer(2));
+        Group group2 = new Group();
+        insertUserIntoGroup(user2, group2);
+        
+        Group group = grouping.getGroupBy(user2);
+        assertEquals("verify group retrieved",group2.getOrderId(),group.getOrderId());
+    }
+    
+    public void testGetNullGroupByLearner()
+    {
+        grouping.setGroups(new HashSet());
+        User user1 = new User();
+        user1.setUserId(new Integer(1));
+        Group group1 = new Group();
+        insertUserIntoGroup(user1, group1);
+        
+        User user2 = new User();
+        user2.setUserId(new Integer(2));
+        
+        Group group = grouping.getGroupBy(user2);
+        assertTrue("verify group retrieved",group.isNull());
+
+    }
     /**
      * @param user1
      * @param group1

@@ -62,13 +62,6 @@ public class LearnerProgressDTO
     }
 
     /**
-     * @return Returns the currentActivityID.
-     */
-    public Long getCurrentActivityID()
-    {
-        return currentActivityId;
-    }
-    /**
      * @return Returns the learnerId.
      */
     public Integer getLearnerId()
