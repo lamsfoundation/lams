@@ -314,6 +314,7 @@ CREATE TABLE lams_learning_activity (
      , learning_design_id BIGINT(20)
      , learning_library_id BIGINT(20)
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , run_offline_flag TINYINT(1) NOT NULL
      , offline_instructions TEXT
      , max_number_of_options INT(5)
      , min_number_of_options INT(5)
