@@ -112,13 +112,13 @@
         name="userOrganisations"
         lazy="true"
         inverse="true"
-		cascade="none"
+		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
             lazy="true"
             inverse="true"
-            cascade="none"
+            cascade="all-delete-orphan"
 
            @hibernate.collection-key
             column="organisation_id"

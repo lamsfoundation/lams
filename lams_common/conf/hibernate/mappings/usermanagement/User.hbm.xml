@@ -238,7 +238,7 @@
     </property>
     <property
         name="disabledFlag"
-        type="byte"
+        type="java.lang.Boolean"
         column="disabled_flag"
         not-null="true"
         length="1"
@@ -285,13 +285,13 @@
         name="userOrganisations"
         lazy="true"
         inverse="true"
-		cascade="none"
+		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
             lazy="true"
             inverse="true"
-            cascade="none"
+            cascade="all-delete-orphan"
 
            @hibernate.collection-key
             column="user_id"
