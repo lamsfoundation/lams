@@ -39,8 +39,8 @@ Ant build file.
 		<echo message="lamscr-jar  --> Make jar archive for deployment"/>
 		<echo message="lamscr-war  --> Make war archive for deployment"/>
 <!--		<echo message="copyfiles --> <!--Copy the third party jar files and cofiguration files for deployment"/> -->
-<!--		<echo message="middlegen-learningdesign --> <!-- Run middlegen for learningdesign tables"/> -->
-<!--		<echo message="hbm2java-learningdesign  --> <!-- Run hbm2java for learningdesign mapping files"/> -->
+		<echo message="middlegen-cr --> Run middlegen for content repository tables"/>
+		<echo message="hbm2java-cr--> Run hbm2java for content repository mapping files"/>
 		<echo message=""/>
 	</target>
 
@@ -80,21 +80,21 @@ Ant build file.
 
 
 	<!-- =================================================================== -->
-	<!-- Run Middlegen For LearningDesign                                                       -->
+	<!-- Run Middlegen For Content Repository                                -->
 	<!-- =================================================================== -->
 	<target 
-      name="middlegen-learningdesign" 
-      description="Run Middlegen For LearningDesign" 
+      name="middlegen-cr" 
+      description="Run Middlegen For Content Repository tables" 
       unless="middlegen.skip"
       depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present"
     >
 		<taskdef
-         name="middlegen-learningdesign"
+         name="middlegen-cr"
          classname="middlegen.MiddlegenTask"
          classpathref="all-libs"
         />
 
-		<middlegen-learningdesign
+		<middlegen-cr
          appname="learningdesign"
          prefsdir="${middlegen}"
          gui="${gui}"
@@ -109,36 +109,36 @@ Ant build file.
 
 			<hibernate 
 			destination="${hbm}"
-			package="${package.learningdesign.name}"
+			package="${package.contentrepository.name}"
             genXDocletTags="true"
             javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
             />
 
-			<table name="lams_learning_activity"/>
-			<table name="lams_learning_design"/>
-			<table name="lams_learning_library"/>
-			<table name="lams_learning_transition"/>
-			<table name="lams_group"/>
-			<table name="lams_grouping"/>
+			<table name="lams_cr_node"/>
+			<table name="lams_cr_node_version"/>
+			<table name="lams_cr_node_version_property"/>
+			<table name="lams_cr_tool"/>
+			<table name="lams_cr_workspace"/>
+			<table name="lams_cr_workspace_tools"/>
 
-		</middlegen-learningdesign>
+		</middlegen-cr>
 
 	</target>
 
 	<!-- =================================================================== -->
-	<!-- Run hbm2java for learningdesign                                                       -->
+	<!-- Run hbm2java for Content Repository                                 -->
 	<!-- =================================================================== -->
-	<target name="hbm2java-learningdesign" description="Generate .java from .hbm files.">
+	<target name="hbm2java-cr" description="Generate .java from .hbm files.">
 		<taskdef
-         name="hbm2java-learningdesign"
+         name="hbm2java-cr"
          classname="net.sf.hibernate.tool.hbm2java.Hbm2JavaTask"
          classpathref="all-libs"
       />
-		<hbm2java-learningdesign output="${src.java}">
-			<fileset dir="${hbm}/${package.learningdesign}">
+		<hbm2java-cr output="${src.java}">
+			<fileset dir="${hbm}/${package.contentrepository}">
 				<include name="*.hbm.xml"/>
 			</fileset>
-		</hbm2java-learningdesign>
+		</hbm2java-cr>
 	</target>
 
 	<target name="print-classpath">

@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="lib/junit/junit.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate/hibernate2.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate/hibernate-tools.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta-commons/commons-lang-2.0.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

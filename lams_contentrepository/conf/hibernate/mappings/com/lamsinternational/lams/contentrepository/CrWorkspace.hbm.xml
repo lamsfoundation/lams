@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="com.lamsinternational.lams.contentrepository.CrWorkspace" 
+    table="lams_cr_workspace"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_cr_workspace"
+    </meta>
+
+    <id
+        name="workspaceId"
+        type="java.lang.Long"
+        column="workspace_id"
+        unsaved-value="0"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="identity"
+            type="java.lang.Long"
+            column="workspace_id"
+            unsaved-value="0"
+
+
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+
+    <property
+        name="name"
+        type="java.lang.String"
+        column="name"
+        not-null="true"
+        length="255"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="name"
+            length="255"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="rootNodeId"
+        type="java.lang.Long"
+        column="root_node_id"
+        length="20"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="root_node_id"
+            length="20"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to CrWorkspaceTool -->
+    <set
+        name="crWorkspaceTools"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="workspace_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.contentrepository.CrWorkspaceTool"
+        </meta>
+        <key>
+            <column name="workspace_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.contentrepository.CrWorkspaceTool"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

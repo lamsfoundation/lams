@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="com.lamsinternational.lams.contentrepository.CrNodeVersion" 
+    table="lams_cr_node_version"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_cr_node_version"
+    </meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="id"
+        unsaved-value="0"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="identity"
+            type="java.lang.Long"
+            column="id"
+            unsaved-value="0"
+
+
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+
+    <property
+        name="nodeId"
+        type="long"
+        column="node_id"
+        not-null="true"
+        length="20"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="node_id"
+            length="20"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="versionId"
+        type="long"
+        column="version_id"
+        not-null="true"
+        length="20"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="version_id"
+            length="20"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="createdDateTime"
+        type="java.sql.Timestamp"
+        column="created_date_time"
+        length="14"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="created_date_time"
+            length="14"
+        </meta>    
+    </property>
+    <property
+        name="parentVersionId"
+        type="java.lang.Long"
+        column="parent_version_id"
+        length="20"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="parent_version_id"
+            length="20"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to CrNode -->
+    <many-to-one
+        name="crNode"
+        class="com.lamsinternational.lams.contentrepository.CrNode"
+        not-null="true"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="parent_node_id"         
+        </meta>
+        <column name="parent_node_id" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to CrNodeVersionProperty -->
+    <set
+        name="crNodeVersionProperties"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="node_id"
+           @hibernate.collection-key
+            column="version_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.contentrepository.CrNodeVersionProperty"
+        </meta>
+        <key>
+            <column name="node_id" />
+            <column name="version_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.contentrepository.CrNodeVersionProperty"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

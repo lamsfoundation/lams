@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="com.lamsinternational.lams.contentrepository.CrWorkspaceTool" 
+    table="lams_cr_workspace_tools"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_cr_workspace_tools"
+    </meta>
+
+    <composite-id name="comp_id" class="com.lamsinternational.lams.contentrepository.CrWorkspaceToolPK">
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description" inherit="false">
+           @hibernate.id
+            generator-class="assigned"
+        </meta>
+        <key-property 
+            name="workspaceId" 
+            column="workspace_id" 
+            type="java.lang.Long"
+            length="20"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="workspace_id"
+            </meta> 
+        </key-property>
+        <key-property 
+            name="toolId" 
+            column="tool_id" 
+            type="java.lang.Long"
+            length="20"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="tool_id"
+            </meta> 
+        </key-property>
+    </composite-id>    
+
+
+    <!-- Associations -->
+    <!-- derived association(s) for compound key -->
+    <!-- bi-directional many-to-one association to CrWorkspace -->
+    <many-to-one
+        name="crWorkspace"
+	    class="com.lamsinternational.lams.contentrepository.CrWorkspace"
+	    update="false"
+	    insert="false"
+	>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            update="false"
+            insert="false"
+        </meta>
+        <meta attribute="field-description">
+           @hibernate.column
+            name="workspace_id"
+        </meta>
+    	<column name="workspace_id" />
+	</many-to-one>
+	
+    <!-- bi-directional many-to-one association to CrTool -->
+    <many-to-one
+        name="crTool"
+	    class="com.lamsinternational.lams.contentrepository.CrTool"
+	    update="false"
+	    insert="false"
+	>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            update="false"
+            insert="false"
+        </meta>
+        <meta attribute="field-description">
+           @hibernate.column
+            name="tool_id"
+        </meta>
+    	<column name="tool_id" />
+	</many-to-one>
+	
+    <!-- end of derived association(s) -->
+  
+
+</class>
+</hibernate-mapping>

@@ -35,8 +35,8 @@
 	<property name="package.contentrepository"    value="${package}/contentrepository"/>
 	
 	<property name="package.name"                  value="com.lamsinternational.lams"/>
-	<property name="package.contentrepository.name"   value="${package}.contentrepository"/>
-	
+	<property name="package.contentrepository.name"   value="${package.name}.contentrepository"/>
+
 	<!--  database related properties -->
 	<property name="database.driver.file"          value="${lib}/mysql/mysql-connector-java-3.0.16-ga-bin.jar"/>   
 	<property name="database.driver.classpath"     value="${database.driver.file}"/>

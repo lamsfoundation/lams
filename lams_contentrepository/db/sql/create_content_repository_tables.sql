@@ -23,10 +23,15 @@ CREATE TABLE lams_cr_node (
 
 --
 -- Table structure for table 'lams_cr_node_version'
+-- Has a "dummy" id nv_id (node version id) which is unique for all node_id and 
+-- version_id combinations. 
 --
+-- It is the node_id and version_id combination that is the "real" key for this table,
+-- so that's what is used in foriegn keys. Middlegen doesn't like it but tough - it still
+-- seems to work! If we start getting problems here, that may be the issue.
 
 CREATE TABLE lams_cr_node_version (
-  id bigint(20) unsigned NOT NULL auto_increment,
+  nv_id bigint(20) unsigned NOT NULL auto_increment,
   node_id bigint(20) unsigned NOT NULL default '0',
   version_id bigint(20) unsigned NOT NULL default '0',
   created_date_time timestamp(14) NOT NULL,
