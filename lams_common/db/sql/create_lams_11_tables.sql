@@ -271,7 +271,6 @@ CREATE TABLE lams_learning_design (
      , lesson_name VARCHAR(255)
      , lesson_id BIGINT(20)
      , lesson_start_date_time DATETIME
-     , lesson_name VARCHAR(255)
      , last_modified_date_time DATETIME NOT NULL
      , PRIMARY KEY (learning_design_id)
      , INDEX (parent_learning_design_id)
