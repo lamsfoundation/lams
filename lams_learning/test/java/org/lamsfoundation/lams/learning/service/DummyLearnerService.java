@@ -8,14 +8,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
-import org.lamsfoundation.lams.learning.web.util.Utils;
+import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
@@ -23,6 +24,8 @@ import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.LessonCompleteActivity;
+import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -34,6 +37,8 @@ public class DummyLearnerService implements ILearnerService {
 	
 	private HttpServletRequest request;
 	private static String NAME = "lams.learning.testlearnerservice";
+	
+	private ActionMappings actionMappings;
 	
 	private ILessonDAO lessonDAO;
 	
@@ -47,6 +52,10 @@ public class DummyLearnerService implements ILearnerService {
 	
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;
+	}
+	
+	public void setActionMappings(ActionMappings actionMappings) {
+		this.actionMappings = actionMappings;
 	}
 
 	private LearnerProgress getProgress() {
@@ -79,7 +88,7 @@ public class DummyLearnerService implements ILearnerService {
 		return null;
 	}
 
-	public LearnerProgress startLesson(User learner, Lesson lesson) {
+	public LearnerProgress joinLesson(User learner, Lesson lesson) {
 		return null;
 	}
 
@@ -99,15 +108,62 @@ public class DummyLearnerService implements ILearnerService {
 		long completedActivityId = completedActivity.getActivityId().longValue();
 		setComplete(completedActivityId, progress);
 		
-		LearnerProgress newProgress = copyProgress(progress);
-		Activity currentActivity = calculateCurrentActivity(newProgress);
-		newProgress.setCurrentActivity(currentActivity);
-		Activity nextActivity = calculateNextActivity(completedActivityId, newProgress);
-		newProgress.setNextActivity(nextActivity);
+		Activity nextActivity = null;
+		Activity previousActivity = null;
+		Activity currentActivity = progress.getCurrentActivity();
 		
-		setProgress(newProgress);
+		if (completedActivityId == 1) {
+		    nextActivity = getActivity(2, progress);
+		    previousActivity = completedActivity;
+		    currentActivity = nextActivity;
+		}
+		else if (completedActivityId == 2) {
+		    nextActivity = getActivity(3, progress);
+		    previousActivity = completedActivity;
+		    currentActivity = nextActivity;
+		}
+		else if ((completedActivityId == 4) || (completedActivityId == 5)) {
+		    Activity activity3 = getActivity(3, progress);
+		    if (progress.getProgressState(activity3) == LearnerProgress.ACTIVITY_COMPLETED) {
+			    nextActivity = getActivity(6, progress);
+			    previousActivity = activity3;
+			    currentActivity = nextActivity;
+		    }
+		    else {
+		        nextActivity = new ParallelWaitActivity();
+			    previousActivity = completedActivity;
+		    }
+		}
+		else if (completedActivityId == 6) {
+		    nextActivity = getActivity(10, progress);
+		    previousActivity = currentActivity;
+		    currentActivity = nextActivity;
+		}
+		else if ((completedActivityId == 7) || (completedActivityId == 8) || (completedActivityId == 9)) {
+		    Activity activity6 = getActivity(6, progress);
+		    if (progress.getProgressState(activity6) == LearnerProgress.ACTIVITY_COMPLETED) {
+			    nextActivity = getActivity(10, progress);
+			    previousActivity = activity6;
+			    currentActivity = nextActivity;
+		    }
+		    else {
+		        nextActivity = activity6;
+			    previousActivity = completedActivity;
+		    }
+		}
+		else if (completedActivityId == 10) {
+		    nextActivity = new LessonCompleteActivity();
+		    previousActivity = currentActivity;
+		    currentActivity = nextActivity;
+		}
+
+		progress.setCurrentActivity(currentActivity);
+		progress.setNextActivity(nextActivity);
+		progress.setPreviousActivity(previousActivity);
+
+		setProgress(progress);
 		
-		return newProgress;
+		return progress;
 	}
 
 	public String completeToolActivity(long toolSessionId) {
@@ -120,9 +176,7 @@ public class DummyLearnerService implements ILearnerService {
     	
     	String url = null;
     	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
-    	//Activity nextActivity = nextLearnerProgress.getNextActivity();
-    	//ActivityURL activityURL = Utils.generateActivityURL(nextActivity, nextLearnerProgress);
-    	ActivityURL activityURL = Utils.getNextActivityURL(progress, nextLearnerProgress);
+    	ActivityURL activityURL = actionMappings.getNextActivityURL(progress, nextLearnerProgress);
     	url = activityURL.getUrl();
     	
     	return url;
@@ -171,41 +225,7 @@ public class DummyLearnerService implements ILearnerService {
 		}
 		return null;
 	}
-	
-	
-	private Activity calculateCurrentActivity(LearnerProgress progress) {
-		Activity activity = null;
-		if (progress.getProgressState(getActivity(1, progress)) != LearnerProgress.ACTIVITY_COMPLETED) activity = getActivity(1, progress);
-		else if (progress.getProgressState(getActivity(2, progress)) != LearnerProgress.ACTIVITY_COMPLETED) activity = getActivity(2, progress);
-		else if (progress.getProgressState(getActivity(3, progress)) != LearnerProgress.ACTIVITY_COMPLETED) activity = getActivity(3, progress);
-		else if (progress.getProgressState(getActivity(6, progress)) != LearnerProgress.ACTIVITY_COMPLETED) activity = getActivity(6, progress);
-		else if (progress.getProgressState(getActivity(10, progress)) != LearnerProgress.ACTIVITY_COMPLETED) activity = getActivity(10, progress);
 		
-		return activity;
-	}
-	
-	private Activity calculateNextActivity(long completedId, LearnerProgress progress) {
-		// nextActivity is the next activity to be attempted after completedId,
-		// usually this will be whatever is now the current
-		Activity nextActivity = progress.getCurrentActivity();
-		
-		if ((completedId == 4) || (completedId == 5)) {
-			nextActivity = null;
-		}
-		else if ((completedId == 7) ||
-				(completedId == 8) ||
-				(completedId == 9)) {
-			nextActivity = null;
-		}
-		
-		if (completedId == 10) {
-			nextActivity = null;
-		}
-		
-		return nextActivity;
-	}
-
-	
 	private LearnerProgress createProgress() {
 		
 		LearnerProgress progress = new LearnerProgress();
@@ -248,20 +268,24 @@ public class DummyLearnerService implements ILearnerService {
 		activity.setDescription("activities for foo");
 		((OptionsActivity)activity).setMinNumberOfOptions(new Integer(2));
 		((OptionsActivity)activity).setMaxNumberOfOptions(new Integer(3));
-		subActivities = new HashSet();
+		//subActivities = new HashSet();
+		subActivities = new TreeSet(new ActivityOrderComparator());
 		((ComplexActivity)activity).setActivities(subActivities);
 		activities.add(activity);
 		
 		activity = new ToolActivity();
 		activity.setActivityId(new Long(7));
+		activity.setTitle("activity 7");
 		subActivities.add(activity);
 		activities.add(activity);
 		activity = new ToolActivity();
 		activity.setActivityId(new Long(8));
+		activity.setTitle("activity 8");
 		subActivities.add(activity);
 		activities.add(activity);
 		activity = new ToolActivity();
 		activity.setActivityId(new Long(9));
+		activity.setTitle("activity 9");
 		subActivities.add(activity);
 		activities.add(activity);
 
@@ -275,47 +299,6 @@ public class DummyLearnerService implements ILearnerService {
 		progress.setCurrentActivity(getActivity(1, progress));
 		
 		return progress;
-	}
-	
-	private LearnerProgress createNextProgress(long completedId, LearnerProgress oldProgress) {
-		LearnerProgress progress = new LearnerProgress();
-		progress.setLesson(oldProgress.getLesson());
-		progress.setLessonComplete(oldProgress.isLessonComplete());
-		progress.setAttemptedActivities(oldProgress.getAttemptedActivities());
-		progress.setCompletedActivities(oldProgress.getCompletedActivities());
-		progress.setCurrentActivity(oldProgress.getCurrentActivity());
-		
-		// nextActivity is the next activity to be attempted after completedId,
-		// usually this will be whatever is now the current
-		Activity nextActivity = oldProgress.getCurrentActivity();
-		
-		if ((completedId == 4) || (completedId == 5)) {
-			nextActivity = null;
-		}
-		else if ((completedId == 7) ||
-				(completedId == 8) ||
-				(completedId == 9)) {
-			nextActivity = null;
-		}
-		
-		if (completedId == 10) {
-			nextActivity = null;
-		}
-		
-		// this is the completed activity specific progress
-		progress.setNextActivity(nextActivity);
-		
-		return progress;
-	}
-	
-	private LearnerProgress copyProgress(LearnerProgress progress) {
-		LearnerProgress newProgress = new LearnerProgress();
-		newProgress.setLesson(progress.getLesson());
-		newProgress.setLessonComplete(progress.isLessonComplete());
-		newProgress.setAttemptedActivities(progress.getAttemptedActivities());
-		newProgress.setCompletedActivities(progress.getCompletedActivities());
-		newProgress.setCurrentActivity(progress.getCurrentActivity());
-		return newProgress;
-	}
+	}	
 	
 }
