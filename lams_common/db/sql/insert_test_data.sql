@@ -122,7 +122,14 @@ insert into lams_tool_content (tool_content_id,tool_id) values (8,8);
 insert into lams_tool_content (tool_content_id,tool_id) values (9,9);
 insert into lams_tool_content (tool_content_id,tool_id) values (10,10);
 insert into lams_tool_content (tool_content_id,tool_id) values (11,11);
-
+insert into lams_tool_content (tool_content_id,tool_id) values (12,1);
+insert into lams_tool_content (tool_content_id,tool_id) values (13,2);
+insert into lams_tool_content (tool_content_id,tool_id) values (14,3);
+insert into lams_tool_content (tool_content_id,tool_id) values (15,4);
+insert into lams_tool_content (tool_content_id,tool_id) values (16,5);
+insert into lams_tool_content (tool_content_id,tool_id) values (17,6);
+insert into lams_tool_content (tool_content_id,tool_id) values (18,7);
+insert into lams_tool_content (tool_content_id,tool_id) values (19,8);
 -- Populates the lams_learning_activity table with default activity templates that would be avaialbe to the
 -- author in the left panel and a default dummy learning_design defination 
 
@@ -135,7 +142,7 @@ values
 (1,1,'Notebook Template','Notebook',10,20,null,
 1,null,null,0,
 null,1,'20050101','Offline  Instructions ',
-null,null,1,null,
+null,null,1,1,
 null,null,null,'NotebookImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -147,7 +154,7 @@ values
 (2,2,'NoticeBoard Template','NoticeBoard',10,20,null,
 1,null,null,0,
 null,2,'20050101','Offline  Instructions ',
-null,null,2,null,
+null,null,2,2,
 null,null,null,'NoticeBoardImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -159,7 +166,7 @@ values
 (3,3,'Multiple Choice Template','Multiple Choice',10,20,null,
 1,null,null,0,
 null,3,'20050101','Offline  Instructions ',
-null,null,3,null,
+null,null,3,3,
 null,null,null,'MultipleChoiceImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -171,7 +178,7 @@ values
 (4,4,'Question and Answer Template','Question and Answer',10,20,null,
 1,null,null,0,
 null,4,'20050101','Offline  Instructions ',
-null,null,4,null,
+null,null,4,4,
 null,null,null,'QAImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -183,7 +190,7 @@ values
 (5,5,'MessageBoard Template','MessageBoard',10,20,null,
 1,null,null,0,
 null,5,'20050101','Offline  Instructions ',
-null,null,5,null,
+null,null,5,5,
 null,null,null,'MBImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -195,7 +202,7 @@ values
 (6,6,'Survey Template','Survey',10,20,null,
 1,null,null,0,
 null,6,'20050101','Offline  Instructions ',
-null,null,6,null,
+null,null,6,6,
 null,null,null,'SurveyImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -207,7 +214,7 @@ values
 (7,7,'Chat Template','Chat',10,20,null,
 1,null,null,0,
 null,7,'20050101','Offline  Instructions ',
-null,null,7,null,
+null,null,7,7,
 null,null,null,'ChatImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -219,7 +226,7 @@ values
 (8,8,'Shared Resources Template','Shared Resources',10,20,null,
 1,null,null,0,
 null,8,'20050101','Offline  Instructions ',
-null,null,8,null,
+null,null,8,8,
 null,null,null,'SRImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -231,7 +238,7 @@ values
 (9,9,'Voting Template','Voting',10,20,null,
 1,null,null,0,
 null,9,'20050101','Offline  Instructions ',
-null,null,9,null,
+null,null,9,9,
 null,null,null,'VotingImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -243,7 +250,7 @@ values
 (10,10,'Submit Files Template','Submit Files',10,20,null,
 1,null,null,0,
 null,10,'20050101','Offline  Instructions ',
-null,null,10,null,
+null,null,10,10,
 null,null,null,'SubmitFilesImage');
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
@@ -255,7 +262,7 @@ values
 (11,11,'Instant Messaging Template','Instant Messaging',10,20,null,
 1,null,null,0,
 null,11,'20050101','Offline  Instructions ',
-null,null,11,null,
+null,null,11,11,
 null,null,null,'IMImage');
 
 insert into lams_learning_activity
@@ -307,7 +314,7 @@ values
 (15,1,'Notebook Activity Description','Notebook Activity Title',10,20,null,
 1,null,1,0,
 1,1,'20050101','Notebook Activity Offline  Instructions ',
-null,null,1,null,
+null,null,1,12,
 null,null,null,'image');
 
 insert into lams_learning_activity
@@ -320,7 +327,7 @@ values
 (16,2,'NoticeBoard Activity','NoticeBoard Activity',10,20,12,
 1,null,0,0,
 1,2,'20050101','NoticeBoard Activity Offline  Instructions ',
-null,null,2,null,
+null,null,2,13,
 null,null,null,'image');
 
 insert into lams_learning_activity
@@ -333,7 +340,7 @@ values
 (17,3,'Multiple Choice Activity ','Multiple Choice',10,20,12,
 1,null,1,0,
 1,3,'20050101','Tool Activity Offline  Instructions ',
-null,null,3,null,
+null,null,3,14,
 null,null,null,'image');
 
 insert into lams_learning_activity
@@ -346,7 +353,7 @@ values
 (18,4,'Question and Answer Activity','Question and Answer',10,20,13,
 1,null,0,0,
 1,4,'20050101','Tool Activity Offline  Instructions ',
-null,null,4,null,
+null,null,4,15,
 null,null,null,'image');
 
 insert into lams_learning_activity
@@ -359,7 +366,7 @@ values
 (19,5,'Message Board Activity','Message Board',10,20,13,
 1,null,1,0,
 1,5,'20050101','Tool Activity Offline  Instructions ',
-null,null,5,null,
+null,null,5,16,
 null,null,null,'image');
 
 insert into lams_learning_activity
@@ -372,7 +379,7 @@ values
 (20,6,'Survey Activity','Survey Title',10,20,14,
 1,null,0,0,
 1,6,'20050101','Tool Activity Offline  Instructions ',
-null,null,6,null,
+null,null,6,17,
 null,null,null,'image');
 
 insert into lams_learning_activity
@@ -385,7 +392,7 @@ values
 (21,7,'Chat Activity','Chat Title',10,20,14,
 1,null,1,0,
 1,7,'20050101','Tool Activity Offline  Instructions ',
-null,null,7,null,
+null,null,7,18,
 null,null,null,'image');
 
 insert into lams_learning_activity
@@ -398,7 +405,7 @@ values
 (22,8,'Shared Resources Activity','Shared Resources',10,20,14,
 1,null,2,0,
 1,8,'20050101','Tool Activity Offline  Instructions ',
-null,null,8,null,
+null,null,8,19,
 null,null,null,'image');
 
 -- Populates the lams_learning_transition table with various transitions for the dummy design 
