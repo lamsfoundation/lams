@@ -63,6 +63,9 @@ public abstract class Activity implements Serializable,Nullable {
 
 	/** persistent field */
 	private Boolean defineLater;
+	
+	/** persistent field */
+	private Boolean runOffline;
 
 	/** persistent field */
 	private Date createDateTime;
@@ -87,6 +90,9 @@ public abstract class Activity implements Serializable,Nullable {
 
 	/** persistent field */
 	private Grouping grouping;
+	
+	/** nullable persistent field */
+	private Integer groupingUIID;
 
 	/** persistent field */
 	private Integer activityTypeId;
@@ -383,6 +389,7 @@ public abstract class Activity implements Serializable,Nullable {
 		this.libraryActivityUiImage = libraryActivityUiImage;
 	}	
 	/**
+	 * Returns the Transition FROM this activity
 	 * @return Returns the transitionFrom.
 	 */
 	public Transition getTransitionFrom() {
@@ -395,6 +402,7 @@ public abstract class Activity implements Serializable,Nullable {
 		this.transitionFrom = transitionFrom;
 	}
 	/**
+	 * Returns the Transition TO this Activity
 	 * @return Returns the transitionTo.
 	 */
 	public Transition getTransitionTo() {
@@ -423,6 +431,18 @@ public abstract class Activity implements Serializable,Nullable {
 	}
 	public void setHelpText(String helpText) {
 		this.helpText = helpText;
+	}
+	public Integer getGroupingUIID() {
+		return groupingUIID;
+	}
+	public void setGroupingUIID(Integer groupingUIID) {
+		this.groupingUIID = groupingUIID;
+	}
+	public Boolean getRunOffline() {
+		return runOffline;
+	}
+	public void setRunOffline(Boolean runOffline) {
+		this.runOffline = runOffline;
 	}
 	
 	/**
