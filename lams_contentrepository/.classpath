@@ -22,5 +22,5 @@
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/struts/struts.jar"/>
 	<classpathentry kind="lib" path="lib/jakarta-taglibs/standard.jar"/>
-	<classpathentry kind="output" path="WEB-INF/classes"/>
+	<classpathentry kind="output" path="build"/>
 </classpath>

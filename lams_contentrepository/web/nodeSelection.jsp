@@ -74,9 +74,9 @@
 							<TD>Version: <%=detail.getVersionId()%></TD>
 							<TD><input name="getNode" onClick="setActionSubmit('getNode', '<%=key.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Get File"/></TD>
 							<TD><input name="deleteVersion" onClick="setActionSubmit('deleteNode', '<%=key.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Delete Version"/>
-							<TD>Created Date Time: <%=detail.getCreatedDateTime()%></TD>
-							<TD>Version Description: <%=detail.getDescription()%></TD>
-							<TD>File Name (Application Cache):<%=nodeName!=null?nodeName:""%></TD>
+							<TD>Created&nbsp;Date&nbsp;Time: <%=detail.getCreatedDateTime()%></TD>
+							<TD>Version&nbsp;Description: <%=detail.getDescription()%></TD>
+							<TD>File&nbsp;Name&nbsp;(Application&nbsp;Cache):<%=nodeName!=null?nodeName:""%></TD>
 						</TR>
 			<%
 					} // end version details iterator

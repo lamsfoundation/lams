@@ -24,7 +24,7 @@
 	<property name="web"                           value="${basedir}/web"/>
 	<property name="webinf"                        value="${web}/WEB-INF"/>
 	
-	<property name="jboss.home"                    value="G:/jboss-3.2.6"/>
+	<property name="jboss.home"                    value="D:/jboss-3.2.6"/>
 	<property name="jboss.deploy"                    value="${jboss.home}/server/default/deploy"/>
 
 	<property name="build"                         value="${basedir}/build"/>
