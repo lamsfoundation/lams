@@ -42,7 +42,7 @@ Notes:
 (1) UTF-8
 
 MySQL 4.1 Windows version comes with 3 packages, two of which use
-Windows aut-installer. Select Most International option, which
+Windows auto-installer. Select Most International option, which
 sets the character encoding to UTF-8.
 
 Windows version now installs it as:
@@ -120,8 +120,8 @@ server by skipping the grant table and manually change it.
 	mysql
 	
 	USE mysql;
-	UPDATE user SET password=password("newpassword") 
-		WHERE user="root";
+	UPDATE user SET password=password("newpassword") WHERE user="root";
+	-- Don't forget the WHERE clause!!!
 	flush privileges;
 	quit
 	
