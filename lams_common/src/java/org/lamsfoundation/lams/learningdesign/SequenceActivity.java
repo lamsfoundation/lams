@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.lesson.SequenceActivityStrategy;
 
 
 /** 
@@ -53,11 +54,13 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
                 transitionTo,
 				transitionFrom,
                 activities);
+        super.activityStrategy = new SequenceActivityStrategy();
     }
 
 
     /** default constructor */
     public SequenceActivity() {
+        super.activityStrategy = new SequenceActivityStrategy();
     }
 
      /** minimal constructor */
@@ -83,6 +86,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
               transitionTo,
 			  transitionFrom,
               activities);
+      super.activityStrategy = new SequenceActivityStrategy();
     }
     
     /**

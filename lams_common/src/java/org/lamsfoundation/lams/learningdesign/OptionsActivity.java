@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.lesson.OptionsActivityStrategy;
 
 
 /** 
@@ -68,11 +69,12 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
         this.maxNumberOfOptions = maxNumberOfOptions;
         this.minNumberOfOptions = minNumberOfOptions;
         this.optionsInstructions = options_instructions;
+        super.activityStrategy = new OptionsActivityStrategy();
     }
 
     /** default constructor */
     public OptionsActivity() {
-    	
+        super.activityStrategy = new OptionsActivityStrategy();
     }
 
     /** minimal constructor */
@@ -98,6 +100,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
               transitionTo,
               transitionFrom,
               activities);
+      super.activityStrategy = new OptionsActivityStrategy();
     }
     public static OptionsActivity createCopy(OptionsActivity originalActivity){
     	OptionsActivity newOptionsActivity = new OptionsActivity();

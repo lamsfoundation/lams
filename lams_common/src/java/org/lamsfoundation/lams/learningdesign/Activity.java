@@ -9,32 +9,24 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
-
+import org.lamsfoundation.lams.lesson.ActivityStrategy;
 /**
  * @hibernate.class table="lams_learning_activity"
  */
 public abstract class Activity implements Serializable,Nullable {
 
 	public static final int TOOL_ACTIVITY_TYPE = 1;
-
 	public static final int RANDOM_GROUPING_ACTIVITY_TYPE = 2;
-
 	public static final int CHOSEN_GROUPING_ACTIVITY_TYPE = 3;
-
 	public static final int PERMISSION_GATE_ACTIVITY_TYPE = 4;
-
 	public static final int SCHEDULE_GATE_ACTIVITY_TYPE = 5;
-
 	public static final int SYNCH_GATE_ACTIVITY_TYPE = 6;
-
 	public static final int PARALLEL_ACTIVITY_TYPE = 7;
-
 	public static final int OPTIONS_ACTIVITY_TYPE = 8;
-
 	public static final int SEQUENCE_ACTIVITY_TYPE = 9;
-	
 	public static final String OBJECT_TYPE ="Activity";
 
 	/** identifier field */
@@ -106,6 +98,8 @@ public abstract class Activity implements Serializable,Nullable {
 	/** persistent field */
 	private Integer parentUIID;
 		
+	protected ActivityStrategy activityStrategy;
+	
 	/** full constructor */
 	public Activity(
 			Long activityId,
@@ -508,4 +502,17 @@ public abstract class Activity implements Serializable,Nullable {
 	{
 	    return getActivityTypeId().intValue()==TOOL_ACTIVITY_TYPE;
 	}
+	
+	/**
+	 * Delegate to activity strategy to check up the status of all children.
+	 * @param learnerProgress the current learner progress that record the
+	 * 						  all completed activities.
+	 * @return the boolean to indicate the status of children.
+	 */
+	public boolean areChildrenCompleted(LearnerProgress learnerProgress)
+	{
+	    return activityStrategy.areChildrenCompleted(this,learnerProgress);
+	}
+	
+	
 }

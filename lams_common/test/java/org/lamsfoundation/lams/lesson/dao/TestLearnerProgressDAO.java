@@ -25,13 +25,17 @@ import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;
  */
 public class TestLearnerProgressDAO extends LessonDataAccessTestCase
 {
-    private IActivityDAO activityDAO;
-    private Activity testToolActivity;
-    private Activity testComplexActivity;
+    protected IActivityDAO activityDAO;
+    protected Activity testToolActivity;
+    protected Activity testParallelActivity;
+    protected Activity testOptionsActivity;
+    protected Activity testSequenceActivity;
     
     //this is survey id we inserted in test data sql script
-    private static final Long TEST_TOOL_ACTIVITY_ID = new Long(15);
-    private static final Long TEST_COMPLEX_ACTIVITY_ID = new Long(13);
+    protected static final Long TEST_TOOL_ACTIVITY_ID = new Long(15);
+    protected static final Long TEST_PARALLEL_ACTIVITY_ID = new Long(13);
+    protected static final Long TEST_OPTIONS_ACTIVITY_ID = new Long(12);
+    protected static final Long TEST_SEQUENCE_ACTIVITY_ID = new Long(14);
     /*
      * @see LessonDataAccessTestCase#setUp()
      */
@@ -43,7 +47,9 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         
 		activityDAO =(ActivityDAO) context.getBean("activityDAO");
 		testToolActivity = activityDAO.getActivityByActivityId(TEST_TOOL_ACTIVITY_ID);
-		testComplexActivity = activityDAO.getActivityByActivityId(TEST_COMPLEX_ACTIVITY_ID);
+		testParallelActivity = activityDAO.getActivityByActivityId(TEST_PARALLEL_ACTIVITY_ID);
+		testOptionsActivity = activityDAO.getActivityByActivityId(TEST_OPTIONS_ACTIVITY_ID);
+		testSequenceActivity = activityDAO.getActivityByActivityId(TEST_SEQUENCE_ACTIVITY_ID);
     }
 
     /*
@@ -126,7 +132,7 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         Activity firstActivity = this.testLesson.getLearningDesign().getFirstActivity();
         
         progress.setProgressState(firstActivity,LearnerProgress.ACTIVITY_COMPLETED);
-        progress.setProgressState(testComplexActivity,LearnerProgress.ACTIVITY_COMPLETED);
+        progress.setProgressState(testParallelActivity,LearnerProgress.ACTIVITY_COMPLETED);
         progress.setProgressState(testToolActivity,LearnerProgress.ACTIVITY_ATTEMPTED);
         
         super.learnerProgressDao.updateLearnerProgress(progress);

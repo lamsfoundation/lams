@@ -295,7 +295,7 @@ values
 (12,12,'Optional Activity Description','Optional Activity Title',10,20,null,'Help Text for Activity',
 8,null,1,0,
 1,null,'20050101','Offline Instructions ',0,
-5,3,null,null,
+1,3,null,null,
 null,'20050101','20050101','image');
 
 insert into lams_learning_activity

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.lesson.ParallelActivityStrategy;
 
 /** 
  * @hibernate.class 
@@ -52,10 +53,12 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
                 transitionTo,
 				transitionFrom,
                 activities);
+        super.activityStrategy = new ParallelActivityStrategy();
     }
 
     /** default constructor */
     public ParallelActivity() {
+        super.activityStrategy = new ParallelActivityStrategy();
     }
 
     /** minimal constructor */
@@ -81,6 +84,7 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
               transitionTo,
 			  transitionFrom,
               activities);
+      super.activityStrategy = new ParallelActivityStrategy();
     }
     /**
      * Makes a copy of the ParallelActivity for authoring, preview and monitoring enviornment 
