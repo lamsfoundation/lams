@@ -15,6 +15,8 @@ import net.sf.hibernate.Session;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.orm.hibernate.HibernateCallback;
+import org.springframework.orm.hibernate.HibernateTemplate;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
@@ -43,10 +45,22 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
      * @param learner a User that identifies the learner.
      * @return a List with all active lessons in it.
      */
-    public List getActiveLessonsForLearner(User learner)
+    public List getActiveLessonsForLearner(final User learner)
     {
     	List lessons = null;
-    	Session session = this.getSession();
+    	
+        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+    	lessons = (List)hibernateTemplate.execute(
+            new HibernateCallback() {
+                public Object doInHibernate(Session session) throws HibernateException {
+        	    	Query query = session.getNamedQuery("activeLessons");
+        	    	query.setInteger("userId", learner.getUserId().intValue());
+        	    	List result = query.list();
+                    return result;
+                }
+            }
+        );
+    	/*Session session = this.getSession();
     	try {
 	    	Query query = session.getNamedQuery("activeLessons");
 	    	query.setInteger("userId", learner.getUserId().intValue());
@@ -54,7 +68,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
     	}
     	catch (HibernateException e) {
     		throw new DataRetrievalFailureException(e.getMessage(), e);
-    	}
+    	}*/
         return lessons;
     }
     
@@ -62,7 +76,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
      * Saves or Updates a Lesson.
      * @param lesson
      */
-    public void saveOrUpdateLesson(Lesson lesson)
+    public void saveLesson(Lesson lesson)
     {
         getHibernateTemplate().save(lesson);
     }

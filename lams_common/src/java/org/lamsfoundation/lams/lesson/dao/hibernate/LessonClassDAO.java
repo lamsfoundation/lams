@@ -27,7 +27,7 @@ public class LessonClassDAO extends HibernateDaoSupport implements ILessonClassD
      * Saves or Updates a Lesson.
      * @param lesson
      */
-    public void saveOrUpdateLessonClass(LessonClass lessonClass)
+    public void saveLessonClass(LessonClass lessonClass)
     {
         getHibernateTemplate().save(lessonClass);
     }

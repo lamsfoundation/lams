@@ -28,7 +28,7 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
         return (ToolSession)getHibernateTemplate().get(ToolSession.class, toolSessionId);
     }
 	
-    public void saveOrUpdateToolSession(ToolSession toolSession)
+    public void saveToolSession(ToolSession toolSession)
     {
         getHibernateTemplate().save(toolSession);
     }

@@ -27,7 +27,7 @@ public interface ILearnerProgressDAO
      * Saves or Updates learner progress data.
      * @param learnerProgress holds the learne progress data
      */
-    public void saveOrUpdateLearnerProgress(LearnerProgress learnerProgress);
+    public void saveLearnerProgress(LearnerProgress learnerProgress);
     
     /**
      * Deletes a LearnerProgress data <b>permanently</b>.

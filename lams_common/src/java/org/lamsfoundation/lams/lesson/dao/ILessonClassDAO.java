@@ -26,7 +26,7 @@ public interface ILessonClassDAO
      * Saves or Updates a Lesson.
      * @param lesson the Lesson to save
      */
-    public void saveOrUpdateLessonClass(LessonClass lessonClass);
+    public void saveLessonClass(LessonClass lessonClass);
     
     /**
      * Deletes a Lesson <b>permanently</b>.

@@ -22,6 +22,6 @@ public interface IToolSessionDAO
      */
     public ToolSession getToolSession(Long toolSessionId);
     
-    public void saveOrUpdateToolSession(ToolSession toolSession);
+    public void saveToolSession(ToolSession toolSession);
 
 }
