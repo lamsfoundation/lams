@@ -14,12 +14,16 @@
   <form-beans>
 
     <form-bean
-      name="toolTestForm"
-      type="org.lamsfoundation.lams.learning.web.form.ToolTestForm"
-    />
-    <form-bean
       name="activityForm"
       type="org.lamsfoundation.lams.learning.web.form.ActivityForm"
+    />
+    <form-bean
+      name="dummyToolForm"
+      type="org.lamsfoundation.lams.learning.web.form.DummyToolForm"
+    />
+    <form-bean
+      name="testDblSubmitForm"
+      type="org.lamsfoundation.lams.learning.web.form.TestDblSubmitForm"
     />
     <form-bean
       name="optionsActivityForm"
@@ -35,13 +39,61 @@
   -->
 
   <!-- ========== Global Forward Definitions =================================== -->
-<global-forwards>
+  <global-forwards>
 	<forward name="error" path="/error.jsp" />
 	<forward name="noSessionError" path="/noSessionError.jsp" />
+	<forward name="displayActivity" path="/DisplayActivity.do" />
+	<forward name="displayToolActivity" path="/DisplayToolActivity.do" />
+	<forward name="displayParallelActivity" path="/DisplayParallelActivity.do" />
+	<forward name="displayOptionsActivity" path="/DisplayOptionsActivity.do" />
+	<!-- forward name="displayGateActivity" path="/DisplayGateActivity.do" /-->
 </global-forwards>
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
+    <action
+      path="/DisplayActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayActivity"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/DisplayToolActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayToolActivity"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayTool"
+        path=".toolActivity"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/test/DummyTool"
+      type="org.lamsfoundation.lams.learning.web.action.DummyToolAction"
+      name="dummyToolForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="display"
+        path="/test/dummyTool.jsp"
+        redirect="false"
+      />
+      <forward
+        name="next"
+        path=".requestDisplay"
+        redirect="false"
+      />
+    </action>
     <action
       path="/DisplayParallelActivity"
       type="org.lamsfoundation.lams.learning.web.action.DisplayParallelActivity"
@@ -72,91 +124,49 @@
       />
     </action>
     <action
-      path="/toolTest"
-      type="org.lamsfoundation.lams.learning.web.action.ToolTestAction"
-      name="toolTestForm"
+      path="/CompleteActivity"
+      type="org.lamsfoundation.lams.learning.web.action.CompleteActivity"
+      name="activityForm"
       scope="request"
-      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/test/DblSubmit"
+      type="org.lamsfoundation.lams.learning.web.action.TestDblSubmitAction"
+      name="testDblSubmitForm"
+      scope="request"
       unknown="false"
       validate="false"
     >
       <forward
         name="display"
-        path="/toolTest.jsp"
-        redirect="false"
-      />
-      <forward
-        name="next"
-        path=".requestDisplay"
+        path="/test/dblSubmitTest.jsp"
         redirect="false"
       />
     </action>
     <action
-      path="/test"
-      type="org.lamsfoundation.lams.learning.web.action.TestAction"
-      name="testForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-    </action>
-    <action
-      path="/Activity"
-      type="org.lamsfoundation.lams.learning.web.action.ActivityAction"
+      path="/ChooseActivity"
+      type="org.lamsfoundation.lams.learning.web.action.ChooseActivity"
       name="activityForm"
       scope="request"
-      parameter="method"
       unknown="false"
       validate="false"
     >
-      <forward
-        name="displayToolActivity"
-        path="/DisplayToolActivity.do"
-        redirect="false"
-      />
-      <forward
-        name="displayParallelActivity"
-        path="/DisplayParallelActivity.do"
-        redirect="false"
-      />
-      <forward
-        name="displayOptionsActivity"
-        path="/DisplayOptionsActivity.do"
-        redirect="false"
-      />
-      <forward
-        name="displayGateActivity"
-        path="/DisplayGateActivity.do"
-        redirect="false"
-      />
-      <forward
-        name="requestDisplay"
-        path=".requestDisplay"
-        redirect="false"
-      />
-      <forward
-        name="parallelWait"
-        path=".parallelWait"
-        redirect="true"
-      />
-      <forward
-        name="lessonComplete"
-        path=".lessonComplete"
-        redirect="true"
-      />
     </action>
     <action
-      path="/DisplayToolActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayToolActivity"
+      path="/test/DummyLesson"
+      type="org.lamsfoundation.lams.learning.web.action.DummyLessonAction"
       name="activityForm"
       scope="request"
       unknown="false"
       validate="false"
     >
       <forward
-        name="displayTool"
-        path=".toolActivity"
-        redirect="false"
+        name="displayLesson"
+        path="/DisplayActivity.do"
+        redirect="true"
       />
     </action>
 
