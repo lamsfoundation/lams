@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -175,12 +176,33 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     }
     
     /**
+     * @throws LamsToolServiceException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getToolURLByMode(org.lamsfoundation.lams.learningdesign.ToolActivity, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.tool.ToolAccessMode)
      */
-    public String getToolURLByMode(ToolActivity activity, User learner, ToolAccessMode accessMode)
+    public String getToolURLByMode(ToolActivity activity, User learner, ToolAccessMode accessMode) throws LamsToolServiceException
     {
-        // TODO Auto-generated method stub
-        return null;
+        ToolSession toolSession = toolSessionDAO.getToolSessionByLearner(learner, activity);
+
+        if(accessMode==ToolAccessMode.LEARNER)
+            // Append toolSessionId to tool URL		
+            return activity.getTool().getLearnerUrl() + "&"
+                	+ WebUtil.PARAM_TOOL_SESSION_ID + "="
+                	+ toolSession.getToolSessionId().toString() + "&"
+                	+ WebUtil.PARAM_MODE + "=" + ToolAccessMode.LEARNER;
+        else if(accessMode == ToolAccessMode.TEACHER)
+            // Append toolSessionId to tool URL		
+            return activity.getTool().getLearnerUrl() + "&"
+                	+ WebUtil.PARAM_TOOL_SESSION_ID + "="
+                	+ toolSession.getToolSessionId().toString() + "&"
+                	+ WebUtil.PARAM_MODE + "=" + ToolAccessMode.TEACHER;
+        else if (accessMode == ToolAccessMode.AUTHOR)
+            // Append toolSessionId to tool URL		
+            return activity.getTool().getAuthorUrl() + "&"
+                	+ WebUtil.PARAM_TOOL_SESSION_ID + "="
+                	+ toolSession.getToolSessionId().toString() + "&"
+                	+ WebUtil.PARAM_MODE + "=" + ToolAccessMode.TEACHER;
+        
+        throw new LamsToolServiceException("Unknown tool access mode:"+accessMode.toString());
     }    
     //---------------------------------------------------------------------
     // Helper Methods

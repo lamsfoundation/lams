@@ -62,5 +62,14 @@ public interface ILamsCoreToolService
     
     public void updateToolSession(ToolSession toolSession);
 
-    public String getToolURLByMode(ToolActivity activity, User learner, ToolAccessMode accessMode);
+    /**
+     * Return tool activity url for a learner according to the access mode.
+     * For example, the monitor side sould passed in the teacher mode and 
+     * learning side sould pass in the learner mode.
+     * @param activity the requested activity.
+     * @param learner the current learner.
+     * @param accessMode tool access mode.
+     * @return the tool access url with tool session id and access mode.
+     */
+    public String getToolURLByMode(ToolActivity activity, User learner, ToolAccessMode accessMode) throws LamsToolServiceException;
 }

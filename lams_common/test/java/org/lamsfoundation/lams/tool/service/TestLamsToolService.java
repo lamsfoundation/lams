@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.tool.service;
 
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolDataAccessTestCase;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
@@ -36,6 +38,7 @@ import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
  */
 public class TestLamsToolService extends ToolDataAccessTestCase
 {
+	private static Logger log = Logger.getLogger(TestLamsToolService.class);
     private ILamsCoreToolService toolService;
     
     /*
@@ -83,8 +86,30 @@ public class TestLamsToolService extends ToolDataAccessTestCase
     {
         ToolSession tgroupedToolSession = toolService.getToolSessionByActivity(this.testUser,
                                                                                 this.testGroupedActivity);
-        
         assertNotNull(tgroupedToolSession);
-
+    }
+    
+    public void testGetToolURLByLearnerMode() throws LamsToolServiceException
+    {
+        String learnerUrl = toolService.getToolURLByMode(testNonGroupedActivity,testUser,ToolAccessMode.LEARNER);
+        
+        assertNotNull(learnerUrl);
+        log.info("learner url:"+learnerUrl);
+    }
+    
+    public void testGetToolURLByTeacherMode() throws LamsToolServiceException
+    {
+        String monitorUrl = toolService.getToolURLByMode(testNonGroupedActivity,testUser,ToolAccessMode.TEACHER);
+        
+        assertNotNull(monitorUrl);
+        log.info("learner url:"+monitorUrl);
+    }
+    
+    public void testGetToolURLByAuthorMode() throws LamsToolServiceException
+    {
+        String authorUrl = toolService.getToolURLByMode(testNonGroupedActivity,testUser,ToolAccessMode.AUTHOR);
+        
+        assertNotNull(authorUrl);
+        log.info("learner url:"+authorUrl);
     }
 }
