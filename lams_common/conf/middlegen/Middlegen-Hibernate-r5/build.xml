@@ -1,0 +1,258 @@
+<?xml version="1.0"?>
+
+<!-- 
+The DOCTYPE declaration declares the location of database-specific parts of the
+Ant build file. 
+-->
+<!DOCTYPE project [
+    <!ENTITY database SYSTEM "file:./config/database/mysql.xml">
+]>
+
+
+<project name="Middlegen Hibernate" default="all" basedir=".">
+
+   <property file="${basedir}/build.properties"/>
+   <property name="name" value="lams"/>
+   <property name="script_file" value="create_lams_11_tables"/>
+   <property name="project.dir" value="D:/eclipse/workspace/lams_common"/>	
+
+   <property name="gui"                            value="true"/>
+   <property name="unique.name"                    value="${name}"/>
+   <property name="appxml.src.file"                value="${basedir}/src/application.xml"/>
+	
+   <property name="lib.dir"                        value="${basedir}/lib"/>
+
+   <property name="project.lib.dir"				    value="${project.dir}/lib"/>
+   <property name="script.dir"                     value="${project.dir}/db/sql"/>
+   <property name="pref.dir"					   value="${basedir}/config"/>
+	
+   <property name="src.dir"                        value="${project.dir}/src"/>
+   <property name="java.src.dir"                   value="${src.dir}/java/com/lamsinternational/lams"/>
+   <property name="java.src.learningdesign.dir"  value="${java.src.dir}/learningdesign"/>  	
+   <property name="web.src.dir"                    value="${project.dir}/web/WEB-INF"/>
+   
+   <property name="conf.dir"                      value="${project.dir}/conf"/>
+	<property name="hibernate.dir"				  value="${conf.dir}/hibernate"/>	
+	<property name="mappings.dir"                 value="${hibernate.dir}/mappings"/>
+	
+	<property name="usermanagement.dir"           value="${mappings.dir}/usermanagement"/>	
+	<property name="learningdesign.dir"			  value="${mappings.dir}/learningdesign"/>	
+	<property name="dummy.dir"			  		  value="${java.src.dir}/dummy"/>	
+    	
+   &database;
+   
+   <!-- define the datasource.jndi.name in case the imported ejb file doesn't -->
+   <property name="datasource.jndi.name"           value="${name}/datasource"/>
+
+   <path id="lib.class.path">
+      <pathelement path="${database.driver.classpath}"/>
+      <fileset dir="${lib.dir}">
+         <include name="*.jar"/>
+      </fileset>
+      <!-- The middlegen jars -->
+      <!--fileset dir="${basedir}/.."-->
+      <fileset dir="${basedir}/middlegen-lib">
+         <include name="*.jar"/>
+      </fileset>
+   </path>
+
+   <target name="init">
+      <available property="xdoclet1.2+" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="lib.class.path"/>
+   </target>
+
+   <!-- =================================================================== -->
+   <!-- Fails if XDoclet 1.2.x is not on classpath                          -->
+   <!-- =================================================================== -->
+   <target name="fail-if-no-xdoclet-1.2" unless="xdoclet1.2+">
+      <fail>
+      You must download several jar files before you can build Middlegen.
+      </fail>
+   </target>
+
+   <!-- =================================================================== -->
+   <!-- Create tables                                                       -->
+   <!-- =================================================================== -->
+   <target 
+      name="create-tables" 
+      depends="init,fail-if-no-xdoclet-1.2,check-driver-present,panic-if-driver-not-present" 
+      description="Create tables"
+   >
+      <echo>Creating tables using URL ${database.url}</echo>
+      <sql
+         classpath="${database.driver.classpath}"
+         driver="${database.driver}"
+         url="${database.url}"
+         userid="${database.userid}"
+         password="${database.password}"
+         src="${database.script.file}"
+         print="true"
+         output="result.txt"
+      />
+   </target>
+   <target name="check-driver-present">
+      <available file="${database.driver.file}" type="file" property="driver.present"/>
+   </target>
+   <target name="panic-if-driver-not-present" unless="driver.present">
+      <fail>
+      The JDBC driver you have specified by including one of the files in ${basedir}/config/database
+      doesn't exist. You have to download this driver separately and put it in ${database.driver.file}
+      Please make sure you're using a version that is equal or superior to the one we looked for.
+      If you name the driver jar file differently, please update the database.driver.file property
+      in the ${basedir}/config/database/xxx.xml file accordingly.
+      </fail>
+   </target>
+
+   <!-- =================================================================== -->
+   <!-- Run Middlegen                                                       -->
+   <!-- =================================================================== -->
+   <target 
+      name="middlegen" 
+      description="Run Middlegen" 
+      unless="middlegen.skip"
+      depends="init,fail-if-no-xdoclet-1.2,check-driver-present,panic-if-driver-not-present"
+   >
+   	  <mkdir dir="${learningdesign.dir}"/>
+   	
+	  <echo message="Class path = ${basedir}"/>
+      <taskdef
+         name="middlegen"
+         classname="middlegen.MiddlegenTask"
+         classpathref="lib.class.path"
+      />
+
+      <middlegen
+         appname="${name}"
+         prefsdir="${pref.dir}"
+         gui="${gui}"
+         databaseurl="${database.url}"
+         initialContextFactory="${java.naming.factory.initial}"
+         providerURL="${java.naming.provider.url}"
+         datasourceJNDIName="${datasource.jndi.name}"
+         driver="${database.driver}"
+         username="${database.userid}"
+         password="${database.password}"
+         schema="${database.schema}"
+         catalog="${database.catalog}"
+      >
+
+         <!--
+         We can specify what tables we want Data generated for.
+         If none are specified, Data will be generated for all tables.
+         Comment out the <table> elements if you want to generate for all tables.
+         Also note that table names are CASE SENSITIVE for certain databases,
+         so on e.g. Oracle you should specify table names in upper case.
+         -->
+         <!--table generate="true" name="flights" pktable="flights_pk"/-->
+
+      	 <table name="lams_learning_activity"/>  	
+		 <table name="lams_learning_design"/>
+     	 <table name="lams_learning_library"/>      	
+         <table name="lams_learning_transition"/>		
+      	 <table name="lams_group"/>      	
+      	 <table name="lams_grouping"/>      	
+
+         <!--
+         If you want m:n relations, they must be specified like this.
+         Note that tables declare in multiple locations must all have
+         the same value of the generate attribute.
+         -->
+         <!--many2many>
+            <tablea generate="true" name="persons"/>
+            <jointable name="reservations" generate="false"/>
+            <tableb generate="true" name="flights"/>
+         </many2many-->
+
+
+         <!-- Plugins - Only Hibernate Plugin has been included with this special distribution  -->
+         
+         <!--
+         If you want to generate XDoclet markup for hbm2java to include in the POJOs then
+         set genXDocletTags to true. Also, composite keys are generated as external classes which is
+         recommended. If you wish to keep them internal then set genIntergratedCompositeKeys to true.
+         Since r4 the ability to customise the selection of JavaTypes is now provided. The is a 
+         recommended type mapper provided as shown. It is optional - if not provided then Middlegen
+         itself will select the Java mapping (as it did previously).
+         These settings are optional thus if they are not define here values default to false.
+         -->
+         <hibernate
+         	destination="${learningdesign.dir}"
+            package="."
+            genXDocletTags="true"
+            genIntergratedCompositeKeys="false"
+            javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
+         />
+         
+      </middlegen>      
+   </target>
+
+	
+   <!-- =================================================================== -->
+   <!-- Compile business logic (hibernate)                                        -->
+   <!-- =================================================================== -->
+   <target name="compile-hibernate" depends="middlegen" description="Compile hibernate Business Domain Model">
+      <javac
+      	srcdir ="${script.dir}"
+      	destdir="${learningdesign.dir}"
+   		classpathref="lib.class.path"
+   	>   	
+         <include name="**/hibernate/**/*"/>
+      </javac>
+   </target>
+   
+   <!-- =================================================================== -->
+   <!-- Run hbm2java    depends="middlegen"                                 -->
+   <!-- =================================================================== -->
+   <target name="hbm2java" description="Generate .java from .hbm files.">
+      <taskdef
+         name="hbm2java"
+         classname="net.sf.hibernate.tool.hbm2java.Hbm2JavaTask"
+         classpathref="lib.class.path"
+      />
+		
+	<hbm2java output="${dummy.dir}">
+			<fileset dir="${learningdesign.dir}">
+				<include name="**/*.hbm.xml"/>
+			</fileset>
+		</hbm2java>
+   </target>
+
+   <!-- =================================================================== -->
+   <!-- Build everything                                                    -->
+   <!-- =================================================================== -->
+   <target name="all" description="Build everything" depends="compile-hibernate"/>
+
+   <!-- =================================================================== -->
+   <!-- Clean everything                                                    -->
+   <!-- =================================================================== -->
+   <target name="clean" description="Clean all generated stuff">
+      <delete dir="${conf.dir}"/>
+   </target>
+
+   <!-- =================================================================== -->
+   <!-- Brings up the hsqldb admin tool                                     -->
+   <!-- =================================================================== -->
+   <target name="hsqldb-gui" description="Brings up the hsqldb admin tool">
+      <property name="database.urlparams" value="?user=${database.userid}&amp;password=${database.password}"/>
+      <java 
+         classname="org.hsqldb.util.DatabaseManager" 
+         fork="yes" 
+         classpath="${lib.dir}/hsqldb-1.7.1.jar;${database.driver.classpath}"
+         failonerror="true"
+      >
+         <arg value="-url"/>
+         <arg value="${database.url}${database.urlparams}"/>
+         <arg value="-driver"/>
+         <arg value="${database.driver}"/>
+      </java>
+   </target>
+
+   <!-- ==================================================================== -->
+   <!-- Validate the generated xml mapping documents                         -->
+   <!-- ==================================================================== -->
+   <target name="validate">
+      <xmlvalidate failonerror="no" lenient="no" warn="yes">
+      	 <fileset dir="${build.gen-src.dir}/airline/hibernate" includes="*.xml" />
+      </xmlvalidate>
+   </target>
+   
+</project>
