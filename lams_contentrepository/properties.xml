@@ -1,0 +1,52 @@
+   	<!-- =================================================================== -->
+   	<!-- note: This is not a proper xml file (there is no root element)      -->
+   	<!--       It defines properties for ant build.xml file                  -->
+   	<!--       It is intended to be imported to ant build.xml file           -->
+   	<!-- =================================================================== -->
+	
+	<!-- progect-wide properties -->
+	<property name="project"                  value="LAMS"/>
+	<property name="product"                  value="lamscr"/>
+	<property name="version"                       value="1.1"/>
+
+	<!-- xdoclet properties-->	
+	<property name="xdoclet.version"               value="1.2.2"/>
+	
+	<!-- path properties -->
+	<property name="lib"                       value="${basedir}/lib"/>
+	<property name="sql"                       value="${basedir}/db/sql"/>
+	<property name="src"                       value="${basedir}/src"/>
+	<property name="src.java"                  value="${basedir}/src/java"/>
+	<property name="conf"                      value="${basedir}/conf"/>
+	<property name="conf.jboss"                value="${conf}/jboss"/>
+	<property name="hbm"                       value="${conf}/hibernate/mappings"/>
+	
+	<property name="web"                           value="${basedir}/web"/>
+	<property name="webinf"                        value="${web}/WEB-INF"/>
+	
+	<property name="jboss.home"                    value="G:/jboss-3.2.6"/>
+	<property name="jboss.deploy"                    value="${jboss.home}/server/default/deploy"/>
+
+	<property name="build"                         value="${basedir}/build"/>
+	<property name="build.classes"                 value="${build}/classes"/>
+	<property name="build.lib"                     value="${build}/lib"/>
+	
+	<property name="package"                   value="com/lamsinternational/lams"/>
+	<property name="package.contentrepository"    value="${package}/contentrepository"/>
+	
+	<property name="package.name"                  value="com.lamsinternational.lams"/>
+	<property name="package.contentrepository.name"   value="${package}.contentrepository"/>
+	
+	<!--  database related properties -->
+	<property name="database.driver.file"          value="${lib}/mysql/mysql-connector-java-3.0.16-ga-bin.jar"/>   
+	<property name="database.driver.classpath"     value="${database.driver.file}"/>
+	<property name="database.driver"               value="org.gjt.mm.mysql.Driver"/>
+	<property name="database.url"                  value="jdbc:mysql://localhost/lams"/>
+	<property name="database.userid"               value="root"/>
+	<property name="database.password"             value=""/>
+	<property name="database.schema"               value=""/>
+	<property name="database.catalog"              value=""/>
+
+	<!-- middlegen properties -->
+	<property name="middlegen"                 value="${conf}/middlegen"/>
+	<property name="gui"                           value="true"/>	

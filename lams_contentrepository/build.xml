@@ -1,0 +1,311 @@
+<?xml version="1.0"?>
+
+<!-- 
+The DOCTYPE declaration declares the location of database-specific parts of the
+Ant build file. 
+-->
+<!DOCTYPE project [
+	<!ENTITY properties SYSTEM "file:./properties.xml">
+]>
+
+<project name="LAMS" basedir="." default="usage">
+
+	<!-- import properties from the specified file -->
+	&properties; 
+
+	<path id="all-libs">
+		<fileset dir="${lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="project.classpath">
+		<path refid="all-libs"/>
+		<!-- Java CLASSPATH should be added as the last item -->
+		<!-- This property is supposed to be set in eclipse  -->
+		<pathelement location="${java.class.path}" />
+	</path>
+
+	<target name="usage">
+		<echo message=""/>
+		<echo message="${project} build file"/>
+		<echo message="------------------------------------------------------"/>
+		<echo message=""/>
+		<echo message="Among the available targets are:"/>
+		<echo message=""/>
+		<echo message="deploy-lamscr  --> Deploy the content repository project"/>
+		<echo message="create-db-tables   --> (Re)create the content repository tables"/>
+<!--		<echo message="insert-test-data --> <!-- Insert test data to database"/>  -->
+		<echo message="lamscr-jar  --> Make jar archive for deployment"/>
+		<echo message="lamscr-war  --> Make war archive for deployment"/>
+<!--		<echo message="copyfiles --> <!--Copy the third party jar files and cofiguration files for deployment"/> -->
+<!--		<echo message="middlegen-learningdesign --> <!-- Run middlegen for learningdesign tables"/> -->
+<!--		<echo message="hbm2java-learningdesign  --> <!-- Run hbm2java for learningdesign mapping files"/> -->
+		<echo message=""/>
+	</target>
+
+	<target name="init">
+		<available property="xdoclet-jars-installed" file="lib/xdoclet/xdoclet-${xdoclet.version}.jar"/>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Fails if XDoclet 1.2.x is not on classpath                          -->
+	<!-- =================================================================== -->
+	<target name="fail-if-no-xdoclet-1.2.x" unless="xdoclet-jars-installed">
+		<fail>
+	      You must download several jar files before you can build Middlegen.
+	      Execute the "download-deps" target. Then try to build again.
+
+	      If you are behind a proxy, you should define the properties
+	      http.proxyHost and http.proxyPort. Example:
+	      
+	      ant -Dhttp.proxyHost=foo.com -Dhttp.proxyPort=8080
+	      
+	      It's also possible to download the jars manually.
+	     </fail>
+	</target>
+
+	<target name="check-driver-present">
+		<available file="${database.driver.file}" type="file" property="driver.present"/>
+	</target>
+	<target name="panic-if-driver-not-present" unless="driver.present">
+		<fail>
+	      The JDBC driver you have specified by including one of the files in ${basedir}/config/database
+	      doesn't exist. You have to download this driver separately and put it in ${database.driver.file}
+	      Please make sure you're using a version that is equal or superior to the one we looked for.
+	      If you name the driver jar file differently, please update the database.driver.file property
+	      in the ${basedir}/config/database/xxx.xml file accordingly.
+	     </fail>
+	</target>
+
+
+	<!-- =================================================================== -->
+	<!-- Run Middlegen For LearningDesign                                                       -->
+	<!-- =================================================================== -->
+	<target 
+      name="middlegen-learningdesign" 
+      description="Run Middlegen For LearningDesign" 
+      unless="middlegen.skip"
+      depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present"
+    >
+		<taskdef
+         name="middlegen-learningdesign"
+         classname="middlegen.MiddlegenTask"
+         classpathref="all-libs"
+        />
+
+		<middlegen-learningdesign
+         appname="learningdesign"
+         prefsdir="${middlegen}"
+         gui="${gui}"
+         databaseurl="${database.url}"
+         driver="${database.driver}"
+         username="${database.userid}"
+         password="${database.password}"
+         schema="${database.schema}"
+         catalog="${database.catalog}"
+         includeViews="false"
+        >
+
+			<hibernate 
+			destination="${hbm}"
+			package="${package.learningdesign.name}"
+            genXDocletTags="true"
+            javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
+            />
+
+			<table name="lams_learning_activity"/>
+			<table name="lams_learning_design"/>
+			<table name="lams_learning_library"/>
+			<table name="lams_learning_transition"/>
+			<table name="lams_group"/>
+			<table name="lams_grouping"/>
+
+		</middlegen-learningdesign>
+
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Run hbm2java for learningdesign                                                       -->
+	<!-- =================================================================== -->
+	<target name="hbm2java-learningdesign" description="Generate .java from .hbm files.">
+		<taskdef
+         name="hbm2java-learningdesign"
+         classname="net.sf.hibernate.tool.hbm2java.Hbm2JavaTask"
+         classpathref="all-libs"
+      />
+		<hbm2java-learningdesign output="${src.java}">
+			<fileset dir="${hbm}/${package.learningdesign}">
+				<include name="*.hbm.xml"/>
+			</fileset>
+		</hbm2java-learningdesign>
+	</target>
+
+	<target name="print-classpath">
+		<echo message="java.class.path = ${java.class.path}"/>
+	</target>
+
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+	<target name="preparedirs">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.lib}"/>
+	</target>
+
+
+	<target name="clean" depends="preparedirs" description="removes all class files">
+		<delete>
+			<fileset dir="${build.classes}"/>
+			<fileset dir="${build.lib}"/>
+		</delete>
+		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.lib}"/>
+	</target>
+
+	<target name="compile" depends="clean" description="compile java sources">
+		<javac srcdir="${src.java}" compiler="modern"
+	         	 	destdir="${build.classes}" deprecation="on" debug="on">
+			<classpath>
+				<path refid="project.classpath"/>
+			</classpath>
+		</javac>
+	</target>
+
+	<!-- ================================================================ -->
+	<!-- Make jar archive for deployment        		    	          -->
+	<!-- ================================================================ -->
+	<target name="lamscr-jar" depends="compile" description="creates jar file">
+		<delete file="${build.lib}/${product}.jar"/>
+		<jar jarfile="${build.lib}/${product}.jar">
+			<fileset dir="${build.classes}">
+			</fileset>
+<!--			<fileset dir="${hbm}">
+			</fileset> -->
+		</jar>
+	</target>
+
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<!-- Make the war archive  for deployment             -->
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<target name="lamscr-war" depends="lamscr-jar" description="creates war file">
+		<delete file="${build.lib}/${product}.war"/>
+		<war warfile="${build.lib}/${product}.war" 
+  				webxml="${webinf}/web.xml">
+			<webinf dir="${webinf}">
+				<include name="*.xml"/>
+				<include name="*.properties"/>
+				<include name="struts/*"/>
+				<include name="jstl/*"/>
+				<exclude name="web.xml"/>
+			</webinf>
+			<lib dir="${build.lib}">
+				<include name="${product}.jar"/>
+			</lib>
+			<fileset dir="${web}">
+				<include name="*"/>
+				<include name="admin/*"/>
+				<include name="images/*"/>
+			</fileset>
+		</war>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Copy the third party jar files and cofiguration files for deployment-->
+	<!-- =================================================================== -->
+<!--	<target name="copyfiles" description="copy lib and config files">
+		<copy overwrite="yes" todir="${jboss.home}/server/default/lib/">
+			<fileset dir="${lib}/cglib/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/hibernate/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/j2ee/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/jakarta-commons/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/jdom/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/log4j/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/mysql/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/odmg/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/spring/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/struts/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/aopalliance/">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${lib}/jakarta-taglibs/">
+				<include name="*.jar"/>
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${jboss.home}/server/default/conf/">
+			<fileset dir="${conf.jboss}/">
+				<include name="login-config.xml"/>
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${jboss.deploy}">
+			<fileset dir="${conf.jboss}/service">
+				<include name="mysql*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+-->
+	<!-- =================================================================== -->
+	<!-- Deploy the project                                                  -->
+	<!-- =================================================================== -->
+	<target name="deploy-lamscr" depends="lamscr-jar,lamscr-war">
+		<delete quiet="true">
+			<fileset dir="${jboss.deploy}/tmp"/>
+			<fileset dir="${jboss.deploy}/work"/>
+		</delete>
+		<copy file="${build.lib}/${product}.jar"
+				todir="${jboss.deploy}"/>
+		<copy file="${build.lib}/${product}.war"
+				todir="${jboss.deploy}"/>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Clean and rebuild the database                                      -->
+	<!-- =================================================================== -->
+	<target name="create-db-tables"
+		description="(re)create content repository tables. Mysql has to be running first and the database should exist.">
+		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
+				password="${database.password}">
+			<classpath>
+				<pathelement location="${database.driver.file}"/>
+			</classpath>
+			<transaction src="${sql}/create_content_repository_tables.sql"/>
+		</sql>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Insert test data to lams database                                   -->
+	<!-- =================================================================== -->
+	<target name="insert-test-data"
+		description="insert test data to lams database">
+		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
+				password="${database.password}">
+			<classpath>
+				<pathelement location="${database.driver.file}"/>
+			</classpath>
+			<transaction src="${sql}/insert_test_data.sql"/>
+		</sql>
+	</target>
+	
+</project>
+
