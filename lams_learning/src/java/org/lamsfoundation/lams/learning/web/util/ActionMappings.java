@@ -7,7 +7,6 @@ package org.lamsfoundation.lams.learning.web.util;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ForwardingActionForward;
 import org.apache.struts.action.RedirectingActionForward;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -20,11 +19,18 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.LessonCompleteActivity;
 import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
+import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 
 /**
  * This class contains the standard struts action mappings for errors as
  * well as methods that get required Action/URL to display an Activity or
- * LearnerProgress. 
+ * LearnerProgress.
+ * 
+ * In order to return a URL this class needs to know the baseURL. This can
+ * be set using in the application context.
  * 
  * @author daveg
  *
@@ -34,6 +40,9 @@ public class ActionMappings {
     public static final String ERROR = "error";
     public static final String NO_SESSION_ERROR = "noSessionError";
     public static final String DOUBLE_SUBMIT_ERROR = "doubleSubmitError";
+    
+    private ILamsToolService toolService;
+    private String baseURL;
 
 
 	/**
@@ -91,10 +100,9 @@ public class ActionMappings {
 	 * @param activity, the Activity to be displayed
 	 * @param progress, the LearnerProgress associated with the Activity and learner
 	 */
-	public ActivityURL getActivityURL(Activity activity, LearnerProgress progress) {
-	    ActivityURL activityURL = null;
+	public String getActivityURL(Activity activity, LearnerProgress progress) {
+	    String activityURL = null;
 		
-		// TODO: remove instanceof
 		if (activity instanceof ToolActivity) {
 		    activityURL = getToolURL((ToolActivity)activity, progress);
 		}
@@ -116,8 +124,8 @@ public class ActionMappings {
 	 * Note that the URL could also be a wait message or a jsp to clear the frames.
 	 * @param progress, the current LearnerProgress.
 	 */
-	public ActivityURL getProgressURL(LearnerProgress progress) {
-		ActivityURL activityURL = null;
+	public String getProgressURL(LearnerProgress progress) {
+		String activityURL = null;
 
 		Activity nextActivity = progress.getNextActivity();
 		Activity previousActivity = progress.getPreviousActivity();
@@ -142,23 +150,31 @@ public class ActionMappings {
 	}
 	
 
-	/** TODO: getToolURL()
+	/**
 	 * Generates an ActivityURL for a Tool Activity. The URL is for the tool and
 	 * not for the tool loading page. The URL also includes toolSessionId and all
 	 * other required data.
 	 * @param activity, the ToolActivity to be displayed
 	 * @param progress, the current LearnerProgress, used to get activity status
 	 */
-	public ActivityURL getToolURL(ToolActivity activity, LearnerProgress progress) {
-		ActivityURL activityURL = new ActivityURL();
-		activityURL.setTitle("activity "+activity.getActivityId());
-		activityURL.setDescription("description for activity with id "+activity.getActivityId());
-		activityURL.setComplete(progress.getProgressState(activity) == LearnerProgress.ACTIVITY_COMPLETED);
+	public String getToolURL(ToolActivity activity, LearnerProgress progress) {
+		Tool tool = activity.getTool();
+		String url = tool.getLearnerUrl();
 
-		activityURL.setActivityId(activity.getActivityId());
-		activityURL.setUrl("/lams_learning/test/DummyTool.do?method=display&activityId="+activity.getActivityId()+"&progressState="+progress.getProgressState(activity));
-
-		return activityURL;
+		ToolSession toolSession;
+		try {
+			// Get tool session using learner and activity
+			toolSession = toolService.getToolSession(progress.getUser(), activity);
+		}
+		catch (LamsToolServiceException e) {
+			return null;
+		}
+		
+		// Append toolSessionId to tool URL
+		Long toolSessionId = toolSession.getToolSessionId();
+		url += "?toolSessionId="+toolSessionId;
+		
+		return url;
 	}
 	
 	
@@ -171,7 +187,6 @@ public class ActionMappings {
 	protected String getActivityAction(Activity activity, LearnerProgress progress) {
 		String strutsAction = null;
 		
-		// TODO: remove instanceof
 		if (activity instanceof NullActivity) {
 		    if (activity instanceof ParallelWaitActivity) {
 		        strutsAction = "/parallelWait.do";
@@ -204,27 +219,33 @@ public class ActionMappings {
 		return strutsAction;
 	}
 	
-	protected ActivityURL strutsActionToURL(String strutsAction, Activity activity, boolean useContext) {
-	    ActivityURL activityURL = new ActivityURL();
-	    activityURL.setActivityId(activity.getActivityId());
-	    // TODO: don't hardcode
+	/**
+	 * Creates a URL for a struts action for an activity.
+	 * @param strutsAction, the struts action path.
+	 * @param activity, the activity the action is for.
+	 * @param useContext, if true prepends the server and context to the URL.
+	 */
+	protected String strutsActionToURL(String strutsAction, Activity activity, boolean useContext) {
 		String query = "?activityId="+activity.getActivityId();
 		String url = strutsAction+query;
 		if (useContext) {
-			String context = "/lams_learning";
-		    url = context+url;
+			String lamsUrl = getLamsURL();
+		    url = lamsUrl+url;
 		}
-		activityURL.setUrl(url);
-		
-		return activityURL;
+
+		return url;
+	}
+	
+	private String getLamsURL() {
+		return baseURL;
 	}
 	
 	protected ActionForward strutsActionToForward(String strutsAction, Activity activity, boolean redirect) {
 		ActionForward actionForward;
 		if (redirect) {
-			ActivityURL activityURL = strutsActionToURL(strutsAction, activity, false);
-			String path = activityURL.getUrl();
-			actionForward = new RedirectingActionForward(path);
+			String activityURL = strutsActionToURL(strutsAction, activity, false);
+			//String path = activityURL.getUrl();
+			actionForward = new RedirectingActionForward(activityURL);
 		}
 		else {
 		    actionForward = new ForwardingActionForward(strutsAction);
@@ -233,4 +254,11 @@ public class ActionMappings {
 		return actionForward;
 	}
 	
+	public void setToolService(ILamsToolService toolService) {
+		this.toolService = toolService;
+	}
+	
+	public void setBaseURL(String baseURL) {
+		this.baseURL = baseURL;
+	}
 }

@@ -5,7 +5,6 @@
 package org.lamsfoundation.lams.learning.web.util;
 
 import org.apache.struts.action.ActionForward;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -61,8 +60,8 @@ public class ActionMappingsWithToolWait extends ActionMappings {
 	 * @param activity, the Activity to be displayed
 	 * @param progress, the LearnerProgress associated with the Activity and learner
 	 */
-	public ActivityURL getActivityURL(Activity activity, LearnerProgress progress) {
-	    ActivityURL activityURL = null;
+	public String getActivityURL(Activity activity, LearnerProgress progress) {
+	    String activityURL = null;
 		
 	    // use LAMS action
 	    String strutsAction = null;
@@ -80,8 +79,8 @@ public class ActionMappingsWithToolWait extends ActionMappings {
 	 * Note that the URL could also be a wait message or a jsp to clear the frames.
 	 * @param progress, the current LearnerProgress.
 	 */
-	public ActivityURL getProgressURL(LearnerProgress progress) {
-		ActivityURL activityURL = null;
+	public String getProgressURL(LearnerProgress progress) {
+		String url;
 
 		Activity nextActivity = progress.getNextActivity();
 		Activity previousActivity = progress.getPreviousActivity();
@@ -90,14 +89,14 @@ public class ActionMappingsWithToolWait extends ActionMappings {
 		if (previousActivity instanceof ParallelActivity) {
 		    // clear frameset
 		    String strutsAction = "/requestDisplay.do";
-		    activityURL = strutsActionToURL(strutsAction, nextActivity, true);
+		    url = strutsActionToURL(strutsAction, nextActivity, true);
 		}
 		else {
 			String strutsAction = getActivityAction(nextActivity, progress);
-		    activityURL = strutsActionToURL(strutsAction, nextActivity, true);
+		    url = strutsActionToURL(strutsAction, nextActivity, true);
 		}
 		
-		return activityURL;
+		return url;
 	}
 	
 	
@@ -110,7 +109,6 @@ public class ActionMappingsWithToolWait extends ActionMappings {
 	protected String getActivityAction(Activity activity, LearnerProgress progress) {
 	    String strutsAction = null;
 		
-		// TODO: remove instanceof
 		if (activity instanceof NullActivity) {
 		    if (activity instanceof ParallelWaitActivity) {
 		        strutsAction = "/parallelWait.do";
