@@ -65,19 +65,19 @@ public class TestLearnerService extends AbstractLamsTestCase
     private User testUser;
     private Lesson testLesson;
     private static LearnerProgress testProgress;
-    private static final long TEST_NB_ACTIVITY_ID = 26;
-    private static final long TEST_RGRP_ACTIVITY_ID = 31;
-    private static final long TEST_CHAT_ACTIVITY_ID = 30;
-    private static final long TEST_QNA_ACTIVITY_ID = 35;
-    private static final long TEST_OPTIONS_ACTIVITY_ID = 37;
-    private static final long TEST_CNB_ACTIVITY_ID = 39;
-    private static final long TEST_PARALLEL_ACTIVITY_ID = 27;
-    private static final long TEST_CQNA_ACTIVITY_ID = 28;
+    private static final long TEST_NB_ACTIVITY_ID = 35;
+    private static final long TEST_RGRP_ACTIVITY_ID = 38;
+    private static final long TEST_CHAT_ACTIVITY_ID = 37;
+    private static final long TEST_QNA_ACTIVITY_ID = 39;
+    private static final long TEST_OPTIONS_ACTIVITY_ID = 26;
+    private static final long TEST_CNB_ACTIVITY_ID = 27;
+    private static final long TEST_PARALLEL_ACTIVITY_ID = 29;
+    private static final long TEST_CQNA_ACTIVITY_ID = 30;
     private static final long TEST_WAITING_ACTIVITY_ID = -1;
-    private static final long TEST_MB_ACTIVITY_ID = 29;
+    private static final long TEST_MB_ACTIVITY_ID = 31;
     private static final long TEST_SEQUENCE_ACTIVITY_ID = 32;
-    private static final long TEST_SR_ACTIVITY_ID = 34;
-    private static final long TEST_SQNA_ACTIVITY_ID = 33;
+    private static final long TEST_SR_ACTIVITY_ID = 33;
+    private static final long TEST_SQNA_ACTIVITY_ID = 34;
     private static final String HOST="http://localhost:8080/lams_learning/";
     private static final String LOAD_TOOL_URL="/DisplayLoadToolActivity.do";
     private static final String PARAM_ACTIVITY_ID="?activityId=";
@@ -142,6 +142,20 @@ public class TestLearnerService extends AbstractLamsTestCase
                      ((ToolActivity)testProgress.getNextActivity()).getToolSessions().size());
     }
 
+
+    public void testCompleteToolSession()
+    {
+        String urlForNextActivity = learnerService.completeToolSession(TEST_TOOL_SESSION_ID,testUser);
+        
+        ToolSession toolSession = toolSessionDao.getToolSession(new Long(TEST_TOOL_SESSION_ID));
+        
+        assertNotNull("verify the existance of tool session",toolSession);
+        assertEquals("verify tool session state",ToolSession.ENDED_STATE,toolSession.getToolSessionStateId());
+        
+        assertEquals("verify the returned url",HOST+LOAD_TOOL_URL+PARAM_ACTIVITY_ID+TEST_NB_ACTIVITY_ID,urlForNextActivity);
+        
+    }
+    
     public void testCalculateProgress() throws ProgressException
     {
         Activity testCompletedActivity = testProgress.getNextActivity();
@@ -152,7 +166,7 @@ public class TestLearnerService extends AbstractLamsTestCase
                                                         testUser,
                                                         testLesson);
         assertLearnerProgress(testRootPreviousActivity,TEST_NB_ACTIVITY_ID,TEST_NB_ACTIVITY_ID,1,1,"nb","nb");
-        
+
         //progress from notice board to random grouping activity
         testCompletedActivity = testProgress.getNextActivity();
         testRootPreviousActivity = testCompletedActivity;
@@ -229,18 +243,6 @@ public class TestLearnerService extends AbstractLamsTestCase
         assertTrue("verify lesson complete",testProgress.isLessonComplete());
     }
 
-    public void testCompleteToolSession()
-    {
-        String urlForNextActivity = learnerService.completeToolSession(TEST_TOOL_SESSION_ID,testUser);
-        
-        ToolSession toolSession = toolSessionDao.getToolSession(new Long(TEST_TOOL_SESSION_ID));
-        
-        assertNotNull("verify the existance of tool session",toolSession);
-        assertEquals("verify tool session state",ToolSession.ENDED_STATE,toolSession.getToolSessionStateId());
-        
-        assertEquals("verify the returned url",HOST+LOAD_TOOL_URL+PARAM_ACTIVITY_ID+TEST_NB_ACTIVITY_ID,urlForNextActivity);
-        
-    }
     /**
      * @param numberOfAttemptedAct 
      * @param testCompletedActivity
