@@ -1,0 +1,4 @@
+<context-param>
+  	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+  	<param-value>com.lamsinternational.lams.learning.LearningResources</param-value>
+</context-param>
