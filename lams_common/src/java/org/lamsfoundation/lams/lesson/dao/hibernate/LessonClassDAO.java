@@ -29,7 +29,7 @@ public class LessonClassDAO extends HibernateDaoSupport implements ILessonClassD
      */
     public void saveOrUpdateLessonClass(LessonClass lessonClass)
     {
-        getHibernateTemplate().saveOrUpdate(lessonClass);
+        getHibernateTemplate().save(lessonClass);
     }
     
     /**

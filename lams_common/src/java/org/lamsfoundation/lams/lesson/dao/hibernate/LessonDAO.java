@@ -64,7 +64,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
      */
     public void saveOrUpdateLesson(Lesson lesson)
     {
-        getHibernateTemplate().saveOrUpdate(lesson);
+        getHibernateTemplate().save(lesson);
     }
     
     /**

@@ -30,7 +30,7 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
 	
     public void saveOrUpdateToolSession(ToolSession toolSession)
     {
-        getHibernateTemplate().saveOrUpdate(toolSession);
+        getHibernateTemplate().save(toolSession);
     }
     
 }

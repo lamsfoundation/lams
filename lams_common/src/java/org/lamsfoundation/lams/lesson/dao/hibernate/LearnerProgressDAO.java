@@ -35,7 +35,7 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
      */
     public void saveOrUpdateLearnerProgress(LearnerProgress learnerProgress)
     {
-        getHibernateTemplate().saveOrUpdate(learnerProgress);
+        getHibernateTemplate().save(learnerProgress);
     }
     
     /**
