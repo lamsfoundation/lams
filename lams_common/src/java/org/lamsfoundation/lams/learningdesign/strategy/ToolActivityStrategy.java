@@ -24,9 +24,9 @@ public class ToolActivityStrategy extends SimpleActivityStrategy {
 		ArrayList contributionType = new ArrayList();
 		
 		ToolActivity toolActivity = (ToolActivity)activity;
-		if(toolActivity.getTool().getSupportsModeration().booleanValue())
+		if(toolActivity.getTool().getSupportsModeration())
 			contributionType.add(new Integer(MODERATION));
-		if(toolActivity.getTool().getSupportsContribute().booleanValue())
+		if(toolActivity.getTool().getSupportsContribute())
 			contributionType.add(new Integer(CONTRIBUTION));
 		if(toolActivity.getDefineLater().booleanValue())
 			contributionType.add(new Integer(DEFINE_LATER));

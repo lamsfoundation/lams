@@ -52,16 +52,16 @@
         </meta>    
     </property>
     <property
-        name="supportsGrouping"
-        type="java.lang.Boolean"
-        column="supports_grouping_flag"
+        name="groupingSupportTypeId"
+        type="java.lang.Integer"
+        column="grouping_support_type_id"
         not-null="true"
-        length="1"
+        length="3"
     >
         <meta attribute="field-description">
            @hibernate.property
-            column="supports_grouping_flag"
-            length="1"
+            column="grouping_support_type_id"
+            length="3"
             not-null="true"
         </meta>    
     </property>
@@ -91,6 +91,67 @@
             not-null="true"
         </meta>    
     </property>
+    
+    <property
+        name="supportsModeration"
+        type="java.lang.Boolean"
+        column="supports_moderation_flag"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="supports_moderation_flag"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property>
+    
+    <property
+        name="supportsRunOffline"
+        type="java.lang.Boolean"
+        column="supports_run_offline_flag"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="supports_run_offline_flag"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property>    
+    
+    <property
+        name="supportsContribute"
+        type="java.lang.Boolean"
+        column="supports_contribute_flag"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="supports_contribute_flag"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property> 
+    
+    <property
+        name="valid"
+        type="java.lang.Boolean"
+        column="valid_flag"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="valid_flag"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property>
+        
     <property
         name="defineLaterUrl"
         type="java.lang.String"
@@ -157,6 +218,13 @@
             length="65535"
         </meta>    
     </property>
+    <property name="createDateTime" type="java.sql.Timestamp"
+			column="create_date_time" not-null="true" length="19">
+			<meta attribute="field-description">
+				@hibernate.property column="create_date_time"
+				length="19" not-null="true"
+			</meta>
+	</property>
     <property
         name="serviceName"
         type="java.lang.String"
@@ -185,7 +253,52 @@
             not-null="true"
         </meta>    
     </property>
-
+    
+    <property
+        name="monitorUrl"
+        type="java.lang.String"
+        column="monitor_url"
+        not-null="true"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="monitor_url"
+            length="65535"
+            not-null="true"
+        </meta>    
+    </property>
+    
+    <property
+        name="moderationUrl"
+        type="java.lang.String"
+        column="moderation_url"
+        not-null="true"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="moderation_url"
+            length="65535"
+            not-null="true"
+        </meta>    
+    </property> 
+    
+    <property
+        name="contributeUrl"
+        type="java.lang.String"
+        column="contribute_url"
+        not-null="true"
+        length="65535"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="contribute_url"
+            length="65535"
+            not-null="true"
+        </meta>    
+    </property>
+           
     <!-- Associations -->
   
     <!-- bi-directional one-to-many association to Activity -->

@@ -164,7 +164,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
      */
     public ToolSession createToolSessionForActivity(User learner,Lesson lesson)
     {
-        if(this.getTool().getGroupingSupportType().intValue()!= 1)
+        if(this.getApplyGrouping().booleanValue())
             return new GroupedToolSession(this,
                                           new Date(System.currentTimeMillis()),
                                           ToolSession.STARTED_STATE,

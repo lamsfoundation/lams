@@ -138,7 +138,7 @@ CREATE TABLE lams_workspace_folder (
      , workspace_id BIGINT(20) NOT NULL
      , user_id BIGINT(20) NOT NULL
      , create_date_time DATETIME NOT NULL
-     , last_modified_date_time DATETIME NOT NULL
+     , last_modified_date_time DATETIME 
      , lams_workspace_folder_type_id INT(3) NOT NULL
      , PRIMARY KEY (workspace_folder_id)
      , INDEX (parent_folder_id)
@@ -242,7 +242,7 @@ CREATE TABLE lams_learning_design (
      , lesson_id BIGINT(20)
      , lesson_start_date_time DATETIME
      , lesson_name VARCHAR(255)
-     , last_modified_date_time DATETIME NOT NULL
+     , last_modified_date_time DATETIME 
      , PRIMARY KEY (learning_design_id)
      , INDEX (parent_learning_design_id)
      , CONSTRAINT FK_lams_learning_design_2 FOREIGN KEY (parent_learning_design_id)
