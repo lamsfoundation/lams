@@ -32,8 +32,8 @@ INSERT INTO lams_user_organisation_role VALUES (12, 5, 4);
 INSERT INTO lams_user_organisation_role VALUES (13, 5, 5);
 INSERT INTO lams_user_organisation_role VALUES (14, 6, 3);
 
-INSERT INTO lams_authentication_method VALUES (1, 'LAMS-Database', 1);
-INSERT INTO lams_authentication_method VALUES (2, 'Oxford-WebAuth', 2);
-INSERT INTO lams_authentication_method VALUES (3, 'MQ-LDAP', 3);
+INSERT INTO lams_authentication_method VALUES (1, 1, 'LAMS-Database');
+INSERT INTO lams_authentication_method VALUES (2, 2, 'Oxford-WebAuth');
+INSERT INTO lams_authentication_method VALUES (3, 3, 'MQ-LDAP');
 
 SET FOREIGN_KEY_CHECKS=1;

@@ -87,12 +87,13 @@ CREATE TABLE lams_authentication_method_type (
 CREATE TABLE lams_authentication_method (
        authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
      , authentication_method_type_id INT(3) NOT NULL DEFAULT 0
-     , parameters_file_name VARCHAR(255) NOT NULL
+     , authentication_method_name VARCHAR(255) NOT NULL
      , PRIMARY KEY (authentication_method_id)
      , INDEX (authentication_method_type_id)
      , CONSTRAINT FK_lams_authorization_method_1 FOREIGN KEY (authentication_method_type_id)
                   REFERENCES lams_authentication_method_type (authentication_method_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
+CREATE UNIQUE INDEX UQ_lams_authentication_method_name ON lams_authentication_method (authentication_method_name ASC);
 
 CREATE TABLE lams_workspace_folder (
        workspace_folder_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
