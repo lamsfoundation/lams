@@ -401,7 +401,7 @@ values
 null,null,8,null,
 null,null,null,'image');
 
-# Populates the lams_learning_transition table with various transitions for the dummy design 
+-- Populates the lams_learning_transition table with various transitions for the dummy design 
 
 insert into lams_learning_transition(transition_id,id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
 values(1,1,'NoteBook to Optional Activity','Notebook to Optional Activity',12,null,1,'20050207');
