@@ -11,7 +11,7 @@ package org.lamsfoundation.lams.tool;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 
@@ -37,9 +37,9 @@ public interface ToolSessionManager
     /**
      * Call the controller service to complete and leave the tool session.
      * @param toolSessionId the runtime tool session id.
-     * @return the data object that wraps the progess information.
+     * @return the url for next activity.
      */
-    public LearnerProgress leaveToolSession(Long toolSessionId);
+    public String leaveToolSession(Long toolSessionId, User learner);
     
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId);
 

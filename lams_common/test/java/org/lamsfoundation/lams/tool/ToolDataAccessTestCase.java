@@ -13,14 +13,11 @@ import java.util.Date;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
-import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;

@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
  */
 public class TestLamsToolService extends ToolDataAccessTestCase
 {
-    private ILamsToolService toolService;
+    private ILamsCoreToolService toolService;
     
     /*
      * @see ToolDataAccessTestCase#setUp()
@@ -44,7 +44,7 @@ public class TestLamsToolService extends ToolDataAccessTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        toolService = (ILamsToolService) this.context.getBean("lamsToolService");
+        toolService = (ILamsCoreToolService) this.context.getBean("lamsCoreToolService");
         
         toolSessionDao = (ToolSessionDAO)this.context.getBean("toolSessionDAO");
         
