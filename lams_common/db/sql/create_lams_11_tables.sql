@@ -5,7 +5,7 @@ CREATE TABLE lams_gate_activity_level (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_grouping_type (
-       grouping_type_id INT(11) NOT NULL DEFAULT 0
+       grouping_type_id INT(11) NOT NULL
      , description VARCHAR(128) NOT NULL
      , PRIMARY KEY (grouping_type_id)
 )TYPE=InnoDB;
@@ -17,7 +17,7 @@ CREATE TABLE lams_learning_activity_type (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learning_library (
-       learning_library_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       learning_library_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , description TEXT
      , title VARCHAR(255)
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
@@ -25,7 +25,7 @@ CREATE TABLE lams_learning_library (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_organisation_type (
-       organisation_type_id INT(3) NOT NULL DEFAULT 0
+       organisation_type_id INT(3) NOT NULL
      , name VARCHAR(64) NOT NULL
      , description VARCHAR(255) NOT NULL
      , PRIMARY KEY (organisation_type_id)
@@ -79,13 +79,13 @@ CREATE TABLE lams_tool_session_type (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_authentication_method_type (
-       authentication_method_type_id INT(3) NOT NULL DEFAULT 0
+       authentication_method_type_id INT(3) NOT NULL
      , description VARCHAR(64) NOT NULL
      , PRIMARY KEY (authentication_method_type_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_authentication_method (
-       authentication_method_id BIGINT(20) NOT NULL DEFAULT 0
+       authentication_method_id BIGINT(20) NOT NULL
      , authentication_method_type_id INT(3) NOT NULL DEFAULT 0
      , authentication_method_name VARCHAR(255) NOT NULL
      , UNIQUE UQ_lams_authentication_method_1 (authentication_method_name)
@@ -96,7 +96,7 @@ CREATE TABLE lams_authentication_method (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_workspace_folder (
-       workspace_folder_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       workspace_folder_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , parent_folder_id BIGINT(20)
      , name VARCHAR(64) NOT NULL
      , workspace_id BIGINT(20) NOT NULL
@@ -107,8 +107,9 @@ CREATE TABLE lams_workspace_folder (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_workspace (
-       workspace_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       workspace_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , root_folder_id BIGINT(20) NOT NULL
+     , name VARCHAR(255)
      , PRIMARY KEY (workspace_id)
      , INDEX (root_folder_id)
      , CONSTRAINT FK_lams_workspace_1 FOREIGN KEY (root_folder_id)
@@ -116,12 +117,14 @@ CREATE TABLE lams_workspace (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_grouping (
-       grouping_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       grouping_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , grouping_ui_id INT(11)
      , grouping_type_id INT(11) NOT NULL
      , number_of_groups INT(11)
      , learners_per_group INT(11)
      , staff_group_id BIGINT(20) DEFAULT 0
      , max_number_of_groups INT(3)
+     , id INT(11)
      , PRIMARY KEY (grouping_id)
      , INDEX (grouping_type_id)
      , CONSTRAINT FK_lams_learning_grouping_1 FOREIGN KEY (grouping_type_id)
@@ -129,7 +132,7 @@ CREATE TABLE lams_grouping (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_organisation (
-       organisation_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       organisation_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , name VARCHAR(250)
      , description VARCHAR(250)
      , parent_organisation_id BIGINT(20)
@@ -149,7 +152,7 @@ CREATE TABLE lams_organisation (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_user (
-       user_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       user_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , login VARCHAR(20) NOT NULL
      , password VARCHAR(50) NOT NULL
      , title VARCHAR(32)
@@ -187,7 +190,7 @@ CREATE UNIQUE INDEX UQ_lams_user_login ON lams_user (login ASC);
 CREATE INDEX login ON lams_user (login ASC);
 
 CREATE TABLE lams_learning_design (
-       learning_design_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       learning_design_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , id INT(11)
      , description TEXT
      , title VARCHAR(255)
@@ -200,11 +203,10 @@ CREATE TABLE lams_learning_design (
      , help_text TEXT
      , lesson_copy_flag TINYINT(4) NOT NULL DEFAULT 0
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
-     , version VARCHAR(56) NOT NULL
+     , version VARCHAR(56)
      , parent_learning_design_id BIGINT(20)
-     , open_date_time DATETIME
-     , close_date_time DATETIME
-     , workspace_folder_id BIGINT(20) NOT NULL
+     , workspace_folder_id BIGINT(20)
+     , duration BIGINT(38)
      , PRIMARY KEY (learning_design_id)
      , INDEX (parent_learning_design_id)
      , CONSTRAINT FK_lams_learning_design_2 FOREIGN KEY (parent_learning_design_id)
@@ -219,7 +221,7 @@ CREATE TABLE lams_learning_design (
 CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
 
 CREATE TABLE lams_group (
-       group_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       group_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , grouping_id BIGINT(20) NOT NULL
      , order_id INT(6) NOT NULL DEFAULT 1
      , PRIMARY KEY (group_id)
@@ -229,7 +231,7 @@ CREATE TABLE lams_group (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_user_organisation (
-       user_organisation_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       user_organisation_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , organisation_id BIGINT(20) NOT NULL
      , user_id BIGINT(20) NOT NULL
      , PRIMARY KEY (user_organisation_id)
@@ -270,15 +272,17 @@ CREATE TABLE lams_lesson (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learning_activity (
-       activity_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
-     , id INT(11)
+       activity_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , activity_ui_id INT(11)
      , description TEXT
      , title VARCHAR(255)
      , xcoord INT(11)
      , ycoord INT(11)
      , parent_activity_id BIGINT(20)
+     , parent_ui_id INT(11)
      , learning_activity_type_id INT(11) NOT NULL DEFAULT 0
      , grouping_id BIGINT(20)
+     , grouping_ui_id INT(11)
      , order_id INT(11)
      , define_later_flag TINYINT(4) NOT NULL DEFAULT 0
      , learning_design_id BIGINT(20)
@@ -287,13 +291,15 @@ CREATE TABLE lams_learning_activity (
      , offline_instructions TEXT
      , max_number_of_options INT(5)
      , min_number_of_options INT(5)
+     , options_instructions TEXT
      , tool_id BIGINT(20)
      , tool_content_id BIGINT(20)
      , gate_activity_level_id INT(11)
-     , gate_start_date_time DATETIME
-     , gate_end_date_time DATETIME
+     , gate_start_time_offset BIGINT(38)
+     , gate_end_time_offset BIGINT(38)
      , library_activity_ui_image VARCHAR(255)
      , create_grouping_id BIGINT(20)
+     , create_grouping_ui_id INT(11)
      , library_activity_id BIGINT(20)
      , PRIMARY KEY (activity_id)
      , INDEX (learning_library_id)
@@ -350,7 +356,7 @@ CREATE TABLE lams_learner_progress (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_user_organisation_role (
-       user_organisation_role_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       user_organisation_role_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , user_organisation_id BIGINT(20) NOT NULL
      , role_id INT(6) NOT NULL
      , PRIMARY KEY (user_organisation_role_id)
@@ -365,6 +371,7 @@ CREATE TABLE lams_user_organisation_role (
 CREATE TABLE lams_tool_session (
        tool_session_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , tool_session_type_id INT(3) NOT NULL
+     , lesson_id BIGINT(20) NOT NULL
      , activity_id BIGINT(20) NOT NULL
      , tool_session_state_id INT(3) NOT NULL
      , create_date_time DATETIME NOT NULL
@@ -430,7 +437,7 @@ CREATE TABLE lams_user_group (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_tool_content (
-       tool_content_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
+       tool_content_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , tool_id BIGINT(20) NOT NULL
      , PRIMARY KEY (tool_content_id)
      , INDEX (tool_id)
@@ -461,14 +468,16 @@ CREATE TABLE lams_lesson_learner (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_learning_transition (
-       transition_id BIGINT(20) NOT NULL DEFAULT 0 AUTO_INCREMENT
-     , id INT(11)
+       transition_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , transition_ui_id INT(11)
      , description TEXT
      , title VARCHAR(255)
-     , to_activity_id BIGINT(20)
-     , from_activity_id BIGINT(20)
+     , to_activity_id BIGINT(20) NOT NULL
+     , from_activity_id BIGINT(20) NOT NULL
      , learning_design_id BIGINT(20) NOT NULL DEFAULT 0
      , create_date_time DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
+     , to_ui_id INT(11) NOT NULL
+     , from_ui_id INT(11) NOT NULL
      , PRIMARY KEY (transition_id)
      , INDEX (from_activity_id)
      , CONSTRAINT FK_learning_transition_3 FOREIGN KEY (from_activity_id)
