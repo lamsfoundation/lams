@@ -24,4 +24,4 @@
 #DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
-ALL /usr/local/cvsroot/CVSROOT/log.pl -f /usr/local/cvsroot/CVSROOT/commitlog -m ernieg@melcoe.mq.edu.au %s
+ALL /usr/local/cvsroot/CVSROOT/log.pl -f /usr/local/cvsroot/CVSROOT/commitlog -m lamsdev@melcoe.mq.edu.au %s
