@@ -29,7 +29,7 @@
 		it in your merge directory.
 	-->
 	<global-forwards>
-		<forward name="error" path="/error.jsp"/>
+		<forward name="error" path=".error"/>
 	</global-forwards>
 
 	<!-- ========== Action Mapping Definitions =================================== -->
@@ -38,6 +38,21 @@
     <action path="/home"
             type="com.lamsinternational.lams.web.HomeAction"
             parameter="method">
+      <forward name="sysadmin"
+               path="/sysadmin.jsp">
+      </forward>
+      <forward name="admin"
+               path="/admin.jsp">
+      </forward>
+      <forward name="staff"
+               path="/staff.jsp">
+      </forward>
+      <forward name="author"
+               path="/author.jsp">
+      </forward>
+      <forward name="learner"
+               path="/learner.jsp">
+      </forward>
       <forward name="passwordChange"
                path=".passwordChange">
       </forward>
