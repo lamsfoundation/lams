@@ -1,5 +1,9 @@
-
 <global-forwards>
 	<forward name="error" path="/error.jsp" />
 	<forward name="noSessionError" path="/noSessionError.jsp" />
+	<forward name="displayActivity" path="/DisplayActivity.do" />
+	<forward name="displayToolActivity" path="/DisplayToolActivity.do" />
+	<forward name="displayParallelActivity" path="/DisplayParallelActivity.do" />
+	<forward name="displayOptionsActivity" path="/DisplayOptionsActivity.do" />
+	<!-- forward name="displayGateActivity" path="/DisplayGateActivity.do" /-->
 </global-forwards>
