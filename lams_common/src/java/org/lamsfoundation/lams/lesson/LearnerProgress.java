@@ -39,20 +39,36 @@ public class LearnerProgress implements Serializable
     /** Set of completed activities */
     private Set completedActivities;
     
+    /**
+     * The activity that user just completed. The purpose of this
+     * activity is to allow lams to remove unecessary frame for 
+     * next activity.
+     */
     private Activity previousActivity;
     
-    /** The current activity */
+    /** 
+     * The current activity always present the activity with transition, which
+     * means it won't be leaf node of a complex activity. To understand, the
+     * activity tree, please read relevant documentation and comment. The tool
+     * content could be the same as next activity if next activity is not the 
+     * leaf node. The main purpose of current activity is to restore the 
+     * progress states if the user exist without finishing the activity. 
+     */
     private Activity currentActivity;
 
+
+    /**
+     * The activity that progress engine is about to progress to. It could be
+     * next activity following the transition or leaf activity within a 
+     * complex activity.
+     */
+    private Activity nextActivity;
+    
     /**
      * Indicates is the User has completed this lesson.
      */
     private boolean lessonComplete;
 
-    /**
-     * Non persistent field.
-     */
-    private Activity nextActivity;
     
     /** full constructor */
     public LearnerProgress(Long learnerProgressId, User user, Lesson lesson, Set attemptedActivities, Set completedActivities)
