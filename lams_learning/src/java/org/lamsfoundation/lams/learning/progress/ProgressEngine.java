@@ -99,12 +99,20 @@ public class ProgressEngine
         progress.setNextActivity(ld.getFirstActivity());
         progress.setProgressState(ld.getFirstActivity(),LearnerProgress.ACTIVITY_ATTEMPTED);
     }
+    
     /**
+     * We setup the progress data for a completed activity. This happens when
+     * we find a transition to progress to. It should setup all activity states
+     * that allow web layer to calculate the url to move one to.
      * 
-     * @param completedActivity
-     * @param learnerProgress
-     * @param transition
-     * @return
+     * @param completedActivity the activity finished either by user or the 
+     * 	lams. In terms of lams completed activity, it would be 
+     *  <code>ParallelActivity</code>, <code>SequenceActivity</code>, 
+     *  <code>OptionsActivity</code> and other system driven activities. 
+     *  Whereas user activity will be mostly tool activities.
+     * @param learnerProgress the progress we based on.
+     * @param transition the transition we progress to.
+     * @return the learner progress data we calculated.
      */
     private LearnerProgress progressCompletedActivity(Activity completedActivity,
                                                       LearnerProgress learnerProgress,
@@ -134,11 +142,20 @@ public class ProgressEngine
     }
 
     /**
-     * @param learner
-     * @param lesson
-     * @param completedActivity
-     * @param learnerProgress
-     * @return
+     * Calculate the progress data for a parent activity if we can not find the
+     * transition for a completed activity. Most likely, the completed activity
+     * is in the leaf node of an activity hierarchy. And we need to travesal the
+     * activity hierarchy upwards to find the progress information.
+     * 
+     * @param learner the current learner.
+     * @param lesson the lesson that current learner progress belongs to.
+     * @param completedActivity the activity finished either by user or the 
+     * 	lams. In terms of lams completed activity, it would be 
+     *  <code>ParallelActivity</code>, <code>SequenceActivity</code>, 
+     *  <code>OptionsActivity</code> and other system driven activities. 
+     *  Whereas user activity will be mostly tool activities.
+     * @param learnerProgress the progress we based on.
+     * @return the learner progress data we calculated.
      * @throws ProgressException
      */
     private LearnerProgress progressParentActivity(User learner,
@@ -202,14 +219,22 @@ public class ProgressEngine
     }
     
     /**
-     * @param nextActivity
-     * @return
+     * The next valid is valid if it is not null activity or if it is a parallel
+     * waiting activity.
+     * @param nextActivity the next activity we progress to.
+     * @return is the next activity valid.
      */
     private boolean isNextActivityValid(Activity nextActivity)
     {
         return !nextActivity.isNull()||isParallelWaitActivity(nextActivity);
     }
 
+    /**
+     * Check up the object type to see whether it is a parallel waiting 
+     * activity.
+     * @param nextActivity the next activity we progress to.
+     * @return is the next activity the type of parallel activity.
+     */
     private boolean isParallelWaitActivity(Activity nextActivity)
     {
         return nextActivity.getActivityTypeId().intValue()==ParallelWaitActivity.PARALLEL_WAIT_ACTIVITY_TYPE;
