@@ -136,12 +136,19 @@ insert into lams_tool_content (tool_content_id,tool_id) values (21,4);
 --insert a testing grouping
 insert into lams_grouping values(99,99,1,1,10,0,2);
 insert into lams_grouping values(100,100,2,1,10,0,2);		
+INSERT INTO lams_grouping values(101, NULL, 3, NULL, NULL, 89, NULL);
 
 insert into lams_group values(87,99,1);
 insert into lams_group values(88,100,1);
+insert into lams_group values(89, 101, 1);
+insert into lams_group values(90, 101, 1);
 
 insert into lams_user_group values(1,87);
 insert into lams_user_group values(2,88);
+insert into lams_user_group values(2, 90);
+insert into lams_user_group values(3, 89);
+
+insert into lams_lesson values (1, 1, 1, '2005-02-23 17:37:25', 1, 3, NULL, NULL, 101);
 
 -- Populates the lams_learning_activity table with default activity templates that would be avaialbe to the
 -- author in the left panel and a default dummy learning_design defination 

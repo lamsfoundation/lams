@@ -9,6 +9,7 @@ package org.lamsfoundation.lams.tool;
 import java.util.Date;
 
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -25,9 +26,10 @@ public class NonGroupedToolSession extends ToolSession {
     public NonGroupedToolSession(ToolActivity toolActivity,
                                  Date createDateTime,
                                  int toolSessionStateId,
-                                 User user)
+                                 User user,
+                                 Lesson lesson)
     {
-        super(null,toolActivity,createDateTime,toolSessionStateId);
+        super(null,toolActivity,createDateTime,toolSessionStateId,lesson);
         super.setUniqueKey(UNIQUE_KEY_PREFIX
                            +toolActivity.getActivityId().toString()
                            +user.getUserId().toString());

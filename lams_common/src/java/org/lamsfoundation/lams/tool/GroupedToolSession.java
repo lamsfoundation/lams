@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
 
 
 /**
@@ -32,9 +33,10 @@ public class GroupedToolSession extends ToolSession {
     public GroupedToolSession(ToolActivity toolActivity,
                               Date createDateTime,
                               int toolSessionStateId,
-                              Group group)
+                              Group group,
+                              Lesson lesson)
     {
-        super(null,toolActivity,createDateTime,toolSessionStateId);
+        super(null,toolActivity,createDateTime,toolSessionStateId,lesson);
         super.setUniqueKey(UNIQUE_KEY_PREFIX
                            +toolActivity.getActivityId().toString()
                            +group.getGroupId().toString());

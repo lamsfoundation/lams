@@ -18,6 +18,9 @@ import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
 
 
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
@@ -46,7 +49,8 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
     protected IUserDAO userDao;
 	protected IActivityDAO activityDAO;
     protected IGroupDAO groupDao;
-	
+	protected ILessonDAO lessonDao;
+    
     //Test tool id - survey tool
     protected final Long TEST_TOOL_ID = new Long(6);
     protected Tool testTool;
@@ -56,11 +60,13 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
     protected Group testGroup;
     protected ToolActivity testNonGroupedActivity;
     protected ToolActivity testGroupedActivity;
+    protected Lesson testLesson;
     
     private final static Integer TEST_USER_ID = new Integer(1);
     private final static Long TEST_NON_GROUP_ACTIVITY_ID = new Long(20);
     private static final Long TEST_GROUPED_ACTIVITY_ID = new Long(19);
     private static final Long TEST_GROUP_ID = new Long(88);
+    private static final Long TEST_LESSON_ID = new Long(1);
     
     /*
      * @see AbstractLamsCommonTestCase#setUp()
@@ -76,11 +82,14 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
         
         userDao = (UserDAO) this.context.getBean("userDAO");
         groupDao = (GroupDAO)this.context.getBean("groupDAO");
+        lessonDao = (LessonDAO)this.context.getBean("lessonDAO");
+        
         //retrieve test domain data
         testUser = userDao.getUserById(TEST_USER_ID);
         testNonGroupedActivity = (ToolActivity)activityDAO.getActivityByActivityId(TEST_NON_GROUP_ACTIVITY_ID);
         testGroupedActivity = (ToolActivity)activityDAO.getActivityByActivityId(TEST_GROUPED_ACTIVITY_ID);
         testGroup = (Group)groupDao.getGroupById(TEST_GROUP_ID);
+        testLesson = lessonDao.getLesson(TEST_LESSON_ID);
     }
 
     /*
@@ -104,7 +113,8 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
      */
     protected String[] getContextConfigLocation()
     {
-        return new String[] { "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+        return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+                			  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
                 			  "/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
         					  "applicationContext.xml"};
     }
@@ -120,7 +130,8 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
         return new NonGroupedToolSession(testNonGroupedActivity,
                                          new Date(System.currentTimeMillis()),
                                          ToolSession.STARTED_STATE,
-                                         testUser);
+                                         testUser,
+                                         testLesson);
     }
     
     
@@ -129,7 +140,8 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
         return new GroupedToolSession(testGroupedActivity,
                                       new Date(System.currentTimeMillis()),
                                       ToolSession.STARTED_STATE,
-                                      testGroup);
+                                      testGroup,
+                                      testLesson);
     }
    
 }

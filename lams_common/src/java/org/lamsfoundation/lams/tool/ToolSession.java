@@ -48,11 +48,13 @@ public abstract class ToolSession implements Serializable {
     public ToolSession(Long toolSessionId, 
                        ToolActivity toolActivity, 
                        Date createDateTime, 
-                       int toolSessionStateId) {
+                       int toolSessionStateId,
+                       Lesson lesson) {
         this.toolSessionId = toolSessionId;
         this.toolActivity = toolActivity;
         this.createDateTime = createDateTime;
         this.toolSessionStateId = toolSessionStateId;
+        this.lesson = lesson;
     }
 
     /** default constructor */

@@ -85,6 +85,4 @@ public class TestToolSessionDAO extends ToolDataAccessTestCase
         toolSessionDao.saveToolSession(this.ngToolSession);
     }
 
-
-    
 }
