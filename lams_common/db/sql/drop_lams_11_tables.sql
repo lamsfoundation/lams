@@ -52,7 +52,7 @@ DROP TABLE lams_activity_learners;
 DROP TABLE lams_tool_content;
 DROP TABLE lams_user_group;
 DROP TABLE lams_user_tool_session;
-DROP TABLE lams_progress_current;
+DROP TABLE lams_progress_attempted;
 DROP TABLE lams_progress_completed;
 DROP TABLE lams_user_organisation_role;
 DROP TABLE lams_tool_session;

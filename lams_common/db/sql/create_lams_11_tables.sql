@@ -329,6 +329,7 @@ CREATE TABLE lams_learner_progress (
      , lesson_completed_flag TINYINT(1) NOT NULL DEFAULT 0
      , start_date_time DATETIME NOT NULL
      , finish_date_time DATETIME
+     , activity_id BIGINT(20) NOT NULL DEFAULT 0
      , PRIMARY KEY (learner_progress_id)
      , INDEX (user_id)
      , CONSTRAINT FK_lams_learner_progress_1 FOREIGN KEY (user_id)
@@ -336,6 +337,9 @@ CREATE TABLE lams_learner_progress (
      , INDEX (lesson_id)
      , CONSTRAINT FK_lams_learner_progress_2 FOREIGN KEY (lesson_id)
                   REFERENCES lams_lesson (lesson_id)
+     , INDEX (activity_id)
+     , CONSTRAINT FK_lams_learner_progress_3 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_tool_session (
@@ -379,7 +383,7 @@ CREATE TABLE lams_progress_completed (
                   REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams_progress_current (
+CREATE TABLE lams_progress_attempted (
        learner_progress_id BIGINT(20) NOT NULL
      , activity_id BIGINT(20) NOT NULL DEFAULT 0
      , PRIMARY KEY (learner_progress_id, activity_id)
