@@ -338,6 +338,16 @@ public class DummyLearnerService implements ILearnerService {
 		progress.setCurrentActivity(getActivity(1, progress));
 		
 		return progress;
-	}	
+	}
+
+
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#getActiveLessonsFor(org.lamsfoundation.lams.usermanagement.User)
+     */
+    public List getActiveLessonsFor(User learner)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }	
 	
 }

@@ -44,7 +44,7 @@ public class ProgressEngine
      * result in the completion of A. Therefore, <code>completedActivityList</code>
      * will hold B and C.
      */
-    private static List completedActivityList = new LinkedList();
+    private List completedActivityList = new LinkedList();
     /**
      * Method determines next step for a learner based on the activity
      * they have just completed.
@@ -111,8 +111,9 @@ public class ProgressEngine
                                                       Transition transition)
     {
         learnerProgress.setPreviousActivity(completedActivity);
-        learnerProgress.setCurrentCompletedActivitiesList(completedActivityList);
-        completedActivityList.clear();
+        
+        populateCurrentCompletedActivityList(learnerProgress);
+        
         learnerProgress.setCurrentActivity(transition.getToActivity());
                 
         //we set the next activity to be the first child activity if it
@@ -166,6 +167,7 @@ public class ProgressEngine
                 {
                     learnerProgress.setParallelWaiting(true);
                     learnerProgress.setNextActivity(null);
+                    populateCurrentCompletedActivityList(learnerProgress);
                 }
                 else
                 {
@@ -173,6 +175,7 @@ public class ProgressEngine
                     learnerProgress.setNextActivity(nextActivity);
                     learnerProgress.setProgressState(nextActivity,
                                                      LearnerProgress.ACTIVITY_ATTEMPTED);
+                    populateCurrentCompletedActivityList(learnerProgress);
                 }
             }
             //recurvisely call back to calculateProgress to calculate completed
@@ -187,6 +190,17 @@ public class ProgressEngine
         return learnerProgress;
     }
 
+    /**
+     * The helper method to setup the completed activity list since the last
+     * transition. 
+     * @param learnerProgress
+     */
+    private void populateCurrentCompletedActivityList(LearnerProgress learnerProgress)
+    {
+        learnerProgress.setCurrentCompletedActivitiesList(completedActivityList);
+        completedActivityList.clear();
+    }
+    
     /**
      * @param nextActivity
      * @return

@@ -41,7 +41,7 @@
 	</bean>
 	
 	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">
-		<property name="toolService"><ref bean="lamsToolService"/></property>
+		<!-- property name="lamsToolService"><ref bean="lamsToolService"/></property-->
 		<property name="baseURL"><value>http://localhost:8080/lams_learning/</value></property>
 	</bean>
 	

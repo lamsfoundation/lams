@@ -65,19 +65,19 @@ public class TestLearnerService extends AbstractLamsTestCase
     private User testUser;
     private Lesson testLesson;
     private static LearnerProgress testProgress;
-    private static final long TEST_NB_ACTIVITY_ID = 35;
-    private static final long TEST_RGRP_ACTIVITY_ID = 38;
-    private static final long TEST_CHAT_ACTIVITY_ID = 37;
-    private static final long TEST_QNA_ACTIVITY_ID = 39;
-    private static final long TEST_OPTIONS_ACTIVITY_ID = 26;
-    private static final long TEST_CNB_ACTIVITY_ID = 27;
-    private static final long TEST_PARALLEL_ACTIVITY_ID = 29;
-    private static final long TEST_CQNA_ACTIVITY_ID = 30;
+    private static final long TEST_NB_ACTIVITY_ID = 39;
+    private static final long TEST_RGRP_ACTIVITY_ID = 28;
+    private static final long TEST_CHAT_ACTIVITY_ID = 27;
+    private static final long TEST_QNA_ACTIVITY_ID = 29;
+    private static final long TEST_OPTIONS_ACTIVITY_ID = 30;
+    private static final long TEST_CNB_ACTIVITY_ID = 31;
+    private static final long TEST_PARALLEL_ACTIVITY_ID = 33;
+    private static final long TEST_CQNA_ACTIVITY_ID = 34;
     private static final long TEST_WAITING_ACTIVITY_ID = -1;
-    private static final long TEST_MB_ACTIVITY_ID = 31;
-    private static final long TEST_SEQUENCE_ACTIVITY_ID = 32;
-    private static final long TEST_SR_ACTIVITY_ID = 33;
-    private static final long TEST_SQNA_ACTIVITY_ID = 34;
+    private static final long TEST_MB_ACTIVITY_ID = 35;
+    private static final long TEST_SEQUENCE_ACTIVITY_ID = 36;
+    private static final long TEST_SR_ACTIVITY_ID = 37;
+    private static final long TEST_SQNA_ACTIVITY_ID = 38;
     private static final String HOST="http://localhost:8080/lams_learning/";
     private static final String LOAD_TOOL_URL="/LoadToolActivity.do";
     private static final String PARAM_ACTIVITY_ID="?activityId=";
@@ -115,12 +115,12 @@ public class TestLearnerService extends AbstractLamsTestCase
     }
     protected String[] getContextConfigLocation()
     {
-        return new String[] { "/WEB-INF/spring/learningApplicationContext.xml",
-  			  				  "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-  			  				  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",					  
+        return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+  			  				  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
                               "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
                               "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",          					  
-        					  "applicationContext.xml"};
+        					  "applicationContext.xml",
+    			  			  "/WEB-INF/spring/learningApplicationContext.xml"};
     }
     
     public void testJoinLesson() throws ProgressException,LamsToolServiceException
@@ -131,9 +131,9 @@ public class TestLearnerService extends AbstractLamsTestCase
         
         assertNotNull(testProgress);
         assertNotNull("verify next activity",testProgress.getNextActivity());
-        assertEquals("verify id of next activity-survey",36,testProgress.getNextActivity().getActivityId().longValue());
+        assertEquals("verify id of next activity-survey",26,testProgress.getNextActivity().getActivityId().longValue());
         assertNotNull("verify current activity",testProgress.getCurrentActivity());
-        assertEquals("verify id of current activity-survey",36,testProgress.getCurrentActivity().getActivityId().longValue());
+        assertEquals("verify id of current activity-survey",26,testProgress.getCurrentActivity().getActivityId().longValue());
         assertEquals("verify attempted activity",1,testProgress.getAttemptedActivities().size());
         assertEquals("verify completed activity",0,testProgress.getCompletedActivities().size());
         assertNotNull("verify correspondent tool session for next activity",
