@@ -1,3 +1,25 @@
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ************************************************************************
+ */
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
@@ -18,6 +40,11 @@ import org.lamsfoundation.lams.lesson.ActivityStrategy;
  */
 public abstract class Activity implements Serializable,Nullable {
 
+	/**
+	 * static final variables indicating the type of activities
+	 * available for a LearningDesign 
+	 * */
+	/******************************************************************/
 	public static final int TOOL_ACTIVITY_TYPE = 1;
 	public static final int RANDOM_GROUPING_ACTIVITY_TYPE = 2;
 	public static final int CHOSEN_GROUPING_ACTIVITY_TYPE = 3;
@@ -27,66 +54,84 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int PARALLEL_ACTIVITY_TYPE = 7;
 	public static final int OPTIONS_ACTIVITY_TYPE = 8;
 	public static final int SEQUENCE_ACTIVITY_TYPE = 9;
+	/******************************************************************/
+	
+	/** WDDX packet specific attribute created to identify the
+	 * type of object being passed.*/
 	public static final String OBJECT_TYPE ="Activity";
 
 	/** identifier field */
 	private Long activityId;
 
-	/** nullable persistent field */
+	/** FLASH generated value. Unique per LearningDesign.
+	 * Required by flash only.*/
 	private Integer activityUIID;
 
-	/** nullable persistent field */
+	/** Description of the activity*/
 	private String description;
 
-	/** nullable persistent field */
+	/** Title of the activity*/
 	private String title;
 	
-	/** nullable persistent field */
+	/** Help text for the activity*/
 	private String helpText;
 
-	/** nullable persistent field */
+	/** UI specific attribute indicating the
+	 * position of the activity*/
 	private Integer xcoord;
 
-	/** nullable persistent field */
+	/** UI specific attribute indicating the
+	 * position of the activity*/
 	private Integer ycoord;
 
-	/** nullable persistent field */
+	/** Indicates the order in which the activities
+	 * appear inside complex activities. Starts from 
+	 * 0, 1 and so on.*/
 	private Integer orderId;
 
-	/** persistent field */
+	/** Indicates whether the content of this activity 
+	 * would be defined later in the monitoring enviornment or not.*/
 	private Boolean defineLater;
 	
-	/** persistent field */
+	/** Indicates whether this activity is available offline*/
 	private Boolean runOffline;
 
-	/** persistent field */
+	/** Date this activity was created */
 	private Date createDateTime;
 
-	/** nullable persistent field */
+	/** Offline Instruction for this activity*/
 	private String offlineInstructions;
 
-	/** nullable persistent field */
+	/** The image that represents the icon of this 
+	 * activity in the UI*/
 	private String libraryActivityUiImage;
 
-	/** persistent field */
+	/** The LearningLibrary of which this activity is a part*/
 	private LearningLibrary learningLibrary;
 
-	/** persistent field */
+	/** The activity that acts as a container/parent for
+	 * this activity. Normally would be one of the 
+	 * complex activities which have child activities 
+	 * defined inside them. */
 	private Activity parentActivity;
 	
-	/** persistent field */
+	/** Single Library can have one or more activities
+	 * defined inside it. This field indicates which
+	 * activity is this.*/
 	private Activity libraryActivity;
 
-	/** persistent field */
+	/** The LearningDesign to which this activity belongs*/
 	private LearningDesign learningDesign;
 
-	/** persistent field */
+	/** The Grouping that applies to this activity*/
 	private Grouping grouping;
 	
-	/** nullable persistent field */
+	/** The grouping_ui_id of the Grouping that
+	 * applies that to this activity
+	 * */
 	private Integer groupingUIID;
 
-	/** persistent field */
+	/** The type of activity */
 	private Integer activityTypeId;
 
 	/** persistent field */
@@ -95,7 +140,7 @@ public abstract class Activity implements Serializable,Nullable {
 	/** persistent field */
 	private Transition transitionFrom;
 	
-	/** persistent field */
+	/** the activity_ui_id of the parent activity */
 	private Integer parentUIID;
 		
 	protected ActivityStrategy activityStrategy;
@@ -382,8 +427,16 @@ public abstract class Activity implements Serializable,Nullable {
 	public void setLibraryActivityUiImage(String libraryActivityUiImage) {
 		this.libraryActivityUiImage = libraryActivityUiImage;
 	}	
+	
 	/**
-	 * Returns the Transition FROM this activity
+	 * This function returns the Transition that 
+	 * STARTS FROM THIS ACTIVITY. In simpler words the
+	 * next activity in the transition.
+	 * 
+	 * For example, if we have a transition as  following
+	 * A --> B --> C. For activity B this function would
+	 * return C. That is the Transition FROM activity B.
+	 * 
 	 * @return Returns the transitionFrom.
 	 */
 	public Transition getTransitionFrom() {
@@ -396,7 +449,15 @@ public abstract class Activity implements Serializable,Nullable {
 		this.transitionFrom = transitionFrom;
 	}
 	/**
-	 * Returns the Transition TO this Activity
+	 * This function returns the Transition that 
+	 * POINTS TO THIS ACTIVITY and NOT the transition 
+	 * that this activity points to.
+	 * 
+	 * For example, if we have a transition as  following
+	 * A --> B --> C. For activity B this function would
+	 * return A. That is the Transition that points TO 
+	 * activity B.
+	 * 
 	 * @return Returns the transitionTo.
 	 */
 	public Transition getTransitionTo() {
