@@ -184,7 +184,11 @@ public class LearnerService implements ILearnerService
     {
         LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
 
-        return progressEngine.calculateProgress(learner, lesson, completedActivity,learnerProgress);
+        learnerProgress = progressEngine.calculateProgress(learner, lesson, completedActivity,learnerProgress);
+        
+        learnerProgressDAO.updateLearnerProgress(learnerProgress);
+        
+        return learnerProgress;
     }
     
 
