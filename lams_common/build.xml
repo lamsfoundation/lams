@@ -33,7 +33,11 @@ Ant build file.
 		<echo message=""/>
 		<echo message="Among the available targets are:"/>
 		<echo message=""/>
-		<echo message="middlegen-learningdesign    --> Run middlegen for learningdesign tables"/>
+		<echo message="deploy-lams  --> Deploy lams project"/>
+		<echo message="lams-jar  --> Make jar archive for deployment"/>
+		<echo message="lams-war  --> Make war archive for deployment"/>
+		<echo message="copyfiles --> Copy the third party jar files and cofiguration files for deployment"/>
+		<echo message="middlegen-learningdesign --> Run middlegen for learningdesign tables"/>
 		<echo message="hbm2java-learningdesign  --> Run hbm2java for learningdesign mapping files"/>
 		<echo message=""/>
 	</target>
@@ -159,7 +163,7 @@ Ant build file.
 	</target>
 
 	<target name="compile" depends="clean" description="compile java sources">
-		<javac srcdir="${src.java}" compiler="javac1.5"
+		<javac srcdir="${src.java}" compiler="modern"
 	         	 	destdir="${build.classes}" deprecation="on" debug="on">
 			<classpath>
 				<path refid="project.classpath"/>
@@ -168,7 +172,7 @@ Ant build file.
 	</target>
 
 	<!-- ================================================================ -->
-	<!-- making packages for deployment					    	          -->
+	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
 	<target name="lams-jar" depends="compile" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
@@ -181,7 +185,7 @@ Ant build file.
 	</target>
 
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
-	<!-- Creates the war archive                          -->
+	<!-- Make the war archive  for deployment             -->
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<target name="lams-war" depends="lams-jar" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
@@ -205,7 +209,7 @@ Ant build file.
 	</target>
 
 	<!-- =================================================================== -->
-	<!-- copy jar files and cofiguration files                               -->
+	<!-- Copy the third party jar files and cofiguration files for deployment-->
 	<!-- =================================================================== -->
 	<target name="copyfiles" description="copy lib and config files">
 		<copy overwrite="yes" todir="${jboss.home}/server/default/lib/">
@@ -259,7 +263,7 @@ Ant build file.
 	</target>
 
 	<!-- =================================================================== -->
-	<!-- deploy the project                                                  -->
+	<!-- Deploy the project                                                  -->
 	<!-- =================================================================== -->
 	<target name="deploy-lams" depends="lams-jar,lams-war,copyfiles">
 		<delete quiet="true">
