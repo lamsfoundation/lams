@@ -33,12 +33,12 @@ Ant build file.
 		<echo message=""/>
 		<echo message="Among the available targets are:"/>
 		<echo message=""/>
-		<echo message="deploy-lams  --> Deploy lams project"/>
+		<echo message="deploy-lams-windows  --> Deploy lams project on windows"/>
 		<echo message="rebuild-db   --> Clean and rebuild the database"/>
 		<echo message="insert-test-data --> Insert test data to database"/>
 		<echo message="lams-jar  --> Make jar archive for deployment"/>
 		<echo message="lams-war  --> Make war archive for deployment"/>
-		<echo message="copyfiles --> Copy the third party jar files and cofiguration files for deployment"/>
+		<echo message="copyfiles-windows --> Copy the third party jar files and cofiguration files for deployment on windows"/>
 		<echo message="middlegen-learningdesign --> Run middlegen for learningdesign tables"/>
 		<echo message="hbm2java-learningdesign  --> Run hbm2java for learningdesign mapping files"/>
 		<echo message=""/>
@@ -148,6 +148,13 @@ Ant build file.
 	<!-- ================================================================ -->
 	<!-- Preparations									                  -->
 	<!-- ================================================================ -->
+	<target name="makeconfdir-windows">
+		<delete quiet="true">
+			<fileset dir="${lamsconf.windows}"/>
+		</delete>
+		<mkdir dir="${lamsconf.windows}"/>
+	</target>
+	
 	<target name="preparedirs">
 		<mkdir dir="${build}"/>
 		<mkdir dir="${build.classes}"/>
@@ -211,11 +218,11 @@ Ant build file.
 		</war>
 	</target>
 
-	<!-- =================================================================== -->
-	<!-- Copy the third party jar files and cofiguration files for deployment-->
-	<!-- =================================================================== -->
-	<target name="copyfiles" description="copy lib and config files">
-		<copy overwrite="yes" todir="${jboss.home}/server/default/lib/">
+	<!-- ============================================================================== -->
+	<!-- Copy the third party jar files and cofiguration files for deployment on windows-->
+	<!-- ============================================================================== -->
+	<target name="copyfiles-windows" depends="makeconfdir-windows" description="copy lib and config files">
+		<copy overwrite="yes" todir="${jboss.home.windows}/server/default/lib/">
 			<fileset dir="${lib}/cglib/">
 				<include name="*.jar"/>
 			</fileset>
@@ -253,30 +260,40 @@ Ant build file.
 				<include name="*.jar"/>
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${jboss.home}/server/default/conf/">
-			<fileset dir="${conf.jboss}/">
+		<copy overwrite="yes" todir="${jboss.home.windows}/server/default/conf/">
+			<fileset dir="${conf.jboss.windows}/">
 				<include name="login-config.xml"/>
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${jboss.deploy}">
-			<fileset dir="${conf.jboss}/service">
+		<copy overwrite="yes" todir="${lamsconf.windows}">
+			<fileset dir="${conf.auth.windows}/">
+				<include name="*.xml"/>
+				<include name="*.dtd"/>
+			</fileset>
+			<fileset dir="${conf.lams.windows}/">
+				<include name="*.xml"/>
+				<include name="*.dtd"/>
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${jboss.deploy.windows}">
+			<fileset dir="${conf.jboss.windows}/service">
 				<include name="mysql*.xml"/>
 			</fileset>
 		</copy>
 	</target>
 
 	<!-- =================================================================== -->
-	<!-- Deploy the project                                                  -->
+	<!-- Deploy the project on windows                                       -->
 	<!-- =================================================================== -->
-	<target name="deploy-lams" depends="lams-jar,lams-war,copyfiles">
+	<target name="deploy-lams-windows" depends="lams-jar,lams-war,copyfiles-windows">
 		<delete quiet="true">
-			<fileset dir="${jboss.deploy}/tmp"/>
-			<fileset dir="${jboss.deploy}/work"/>
+			<fileset dir="${jboss.deploy.windows}/tmp"/>
+			<fileset dir="${jboss.deploy.windows}/work"/>
 		</delete>
 		<copy file="${build.lib}/${product}.jar"
-				todir="${jboss.deploy}"/>
+				todir="${jboss.deploy.windows}"/>
 		<copy file="${build.lib}/${product}.war"
-				todir="${jboss.deploy}"/>
+				todir="${jboss.deploy.windows}"/>
 	</target>
 
 	<!-- =================================================================== -->

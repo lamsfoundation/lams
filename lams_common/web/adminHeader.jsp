@@ -13,9 +13,11 @@
 		</td>
 	</tr>
 	<tr bgcolor="#1C8AC6"> 
+		<!--
 		<td height="8">
 		</td>
-		<td height="8" align="right" >
+		-->
+		<td colspan="2" height="8" align="right" >
 			<img height=8 width=8 src="images/spacer.gif">
 		</td>
 	</tr>

@@ -18,14 +18,26 @@
 	<property name="src"                       value="${basedir}/src"/>
 	<property name="src.java"                  value="${basedir}/src/java"/>
 	<property name="conf"                      value="${basedir}/conf"/>
-	<property name="conf.jboss"                value="${conf}/jboss"/>
+	<property name="conf.windows"              value="${conf}/windows"/>
+	<property name="conf.jboss.windows"        value="${conf.windows}/jboss"/>
+	<property name="conf.auth.windows"         value="${conf.windows}/authentication"/>
+	<property name="conf.lams.windows"         value="${conf.windows}/lams"/>
+	<property name="conf.unix"              value="${conf}/unix"/>
+	<property name="conf.jboss.unix"        value="${conf.unix}/jboss"/>
+	<property name="conf.auth.unix"         value="${conf.unix}/authentication"/>
+	<property name="conf.lams.unix"         value="${conf.unix}/lams"/>
 	<property name="hbm"                       value="${conf}/hibernate/mappings"/>
+	
+	<property name="lamsconf.windows"          value="C:/lamsconf"/>
+	<property name="lamsconf.unix"             value="/usr/local/lamsconf"/>
 	
 	<property name="web"                           value="${basedir}/web"/>
 	<property name="webinf"                        value="${web}/WEB-INF"/>
 	
-	<property name="jboss.home"                    value="D:/jboss-3.2.6"/>
-	<property name="jboss.deploy"                    value="${jboss.home}/server/default/deploy"/>
+	<property name="jboss.home.windows"                    value="D:/jboss-3.2.6"/>
+	<property name="jboss.deploy.windows"                    value="${jboss.home.windows}/server/default/deploy"/>
+	<property name="jboss.home.unix"                    value="D:/jboss-3.2.6"/>
+	<property name="jboss.deploy.unix"                    value="${jboss.home.unix}/server/default/deploy"/>
 
 	<property name="build"                         value="${basedir}/build"/>
 	<property name="build.classes"                 value="${build}/classes"/>
