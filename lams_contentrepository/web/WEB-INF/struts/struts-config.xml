@@ -74,6 +74,7 @@
          input="/nodeSelection.jsp"
          parameter="method">
 	     <forward name="nodelist" path="/nodeSelection.jsp" />
+	     <forward name="packagelist" path="/packageList.jsp" />
 	     <forward name="error" path="/error.jsp" />
       </action>
       <action

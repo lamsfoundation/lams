@@ -5,6 +5,7 @@
 <%@ page import="com.lamsinternational.lams.contentrepository.IVersionDetail"%>
 <%@ page import="com.lamsinternational.lams.contentrepository.IVersionedNode"%>
 <%@ page import="com.lamsinternational.lams.contentrepository.PropertyName"%>
+<%@ page import="com.lamsinternational.lams.contentrepository.NodeType"%>
 
 <%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
@@ -58,6 +59,7 @@
 					Set versionDetails = (Set) iter.next();
 					Long uuid = node.getUUID();
 					String nodeType = node.getNodeType();
+					String getButtonText = ( node.isNodeType(NodeType.FILENODE) ? "View File" : "View Package");
 			%>
 				<TR><TD colspan="6"><STRONG><%=nodeType%> Node <%=uuid.toString()%>:</STRONG>
 				<input name="getNode" onClick="parent.location='download?uuid=<%=uuid.toString()%>'" type="button" size="50" value="Get Latest Version"/>
@@ -68,7 +70,6 @@
 					<TD>Version</TD>
 					<TD>Created Date Time</TD>
 					<TD>Version Description</TD>
-					<TD>File Name
 					<TD>&nbsp;</TD>
 					<TD>&nbsp;</TD>
 				</TR>
@@ -76,16 +77,20 @@
 					Iterator setIter = versionDetails.iterator();
 					while ( setIter.hasNext() ) {
 						IVersionDetail detail = (IVersionDetail) setIter.next();
-						IValue filenameProperty = node.getProperty(PropertyName.FILENAME);
-						String filename = filenameProperty != null ? filenameProperty.getString() : "";
 			%>
 						<TR>
 							<TD><%=detail.getVersionId()%></TD>
 							<TD><%=detail.getCreatedDateTime()%></TD>
 							<TD><%=detail.getDescription()%></TD>
-							<TD><%=filename%></TD>
 							<TD><input name="getNode" onClick="parent.location='download?uuid=<%=uuid.toString()%>&version=<%=detail.getVersionId()%>'" type="button" size="50" value="Get File"/></TD>
 							<TD><input name="deleteVersion" onClick="setActionSubmit('deleteNode', '<%=uuid.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Delete Version"/>
+			<%
+						if ( node.isNodeType(NodeType.PACKAGENODE) ) {
+			%>				
+							<TD><input name="viewPackage" onClick="setActionSubmit('viewPackage', '<%=uuid.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="View Files In Package"/>
+			<%
+						}
+			%>				
 						</TR>
 			<%
 					} // end version details iterator
