@@ -83,7 +83,7 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
               activities);
     }
     /**
-     * Makes a copy of the ToolActivity for authoring, preview and monitoring enviornment 
+     * Makes a copy of the ParallelActivity for authoring, preview and monitoring enviornment 
      * 
      * @param originalActivity The activity that needs to be deep-copied
      * @return ParallelActivity Returns a deep-copy of the originalActivity

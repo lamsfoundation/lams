@@ -86,7 +86,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     }
     
     /**
-     * Makes a copy of the ToolActivity for authoring, preview and monitoring enviornment
+     * Makes a copy of the SequenceActivity for authoring, preview and monitoring enviornment
      * 
      * @param originalActivity The activity that needs to be deep-copied
      * @return SequenceActivity Returns a deep-copy of the originalActivity

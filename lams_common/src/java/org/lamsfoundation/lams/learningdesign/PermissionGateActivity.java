@@ -86,26 +86,28 @@ public class PermissionGateActivity extends GateActivity implements Serializable
 				transitionFrom,
                 gateActivityLevelId);
     }
+    /**
+     * Makes a copy of the PermissionGateActivity for authoring, preview and monitoring enviornment 
+     * 
+     * @param originalActivity The activity that needs to be deep-copied
+     * @return PermissionGateActivity Returns a deep-copy of the originalActivity
+     */
     public static PermissionGateActivity createCopy(PermissionGateActivity originalActivity){
     	PermissionGateActivity newPermissionGateActivity = new PermissionGateActivity();
     	
     	newPermissionGateActivity.setActivityUIID(originalActivity.getActivityUIID());
     	newPermissionGateActivity.setDescription(originalActivity.getDescription());
     	newPermissionGateActivity.setTitle(originalActivity.getTitle());
+    	newPermissionGateActivity.setHelpText(originalActivity.getHelpText());
     	newPermissionGateActivity.setXcoord(originalActivity.getXcoord());
     	newPermissionGateActivity.setYcoord(originalActivity.getYcoord());
+    	newPermissionGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newPermissionGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());    	
     	newPermissionGateActivity.setDefineLater(originalActivity.getDefineLater());
     	newPermissionGateActivity.setCreateDateTime(new Date());
     	newPermissionGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newPermissionGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());
-    	newPermissionGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
-    	
-    	/**
-    	 * TODO calculate how these two values would be set for COPY 
-    	 * */
-    	//newPermissionGateActivity.setTransitionTo();
-    	//newPermissionGateActivity.setTransitionFrom();
-    	
+    	newPermissionGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
+    	newPermissionGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
     	return newPermissionGateActivity;
     	
     }
