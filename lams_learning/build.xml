@@ -14,6 +14,7 @@
 			<include name="**/*.jar" />
 			<exclude name="**/gnujaxp.jar" />
 		</fileset>
+		<pathelement location="../lams_common/build/classes" />
 	</path>
 
 	<path id="project.classpath">
@@ -162,8 +163,10 @@
 			force="${xdoclet.force}">
 
 			<fileset dir="${src.dir.java}">
-				<!-- include name="**/*Action.java" />
-				<include name="**/*Form.java" /-->
+				<include name="**/web/action/*.java" />
+				<include name="**/web/form/*.java" />
+			</fileset>
+			<fileset dir="${src.dir.test}">
 				<include name="**/web/action/*.java" />
 				<include name="**/web/form/*.java" />
 			</fileset>
@@ -176,6 +179,7 @@
 				mergedir="${conf.xdoclet.dir}" version="1.2" />
 		</webdoclet>
 	</target>
+
 
 	<!-- =================================================================== -->
 	<!-- Run JUnit Tests                                                     -->
