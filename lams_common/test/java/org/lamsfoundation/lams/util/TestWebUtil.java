@@ -112,5 +112,8 @@ public class TestWebUtil extends MockStrutsTestCase
         
         name = WebUtil.getStrutsForwardNameFromPath("/requestDisplay.do");
         assertEquals("requestDisplay",name);
+        
+        name = WebUtil.getStrutsForwardNameFromPath("/TestDispaly.do?url=11&id=2");
+        assertEquals("testDispaly",name);
     }
 }
