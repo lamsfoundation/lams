@@ -11,7 +11,7 @@
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
-	<bean id="learnerService" class="org.lamsfoundation.lams.learning.service.TestLearnerService" singleton="false">
+	<bean id="learnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 	</bean>
 
