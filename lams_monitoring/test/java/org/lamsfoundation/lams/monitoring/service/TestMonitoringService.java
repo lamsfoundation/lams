@@ -115,13 +115,26 @@ public class TestMonitoringService extends AbstractLamsTestCase
         assertEquals("verify the organization",TEST_ORGANIZATION_ID,createdLesson.getOrganisation().getOrganisationId());
         assertEquals("verify the lesson state",Lesson.CREATED,createdLesson.getLessonStateId());
         
+        assertEquals("verify number of the learners",1,createdLesson.getAllLearners().size());
         assertEquals("verify the lesson class",Grouping.CLASS_GROUPING_TYPE,createdLesson.getLessonClass().getGroupingTypeId());
         assertEquals("verify the staff group",staffs.size(),createdLesson.getLessonClass().getStaffGroup().getUsers().size());
         assertEquals("verify the learner group",1,createdLesson.getLessonClass().getGroups().size());
+        
+        //createdLesson.getLessonClass().getGroups().clear();
+        //lessonDao.deleteLesson(createdLesson);
     }
 
     public void testStartlesson()
     {
+        monitoringService.startlesson(TEST_LESSON_ID.longValue());
+        assertTrue(true);
+        
+        Lesson startedLesson = lessonDao.getLesson(TEST_LESSON_ID);
+        
+        assertNotNull(startedLesson);
+        assertEquals("verify the lesson status",Lesson.STARTED_STATE,startedLesson.getLessonStateId());
+        
+        
     }
 
     public void testForceCompleteLessonByUser()

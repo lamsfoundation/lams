@@ -23,6 +23,7 @@
 	>
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>	
+		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 		<property name="authoringService"><ref bean="authoringService"/></property>			
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>			
 	</bean>	
@@ -33,6 +34,7 @@
 		<property name="transactionAttributes">
 			<props>
 				<prop key="createLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="startLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
 			</props>
 		</property>
 	</bean>    

@@ -9,6 +9,7 @@
 
 package org.lamsfoundation.lams.monitoring.service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -17,21 +18,23 @@ import java.util.Set;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
 
 /**
  * <p>This is the major service facade for all monitoring functionalities. It is 
@@ -43,17 +46,21 @@ import org.springframework.context.ApplicationContextAware;
  * 
  * @author Jacky Fang 2/02/2005
  */
-public class MonitoringService implements IMonitoringService,ApplicationContextAware
+public class MonitoringService implements
+                              IMonitoringService,
+                              ApplicationContextAware
 {
+
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
     private ILessonDAO lessonDAO;
     private ILessonClassDAO lessonClassDAO;
+    private IToolSessionDAO toolSessionDAO;
     private IAuthoringService authoringService;
     private ApplicationContext context;
     private ToolContentIDGenerator contentIDGenerator;
-    
+
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
@@ -64,6 +71,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         this.authoringService = authoringService;
     }
+
     /**
      * @param lessonClassDAO The lessonClassDAO to set.
      */
@@ -71,6 +79,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         this.lessonClassDAO = lessonClassDAO;
     }
+
     /**
      * @param lessonDAO The lessonDAO to set.
      */
@@ -78,14 +87,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         this.lessonDAO = lessonDAO;
     }
+
     /**
      * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
      */
     public void setApplicationContext(ApplicationContext context) throws BeansException
     {
-        this.context=context;
+        this.context = context;
     }
-    
+
     /**
      * @param contentIDGenerator The contentIDGenerator to set.
      */
@@ -93,7 +103,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         this.contentIDGenerator = contentIDGenerator;
     }
-    
+
+    /**
+     * @param toolSessionDAO The toolSessionDAO to set.
+     */
+    public void setToolSessionDAO(IToolSessionDAO toolSessionDAO)
+    {
+        this.toolSessionDAO = toolSessionDAO;
+    }
+
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
@@ -108,36 +126,59 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLesson(long, org.lamsfoundation.lams.usermanagement.User, java.util.List, java.util.List)
      */
-    public void createLesson(long learningDesignId, 
-                             User user, 
+    public void createLesson(long learningDesignId,
+                             User user,
                              Organisation organisation,
-                             List organizationUsers, 
+                             List organizationUsers,
                              List staffs)
     {
-        
+        LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
         //copy the current learning design
-        LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(new Long(learningDesignId));
-        
+        LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign);
+
         //copy the tool content
-        for(Iterator i = copiedLearningDesign.getActivities().iterator();i.hasNext();)
+        for (Iterator i = copiedLearningDesign.getActivities().iterator(); i.hasNext();)
         {
-            Activity currentActivity = (Activity)i.next();
-            if(currentActivity.getActivityTypeId().intValue()==Activity.TOOL_ACTIVITY_TYPE)
-                copyToolContent((ToolActivity)currentActivity);
+            Activity currentActivity = (Activity) i.next();
+            if (currentActivity.isToolActivity())
+            {
+                Long newContentId = copyToolContent((ToolActivity) currentActivity);
+                ((ToolActivity) currentActivity).setToolContentId(newContentId);
+            }
         }
-        
-        createNewLesson(user, organisation, organizationUsers, staffs, copiedLearningDesign);
+        authoringService.updateLearningDesign(copiedLearningDesign);
+        //create the new lesson
+        createNewLesson(user,
+                        organisation,
+                        organizationUsers,
+                        staffs,
+                        copiedLearningDesign);
 
     }
-
 
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startlesson(long)
      */
     public void startlesson(long lessonId)
     {
-        // TODO Auto-generated method stub
-        
+        //we get the lesson just created
+        Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+        //initialize tool sessions if necessary
+        for (Iterator i = requestedLesson.getLearningDesign()
+                                         .getActivities()
+                                         .iterator(); i.hasNext();)
+        {
+            Activity activity = (Activity) i.next();
+            if (shouldInitToolSessionFor(activity)&&this.isSurvey((ToolActivity)activity))
+            {
+                initToolSessionFor((ToolActivity) activity,
+                                   requestedLesson.getAllLearners());
+            }
+        }
+        //update lesson status
+        requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+
+        lessonDAO.updateLesson(requestedLesson);
     }
 
     /**
@@ -146,10 +187,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public void forceCompleteLessonByUser(long learnerProgressId)
     {
         // TODO Auto-generated method stub
-        
+
     }
-    
-    
+
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------
@@ -163,24 +203,34 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @param copiedLearningDesign the new run-time learning design copy 
      * 							   for this lesson.
      */
-    private void createNewLesson(User user, Organisation organisation, List organizationUsers, List staffs, LearningDesign copiedLearningDesign)
+    private void createNewLesson(User user,
+                                 Organisation organisation,
+                                 List organizationUsers,
+                                 List staffs,
+                                 LearningDesign copiedLearningDesign)
     {
         //create a new lesson object
         LessonClass newLessonClass = createNewLessonClass(copiedLearningDesign);
         lessonClassDAO.saveLessonClass(newLessonClass);
-        
+
         //setup staff group
-        newLessonClass.setStaffGroup(Group.createStaffGroup(newLessonClass,new HashSet(staffs)));
+        newLessonClass.setStaffGroup(Group.createStaffGroup(newLessonClass,
+                                                            new HashSet(staffs)));
         //setup learner group
-        newLessonClass.getGroups().add(Group.createLearnerGroup(newLessonClass,new HashSet(organizationUsers)));
+        newLessonClass.getGroups()
+                      .add(Group.createLearnerGroup(newLessonClass,
+                                                    new HashSet(organizationUsers)));
         lessonClassDAO.updateLessonClass(newLessonClass);
-        
+
         //create new Lesson object
-        Lesson newLesson = Lesson.createNewLesson(user, organisation, copiedLearningDesign, newLessonClass);
+        Lesson newLesson = Lesson.createNewLesson(user,
+                                                  organisation,
+                                                  copiedLearningDesign,
+                                                  newLessonClass);
         newLessonClass.setLesson(newLesson);
         lessonDAO.saveLesson(newLesson);
     }
-    
+
     /**
      * Setup the empty lesson class according to the run-time learning design
      * copy.
@@ -192,10 +242,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         //make a copy of lazily initialized activities
         Set activities = new HashSet(copiedLearningDesign.getActivities());
         LessonClass newLessonClass = new LessonClass(null, //grouping id
-                                                     Grouping.CLASS_GROUPING_TYPE,
                                                      new HashSet(),//groups
-                                                     activities,
-                                                     null, //staff group 
+                                                     activities, null, //staff group 
                                                      null);//lesson
         return newLessonClass;
     }
@@ -205,17 +253,19 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * 
      * @param toolActivity the tool activity defined in the design.
      */
-    private void copyToolContent(ToolActivity toolActivity)
+    private Long copyToolContent(ToolActivity toolActivity)
     {
-        //This is just for testing purpose because only service is available
-        //at the moment. TODO we need to remove this once all done.
-        if(shouldCopy(toolActivity))
+        Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
+        //This is just for testing purpose because surveyService is the only 
+        //service is available at the moment. 
+        //TODO we need to remove this once all done.
+        if (isSurvey(toolActivity))
         {
-            ToolContentManager contentManager = (ToolContentManager)findToolService(toolActivity);
+            ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
             contentManager.copyToolContent(toolActivity.getToolContentId(),
-                                           contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool()));
-
+                                           newToolcontentID);
         }
+        return newToolcontentID;
     }
 
     /**
@@ -229,16 +279,59 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         return context.getBean(toolActivity.getTool().getServiceName());
     }
-    
+
     /**
      * This is more for testing purpose. 
      * @param toolActivity the tool activity defined in the design.
      * @return
      */
-    private boolean shouldCopy(ToolActivity toolActivity)
+    private boolean isSurvey(ToolActivity toolActivity)
     {
         return toolActivity.getTool().getServiceName().equals("surveyService");
     }
 
+    /**
+     * @param activity
+     */
+    private void initToolSessionFor(ToolActivity activity, Set learners)
+    {
+        activity.setToolSessions(new HashSet());
+        for (Iterator i = learners.iterator(); i.hasNext();)
+        {
+            User learner = (User) i.next();
+            ToolSession toolSession = new NonGroupedToolSession(activity,
+                                                                new Date(System.currentTimeMillis()),
+                                                                ToolSession.STARTED_STATE,
+                                                                learner);
+            toolSessionDAO.saveToolSession(toolSession);
+            //ask tool to create their own tool sessions using the given id.
+            notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
+            //update the hibernate persistent object
+            activity.getToolSessions().add(toolSession);
+        }
+    }
+
+    /**
+     * @param toolSessionId
+     */
+    private void notifyToolsToCreateSession(Long toolSessionId,
+                                            ToolActivity activity)
+    {
+        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity);
+        //TODO this is for testing purpose as survey is the only tool available
+        //so far.
+        sessionManager.createToolSession(toolSessionId,
+                                         activity.getToolContentId());
+    }
+
+    /**
+     * @param activity
+     * @return
+     */
+    private boolean shouldInitToolSessionFor(Activity activity)
+    {
+        return activity.isToolActivity()
+                && !((ToolActivity) activity).getTool().getSupportsGrouping();
+    }
 
 }

@@ -37,15 +37,15 @@ public class MockAuthoringService implements IAuthoringService
      */
     public LearningDesign getLearningDesign(Long arg0)
     {
-        return null;
+        return learningDesignDAO.getLearningDesignById(arg0);
     }
 
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(java.lang.Long)
      */
-    public LearningDesign copyLearningDesign(Long learningDesignId)
+    public LearningDesign copyLearningDesign(LearningDesign learningDesign)
     {
-        return learningDesignDAO.getLearningDesignById(new Long(1));
+        return learningDesign;
     }
 
     /**
@@ -67,10 +67,9 @@ public class MockAuthoringService implements IAuthoringService
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#updateLearningDesign(java.lang.Long)
      */
-    public void updateLearningDesign(Long arg0)
+    public void updateLearningDesign(LearningDesign learningDesign)
     {
-        // TODO Auto-generated method stub
-
+        learningDesignDAO.update(learningDesign);
     }
 
     /**
