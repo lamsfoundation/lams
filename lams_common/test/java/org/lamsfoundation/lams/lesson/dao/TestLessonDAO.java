@@ -23,7 +23,7 @@ import junit.framework.TestCase;
  */
 public class TestLessonDAO extends LessonDataAccessTestCase
 {
-    
+    private static final Long TEST_EXT_LESSON_ID = new Long(1);
     /**
      * @param name
      */
@@ -58,6 +58,13 @@ public class TestLessonDAO extends LessonDataAccessTestCase
         
     }
 
+    public void testGetExistingLesson()
+    {
+        Lesson existingLesson = this.lessonDao.getLesson(TEST_EXT_LESSON_ID);
+        
+        assertNotNull(existingLesson);
+    }
+    
     public void testGetActiveLessonsForLearner()
     {
         List lessons = this.lessonDao.getActiveLessonsForLearner(this.testUser);
