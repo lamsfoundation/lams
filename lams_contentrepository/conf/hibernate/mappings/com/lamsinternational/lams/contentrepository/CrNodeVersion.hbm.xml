@@ -88,7 +88,7 @@
         <column name="node_id" />
     </many-to-one>
 
-    <!-- bi-directional many-to-one association to CrNodeVersion -->
+    <!-- bi-directional many-to-one association to CrNodeVersion - which is my parent node? -->
     <many-to-one
         name="parentNodeVersion"
         class="com.lamsinternational.lams.contentrepository.CrNodeVersion"
@@ -102,7 +102,33 @@
         </meta>
         <column name="parent_nv_id" />
     </many-to-one>
-    <!-- bi-directional one-to-many association to CrNodeVersionProperty -->
+    <!-- bi-directional one-to-many association to CrNodeVersion - what are my child nodes? -->
+    <set
+        name="childNodeVersions"
+        lazy="false"
+        inverse="true"
+		cascade="all-delete-orphan"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="false"
+            cascade="all-delete-orphan"
+
+           @hibernate.collection-key
+            column="parent_nv_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.contentrepository.CrNodeVersion"
+        </meta>
+        <key>
+            <column name="parent_nv_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.contentrepository.CrNodeVersion"
+        />
+    </set>
+     <!-- bi-directional one-to-many association to CrNodeVersionProperty -->
     <set
         name="crNodeVersionProperties"
         lazy="false"
