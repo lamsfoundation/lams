@@ -164,12 +164,17 @@ public class ProgressEngine
                                                    LearnerProgress learnerProgress) throws ProgressException
     {
         Activity parent = completedActivity.getParentActivity();
+        
         if (parent != null)
         {
+            if(!(parent instanceof ComplexActivity))
+                throw new ProgressException("Parent activity is always expected" +
+                		" to the complex activity. But activity type"+
+                		parent.getActivityTypeId()+" has been found");
             //move to next activity within parent if not all children are completed.
-            if (!parent.areChildrenCompleted(learnerProgress))
+            if (!((ComplexActivity)parent).areChildrenCompleted(learnerProgress))
             {
-                Activity nextActivity = parent.getNextActivityByParent(completedActivity);
+                Activity nextActivity = ((ComplexActivity)parent).getNextActivityByParent(completedActivity);
                 
                 
                 if (!isNextActivityValid(nextActivity))

@@ -18,7 +18,7 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.lesson;
+package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  * @author Jacky Fang 2005-2-23
  * 
  */
-public abstract class ActivityStrategy implements Serializable
+public abstract class ComplextActivityStrategy implements Serializable
 {
     /**
      * <p>Check up all children completion status for a complex activity. </p>

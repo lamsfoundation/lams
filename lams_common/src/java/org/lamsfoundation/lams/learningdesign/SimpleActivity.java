@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.learningdesign;
 import java.io.Serializable;
 import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 
 
 /**
@@ -10,6 +11,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public abstract class SimpleActivity extends Activity implements Serializable
 {
+    protected SimpleActivityStrategy simpleActivityStrategy;
+    
     /** full constructor */
     public SimpleActivity(Long activityId, 
             Integer id, 
@@ -83,4 +86,9 @@ public abstract class SimpleActivity extends Activity implements Serializable
         .append("activityId", getActivityId())
         .toString();
     }
+
+    
+	public Integer[] getContributionType(){
+		return simpleActivityStrategy.getContributionType(this);
+	}
 }

@@ -5,21 +5,47 @@ import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
-/** 
+/**
+ * <p>The hibernate object that wraps the information to schedule a gate in the
+ * sequence engine. The schedule gate is defined either by offset to the
+ * lesson start time or by the absolute time set by the teacher.<p> 
+ * 
+ * <p>Interms of gate level, schedule gate only cares about class level at
+ * the moment. we leaves the complexity of apply schdule gate to group
+ * and individual level to the future release.</p>
+ * 
+ * @author Chris Perfect
+ * @author Jacky Fang
+ * 
  * @hibernate.class 
-*/
+ */
 public class ScheduleGateActivity extends GateActivity implements Serializable {
 
-    /** nullable persistent field */
+    /**
+     * The relative gate open time from the lesson start time. For example, 
+     * if the lesson starts at 3:00pm and offset is 1, the gate will be opened
+     * at 4:00pm.
+     */
     private Long gateStartTimeOffset;
 
-    /** nullable persistent field */
+    /**
+     * <p>The relative time that gate will be closed from the lesson start time.
+     * For example, if the lesson starts at 3:00pm and offset is 2, the gate
+     * will be closed at 5:00pm.</p> 
+     * Note it must be larger than <code>gateStartTimeOffset</code>.
+     */
     private Long gateEndTimeOffset;
     
-    /** nullable persistent field */
+    /**
+     * The absolute start time of the gate activity. If this is set, we are
+     * expecting <code>gateStartTimeOffset</code> is set to null.
+     */
     private Date gateStartDateTime;
 
-    /** nullable persistent field */
+    /**
+     * The absolute end time of the gate activity. If this is set, we are 
+     * expecting <code>gateEndTimeOffset</code> is set to null.
+     */
     private Date gateEndDateTime;
 
 

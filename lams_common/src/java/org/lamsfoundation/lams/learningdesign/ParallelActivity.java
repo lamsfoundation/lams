@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.lesson.ParallelActivityStrategy;
+import org.lamsfoundation.lams.learningdesign.strategy.ParallelActivityStrategy;
 
 /** 
  * @hibernate.class 

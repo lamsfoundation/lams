@@ -18,11 +18,12 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.lesson;
+package org.lamsfoundation.lams.learningdesign.strategy;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
 
 
 /**
@@ -31,14 +32,14 @@ import org.lamsfoundation.lams.learningdesign.ParallelActivity;
  * @author Jacky Fang 2005-2-24
  * 
  */
-public class ParallelActivityStrategy extends ActivityStrategy
+public class ParallelActivityStrategy extends ComplextActivityStrategy
 {
     /**
      * Regarding incomplete parallel activity, the next activity will always
      * be a waiting activity, which will finally translated into waiting
      * message.
      * 
-     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#getNextActivityByParent(Activity, Activity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
     public Activity getNextActivityByParent(Activity activity, Activity currentChild)
     {
@@ -50,7 +51,7 @@ public class ParallelActivityStrategy extends ActivityStrategy
      * activity. A parallel activity is marked as complete if all children
      * activities are completed.
      * 
-     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
      */
     protected boolean isComplete(int numOfCompletedActivities, ComplexActivity complexActivity)
     {

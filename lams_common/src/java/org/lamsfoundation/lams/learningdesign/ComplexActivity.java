@@ -7,12 +7,16 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
  * @hibernate.class
  */
 public abstract class ComplexActivity extends Activity implements Serializable {
 
+
+    protected ComplextActivityStrategy activityStrategy;
 	/** persistent field */
 	private Set activities;
 
@@ -113,4 +117,33 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	    }
 	    return new NullActivity();
 	}
+    
+	/**
+	 * Delegate to activity strategy to check up the status of all children.
+	 * 
+     * @param learnerProgress the progress data that record what has been 
+     * 						  completed
+     * @return true if all children are completed.
+
+	 */
+	public boolean areChildrenCompleted(LearnerProgress learnerProgress)
+	{
+	    return activityStrategy.areChildrenCompleted(this,learnerProgress);
+	}
+	
+	/**
+	 * <p>Delegate to activity strategy to calculate what is the next activity
+	 * within the parent activity.</p>
+	 * 
+	 * <b>Note:</b> The logic of what is the next activity here is progress
+	 * 				enigne specific now. Please see the <code>ActivityStrategy</code>
+	 * 				for details explaination of what is next.
+	 * 
+	 * @param currentChild the current child activity in a complex activity.
+	 * @return the next activity within a parent activity
+	 */
+	public Activity getNextActivityByParent(Activity currentChild)
+	{
+	    return activityStrategy.getNextActivityByParent(this,currentChild);
+	}	
 }

@@ -208,7 +208,12 @@ public class RandomGrouper implements Grouper , Serializable
         if(isInitialization)
             return randomGrouping.getNumberOfGroups().intValue();
         else 
-            return 0;
+        {
+            int numberOfNewGroups = randomGrouping.getNumberOfGroups().intValue()-
+            						randomGrouping.getGroups().size();
+            
+            return numberOfNewGroups>0?numberOfNewGroups:0;
+        }
     }
 
 }

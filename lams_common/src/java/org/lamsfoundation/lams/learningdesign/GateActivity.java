@@ -99,7 +99,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     
     /**
      * @hibernate.many-to-one not-null="true"
-     *         							        @hibernate.column name="gate_activity_level_id"
+     * @hibernate.column name="gate_activity_level_id"
      *
      */
     public Integer getGateActivityLevelId()
@@ -119,10 +119,18 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
         .toString();
     }
     
-	public Boolean getGateOpen() {
+	public Boolean getGateOpen() 
+	{
 		return gateOpen;
 	}
-	public void setGateOpen(Boolean gateOpen) {
+	
+	public void setGateOpen(Boolean gateOpen) 
+	{
 		this.gateOpen = gateOpen;
+	}
+	
+	public boolean shouldOpen()
+	{
+	    return false;
 	}
 }

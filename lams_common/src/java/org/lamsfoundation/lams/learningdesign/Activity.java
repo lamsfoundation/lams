@@ -34,11 +34,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.MonitoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
-import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
+import org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
-import org.lamsfoundation.lams.lesson.ActivityStrategy;
 /**
  * @hibernate.class table="lams_learning_activity"
  */
@@ -190,9 +189,6 @@ public abstract class Activity implements Serializable,Nullable {
 	public void setGroupingSupportType(Integer groupingSupportType) {
 		this.groupingSupportType = groupingSupportType;
 	}
-	protected ActivityStrategy activityStrategy;
-	protected SimpleActivityStrategy simpleActivityStrategy;
-	
 	/** full constructor */
 	public Activity(
 			Long activityId,
@@ -634,6 +630,7 @@ public abstract class Activity implements Serializable,Nullable {
 	public boolean isGroupingActivity(){
 		return getActivityTypeId().intValue()== GROUPING_ACTIVITY_TYPE;
 	}
+	
 	/**
 	 * Delegate to activity strategy to check up the status of all children.
 	 * 
@@ -642,9 +639,10 @@ public abstract class Activity implements Serializable,Nullable {
      * @return true if all children are completed.
 
 	 */
-	public boolean areChildrenCompleted(LearnerProgress learnerProgress)
+/**	public boolean areChildrenCompleted(LearnerProgress learnerProgress)
 	{
-	    return activityStrategy.areChildrenCompleted(this,learnerProgress);
+	    //return activityStrategy.areChildrenCompleted(this,learnerProgress);
+	    return ((ComplexActivity)this).areChildrenCompleted(learnerProgress);
 	}
 	
 	/**
@@ -658,27 +656,25 @@ public abstract class Activity implements Serializable,Nullable {
 	 * @param currentChild the current child activity in a complex activity.
 	 * @return the next activity within a parent activity
 	 */
-	public Activity getNextActivityByParent(Activity currentChild)
+/**	public Activity getNextActivityByParent(Activity currentChild)
 	{
-	    return activityStrategy.getNextActivityByParent(this,currentChild);
+	    return ((ComplexActivity)this).getNextActivityByParent(currentChild);
 	}	
-	
+	*/
 	public Integer getActivityCategoryID() {
 		return activityCategoryID;
 	}
 	public void setActivityCategoryID(Integer activityCategoryID) {
 		this.activityCategoryID = activityCategoryID;
 	}
-	public Integer[] getContributionType(){
-		return simpleActivityStrategy.getContributionType(this);
-	}
+
 	public MonitoringActivityDTO getMonitoringActivityDTO(){
 		return new MonitoringActivityDTO(this);
 	}
 	public MonitoringActivityDTO getMonitoringActivityDTO(Activity activity){
 		Integer contributionType[]= null;
 		if(activity.isGateActivity() || activity.isToolActivity() || activity.isGroupingActivity()){
-			contributionType = activity.getContributionType();			
+			contributionType = ((SimpleActivity)activity).getContributionType();			
 			return new MonitoringActivityDTO(activity,contributionType);
 		}
 		else

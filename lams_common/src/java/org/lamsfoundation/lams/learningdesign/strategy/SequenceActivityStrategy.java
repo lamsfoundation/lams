@@ -18,7 +18,7 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.lesson;
+package org.lamsfoundation.lams.learningdesign.strategy;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
  * @author Jacky Fang 2005-2-24
  * 
  */
-public class SequenceActivityStrategy extends ActivityStrategy
+public class SequenceActivityStrategy extends ComplextActivityStrategy
 {
     
     /**
@@ -46,7 +46,7 @@ public class SequenceActivityStrategy extends ActivityStrategy
      * 
      * Pre-condition: the parent must have some incomplete children
      * 
-     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#getNextActivityByParent(Activity, Activity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
     public Activity getNextActivityByParent(Activity parent, Activity currentChild)
     {
@@ -72,7 +72,7 @@ public class SequenceActivityStrategy extends ActivityStrategy
      * of this sequence activity appear in the completed activities set from
      * current learner progress.
      * 
-     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
      */
     protected boolean isComplete(int numOfCompletedActivities, ComplexActivity complexActivity)
     {

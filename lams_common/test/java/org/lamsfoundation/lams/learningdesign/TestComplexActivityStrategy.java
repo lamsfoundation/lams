@@ -18,10 +18,10 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.lesson;
+package org.lamsfoundation.lams.learningdesign;
 
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.NullActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
 import org.lamsfoundation.lams.lesson.dao.TestLearnerProgressDAO;
 
 
@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.lesson.dao.TestLearnerProgressDAO;
  * @author Jacky Fang 2005-2-24
  * 
  */
-public class TestActivityStrategy extends TestLearnerProgressDAO
+public class TestComplexActivityStrategy extends TestLearnerProgressDAO
 {
 
     private Activity testSubOptionsActivityNB;
@@ -67,7 +67,7 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
      * Constructor for TestActivityStrategy.
      * @param arg0
      */
-    public TestActivityStrategy(String name)
+    public TestComplexActivityStrategy(String name)
     {
         super(name);
     }
@@ -80,7 +80,7 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
         super.testLearnerProgress.setProgressState(testSubParallelActivityQA,LearnerProgress.ACTIVITY_COMPLETED);
         super.testLearnerProgress.setProgressState(testSubParallelActivityMB,LearnerProgress.ACTIVITY_COMPLETED);
         
-        assertTrue("should be completed",this.testParallelActivity.areChildrenCompleted(super.testLearnerProgress));
+        assertTrue("should be completed",((ComplexActivity)testParallelActivity).areChildrenCompleted(super.testLearnerProgress));
     }
 
     public void testChildrenInCompletedForParallelActivity()
@@ -89,7 +89,7 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
        
         super.testLearnerProgress.setProgressState(testSubParallelActivityQA,LearnerProgress.ACTIVITY_COMPLETED);
 
-        assertTrue("should not be completed",!this.testParallelActivity.areChildrenCompleted(super.testLearnerProgress));
+        assertTrue("should not be completed",!((ComplexActivity)testParallelActivity).areChildrenCompleted(super.testLearnerProgress));
     }
     
     public void testChildrenCompletedForSequenceActivity()
@@ -100,7 +100,7 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
         
         super.testLearnerProgress.setProgressState(testSubSeuquencActivitySR,LearnerProgress.ACTIVITY_COMPLETED);
         super.testLearnerProgress.setProgressState(testSubSeuqenceActivityQNA,LearnerProgress.ACTIVITY_COMPLETED);
-        assertTrue("should be completed",this.testSequenceActivity.areChildrenCompleted(super.testLearnerProgress));
+        assertTrue("should be completed",((ComplexActivity)testSequenceActivity).areChildrenCompleted(super.testLearnerProgress));
     }
     
     public void testChildrenInCompletedForSequenceActivity()
@@ -108,7 +108,7 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
         testSubSeuquencActivitySR = activityDAO.getActivityByActivityId(TEST_SR_ACTIVITY_ID);
         
         super.testLearnerProgress.setProgressState(testSubSeuquencActivitySR,LearnerProgress.ACTIVITY_COMPLETED);
-        assertTrue("should not be completed",!this.testSequenceActivity.areChildrenCompleted(super.testLearnerProgress));
+        assertTrue("should not be completed",!((ComplexActivity)testSequenceActivity).areChildrenCompleted(super.testLearnerProgress));
     }
     
     public void testChildrenCompletedForOptionsActivity()
@@ -117,12 +117,12 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
         testSubOptionsActivityMC = activityDAO.getActivityByActivityId(TEST_MC_ACTIVITY_ID);
         
         super.testLearnerProgress.setProgressState(testSubOptionsActivityNB,LearnerProgress.ACTIVITY_COMPLETED);
-        assertTrue("should be completed",this.testOptionsActivity.areChildrenCompleted(super.testLearnerProgress));
+        assertTrue("should be completed",((ComplexActivity)testOptionsActivity).areChildrenCompleted(super.testLearnerProgress));
     }
     
     public void testChildrenInCompletedForOptionsActivity()
     {
-        assertTrue("should not be completed",!this.testOptionsActivity.areChildrenCompleted(super.testLearnerProgress));
+        assertTrue("should not be completed",!((ComplexActivity)testOptionsActivity).areChildrenCompleted(super.testLearnerProgress));
     }
     
     public void testGetNextActivityBySequenceParentActivity()
@@ -130,7 +130,7 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
         testSubSeuquencActivitySR = activityDAO.getActivityByActivityId(TEST_SR_ACTIVITY_ID);
         testSubSeuqenceActivityQNA = activityDAO.getActivityByActivityId(TEST_QNA_ACTIVITY_ID);
         
-        Activity nextActivity = this.testSequenceActivity.getNextActivityByParent(testSubSeuquencActivitySR);
+        Activity nextActivity = ((ComplexActivity)testSequenceActivity).getNextActivityByParent(testSubSeuquencActivitySR);
         
         assertNotNull("we should have a next activity",nextActivity);
         assertEquals("it should be qna",this.testSubSeuqenceActivityQNA.getActivityId().longValue(),nextActivity.getActivityId().longValue());
@@ -140,7 +140,7 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
     {
         testSubSeuquencActivitySR = activityDAO.getActivityByActivityId(TEST_SR_ACTIVITY_ID);
 
-        Activity nextActivity = this.testSequenceActivity.getNextActivityByParent(new NullActivity());
+        Activity nextActivity = ((ComplexActivity)testSequenceActivity).getNextActivityByParent(new NullActivity());
         
         assertNotNull("we should have a next activity",nextActivity);
         assertEquals("it should be share resource",this.testSubSeuquencActivitySR.getActivityId().longValue(),nextActivity.getActivityId().longValue());
@@ -151,7 +151,7 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
     {
         testSubOptionsActivityNB = activityDAO.getActivityByActivityId(TEST_NB_ACTIVITY_ID);
 
-        Activity nextActivity = this.testOptionsActivity.getNextActivityByParent(testSubOptionsActivityNB);
+        Activity nextActivity = ((ComplexActivity)testOptionsActivity).getNextActivityByParent(testSubOptionsActivityNB);
 
         assertNotNull("we should have a next activity",nextActivity);
         assertEquals("it should be option activity itself",
@@ -163,7 +163,7 @@ public class TestActivityStrategy extends TestLearnerProgressDAO
     {
         testSubParallelActivityQA = activityDAO.getActivityByActivityId(TEST_QA_ACTIVITY_ID);
 
-        Activity nextActivity = this.testParallelActivity.getNextActivityByParent(testSubParallelActivityQA);
+        Activity nextActivity = ((ComplexActivity)testParallelActivity).getNextActivityByParent(testSubParallelActivityQA);
         
         assertNotNull("we should have a next activity",nextActivity);
 

@@ -82,7 +82,7 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 	}
 	public void testGetContributionType(){
 		activity = activityDAO.getActivityByActivityId(new Long(18));
-		Integer as[]=activity.getContributionType();
+		Integer as[]=((SimpleActivity)activity).getContributionType();
 		for(int i=0;i<as.length;i++)
 			System.out.println(as[i]);
 		

@@ -18,7 +18,7 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.lesson;
+package org.lamsfoundation.lams.learningdesign.strategy;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.learningdesign.OptionsActivity;
  * @author Jacky Fang 2005-2-24
  * 
  */
-public class OptionsActivityStrategy extends ActivityStrategy
+public class OptionsActivityStrategy extends ComplextActivityStrategy
 {
 
     /**
@@ -40,7 +40,7 @@ public class OptionsActivityStrategy extends ActivityStrategy
      * activity itself so as to display the options page again when the user
      * finish one option.
      *  
-     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#getNextActivityByParent(Activity, Activity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
     public Activity getNextActivityByParent(Activity parent, Activity currentChild)
     {
@@ -52,7 +52,7 @@ public class OptionsActivityStrategy extends ActivityStrategy
      * activity. A option activity is marked as complete if the maximum
      * number of options requirement is met.
      * 
-     * @see org.lamsfoundation.lams.lesson.ActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
      */
     protected boolean isComplete(int numOfCompletedActivities, ComplexActivity complexActivity)
     {

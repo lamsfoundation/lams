@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.lesson.SequenceActivityStrategy;
+import org.lamsfoundation.lams.learningdesign.strategy.SequenceActivityStrategy;
 
 
 /** 
