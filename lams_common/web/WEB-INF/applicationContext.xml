@@ -12,7 +12,7 @@
 	<!-- (in this case, JDBC-related settings for the dataSource definition below) -->
 	
 	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location"><value>/WEB-INF/dbConnection.properties</value></property>
+		<property name="location"><value>WEB/WEB-INF/dbConnection.properties</value></property>
 	</bean>
 
 	<!-- Message source for this context, loaded from localized "messages_xx" files -->
@@ -37,8 +37,7 @@
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
 		<property name="dataSource"><ref local="dataSource"/></property>
 		<property name="mappingResources">
-			<list>
-				<!-- usermanagement related mapping files -->	
+			<list>	
 				<value>com/lamsinternational/lams/usermanagement/AuthenticationMethod.hbm.xml</value>
 				<value>com/lamsinternational/lams/usermanagement/AuthenticationMethodType.hbm.xml</value>
 				<value>com/lamsinternational/lams/usermanagement/Organisation.hbm.xml</value>
@@ -76,7 +75,7 @@
 				<!-- Tool related mapping files-->
 				<value>com/lamsinternational/lams/tool/Tool.hbm.xml</value>
 				<value>com/lamsinternational/lams/tool/ToolSession.hbm.xml</value>
-				<value>com/lamsinternational/lams/tool/ToolSessionState.hbm.xml</value>
+				<value>com/lamsinternational/lams/tool/ToolsessionState.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -101,15 +100,17 @@
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
 
 	<!-- LAMS primary business object: Hibernate implementation -->
-	<bean id="userManagementServiceTarget" class="com.lamsinternational.lams.usermanagement.service.UserManagementService"
+	<!-- 
+	<bean id="userManagementServiceTarget" class="com.lamsinternational.lams.usermanagement.service.UserManagementServiceImpl"
 		singleton="false"
 	>
 		<property name="userDAO"><ref local="userDAO"/></property>
 		<property name="organisationDAO"><ref local="organisationDAO"/></property>
-		<property name="userOrganisationDAO"><ref local="userOrganisationDAO"/></property>
 	</bean>	
+	-->
 	
 	<!-- Transactional proxy for the user management primary business object -->
+	<!-- 
 	<bean id="userManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref local="transactionManager"/></property>
 		<property name="target"><ref local="userManagementServiceTarget"/></property>
@@ -120,6 +121,7 @@
 			</props>
 		</property>
 	</bean>
+	-->
 	
 	<bean id="userDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
@@ -130,10 +132,6 @@
 	</bean>
 	
 	<bean id="organisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationDAO">
-		<property name="sessionFactory"><ref local="sessionFactory"/></property>
-	</bean>
-
-	<bean id="userOrganisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
 		<property name="sessionFactory"><ref local="sessionFactory"/></property>
 	</bean>
 
