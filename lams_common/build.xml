@@ -351,6 +351,9 @@ Ant build file.
 	<!-- =================================================================== -->
 	<target name="test" depends="compile.test,insert-test-data"> 
 		<mkdir dir="${build.report}"/>
+		<copy file="${webinf}/web.xml" todir="${testwebinf}" overwrite="true"/>		
+		<copy file="${webinf}/struts/struts-config.xml" todir="${testwebinf}" overwrite="true"/>			
+		<copy file="${webinf}/tiles/tiles-defs.xml" todir="${testwebinf}/tiles" overwrite="true"/>			
 		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
 			   fork="yes">
 			<formatter type="plain" usefile="false"/>
@@ -366,8 +369,7 @@ Ant build file.
 				<pathelement location="${build.classes}"/>
 				<pathelement location="${build.classes.test}"/>
 				<pathelement location="${hbm}"/>
-				<pathelement location="${web}"/>
-				<pathelement location="${conf.struts}"/>
+				<pathelement location="${testweb}"/>
 				<path refid="project.classpath"/>
 			</classpath>
 		</junit>
