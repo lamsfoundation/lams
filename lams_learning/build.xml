@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+
+<!-- -->
+<!DOCTYPE project [
+]>
+
+
+<project name="lams_learning" default="usage" basedir=".">
+
+	<property file="build.properties" />
+
+	<path id="all-libs">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+			<exclude name="**/gnujaxp.jar" />
+		</fileset>
+	</path>
+
+	<path id="project.classpath">
+		<path refid="all-libs" />
+		<!-- Java CLASSPATH should be added as the last item -->
+		<!-- This property is supposed to be set in eclipse  -->
+		<pathelement location="${java.class.path}" />
+	</path>
+
+	<target name="usage">
+		<echo message="" />
+		<echo message="${name} build file" />
+		<echo
+			message="------------------------------------------------------" />
+		<echo message="" />
+		<echo message="Among the available targets are:" />
+		<echo message="" />
+		<echo message="build    --> build all; don't create JARs" />
+		<echo message="alljars  --> create all JAR files" />
+		<echo message="tests    --> run tests" />
+		<echo message="" />
+	</target>
+
+	<target name="init">
+		<available property="xdoclet-jars-installed"
+			file="lib/xdoclet/xdoclet-${xdoclet.version}.jar" />
+	</target>
+
+
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+	<target name="preparedirs">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build.classes.java}" />
+		<mkdir dir="${build.classes.test}" />
+		<mkdir dir="${build.lib}" />
+	</target>
+
+	<target name="clean" depends="preparedirs"
+		description="removes all class files">
+		<delete>
+			<fileset dir="${build.classes.java}" />
+			<fileset dir="${build.classes.test}" />
+			<fileset dir="${build.lib}" />
+		</delete>
+	</target>
+
+	<target name="compile.java" depends="clean"
+		description="compile java sources">
+		<javac srcdir="${src.dir.java}" compiler="modern"
+			destdir="${build.classes.java}" deprecation="on" debug="on">
+			<classpath>
+				<path refid="project.classpath" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="compile.test" depends="compile.java">
+		<javac destdir="${build.classes.test}" compiler="modern">
+			<src path="${src.dir.test}" />
+			<classpath>
+				<pathelement location="${build.classes.java}" />
+				<path refid="project.classpath" />
+			</classpath>
+		</javac>
+		<copy overwrite="yes"
+			todir="${build.classes.test}/${survey.path}">
+			<fileset dir="${src.dir.test}/${survey.path}">
+				<include name="*.xml" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Fails if XDoclet 1.2.x is not on classpath                          -->
+	<!-- =================================================================== -->
+	<target name="fail-if-no-xdoclet-1.2"
+		unless="xdoclet-jars-installed">
+		<fail>
+			You must download several jar files before you can build
+			Middlegen. Execute the "download-deps" target. Then try to
+			build again.
+
+			If you are behind a proxy, you should define the properties
+			http.proxyHost and http.proxyPort. Example:
+
+			ant -Dhttp.proxyHost=foo.com -Dhttp.proxyPort=8080
+
+			It's also possible to download the jars manually.
+		</fail>
+	</target>
+	<!-- target name="check-driver-present">
+		<available file="${database.driver.file}" type="file" property="driver.present"/>
+		</target>
+		<target name="panic-if-driver-not-present" unless="driver.present">
+		<fail>
+		The JDBC driver you have specified by including one of the files in ${basedir}/config/database
+		doesn't exist. You have to download this driver separately and put it in ${database.driver.file}
+		Please make sure you're using a version that is equal or superior to the one we looked for.
+		If you name the driver jar file differently, please update the database.driver.file property
+		in the ${basedir}/config/database/xxx.xml file accordingly.
+		</fail>
+		</target-->
+
+	<!-- =================================================================== -->
+	<!-- Compile hibernate                                                   -->
+	<!-- =================================================================== -->
+	<!-- target name="compile-hibernate" depends="hibernatedoclet"
+		description="Compile hibernate">
+		<javac srcdir="${build.gen-src.dir}"
+			destdir="${build.classes.dir}" classpathref="lib.class.path">
+			<include name="**/hibernate/**/*" />
+		</javac>
+	</target-->
+
+	<!-- =================================================================== -->
+	<!-- Run xdoclet for hibernate                                           -->
+	<!-- =================================================================== -->
+	<!-- taskdef name="hibernatedoclet"
+		classname="xdoclet.modules.hibernate.HibernateDocletTask">
+		<classpath refid="all-libs" />
+	</taskdef-->
+
+	<taskdef name="webdoclet"
+		classname="xdoclet.modules.web.WebDocletTask">
+		<classpath refid="all-libs" />
+	</taskdef>
+
+	<!-- target name="hibernatedoclet" description="Run hibernatedoclet">
+		<hibernatedoclet destdir="${conf.hibernate.dir}/mapping"
+			excludedtags="@version,@author,@todo" force="${generated.forced}"
+			verbose="true">
+
+			<fileset dir="${src.dir.java}">
+				<include name="${survey.path}/*.java" />
+			</fileset>
+			<hibernate version="2.0" />
+
+		</hibernatedoclet>
+	</target-->
+
+
+	<target name="webdoclet" depends="preparedirs">
+		<webdoclet destdir="${generated.java}"
+			force="${xdoclet.force}">
+
+			<fileset dir="${src.dir.java}">
+				<!-- include name="**/*Action.java" />
+				<include name="**/*Form.java" /-->
+				<include name="**/web/action/*.java" />
+				<include name="**/web/form/*.java" />
+			</fileset>
+
+			<deploymentdescriptor servletspec="2.3"
+				destdir="${conf.webinf.dir}" mergedir="${conf.xdoclet.dir}"
+				sessiontimeout="${sessiontimeout}" />
+
+			<strutsconfigxml destdir="${conf.struts.dir}"
+				mergedir="${conf.xdoclet.dir}" version="1.2" />
+		</webdoclet>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Run JUnit Tests                                                     -->
+	<!-- =================================================================== -->
+	<!-- target name="test" depends="compile.test,build-db">
+		<mkdir dir="${build.report}" />
+		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
+			fork="yes">
+			<formatter type="plain" usefile="false" />
+			<formatter type="xml" />
+			<batchtest todir="${build.report}">
+				<fileset dir="${src.dir.test}">
+					<include name="**/Test*.java" />
+					<exclude name="**/Test*All.java" />
+					<exclude name="**/TestInitSurveySession.java" />
+					<exclude name="**/*Action.java" />
+				</fileset>
+			</batchtest>
+			<classpath>
+				<pathelement location="${build.classes.java}" />
+				<pathelement location="${build.classes.test}" />
+				<pathelement location="${conf.hibernate.mapping.dir}" />
+				<pathelement location="${conf.web.dir}" />
+				<path refid="project.classpath" />
+			</classpath>
+		</junit>
+	</target>
+
+	<target name="test-report" depends="test">
+		<mkdir dir="${build.report}/html" />
+		<junitreport todir="${build.report}">
+			<fileset dir="${build.report}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report todir="${build.report}/html" />
+		</junitreport>
+	</target-->
+
+</project>

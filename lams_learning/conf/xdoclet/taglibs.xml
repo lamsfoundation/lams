@@ -1,0 +1,61 @@
+   
+<!-- Struts Tag Library Defintions -->
+<taglib>
+	<taglib-uri>http://jakarta.apache.org/struts/struts-bean</taglib-uri>
+	<taglib-location>/WEB-INF/struts/struts-bean.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://jakarta.apache.org/struts/struts-bean-el</taglib-uri>
+	<taglib-location>/WEB-INF/struts/struts-bean-el.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://jakarta.apache.org/struts/struts-html</taglib-uri>
+	<taglib-location>/WEB-INF/struts/struts-html.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://jakarta.apache.org/struts/struts-html-el</taglib-uri>
+	<taglib-location>/WEB-INF/struts/struts-html-el.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://jakarta.apache.org/struts/struts-logic</taglib-uri>
+	<taglib-location>/WEB-INF/struts/struts-logic.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://jakarta.apache.org/struts/struts-logic-el</taglib-uri>
+	<taglib-location>/WEB-INF/struts/struts-logic-el.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://jakarta.apache.org/struts/struts-template</taglib-uri>
+	<taglib-location>/WEB-INF/struts/struts-template.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://jakarta.apache.org/struts/struts-tiles</taglib-uri>
+	<taglib-location>/WEB-INF/struts/struts-tiles.tld</taglib-location>
+</taglib>
+
+<!-- JSTL Tag Library Defintions -->
+<taglib>
+	<taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/c.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://java.sun.com/jstl/core_rt</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/c-rt.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://java.sun.com/jstl/fmt</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/fmt.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://java.sun.com/jstl/fmt_rt</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/fmt-rt.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://java.sun.com/jstl/xml</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/x.tld</taglib-location>
+</taglib>
+<taglib>
+	<taglib-uri>http://java.sun.com/jstl/xml_rt</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/x-rt.tld</taglib-location>
+</taglib>
+	

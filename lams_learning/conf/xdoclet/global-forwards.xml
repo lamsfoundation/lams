@@ -1,0 +1,5 @@
+
+<global-forwards>
+	<forward name="error" path="/error.jsp" />
+	<forward name="noSessionError" path="/noSessionError.jsp" />
+</global-forwards>

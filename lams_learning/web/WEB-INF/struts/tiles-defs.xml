@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
+   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
+ 
+<tiles-definitions>
+	
+	<!-- Standard layout with css. -->
+	<definition name=".layout" path="/layout/layout.jsp">
+		<put name="title" value="LAMS"/>
+		<put name="body" value=""/>
+		<put name="includeBodyTag" value="true"/>
+	</definition>
+
+	<!-- Standard layout for message or tool. This probably needs to be done using
+	included header and footer though because tools need this. -->
+	<definition name=".activityLayout" path="/layout/activityLayout.jsp">
+		<put name="title" value="LAMS"/>
+		<put name="body" value=""/>
+	</definition>
+	
+	<definition name=".toolActivity" extends=".layout">
+		<put name="title" value="Loading..."/>
+		<put name="body" value="/toolActivity.jsp"/>
+		<put name="includeBodyTag" value="false"/>
+	</definition>
+	<definition name=".parallelActivity" extends=".layout">
+		<put name="body" value="/parallelActivity.jsp"/>
+		<put name="includeBodyTag" value="false"/>
+	</definition>
+	<definition name=".optionsActivity" extends=".activityLayout">
+		<put name="body" value="/optionsActivity.jsp"/>
+	</definition>
+	<definition name=".requestDisplay" path="/requestDisplayActivity.jsp" />
+	<definition name=".parallelWait" extends=".activityLayout">
+		<put name="title" value="Wait..."/>
+		<put name="body" value="/partialCompleted.jsp"/>
+	</definition>
+	<definition name=".lessonComplete" extends=".activityLayout">
+		<put name="body" value="/lessonComplete.jsp"/>
+	</definition>
+	
+</tiles-definitions>
