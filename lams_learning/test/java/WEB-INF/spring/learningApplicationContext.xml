@@ -19,6 +19,7 @@
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
 		<property name="lamsToolService"><ref bean="lamsToolService"/></property>
+		<property name="activityMappings"><ref bean="activityMappings"/></property>
 	</bean>
 	
 	<bean id="learnerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -38,7 +39,7 @@
 	<bean id="progressEngine" class="org.lamsfoundation.lams.learning.progress.ProgressEngine" singleton="false">
 	</bean>
 	
-	<bean id="actionMappings" class="org.lamsfoundation.lams.learning.web.util.ActionMappingsWithToolWait" singleton="false">
+	<bean id="activityMappings" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">
 		<property name="toolService"><ref bean="toolService"/></property>
 	</bean>
 	

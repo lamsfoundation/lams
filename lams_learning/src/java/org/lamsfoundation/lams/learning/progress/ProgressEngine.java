@@ -101,9 +101,21 @@ public class ProgressEngine
     {
         learnerProgress.setPreviousActivity(completedActivity);
         learnerProgress.setCurrentActivity(transition.getToActivity());
-        learnerProgress.setNextActivity(transition.getToActivity());
+        
+        //we set the next activity to be the first child activity if it
+        //is a sequence activity.
+        if(transition.getToActivity().isSequenceActivity())
+        {
+            Activity firstActivityInSequence = 
+                ((SequenceActivity)transition.getToActivity()).getFirstActivityInSequenceActivity();
+            learnerProgress.setNextActivity(firstActivityInSequence);
+        }
+        //set next activity as the activity follows the transition.
+        else
+            learnerProgress.setNextActivity(transition.getToActivity());
         learnerProgress.setProgressState(transition.getToActivity(),
                                          LearnerProgress.ACTIVITY_ATTEMPTED);
+        learnerProgress.setParallelWaiting(false);
         return learnerProgress;
     }
 
@@ -127,18 +139,28 @@ public class ProgressEngine
             if (!parent.areChildrenCompleted(learnerProgress))
             {
                 Activity nextActivity = parent.getNextActivityByParent(completedActivity);
-
-                if (nextActivity.isNull())
+                
+                
+                if (!isNextActivityValid(nextActivity))
                     throw new ProgressException("Error occurred in progress engine."
                             + " Unexpected Null activity received when progressing"
                             + " to the next activity within a incomplete parent activity:"
                             + " Parent activity id ["
                             + parent.getActivityId()
                             + "]");
-
-                learnerProgress.setNextActivity(nextActivity);
-                learnerProgress.setProgressState(nextActivity,
-                                                 LearnerProgress.ACTIVITY_ATTEMPTED);
+                
+                if(isParallelWaitActivity(nextActivity))
+                {
+                    learnerProgress.setParallelWaiting(true);
+                    learnerProgress.setNextActivity(null);
+                }
+                else
+                {
+                    learnerProgress.setParallelWaiting(false);
+                    learnerProgress.setNextActivity(nextActivity);
+                    learnerProgress.setProgressState(nextActivity,
+                                                     LearnerProgress.ACTIVITY_ATTEMPTED);
+                }
             }
             //recurvisely call back to calculateProgress to calculate completed
             //parent activity.
@@ -152,4 +174,17 @@ public class ProgressEngine
         return learnerProgress;
     }
 
+    /**
+     * @param nextActivity
+     * @return
+     */
+    private boolean isNextActivityValid(Activity nextActivity)
+    {
+        return !nextActivity.isNull()||isParallelWaitActivity(nextActivity);
+    }
+
+    private boolean isParallelWaitActivity(Activity nextActivity)
+    {
+        return nextActivity.getActivityTypeId().intValue()==ParallelWaitActivity.PARALLEL_WAIT_ACTIVITY_TYPE;
+    }
 }

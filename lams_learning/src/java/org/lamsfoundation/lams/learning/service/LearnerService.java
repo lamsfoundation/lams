@@ -27,8 +27,9 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 
-import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -58,7 +59,7 @@ public class LearnerService implements ILearnerService
     private ProgressEngine progressEngine;
     private IToolSessionDAO toolSessionDAO;
     private ILamsToolService lamsToolService;
-    private ActionMappings actionMappings;
+    private ActivityMapping activityMappings;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
     //---------------------------------------------------------------------
@@ -102,6 +103,10 @@ public class LearnerService implements ILearnerService
     {
         this.lamsToolService = lamsToolService;
     }
+    
+    public void setActivityMappings(ActivityMapping activityMappings) {
+		this.activityMappings = activityMappings;
+	}
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
@@ -185,7 +190,7 @@ public class LearnerService implements ILearnerService
         LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner,lesson);
 
         learnerProgress = progressEngine.calculateProgress(learner, lesson, completedActivity,learnerProgress);
-        
+
         learnerProgressDAO.updateLearnerProgress(learnerProgress);
         
         return learnerProgress;
@@ -202,7 +207,7 @@ public class LearnerService implements ILearnerService
     	try {
 	    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
 	    	Activity nextActivity = nextLearnerProgress.getNextActivity();
-	    	url = actionMappings.getActivityURL(nextActivity, nextLearnerProgress);
+	    	url = activityMappings.getActivityURL(nextActivity, nextLearnerProgress);
     	}
     	catch (ProgressException e) {
     		// log e
@@ -211,10 +216,6 @@ public class LearnerService implements ILearnerService
     	
     	return url;
     }
-    
-    public void setActionMappings(ActionMappings actionMappings) {
-		this.actionMappings = actionMappings;
-	}
 
     //---------------------------------------------------------------------
     // Helper Methods

@@ -66,9 +66,13 @@ public class TestLearnerService extends AbstractLamsTestCase
     private static final long TEST_QNA_ACTIVITY_ID = 24;
     private static final long TEST_OPTIONS_ACTIVITY_ID = 12;
     private static final long TEST_CNB_ACTIVITY_ID = 16;
-    private static final long TEST_Parallel_ACTIVITY_ID = 13;
+    private static final long TEST_PARALLEL_ACTIVITY_ID = 13;
     private static final long TEST_CQNA_ACTIVITY_ID = 18;
-    private static final long TEST_WAITING_ACTIVITY_ID = 0;
+    private static final long TEST_WAITING_ACTIVITY_ID = -1;
+    private static final long TEST_MB_ACTIVITY_ID = 19;
+    private static final long TEST_SEQUENCE_ACTIVITY_ID = 14;
+    private static final long TEST_SR_ACTIVITY_ID = 22;
+    private static final long TEST_SQNA_ACTIVITY_ID = 25;
     
     /*
      * @see TestCase#setUp()
@@ -132,79 +136,114 @@ public class TestLearnerService extends AbstractLamsTestCase
 
     public void testCalculateProgress() throws ProgressException
     {
-        //progress from survey to notice board
         Activity testCompletedActivity = testProgress.getNextActivity();
+        Activity testRootPreviousActivity = testProgress.getPreviousActivity();
+        //progress from survey to notice board
+        testRootPreviousActivity = testCompletedActivity;        
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser,
                                                         testLesson);
-        assertLearnerProgress(testCompletedActivity,TEST_NB_ACTIVITY_ID,TEST_NB_ACTIVITY_ID,1,"nb","nb");
+        assertLearnerProgress(testRootPreviousActivity,TEST_NB_ACTIVITY_ID,TEST_NB_ACTIVITY_ID,1,1,"nb","nb");
         
         //progress from notice board to random grouping activity
         testCompletedActivity = testProgress.getNextActivity();
+        testRootPreviousActivity = testCompletedActivity;
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser,
                                                         testLesson);
-        assertLearnerProgress(testCompletedActivity,TEST_RGRP_ACTIVITY_ID,TEST_RGRP_ACTIVITY_ID,2,"random grouping","random grouping");
+        assertLearnerProgress(testRootPreviousActivity,TEST_RGRP_ACTIVITY_ID,TEST_RGRP_ACTIVITY_ID,2,1,"random grouping","random grouping");
         
         //progress from random grouping activity to chat
         testCompletedActivity = testProgress.getNextActivity();
+        testRootPreviousActivity = testCompletedActivity;
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser,
                                                         testLesson);
-        assertLearnerProgress(testCompletedActivity,TEST_CHAT_ACTIVITY_ID,TEST_CHAT_ACTIVITY_ID,3,"chat","chat");
+        assertLearnerProgress(testRootPreviousActivity,TEST_CHAT_ACTIVITY_ID,TEST_CHAT_ACTIVITY_ID,3,1,"chat","chat");
        
         //progress from chat to QNA
         testCompletedActivity = testProgress.getNextActivity();
+        testRootPreviousActivity = testCompletedActivity;
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser,
                                                         testLesson);
-        assertLearnerProgress(testCompletedActivity,TEST_QNA_ACTIVITY_ID,TEST_QNA_ACTIVITY_ID,4,"QNA","QNA");
+        assertLearnerProgress(testRootPreviousActivity,TEST_QNA_ACTIVITY_ID,TEST_QNA_ACTIVITY_ID,4,1,"QNA","QNA");
 
         //progress from QNA to options activity
+        testCompletedActivity = testProgress.getNextActivity();
+        testRootPreviousActivity = testCompletedActivity;
+        testProgress = learnerService.calculateProgress(testCompletedActivity,
+                                                        testUser,
+                                                        testLesson);
+        assertLearnerProgress(testRootPreviousActivity,TEST_OPTIONS_ACTIVITY_ID,TEST_OPTIONS_ACTIVITY_ID,5,1,"OPTIONS","OPTIONS");
+
+        //progress from sub option(notice board) to parallel activity
+        testCompletedActivity = ((OptionsActivity)testProgress.getCurrentActivity()).getChildActivityById(TEST_CNB_ACTIVITY_ID);
+        testRootPreviousActivity = testCompletedActivity.getParentActivity();
+        testProgress = learnerService.calculateProgress(testCompletedActivity,
+                                                        testUser,
+                                                        testLesson);
+        assertLearnerProgress(testRootPreviousActivity,TEST_PARALLEL_ACTIVITY_ID,TEST_PARALLEL_ACTIVITY_ID,7,1,"PARALLEL","PARALLEL");
+
+        //progress from sub parallel(QNA) to waiting
+        testCompletedActivity = ((ParallelActivity)testProgress.getCurrentActivity()).getChildActivityById(TEST_CQNA_ACTIVITY_ID);
+        //the previous activity should not be changed.
+        testRootPreviousActivity = testProgress.getPreviousActivity();
+        testProgress = learnerService.calculateProgress(testCompletedActivity,
+                                                        testUser,
+                                                        testLesson);
+        assertLearnerProgress(testRootPreviousActivity,TEST_PARALLEL_ACTIVITY_ID,TEST_WAITING_ACTIVITY_ID,8,1,"PARALLEL","WAITING");
+        assertTrue("verify waiting flag-should be waiting.",testProgress.isParallelWaiting());
+        assertTrue("verify next activity",testProgress.getNextActivity()==null);
+
+        //progress from sub parallel(message board) to sub sequence activity(share resource)
+        testCompletedActivity = ((ParallelActivity)testProgress.getCurrentActivity()).getChildActivityById(TEST_MB_ACTIVITY_ID);
+        testRootPreviousActivity = testCompletedActivity.getParentActivity();
+        testProgress = learnerService.calculateProgress(testCompletedActivity,
+                                                        testUser,
+                                                        testLesson);
+        assertLearnerProgress(testRootPreviousActivity,TEST_SEQUENCE_ACTIVITY_ID,TEST_SR_ACTIVITY_ID,10,1,"SEQUENCE","SHARE RESOURCE");
+        assertTrue("verify waiting flag-should not be waiting",!testProgress.isParallelWaiting());
+        
+        //progress from sub sequence(share resource) to sub sequence(QNA)
+        testCompletedActivity = testProgress.getNextActivity();
+        testRootPreviousActivity = testProgress.getPreviousActivity();
+        testProgress = learnerService.calculateProgress(testCompletedActivity,
+                                                        testUser,
+                                                        testLesson);
+        assertLearnerProgress(testRootPreviousActivity,TEST_SEQUENCE_ACTIVITY_ID,TEST_SQNA_ACTIVITY_ID,11,2,"SEQUENCE","QNA");
+
+        //progress sub sequence(QNA) to complete lesson
         testCompletedActivity = testProgress.getNextActivity();
         testProgress = learnerService.calculateProgress(testCompletedActivity,
                                                         testUser,
                                                         testLesson);
-        assertLearnerProgress(testCompletedActivity,TEST_OPTIONS_ACTIVITY_ID,TEST_OPTIONS_ACTIVITY_ID,5,"OPTIONS","OPTIONS");
-
-        //progress from sub option(notice board) to parallel activity
-        testCompletedActivity = ((OptionsActivity)testProgress.getCurrentActivity()).getChildActivityById(TEST_CNB_ACTIVITY_ID);
-        testProgress = learnerService.calculateProgress(testCompletedActivity,
-                                                        testUser,
-                                                        testLesson);
-        assertLearnerProgress(testCompletedActivity.getParentActivity(),TEST_Parallel_ACTIVITY_ID,TEST_Parallel_ACTIVITY_ID,7,"PARALLEL","PARALLEL");
-
-        //progress from sub parallel(QNA) to waiting
-/**        testCompletedActivity = ((ParallelActivity)testProgress.getCurrentActivity()).getChildActivityById(TEST_CQNA_ACTIVITY_ID);
-        testProgress = learnerService.calculateProgress(testCompletedActivity,
-                                                        testUser,
-                                                        testLesson);
-        assertLearnerProgress(testCompletedActivity,TEST_Parallel_ACTIVITY_ID,TEST_WAITING_ACTIVITY_ID,7,"PARALLEL","WAITING");
-
-*/
+        assertTrue("verify lesson complete",testProgress.isLessonComplete());
     }
 
     /**
+     * @param numberOfAttemptedAct TODO
      * @param testCompletedActivity
      */
-    private void assertLearnerProgress(Activity testCompletedActivity,
+    private void assertLearnerProgress(Activity testRootPreviousActivity,
                                        long curActivityId,
                                        long nextActivityId,
                                        int numberOfCompletedActivities,
+                                       int numberOfAttemptedActivities,
                                        String currentAct,
                                        String nextAct)
     {
         assertEquals("verify the expected previous activity",
-                     testCompletedActivity.getActivityId(),
+                     testRootPreviousActivity.getActivityId(),
                      testProgress.getPreviousActivity().getActivityId());
-        
         assertEquals("verify the expected current activity - "+currentAct,
                      curActivityId,
                      testProgress.getCurrentActivity().getActivityId().longValue());
+        //assert next activity, id is set to 0 if it is waiting activity
         assertEquals("verify the expected next activity - "+ nextAct,
                      nextActivityId,
-                     testProgress.getNextActivity().getActivityId().longValue());
+                     nextActivityId!=-1?testProgress.getNextActivity().getActivityId().longValue():-1);
         assertEquals("verify the completed activities",numberOfCompletedActivities,testProgress.getCompletedActivities().size());
-        assertEquals("verify the attempted activities",1,testProgress.getAttemptedActivities().size());
+        assertEquals("verify the attempted activities",numberOfAttemptedActivities,testProgress.getAttemptedActivities().size());
     }
 }
