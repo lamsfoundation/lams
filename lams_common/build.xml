@@ -204,6 +204,7 @@ Ant build file.
 			<fileset dir="${web}">
 				<include name="*"/>
 				<include name="admin/*"/>
+				<include name="images/*"/>
 			</fileset>
 		</war>
 	</target>
