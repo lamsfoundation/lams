@@ -23,5 +23,13 @@ public class GroupDAO extends BaseDAO implements IGroupDAO {
 	public Group getGroupById(Long groupID) {
 		return (Group)super.find(Group.class,groupID);
 	}
+	
+	public void saveGroup(Group group) {
+        getHibernateTemplate().save(group);
+	}
+	
+	public void deleteGroup(Group group) {
+        getHibernateTemplate().delete(group);
+	}
 
 }

@@ -14,6 +14,10 @@ public interface IGroupDAO extends IBaseDAO {
 	 * @param groupID
 	 * @return Group populated Group object
 	 */
-	public Group getGroupById(Long groupID); 
+	public Group getGroupById(Long groupID);
+	
+	public void saveGroup(Group group);
 
+	public void deleteGroup(Group group);
+	
 }
