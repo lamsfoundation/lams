@@ -828,4 +828,5 @@ public class LDWDDXValueObjectStorer {
 		}else
 			throw new Exception("An attempt to save a complex activity with no child activities");
 	}
+	
 }
