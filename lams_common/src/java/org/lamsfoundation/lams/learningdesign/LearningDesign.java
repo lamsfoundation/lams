@@ -24,8 +24,13 @@ public class LearningDesign implements Serializable {
 	/** Represents a list of LearningDesign objects in the WDDXPacket */
 	public static final String DESIGN_LIST_OBJECT = "LearningDesignList";
 	
+	/** Represents a copy of LearningDesign for authoring enviornment */
 	public static final int COPY_TYPE_NONE =1;
+	
+	/** Represents a copy of LearningDesign for monitoring enviornment */
 	public static final int COPY_TYPE_LESSON=2;
+	
+	/** Represents a copy of LearningDesign for preview purposes */
 	public static final int COPY_TYPE_PREVIEW=3;
 
 	/** identifier field */
@@ -91,21 +96,17 @@ public class LearningDesign implements Serializable {
 	/** persistent field */
 	private Long duration;
 	
-	/** persistent field */
+	/** nullable persistent field */
 	private String licenseText;
 	
+	/** nullable persistent field */
 	private License license;
 	
-	public License getLicense() {
-		return license;
-	}
-	public void setLicense(License license) {
-		this.license = license;
-	}
+	
 	/** full constructor */
 	public LearningDesign(
 			Long learningDesignId,
-			Integer id,
+			Integer ui_id,
 			String description,
 			String title,
 			Activity firstActivity,
@@ -125,7 +126,7 @@ public class LearningDesign implements Serializable {
 			String licenseText,
 			License license) {
 		this.learningDesignId = learningDesignId;
-		this.learningDesignUIID = id;
+		this.learningDesignUIID = ui_id;
 		this.description = description;
 		this.title = title;
 		this.firstActivity = firstActivity;
@@ -177,35 +178,33 @@ public class LearningDesign implements Serializable {
 		this.transitions = transitions;
 		this.activities = activities;
 	}
-	public static LearningDesign createLearningDesignCopy(LearningDesign design,boolean lesson){
+	public static LearningDesign createLearningDesignCopy(LearningDesign design, Integer designCopyType){
 		LearningDesign newDesign = newInstance(design);
-		if(lesson){
+				
+		if(designCopyType.intValue()!=COPY_TYPE_NONE)
 			newDesign.setReadOnly(new Boolean(true));
-			newDesign.setCopyTypeID(new Integer(COPY_TYPE_LESSON));			
-		}else{
+		else
 			newDesign.setReadOnly(new Boolean(false));
-			newDesign.setCopyTypeID(new Integer(COPY_TYPE_NONE));			
-		}
+		
+		newDesign.setCopyTypeID(designCopyType);		
 		return newDesign;
 	}	
-	private static LearningDesign newInstance(LearningDesign design) {
-		
-		LearningDesign newDesign = new LearningDesign();
-		
+	private static LearningDesign newInstance(LearningDesign design) {		
+		LearningDesign newDesign = new LearningDesign();		
+		newDesign.setLearningDesignUIID(design.getLearningDesignUIID());
 		newDesign.setDescription(design.getDescription());
 		newDesign.setTitle(design.getTitle());		
 		newDesign.setMaxId(design.getMaxId());
 		newDesign.setValidDesign(design.getValidDesign());		
+		newDesign.setDateReadOnly(design.getDateReadOnly());
 		newDesign.setHelpText(design.getHelpText());
 		newDesign.setVersion(design.getVersion());
+		newDesign.setParentLearningDesign(design);
 		newDesign.setCreateDateTime(new Date());
-			
-		/**
-		 * TODO Set the First Activity of the new Design
-		 * TODO Set the ID of the new Design
-		 */
+		newDesign.setDuration(design.getDuration());
+		newDesign.setLicense(design.getLicense());
+		newDesign.setLicenseText(design.getLicenseText());
 		return newDesign;
-
 	}	
 	public Long getLearningDesignId() {
 		return this.learningDesignId;
@@ -214,205 +213,113 @@ public class LearningDesign implements Serializable {
 	public void setLearningDesignId(Long learningDesignId) {
 		this.learningDesignId = learningDesignId;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public Integer getLearningDesignUIID() {
 		return this.learningDesignUIID;
 	}
-
 	public void setLearningDesignUIID(Integer id) {
 		this.learningDesignUIID = id;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public String getDescription() {
 		return this.description;
 	}
-
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public String getTitle() {
 		return this.title;
 	}
-
 	public void setTitle(String title) {
 		this.title = title;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public Activity getFirstActivity() {
 		return this.firstActivity;
 	}
-
 	public void setFirstActivity(Activity firstActivity) {
 		this.firstActivity = firstActivity;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public Integer getMaxId() {
 		return this.maxId;
 	}
-
 	public void setMaxId(Integer maxId) {
 		this.maxId = maxId;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public Boolean getValidDesign() {
 		return this.validDesign;
 	}
-
 	public void setValidDesign(Boolean validDesign) {
 		this.validDesign = validDesign;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public Boolean getReadOnly() {
 		return this.readOnly;
 	}
-
 	public void setReadOnly(Boolean readOnly) {
 		this.readOnly = readOnly;
 	}
-
-	/**
-	 *  
-	 */
 	public Date getDateReadOnly() {
 		return this.dateReadOnly;
 	}
-
 	public void setDateReadOnly(Date dateReadOnly) {
 		this.dateReadOnly = dateReadOnly;
 	}
-
-	/**
-	 *  
-	 */
 	public String getHelpText() {
 		return this.helpText;
 	}
-
 	public void setHelpText(String helpText) {
 		this.helpText = helpText;
 	}
 	public Date getCreateDateTime() {
 		return this.createDateTime;
 	}
-
 	public void setCreateDateTime(Date createDateTime) {
 		this.createDateTime = createDateTime;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public String getVersion() {
 		return this.version;
 	}
-
 	public void setVersion(String version) {
 		this.version = version;
 	}
 	public User getUser() {
 		return this.user;
 	}
-
 	public void setUser(User user) {
 		this.user = user;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public org.lamsfoundation.lams.learningdesign.LearningDesign getParentLearningDesign() {
 		return this.parentLearningDesign;
 	}
-
 	public void setParentLearningDesign(
 			org.lamsfoundation.lams.learningdesign.LearningDesign parentLearningDesign) {
 		this.parentLearningDesign = parentLearningDesign;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public Set getChildLearningDesigns() {
 		return this.childLearningDesigns;
 	}
-
 	public void setChildLearningDesigns(Set childLearningDesigns) {
 		this.childLearningDesigns = childLearningDesigns;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public Set getLessons() {
 		return this.lessons;
 	}
-
 	public void setLessons(Set lessons) {
 		this.lessons = lessons;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public Set getTransitions() {
 		return this.transitions;
 	}
-
 	public void setTransitions(Set transitions) {
 		this.transitions = transitions;
 	}
-
-	/**
-	 * 
-	 *  
-	 */
 	public Set getActivities() {
 		return this.activities;
 	}
-
 	public void setActivities(Set activities) {
 		this.activities = activities;
 	}
-
 	public String toString() {
 		return new ToStringBuilder(this).append("learningDesignId",
 				getLearningDesignId()).toString();
 	}
-
 	public boolean equals(Object other) {
 		if ((this == other))
 			return true;
@@ -422,7 +329,6 @@ public class LearningDesign implements Serializable {
 		return new EqualsBuilder().append(this.getReadOnly(),
 				castOther.getReadOnly()).isEquals();
 	}
-
 	public int hashCode() {
 		return new HashCodeBuilder().append(getReadOnly()).toHashCode();
 	}	
@@ -436,17 +342,9 @@ public class LearningDesign implements Serializable {
 		}
 		return parentActivities;
 	}
-	/**
-	 * @return Returns the workspaceFolder.
-	 */
 	public WorkspaceFolder getWorkspaceFolder() {
 		return workspaceFolder;
 	}
-
-	/**
-	 * @param workspaceFolder
-	 *            The workspaceFolder to set.
-	 */
 	public void setWorkspaceFolder(WorkspaceFolder workspaceFolder) {
 		this.workspaceFolder = workspaceFolder;
 	}
@@ -467,5 +365,11 @@ public class LearningDesign implements Serializable {
 	}
 	public void setCopyTypeID(Integer copyTypeID) {
 		this.copyTypeID = copyTypeID;
+	}
+	public License getLicense() {
+		return license;
+	}
+	public void setLicense(License license) {
+		this.license = license;
 	}
 }
