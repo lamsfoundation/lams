@@ -39,5 +39,11 @@ DROP TABLE IF EXISTS lams_gate_activity_level;
 DROP TABLE IF EXISTS lams_license;
 DROP TABLE IF EXISTS lams_copy_type;
 DROP TABLE IF EXISTS lams_activity_category;
+DROP TABLE IF EXISTS lams_cr_node_version_property;
+DROP TABLE IF EXISTS lams_cr_node_version;
+DROP TABLE IF EXISTS lams_cr_node;
+DROP TABLE IF EXISTS lams_cr_workspace_credential;
+DROP TABLE IF EXISTS lams_cr_workspace;
+DROP TABLE IF EXISTS lams_cr_credential;
 
 SET FOREIGN_KEY_CHECKS=1;
