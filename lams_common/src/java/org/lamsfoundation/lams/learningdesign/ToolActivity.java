@@ -6,7 +6,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.GroupedToolSession;
+import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @hibernate.class
@@ -134,6 +138,27 @@ public class ToolActivity extends SimpleActivity implements Serializable
     	newToolActivity.setToolSessions(new HashSet());    	    	
     	return newToolActivity;
     }    
+    
+    /**
+     * Factory method to create a new tool session for the user when he is
+     * running current activity.
+     * @param learner the user who should be using this tool session.
+     * @return the new tool session.
+     */
+    public ToolSession createToolSessionForActivity(User learner)
+    {
+        if(this.getTool().getSupportsGrouping())
+            return new GroupedToolSession(this,
+                                          new Date(System.currentTimeMillis()),
+                                          ToolSession.STARTED_STATE,
+                                          this.getGroupFor(learner));
+        else
+            return new NonGroupedToolSession(this,
+                                             new Date(System.currentTimeMillis()),
+                                             ToolSession.STARTED_STATE,
+                                             learner);
+    }
+    
     public String toString()
     {
         return new ToStringBuilder(this)

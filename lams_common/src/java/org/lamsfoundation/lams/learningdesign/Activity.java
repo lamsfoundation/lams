@@ -500,4 +500,13 @@ public abstract class Activity implements Serializable,Nullable {
 	    
 	    return new NullGroup();
 	}
+	
+	/**
+	 * Check up whether a is tool activity or not.
+	 * @return
+	 */
+	public boolean isToolActivity()
+	{
+	    return getActivityTypeId().intValue()==TOOL_ACTIVITY_TYPE;
+	}
 }
