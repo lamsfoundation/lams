@@ -592,7 +592,7 @@ values(6,6,'OptionsActivity to ParallelActivity','OptionsActivity to ParallelAct
 --values(10,10,'QNA to MessageBoard','QNA to MessageBoard',19,18,1,'20050207',5,4);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(7,7,'ParallelActivity to SequenceActivity','ParallelActivity to SequenceActivity',14,13,1,'20050207',14,14);
+values(7,7,'ParallelActivity to SequenceActivity','ParallelActivity to SequenceActivity',14,13,1,'20050207',14,13);
 
 --insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
 --values(12,12,'SequenceActivity to Shared Resources','SequenceActivity to Shared Resources',22,14,1,'20050207',8,14);
