@@ -84,6 +84,16 @@
 		</init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>webauthservlet</servlet-name>
+		<servlet-class>
+			com.lamsinternational.lams.security.WebAuthServlet
+		</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+
+	
 
 	<!--
 		- Dispatcher servlet mapping for the main web user interface.
@@ -91,6 +101,11 @@
 	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>webauthservlet</servlet-name>
+		<url-pattern>/webauth</url-pattern>
 	</servlet-mapping>
 
 	<session-config>
