@@ -54,30 +54,20 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional one-to-many association to UserGroup -->
+    <!-- bi-directional one-to-many association to User -->
     <set
-        name="userGroups"
+        name="users"
         lazy="true"
         inverse="true"
-		cascade="none"
+        cascade="none"
+        table="lams_user_group"
     >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="group_id"
-
-           @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.lesson.UserGroup"
-        </meta>
         <key>
             <column name="group_id" />
         </key>
-        <one-to-many 
-            class="com.lamsinternational.lams.lesson.UserGroup"
+        <many-to-many 
+            column="user_id"
+            class="com.lamsinternational.lams.usermanagement.User"
         />
     </set>
     <!-- bi-directional one-to-many association to ToolSession -->

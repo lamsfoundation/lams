@@ -4,147 +4,42 @@
     "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
     
 <hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
 
 <class 
     name="com.lamsinternational.lams.learningdesign.Grouping" 
     table="lams_grouping"
 >
-    <meta attribute="class-description" inherit="false">
-       @hibernate.class
-        table="lams_grouping"
-    </meta>
-    <meta attribute="implement-equals" inherit="false">true</meta>
-
+    <discriminator column="grouping_type_id" type="int"/>
     <id
         name="groupingId"
         type="java.lang.Long"
         column="grouping_id"
     >
-        <meta attribute="field-description">
-           @hibernate.id
-            generator-class="identity"
-            type="java.lang.Long"
-            column="grouping_id"
-
-
-        </meta>
         <generator class="identity" />
     </id>
 
-    <property
-        name="numberOfGroups"
-        type="java.lang.Integer"
-        column="number_of_groups"
-        length="11"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="number_of_groups"
-            length="11"
-        </meta>    
-    </property>
-    <property
-        name="learnersPerGroup"
-        type="java.lang.Integer"
-        column="learners_per_group"
-        length="11"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="learners_per_group"
-            length="11"
-        </meta>    
-    </property>
-    <property
-        name="staffGroupId"
-        type="java.lang.Long"
-        column="staff_group_id"
-        length="20"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="staff_group_id"
-            length="20"
-        </meta>    
-    </property>
-    
-    <property name="maxNumberOfGroups" type="java.lang.Integer" column="max_number_of_groups" length="3">
-        <meta attribute="field-description">@hibernate.property column="max_number_of_groups" length="3"</meta>    
-    </property>
+    <property name="maxNumberOfGroups" type="java.lang.Integer" column="max_number_of_groups" length="3"/>
 
     <!-- Associations -->
-  
-    <!-- bi-directional many-to-one association to GroupingType -->
-    <many-to-one
-        name="groupingType"
-        class="com.lamsinternational.lams.learningdesign.GroupingType"
-        not-null="true"
-    >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="grouping_type_id"         
-        </meta>
-        <column name="grouping_type_id" />
-    </many-to-one>
-    <!-- bi-directional one-to-many association to Group -->
-    <set
+
+    <list
         name="groups"
         lazy="true"
         inverse="true"
 		cascade="none"
     >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="grouping_id"
-
-           @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.learningdesign.Group"
-        </meta>
         <key>
             <column name="grouping_id" />
         </key>
         <one-to-many 
             class="com.lamsinternational.lams.learningdesign.Group"
         />
-    </set>
-    <!-- bi-directional one-to-many association to Lesson -->
-    <set
-        name="lessons"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="class_grouping_id"
-
-           @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.lesson.Lesson"
-        </meta>
-        <key>
-            <column name="class_grouping_id" />
-        </key>
-        <one-to-many 
-            class="com.lamsinternational.lams.lesson.Lesson"
+        <index
+            column="order_id"                                     
         />
-    </set>
+    </list>
+   
     <!-- bi-directional one-to-many association to Activity -->
     <set
         name="activities"
@@ -152,18 +47,6 @@
         inverse="true"
 		cascade="none"
     >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="grouping_id"
-
-           @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.learningdesign.Activity"
-        </meta>
         <key>
             <column name="grouping_id" />
         </key>
@@ -172,5 +55,39 @@
         />
     </set>
 
+    <subclass name="com.lamsinternational.lams.learningdesign.RandomGrouping" discriminator-value="1">
+        <property
+        name="numberOfGroups"
+        type="java.lang.Integer"
+        column="number_of_groups"
+        length="11"
+        />
+        <property
+        name="learnersPerGroup"
+        type="java.lang.Integer"
+        column="learners_per_group"
+        length="11"
+        />
+    </subclass>
+    <subclass name="com.lamsinternational.lams.learningdesign.ChosenGrouping" discriminator-value="2"/>
+        
+    <subclass name="com.lamsinternational.lams.lesson.LessonClass" discriminator-value="3">
+        <!-- bi-directional many-to-one (effectiviey a  one to one) assocaites to Group in staff group role -->
+        <many-to-one name="staffGroup" class="com.lamsinternational.lams.learningdesign.Group" column="staff_group_id" unique="true"/>
+         <!-- bi-directional one-to-many association to Lesson -->
+    <set
+        name="lessons"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="class_grouping_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.lesson.Lesson"
+        />
+    </set>
+    </subclass>
 </class>
 </hibernate-mapping>
