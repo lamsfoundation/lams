@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+ *Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ *
+ *This program is free software; you can redistribute it and/or modify
+ *it under the terms of the GNU General Public License as published by
+ *the Free Software Foundation; either version 2 of the License, or
+ *(at your option) any later version.
+ *
+ *This program is distributed in the hope that it will be useful,
+ *but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *GNU General Public License for more details.
+ *
+ *You should have received a copy of the GNU General Public License
+ *along with this program; if not, write to the Free Software
+ *Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ *USA
+ *
+ *http://www.gnu.org/licenses/gpl.txt
+ */
+-->
+<project name="lams_tool_deploy" default="usage" basedir=".">
+	
+        <property name="classes.dir" value="build/classes"/>
+        <property name="test.classes.dir" value="build/test"/>
+        <property name="build.dir" value="build/lib"/>
+        <property name="lib.dir" value="lib"/>
+        <property name="src.dir" value="src/java"/>
+        <property name="test.src.dir" value="test/java"/>
+        <property name="jar.file" value="${build.dir}/lams_tool_util.jar"/>
+        <property name="test.dir" value="test"/>
+        
+        
+
+        <target name="usage">
+	</target> 
+        
+        <target name="init">
+            <mkdir dir="${classes.dir}"/>
+            <mkdir dir="${test.classes.dir}"/>
+            <mkdir dir="${build.dir}"/>
+        </target>   
+        
+        <target name="clean" depends="init">
+            <delete includeEmptyDirs="true" >
+                <fileset dir="${classes.dir}">
+                    <include name="**/*"/>
+                </fileset>
+                <fileset dir="${build.dir}">
+                    <include name="**/*"/>
+                </fileset>
+                <fileset dir="${test.classes.dir}">
+                    <include name="**/*"/>
+                </fileset>
+            </delete>
+        </target>
+        
+        <target name="compile" depends="clean">
+            <javac srcdir="${src.dir}" destdir="${classes.dir}">
+                <classpath>
+                    <fileset dir="${lib.dir}">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                </classpath>
+            </javac>
+            <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}">
+                <classpath>
+                    <pathelement location="${classes.dir}"/> 
+                    <fileset dir="${lib.dir}">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                </classpath>
+            </javac>
+        </target>
+        
+        <target name="build" depends="compile">
+            <jar destfile="${jar.file}" basedir="${classes.dir}"/>
+        </target>
+        
+        
+        <target name="test-token-replacer" >
+        <!-- NOTE: needs fork adn dir so it can find test files! -->
+            <junit printsummary="withOutAndErr" showoutput="on" fork="on" dir="${basedir}">
+                <classpath>
+                    <pathelement location="${classes.dir}"/> 
+                    <pathelement location="${test.classes.dir}"/> 
+                    <fileset dir="${lib.dir}">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                </classpath>
+                <formatter type="plain"/>
+                <test name="org.lamsfoundation.lams.tool.deploy.FileTokenReplacerTest" todir="${basedir}/test/results" outfile="FileTokenReplacer"/>
+            </junit>
+        </target>
+</project>

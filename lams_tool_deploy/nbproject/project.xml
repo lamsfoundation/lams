@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <!--Do not use Project Properties customizer when editing this file manually.-->
+            <name>lams_tool_deploy</name>
+            <folders>
+                <source-folder>
+                    <label>src/java</label>
+                    <type>java</type>
+                    <location>src/java</location>
+                </source-folder>
+                <source-folder>
+                    <label>test/java</label>
+                    <type>java</type>
+                    <location>test/java</location>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>build</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>build</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+            </ide-actions>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src/java</label>
+                        <location>src/java</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>test/java</label>
+                        <location>test/java</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
+            <compilation-unit>
+                <package-root>src/java</package-root>
+                <classpath mode="compile">lib/ant/ant.jar:lib/jakarta-commmons/commons-dbutils-1.0.jar:lib/mysql/mysql-connector-java-3.1.7-bin.jar</classpath>
+                <source-level>1.4</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>test/java</package-root>
+                <classpath mode="compile">src/java:lib/ant/ant.jar:lib/jakarta-commmons/commons-dbutils-1.0.jar:lib/mysql/mysql-connector-java-3.1.7-bin.jar:lib/junit/junit.jar</classpath>
+                <source-level>1.4</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>

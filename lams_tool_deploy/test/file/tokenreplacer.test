@@ -1,0 +1,1 @@
+INSERT INTO FOO VALUES (BAR, 'QUUX', ${test}, 1.233, NOW());

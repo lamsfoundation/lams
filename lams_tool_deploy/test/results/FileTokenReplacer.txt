@@ -1,0 +1,11 @@
+Testsuite: org.lamsfoundation.lams.tool.deploy.FileTokenReplacerTest
+Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.022 sec
+------------- Standard Output ---------------
+java.lang.IllegalArgumentException: File does not exist
+INSERT INTO FOO VALUES (BAR, 'QUUX', value, 1.233, NOW());
+------------- ---------------- ---------------
+
+Testcase: testBadCharToken took 0.014 sec
+Testcase: testBadRegexToken took 0 sec
+Testcase: testNoFile took 0.002 sec
+Testcase: testReplace took 0.004 sec
