@@ -5,6 +5,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -90,7 +91,24 @@ public class Lesson implements Serializable {
         this.organisation = organisation;
         this.learnerProgresses = learnerProgresses;        
     }
-
+    /**
+     * @param user
+     * @param organisation
+     * @param ld
+     * @param newLessonClass
+     * @return
+     */
+    public static Lesson createNewLesson(User user, Organisation organisation, LearningDesign ld, LessonClass newLessonClass)
+    {
+        //setup new lesson
+        return new Lesson(new Date(System.currentTimeMillis()),
+                                   user,
+                                   Lesson.CREATED,
+                                   ld,
+                                   newLessonClass,//lesson class
+                                   organisation,
+                                   new HashSet());//learner progress
+    }
 
 
     /** 

@@ -61,5 +61,6 @@ public class TestInitLesson extends LessonDataAccessTestCase
         assertLessonClass(createdLessonClass);
         //checking initialization result of lesson
         assertLesson(createdLesson);
+        
     }
 }

@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -14,6 +15,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 */
 public class Group implements Serializable {
 
+    public final static int STAFF_GROUP_ORDER_ID = 1;
+    
     /** identifier field */
     private Long groupId;
 
@@ -21,7 +24,7 @@ public class Group implements Serializable {
     private int orderId;
 
     /** persistent field */
-    private org.lamsfoundation.lams.learningdesign.Grouping grouping;
+    private Grouping grouping;
 
     /** persistent field */
     private Set users;
@@ -29,18 +32,64 @@ public class Group implements Serializable {
     /** persistent field */
     private Set toolSessions;
 
+    //---------------------------------------------------------------------
+    // Object creation Methods
+    //---------------------------------------------------------------------
+    
     /** full constructor */
-    public Group(Long groupId, int orderId, org.lamsfoundation.lams.learningdesign.Grouping grouping, Set userGroups, Set toolSessions) {
+    public Group(Long groupId, int orderId, Grouping grouping, Set users, Set toolSessions) {
         this.groupId = groupId;
         this.orderId = orderId;
         this.grouping = grouping;
-        this.users = userGroups;
+        this.users = users;
         this.toolSessions = toolSessions;
     }
 
+    /**
+     * Creation Constructor for initializing learner group without tool sessions
+     * The order is generated using synchornize method on grouping.
+     * 
+     * @param grouping the grouping this group belongs to.
+     * @param users the users in this group.
+     * @return the new learner group
+     */
+    public static Group createLearnerGroup(Grouping grouping, Set users)
+    {
+        return new Group(null,grouping.getNextGroupOrderId(),grouping,users,new HashSet());
+    }
+  
+    /**
+     * Creation Constructor for initializing learner group with tool sessions
+     * The order is generated using synchornize method on grouping.
+     * 
+     * @param grouping the grouping this group belongs to.
+     * @param users the users in this group.
+     * @param toolSessions all tool sessions included in this group
+     * @return the new learner group
+     */
+    public static Group createLearnerGroupWithToolSession(Grouping grouping, Set users,Set toolSessions)
+    {
+        return new Group(null,grouping.getNextGroupOrderId(),grouping,users,toolSessions);
+    }
+    
+    /**
+     * Creation constructor for initializing staff group. The order is created
+     * using default constant.
+     * @param grouping the grouping this group belongs to.
+     * @param staffs the users in this group.
+     * @return the new staff group. 
+     */
+    public static Group createStaffGroup(Grouping grouping, Set staffs)
+    {
+        return new Group(null,STAFF_GROUP_ORDER_ID,grouping,staffs,new HashSet());
+    }
+    
     /** default constructor */
     public Group() {
     }
+    //---------------------------------------------------------------------
+    // Field Access Methods
+    //---------------------------------------------------------------------
 
     /** 
      *            @hibernate.id
@@ -131,13 +180,15 @@ public class Group implements Serializable {
         if ( !(other instanceof Group) ) return false;
         Group castOther = (Group) other;
         return new EqualsBuilder()
-            .append(this.getGroupId(), castOther.getGroupId())
+        	.append(this.getGroupId(), castOther.getGroupId())
+            .append(this.getOrderId(), castOther.getOrderId())
             .isEquals();
     }
 
     public int hashCode() {
         return new HashCodeBuilder()
-            .append(getGroupId())
+        	.append(getGroupId())
+            .append(getOrderId())
             .toHashCode();
     }
 

@@ -156,4 +156,15 @@ public abstract class Grouping implements Serializable
     {
         this.maxNumberOfGroups = maxNumberOfGroups;
     }
+    
+    public synchronized int getNextGroupOrderId()
+    {
+        int order =0;
+        if(this.groups!=null)
+        {
+            order = groups.size();
+            return ++order;
+        }
+        else return ++order;
+    }
 }

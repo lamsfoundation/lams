@@ -204,7 +204,7 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
         //make a copy of lazily initialized users
         Set users = new HashSet(testOrg.getUsers());
         Group learnerClassGroup = new Group(null,//group id 
-                                            TEST_GROUP_ORDER_ID,
+                                            testLessonClass.getNextGroupOrderId(),
                                             testLessonClass,
                                             users,
                                             new HashSet());//tool session, should be empty now
@@ -238,7 +238,7 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
      */
     protected void assertLessonClass(LessonClass lessonClass)
     {
-        assertEquals("check up number of activities",1,lessonClass.getActivities().size());
+        assertEquals("check up number of activities",11,lessonClass.getActivities().size());
         assertEquals("check up staff groups",1,lessonClass.getStaffGroup().getUsers().size());
         assertEquals("check up grouping types, should be class grouping",Grouping.CLASS_GROUPING_TYPE,lessonClass.getGroupingTypeId());
         assertEquals("check up learner groups",1,lessonClass.getGroups().size());
@@ -253,7 +253,7 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
         assertEquals("check up creation time",testLesson.getCreateDateTime().toString(),
                      						  lesson.getCreateDateTime().toString());
         assertEquals("check up user who created this lesson",testUser.getLogin(),lesson.getUser().getLogin());
-        assertEquals("check up the lesson state",Lesson.NOT_STARTED_STATE,lesson.getLessonStateId());
+        assertEquals("check up the lesson state",Lesson.CREATED,lesson.getLessonStateId());
         assertEquals("check up the learning design that used to create lesson",
                      							testLearningDesign.getTitle(),
                      							lesson.getLearningDesign().getTitle());

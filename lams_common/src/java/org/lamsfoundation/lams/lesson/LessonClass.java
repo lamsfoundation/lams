@@ -17,8 +17,8 @@ import org.lamsfoundation.lams.learningdesign.Group;
  * @author chris
  */
 public class LessonClass extends Grouping {
-
-	private Group staffGroup;
+    
+    private Group staffGroup;
 
 	private Lesson lesson;
 
