@@ -21,6 +21,9 @@
 
 package org.lamsfoundation.lams.learning.progress;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -34,6 +37,14 @@ import org.lamsfoundation.lams.usermanagement.User;
 public class ProgressEngine
 {
 
+    /**
+     * Holds a list of completed activity ids in one recursive move to next
+     * task calculation. For example, if a parallel activity A has two children
+     * B,C. Assume B has been finished first. The complete of C will also
+     * result in the completion of A. Therefore, <code>completedActivityList</code>
+     * will hold B and C.
+     */
+    private static List completedActivityList = new LinkedList();
     /**
      * Method determines next step for a learner based on the activity
      * they have just completed.
@@ -52,7 +63,7 @@ public class ProgressEngine
     {
         learnerProgress.setProgressState(completedActivity,
                                          LearnerProgress.ACTIVITY_COMPLETED);
-
+        completedActivityList.add(completedActivity.getActivityId());
         Transition transition = completedActivity.getTransitionFrom();
 
         if (transition != null)
@@ -100,8 +111,10 @@ public class ProgressEngine
                                                       Transition transition)
     {
         learnerProgress.setPreviousActivity(completedActivity);
+        learnerProgress.setCurrentCompletedActivitiesList(completedActivityList);
+        completedActivityList.clear();
         learnerProgress.setCurrentActivity(transition.getToActivity());
-        
+                
         //we set the next activity to be the first child activity if it
         //is a sequence activity.
         if(transition.getToActivity().isSequenceActivity())
