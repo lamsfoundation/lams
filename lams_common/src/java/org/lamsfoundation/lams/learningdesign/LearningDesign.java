@@ -191,7 +191,6 @@ public class LearningDesign implements Serializable {
 	}	
 	private static LearningDesign newInstance(LearningDesign design) {		
 		LearningDesign newDesign = new LearningDesign();		
-		newDesign.setLearningDesignUIID(design.getLearningDesignUIID());
 		newDesign.setDescription(design.getDescription());
 		newDesign.setTitle(design.getTitle());		
 		newDesign.setMaxId(design.getMaxId());
