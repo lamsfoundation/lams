@@ -176,7 +176,10 @@
 			
 			<subclass name="org.lamsfoundation.lams.learningdesign.GateActivity">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
-				
+				<set  name="waitingLearners" lazy="true" cascade="none" table="lams_activity_learners" batch-size="20">
+        			<key><column name="activity_id" /></key>
+        			<many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"/>
+    			</set>
 				<property name="gateActivityLevelId" type="java.lang.Integer" column="gate_activity_level_id" length="11" />
 				<property name="gateOpen" type="java.lang.Boolean" column="gate_open_flag" length="4" />
 				

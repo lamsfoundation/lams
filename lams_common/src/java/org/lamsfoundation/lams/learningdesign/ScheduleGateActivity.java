@@ -2,6 +2,8 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -83,7 +85,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             Transition transitionFrom,
             Integer gateActivityLevelId,
             Long gateStartTimeOffset, 
-            Long gateEndTimeOffset) {
+            Long gateEndTimeOffset,
+            Set waitingLearners) {
         super(activityId, 
                 id,
                 description,
@@ -103,7 +106,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
                 activityTypeId,
                 transitionTo,
 				transitionFrom,
-                gateActivityLevelId);
+                gateActivityLevelId,
+                waitingLearners);
         this.gateStartTimeOffset = gateStartTimeOffset;
         this.gateEndTimeOffset = gateEndTimeOffset;
     }
@@ -125,7 +129,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             Transition transitionFrom,
             Integer gateActivityLevelId,
             Long gateStartTimeOffset, 
-            Long gateEndTimeOffset) {
+            Long gateEndTimeOffset,
+            Set waitingLearners) {
       super(activityId,
                 defineLater,
                 createDateTime,
@@ -136,7 +141,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
                 activityTypeId,
                 transitionTo,
 				transitionFrom,
-                gateActivityLevelId);
+                gateActivityLevelId,
+                waitingLearners);
       this.gateStartTimeOffset = gateStartTimeOffset;
       this.gateEndTimeOffset = gateEndTimeOffset;
     }

@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.PermissionGateActivityStrategy;
@@ -33,7 +34,8 @@ public class PermissionGateActivity extends GateActivity implements Serializable
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
-            Integer gateActivityLevelId)
+            Integer gateActivityLevelId,
+            Set waitingLearners)
     {
         super(activityId,
                 id,
@@ -54,7 +56,8 @@ public class PermissionGateActivity extends GateActivity implements Serializable
                 activityTypeId,
                 transitionTo,
 				transitionFrom,
-                gateActivityLevelId);
+                gateActivityLevelId,
+                waitingLearners);
         super.simpleActivityStrategy = new PermissionGateActivityStrategy();
     }
     
@@ -75,7 +78,8 @@ public class PermissionGateActivity extends GateActivity implements Serializable
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
-            Integer gateActivityLevelId)
+            Integer gateActivityLevelId,
+            Set waitingLearners)
     {
         super(activityId,
                 defineLater,
@@ -87,7 +91,8 @@ public class PermissionGateActivity extends GateActivity implements Serializable
                 activityTypeId,
                 transitionTo,
 				transitionFrom,
-                gateActivityLevelId);
+                gateActivityLevelId,
+                waitingLearners);
         super.simpleActivityStrategy = new PermissionGateActivityStrategy();
     }
     /**

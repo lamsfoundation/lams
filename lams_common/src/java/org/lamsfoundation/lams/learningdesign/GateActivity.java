@@ -1,6 +1,9 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -22,6 +25,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     /** persistent field */
     private Boolean gateOpen;
     
+    private Set waitingLearners;
+    
     /** full constructor */
     public GateActivity(Long activityId,
             Integer id,
@@ -42,7 +47,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
-            Integer gateActivityLevelId)
+            Integer gateActivityLevelId,
+            Set waitingLearners)
     {
         super(activityId,
                 id,
@@ -64,6 +70,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
                 transitionTo,
 				transitionFrom);
         this.gateActivityLevelId = gateActivityLevelId;
+        this.waitingLearners = waitingLearners;
     }
     
     /** default constructor */
@@ -82,7 +89,8 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
             Integer activityTypeId,
             Transition transitionTo,
             Transition transitionFrom,
-            Integer gateActivityLevelId)
+            Integer gateActivityLevelId,
+            Set waitingLearners)
     {
         super(activityId,
                 defineLater,
@@ -95,6 +103,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
                 transitionTo,
 				transitionFrom);
         this.gateActivityLevelId = gateActivityLevelId;
+        this.waitingLearners = waitingLearners;
     }
     
     /**
@@ -110,6 +119,23 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     public void setGateActivityLevelId(Integer gateActivityLevelId)
     {
         this.gateActivityLevelId = gateActivityLevelId;
+    }
+    
+    /**
+     * @return Returns the waitingLearners.
+     */
+    public Set getWaitingLearners()
+    {
+        if(this.waitingLearners == null)
+            this.setWaitingLearners(new HashSet());
+        return waitingLearners;
+    }
+    /**
+     * @param waitingLearners The waitingLearners to set.
+     */
+    public void setWaitingLearners(Set waitingLearners)
+    {
+        this.waitingLearners = waitingLearners;
     }
     
     public String toString()
@@ -133,4 +159,5 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 	{
 	    return false;
 	}
+
 }

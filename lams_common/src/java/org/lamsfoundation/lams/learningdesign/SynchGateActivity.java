@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -31,7 +32,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
             Integer activityTypeId, 
             Transition transitionTo,
             Transition transitionFrom,
-            Integer gateActivityLevelId) {
+            Integer gateActivityLevelId,
+            Set waitingLearners) {
         super(activityId, 
                 id, 
                 description, 
@@ -51,7 +53,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
                 activityTypeId,  
                 transitionTo,
 				transitionFrom,
-                gateActivityLevelId);
+                gateActivityLevelId,
+                waitingLearners);
     }
 
     /** default constructor */
@@ -69,7 +72,9 @@ public class SynchGateActivity extends GateActivity implements Serializable {
             Integer activityTypeId, 
             Transition transitionTo,
             Transition transitionFrom,
-            Integer gateActivityLevelId) {
+            Integer gateActivityLevelId,
+            Set waitingLearners) 
+    {
       super(activityId, 
               defineLater, 
               createDateTime, 
@@ -80,7 +85,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
               activityTypeId,  
               transitionTo,
 			  transitionFrom,
-              gateActivityLevelId);
+              gateActivityLevelId,
+              waitingLearners);
     }
     
     /**
