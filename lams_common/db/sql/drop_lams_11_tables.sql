@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS=0;
+
 # Connection: ROOT LOCAL
 # Host: localhost
 # Saved: 2005-02-15 11:12:43
@@ -36,35 +38,4 @@ DROP TABLE IF EXISTS lams_grouping_type;
 DROP TABLE IF EXISTS lams_gate_activity_level;
 DROP TABLE IF EXISTS lams_license;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+SET FOREIGN_KEY_CHECKS=1;
