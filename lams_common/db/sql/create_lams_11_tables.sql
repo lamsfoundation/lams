@@ -366,6 +366,7 @@ CREATE TABLE lams_learner_progress (
      , user_id BIGINT(20) NOT NULL
      , lesson_id BIGINT(20) NOT NULL
      , lesson_completed_flag TINYINT(1) NOT NULL DEFAULT 0
+     , waiting_flag TINYINT(1) NOT NULL
      , start_date_time DATETIME NOT NULL
      , finish_date_time DATETIME
      , current_activity_id BIGINT(20)
