@@ -33,7 +33,8 @@ public class ChosenGrouping extends Grouping
      * @param originalGrouping The Grouping object to be deep copied
      * @return ChosenGrouping The deep copied Grouping object
      */
-    public static ChosenGrouping createCopy(ChosenGrouping originalGrouping){
+    public static ChosenGrouping createCopy(ChosenGrouping originalGrouping)
+    {
     	ChosenGrouping chosenGrouping = new ChosenGrouping();
     	chosenGrouping.setMaxNumberOfGroups(originalGrouping.getMaxNumberOfGroups());
     	chosenGrouping.setGroupingUIID(originalGrouping.getGroupingUIID());

@@ -40,9 +40,18 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public interface Grouper
 {
-
+    /**
+     * Do the grouping for a list of learners that the teacher requested.
+     * @param grouping the grouping that is used to perform groups creation.
+     * @param learners the list of learners that the teacher requested.
+     */
 	public void doGrouping(Grouping grouping, List learners);
 	
+	/**
+	 * Do the grouping for a single learner.
+	 * @param grouping the grouping that is used to perform groups creation.
+	 * @param learner the learner teacher want to add.
+	 */
 	public void doGrouping(Grouping grouping, User learner);
     
 }

@@ -100,7 +100,7 @@ public class RandomGrouper implements Grouper , Serializable
     //---------------------------------------------------------------------
     /**
      * Compute the number of new groups needs to be created based on passed
-     * in grouping. It figure out group by number of groups or group by
+     * in grouping. It figures out group by number of groups or group by
      * learner per group automatically.
      * 
      * @param randomGrouping the grouping we used to group learner
@@ -115,7 +115,7 @@ public class RandomGrouper implements Grouper , Serializable
             return getNewGroupsByNumberOfGroups(randomGrouping, isInitialization);
         else if(randomGrouping.getLearnersPerGroup()!=null)
             return getNewGroupsByLearnerPerGroup(randomGrouping,learners);
-        
+        //TODO need to be changed to customized exception.
         throw new RuntimeException("At least one random grouping algorithm" +
         		"needs to be defined.");
     }
@@ -146,7 +146,7 @@ public class RandomGrouper implements Grouper , Serializable
         for(Iterator i=learners.iterator();i.hasNext();)
         {
             User learner = (User)i.next();
-            if(randomGrouping.getGroupBy(learner).isNull())
+            if(randomGrouping.doesLearnerExist(learner))
             {
                 Group selectedGroup = selectGroupToJoin((RandomGrouping)randomGrouping);
                 selectedGroup.getUsers().add(learner);
@@ -210,6 +210,5 @@ public class RandomGrouper implements Grouper , Serializable
         else 
             return 0;
     }
-
 
 }

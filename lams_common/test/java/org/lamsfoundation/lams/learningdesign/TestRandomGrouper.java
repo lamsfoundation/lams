@@ -50,7 +50,7 @@ public class TestRandomGrouper extends TestCase
     private RandomGrouping groupingByNumofGroups;
     private RandomGrouping groupingByLearnerPerGroups;
     private List userList = new ArrayList();
-    private int testerUser = 10;
+    private static final int NUM_OF_TEST_USERS = 10;
     
     
     /**
@@ -80,7 +80,7 @@ public class TestRandomGrouper extends TestCase
                                                         null,
                                                         new Integer(4));//learner per groups
         //initialize users
-        for(int i =0; i<testerUser;i++)
+        for(int i =0; i<NUM_OF_TEST_USERS;i++)
             userList.add(createUser(new Integer(i+1),"tester"+i));
     }
 

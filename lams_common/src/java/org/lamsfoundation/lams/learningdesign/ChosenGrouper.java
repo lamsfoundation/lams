@@ -23,46 +23,44 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
+ * The chosen grouper algorithm implementation. It creates a new group for
+ * the learners that the teacher requested.
  * 
  * @author Jacky Fang
  * @since  2005-3-24
- * @version
+ * @version 1.1
  * 
  */
 public class ChosenGrouper implements Grouper,Serializable
 {
 
     /**
-     * 
+     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping, org.lamsfoundation.lams.usermanagement.User)
      */
-    public ChosenGrouper()
+    public void doGrouping(Grouping chosenGrouping, User learner)
     {
-        super();
-        // TODO Auto-generated constructor stub
+        //convert the single user into a list.
+        List learners = new ArrayList();
+        learners.add(learner);
+        //delegate to do grouping for a list of learners.
+        doGrouping(chosenGrouping,learners);
     }
-
+    
     /**
      * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping, java.util.List)
      */
-    public void doGrouping(Grouping grouping, List learners)
+    public void doGrouping(Grouping chosenGrouping, List learners)
     {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping, org.lamsfoundation.lams.usermanagement.User)
-     */
-    public void doGrouping(Grouping grouping, User learner)
-    {
-        // TODO Auto-generated method stub
-
+        chosenGrouping.getGroups().add(Group.createLearnerGroup(chosenGrouping,
+                                                                new HashSet(learners)));
     }
 
 }

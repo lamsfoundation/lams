@@ -287,4 +287,9 @@ public abstract class Grouping implements Serializable
 	{
 	    this.grouper.doGrouping(this,learner);
 	}
+	
+	public boolean doesLearnerExist(User learner)
+	{
+	    return getGroupBy(learner).isNull();
+	}
 }
