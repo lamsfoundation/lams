@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-package org.lamsfoundation.lams.util;
+package org.lamsfoundation.lams.util.wddx;
 
 import java.util.Arrays;
 import java.util.Collection;

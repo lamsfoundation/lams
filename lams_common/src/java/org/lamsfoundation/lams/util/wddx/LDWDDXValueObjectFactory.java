@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-package org.lamsfoundation.lams.util;
+package org.lamsfoundation.lams.util.wddx;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 
-import org.lamsfoundation.lams.util.WDDXTAGS;
+
 
 
 /**

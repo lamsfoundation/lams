@@ -21,7 +21,7 @@
  * ************************************************************************
  */
 
-package org.lamsfoundation.lams.util;
+package org.lamsfoundation.lams.util.wddx;
 
 /**
  * @author Manpreet Minhas
