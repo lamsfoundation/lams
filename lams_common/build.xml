@@ -351,6 +351,14 @@ Ant build file.
 	<!-- =================================================================== -->
 	<!-- Run JUnit Tests                                                     -->
 	<!-- =================================================================== -->
+	<!-- * This task will fail unless you have junit.jar and the class files
+	     for the <junit> task in the same classpath. Read
+         http://ant.apache.org/manual/OptionalTasks/junit.html
+         for how you can do this.                                            -->
+	<!-- * For Eclipse, you have to add a junit.jar to its Runtime classpath.
+         E.g. Put D:\eclipse\plugins\org.junit_3.8.1\junit.jar
+         in the Preferences->Ant->Runtime->Classpath->Global Entries
+         by clicking "Add External JARS" and locating the junit.jar.         -->
 	<target name="test" depends="compile.test,insert-test-data"> 
 		<mkdir dir="${build.report}"/>
 		<copy file="${webinf}/web.xml" todir="${testwebinf}" overwrite="true"/>		
