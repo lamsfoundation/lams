@@ -9,5 +9,12 @@
 	<classpathentry kind="lib" path="lib/hibernate/hibernate2.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate/hibernate-tools.jar"/>
 	<classpathentry kind="lib" path="lib/jakarta-commons/commons-lang-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta-commons/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/mysql/mysql-connector-java-3.0.16-ga-bin.jar"/>
+	<classpathentry kind="lib" path="lib/j2ee/j2ee.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j/dom4j-1.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/aopalliance/aopalliance.jar"/>
+	<classpathentry kind="lib" path="lib/cglib/cglib-full-2.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta-commons/commons-collections-3.1.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

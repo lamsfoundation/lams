@@ -117,9 +117,9 @@ Ant build file.
 			<table name="lams_cr_node"/>
 			<table name="lams_cr_node_version"/>
 			<table name="lams_cr_node_version_property"/>
-			<table name="lams_cr_tool"/>
+			<table name="lams_cr_credential"/>
 			<table name="lams_cr_workspace"/>
-			<table name="lams_cr_workspace_tools"/>
+			<table name="lams_cr_workspace_credential"/>
 
 		</middlegen-cr>
 

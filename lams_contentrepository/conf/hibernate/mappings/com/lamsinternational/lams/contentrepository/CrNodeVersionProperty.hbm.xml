@@ -19,6 +19,7 @@
        @hibernate.class
         table="lams_cr_node_version_property"
     </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
         name="id"

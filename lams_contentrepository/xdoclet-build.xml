@@ -18,6 +18,7 @@
 <pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/lib/junit/junit.jar"/>
 <pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/lib/hibernate/hibernate2.jar"/>
 <pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/lib/hibernate/hibernate-tools.jar"/>
+<pathelement location="G:/eclipse3.0/workspace/lams_contentrepository/lib/jakarta-commons/commons-lang-2.0.jar"/>
 </path>
 <target name="_generation_" depends=""/>
 </project>

@@ -19,6 +19,8 @@
        @hibernate.class
         table="lams_cr_workspace"
     </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+    <meta attribute="implements" inherit="false">IWorkspace</meta>
 
     <id
         name="workspaceId"
@@ -72,9 +74,9 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional one-to-many association to CrWorkspaceTool -->
+    <!-- bi-directional one-to-many association to CrWorkspaceCredential -->
     <set
-        name="crWorkspaceTools"
+        name="crWorkspaceCredentials"
         lazy="true"
         inverse="true"
 		cascade="none"
@@ -89,13 +91,39 @@
             column="workspace_id"
 
            @hibernate.collection-one-to-many
-            class="com.lamsinternational.lams.contentrepository.CrWorkspaceTool"
+            class="com.lamsinternational.lams.contentrepository.CrWorkspaceCredential"
         </meta>
         <key>
             <column name="workspace_id" />
         </key>
         <one-to-many 
-            class="com.lamsinternational.lams.contentrepository.CrWorkspaceTool"
+            class="com.lamsinternational.lams.contentrepository.CrWorkspaceCredential"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to CrNode -->
+    <set
+        name="crNodes"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="workspace_id"
+
+           @hibernate.collection-one-to-many
+            class="com.lamsinternational.lams.contentrepository.CrNode"
+        </meta>
+        <key>
+            <column name="workspace_id" />
+        </key>
+        <one-to-many 
+            class="com.lamsinternational.lams.contentrepository.CrNode"
         />
     </set>
 

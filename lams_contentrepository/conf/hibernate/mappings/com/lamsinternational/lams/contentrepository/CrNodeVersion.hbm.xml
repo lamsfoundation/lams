@@ -19,18 +19,19 @@
        @hibernate.class
         table="lams_cr_node_version"
     </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
-        name="id"
+        name="nvId"
         type="java.lang.Long"
-        column="id"
+        column="nv_id"
         unsaved-value="0"
     >
         <meta attribute="field-description">
            @hibernate.id
             generator-class="identity"
             type="java.lang.Long"
-            column="id"
+            column="nv_id"
             unsaved-value="0"
 
 

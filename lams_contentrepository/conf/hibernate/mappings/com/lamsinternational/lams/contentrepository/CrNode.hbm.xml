@@ -19,6 +19,7 @@
        @hibernate.class
         table="lams_cr_node"
     </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
 
     <id
         name="nodeId"
@@ -84,6 +85,20 @@
             class="com.lamsinternational.lams.contentrepository.CrNodeVersion"
         />
     </set>
+    <!-- bi-directional many-to-one association to CrWorkspace -->
+    <many-to-one
+        name="crWorkspace"
+        class="com.lamsinternational.lams.contentrepository.CrWorkspace"
+        not-null="true"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="workspace_id"         
+        </meta>
+        <column name="workspace_id" />
+    </many-to-one>
 
 </class>
 </hibernate-mapping>
