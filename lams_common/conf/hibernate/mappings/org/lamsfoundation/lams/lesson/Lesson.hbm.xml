@@ -72,9 +72,12 @@
 		<!-- one-to-one name="lessonClass"
 			class="org.lamsfoundation.lams.lesson.LessonClass"
 			constrained="true"
-			cascade="all"
-			property-ref="lesson"
+			foreign-key="class_grouping_id"
 			/-->
+		<many-to-one name="lessonClass"
+			class="org.lamsfoundation.lams.lesson.LessonClass"
+			column="class_grouping_id"
+			unique="true" />
 
 		<!-- bi-directional many-to-one association to Organisation -->
 		<many-to-one name="organisation"
