@@ -6,6 +6,7 @@
 
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
+
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 import org.lamsfoundation.lams.lesson.LessonClass;
@@ -39,6 +40,15 @@ public class LessonClassDAO extends HibernateDaoSupport implements ILessonClassD
     public void deleteLessonClass(LessonClass lessonClass)
     {
         getHibernateTemplate().delete(lessonClass);
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.lesson.dao.ILessonClassDAO#updateLessonClass(org.lamsfoundation.lams.lesson.LessonClass)
+     */
+    public void updateLessonClass(LessonClass lessonClass)
+    {
+        getHibernateTemplate().update(lessonClass);
+        
     }
     
 }

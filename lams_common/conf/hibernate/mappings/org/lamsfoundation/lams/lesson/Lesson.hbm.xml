@@ -30,14 +30,6 @@
 
 		<!-- Associations -->
 		
-		<!-- bi-directional many-to-many association to User as learners -->
-		<set name="learners" lazy="true" inverse="true" cascade="none"
-			table="lams_lesson_learner">
-			<key column="lesson_id" />
-			<many-to-many column="user_id"
-				class="org.lamsfoundation.lams.usermanagement.User" />
-		</set>
-
 		<!-- bi-directional many-to-one association to User -->
 		<many-to-one name="user"
 			class="org.lamsfoundation.lams.usermanagement.User"
@@ -53,7 +45,7 @@
 		</many-to-one>
 		
 		<!-- bi-directional one-to-many association to LearnerProgress -->
-		<set name="learnerProgresses" lazy="false" inverse="true"
+		<set name="learnerProgresses" lazy="true" inverse="true"
 			cascade="none">
 			<key>
 				<column name="lesson_id" />
@@ -78,7 +70,7 @@
 			class="org.lamsfoundation.lams.lesson.LessonClass"
 			column="class_grouping_id"
 			unique="true" 
-			cascade = "save-update"/>
+			cascade = "all"/>
 
 		<!-- bi-directional many-to-one association to Organisation -->
 		<many-to-one name="organisation"

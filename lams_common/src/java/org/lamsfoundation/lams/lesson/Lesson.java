@@ -63,11 +63,6 @@ public class Lesson implements Serializable {
     /** persistent field */
     private Set learnerProgresses;
 
-    /**
-     * Holds value of property learners.
-     */
-    private Set learners;
-    
     /** default constructor */
     public Lesson() {
     }
@@ -205,26 +200,6 @@ public class Lesson implements Serializable {
 
     public void setOrganisation(Organisation organisation) {
         this.organisation = organisation;
-    }
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * 				  table="lams_lesson_learner"
-     * @hibernate.collection-key column="lesson_id"
-     * @hibernate.collection-many-to-many
-     *            class="org.lamsfoundation.lams.usermanagement.User"
-     */
-    public Set getLearners()
-    {
-        return this.learners;
-    }
-
-    /**
-     * Setter for property learners.
-     * @param learners New value of property learners.
-     */
-    public void setLearners(Set learners)
-    {
-        this.learners = learners;
     }
     
     /** 

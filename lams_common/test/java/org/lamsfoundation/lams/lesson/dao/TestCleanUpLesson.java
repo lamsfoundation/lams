@@ -4,23 +4,34 @@
  * This file contains propriety information of LAMS Foundation. 
  * Copying or reproduction with prior written permission is prohibited.
  * Copyright (c) 2005 
- * Created on 3/02/2005
+ * Created on 4/02/2005
  ******************************************************************************** */
 
 package org.lamsfoundation.lams.lesson.dao;
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;
 
 
 /**
  * 
- * @author Jacky Fang 3/02/2005
+ * @author Jacky Fang 4/02/2005
  * 
  */
-public class TestInitLesson extends LessonDataAccessTestCase
+public class TestCleanUpLesson extends LessonDataAccessTestCase
 {
+    private static Long TEST_LESSON_ID = new Long(1);
+    /**
+     * @param name
+     */
+    public TestCleanUpLesson(String name)
+    {
+        super(name);
+    }
     
-
     /*
      * @see LessonDataAccessTestCase#setUp()
      */
@@ -37,21 +48,16 @@ public class TestInitLesson extends LessonDataAccessTestCase
         super.tearDown();
     }
 
-    /**
-     * Constructor for TestInitLesson.
-     * @param arg0
-     */
-    public TestInitLesson(String arg0)
+    public void testCleanUpLesson()
     {
-        super(arg0);
-    }
-
-    public void testInitLesson()
-    {
-        super.initializeTestLesson();
-        //checking initialization result of lesson class
-        assertLessonClass();
-        //checking initialization result of lesson
-        assertLesson();
+        List lessons = lessonDao.getAllLessons();
+        
+        for(Iterator i = lessons.iterator();i.hasNext();)
+        {
+            Lesson curLesson = (Lesson)i.next();
+            super.cleanUpTestLesson(curLesson);
+        }
+        List cleanedLessons = lessonDao.getAllLessons();
+        assertEquals("There should be a lesson in the db",0,cleanedLessons.size());
     }
 }

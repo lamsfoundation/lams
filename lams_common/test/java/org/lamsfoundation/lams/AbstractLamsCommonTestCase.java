@@ -11,8 +11,14 @@ package org.lamsfoundation.lams;
 
 import junit.framework.TestCase;
 
+import net.sf.hibernate.Session;
+import net.sf.hibernate.SessionFactory;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.orm.hibernate.SessionFactoryUtils;
+import org.springframework.orm.hibernate.SessionHolder;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 
 /**
@@ -39,6 +45,11 @@ public abstract class AbstractLamsCommonTestCase extends TestCase
     {
         super.setUp();
         ac = new ClassPathXmlApplicationContext(getContextConfigLocation());
+        //hold the hibernate session
+		SessionFactory sessionFactory = (SessionFactory) this.ac.getBean("coreSessionFactory");
+		Session s = sessionFactory.openSession();
+		TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(s));
+
     }
     
 	protected abstract String[] getContextConfigLocation();
@@ -49,5 +60,14 @@ public abstract class AbstractLamsCommonTestCase extends TestCase
     protected void tearDown() throws Exception
     {
         super.tearDown();
+        //clean the hibernate session
+		SessionFactory sessionFactory = (SessionFactory)this.ac.getBean("coreSessionFactory");
+	    SessionHolder holder = (SessionHolder)TransactionSynchronizationManager.getResource(sessionFactory);
+	    if (holder != null) {
+	    	Session s = holder.getSession(); 
+		    s.flush();
+		    TransactionSynchronizationManager.unbindResource(sessionFactory);
+		    SessionFactoryUtils.closeSessionIfNecessary(s, sessionFactory);
+	    }
     }
 }

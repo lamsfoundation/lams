@@ -23,16 +23,23 @@ public interface ILessonClassDAO
     public LessonClass getLessonClass(Long lessonClassId);
     
     /**
-     * Saves or Updates a Lesson.
+     * Saves a new Lesson.
      * @param lesson the Lesson to save
      */
     public void saveLessonClass(LessonClass lessonClass);
+    
+    /**
+     * Update an existing lesson class.
+     * @param lessonClass
+     */
+    public void updateLessonClass(LessonClass lessonClass);
     
     /**
      * Deletes a Lesson <b>permanently</b>.
      * @param lesson the Lesson to remove.
      */
     public void deleteLessonClass(LessonClass lessonClass);
+    
     
     
 }

@@ -7,14 +7,13 @@
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
 import java.util.List;
-import java.util.Set;
 
+
+import net.sf.hibernate.FetchMode;
 import net.sf.hibernate.HibernateException;
 import net.sf.hibernate.Query;
 import net.sf.hibernate.Session;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.orm.hibernate.HibernateCallback;
 import org.springframework.orm.hibernate.HibernateTemplate;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
@@ -40,6 +39,28 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
         return (Lesson)getHibernateTemplate().get(Lesson.class, lessonId);
     }
     
+    
+    public Lesson getLessonWithEagerlyFetchedProgress(Long lessonId)
+    {
+        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+        return (Lesson)hibernateTemplate.execute(
+             new HibernateCallback() 
+             {
+                 public Object doInHibernate(Session session) throws HibernateException 
+                 {
+                     return session.createCriteria(Lesson.class)
+                     			   .setFetchMode("learnerProgresses",FetchMode.EAGER)
+                     			   .uniqueResult();
+                 }
+             }
+       ); 
+    }
+    
+    public List getAllLessons()
+    {
+        return getHibernateTemplate().loadAll(Lesson.class);
+    }
     /**
      * Gets all lessons that are active for a learner.
      * @param learner a User that identifies the learner.

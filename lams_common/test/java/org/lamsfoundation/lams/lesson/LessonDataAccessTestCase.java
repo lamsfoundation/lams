@@ -21,6 +21,10 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
+import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.lesson.dao.hibernate.LessonClassDAO;
+import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
@@ -28,8 +32,12 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 
+
 /**
- * 
+ * The super class for lesson related data access test. It defines services, 
+ * such as initialize lesson data and clean up lesson data, for its descendents.
+ * It also act as a good example of creating and deleting lesson object that
+ * can be used by client.
  * @author Jacky Fang 2/02/2005
  * 
  */
@@ -42,6 +50,8 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
     protected IUserDAO userDao;
     protected ILearningDesignDAO learningDesignDao;
     protected IOrganisationDAO orgDao;
+    protected ILessonDAO lessonDao;
+    protected ILessonClassDAO lessonClassDao;    
     //---------------------------------------------------------------------
     // Domain Object instances
     //---------------------------------------------------------------------
@@ -57,7 +67,7 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
     private final Long TEST_LEARNING_DESIGN_ID = new Long(1);
     private final Integer TEST_ORGANIZATION_ID = new Integer(1);
     private final int TEST_GROUP_ORDER_ID = 0;
-    private final Long TEST_CLASS_GROUPING_ID = new Long(1);
+
 
     //---------------------------------------------------------------------
     // Overidden methods
@@ -76,6 +86,7 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+
         userDao = (UserDAO) this.ac.getBean("userDAO");
         learningDesignDao = (LearningDesignDAO) this.ac.getBean("learningDesignDAO");
         orgDao = (OrganisationDAO) this.ac.getBean("organisationDAO");
@@ -84,6 +95,10 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
         testUser = userDao.getUserById(TEST_USER_ID);
         testLearningDesign = learningDesignDao.getLearningDesignById(TEST_LEARNING_DESIGN_ID);
         testOrg = orgDao.getOrganisationById(TEST_ORGANIZATION_ID);
+   
+        //get lesson related daos
+        lessonDao = (LessonDAO)this.ac.getBean("lessonDAO");
+        lessonClassDao = (LessonClassDAO)this.ac.getBean("lessonClassDAO");
     }
 
     /**
@@ -106,29 +121,59 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
     //---------------------------------------------------------------------
     // Data initialization and finalization methods
     //---------------------------------------------------------------------
-
-    protected void initLessonData()
+    /**
+     * Initialize the whole lesson object. This also act as an example of 
+     * creating a new lesson for a learning design.
+     * 
+     * We have to creat lesson class before create group due to the not null
+     * field(grouping_id) in the group object.
+     * 
+     */
+    protected void initializeTestLesson()
     {
-
-        testLesson = new Lesson(new Date(System.currentTimeMillis()),
-                                testUser,
-                                Lesson.NOT_STARTED_STATE,
-                                testLearningDesign,
-                                testLessonClass,//lesson class
-                                testOrg,
-                                new HashSet());
-
-        testLesson.setLessonClass(createTestLessonClass(testLesson));
+        this.initLessonClassData();
+        lessonClassDao.saveLessonClass(this.testLessonClass);
+        
+        this.setUpGroupsForClass();
+        lessonClassDao.updateLessonClass(this.testLessonClass);
+        
+        this.initLessonData();
+        lessonDao.saveLesson(testLesson);
     }
-
+    
+    /**
+     * Remove the target lesson from database. We have to clean up the groups 
+     * first. We are using hibernate transparent persistant mechanism. To make
+     * the deletion of groups work, we have to setup "all-delete-orphan" for
+     * groups collection
+     * @param lesson the lesson needs to be removed.
+     */
+    protected void cleanUpTestLesson(Lesson lesson)
+    {
+        lesson.getLessonClass().getGroups().clear();
+        lessonDao.deleteLesson(lesson);
+    }
+    
+    /**
+     * Create a lesson class with empty group information.
+     */
     protected void initLessonClassData()
     {
-        testLessonClass = new LessonClass(TEST_CLASS_GROUPING_ID, //grouping id
+        //make a copy of lazily initialized activities
+        Set activities = new HashSet(testLearningDesign.getActivities());
+        testLessonClass = new LessonClass(null, //grouping id
                                           Grouping.CLASS_GROUPING_TYPE,
                                           new HashSet(),//groups
-                                          testLearningDesign.getActivities(),
+                                          activities,
                                           null, //staff group 
                                           testLesson);
+    }
+    
+    /**
+     * Setup groups(learner group and staff group) fro created lesson class.
+     */
+    protected void setUpGroupsForClass()
+    {
         //create a new staff group
         Set staffs = new HashSet();
         staffs.add(testUser);
@@ -141,25 +186,63 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
 
         //create learner class group
         Set learnergroups = new HashSet();
+        //make a copy of lazily initialized users
+        Set users = new HashSet(testOrg.getUsers());
         Group learnerClassGroup = new Group(null,//group id 
                                             TEST_GROUP_ORDER_ID,
                                             testLessonClass,
-                                            testOrg.getUsers(),
+                                            users,
                                             new HashSet());//tool session, should be empty now
 
         learnergroups.add(learnerClassGroup);
+        testLessonClass.setGroups(learnergroups);
     }
+    
+    /**
+     * Create lesson based on the information we initialized.
+     */
+    protected void initLessonData()
+    {
+        testLesson = new Lesson(new Date(System.currentTimeMillis()),
+                                testUser,
+                                Lesson.NOT_STARTED_STATE,
+                                testLearningDesign,
+                                testLessonClass,//lesson class
+                                testOrg,
+                                new HashSet());
+    }
+  
+
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
     /**
-     * Create test lesson class based on the give lesson
-     * @param lesson the lesson for the class we are going to create
-     * @return the new Lesson Class transiant hibernate object
+     * Helper method to validate the created lesson class. This validation
+     * method can be reused by sub-classes.
      */
-    private LessonClass createTestLessonClass(Lesson lesson)
+    protected void assertLessonClass()
     {
-
-        return testLessonClass;
+        LessonClass createdLessonClass = lessonClassDao.getLessonClass(this.testLessonClass.getGroupingId());
+        assertEquals("check up number of activities",1,createdLessonClass.getActivities().size());
+        assertEquals("check up staff groups",1,createdLessonClass.getStaffGroup().getUsers().size());
+        assertEquals("check up grouping types, should be class grouping",Grouping.CLASS_GROUPING_TYPE,createdLessonClass.getGroupingTypeId());
+        assertEquals("check up learner groups",1,createdLessonClass.getGroups().size());
+    }
+    /**
+     * Helper method to validate the created lesson. This validation
+     * method can be reused by sub-classes.
+     */
+    protected void assertLesson()
+    {
+        Lesson createdLesson = lessonDao.getLesson(this.testLesson.getLessonId());
+        assertEquals("check up creation time",testLesson.getCreateDateTime().toString(),
+                     						  createdLesson.getCreateDateTime().toString());
+        assertEquals("check up user who created this lesson",testUser.getLogin(),createdLesson.getUser().getLogin());
+        assertEquals("check up the lesson state",Lesson.NOT_STARTED_STATE,createdLesson.getLessonStateId());
+        assertEquals("check up the learning design that used to create lesson",
+                     							testLearningDesign.getTitle(),
+                     							createdLesson.getLearningDesign().getTitle());
+        assertEquals("check up the organization", testOrg.getName(),createdLesson.getOrganisation().getName());
+        
     }
 }
