@@ -28,6 +28,12 @@
     </target>
     
     <target name="usage" description="print usage message">
+        <echo>usage: this message</echo>
+        <echo>clean: clean the ear assembly directories</echo>
+        <echo>clean-subprojects: clean sub project build directories</echo>
+        <echo>build-subprojects: build sub projects</echo>
+        <echo>assemble-ear: assemble ear structure</echo>
+        <echo>deploy-ear: copy ear to loca jboss server</echo>
     </target>
     
     <!-- clean dirs for this script only -->
