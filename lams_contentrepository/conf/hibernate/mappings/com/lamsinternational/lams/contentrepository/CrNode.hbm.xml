@@ -84,7 +84,19 @@
             length="14"
         </meta>    
     </property>
-
+    <property
+        name="nextVersionId"
+        type="java.lang.Long"
+        column="next_version_id"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            type="java.lang.Long"
+            column="next_version_id"
+        </meta>    
+    </property>
     <!-- Associations -->
   
     <!-- bi-directional one-to-many association to CrNodeVersion -->
