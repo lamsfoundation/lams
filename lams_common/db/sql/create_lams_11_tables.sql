@@ -281,6 +281,7 @@ CREATE TABLE lams_learning_design (
      , lesson_org_name VARCHAR(255)
      , lesson_id BIGINT(20)
      , lesson_start_date_time DATETIME
+     , lesson_name VARCHAR(255)
      , last_modified_date_time DATETIME NOT NULL
      , PRIMARY KEY (learning_design_id)
      , INDEX (parent_learning_design_id)
@@ -368,6 +369,7 @@ CREATE TABLE lams_learning_activity (
      , parent_ui_id INT(11)
      , learning_activity_type_id INT(11) NOT NULL DEFAULT 0
      , grouping_support_type_id INT(3) NOT NULL
+     , apply_grouping_flag TINYINT(1) NOT NULL
      , grouping_id BIGINT(20)
      , grouping_ui_id INT(11)
      , order_id INT(11)

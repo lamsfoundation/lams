@@ -316,6 +316,19 @@
 <variant type-name-pattern="INT ZEROFILL"/>
 </data-type>
 </column>
+<column name="apply_grouping_flag" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
 <column name="grouping_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
