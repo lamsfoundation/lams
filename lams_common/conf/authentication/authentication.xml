@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "authentication.dtd">
+<!DOCTYPE Authentication PUBLIC "-//LAMS//DTD LAMS//EN" "D:/authentication.dtd">
 
 <Authentication>
 
@@ -13,7 +13,7 @@
 	<Param Name="dsJndiName">java:/MySqlDS</Param>
 	<Param Name="principalsQuery">select password from lams_user where login=?</Param>
 	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
-	<Param Name="truststore.path">"D:/MQLdapTrustStore"</Param>
+	<Param Name="truststore.path">D:/MQLdapTrustStore</Param>
 	<Param Name="truststore.password">webauth</Param>
 </Method>
 
@@ -28,6 +28,8 @@
 	<Param Name="WebAuthTokenName">WEBAUTH_USER</Param>
 	<Param Name="WebAuthTriggerPage">https://array00.melcoe.mq.edu.au/webauth.html</Param>
 	<Param Name="DummyPasswordForWebAuthUser">dummy</Param>
+	<Param Name="dsJndiName">java:/MySqlDS</Param>
+	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
 </Method>
 
 <!-- NOT in USE -->
