@@ -1,0 +1,6 @@
+com.lamsinternational.lams.contentrepository
+com.lamsinternational.lams.contentrepository.dao
+com.lamsinternational.lams.contentrepository.dao.file
+com.lamsinternational.lams.contentrepository.dao.hibernate
+com.lamsinternational.lams.contentrepository.struts.action
+com.lamsinternational.lams.contentrepository.struts.form
