@@ -29,7 +29,6 @@ http://www.gnu.org/licenses/gpl.txt
 <%-- TODO: use type --%>
 <frameset rows="*,*" bordercolor="1" id="lamsDynamicFrameSet">
 	<c:forEach items="${activityForm.activityURLs}" var="activityURL" varStatus="loop">
-		<%--c:out value="${activityURL}" /--%>
 		<frame src="<c:out value="${activityURL.url}" />" 
 			name="TaskFrame<c:out value="${loop.index}" />"
 			frameborder="" bordercolor="#E0E7EB"
