@@ -11,7 +11,6 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.util.HashSet;
 
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 
 
@@ -20,13 +19,14 @@ import junit.framework.TestCase;
 
 /**
  * 
- * @author Jacky Fang 8/02/2005
- * 
+ * @author Jacky Fang 
+ * @since 8/02/2005
+ * @version 1.1
  */
 public class TestGrouping extends TestCase
 {
 
-    private Grouping grouping;    
+    private Grouping grouping;
     /*
      * @see TestCase#setUp()
      */
@@ -34,7 +34,6 @@ public class TestGrouping extends TestCase
     {
         super.setUp();
         grouping = new RandomGrouping();
-        
     }
 
     /*
