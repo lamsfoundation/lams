@@ -52,12 +52,6 @@ public class LearningDesign implements Serializable {
     private Date dateReadOnly;
 
     /** nullable persistent field */
-    private Long readAccess;
-
-    /** nullable persistent field */
-    private Long writeAccess;
-
-    /** nullable persistent field */
     private String helpText;
 
     /** persistent field */
@@ -96,10 +90,13 @@ public class LearningDesign implements Serializable {
     /** non-persistent field containing a list
      * of optional activities in the design*/
     private Set optionalActivities;
+    
+    private Set paralleActivities;
 
+    private Set sequenceActivities;
     
     /** full constructor */
-    public LearningDesign(Long learningDesignId, Integer id, String description, String title, Activity firstActivity, Integer maxId, Boolean validDesign, Boolean readOnly, Date dateReadOnly, Long readAccess, Long writeAccess, String helpText, Boolean lessonCopy, Date createDateTime, String version, Date openDateTime, Date closeDateTime, User user, org.lamsfoundation.lams.learningdesign.LearningDesign parentLearningDesign, Set childLearningDesigns, Set lessons, Set transitions, Set activities) {
+    public LearningDesign(Long learningDesignId, Integer id, String description, String title, Activity firstActivity, Integer maxId, Boolean validDesign, Boolean readOnly, Date dateReadOnly,String helpText, Boolean lessonCopy, Date createDateTime, String version, Date openDateTime, Date closeDateTime, User user, org.lamsfoundation.lams.learningdesign.LearningDesign parentLearningDesign, Set childLearningDesigns, Set lessons, Set transitions, Set activities) {
         this.learningDesignId = learningDesignId;
         this.id = id;
         this.description = description;
@@ -109,8 +106,6 @@ public class LearningDesign implements Serializable {
         this.validDesign = validDesign;
         this.readOnly = readOnly;
         this.dateReadOnly = dateReadOnly;
-        this.readAccess = readAccess;
-        this.writeAccess = writeAccess;
         this.helpText = helpText;
         this.lessonCopy = lessonCopy;
         this.createDateTime = createDateTime;
@@ -251,31 +246,6 @@ public class LearningDesign implements Serializable {
     public void setDateReadOnly(Date dateReadOnly) {
         this.dateReadOnly = dateReadOnly;
     }
-
-    /** 
-     *            
-     *         
-     */
-    public Long getReadAccess() {
-        return this.readAccess;
-    }
-
-    public void setReadAccess(Long readAccess) {
-        this.readAccess = readAccess;
-    }
-
-    /** 
-     *           
-     *         
-     */
-    public Long getWriteAccess() {
-        return this.writeAccess;
-    }
-
-    public void setWriteAccess(Long writeAccess) {
-        this.writeAccess = writeAccess;
-    }
-
     /** 
      *           
      */
@@ -416,6 +386,14 @@ public class LearningDesign implements Serializable {
 
     public void setActivities(Set activities) {
         this.activities = activities;
+       /* HashSet designActivities =(HashSet)this.activities;
+		Iterator iter = designActivities.iterator();
+		Activity activity = null;
+		while(iter.hasNext()){
+			activity =(Activity) iter.next();
+			Integer activityTypeID = activity.getActivityTypeId();
+			populateDesignActivitySets(activity,activityTypeID);
+		}*/
     }
 
     public String toString() {
@@ -526,6 +504,23 @@ public class LearningDesign implements Serializable {
 			
 		}
 		return activityIds;
+	}
+	private void populateDesignActivitySets(Activity activity, Integer activityTypeID){
+		int typeID = activityTypeID.intValue();
+		if(typeID==7){
+			if(paralleActivities==null)
+				paralleActivities = new HashSet();
+			paralleActivities.add(activity);
+		}else if(typeID==8){
+			if(optionalActivities==null)
+				optionalActivities = new HashSet();
+			optionalActivities.add(activity);
+		}else if(typeID==9){
+			if(sequenceActivities==null)
+				sequenceActivities = new HashSet();
+			sequenceActivities.add(activity);
+		}
+		
 	}
 
 }

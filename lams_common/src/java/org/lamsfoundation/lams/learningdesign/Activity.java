@@ -29,6 +29,8 @@ public abstract class Activity implements Serializable {
 	public static final int OPTIONS_ACTIVITY_TYPE = 8;
 
 	public static final int SEQUENCE_ACTIVITY_TYPE = 9;
+	
+	public static final String OBJECT_TYPE ="Activity";
 
 	/** identifier field */
 	private Long activityId;
@@ -83,7 +85,7 @@ public abstract class Activity implements Serializable {
 
 	/** persistent field */
 	private Set transitionsByFromActivityId;
-
+	
 	/** full constructor */
 	public Activity(
 			Long activityId,
@@ -123,6 +125,7 @@ public abstract class Activity implements Serializable {
 
 	/** default constructor */
 	public Activity() {
+		this.grouping = null;		
 	}
 
 	/** minimal constructor */
@@ -388,5 +391,5 @@ public abstract class Activity implements Serializable {
 	 */
 	public void setLibraryActivityUiImage(String libraryActivityUiImage) {
 		this.libraryActivityUiImage = libraryActivityUiImage;
-	}
+	}	
 }

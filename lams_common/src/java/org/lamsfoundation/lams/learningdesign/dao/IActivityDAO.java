@@ -23,7 +23,7 @@ public interface IActivityDAO extends IBaseDAO{
 	 * @param parentActivityId The activityId of the parent activity
 	 * @return Activity populated Activity object
 	 */
-	public Activity getActivityByParentActivityId(Long parentActivityId);
+	public List getActivitiesByParentActivityId(Long parentActivityId);
 	
 	/**
 	 * @return List of all the activities

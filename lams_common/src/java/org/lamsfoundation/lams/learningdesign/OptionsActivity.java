@@ -26,10 +26,10 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
             Boolean defineLater, 
             java.util.Date createDateTime, 
             String offlineInstructions, 
-            org.lamsfoundation.lams.learningdesign.LearningLibrary learningLibrary, 
-            org.lamsfoundation.lams.learningdesign.Activity parentActivity, 
-            org.lamsfoundation.lams.learningdesign.LearningDesign learningDesign, 
-            org.lamsfoundation.lams.learningdesign.Grouping grouping, 
+            LearningLibrary learningLibrary, 
+            Activity parentActivity, 
+            LearningDesign learningDesign, 
+            Grouping grouping, 
             Integer activityTypeId,  
             java.util.Set transitionsByToActivityId, 
             java.util.Set transitionsByFromActivityId,
@@ -60,6 +60,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
 
     /** default constructor */
     public OptionsActivity() {
+    	
     }
 
     /** minimal constructor */
