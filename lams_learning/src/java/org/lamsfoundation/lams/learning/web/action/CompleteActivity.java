@@ -87,7 +87,7 @@ public class CompleteActivity extends ActivityAction {
 		sessionBean.setLearnerProgress(progress);
 		setSessionBean(sessionBean, request);
 
-		ActionForward forward = actionMappings.getNextActivityForward(progress, true);
+		ActionForward forward = actionMappings.getProgressForward(progress, true);
 		
 		return forward;
 	}

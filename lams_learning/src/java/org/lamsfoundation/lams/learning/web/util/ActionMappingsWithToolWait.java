@@ -5,8 +5,6 @@
 package org.lamsfoundation.lams.learning.web.util;
 
 import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ForwardingActionForward;
-import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -18,7 +16,7 @@ import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.LessonCompleteActivity;
-import org.lamsfoundation.lams.lesson.NullActivity;
+import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
 
 /**
@@ -52,24 +50,8 @@ public class ActionMappingsWithToolWait extends ActionMappings {
 	 * @param redirect, If true a RedirectActionForward is used
 	 * @return
 	 */
-	public ActionForward getNextActivityForward(LearnerProgress progress, boolean redirect) {
-	    return super.getNextActivityForward(progress, redirect);
-	    /*ActionForward actionForward = null;
-
-		Activity nextActivity = progress.getNextActivity();
-		Activity previousActivity = progress.getPreviousActivity();
-		Activity currentActivity = progress.getCurrentActivity();
-		
-		if (previousActivity instanceof ParallelActivity) {
-		    // clear frameset
-		    String strutsAction = "/requestDisplay.do";
-		    actionForward = strutsActionToForward(strutsAction, nextActivity, redirect);
-		}
-		else {
-			actionForward = getActivityForward(nextActivity, progress, redirect);
-		}
-
-		return actionForward;*/
+	public ActionForward getProgressForward(LearnerProgress progress, boolean redirect) {
+	    return super.getProgressForward(progress, redirect);
 	}
 	
 	/**
@@ -96,11 +78,9 @@ public class ActionMappingsWithToolWait extends ActionMappings {
 	 * Note that this method always returns a LAMS URLs, if a ToolActivity is next
 	 * the URL will be the action for displaying the tool.
 	 * Note that the URL could also be a wait message or a jsp to clear the frames.
-	 * @param previousProgress, the previous LearnerProgress before an activity was
-	 * completed.
 	 * @param progress, the current LearnerProgress.
 	 */
-	public ActivityURL getNextActivityURL(LearnerProgress previousProgress, LearnerProgress progress) {
+	public ActivityURL getProgressURL(LearnerProgress progress) {
 		ActivityURL activityURL = null;
 
 		Activity nextActivity = progress.getNextActivity();

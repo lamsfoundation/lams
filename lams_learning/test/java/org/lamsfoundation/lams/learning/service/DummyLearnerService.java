@@ -175,8 +175,8 @@ public class DummyLearnerService implements ILearnerService {
     	Activity activity = getActivity(toolSessionId, progress);
     	
     	String url = null;
-    	LearnerProgress nextLearnerProgress = calculateProgress(activity, learner, lesson);
-    	ActivityURL activityURL = actionMappings.getNextActivityURL(progress, nextLearnerProgress);
+    	progress = calculateProgress(activity, learner, lesson);
+    	ActivityURL activityURL = actionMappings.getProgressURL(progress);
     	url = activityURL.getUrl();
     	
     	return url;

@@ -18,7 +18,7 @@ import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.LessonCompleteActivity;
-import org.lamsfoundation.lams.lesson.NullActivity;
+import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
 
 /**
@@ -65,7 +65,7 @@ public class ActionMappings {
 	 * @param redirect, If true a RedirectActionForward is used
 	 * @return
 	 */
-	public ActionForward getNextActivityForward(LearnerProgress progress, boolean redirect) {
+	public ActionForward getProgressForward(LearnerProgress progress, boolean redirect) {
 	    ActionForward actionForward = null;
 
 		Activity nextActivity = progress.getNextActivity();
@@ -114,11 +114,9 @@ public class ActionMappings {
 	 * Note that this method always returns a LAMS URLs, if a ToolActivity is next
 	 * the URL will be the action for displaying the tool.
 	 * Note that the URL could also be a wait message or a jsp to clear the frames.
-	 * @param previousProgress, the previous LearnerProgress before an activity was
-	 * completed.
 	 * @param progress, the current LearnerProgress.
 	 */
-	public ActivityURL getNextActivityURL(LearnerProgress previousProgress, LearnerProgress progress) {
+	public ActivityURL getProgressURL(LearnerProgress progress) {
 		ActivityURL activityURL = null;
 
 		Activity nextActivity = progress.getNextActivity();
@@ -148,6 +146,8 @@ public class ActionMappings {
 	 * Generates an ActivityURL for a Tool Activity. The URL is for the tool and
 	 * not for the tool loading page. The URL also includes toolSessionId and all
 	 * other required data.
+	 * @param activity, the ToolActivity to be displayed
+	 * @param progress, the current LearnerProgress, used to get activity status
 	 */
 	public ActivityURL getToolURL(ToolActivity activity, LearnerProgress progress) {
 		ActivityURL activityURL = new ActivityURL();
@@ -165,7 +165,7 @@ public class ActionMappings {
 	/**
 	 * Returns the struts action used to display the specified activity.
 	 * @param activity, Activity to be displayed
-	 * @param progress, LearnerProgress for the activity
+	 * @param progress, LearnerProgress for the activity, used to check activity status
 	 * @return String representing a struts action
 	 */
 	protected String getActivityAction(Activity activity, LearnerProgress progress) {
