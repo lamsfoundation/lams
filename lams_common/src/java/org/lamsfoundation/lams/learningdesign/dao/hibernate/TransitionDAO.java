@@ -25,7 +25,8 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	private static final String TABLENAME ="lams_learning_transition";
 	private static final String FIND_BY_TO_ACTIVITY = "from " + TABLENAME +" in class " + Transition.class.getName()+ " where to_activity_id =?";
 	private static final String FIND_BY_FROM_ACTIVITY = "from " + TABLENAME +" in class " + Transition.class.getName()+ " where from_activity_id =?";
-	
+	private static final String FIND_BY_LEARNING_DESIGN_ID = "from " + TABLENAME +" in class " + Transition.class.getName()+
+															" where learning_design_id=?";
 	
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO#getTransitionById(java.lang.Integer)
@@ -55,6 +56,11 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	 */
 	public List getTransitionByfromActivityID(Long fromActivityID) {
 		List list = this.getHibernateTemplate().find(FIND_BY_FROM_ACTIVITY,new Object[]{fromActivityID}, new Type[]{Hibernate.LONG});
+		return list;
+	}
+	
+	public List getTransitionsByLearningDesignID(Long learningDesignID){
+		List list = this.getHibernateTemplate().find(FIND_BY_LEARNING_DESIGN_ID, new Object[]{learningDesignID}, new Type[]{Hibernate.LONG});
 		return list;
 	}
 

@@ -37,5 +37,7 @@ public interface ITransitionDAO extends IBaseDAO {
 	 * @return Returns the list of Transition objects where from_activity_id = activityID
 	 */
 	public List getTransitionByfromActivityID(Long fromActivityID);
+	
+	public List getTransitionsByLearningDesignID(Long learningDesignID);
 
 }
