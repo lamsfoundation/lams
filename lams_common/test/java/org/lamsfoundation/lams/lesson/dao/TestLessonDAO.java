@@ -9,6 +9,7 @@
 
 package org.lamsfoundation.lams.lesson.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -75,16 +76,18 @@ public class TestLessonDAO extends LessonDataAccessTestCase
     public void testUpdateLesson()
     {
         Lesson createdLesson = this.lessonDao.getLesson(this.testLesson.getLessonId());
-        
         assertEquals("should be created state now",Lesson.CREATED,createdLesson.getLessonStateId());
-        createdLesson.setLessonStateId(Lesson.STARTED_STATE);
+        assertNull("ensure we are testing right lesson",createdLesson.getScheduleEndDate());
         
+        createdLesson.setLessonStateId(Lesson.STARTED_STATE);
+        createdLesson.setScheduleEndDate(new Date(System.currentTimeMillis()+60));
         lessonDao.updateLesson(createdLesson);
         
         Lesson updatedLesson = lessonDao.getLesson(testLesson.getLessonId());
         
         assertEquals("verify the updated lesson state",Lesson.STARTED_STATE,updatedLesson.getLessonStateId());
-    
+        assertNotNull("verify the sechdule end date",updatedLesson.getScheduleEndDate());
+        
         List lessons = this.lessonDao.getActiveLessonsForLearner(this.testUser);
         
         assertEquals("verify the number of lesson we get",1,lessons.size());

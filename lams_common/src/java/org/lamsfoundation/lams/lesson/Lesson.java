@@ -107,18 +107,30 @@ public class Lesson implements Serializable {
     /** default constructor */
     public Lesson() {
     }
+    
+    /**
+     * Minimum constructor that initialize the lesson data. It doesn't include
+     * organization and class information.
+     * Cain constructor pattern implementation.
+     */
+    public Lesson(Date createDateTime, User user, Integer lessonStateId, LearningDesign learningDesign,Set learnerProgresses) 
+    {
+        this(null,createDateTime,null,null,user,lessonStateId,learningDesign,null,null,learnerProgresses);
+    }     
+    
     /** 
-     * Minimum constructor that includes all not null attributes to create
-     * a new Lesson object.
+     * Constructor that creates a new lesson with organization and class 
+     * information.
      * Chain construtor pattern implementation. 
      */
-    public Lesson(Date createDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) {
-
+    public Lesson(Date createDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) 
+    {
         this(null,createDateTime,null,null,user,lessonStateId,learningDesign,lessonClass,organisation,learnerProgresses);
     }    
     
     /** full constructor */
-    public Lesson(Long lessonId, Date createDateTime, Date startDateTime, Date endDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) {
+    public Lesson(Long lessonId, Date createDateTime, Date startDateTime, Date endDateTime, User user, Integer lessonStateId, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation, Set learnerProgresses) 
+    {
         this.lessonId = lessonId;
         this.createDateTime = createDateTime;
         this.startDateTime = startDateTime;
@@ -132,8 +144,8 @@ public class Lesson implements Serializable {
     }
     /**
      * Factory method that create a new lesson. It initialized all necessary
-     * data for a new lesson. It is design for monitor side to create a lesson
-     * by teacher.
+     * data for a new lesson with organization and lesson class information.
+     * It is designed for monitor side to create a lesson by teacher.
      * 
      * @param user the teacher who created this lesson
      * @param organisation the organisation associated with this lesson.
@@ -156,6 +168,24 @@ public class Lesson implements Serializable {
                                    new HashSet());//learner progress
     }
 
+    /**
+     * Factory method that create a new lesson with lesson class and organization.
+     * It is design to allow user create a lesson first and modify organization
+     * and lesson class data later.
+     * 
+     * @param user the user who want to create a lesson.
+     * @param ld the learning design that this lesson is based on.
+     * @return the lesson created.
+     */
+    public static Lesson createNewLessonWithoutClass(User user,
+                                                     LearningDesign ld)
+    {
+        return new Lesson(new Date(System.currentTimeMillis()),
+                          user,
+                          Lesson.CREATED,
+                          ld,
+                          new HashSet());
+    }
     //---------------------------------------------------------------------
     // Getters and Setters
     //---------------------------------------------------------------------
@@ -208,7 +238,7 @@ public class Lesson implements Serializable {
     }
 
     /**
-     * @hibernate.property type="java.sql.Timestamp"  column="end_date_time"
+     * @hibernate.property type="java.sql.Timestamp"  column="schedule_end_date_time"
      *            	       length="19"
      * 
      * @return Returns the scheduleEndDate.
@@ -225,6 +255,8 @@ public class Lesson implements Serializable {
         this.scheduleEndDate = scheduleEndDate;
     }
     /**
+     * @hibernate.property type="java.sql.Timestamp" column="schedule_start_date_time"
+     *            		   length="19"
      * @return Returns the scheduleStartDate.
      */
     public Date getScheduleStartDate()
@@ -275,7 +307,7 @@ public class Lesson implements Serializable {
     }
 
     /** 
-     * @hibernate.many-to-one not-null="true" unique="true" 
+     * @hibernate.many-to-one not-null="false" unique="true" 
      * 						  cascade = "save-update"
      * @hibernate.column name="learning_design_id"           
      */
@@ -288,7 +320,7 @@ public class Lesson implements Serializable {
     }
 
     /** 
-     * @hibernate.many-to-one not-null="true" cascade="none"
+     * @hibernate.many-to-one not-null="false" cascade="none"
      * @hibernate.column name="organisation_id"         
      */
     public Organisation getOrganisation() {

@@ -24,10 +24,15 @@
 		<property name="endDateTime" type="java.sql.Timestamp"
 			column="end_date_time" length="19">
 		</property>
+		<property name="scheduleStartDate" type="java.sql.Timestamp"
+			column="schedule_start_date_time" length="19">
+		</property>
+		<property name="scheduleEndDate" type="java.sql.Timestamp"
+			column="schedule_end_date_time" length="19">
+		</property>				
 		<property name="lessonStateId" type="java.lang.Integer"
 			column="lesson_state_id" length="3">
 		</property>
-
 		<!-- Associations -->
 		
 		<!-- bi-directional many-to-one association to User -->
@@ -58,13 +63,14 @@
 		<many-to-one name="lessonClass"
 			class="org.lamsfoundation.lams.lesson.LessonClass"
 			column="class_grouping_id"
-			unique="true" 
+			unique="true"
+			not-null="false" 
 			cascade = "all"/>
 
 		<!-- bi-directional many-to-one association to Organisation -->
 		<many-to-one name="organisation"
 			class="org.lamsfoundation.lams.usermanagement.Organisation"
-			not-null="true">
+			not-null="false">
 			<column name="organisation_id" />
 		</many-to-one>
 
