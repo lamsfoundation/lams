@@ -30,7 +30,7 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
     private Activity testComplexActivity;
     
     //this is survey id we inserted in test data sql script
-    private static final Long TEST_TOOL_ACTIVITY_ID = new Long(20);
+    private static final Long TEST_TOOL_ACTIVITY_ID = new Long(15);
     private static final Long TEST_COMPLEX_ACTIVITY_ID = new Long(13);
     /*
      * @see LessonDataAccessTestCase#setUp()
