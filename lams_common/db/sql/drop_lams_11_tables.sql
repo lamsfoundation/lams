@@ -1,5 +1,13 @@
 # Connection: ROOT LOCAL
 # Host: localhost
+# Saved: 2005-03-18 15:25:57
+# 
+# Connection: ROOT LOCAL
+# Host: localhost
+# Saved: 2005-03-18 15:04:50
+# 
+# Connection: ROOT LOCAL
+# Host: localhost
 # Saved: 2005-03-15 13:43:35
 # 
 # Connection: ROOT LOCAL
@@ -55,5 +63,7 @@ DROP TABLE IF EXISTS lams_cr_workspace;
 DROP TABLE IF EXISTS lams_cr_credential;
 DROP TABLE IF EXISTS lams_workspace_folder_type;
 DROP TABLE IF EXISTS lams_grouping_support_type;
+DROP TABLE IF EXISTS lams_log_event;
+DROP TABLE IF EXISTS lams_log_event_type;
 
 SET FOREIGN_KEY_CHECKS=1;

@@ -407,7 +407,7 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="DATETIME"/>
@@ -496,11 +496,11 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="activity_category_id" alias="" remarks="" mandatory="false" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
+<column name="activity_category_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
 <variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
@@ -902,7 +902,7 @@
 <variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="DATETIME"/>
@@ -1320,7 +1320,7 @@
 <variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="DATETIME"/>
@@ -1422,7 +1422,7 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="DATETIME"/>
@@ -1559,7 +1559,7 @@
 <variant type-name-pattern="INT ZEROFILL"/>
 </data-type>
 </column>
-<column name="create_date" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column name="create_date" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="DATETIME"/>
@@ -1871,7 +1871,7 @@
 <variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="create_date" alias="" remarks="" mandatory="true" column-size="19" decimal-digits="0" default-value="0000-00-00 00:00:00" auto-increment="false">
+<column name="create_date" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
 <data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="DATETIME"/>
@@ -2863,6 +2863,12 @@
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
+<column name="create_date_time" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
 </column-list>
 <primary-key name="PK_LAMS_TOOL" alias="" remarks="">
 <primary-key-description/>
@@ -3173,7 +3179,7 @@
 </table>
 <table name="lams_tool_session_state" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="1201" y="1916" width="-1" height="-1"/>
+<table-figure-bounds x="1153" y="1825" width="-1" height="-1"/>
 <column-list>
 <column name="tool_session_state_id" alias="" remarks="" mandatory="true" column-size="3" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
@@ -4092,6 +4098,125 @@ It is the node_id and version_id combination that is the "real" key for this tab
 <primary-key name="PK_LAMS_GROUPING_SUPPORT_TYPE" alias="" remarks="">
 <primary-key-description/>
 <primary-key-column name="grouping_support_type_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list/>
+</table>
+<table name="lams_log_event" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="1106" y="1978" width="-1" height="-1"/>
+<column-list>
+<column name="log_event_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="true">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="log_event_type_id" alias="" remarks="" mandatory="true" column-size="5" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="user_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="timestamp" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="ref_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="message" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PK_LAMS_LOG_EVENT" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="log_event_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_lams_event_log_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_log_event_type" referenced-key="PK_LAMS_LOG_EVENT_TYPE" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="log_event_type_id" referenced-key-column-name="log_event_type_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list/>
+</table>
+<table name="lams_log_event_type" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="1370" y="1970" width="-1" height="-1"/>
+<column-list>
+<column name="log_event_type_id" alias="" remarks="" mandatory="true" column-size="5" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column name="description" alias="" remarks="" mandatory="true" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PK_LAMS_LOG_EVENT_TYPE" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="log_event_type_id"/>
 </primary-key>
 <unique-key-list/>
 <foreign-key-list/>
