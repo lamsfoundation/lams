@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.learning.web.util.ActionMappings;
  * @struts:action path="/DisplayLoadToolActivity" name="activityForm"
  *                validate="false" scope="request"
  * 
- * @struts:action-forward name="displayTool" path=".toolActivity"
+ * @struts:action-forward name="displayTool" path=".loadToolActivity"
  * 
  */
 public class DisplayLoadToolActivity extends ActivityAction {
@@ -64,7 +64,7 @@ public class DisplayLoadToolActivity extends ActivityAction {
 		Activity activity = getActivity(request, form, learnerProgress);
 		if (!(activity instanceof ToolActivity)) {
 		    log.error(className+": activity not ToolActivity");
-			return mapping.findForward(actionMappings.ERROR);
+			return mapping.findForward(ActionMappings.ERROR);
 		}
 		
 		ToolActivity toolActivity = (ToolActivity)activity;

@@ -72,7 +72,7 @@ public class DisplayOptionsActivity extends ActivityAction {
 		Activity activity = getActivity(request, form, learnerProgress);
 		if (!(activity instanceof OptionsActivity)) {
 		    log.error(className+": activity not OptionsActivity "+activity.getActivityId());
-			return mapping.findForward(actionMappings.ERROR);
+			return mapping.findForward(ActionMappings.ERROR);
 		}
 
 		OptionsActivity optionsActivity = (OptionsActivity)activity;

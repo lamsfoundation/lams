@@ -23,12 +23,9 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import javax.servlet.http.*;
 
-import java.util.*;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
 import org.lamsfoundation.lams.learningdesign.*;
@@ -37,6 +34,8 @@ import org.lamsfoundation.lams.learning.web.util.ActionMappings;
 
 /** 
  * Action class to forward the user to a Tool.
+ * 
+ * @author daveg
  * 
  * XDoclet definition:
  * 
@@ -62,7 +61,7 @@ public class DisplayToolActivity extends ActivityAction {
 		Activity activity = getActivity(request, form, learnerProgress);
 		if (!(activity instanceof ToolActivity)) {
 		    log.error(className+": activity not ToolActivity");
-			return mapping.findForward(actionMappings.ERROR);
+			return mapping.findForward(ActionMappings.ERROR);
 		}
 		
 		ToolActivity toolActivity = (ToolActivity)activity;
@@ -72,7 +71,7 @@ public class DisplayToolActivity extends ActivityAction {
 		    response.sendRedirect(url);
 		}
 		catch (java.io.IOException e) {
-		    return mapping.findForward(actionMappings.ERROR);
+		    return mapping.findForward(ActionMappings.ERROR);
 		}
 		return null;
 	}

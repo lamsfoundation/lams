@@ -64,21 +64,21 @@ public class CompleteActivity extends ActivityAction {
 		ActivityForm form = (ActivityForm)actionForm;
 		ActionMappings actionMappings = getActionMappings();
 		
-		SessionBean sessionBean = ActivityAction.getSessionBean(request);
+		SessionBean sessionBean = getSessionBean(request);
 		if (sessionBean == null) {
 			// forward to the no session error page
-			return mapping.findForward(actionMappings.NO_SESSION_ERROR);
+			return mapping.findForward(ActionMappings.NO_SESSION_ERROR);
 		}
 		
 		// check token
 		if (!this.isTokenValid(request, true)) {
 			// didn't come here from options page
 		    log.info(className+": No valid token in request");
-			return mapping.findForward(actionMappings.DOUBLE_SUBMIT_ERROR);
+			return mapping.findForward(ActionMappings.DOUBLE_SUBMIT_ERROR);
 		}
 		
 		// Get learner
-		User learner = sessionBean.getLeaner();
+		User learner = sessionBean.getLearner();
 		Lesson lesson = sessionBean.getLesson();
 		
 		LearnerProgress progress = getLearnerProgress(request, form);
@@ -86,7 +86,7 @@ public class CompleteActivity extends ActivityAction {
 		
 		if (activity == null) {
 		    log.error(className+": No activity in request or session");
-			return mapping.findForward(actionMappings.ERROR);
+			return mapping.findForward(ActionMappings.ERROR);
 		}
 
 		ILearnerService learnerService = getLearnerService(request);

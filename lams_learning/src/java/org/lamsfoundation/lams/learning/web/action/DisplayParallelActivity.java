@@ -65,7 +65,7 @@ public class DisplayParallelActivity extends ActivityAction {
 		Activity activity = getActivity(request, form, learnerProgress);
 		if (!(activity instanceof ParallelActivity)) {
 		    log.error(className+": activity not ParallelActivity "+activity.getActivityId());
-			return mapping.findForward(actionMappings.ERROR);
+			return mapping.findForward(ActionMappings.ERROR);
 		}
 
 		ParallelActivity parallelActivity = (ParallelActivity)activity;
@@ -84,7 +84,7 @@ public class DisplayParallelActivity extends ActivityAction {
 		}
 		if (activityURLs.size() == 0) {
 		    log.error(className+": No sub-activity URLs for activity "+activity.getActivityId());
-			return mapping.findForward(actionMappings.ERROR);
+			return mapping.findForward(ActionMappings.ERROR);
 		}
 		form.setActivityURLs(activityURLs);
 		

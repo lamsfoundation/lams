@@ -23,8 +23,6 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import javax.servlet.http.*;
 
-import java.util.*;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -62,14 +60,14 @@ public class DisplayActivity extends ActivityAction {
 		ActivityForm form = (ActivityForm) actionForm;
 		ActionMappings actionMappings = getActionMappings();
 		
-		SessionBean sessionBean = ActivityAction.getSessionBean(request);
+		SessionBean sessionBean = getSessionBean(request);
 		if (sessionBean == null) {
 			// forward to the no session error page
-			return mapping.findForward(actionMappings.NO_SESSION_ERROR);
+			return mapping.findForward(ActionMappings.NO_SESSION_ERROR);
 		}
 		
 		// Get learner
-		User learner = sessionBean.getLeaner();
+		User learner = sessionBean.getLearner();
 		Lesson lesson = sessionBean.getLesson();
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request, form);
