@@ -13,9 +13,9 @@ import org.apache.struts.action.Action;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 
-import com.lamsinternational.lams.usermanagement.*;
-import com.lamsinternational.lams.learningdesign.*;
-import com.lamsinternational.lams.lesson.*;
+import org.lamsfoundation.lams.usermanagement.*;
+import org.lamsfoundation.lams.learningdesign.*;
+import org.lamsfoundation.lams.lesson.*;
 
 /** 
  * MyEclipse Struts

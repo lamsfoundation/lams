@@ -6,8 +6,8 @@
  */
 package org.lamsfoundation.lams.learning.web.bean;
 
-import com.lamsinternational.lams.usermanagement.*;
-import com.lamsinternational.lams.lesson.*;
+import org.lamsfoundation.lams.usermanagement.*;
+import org.lamsfoundation.lams.lesson.*;
 
 /**
  * @author kevin

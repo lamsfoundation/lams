@@ -8,13 +8,13 @@ package org.lamsfoundation.lams.learning.web.util;
 
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 
-import com.lamsinternational.lams.lesson.*;
-import com.lamsinternational.lams.learningdesign.Activity;
-import com.lamsinternational.lams.learningdesign.ComplexActivity;
-import com.lamsinternational.lams.learningdesign.GateActivity;
-import com.lamsinternational.lams.learningdesign.GroupingActivity;
-import com.lamsinternational.lams.learningdesign.SimpleActivity;
-import com.lamsinternational.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.*;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.SimpleActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
 /**
  * @author kevin

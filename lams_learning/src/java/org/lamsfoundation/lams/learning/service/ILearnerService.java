@@ -8,9 +8,9 @@ package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
 
-import com.lamsinternational.lams.lesson.Lesson;
-import com.lamsinternational.lams.lesson.LearnerProgress;
-import com.lamsinternational.lams.usermanagement.User;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.usermanagement.User;
 /**
  *
  * @author chris

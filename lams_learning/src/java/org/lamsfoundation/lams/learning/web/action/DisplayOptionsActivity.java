@@ -21,9 +21,9 @@ import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
 import org.lamsfoundation.lams.learning.web.util.Utils;
 
-import com.lamsinternational.lams.learningdesign.Activity;
-import com.lamsinternational.lams.learningdesign.OptionsActivity;
-import com.lamsinternational.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
  * @author daveg

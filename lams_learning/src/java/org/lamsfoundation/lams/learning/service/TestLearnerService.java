@@ -14,16 +14,16 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.lamsinternational.lams.learningdesign.Activity;
-import com.lamsinternational.lams.learningdesign.ComplexActivity;
-import com.lamsinternational.lams.learningdesign.LearningDesign;
-import com.lamsinternational.lams.learningdesign.OptionsActivity;
-import com.lamsinternational.lams.learningdesign.ParallelActivity;
-import com.lamsinternational.lams.learningdesign.ToolActivity;
-import com.lamsinternational.lams.lesson.LearnerProgress;
-import com.lamsinternational.lams.lesson.Lesson;
-import com.lamsinternational.lams.lesson.dao.ILessonDAO;
-import com.lamsinternational.lams.usermanagement.User;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author kevin

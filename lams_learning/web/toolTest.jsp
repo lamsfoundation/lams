@@ -4,7 +4,7 @@
 <%@ taglib uri="http://jakarta.apache.org/struts/struts-bean-el" prefix="bean-el"%>
 <%@ taglib uri="http://jakarta.apache.org/struts/struts-html" prefix="html"%>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
-<%@ page import="com.lamsinternational.lams.lesson.LearnerProgress"%>
+<%@ page import="org.lamsfoundation.lams.lesson.LearnerProgress"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">

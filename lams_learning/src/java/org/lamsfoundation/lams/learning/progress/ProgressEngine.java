@@ -7,9 +7,9 @@
 package org.lamsfoundation.lams.learning.progress;
 
 
-import com.lamsinternational.lams.learningdesign.*;
-import com.lamsinternational.lams.lesson.*;
-import com.lamsinternational.lams.usermanagement.User;
+import org.lamsfoundation.lams.learningdesign.*;
+import org.lamsfoundation.lams.lesson.*;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * The Progress Engine controls how a learner progresses
