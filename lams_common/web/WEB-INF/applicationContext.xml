@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for LAMS.
+-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+	<!-- (in this case, JDBC-related settings for the dataSource definition below) -->
+	
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location"><value>/WEB-INF/dbConnection.properties</value></property>
+	</bean>
+
+	<!-- Message source for this context, loaded from localized "messages_xx" files -->
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>messages</value></property>										
+	</bean>
+
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+  
+	<!-- Local DataSource that works in any environment -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"><value>${jdbc.driverClassName}</value></property>
+		<property name="url"><value>${jdbc.url}</value></property>
+		<property name="username"><value>${jdbc.username}</value></property>
+		<property name="password"><value>${jdbc.password}</value></property>
+	</bean>
+
+
+
+	<!-- Hibernate SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+		<property name="dataSource"><ref local="dataSource"/></property>
+		<property name="mappingResources">
+			<list>
+				<!-- usermanagement related mapping files -->	
+				<value>com/lamsinternational/lams/usermanagement/AuthenticationMethod.hbm.xml</value>
+				<value>com/lamsinternational/lams/usermanagement/AuthenticationMethodType.hbm.xml</value>
+				<value>com/lamsinternational/lams/usermanagement/Organisation.hbm.xml</value>
+				<value>com/lamsinternational/lams/usermanagement/OrganisationType.hbm.xml</value>
+				<value>com/lamsinternational/lams/usermanagement/Role.hbm.xml</value>
+				<value>com/lamsinternational/lams/usermanagement/User.hbm.xml</value>
+				<value>com/lamsinternational/lams/usermanagement/UserOrganisation.hbm.xml</value>
+				<value>com/lamsinternational/lams/usermanagement/UserOrganisationRole.hbm.xml</value>
+				<value>com/lamsinternational/lams/usermanagement/Workspace.hbm.xml</value>
+				<value>com/lamsinternational/lams/usermanagement/WorkspaceFolder.hbm.xml</value>
+				
+				<!-- learning design related mapping files -->
+				<value>com/lamsinternational/lams/learningdesign/Activity.hbm.xml</value>
+				<value>com/lamsinternational/lams/learningdesign/ActivityType.hbm.xml</value>				
+				<value>com/lamsinternational/lams/learningdesign/Group.hbm.xml</value>				
+				<value>com/lamsinternational/lams/learningdesign/Grouping.hbm.xml</value>
+				<value>com/lamsinternational/lams/learningdesign/GroupingType.hbm.xml</value>
+				<value>com/lamsinternational/lams/learningdesign/GateActivityLevel.hbm.xml</value>
+				<value>com/lamsinternational/lams/learningdesign/LearningDesign.hbm.xml</value>
+				<value>com/lamsinternational/lams/learningdesign/LearningLibrary.hbm.xml</value>	
+				<value>com/lamsinternational/lams/learningdesign/Transition.hbm.xml</value>	
+				
+				
+				<!-- lesson related mapping files-->
+				<value>com/lamsinternational/lams/lesson/LearnerProgress.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/Lesson.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/LessonLearner.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/LessonState.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/ProgressCompleted.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/ProgressCurrent.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/UserGroup.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/UserToolSession.hbm.xml</value>
+				<value>com/lamsinternational/lams/lesson/UserToolSessionState.hbm.xml</value>
+				
+				<!-- Tool related mapping files-->
+				<value>com/lamsinternational/lams/tool/Tool.hbm.xml</value>
+				<value>com/lamsinternational/lams/tool/ToolSession.hbm.xml</value>
+				<value>com/lamsinternational/lams/tool/ToolSessionState.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.c3p0.minPoolSize">${hibernate.c3p0.minPoolSize}</prop>
+				<prop key="hibernate.c3p0.maxPoolSize">${hibernate.c3p0.maxPoolSize}</prop>
+				<prop key="hibernate.c3p0.timeout">${hibernate.c3p0.timeout}</prop>
+				<prop key="hibernate.c3p0.max_statement">${hibernate.c3p0.max_statement}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>
+
+
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
+
+	<!-- LAMS primary business object: Hibernate implementation -->
+	<bean id="userManagementServiceTarget" class="com.lamsinternational.lams.usermanagement.service.UserManagementService"
+		singleton="false"
+	>
+		<property name="userDAO"><ref local="userDAO"/></property>
+		<property name="organisationDAO"><ref local="organisationDAO"/></property>
+		<property name="userOrganisationDAO"><ref local="userOrganisationDAO"/></property>
+	</bean>	
+	
+	<!-- Transactional proxy for the user management primary business object -->
+	<bean id="userManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref local="transactionManager"/></property>
+		<property name="target"><ref local="userManagementServiceTarget"/></property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="userDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>
+
+	<bean id="roleDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.RoleDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>
+	
+	<bean id="organisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>
+
+	<bean id="userOrganisationDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>
+
+	<bean id="organisationTypeDAO" class="com.lamsinternational.lams.usermanagement.dao.hibernate.OrganisationTypeDAO">
+		<property name="sessionFactory"><ref local="sessionFactory"/></property>
+	</bean>
+
+</beans>
