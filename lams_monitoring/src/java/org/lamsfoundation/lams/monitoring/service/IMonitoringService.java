@@ -36,24 +36,38 @@ public interface IMonitoringService
 {
 
     /**
-     * Create a new lesson so as to start the learning process. It needs to 
-     * notify lams which learning design it belongs to and who will be 
-     * involved in this lesson.
+     * Initialize a new lesson so as to start the learning process. It needs to 
+     * notify lams which learning design it belongs to. The initialize process
+     * doesn't involve the setup of lesson class and organization.
      * 
      * @param lessonName the name of the lesson
      * @param lessonDescription the description of the lesson.
      * @param learningDesignId the selected learning design
      * @param user user the user who want to create this lesson.
+     * @return the lesson initialized.
+     */
+    public Lesson initializeLesson(String lessonName, String lessonDescription,long learningDesignId,User user);;
+    
+    
+    /**
+     * Setup the lesson class and organization for a lesson according to the 
+     * input from monitoring GUI interface.
+     * 
+     * @param lessonId the lesson without lesson class and organization
      * @param organisation  the organization this lesson belongs to.
      * @param organizationUsers a list of learner will be in this new lessons.
      * @param staffs a list of staffs who will be in charge of this lesson.
+     * @return the lesson with lesson class and organization
      */
-    public Lesson createLesson(String lessonName, String lessonDescription,long learningDesignId,User user,Organisation organisation,List organizationUsers,List staffs);;
+    public Lesson createLessonClassForLesson(long lessonId,Organisation organisation,List organizationUsers,List staffs);
     
     /**
      * Start the specified the lesson. It must be created before calling this
      * service.
      * @param lessonId the specified the lesson id.
+     * @throws LamsToolServiceException the exception occurred during the
+     * 									lams and tool interaction to start a
+     * 									lesson.
      */
     public void startlesson(long lessonId)throws LamsToolServiceException;
     

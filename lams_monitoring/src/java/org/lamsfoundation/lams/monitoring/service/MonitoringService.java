@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -58,7 +58,7 @@ public class MonitoringService implements IMonitoringService
     //---------------------------------------------------------------------
     private ILessonDAO lessonDAO;
     private ILessonClassDAO lessonClassDAO;
-    private ILamsToolService lamsToolService;
+    private ILamsCoreToolService lamsCoreToolService;
     private IAuthoringService authoringService;
 
 
@@ -92,9 +92,9 @@ public class MonitoringService implements IMonitoringService
     /**
      * @param lamsToolService The lamsToolService to set.
      */
-    public void setLamsToolService(ILamsToolService lamsToolService)
+    public void setLamsCoreToolService(ILamsCoreToolService lamsToolService)
     {
-        this.lamsToolService = lamsToolService;
+        this.lamsCoreToolService = lamsToolService;
     }
 
     //---------------------------------------------------------------------
@@ -107,17 +107,13 @@ public class MonitoringService implements IMonitoringService
      * <li>1. Make a runtime copy of static learning design defined in authoring</li>
      * <li>2. Go through all the tool activities defined in the learning design,
      * 		  create a runtime copy of all tool's content.</li>
-     * <li>3. Create a new lesson with all staffs and learners involved.</li>
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLesson(long, org.lamsfoundation.lams.usermanagement.User, java.util.List, java.util.List)
      */
-    public Lesson createLesson(String lessonName,
+    public Lesson initializeLesson(String lessonName,
                                String lessonDescription,
                                long learningDesignId,
-                               User user,
-                               Organisation organisation,
-                               List organizationUsers,
-                               List staffs)
+                               User user)
     {
         LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
         //copy the current learning design
@@ -125,31 +121,51 @@ public class MonitoringService implements IMonitoringService
                                                                                   new Integer(LearningDesign.COPY_TYPE_LESSON),
                                                                                   user,
                                                                                   originalLearningDesign.getWorkspaceFolder());
-
         //copy the tool content
         for (Iterator i = copiedLearningDesign.getActivities().iterator(); i.hasNext();)
         {
             Activity currentActivity = (Activity) i.next();
             if (currentActivity.isToolActivity())
             {
-                Long newContentId = lamsToolService.copyToolContent((ToolActivity) currentActivity);
+                Long newContentId = lamsCoreToolService.notifyToolToCopyContent((ToolActivity) currentActivity);
                 ((ToolActivity) currentActivity).setToolContentId(newContentId);
             }
         }
         authoringService.updateLearningDesign(copiedLearningDesign);
-        //create the new lesson
-        return createNewLesson(lessonName,
-                               lessonDescription,
-                               user,
-                               organisation,
-                               organizationUsers,
-                               staffs,
-                               copiedLearningDesign);
+        
+        return createNewLesson(lessonName,lessonDescription,user,copiedLearningDesign);
 
     }
 
     /**
-     * @throws LamsToolServiceException
+     * <p>Pre-condition: This method must be called under the condition of the
+     * 					 existance of new lesson (without lesson class).</p>
+     * <p>A lesson class record should be inserted and organization should be
+     * 	  setup after execution of this service.</p> 
+     * 
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLessonClassForLesson(long, org.lamsfoundation.lams.usermanagement.Organisation, java.util.List, java.util.List)
+     */
+    public Lesson createLessonClassForLesson(long lessonId,
+                                             Organisation organisation,
+                                             List organizationUsers,
+                                             List staffs)
+    {
+        Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
+        
+        LessonClass newLessonClass = this.createLessonClass(organisation,
+                                                            organizationUsers,
+                                                            staffs,
+                                                            newLesson);
+        newLessonClass.setLesson(newLesson);
+        newLesson.setLessonClass(newLessonClass);
+        newLesson.setOrganisation(organisation);
+        
+        lessonDAO.updateLesson(newLesson);
+        
+        return newLesson;
+    }
+
+    /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startlesson(long)
      */
     public void startlesson(long lessonId) throws LamsToolServiceException
@@ -192,23 +208,18 @@ public class MonitoringService implements IMonitoringService
     /**
      * Create a new lesson and setup all the staffs and learners who will be
      * participating this less.
-     * @param user the user who created this lesson.
      * @param organisation the organization this lesson belongs to.	
      * @param organizationUsers a list of learner will be in this new lessons.
      * @param staffs a list of staffs who will be in charge of this lesson.
-     * @param copiedLearningDesign the new run-time learning design copy 
-     * 							   for this lesson.
+     * @param newLesson 
      */
-    private Lesson createNewLesson(String lessonName,
-                                   String lessonDescription,
-                                   User user,
-                                   Organisation organisation,
-                                   List organizationUsers,
-                                   List staffs,
-                                   LearningDesign copiedLearningDesign)
+    private LessonClass createLessonClass(Organisation organisation,
+                                          List organizationUsers,
+                                          List staffs,
+                                          Lesson newLesson)
     {
-        //create a new lesson object
-        LessonClass newLessonClass = createNewLessonClass(copiedLearningDesign);
+        //create a new lesson class object
+        LessonClass newLessonClass = createNewLessonClass(newLesson.getLearningDesign());
         lessonClassDAO.saveLessonClass(newLessonClass);
 
         //setup staff group
@@ -218,21 +229,32 @@ public class MonitoringService implements IMonitoringService
         newLessonClass.getGroups()
                       .add(Group.createLearnerGroup(newLessonClass,
                                                     new HashSet(organizationUsers)));
-        lessonClassDAO.updateLessonClass(newLessonClass);
-
-        //create new Lesson object
-        Lesson newLesson = Lesson.createNewLesson(lessonName,
-                                                  lessonDescription,
-                                                  user,
-                                                  organisation,
-                                                  copiedLearningDesign,
-                                                  newLessonClass);
-        newLessonClass.setLesson(newLesson);
-        lessonDAO.saveLesson(newLesson);
         
+        lessonClassDAO.updateLessonClass(newLessonClass);
+        
+        return newLessonClass;
+    }
+    
+    /**
+     * Setup a new lesson object without class and insert it into the database.
+     * 
+     * @param lessonName the name of the lesson
+     * @param lessonDescription the description of the lesson.
+     * @param user user the user who want to create this lesson.
+     * @param copiedLearningDesign the copied learning design
+     * @return the lesson object without class.
+     * 
+     */
+    private Lesson createNewLesson(String lessonName, String lessonDescription, User user, LearningDesign copiedLearningDesign)
+    {
+        Lesson newLesson = Lesson.createNewLessonWithoutClass(lessonName,
+                                                              lessonDescription,
+                                                              user,
+                                                              copiedLearningDesign);
+        lessonDAO.saveLesson(newLesson);
         return newLesson;
     }
-
+    
     /**
      * Setup the empty lesson class according to the run-time learning design
      * copy.
@@ -261,8 +283,15 @@ public class MonitoringService implements IMonitoringService
     }
 
     /**
-     * @param activity
-     * @throws LamsToolServiceException
+     * Create lams tool session for requested learner in the lesson. After the
+     * creation of lams tool session, it delegates to the tool instances to 
+     * create tool's own tool session.
+     * 
+     * @param activity the tool activity that all tool session reference to.
+     * @param learners the set of learners that needs to have tool session
+     * 				   initialized.
+     * @param lesson the target lesson that these tool sessions belongs to.
+     * @throws LamsToolServiceException the exception when lams is talking to tool.
      */
     private void initToolSessionFor(ToolActivity activity, Set learners,Lesson lesson) throws LamsToolServiceException
     {
@@ -271,22 +300,26 @@ public class MonitoringService implements IMonitoringService
         {
             User learner = (User) i.next();
 
-            ToolSession toolSession = lamsToolService.createToolSession(learner,activity,lesson);
+            ToolSession toolSession = lamsCoreToolService.createToolSession(learner,activity,lesson);
             //ask tool to create their own tool sessions using the given id.
-            lamsToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
+            lamsCoreToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
             //update the hibernate persistent object
             activity.getToolSessions().add(toolSession);
         }
     }
 
     /**
-     * @param activity
-     * @return
+     * Returns whether we should initialize tool session or not. Tool sessions
+     * can be initialized if the activity is tool activity and it doesn't 
+     * involve any grouping.
+     * 
+     * @param activity the activity that needs to be inspected.
+     * @return the result.
      */
     private boolean shouldInitToolSessionFor(Activity activity)
     {
         return activity.isToolActivity()
-                && !((ToolActivity) activity).getTool().getSupportsGrouping();
+                && !((ToolActivity) activity).getApplyGrouping().booleanValue();
     }
 
 

@@ -109,37 +109,47 @@ public class TestMonitoringService extends AbstractLamsTestCase
         					  "applicationContext.xml"};
     }
     
-    public void testCreateLesson()
+    public void testInitializeLesson()
+    {
+        
+        Lesson testLesson = monitoringService.initializeLesson("Test_Lesson",
+                                                               "Test_Description",
+                                                               TEST_LEARNING_DESIGN_ID,
+                                                               testUser);
+        TEST_LESSON_ID=testLesson.getLessonId();
+        Lesson createdLesson = lessonDao.getLesson(TEST_LESSON_ID);
+        assertNotNull(createdLesson);
+        assertEquals("verify the design",TEST_COPIED_LEARNING_DESIGN_ID,createdLesson.getLearningDesign().getLearningDesignId().longValue());
+        assertEquals("verify the user", TEST_USER_ID,createdLesson.getUser().getUserId());
+        assertEquals("verify the lesson state",Lesson.CREATED,createdLesson.getLessonStateId());
+        
+        
+        //createdLesson.getLessonClass().getGroups().clear();
+        //lessonDao.deleteLesson(createdLesson);
+    }
+
+    public void testCreateLessonClassForLesson()
     {
         LinkedList learners = new LinkedList();
         learners.add(testLearner);
         LinkedList staffs = new LinkedList();
         staffs.add(testStaff);
         
-        Lesson testLesson = monitoringService.createLesson("Test_Lesson",
-                                                           "Test_Description",
-                                                           TEST_LEARNING_DESIGN_ID,
-                                                           testUser,
-                                                           testOrganisation,
-                                                           learners,
-                                                           staffs);
-        TEST_LESSON_ID=testLesson.getLessonId();
+        Lesson testLesson = monitoringService.createLessonClassForLesson(TEST_LESSON_ID.longValue(),
+                                                                         testOrganisation,
+                                                                         learners,
+                                                                         staffs);
         Lesson createdLesson = lessonDao.getLesson(TEST_LESSON_ID);
-        assertNotNull(createdLesson);
-        assertEquals("verify the design",TEST_COPIED_LEARNING_DESIGN_ID,createdLesson.getLearningDesign().getLearningDesignId().longValue());
-        assertEquals("verify the user", TEST_USER_ID,createdLesson.getUser().getUserId());
-        assertEquals("verify the organization",TEST_ORGANIZATION_ID,createdLesson.getOrganisation().getOrganisationId());
-        assertEquals("verify the lesson state",Lesson.CREATED,createdLesson.getLessonStateId());
         
+        assertEquals("verify the staff group",staffs.size(),createdLesson.getLessonClass().getStaffGroup().getUsers().size());
+        assertEquals("verify the organization",TEST_ORGANIZATION_ID,createdLesson.getOrganisation().getOrganisationId());
         assertEquals("verify number of the learners",1,createdLesson.getAllLearners().size());
         assertEquals("verify the lesson class",Grouping.CLASS_GROUPING_TYPE,createdLesson.getLessonClass().getGroupingTypeId());
-        assertEquals("verify the staff group",staffs.size(),createdLesson.getLessonClass().getStaffGroup().getUsers().size());
         assertEquals("verify the learner group",1,createdLesson.getLessonClass().getGroups().size());
-        
-        //createdLesson.getLessonClass().getGroups().clear();
-        //lessonDao.deleteLesson(createdLesson);
-    }
 
+        
+    }
+    
     public void testStartlesson() throws LamsToolServiceException
     {
         monitoringService.startlesson(TEST_LESSON_ID.longValue());
