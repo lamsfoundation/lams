@@ -27,13 +27,14 @@ http://www.gnu.org/licenses/gpl.txt
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 
+	<tiles:useAttribute name="pageTitle" ignore="false" />
 	<tiles:useAttribute name="title" ignore="false" />
 	
 	<head>
-		<title>LAMS</title>
+		<title><c:out value="${pageTitle}" /></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-		<link href="css/learner.css" rel="stylesheet" type="text/css" />
-		<script language="javascript" src="javascript/learning.js"></script>
+		<link href="<c:url value="/css/learner.css" />" rel="stylesheet" type="text/css" />
+		<script language="javascript" src="<c:url value="/javascript/learning.js" />"></script>
 	</head>
 
 	<body bgcolor="#9DC5EC">
