@@ -260,7 +260,7 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
         assertEquals("check up number of activities",11,lessonClass.getActivities().size());
         assertEquals("check up staff groups",1,lessonClass.getStaffGroup().getUsers().size());
         assertEquals("check up grouping types, should be class grouping",Grouping.CLASS_GROUPING_TYPE,lessonClass.getGroupingTypeId());
-        assertEquals("check up learner groups",1,lessonClass.getGroups().size());
+        assertEquals("check up groups",2,lessonClass.getGroups().size());
     }
     /**
      * Helper method to validate the created lesson. This validation

@@ -12,15 +12,21 @@ package org.lamsfoundation.lams.tool;
 import java.util.Date;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
+
+
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
+
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
@@ -39,16 +45,23 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
     protected IToolSessionDAO toolSessionDao;
     protected IUserDAO userDao;
 	protected IActivityDAO activityDAO;
+    protected IGroupDAO groupDao;
+	
     //Test tool id - survey tool
     protected final Long TEST_TOOL_ID = new Long(6);
     protected Tool testTool;
     protected ToolSession ngToolSession;
     protected ToolSession gToolSession;
     protected User testUser;
-    protected ToolActivity testActivity;
+    protected Group testGroup;
+    protected ToolActivity testNonGroupedActivity;
+    protected ToolActivity testGroupedActivity;
     
-    private final Integer TEST_USER_ID = new Integer(1);
-    private final Long TEST_ACTIVITY_ID = new Long(20);
+    private final static Integer TEST_USER_ID = new Integer(1);
+    private final static Long TEST_NON_GROUP_ACTIVITY_ID = new Long(20);
+    private static final Long TEST_GROUPED_ACTIVITY_ID = new Long(19);
+    private static final Long TEST_GROUP_ID = new Long(88);
+    
     /*
      * @see AbstractLamsCommonTestCase#setUp()
      */
@@ -62,9 +75,12 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
         activityDAO =(ActivityDAO) context.getBean("activityDAO");
         
         userDao = (UserDAO) this.context.getBean("userDAO");
+        groupDao = (GroupDAO)this.context.getBean("groupDAO");
         //retrieve test domain data
         testUser = userDao.getUserById(TEST_USER_ID);
-        testActivity = (ToolActivity)activityDAO.getActivityByActivityId(TEST_ACTIVITY_ID);
+        testNonGroupedActivity = (ToolActivity)activityDAO.getActivityByActivityId(TEST_NON_GROUP_ACTIVITY_ID);
+        testGroupedActivity = (ToolActivity)activityDAO.getActivityByActivityId(TEST_GROUPED_ACTIVITY_ID);
+        testGroup = (Group)groupDao.getGroupById(TEST_GROUP_ID);
     }
 
     /*
@@ -96,17 +112,24 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
     public void initTestToolSession()
     {
         this.ngToolSession=this.initNGToolSession();
+        this.gToolSession = this.initGToolSession();
     }
     
     public ToolSession initNGToolSession()
     {
-        ToolSession toolSession = new NonGroupedToolSession(testActivity,
-                                                  new Date(System.currentTimeMillis()),
-                                                  ToolSession.STARTED_STATE,
-                                                  testUser);
-        return toolSession;
+        return new NonGroupedToolSession(testNonGroupedActivity,
+                                         new Date(System.currentTimeMillis()),
+                                         ToolSession.STARTED_STATE,
+                                         testUser);
     }
     
-   
     
+    public ToolSession initGToolSession()
+    {
+        return new GroupedToolSession(testGroupedActivity,
+                                      new Date(System.currentTimeMillis()),
+                                      ToolSession.STARTED_STATE,
+                                      testGroup);
+    }
+   
 }

@@ -445,5 +445,10 @@ insert into lams_learning_design(learning_design_ui_id,description,title,first_a
 								 parent_learning_design_id,workspace_folder_id)
 								values
 								(1,'Test Learning Design','Test Learning Design title',15,1,1,0,1,
-								'Help Text',1,'20041223','1.0',null,1);																
+								'Help Text',1,'20041223','1.0',null,1);		
+								
+insert into lams_grouping values(100,100,2,1,10,0,2);		
+
+insert into lams_group values(88,100,1);
+												
 SET FOREIGN_KEY_CHECKS=1;

@@ -14,6 +14,7 @@ import org.springframework.orm.hibernate.HibernateTemplate;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -27,6 +28,8 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
 
     protected static final String LOAD_NONGROUPED_TOOL_SESSION_BY_LEARNER = 
         "from NonGroupedToolSession s where s.user = :learner and s.toolActivity = :activity";
+    protected static final String LOAD_NONGROUPED_TOOL_SESSION_BY_GROUP = 
+        "from GroupedToolSession s where s.group = :group and s.toolActivity = :activity";
     /**
      * Retrieves the ToolSession
      * @param toolSessionId identifies the ToolSession to get
@@ -59,6 +62,27 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
              }
        );   	    
 	}
+
+    /**
+     * @see org.lamsfoundation.lams.tool.dao.IToolSessionDAO#getToolSessionByGroup(org.lamsfoundation.lams.learningdesign.Group, org.lamsfoundation.lams.learningdesign.Activity)
+     */
+    public ToolSession getToolSessionByGroup(final Group group, final Activity activity)
+    {
+        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+        return (ToolSession)hibernateTemplate.execute(
+             new HibernateCallback() 
+             {
+                 public Object doInHibernate(Session session) throws HibernateException 
+                 {
+                     return session.createQuery(LOAD_NONGROUPED_TOOL_SESSION_BY_GROUP)
+                     			   .setEntity("group",group)
+                     			   .setEntity("activity",activity)
+                     			   .uniqueResult();
+                 }
+             }
+       );  
+    }	
 	
     public void saveToolSession(ToolSession toolSession)
     {
@@ -71,5 +95,7 @@ public class ToolSessionDAO extends HibernateDaoSupport implements IToolSessionD
     {
         getHibernateTemplate().delete(toolSession);
     }
+
+
     
 }

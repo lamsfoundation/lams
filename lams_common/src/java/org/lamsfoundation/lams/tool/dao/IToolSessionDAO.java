@@ -7,6 +7,7 @@
 package org.lamsfoundation.lams.tool.dao;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -30,4 +31,5 @@ public interface IToolSessionDAO
     
 	public ToolSession getToolSessionByLearner(final User learner,final Activity activity);
 
+	public ToolSession getToolSessionByGroup(final Group group, final Activity activity);
 }

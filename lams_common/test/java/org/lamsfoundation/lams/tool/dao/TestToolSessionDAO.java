@@ -30,8 +30,10 @@ public class TestToolSessionDAO extends ToolDataAccessTestCase
     {
         super.setUp();
         toolSessionDao = (ToolSessionDAO)this.context.getBean("toolSessionDAO");
+        
         super.initTestToolSession();
         toolSessionDao.saveToolSession(this.ngToolSession);
+        toolSessionDao.saveToolSession(this.gToolSession);
     }
 
     /*
@@ -41,15 +43,16 @@ public class TestToolSessionDAO extends ToolDataAccessTestCase
     {
         super.tearDown();
         toolSessionDao.removeToolSession(this.ngToolSession);
+        toolSessionDao.removeToolSession(this.gToolSession);
     }
 
     /**
      * Constructor for TestToolSessionDAO.
      * @param arg0
      */
-    public TestToolSessionDAO(String arg0)
+    public TestToolSessionDAO(String testName)
     {
-        super(arg0);
+        super(testName);
     }
 
     public void testGetToolSession()
@@ -64,7 +67,14 @@ public class TestToolSessionDAO extends ToolDataAccessTestCase
 
     public void testGetToolSessionByLearner()
     {
-        ToolSession toolSession = toolSessionDao.getToolSessionByLearner(testUser,testActivity);
+        ToolSession toolSession = toolSessionDao.getToolSessionByLearner(testUser,testNonGroupedActivity);
+        
+        assertNotNull(toolSession);
+    }
+    
+    public void testGetToolSessionByGroup()
+    {
+        ToolSession toolSession = toolSessionDao.getToolSessionByGroup(testGroup,testGroupedActivity);
         
         assertNotNull(toolSession);
     }

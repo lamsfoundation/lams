@@ -22,6 +22,9 @@
 	<bean id="groupingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
+	<bean id="groupDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
 	<bean id="transitionDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
