@@ -20,6 +20,13 @@ public abstract class ToolSession implements Serializable {
     public static final int GROUPED_TYPE = 1;
     /** Tool session type id for non-grouped */
     public static final int NON_GROUPED_TYPE = 2;
+    
+    /** Tool session state id for not attempted */
+    public static final int NON_ATTEMPTED_STATE = 1;
+    /** Tool session state id for attempted */
+    public static final int ATTEMPTED_STATE = 2;
+    /** Tool session state id for completed */
+    public static final int COMPLETED_STATE = 3;
 
     /** identifier field */
     private Long toolSessionId;
@@ -34,17 +41,17 @@ public abstract class ToolSession implements Serializable {
     private Date createDateTime;
 
     /** persistent field */
-    private org.lamsfoundation.lams.tool.ToolSessionState toolSessionState;
+    private int toolSessionStateId;
     
     private int toolSessionTypeId;
 
     /** full constructor */
-    public ToolSession(Long toolSessionId, long activityId, long toolSessionKey, Date createDateTime, Group group, org.lamsfoundation.lams.tool.ToolSessionState toolSessionState, Set userToolSessions) {
+    public ToolSession(Long toolSessionId, long activityId, long toolSessionKey, Date createDateTime, Group group, int toolSessionStateId, Set userToolSessions) {
         this.toolSessionId = toolSessionId;
         this.activityId = activityId;
         this.toolSessionKey = toolSessionKey;
         this.createDateTime = createDateTime;
-        this.toolSessionState = toolSessionState;
+        this.toolSessionStateId = toolSessionStateId;
     }
 
     /** default constructor */
@@ -117,12 +124,12 @@ public abstract class ToolSession implements Serializable {
      *            @hibernate.column name="tool_session_state_id"         
      *         
      */
-    public org.lamsfoundation.lams.tool.ToolSessionState getToolSessionState() {
-        return this.toolSessionState;
+    public int getToolSessionStateId() {
+        return this.toolSessionStateId;
     }
 
-    public void setToolSessionState(org.lamsfoundation.lams.tool.ToolSessionState toolSessionState) {
-        this.toolSessionState = toolSessionState;
+    public void setToolSessionStateId(int toolSessionStateId) {
+        this.toolSessionStateId = toolSessionStateId;
     }
 
     public String toString() {
