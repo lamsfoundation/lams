@@ -73,9 +73,9 @@ CREATE TABLE lams_user_tool_session_state (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_lesson_state (
-       lams_lesson_state_id INT(3) NOT NULL
+       lesson_state_id INT(3) NOT NULL
      , description VARCHAR(255) NOT NULL
-     , PRIMARY KEY (lams_lesson_state_id)
+     , PRIMARY KEY (lesson_state_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_authentication_method_type (
@@ -195,8 +195,6 @@ CREATE TABLE lams_learning_design (
      , valid_design_flag TINYINT(4) NOT NULL
      , read_only_flag TINYINT(4) NOT NULL
      , date_read_only DATETIME
-     , read_access BIGINT(20)
-     , write_access BIGINT(20)
      , user_id BIGINT(20) NOT NULL
      , help_text TEXT
      , lesson_copy_flag TINYINT(4) NOT NULL DEFAULT 0
@@ -248,7 +246,7 @@ CREATE TABLE lams_lesson (
      , user_id BIGINT(20) NOT NULL DEFAULT 0
      , create_date_time DATETIME NOT NULL
      , organisation_id BIGINT(20) NOT NULL DEFAULT 0
-     , lams_lesson_state_id INT(3) NOT NULL
+     , lesson_state_id INT(3) NOT NULL
      , start_date_time DATETIME
      , end_date_time DATETIME
      , class_grouping_id BIGINT(20) NOT NULL DEFAULT 0
@@ -262,9 +260,9 @@ CREATE TABLE lams_lesson (
      , INDEX (organisation_id)
      , CONSTRAINT FK_lams_lesson_3 FOREIGN KEY (organisation_id)
                   REFERENCES lams_organisation (organisation_id)
-     , INDEX (lams_lesson_state_id)
-     , CONSTRAINT FK_lams_lesson_4 FOREIGN KEY (lams_lesson_state_id)
-                  REFERENCES lams_lesson_state (lams_lesson_state_id)
+     , INDEX (lesson_state_id)
+     , CONSTRAINT FK_lams_lesson_4 FOREIGN KEY (lesson_state_id)
+                  REFERENCES lams_lesson_state (lesson_state_id)
      , INDEX (class_grouping_id)
      , CONSTRAINT FK_lams_lesson_5 FOREIGN KEY (class_grouping_id)
                   REFERENCES lams_grouping (grouping_id)
