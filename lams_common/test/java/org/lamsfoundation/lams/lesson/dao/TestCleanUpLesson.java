@@ -55,7 +55,7 @@ public class TestCleanUpLesson extends LessonDataAccessTestCase
         for(Iterator i = lessons.iterator();i.hasNext();)
         {
             Lesson curLesson = (Lesson)i.next();
-            super.cleanUpTestLesson(curLesson);
+            super.cleanUpLesson(curLesson);
         }
         List cleanedLessons = lessonDao.getAllLessons();
         assertEquals("There should be a lesson in the db",0,cleanedLessons.size());

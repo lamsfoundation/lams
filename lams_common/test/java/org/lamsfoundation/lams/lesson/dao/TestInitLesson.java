@@ -9,6 +9,8 @@
 
 package org.lamsfoundation.lams.lesson.dao;
 
+import net.sf.hibernate.HibernateException;
+
 import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;
 
 
@@ -46,7 +48,7 @@ public class TestInitLesson extends LessonDataAccessTestCase
         super(arg0);
     }
 
-    public void testInitLesson()
+    public void testInitLesson() throws HibernateException
     {
         super.initializeTestLesson();
         //checking initialization result of lesson class

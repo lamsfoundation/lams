@@ -15,6 +15,8 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import net.sf.hibernate.HibernateException;
+
 import org.lamsfoundation.lams.AbstractLamsCommonTestCase;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -127,9 +129,10 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
      * 
      * We have to creat lesson class before create group due to the not null
      * field(grouping_id) in the group object.
+     * @throws HibernateException
      * 
      */
-    protected void initializeTestLesson()
+    protected void initializeTestLesson() throws HibernateException
     {
         this.initLessonClassData();
         lessonClassDao.saveLessonClass(this.testLessonClass);
@@ -139,6 +142,8 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
         
         this.initLessonData();
         lessonDao.saveLesson(testLesson);
+        
+        super.getSession().flush();
     }
     
     /**
@@ -148,12 +153,21 @@ public class LessonDataAccessTestCase extends AbstractLamsCommonTestCase
      * groups collection
      * @param lesson the lesson needs to be removed.
      */
-    protected void cleanUpTestLesson(Lesson lesson)
+    protected void cleanUpLesson(Lesson lesson)
     {
         lesson.getLessonClass().getGroups().clear();
         lessonDao.deleteLesson(lesson);
     }
     
+    protected void cleanUpTestLesson() throws HibernateException
+    {
+        super.initializeHibernateSession();
+        
+        Lesson lesson = lessonDao.getLesson(this.testLesson.getLessonId());
+        this.cleanUpLesson(lesson);
+        
+        super.finalizeHibernateSession();
+    }
     /**
      * Create a lesson class with empty group information.
      */

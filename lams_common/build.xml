@@ -158,6 +158,7 @@ Ant build file.
 	<target name="preparedirs">
 		<mkdir dir="${build}"/>
 		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.classes.test}"/>
 		<mkdir dir="${build.lib}"/>
 	</target>
 
@@ -180,6 +181,20 @@ Ant build file.
 		</javac>
 	</target>
 
+	<target name="compile.test" depends="compile">
+		<javac destdir="${build.classes.test}" compiler="modern">
+			<src path="${src.test.java}"/>
+			<classpath>
+				<pathelement location="${build.classes}"/>
+				<path refid="project.classpath"/>
+			</classpath>
+		</javac>
+		<copy overwrite="yes" todir="${build.classes.test}">
+			<fileset dir="${src.test.java}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
 	<!-- ================================================================ -->
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
@@ -331,6 +346,41 @@ Ant build file.
 			<transaction src="${sql}/insert_test_data.sql"/>
 		</sql>
 	</target>
+	<!-- =================================================================== -->
+	<!-- Run JUnit Tests                                                     -->
+	<!-- =================================================================== -->
+	<target name="test" depends="compile.test,insert-test-data"> 
+		<mkdir dir="${build.report}"/>
+		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
+			   fork="yes">
+			<formatter type="plain" usefile="false"/>
+			<formatter type="xml"/>
+			<batchtest todir="${build.report}">
+				<fileset dir="${src.test.java}">
+					<include name="**/Test*.java"/>
+					<exclude name="**/Test*All.java"/>
+					<exclude name="**/TestInitLesson.java"/>
+				</fileset>
+			</batchtest>
+			<classpath>
+				<pathelement location="${build.classes}"/>
+				<pathelement location="${build.classes.test}"/>
+				<pathelement location="${hbm}"/>
+				<pathelement location="${web}"/>
+				<pathelement location="${conf.struts}"/>
+				<path refid="project.classpath"/>
+			</classpath>
+		</junit>
+	</target>
 	
+	<target name="test-report" depends="test">
+		<mkdir dir="${build.report}/html"/> 
+		<junitreport todir="${build.report}"> 
+			<fileset dir="${build.report}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report todir="${build.report}/html"/> 
+		</junitreport>
+	</target>	
 </project>
 

@@ -17,6 +17,7 @@
 	<property name="sql"                       value="${basedir}/db/sql"/>
 	<property name="src"                       value="${basedir}/src"/>
 	<property name="src.java"                  value="${basedir}/src/java"/>
+	<property name="src.test.java"			   value="${basedir}/test/java"/>
 	<property name="conf"                      value="${basedir}/conf"/>
 	<property name="conf.windows"              value="${conf}/windows"/>
 	<property name="conf.jboss.windows"        value="${conf.windows}/jboss"/>
@@ -33,6 +34,7 @@
 	
 	<property name="web"                           value="${basedir}/web"/>
 	<property name="webinf"                        value="${web}/WEB-INF"/>
+	<property name="conf.struts"                        value="${web}/WEB-INF/struts/struts-config.xml"/>
 	
 	<property name="jboss.home.windows"                    value="D:/jboss-3.2.6"/>
 	<property name="jboss.deploy.windows"                    value="${jboss.home.windows}/server/default/deploy"/>
@@ -41,6 +43,9 @@
 
 	<property name="build"                         value="${basedir}/build"/>
 	<property name="build.classes"                 value="${build}/classes"/>
+	<property name="build.report"                 value="${build}/report"/>
+	<property name="build.classes.test"            value="${build}/classes/test"/>
+	
 	<property name="build.lib"                     value="${build}/lib"/>
 	
 	<property name="package"                   value="org/lamsfoundation/lams"/>

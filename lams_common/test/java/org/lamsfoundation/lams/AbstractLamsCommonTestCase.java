@@ -11,6 +11,7 @@ package org.lamsfoundation.lams;
 
 import junit.framework.TestCase;
 
+import net.sf.hibernate.HibernateException;
 import net.sf.hibernate.Session;
 import net.sf.hibernate.SessionFactory;
 
@@ -45,14 +46,10 @@ public abstract class AbstractLamsCommonTestCase extends TestCase
     {
         super.setUp();
         ac = new ClassPathXmlApplicationContext(getContextConfigLocation());
-        //hold the hibernate session
-		SessionFactory sessionFactory = (SessionFactory) this.ac.getBean("coreSessionFactory");
-		Session s = sessionFactory.openSession();
-		TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(s));
-
+        initializeHibernateSession();
     }
     
-	protected abstract String[] getContextConfigLocation();
+    protected abstract String[] getContextConfigLocation();
 	
     /**
      * @see TestCase#tearDown()
@@ -60,6 +57,24 @@ public abstract class AbstractLamsCommonTestCase extends TestCase
     protected void tearDown() throws Exception
     {
         super.tearDown();
+        finalizeHibernateSession();
+    }
+    
+	/**
+     * @throws HibernateException
+     */
+    protected void initializeHibernateSession() throws HibernateException
+    {
+        //hold the hibernate session
+		SessionFactory sessionFactory = (SessionFactory) this.ac.getBean("coreSessionFactory");
+		Session s = sessionFactory.openSession();
+		TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(s));
+    }    
+    /**
+     * @throws HibernateException
+     */
+    protected void finalizeHibernateSession() throws HibernateException
+    {
         //clean the hibernate session
 		SessionFactory sessionFactory = (SessionFactory)this.ac.getBean("coreSessionFactory");
 	    SessionHolder holder = (SessionHolder)TransactionSynchronizationManager.getResource(sessionFactory);
@@ -69,5 +84,16 @@ public abstract class AbstractLamsCommonTestCase extends TestCase
 		    TransactionSynchronizationManager.unbindResource(sessionFactory);
 		    SessionFactoryUtils.closeSessionIfNecessary(s, sessionFactory);
 	    }
+    }
+
+    protected Session getSession()
+    {
+		SessionFactory sessionFactory = (SessionFactory)this.ac.getBean("coreSessionFactory");
+	    SessionHolder holder = (SessionHolder)TransactionSynchronizationManager.getResource(sessionFactory);
+	    if (holder != null) 
+	    	return holder.getSession(); 
+	    else
+	        return null;
+
     }
 }
