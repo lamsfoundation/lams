@@ -119,7 +119,10 @@ public class MonitoringService implements IMonitoringService
     {
         LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
         //copy the current learning design
-        LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign);
+        LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
+                                                                                  new Integer(LearningDesign.COPY_TYPE_LESSON),
+                                                                                  user,
+                                                                                  originalLearningDesign.getWorkspaceFolder());
 
         //copy the tool content
         for (Iterator i = copiedLearningDesign.getActivities().iterator(); i.hasNext();)

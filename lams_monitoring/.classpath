@@ -8,7 +8,6 @@
 	<classpathentry kind="lib" path="web/WEB-INF/lib/standard.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-beanutils.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-collections.jar"/>
-	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-digester.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-fileupload.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-lang.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/commons-logging.jar"/>
@@ -16,5 +15,20 @@
 	<classpathentry kind="lib" path="web/WEB-INF/lib/jakarta-oro.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/struts-legacy.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/struts.jar"/>
+	<classpathentry sourcepath="lib/lams/src/lams_common_src.zip" kind="lib" path="lib/lams/lams.jar"/>
+	<classpathentry sourcepath="lib/lams/src/lams_authoring_src.zip" kind="lib" path="lib/lams/lams-authoring.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring.jar"/>
+	<classpathentry kind="lib" path="lib/junit/junit.jar"/>
+	<classpathentry sourcepath="lib/lams/src/lams_tool_survey_src.zip" kind="lib" path="lib/lams/lams-tool-survey.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/hibernate2.jar"/>
+	<classpathentry kind="lib" path="lib/aopalliance/aopalliance.jar"/>
+	<classpathentry kind="lib" path="lib/odmg/odmg-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta-commons/commons-digester.jar"/>
+	<classpathentry kind="lib" path="lib/log4j/log4j-1.2.9.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j/dom4j-1.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/cglib/cglib-full-2.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart/jfreechart-0.9.21.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart/jcommon-0.9.6.jar"/>
+	<classpathentry kind="lib" path="lib/mysql/mysql-connector-java-3.1.7-bin.jar"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>

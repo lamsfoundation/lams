@@ -9,11 +9,13 @@
 
 package org.lamsfoundation.lams.authoring.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 
 
 /**
@@ -112,6 +114,41 @@ public class MockAuthoringService implements IAuthoringService
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#requestLearningDesignWDDX(org.lamsfoundation.lams.usermanagement.User)
      */
     public String requestLearningDesignWDDX(User arg0)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.usermanagement.WorkspaceFolder)
+     */
+    public LearningDesign copyLearningDesign(LearningDesign learningDesign, Integer arg1, User arg2, WorkspaceFolder arg3)
+    {
+        return learningDesign;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#requestLearningLibraryWDDX(java.lang.Long)
+     */
+    public String requestLearningLibraryWDDX(Long arg0)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#requestLearningLibraryListWDDX()
+     */
+    public String requestLearningLibraryListWDDX() throws IOException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#storeWDDXData(java.lang.String)
+     */
+    public String storeWDDXData(String arg0) throws Exception
     {
         // TODO Auto-generated method stub
         return null;
