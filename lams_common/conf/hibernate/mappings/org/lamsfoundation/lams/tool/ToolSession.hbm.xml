@@ -29,11 +29,18 @@
 
 		<discriminator column="tool_session_type_id" type="int" />
 
-		<!-- bi-directional many-to-one association to the tool activity -->
+		<!-- uni-directional many-to-one association to the tool activity -->
 		<many-to-one name="toolActivity"
 			class="org.lamsfoundation.lams.learningdesign.ToolActivity"
 			not-null="true">
 			<column name="activity_id" />
+		</many-to-one>
+
+		<!-- uni-directional many-to-one association to the tool lesson -->
+		<many-to-one name="lesson"
+			class="org.lamsfoundation.lams.lesson.Lesson"
+			not-null="true">
+			<column name="lesson_id" />
 		</many-to-one>
 
 		<property name="createDateTime" type="java.sql.Timestamp"
