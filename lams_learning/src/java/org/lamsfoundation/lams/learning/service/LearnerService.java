@@ -1,4 +1,3 @@
-/*
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
 This program is free software; you can redistribute it and/or modify
@@ -19,6 +18,7 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 */
 
+
 package org.lamsfoundation.lams.learning.service;
 
 import java.util.Iterator;
@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActionMappings;
+
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
@@ -37,6 +38,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
@@ -52,10 +54,8 @@ public class LearnerService implements ILearnerService
     private ILessonDAO lessonDAO;
     private ProgressEngine progressEngine;
     private IToolSessionDAO toolSessionDAO;
-
-	
-	private ActionMappings actionMappings;
-   
+    
+   private ActionMappings actionMappings;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
     //---------------------------------------------------------------------
@@ -162,11 +162,12 @@ public class LearnerService implements ILearnerService
     private boolean shouldCreateToolSession(LearnerProgress learnerProgress,
                                             ToolActivity toolActivity)
     {
+        ToolSession targetSession = null;
         if(!toolActivity.getTool().getSupportsGrouping())
-        {
-            //ToolSession nonGroupedToolSession = toolSessionDAO.get
-        }
-        return false;
+            targetSession = toolSessionDAO.getToolSessionByLearner(learnerProgress.getUser(),
+                                                                   toolActivity);
+        
+        return targetSession!=null?true:false;
     }
     /**
      * @param toolActivity
@@ -231,9 +232,9 @@ public class LearnerService implements ILearnerService
     	
     	return url;
     }
-	
-	public void setActionMappings(ActionMappings actionMappings) {
+    
+    public void setActionMappings(ActionMappings actionMappings) {
 		this.actionMappings = actionMappings;
 	}
-	
+    
 }
