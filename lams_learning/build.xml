@@ -199,6 +199,27 @@ http://www.gnu.org/licenses/gpl.txt
 		</webdoclet>
 	</target>
 
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<!-- Make the war archive  for deployment             -->
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<target name="lams-war" depends="compile.java, webdoclet" description="creates war file">
+		<delete file="${build.lib}/${product}.war"/>
+		<war warfile="${build.lib}/${product}.war" 
+  				webxml="${conf.webinf.dir}/web.xml">
+			<webinf dir="${conf.webinf.dir}">
+				<include name="*.xml"/>
+				<include name="struts/*"/>
+				<include name="jstl/*"/>
+				<include name="spring/*"/>
+				<exclude name="web.xml"/>
+			</webinf>
+			<classes dir="${build.classes.java}"/>
+			<lib dir="${conf.webinf.dir}/lib"/>
+			<fileset dir="${conf.web.dir}">
+				<include name="*"/>
+			</fileset>
+		</war>
+	</target>
 
 	<!-- =================================================================== -->
 	<!-- Run JUnit Tests                                                     -->
