@@ -45,7 +45,8 @@ insert into lams_learning_design(id,description,title,first_activity_id,max_id,v
 								(1,'Test Learning Design','Test Learning Design title',1,1,1,0,1,
 								'Help Text',0,'20041223','1.0',null,'20041223','20041223',1);
 
-# Populates the lams_learning_library table with default libraries
+-- Populates the lams_learning_library table with default libraries
+
 insert into lams_learning_library (learning_library_id,description,title,create_date_time) values (1,'Notebook','Notebook','20050207');
 insert into lams_learning_library (learning_library_id,description,title,create_date_time) values (2,'NoticeBoard','NoticeBoard','20050207');
 insert into lams_learning_library (learning_library_id,description,title,create_date_time) values (3,'Multiple Choice Questions','Multiple Choice','20050207');
@@ -58,7 +59,7 @@ insert into lams_learning_library (learning_library_id,description,title,create_
 insert into lams_learning_library (learning_library_id,description,title,create_date_time) values (10,'Submit Files','Submit Files','20050207');
 insert into lams_learning_library (learning_library_id,description,title,create_date_time) values (11,'Instant Messaging','Instant Messaging','20050207');
 
-# Populates the lams_tool table with default tools corresponding to each of the above libraries
+-- Populates the lams_tool table with default tools corresponding to each of the above libraries
 
 insert into lams_tool (tool_id,tool_signature,class_name,tool_display_name,description,default_tool_content_id,supports_grouping_flag,supports_define_later_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
@@ -115,7 +116,7 @@ learner_url,author_url,define_later_url,export_portfolio_url,monitor_url)
 values(11,'instant_messaging_signature','instant_messaging_classname','Instant Messaging','Instant Messaging Description',11,0,0,
 'learner_url','author_url','define_later_url','export_portfolio_url','monitor_url');
 
-# Populates the lams_tool_content table with dummy default content for all above tools
+-- Populates the lams_tool_content table with dummy default content for all above tools
 
 insert into lams_tool_content (tool_content_id,tool_id) values (1,1);
 insert into lams_tool_content (tool_content_id,tool_id) values (2,2);
@@ -129,8 +130,8 @@ insert into lams_tool_content (tool_content_id,tool_id) values (9,9);
 insert into lams_tool_content (tool_content_id,tool_id) values (10,10);
 insert into lams_tool_content (tool_content_id,tool_id) values (11,11);
 
-# Populates the lams_learning_activity table with default activity templates that would be avaialbe to the
-# author in the left panel and a default dummy learning_design defination 
+-- Populates the lams_learning_activity table with default activity templates that would be avaialbe to the
+-- author in the left panel and a default dummy learning_design defination 
 
 insert into lams_learning_activity (activity_id,id,description,title,xcoord,ycoord,parent_activity_id,
 learning_activity_type_id,grouping_id,order_id,define_later_flag,
