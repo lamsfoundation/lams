@@ -264,7 +264,7 @@
 							<%JspRedirectStrategy.welcomePageStatusUpdate(request,response);%>
 							<%String login = request.getRemoteUser();
 							WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext()); 
-							UserManagementService service = (UserManagementService)ctx.getBean("userManagementService");
+							UserManagementService service = (UserManagementService)ctx.getBean("userManagementServiceTarget");
 							User user = service.getUserByLogin(login);
 							if ( login==null ){%>
 								<P class="error">An error has occured. You have tried to log
@@ -298,7 +298,7 @@
 													<td align="center">
 														<input name="sysadmin" type="button" id="sysadmin" onClick="openAuthor();" value="SysAdmin" style="width:100" />
 													</td>
-													<td align="center">
+													<td align="left">
 														<select name="selectedOrgId">
 															<%for(int i=0;i<list.size();i++){
 																Organisation org = (Organisation)list.get(i);%>
