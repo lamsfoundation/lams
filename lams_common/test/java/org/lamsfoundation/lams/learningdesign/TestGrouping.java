@@ -19,8 +19,9 @@ import junit.framework.TestCase;
 
 /**
  * 
- * @author Jacky Fang 8/02/2005
- * 
+ * @author Jacky Fang 
+ * @since 8/02/2005
+ * @version 1.1
  */
 public class TestGrouping extends TestCase
 {

@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -386,10 +387,11 @@ public class LearnerProgress implements Serializable
         return currentCompletedActivitiesList;
     }
     /**
-     * @param currentCompletedActivitiesList The currentCompletedActivitiesList to set.
+     * @param completedActivitiesList The currentCompletedActivitiesList to set.
      */
-    public void setCurrentCompletedActivitiesList(List currentCompletedActivitiesList)
+    public void setCurrentCompletedActivitiesList(List completedActivitiesList)
     {
-        this.currentCompletedActivitiesList = currentCompletedActivitiesList;
+        this.currentCompletedActivitiesList = new LinkedList();
+        this.currentCompletedActivitiesList.addAll(completedActivitiesList);
     }
 }

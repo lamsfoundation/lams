@@ -44,6 +44,9 @@ public class ActivityOrderComparator implements Comparator, Serializable {
         Activity activity1 = (Activity)o1;
         Activity activity2 = (Activity)o2;
         
+        if(activity1.getOrderId()==null||activity2.getOrderId()==null)
+            return activity1.getActivityId().compareTo(activity2.getActivityId());
+        
         int orderDiff = activity1.getOrderId().compareTo(activity2.getOrderId());
         //return order id compare result if they are not the same
         if(orderDiff!=0)

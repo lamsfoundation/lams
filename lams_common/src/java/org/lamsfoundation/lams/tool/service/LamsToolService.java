@@ -38,8 +38,9 @@ import org.springframework.context.ApplicationContextAware;
 
 /**
  * 
- * @author Jacky Fang 2005-2-23
- * 
+ * @author Jacky Fang 
+ * @version 1.1
+ * @since 2005-2-23
  */
 public class LamsToolService implements ILamsToolService,ApplicationContextAware
 {

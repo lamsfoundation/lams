@@ -77,6 +77,12 @@ public class Lesson implements Serializable {
     /** nullable persistent field */
     private Date endDateTime;
 
+    /** nullable persistent field */
+    private Date scheduleStartDate;
+    
+    /** nullable persistent field */
+    private Date scheduleEndDate;
+    
     /** persistent field */
     private User user;
 
@@ -94,7 +100,7 @@ public class Lesson implements Serializable {
 
     /** persistent field */
     private Set learnerProgresses;
-    
+
     //---------------------------------------------------------------------
     // constructors
     //---------------------------------------------------------------------
@@ -201,6 +207,37 @@ public class Lesson implements Serializable {
         this.endDateTime = endDateTime;
     }
 
+    /**
+     * @hibernate.property type="java.sql.Timestamp"  column="end_date_time"
+     *            	       length="19"
+     * 
+     * @return Returns the scheduleEndDate.
+     */
+    public Date getScheduleEndDate()
+    {
+        return scheduleEndDate;
+    }
+    /**
+     * @param scheduleEndDate The scheduleEndDate to set.
+     */
+    public void setScheduleEndDate(Date scheduleEndDate)
+    {
+        this.scheduleEndDate = scheduleEndDate;
+    }
+    /**
+     * @return Returns the scheduleStartDate.
+     */
+    public Date getScheduleStartDate()
+    {
+        return scheduleStartDate;
+    }
+    /**
+     * @param scheduleStartDate The scheduleStartDate to set.
+     */
+    public void setScheduleStartDate(Date scheduleStartDate)
+    {
+        this.scheduleStartDate = scheduleStartDate;
+    }
     /** 
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="user_id"     
@@ -315,4 +352,5 @@ public class Lesson implements Serializable {
                              this.getLearningDesign().getDescription(),
                              this.lessonStateId);
     }
+
 }

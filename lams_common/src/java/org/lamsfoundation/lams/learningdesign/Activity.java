@@ -46,14 +46,13 @@ public abstract class Activity implements Serializable,Nullable {
 	 * */
 	/******************************************************************/
 	public static final int TOOL_ACTIVITY_TYPE = 1;
-	public static final int RANDOM_GROUPING_ACTIVITY_TYPE = 2;
-	public static final int CHOSEN_GROUPING_ACTIVITY_TYPE = 3;
-	public static final int PERMISSION_GATE_ACTIVITY_TYPE = 4;
-	public static final int SCHEDULE_GATE_ACTIVITY_TYPE = 5;
-	public static final int SYNCH_GATE_ACTIVITY_TYPE = 6;
-	public static final int PARALLEL_ACTIVITY_TYPE = 7;
-	public static final int OPTIONS_ACTIVITY_TYPE = 8;
-	public static final int SEQUENCE_ACTIVITY_TYPE = 9;
+	public static final int GROUPING_ACTIVITY_TYPE = 2;
+	public static final int SYNCH_GATE_ACTIVITY_TYPE = 3;
+	public static final int SCHEDULE_GATE_ACTIVITY_TYPE = 4;
+	public static final int PERMISSION_GATE_ACTIVITY_TYPE = 5;
+	public static final int PARALLEL_ACTIVITY_TYPE = 6;
+	public static final int OPTIONS_ACTIVITY_TYPE = 7;
+	public static final int SEQUENCE_ACTIVITY_TYPE = 8;
 	/******************************************************************/
 	
 	/**
