@@ -134,6 +134,23 @@
     <property name="licenseText" type="java.lang.String" column="license_text">
 		<meta attribute="field-description">@hibernate.property column ="license_text"</meta>
     </property>
+    
+    <property name="lessonOrgID" type="java.lang.Long" column="lesson_org_id">
+    	<meta attribute="field-description">@hibernate.property column ="lesson_org_id"</meta>
+    </property>    
+    <property name="lessonOrgName" type="java.lang.String" column="lesson_org_name">
+    	<meta attribute="field-description">@hibernate.property column ="lesson_org_name"</meta>
+    </property>
+    <property name="lessonID" type="java.lang.Long" column="lesson_id">
+    	<meta attribute="field-description">@hibernate.property column ="lesson_id"</meta>
+    </property>
+    <property name="lessonName" type="java.lang.String" column="lesson_name">
+    	<meta attribute="field-description">@hibernate.property column ="lesson_name"</meta>
+    </property>
+    <property name="lessonStartDateTime" type ="java.sql.Timestamp" column="lesson_start_date_time">
+    	<meta attribute="field-description">@hibernate.property column ="lesson_start_date_time"</meta>
+    </property>
+    
 
     <!-- Associations -->
     

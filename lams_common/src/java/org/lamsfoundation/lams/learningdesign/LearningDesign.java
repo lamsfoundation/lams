@@ -103,6 +103,20 @@ public class LearningDesign implements Serializable {
 	/** nullable persistent field */
 	private License license;
 	
+	/** nullable persistent field*/
+	private Long lessonOrgID;
+	
+	/** nullable persistent field*/
+	private String lessonOrgName;
+	
+	/** nullable persistent field*/
+	private Long lessonID;
+	
+	/** nullable persistent field*/
+	private String lessonName;
+	
+	/** nullable persistent field*/
+	private Date lessonStartDateTime;
 	
 	/** full constructor */
 	public LearningDesign(
@@ -384,5 +398,35 @@ public class LearningDesign implements Serializable {
 	}
 	public void setLicense(License license) {
 		this.license = license;
+	}
+	public Long getLessonID() {
+		return lessonID;
+	}
+	public void setLessonID(Long lessonID) {
+		this.lessonID = lessonID;
+	}
+	public String getLessonName() {
+		return lessonName;
+	}
+	public void setLessonName(String lessonName) {
+		this.lessonName = lessonName;
+	}
+	public Long getLessonOrgID() {
+		return lessonOrgID;
+	}
+	public void setLessonOrgID(Long lessonOrgID) {
+		this.lessonOrgID = lessonOrgID;
+	}
+	public String getLessonOrgName() {
+		return lessonOrgName;
+	}
+	public void setLessonOrgName(String lessonOrgName) {
+		this.lessonOrgName = lessonOrgName;
+	}
+	public Date getLessonStartDateTime() {
+		return lessonStartDateTime;
+	}
+	public void setLessonStartDateTime(Date lessonStartDateTime) {
+		this.lessonStartDateTime = lessonStartDateTime;
 	}
 }
