@@ -29,7 +29,7 @@ import org.lamsfoundation.lams.learningdesign.OptionsActivity;
  * 
  * Progress calculation strategy for options activity.
  * @author Jacky Fang 2005-2-24
- * 
+ * @version 1.1
  */
 public class OptionsActivityStrategy extends ComplextActivityStrategy
 {

@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  * polymorphism caculation regarding different type of activity. 
  * 
  * @author Jacky Fang 2005-2-23
- * 
+ * @version 1.1
  */
 public abstract class ComplextActivityStrategy implements Serializable
 {

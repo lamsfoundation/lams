@@ -25,35 +25,27 @@ package org.lamsfoundation.lams.learningdesign.strategy;
 import java.util.ArrayList;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
+
 
 /**
- * Activity strategy that deals with the calculation specific to tool activity.
- * The major part of this strategy will be overiding the methods that defined
- * in the abstract level.
+ * Activity strategy that deal with the calculation of all sub gate activities.
+ * It is abstract calculation layer for all concrete gate activities.
  * 
  * @author Jacky Fang
- * @author Minhas
+ * @since  2005-4-6
  * @version 1.1
+ * 
  */
-public class ToolActivityStrategy extends SimpleActivityStrategy {
-
+public abstract class GateActivityStrategy extends SimpleActivityStrategy
+{
+    
+    
     //---------------------------------------------------------------------
-    // Overriden methods
+    // Overidden methods
     //---------------------------------------------------------------------
     /**
-     * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
      */
-    protected void setUpContributionType(Activity activity,
-                                         ArrayList contributionTypes)
-    {
-		ToolActivity toolActivity = (ToolActivity)activity;
-		if(toolActivity.getTool().getSupportsModeration())
-		    contributionTypes.add(MODERATION);
-		if(toolActivity.getTool().getSupportsContribute())
-		    contributionTypes.add(CONTRIBUTION);
-		if(toolActivity.getDefineLater().booleanValue())
-		    contributionTypes.add(DEFINE_LATER);
-    }
+    protected abstract void setUpContributionType(Activity activity, ArrayList contributionTypes);
 
 }

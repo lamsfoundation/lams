@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
  * The progress calculation strategy for parallel activity.
  * 
  * @author Jacky Fang 2005-2-24
- * 
+ * @version 1.1
  */
 public class ParallelActivityStrategy extends ComplextActivityStrategy
 {
