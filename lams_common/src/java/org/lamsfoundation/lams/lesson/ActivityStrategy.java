@@ -20,6 +20,7 @@
  */
 package org.lamsfoundation.lams.lesson;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -35,7 +36,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  * @author Jacky Fang 2005-2-23
  * 
  */
-public abstract class ActivityStrategy
+public abstract class ActivityStrategy implements Serializable
 {
     /**
      * <p>Check up all children completion status for a complex activity. </p>

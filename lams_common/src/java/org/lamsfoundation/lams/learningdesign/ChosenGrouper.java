@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.learningdesign;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.lamsfoundation.lams.usermanagement.User;
@@ -34,7 +35,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @version
  * 
  */
-public class ChosenGrouper implements Grouper
+public class ChosenGrouper implements Grouper,Serializable
 {
 
     /**

@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.learningdesign;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -55,7 +56,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @version 1.1
  * 
  */
-public class RandomGrouper implements Grouper
+public class RandomGrouper implements Grouper , Serializable
 {
     //---------------------------------------------------------------------
     // Grouping algorithm Implementation Method

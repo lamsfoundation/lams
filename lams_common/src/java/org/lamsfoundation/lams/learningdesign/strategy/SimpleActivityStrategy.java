@@ -6,6 +6,8 @@
  */
 package org.lamsfoundation.lams.learningdesign.strategy;
 
+import java.io.Serializable;
+
 import org.lamsfoundation.lams.learningdesign.Activity;
 
 
@@ -17,7 +19,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public abstract class SimpleActivityStrategy {
+public abstract class SimpleActivityStrategy implements Serializable {
 	
 	public static final int MODERATION = 1;
 	public static final int DEFINE_LATER = 2;
