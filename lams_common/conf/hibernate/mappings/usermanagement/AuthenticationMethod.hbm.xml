@@ -40,6 +40,22 @@
         <generator class="native" />
     </id>
 
+    <property
+        name="authenticationMethodName"
+        type="java.lang.String"
+        column="authentication_method_name"
+        not-null="true"
+        unique="true"
+        length="64"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="authentication_method_name"
+            unique="true"
+            length="64"
+            not-null="true"
+        </meta>    
+    </property>
 
     <!-- Associations -->
   
