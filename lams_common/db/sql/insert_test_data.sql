@@ -410,43 +410,40 @@ null,null,null,'image');
 
 -- Populates the lams_learning_transition table with various transitions for the dummy design 
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(1,1,'NoteBook to Optional Activity','Notebook to Optional Activity',12,null,1,'20050207');
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(1,1,'NoteBook to Optional Activity','Notebook to Optional Activity',12,15,1,'20050207',12,1);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(2,2,'Optional to Child Activity','To NoticeBoard',16,12,1,'20050207');
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(2,2,'Optional to Child Activity','To NoticeBoard',16,12,1,'20050207',2,12);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(3,3,'To Multiple Choice','To Multiple Choice',17,16,1,'20050207');
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(3,3,'To Multiple Choice','To Multiple Choice',17,16,1,'20050207',3,2);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(4,4,'To Parallel Activity','To Parallel Activity',13,17,1,'20050207');
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(4,4,'To Parallel Activity','To Parallel Activity',13,17,1,'20050207',13,3);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(5,5,'To Question and Answer','To Question and Answer',18,13,1,'20050207');
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(5,5,'To Question and Answer','To Question and Answer',18,13,1,'20050207',4,13);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(6,6,'To Messageboard','To Messageboard',19,18,1,'20050207');
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(6,6,'To Messageboard','To Messageboard',19,18,1,'20050207',5,4);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(7,7,'To Sequence Activity','To Sequence Activity',14,19,1,'20050207');
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(7,7,'To Sequence Activity','To Sequence Activity',14,19,1,'20050207',14,5);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(8,8,'To Survey','To Survey',20,14,1,'20050207');
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(8,8,'To Survey','To Survey',20,14,1,'20050207',6,14);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(9,9,'To Chat','To Chat',21,20,1,'20050207');
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(9,9,'To Chat','To Chat',21,20,1,'20050207',7,6);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(10,10,'To Shared Resourcese','To Shared Resourcese',22,21,1,'20050207');
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(10,10,'To Shared Resourcese','To Shared Resourcese',22,21,1,'20050207',8,7);
 
-insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time)
-values(11,11,'To End','To End',null,22,1,'20050207');
-
-insert into lams_learning_design(id,description,title,first_activity_id,max_id,valid_design_flag,
-								 read_only_flag,user_id,help_text,lesson_copy_flag,create_date_time,version,
-								 parent_learning_design_id,open_date_time,close_date_time,workspace_folder_id)
+insert into lams_learning_design(learning_design_ui_id,description,title,first_activity_id,max_id,valid_design_flag,
+								 read_only_flag,user_id,help_text,copy_type_id,create_date_time,version,
+								 parent_learning_design_id,workspace_folder_id)
 								values
 								(1,'Test Learning Design','Test Learning Design title',15,1,1,0,1,
-								'Help Text',0,'20041223','1.0',null,'20041223','20041223',1);																
+								'Help Text',1,'20041223','1.0',null,1);																
 SET FOREIGN_KEY_CHECKS=1;
