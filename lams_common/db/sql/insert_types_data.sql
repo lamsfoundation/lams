@@ -52,11 +52,14 @@ INSERT INTO lams_tool_session_state VALUES  (1, 'NOT ATTEMPTED');
 INSERT INTO lams_tool_session_state VALUES  (2, 'INCOMPLETE');
 INSERT INTO lams_tool_session_state VALUES  (3, 'COMPLETED');
 
-INSERT INTO lams_user_tool_session_state VALUES (1, 'JOINED');
-INSERT INTO lams_user_tool_session_state VALUES (2, 'LEFT' );
-INSERT INTO lams_user_tool_session_state VALUES (3, 'SUSPENDED');
-INSERT INTO lams_user_tool_session_state VALUES (4, 'RESUMED');
-INSERT INTO lams_user_tool_session_state VALUES (5, 'ERROR');
+--INSERT INTO lams_user_tool_session_state VALUES (1, 'JOINED');
+--INSERT INTO lams_user_tool_session_state VALUES (2, 'LEFT' );
+--INSERT INTO lams_user_tool_session_state VALUES (3, 'SUSPENDED');
+--INSERT INTO lams_user_tool_session_state VALUES (4, 'RESUMED');
+--INSERT INTO lams_user_tool_session_state VALUES (5, 'ERROR');
+
+INSERT INTO lams_tool_session_type VALUES  (1, 'GROUPED');
+INSERT INTO lams_tool_session_type VALUES  (2, 'NON_GROUPED');
 
 INSERT INTO lams_lesson_state VALUES (1, 'NOT_STARTED');
 INSERT INTO lams_lesson_state VALUES (2, 'STARTED');

@@ -66,11 +66,11 @@ CREATE TABLE lams_tool_session_state (
      , PRIMARY KEY (tool_session_state_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams_user_tool_session_state (
-       user_tool_session_state_id INT(3) NOT NULL
-     , description VARCHAR(255) NOT NULL
-     , PRIMARY KEY (user_tool_session_state_id)
-)TYPE=InnoDB;
+--CREATE TABLE lams_user_tool_session_state (
+--       user_tool_session_state_id INT(3) NOT NULL
+--     , description VARCHAR(255) NOT NULL
+--     , PRIMARY KEY (user_tool_session_state_id)
+--)TYPE=InnoDB;
 
 CREATE TABLE lams_lesson_state (
        lesson_state_id INT(3) NOT NULL
@@ -345,17 +345,31 @@ CREATE TABLE lams_learner_progress (
                   REFERENCES lams_learning_activity (activity_id) 
 )TYPE=InnoDB;
 
+CREATE TABLE lams_tool_session_type (
+       tool_session_type_id INT(11) NOT NULL DEFAULT 0
+     , description VARCHAR(128) NOT NULL
+     , PRIMARY KEY (tool_session_type_id)
+)TYPE=InnoDB;
+
 CREATE TABLE lams_tool_session (
        tool_session_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , group_id BIGINT(20) DEFAULT 0
+     , tool_session_type_id INT(11) NOT NULL
+     , group_id BIGINT(20)
+     , user_id BIGINT(20)
      , activity_id BIGINT(20) NOT NULL
      , tool_session_key BIGINT(20) NOT NULL
      , tool_session_state_id INT(3) NOT NULL
      , create_date_time DATETIME NOT NULL
      , PRIMARY KEY (tool_session_id)
+     , INDEX (tool_session_type_id) 
+     , CONSTRAINT FK_lams_tool_session_1 FOREIGN KEY (tool_session_type_id) 
+                  REFERENCES lams_tool_session_type (tool_session_type_id) 
      , INDEX (group_id)
-     , CONSTRAINT FK_lams_tool_session_1 FOREIGN KEY (group_id)
+     , CONSTRAINT FK_lams_tool_session_2 FOREIGN KEY (group_id)
                   REFERENCES lams_group (group_id)
+     , INDEX (user_id)
+     , CONSTRAINT FK_lams_tool_session_3 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id)
      , INDEX (tool_session_state_id)
      , CONSTRAINT FK_lams_tool_session_4 FOREIGN KEY (tool_session_state_id)
                   REFERENCES lams_tool_session_state (tool_session_state_id)
@@ -398,21 +412,21 @@ CREATE TABLE lams_progress_attempted (
                   REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams_user_tool_session (
-       tool_session_id BIGINT(20) NOT NULL
-     , user_id BIGINT(20) NOT NULL DEFAULT 0
-     , user_tool_session_state_id INT(3) NOT NULL
-     , PRIMARY KEY (tool_session_id, user_id)
-     , INDEX (tool_session_id)
-     , CONSTRAINT FK_lams_user_tool_session_1 FOREIGN KEY (tool_session_id)
-                  REFERENCES lams_tool_session (tool_session_id)
-     , INDEX (user_id)
-     , CONSTRAINT FK_lams_user_tool_session_2 FOREIGN KEY (user_id)
-                  REFERENCES lams_user (user_id)
-     , INDEX (user_tool_session_state_id)
-     , CONSTRAINT FK_lams_user_tool_session_3 FOREIGN KEY (user_tool_session_state_id)
-                  REFERENCES lams_user_tool_session_state (user_tool_session_state_id)
-)TYPE=InnoDB;
+--CREATE TABLE lams_user_tool_session (
+--       tool_session_id BIGINT(20) NOT NULL
+--     , user_id BIGINT(20) NOT NULL DEFAULT 0
+--     , user_tool_session_state_id INT(3) NOT NULL
+--     , PRIMARY KEY (tool_session_id, user_id)
+--     , INDEX (tool_session_id)
+--     , CONSTRAINT FK_lams_user_tool_session_1 FOREIGN KEY (tool_session_id)
+--                  REFERENCES lams_tool_session (tool_session_id)
+--     , INDEX (user_id)
+--     , CONSTRAINT FK_lams_user_tool_session_2 FOREIGN KEY (user_id)
+--                  REFERENCES lams_user (user_id)
+--     , INDEX (user_tool_session_state_id)
+--     , CONSTRAINT FK_lams_user_tool_session_3 FOREIGN KEY (user_tool_session_state_id)
+--                  REFERENCES lams_user_tool_session_state (user_tool_session_state_id)
+--)TYPE=InnoDB;
 
 CREATE TABLE lams_user_group (
        user_id BIGINT(20) NOT NULL DEFAULT 0
