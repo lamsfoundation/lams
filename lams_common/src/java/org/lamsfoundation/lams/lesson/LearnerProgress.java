@@ -52,8 +52,8 @@ public class LearnerProgress implements Serializable
     
     /** 
      * The current activity always present the activity with transition, which
-     * means it won't be leaf node of a complex activity. To understand, the
-     * activity tree, please read relevant documentation and comment. The tool
+     * means it won't be leaf node of a complex activity. To understand the
+     * activity tree, please read relevant documentation and comment. The current
      * content could be the same as next activity if next activity is not the 
      * leaf node. The main purpose of current activity is to restore the 
      * progress states if the user exist without finishing the activity. 
