@@ -51,8 +51,9 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
      */
     protected void tearDown() throws Exception
     {
-        super.tearDown();
         super.cleanUpTestLesson();
+        super.tearDown();
+
     }
 
     /**
@@ -70,30 +71,17 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         assertNull("should not get any progress data",progress);
     }
 
-    public void testSaveLearnerProgress()
+    public void testSaveLearnerProgress() throws HibernateException
     {
         super.learnerProgressDao.saveLearnerProgress(this.testLearnerProgress);
         
         LearnerProgress progress= learnerProgressDao.getLearnerProgressByLeaner(testUser,testLesson);
         assertLearnerProgressInitialization(progress);
-    }
-
-    public void testGetLearnerProgressByLeaner()
-    {
-        super.learnerProgressDao.saveLearnerProgress(this.testLearnerProgress);
-        LearnerProgress progress= learnerProgressDao.getLearnerProgressByLeaner(testUser,testLesson);
-        assertLearnerProgressInitialization(progress);
+        
+        super.learnerProgressDao.deleteLearnerProgress(testLearnerProgress);
+        super.getSession().flush();
     }
     
-    public void testGetLearnerProgress()
-    {
-        super.learnerProgressDao.saveLearnerProgress(this.testLearnerProgress);
-
-        LearnerProgress progress = learnerProgressDao.getLearnerProgress(testLearnerProgress.getLearnerProgressId());
-        assertLearnerProgressInitialization(progress);
-    }
-
-
     public void testDeleteLearnerProgress() throws HibernateException
     {
         super.learnerProgressDao.saveLearnerProgress(this.testLearnerProgress);
@@ -107,8 +95,30 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         assertNull("should not get any progress data",nullProgress);
 
     }
+    public void testGetLearnerProgressByLeaner() throws HibernateException
+    {
+        super.learnerProgressDao.saveLearnerProgress(this.testLearnerProgress);
+        LearnerProgress progress= learnerProgressDao.getLearnerProgressByLeaner(testUser,testLesson);
+        assertLearnerProgressInitialization(progress);
+        super.learnerProgressDao.deleteLearnerProgress(testLearnerProgress);
+        super.getSession().flush();
+    }
+    
+    public void testGetLearnerProgress() throws HibernateException
+    {
+        super.learnerProgressDao.saveLearnerProgress(this.testLearnerProgress);
 
-    public void testUpdateLearnerProgress()
+        LearnerProgress progress = learnerProgressDao.getLearnerProgress(testLearnerProgress.getLearnerProgressId());
+        assertLearnerProgressInitialization(progress);
+        
+        super.learnerProgressDao.deleteLearnerProgress(testLearnerProgress);
+        super.getSession().flush();
+    }
+
+
+
+
+    public void testUpdateLearnerProgress() throws HibernateException
     {
         super.learnerProgressDao.saveLearnerProgress(this.testLearnerProgress);
         LearnerProgress progress= learnerProgressDao.getLearnerProgressByLeaner(testUser,testLesson);
@@ -126,6 +136,8 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         assertEquals("verify completed activity",2,updatedProgress.getCompletedActivities().size());
         assertEquals("verify attempted activity",1,updatedProgress.getAttemptedActivities().size());
         
+        super.learnerProgressDao.deleteLearnerProgress(testLearnerProgress);
+        super.getSession().flush();
     }
 
     /**

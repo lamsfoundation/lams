@@ -165,14 +165,13 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
      */
     protected void cleanUpLesson(Lesson lesson)
     {
-
         lessonDao.deleteLesson(lesson);
     }
     
     protected void cleanUpTestLesson() throws HibernateException
     {
         //super.initializeHibernateSession();
-
+        //super.getSession().lock(testLesson,LockMode.READ);
         this.cleanUpLesson(testLesson);
         
         //super.finalizeHibernateSession();

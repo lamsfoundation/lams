@@ -102,6 +102,7 @@
         name="grouping"
         class="org.lamsfoundation.lams.learningdesign.Grouping"
         not-null="true"
+        update="false"
         cascade="none"
     >
         <meta attribute="field-description">
