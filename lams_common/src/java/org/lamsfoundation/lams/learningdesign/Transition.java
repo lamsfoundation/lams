@@ -83,6 +83,13 @@ public class Transition implements Serializable {
 		this.activityByFromActivityId = activityByFromActivityId;
 		this.learningDesign = learningDesign;
 	}
+	
+	/**
+	 * Makes a copy of the Transition for authoring, preview and monitoring enviornment
+	 * 
+	 * @param originalTransition The transition to be deep-copied
+	 * @return Transition Returns a deep-copy o fthe originalTransition
+	 */
 	public static Transition createCopy(Transition originalTransition){
 		Transition newTransition = new Transition();
 		
@@ -91,7 +98,7 @@ public class Transition implements Serializable {
 		newTransition.setTitle(originalTransition.getTitle());
 		newTransition.setCreateDateTime(new Date());
 		newTransition.setToUIID(originalTransition.getToUIID());
-		newTransition.setFromUIID(originalTransition.getFromUIID());
+		newTransition.setFromUIID(originalTransition.getFromUIID());		
 		return newTransition;
 	}
 
