@@ -83,5 +83,10 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="title" value="Grouping" />
 		<put name="body" value="/grouping/grouping.jsp"/>
 	</definition>
-	
+	<!-- -->
+	<definition name=".gateWaiting" extends=".activityLayout">
+		<put name="pageTitle" value="Gate Waiting Page" />
+		<put name="title" value="Gate" />
+		<put name="body" value="/gate/gateWaiting.jsp"/>
+	</definition>
 </tiles-definitions>

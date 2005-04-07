@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,10 +33,25 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerServiceException;
+import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 
 /**
+ * <p>The action servlet that deals with gate activity. This class allows the 
+ * learner to knock gate when they reach the gate. The knocking process will
+ * be triggered by the lams progress engine in the first place. The learner
+ * can also trigger the knocking process by clicking on the button on the 
+ * waiting page.</p>
+ * 
+ * <p>Learner will progress to the next activity if the gate is open. Otherwise,
+ * the learner should see the waiting page.</p>
  * 
  * @author Jacky Fang
  * @since  2005-4-7
@@ -43,16 +59,15 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * 
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action name = "GroupingForm"
- * 				  path="/grouping" 
+ * @struts:action path="/gate" 
  *                parameter="method" 
  *                validate="false"
  * @struts.action-exception key="error.system.learner" scope="request"
  *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
- * @struts:action-forward name="viewGrouping" path="/grouping.do?method=viewGrouping"
- * @struts:action-forward name="showGroup" path=".grouping"
+ * 
+ * @struts:action-forward name="waiting" path=".gateWaiting"
  * ----------------XDoclet Tags--------------------
  */
 public class GateAction extends LamsDispatchAction
@@ -63,11 +78,14 @@ public class GateAction extends LamsDispatchAction
     //---------------------------------------------------------------------
 	private static Logger log = Logger.getLogger(GateAction.class);
 
+    //---------------------------------------------------------------------
+    // Class level constants - Struts forward
+    //---------------------------------------------------------------------
+    private static final String WAITING = "waiting";
 	
     //---------------------------------------------------------------------
     // Struts Dispatch Method
     //---------------------------------------------------------------------    
-
 	/**
 	 * 
 	 * @param mapping
@@ -78,12 +96,65 @@ public class GateAction extends LamsDispatchAction
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	public ActionForward checkUpGate(ActionMapping mapping,
-                                     ActionForm form,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response) throws IOException,
+	public ActionForward knockGate(ActionMapping mapping,
+                                   ActionForm form,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) throws IOException,
                                                                           ServletException
     {
-        return mapping.findForward(null);
+        LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByID(request,
+                                                                                 getServlet().getServletContext());
+        //validate pre-condition.
+        validateLearnerProgress(learnerProgress);
+        
+        //initialize service object
+        ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+        //get all learners in the lesson
+        List currentLessonLearners = LessonLearnerDataManager.getAllLessonLearners(getServlet().getServletContext(),
+                                                                                   learnerProgress.getLesson().getLessonId().longValue(),
+                                                                                   learnerService);
+        //knock the gate
+        boolean gateOpen = learnerService.knockGate((GateActivity)learnerProgress.getNextActivity(),
+                                                    learnerProgress.getUser(),
+                                                    currentLessonLearners);
+        //if the gate is open, let the learner go to the next activity.
+        if(gateOpen)
+        {
+            String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser(),
+                                                                     learnerProgress.getNextActivity(),
+                                                                     learnerProgress.getLesson());
+    		response.sendRedirect(nextActivityUrl);
+            return null;
+        }
+        //if the gate is closed, ask the learner to wait
+        else
+            return mapping.findForward(WAITING);
     }
+	
+    //---------------------------------------------------------------------
+    // Helper method
+    //---------------------------------------------------------------------
+    /**
+     * @param learnerProgress
+     */
+    private void validateLearnerProgress(LearnerProgress learnerProgress)
+    {
+        if(learnerProgress ==null)
+            throw new LearnerServiceException("Can't perform grouping without knowing" +
+            		" the learner progress.");
+        
+        if(!isNextActivityValid(learnerProgress))
+            throw new LearnerServiceException("Error in progress engine. Getting "
+                                              +learnerProgress.getNextActivity().toString()
+                                              +" where it should be grouping activity");
+    }
+
+    /**
+     * @param learnerProgress
+     * @return
+     */
+    private boolean isNextActivityValid(LearnerProgress learnerProgress)
+    {
+        return learnerProgress.getNextActivity()!=null&&(learnerProgress.getNextActivity() instanceof GateActivity);
+    }	
 }

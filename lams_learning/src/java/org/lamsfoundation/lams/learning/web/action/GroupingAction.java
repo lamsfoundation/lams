@@ -194,7 +194,7 @@ public class GroupingAction extends LamsDispatchAction
         Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);
 
         
-        String nextActivityUrl = learnerService.completelActivity(learnerProgress.getUser(),
+        String nextActivityUrl = learnerService.completeActivity(learnerProgress.getUser(),
                                                                   groupingActivity,
                                                                   learnerProgress.getLesson());
         

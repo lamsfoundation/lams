@@ -117,7 +117,7 @@ public interface ILearnerService
      * @param lesson the lesson this learner is currently in.
      * @return the url for next activity.
      */
-    public String completelActivity(User learner,Activity activity,Lesson lesson);
+    public String completeActivity(User learner,Activity activity,Lesson lesson);
   
     /**
      * Retrieve all lessons that has been started, suspended or finished. All

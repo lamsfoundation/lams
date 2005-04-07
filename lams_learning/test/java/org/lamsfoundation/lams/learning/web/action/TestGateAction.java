@@ -22,14 +22,12 @@
 
 package org.lamsfoundation.lams.learning.web.action;
 
-import java.util.List;
-
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -38,28 +36,32 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * 
  * @author Jacky Fang
- * @since  2005-4-1
- * @version
+ * @since  2005-4-7
+ * @version 1.1
  * 
  */
-public class TestGroupingAction extends AbstractLamsStrutsTestCase
+public class TestGateAction extends AbstractLamsStrutsTestCase
 {
+    //---------------------------------------------------------------------
+    // Instance variables
+    //---------------------------------------------------------------------
+	private static Logger log = Logger.getLogger(TestGateAction.class);
 
     private static final String TEST_LERNER_PROGRESS_ID = "1";
-    private static final String TEST_RGRP_ACTIVITY_ID = "29";
     private static final String TEST_LEARNER_ID = "2";
     private static final String TEST_LESSON_ID = "2";
-    private static Activity groupingActivity;
+    
     private ILearnerService learnerService;
-    /**
-     * @param arg0
-     * @param arg1
-     */
-    public TestGroupingAction(String testName)
-    {
-        super(testName, getContextConfigLocation());
-    }
 
+    private static final String TEST_GATE_ACTIVITY_ID = "31";
+    /**
+     * Constructor for TestGateAction.
+     * @param testName
+     */
+    public TestGateAction(String testName)
+    {
+        super(testName,getContextConfigLocation());
+    }
     /**
      * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getContextConfigLocation()
      */
@@ -71,6 +73,7 @@ public class TestGroupingAction extends AbstractLamsStrutsTestCase
   			   +"/WEB-INF/spring/applicationContext.xml "
   			   +"/WEB-INF/spring/learningApplicationContext.xml";
     }
+
     /*
      * @see AbstractLamsStrutsTestCase#setUp()
      */
@@ -78,7 +81,7 @@ public class TestGroupingAction extends AbstractLamsStrutsTestCase
     {
         super.setUp();
         setConfigFile("/WEB-INF/struts/struts-config.xml");
-        setRequestPathInfo("/grouping.do");
+        setRequestPathInfo("/gate.do");
         
         learnerService =  (ILearnerService)this.wac.getBean("learnerService");
     }
@@ -90,58 +93,39 @@ public class TestGroupingAction extends AbstractLamsStrutsTestCase
     {
         super.tearDown();
     }
-
-    public void testPerformGrouping()
+    
+    public void testKnockClosedGate()
     {
-        addRequestParameter("method", "performGrouping");
+        addRequestParameter("method", "knockGate");
         addRequestParameter(LearningWebUtil.PARAM_PROGRESS_ID,TEST_LERNER_PROGRESS_ID);
         addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
-        addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID,TEST_RGRP_ACTIVITY_ID);
+        addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID,TEST_GATE_ACTIVITY_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
         
         initializeLearnerProgress();
-        
-        initializeUserMap();
+        initializeUserMap(false);
         
         actionPerform();
-
+        
         verifyNoActionErrors();
-        verifyForward("viewGrouping");
-        
-        groupingActivity = (Activity)request.getAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE);
-    
-        assertNotNull("verify the acitivity in the request",groupingActivity);
-        assertTrue("verify the activity type",groupingActivity instanceof GroupingActivity);
-        
+        verifyTilesForward("waiting",".gateWaiting");
     }
 
-    public void testViewGrouping()
+    public void testKnockOpenGate()
     {
-        addRequestParameter("method", "viewGrouping");
+        addRequestParameter("method", "knockGate");
+        addRequestParameter(LearningWebUtil.PARAM_PROGRESS_ID,TEST_LERNER_PROGRESS_ID);
         addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
+        addRequestParameter(LearningWebUtil.PARAM_ACTIVITY_ID,TEST_GATE_ACTIVITY_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
-        request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE,groupingActivity);
         
-        actionPerform();
-    
-        verifyNoActionErrors();
-        verifyTilesForward("showGroup",".grouping");
+        initializeLearnerProgress();
+        initializeUserMap(true);
         
-        List groups = (List)httpSession.getAttribute("groups");
-        assertNotNull("verify groups",groups);
-        assertEquals("verify number of groups",2,groups.size());
-    }
-
-    public void testCompleteActivity()
-    {
-        addRequestParameter("method", "completeActivity");
-        addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
-        addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
-        request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE,groupingActivity);
-
         actionPerform();
         
         verifyNoActionErrors();
+        
     }
     /**
      * 
@@ -154,15 +138,22 @@ public class TestGroupingAction extends AbstractLamsStrutsTestCase
         httpSession.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE,
                                  learnerProgress);
     }
-    
     /**
      * 
      */
-    private void initializeUserMap()
+    private void initializeUserMap(boolean singleUser)
     {
         User testUser = LearningWebUtil.getUserData(request,context);
         Lesson lesson = LearningWebUtil.getLessonData(request,context);
-        
         LessonLearnerDataManager.cacheLessonUser(context,lesson,testUser);
+        
+        if(!singleUser)
+        {
+            request.getSession().removeAttribute("user");
+            addRequestParameter(LearningWebUtil.PARAM_USER_ID, "1");
+            User testUser2 = LearningWebUtil.getUserData(request,context);
+            LessonLearnerDataManager.cacheLessonUser(context,lesson,testUser2);
+        }
+
     }
 }

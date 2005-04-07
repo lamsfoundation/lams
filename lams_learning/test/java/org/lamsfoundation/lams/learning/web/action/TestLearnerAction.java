@@ -44,7 +44,7 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
 	
     private static final String TEST_USER_ID = "2";
     private static final String TEST_LESSON_ID = "2";
-    private static final String TEST_ACTIVITY_ID = "26";
+    private static final String TEST_ACTIVITY_ID = "27";
     
     //private static SessionBean joinedLessonBean = null;
     private static LearnerProgress testLearnerProgress = null;

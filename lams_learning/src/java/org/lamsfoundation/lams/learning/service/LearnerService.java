@@ -291,13 +291,13 @@ public class LearnerService implements ILearnerService
         
         lamsCoreToolService.updateToolSession(toolSession);
         
-        return completelActivity(learner, toolSession.getToolActivity(), toolSession.getLesson());
+        return completeActivity(learner, toolSession.getToolActivity(), toolSession.getLesson());
     }
     
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completelActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.lesson.Lesson)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeActivity(org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity, org.lamsfoundation.lams.lesson.Lesson)
      */
-    public String completelActivity(User learner,Activity activity,Lesson lesson)
+    public String completeActivity(User learner,Activity activity,Lesson lesson)
     {
         //build up the url for next activity.
     	try 
