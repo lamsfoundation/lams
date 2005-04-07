@@ -35,7 +35,8 @@
 				<prop key="completelActivity">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
 				<prop key="exitLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
 				<prop key="performGrouping">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
-			</props>
+				<prop key="knockGate">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+   			</props>
 		</property>
 	</bean> 
 	
