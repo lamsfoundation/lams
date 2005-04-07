@@ -18,8 +18,6 @@
 # Host: localhost
 # Saved: 2005-02-16 16:04:11
 
-use lams;
-
 SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS lams_activity_category;
