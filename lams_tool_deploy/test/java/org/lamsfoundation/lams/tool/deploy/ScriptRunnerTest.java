@@ -41,7 +41,7 @@ public class ScriptRunnerTest extends TestCase
              {
                  try
                  {
-                     testScript = loadTestScript("test/file/sql/test-script.sql");
+                     testScript = loadTestScript("test/file/sql/test_script.sql");
                      DBConnector connector = new DBConnector("test/file/test.properties");
                      conn = connector.connect();
                      conn.setAutoCommit(false);
@@ -85,7 +85,7 @@ public class ScriptRunnerTest extends TestCase
                      System.out.println(statements[i]);
                  }
                  assertNotNull(statements);
-                 assertEquals(statements.length, 5);
+                 assertEquals(6, statements.length);
                  
              }
              

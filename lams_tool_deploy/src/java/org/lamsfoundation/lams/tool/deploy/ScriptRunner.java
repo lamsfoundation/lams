@@ -23,7 +23,8 @@ import org.apache.commons.dbutils.DbUtils;
 public class ScriptRunner
 {
     public static final String STATEMENT_DELIMITER = ";";
-    public static final String COMMENT_PATTERN = "[#|\\-\\-].*";
+    public static final String HASH_COMMENT_PATTERN = "#.*";
+    public static final String DASH_COMMENT_PATTERN = "\\-{2,}.*";
     public static final String LINE_BREAK_PATTERN = "\\r\\n|\\n|\\r|\\u0085|\\u2028|\\u2029";
     public static final String LARGE_WHITE_SPACE_PATTERN = "\\s{2,}";
     
@@ -56,8 +57,9 @@ public class ScriptRunner
      */
     protected String[] parseScript(String script) throws DeployException
     {
-        //remove comments (lines beginning with --)
-        script = script.replaceAll(COMMENT_PATTERN,"");
+        //remove comments (beginning with # & --)
+        script = script.replaceAll(HASH_COMMENT_PATTERN,"");
+        script = script.replaceAll(DASH_COMMENT_PATTERN,"");
         
         //remove line breaks
         script = script.replaceAll(LINE_BREAK_PATTERN, "");

@@ -38,9 +38,10 @@ public class ToolDBActivateTask extends DBTask
         Connection conn = getConnection();
         try
         {
+            conn.setAutoCommit(false);
             activateTool(toolId, conn);
             activateLibrary(learningLibraryId, conn);
-            activateActivity(learningLibraryId, conn);
+            //activateActivity(learningLibraryId, conn);
             conn.commit();
         }
          catch (SQLException sqlex)
@@ -125,20 +126,20 @@ public class ToolDBActivateTask extends DBTask
         
     }
     
-    private void activateActivity(long libraryId, Connection conn) throws SQLException
-    {
-        PreparedStatement stmt = null;
-        try
-        {
-            stmt = conn.prepareStatement("UPDATE lams_learning_activity SET valid_flag = 1 WHERE learning_library_id  = ?");
-            stmt.setLong(1, libraryId);
-            stmt.execute();
-        }
-        finally
-        {
-            DbUtils.closeQuietly(stmt);
-        }
-        
-    }
+//    private void activateActivity(long libraryId, Connection conn) throws SQLException
+//    {
+//        PreparedStatement stmt = null;
+//        try
+//        {
+//            stmt = conn.prepareStatement("UPDATE lams_learning_activity SET valid_flag = 1 WHERE learning_library_id  = ?");
+//            stmt.setLong(1, libraryId);
+//            stmt.execute();
+//        }
+//        finally
+//        {
+//            DbUtils.closeQuietly(stmt);
+//        }
+//        
+//    }
     
 }

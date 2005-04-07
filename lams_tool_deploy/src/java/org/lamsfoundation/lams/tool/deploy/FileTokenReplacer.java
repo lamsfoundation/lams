@@ -29,10 +29,21 @@ public class FileTokenReplacer
     public static final String TOKEN_REGEX_PREFIX = "\\$\\{";
     public static final String TOKEN_REGEX_SUFFIX = "\\}";
     
-    public static final Pattern TOKEN_PATTERN = Pattern.compile("^\\$\\{[A-Za-z0-9]+\\}$");
+    public static final Pattern TOKEN_PATTERN = Pattern.compile("\\$\\{\\w+\\}");
     //pattern for ${letters}
     
+    protected static String makeToken(final String tokenValue)
+    {
+        StringBuffer buf =  new StringBuffer(TOKEN_PREFIX);
+        buf.append(tokenValue);
+        buf.append(TOKEN_SUFFIX);
+        return buf.toString();
+    }
     
+    protected static boolean isValidToken(String token)
+    {
+        return TOKEN_PATTERN.matcher(token).matches();
+    }
     
     
     /** Creates a new instance of FileTokenReplacer */
@@ -67,7 +78,7 @@ public class FileTokenReplacer
             String token = makeToken(key);
             if (!isValidToken(token))
             {
-                throw new DeployException(key +" does not make a valid token");
+                throw new DeployException(key +" does not make a valid token ("+token+")");
             }
             
             fileString = fileString.replaceAll(makeTokenRegex(key), value);
@@ -76,18 +87,7 @@ public class FileTokenReplacer
         return fileString;
     }
     
-    protected String makeToken(final String tokenValue)
-    {
-        StringBuffer buf =  new StringBuffer(TOKEN_PREFIX);
-        buf.append(tokenValue);
-        buf.append(TOKEN_SUFFIX);
-        return buf.toString();
-    }
     
-    protected boolean isValidToken(String token)
-    {
-        return TOKEN_PATTERN.matcher(token).matches();
-    }
     
     protected String makeTokenRegex(String tokenValue) throws DeployException
     {

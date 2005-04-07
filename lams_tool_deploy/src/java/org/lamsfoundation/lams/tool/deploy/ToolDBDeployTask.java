@@ -113,19 +113,19 @@ public class ToolDBDeployTask extends DBTask
             updateToolDefaultContentId(toolId, defaultContentId, conn);
             
             //put the tool id into the tool library script
-            Map replacementMap = new HashMap(1);
-            replacementMap.put("tool_id", Long.toString(toolId));
-            FileTokenReplacer libraryScriptReplacer = new FileTokenReplacer(toolLibraryInsertScript, replacementMap);
-            String libraryScriptSQL = libraryScriptReplacer.replace();
+//            Map replacementMap = new HashMap(1);
+//            replacementMap.put("tool_id", Long.toString(toolId));
+//            FileTokenReplacer libraryScriptReplacer = new FileTokenReplacer(toolLibraryInsertScript, replacementMap);
+//            String libraryScriptSQL = libraryScriptReplacer.replace();
             
             //run tool library script and get the library id back
-            learningLibraryId = runLibraryScript(libraryScriptSQL, conn);
+            learningLibraryId = runLibraryScript(readFile(toolLibraryInsertScript), conn);
             
             //update tool record to include library id
             updateToolLibraryId(toolId, learningLibraryId, conn);
             
             //put the library id into the activity insert script
-            replacementMap = new HashMap(1);
+            Map replacementMap = new HashMap(1);
             replacementMap.put("tool_id", Long.toString(toolId));
             replacementMap.put("learning_library_id", Long.toString(learningLibraryId));
             FileTokenReplacer activityScriptReplacer = new FileTokenReplacer(toolActivityInsertScript, replacementMap);
@@ -245,7 +245,7 @@ public class ToolDBDeployTask extends DBTask
         PreparedStatement stmt = null;
         try
         {
-            stmt = conn.prepareStatement("UPDATE lams_tool SET default_content_id = ? WHERE tool_id = ?");
+            stmt = conn.prepareStatement("UPDATE lams_tool SET default_tool_content_id = ? WHERE tool_id = ?");
             stmt.setLong(1, defaultContentId);
             stmt.setLong(2, toolId);
             stmt.execute();

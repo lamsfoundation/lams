@@ -116,7 +116,15 @@ public class FileTokenReplacerTest extends TestCase
         System.out.println(output);
     }
     
+    public void testMakeToken() throws Exception
+    {
+        assertEquals("${test_id}", FileTokenReplacer.makeToken("test_id"));
+    }
     
+    public void testIsValidToken() throws Exception
+    {
+        assertTrue(FileTokenReplacer.isValidToken("${test_id}"));
+    }
     
     public static junit.framework.Test suite()
     {

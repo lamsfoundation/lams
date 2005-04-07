@@ -16,6 +16,7 @@ TEST_1_DATE DATETIME
 
 -- more comments
 INSERT INTO TEST_1 VALUES (1, 'foo', NOW());
+INSERT INTO TEST_1 VALUES (2, 'foo-bar', NOW());
     
 -- comments
 -- comments
