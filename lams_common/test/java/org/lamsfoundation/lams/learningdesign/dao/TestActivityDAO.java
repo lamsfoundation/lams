@@ -8,6 +8,8 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.*;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 
 /*
  * Created on Dec 3, 2004
@@ -30,7 +32,7 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 	protected LearningLibraryDAO learningLibraryDAO;
 	protected GroupingDAO groupingDAO;
 	protected LearningDesign learningDesign;
-
+	protected UserDAO userDAO;
 	/**
 	 * @param name
 	 */
@@ -45,6 +47,7 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 		learningLibraryDAO =(LearningLibraryDAO)context.getBean("learningLibraryDAO");
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");
 		groupingDAO = (GroupingDAO)context.getBean("groupingDAO");
+		userDAO = (UserDAO)context.getBean("userDAO");
 		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
 	}
 	public void testGetActivitiesByParentActivityId() {
@@ -122,6 +125,31 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 			activityDAO.insert(parallelActivity);
 		}
 		assertNotNull(parallelActivity.getActivityId());
-	}	
+	}
+	
+	public void testUpdateGateActivity()
+	{
+	    User learner = userDAO.getUserById(new Integer(1));
+	    Activity synchGate = activityDAO.getActivityByActivityId(new Long(26));
+	    
+	    //add waiting learner.
+	    ((GateActivity)synchGate).addWaitingLeaner(learner);
+	    ((GateActivity)synchGate).setGateOpen(new Boolean(true));
+	    
+	    activityDAO.updateActivity(synchGate);
+	    
+	    synchGate = activityDAO.getActivityByActivityId(new Long(26));
+	    assertTrue("gate status should be open",((GateActivity)synchGate).getGateOpen().booleanValue());
+	    assertEquals("should be one learner waiting",1,((GateActivity)synchGate).getWaitingLearners().size());
+	    
+	    //remove waiting learner
+	    ((GateActivity)synchGate).getWaitingLearners().clear();
+	    
+	    activityDAO.updateActivity(synchGate);
+	    synchGate = activityDAO.getActivityByActivityId(new Long(26));
+	    assertTrue("gate status should be open",((GateActivity)synchGate).getGateOpen().booleanValue());
+	    assertEquals("should be no learner waiting",0,((GateActivity)synchGate).getWaitingLearners().size());
+
+	}
 }
 
