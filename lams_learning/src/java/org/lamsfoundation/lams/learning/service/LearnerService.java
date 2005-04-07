@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -353,6 +354,25 @@ public class LearnerService implements ILearnerService
         groupingDAO.update(grouping);
         
     }
+    
+    /**
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#knockGate(org.lamsfoundation.lams.learningdesign.GateActivity, org.lamsfoundation.lams.usermanagement.User, java.util.List)
+     */
+    public boolean knockGate(GateActivity gate, User knocker, List lessonLearners)
+    {
+        boolean gateOpen = false;
+        //knock the gate.
+        if(gate.shouldOpenGateFor(knocker,lessonLearners))
+            gateOpen = true;
+        else
+            gateOpen = false;
+        
+        //update gate including updating the waiting list and gate status in
+        //the database.
+        activityDAO.update(gate);
+        
+        return gateOpen;
+    }
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------
@@ -456,5 +476,4 @@ public class LearnerService implements ILearnerService
     {
         return this.lessonDAO.getActiveLearnerByLesson(lessonId);
     }
-
 }

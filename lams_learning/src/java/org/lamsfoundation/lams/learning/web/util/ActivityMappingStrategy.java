@@ -60,6 +60,7 @@ public class ActivityMappingStrategy implements Serializable {
 			if (activity instanceof GroupingActivity) 
 			    strutsAction = "/grouping.do?";
 			if (activity instanceof GateActivity) {
+			    strutsAction = "/gate.do";
 				// not completed so return wait URL
 			}
 			if (activity instanceof ToolActivity) 

@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learning.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -163,5 +164,12 @@ public interface ILearnerService
      */
     public void performGrouping(GroupingActivity groupingActivity, User learner);
     
-    
+    /**
+     * Check up the gate status to go through the gate.
+     * @param gate the gate that current learner is facing. It could be 
+     * 			   synch gate, schedule gate or permission gate.
+     * @param knocker the learner who wants to go through the gate.
+     * @param lessonLearners the entire lesson learners.
+     */
+    public boolean knockGate(GateActivity gate,User knocker,List lessonLearners);
 }

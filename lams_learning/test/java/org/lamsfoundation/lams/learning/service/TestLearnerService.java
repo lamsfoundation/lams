@@ -20,11 +20,15 @@
 */
 package org.lamsfoundation.lams.learning.service;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
@@ -301,6 +305,44 @@ public class TestLearnerService extends AbstractLamsTestCase
         learnerService.performGrouping((GroupingActivity)randomGroupingActivity,testUser);
     
         assertTrue("verify the existance of test user",randomGrouping.doesLearnerExist(testUser));
+    }
+    
+    public void testKnockSynchGateClosed()
+    {
+        //setup lesson learner list
+        List lessonLearners = new LinkedList();
+        lessonLearners.add(testUser);
+        User testUser2= usermanageService.getUserById(new Integer(1));
+        lessonLearners.add(testUser2);
+        
+        //get sync gate
+        GateActivity synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
+        
+        boolean gateOpen = learnerService.knockGate(synchGate,testUser,lessonLearners);
+        
+        assertTrue("gate is closed",!gateOpen);
+        synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
+        
+        assertEquals("one learner is waiting",1,synchGate.getWaitingLearners().size());
+    }
+    
+    public void testKnockSynchGateOpen()
+    {
+        List lessonLearners = new LinkedList();
+        lessonLearners.add(testUser);
+        User testUser2= usermanageService.getUserById(new Integer(1));
+        lessonLearners.add(testUser2);
+        
+        //get sync gate
+        GateActivity synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
+
+        boolean gateOpen = learnerService.knockGate(synchGate,testUser2,lessonLearners);
+        assertTrue("gate is closed",gateOpen);
+
+        synchGate = (GateActivity)learnerService.getActivity(new Long(TEST_SYNCHGATE_ACTIVITY_ID));
+
+        assertEquals("Gate opened, no one should be waiting",0,synchGate.getWaitingLearners().size());
+
     }
     /**
      * @param numberOfAttemptedAct 
