@@ -47,4 +47,20 @@ public class RepositoryProxy {
     	return repository;
 	}
 
+	/** Get a version of the repository service suitable for using in JUNIT tests.
+	 * It has been placed here (as well as similar logic existing in the BaseTestCase)
+	 * so that other projects can access the appropriate Spring configuration.
+	 * This configuration uses a local datasource and does not use the cache.
+	 * @return Repository service built using a local datasource
+	 */
+	public static IRepository getLocalRepositoryService()  {
+    	
+		ApplicationContext context = new ClassPathXmlApplicationContext(IRepository.LOCAL_CONTEXT_PATH);
+		if ( context == null ) 
+			throw new RepositoryRuntimeException("Unable to access application context. Cannot create repository object.");
+		
+		IRepository repository =(IRepository)context.getBean(IRepository.REPOSITORY_SERVICE_ID);
+    	return repository;
+	}
+
 }
