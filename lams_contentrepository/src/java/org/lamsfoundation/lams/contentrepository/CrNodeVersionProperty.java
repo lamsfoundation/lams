@@ -126,6 +126,11 @@ public class CrNodeVersionProperty implements IValue,Serializable {
         return this.type;
     }
 
+    /** Set the type of the node. Should be a value from 
+     * PropertyType.
+     * 
+     * @param type
+     */
     public void setType(int type) {
         this.type = type;
     }
