@@ -24,19 +24,19 @@ public class ToolDBDeployTask extends DBTask
 {
     
     /**
-     * Holds value of property toolInsertScript.
+     * Holds value of property toolInsertScriptPath.
      */
-    private File toolInsertScript;
+    private String toolInsertScriptPath;
     
     /**
-     * Holds value of property toolLibraryInsertScript.
+     * Holds value of property toolLibraryInsertScriptPath.
      */
-    private File toolLibraryInsertScript;
+    private String toolLibraryInsertScriptPath;
     
     /**
-     * Holds value of property toolTablesScript.
+     * Holds value of property toolTablesScriptPath.
      */
-    private File toolTablesScript;
+    private String toolTablesScriptPath;
     
     /**
      * Holds value of property toolId.
@@ -49,9 +49,9 @@ public class ToolDBDeployTask extends DBTask
     private long learningLibraryId;
     
     /**
-     * Holds value of property toolActivityInsertScript.
+     * Holds value of property toolActivityInsertScriptPath.
      */
-    private File toolActivityInsertScript;
+    private String toolActivityInsertScriptPath;
     
     private long defaultContentId;
     
@@ -64,42 +64,47 @@ public class ToolDBDeployTask extends DBTask
      * Setter for property toolInsertFile.
      * @param toolInsertFile New value of property toolInsertFile.
      */
-    public void setToolInsertScript(java.io.File toolInsertScript)
+    public void setToolInsertScriptPath(String toolInsertScriptPath)
+    
     
     {
-        
-        this.toolInsertScript = toolInsertScript;
+
+        this.toolInsertScriptPath = toolInsertScriptPath;
     }
     
     /**
      * Setter for property toolLibraryInsertFile.
      * @param toolLibraryInsertFile New value of property toolLibraryInsertFile.
      */
-    public void setToolLibraryInsertScript(java.io.File toolLibraryInsertScript)
+    public void setToolLibraryInsertScriptPath(String toolLibraryInsertScriptPath)
+    
     
     {
-        
-        this.toolLibraryInsertScript = toolLibraryInsertScript;
+
+        this.toolLibraryInsertScriptPath = toolLibraryInsertScriptPath;
     }
     
     /**
      * Setter for property toolTablesCreatScript.
      * @param toolTablesCreatScript New value of property toolTablesCreatScript.
      */
-    public void setToolTablesScript(java.io.File toolTablesScript)
+    public void setToolTablesScriptPath(String toolTablesScriptPath)
+    
     
     
     {
 
-        this.toolTablesScript = toolTablesScript;
+        this.toolTablesScriptPath = toolTablesScriptPath;
     }
     
     public void execute() throws DeployException
     {
+        toolInsertScript = new File(toolInsertScriptPath);
+        toolLibraryInsertScript = new File(toolLibraryInsertScriptPath);
+        toolActivityInsertScript = new File(toolActivityInsertScriptPath);
+        toolTablesScript = new File(toolTablesScriptPath);
         //get a connection
         Connection conn = getConnection();
-        
-        
         try
         {
             conn.setAutoCommit(false);
@@ -202,10 +207,11 @@ public class ToolDBDeployTask extends DBTask
      * Setter for property toolActivityInsertScript.
      * @param toolActivityInsertScript New value of property toolActivityInsertScript.
      */
-    public void setToolActivityInsertScript(File toolActivityInsertScript)
+    public void setToolActivityInsertScriptPath(String toolActivityInsertScriptPath)
+    
     {
-        
-        this.toolActivityInsertScript = toolActivityInsertScript;
+
+        this.toolActivityInsertScriptPath = toolActivityInsertScriptPath;
     }
     
     private long getNewToolContentId(long toolId, Connection conn) throws DeployException
@@ -357,4 +363,12 @@ public class ToolDBDeployTask extends DBTask
 
         return this.defaultContentId;
     }
+
+    private File toolInsertScript;
+
+    private File toolActivityInsertScript;
+
+    private File toolLibraryInsertScript;
+
+    private File toolTablesScript;
 }

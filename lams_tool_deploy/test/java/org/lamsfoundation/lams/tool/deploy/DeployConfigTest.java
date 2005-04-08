@@ -47,17 +47,17 @@ public class DeployConfigTest extends TestCase
     
     public void testGetDbUsername()
     {
-        assertEquals(config.getDbUsername(), "lams");
+        assertEquals(config.getDbUsername(), "root");
     }
     
     public void testGetDbPassword()
     {
-        assertEquals(config.getDbPassword(), "lamsdemo");
+        assertEquals(config.getDbPassword(), "dag.Quiz");
     }
     
     public void testGetDbDriverUrl()
     {
-        assertEquals(config.getDbDriverUrl(), "jdbc:mysql://localhost:3306/lams");
+        assertEquals(config.getDbDriverUrl(), "jdbc:mysql://localhost:3306/scratch");
     }
     
     public void testGetDbDriverClass()
@@ -65,60 +65,58 @@ public class DeployConfigTest extends TestCase
         assertEquals(config.getDbDriverClass(), "com.mysql.jdbc.Driver");
     }
     
-    //    #List of files to move to the deploy directory
-    //deployFiles=lams_tool_imscp.war,lams_tool_imscp.jar
+
     
     public void testDeployFiles()
     {
         List deployFiles = config.getDeployFiles();
         assertNotNull(deployFiles);
         assertEquals(deployFiles.size(),2);
-        assertEquals(deployFiles.get(0), "lams_tool_imscp.war");
-        assertEquals(deployFiles.get(1), "lams_tool_imscp.jar");
+        assertEquals(deployFiles.get(0), "test/file/test-dummy.war");
+        assertEquals(deployFiles.get(1), "test/file/test-dummy.jar");
         
     }
-    //#nameof SQL script file to create and populate the tool tables
-    //toolTablesScriptPath=create_imscp_db.sql
+
     
     public void testGetToolTablesScriptPath()
     {
-        assertEquals(config.getToolTablesScriptPath(), "create_imscp_db.sql");
+        assertEquals(config.getToolTablesScriptPath(), "test/file/sql/create_tool_tables.sql");
     }
     //#Path of SQL script file to create the tool library activity
     //toolActivityInsertScriptPath=insert_imscp_activity.sql
     public void testGetToolActivityInsertScriptPath()
     {
-        assertEquals(config.getToolActivityInsertScriptPath(), "insert_imscp_activity.sql");
+        assertEquals(config.getToolActivityInsertScriptPath(), "test/file/sql/activity_insert.sql");
     }
     
     //#Path of SQL script to insert the library record
     //toolLibraryInsertScriptPath=insert_imscp_library.sql
     public void testGetToolLibraryInsertScriptPath()
     {
-        assertEquals(config.getToolLibraryInsertScriptPath(), "insert_imscp_library.sql");
+        assertEquals(config.getToolLibraryInsertScriptPath(), "test/file/sql/library_insert.sql");
     }
     //#name of SQL script that inserts the lams_tool record
     //toolInsertScriptPath=insert_imscp_tool.sql
     public void testGetToolInsertScriptPath()
     {
-        assertEquals(config.getToolInsertScriptPath(), "insert_imscp_tool.sql");
+        assertEquals(config.getToolInsertScriptPath(), "test/file/sql/tool_insert.sql");
     }
     //#path to lams ear dir
     //lamsEarPath=/var/jboss/server/default/deploy/lams.ear
     public void testGetLamsEarPath()
     {
-        assertEquals(config.getLamsEarPath(), "/var/jboss/server/default/deploy/lams.ear");
+        assertEquals(config.getLamsEarPath(), "test/file/lams.ear");
     }
     //#Context path to deploy the tool under
     //toolContext=/lams/tool/imscp
     public void testGetToolContextRoot()
     {
-        assertEquals(config.getToolContextRoot(), "/lams/tool/imscp");
+        assertEquals(config.getToolContextRoot(), "/lams/tool/test");
     }
     //#URI of tool web app location
     //toolWebUri=lams_tool_imscp.war
     public void testGetToolWebUri()
     {
-        assertEquals(config.getToolWebUri(), "lams_tool_imscp.war");
+        assertEquals(config.getToolWebUri(), "test-dummy.war");
     }
 }

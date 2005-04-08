@@ -39,26 +39,7 @@ public class ToolDBDeployTaskTest extends ToolDBTest
     protected void setUp() throws java.lang.Exception
     {
         super.setUp();
-        toolInsertScript = new File("test/file/sql/tool_insert.sql");
-        if (!toolInsertScript.exists())
-        {
-            throw new Exception("can't find test tool insert script!");
-        }
-        libraryInsertScript =  new File("test/file/sql/library_insert.sql");
-        if (!libraryInsertScript.exists())
-        {
-            throw new Exception("can't find test library insert script!");
-        }
-        toolCreateScript =  new File("test/file/sql/create_tool_tables.sql");
-        if (!toolCreateScript.exists())
-        {
-            throw new Exception("can't find test tool create script!");
-        }
-        activityInsertScript =  new File("test/file/sql/activity_insert.sql");
-        if (!activityInsertScript.exists())
-        {
-            throw new Exception("can't find test activity insert script!");
-        }
+        
         
     }
     
@@ -83,10 +64,10 @@ public class ToolDBDeployTaskTest extends ToolDBTest
         task.setDbPassword(props.getString("dbPassword"));
         task.setDbDriverClass(props.getString("dbDriverClass"));
         task.setDbDriverUrl(props.getString("dbDriverUrl"));
-        task.setToolInsertScript(toolInsertScript);
-        task.setToolLibraryInsertScript(libraryInsertScript);
-        task.setToolActivityInsertScript(activityInsertScript);
-        task.setToolTablesScript(toolCreateScript);
+        task.setToolInsertScriptPath(props.getString("toolInsertScriptPath"));
+        task.setToolLibraryInsertScriptPath(props.getString("toolLibraryInsertScriptPath"));
+        task.setToolActivityInsertScriptPath(props.getString("toolActivityInsertScriptPath"));
+        task.setToolTablesScriptPath(props.getString("toolTablesScriptPath"));
         task.execute();
         assertTrue(task.getToolId() > 0L);
         assertTrue(task.getLearningLibraryId() > 0L);

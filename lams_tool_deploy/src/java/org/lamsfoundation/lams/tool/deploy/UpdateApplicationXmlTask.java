@@ -49,7 +49,7 @@ public abstract class UpdateApplicationXmlTask implements Task
     /**
      * The application.xml file.
      */
-    protected File lamsEarPath;
+    protected String lamsEarPath;
     
     /**
      * The value of the web-uri element.
@@ -74,7 +74,7 @@ public abstract class UpdateApplicationXmlTask implements Task
      * Sets the location of the application xml file to be modified.
      * @param appxml New value of property appxml.
      */
-    public void setLamsEarPath(final String lasmEarPath)
+    public void setLamsEarPath(final String lamsEarPath)
     {
         this.lamsEarPath = lamsEarPath;
         this.applicationXmlPath = lamsEarPath+"/META-INF/application.xml";

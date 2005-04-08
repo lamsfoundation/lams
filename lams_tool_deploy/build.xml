@@ -88,7 +88,7 @@
         
         <target name="junit" depends="compile" description="Build and test the project">
         <!-- NOTE: needs fork and dir so it can find test files! -->
-            <junit printsummary="withOutAndErr" showoutput="on" fork="on" dir="${basedir}">
+            <junit printsummary="withOutAndErr" haltonfailure="true" showoutput="on" fork="on" dir="${basedir}">
                 <classpath>
                     <path refid="junit.class.path"/>
                 </classpath>
@@ -99,6 +99,7 @@
                 <test name="org.lamsfoundation.lams.tool.deploy.ScriptRunnerTest" todir="${basedir}/test/results" outfile="ScriptRunner"/>
                 <test name="org.lamsfoundation.lams.tool.deploy.ToolDBDeployTaskTest" todir="${basedir}/test/results" outfile="ToolDBDeployTaskTest"/>
                 <test name="org.lamsfoundation.lams.tool.deploy.ToolDBActivateTaskTest" todir="${basedir}/test/results" outfile="ToolDBActivateTaskTest"/>
+                <test name="org.lamsfoundation.lams.tool.deploy.DeployTest" todir="${basedir}/test/results" outfile="DeployTest"/>
             </junit>
         </target>
 </project>
