@@ -356,7 +356,7 @@ Ant build file.
 	
 	<target name="test" depends="compile.test"> 
 		<mkdir dir="${build.report}"/>
-		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
+		<junit printsummary="yes" haltonerror="yes" haltonfailure="yes"
 			   fork="yes">
 			<formatter type="plain" usefile="false"/>
 			<formatter type="xml"/>

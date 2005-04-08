@@ -23,13 +23,7 @@ package org.lamsfoundation.lams.contentrepository;
 
 import junit.framework.TestCase;
 
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.IRepository;
-import org.lamsfoundation.lams.contentrepository.IRepositoryAdmin;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.SimpleCredentials;
-import org.lamsfoundation.lams.contentrepository.SimpleVersionedNode;
+import org.apache.log4j.BasicConfigurator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -73,7 +67,7 @@ public class BaseTestCase extends TestCase {
 		// this is run for each test so once we have it, we don't
 		// want to get it again!
 		if ( context == null ) {
-			context = new ClassPathXmlApplicationContext("/org/lamsfoundation/lams/contentrepository/testContentRepositoryApplicationContext.xml");
+			context = new ClassPathXmlApplicationContext(IRepository.LOCAL_CONTEXT_PATH);
 		}
 		
 		if ( repository == null ) {

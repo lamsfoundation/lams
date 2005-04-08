@@ -121,7 +121,7 @@ public class LoginRepositoryAction extends RepositoryDispatchAction {
 				// add the tool credential, then create the workspace
 				// if the credential isn't added first, then the addWorkspace
 				// call will fail - only a valid credential can add a workspace.
-				repository.createCredential(cred);
+				repository.createCredentials(cred);
 				repository.addWorkspace(cred, workspaceName);
 			} catch (LoginException e) {
 				log.error("LoginException occured ",e);

@@ -177,8 +177,8 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 	 * Possibly this should only be available to an internal management tool
 	 * *** Security Risk - I'm converting two passwords to a string... ***
 	 */
-	public void createCredential(ICredentials newCredential) 			
-					throws AccessDeniedException, RepositoryCheckedException {
+	public void createCredentials(ICredentials newCredential) 			
+					throws AccessDeniedException, RepositoryCheckedException, ItemExistsException {
 		if ( newCredential == null || newCredential.getName() == null || newCredential.getPassword() == null)
 			throw new RepositoryCheckedException("Credential is null or name/password is missing - cannot create credential.");
 
@@ -187,7 +187,7 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 		// check that the user doesn't already exist
 		CrCredential cred = credentialDAO.findByName(newCredential.getName());
 		if ( cred != null )
-			throw new RepositoryCheckedException("Credential name "+newCredential.getName()+" already exists - cannot create credential.");
+			throw new ItemExistsException("Credential name "+newCredential.getName()+" already exists - cannot create credential.");
 		
 		// try to create the credential - this should be done via the Spring bean factory.
 		cred = new CrCredential();

@@ -36,6 +36,10 @@ public interface IRepository {
 	/** String used to define the path to the context file */
 	public static final String REPOSITORY_CONTEXT_PATH = 
 		"/org/lamsfoundation/lams/contentrepository/contentRepositoryApplicationContext.xml";
+	/** String used to define the path to the context file used for
+	 * JUNIT testing. This file uses local datasources */
+	public static final String LOCAL_CONTEXT_PATH = 
+		"/org/lamsfoundation/lams/contentrepository/contentRepositoryLocalApplicationContext.xml";
 	
     /**
      * Login, creating a new ticket for the given credentials and specified
@@ -81,9 +85,10 @@ public interface IRepository {
      *    
 	 * @param newCredential this user/password will be added to the repository
 	 * @throws RepositoryCheckedException if parameters are missing.	 
+	 * @throws ItemExistsException if the credential already exists.
      */
-	public void createCredential(ICredentials newCredential) 			
-		throws AccessDeniedException, RepositoryCheckedException;
+	public void createCredentials(ICredentials newCredential) 			
+		throws AccessDeniedException, RepositoryCheckedException, ItemExistsException;
 
     /**
 	 * Update a credential. Name cannot change, so really only the password changes

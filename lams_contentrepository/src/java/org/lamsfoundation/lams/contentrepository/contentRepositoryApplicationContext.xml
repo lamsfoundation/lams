@@ -81,7 +81,7 @@
 	</bean>
 
 	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
-	<bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
+	<bean id="crTransactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
 		<property name="sessionFactory"><ref local="crSessionFactory"/></property>
 	</bean>
 
@@ -114,7 +114,7 @@
 	<!--  automatically, but put then in here as documentation	-->
 	<bean id="repositoryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager">
-			<ref local ="transactionManager"/>
+			<ref local ="crTransactionManager"/>
 		</property>
 		<property name ="target">
 			<ref local="repositoryTarget"/>
