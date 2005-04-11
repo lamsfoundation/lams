@@ -1,23 +1,3 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-18 15:25:57
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-18 15:04:50
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-15 13:43:35
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-10 14:16:48
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-02-16 16:04:11
-
 SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS lams_activity_category;
