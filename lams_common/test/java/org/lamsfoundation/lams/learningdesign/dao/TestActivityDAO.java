@@ -151,5 +151,14 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 	    assertEquals("should be no learner waiting",0,((GateActivity)synchGate).getWaitingLearners().size());
 
 	}
+
+
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+     */
+    protected String getHibernateSessionFactoryName()
+    {
+        return "coreSessionFactory";
+    }
 }
 

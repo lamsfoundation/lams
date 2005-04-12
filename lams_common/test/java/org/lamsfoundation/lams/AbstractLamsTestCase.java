@@ -53,6 +53,11 @@ public abstract class AbstractLamsTestCase extends TestCase
     protected abstract String[] getContextConfigLocation();
 	
     /**
+     * @return
+     */
+    protected abstract String getHibernateSessionFactoryName();
+    
+    /**
      * @see TestCase#tearDown()
      */
     protected void tearDown() throws Exception
@@ -67,17 +72,19 @@ public abstract class AbstractLamsTestCase extends TestCase
     protected void initializeHibernateSession() throws HibernateException
     {
         //hold the hibernate session
-		SessionFactory sessionFactory = (SessionFactory) this.context.getBean("coreSessionFactory");
+		SessionFactory sessionFactory = (SessionFactory) this.context.getBean(getHibernateSessionFactoryName());
 		Session s = sessionFactory.openSession();
 		TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(s));
     }    
+
+
     /**
      * @throws HibernateException
      */
     protected void finalizeHibernateSession() throws HibernateException
     {
         //clean the hibernate session
-		SessionFactory sessionFactory = (SessionFactory)this.context.getBean("coreSessionFactory");
+		SessionFactory sessionFactory = (SessionFactory)this.context.getBean(getHibernateSessionFactoryName());
 	    SessionHolder holder = (SessionHolder)TransactionSynchronizationManager.getResource(sessionFactory);
 	    if (holder != null&&shouldFlush) {
 	    	Session s = holder.getSession(); 
@@ -89,13 +96,12 @@ public abstract class AbstractLamsTestCase extends TestCase
 
     protected Session getSession()
     {
-		SessionFactory sessionFactory = (SessionFactory)this.context.getBean("coreSessionFactory");
+		SessionFactory sessionFactory = (SessionFactory)this.context.getBean(getHibernateSessionFactoryName());
 	    SessionHolder holder = (SessionHolder)TransactionSynchronizationManager.getResource(sessionFactory);
 	    if (holder != null) 
 	    	return holder.getSession(); 
 	    else
 	        return null;
-
     }
     /**
      * @param shouldFlush The shouldFlush to set.

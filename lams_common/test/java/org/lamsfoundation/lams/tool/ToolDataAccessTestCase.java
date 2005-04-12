@@ -144,5 +144,13 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
                                       testGroup,
                                       testLesson);
     }
+
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+     */
+    protected String getHibernateSessionFactoryName()
+    {
+        return "coreSessionFactory";
+    }
    
 }

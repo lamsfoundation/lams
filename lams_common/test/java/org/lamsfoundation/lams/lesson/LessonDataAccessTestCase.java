@@ -284,4 +284,12 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
         assertEquals("check up the learner progresses",0,lesson.getLearnerProgresses().size());
         
     }
+
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+     */
+    protected String getHibernateSessionFactoryName()
+    {
+        return "coreSessionFactory";
+    }
 }

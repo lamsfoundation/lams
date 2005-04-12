@@ -43,4 +43,12 @@ public class TestTransitionDAO extends AbstractLamsTestCase{
 		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
 		 "applicationContext.xml"};
 	}
+
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+     */
+    protected String getHibernateSessionFactoryName()
+    {
+        return "coreSessionFactory";
+    }
 }

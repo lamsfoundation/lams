@@ -57,7 +57,7 @@ import servletunit.struts.MockStrutsTestCase;
 public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
 {
     //protected ApplicationContext context;
-    private final String CONFIG_LOCATIONS;
+    //private String CONFIG_LOCATIONS;
     protected HttpServletRequestSimulator httpRequest;
     protected HttpSession httpSession ; 
     protected WebApplicationContext wac;
@@ -65,10 +65,10 @@ public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
     /**
      * @param arg0
      */
-    public AbstractLamsStrutsTestCase(String testName,String location)
+    public AbstractLamsStrutsTestCase(String testName)
     {
         super(testName);
-        this.CONFIG_LOCATIONS = location;
+        //this.CONFIG_LOCATIONS = location;
         
     }
     
@@ -85,7 +85,7 @@ public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
         context.setInitParameter(ContextLoader.CONTEXT_CLASS_PARAM,
                                  XmlWebApplicationContext.class.getName());
         context.setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM,
-                                 CONFIG_LOCATIONS);
+                                 getContextConfigLocation());
         ctxLoader.initWebApplicationContext(context);
         
         wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
@@ -108,7 +108,7 @@ public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
     protected void initializeHibernateSession() throws HibernateException
     {
         //hold the hibernate session
-		SessionFactory sessionFactory = (SessionFactory) this.wac.getBean("coreSessionFactory");
+		SessionFactory sessionFactory = (SessionFactory) this.wac.getBean(getHibernateSessionFactoryBeanName());
 		Session s = sessionFactory.openSession();
 		TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(s));
     }   
@@ -119,7 +119,7 @@ public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
     protected void finalizeHibernateSession() throws HibernateException
     {
         //clean the hibernate session
-		SessionFactory sessionFactory = (SessionFactory)this.wac           .getBean("coreSessionFactory");
+		SessionFactory sessionFactory = (SessionFactory)this.wac.getBean(getHibernateSessionFactoryBeanName());
 	    SessionHolder holder = (SessionHolder)TransactionSynchronizationManager.getResource(sessionFactory);
 	    if (holder != null) {
 	    	Session s = holder.getSession(); 
@@ -128,4 +128,11 @@ public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
 		    SessionFactoryUtils.closeSessionIfNecessary(s, sessionFactory);
 	    }
     }
+    
+    /**
+     * @return
+     */
+    protected abstract String getHibernateSessionFactoryBeanName();
+    
+    protected abstract String getContextConfigLocation();
 }

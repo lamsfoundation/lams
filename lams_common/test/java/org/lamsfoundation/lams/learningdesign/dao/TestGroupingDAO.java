@@ -104,5 +104,13 @@ public class TestGroupingDAO extends AbstractLamsTestCase
         
     }
 
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+     */
+    protected String getHibernateSessionFactoryName()
+    {
+        return "coreSessionFactory";
+    }
+
 
 }

@@ -34,7 +34,8 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		super.setUp();
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");		
 		userDAO = (UserDAO)context.getBean("userDAO");
-	}	/*
+	}	
+	/*
 	public void testInsertLearningDesign(){
 		LearningDesign design = new LearningDesign();
 				
@@ -59,4 +60,11 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
 		 "applicationContext.xml"};
 	}
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+     */
+    protected String getHibernateSessionFactoryName()
+    {
+        return "coreSessionFactory";
+    }
 }

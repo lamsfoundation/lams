@@ -114,4 +114,12 @@ public class TestActivity extends AbstractLamsTestCase
 		 "applicationContext.xml"};
     }
 
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+     */
+    protected String getHibernateSessionFactoryName()
+    {
+        return "coreSessionFactory";
+    }
+
 }
