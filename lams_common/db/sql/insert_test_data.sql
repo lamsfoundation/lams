@@ -663,6 +663,76 @@ null,null,
 null,
 1,0,'Online Instructions',1);
 
+insert into lams_learning_activity
+(activity_id,activity_ui_id,
+description,title,help_text,
+xcoord,ycoord,
+parent_activity_id,parent_ui_id,learning_activity_type_id,
+grouping_id,grouping_ui_id,order_id,define_later_flag,
+learning_design_id,learning_library_id,create_date_time,
+run_offline_flag,offline_instructions,
+max_number_of_options,min_number_of_options,options_instructions,
+tool_id,tool_content_id,
+gate_activity_level_id,gate_open_flag,
+gate_start_time_offset,gate_end_time_offset,
+gate_start_date_time,gate_end_date_time,
+library_activity_ui_image,
+create_grouping_id,create_grouping_ui_id,
+library_activity_id,
+grouping_support_type_id, apply_grouping_flag,online_instructions,activity_category_id)
+values
+(27,27,
+'Schedule Gate','Schedule Gate Activity','Help Text for Schedule Gate',
+10,20,
+null,null,4,
+null,null,0,0,
+1,null,'20050101',
+0,null,
+null,null,null,
+null,null,
+3,0,
+1,2,
+null,null,
+'ScheduleGateImage',
+null,null,
+null,
+1,0,'Online Instructions',1);
+
+insert into lams_learning_activity
+(activity_id,activity_ui_id,
+description,title,help_text,
+xcoord,ycoord,
+parent_activity_id,parent_ui_id,learning_activity_type_id,
+grouping_id,grouping_ui_id,order_id,define_later_flag,
+learning_design_id,learning_library_id,create_date_time,
+run_offline_flag,offline_instructions,
+max_number_of_options,min_number_of_options,options_instructions,
+tool_id,tool_content_id,
+gate_activity_level_id,gate_open_flag,
+gate_start_time_offset,gate_end_time_offset,
+gate_start_date_time,gate_end_date_time,
+library_activity_ui_image,
+create_grouping_id,create_grouping_ui_id,
+library_activity_id,
+grouping_support_type_id, apply_grouping_flag,online_instructions,activity_category_id)
+values
+(28,28,
+'Permission Gate','Permission Gate Activity','Help Text for Permission Gate',
+10,20,
+null,null,5,
+null,null,0,0,
+1,null,'20050101',
+0,null,
+null,null,null,
+null,null,
+3,0,
+null,null,
+null,null,
+'PermissionGateImage',
+null,null,
+null,
+1,0,'Online Instructions',1);
+
 -- Populates the lams_learning_transition table with various transitions for the dummy design 
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
@@ -675,13 +745,19 @@ insert into lams_learning_transition(transition_id,transition_ui_id,description,
 values(3,3,'Notebook to GroupingActivity','Notebook to GroupingActivity',23,15,1,'20050207',23,1);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(4,4,'GroupingActivity to Chat','GroupingActivity to Chat',21,23,1,'20050207',7,23);
+values(4,4,'GroupingActivity to Schedule gate','GroupingActivity to Schedule gate',27,23,1,'20050207',27,23);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(5,5,'Chat to QNA','Chat to QNA',24,21,1,'20050207',24,7);
+values(5,5,'Schedule gate to Chat','Schedule gate to Chat',21,27,1,'20050207',7,27);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(6,6,'QNA to OptionsActivity','QNA to OptionsActivity',12,24,1,'20050207',12,24);
+values(6,6,'Chat to QNA','Chat to QNA',24,21,1,'20050207',24,7);
+
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(7,7,'QNA to Permission gate','QNA to Permission gate',28,24,1,'20050207',28,24);
+
+insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
+values(8,8,'Permission gate to OptionsActivity','Permission gate to OptionsActivity',12,28,1,'20050207',12,28);
 
 --insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
 --values(6,6,'OptionsActivity to Notebook','OptionsActivity to Notebook',16,12,1,'20050207',2,12);
@@ -693,7 +769,7 @@ values(6,6,'QNA to OptionsActivity','QNA to OptionsActivity',12,24,1,'20050207',
 --values(8,8,'MultipleChoice to ParallelActivity','MultipleChoice to ParallelActivity',13,17,1,'20050207',13,3);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(7,7,'OptionsActivity to ParallelActivity','OptionsActivity to ParallelActivity',13,12,1,'20050207',13,12);
+values(9,9,'OptionsActivity to ParallelActivity','OptionsActivity to ParallelActivity',13,12,1,'20050207',13,12);
 
 --insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
 --values(9,9,'ParallelActivity to QNA','ParallelActivity to QNA',18,13,1,'20050207',4,13);
@@ -702,7 +778,7 @@ values(7,7,'OptionsActivity to ParallelActivity','OptionsActivity to ParallelAct
 --values(10,10,'QNA to MessageBoard','QNA to MessageBoard',19,18,1,'20050207',5,4);
 
 insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
-values(8,8,'ParallelActivity to SequenceActivity','ParallelActivity to SequenceActivity',14,13,1,'20050207',14,13);
+values(10,10,'ParallelActivity to SequenceActivity','ParallelActivity to SequenceActivity',14,13,1,'20050207',14,13);
 
 --insert into lams_learning_transition(transition_id,transition_ui_id,description,title,to_activity_id,from_activity_id,learning_design_id,create_date_time,to_ui_id,from_ui_id)
 --values(12,12,'SequenceActivity to Shared Resources','SequenceActivity to Shared Resources',22,14,1,'20050207',8,14);
