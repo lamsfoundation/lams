@@ -1,11 +1,3 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-18 15:28:01
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-18 14:55:46
-# 
 INSERT INTO lams_role VALUES (1, 'SYSADMIN', 'LAMS System Adminstrator', NOW());
 INSERT INTO lams_role VALUES (2, 'ADMIN', 'Organization Adminstrator', NOW());
 INSERT INTO lams_role VALUES (3, 'AUTHOR', 'Authors Learning Designs', NOW());
