@@ -22,6 +22,7 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -77,4 +78,17 @@ public interface IMonitoringService
      * 							will be force complete
      */
     public void forceCompleteLessonByUser(long learnerProgressId);
+    
+    /**
+     * Set the gate to open to let all the learners through. This learning service
+     * is triggerred by the system scheduler.
+     * @param gate the gate that we need to open.
+     */
+    public void openGate(GateActivity gate);
+    
+    /**
+     * Set the gate to closed.
+     * @param gate the gate that we need to close.
+     */
+    public void closeGate(GateActivity gate);
 }

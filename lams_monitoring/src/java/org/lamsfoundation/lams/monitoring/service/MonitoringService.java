@@ -27,9 +27,11 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
@@ -60,7 +62,7 @@ public class MonitoringService implements IMonitoringService
     private ILessonClassDAO lessonClassDAO;
     private ILamsCoreToolService lamsCoreToolService;
     private IAuthoringService authoringService;
-
+    private IActivityDAO activityDAO;
 
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -97,6 +99,13 @@ public class MonitoringService implements IMonitoringService
         this.lamsCoreToolService = lamsToolService;
     }
 
+    /**
+     * @param activityDAO The activityDAO to set.
+     */
+    public void setActivityDAO(IActivityDAO activityDAO)
+    {
+        this.activityDAO = activityDAO;
+    }
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
@@ -193,6 +202,23 @@ public class MonitoringService implements IMonitoringService
         lessonDAO.updateLesson(requestedLesson);
     }
 
+    /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#openGate(org.lamsfoundation.lams.learningdesign.GateActivity)
+     */
+    public void openGate(GateActivity gate)
+    {
+        gate.setGateOpen(new Boolean(true));
+        activityDAO.update(gate);
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#closeGate(org.lamsfoundation.lams.learningdesign.GateActivity)
+     */
+    public void closeGate(GateActivity gate)
+    {
+        gate.setGateOpen(new Boolean(false));
+        activityDAO.update(gate);
+    }
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#forceCompleteLessonByUser(long)
      */
@@ -321,6 +347,4 @@ public class MonitoringService implements IMonitoringService
         return activity.isToolActivity()
                 && !((ToolActivity) activity).getApplyGrouping().booleanValue();
     }
-
-
 }
