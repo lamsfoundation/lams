@@ -116,6 +116,13 @@ public class TestMonitoringService extends AbstractLamsTestCase
                               "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",        					  
         					  "applicationContext.xml"};
     }
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+     */
+    protected String getHibernateSessionFactoryName()
+    {
+        return "coreSessionFactory";
+    }
     
     public void testInitializeLesson()
     {
@@ -173,23 +180,15 @@ public class TestMonitoringService extends AbstractLamsTestCase
 
     public void testOpenGate()
     {
-        Activity scheduleGate = activityDao.getActivityByActivityId(TEST_SCHEDULE_GATE_ID);
-        
-        monitoringService.openGate((GateActivity)scheduleGate);
-        
+        monitoringService.openGate(TEST_SCHEDULE_GATE_ID);
         Activity openedScheduleGate = activityDao.getActivityByActivityId(TEST_SCHEDULE_GATE_ID);
-        
         assertTrue("the gate should be opened",((GateActivity)openedScheduleGate).getGateOpen().booleanValue());
     }
 
     public void testCloseGate()
     {
-        Activity scheduleGate = activityDao.getActivityByActivityId(TEST_SCHEDULE_GATE_ID);
-        
-        monitoringService.closeGate((GateActivity)scheduleGate);
-        
+        monitoringService.closeGate(TEST_SCHEDULE_GATE_ID);
         Activity closedScheduleGate = activityDao.getActivityByActivityId(TEST_SCHEDULE_GATE_ID);
-        
         assertTrue("the gate should be closed",!((GateActivity)closedScheduleGate).getGateOpen().booleanValue());
     }
     
@@ -207,4 +206,5 @@ public class TestMonitoringService extends AbstractLamsTestCase
         testLearner = usermanageService.getUserById(TEST_LEARNER_ID);        
         testOrganisation = usermanageService.getOrganisationById(TEST_ORGANIZATION_ID);
     }
+
 }

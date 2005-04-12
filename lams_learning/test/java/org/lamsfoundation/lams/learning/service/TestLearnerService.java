@@ -392,4 +392,12 @@ public class TestLearnerService extends AbstractLamsTestCase
         assertEquals("verify the completed activities",numberOfCompletedActivities,testProgress.getCompletedActivities().size());
         assertEquals("verify the attempted activities",numberOfAttemptedActivities,testProgress.getAttemptedActivities().size());
     }
+
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+     */
+    protected String getHibernateSessionFactoryName()
+    {
+        return "coreSessionFactory";
+    }
 }

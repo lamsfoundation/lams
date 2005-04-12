@@ -54,13 +54,13 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
      */
     public TestDisplayActivityAction(String arg0)
     {
-        super(arg0,getContextConfigLocation());
+        super(arg0);
     }
 
     /**
      * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getContextConfigLocation()
      */
-    private static String getContextConfigLocation()
+    protected String getContextConfigLocation()
     {
         return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
 		   	   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
@@ -69,6 +69,13 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
 		   	   +"/WEB-INF/spring/learningApplicationContext.xml";
     }
     
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getHibernateSessionFactoryBeanName()
+     */
+    protected String getHibernateSessionFactoryBeanName()
+    {
+        return "coreSessionFactory";
+    }    
     /*
      * @see AbstractLamsStrutsTestCase#setUp()
      */

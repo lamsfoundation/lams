@@ -57,19 +57,27 @@ public class TestGroupingAction extends AbstractLamsStrutsTestCase
      */
     public TestGroupingAction(String testName)
     {
-        super(testName, getContextConfigLocation());
+        super(testName);
     }
 
     /**
      * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getContextConfigLocation()
      */
-    private static String getContextConfigLocation()
+    protected String getContextConfigLocation()
     {
         return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
   			   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
   			   +"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml "
   			   +"/WEB-INF/spring/applicationContext.xml "
   			   +"/WEB-INF/spring/learningApplicationContext.xml";
+    }
+    
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getHibernateSessionFactoryBeanName()
+     */
+    protected String getHibernateSessionFactoryBeanName()
+    {
+        return "coreSessionFactory";
     }
     /*
      * @see AbstractLamsStrutsTestCase#setUp()

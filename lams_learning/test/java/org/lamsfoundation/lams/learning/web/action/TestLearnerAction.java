@@ -70,7 +70,7 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
     /**
      * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getContextConfigLocation()
      */
-    private static String getContextConfigLocation()
+    protected String getContextConfigLocation()
     {
         return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
   			   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
@@ -85,7 +85,7 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
      */
     public TestLearnerAction(String testName)
     {
-        super(testName,getContextConfigLocation());
+        super(testName);
     }
 
     public void testGetActiveLessons()
@@ -151,5 +151,13 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
         actionPerform();
         
         verifyNoActionErrors();
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getHibernateSessionFactoryBeanName()
+     */
+    protected String getHibernateSessionFactoryBeanName()
+    {
+        return "coreSessionFactory";
     }
 }
