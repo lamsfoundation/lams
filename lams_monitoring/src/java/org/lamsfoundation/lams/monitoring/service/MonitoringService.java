@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -41,6 +42,8 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
 
 /**
  * <p>This is the major service facade for all monitoring functionalities. It is 
@@ -63,7 +66,9 @@ public class MonitoringService implements IMonitoringService
     private ILamsCoreToolService lamsCoreToolService;
     private IAuthoringService authoringService;
     private IActivityDAO activityDAO;
-
+    private JobDetail openScheduleGateJob;
+    private JobDetail closeScheduleGateJob;
+    private Scheduler scheduler;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
@@ -105,6 +110,29 @@ public class MonitoringService implements IMonitoringService
     public void setActivityDAO(IActivityDAO activityDAO)
     {
         this.activityDAO = activityDAO;
+    }
+
+    /**
+     * @param openScheduleGateJob The openScheduleGateJob to set.
+     */
+    public void setOpenScheduleGateJob(JobDetail openScheduleGateJob)
+    {
+        this.openScheduleGateJob = openScheduleGateJob;
+    }
+    
+    /**
+     * @param closeScheduleGateJob The closeScheduleGateJob to set.
+     */
+    public void setCloseScheduleGateJob(JobDetail closeScheduleGateJob)
+    {
+        this.closeScheduleGateJob = closeScheduleGateJob;
+    }
+    /**
+     * @param scheduler The scheduler to set.
+     */
+    public void setScheduler(Scheduler scheduler)
+    {
+        this.scheduler = scheduler;
     }
     //---------------------------------------------------------------------
     // Service Methods
@@ -190,11 +218,12 @@ public class MonitoringService implements IMonitoringService
             //TODO this is for testing purpose as survey is the only tool available
             //so far.
             if (shouldInitToolSessionFor(activity)&&this.isSurvey((ToolActivity)activity))
-            {
                 initToolSessionFor((ToolActivity) activity,
                                    requestedLesson.getAllLearners(),
                                    requestedLesson);
-            }
+            //if it is schedule gate, we need to initialize sheduler for it.
+            if(activity.getActivityTypeId().intValue()==Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
+                initGateScheduler((ScheduleGateActivity)activity);
         }
         //update lesson status
         requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
@@ -203,10 +232,19 @@ public class MonitoringService implements IMonitoringService
     }
 
     /**
+     * @param activity
+     */
+    private void initGateScheduler(ScheduleGateActivity scheduleGate)
+    {
+        
+    }
+
+    /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#openGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */
-    public void openGate(GateActivity gate)
+    public void openGate(Long gateId)
     {
+        GateActivity gate = (GateActivity)activityDAO.getActivityByActivityId(gateId);
         gate.setGateOpen(new Boolean(true));
         activityDAO.update(gate);
     }
@@ -214,8 +252,9 @@ public class MonitoringService implements IMonitoringService
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#closeGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */
-    public void closeGate(GateActivity gate)
+    public void closeGate(Long gateId)
     {
+        GateActivity gate = (GateActivity)activityDAO.getActivityByActivityId(gateId);
         gate.setGateOpen(new Boolean(false));
         activityDAO.update(gate);
     }
