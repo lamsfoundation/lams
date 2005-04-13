@@ -51,8 +51,22 @@
             not-null="true"
         </meta>    
     </property>
+    
+    <property name="userID" type="java.lang.Integer" column="user_id" length="11" >
+        <meta attribute="field-description">@hibernate.property column="user_id" length="11" </meta>    
+    </property>
+    <property name="workspaceFolderType" type="java.lang.Integer" column="lams_workspace_folder_type_id" length="11" >
+        <meta attribute="field-description">@hibernate.property column="lams_workspace_folder_type_id" length="11" </meta>    
+    </property>
+    <property name="creationDate" type="java.sql.Timestamp" column="create_date_time" not-null="true" length="19">
+        <meta attribute="field-description">@hibernate.property column="create_date_time" length="19" not-null="true"</meta>    
+    </property>
+    <property name="lastModifiedDate" type="java.sql.Timestamp" column="last_modified_date_time" not-null="true" length="19">
+        <meta attribute="field-description">@hibernate.property column="last_modified_date_time" length="19" not-null="true"</meta>    
+    </property>
+    
     <property
-        name="workspaceId"
+        name="workspaceID"
         type="int"
         column="workspace_id"
         not-null="true"

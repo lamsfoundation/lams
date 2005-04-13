@@ -6,6 +6,7 @@ import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 
 /** 
  *        @hibernate.class
@@ -14,6 +15,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 */
 public class Organisation implements Serializable {
 
+	
     /** identifier field */
     private Integer organisationId;
 
@@ -74,6 +76,16 @@ public class Organisation implements Serializable {
         this.users = users;
         this.lessons = lessons;
     }
+    public Organisation(String name, 
+    					String description,						
+						Date createDate,						 
+						OrganisationType organisationType) {
+		super();
+		this.name = name;
+		this.description = description;		
+		this.createDate = createDate;		
+		this.organisationType = organisationType;
+	}
 
     /** 
      *            @hibernate.id
@@ -268,6 +280,9 @@ public class Organisation implements Serializable {
         return new HashCodeBuilder()
             .append(getOrganisationId())
             .toHashCode();
+    }
+    public OrganisationDTO getOrganisationDTO(){
+    	return new OrganisationDTO(this);
     }
 
 }

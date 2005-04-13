@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -32,8 +33,12 @@ import java.util.Vector;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.MonitoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
+import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
+import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
 /**
@@ -64,7 +69,15 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int CATEGORY_ASSESSMENT = 3;
 	public static final int CATEGORY_CONTENT = 4;
 	public static final int CATEGORY_SPLIT = 5;
-    /*******************************************************************/
+	/******************************************************************/
+	
+	/**
+	 * static final variables indicating the grouping_support of activities
+	 *******************************************************************/
+	public static final int GROUPING_SUPPORT_NONE = 1;
+	public static final int GROUPING_SUPPORT_OPTIONAL = 2;
+	public static final int GROUPING_SUPPORT_REQUIRED = 3;
+	/******************************************************************/
 	
 	/** WDDX packet specific attribute created to identify the
 	 * type of object being passed.*/
@@ -187,6 +200,9 @@ public abstract class Activity implements Serializable,Nullable {
 	public void setGroupingSupportType(Integer groupingSupportType) {
 		this.groupingSupportType = groupingSupportType;
 	}
+	protected ComplexActivityStrategy complexActivityStrategy;
+	protected SimpleActivityStrategy simpleActivityStrategy;
+	
 	/** full constructor */
 	public Activity(
 			Long activityId,
@@ -635,10 +651,13 @@ public abstract class Activity implements Serializable,Nullable {
 	public void setActivityCategoryID(Integer activityCategoryID) {
 		this.activityCategoryID = activityCategoryID;
 	}
-
+		
 	public MonitoringActivityDTO getMonitoringActivityDTO(){
-		return new MonitoringActivityDTO(this);
+		return new MonitoringActivityDTO(this); 
 	}
+	public MonitoringActivityDTO getMonitoringActivityDTO(Integer contributionType,Boolean required){
+		return new MonitoringActivityDTO(this,contributionType,required);
+	}	
 	public MonitoringActivityDTO getMonitoringActivityDTO(Activity activity){
 		Integer contributionType[]= null;
 		if(activity.isGateActivity() || activity.isToolActivity() || activity.isGroupingActivity()){
@@ -657,6 +676,9 @@ public abstract class Activity implements Serializable,Nullable {
 		}
 		return children;
 	}	
+	public AuthoringActivityDTO getAuthoringActivityDTO(){
+		return new AuthoringActivityDTO(this);
+	}
 	/**
 	 * @return Returns the onlineInstructions.
 	 */
@@ -677,5 +699,25 @@ public abstract class Activity implements Serializable,Nullable {
 	public ProgressActivityDTO getProgressActivityData()
 	{
 	    return new ProgressActivityDTO(this.activityId);
+	}
+	public static Object getActivityInstance(int activityType){
+		switch(activityType){
+			case TOOL_ACTIVITY_TYPE:
+				return new ToolActivity();
+			case OPTIONS_ACTIVITY_TYPE:
+				return new OptionsActivity();
+			case PARALLEL_ACTIVITY_TYPE:
+				return new ParallelActivity();
+			case SEQUENCE_ACTIVITY_TYPE:
+				return new SequenceActivity();
+			case SYNCH_GATE_ACTIVITY_TYPE:
+				return new SynchGateActivity();
+			case SCHEDULE_GATE_ACTIVITY_TYPE:
+				return new ScheduleGateActivity();
+			case PERMISSION_GATE_ACTIVITY_TYPE:
+				return new PermissionGateActivity();
+			default:
+				return new GroupingActivity();
+		}
 	}
 }

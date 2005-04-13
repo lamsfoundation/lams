@@ -1,7 +1,10 @@
 package org.lamsfoundation.lams.learningdesign;
 
+import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
+import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -409,7 +412,7 @@ public class LearningDesign implements Serializable {
 	public Long getDuration() {
 		return duration;
 	}
-	public void setDuration(Long duration) {
+	public void setDuration(Long duration) {		
 		this.duration = duration;
 	}
 	public String getLicenseText() {
@@ -465,5 +468,14 @@ public class LearningDesign implements Serializable {
 	}
 	public void setLastModifiedDateTime(Date lastModifiedDateTime) {
 		this.lastModifiedDateTime = lastModifiedDateTime;
-	}	
+	}
+	public LearningDesignDTO getLearningDesignDTO(){
+		return new LearningDesignDTO(this);
+	}
+	public DesignDetailDTO getDesignDetailDTO(){
+		return new DesignDetailDTO(this);
+	}
+	public FolderContentDTO getFolderContentDTO(){
+		return new FolderContentDTO();
+	}
 }

@@ -21,24 +21,26 @@ public class MonitoringActivityDTO {
 	private String description;
 	private Long activityID;
 	private Integer activityTypeID;	
-	private Integer contributionTypeID[];
 	private Integer orderID;
+	private Integer contributionType;
+	private Boolean isRequired;
+	
 	
 	public MonitoringActivityDTO(Activity activity){
 		this.title = activity.getTitle();
 		this.description = activity.getDescription();
 		this.activityID = activity.getActivityId();
-		this.activityTypeID = activity.getActivityTypeId();
-		this.contributionTypeID = new Integer[1];
+		this.activityTypeID = activity.getActivityTypeId();		
 		this.orderID = activity.getOrderId();		
-	}
-	public MonitoringActivityDTO(Activity activity,Integer[] contributionTypeID){
+	}	
+	public MonitoringActivityDTO(Activity activity,Integer contributionType,Boolean required){
 		this.title = activity.getTitle();
 		this.description = activity.getDescription();
 		this.activityID = activity.getActivityId();
 		this.activityTypeID = activity.getActivityTypeId();
-		this.contributionTypeID = contributionTypeID;
+		this.contributionType = contributionType;
 		this.orderID = activity.getOrderId();		
+		this.isRequired = required;
 	}
 	/**
 	 * @return Returns the activityID.
@@ -51,13 +53,7 @@ public class MonitoringActivityDTO {
 	 */
 	public Integer getActivityTypeID() {
 		return activityTypeID!=null?activityTypeID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
-	}
-	/**
-	 * @return Returns the contributionTypeID.
-	 */
-	public Integer[] getContributionTypeID() {
-		return contributionTypeID!=null?contributionTypeID:new Integer[1];
-	}
+	}	
 	/**
 	 * @return Returns the description.
 	 */
@@ -75,5 +71,17 @@ public class MonitoringActivityDTO {
 	 */
 	public String getTitle() {
 		return title!=null?title:WDDXTAGS.STRING_NULL_VALUE;
-	}	
+	}
+	/**
+	 * @return Returns the contributionType.
+	 */
+	public Integer getContributionType() {
+		return contributionType!=null?contributionType:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	}
+	/**
+	 * @return Returns the isRequired.
+	 */
+	public Boolean getIsRequired() {
+		return isRequired!=null?isRequired:new Boolean(false);
+	}
 }

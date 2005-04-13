@@ -5,6 +5,7 @@ import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.usermanagement.dto.WorkspaceDTO;
 
 /** 
  *        @hibernate.class
@@ -17,17 +18,26 @@ public class Workspace implements Serializable {
     private Integer workspaceId;
 
     /** persistent field */
-    private WorkspaceFolder workspaceFolder;
+    private WorkspaceFolder rootFolder;
 
     /** persistent field */
     private Set users;
 
     /** persistent field */
     private Set organisations;
+    
+    /** nullable persistent field representing the name of the workspace,
+     *  defaults to the name of the Organisation 
+     * */
+    private String name;
 
+	public Workspace(String name) {
+		super();
+		this.name = name;
+	}
     /** full constructor */
     public Workspace(WorkspaceFolder workspaceFolder, Set users, Set organisations) {
-        this.workspaceFolder = workspaceFolder;
+        this.rootFolder = workspaceFolder;
         this.users = users;
         this.organisations = organisations;
     }
@@ -57,12 +67,12 @@ public class Workspace implements Serializable {
      *            @hibernate.column name="root_folder_id"         
      *         
      */
-    public WorkspaceFolder getWorkspaceFolder() {
-        return this.workspaceFolder;
+    public WorkspaceFolder getRootFolder() {
+        return this.rootFolder;
     }
 
-    public void setWorkspaceFolder(WorkspaceFolder workspaceFolder) {
-        this.workspaceFolder = workspaceFolder;
+    public void setRootFolder(WorkspaceFolder workspaceFolder) {
+        this.rootFolder = workspaceFolder;
     }
 
     /** 
@@ -123,4 +133,20 @@ public class Workspace implements Serializable {
             .toHashCode();
     }
 
+	/**
+	 * @return Returns the name.
+	 */
+	public String getName() {
+		return name;
+	}
+	/**
+	 * @param name The name to set.
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+	public WorkspaceDTO getWorkspaceDTO(){
+		return new WorkspaceDTO(workspaceId,
+								rootFolder.getWorkspaceFolderId()); 
+	}
 }

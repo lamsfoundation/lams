@@ -81,5 +81,7 @@ public interface IOrganisationDAO {
      * @param organisationId the organisation's organisationId
      */
     public void deleteOrganisationById(Integer organisationId);
+    
+    public Organisation getOrganisationByWorkspaceID(Integer workspaceID);
 
 }

@@ -2,10 +2,14 @@ package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /** 
  *        @hibernate.class
@@ -82,6 +86,9 @@ public class User implements Serializable {
     
     /** persistent field */
     private Organisation baseOrganisation;
+    
+    /** non-nullable persistent field */
+    private Integer userOrganisationID;
 
     /** persistent field */
     private Set learnerProgresses;
@@ -487,6 +494,12 @@ public class User implements Serializable {
     public void setUserOrganisations(Set userOrganisations) {
         this.userOrganisations = userOrganisations;
     }
+    /** This methods adds a new membership for the given user*/
+    public void addUserOrganisation(UserOrganisation userOrganisation){
+    	if(this.userOrganisations==null)
+    		userOrganisations = new HashSet();
+    	userOrganisations.add(userOrganisation);    	
+    }
 
     /** 
      *            @hibernate.set
@@ -602,5 +615,50 @@ public class User implements Serializable {
             .append(getUserId())
             .toHashCode();
     }
+    public UserDTO getUserDTO(){
+    	return new UserDTO(this.userId,
+    						this.firstName,
+							this.lastName,
+							this.login);
+    }
 
+	/**
+	 * @return Returns the userOrganisationID.
+	 */
+	public Integer getUserOrganisationID() {
+		return userOrganisationID;
+	}
+	/**
+	 * @param userOrganisationID The userOrganisationID to set.
+	 */
+	public void setUserOrganisationID(Integer userOrganisationID) {
+		this.userOrganisationID = userOrganisationID;
+	}
+	
+	/**This method checks whether user is a member of the 
+	 * given organisation*/
+	public boolean isMember(Organisation organisation){
+		Iterator iterator = this.userOrganisations.iterator();
+		while(iterator.hasNext()){
+			UserOrganisation userOrganisation = (UserOrganisation)iterator.next();
+			Integer organisationID = userOrganisation.getOrganisation().getOrganisationId();
+			if(organisationID==organisation.getOrganisationId())
+				return true;
+		}
+		return false;		
+	}
+	/** This method checks whether the user has membership access to 
+	 * the given workspaceFolder. Membership access means that the user 
+	 * has read and write access but cannot modify anybody else's content/stuff
+	 **/
+	public boolean hasMemberAccess(WorkspaceFolder workspaceFolder){		
+		Iterator iterator = this.userOrganisations.iterator();
+		while(iterator.hasNext()){
+			UserOrganisation userOrganisation = (UserOrganisation)iterator.next();			
+			Integer folderID = userOrganisation.getOrganisation().getWorkspace().getRootFolder().getWorkspaceFolderId();
+			if(folderID==workspaceFolder.getWorkspaceFolderId())
+				return true;
+		}		
+		return false;
+	}	
 }

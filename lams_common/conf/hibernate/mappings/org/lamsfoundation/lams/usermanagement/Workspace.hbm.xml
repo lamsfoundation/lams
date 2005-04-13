@@ -37,6 +37,10 @@
         <meta attribute="use-in-equals">true</meta>
         <generator class="native" />
     </id>
+    
+    <property name="name" type="java.lang.String" column="name" length="65535">
+        <meta attribute="field-description">@hibernate.property column="name" length="65535" </meta>    
+    </property>
 
 
     <!-- Associations -->
@@ -95,7 +99,7 @@
     </set>
     <!-- bi-directional many-to-one association to WorkspaceFolder -->
     <many-to-one
-        name="workspaceFolder"
+        name="rootFolder"
         class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder"
         not-null="true"
     >

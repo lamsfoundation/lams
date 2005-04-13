@@ -264,18 +264,20 @@
             not-null="true"
         </meta>    
     </property>
+    
+    <property name="userOrganisationID" type="java.lang.Integer" column="user_organisation_id" length="11" not-null="true">
+        <meta attribute="field-description">@hibernate.property column="user_organisation_id" length="11" </meta>    
+    </property>
 
     <!-- Associations -->
   
     <!-- bi-directional many-to-one association to Workspace -->
     <many-to-one
         name="workspace"
-        class="org.lamsfoundation.lams.usermanagement.Workspace"
-        not-null="true"
+        class="org.lamsfoundation.lams.usermanagement.Workspace"     
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
-            not-null="true"
            @hibernate.column name="workspace_id"         
         </meta>
         <column name="workspace_id" />
@@ -283,13 +285,13 @@
     <!-- bi-directional one-to-many association to UserOrganisation -->
     <set
         name="userOrganisations"
-        lazy="true"
+        lazy="false"
         inverse="true"
 		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
-            lazy="true"
+            lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
 

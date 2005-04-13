@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.lesson;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import java.io.Serializable;
@@ -433,5 +434,8 @@ public class Lesson implements Serializable {
                              this.getLessonName(),
                              this.getLessonDescription(),
                              this.lessonStateId);
+    }
+    public LessonDetailsDTO getLessonDetails(){
+    	return new LessonDetailsDTO(this);
     }
 }

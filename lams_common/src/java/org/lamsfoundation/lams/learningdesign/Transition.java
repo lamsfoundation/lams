@@ -5,6 +5,7 @@ import java.util.Date;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 
 /**
  * @hibernate.class table="lams_learning_transition"
@@ -238,5 +239,8 @@ public class Transition implements Serializable {
 
 	public void setToUIID(Integer toUIID) {
 		this.toUIID = toUIID;
+	}
+	public TransitionDTO getTransitionDTO(){
+		return new TransitionDTO(this);
 	}
 }

@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -114,7 +115,11 @@ public class Role implements Serializable {
     public void setUserOrganisationRoles(Set userOrganisationRoles) {
         this.userOrganisationRoles = userOrganisationRoles;
     }
-
+    public void addUserOrganisationRole(UserOrganisationRole userOrganisationRole){
+    	if(userOrganisationRoles==null)
+    		userOrganisationRoles = new HashSet();
+    	userOrganisationRoles.add(userOrganisationRole);
+    }
     public String toString() {
         return new ToStringBuilder(this)
             .append("roleId", getRoleId())

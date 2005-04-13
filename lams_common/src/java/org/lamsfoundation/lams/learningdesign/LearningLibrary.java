@@ -6,6 +6,7 @@ import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 
 
 /** 
@@ -161,5 +162,8 @@ public class LearningLibrary implements Serializable {
 	}
 	public void setValidLibrary(Boolean validLibrary) {
 		this.validLibrary = validLibrary;
+	}
+	public LearningLibraryDTO getLearningLibraryDTO(){
+		return new LearningLibraryDTO(this);
 	}
 }

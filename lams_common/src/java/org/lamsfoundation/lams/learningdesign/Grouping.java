@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -296,5 +297,16 @@ public abstract class Grouping implements Serializable
 	public boolean doesLearnerExist(User learner)
 	{
 	    return !getGroupBy(learner).isNull();
+	}
+	public GroupingDTO getGroupingDTO(){
+		return new GroupingDTO(this);
+	}
+	public static Object getGroupingInstance(Integer groupingType){
+		if(groupingType.equals(RANDOM_GROUPING_TYPE))
+			return new RandomGrouping();
+		else if(groupingType.equals(CHOSEN_GROUPING_TYPE))
+			return new ChosenGrouping();
+		else
+			return new LessonClass();
 	}
 }

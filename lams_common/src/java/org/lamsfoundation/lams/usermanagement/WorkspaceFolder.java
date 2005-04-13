@@ -1,26 +1,65 @@
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ************************************************************************
+ */
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/** 
- *        @hibernate.class
- *         table="lams_workspace_folder"
+/**
+ * @hibernate.class table="lams_workspace_folder"
+ * 
+ * @author Fei Yang,Manpreet Minhas
  *     
 */
 public class WorkspaceFolder implements Serializable {
+	
+	/** static final variables indicating the type of workspaceFolder */
+	/******************************************************************/
+	public static final Integer NORMAL = new Integer(1);
+	public static final Integer RUN_SEQUENCES = new Integer(2);
+	/******************************************************************/
+	
+	/** static final variables indicating the permissions on the workspaceFolder */
+	/******************************************************************/
+	public static final Integer READ_ACCESS = new Integer(1);		
+	public static final Integer MEMBERSHIP_ACCESS = new Integer(2);
+	public static final Integer OWNER_ACCESS = new Integer(3);
+	public static final Integer NO_ACCESS = new Integer(4);
+	/******************************************************************/
 
     /** identifier field */
     private Integer workspaceFolderId;
 
     /** persistent field */
     private String name;
-
-    /** persistent field */
-    private int workspaceId;
+    
+    /** non-nullable persistent field indicating the
+     * workspace which contains this folder*/
+    private Integer workspaceID;
 
     /** persistent field */
     private WorkspaceFolder parentWorkspaceFolder;
@@ -32,7 +71,55 @@ public class WorkspaceFolder implements Serializable {
     private Set childWorkspaceFolders;
     
     private Set learningDesigns;
+    
+    /**
+     * non-nullable persistent field indicating the 
+     * user who created/owns the workspace folder
+     */
+    private Integer userID;
+    
+    /** non-nullable persistent field */
+    private Date creationDate;
+    
+    /** non-nullable persistent field */
+    private Date lastModifiedDate;
+    
+    /** 
+     * non-nullable persistent field indicating 
+     * the type of workspace folder. Can be either 
+     * NORMAL OR RUN_SEQUENCES */
+    private Integer workspaceFolderType;
 
+	public WorkspaceFolder(String name,
+						   Integer workspaceID,
+						   Integer userID,
+						   Date creationDate,
+						   Date lastModifiedDate,
+						   Integer workspaceFolderType) {	
+		this.name = name;	
+		this.workspaceID = workspaceID;
+		this.userID = userID;
+		this.creationDate = creationDate;
+		this.lastModifiedDate = lastModifiedDate;
+		this.workspaceFolderType = workspaceFolderType;
+	}
+	
+	public WorkspaceFolder(String name, 
+						  Integer workspaceID,
+						  WorkspaceFolder parentWorkspaceFolder,
+						  Integer userID,
+						  Date creationDate,
+						  Date lastModifiedDate,
+						  Integer workspaceFolderType) {
+		super();
+		this.name = name;
+		this.workspaceID = workspaceID;
+		this.parentWorkspaceFolder = parentWorkspaceFolder;
+		this.userID = userID;
+		this.creationDate = creationDate;
+		this.lastModifiedDate = lastModifiedDate;
+		this.workspaceFolderType = workspaceFolderType;
+	}
 	/**
 	 * @return Returns the learningDesigns.
 	 */
@@ -46,9 +133,8 @@ public class WorkspaceFolder implements Serializable {
 		this.learningDesigns = learningDesigns;
 	}
     /** full constructor */
-    public WorkspaceFolder(String name, int workspaceId, WorkspaceFolder parentWorkspaceFolder, Set workspaces, Set childWorkspaceFolders) {
-        this.name = name;
-        this.workspaceId = workspaceId;
+    public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder, Set workspaces, Set childWorkspaceFolders) {
+        this.name = name;    
         this.parentWorkspaceFolder = parentWorkspaceFolder;
         this.workspaces = workspaces;
         this.childWorkspaceFolders = childWorkspaceFolders;
@@ -87,22 +173,6 @@ public class WorkspaceFolder implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-
-    /** 
-     *            @hibernate.property
-     *             column="workspace_id"
-     *             length="11"
-     *             not-null="true"
-     *         
-     */
-    public int getWorkspaceId() {
-        return this.workspaceId;
-    }
-
-    public void setWorkspaceId(int workspaceId) {
-        this.workspaceId = workspaceId;
-    }
-
     /** 
      *            @hibernate.many-to-one
      *            @hibernate.column name="parent_folder_id"         
@@ -174,4 +244,77 @@ public class WorkspaceFolder implements Serializable {
             .toHashCode();
     }
 
+	/**
+	 * @return Returns the userID.
+	 */
+	public Integer getUserID() {
+		return userID;
+	}
+	/**
+	 * @param userID The userID to set.
+	 */
+	public void setUserID(Integer userID) {
+		this.userID = userID;
+	}
+	/**
+	 * @return Returns the creationDate.
+	 */
+	public Date getCreationDate() {
+		return creationDate;
+	}
+	/**
+	 * @param creationDate The creationDate to set.
+	 */
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+	/**
+	 * @return Returns the lastModifiedDate.
+	 */
+	public Date getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+	/**
+	 * @param lastModifiedDate The lastModifiedDate to set.
+	 */
+	public void setLastModifiedDate(Date lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+	/**
+	 * @return Returns the workspaceFolderType.
+	 */
+	public Integer getWorkspaceFolderType() {
+		return workspaceFolderType;
+	}
+	/**
+	 * @param workspaceFolderType The workspaceFolderType to set.
+	 */
+	public void setWorkspaceFolderType(Integer workspaceFolderType) {
+		this.workspaceFolderType = workspaceFolderType;
+	}
+	/**
+	 * @return Returns the workspaceID.
+	 */
+	public Integer getWorkspaceID() {
+		return workspaceID;
+	}
+	/**
+	 * @param workspaceID The workspaceID to set.
+	 */
+	public void setWorkspaceID(Integer workspaceID) {
+		this.workspaceID = workspaceID;
+	}
+	/**
+	 * This is a utility function which checks if the given 
+	 * workspaceFolder has subFolders defined inside it.
+	 * 
+	 * @return boolean A boolean value indicating whether the 
+	 * 				   current workspaces contains subFolders 
+	 */
+	public boolean hasSubFolders(){
+		if (this.childWorkspaceFolders!=null || childWorkspaceFolders.size()!=0)
+			return true;
+		else
+			return false;
+	}	
 }

@@ -93,7 +93,10 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	public Activity getActivityByUIID(Integer id, LearningDesign design) {
 		Long designID = design.getLearningDesignId();
 		List list = this.getHibernateTemplate().find(FIND_BY_UI_ID,new Object[]{id,designID},new Type[]{Hibernate.INTEGER,Hibernate.LONG});
-		return (Activity) list.get(0);		
+		if(list!=null && list.size()!=0)
+			return (Activity) list.get(0);
+		else
+			return null;
 	}
 	/**
 	 * @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getActivitiesByLibraryID(java.lang.Long)
