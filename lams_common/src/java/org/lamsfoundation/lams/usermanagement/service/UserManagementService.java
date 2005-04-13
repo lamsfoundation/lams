@@ -5,10 +5,15 @@
  */
 package org.lamsfoundation.lams.usermanagement.service;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Vector;
 
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
@@ -16,6 +21,8 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -23,6 +30,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.Workspace;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
 /**
  * TODO Add description here
@@ -43,6 +53,18 @@ public class UserManagementService implements IUserManagementService {
 	private IUserOrganisationRoleDAO userOrganisationRoleDAO;
 	private IAuthenticationMethodDAO authenticationMethodDAO;
 	
+	protected IWorkspaceDAO workspaceDAO;
+	protected IWorkspaceFolderDAO workspaceFolderDAO;
+	protected ILearningDesignDAO learningDesignDAO;
+	
+	private FlashMessage flashMessage;
+	
+	/**
+	 * @param workspaceFolderDAO The workspaceFolderDAO to set.
+	 */
+	public void setWorkspaceFolderDAO(IWorkspaceFolderDAO workspaceFolderDAO) {
+		this.workspaceFolderDAO = workspaceFolderDAO;
+	}
 	/** 
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#setUserDAO(org.lamsfoundation.lams.usermanagement.dao.IUserDAO)
 	 */
@@ -194,7 +216,7 @@ public class UserManagementService implements IUserManagementService {
 	/** 
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getOrganisationsForUserByRole(org.lamsfoundation.lams.usermanagement.User, java.lang.String)
 	 */
-    public List getOrganisationsForUserByRole(User user, String roleName){
+	public List getOrganisationsForUserByRole(User user, String roleName){
     	List list = new ArrayList();
     	Iterator i = userOrganisationDAO.getUserOrganisationsByUser(user).iterator();
     	while(i.hasNext()){
@@ -209,7 +231,6 @@ public class UserManagementService implements IUserManagementService {
     	}
     	return list;
     }
-
 	/** 
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getChildOrganisations(org.lamsfoundation.lams.usermanagement.Organisation)
 	 */
@@ -301,4 +322,213 @@ public class UserManagementService implements IUserManagementService {
     public void saveOrUpdateUserOrganisationRole(UserOrganisationRole userOrganisationRole){
     	userOrganisationRoleDAO.saveOrUpdateUserOrganisationRole(userOrganisationRole);
     }
+	/**
+	 * @param workspaceDAO The workspaceDAO to set.
+	 */
+	public void setWorkspaceDAO(IWorkspaceDAO workspaceDAO) {
+		this.workspaceDAO = workspaceDAO;
+	}
+	/**
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrganisation(org.lamsfoundation.lams.usermanagement.Organisation, java.lang.Integer)
+	 */
+	public Integer saveOrganisation(Organisation organisation,Integer userID){		
+		Workspace workspace = createWorkspace(organisation.getName());
+		WorkspaceFolder workspaceFolder = createWorkspaceFolder(workspace,
+																userID,
+																WorkspaceFolder.NORMAL);
+		workspace.setRootFolder(workspaceFolder);
+		workspaceDAO.update(workspace);
+		organisation.setWorkspace(workspace);
+		organisationDAO.saveOrganisation(organisation);
+		return organisation.getOrganisationId();
+	}
+	/**
+	 * This method creates a new Workspace with a given name
+	 * 
+	 * @param name The name with which workspace should be created
+	 * @return Workspace The new Workspace object
+	 */
+	public Workspace createWorkspace(String name){
+		Workspace workspace = new Workspace(name);
+		workspaceDAO.insert(workspace);
+		return workspace;
+		
+	}
+	/**
+	 * This method creates a WorkspaceFolder for a given workspace and user. 
+	 * 
+	 * @param workspace The Workspace in which this WorkspaceFolder will be contained
+	 * @param userID The user_id of the user who creates the above organisation
+	 * @param workspaceFolderType The type of folder to be created. 
+	 * @return WorkspaceFolder The new WorkspaceFolder object
+	 */
+	public WorkspaceFolder createWorkspaceFolder(Workspace workspace,Integer userID, Integer workspaceFolderType){
+		WorkspaceFolder workspaceFolder = new WorkspaceFolder(workspace.getName(),
+															  workspace.getWorkspaceId(),
+															  userID,
+															  new Date(),
+															  new Date(),
+															  workspaceFolderType);
+		workspaceFolderDAO.insert(workspaceFolder);
+		return workspaceFolder;
+		
+	}
+	/**
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveUser(org.lamsfoundation.lams.usermanagement.User)
+	 */
+	public Integer saveUser(User user,Integer roleID){
+		userDAO.saveUser(user);
+		createUserOrganisation(user,roleID);
+		Workspace workspace = createWorkspace(user.getLogin());
+		WorkspaceFolder workspaceFolder = createWorkspaceFolder(workspace,
+																user.getUserId(),
+																WorkspaceFolder.NORMAL);
+		WorkspaceFolder runSequencesFolder = createWorkspaceFolder(workspace,
+																	user.getUserId(),
+																	WorkspaceFolder.RUN_SEQUENCES);
+		workspace.setRootFolder(workspaceFolder);
+		workspaceDAO.update(workspace);
+		user.setWorkspace(workspace);
+		userDAO.updateUser(user);
+		return user.getUserId();
+	}
+	private Integer createUserOrganisation(User user,Integer roleID){
+		UserOrganisation userOrganisation = new UserOrganisation();
+		userOrganisation.setOrganisation(user.getBaseOrganisation());
+		userOrganisation.setUser(user);		
+		userOrganisationDAO.saveUserOrganisation(userOrganisation);	
+		userOrganisation.addUserOrganisationRole(createUserOrganisationRole(userOrganisation,roleID));
+		userOrganisationDAO.saveOrUpdateUserOrganisation(userOrganisation);
+		return userOrganisation.getUserOrganisationId();
+	}
+	private UserOrganisationRole createUserOrganisationRole(UserOrganisation userOrganisation, Integer roleID){
+		UserOrganisationRole userOrganisationRole = new UserOrganisationRole();
+		userOrganisationRole.setUserOrganisation(userOrganisation);
+		userOrganisationRole.setRole(roleDAO.getRoleById(roleID));
+		userOrganisationRoleDAO.saveUserOrganisationRole(userOrganisationRole);
+		return userOrganisationRole;
+	}
+	/**TODO yet to be implemented*/
+	public void getFolderContents(Integer userID, Integer workspaceFolderID){
+		
+	}
+	/** TODO check if a user is authorized to complete this operation*/
+	public String moveLearningDesign(Long learningDesignID,Integer targetWorkspaceFolderID, Integer userID)throws IOException{
+		LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignID);
+		if(learningDesign!=null){
+			WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetWorkspaceFolderID);
+			if(workspaceFolder!=null){
+				learningDesign.setWorkspaceFolder(workspaceFolder);
+				learningDesignDAO.update(learningDesign);
+				flashMessage = new FlashMessage("moveLearningDesign",targetWorkspaceFolderID);
+			}else{
+				flashMessage = new FlashMessage("moveLearningDesign",
+												"No such target workspaceFolder with a workspace_folder_id of :" + targetWorkspaceFolderID + " exists",
+												FlashMessage.ERROR);
+			}
+		}else{
+			flashMessage = new FlashMessage("moveLearningDesign",
+											"No such learning design with a learning_design_id of:" + learningDesignID + " exists",
+											FlashMessage.ERROR);			
+		}
+		return flashMessage.serializeMessage();
+	}
+	/** 
+	 * TODO check if a user is authorized to complete this operation
+	 * As of now I am assuming that the folders CANNOT be moved across
+	 * different workspaces. If they can be moved in that case the signature of this
+	 * method would be changed*/
+	public void moveWorkspaceFolder(Integer currentWorkspaceFolderID, Integer targetWorkspaceFolderID, Integer userID){
+		WorkspaceFolder currentWorkspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(currentWorkspaceFolderID);
+		WorkspaceFolder targetWorkspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetWorkspaceFolderID);
+		if(currentWorkspaceFolder!=null && targetWorkspaceFolder!=null){
+			/** TODO move the contents of this folder */
+			currentWorkspaceFolder.setParentWorkspaceFolder(targetWorkspaceFolder);
+			workspaceFolderDAO.update(currentWorkspaceFolder);
+		}
+	}
+	/** 
+	 * TODO check if a user is authorized to complete this operation
+	 */
+	public void renameFolder(Integer workspaceFolderID, String newName, Integer userID){
+		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
+		if(workspaceFolder!=null){
+			workspaceFolder.setName(newName);
+			workspaceFolderDAO.update(workspaceFolder);
+		}
+	}
+	/** TODO check if a user is authorized to complete this operation */
+	public void renameLearningDesign(Long learningDesignID,String title, Integer userID){
+		LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignID);
+		if(learningDesign!=null){
+			learningDesign.setTitle(title);
+			learningDesignDAO.update(learningDesign);
+		}
+	}	
+	/**
+	 * @param learningDesignDAO The learningDesignDAO to set.
+	 */
+	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
+		this.learningDesignDAO = learningDesignDAO;
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getWorkspace(java.lang.Integer)
+	 */
+	public String getWorkspace(Integer userID)throws IOException{
+		User user = userDAO.getUserById(userID);
+		if(user!=null){
+			Workspace workspace = user.getWorkspace();
+			flashMessage = new FlashMessage("getWorkspace",
+											workspace.getWorkspaceDTO());
+		}
+		else
+			flashMessage = FlashMessage.getNoSuchUserExists("getWorkspace",userID);
+			
+		return flashMessage.serializeMessage();
+	}
+	/**
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getWDDXForOrganisationsForUserByRole(java.lang.Integer, java.lang.String)
+	 */
+	public String getWDDXForOrganisationsForUserByRole(Integer userID, String roleName)throws IOException{
+    	User user = userDAO.getUserById(userID);
+    	Vector organisations = new Vector();
+    	if(user!=null){
+    		Iterator iterator= getOrganisationsForUserByRole(user,roleName).iterator();    		
+    		while(iterator.hasNext()){
+    			Organisation organisation = (Organisation)iterator.next();
+    			organisations.add(organisation.getOrganisationDTO());
+    		}
+    		flashMessage = new FlashMessage("getWDDXForOrganisationsForUserByRole", organisations);
+    	}else
+    		flashMessage = FlashMessage.getNoSuchUserExists("getWDDXForOrganisationsForUserByRole",userID);
+    	
+    	return flashMessage.serializeMessage();
+    }
+	/**
+	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer, java.lang.String)
+	 */
+	public String getUsersFromOrganisationByRole(Integer organisationID, String roleName)throws IOException{
+		Vector users = new Vector();
+		Organisation organisation = organisationDAO.getOrganisationById(organisationID);
+		if(organisation!=null){
+			Iterator iterator = organisation.getUserOrganisations().iterator();
+			while(iterator.hasNext()){
+				UserOrganisation userOrganisation = (UserOrganisation)iterator.next();
+				Iterator userOrganisationRoleIterator = userOrganisation.getUserOrganisationRoles().iterator();
+				while(userOrganisationRoleIterator.hasNext()){
+					UserOrganisationRole userOrganisationRole = (UserOrganisationRole)userOrganisationRoleIterator.next();
+					if(userOrganisationRole.getRole().getName().equals(roleName))
+						users.add(userOrganisation.getUser().getUserDTO());
+				}
+			}
+			flashMessage =new FlashMessage("getUsersFromOrganisationByRole",users);
+			
+		}else
+			flashMessage = new FlashMessage("getUsersFromOrganisationByRole",
+											"No such Organisation with an organisation_id of:" + organisationID +" exists",
+											FlashMessage.ERROR);
+		
+		return flashMessage.serializeMessage();
+	}
 }

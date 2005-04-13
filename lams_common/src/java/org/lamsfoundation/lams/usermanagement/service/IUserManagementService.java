@@ -5,6 +5,7 @@
  */
 package org.lamsfoundation.lams.usermanagement.service;
 
+import java.io.IOException;
 import java.util.List;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
@@ -20,6 +21,8 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.Workspace;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 
 /**
  * User Management Service Interface to handle communication between 
@@ -150,8 +153,7 @@ public interface IUserManagementService {
      */
     public UserOrganisation getUserOrganisation(Integer userId,Integer organisationId);
     
-    
-	/**
+    /**
      * Retrieves organisations in which the user 
      * has the specified role 
      * 
@@ -160,7 +162,7 @@ public interface IUserManagementService {
      * @return List of organisations
      */
     public List getOrganisationsForUserByRole(User user, String roleName);
-
+    
 	/**
      * Retrieves child organisations of the parentOrg 
      * 
@@ -286,4 +288,76 @@ public interface IUserManagementService {
      */
     public void saveOrUpdateUserOrganisationRole(UserOrganisationRole userOrganisationRole);
     
+    /**
+     * Saves an Organisation while creating its corresponding Workspace
+     * and WorkspaceFolder  
+     * 
+     * @param organisation The Organisation to be saved
+     * @param userID The user_id of the user who creates this organisation 
+     * @return Integer The organisation_id of the new Organisation
+     */
+    public Integer saveOrganisation(Organisation organisation,Integer userID);
+    
+	/**
+	 * This method saves a new User to the underlying database while
+	 * creating his default workspace and workspaceFolder
+	 *  
+	 * @param user The User object to be persisted
+	 * @param roleID What kind of user he is (AUTHOR/LEARNER/STAFF/ADMIN) 
+	 * @return Integer The user_id of the User
+	 */
+	public Integer saveUser(User user, Integer roleID);
+	
+	/**
+	 * This method creates a new Workspace with a given name
+	 * 
+	 * @param name The name with which workspace should be created
+	 * @return Workspace The new Workspace object
+	 */
+	public Workspace createWorkspace(String name);
+	
+	/**
+	 * This method creates a WorkspaceFolder for a given workspace and user. 
+	 * 
+	 * @param workspace The Workspace in which this WorkspaceFolder will be contained
+	 * @param userID The user_id of the user who creates the above organisation
+	 * @param workspaceFolderType The type of folder to be created. 
+	 * @return WorkspaceFolder The new WorkspaceFolder object
+	 */
+	public WorkspaceFolder createWorkspaceFolder(Workspace workspace,Integer userID, Integer workspaceFolderType);
+	
+	/**
+	 * Returns the workspace related information for the given
+	 * user.
+	 * 
+	 * @param userID The user_id of the User
+	 * @return String The required information in WDDX format
+	 * @throws IOException
+	 */
+	public String getWorkspace(Integer userID)throws IOException;
+	
+	/**
+	 * This method returns the same information as
+     * in above method 
+     * <code>getOrganisationsForUserByRole(User user, String roleName)</code>
+     * with the only difference being that it is in WDDX format
+     * 
+	 * @param userID The user_id of the user
+	 * @param roleName The role name
+	 * @return String The required information in WDDX format
+	 * @throws IOException
+	 */
+	public String getWDDXForOrganisationsForUserByRole(Integer userID, String roleName)throws IOException;
+	
+	/**
+	 * This method returns the users in the Organisation with
+	 * given <code> organisationID</code> and <code>roleName</code>
+	 * in WDDX format.
+	 * 
+	 * @param organisationID
+	 * @param roleName
+	 * @return
+	 * @throws IOException
+	 */
+	public String getUsersFromOrganisationByRole(Integer organisationID, String roleName)throws IOException;
 }

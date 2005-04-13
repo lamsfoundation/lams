@@ -5,15 +5,8 @@
  */
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
-import java.util.Date;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
-
+import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.Workspace;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
-
-import junit.framework.TestCase;
 
 /**
  * TODO Add description here
@@ -24,32 +17,30 @@ import junit.framework.TestCase;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class OrganisationDAOTest extends TestCase {
-	private Organisation organisation = null;
-	private String errorMessage = "";
-	private OrganisationTypeDAO organisationDAO = null;
-	private ApplicationContext ctx;
+public class OrganisationDAOTest extends AbstractLamsTestCase {
 	
+	private Organisation organisation = null;	
+	private OrganisationDAO organisationDAO = null;
+	
+	
+	public OrganisationDAOTest(String name){
+		super(name);
+	}
 	protected void setUp() throws Exception{
-		ctx = new FileSystemXmlApplicationContext("applicationContext.xml");
-		organisationDAO = (OrganisationTypeDAO)ctx.getBean("organisationDAO");
+		super.setUp();
+		organisationDAO = (OrganisationDAO)context.getBean("organisationDAO");
 	}
 	
 	protected void tearDown() throws Exception{
 		organisationDAO = null;
+	}	
+	public void testGetOrganisationByWorkspaceeID(){
+		organisation = organisationDAO.getOrganisationByWorkspaceID(new Integer(1));
+		assertNotNull(organisation.getOrganisationId());
 	}
-	
-	public void testSaveOrganisation(){
-		/*
-		IOrganisationTypeDAO organisationTypeDAO = (IOrganisationTypeDAO)ctx.getBean("organisationTypeDAO");
-		organisation = new Organisation("Root","",null,new Date(), new Workspace(), organisationTypeDAO.getOrganisationTypeById(new Integer(1)),null,null);
-		organisationTypeDAO = null;
-		organisationDAO.saveOrganisation(organisation);
-		assertTrue(organisationDAO.getAllOrganisations().size()==1);
-		*/
-	}
-
-	public void testGetOrganisationById(){
+	protected String[] getContextConfigLocation() {
+		return new String[] {"WEB-INF/spring/learningDesignApplicationContext.xml",
+		 "WEB-INF/spring/applicationContext.xml"};
 	}
 
 }

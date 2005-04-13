@@ -6,23 +6,44 @@
  */
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 /**
- * @author Minhas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author Manpreet Minhas
  */
-public class WorkspaceFolderDAO extends HibernateDaoSupport implements IWorkspaceFolderDAO {
-
-	/* (non-Javadoc)
+public class WorkspaceFolderDAO extends BaseDAO implements IWorkspaceFolderDAO {
+	
+	private final String TABLENAME ="lams_workspace_folder";
+	private final String FIND_BY_PARENT = "from " + TABLENAME +
+												 " in class " + WorkspaceFolder.class.getName() +
+												 " where parent_folder_id=?";
+	private final String FIND_BY_USER = "from " + TABLENAME +
+										" in class " + WorkspaceFolder.class.getName() +
+										" where user_id=?";
+	
+	/**
+	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO#getWorkspaceFolderByID(java.lang.Long)
 	 */
 	public WorkspaceFolder getWorkspaceFolderByID(Integer workspaceFolderID) {
-		return (WorkspaceFolder)this.getHibernateTemplate().get(WorkspaceFolder.class,workspaceFolderID);		
+		return (WorkspaceFolder) super.find(WorkspaceFolder.class,workspaceFolderID);				
 	}
-
+	public WorkspaceFolder getRunSequencesFolderForUser(Integer userID){
+		String query = "from lams_workspace_folder wf where wf.user_id=? AND wf.lams_workspace_folder_type_id=2";
+		List list = this.getHibernateTemplate().find(query,userID); 
+		if(list.size()!=0)
+			return (WorkspaceFolder)list.get(0);
+		else
+			return null;
+	}
+	public List getWorkspaceFolderByParentFolder(Integer parentFolderID){		
+		return this.getHibernateTemplate().find(FIND_BY_PARENT,parentFolderID);		
+	}
+	public List getWorkspaceFolderByUser(Integer userID){
+		return this.getHibernateTemplate().find(FIND_BY_USER,userID);
+	}
 }

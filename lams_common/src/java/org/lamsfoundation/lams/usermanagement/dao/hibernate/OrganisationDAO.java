@@ -25,6 +25,11 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
  */
 public class OrganisationDAO extends HibernateDaoSupport implements
 		IOrganisationDAO {
+	
+	private static final String TABLENAME ="lams_organisation";
+	private static final String FIND_BY_WORKSPACE = "from " + TABLENAME +
+													" in class " + Organisation.class.getName() +
+													" where workspace_id=?";
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO#getAllOrganisations()
@@ -96,6 +101,13 @@ public class OrganisationDAO extends HibernateDaoSupport implements
 	 */
 	public void deleteOrganisationById(Integer organisationId) {
  		deleteOrganisation(getOrganisationById(organisationId));
+	}
+	public Organisation getOrganisationByWorkspaceID(Integer workspaceID){		
+		List list = getHibernateTemplate().find(FIND_BY_WORKSPACE,workspaceID);
+		if(list.size()!=0)
+			return (Organisation) list.get(0);
+		else
+			return null;
 	}
 
 }

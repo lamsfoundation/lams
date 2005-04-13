@@ -529,8 +529,8 @@ public class LDWDDXValueObjectFactory {
 	 * @return Hashtable
 	 */
 	public Hashtable buildLearningDesignObject(LearningDesign design){
-		Hashtable designs = getCutDownLearningDesignDetails(design);
 		
+		Hashtable designs = getCutDownLearningDesignDetails(design);		
 		
 		designs.put(WDDXTAGS.LEARNING_DESIGN_UIID,
 					(design.getLearningDesignUIID()!=null?design.getLearningDesignUIID():WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER));

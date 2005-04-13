@@ -22,6 +22,7 @@
  */
 package org.lamsfoundation.lams.util.wddx;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -103,5 +104,34 @@ public class FlashMessage implements Serializable {
         sb.append("messageType='" + getMessageType()+"';");
         sb.append("messageValue='" + getMessageValue() + "'; ");
         return sb.toString();
+    }
+    public String serializeMessage()throws IOException{
+    	String wddxPacket = null;
+    	try{
+    		wddxPacket = WDDXProcessor.serialize(this);
+    	}catch(IOException ie){
+    		throw new IOException("IOException occured while serializing " + ie.getMessage());
+    	} 
+    	return wddxPacket;
+    }
+    public static FlashMessage getNoSuchUserExists(String methodName, Integer userID){
+    	return new FlashMessage(methodName,
+    							"No such User with a user_id of :" + userID + " exists",
+								ERROR);    	
+    }
+    public static FlashMessage getUserNotAuthorized(String methodName, Integer userID){
+    	return new FlashMessage(methodName,
+    			"User with user_id of:" + userID +" is not authorized to perfom this action:",
+				FlashMessage.ERROR);
+    }
+    public static FlashMessage getNoSuchWorkspaceFolderExsists(String methodName, Integer folderID){
+    	return new FlashMessage(methodName,
+    			"No such WorkspaceFolder with a workspace_folder_id of " + folderID +" exists",
+				FlashMessage.ERROR);
+    }
+    public static FlashMessage getNoSuchLearningDesignExists(String methodName, Long learningDesignID){
+    	return new FlashMessage(methodName,
+    			"No such LearningDesign with a learning_design_id of " + learningDesignID +" exists",
+				FlashMessage.ERROR);
     }
 }
