@@ -27,7 +27,7 @@ import java.sql.PreparedStatement;
 import org.apache.commons.dbutils.DbUtils;
 
 /**
- * Ant task runs the creates & inserts for the LAMS aand Tool DB tables
+ * Task activates tool records int the lams db.
  * @author chris
  *
  *
@@ -90,7 +90,7 @@ public class ToolDBActivateTask extends DBTask
     }
     
     /**
-     * Setter for property toolId.
+     * Sets the id of the tool to activate.
      * @param toolId New value of property toolId.
      */
     public void setToolId(long toolId)
@@ -100,7 +100,7 @@ public class ToolDBActivateTask extends DBTask
     }
     
     /**
-     * Setter for property learningLibraryId.
+     * Sets the id of the tools library.
      * @param learningLibraryId New value of property learningLibraryId.
      */
     public void setLearningLibraryId(long learningLibraryId)

@@ -30,7 +30,7 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 
 /**
- *
+ * parent of database related tasks
  * @author chris
  */
 public abstract class DBTask implements Task

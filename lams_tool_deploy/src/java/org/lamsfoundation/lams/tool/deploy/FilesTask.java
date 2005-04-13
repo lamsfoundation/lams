@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 
 /**
- * Copies the required file to the lams ear directory.
+ * Parent of Tasks that deal with the deploy files.
  * @author chris
  */
 public abstract class FilesTask implements Task
@@ -48,7 +48,7 @@ public abstract class FilesTask implements Task
     }
     
     /**
-     * Setter for property lamsEarPath.
+     * Sets the path to the lams ear.
      * @param lamsEarPath New value of property lamsEarPath.
      */
     public void setLamsEarPath(String lamsEarPath)
@@ -58,7 +58,7 @@ public abstract class FilesTask implements Task
     }
     
     /**
-     * Setter for property deployFiles.
+     * Sets the list of file paths to operate on.
      * @param deployFiles New value of property deployFiles.
      */
     public void setDeployFiles(List deployFiles)

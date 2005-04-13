@@ -7,7 +7,7 @@
 package org.lamsfoundation.lams.tool.deploy;
 
 /**
- *
+ * Exception thrown by deployment process.
  * @author chris
  */
 public class DeployException extends java.lang.RuntimeException

@@ -25,7 +25,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Ant Task to add a web application entry to an EAR application XML
+ * Task to add a web application entry to an EAR application XML
  * @author chris
  */
 public class AddWebAppToApplicationXmlTask extends UpdateApplicationXmlTask

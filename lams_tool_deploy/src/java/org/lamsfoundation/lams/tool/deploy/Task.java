@@ -22,10 +22,15 @@
 package org.lamsfoundation.lams.tool.deploy;
 
 /**
- *
+ * Defines a Task in the tool deploy or undeploy process.
  * @author chris
  */
 public interface Task
 {
+    /**
+     * Executes the task.
+     * @throws DeployException if Task cannot be executed.
+     *
+     */
     public void execute() throws DeployException;
 }

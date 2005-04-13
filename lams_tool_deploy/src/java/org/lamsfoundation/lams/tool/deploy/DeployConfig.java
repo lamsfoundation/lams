@@ -134,8 +134,9 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property toolWebAppPath.
-     * @return Value of property toolWebAppPath.
+     * The value to be used in the web-uri element of the application xml
+     * for the tool being deployed.
+     * @return Value of property toolWebAppUri.
      */
     public String getToolWebUri()
     
@@ -146,7 +147,8 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property toolContextRoot.
+     * The value to be used in the context-root element of the application xml
+     * for the tool being deployed.
      * @return Value of property toolContextRoot.
      */
     public String getToolContextRoot()
@@ -156,7 +158,7 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property lamsEarPath.
+     * The path to the lasm ear.
      * @return Value of property lamsEarPath.
      */
     public String getLamsEarPath()
@@ -166,7 +168,7 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property toolIinsertScriptPath.
+     * The path to the sql script that inserts the lams_tool record.
      * @return Value of property toolIinsertScriptPath.
      */
     public String getToolInsertScriptPath()
@@ -178,7 +180,7 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property libraryInsertScriptPath.
+     * The path to the sql script that inserts that lams_learning_library record.
      * @return Value of property libraryInsertScriptPath.
      */
     public String getToolLibraryInsertScriptPath()
@@ -190,7 +192,7 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property toolActivityInsertScriptPath.
+     * The path to the sql script that inserts the lams_learning_activity record.
      * @return Value of property toolActivityInsertScriptPath.
      */
     public String getToolActivityInsertScriptPath()
@@ -201,7 +203,8 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property toolTablesScriptPath.
+     * The path to the sql script that creates the tools tables and inserts
+     * any required data.
      * @return Value of property toolTablesScriptPath.
      */
     public String getToolTablesScriptPath()
@@ -212,7 +215,8 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property deployFiles.
+     * The list of files that need to be nmoved to the lams ear
+     * to deploy the tool.
      * @return Value of property deployFiles.
      */
     public List getDeployFiles()
@@ -222,7 +226,7 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property dbUsername.
+     * The username for the lams db.
      * @return Value of property dbUsername.
      */
     public String getDbUsername()
@@ -232,7 +236,7 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property dbPassword.
+     * The password for the lams db.
      * @return Value of property dbPassword.
      */
     public String getDbPassword()
@@ -242,7 +246,7 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property dbDriverClass.
+     * The class name of the JDBC driver to use.
      * @return Value of property dbDriverClass.
      */
     public String getDbDriverClass()
@@ -252,7 +256,7 @@ public class DeployConfig
     }
     
     /**
-     * Getter for property dbDriverURL.
+     * The URL for the JDBC driver to connect with.
      * @return Value of property dbDriverURL.
      */
     public String getDbDriverUrl()

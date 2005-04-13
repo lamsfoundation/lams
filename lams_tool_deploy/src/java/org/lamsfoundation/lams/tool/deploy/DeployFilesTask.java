@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 
 /**
- * Copies the required file to the lams ear directory.
+ * Deploys required files to the lams ear.
  * @author chris
  */
 public class DeployFilesTask extends FilesTask

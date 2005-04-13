@@ -22,7 +22,7 @@
 package org.lamsfoundation.lams.tool.deploy;
 
 /**
- * Tool Deployer
+ * Tool Deployer Main Class
  * @author chris
  */
 public class Deploy
@@ -34,6 +34,7 @@ public class Deploy
     }
     
     /**
+     * Runs the Deploy
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception
