@@ -7,16 +7,8 @@
     </description>
     <module>
         <web>
-            <web-uri>lasm_central.war</web-uri>
+            <web-uri>lams_central.war</web-uri>
             <context-root>/lams</context-root>
-            <web-uri>lams_admin.war</web-uri>
-            <context-root>/lams/admin</context-root>
-            <web-uri>lams_authoring.war</web-uri>
-            <context-root>/lams/authoring</context-root>
-            <web-uri>lams_learning.war</web-uri>
-            <context-root>/lams/learning</context-root>
-            <web-uri>lams_monitoring.war</web-uri>
-            <context-root>/lams/monitoring</context-root>
 	</web>
     </module>
 </application>

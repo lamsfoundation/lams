@@ -108,9 +108,7 @@ public abstract class UpdateApplicationXmlTask implements Task
     {
         Document doc = parseApplicationXml();
         
-        Element webElement = findWebElement(doc);
-        
-        updateApplicationXml(doc, webElement);
+        updateApplicationXml(doc);
         
         writeApplicationXml(doc);
     }
@@ -245,11 +243,9 @@ public abstract class UpdateApplicationXmlTask implements Task
     /**
      * Modifies the application Xml in the required manner.
      * Abstract method to be implmented by subclasses.
-     * @param doc the DOM Document to modify
-     * @param webElement The web Element in the document to modify
      * @throws org.apache.tools.ant.DeployException in case of errors
      */
-    protected abstract void updateApplicationXml(Document doc, Element webElement) throws DeployException;
+    protected abstract void updateApplicationXml(Document doc) throws DeployException;
     
     
 }

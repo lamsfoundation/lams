@@ -2,7 +2,7 @@
 <project name="LAMS" default="usage" basedir=".">
 
     <!--  <property name="jboss.home" value="/var/jboss"/> -->
-    <property name="jboss.home" value="D:/jboss-3.2.6"/>
+    <property name="jboss.home" value="/var/jboss"/>
     <property name="jboss.deploy.dir" value="${jboss.home}/server/default/deploy"/>
     <property name="assembly.dir" value="assembly"/>
     <property name="lams.ear" value="lams.ear"/>

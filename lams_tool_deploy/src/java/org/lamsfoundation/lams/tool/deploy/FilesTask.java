@@ -20,38 +20,52 @@
  */
 
 package org.lamsfoundation.lams.tool.deploy;
+import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;;
 /**
- * Removes a web app entry from the LAMS Application XML
+ * Copies the required file to the lams ear directory.
  * @author chris
  */
-public class RemoveWebAppFromApplicationXmlTask extends UpdateApplicationXmlTask
+public abstract class FilesTask implements Task
 {
     
-    
-    /** Creates a new instance of RemoveWebAppFromApplicationXmlTask */
-    public RemoveWebAppFromApplicationXmlTask()
-    {
-    }
-    
+    /**
+     * Holds value of property lamsEarPath.
+     */
+    protected String lamsEarPath;
     
     /**
-     * Removes the web uri adn context root from the application xml
+     * Holds value of property deployFiles.
      */
-    protected void updateApplicationXml(Document doc) throws DeployException
+    protected List deployFiles;
+    
+    /** Creates a new instance of DeployWarTask */
+    public FilesTask()
     {
-         
-        //find & remove web uri element
-        NodeList webUriNodeList = doc.getElementsByTagName("web-uri");
-        Element matchingWebUriElement = findElementWithMatchingText(webUri, webUriNodeList);
-        Element moduleElement = (Element) matchingWebUriElement.getParentNode().getParentNode();
-        doc.getDocumentElement().removeChild(moduleElement);
-        
-        
-        
     }
+    
+    /**
+     * Setter for property lamsEarPath.
+     * @param lamsEarPath New value of property lamsEarPath.
+     */
+    public void setLamsEarPath(String lamsEarPath)
+    {
+        
+        this.lamsEarPath = lamsEarPath;
+    }
+    
+    /**
+     * Setter for property deployFiles.
+     * @param deployFiles New value of property deployFiles.
+     */
+    public void setDeployFiles(List deployFiles)
+    {
+        
+        this.deployFiles = deployFiles;
+    }
+    
     
 }

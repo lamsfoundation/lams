@@ -29,7 +29,7 @@
         <property name="lib.dir" value="lib"/>
         <property name="src.dir" value="src/java"/>
         <property name="test.src.dir" value="test/java"/>
-        <property name="jar.file" value="${build.dir}/lams_tool_util.jar"/>
+        <property name="jar.file" value="${build.dir}/lams_tool_deploy.jar"/>
         <property name="test.dir" value="test"/>
         <property name="test.file.dir" value="test/file"/>
         <property name="debug" value="on"/>

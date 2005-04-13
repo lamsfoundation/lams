@@ -41,9 +41,14 @@ public class AddWebAppToApplicationXmlTask extends UpdateApplicationXmlTask
     /**
      * Add the web uri and context root elements ot the Application xml
      */
-    protected void updateApplicationXml(Document doc, Element webElement) throws DeployException
+    protected void updateApplicationXml(Document doc) throws DeployException
     {
         
+        
+        //create new module
+        Element moduleElement = doc.createElement("module");
+        Element webElement = doc.createElement("web");
+        moduleElement.appendChild(webElement);
         //create new web-uri element in the web element
         Element webUriElement = doc.createElement("web-uri");
         webUriElement.appendChild(doc.createTextNode(webUri));
@@ -53,6 +58,8 @@ public class AddWebAppToApplicationXmlTask extends UpdateApplicationXmlTask
         Element contextRootElement = doc.createElement("context-root");
         contextRootElement.appendChild(doc.createTextNode(contextRoot));
         webElement.appendChild(contextRootElement);
+        
+        doc.getDocumentElement().appendChild(moduleElement);
         
     }
     
