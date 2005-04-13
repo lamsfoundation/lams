@@ -81,12 +81,13 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 		boolean result = activity.isComplexActivity();
 		assertTrue(result);		
 	}
-	public void testGetContributionType(){
+	/*public void testGetContributionType(){
 		activity = activityDAO.getActivityByActivityId(new Long(18));
+		//activity.ge
 		HashSet set = activity.getContributionType();
 		assertTrue(set.size()>0);
 		
-	}
+	}*/
 	public void testCreateToolActivityCopy(){
 		activity = activityDAO.getActivityByActivityId(new Long(20));		
 		ToolActivity newToolActivity =null;
@@ -122,6 +123,15 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 			activityDAO.insert(parallelActivity);
 		}
 		assertNotNull(parallelActivity.getActivityId());
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+	 */
+	protected String getHibernateSessionFactoryName() {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 }
 

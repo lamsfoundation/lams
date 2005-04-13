@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -36,9 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.MonitoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
-import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
 /**
@@ -199,8 +196,7 @@ public abstract class Activity implements Serializable,Nullable {
 	 */
 	public void setGroupingSupportType(Integer groupingSupportType) {
 		this.groupingSupportType = groupingSupportType;
-	}
-	protected ComplexActivityStrategy complexActivityStrategy;
+	}	
 	protected SimpleActivityStrategy simpleActivityStrategy;
 	
 	/** full constructor */
@@ -658,21 +654,12 @@ public abstract class Activity implements Serializable,Nullable {
 	public MonitoringActivityDTO getMonitoringActivityDTO(Integer contributionType,Boolean required){
 		return new MonitoringActivityDTO(this,contributionType,required);
 	}	
-	public MonitoringActivityDTO getMonitoringActivityDTO(Activity activity){
-		Integer contributionType[]= null;
-		if(activity.isGateActivity() || activity.isToolActivity() || activity.isGroupingActivity()){
-			contributionType = ((SimpleActivity)activity).getContributionType();			
-			return new MonitoringActivityDTO(activity,contributionType);
-		}
-		else
-			return new MonitoringActivityDTO(activity);
-	}
 	public Vector getMonitoringActivityDTOSet(Set activities){
 		Vector children = new Vector();		
 		Iterator iterator = activities.iterator();
 		while(iterator.hasNext()){
 			Activity activity = (Activity)iterator.next();
-			children.add(getMonitoringActivityDTO(activity));
+			children.add(new MonitoringActivityDTO(activity));
 		}
 		return children;
 	}	

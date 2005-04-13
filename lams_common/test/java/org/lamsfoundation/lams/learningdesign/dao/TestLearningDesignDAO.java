@@ -67,5 +67,12 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		LearningDesignDTO learningDesignDTO = learningDesign.getLearningDesignDTO();		
 		String str = WDDXProcessor.serialize(learningDesignDTO);
 		System.out.println(str);		
+	}
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+	 */
+	protected String getHibernateSessionFactoryName() {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 }

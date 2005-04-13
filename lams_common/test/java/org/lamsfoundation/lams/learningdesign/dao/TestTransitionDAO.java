@@ -43,4 +43,12 @@ public class TestTransitionDAO extends AbstractLamsTestCase{
 		return new String[] {"WEB-INF/spring/learningDesignApplicationContext.xml",
 		 "WEB-INF/spring/applicationContext.xml"};
 	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+	 */
+	protected String getHibernateSessionFactoryName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
