@@ -42,15 +42,7 @@ public class TestLearningLibraryDAO extends AbstractLamsTestCase {
 	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
 	 */
 	protected String[] getContextConfigLocation() {
-		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
-		 "applicationContext.xml"};
+		return new String[] {"WEB-INF/spring/learningDesignApplicationContext.xml",
+		 "WEB-INF/spring/applicationContext.xml"};
 	}
-
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-     */
-    protected String getHibernateSessionFactoryName()
-    {
-        return "coreSessionFactory";
-    }
 }

@@ -3,14 +3,23 @@
  */
 package org.lamsfoundation.lams.learningdesign.dao;
 
-import java.util.Date;
+
+import java.util.List;
+
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Activity;
+
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
+
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+
 
 /**
  * @author MMINHAS
@@ -20,8 +29,9 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
  */
 public class TestLearningDesignDAO extends AbstractLamsTestCase {
 	
-	
-	private LearningDesignDAO learningDesignDAO;	
+	protected ActivityDAO activityDAO;
+	private LearningDesignDAO learningDesignDAO;
+	protected TransitionDAO transitionDAO;
 	protected WorkspaceFolderDAO workspaceFolderDAO;
 	private UserDAO userDAO;
 	private User user;
@@ -33,38 +43,29 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 	public void setUp() throws Exception{
 		super.setUp();
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");		
+		transitionDAO =(TransitionDAO) context.getBean("transitionDAO");
+		activityDAO =(ActivityDAO) context.getBean("activityDAO");
 		userDAO = (UserDAO)context.getBean("userDAO");
-	}	
-	/*
-	public void testInsertLearningDesign(){
-		LearningDesign design = new LearningDesign();
-				
-		design.setValidDesign(new Boolean (true));
-		design.setReadOnly(new Boolean (false));
-		design.setUser(userDAO.getUserById(new Integer(1)));
-		design.setCopyTypeID(new Integer(1));
-		design.setCreateDateTime(new Date());		
-		learningDesignDAO.insert(design);		
-	}*/
+	}
 	public void testCalculateFirstActivity(){
-		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
+		learningDesign = learningDesignDAO.getLearningDesignById(new Long(2));
 		Activity activity = learningDesign.calculateFirstActivity();
 		assertNotNull(activity.getActivityId());
-		long x = 20;
+		long x = 27;
 		assertEquals(activity.getActivityId().longValue(),x);
 	}
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
-	 */
 	protected String[] getContextConfigLocation() {
-		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
-		 "applicationContext.xml"};
+		return new String[] {"WEB-INF/spring/learningDesignApplicationContext.xml",
+		 "WEB-INF/spring/applicationContext.xml"};
 	}
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-     */
-    protected String getHibernateSessionFactoryName()
-    {
-        return "coreSessionFactory";
-    }
+	public void testGetAllValidLearningDesignsInFolder(){
+		List list = learningDesignDAO.getAllValidLearningDesignsInFolder(new Integer(1));
+		System.out.println("SIZE:"+list.size());
+	}
+	public void testGetLearningDesignDTO() throws Exception{
+		learningDesign = learningDesignDAO.getLearningDesignById(new Long(2));
+		LearningDesignDTO learningDesignDTO = learningDesign.getLearningDesignDTO();		
+		String str = WDDXProcessor.serialize(learningDesignDTO);
+		System.out.println(str);		
+	}	
 }

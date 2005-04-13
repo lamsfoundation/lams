@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.learningdesign.dao;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
@@ -8,8 +9,6 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.*;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 
 /*
  * Created on Dec 3, 2004
@@ -32,7 +31,7 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 	protected LearningLibraryDAO learningLibraryDAO;
 	protected GroupingDAO groupingDAO;
 	protected LearningDesign learningDesign;
-	protected UserDAO userDAO;
+
 	/**
 	 * @param name
 	 */
@@ -47,7 +46,6 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 		learningLibraryDAO =(LearningLibraryDAO)context.getBean("learningLibraryDAO");
 		learningDesignDAO =(LearningDesignDAO)context.getBean("learningDesignDAO");
 		groupingDAO = (GroupingDAO)context.getBean("groupingDAO");
-		userDAO = (UserDAO)context.getBean("userDAO");
 		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
 	}
 	public void testGetActivitiesByParentActivityId() {
@@ -70,8 +68,8 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
 	 */
 	protected String[] getContextConfigLocation() {
-		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
-		 "applicationContext.xml"};
+		return new String[] {"WEB-INF/spring/learningDesignApplicationContext.xml",
+		 "WEB-INF/spring/applicationContext.xml"};
 	}
 	public void testgetActivityByLibraryID(){
 		List activities = activityDAO.getActivitiesByLibraryID(new Long(1));
@@ -85,9 +83,8 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 	}
 	public void testGetContributionType(){
 		activity = activityDAO.getActivityByActivityId(new Long(18));
-		Integer as[]=((SimpleActivity)activity).getContributionType();
-		for(int i=0;i<as.length;i++)
-			System.out.println(as[i]);
+		HashSet set = activity.getContributionType();
+		assertTrue(set.size()>0);
 		
 	}
 	public void testCreateToolActivityCopy(){
@@ -125,40 +122,6 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 			activityDAO.insert(parallelActivity);
 		}
 		assertNotNull(parallelActivity.getActivityId());
-	}
-	
-	public void testUpdateGateActivity()
-	{
-	    User learner = userDAO.getUserById(new Integer(1));
-	    Activity synchGate = activityDAO.getActivityByActivityId(new Long(26));
-	    
-	    //add waiting learner.
-	    ((GateActivity)synchGate).addWaitingLeaner(learner);
-	    ((GateActivity)synchGate).setGateOpen(new Boolean(true));
-	    
-	    activityDAO.updateActivity(synchGate);
-	    
-	    synchGate = activityDAO.getActivityByActivityId(new Long(26));
-	    assertTrue("gate status should be open",((GateActivity)synchGate).getGateOpen().booleanValue());
-	    assertEquals("should be one learner waiting",1,((GateActivity)synchGate).getWaitingLearners().size());
-	    
-	    //remove waiting learner
-	    ((GateActivity)synchGate).getWaitingLearners().clear();
-	    
-	    activityDAO.updateActivity(synchGate);
-	    synchGate = activityDAO.getActivityByActivityId(new Long(26));
-	    assertTrue("gate status should be open",((GateActivity)synchGate).getGateOpen().booleanValue());
-	    assertEquals("should be no learner waiting",0,((GateActivity)synchGate).getWaitingLearners().size());
-
-	}
-
-
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-     */
-    protected String getHibernateSessionFactoryName()
-    {
-        return "coreSessionFactory";
-    }
+	}	
 }
 

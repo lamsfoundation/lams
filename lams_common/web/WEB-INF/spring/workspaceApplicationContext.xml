@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
+	
+	<bean id="workspaceServiceTarget" class="org.lamsfoundation.lams.workspace.service.WorkspaceManagementService">
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="userDAO"><ref bean="userDAO"/></property>
+		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
+		<property name="workspaceDAO"><ref bean="workspaceDAO"/></property>
+		<property name="organisationDAO"><ref bean="organisationDAO"/></property>
+		<property name="authoringService"><ref bean="authoringService"/></property>
+	</bean>
+	
+	<bean id="workspaceManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="workspaceServiceTarget"/></property>
+		
+		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
+		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
+		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
+		<property name="proxyTargetClass"><value>true</value></property>     
+		
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="store*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+</beans>

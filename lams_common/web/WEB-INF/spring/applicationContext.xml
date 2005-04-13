@@ -26,7 +26,7 @@
 	<!-- Local DataSource that works in any environment -->
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
-		<property name="url"><value>jdbc:mysql://localhost/lams?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull</value></property>
+		<property name="url"><value>jdbc:mysql://localhost/lams?zeroDateTimeBehavior=convertToNull&amp;characterEncoding=utf8</value></property>
 		<property name="username"><value>lams</value></property>
 		<property name="password"><value>lamsdemo</value></property>
 	</bean>
@@ -104,12 +104,16 @@
 		<property name="userOrganisationDAO"><ref local="userOrganisationDAO"/></property>
 		<property name="userOrganisationRoleDAO"><ref local="userOrganisationRoleDAO"/></property>
 		<property name="authenticationMethodDAO"><ref local="authenticationMethodDAO"/></property>
+		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
+		<property name="workspaceDAO"><ref bean="workspaceDAO"/></property>
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 	</bean>	
 	
 	<!-- Transactional proxy for the user management primary business object -->
 	<bean id="userManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref local="transactionManager"/></property>
 		<property name="target"><ref local="userManagementServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
 		<property name="transactionAttributes">
 			<props>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
@@ -121,6 +125,35 @@
 			</props>
 		</property>
 	</bean>
+	
+	<!-- Learning Design related beans-->
+	
+	<bean id="activityDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	<bean id="learningLibraryDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	<bean id="learningDesignDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="transitionDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="toolDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="groupingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="groupDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	<bean id="licenseDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>	
+	
+	<!--User management related beans -->
 	
 	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
@@ -149,5 +182,12 @@
 	<bean id="userOrganisationRoleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationRoleDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>	
-
+	
+	<bean id="workspaceDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="workspaceFolderDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
 </beans>
