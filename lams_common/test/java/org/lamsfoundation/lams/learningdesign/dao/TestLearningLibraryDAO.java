@@ -46,11 +46,7 @@ public class TestLearningLibraryDAO extends AbstractLamsTestCase {
 		 "WEB-INF/spring/applicationContext.xml"};
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-	 */
 	protected String getHibernateSessionFactoryName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "coreSessionFactory";
 	}
 }

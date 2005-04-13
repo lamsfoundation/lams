@@ -41,13 +41,9 @@ public class TestWorkspaceManagement extends AbstractLamsTestCase {
 	public void testCopyFolder() throws IOException{
 		String packet = workspaceManagementService.copyFolder(new Integer(2),new Integer(8),new Integer(4));
 		System.out.println(packet);
-	}
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-	 */
+	}	
 	protected String getHibernateSessionFactoryName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "coreSessionFactory";
 	}
 
 }

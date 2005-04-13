@@ -91,12 +91,8 @@ public class UserDAOTest extends AbstractLamsTestCase{
 		userOrganisationRole.setRole(roleDAO.getRoleByName(Role.STAFF));
 		userOrganisationRoleDAO.saveUserOrganisationRole(userOrganisationRole);
 		return userOrganisationRole;
-	}
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-	 */
+	}	
 	protected String getHibernateSessionFactoryName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "coreSessionFactory";
 	}
 }

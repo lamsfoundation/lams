@@ -1,6 +1,5 @@
 package org.lamsfoundation.lams.learningdesign.dao;
 
-import java.util.HashSet;
 import java.util.List;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
@@ -124,14 +123,8 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 		}
 		assertNotNull(parallelActivity.getActivityId());
 	}
-
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-	 */
 	protected String getHibernateSessionFactoryName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "coreSessionFactory";
 	}	
 }
 
