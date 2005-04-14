@@ -108,14 +108,14 @@ public class TestMonitoringService extends AbstractLamsTestCase
      */
     protected String[] getContextConfigLocation()
     {
-        return new String[] { "WEB-INF/spring/applicationContext.xml",
-        					  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
-                			  "WEB-INF/spring/monitoringApplicationContext.xml",
-                			  "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-                			  "/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
-                			  "WEB-INF/spring/authoringApplicationContext.xml",
-                              "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
-                              "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml"};
+        return new String[] { "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+  			  				  "/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
+  			  				  "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+  			  				  "/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
+  			  				  "/WEB-INF/authoringApplicationContext.xml",
+  			  				  "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
+  			  				  "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",        					  
+				  			  "applicationContext.xml"};    
     }
     /**
      * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -60,6 +61,12 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * <p>This is the major service facade for all monitoring functionalities. It is 
@@ -72,12 +79,14 @@ import org.quartz.Scheduler;
  * @author Jacky Fang 2/02/2005
  * @author Manpreet Minhas
  */
-public class MonitoringService implements IMonitoringService
+public class MonitoringService implements IMonitoringService,ApplicationContextAware
 {
 
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
+	private static Logger log = Logger.getLogger(MonitoringService.class);
+    
     private ILessonDAO lessonDAO;    
     private ILessonClassDAO lessonClassDAO;        
     private IOrganisationDAO organisationDAO;
@@ -86,16 +95,15 @@ public class MonitoringService implements IMonitoringService
     private IUserDAO userDAO;        
     private IWorkspaceFolderDAO workspaceFolderDAO;
     private ILearningDesignDAO learningDesignDAO;
-    
+    private FlashMessage flashMessage;
     private IAuthoringService authoringService;
     private ILamsCoreToolService lamsCoreToolService;
     private IUserManagementService userManagementService;
-    
-    private JobDetail openScheduleGateJob;
-    private JobDetail closeScheduleGateJob;
     private Scheduler scheduler;
-    
-    private FlashMessage flashMessage;
+    private ApplicationContext applicationContext;
+    //---------------------------------------------------------------------
+    // Inversion of Control Methods - Method injection
+    //---------------------------------------------------------------------
 	/**
 	 * @param userManagementService The userManagementService to set.
 	 */
@@ -115,34 +123,20 @@ public class MonitoringService implements IMonitoringService
 	public void setWorkspaceFolderDAO(IWorkspaceFolderDAO workspaceFolderDAO) {
 		this.workspaceFolderDAO = workspaceFolderDAO;
 	}
-	/**
-	 * @param activityDAO The activityDAO to set.
-	 */
-	public void setActivityDAO(IActivityDAO activityDAO) {
-		this.activityDAO = activityDAO;
-	}
+
 	/**
 	 * @param transitionDAO The transitionDAO to set.
 	 */
 	public void setTransitionDAO(ITransitionDAO transitionDAO) {
 		this.transitionDAO = transitionDAO;
 	}
-	/**
-	 * @param lamsCoreToolService The lamsCoreToolService to set.
-	 */
-	public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
-		this.lamsCoreToolService = lamsCoreToolService;
-	}
+
 	/**
 	 * @param userDAO The userDAO to set.
 	 */
 	public void setUserDAO(IUserDAO userDAO) {
 		this.userDAO = userDAO;
 	}
-	
-	//---------------------------------------------------------------------
-    // Inversion of Control Methods - Method injection
-    //---------------------------------------------------------------------
     /**
      * @param authoringService The authoringService to set.
      */
@@ -166,24 +160,33 @@ public class MonitoringService implements IMonitoringService
     {
         this.lessonDAO = lessonDAO;
     }
+
+    /**
+     * @param lamsToolService The lamsToolService to set.
+     */
+    public void setLamsCoreToolService(ILamsCoreToolService lamsToolService)
+    {
+        this.lamsCoreToolService = lamsToolService;
+    }
+
+    /**
+     * @param activityDAO The activityDAO to set.
+     */
+    public void setActivityDAO(IActivityDAO activityDAO)
+    {
+        this.activityDAO = activityDAO;
+    }
+    /**
+     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
+     */
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    {
+        this.applicationContext=applicationContext;
+    }
 	public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
 		this.organisationDAO = organisationDAO;
 	}
-	/**
-     * @param openScheduleGateJob The openScheduleGateJob to set.
-     */
-    public void setOpenScheduleGateJob(JobDetail openScheduleGateJob)
-    {
-        this.openScheduleGateJob = openScheduleGateJob;
-    }
-    
-    /**
-     * @param closeScheduleGateJob The closeScheduleGateJob to set.
-     */
-    public void setCloseScheduleGateJob(JobDetail closeScheduleGateJob)
-    {
-        this.closeScheduleGateJob = closeScheduleGateJob;
-    }
+	
     /**
      * @param scheduler The scheduler to set.
      */
@@ -278,9 +281,9 @@ public class MonitoringService implements IMonitoringService
                 initToolSessionFor((ToolActivity) activity,
                                    requestedLesson.getAllLearners(),
                                    requestedLesson);
-            //if it is schedule gate, we need to initialize sheduler for it.
+            //if it is schedule gate, we need to initialize the sheduler for it.
             if(activity.getActivityTypeId().intValue()==Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
-                initGateScheduler((ScheduleGateActivity)activity);
+                runGateScheduler((ScheduleGateActivity)activity);
         }
         //update lesson status
         requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
@@ -289,11 +292,43 @@ public class MonitoringService implements IMonitoringService
     }
 
     /**
-     * @param activity
+     * <p>Runs the system scheduler to start the scheduling for opening gate and
+     * closing gate. It invlovs a couple of steps to start the scheduler:</p>
+     * <li>1. Initialize the resource needed by scheduling job by setting 
+     * 		  them into the job data map.
+     * </li>
+     * <li>2. Create customized triggers for the scheduling.</li>
+     * <li>3. start the scheduling job</li> 
+     * 
+     * @param scheduleGate the gate that needs to be scheduled.
      */
-    private void initGateScheduler(ScheduleGateActivity scheduleGate)
+    private void runGateScheduler(ScheduleGateActivity scheduleGate)
     {
-        
+        JobDetail openScheduleGateJob = getOpenScheduleGateJob();
+        JobDetail closeScheduleGateJob = getCloseScheduleGateJob();
+        //setup the message for scheduling job
+        openScheduleGateJob.setName("openGate");
+        openScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
+        closeScheduleGateJob.setName("closeGate");
+        closeScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
+        //create customized triggers
+        Trigger openGateTrigger = new SimpleTrigger("openGateTrigger",
+                                                    Scheduler.DEFAULT_GROUP, 
+                                                    scheduleGate.getRealGateOpenTime());
+        Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger",
+                                                    Scheduler.DEFAULT_GROUP,
+                                                    scheduleGate.getRealGateCloseTime());
+        //start the scheduling job
+        try
+        {
+            scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
+            scheduler.scheduleJob(closeScheduleGateJob, closeGateTrigger);
+        }
+        catch (SchedulerException e)
+        {
+            throw new MonitoringServiceException("Error occurred at " +
+            		"[runGateScheduler]- fail to start scheduling",e);
+        }
     }
 
     /**
@@ -356,6 +391,7 @@ public class MonitoringService implements IMonitoringService
         
         return newLessonClass;
     }
+    
     /**
      * Setup a new lesson object without class and insert it into the database.
      * 
@@ -375,7 +411,7 @@ public class MonitoringService implements IMonitoringService
         lessonDAO.saveLesson(newLesson);
         return newLesson;
     }
-
+    
     /**
      * Setup the empty lesson class according to the run-time learning design
      * copy.
@@ -443,7 +479,7 @@ public class MonitoringService implements IMonitoringService
                 && !((ToolActivity) activity).getApplyGrouping().booleanValue();
     }
     
-    /**
+        /**
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons()
      */
@@ -696,4 +732,20 @@ public class MonitoringService implements IMonitoringService
 											FlashMessage.ERROR);
 	 	return flashMessage.serializeMessage();
 	 }
+    
+    /**
+     *
+     */
+    private JobDetail getOpenScheduleGateJob()
+    {
+        return (JobDetail)applicationContext.getBean("openScheduleGateJob");
+    }
+    
+    /**
+     * 
+     */
+    private JobDetail getCloseScheduleGateJob()
+    {
+        return (JobDetail)applicationContext.getBean("closeScheduleGateJob");
+    }
 }

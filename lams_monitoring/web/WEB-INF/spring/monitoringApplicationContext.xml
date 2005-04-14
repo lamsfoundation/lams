@@ -51,6 +51,7 @@ http://www.gnu.org/licenses/gpl.txt
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
 		<property name="userManagementService"><ref bean="userManagementService"/></property>			
+		<property name="scheduler"><ref bean="scheduler"/></property>
 	</bean>	
 	
 	<bean id="monitoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -66,8 +67,8 @@ http://www.gnu.org/licenses/gpl.txt
 			</props>
 		</property>
 	</bean>    
-	
-	<bean id="openScheduleGateJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+
+    <bean id="openScheduleGateJob" class="org.springframework.scheduling.quartz.JobDetailBean">
         <property name="jobClass">
             <value>org.lamsfoundation.lams.monitoring.service.OpenScheduleGateJob</value>
         </property>
@@ -95,5 +96,4 @@ http://www.gnu.org/licenses/gpl.txt
     
     <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
     </bean>
-
 </beans>
