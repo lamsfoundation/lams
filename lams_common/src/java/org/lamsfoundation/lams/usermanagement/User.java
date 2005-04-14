@@ -87,9 +87,6 @@ public class User implements Serializable {
     /** persistent field */
     private Organisation baseOrganisation;
     
-    /** non-nullable persistent field */
-    private Integer userOrganisationID;
-
     /** persistent field */
     private Set learnerProgresses;
     
@@ -621,19 +618,6 @@ public class User implements Serializable {
 							this.lastName,
 							this.login);
     }
-
-	/**
-	 * @return Returns the userOrganisationID.
-	 */
-	public Integer getUserOrganisationID() {
-		return userOrganisationID;
-	}
-	/**
-	 * @param userOrganisationID The userOrganisationID to set.
-	 */
-	public void setUserOrganisationID(Integer userOrganisationID) {
-		this.userOrganisationID = userOrganisationID;
-	}
 	
 	/**This method checks whether user is a member of the 
 	 * given organisation*/

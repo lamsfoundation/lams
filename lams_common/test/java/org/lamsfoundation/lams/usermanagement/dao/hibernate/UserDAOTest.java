@@ -70,11 +70,9 @@ public class UserDAOTest extends AbstractLamsTestCase{
 		user.setDisabledFlag(new Boolean(false));
 		user.setCreateDate(new Date());
 		user.setAuthenticationMethod(authenticationMethodDAO.getAuthenticationMethodById(new Integer(2)));
-		user.setBaseOrganisation(organisationDAO.getOrganisationById(new Integer(1)));
-		user.setUserOrganisationID(new Integer(1));
-		userDAO.saveUser(user);		
-		user.setUserOrganisationID(createUserOrganisation(user));
-		userDAO.updateUser(user);		
+		user.setBaseOrganisation(organisationDAO.getOrganisationById(new Integer(1)));		
+		userDAO.saveUser(user);
+		createUserOrganisation(user);
 	}
 	private Integer createUserOrganisation(User user){
 		UserOrganisation userOrganisation = new UserOrganisation();

@@ -265,10 +265,6 @@
         </meta>    
     </property>
     
-    <property name="userOrganisationID" type="java.lang.Integer" column="user_organisation_id" length="11" not-null="true">
-        <meta attribute="field-description">@hibernate.property column="user_organisation_id" length="11" </meta>    
-    </property>
-
     <!-- Associations -->
   
     <!-- bi-directional many-to-one association to Workspace -->
