@@ -48,7 +48,7 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
 	 */
 	protected String[] getContextConfigLocation() {
-		return new String[] {"applicationContext.xml","org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml"};
+		return new String[] {"WEB-INF/spring/applicationContext.xml","WEB-INF/spring/learningDesignApplicationContext.xml"};
 	}
 	public void testSaveOrganisation(){
 		Organisation organisation = new Organisation("Test Organisation",
@@ -66,8 +66,7 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 		user.setDisabledFlag(new Boolean(false));
 		user.setCreateDate(new Date());
 		user.setAuthenticationMethod(authenticationMethodDAO.getAuthenticationMethodById(new Integer(2)));
-		user.setBaseOrganisation(organisationDAO.getOrganisationById(new Integer(1)));
-		user.setUserOrganisationID(new Integer(1));
+		user.setBaseOrganisation(organisationDAO.getOrganisationById(new Integer(1)));		
 		assertNotNull(userManagementService.saveUser(user, new Integer(4)));	
 		
 	}	
@@ -82,6 +81,13 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 	public void testGetUsersFromOrganisationByRole() throws IOException{
 		String packet = userManagementService.getUsersFromOrganisationByRole(new Integer(4),"AUTHOR");
 		System.out.println(packet);
+	}
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
+	 */
+	protected String getHibernateSessionFactoryName() {
+		
+		return "coreSessionFactory";
 	}
 
 }

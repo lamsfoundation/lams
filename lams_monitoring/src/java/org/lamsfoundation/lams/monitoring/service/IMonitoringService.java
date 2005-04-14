@@ -182,6 +182,31 @@ public interface IMonitoringService
      */
     public String getLearnerActivityURL(Long activityID,Integer userID)throws IOException,LamsToolServiceException;
     public String getActivityContributionURL(Long activityID)throws IOException;
+    
+    /**
+     * This method moves the learning design corresponding to the given
+     * Lesson into the specified workspaceFolder. But before this action
+     * is performed it checks whether the user is authorized to do so. 
+     * If not, Flash is notified of the same. As of now it is assumed that 
+     * only the owner of lesson/learning design can move it 
+     *  
+     * @param lessonID The lesson_id of the Lesson which has to be moved
+     * @param targetWorkspaceFolderID The workspace_folder_id of the WorkspaceFolder
+     * 								  to which the lesson has to be moved 
+     * @param userID The user_id of the User who has requested this operation
+     * @return String The acknowledgement message/error in WDDX format 
+     * @throws IOException
+     */
     public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID,Integer userID)throws IOException;
-    public void renameLesson(Long lessonID, String newName, Integer userID);
+    /**
+     * This method changes the name of an existing Lesson to the
+     * one specified.
+     *   
+     * @param lessonID The lesson_id of the Lesson whose name has to be changed
+     * @param newName The new name of the Lesson
+     * @param userID The user_id of the User who has requested this operation
+     * @return String The acknowledgement message/error in WDDX format 
+     * @throws IOException
+     */
+    public String renameLesson(Long lessonID, String newName, Integer userID)throws IOException;
 }

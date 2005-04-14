@@ -134,4 +134,9 @@ public class FlashMessage implements Serializable {
     			"No such LearningDesign with a learning_design_id of " + learningDesignID +" exists",
 				FlashMessage.ERROR);
     }
+    public static FlashMessage getNoSuchActivityExists(String methodName, Long activityID){
+    	return new FlashMessage(methodName,
+    			"No such Activity with an activity_id of " + activityID +" exists",
+				FlashMessage.ERROR);
+    }
 }

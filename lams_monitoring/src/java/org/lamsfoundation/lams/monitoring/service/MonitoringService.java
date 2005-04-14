@@ -648,23 +648,26 @@ public class MonitoringService implements IMonitoringService
 			nextActivity = transitionDAO.getNextActivity(nextActivity.getActivityId());	
 		}				
 		return activitySet;
-	}
-	/** TODO check if a user is authorized to complete this operation*/
+	}	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#moveLesson(java.lang.Long, java.lang.Integer, java.lang.Integer)
+	 */
 	public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID,Integer userID)throws IOException{
 		Lesson lesson = lessonDAO.getLesson(lessonID);
 		if(lesson!=null){
-			WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetWorkspaceFolderID);
-			if(workspaceFolder!=null){
-				LearningDesign learningDesign = lesson.getLearningDesign();
-				learningDesign.setWorkspaceFolder(workspaceFolder);
-				learningDesignDAO.update(learningDesign);
-				flashMessage = new FlashMessage("moveLesson",targetWorkspaceFolderID);
-			}
-			else{
-				flashMessage = new FlashMessage("moveLesson",
-												"No such target workspaceFolder with a workspace_folder_id of :" + targetWorkspaceFolderID + " exists",
-												FlashMessage.ERROR);
-			}
+			if(lesson.getUser().getUserId().equals(userID)){
+				WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetWorkspaceFolderID);
+				if(workspaceFolder!=null){
+					LearningDesign learningDesign = lesson.getLearningDesign();
+					learningDesign.setWorkspaceFolder(workspaceFolder);
+					learningDesignDAO.update(learningDesign);
+					flashMessage = new FlashMessage("moveLesson",targetWorkspaceFolderID);
+				}
+				else
+					flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("moveLesson",targetWorkspaceFolderID);
+			}else
+				flashMessage = FlashMessage.getUserNotAuthorized("moveLesson",userID);
 		}else{
 			flashMessage = new FlashMessage("moveLesson",
 											"No such lesson with a lesson_id of :" + lessonID +" exists.",
@@ -678,11 +681,19 @@ public class MonitoringService implements IMonitoringService
 	  * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#renameLesson(java.lang.Long, java.lang.String, java.lang.Integer)
 	 */
-	public void renameLesson(Long lessonID, String newName, Integer userID){
+	public String renameLesson(Long lessonID, String newName, Integer userID)throws IOException{
 	 	Lesson lesson = lessonDAO.getLesson(lessonID);
 	 	if(lesson!=null){
-	 		lesson.setLessonName(newName);
-	 		lessonDAO.updateLesson(lesson);
-	 	}
+	 		if(lesson.getUser().getUserId().equals(userID)){
+	 			lesson.setLessonName(newName);
+	 			lessonDAO.updateLesson(lesson);
+	 			flashMessage = new FlashMessage("renameLesson",newName);
+	 		}else
+	 			flashMessage = FlashMessage.getUserNotAuthorized("renameLesson",userID);
+	 	}else
+	 		flashMessage = new FlashMessage("renameLesson",
+	 										"No such lesson with a lesson_id of :" + lessonID +" exists.",
+											FlashMessage.ERROR);
+	 	return flashMessage.serializeMessage();
 	 }
 }
