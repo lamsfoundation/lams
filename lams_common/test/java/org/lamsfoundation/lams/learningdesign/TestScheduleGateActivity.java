@@ -22,14 +22,11 @@
 
 package org.lamsfoundation.lams.learningdesign;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.sql.Timestamp;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.DateUtil;
 
 import junit.framework.TestCase;
 
@@ -67,12 +64,8 @@ public class TestScheduleGateActivity extends TestCase
         
         //convert current system time to utc
         Calendar now = new GregorianCalendar();
-        TimeZone gmt = TimeZone.getTimeZone("Etc/GMT");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
-        sdf.setTimeZone(gmt);
-        String str = sdf.format(now.getTime());
-        Timestamp gmtNow = Timestamp.valueOf(str);
-        now.setTime(new Date(gmtNow.getTime()));
+
+        now.setTime(DateUtil.convertToUTC(now.getTime()));
         gateByDateTime.setGateStartDateTime(now.getTime());
         
         now.add(Calendar.MINUTE,END_TIME_OFFSET.intValue());
@@ -110,12 +103,25 @@ public class TestScheduleGateActivity extends TestCase
     public void testGetRealGateCloseTime()
     {
         assertNotNull("verify real open time",gateByTimeOffset.getRealGateCloseTime());
-        log.info("gate open time offset -- "+gateByTimeOffset.getGateEndTimeOffset());
-        log.info("Gate Close time by offset --"+gateByTimeOffset.getRealGateCloseTime());
+        log.info("gate close time offset -- "+gateByTimeOffset.getGateEndTimeOffset());
+        log.info("gate close time by offset --"+gateByTimeOffset.getRealGateCloseTime());
         
         assertNotNull("verify real close time by date time",gateByDateTime.getRealGateCloseTime());
         log.info("gate close date time(UTC) -- "+gateByDateTime.getGateEndDateTime());
         log.info("Real gate close time by date time -- "+gateByDateTime.getRealGateCloseTime());
     }
 
+    public void testGetRealCloseTimeWithLongOffset()
+    {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(gateByDateTime.getGateEndDateTime());
+        cal.add(Calendar.MINUTE,END_TIME_OFFSET.intValue()*24);
+        gateByDateTime.setGateEndDateTime(cal.getTime());
+        
+        assertNotNull("verify real close time by date time",gateByDateTime.getRealGateCloseTime());
+        
+        log.info("gate close date time(UTC) -- "+gateByDateTime.getGateEndDateTime());
+        log.info("Real gate close time by date time -- "+gateByDateTime.getRealGateCloseTime());
+       
+    }
 }

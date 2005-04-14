@@ -10,6 +10,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.exception.ActivityBehaviorException;
 import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
+import org.lamsfoundation.lams.util.DateUtil;
 
 
 /**
@@ -251,14 +252,13 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      */
     public Date getRealGateOpenTime()
     {
-               
-        Calendar openTime = new GregorianCalendar(TimeZone.getDefault());
-        long offset  = openTime.get(Calendar.ZONE_OFFSET)+openTime.get(Calendar.DST_OFFSET);
+        Calendar openTime = new GregorianCalendar(TimeZone.getDefault());       
         //compute the real opening time based on the  
         if(isScheduledByTimeOffset())
             openTime.add(Calendar.MINUTE,getGateStartTimeOffset().intValue());
         else if(isScheduledByDateTime())
-            openTime.setTime(new Date(getGateStartDateTime().getTime()+offset));
+            openTime.setTime(DateUtil.convertFromUTCToLocal(TimeZone.getDefault(),
+                                                            getGateStartDateTime()));
         else
             throw new ActivityBehaviorException("No way of scheduling has " +
             		"been setup - this usually should be done at authoring " +
@@ -286,7 +286,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
         if(isScheduledByTimeOffset())
             closeTime.add(Calendar.MINUTE,getGateEndTimeOffset().intValue());
         else if(isScheduledByDateTime())
-            closeTime.setTime(new Date(getGateEndDateTime().getTime()+offset));
+            closeTime.setTime(DateUtil.convertFromUTCToLocal(TimeZone.getDefault(),
+                                                             getGateEndDateTime()));
         else
             throw new ActivityBehaviorException("No way of scheduling has " +
             		"been setup - this usually should be done at authoring " +
