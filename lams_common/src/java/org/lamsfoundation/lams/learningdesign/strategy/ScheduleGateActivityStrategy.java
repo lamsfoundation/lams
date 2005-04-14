@@ -57,8 +57,8 @@ public class ScheduleGateActivityStrategy extends GateActivityStrategy
     /**
      * Regarding schedule gate, we don't validate the open condition for the 
      * learner because the decision of opening the gate or not comes from the 
-     * system scheduler. Lams open the gate when the start time is reached and 
-     * closed the gate when the end time is reached.
+     * system scheduler. Lams opens the gate when the start time is reached and 
+     * closes the gate when the end time is reached.
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#isOpenConditionMet()
      */
@@ -67,6 +67,4 @@ public class ScheduleGateActivityStrategy extends GateActivityStrategy
     {
         return activity.getGateOpen().booleanValue();
     }
-
-
 }
