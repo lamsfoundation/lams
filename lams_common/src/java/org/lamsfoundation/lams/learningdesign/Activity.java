@@ -24,10 +24,10 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -647,22 +647,13 @@ public abstract class Activity implements Serializable,Nullable {
 	public void setActivityCategoryID(Integer activityCategoryID) {
 		this.activityCategoryID = activityCategoryID;
 	}
-		
-	public MonitoringActivityDTO getMonitoringActivityDTO(){
-		return new MonitoringActivityDTO(this); 
-	}
-	public MonitoringActivityDTO getMonitoringActivityDTO(Integer contributionType,Boolean required){
-		return new MonitoringActivityDTO(this,contributionType,required);
-	}	
-	public Vector getMonitoringActivityDTOSet(Set activities){
-		Vector children = new Vector();		
-		Iterator iterator = activities.iterator();
-		while(iterator.hasNext()){
-			Activity activity = (Activity)iterator.next();
-			children.add(new MonitoringActivityDTO(activity));
+	public Set getMonitoringActivityDTO(Integer[] contributionType){
+		HashSet dtoSet = new HashSet();
+		for(int i=0;i<contributionType.length;i++){
+			dtoSet.add(new MonitoringActivityDTO(this,contributionType[i]));
 		}
-		return children;
-	}	
+		return dtoSet;
+	}
 	public AuthoringActivityDTO getAuthoringActivityDTO(){
 		return new AuthoringActivityDTO(this);
 	}

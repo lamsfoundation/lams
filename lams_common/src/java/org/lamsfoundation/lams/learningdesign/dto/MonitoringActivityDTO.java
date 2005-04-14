@@ -7,6 +7,7 @@
 package org.lamsfoundation.lams.learningdesign.dto;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -25,22 +26,26 @@ public class MonitoringActivityDTO {
 	private Integer contributionType;
 	private Boolean isRequired;
 	
-	
-	public MonitoringActivityDTO(Activity activity){
-		this.title = activity.getTitle();
-		this.description = activity.getDescription();
-		this.activityID = activity.getActivityId();
-		this.activityTypeID = activity.getActivityTypeId();		
-		this.orderID = activity.getOrderId();		
-	}	
-	public MonitoringActivityDTO(Activity activity,Integer contributionType,Boolean required){
+	public MonitoringActivityDTO(){
+		
+	}
+	public MonitoringActivityDTO(Activity activity,Integer contributionType){
 		this.title = activity.getTitle();
 		this.description = activity.getDescription();
 		this.activityID = activity.getActivityId();
 		this.activityTypeID = activity.getActivityTypeId();
 		this.contributionType = contributionType;
 		this.orderID = activity.getOrderId();		
-		this.isRequired = required;
+		this.isRequired = new Boolean(calculateIsRequired(contributionType));
+	}
+	private boolean calculateIsRequired(Integer contributionType){
+		if(contributionType.equals(SimpleActivityStrategy.DEFINE_LATER) ||
+				contributionType.equals(SimpleActivityStrategy.PERMISSION_GATE)||
+				contributionType.equals(SimpleActivityStrategy.CHOSEN_GROUPING))
+			return true;
+		else
+			return false;
+		
 	}
 	/**
 	 * @return Returns the activityID.
