@@ -14,8 +14,11 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.exception.UserException;
+import org.lamsfoundation.lams.workspace.exception.WorkspaceFolderException;
 
 
 /**
@@ -153,5 +156,61 @@ public class MockAuthoringService implements IAuthoringService
         // TODO Auto-generated method stub
         return null;
     }
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User)
+	 */
+	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign, Integer copyType, User user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(java.lang.Long, java.lang.Integer, java.lang.Integer, java.lang.Integer)
+	 */
+	public String copyLearningDesign(Long originalLearningDesignID, Integer copyType, Integer userID, Integer workspaceFolder) throws UserException, LearningDesignException, WorkspaceFolderException, IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignDetails(java.lang.Long)
+	 */
+	public String getLearningDesignDetails(Long learningDesignID) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#storeLearningDesignDetails(java.lang.String)
+	 */
+	public String storeLearningDesignDetails(String wddxPacket) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningDesignDetails()
+	 */
+	public String getAllLearningDesignDetails() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignsForUser(java.lang.Long)
+	 */
+	public String getLearningDesignsForUser(Long userID) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraryDetails()
+	 */
+	public String getAllLearningLibraryDetails() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

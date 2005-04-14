@@ -20,6 +20,7 @@
  */
 package org.lamsfoundation.lams.monitoring.service;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
@@ -40,7 +41,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 /**
  * 
  * @author Jacky Fang 9/02/2005
- * 
+ * @author Manpreet Minhas
  */
 public class TestMonitoringService extends AbstractLamsTestCase
 {
@@ -107,14 +108,14 @@ public class TestMonitoringService extends AbstractLamsTestCase
      */
     protected String[] getContextConfigLocation()
     {
-        return new String[] { "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
-                			  "/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
+        return new String[] { "WEB-INF/spring/applicationContext.xml",
+        					  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+                			  "WEB-INF/spring/monitoringApplicationContext.xml",
                 			  "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
                 			  "/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
-                			  "/WEB-INF/authoringApplicationContext.xml",
+                			  "WEB-INF/spring/authoringApplicationContext.xml",
                               "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
-                              "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",        					  
-        					  "applicationContext.xml"};
+                              "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml"};
     }
     /**
      * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
@@ -123,7 +124,6 @@ public class TestMonitoringService extends AbstractLamsTestCase
     {
         return "coreSessionFactory";
     }
-    
     public void testInitializeLesson()
     {
         
@@ -206,5 +206,40 @@ public class TestMonitoringService extends AbstractLamsTestCase
         testLearner = usermanageService.getUserById(TEST_LEARNER_ID);        
         testOrganisation = usermanageService.getOrganisationById(TEST_ORGANIZATION_ID);
     }
-
+    
+    
+    public void testGetAllLessons()throws IOException{
+    	String packet = monitoringService.getAllLessons();
+    	System.out.print(packet);
+    }
+    public void testGetLessonDetails() throws IOException{
+    	String packet = monitoringService.getLessonDetails(new Long(1));
+    	System.out.print(packet);
+    }
+    public void testGetLessonLearners() throws IOException{
+    	String packet = monitoringService.getLessonLearners(new Long(1));
+    	System.out.println(packet);
+    }
+    public void testGetLessonDesign()throws IOException{
+    	String packet = monitoringService.getLearningDesignDetails(new Long(1));
+    	System.out.println(packet);
+    }
+    public void testGetAllLearnersProgress() throws IOException{
+    	String packet = monitoringService.getAllLearnersProgress(new Long(1));
+    	System.out.println(packet);
+    }
+    public void testGetLearnerActivityURL() throws Exception{
+    	String packet = monitoringService.getLearnerActivityURL(new Long(26),new Integer(2));
+    	System.out.println(packet);
+    }
+    public void  testGellAllContributeActivities()throws IOException{
+    	String packet = monitoringService.getAllContributeActivities(new Long(1));
+    	System.out.println(packet);
+    }
+    public void testMoveLesson() throws IOException{
+    	String packet = monitoringService.moveLesson(new Long(1),new Integer(3),new Integer(1));
+    	System.out.println(packet);
+    }
+    
+    
 }

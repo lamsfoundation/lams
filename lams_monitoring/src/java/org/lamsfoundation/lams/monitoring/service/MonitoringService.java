@@ -20,28 +20,44 @@
  */
 package org.lamsfoundation.lams.monitoring.service;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 
@@ -54,6 +70,7 @@ import org.quartz.Scheduler;
  * selected learning design.</p>
  * 
  * @author Jacky Fang 2/02/2005
+ * @author Manpreet Minhas
  */
 public class MonitoringService implements IMonitoringService
 {
@@ -61,15 +78,69 @@ public class MonitoringService implements IMonitoringService
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-    private ILessonDAO lessonDAO;
-    private ILessonClassDAO lessonClassDAO;
-    private ILamsCoreToolService lamsCoreToolService;
-    private IAuthoringService authoringService;
+    private ILessonDAO lessonDAO;    
+    private ILessonClassDAO lessonClassDAO;        
+    private IOrganisationDAO organisationDAO;
+    private ITransitionDAO transitionDAO;
     private IActivityDAO activityDAO;
+    private IUserDAO userDAO;        
+    private IWorkspaceFolderDAO workspaceFolderDAO;
+    private ILearningDesignDAO learningDesignDAO;
+    
+    private IAuthoringService authoringService;
+    private ILamsCoreToolService lamsCoreToolService;
+    private IUserManagementService userManagementService;
+    
     private JobDetail openScheduleGateJob;
     private JobDetail closeScheduleGateJob;
     private Scheduler scheduler;
-    //---------------------------------------------------------------------
+    
+    private FlashMessage flashMessage;
+	/**
+	 * @param userManagementService The userManagementService to set.
+	 */
+	public void setUserManagementService(
+			IUserManagementService userManagementService) {
+		this.userManagementService = userManagementService;
+	}
+	/**
+	 * @param learningDesignDAO The learningDesignDAO to set.
+	 */
+	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
+		this.learningDesignDAO = learningDesignDAO;
+	}
+	/**
+	 * @param workspaceFolderDAO The workspaceFolderDAO to set.
+	 */
+	public void setWorkspaceFolderDAO(IWorkspaceFolderDAO workspaceFolderDAO) {
+		this.workspaceFolderDAO = workspaceFolderDAO;
+	}
+	/**
+	 * @param activityDAO The activityDAO to set.
+	 */
+	public void setActivityDAO(IActivityDAO activityDAO) {
+		this.activityDAO = activityDAO;
+	}
+	/**
+	 * @param transitionDAO The transitionDAO to set.
+	 */
+	public void setTransitionDAO(ITransitionDAO transitionDAO) {
+		this.transitionDAO = transitionDAO;
+	}
+	/**
+	 * @param lamsCoreToolService The lamsCoreToolService to set.
+	 */
+	public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
+		this.lamsCoreToolService = lamsCoreToolService;
+	}
+	/**
+	 * @param userDAO The userDAO to set.
+	 */
+	public void setUserDAO(IUserDAO userDAO) {
+		this.userDAO = userDAO;
+	}
+	
+	//---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
     /**
@@ -95,24 +166,10 @@ public class MonitoringService implements IMonitoringService
     {
         this.lessonDAO = lessonDAO;
     }
-
-    /**
-     * @param lamsToolService The lamsToolService to set.
-     */
-    public void setLamsCoreToolService(ILamsCoreToolService lamsToolService)
-    {
-        this.lamsCoreToolService = lamsToolService;
-    }
-
-    /**
-     * @param activityDAO The activityDAO to set.
-     */
-    public void setActivityDAO(IActivityDAO activityDAO)
-    {
-        this.activityDAO = activityDAO;
-    }
-
-    /**
+	public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
+		this.organisationDAO = organisationDAO;
+	}
+	/**
      * @param openScheduleGateJob The openScheduleGateJob to set.
      */
     public void setOpenScheduleGateJob(JobDetail openScheduleGateJob)
@@ -299,7 +356,6 @@ public class MonitoringService implements IMonitoringService
         
         return newLessonClass;
     }
-    
     /**
      * Setup a new lesson object without class and insert it into the database.
      * 
@@ -319,7 +375,7 @@ public class MonitoringService implements IMonitoringService
         lessonDAO.saveLesson(newLesson);
         return newLesson;
     }
-    
+
     /**
      * Setup the empty lesson class according to the run-time learning design
      * copy.
@@ -386,4 +442,247 @@ public class MonitoringService implements IMonitoringService
         return activity.isToolActivity()
                 && !((ToolActivity) activity).getApplyGrouping().booleanValue();
     }
+    
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons()
+     */
+    public String getAllLessons() throws IOException{
+    	List lessons = lessonDAO.getAllLessons(); 
+    	return requestLessonList(lessons);    	
+    }
+    /**
+     * This method returns the list of lessons in WDDX format
+     * 
+     * @param lessons The list of lessons to be converted into WDDX format
+     * @return String The required information in WDDX format
+     * @throws IOException
+     */
+    private String requestLessonList(List lessons)throws IOException{
+    	Vector lessonObjects = new Vector();
+		Iterator lessonIterator = lessons.iterator();
+		while(lessonIterator.hasNext()){
+			Lesson lesson = (Lesson)lessonIterator.next();
+			lessonObjects.add(lesson.getLessonData());
+		}	
+    	FlashMessage flashMessage = new FlashMessage("getAllLessons",lessonObjects);
+    	return flashMessage.serializeMessage();    	
+    }
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons(java.lang.Integer)
+     */
+    public String getAllLessons(Integer userID)throws IOException{
+    	List lessons = lessonDAO.getLessonsForUser(userID);
+    	return requestLessonList(lessons); 
+    }
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
+     */
+    public String getLessonDetails(Long lessonID)throws IOException{
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	if(lesson!=null){
+    		flashMessage = new FlashMessage("getLessonDetails",lesson.getLessonDetails());
+    	}else
+    		flashMessage = new FlashMessage("getLessonDetails",
+    										"No such Lesson with a lessonID of :" + lessonID + " exists.",
+											FlashMessage.ERROR);
+    	return flashMessage.serializeMessage();    	
+    }
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonLearners(java.lang.Long)
+     */
+    public String getLessonLearners(Long lessonID)throws IOException{
+    	Vector lessonLearners = new Vector();
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	if(lesson!=null){
+    		Iterator iterator = lesson.getLessonClass().getLearners().iterator();
+    		while(iterator.hasNext()){
+    			User user = (User)iterator.next();
+    			lessonLearners.add(user.getUserDTO());
+    		}    		
+    		flashMessage = new FlashMessage("getLessonLearners",lessonLearners);
+    	}else
+    		flashMessage = new FlashMessage("getLessonLearners",
+    										 "No such lesson with a lesson_id of :"+ lessonID + " exists",
+											 FlashMessage.ERROR);
+    	return flashMessage.serializeMessage();
+    }    
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearningDesignDetails(java.lang.Long)
+     */
+    public String getLearningDesignDetails(Long lessonID)throws IOException{
+    	Lesson lesson = lessonDAO.getLesson(lessonID);    	
+    	return authoringService.getLearningDesignDetails(lesson.getLearningDesign().getLearningDesignId());
+    }
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLearnersProgress(java.lang.Long)
+     */
+    public String getAllLearnersProgress(Long lessonID)throws IOException {
+    	Vector progressData = new Vector();
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	if(lesson!=null){
+    		Iterator iterator = lesson.getLearnerProgresses().iterator();
+    		while(iterator.hasNext()){
+    			LearnerProgress learnerProgress = (LearnerProgress)iterator.next();
+    			progressData.add(learnerProgress.getLearnerProgressData());
+    		}
+    		flashMessage = new FlashMessage("getAllLearnersProgress",progressData);
+    	}else{
+    			flashMessage = new FlashMessage("getAllLearnersProgress",
+    											"No such lesson with a lesson_id of :"+ lessonID + " exists",
+												FlashMessage.ERROR);
+    	}
+    	return flashMessage.serializeMessage();
+    }   
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllContributeActivities(java.lang.Long)
+     */
+    public String getAllContributeActivities(Long lessonID)throws IOException{
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	if(lesson!=null){
+    		Vector sortedSet = getOrderedActivityTree(lesson.getLearningDesign());
+    		flashMessage = new FlashMessage("getAllContributeActivities",sortedSet);
+    	}else{
+    		flashMessage = new FlashMessage("getAllContributeActivities",
+    										"No such lesson with a lesson_id of " + lessonID + "exists",
+											FlashMessage.ERROR);
+    	}
+    	return flashMessage.serializeMessage();    	
+    }
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearnerActivityURL(java.lang.Long, java.lang.Integer)
+     */
+    public String getLearnerActivityURL(Long activityID,Integer userID)throws IOException, LamsToolServiceException{    	
+    	Activity activity = activityDAO.getActivityByActivityId(activityID);
+    	User user = userDAO.getUserById(userID);
+    	if(activity==null || user==null){
+    		flashMessage = new FlashMessage("getLearnerActivityURL",
+    										"Invalid activityID/User :" + activityID + " : " + userID,
+											FlashMessage.ERROR);
+    	}else{
+    		if(activity.isToolActivity()){
+        		ToolActivity toolActivity = (ToolActivity)activity;        		
+        		String toolURL = lamsCoreToolService.getLearnerToolURLByMode(toolActivity,user,ToolAccessMode.TEACHER);        		
+        		flashMessage = new FlashMessage("getLearnerActivityURL",new ProgressActivityDTO(activityID,toolURL));
+        	}else{
+        		flashMessage = new FlashMessage("getLearnerActivityURL",
+        										"Invalid Activity type: " + activity.getActivityId()+ "\n Only ToolActivity allowed.",
+												FlashMessage.ERROR);
+        	}    		
+    	}   	
+    	
+    	return flashMessage.serializeMessage();
+    }	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityContributionURL(java.lang.Long)
+	 */
+	public String getActivityContributionURL(Long activityID)throws IOException{
+		Activity activity = activityDAO.getActivityByActivityId(activityID);
+		if(activity!=null){
+			if(activity.isToolActivity()){
+				ToolActivity toolActivity = (ToolActivity)activity;
+				String contributionURL = toolActivity.getTool().getContributeUrl();
+				flashMessage = new FlashMessage("getActivityContributionURL",contributionURL);
+			}
+		}else
+			flashMessage = FlashMessage.getNoSuchActivityExists("getActivityContributionURL",activityID);
+		
+		return flashMessage.serializeMessage();
+	}
+	/**
+     * This method assigns an orderID to all the activties in the LearningDesign
+     * based on the transitions. Once this is done it just packages it in a container 
+     * to be serialized and sent to flash
+     * 
+     * @param learningDesign The learningdesign whose activities have to be ordered
+     * @return Vector The activities with orderID assigned.
+     */
+	private Vector getOrderedActivityTree(LearningDesign learningDesign){
+		int order = 0;		
+		HashMap activityTree = learningDesign.getActivityTree();		
+		Vector activitySet = new Vector();		
+		
+		Activity firstActivity = learningDesign.getFirstActivity();
+		firstActivity.setOrderId(new Integer(order));
+		order++;
+		
+		if(firstActivity.isComplexActivity()){			
+			ComplexActivity complexActivity = (ComplexActivity)firstActivity;			
+			Iterator childIterator = complexActivity.getActivities().iterator();
+			while(childIterator.hasNext()){
+				SimpleActivity simpleActivity= (SimpleActivity)childIterator.next();
+				activitySet.addAll(simpleActivity.getMonitoringActivityDTO(simpleActivity.getContributionType()));				
+			}		
+		}else{
+			SimpleActivity simpleActivity = (SimpleActivity)firstActivity;
+			if(simpleActivity.getContributionType().length!=0)
+				activitySet.addAll(simpleActivity.getMonitoringActivityDTO(simpleActivity.getContributionType()));
+		}
+		
+		
+		Activity nextActivity = transitionDAO.getNextActivity(firstActivity.getActivityId());
+		while(nextActivity!=null){
+			nextActivity.setOrderId(new Integer(order));
+			order++;			
+			Set childActiivities = (Set) activityTree.get(nextActivity.getActivityId());			
+			if(childActiivities.size()!=0){
+				Iterator iterator = childActiivities.iterator();
+				while(iterator.hasNext()){					
+					SimpleActivity simpleActivity= (SimpleActivity)iterator.next();
+					activitySet.addAll(simpleActivity.getMonitoringActivityDTO(simpleActivity.getContributionType()));
+				}
+			}else{
+				SimpleActivity simpleActivity = (SimpleActivity)nextActivity;
+				if(simpleActivity.getContributionType().length!=0)
+					activitySet.addAll(simpleActivity.getMonitoringActivityDTO(simpleActivity.getContributionType()));
+			}
+			
+			nextActivity = transitionDAO.getNextActivity(nextActivity.getActivityId());	
+		}				
+		return activitySet;
+	}
+	/** TODO check if a user is authorized to complete this operation*/
+	public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID,Integer userID)throws IOException{
+		Lesson lesson = lessonDAO.getLesson(lessonID);
+		if(lesson!=null){
+			WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetWorkspaceFolderID);
+			if(workspaceFolder!=null){
+				LearningDesign learningDesign = lesson.getLearningDesign();
+				learningDesign.setWorkspaceFolder(workspaceFolder);
+				learningDesignDAO.update(learningDesign);
+				flashMessage = new FlashMessage("moveLesson",targetWorkspaceFolderID);
+			}
+			else{
+				flashMessage = new FlashMessage("moveLesson",
+												"No such target workspaceFolder with a workspace_folder_id of :" + targetWorkspaceFolderID + " exists",
+												FlashMessage.ERROR);
+			}
+		}else{
+			flashMessage = new FlashMessage("moveLesson",
+											"No such lesson with a lesson_id of :" + lessonID +" exists.",
+											FlashMessage.ERROR);
+											
+		}
+		return flashMessage.serializeMessage();
+		
+	}
+	 /**
+	  * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#renameLesson(java.lang.Long, java.lang.String, java.lang.Integer)
+	 */
+	public void renameLesson(Long lessonID, String newName, Integer userID){
+	 	Lesson lesson = lessonDAO.getLesson(lessonID);
+	 	if(lesson!=null){
+	 		lesson.setLessonName(newName);
+	 		lessonDAO.updateLesson(lesson);
+	 	}
+	 }
 }

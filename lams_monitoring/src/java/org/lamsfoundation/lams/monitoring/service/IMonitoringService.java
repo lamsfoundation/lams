@@ -20,6 +20,7 @@
  */
 package org.lamsfoundation.lams.monitoring.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -31,6 +32,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * Interface defines all monitoring services needed by presentation tier.
  * @author Jacky Fang 2/02/2005
+ * @author Manpreet Minhas
  */
 public interface IMonitoringService
 {
@@ -90,4 +92,96 @@ public interface IMonitoringService
      * @param gate the id of the gate we need to close.
      */
     public void closeGate(Long gateId);
+    
+    /**
+     * This method returns a string representing a list of all 
+     * available Lessons in the WDDX format
+     * 
+     * @return String The requested list of Lessons in wddx format
+     * @throws IOException
+     */
+    public String getAllLessons() throws IOException;
+    
+    /**
+     * This method returns a string representing a list of all 
+     * available Lessons for a given user in the WDDX format
+     * 
+     * @param userID The user_id of the user for whom the lessons 
+     * 				 are being fetched.
+     * @return String The requested list of Lessons in wddx format
+     * @throws IOException
+     */
+    public String getAllLessons(Integer userID)throws IOException;
+    
+    /**
+     * This method returns the details for the given Lesson in
+     * WDDX format
+     * 
+     * @param lessonID The lesson_id of the Lesson for which the details have 
+     * 				   to be fetched
+     * @return String The requested details in wddx format
+     * @throws IOException
+     */
+    public String getLessonDetails(Long lessonID)throws IOException;
+    
+    /**
+     * Returns a list of learners participating in the given Lesson
+     * 
+     * @param lessonID The lesson_id of the Lesson
+     * @return String The requested list in wddx format
+     * 
+     * @throws IOException
+     */
+    public String getLessonLearners(Long lessonID)throws IOException;
+    
+    /**
+     * This method returns the LearningDesign details for a given Lesson
+     * 
+     * @param lessonID The lesson_id of the Lesson whose LearningDesign details are required
+     * @return String The requested details in wddx format
+     * @throws IOException
+     */
+    public String getLearningDesignDetails(Long lessonID)throws IOException;
+    
+    /**
+     * This method returns the progress information of all learners
+     * in a given Lesson.
+     * 
+     * @param lessonID The lesson_id of the Lesson whose progress information is required
+     * @return String The requested information in wddx format
+     * @throws IOException
+     */
+    public String getAllLearnersProgress(Long lessonID)throws IOException;
+    
+    /**
+     * This method is called when the user clicks the 'Contribute' tab in the 
+     * monitoring enviornment. It returns a list of activities "in the 
+     * order" they have to be performed and with additional information as to 
+     * what kind of contribution (Define later content, Moderation, Contribution, 
+     * Permission for gate activity, Chosen Grouing etc.) is reuired from the 
+     * user(teacher/staff).
+     *   
+     * @param lessonID The lesson_id of the Lesson for which the information has
+     * 					to be fetched. 
+     * @return String The required information in WDDX format
+     * @throws IOException
+     */
+    public String getAllContributeActivities(Long lessonID)throws IOException;
+    
+    /**
+     * This method returns the url associated with the activity in the monitoring
+     * enviornment. This is the URL that opens up when the user/teacher clicks on
+     * the activity in the monitoring enviornment and then selects a learner OR
+     * in the LEARNER tab when a learner's activity is clicked.
+     *  
+     * @param activityID The activity_id of the activity for which the URL is required 
+     * @param userID The user_id of the Learner for whom the URL is being fetched
+     * @return String The required information in WDDX format
+     * @throws IOException
+     * @throws LamsToolServiceException
+     */
+    public String getLearnerActivityURL(Long activityID,Integer userID)throws IOException,LamsToolServiceException;
+    public String getActivityContributionURL(Long activityID)throws IOException;
+    public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID,Integer userID)throws IOException;
+    public void renameLesson(Long lessonID, String newName, Integer userID);
 }
