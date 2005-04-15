@@ -48,7 +48,7 @@ public interface IMonitoringService
      * @param user user the user who want to create this lesson.
      * @return the lesson initialized.
      */
-    public Lesson initializeLesson(String lessonName, String lessonDescription,long learningDesignId,User user);;
+    public Lesson initializeLesson(String lessonName, String lessonDescription,long learningDesignId,User user);
     
     
     /**
@@ -71,7 +71,7 @@ public interface IMonitoringService
      * 									lams and tool interaction to start a
      * 									lesson.
      */
-    public void startlesson(long lessonId)throws LamsToolServiceException;
+    public void startlesson(long lessonId);
     
     /**
      * Force the learner to complete all the activities for current lesson.

@@ -265,8 +265,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startlesson(long)
      */
-    public void startlesson(long lessonId) throws LamsToolServiceException
+    public void startlesson(long lessonId) 
     {
+        //if(log.isDebugEnabled())
+            log.info("=============Starting Lesson "+lessonId+"==============");
         //we get the lesson just created
         Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
         //initialize tool sessions if necessary
@@ -289,6 +291,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
 
         lessonDAO.updateLesson(requestedLesson);
+        
+        //if(log.isDebugEnabled())
+            log.info("=============Lesson "+lessonId+" started===============");
     }
 
     /**
@@ -304,6 +309,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     private void runGateScheduler(ScheduleGateActivity scheduleGate)
     {
+        //if(log.isDebugEnabled())
+            log.info("Running scheduler for gate "+scheduleGate.getActivityId()+"...");
         JobDetail openScheduleGateJob = getOpenScheduleGateJob();
         JobDetail closeScheduleGateJob = getCloseScheduleGateJob();
         //setup the message for scheduling job
@@ -329,6 +336,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             throw new MonitoringServiceException("Error occurred at " +
             		"[runGateScheduler]- fail to start scheduling",e);
         }
+        //if(log.isDebugEnabled())
+            log.info("Scheduler for Gate "+scheduleGate.getActivityId()+" started...");
     }
 
     /**
@@ -450,18 +459,29 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * @param lesson the target lesson that these tool sessions belongs to.
      * @throws LamsToolServiceException the exception when lams is talking to tool.
      */
-    private void initToolSessionFor(ToolActivity activity, Set learners,Lesson lesson) throws LamsToolServiceException
+    private void initToolSessionFor(ToolActivity activity, Set learners,Lesson lesson) 
     {
         activity.setToolSessions(new HashSet());
-        for (Iterator i = learners.iterator(); i.hasNext();)
+        try
         {
-            User learner = (User) i.next();
+            for (Iterator i = learners.iterator(); i.hasNext();)
+            {
+                User learner = (User) i.next();
 
-            ToolSession toolSession = lamsCoreToolService.createToolSession(learner,activity,lesson);
-            //ask tool to create their own tool sessions using the given id.
-            lamsCoreToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
-            //update the hibernate persistent object
-            activity.getToolSessions().add(toolSession);
+                ToolSession toolSession;
+
+                toolSession = lamsCoreToolService.createToolSession(learner,activity,lesson);
+
+                //ask tool to create their own tool sessions using the given id.
+                lamsCoreToolService.notifyToolsToCreateSession(toolSession.getToolSessionId(), activity);
+                //update the hibernate persistent object
+                activity.getToolSessions().add(toolSession);
+            }
+        }
+        catch (LamsToolServiceException e)
+        {
+            throw new MonitoringServiceException("Error occurred at " +
+                                         		"[initToolSessionFor]- Fail to call tool services",e);
         }
     }
 

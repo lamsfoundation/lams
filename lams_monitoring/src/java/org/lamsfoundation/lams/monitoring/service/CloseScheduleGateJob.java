@@ -70,12 +70,12 @@ public class CloseScheduleGateJob extends QuartzJobBean
         Map properties = context.getJobDetail().getJobDataMap();
         Long gateId = (Long)properties.get("gateId");
         
-        if(log.isDebugEnabled())
-            log.debug("Closing gate......["+gateId.longValue()+"]");
+        //if(log.isDebugEnabled())
+            log.info("Closing gate......["+gateId.longValue()+"]");
         
         monitoringService.closeGate(gateId);
         
-        if(log.isDebugEnabled())
-            log.debug("Gate......["+gateId.longValue()+"] Closed");
+        //if(log.isDebugEnabled())
+            log.info("Gate......["+gateId.longValue()+"] Closed");
     }
 }

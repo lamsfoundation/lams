@@ -164,7 +164,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
 
         
     }
-    
+/**    
     public void testStartlesson() throws LamsToolServiceException
     {
         monitoringService.startlesson(TEST_LESSON_ID.longValue());
@@ -195,18 +195,6 @@ public class TestMonitoringService extends AbstractLamsTestCase
     public void testForceCompleteLessonByUser()
     {
     }
-
-    /**
-     * Initialize all instance variables for testing
-     */
-    private void initializeTestingData()
-    {
-        testUser = usermanageService.getUserById(TEST_USER_ID);
-        testStaff = usermanageService.getUserById(TEST_STAFF_ID);
-        testLearner = usermanageService.getUserById(TEST_LEARNER_ID);        
-        testOrganisation = usermanageService.getOrganisationById(TEST_ORGANIZATION_ID);
-    }
-    
     
     public void testGetAllLessons()throws IOException{
     	String packet = monitoringService.getAllLessons();
@@ -244,6 +232,17 @@ public class TestMonitoringService extends AbstractLamsTestCase
     	String packet = monitoringService.renameLesson(new Long(1),"New name after renaming",new Integer(1));
     	System.out.println(packet);
     }
+    */
     
-    
+    /**
+     * Initialize all instance variables for testing
+     */
+    private void initializeTestingData()
+    {
+        testUser = usermanageService.getUserById(TEST_USER_ID);
+        testStaff = usermanageService.getUserById(TEST_STAFF_ID);
+        testLearner = usermanageService.getUserById(TEST_LEARNER_ID);        
+        testOrganisation = usermanageService.getOrganisationById(TEST_ORGANIZATION_ID);
+    }
+
 }
