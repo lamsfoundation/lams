@@ -164,7 +164,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
 
         
     }
-/**    
+    
     public void testStartlesson() throws LamsToolServiceException
     {
         monitoringService.startlesson(TEST_LESSON_ID.longValue());
@@ -232,7 +232,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
     	String packet = monitoringService.renameLesson(new Long(1),"New name after renaming",new Integer(1));
     	System.out.println(packet);
     }
-    */
+    
     
     /**
      * Initialize all instance variables for testing

@@ -150,9 +150,10 @@
 
          <deploymentdescriptor servletspec="2.3" destdir="${conf.webinf.dir}"
 			mergedir="${conf.xdoclet.dir}" sessiontimeout="${sessiontimeout}"/>
-			
-         <strutsconfigxml destdir="${conf.webinf.dir}" mergedir="${conf.xdoclet.dir}" version="1.2" />
-      </webdoclet>
+		
+		 <strutsconfigxml destdir="${conf.struts.dir}"
+				mergedir="${conf.xdoclet.dir}" version="1.2" />	
+       </webdoclet>
    </target>
 	
 	<!-- =================================================================== -->

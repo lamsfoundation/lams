@@ -1,0 +1,1 @@
+<FlowViewLayout Version="1.2"><StrutsActivity path="/monitoring.do" location="0,0" dimension="320,75" /><StrutsActivity path="" location="146,175" dimension="27,49" /><StrutsTransition id="/monitoring.do,,,1" routingType="0"><AutomaticBendpoints><AbsolutePoint location="160,75" /><AbsolutePoint location="160,175" /></AutomaticBendpoints></StrutsTransition></FlowViewLayout>

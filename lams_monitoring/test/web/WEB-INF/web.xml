@@ -31,75 +31,27 @@ http://www.gnu.org/licenses/gpl.txt
 <context-param>
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
-		/WEB-INF/spring/applicationContext.xml /WEB-INF/spring/toolApplicationContext.xml
-		/WEB-INF/spring/monitoringApplicationContext.xml /WEB-INF/spring/lessonApplicationContext.xml
-		/WEB-INF/spring/authoringApplicationContext.xml	
-		/WEB-INF/spring/dataAccessContext.xml  /WEB-INF/spring/surveyApplicationContext.xml
+		/WEB-INF/spring/applicationContext.xml /org/lamsfoundation/lams/tool/toolApplicationContext.xml
+		/WEB-INF/spring/monitoringApplicationContext.xml /org/lamsfoundation/lams/lesson/lessonApplicationContext.xml	
+		/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml
+		/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml
+		/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml
 	</param-value>
 </context-param>
 
-  <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+    <!--
+    To use non XDoclet filters, create a filters.xml file that
+    contains the additional filters (eg Sitemesh) and place it in your
+    project's merge dir.  Don't include filter-mappings in this file,
+    include them in a file called filter-mappings.xml and put that in
+    the same directory.
+    -->
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
-
-<filter>
-	<filter-name>HibernateFilter</filter-name>
-	<filter-class>org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter</filter-class>
-	<init-param>
-		<param-name>sessionFactoryBeanName</param-name>
-		<param-value>coreSessionFactory</param-value>
-	</init-param>
-	<init-param>
-		<param-name>singleSession</param-name>
-		<param-value>true</param-value>
-	</init-param>
-</filter>
-
-  <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
--->
-<filter-mapping>
-	<filter-name>HibernateFilter</filter-name>
-	<url-pattern>*.do</url-pattern>
-</filter-mapping>
-<filter-mapping>
-	<filter-name>HibernateFilter</filter-name>
-	<url-pattern>*.jsp</url-pattern>
-</filter-mapping>
+    <!--
+    To use non XDoclet filter-mappings, create a filter-mappings.xml file that
+    contains the additional filter-mappings and place it in your
+    project's merge dir.
+    -->
 
     <!--
     To use non XDoclet listeners, create a listeners.xml file that
