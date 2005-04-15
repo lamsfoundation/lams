@@ -87,10 +87,58 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public void setUserDAO(IUserDAO userDAO) {
 		this.userDAO = userDAO;
 	}
-	public void deleteFolder(Integer folderID){
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteFolder(java.lang.Integer, java.lang.Integer)
+	 */
+	public String deleteFolder(Integer folderID, Integer userID)throws IOException{		
 		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(folderID);
-		if(workspaceFolder!=null){
-			workspaceFolderDAO.delete(workspaceFolder);
+		User user = userDAO.getUserById(userID);
+		if(user!=null){
+			if(!getPermissions(workspaceFolder,user).equals(WorkspaceFolder.OWNER_ACCESS)){
+				flashMessage = FlashMessage.getUserNotAuthorized("deleteFolder",userID);
+			}else{
+				if(workspaceFolder!=null){
+					if(isRootFolder(workspaceFolder))
+						flashMessage = new FlashMessage("deleteFolder",
+														"Cannot delete this folder as it is the Root folder.",
+														FlashMessage.ERROR);
+					else{
+						if(!workspaceFolder.isEmpty())
+							flashMessage = new FlashMessage("deleteFolder",
+															"Cannot delete folder with folder_id of: " + folderID +
+															" as it is not empty. Please delete its contents first.",
+															FlashMessage.ERROR);
+						else{
+							workspaceFolderDAO.delete(workspaceFolder);
+							flashMessage = new FlashMessage("deleteFolder","Folder deleted:" + folderID);
+						}
+					}
+				}else
+					flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("deleteFolder",folderID);
+			}
+		}else
+			flashMessage = FlashMessage.getNoSuchUserExists("deleteFolder",userID);
+			
+		return flashMessage.serializeMessage();
+	}	
+	/**
+	 * This method checks if the given <code>workspaceFolder</code> is the
+	 * root folder of any <code>Organisation</code> or <code>User</code>
+	 * 
+	 * @param workspaceFolder The <code>workspaceFolder</code> to be checked
+	 * @return boolean The boolean value indicating whether it is a 
+	 * 		  root folder or not. 
+	 */
+	private boolean isRootFolder(WorkspaceFolder workspaceFolder){
+		try{
+			Workspace workspace = workspaceDAO.getWorkspaceByRootFolderID(workspaceFolder.getWorkspaceFolderId());
+			if(workspace!=null)
+				return true;
+			else
+				return false;
+		}catch(Exception e){
+			return false;
 		}
 	}
 	public String getFolderContents(Integer userID, Integer workspaceFolderID, Integer mode)throws IOException{
@@ -258,14 +306,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		packet.put("workspaceFolderID", workspaceFolder.getWorkspaceFolderId());
 		packet.put("workspaceID",workspaceFolder.getWorkspaceID());
 		return packet;
-	}
-	public boolean isUserPermitted(WorkspaceFolder workspaceFolder, User user){
-		Integer permissions = getPermissions(workspaceFolder, user);
-		if(permissions!=WorkspaceFolder.NO_ACCESS)
-			return true;
-		else
-			return false;
-	}
+	}	
 	public boolean isUserOwner(WorkspaceFolder workspaceFolder, User user){				
 		List folders = workspaceFolderDAO.getWorkspaceFolderByUser(user.getUserId());
 		if(folders!=null && folders.size()!=0){
