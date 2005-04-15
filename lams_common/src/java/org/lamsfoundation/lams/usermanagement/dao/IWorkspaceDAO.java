@@ -40,5 +40,15 @@ public interface IWorkspaceDAO extends IBaseDAO{
 	 * @return Workspace The populated workspace object 
 	 */
 	public Workspace getWorkspaceByID(Integer workspaceID);	
+	
+	/**
+	 * Returns the workspace corresponding to the given
+	 * root_folder_id
+	 * 
+	 * @param rootFolderID The root_folder_id of the workspace
+	 * 					   being looked for
+	 * @return Workspace The populated workspace object 
+	 */
+	public Workspace getWorkspaceByRootFolderID(Integer rootFolderID);
 
 }

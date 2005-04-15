@@ -34,16 +34,21 @@ public class TestWorkspaceManagement extends AbstractLamsTestCase {
 							 "WEB-INF/spring/learningDesignApplicationContext.xml",
 							 "WEB-INF/spring/applicationContext.xml"};		
 	}
-	public void testGetFolderContents()throws IOException{
+	protected String getHibernateSessionFactoryName() {
+		return "coreSessionFactory";
+	}
+	/*public void testGetFolderContents()throws IOException{
 		String packet = workspaceManagementService.getFolderContents(new Integer(4),new Integer(2),WorkspaceManagementService.AUTHORING);		
 		System.out.println(packet);
 	}
 	public void testCopyFolder() throws IOException{
 		String packet = workspaceManagementService.copyFolder(new Integer(2),new Integer(8),new Integer(4));
 		System.out.println(packet);
-	}	
-	protected String getHibernateSessionFactoryName() {
-		return "coreSessionFactory";
+	}*/
+	public void testDeleteFolder() throws IOException{
+		String message = workspaceManagementService.deleteFolder(new Integer(7), new Integer(4));
+		System.out.println(message);
 	}
+	
 
 }

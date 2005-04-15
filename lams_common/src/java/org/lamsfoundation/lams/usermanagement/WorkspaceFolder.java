@@ -312,9 +312,30 @@ public class WorkspaceFolder implements Serializable {
 	 * 				   current workspaces contains subFolders 
 	 */
 	public boolean hasSubFolders(){
-		if (this.childWorkspaceFolders!=null || childWorkspaceFolders.size()!=0)
+		if (this.childWorkspaceFolders!=null && childWorkspaceFolders.size()!=0)
 			return true;
 		else
 			return false;
 	}	
+	/**
+	 * This is a utility function which checks whether the given
+	 * workspace Folder is empty or not.
+	 * 
+	 * TODO As of now it is being assumed that a workspace folder
+	 * can contain only subFolders and Learning designs as its contents.
+	 * For now, other kinds of contents like flat files, zip files,
+	 * documents etc. have not been taken into consideration.
+	 *  
+	 * @return boolean A boolean value indicating whether this
+	 * 				   folder is empty orit contains Learning Designs
+	 */
+	public boolean isEmpty(){
+		if(!hasSubFolders()){
+			if(this.learningDesigns==null || this.learningDesigns.size()==0)
+				return true;
+			else
+				return false;
+		}else
+			return false;
+	}
 }
