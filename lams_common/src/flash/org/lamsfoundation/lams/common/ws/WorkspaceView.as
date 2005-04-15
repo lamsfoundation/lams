@@ -1,0 +1,50 @@
+﻿import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.ws.*
+import org.lamsfoundation.lams.common.mvc.*
+/**
+Authoring view for the canvas
+*/
+class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView 
+{
+	//Canvas clip
+	private var _workspace_mc:MovieClip;
+	
+	/*
+	* Constructor
+	*/
+	public function WorkspaceView (m:Observable, c:Controller,target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number){
+		// Invoke superconstructor, which sets up MVC relationships.
+		// This view has no user inputs, so no controller is required.
+		super (m, c);
+		//
+		createWorkspace (target_mc,depth,x,y,w,h);
+	}
+	/*
+	* Creates workspace movie clip 
+	*
+	* @param   target_mc	The clip in which to create the movie clip.
+	* @param   depth   		The depth at which to create the movie clip.
+	* @param   x   			The movie clip's horizontal position in target.
+	* @param   y   			The movie clip's vertical position in target.
+	*/
+	public function createWorkspace (target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number):Void 
+	{
+		_workspace_mc = target_mc.attachMovie ("Workspace", "workspace_mc", depth);
+		_workspace_mc._x = x;
+		_workspace_mc._y = y;
+		_workspace_mc.bg_mc._width = w;
+		_workspace_mc.bg_mc._height = h;
+        //Workspace initially invisible
+        _workspace_mc._visible = false;
+	}
+	
+	/*
+	* Updates state of the canvas, called by Canvas Model
+	*
+	* @param   o   		The model object that is broadcasting an update.
+	* @param   infoObj  object with details of changes to model
+	*/
+	public function update (o:Observable,infoObj:Object):Void {
+		//Go through update object and update mc with visual changes required 
+	}
+}

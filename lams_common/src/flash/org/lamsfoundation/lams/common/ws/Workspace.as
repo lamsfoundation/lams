@@ -1,0 +1,39 @@
+﻿import org.lamsfoundation.lams.common.ws.*
+import org.lamsfoundation.lams.authoring.*
+
+/**
+* Canvas is
+*/
+class org.lamsfoundation.lams.common.ws.Workspace {
+	//Model
+	private var workspaceModel:WorkspaceModel;
+	//View
+	private var workspaceView:WorkspaceView;
+
+	/**
+	 * workspace Constructor
+	 *
+	 * @param   target_mc	Target clip for attaching view
+	 */
+	public function Workspace (target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number){
+        //trace('workspace.constructor')
+		//Create the model.
+		workspaceModel = new WorkspaceModel();
+		
+		//Create the authoring view and register with model
+		workspaceView = new WorkspaceView(workspaceModel, undefined,target_mc,depth,x,y,w,h);
+		workspaceModel.addObserver(workspaceView);
+	}
+	
+    
+    public function userSelectItem(id:Number){
+        trace('Workspace.userSelectItem');
+        //todo DI 07/04/05 write code user design selection, just a stub at the moment, calls itemSelected
+        itemSelected(1);
+    }
+    
+    private function itemSelected(designId:Number){
+        //Design has been chosen, get Canvas to open design
+        Application.getInstance().getCanvas().openDesignById(designId);
+    }
+}
