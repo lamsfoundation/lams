@@ -190,51 +190,25 @@
     
     
     <!-- bi-directional one-to-many association to LearningDesign -->
-    <set
-        name="childLearningDesigns"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <key>
-            <column name="parent_learning_design_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.learningdesign.LearningDesign"
-        />
+    <set name="childLearningDesigns" lazy="true" inverse="true" cascade="none">
+        <key><column name="parent_learning_design_id" /></key>
+        <one-to-many class="org.lamsfoundation.lams.learningdesign.LearningDesign"/>
     </set>
+    
     <!-- bi-directional one-to-many association to Lesson -->
-    <set
-        name="lessons"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        
-        <key>
-            <column name="learning_design_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.lesson.Lesson"
-        />
+    <set name="lessons" lazy="true" inverse="true" cascade="none">        
+        <key><column name="learning_design_id" /></key>
+        <one-to-many class="org.lamsfoundation.lams.lesson.Lesson"/>
     </set>
+    
     <!-- bi-directional one-to-many association to Transition -->
-    <set
-        name="transitions"
-        lazy="false"
-        inverse="true"
-		cascade="none"
-    >
-       
-        <key>
-            <column name="learning_design_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.learningdesign.Transition"
-        />
+    <set name="transitions" lazy="false" inverse="true" cascade="all">
+    	 <key><column name="learning_design_id" /></key>
+    	 <one-to-many class="org.lamsfoundation.lams.learningdesign.Transition"/>
     </set>
+    
     <!-- bi-directional one-to-many association to Activity -->
-    <set name="activities" lazy="false" inverse="true" cascade="save-update">
+    <set name="activities" lazy="false" inverse="true" cascade="all">
        	<key><column name="learning_design_id" /></key>
         <one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"/>
     </set>
