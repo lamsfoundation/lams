@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt
+-->
+<!DOCTYPE tiles-definitions PUBLIC
+   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
+   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
+ 
+<tiles-definitions>
+<!-- ============= template Definitions ====================== -->
+	<definition name=".baseDef" path="/template/template.jsp">
+		<put name="title" value="Base Template Page"/>
+		<put name="pageHeader" value = "Base Template"/>
+		<put name="header" value="/header.jsp"/>
+		<put name="content" value="/template/baseContent.jsp" />	
+		<put name="footer" value="/footer.jsp"/>	
+	</definition>
+<!-- ============= Exception Page Definitions ====================== -->	
+	<definition name=".systemError" extends=".baseDef" >
+		<put name="title" value="System Error Page"/>
+		<put name="pageHeader" value = "System Exception"/>
+		<put name="content" value="/systemErrorContent.jsp" />	
+	</definition>
+<!-- ============= Gate Page Definitions ====================== -->	
+	<definition name=".viewSynchGate" extends=".baseDef" >
+		<put name="title" value="Synch Gate"/>
+		<put name="pageHeader" value = "View Synch Gate"/>
+		<put name="content" value="/gate/sychGateContent.jsp" />	
+	</definition>
+	<definition name=".viewPermissionGate" extends=".baseDef" >
+		<put name="title" value="Permission Gate"/>
+		<put name="pageHeader" value = "View Permission Gate"/>
+		<put name="content" value="/gate/permissionGateContent.jsp" />	
+	</definition>
+	<definition name=".viewScheduleGate" extends=".baseDef" >
+		<put name="title" value="Schedule Gate"/>
+		<put name="pageHeader" value = "View Schedule Gate"/>
+		<put name="content" value="/gate/scheduleGateContent.jsp" />	
+	</definition>
+	<definition name=".openGate" extends=".baseDef" >
+		<put name="title" value="Open Gate"/>
+		<put name="pageHeader" value = "Open Gate"/>
+		<put name="content" value="/gate/openGateContent.jsp" />	
+	</definition>	
+</tiles-definitions>

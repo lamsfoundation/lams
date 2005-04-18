@@ -69,13 +69,13 @@ public class OpenScheduleGateJob extends QuartzJobBean
         Map properties = context.getJobDetail().getJobDataMap();
         Long gateId = (Long)properties.get("gateId");
         
-        //if(log.isDebugEnabled())
-            log.info("Openning gate......["+gateId.longValue()+"]");
+        if(log.isDebugEnabled())
+            log.debug("Openning gate......["+gateId.longValue()+"]");
         
         monitoringService.openGate(gateId);
         
-        //if(log.isDebugEnabled())
-            log.info("Gate......["+gateId.longValue()+"] opened");
+        if(log.isDebugEnabled())
+            log.debug("Gate......["+gateId.longValue()+"] opened");
     }
     
 

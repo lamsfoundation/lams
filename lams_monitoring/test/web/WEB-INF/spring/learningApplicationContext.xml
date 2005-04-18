@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for lams survey business layer.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="learnerServiceTarget" class="org.lamsfoundation.lams.learning.service.LearnerService" singleton="false">
+		<constructor-arg>
+			<ref bean="progressEngine"/>
+		</constructor-arg>
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
+		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
+		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+		<property name="activityMapping"><ref bean="activityMapping"/></property>
+	</bean>
+	
+	<bean id="learnerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref local="learnerServiceTarget"/></property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="joinLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="calculateProgress">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="completeToolSession">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="completelActivity">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="exitLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="performGrouping">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="knockGate">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+   			</props>
+		</property>
+	</bean> 
+	
+	<!-- bean id="toolService" class="org.lamsfoundation.lams.tool.service.DummyToolService" singleton="false">
+	</bean-->
+
+	<bean id="progressEngine" class="org.lamsfoundation.lams.learning.progress.ProgressEngine" singleton="false">
+	</bean>
+	
+	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">
+		<property name="toolService"><ref bean="lamsCoreToolService"/></property>
+		<property name="baseURL"><value>http://localhost:8080/lams_learning</value></property>
+	</bean>
+	
+	<!-- bean id="dummyLearnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
+		<constructor-arg>
+			<ref bean="progressEngine"/>
+		</constructor-arg>
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+	</bean-->	
+</beans>

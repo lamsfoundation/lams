@@ -76,8 +76,10 @@ import org.springframework.context.ApplicationContextAware;
  * because we need to load up tool's service dynamically according to the
  * selected learning design.</p>
  * 
- * @author Jacky Fang 2/02/2005
+ * @author Jacky Fang 
  * @author Manpreet Minhas
+ * @since 2/02/2005
+ * @version 1.1
  */
 public class MonitoringService implements IMonitoringService,ApplicationContextAware
 {
@@ -267,8 +269,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     public void startlesson(long lessonId) 
     {
-        //if(log.isDebugEnabled())
-            log.info("=============Starting Lesson "+lessonId+"==============");
+        if(log.isDebugEnabled())
+            log.debug("=============Starting Lesson "+lessonId+"==============");
         //we get the lesson just created
         Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
         //initialize tool sessions if necessary
@@ -292,52 +294,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 
         lessonDAO.updateLesson(requestedLesson);
         
-        //if(log.isDebugEnabled())
-            log.info("=============Lesson "+lessonId+" started===============");
-    }
-
-    /**
-     * <p>Runs the system scheduler to start the scheduling for opening gate and
-     * closing gate. It invlovs a couple of steps to start the scheduler:</p>
-     * <li>1. Initialize the resource needed by scheduling job by setting 
-     * 		  them into the job data map.
-     * </li>
-     * <li>2. Create customized triggers for the scheduling.</li>
-     * <li>3. start the scheduling job</li> 
-     * 
-     * @param scheduleGate the gate that needs to be scheduled.
-     */
-    private void runGateScheduler(ScheduleGateActivity scheduleGate)
-    {
-        //if(log.isDebugEnabled())
-            log.info("Running scheduler for gate "+scheduleGate.getActivityId()+"...");
-        JobDetail openScheduleGateJob = getOpenScheduleGateJob();
-        JobDetail closeScheduleGateJob = getCloseScheduleGateJob();
-        //setup the message for scheduling job
-        openScheduleGateJob.setName("openGate");
-        openScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
-        closeScheduleGateJob.setName("closeGate");
-        closeScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
-        //create customized triggers
-        Trigger openGateTrigger = new SimpleTrigger("openGateTrigger",
-                                                    Scheduler.DEFAULT_GROUP, 
-                                                    scheduleGate.getRealGateOpenTime());
-        Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger",
-                                                    Scheduler.DEFAULT_GROUP,
-                                                    scheduleGate.getRealGateCloseTime());
-        //start the scheduling job
-        try
-        {
-            scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
-            scheduler.scheduleJob(closeScheduleGateJob, closeGateTrigger);
-        }
-        catch (SchedulerException e)
-        {
-            throw new MonitoringServiceException("Error occurred at " +
-            		"[runGateScheduler]- fail to start scheduling",e);
-        }
-        //if(log.isDebugEnabled())
-            log.info("Scheduler for Gate "+scheduleGate.getActivityId()+" started...");
+        if(log.isDebugEnabled())
+            log.debug("=============Lesson "+lessonId+" started===============");
     }
 
     /**
@@ -367,9 +325,205 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         // TODO Auto-generated method stub
 
     }
+    
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons()
+     */
+    public String getAllLessons() throws IOException{
+    	List lessons = lessonDAO.getAllLessons(); 
+    	return requestLessonList(lessons);    	
+    }
+    
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons(java.lang.Integer)
+     */
+    public String getAllLessons(Integer userID)throws IOException{
+    	List lessons = lessonDAO.getLessonsForUser(userID);
+    	return requestLessonList(lessons); 
+    }
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
+     */
+    public String getLessonDetails(Long lessonID)throws IOException{
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	if(lesson!=null){
+    		flashMessage = new FlashMessage("getLessonDetails",lesson.getLessonDetails());
+    	}else
+    		flashMessage = new FlashMessage("getLessonDetails",
+    										"No such Lesson with a lessonID of :" + lessonID + " exists.",
+											FlashMessage.ERROR);
+    	return flashMessage.serializeMessage();    	
+    }
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonLearners(java.lang.Long)
+     */
+    public String getLessonLearners(Long lessonID)throws IOException{
+    	Vector lessonLearners = new Vector();
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	if(lesson!=null){
+    		Iterator iterator = lesson.getLessonClass().getLearners().iterator();
+    		while(iterator.hasNext()){
+    			User user = (User)iterator.next();
+    			lessonLearners.add(user.getUserDTO());
+    		}    		
+    		flashMessage = new FlashMessage("getLessonLearners",lessonLearners);
+    	}else
+    		flashMessage = new FlashMessage("getLessonLearners",
+    										 "No such lesson with a lesson_id of :"+ lessonID + " exists",
+											 FlashMessage.ERROR);
+    	return flashMessage.serializeMessage();
+    }    
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearningDesignDetails(java.lang.Long)
+     */
+    public String getLearningDesignDetails(Long lessonID)throws IOException{
+    	Lesson lesson = lessonDAO.getLesson(lessonID);    	
+    	return authoringService.getLearningDesignDetails(lesson.getLearningDesign().getLearningDesignId());
+    }
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLearnersProgress(java.lang.Long)
+     */
+    public String getAllLearnersProgress(Long lessonID)throws IOException {
+    	Vector progressData = new Vector();
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	if(lesson!=null){
+    		Iterator iterator = lesson.getLearnerProgresses().iterator();
+    		while(iterator.hasNext()){
+    			LearnerProgress learnerProgress = (LearnerProgress)iterator.next();
+    			progressData.add(learnerProgress.getLearnerProgressData());
+    		}
+    		flashMessage = new FlashMessage("getAllLearnersProgress",progressData);
+    	}else{
+    			flashMessage = new FlashMessage("getAllLearnersProgress",
+    											"No such lesson with a lesson_id of :"+ lessonID + " exists",
+												FlashMessage.ERROR);
+    	}
+    	return flashMessage.serializeMessage();
+    } 
+    
+    /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityById(long)
+     */
+    public Activity getActivityById(long activityId)
+    {
+        return activityDAO.getActivityByActivityId(new Long(activityId));
+    }
+    
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllContributeActivities(java.lang.Long)
+     */
+    public String getAllContributeActivities(Long lessonID)throws IOException{
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	if(lesson!=null){
+    		Vector sortedSet = getOrderedActivityTree(lesson.getLearningDesign());
+    		flashMessage = new FlashMessage("getAllContributeActivities",sortedSet);
+    	}else{
+    		flashMessage = new FlashMessage("getAllContributeActivities",
+    										"No such lesson with a lesson_id of " + lessonID + "exists",
+											FlashMessage.ERROR);
+    	}
+    	return flashMessage.serializeMessage();    	
+    }
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearnerActivityURL(java.lang.Long, java.lang.Integer)
+     */
+    public String getLearnerActivityURL(Long activityID,Integer userID)throws IOException, LamsToolServiceException{    	
+    	Activity activity = activityDAO.getActivityByActivityId(activityID);
+    	User user = userDAO.getUserById(userID);
+    	if(activity==null || user==null){
+    		flashMessage = new FlashMessage("getLearnerActivityURL",
+    										"Invalid activityID/User :" + activityID + " : " + userID,
+											FlashMessage.ERROR);
+    	}else{
+    		if(activity.isToolActivity()){
+        		ToolActivity toolActivity = (ToolActivity)activity;        		
+        		String toolURL = lamsCoreToolService.getLearnerToolURLByMode(toolActivity,user,ToolAccessMode.TEACHER);        		
+        		flashMessage = new FlashMessage("getLearnerActivityURL",new ProgressActivityDTO(activityID,toolURL));
+        	}else{
+        		flashMessage = new FlashMessage("getLearnerActivityURL",
+        										"Invalid Activity type: " + activity.getActivityId()+ "\n Only ToolActivity allowed.",
+												FlashMessage.ERROR);
+        	}    		
+    	}   	
+    	
+    	return flashMessage.serializeMessage();
+    }	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityContributionURL(java.lang.Long)
+	 */
+	public String getActivityContributionURL(Long activityID)throws IOException{
+		Activity activity = activityDAO.getActivityByActivityId(activityID);
+		if(activity!=null){
+			if(activity.isToolActivity()){
+				ToolActivity toolActivity = (ToolActivity)activity;
+				String contributionURL = toolActivity.getTool().getContributeUrl();
+				flashMessage = new FlashMessage("getActivityContributionURL",contributionURL);
+			}
+		}else
+			flashMessage = FlashMessage.getNoSuchActivityExists("getActivityContributionURL",activityID);
+		
+		return flashMessage.serializeMessage();
+	}
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#moveLesson(java.lang.Long, java.lang.Integer, java.lang.Integer)
+	 */
+	public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID,Integer userID)throws IOException{
+		Lesson lesson = lessonDAO.getLesson(lessonID);
+		if(lesson!=null){
+			if(lesson.getUser().getUserId().equals(userID)){
+				WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetWorkspaceFolderID);
+				if(workspaceFolder!=null){
+					LearningDesign learningDesign = lesson.getLearningDesign();
+					learningDesign.setWorkspaceFolder(workspaceFolder);
+					learningDesignDAO.update(learningDesign);
+					flashMessage = new FlashMessage("moveLesson",targetWorkspaceFolderID);
+				}
+				else
+					flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("moveLesson",targetWorkspaceFolderID);
+			}else
+				flashMessage = FlashMessage.getUserNotAuthorized("moveLesson",userID);
+		}else{
+			flashMessage = new FlashMessage("moveLesson",
+											"No such lesson with a lesson_id of :" + lessonID +" exists.",
+											FlashMessage.ERROR);
+											
+		}
+		return flashMessage.serializeMessage();
+		
+	}
+	 /**
+	  * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#renameLesson(java.lang.Long, java.lang.String, java.lang.Integer)
+	 */
+	public String renameLesson(Long lessonID, String newName, Integer userID)throws IOException{
+	 	Lesson lesson = lessonDAO.getLesson(lessonID);
+	 	if(lesson!=null){
+	 		if(lesson.getUser().getUserId().equals(userID)){
+	 			lesson.setLessonName(newName);
+	 			lessonDAO.updateLesson(lesson);
+	 			flashMessage = new FlashMessage("renameLesson",newName);
+	 		}else
+	 			flashMessage = FlashMessage.getUserNotAuthorized("renameLesson",userID);
+	 	}else
+	 		flashMessage = new FlashMessage("renameLesson",
+	 										"No such lesson with a lesson_id of :" + lessonID +" exists.",
+											FlashMessage.ERROR);
+	 	return flashMessage.serializeMessage();
+	 }
 
+	
     //---------------------------------------------------------------------
-    // Helper Methods
+    // Helper Methods - create lesson
     //---------------------------------------------------------------------
     /**
      * Create a new lesson and setup all the staffs and learners who will be
@@ -447,7 +601,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         return toolActivity.getTool().getServiceName().equals("surveyService");
     }
-
+    
+    //---------------------------------------------------------------------
+    // Helper Methods - start lesson
+    //---------------------------------------------------------------------
     /**
      * Create lams tool session for requested learner in the lesson. After the
      * creation of lams tool session, it delegates to the tool instances to 
@@ -498,15 +655,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         return activity.isToolActivity()
                 && !((ToolActivity) activity).getApplyGrouping().booleanValue();
     }
-    
-        /**
-     * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons()
-     */
-    public String getAllLessons() throws IOException{
-    	List lessons = lessonDAO.getAllLessons(); 
-    	return requestLessonList(lessons);    	
-    }
+
     /**
      * This method returns the list of lessons in WDDX format
      * 
@@ -524,135 +673,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     	FlashMessage flashMessage = new FlashMessage("getAllLessons",lessonObjects);
     	return flashMessage.serializeMessage();    	
     }
-    /**
-     * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons(java.lang.Integer)
-     */
-    public String getAllLessons(Integer userID)throws IOException{
-    	List lessons = lessonDAO.getLessonsForUser(userID);
-    	return requestLessonList(lessons); 
-    }
-    /**
-     * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
-     */
-    public String getLessonDetails(Long lessonID)throws IOException{
-    	Lesson lesson = lessonDAO.getLesson(lessonID);
-    	if(lesson!=null){
-    		flashMessage = new FlashMessage("getLessonDetails",lesson.getLessonDetails());
-    	}else
-    		flashMessage = new FlashMessage("getLessonDetails",
-    										"No such Lesson with a lessonID of :" + lessonID + " exists.",
-											FlashMessage.ERROR);
-    	return flashMessage.serializeMessage();    	
-    }
-    /**
-     * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonLearners(java.lang.Long)
-     */
-    public String getLessonLearners(Long lessonID)throws IOException{
-    	Vector lessonLearners = new Vector();
-    	Lesson lesson = lessonDAO.getLesson(lessonID);
-    	if(lesson!=null){
-    		Iterator iterator = lesson.getLessonClass().getLearners().iterator();
-    		while(iterator.hasNext()){
-    			User user = (User)iterator.next();
-    			lessonLearners.add(user.getUserDTO());
-    		}    		
-    		flashMessage = new FlashMessage("getLessonLearners",lessonLearners);
-    	}else
-    		flashMessage = new FlashMessage("getLessonLearners",
-    										 "No such lesson with a lesson_id of :"+ lessonID + " exists",
-											 FlashMessage.ERROR);
-    	return flashMessage.serializeMessage();
-    }    
-    /**
-     * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearningDesignDetails(java.lang.Long)
-     */
-    public String getLearningDesignDetails(Long lessonID)throws IOException{
-    	Lesson lesson = lessonDAO.getLesson(lessonID);    	
-    	return authoringService.getLearningDesignDetails(lesson.getLearningDesign().getLearningDesignId());
-    }
-    /**
-     * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLearnersProgress(java.lang.Long)
-     */
-    public String getAllLearnersProgress(Long lessonID)throws IOException {
-    	Vector progressData = new Vector();
-    	Lesson lesson = lessonDAO.getLesson(lessonID);
-    	if(lesson!=null){
-    		Iterator iterator = lesson.getLearnerProgresses().iterator();
-    		while(iterator.hasNext()){
-    			LearnerProgress learnerProgress = (LearnerProgress)iterator.next();
-    			progressData.add(learnerProgress.getLearnerProgressData());
-    		}
-    		flashMessage = new FlashMessage("getAllLearnersProgress",progressData);
-    	}else{
-    			flashMessage = new FlashMessage("getAllLearnersProgress",
-    											"No such lesson with a lesson_id of :"+ lessonID + " exists",
-												FlashMessage.ERROR);
-    	}
-    	return flashMessage.serializeMessage();
-    }   
-    /**
-     * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllContributeActivities(java.lang.Long)
-     */
-    public String getAllContributeActivities(Long lessonID)throws IOException{
-    	Lesson lesson = lessonDAO.getLesson(lessonID);
-    	if(lesson!=null){
-    		Vector sortedSet = getOrderedActivityTree(lesson.getLearningDesign());
-    		flashMessage = new FlashMessage("getAllContributeActivities",sortedSet);
-    	}else{
-    		flashMessage = new FlashMessage("getAllContributeActivities",
-    										"No such lesson with a lesson_id of " + lessonID + "exists",
-											FlashMessage.ERROR);
-    	}
-    	return flashMessage.serializeMessage();    	
-    }
-    /**
-     * (non-Javadoc)
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearnerActivityURL(java.lang.Long, java.lang.Integer)
-     */
-    public String getLearnerActivityURL(Long activityID,Integer userID)throws IOException, LamsToolServiceException{    	
-    	Activity activity = activityDAO.getActivityByActivityId(activityID);
-    	User user = userDAO.getUserById(userID);
-    	if(activity==null || user==null){
-    		flashMessage = new FlashMessage("getLearnerActivityURL",
-    										"Invalid activityID/User :" + activityID + " : " + userID,
-											FlashMessage.ERROR);
-    	}else{
-    		if(activity.isToolActivity()){
-        		ToolActivity toolActivity = (ToolActivity)activity;        		
-        		String toolURL = lamsCoreToolService.getLearnerToolURLByMode(toolActivity,user,ToolAccessMode.TEACHER);        		
-        		flashMessage = new FlashMessage("getLearnerActivityURL",new ProgressActivityDTO(activityID,toolURL));
-        	}else{
-        		flashMessage = new FlashMessage("getLearnerActivityURL",
-        										"Invalid Activity type: " + activity.getActivityId()+ "\n Only ToolActivity allowed.",
-												FlashMessage.ERROR);
-        	}    		
-    	}   	
-    	
-    	return flashMessage.serializeMessage();
-    }	
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityContributionURL(java.lang.Long)
-	 */
-	public String getActivityContributionURL(Long activityID)throws IOException{
-		Activity activity = activityDAO.getActivityByActivityId(activityID);
-		if(activity!=null){
-			if(activity.isToolActivity()){
-				ToolActivity toolActivity = (ToolActivity)activity;
-				String contributionURL = toolActivity.getTool().getContributeUrl();
-				flashMessage = new FlashMessage("getActivityContributionURL",contributionURL);
-			}
-		}else
-			flashMessage = FlashMessage.getNoSuchActivityExists("getActivityContributionURL",activityID);
-		
-		return flashMessage.serializeMessage();
-	}
 	/**
      * This method assigns an orderID to all the activties in the LearningDesign
      * based on the transitions. Once this is done it just packages it in a container 
@@ -705,56 +725,56 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 		}				
 		return activitySet;
 	}	
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#moveLesson(java.lang.Long, java.lang.Integer, java.lang.Integer)
-	 */
-	public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID,Integer userID)throws IOException{
-		Lesson lesson = lessonDAO.getLesson(lessonID);
-		if(lesson!=null){
-			if(lesson.getUser().getUserId().equals(userID)){
-				WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetWorkspaceFolderID);
-				if(workspaceFolder!=null){
-					LearningDesign learningDesign = lesson.getLearningDesign();
-					learningDesign.setWorkspaceFolder(workspaceFolder);
-					learningDesignDAO.update(learningDesign);
-					flashMessage = new FlashMessage("moveLesson",targetWorkspaceFolderID);
-				}
-				else
-					flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("moveLesson",targetWorkspaceFolderID);
-			}else
-				flashMessage = FlashMessage.getUserNotAuthorized("moveLesson",userID);
-		}else{
-			flashMessage = new FlashMessage("moveLesson",
-											"No such lesson with a lesson_id of :" + lessonID +" exists.",
-											FlashMessage.ERROR);
-											
-		}
-		return flashMessage.serializeMessage();
-		
-	}
-	 /**
-	  * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#renameLesson(java.lang.Long, java.lang.String, java.lang.Integer)
-	 */
-	public String renameLesson(Long lessonID, String newName, Integer userID)throws IOException{
-	 	Lesson lesson = lessonDAO.getLesson(lessonID);
-	 	if(lesson!=null){
-	 		if(lesson.getUser().getUserId().equals(userID)){
-	 			lesson.setLessonName(newName);
-	 			lessonDAO.updateLesson(lesson);
-	 			flashMessage = new FlashMessage("renameLesson",newName);
-	 		}else
-	 			flashMessage = FlashMessage.getUserNotAuthorized("renameLesson",userID);
-	 	}else
-	 		flashMessage = new FlashMessage("renameLesson",
-	 										"No such lesson with a lesson_id of :" + lessonID +" exists.",
-											FlashMessage.ERROR);
-	 	return flashMessage.serializeMessage();
-	 }
-    
+
+    //---------------------------------------------------------------------
+    // Helper Methods - scheduling
+    //---------------------------------------------------------------------
     /**
-     *
+     * <p>Runs the system scheduler to start the scheduling for opening gate and
+     * closing gate. It invlovs a couple of steps to start the scheduler:</p>
+     * <li>1. Initialize the resource needed by scheduling job by setting 
+     * 		  them into the job data map.
+     * </li>
+     * <li>2. Create customized triggers for the scheduling.</li>
+     * <li>3. start the scheduling job</li> 
+     * 
+     * @param scheduleGate the gate that needs to be scheduled.
+     */
+    private void runGateScheduler(ScheduleGateActivity scheduleGate)
+    {
+        if(log.isDebugEnabled())
+            log.debug("Running scheduler for gate "+scheduleGate.getActivityId()+"...");
+        JobDetail openScheduleGateJob = getOpenScheduleGateJob();
+        JobDetail closeScheduleGateJob = getCloseScheduleGateJob();
+        //setup the message for scheduling job
+        openScheduleGateJob.setName("openGate");
+        openScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
+        closeScheduleGateJob.setName("closeGate");
+        closeScheduleGateJob.getJobDataMap().put("gateId",scheduleGate.getActivityId());
+        //create customized triggers
+        Trigger openGateTrigger = new SimpleTrigger("openGateTrigger",
+                                                    Scheduler.DEFAULT_GROUP, 
+                                                    scheduleGate.getRealGateOpenTime());
+        Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger",
+                                                    Scheduler.DEFAULT_GROUP,
+                                                    scheduleGate.getRealGateCloseTime());
+        //start the scheduling job
+        try
+        {
+            scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
+            scheduler.scheduleJob(closeScheduleGateJob, closeGateTrigger);
+        }
+        catch (SchedulerException e)
+        {
+            throw new MonitoringServiceException("Error occurred at " +
+            		"[runGateScheduler]- fail to start scheduling",e);
+        }
+        if(log.isDebugEnabled())
+            log.debug("Scheduler for Gate "+scheduleGate.getActivityId()+" started...");
+    }
+
+    /**
+     * Returns the bean that defines the open schedule gate job.
      */
     private JobDetail getOpenScheduleGateJob()
     {
@@ -762,10 +782,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     }
     
     /**
-     * 
+     * Returns the bean that defines the close schdule gate job.
      */
     private JobDetail getCloseScheduleGateJob()
     {
         return (JobDetail)applicationContext.getBean("closeScheduleGateJob");
     }
+
 }

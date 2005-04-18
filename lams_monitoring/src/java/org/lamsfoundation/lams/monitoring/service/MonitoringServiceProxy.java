@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import javax.servlet.ServletContext;
 
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -44,17 +45,26 @@ public class MonitoringServiceProxy
 {
 
     /**
-     * Return the learner domain service object. It will delegate to the Spring
+     * Return the monitor domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.
      * @param servletContext the servletContext for current application
-     * @return learner service object.
+     * @return monitoring service object.
      */
     public static final IMonitoringService getMonitoringService(ServletContext servletContext)
     {
         return (IMonitoringService)getDomainService(servletContext,"monitoringService");
     }
     
-    
+    /**
+     * Return the learner domain service object. It will delegate to the Spring
+     * helper method to retrieve the proper bean from Spring bean factory.
+     * @param servletContext the servletContext for current application
+     * @return learner service object.
+     */
+    public static final ILearnerService getLearnerService(ServletContext servletContext)
+    {
+        return (ILearnerService)getDomainService(servletContext,"learnerService");
+    }
     /**
      * Retrieve the proper Spring bean from bean factory. 
      * @param servletContext the servletContext for current application

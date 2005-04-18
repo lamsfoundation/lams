@@ -13,10 +13,12 @@
   <!-- ========== Form Bean Definitions =================================== -->
   <form-beans>
 
-    <!--
-         If you have non XDoclet forms, define them in a file called struts-forms.xml and
-         place it in your merge directory.
-    -->
+   <form-bean name="GateForm"  type="org.apache.struts.action.DynaActionForm">
+	<form-property name="activityId" type="java.lang.Long" />
+	<form-property name="waitingLearners" type="java.lang.Integer" />
+	<form-property name="totalLearners" type="java.lang.Integer" />
+</form-bean>
+
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -72,6 +74,43 @@ http://www.gnu.org/licenses/gpl.txt
         redirect="false"
       />
     </action>
+    <action
+      path="/gate"
+      type="org.lamsfoundation.lams.monitoring.web.GateAction"
+      name="GateForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <exception
+        key="error.system.monitor"
+        type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
+        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        path=".systemError"
+        scope="request"
+      />
+      <forward
+        name="viewSynchGate"
+        path=".viewSynchGate"
+        redirect="false"
+      />
+      <forward
+        name="viewPermissionGate"
+        path=".viewPermissionGate"
+        redirect="false"
+      />
+      <forward
+        name="viewScheduleGate"
+        path=".viewScheduleGate"
+        redirect="false"
+      />
+      <forward
+        name="openGate"
+        path=".openGate"
+        redirect="false"
+      />
+    </action>
 
     <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
   </action-mappings>
@@ -101,6 +140,13 @@ http://www.gnu.org/licenses/gpl.txt
 
 <message-resources parameter="org.lamsfoundation.lams.monitoring.MonitoringResources" />
 
-   <!-- Define your Struts plugins in a file called struts-plugins.xml and place it in your merge directory. -->
+  <!-- ===================== Plugin Definition  ======================== -->
+<plug-in className="org.apache.struts.tiles.TilesPlugin">
+	<set-property property="definitions-config"
+		value="/WEB-INF/struts/tiles-defs.xml" />
+	<set-property property="definitions-debug" value="0" />
+	<set-property property="definitions-parser-details" value="0" />
+	<set-property property="definitions-parser-validate" value="true" />
+</plug-in>
 
 </struts-config>

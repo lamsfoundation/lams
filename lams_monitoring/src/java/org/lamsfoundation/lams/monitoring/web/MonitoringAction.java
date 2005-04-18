@@ -40,7 +40,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 
 /**
- * 
  * <p>The action servlet that provide all the monitoring functionalities. It
  * interact with the teacher via flash and JSP monitoring interface.</p>
  * 
@@ -114,7 +113,10 @@ public class MonitoringAction extends LamsDispatchAction
 
         monitoringService.startlesson(lessonId);
 
-        return mapping.findForward(SCHEDULER);
+        //TODO add the wddx acknowledgement code.
+        
+        //return mapping.findForward(SCHEDULER);
+        return null;
     }
 
 }

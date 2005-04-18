@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.monitoring.service;
 import java.io.IOException;
 import java.util.List;
 
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -209,4 +210,11 @@ public interface IMonitoringService
      * @throws IOException
      */
     public String renameLesson(Long lessonID, String newName, Integer userID)throws IOException;
+    
+    /**
+     * Return an activity object based on the requested id.
+     * @param activityId id of the activity.
+     * @return the requested activity object.
+     */
+    public Activity getActivityById(long activityId);
 }
