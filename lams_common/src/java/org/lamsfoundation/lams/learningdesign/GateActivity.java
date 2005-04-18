@@ -186,7 +186,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
         
 	    return ((GateActivityStrategy)simpleActivityStrategy).shouldOpenGateFor(learner,lessonLearners,this);
 	}
-	
+
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------

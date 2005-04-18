@@ -43,6 +43,9 @@ import org.lamsfoundation.lams.util.Nullable;
  */
 public abstract class Activity implements Serializable,Nullable {
 
+    //---------------------------------------------------------------------
+    // Class Level Constants
+    //---------------------------------------------------------------------
 	/**
 	 * static final variables indicating the type of activities
 	 * available for a LearningDesign 
@@ -76,6 +79,9 @@ public abstract class Activity implements Serializable,Nullable {
 	public static final int GROUPING_SUPPORT_REQUIRED = 3;
 	/******************************************************************/
 	
+    //---------------------------------------------------------------------
+    // Instance variables
+    //---------------------------------------------------------------------
 	/** WDDX packet specific attribute created to identify the
 	 * type of object being passed.*/
 	public static final String OBJECT_TYPE ="Activity";
@@ -172,33 +178,12 @@ public abstract class Activity implements Serializable,Nullable {
 	private Boolean applyGrouping;
 	
 	private Integer groupingSupportType;
-	
-	/**
-	 * @return Returns the applyGrouping.
-	 */
-	public Boolean getApplyGrouping() {
-		return applyGrouping;
-	}
-	/**
-	 * @param applyGrouping The applyGrouping to set.
-	 */
-	public void setApplyGrouping(Boolean applyGrouping) {
-		this.applyGrouping = applyGrouping;
-	}
-	/**
-	 * @return Returns the groupingSupportType.
-	 */
-	public Integer getGroupingSupportType() {
-		return groupingSupportType;
-	}
-	/**
-	 * @param groupingSupportType The groupingSupportType to set.
-	 */
-	public void setGroupingSupportType(Integer groupingSupportType) {
-		this.groupingSupportType = groupingSupportType;
-	}	
+
 	protected SimpleActivityStrategy simpleActivityStrategy;
 	
+    //---------------------------------------------------------------------
+    // Object constructors
+    //---------------------------------------------------------------------
 	/** full constructor */
 	public Activity(
 			Long activityId,
@@ -268,7 +253,32 @@ public abstract class Activity implements Serializable,Nullable {
 		this.transitionTo = transitionTo;
 		this.transitionFrom = transitionFrom;
 	}
-
+	
+	public static Object getActivityInstance(int activityType)
+	{
+		switch(activityType){
+			case TOOL_ACTIVITY_TYPE:
+				return new ToolActivity();
+			case OPTIONS_ACTIVITY_TYPE:
+				return new OptionsActivity();
+			case PARALLEL_ACTIVITY_TYPE:
+				return new ParallelActivity();
+			case SEQUENCE_ACTIVITY_TYPE:
+				return new SequenceActivity();
+			case SYNCH_GATE_ACTIVITY_TYPE:
+				return new SynchGateActivity();
+			case SCHEDULE_GATE_ACTIVITY_TYPE:
+				return new ScheduleGateActivity();
+			case PERMISSION_GATE_ACTIVITY_TYPE:
+				return new PermissionGateActivity();
+			default:
+				return new GroupingActivity();
+		}
+	}
+	
+    //---------------------------------------------------------------------
+    // Getters and Setters
+    //---------------------------------------------------------------------	
 	/**
 	 * @hibernate.activityUIID generator-class="identity" type="java.lang.Long"
 	 *               column="activity_id"
@@ -447,6 +457,32 @@ public abstract class Activity implements Serializable,Nullable {
 	public void setActivityTypeId(Integer activityTypeId) {
 		this.activityTypeId = activityTypeId;
 	}
+
+	/**
+	 * @return Returns the applyGrouping.
+	 */
+	public Boolean getApplyGrouping() {
+		return applyGrouping;
+	}
+	/**
+	 * @param applyGrouping The applyGrouping to set.
+	 */
+	public void setApplyGrouping(Boolean applyGrouping) {
+		this.applyGrouping = applyGrouping;
+	}
+	/**
+	 * @return Returns the groupingSupportType.
+	 */
+	public Integer getGroupingSupportType() {
+		return groupingSupportType;
+	}
+	/**
+	 * @param groupingSupportType The groupingSupportType to set.
+	 */
+	public void setGroupingSupportType(Integer groupingSupportType) {
+		this.groupingSupportType = groupingSupportType;
+	}	
+	
 	public String toString() {
 		return new ToStringBuilder(this).append("activityId", getActivityId())
 				.toString();
@@ -555,6 +591,30 @@ public abstract class Activity implements Serializable,Nullable {
 	}
 	
 	/**
+	 * @return Returns the onlineInstructions.
+	 */
+	public String getOnlineInstructions() {
+		return onlineInstructions;
+	}
+	/**
+	 * @param onlineInstructions The onlineInstructions to set.
+	 */
+	public void setOnlineInstructions(String onlineInstructions) {
+		this.onlineInstructions = onlineInstructions;
+	}
+
+	public Integer getActivityCategoryID() 
+	{
+		return activityCategoryID;
+	}
+	public void setActivityCategoryID(Integer activityCategoryID) 
+	{
+		this.activityCategoryID = activityCategoryID;
+	}
+    //---------------------------------------------------------------------
+    // Service Methods 
+    //---------------------------------------------------------------------	
+	/**
 	 * This method that get all tool activities belong to a particular activity. 
 	 * 
 	 * As the activity object structure might be infinite, we recursively loop
@@ -609,6 +669,9 @@ public abstract class Activity implements Serializable,Nullable {
 	    
 	    return new NullGroup();
 	}
+    //---------------------------------------------------------------------
+    // Activity Type checking methods
+    //---------------------------------------------------------------------
 	/**
 	 * Check up whether an activity is tool activity or not.
 	 * @return is this activity a tool activity?
@@ -626,50 +689,56 @@ public abstract class Activity implements Serializable,Nullable {
 	{
 	    return getActivityTypeId().intValue()==SEQUENCE_ACTIVITY_TYPE;
 	}
-	public boolean isComplexActivity(){
+	
+	public boolean isComplexActivity()
+	{
 		return getActivityTypeId().intValue()== SEQUENCE_ACTIVITY_TYPE || 
 			   getActivityTypeId().intValue()== PARALLEL_ACTIVITY_TYPE ||
 			   getActivityTypeId().intValue()== OPTIONS_ACTIVITY_TYPE;
 	}
-	public boolean isGateActivity(){
+	
+	public boolean isGateActivity()
+	{
 		return getActivityTypeId().intValue()== SCHEDULE_GATE_ACTIVITY_TYPE ||
 			   getActivityTypeId().intValue()== PERMISSION_GATE_ACTIVITY_TYPE ||
 			   getActivityTypeId().intValue()== SYNCH_GATE_ACTIVITY_TYPE;
-				
 	}
-	public boolean isGroupingActivity(){
+	
+	/**
+	 * Check up whether an activity is synch gate activity or not.
+	 * @return is this activity a synch gate activity?
+	 */
+	public boolean isSynchGate()
+	{
+	    return getActivityTypeId().intValue() == SYNCH_GATE_ACTIVITY_TYPE;
+	}
+	
+	/**
+	 * Check up whether an activity is permission gate activity or not.
+	 * @return is this activity a permission gate activity.
+	 */
+	public boolean isPermissionGate()
+	{
+	    return getActivityTypeId().intValue() == PERMISSION_GATE_ACTIVITY_TYPE;
+	}
+	
+	/**
+	 * Check up whether an activity is schedule gate activity or not.
+	 * @return is this activity a schedule gate activity.
+	 */
+	public boolean isScheduleGate()
+	{
+	    return getActivityTypeId().intValue() == SCHEDULE_GATE_ACTIVITY_TYPE;
+	}
+	
+	public boolean isGroupingActivity()
+	{
 		return getActivityTypeId().intValue()== GROUPING_ACTIVITY_TYPE;
 	}
 
-	public Integer getActivityCategoryID() {
-		return activityCategoryID;
-	}
-	public void setActivityCategoryID(Integer activityCategoryID) {
-		this.activityCategoryID = activityCategoryID;
-	}
-	public Set getMonitoringActivityDTO(Integer[] contributionType){
-		HashSet dtoSet = new HashSet();
-		for(int i=0;i<contributionType.length;i++){
-			dtoSet.add(new MonitoringActivityDTO(this,contributionType[i]));
-		}
-		return dtoSet;
-	}
-	public AuthoringActivityDTO getAuthoringActivityDTO(){
-		return new AuthoringActivityDTO(this);
-	}
-	/**
-	 * @return Returns the onlineInstructions.
-	 */
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
-	/**
-	 * @param onlineInstructions The onlineInstructions to set.
-	 */
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-	
+    //---------------------------------------------------------------------
+    // Data Transfer object creation methods
+    //---------------------------------------------------------------------
 	/**
 	 * Return the activity dto for progress view.
 	 * @return the activity dto.
@@ -678,24 +747,19 @@ public abstract class Activity implements Serializable,Nullable {
 	{
 	    return new ProgressActivityDTO(this.activityId);
 	}
-	public static Object getActivityInstance(int activityType){
-		switch(activityType){
-			case TOOL_ACTIVITY_TYPE:
-				return new ToolActivity();
-			case OPTIONS_ACTIVITY_TYPE:
-				return new OptionsActivity();
-			case PARALLEL_ACTIVITY_TYPE:
-				return new ParallelActivity();
-			case SEQUENCE_ACTIVITY_TYPE:
-				return new SequenceActivity();
-			case SYNCH_GATE_ACTIVITY_TYPE:
-				return new SynchGateActivity();
-			case SCHEDULE_GATE_ACTIVITY_TYPE:
-				return new ScheduleGateActivity();
-			case PERMISSION_GATE_ACTIVITY_TYPE:
-				return new PermissionGateActivity();
-			default:
-				return new GroupingActivity();
+	
+	
+	public Set getMonitoringActivityDTO(Integer[] contributionType)
+	{
+		HashSet dtoSet = new HashSet();
+		for(int i=0;i<contributionType.length;i++){
+			dtoSet.add(new MonitoringActivityDTO(this,contributionType[i]));
 		}
+		return dtoSet;
+	}
+	
+	public AuthoringActivityDTO getAuthoringActivityDTO()
+	{
+		return new AuthoringActivityDTO(this);
 	}
 }
