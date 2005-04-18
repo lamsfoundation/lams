@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.contentrepository;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryAdmin;
 import org.springframework.aop.MethodBeforeAdvice;
 
 /** 

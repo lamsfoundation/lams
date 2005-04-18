@@ -19,7 +19,7 @@
   http://www.gnu.org/licenses/gpl.txt 
 */
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +47,6 @@ import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
 import org.lamsfoundation.lams.contentrepository.PropertyType;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.SimpleVersionedNode;
 import org.lamsfoundation.lams.contentrepository.ValidationException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.dao.hibernate.WorkspaceDAO;

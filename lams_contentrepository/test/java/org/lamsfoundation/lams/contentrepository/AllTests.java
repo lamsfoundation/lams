@@ -21,11 +21,13 @@
 
 package org.lamsfoundation.lams.contentrepository;
 
-import org.lamsfoundation.lams.contentrepository.dao.file.TestFileDAO;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.lamsfoundation.lams.contentrepository.dao.file.TestFileDAO;
+import org.lamsfoundation.lams.contentrepository.service.TestSimpleTicket;
+import org.lamsfoundation.lams.contentrepository.service.TestSimpleVersionedNode;
+import org.lamsfoundation.lams.contentrepository.service.TestSimpleRepository;
 
 /**
  * Runs all the currently implemented tests for the Content Repository.

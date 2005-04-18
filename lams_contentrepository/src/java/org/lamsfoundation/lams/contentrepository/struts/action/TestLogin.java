@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.SimpleCredentials;
+import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 
 
 /** 

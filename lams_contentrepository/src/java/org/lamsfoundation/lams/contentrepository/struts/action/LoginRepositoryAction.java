@@ -30,13 +30,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.IRepository;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.ItemExistsException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.SimpleCredentials;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.contentrepository.struts.form.LoginRepositoryForm;
 
 
@@ -114,7 +114,7 @@ public class LoginRepositoryAction extends RepositoryDispatchAction {
 		String workspaceName = loginRepositoryForm.getWorkspaceName();
 		ICredentials cred =  new SimpleCredentials(toolName, toolId); 
 
-		IRepository repository = Download.getRepository();
+		IRepositoryService repository = Download.getRepository();
 		
 		if ( createWorkspaceFirst ) {
 			try {

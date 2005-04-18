@@ -21,7 +21,7 @@
 
 package org.lamsfoundation.lams.contentrepository.dao.file;
 
-import org.lamsfoundation.lams.contentrepository.BaseTestCase;
+import org.lamsfoundation.lams.contentrepository.service.BaseTestCase;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.dao.file.FileDAO;
 

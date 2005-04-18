@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
-import org.lamsfoundation.lams.contentrepository.IRepository;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IValue;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
@@ -43,6 +42,7 @@ import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -98,7 +98,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Download extends HttpServlet {
 
-	private static IRepository repository = null;
+	private static IRepositoryService repository = null;
 
 	protected static Logger log = Logger.getLogger(Download.class);
 
@@ -352,8 +352,8 @@ public class Download extends HttpServlet {
 	 */
 	public void init() throws ServletException {
 		System.err.println("Repository Demo calling context and getting repository singleton.");
-		ApplicationContext context = new ClassPathXmlApplicationContext(IRepository.REPOSITORY_CONTEXT_PATH);
-		repository = (IRepository)context.getBean(IRepository.REPOSITORY_SERVICE_ID);
+		ApplicationContext context = new ClassPathXmlApplicationContext(IRepositoryService.REPOSITORY_CONTEXT_PATH);
+		repository = (IRepositoryService)context.getBean(IRepositoryService.REPOSITORY_SERVICE_ID);
 	}
 
 
@@ -395,7 +395,7 @@ public class Download extends HttpServlet {
 	/**
 	 * @return Returns the repository.
 	 */
-	public static IRepository getRepository() {
+	public static IRepositoryService getRepository() {
 		return repository;
 	}
 }

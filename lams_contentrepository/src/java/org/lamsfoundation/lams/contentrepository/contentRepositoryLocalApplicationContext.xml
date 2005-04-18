@@ -150,7 +150,7 @@
 		
 	</bean>
 
-	<bean id="repositoryTarget" class="org.lamsfoundation.lams.contentrepository.SimpleRepository">
+	<bean id="repositoryTarget" class="org.lamsfoundation.lams.contentrepository.service.SimpleRepository">
 		<property name="workspaceDAO"><ref bean="workspaceDAO"/></property>
 		<property name="credentialDAO"><ref bean="credentialDAO"/></property>
 	</bean>
@@ -158,7 +158,7 @@
 	<bean id="checkCredentialTicketBeforeAdvice" class="org.lamsfoundation.lams.contentrepository.CheckCredentialTicketBeforeAdvice">
 	</bean>
 
-	<bean id="node" class="org.lamsfoundation.lams.contentrepository.SimpleVersionedNode"
+	<bean id="node" class="org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode"
 		singleton="false" destroy-method="destroy">
 		<property name="nodeDAO"><ref bean="nodeDAO"/></property>
 		<property name="fileDAO"><ref bean="fileDAO"/></property>

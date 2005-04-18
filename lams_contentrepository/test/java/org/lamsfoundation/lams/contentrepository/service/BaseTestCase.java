@@ -19,11 +19,13 @@
   http://www.gnu.org/licenses/gpl.txt 
 */
 
-package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository.service;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.BasicConfigurator;
+import org.lamsfoundation.lams.contentrepository.ICredentials;
+import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -67,12 +69,12 @@ public class BaseTestCase extends TestCase {
 		// this is run for each test so once we have it, we don't
 		// want to get it again!
 		if ( context == null ) {
-			context = new ClassPathXmlApplicationContext(IRepository.LOCAL_CONTEXT_PATH);
+			context = new ClassPathXmlApplicationContext(IRepositoryService.LOCAL_CONTEXT_PATH);
 		}
 		
 		if ( repository == null ) {
 			// get repository object from bean factory
-			repository =(IRepositoryAdmin)context.getBean(IRepository.REPOSITORY_SERVICE_ID);
+			repository =(IRepositoryAdmin)context.getBean(IRepositoryService.REPOSITORY_SERVICE_ID);
 			ICredentials cred = new SimpleCredentials(INITIAL_WORKSPACE_USER, INITIAL_WORKSPACE_PASSWORD);
 			try { 
 				ticket = repository.login(cred, INITIAL_WORKSPACE);

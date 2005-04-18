@@ -6,7 +6,7 @@
 
 <p>
 This content repository is designed to store single files and 
-packages of files on disk in a relatively. It is not a full 
+packages of files on disk in a relatively simple way. It is not a full 
 blown repository as you would find behind a web development
 package. 
 </p>
@@ -18,7 +18,7 @@ and the information about the files is stored in the lams_cr_* tables
 in the database.
 </p>
 <p>
-A node may represent a single file (a FILENODE) or be a package node. A 
+A node may represent a single file (a file node) or be a package node. A 
 package node has a set of child nodes which are file nodes. 
 </p>
 <UL>
@@ -53,8 +53,8 @@ and not the implemented classes to allow the implementation to be changed in the
 <TABLE>
 <TR><TD>ICredentials,SimpleCredentials</TD><TD>SimpleCredentials is an implementation of ICredentials. To log in, the 
 tool will create a SimpleCredentials object.</TD></TR>
-<TR><TD>IRepository</TD><TD>The interface used for access to the repository. This is the equivalent of a SLSB interface
-to the repository. It is implemented by singleton SimpleRepository and accessed via the Spring context. </TD></TR>
+<TR><TD>IRepositoryService</TD><TD>The interface used for access to the repository. This is the equivalent of a SLSB interface
+to the repository. It is implemented by singleton SimpleRepository and the RepositoryProxy. </TD></TR>
 <TR><TD>ITicket</TD><TD>The Ticket represents the "authorisation" key to the repository. When the tool logs in, it
 will be passed a SimpleTicket object, which implements the ITicket interface. This ticket must be supplied
 back to the repository to access the tool's nodes.</TD></TR>
@@ -75,24 +75,53 @@ Used to get the appropriate property from a node. e.g. IValue value = node.getPr
 <TR><TD>PropertyType</TD><TD>Defines what type a property really is - String, Long, Double, etc.</TD></TR>
 </TABLE>
 
-<p>Note:  All interfaces with Admin in their name are only to be used within the repository and must not be used by tools. 
-It is intended to make these protected interfaces if possible - they are used by Spring so this may be difficult.</p>
+<p>Note:  All interfaces with Admin in their name are only to be used within the repository and must not be used by tools. </p>
 
 <h2>Typical Usage</h2>
 
 <P>
 Sample usage of the repository can be seen in example webapp, built as lamscr.war. The struts classes
 are in org.lamsfoundation.lams.contentrepository.struts (in the src hierarchy)
-and the jsps are in the web hierarchy.
+and the jsps are in the web hierarchy. The content repository is also used by the 
+IMS Content Package Reader tool.
 </P>
 
-<P>When a tool is installed, it should identify itself to the repository and create a new workspace</P>
+<P>To access the repository service object:
 <PRE>
-	ApplicationContext context = new ClassPathXmlApplicationContext(IRepository.REPOSITORY_CONTEXT_PATH);
-	IRepository	repository = (IRepository)context.getBean(IRepository.REPOSITORY_SERVICE_ID);
-	ICredentials cred =  new SimpleCredentials(toolName, toolId); 
-	repository.createCredential(cred);
-	repository.addWorkspace(cred, workspaceName);
+	IRepositoryService repositoryService = RepositoryProxy.getRepositoryService();
+</PRE>
+
+If you are trying to use the repository service in JUnit test cases, use the special 
+local version of the repository service. This uses a local database connection, rather
+than the JNDI dataservice.
+
+<PRE>
+	IRepositoryService repositoryService = RepositoryProxy.getLocalRepositoryService();
+</PRE>
+
+<P>When a tool is first run, it should identify itself to the repository and create a new workspace.
+The "password" must be 6 or more characters.</P>
+<PRE>
+	private String repositoryWorkspaceName = "myworkspace";
+	private String repositoryUser = "toolname";
+	private char[] repositoryId = {'s','o','m','e','t','h','i','n','g','1'}; 
+
+	private void configureContentRepository() {
+		IRepositoryService repService = RepositoryProxy.getRepositoryService();
+		ICredentials cred = new SimpleCredentials(repositoryUser, repositoryId);
+		try {
+			repService.createCredentials(cred);
+			repService.addWorkspace(cred,repositoryWorkspaceName);
+		} catch (ItemExistsException ie) {
+			log.warn("Tried to configure repository but it "
+					+" appears to be already configured. Exception thrown by repository being ignored. ", ie);
+		} catch (RepositoryCheckedException e) {
+			String error = "Error occured while trying to configure repository."
+				+" Unable to recover from error: "+e.getMessage();
+			log.error(error, e);
+			throw new Exception(error,e);
+		}
+	}
 </PRE>
 
 <P>Before accessing the repository, the tool will need to log in.
@@ -106,38 +135,63 @@ says) so the tool may keep it for months if it wants. But if the tool
 receives an access denied exception, then something has gone wrong and the 
 ticket is no longer valid so the tool should log in again and get a new
 ticket.</P>
+
 <PRE>
-	ITicket ticket = repository.login(cred, workspaceName);
+	private ITicket getTicket( ) throws Exception {
+		ICredentials cred = new SimpleCredentials(repositoryUser, repositoryId);
+		try {
+			try { 
+				repositoryTicket = repositoryService.login(cred, repositoryWorkspaceName);
+			} catch ( WorkspaceNotFoundException e ) {
+				log.error("Content Repository workspace for blah tool not configured. Attempting to configure now.");
+				configureContentRepository();
+				repositoryTicket = repositoryService.login(cred, repositoryWorkspaceName);
+			}
+		} catch ( RepositoryCheckedException e ) {
+			String error = "Unable to get repository service. Exception: "+e.getMessage();
+			log.error(error,e);
+			throw new Exception(error,e);
+		}
+		return repositoryTicket;
+	}
 </PRE>
 
 <P>Using the ticket, the tool can now add, retrieve and delete nodes. Deleting a package
 node deletes all the files in the package. Warning: deleting 
 removes the node completely - from both the database and the file system.</P>
 <PRE>
-	NodeKey fileNodeKeyV1 = repository.login.addFileItem(ticket, inputstream, filename, 
-						mimeType, versionDescription);
-	IVersionedNode version1Node = repository.getFileItem(ticket,fileNodeKeyV1.getUuid(), fileNodeKeyV1.getVersion());
+		
+	User uploads a file:
+	NodeKey nodeKey1 = repositoryService.addFileItem(repositoryTicket, 
+							fileInputStream, 
+							filename, 
+							fileMimeType, 
+							"This is the initial version");
 
-	NodeKey fileNodeKeyV2 = getRepository().updateFileItem(ticket, fileNodeKeyV1.getUuid(), filename,
-	IVersionedNode version2Node = repository.getFileItem(ticket,fileNodeKeyV2.getUuid(), fileNodeKeyV2.getVersion());
-	IVersionedNode latestFileVersionNode = repository.getFileItem(ticket,fileNodeKeyV2.getUuid(), null);
-	InputStream isForOutputToScreen1 = latestFileVersionNode.getFile();
+	User uploads a new version of the file:
+	NodeKey nodeKey2 = repositoryService.updateFileItem(repositoryTicket, 
+							nodeKey1.getUuid(), 
+							filename,
+							fileInputStream, 
+							fileMimeType, 
+							"This is the updated version);
 
-	String[] problemFiles = repository.deleteVersion(ticket,fileNodeKeyV1.getUuid(), fileNodeKeyV1.getVersion());
+	Get the second version of the file:
+	IVersionedNode node = repositoryService.getFileItem(repositoryTicket, 
+							nodeKey2.getUuid(), nodeKey2.getVersion());
+	
+	Delete the second version of the file:
+	String[] problemFiles = repositoryService.deleteVersion(repositoryTicket,nodeKey2.getUuid(), nodeKey2.getVersion());
 
-	NodeKey packageNodeKeyV1 = repository.addPackageItem(ticket,directoryName, initialFile, versionDescription);
-	IVersionedNode package1Node = repository.getFileItem(packageNodeKeyV1.getUuid(), packageNodeKeyV1.getVersion());
-
-	NodeKey packageNodeKeyV2 = repository.updatePackageItem(ticket, packageNodeKeyV1.getUuid(), directoryName, initialFile, versionDescription);
-	IVersionedNode package2Node = repository.getFileItem(packageNodeKeyV2.getUuid(), packageNodeKeyV2.getVersion());
-	IVersionedNode latestPackageVersionNode = repository.getFileItem(ticket,fileNodeKeyV2.getUuid(), null);
-	InputStream isForOutputToScreen2 = latestPackageVersionNode();
-
-	String[] problemFiles2 = getRepository().deleteNode(ticket,packageNodeKeyV1.getUuid());
+	Delete all versions of the file:
+	String[] problemFiles = repositoryService.deleteNode(repositoryTicket, nodeKey2.getUuid());
 </PRE>
 
-<p>When the tool is complete, it should logout from the repository. This
-invalidates the ticket.</p>
+<p>Similar methods exist for packages of files. See IRepositoryService for all the available calls.</p>
+
+<p>In theory, when the tool is complete, it should logout from the repository. This invalidates the ticket.
+In practise, our tools are likely to never logout.</p>
+
 <PRE>
 	repository.logout(ticket);
 </PRE>
@@ -175,15 +229,11 @@ first. But it isn't perfect. </p>
 org.lamsfoundation.lams.contentrepository.contentRepositoryApplicationContext.xml 
 (in the src hierarchy). Defaults to D:\repository. This can reside anywhere it 
 can be accessed as a directory - it does not need to be under the JBOSS hierarchy.
-</LI>
-<LI><STRONG>Database connection</STRONG> Edit 
-org.lamsfoundation.lams.contentrepository.contentRepositoryApplicationContext.xml 
-(in the src hierarchy). Defaults to jdbc:mysql://localhost/lams.
-</LI>
-<LI><STRONG>Database user and password</STRONG> Edit properties.xml (in the root of the project)
+<EM>This needs to be changed to pick up the value from the database!</EM></LI>
+<LI><STRONG>Database user and password</STRONG> Edit build.properties (in the root of the project)
 to set the JBOSS directory. This is required for the database related ANT tasks.
 </LI>
-<LI><STRONG>JBOSS location</STRONG> Edit properties.xml (in the root of the project)
+<LI><STRONG>JBOSS location</STRONG> Edit build.properties (in the root of the project)
 to set the JBOSS directory. This is required for the deploy and copyfiles ANT tasks.
 </LI>
 <LI><STRONG>JUNIT Testing</STRONG> Edit the TEXT_FILEPATH, TEXT_FILENAME, BINARY_FILEPATH
@@ -203,18 +253,14 @@ path to a file within the directory.
 the content repository code.
 <UL>
 <LI>
-With the database running, run the <STRONG>create-db-tables</STRONG> then the 
-<STRONG>insert-test-data</STRONG> targets.<BR>
-The create-db-tables and insert-test-data targets can be run at any time. If you 
-run the create-db-tables then you will need to clear out all the directories in the 
-repository otherwise it fail when it uses an id that has a file in the repository.
-You must run insert-test-data  before running the JUNIT tests or the
-create workspace and create user tests will fail (as the test values to be added
-will already exist). 
+With the database running, run the <STRONG>rebuild-db</STRONG> and
+<STRONG>insert-test-data</STRONG> from the lams_common build
+file, and delete any old files in the content repository file directory.
 </LI>
 <LI>
-At this point, you can run the JUNIT tests if desired. To run them, run the 
-org.lamsfoundation.lams.contentrepositoryAllTests junit test suite. This will
+At this point, you can run the JUNIT tests if desired. To run them, run 
+the the <STRONG>test-report</STRONG> task in the build file, 
+or run the org.lamsfoundation.lams.contentrepositoryAllTests junit test suite. This will
 run all the current tests. Note: the NodeTransactionTest class is not
 complete so it is not included in the test suite.
 </LI>
@@ -226,7 +272,7 @@ One jar that you are likely to be missing it the commons upload.
 This is not required for the repository per se, but is required for the example web app.
 </LI>
 <LI>
-Finally, run the <STRONG>deploy-lamscr-jar</STRONG> or <STRONG>deploy-lamscr-jarwar</STRONG> target
+Finally, run the <STRONG>deploy-jar</STRONG> or <STRONG>deploy-jarwar</STRONG> target
 (and not both). Both targets will compile and deploy the jar file, while
 the second one will also deploy the example usage war file. The jar file 
 is the repository code. The war file is the example web app. The war file is 
@@ -237,5 +283,29 @@ changed to deploy these files separately.
 </LI>
 </UL>
 
+<h2>Demonstration Servlet</h2>
+<p>To get a feel for how to use the content repository, you can run the 
+demonstration servlet. Build the content repository war file (using the 
+deploy jarwar ant task) and then run JBOSS. Go to the URL 
+http://localhost:8080/lams_contentrepository/. </p>
+
+<p>If you have set up the test data (using lams_common test data task)
+then you can log in as atool/atool to workspace atoolworkspace. Otherwise 
+create your own workspace. </p>
+
+<p>This demonstration will allow you to upload a file (as a file node) 
+or a directory (as a package node), and then view the files. You can also 
+list all the files in the package. To be able to upload a directory,
+the directory given must be on the server which is running JBOSS, as 
+the code will do a local filesystem lookup. For example, if you 
+are running on your local PC, then you can refer to any directory
+on your PC. If you are running it on one of the development servers,
+then the directory needs to exist on the development server, not on your
+PC!</p>
+
+<P>Make sure you put an entry in a version description when adding a file 
+- this is a mandatory field and the demo will not add the file unless 
+there is a version description. But the validation is broken so the
+error message doesn't appear.</P> 
 </body>
 </html>
