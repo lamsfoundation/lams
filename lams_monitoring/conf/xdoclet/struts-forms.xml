@@ -3,5 +3,7 @@
 	<form-property name="activityId" type="java.lang.Long" />
 	<form-property name="waitingLearners" type="java.lang.Integer"/>
 	<form-property name="totalLearners" type="java.lang.Integer" />
+	<form-property name="startingTime" type="java.util.Date" />
+	<form-property name="endingTime" type="java.util.Date" />
 </form-bean>
 

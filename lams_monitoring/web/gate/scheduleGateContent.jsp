@@ -23,7 +23,6 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="/WEB-INF/struts/struts-logic-el.tld" prefix="logic-el" %>
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>		
 <%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
-
 <tr>
 	<td>
         <table width="100%" height="295" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only"> 
@@ -38,7 +37,18 @@ http://www.gnu.org/licenses/gpl.txt
 				    <%@ include file="gateInfo.jsp" %>
 			        <tr><td>&nbsp; </td></tr>
 			        <tr><td>&nbsp; </td></tr>
-						
+					<tr>
+						<td width="50%" class="body">Schedule Gate will be opened at:</td>
+						<td width="50%" class="bodyBold">
+							<fmt:formatDate value="${GateForm.map.startingTime}" type="both" dateStyle="default" timeStyle="default"/>
+						</td>
+					</tr>		
+					<tr>
+						<td width="50%" class="body">Schedule Gate will be closed at:</td>
+						<td width="50%" class="bodyBold">
+							<fmt:formatDate value="${GateForm.map.endingTime}" type="both" dateStyle="default" timeStyle="default"/>
+						</td>
+					</tr>
                 </table> 
                 <!-- end of Page Content table--> 
               </div></td> 

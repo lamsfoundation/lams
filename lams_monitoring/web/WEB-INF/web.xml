@@ -37,7 +37,8 @@ http://www.gnu.org/licenses/gpl.txt
   		classpath*:/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml
   		classpath*:/WEB-INF/authoringApplicationContext.xml
   		classpath*:/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml
-  		classpath*:/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml       					  
+  		classpath*:/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml
+  		classpath*:/org/lamsfoundation/lams/learning/learningApplicationContext.xml        					  
 		classpath*:applicationContext.xml
 	</param-value>
 </context-param>
