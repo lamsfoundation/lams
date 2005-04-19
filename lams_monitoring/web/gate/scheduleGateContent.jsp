@@ -33,12 +33,12 @@ http://www.gnu.org/licenses/gpl.txt
                 <table width="90%" border="0" cellspacing="0" cellpadding="0" summary="This table is being used for layout purposes only"> 
 					<tr><td>&nbsp; </td></tr> 
 					<tr> 
-					    <td height="31" colspan="3"> <div class="heading" align="center"><fmt:message key="label.synch.gate"/></div></td> 
-					</tr> 				  
-					<%@ include file="gateInfo.jsp" %>
-				    <tr><td>&nbsp; </td></tr>
-				    <tr><td>&nbsp; </td></tr>
-					<%@ include file="openGate.jsp" %>
+					    <td height="31" colspan="3"> <div class="heading" align="center"><fmt:message key="label.schedule.gate"/></div></td> 
+					</tr> 					  
+				    <%@ include file="gateInfo.jsp" %>
+			        <tr><td>&nbsp; </td></tr>
+			        <tr><td>&nbsp; </td></tr>
+						
                 </table> 
                 <!-- end of Page Content table--> 
               </div></td> 
@@ -50,5 +50,3 @@ http://www.gnu.org/licenses/gpl.txt
 
 	</td>
 </tr>
-
-

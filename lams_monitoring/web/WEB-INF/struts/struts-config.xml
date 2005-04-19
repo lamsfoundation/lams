@@ -14,8 +14,9 @@
   <form-beans>
 
    <form-bean name="GateForm"  type="org.apache.struts.action.DynaActionForm">
+	<form-property name="gate" type="org.lamsfoundation.lams.learningdesign.GateActivity" />
 	<form-property name="activityId" type="java.lang.Long" />
-	<form-property name="waitingLearners" type="java.lang.Integer" />
+	<form-property name="waitingLearners" type="java.lang.Integer"/>
 	<form-property name="totalLearners" type="java.lang.Integer" />
 </form-bean>
 
@@ -78,7 +79,7 @@ http://www.gnu.org/licenses/gpl.txt
       path="/gate"
       type="org.lamsfoundation.lams.monitoring.web.GateAction"
       name="GateForm"
-      scope="request"
+      scope="session"
       parameter="method"
       unknown="false"
       validate="false"
@@ -103,11 +104,6 @@ http://www.gnu.org/licenses/gpl.txt
       <forward
         name="viewScheduleGate"
         path=".viewScheduleGate"
-        redirect="false"
-      />
-      <forward
-        name="openGate"
-        path=".openGate"
         redirect="false"
       />
     </action>

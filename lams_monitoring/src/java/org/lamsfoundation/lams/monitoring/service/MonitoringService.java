@@ -301,21 +301,23 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#openGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */
-    public void openGate(Long gateId)
+    public GateActivity openGate(Long gateId)
     {
         GateActivity gate = (GateActivity)activityDAO.getActivityByActivityId(gateId);
         gate.setGateOpen(new Boolean(true));
         activityDAO.update(gate);
+        return gate;
     }
 
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#closeGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */
-    public void closeGate(Long gateId)
+    public GateActivity closeGate(Long gateId)
     {
         GateActivity gate = (GateActivity)activityDAO.getActivityByActivityId(gateId);
         gate.setGateOpen(new Boolean(false));
         activityDAO.update(gate);
+        return gate;
     }
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#forceCompleteLessonByUser(long)

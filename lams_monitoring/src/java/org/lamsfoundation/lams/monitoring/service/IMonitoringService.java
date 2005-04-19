@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -86,13 +87,13 @@ public interface IMonitoringService
      * is triggerred by the system scheduler.
      * @param gate the id of the gate we need to open.
      */
-    public void openGate(Long gateId);
+    public GateActivity openGate(Long gateId);
     
     /**
      * Set the gate to closed.
      * @param gate the id of the gate we need to close.
      */
-    public void closeGate(Long gateId);
+    public GateActivity closeGate(Long gateId);
     
     /**
      * This method returns a string representing a list of all 

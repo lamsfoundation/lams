@@ -36,6 +36,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
@@ -71,6 +72,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * @struts:action name="GateForm"
  * 				  path="/gate" 
  *                parameter="method" 
+ * 				  scope="session"
  *                validate="false"
  * @struts.action-exception key="error.system.monitor" scope="request"
  *                          type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
@@ -79,7 +81,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * @struts:action-forward name="viewSynchGate" path=".viewSynchGate"
  * @struts:action-forward name="viewPermissionGate" path=".viewPermissionGate"
  * @struts:action-forward name="viewScheduleGate" path=".viewScheduleGate"
- * @struts:action-forward name="openGate" path=".openGate"
  * ----------------XDoclet Tags--------------------
  * 
  */
@@ -98,7 +99,6 @@ public class GateAction extends LamsDispatchAction
     private static final String VIEW_SYNCH_GATE = "viewSynchGate";
     private static final String VIEW_PERMISSION_GATE = "viewPermissionGate";
     private static final String VIEW_SCHEDULE_GATE="viewScheduleGate";
-    private static final String OPEN_GATE = "openGate";
     //---------------------------------------------------------------------
     // Class level constants - session attributes
     //---------------------------------------------------------------------
@@ -157,19 +157,9 @@ public class GateAction extends LamsDispatchAction
                                                     .size();
         gateForm.set("totalLearners",new Integer(totalLearners));
         
-        //dispatch the view according to the type of the gate.
-        if(gate.isSynchGate())
-            return viewSynchGate(mapping,gateForm,(SynchGateActivity)gate);
-        else if(gate.isScheduleGate())
-            return viewScheduleGate(mapping,gateForm,(ScheduleGateActivity)gate);
-        else if(gate.isPermissionGate())
-            return viewPermissionGate(mapping,gateForm,(PermissionGateActivity)gate);
-        else
-            throw new MonitoringServiceException("Invalid gate activity. " +
-            		"gate id ["+gate.getActivityId()+"] - the type ["+
-            		gate.getActivityTypeId()+"] is not a gate type");
+        
+        return findViewByGateType(mapping, gateForm, gate);
     }
-
     /**
      * Open the gate if is closed.
      * 
@@ -195,36 +185,81 @@ public class GateAction extends LamsDispatchAction
 
         DynaActionForm gateForm = (DynaActionForm)form;
         
-        monitoringService.openGate((Long)gateForm.get("activityId"));
-        
-        return mapping.findForward(OPEN_GATE);
+        GateActivity gate = monitoringService.openGate((Long)gateForm.get("activityId"));
+            
+        return findViewByGateType(mapping, gateForm, gate);
     }
 
+    //---------------------------------------------------------------------
+    // Helper Methods
+    //---------------------------------------------------------------------
     /**
+     * Dispatch view the according to the gate type.
      * 
-     * @param mapping
-     * @param gateForm
-     * @param permissionGate
-     * @return
+     * @param mapping An ActionMapping class that will be used by the Action 
+     * class to tell the ActionServlet where to send the end-user.
+     * @param gateForm The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param permissionGate the gate acitivty object
+     * @return An ActionForward class that will be returned to the ActionServlet 
+     * 		   indicating where the user is to go next.
+     */
+    private ActionForward findViewByGateType(ActionMapping mapping, 
+                                             DynaActionForm gateForm, 
+                                             Activity gate)
+    {
+        //dispatch the view according to the type of the gate.
+        if(gate.isSynchGate())
+            return viewSynchGate(mapping,gateForm,(SynchGateActivity)gate);
+        else if(gate.isScheduleGate())
+            return viewScheduleGate(mapping,gateForm,(ScheduleGateActivity)gate);
+        else if(gate.isPermissionGate())
+            return viewPermissionGate(mapping,gateForm,(PermissionGateActivity)gate);
+        else
+            throw new MonitoringServiceException("Invalid gate activity. " +
+            		"gate id ["+gate.getActivityId()+"] - the type ["+
+            		gate.getActivityTypeId()+"] is not a gate type");
+    }
+
+
+
+    /**
+     * Set up the form attributes specific to the permission gate and navigate
+     * to the permission gate view.
+     * @param mapping An ActionMapping class that will be used by the Action 
+     * class to tell the ActionServlet where to send the end-user.
+     * @param gateForm The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param permissionGate the gate acitivty object
+     * @return An ActionForward class that will be returned to the ActionServlet 
+     * 		   indicating where the user is to go next.
      */
     private ActionForward viewPermissionGate(ActionMapping mapping,
                                              DynaActionForm gateForm,
                                              PermissionGateActivity permissionGate)
     {
+        gateForm.set("gate",permissionGate);
         gateForm.set("waitingLearners",new Integer(permissionGate.getWaitingLearners().size()));
         return mapping.findForward(VIEW_PERMISSION_GATE);
     }
 
     /**
-     * @param mapping
-     * @param gateForm
-     * @param scheduleGate
-     * @return
+     * Set up the form attributes specific to the schedule gate and navigate
+     * to the schedule gate view.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action 
+     * class to tell the ActionServlet where to send the end-user.
+     * @param gateForm The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param permissionGate the gate acitivty object
+     * @return An ActionForward class that will be returned to the ActionServlet 
+     * 		   indicating where the user is to go next.
      */
     private ActionForward viewScheduleGate(ActionMapping mapping, 
                                            DynaActionForm gateForm,
                                            ScheduleGateActivity scheduleGate)
     {
+        gateForm.set("gate",scheduleGate);
         gateForm.set("waitingLearners",new Integer(scheduleGate.getWaitingLearners().size()));
         //gateForm.set("startingTime",scheduleGate.get);
         
@@ -232,16 +267,22 @@ public class GateAction extends LamsDispatchAction
     }
 
     /**
+     * Set up the form attributes specific to the synch gate and navigate
+     * to the synch gate view.
      * 
-     * @param mapping
-     * @param gateForm
-     * @param synchgate
-     * @return
+     * @param mapping An ActionMapping class that will be used by the Action 
+     * class to tell the ActionServlet where to send the end-user.
+     * @param gateForm The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param permissionGate the gate acitivty object
+     * @return An ActionForward class that will be returned to the ActionServlet 
+     * 		   indicating where the user is to go next.
      */
     private ActionForward viewSynchGate(ActionMapping mapping,
                                         DynaActionForm gateForm,
                                         SynchGateActivity synchgate)
     {
+        gateForm.set("gate",synchgate);
         gateForm.set("waitingLearners",new Integer(synchgate.getWaitingLearners().size()));
         return mapping.findForward(VIEW_SYNCH_GATE);
     }

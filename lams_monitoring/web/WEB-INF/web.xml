@@ -105,11 +105,11 @@ http://www.gnu.org/licenses/gpl.txt
 	<url-pattern>*.jsp</url-pattern>
 </filter-mapping>
 
-    <!--
-    To use non XDoclet listeners, create a listeners.xml file that
-    contains the additional listeners and place it in your
-    project's merge dir.
-    -->
+  <listener>
+	<listener-class>
+		org.springframework.web.context.ContextLoaderListener
+	</listener-class>
+</listener>	
 
  <!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
@@ -131,11 +131,6 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-<listener>
-	<listener-class>
-		org.springframework.web.context.ContextLoaderListener
-	</listener-class>
-</listener>	
 <servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
