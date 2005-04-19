@@ -28,6 +28,8 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
 	
 	private static final String ALL_IN_FOLDER ="from " + TABLENAME +" in class " + LearningDesign.class.getName()+
 												" where workspace_folder_id=?";
+	private static final String FIND_BY_PARENT ="from " + TABLENAME +" in class " + LearningDesign.class.getName()+
+												" where parent_learning_design_id=?";
 		
 	
 	/* 
@@ -74,6 +76,14 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
 	 */
 	public List getAllLearningDesignsInFolder(Integer workspaceFolderID) {
 		return this.getHibernateTemplate().find(ALL_IN_FOLDER,workspaceFolderID);
+	}
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO#getLearningDesignsByParent(java.lang.Long)
+	 */
+	public List getLearningDesignsByParent(Long parentDesignID){
+		List list = this.getHibernateTemplate().find(FIND_BY_PARENT,parentDesignID);
+		return list;
 	}
 	
 }

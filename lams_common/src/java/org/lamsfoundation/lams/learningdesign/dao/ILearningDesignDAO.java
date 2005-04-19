@@ -54,5 +54,13 @@ public interface ILearningDesignDAO extends IBaseDAO{
 	 */
 	public List getAllLearningDesignsInFolder(Integer workspaceFolderID);
 	
-	
+	/**
+	 * This method returns a List of Learning Designs with given  
+	 * <code>parent_learning_design_id</code>
+	 * 
+	 * @param parentDesignID The <code>parent_learning_design_id</code>
+	 * @return List The List of all corresponding Learning designs with
+	 * 				given <code>parent_learning_design_id</code> 
+	 */
+	public List getLearningDesignsByParent(Long parentDesignID);
 }

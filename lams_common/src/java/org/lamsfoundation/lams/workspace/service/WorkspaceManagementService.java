@@ -141,6 +141,10 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			return false;
 		}
 	}
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getFolderContents(java.lang.Integer, java.lang.Integer, java.lang.Integer)
+	 */
 	public String getFolderContents(Integer userID, Integer workspaceFolderID, Integer mode)throws IOException{
 		User user = userDAO.getUserById(userID);
 		WorkspaceFolder workspaceFolder = null;
@@ -281,25 +285,59 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		packet.put("workspaceFolderID", workspaceFolder.getWorkspaceFolderId());
 		packet.put("contents", contents);
 		return packet;
-	}
-	public String copyFolder(Integer folderID,Integer newWorkspaceFolderID,Integer userID)throws IOException{
-				
-		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(folderID);
-		if(workspaceFolder!=null){
-			try{
-				WorkspaceFolder newFolder = createFolder(newWorkspaceFolderID,workspaceFolder.getName(),userID);
-				copyRootContent(workspaceFolder,newFolder,userID);				
-				if(workspaceFolder.hasSubFolders())
-					createSubFolders(workspaceFolder, newFolder,userID);
-				flashMessage = new FlashMessage("copyFolder",createCopyFolderPacket(newFolder));
-			}catch(UserException ue){
-				flashMessage = FlashMessage.getNoSuchUserExists("copyFolder",userID);
-			}catch(WorkspaceFolderException we){
-				flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("copyFolder", newWorkspaceFolderID);
-			}
-		}		
+	}	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#copyFolder(java.lang.Integer, java.lang.Integer, java.lang.Integer)
+	 */
+	public String copyFolder(Integer folderID,Integer newFolderID,Integer userID)throws IOException{
+		try{
+			if(isUserAuthorized(newFolderID,userID)){
+				WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(folderID);
+				if(workspaceFolder!=null){
+					WorkspaceFolder newFolder = createFolder(newFolderID,workspaceFolder.getName(),userID);
+					copyRootContent(workspaceFolder,newFolder,userID);				
+					if(workspaceFolder.hasSubFolders())
+						createSubFolders(workspaceFolder, newFolder,userID);
+					flashMessage = new FlashMessage("copyFolder",createCopyFolderPacket(newFolder));
+				}else
+					throw new WorkspaceFolderException();				
+			}else
+				flashMessage = FlashMessage.getUserNotAuthorized("copyFolder", userID);
+		}catch(UserException ue){
+			flashMessage = FlashMessage.getNoSuchUserExists("copyFolder",userID);
+		}catch(WorkspaceFolderException we){
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("copyFolder",folderID);
+		}
 		return flashMessage.serializeMessage();
+	}
+	/**
+	 * This method checks whether the user is authorized to create 
+	 * a new folder under the given WorkspaceFolder.
+	 * 
+	 * @param folderID The <code>workspace_folder_id</code> of the <code>WorkspaceFolder<code>
+	 * 				   under which the User wants to create/copy folder
+	 * @param userID The <code>User</code> being checked
+	 * @return boolean A boolean value indicating whether or not the <code>User</code> is authorized
+	 * @throws UserException
+	 * @throws WorkspaceFolderException
+	 */
+	private boolean isUserAuthorized(Integer folderID, Integer userID)throws UserException, WorkspaceFolderException{
+		boolean authorized = false;
+		User user = userDAO.getUserById(userID);
+		if(user!=null){
+			WorkspaceFolder targetParent = workspaceFolderDAO.getWorkspaceFolderByID(folderID);
+			if(targetParent!=null){
+				Integer permissions = getPermissions(targetParent,user);
+				if(!permissions.equals(WorkspaceFolder.NO_ACCESS)&&
+						!permissions.equals(WorkspaceFolder.READ_ACCESS))
+					authorized = true;
+			}else
+				throw new WorkspaceFolderException();
+		}else
+			throw new UserException();
 		
+		return authorized;
 	}
 	private Hashtable createCopyFolderPacket(WorkspaceFolder workspaceFolder){
 		Hashtable packet = new Hashtable();
@@ -335,7 +373,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			}
 		}
 	}
-	private WorkspaceFolder createFolder(Integer parentFolderID, String name, Integer userID) throws UserException,WorkspaceFolderException{
+	public WorkspaceFolder createFolder(Integer parentFolderID, String name, Integer userID) throws UserException,WorkspaceFolderException{
 		WorkspaceFolder parentFolder = workspaceFolderDAO.getWorkspaceFolderByID(parentFolderID);		
 		User user =null;
 		Workspace workspace =null;		
@@ -411,5 +449,67 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			if(subFolder.hasSubFolders())
 				createSubFolders(subFolder,newSubFolder,userID);
 		}
+	}
+	/**
+	 * TODO Deleting a LearningDesign would mean deleting all its corresponding
+	 * activities, transitions and the content related to such activities.
+	 * Deletion of content has to be yet taken care of. Since Tools manage there
+	 * own content.Just need to cross-check this once tools are functional
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteLearningDesign(java.lang.Long)
+	 */
+	public String deleteLearningDesign(Long learningDesignID, Integer userID)throws IOException{
+		User user = userDAO.getUserById(userID);
+		if(user!=null){
+			LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignID);
+			if(learningDesign!=null){
+				if(learningDesign.getUser().getUserId().equals(user.getUserId())){
+					if(learningDesign.getReadOnly().booleanValue()){
+						flashMessage = new FlashMessage("deleteLearningDesign",
+														"Cannot delete design with learning_design_id of:" + learningDesignID +
+														" as it is READ ONLY.",
+														FlashMessage.ERROR);
+					}else{
+						List list = learningDesignDAO.getLearningDesignsByParent(learningDesignID);
+						if(list==null || list.size()==0)
+							learningDesignDAO.delete(learningDesign);
+						else
+							flashMessage = new FlashMessage("deleteLearningDesign",
+															"Cannot delete design with learning_design_id of:" + learningDesignID +
+															" as it is a PARENT.",
+															FlashMessage.ERROR);
+					}
+				}else
+					flashMessage = FlashMessage.getUserNotAuthorized("deleteLearningDesign",userID);
+		}else
+			flashMessage = FlashMessage.getNoSuchLearningDesignExists("deleteLearningDesign",learningDesignID);
+		}else
+			flashMessage = FlashMessage.getNoSuchUserExists("deleteLearningDesign",userID);
+		
+		return flashMessage.serializeMessage();
+	}
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#moveFolder(java.lang.Integer, java.lang.Integer, java.lang.Integer)
+	 */
+	public String moveFolder(Integer currentFolderID,Integer targetFolderID,Integer userID)throws IOException{
+		try{
+			if(isUserAuthorized(targetFolderID,userID)){
+				WorkspaceFolder currentFolder = workspaceFolderDAO.getWorkspaceFolderByID(currentFolderID);
+				if(currentFolder!=null){
+					WorkspaceFolder targetFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetFolderID);
+					currentFolder.setParentWorkspaceFolder(targetFolder);
+					workspaceFolderDAO.update(currentFolder);
+					flashMessage = new FlashMessage("moveFolder",currentFolderID);
+				}else
+					throw new WorkspaceFolderException();
+			}else
+				flashMessage = FlashMessage.getUserNotAuthorized("moveFolder", userID);			
+		}catch(UserException ue){
+			flashMessage = FlashMessage.getNoSuchUserExists("moveFolder", userID);
+		}catch(WorkspaceFolderException we){
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("moveFolder",targetFolderID);			
+		}
+		return flashMessage.serializeMessage();
 	}
 }

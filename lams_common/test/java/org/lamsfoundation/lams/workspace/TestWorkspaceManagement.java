@@ -9,6 +9,8 @@ package org.lamsfoundation.lams.workspace;
 import java.io.IOException;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.workspace.service.WorkspaceManagementService;
 
 /**
@@ -20,6 +22,7 @@ import org.lamsfoundation.lams.workspace.service.WorkspaceManagementService;
 public class TestWorkspaceManagement extends AbstractLamsTestCase {
 	
 	protected WorkspaceManagementService workspaceManagementService;
+	protected IWorkspaceFolderDAO workspaceFolderDAO;
 	
 	public TestWorkspaceManagement(String name){
 		super(name);
@@ -27,6 +30,7 @@ public class TestWorkspaceManagement extends AbstractLamsTestCase {
 	public void setUp() throws Exception {
 		super.setUp();		
 		workspaceManagementService =(WorkspaceManagementService)context.getBean("workspaceManagementService");
+		workspaceFolderDAO = (IWorkspaceFolderDAO)context.getBean("workspaceFolderDAO");
 	}
 	protected String[] getContextConfigLocation() {
 		return new String[] {"WEB-INF/spring/authoringApplicationContext.xml",
@@ -48,6 +52,16 @@ public class TestWorkspaceManagement extends AbstractLamsTestCase {
 	public void testDeleteFolder() throws IOException{
 		String message = workspaceManagementService.deleteFolder(new Integer(7), new Integer(4));
 		System.out.println(message);
+	}
+	public void testDeleteLearningDesign() throws Exception{
+		String message = workspaceManagementService.deleteLearningDesign(new Long(1), new Integer(4));
+		System.out.println(message);
+	}
+	public void testMoveFolder()throws Exception{
+		String message = workspaceManagementService.moveFolder(new Integer(6),new Integer(2), new Integer(4));
+		System.out.println(message);
+		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(new Integer(6));
+		assertTrue(workspaceFolder.getParentWorkspaceFolder().getWorkspaceFolderId().equals(new Integer(2)));
 	}
 	
 
