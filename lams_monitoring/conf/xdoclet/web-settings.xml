@@ -26,9 +26,13 @@ http://www.gnu.org/licenses/gpl.txt
 <context-param>
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
-		/WEB-INF/spring/applicationContext.xml /WEB-INF/spring/toolApplicationContext.xml
-		/WEB-INF/spring/monitoringApplicationContext.xml /WEB-INF/spring/lessonApplicationContext.xml
-		/WEB-INF/spring/authoringApplicationContext.xml	
-		/WEB-INF/spring/dataAccessContext.xml  /WEB-INF/spring/surveyApplicationContext.xml
+		classpath*:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
+  		classpath*:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml
+  		classpath*:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
+  		classpath*:/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml
+  		classpath*:/WEB-INF/authoringApplicationContext.xml
+  		classpath*:/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml
+  		classpath*:/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml       					  
+		classpath*:applicationContext.xml
 	</param-value>
 </context-param>
