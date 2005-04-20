@@ -10,7 +10,6 @@ import java.util.TimeZone;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.exception.ActivityBehaviorException;
 import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrategy;
-import org.lamsfoundation.lams.util.DateUtil;
 
 
 /**
@@ -40,19 +39,24 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * <p>The relative time that gate will be closed from the lesson start time.
      * For example, if the lesson starts at 3:00pm and offset is 2, the gate
      * will be closed at 5:00pm.</p> 
+     * 
      * Note it must be larger than <code>gateStartTimeOffset</code>.
      */
     private Long gateEndTimeOffset;
     
     /**
-     * The absolute start time of the gate activity. If this is set, we are
-     * expecting <code>gateStartTimeOffset</code> is set to null.
+     * </p>The absolute start time of the gate activity. If this is set, we are
+     * expecting <code>gateStartTimeOffset</code> is set to null.</p>
+     * 
+     * <p>All time value that used for persistent should be UTC time</p>
      */
     private Date gateStartDateTime;
 
     /**
-     * The absolute end time of the gate activity. If this is set, we are 
-     * expecting <code>gateEndTimeOffset</code> is set to null.
+     * <p>The absolute end time of the gate activity. If this is set, we are 
+     * expecting <code>gateEndTimeOffset</code> is set to null.</p>
+     * 
+     * <p>All time value that used for persistent should be UTC time</p>
      */
     private Date gateEndDateTime;
 
@@ -241,53 +245,70 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     }
 
     /**
-     * <p>Returns the real gate open time according to the settings done by the 
-     * author.</p>
-     * <p>If the gate is scheduled against time offset, the real gate open 
-     * time will be the current system time plus the time offset. Otherwise,
-     * the real gate open time will be the same as start time. </p>
+     * <p>Returns the gate open time for a particular lesson according to the s
+     * ettings done by the author.</p>
+     * 
+     * <p>If the gate is scheduled against time offset and the scheduler has 
+     * never run this gate before, the lesson gate open time will be the lesson
+     *  start time plus the time offset. Otherwise, the lesson gate open time 
+     *  will be the same as start time. </p>
+     * 
      * <b>Note:</b> the time will also be translated against server timezone.
+     * 
+     * @param lessonStartTime the start time of the lesson. this should be
+     * 						  the server local time. the UTC time is only used
+     * 						  for persistent.
      *  
-     * @return the date time that the gate will be opened.
+     * @return the server local date time that the gate will be opened.
      */
-    public Date getRealGateOpenTime()
+    public Date getLessonGateOpenTime(Date lessonStartTime)
     {
-        Calendar openTime = new GregorianCalendar(TimeZone.getDefault());       
-        //compute the real opening time based on the  
+        Calendar openTime = new GregorianCalendar(TimeZone.getDefault());
+        openTime.setTime(lessonStartTime);
+        //compute the real opening time based on the lesson start time. 
         if(isScheduledByTimeOffset())
+        {
             openTime.add(Calendar.MINUTE,getGateStartTimeOffset().intValue());
+            this.setGateStartDateTime(openTime.getTime());
+        }
+
         else if(isScheduledByDateTime())
-            openTime.setTime(DateUtil.convertFromUTCToLocal(TimeZone.getDefault(),
-                                                            getGateStartDateTime()));
+            openTime.setTime( getGateStartDateTime());
         else
             throw new ActivityBehaviorException("No way of scheduling has " +
             		"been setup - this usually should be done at authoring " +
-            		"interface. Fail to calculate gate open time.");
+            		"interface. Fail to calculate gate open time for lesson.");
         
         return openTime.getTime();
     }
     
     /**
-     * <p>Returns the real gate close time according to the settings done by the 
-     * author.</p>
-     * <p>If the gate is scheduled against time offset, the real gate close 
-     * time will be the current system time plus the time offset. Otherwise,
-     * the real gate open time will be the same as close time. </p>
+     * <p>Returns the real gate close time for a particular lesson according to 
+     * the settings done by the author.</p>
+     * 
+     * <p>If the gate is scheduled against time offset, the lesson gate close 
+     * time will be the lesson start time plus the time offset. Otherwise,
+     * the lesson gate open time will be the same as close time. </p>
+     * 
      * <b>Note:</b> the time will also be translated against proper timezone.
+     * 
+     * @param lessonStartTime 
      *  
      * @return the date time that the gate will be closed.
      */
-    public Date getRealGateCloseTime()
+    public Date getLessonGateCloseTime(Date lessonStartTime)
     {
         Calendar closeTime = new GregorianCalendar(TimeZone.getDefault());
-        long offset  = closeTime.get(Calendar.ZONE_OFFSET)+closeTime.get(Calendar.DST_OFFSET);
-
+        closeTime.setTime(lessonStartTime);
         //compute the real opening time based on the  
         if(isScheduledByTimeOffset())
+        {
             closeTime.add(Calendar.MINUTE,getGateEndTimeOffset().intValue());
+            this.setGateEndDateTime(closeTime.getTime());
+        }
+
         else if(isScheduledByDateTime())
-            closeTime.setTime(DateUtil.convertFromUTCToLocal(TimeZone.getDefault(),
-                                                             getGateEndDateTime()));
+            closeTime.setTime(getGateEndDateTime());
         else
             throw new ActivityBehaviorException("No way of scheduling has " +
             		"been setup - this usually should be done at authoring " +

@@ -54,9 +54,13 @@ public class DateUtil
         String str = sdf.format(time);
         Timestamp gmtLocal = Timestamp.valueOf(str);
 
-        return new Date(gmtLocal.getTime());
+        Calendar gmtCanlendar = new GregorianCalendar(gmt); 
+        gmtCanlendar.setTimeInMillis(gmtLocal.getTime());
+        
+        return gmtCanlendar.getTime();
     }
     
+
     /**
      * Convert from UTC time to your local time. <b>Note: </b>it is your 
      * responsibility to pass in the correct UTC date.
@@ -71,6 +75,5 @@ public class DateUtil
         long offset  = canlendar.get(Calendar.ZONE_OFFSET)+canlendar.get(Calendar.DST_OFFSET);
 
         return new Date(UTCDate.getTime()+offset);
-        
     }
 }

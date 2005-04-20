@@ -22,11 +22,13 @@
 
 package org.lamsfoundation.lams.learningdesign;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.DateUtil;
 
 import junit.framework.TestCase;
 
@@ -49,6 +51,7 @@ public class TestScheduleGateActivity extends TestCase
     private ScheduleGateActivity gateByDateTime;
     private static final Long START_TIME_OFFSET = new Long(30);
     private static final Long END_TIME_OFFSET = new Long(60);
+    private Date lessonStartTime;
     /*
      * @see TestCase#setUp()
      */
@@ -65,11 +68,20 @@ public class TestScheduleGateActivity extends TestCase
         //convert current system time to utc
         Calendar now = new GregorianCalendar();
 
-        now.setTime(DateUtil.convertToUTC(now.getTime()));
+        now.setTime(now.getTime());
         gateByDateTime.setGateStartDateTime(now.getTime());
         
         now.add(Calendar.MINUTE,END_TIME_OFFSET.intValue());
         gateByDateTime.setGateEndDateTime(now.getTime());
+        
+        //setup a lesson start time.
+        Calendar lessonStart = new GregorianCalendar(2005,
+                                                     Calendar.APRIL,
+                                                     20,
+                                                     9,
+                                                     50);
+        lessonStartTime = lessonStart.getTime();
+        log.info("new lessonStartTime--"+lessonStartTime);
     }
 
     /*
@@ -89,39 +101,52 @@ public class TestScheduleGateActivity extends TestCase
         super(arg0);
     }
 
-    public void testGetRealGateOpenTime()
+    public void testGetLessonGateOpenTime()
     {
-        assertNotNull("verify real open time by offset",gateByTimeOffset.getRealGateOpenTime());
+        assertNotNull("verify real open time by offset",gateByTimeOffset.getLessonGateOpenTime(lessonStartTime));
         log.info("gate open time offset -- "+gateByTimeOffset.getGateStartTimeOffset());
-        log.info("Real gate open time by offset --"+gateByTimeOffset.getRealGateOpenTime());
+        log.info("Real gate open time by offset --"+gateByTimeOffset.getLessonGateOpenTime(lessonStartTime));
+        log.info("gate open time by offset, calculated open time --"+gateByTimeOffset.getGateStartDateTime());
         
-        assertNotNull("verify real open time by date time",gateByDateTime.getRealGateOpenTime());
-        log.info("gate open date time(UTC) -- "+gateByDateTime.getGateStartDateTime());
-        log.info("Real gate open time by date time -- "+gateByDateTime.getRealGateOpenTime());
+        assertNotNull("verify real open time by date time",gateByDateTime.getLessonGateOpenTime(lessonStartTime));
+        //log.info("gate open date time(UTC) -- "+gateByDateTime.getGateStartDateTime());
+        //log.info("Just for testing:"+this.formatUTCTime(gateByDateTime.getGateStartDateTime()));
+        log.info("Real gate open time by date time -- "+gateByDateTime.getLessonGateOpenTime(lessonStartTime));
     }
 
-    public void testGetRealGateCloseTime()
+    public void testGetLessonGateCloseTime()
     {
-        assertNotNull("verify real open time",gateByTimeOffset.getRealGateCloseTime());
+        assertNotNull("verify real open time",gateByTimeOffset.getLessonGateCloseTime(lessonStartTime));
         log.info("gate close time offset -- "+gateByTimeOffset.getGateEndTimeOffset());
-        log.info("gate close time by offset --"+gateByTimeOffset.getRealGateCloseTime());
+        log.info("gate close time by offset --"+gateByTimeOffset.getLessonGateCloseTime(lessonStartTime));
+        log.info("gate close time by offset, calculated close time --"+gateByTimeOffset.getGateEndDateTime());
+
         
-        assertNotNull("verify real close time by date time",gateByDateTime.getRealGateCloseTime());
-        log.info("gate close date time(UTC) -- "+gateByDateTime.getGateEndDateTime());
-        log.info("Real gate close time by date time -- "+gateByDateTime.getRealGateCloseTime());
+        assertNotNull("verify real close time by date time",gateByDateTime.getLessonGateCloseTime(lessonStartTime));
+        //log.info("gate close date time(UTC) -- "+gateByDateTime.getGateEndDateTime());
+        log.info("Real gate close time by date time -- "+gateByDateTime.getLessonGateCloseTime(lessonStartTime));
     }
 
-    public void testGetRealCloseTimeWithLongOffset()
+    public void testGetLessonCloseTimeWithLongOffset()
     {
         Calendar cal = new GregorianCalendar();
         cal.setTime(gateByDateTime.getGateEndDateTime());
         cal.add(Calendar.MINUTE,END_TIME_OFFSET.intValue()*24);
         gateByDateTime.setGateEndDateTime(cal.getTime());
         
-        assertNotNull("verify real close time by date time",gateByDateTime.getRealGateCloseTime());
+        assertNotNull("verify real close time by date time",gateByDateTime.getLessonGateCloseTime(lessonStartTime));
         
         log.info("gate close date time(UTC) -- "+gateByDateTime.getGateEndDateTime());
-        log.info("Real gate close time by date time -- "+gateByDateTime.getRealGateCloseTime());
+        log.info("Real gate close time by date time -- "+gateByDateTime.getLessonGateCloseTime(lessonStartTime));
        
+    }
+    
+    private String formatUTCTime(Date time)
+    {
+        TimeZone gmt = TimeZone.getTimeZone("Etc/GMT");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
+        sdf.setTimeZone(gmt);
+        String str = sdf.format(time);
+        return str;
     }
 }
