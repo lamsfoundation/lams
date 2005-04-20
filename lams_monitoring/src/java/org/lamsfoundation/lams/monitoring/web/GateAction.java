@@ -261,8 +261,8 @@ public class GateAction extends LamsDispatchAction
     {
         gateForm.set("gate",scheduleGate);
         gateForm.set("waitingLearners",new Integer(scheduleGate.getWaitingLearners().size()));
-        gateForm.set("startingTime",scheduleGate.getRealGateOpenTime());
-        gateForm.set("endingTime",scheduleGate.getRealGateCloseTime());
+        gateForm.set("startingTime",scheduleGate.getGateStartDateTime());
+        gateForm.set("endingTime",scheduleGate.getGateEndDateTime());
         
         return mapping.findForward(VIEW_SCHEDULE_GATE);
     }

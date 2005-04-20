@@ -40,13 +40,13 @@ http://www.gnu.org/licenses/gpl.txt
 					<tr>
 						<td width="50%" class="body">Schedule Gate will be opened at:</td>
 						<td width="50%" class="bodyBold">
-							<fmt:formatDate value="${GateForm.map.startingTime}" type="both" dateStyle="default" timeStyle="default"/>
+							<fmt:formatDate value="${GateForm.map.startingTime}" type="both" dateStyle="full" timeStyle="full"/>
 						</td>
 					</tr>		
 					<tr>
 						<td width="50%" class="body">Schedule Gate will be closed at:</td>
 						<td width="50%" class="bodyBold">
-							<fmt:formatDate value="${GateForm.map.endingTime}" type="both" dateStyle="default" timeStyle="default"/>
+							<fmt:formatDate value="${GateForm.map.endingTime}" type="both" dateStyle="full" timeStyle="full"/>
 						</td>
 					</tr>
                 </table> 

@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -273,6 +274,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             log.debug("=============Starting Lesson "+lessonId+"==============");
         //we get the lesson just created
         Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+        Date lessonStartTime = new Date();
         //initialize tool sessions if necessary
         for (Iterator i = requestedLesson.getLearningDesign()
                                          .getActivities()
@@ -287,11 +289,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
                                    requestedLesson);
             //if it is schedule gate, we need to initialize the sheduler for it.
             if(activity.getActivityTypeId().intValue()==Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
-                runGateScheduler((ScheduleGateActivity)activity);
+                runGateScheduler((ScheduleGateActivity)activity,lessonStartTime);
         }
         //update lesson status
         requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
-
+        requestedLesson.setStartDateTime(lessonStartTime);
         lessonDAO.updateLesson(requestedLesson);
         
         if(log.isDebugEnabled())
@@ -742,7 +744,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * 
      * @param scheduleGate the gate that needs to be scheduled.
      */
-    private void runGateScheduler(ScheduleGateActivity scheduleGate)
+    private void runGateScheduler(ScheduleGateActivity scheduleGate,
+                                  Date lessonStartTime)
     {
         if(log.isDebugEnabled())
             log.debug("Running scheduler for gate "+scheduleGate.getActivityId()+"...");
@@ -756,10 +759,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         //create customized triggers
         Trigger openGateTrigger = new SimpleTrigger("openGateTrigger",
                                                     Scheduler.DEFAULT_GROUP, 
-                                                    scheduleGate.getRealGateOpenTime());
+                                                    scheduleGate.getLessonGateOpenTime(lessonStartTime));
         Trigger closeGateTrigger = new SimpleTrigger("closeGateTrigger",
                                                     Scheduler.DEFAULT_GROUP,
-                                                    scheduleGate.getRealGateCloseTime());
+                                                    scheduleGate.getLessonGateCloseTime(lessonStartTime));
         //start the scheduling job
         try
         {
@@ -771,6 +774,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             throw new MonitoringServiceException("Error occurred at " +
             		"[runGateScheduler]- fail to start scheduling",e);
         }
+        //update the gate because the start time might be setup 
+        activityDAO.update(scheduleGate);
+        
         if(log.isDebugEnabled())
             log.debug("Scheduler for Gate "+scheduleGate.getActivityId()+" started...");
     }
