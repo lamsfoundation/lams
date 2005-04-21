@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<!--  This configuration uses a local datasource and does not use the cache. -->
 <!-- 
   Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
@@ -35,13 +34,6 @@
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
-	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
-	<!-- (in this case, hibernate-related settings for the session factory definition below) -->
-	
-	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location"><value>/org/lamsfoundation/lams/contentrepository/dbConnection.properties</value></property>
-	</bean>
-
 	<!-- Message source for this context, loaded from localized "messages_xx" files -->
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>messages</value></property>										
@@ -50,12 +42,9 @@
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 
-	<!-- Local DataSource that works in any environment -->
-	<bean id="crDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
-		<property name="url"><value>jdbc:mysql://localhost/lams?characterEncoding=utf8</value></property>
-		<property name="username"><value>lams</value></property>
-		<property name="password"><value>lamsdemo</value></property>
+	<!-- JNDI DataSource  - uses tool-ds Datasource set up in the app-server -->
+	<bean id="crDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName"><value>java:jdbc/lams-ds</value></property>
 	</bean>
 
 	<!-- Hibernate SessionFactory -->
@@ -73,12 +62,13 @@
 		</property>
 		<property name="hibernateProperties">
 			<props>
-				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
-				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
-				<prop key="hibernate.c3p0.minPoolSize">${hibernate.c3p0.minPoolSize}</prop>
-				<prop key="hibernate.c3p0.maxPoolSize">${hibernate.c3p0.maxPoolSize}</prop>
-				<prop key="hibernate.c3p0.timeout">${hibernate.c3p0.timeout}</prop>
-				<prop key="hibernate.c3p0.max_statement">${hibernate.c3p0.max_statement}</prop>
+				<prop key="hibernate.dialect">net.sf.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.c3p0.minPoolSize">5</prop>
+				<prop key="hibernate.c3p0.maxPoolSize">20</prop>
+				<prop key="hibernate.c3p0.timeout">1800</prop>
+				<prop key="hibernate.c3p0.max_statement">50</prop>
+				<prop key="hibernate.cache.provider_class">net.sf.hibernate.cache.TreeCacheProvider</prop>
 			</props>
 		</property>
 	</bean>

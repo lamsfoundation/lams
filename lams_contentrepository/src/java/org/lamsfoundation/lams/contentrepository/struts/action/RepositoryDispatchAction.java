@@ -33,6 +33,9 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /** 
@@ -106,10 +109,16 @@ public class RepositoryDispatchAction extends DispatchAction {
 
 		log.debug("About to logout");
 
-		Download.getRepository().logout(ticket);
+		getRepository().logout(ticket);
 		
 		log.debug("Logged out to "+mapping.findForward(LOGOUT_PATH));
 		return mapping.findForward(LOGOUT_PATH);
 	
 	}
+	
+	public IRepositoryService getRepository() {
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
+	    return (IRepositoryService)wac.getBean(IRepositoryService.REPOSITORY_SERVICE_ID);
+	}
+
 }

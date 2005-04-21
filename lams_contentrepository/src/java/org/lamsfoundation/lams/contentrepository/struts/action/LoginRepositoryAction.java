@@ -114,7 +114,7 @@ public class LoginRepositoryAction extends RepositoryDispatchAction {
 		String workspaceName = loginRepositoryForm.getWorkspaceName();
 		ICredentials cred =  new SimpleCredentials(toolName, toolId); 
 
-		IRepositoryService repository = Download.getRepository();
+		IRepositoryService repository = getRepository();
 		
 		if ( createWorkspaceFirst ) {
 			try {

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -54,7 +53,7 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * /lamscr/download/3/1/images/giralookout.jpg,
  * 
  */
-public class TestLogin extends HttpServlet  {
+public class TestLogin extends Download  {
 
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -101,7 +100,7 @@ public class TestLogin extends HttpServlet  {
 		char[] toolId = request.getParameter("id").toCharArray();
 
 		ICredentials cred =  new SimpleCredentials(toolName, toolId); 
-		ITicket ticket = Download.getRepository().login(cred, workspaceName);
+		ITicket ticket = getRepository().login(cred, workspaceName);
 		request.getSession().setAttribute(RepositoryDispatchAction.TICKET_NAME, ticket);
 	}
 		

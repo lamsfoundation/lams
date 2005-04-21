@@ -109,11 +109,11 @@ public class AddFileContentAction extends RepositoryDispatchAction {
 			NodeKey nodeKey = null;
 			if ( uuid != null ) {
 				// create a new version of this node
-				nodeKey = Download.getRepository().updateFileItem(ticket, uuid, filename,
+				nodeKey = getRepository().updateFileItem(ticket, uuid, filename,
 						is, contentType, versionDescription);
 			} else {
 				// create a new node
-				nodeKey = Download.getRepository().addFileItem(ticket, is, filename, 
+				nodeKey = getRepository().addFileItem(ticket, is, filename, 
 						contentType, versionDescription);
 			}
 
@@ -187,11 +187,11 @@ public class AddFileContentAction extends RepositoryDispatchAction {
 			NodeKey nodeKey = null;
 			if ( uuid != null ) {
 				// create a new version of this node
-				nodeKey = Download.getRepository().updatePackageItem(ticket, uuid, dirName,
+				nodeKey = getRepository().updatePackageItem(ticket, uuid, dirName,
 						entryString, versionDescription);
 			} else {
 				// create a new node
-				nodeKey = Download.getRepository().addPackageItem(ticket,dirName, entryString, versionDescription);
+				nodeKey = getRepository().addPackageItem(ticket,dirName, entryString, versionDescription);
 			}
 			
 			// normally the application would store the node key and

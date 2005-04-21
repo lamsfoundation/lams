@@ -30,9 +30,17 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Method of accessing the Repository from outside of the package.
  * Call RepositoryProxy.getRepository to get the IRepository object.
  * 
- * This will create the IRepository object using a Spring bean factory.
- * Note: the repository objects will be ???? different context ?????
- * to any context used by the calling jar.
+ * These method should only be used when the calling code is not
+ * using Spring. It will create a standalone context. 
+ * 
+ * If the calling class is using Spring, then it should ensure that
+ * /org/lamsfoundation/lams/contentrepository/applicationContext.xml
+ * is loaded into the context and the repository service can be accessed
+ * using something like:
+ * <pre>
+ *   WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+ *   IRepositoryService service = wac.getBean(IRepositoryService.REPOSITORY_SERVICE_ID);
+ * </pre>
  */
 public class RepositoryProxy {
 

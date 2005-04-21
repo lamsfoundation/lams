@@ -90,7 +90,7 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 		log.debug("Getting node map");
 		SortedMap map = null;
 		try {
-			map = Download.getRepository().getNodeList(ticket);
+			map = getRepository().getNodeList(ticket);
 		} catch (AccessDeniedException e) {
 			log.error("Not allowed to do this exception occured ",e);
 			throw e;
@@ -113,7 +113,7 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 				IVersionedNode node;
 				try {
 					
-					node = Download.getRepository().getFileItem(ticket, uuid, null);
+					node = getRepository().getFileItem(ticket, uuid, null);
 					
 				} catch (AccessDeniedException e) {
 					log.error("Not allowed to do this exception occured ",e);
@@ -177,7 +177,7 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 		List packageList = null;
 		try {
 			
-			packageList = Download.getRepository().getPackageNodes(ticket, uuid, version);
+			packageList = getRepository().getPackageNodes(ticket, uuid, version);
 			request.setAttribute(PACKAGE_LIST, packageList);
 			
 		} catch (AccessDeniedException e) {
@@ -233,12 +233,12 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 
 		try {
 			if ( version == null ) {
-				String[] problemFiles = Download.getRepository().deleteNode(ticket,uuid);
+				String[] problemFiles = getRepository().deleteNode(ticket,uuid);
 				log.info("Deleted node, "
 						+(problemFiles==null||problemFiles.length==0?0:problemFiles.length)
 						+" problem files were encountered.");
 			} else {
-				String[] problemFiles = Download.getRepository().deleteVersion(ticket,uuid,version);
+				String[] problemFiles = getRepository().deleteVersion(ticket,uuid,version);
 			}
 			
 			log.debug("Deleted nodes, forwarding to list");

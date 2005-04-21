@@ -49,11 +49,11 @@ public interface IRepositoryService {
 	public static final String REPOSITORY_SERVICE_ID = "repositoryService";
 	/** String used to define the path to the context file */
 	public static final String REPOSITORY_CONTEXT_PATH = 
-		"/org/lamsfoundation/lams/contentrepository/contentRepositoryApplicationContext.xml";
+		"/org/lamsfoundation/lams/contentrepository/applicationContext.xml";
 	/** String used to define the path to the context file used for
 	 * JUNIT testing. This file uses local datasources */
 	public static final String LOCAL_CONTEXT_PATH = 
-		"/org/lamsfoundation/lams/contentrepository/contentRepositoryLocalApplicationContext.xml";
+		"/org/lamsfoundation/lams/contentrepository/localApplicationContext.xml";
 	
     /**
      * Login, creating a new ticket for the given credentials and specified

@@ -44,8 +44,8 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -150,7 +150,7 @@ public class Download extends HttpServlet {
 
 		ITicket ticket = RepositoryDispatchAction.getTicket(request);
 		if ( ticket == null ) {
-			errorInContent(request, response,"No ticket found in session. Unable to access repository.",null);
+			errorInContent(request, response,"No ticket found in session. Unable to access .",null);
 			return;
 		}
 
@@ -254,10 +254,10 @@ public class Download extends HttpServlet {
 			IVersionedNode node = null;
 			if ( relPathString != null ) {
 				// get file in package
-				node = repository.getFileItem(ticket,uuid, version, relPathString);
+				node = getRepository().getFileItem(ticket,uuid, version, relPathString);
 			} else {
 				// get node
-				node = repository.getFileItem(ticket,uuid, version);
+				node = getRepository().getFileItem(ticket,uuid, version);
 			}
 			return node;
 		} catch ( RuntimeException e ) {
@@ -344,16 +344,14 @@ public class Download extends HttpServlet {
 		}
 	}
 
-	/**
-	 * Gets the application context and gets the repository object.
-	 * Required for the demo to run, so make sure this servlet loads on startup.
-	 *
-	 * @throws ServletException if an error occure
-	 */
-	public void init() throws ServletException {
-		System.err.println("Repository Demo calling context and getting repository singleton.");
-		ApplicationContext context = new ClassPathXmlApplicationContext(IRepositoryService.REPOSITORY_CONTEXT_PATH);
-		repository = (IRepositoryService)context.getBean(IRepositoryService.REPOSITORY_SERVICE_ID);
+	public IRepositoryService getRepository() {
+	    if ( repository == null ) {
+	    	System.err.println("Repository Demo calling context and getting repository singleton.");
+	        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+	    	/*ApplicationContext context = new ClassPathXmlApplicationContext(IRepositoryService.REPOSITORY_CONTEXT_PATH); */
+	    	repository = (IRepositoryService)wac.getBean(IRepositoryService.REPOSITORY_SERVICE_ID);
+	    }
+		return repository;
 	}
 
 
@@ -392,10 +390,4 @@ public class Download extends HttpServlet {
 		 + "</TABLE> ";
 	}
 
-	/**
-	 * @return Returns the repository.
-	 */
-	public static IRepositoryService getRepository() {
-		return repository;
-	}
 }

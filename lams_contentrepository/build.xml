@@ -78,7 +78,7 @@ Ant build file.
 	<!-- =================================================================== -->
 	<!-- Build and deploy all the java files                            -->
 	<!-- =================================================================== -->
-	<target name="build-all" depends="build-war" description="Builds all the war/jar files">
+	<target name="build-all" depends="build-jar, build-war" description="Builds all the war/jar files">
 	</target>
 	
 
