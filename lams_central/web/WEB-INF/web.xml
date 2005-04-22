@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+	<!--
+		To use non XDoclet filters, create a filters.xml file that
+		contains the additional filters (eg Sitemesh) and place it in your
+		projects merge dir.  Don't include filter-mappings in this file,
+		include them in a file called filter-mappings.xml and put that in
+		the same directory.
+	-->
+	
+	<display-name>LAMS</display-name>
+
+	<description>Learning Activity Management System</description>
+	
+	<!--
+	  - Location of the Log4J config file, for initialization and refresh checks.
+	  - Applied by Log4jConfigListener.
+	-->
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>/WEB-INF/log4j.xml</param-value>
+	</context-param>
+
+
+	<!-- Struts Tag Library Defintions -->
+	<taglib>
+		<taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
+		<taglib-location>
+			/WEB-INF/struts/struts-bean.tld
+		</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>/WEB-INF/struts-html.tld</taglib-uri>
+		<taglib-location>
+			/WEB-INF/struts/struts-html.tld
+		</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>/WEB-INF/struts-logic.tld</taglib-uri>
+		<taglib-location>
+			/WEB-INF/struts/struts-logic.tld
+		</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>/WEB-INF/struts-tiles.tld</taglib-uri>
+		<taglib-location>
+			/WEB-INF/struts/struts-tiles.tld
+		</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>/WEB-INF/struts-bean-el.tld</taglib-uri>
+		<taglib-location>
+			/WEB-INF/struts/struts-bean-el.tld
+		</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>/WEB-INF/struts-logic-el.tld</taglib-uri>
+		<taglib-location>
+			/WEB-INF/struts/struts-logic-el.tld
+		</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>/WEB-INF/struts-html-el.tld</taglib-uri>
+		<taglib-location>
+			/WEB-INF/struts/struts-html-el.tld
+		</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>/WEB-INF/struts-tiles-el.tld</taglib-uri>
+		<taglib-location>
+			/WEB-INF/struts/struts-tiles-el.tld
+		</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>/WEB-INF/struts-nested.tld</taglib-uri>
+		<taglib-location>
+			/WEB-INF/struts/struts-nested.tld
+		</taglib-location>
+	</taglib>
+	
+	<!-- JSTL Tag Library Defintions -->
+	<taglib>
+		<taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+		<taglib-location>/WEB-INF/jstl/c.tld</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>http://java.sun.com/jstl/core_rt</taglib-uri>
+		<taglib-location>/WEB-INF/jstl/c-rt.tld</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>http://java.sun.com/jstl/fmt</taglib-uri>
+		<taglib-location>/WEB-INF/jstl/fmt.tld</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>http://java.sun.com/jstl/fmt_rt</taglib-uri>
+		<taglib-location>/WEB-INF/jstl/fmt-rt.tld</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>http://java.sun.com/jstl/xml</taglib-uri>
+		<taglib-location>/WEB-INF/jstl/x.tld</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>http://java.sun.com/jstl/xml_rt</taglib-uri>
+		<taglib-location>/WEB-INF/jstl/x-rt.tld</taglib-location>
+	</taglib>
+	
+
+</web-app>

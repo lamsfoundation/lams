@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+   type="WEB"
+   name="lams_central"
+   id="myeclipse.1114057549859"
+   context-root="/lams_central"
+   j2ee-spec="1.3"
+   archive="lams_central.war">
+   <attributes>
+      <attribute name="webrootdir" value="web" />
+   </attributes>
+</project-module>
+

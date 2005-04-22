@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE jboss-web PUBLIC "-//JBoss//DTD Web Application 2.3//EN" "http://www.jboss.org/j2ee/dtd/jboss-web_3_2.dtd"> 
+
+<jboss-web> 
+
+  <!-- This setting is only used when the war file is deployed directly -->
+  <!-- within JBOSS. Usually it will be deployed as /lams, set in the ear's -->
+  <!-- application.xml file. -->
+  <context-root>/</context-root>
+
+</jboss-web>
