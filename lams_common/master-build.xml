@@ -2,7 +2,7 @@
 <project name="LAMS" default="usage" basedir=".">
 
     <!--  <property name="jboss.home" value="/var/jboss"/> -->
-    <property name="jboss.home" value="/var/jboss"/>
+    <property name="jboss.home" value="D:\jboss-3.2.6\"/>
     <property name="jboss.deploy.dir" value="${jboss.home}/server/default/deploy"/>
     <property name="assembly.dir" value="assembly"/>
     <property name="lams.ear" value="lams.ear"/>
@@ -52,12 +52,12 @@
     <target name="build-subprojects" description="builds sub porjects">
         <ant antfile="../${lams_common}/build.xml" target="build-jar" inheritAll="false"/>
         <ant antfile="../${lams_contentrepository}/build.xml"  target="build-jar" inheritAll="false"/>
+        <ant antfile="../${lams_central}/build.xml" target="build-war" inheritAll="false"/>
         <!--
         <ant antfile="../${lams_admin}/build.xml" target="build-war" inheritAll="false"/>
         <ant antfile="../${lams_authoring}/build.xml"  target="build-war" inheritAll="false"/>
         <ant antfile="../${lams_learning}/build.xml" target="build-war" inheritAll="false"/>
         <ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/>
-        <ant antfile="../${lams_central}/build.xml" target="build-war" inheritAll="false"/>
         -->
     </target>
     
@@ -80,8 +80,8 @@
             <fileset dir="..">
                 <include name="${lams.jar}"/>
                 <include name="${lams_contentrepository.jar}"/>
-                <!--include name="lams_central.war"/>
-                <include name="lams_authoring.war"/>
+                <include name="${lams_central.war}"/>
+                <!--<include name="lams_authoring.war"/>
                 <include name="lams_monitoring.war"/>
                 <include name="lams_learning.war"/>
                 <include name="lams_admin.war"/-->
