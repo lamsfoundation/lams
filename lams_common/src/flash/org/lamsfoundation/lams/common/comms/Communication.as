@@ -41,7 +41,6 @@ class org.lamsfoundation.lams.common.comms.Communication {
             delete responseXML;
         }
         responseXML = new XML();
-
         //Set ondata handler to validate data returned in XML object
         responseXML.onData = function(src){
             if (src != undefined) {
@@ -64,8 +63,9 @@ class org.lamsfoundation.lams.common.comms.Communication {
         responseXML.onLoad = Proxy.create(this,xmlOnLoad,responseXML);
         
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
-        responseXML.load(_serverUrl+requestUrl);
-        //responseXML.load('xml/sampleLearningDesign.xml');
+        //responseXML.load(_serverUrl+requestUrl);
+        //_global.breakPoint();
+        responseXML.load('sampleLearningDesign.xml');
         requestCallBack = handlerFn;
     }
     
@@ -75,6 +75,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
     * @param wrappedPacketXML   The wrapped XML response object 
     */
     private function xmlOnLoad(success:Boolean,wrappedPacketXML:XML){
+        trace('XML loaded success:'+ success);
         /*
         * Validate the XML
         * If No Errors THEN
@@ -84,7 +85,6 @@ class org.lamsfoundation.lams.common.comms.Communication {
         *   deal with errors
         * END IF
         */
-        trace('Communication.xmlOnLoad')
         
         //Load ok?
         if(success){
