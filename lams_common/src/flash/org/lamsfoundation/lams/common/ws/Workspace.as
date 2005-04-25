@@ -2,7 +2,10 @@
 import org.lamsfoundation.lams.authoring.*
 
 /**
-* Canvas is
+* 
+* Workspace provides methods for retrieving a user workspace, necessary for selecting a design 
+* 
+* @author   DI
 */
 class org.lamsfoundation.lams.common.ws.Workspace {
 	//Model
@@ -30,6 +33,8 @@ class org.lamsfoundation.lams.common.ws.Workspace {
         trace('Workspace.userSelectItem');
         //todo DI 07/04/05 write code user design selection, just a stub at the moment, calls itemSelected
         itemSelected(1);
+        //Open the workspace dialog
+        workspaceView.createWorkspacePopup();
     }
     
     private function itemSelected(designId:Number){
