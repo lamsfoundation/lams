@@ -1,5 +1,6 @@
-﻿import org.lamsfoundation.lams.common.ui. *
+﻿import org.lamsfoundation.lams.common.ui.*
 import mx.core.UIComponent
+import mx.styles.StyleManager
 /**
 * Panel is a base UI building block used in LAMS.  It is a holder for other UI
 * components
@@ -19,9 +20,9 @@ class Panel extends UIComponent
 	//Variables
 	private var panel : MovieClip;
 	private var boundingBox_mc : MovieClip;
-	private var border_mc : MovieClip;
-	var __borderType : String = "inset";
-
+	private var border_mc : MovieClip;	//private var background_mc : MovieClip;	private var background_ct : Color;
+	private var _borderType : String;	private var _backgroundColour : Number; 
+	
 
 	/**
 	* Constructor (Empty)
@@ -29,28 +30,32 @@ class Panel extends UIComponent
 	*/
 	function Panel ()
 	{
+		//trace('Panel constructor');
 	}
 	/**
 	* Intialisation, Flash calls the init() method
 	* when the class is created. This method is
 	* called once when a component is instantiated
-	* and never again.
+	* and never again.	* NOTE: CALLED BY UI OBJECT so don't call explicitly here
 	*
 	*/
 	function init () : Void 
-	{
-		//trace ('panel innit');
+	{		
+		//trace ('panel innit, _initialised:'+_initialised);
+		
 		super.init ();
-		useHandCursor = false;
+		useHandCursor = false;		
+		//some default values;
+		_borderType  = "inset";
+		_backgroundColour = 0xCCCCCC;
 		//hide the bounding box place holder
 		boundingBox_mc._visible = false;
 		boundingBox_mc._width = 0;
 		boundingBox_mc._height = 0;
-		//attach the actual component
-		createChildren ();
+			
 	}	/**
 	* The draw method is invoked after the component has
-	* been invalidated, by someone calling invalidate().
+	* been invalidated, by someone (USUALLY UI OBJECT) calling invalidate().
 	* This is better than redrawing from within the set function
 	* for value, because if there are other properties, it's
 	* better to batch up the changes into one redraw, rather
@@ -80,29 +85,52 @@ class Panel extends UIComponent
 	}
 	
 	/**
-	* The type indicated if inny our outy etc..
+	* The borderStyle (uses rectBorder class) inny our outy etc..
 	* @param type The kind of border we use, possible values: 'inset', 'outset', 'solid'
 	*/
-	[Inspectable(enumeration="inset,outset,solid,default"defaultValue="inset")]
+	[Inspectable(enumeration="inset,outset,solid,default,dropDown,none"defaultValue="inset")]
 	function set borderType (bStyle:String):Void{		//trace('set bStyle:'+bStyle);
-		__borderType = bStyle;		invalidate();
+		_borderType = bStyle;		invalidate();
 	}
 	
 	function get borderType():String{
-		return __borderType;		
+		return _borderType;		
+	}	/**
+	* General set style method
+	* @param styleProp The property to affect, can be backgroundColor or borderStyle
+	* @param newValue the value to assign to that styleProp. Colours can be in name or hex format, borders as in set borderType
+	* 
+	*/	public function setStyle(styleProp:String, newValue):Void{	//trace('Panel.setStyle');
+		//only process if we want to set the bkg
+		if(styleProp == "backgroundColor"){
+			//trace('Setting panel bkg to:'+newValue);
+			if(isNaN(newValue)){
+				//colour name
+				_backgroundColour = StyleManager.getColorName(newValue);
+			}else{
+				_backgroundColour = newValue;
+			}
+		}else if(styleProp == "borderStyle"){
+			//must be going for the border			_borderType = newValue;		
+		}else{
+			trace('Panel got an unsupported set style type.... can only be backgroundColor or borderStyle');
+		}
+		invalidate();
 	}
 	
 	
 	/**
 	* Attaches the PanelAssets mc which contains all the actual
 	* mc's that make up the component
+	* NOTE: CALLED BY UI OBJECT so don't call explicitly here
 	* 
 	*/
 	private function createChildren () : Void
 	{
-		_global.breakpoint ();
-		//trace ('create children in panel');
-		panel = this.createObject ("PanelAssets", "panel", 10);
+		_global.breakpoint();
+		//trace('create children in panel, panel:'+panel);
+		panel = this.createObject ("PanelAssets", "panel", getNextHighestDepth());
+		//trace('panel:'+panel);		background_ct = new Color(panel.background_mc);		//the border is a MM rect border
 		border_mc = createClassObject(mx.skins.RectBorder,"border_mc", getNextHighestDepth()); //make sure this is the last
 		layoutChildren();
 	}
@@ -116,10 +144,16 @@ class Panel extends UIComponent
 		panel._xscale = 100;
 		//__width and __height is set in UIObject on resizes n stuff
 		panel.background_mc._width = __width;
-		panel.background_mc._height = __height;
+		panel.background_mc._height = __height;		background_ct.setRGB(_backgroundColour);
 		
-		border_mc.setSize(__width, __height);		border_mc.setStyle("borderStyle",__borderType);
-		
+		border_mc.setSize(__width, __height);
+		border_mc._x = panel.background_mc._x;
+		border_mc._y = panel.background_mc._y;
+		if(_borderType == "none"){
+			border_mc.visible=false;
+		}else{
+			if(!border_mc.visible){border_mc.visible=true;};			border_mc.setStyle("borderStyle",_borderType);
+		}
 		
 		/*
 		panel.borderTop_mc._width = __width;
