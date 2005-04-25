@@ -5,7 +5,7 @@ import org.lamsfoundation.lams.common.mvc.*;
  * Provides basic services for the "view" of
  * a Model/View/Controller triad.
  */
-class org.lamsfoundation.lams.common.mvc.AbstractView implements Observer, View {
+class org.lamsfoundation.lams.common.mvc.AbstractView extends MovieClip implements Observer, View {
   private var model:Observable;
   private var controller:Controller;
 
