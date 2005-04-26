@@ -1,14 +1,13 @@
-﻿/*
- *
- * @author
- * @version
- */
- import mx.controls.*
+﻿ import mx.controls.*
  import mx.utils.*
+ /**
+ * @author      DI
+ */
  class org.lamsfoundation.lams.common.ws.WorkspaceDialog extends MovieClip{
      
     private var ok_btn:Button;
     private var cancel_btn:Button;
+    private var panel:MovieClip;
     
     function WorkspaceDialog(){
         trace('WorkSpaceDialog.constructor');
@@ -23,14 +22,24 @@
         ok_btn.addEventListener('click',Delegate.create(this, ok));
         cancel_btn.addEventListener('click',Delegate.create(this, cancel));
         //Tie parent click event (generated on clicking close button) to this instance
-        _parent.addEventListener('click',this);
+        _parent._parent.addEventListener('click',this);
+        
+        //Register for LFWindow size events
+        _parent._parent.addEventListener('size',this);
+        
     }
     
+    /**
+    * Called by the cancel button 
+    */
     private function cancel(){
         trace('Cancel');
         //Escape changes + close parent window
     }
     
+    /**
+    * Called by the OK button 
+    */
     private function ok(){
         trace('OK');
        //If validation successful commit + close parent window
@@ -45,8 +54,14 @@
         e.target.deletePopUp();
     }
     
-    public function size(width,height){
-        trace('size')
+  
+    /**
+    * Main resize method, called by scrollpane container/parent
+    */
+    public function setSize(w:Number,h:Number){
+        //Size the panel
+        panel.setSize(w,h);
+        //Buttons
     }
     
 }
