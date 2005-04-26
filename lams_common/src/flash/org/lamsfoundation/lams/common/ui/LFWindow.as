@@ -5,6 +5,7 @@
 */
 import mx.containers.*
 import mx.managers.*
+import org.lamsfoundation.lams.util.*
 
 class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
 
@@ -16,6 +17,10 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
     private static var RESIZE_WIDTH_OFFSET = 15;            //Offset to place resize clip from bottom rhs of window
     private static var RESIZE_HEIGHT_OFFSET = 15;
     
+    private static var SCROLL_X_OFFSET = 3;
+    private static var SCROLL_Y_OFFSET = 30;
+    private static var SCROLL_X_PADDING = 3;
+    private static var SCROLL_Y_PADDING = 3;
     
     //Public vars
 	public var className:String = 'LFWindow';
@@ -23,13 +28,26 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
     //Private vars
     private var resize_mc:MovieClip;
     private var scrollPane:MovieClip;
+    private var _scrollContentPath:String;
+    
     
     //Constructor
     function LFWindow() {
     }
+    
+	public function init(Void):Void {
+ 	    super.init();
+        //trace('LFWindow.init()');
+        //contentPath = 'ScrollPane';
+	}
+    
   
     public function createChildren(Void):Void {
         super.createChildren();
+
+        //Add the scrollpane
+        scrollPane = createClassObject(mx.containers.ScrollPane,"scrollPane", getNextHighestDepth(),{contentPath:_scrollContentPath,_x:SCROLL_X_OFFSET,_y:SCROLL_Y_OFFSET});
+
         //Dynamically add extra buttons
         //Attach resize and set up resize handling 
         resize_mc = this.createChildAtDepth('resize',DepthManager.kTop);
@@ -57,46 +75,43 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
             delete _parent.onEnterFrame;
         }
         
-        //Add the scrollpane
-        //scrollPane = createClassObject(mx.containers.ScrollPane,"border_mc", getNextHighestDepth()); 
-        
     }
     
 	public function draw(Void):Void {
+        //trace('LFWindow.draw');
         super.draw();
+        size()
     }    
     
     public function size(Void):Void {
+        //trace('LFWindow.size');
         super.size();
-        //forward the resize to the content
-        this.content.size(width,height);
+        //Size the scrollpane
+        var w:Number = width-SCROLL_X_OFFSET-SCROLL_X_PADDING;
+        var h:Number = height-SCROLL_Y_OFFSET-SCROLL_Y_PADDING
+        scrollPane.setSize(w,h);
         
+        //Align the resize button with the bottom right
         resize_mc._x = width-RESIZE_WIDTH_OFFSET;
         resize_mc._y = height-RESIZE_HEIGHT_OFFSET;
+        
+        //Resize the scrollpane content
+        scrollPane.content.setSize(w,h);
+
+        //trace('scrollPane.content.size :' + scrollPane.content.size);
+        //forward the resize to any registered listeners, i.e  the content
+        //dispatchEvent({type:"size",target:this});
     }
-    
-	public function init(Void):Void {
-		super.init();
-        contentPath = 'ScrollPane';
-        scrollContentPath = 'workspaceDialog';
-        //FocusManager.setFocus(this);
-		//visible = false;
-	}
-    
-	public function doLayout(Void):Void {
-		super.doLayout();
-	}  
     
     public function startDragging(Void):Void {
         super.startDragging();
         //trace('drag started');
     }
-    
+
 	//Getters+Setters
     [Inspectable(defaultValue='')]
     function set scrollContentPath (path:String){
-        trace('setting scrollContentPath-'+content);
-        //Set the content path of the contained scrollpane
-        content.contentPath = path;    
+        //trace('setting scrollContentPath-'+content);
+        _scrollContentPath = path;
     }
 }
