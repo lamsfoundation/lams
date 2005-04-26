@@ -37,8 +37,8 @@ class Dialog {
 //
 
     static function createPopUp(path:MovieClip,cls:Object, initobj:Object):MovieClip{
+        trace('Dialog.createPopUp');
         return path.createClassChildAtDepth(cls, DepthManager.kTopmost, initobj);
     }
 
-   
 }
