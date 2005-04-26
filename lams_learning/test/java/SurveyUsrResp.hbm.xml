@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.survey.SurveyUsrResp"
+        table="tool_lasr10_survey_usr_resp"
+        dynamic-update="false"
+        dynamic-insert="false"
+        select-before-update="false"
+        optimistic-lock="version"
+    >
+
+        <id
+            name="responseId"
+            column="response_id"
+            type="java.lang.Long"
+        >
+            <generator class="increment">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-SurveyUsrResp.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="answer"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
+            column="answer"
+            length="65535"
+        />
+
+        <property
+            name="attemptDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            access="property"
+            column="attempt_date"
+            length="19"
+        />
+
+        <many-to-one
+            name="surveyQueContent"
+            class="org.lamsfoundation.lams.tool.survey.SurveyQueContent"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            access="property"
+        >
+            <column
+                name="survey_que_content_id" 
+            />
+        </many-to-one>
+
+        <many-to-one
+            name="surveyAnsContent"
+            class="org.lamsfoundation.lams.tool.survey.SurveyAnsContent"
+            cascade="save-update"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            access="property"
+        >
+            <column
+                name="survey_ans_content_id" 
+            />
+        </many-to-one>
+
+        <many-to-one
+            name="surveyQueUsr"
+            class="org.lamsfoundation.lams.tool.survey.SurveyQueUsr"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            access="property"
+        >
+            <column
+                name="que_usr_id" 
+            />
+        </many-to-one>
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-SurveyUsrResp.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>
