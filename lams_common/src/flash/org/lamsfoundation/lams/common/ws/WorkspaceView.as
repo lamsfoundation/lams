@@ -58,22 +58,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView
     */
     public function createWorkspacePopup(w:Number,height:Number){
         trace('workspace.createWorkspacePopup');
-        var initObj = {};
-        /*
-        with (initObj){
-            title='Select Workspace';
-            _width = 400;
-            _height = 300;
-            _x = 200;
-            _y = 200;
-            contentPath = 'workspaceDialog';    
-        }*/
-        var popup = PopUpManager.createPopUp(_root, LFWindow, true,{title:'PopUpManager.createPopUp',closeButton:true,contentPath:'workspaceDialog',_x:200,_y:200});
-        //var popup = PopUpManager.createPopUp(_workspace_mc, LFWindow, false,{title:'PopUpManager.createPopUp',closeButton:true,contentPath:'workspaceDialog',_x:200,_y:200});
-        //var popup = Dialog.createPopUp(_workspace_mc, LFWindow,{title:'Dialog.createPopUp',closeButton:true,contentPath:'workspaceDialog',_x:200,_y:200});
+        var popup = PopUpManager.createPopUp(_root, LFWindow, true,{title:'PopUpManager.createPopUp',closeButton:true,scrollContentPath:'workspaceDialog',_x:200,_y:200});
         popup.setSize(550,450);
-        
-        //var popup = Dialog.createPopUp(_workspace_mc,initObj);
-        //workspaceDialog = mx.managers.PopUpManager.createPopUp(_workspace_mc, LFWindow, true,{title:'An LF Window',closeButton:true,_width:400,_height:300,contentPath:'workspaceDialog'});
     }
 }
