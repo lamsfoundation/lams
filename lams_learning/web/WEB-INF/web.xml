@@ -33,7 +33,9 @@ http://www.gnu.org/licenses/gpl.txt
 	<param-value>
 		/WEB-INF/spring/dataAccessContext.xml  /WEB-INF/spring/applicationContext.xml /WEB-INF/spring/learningApplicationContext.xml
 		/WEB-INF/spring/lessonApplicationContext.xml /WEB-INF/spring/toolApplicationContext.xml	
-		/WEB-INF/spring/learningDesignApplicationContext.xml			  
+		/WEB-INF/spring/learningDesignApplicationContext.xml		
+		classpath:/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml
+  		classpath:/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml	  
 	</param-value>
 </context-param>
 

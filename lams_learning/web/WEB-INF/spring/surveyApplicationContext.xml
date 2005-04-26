@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for lams survey business layer.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+
+	<!--
+		- A parent bean definition which is a base definition for transaction proxies.
+		- It's marked as abstract, since it's not supposed to be instantiated itself.
+		- We set shared transaction attributes here, following our naming patterns.
+		- The attributes can still be overridden in child bean definitions.
+    -->
+	<bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" 
+	  	  abstract="true">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<!-- prop key="remove*">PROPAGATION_REQUIRED</prop-->
+			</props>
+		</property>
+	</bean>
+
+	<!--
+	  - Lams survey primary business object (default implementation), as an inner bean wrapped
+		- by an outer transactional proxy. The two bean definitions could have been separate,
+		- but this is cleaner as there is no need to ever access the unwrapped object.
+		-->
+	<bean id="surveyService" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="org.lamsfoundation.lams.tool.survey.service.SurveyServicePOJO">
+				<property name="surveyDAO"><ref bean="surveyContentDAO"/></property>
+				<property name="surveySessionDAO"><ref bean="surveySessionDAO"/></property>				
+				<property name="surveyUsrRespDAO"><ref bean="surveyUsrRespDAO"/></property>			
+				<property name="questionTypeDAO"><ref bean="questionTypeDAO"/></property>			
+				<property name="userManagementService"><ref bean="userManagementService"/></property>			
+				<property name="learnerService"><ref bean="learnerService"/></property>
+			</bean>
+		</property>
+	</bean>  
+
+</beans>
