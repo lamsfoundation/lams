@@ -127,7 +127,6 @@ class Panel extends UIComponent
 	*/
 	private function createChildren () : Void
 	{
-		_global.breakpoint();
 		//trace('create children in panel, panel:'+panel);
 		panel = this.createObject ("PanelAssets", "panel", getNextHighestDepth());
 		//trace('panel:'+panel);		background_ct = new Color(panel.background_mc);		//the border is a MM rect border
