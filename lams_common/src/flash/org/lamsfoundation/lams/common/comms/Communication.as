@@ -63,9 +63,9 @@ class org.lamsfoundation.lams.common.comms.Communication {
         responseXML.onLoad = Proxy.create(this,xmlOnLoad,responseXML);
         
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
-        //responseXML.load(_serverUrl+requestUrl);
+        responseXML.load(_serverUrl+requestUrl);
         //_global.breakPoint();
-        responseXML.load('sampleLearningDesign.xml');
+        //responseXML.load('sampleLearningDesign.xml');
         requestCallBack = handlerFn;
     }
     
