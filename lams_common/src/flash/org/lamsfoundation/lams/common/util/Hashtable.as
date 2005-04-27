@@ -11,20 +11,21 @@ class Hashtable {
     private var _watch:Boolean;
     private var _watchFunction:Function;
 	private var _watchFunctionLocation:Object;
+	private var _isBusy:Boolean;
 	
 	
 	
     //Constructor
     function Hashtable(n) {
-        _name=n;
+        _name=n;		clearBusy();
     }
     
-    public function put(key, val) {
-       Debugger.debug('called','Hashtable.prototype.put');
+    public function put(key, val) {		setBusy();
+       //Debugger.debug('called','Hashtable.prototype.put');
         var i = this._getIndex(key);
         var r = this.elements[i].val;
     
-       Debugger.debug('watch update..','Hashtable.prototype.put');
+       //Debugger.debug('watch update..','Hashtable.prototype.put');
         if(this._watch){
             this._watchFunctionLocation[this._watchFunction](this._name, r, val);
         }
@@ -36,11 +37,11 @@ class Hashtable {
         //this.elements.length += i == this.elements.length;
         
         this.elements[i] = new HashtableElement(key, val);
-        return r;
+        clearBusy();
+		return r;
     }
     
-    public function putAll(anArray) {
-        for (var i = 0; i < anArray.length; i++) {
+    public function putAll(anArray) {	        for (var i = 0; i < anArray.length; i++) {
             this.put(i, anArray[i]);
             if(this._watch){
                 this._watchFunctionLocation[this._watchFunction](this._name, null, null);
@@ -50,35 +51,46 @@ class Hashtable {
     
     
     public function get (o) {
+		setBusy();
         //trace('Hashtable.prototype.get called');
         var i = this._getIndex(o);
         trace('i:'+i);
         if (i != this.elements.length) {
+			clearBusy();
             return this.elements[i].val;
         }
+		
     }
     
-     public function keys() {
+     public function keys() {		setBusy();
         var r = new Array();
         for (var i = 0; i < this.elements.length; i++) {
             r[i] = this.elements[i].key;
         }
+		clearBusy();
         return r;
     }
     
     public function values() {
+		setBusy();
         var r = new Array();
         for (var i = 0; i < this.elements.length; i++) {
             r[i] = this.elements[i].val;
         }
+		clearBusy();
         return r;
     }
     
     public function remove(o) {
+		setBusy();
+
         trace("removing " + o);
         var i = this._getIndex(o);
-        
-        if(i < this.keys().length){
+		//we gotta clear the busy flag as keys needs to be called
+		clearBusy();
+        var l = this.keys().length;
+        setBusy();
+		if(i < l){
             // o found
             var r = this.elements[i].val;
     
@@ -88,34 +100,43 @@ class Hashtable {
             
             this.elements.splice(i, 1);
             trace("length after removal: "+ this.elements.length);
+			clearBusy();
             return r;
         }else{
+			clearBusy();
             return null;
         }	
     }
     
-    public function clear() {
+    public function clear() {		setBusy();
         this.elements = new Array();
         if(this._watch){
             this._watchFunctionLocation[this._watchFunction](this._name, null, null);
-        }
+        }		clearBusy();
         
     }
     
     public function clone(newName) {
+		setBusy();
         var r = new Hashtable(newName);
         for (var i = 0; i < this.elements.length; i++) {
             r.elements[i] = this.elements[i];
         }
+		clearBusy();
         return r;
     }
     
     public function containsKey(o) {
-        return this._getIndex(o) != this.elements.length;
+		setBusy();
+		var r = this._getIndex(o) != this.elements.length;
+		clearBusy();
+        return r;
     }
     
-    public function containsValue(o) {
-        return this._getIndex(o, "val") != this.elements.length;
+    public function containsValue(o) {		setBusy();
+		var r = this._getIndex(o, "val") != this.elements.length;
+		clearBusy();
+        return r;
     }
     
     public function size() {
@@ -160,5 +181,20 @@ class Hashtable {
         f = f == undefined ? "key" : f;
         for (r = 0; r < this.elements.length && this.elements[r][f] != o; r++);
         return r;
-    }    
+    }    	private function setBusy():Void{
+		if(_isBusy){
+			Debugger.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
+			Debugger.log('!!!!!!!!!!!!!!!!!!!! HASHTABLE ACCESED WHILE BUSY !!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
+			Debugger.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',1,'checkBusy','org.lamsfoundation.lams.common.util.Hashtable');
+		}
+		_isBusy=true;
+	}
+	
+	private function clearBusy():Void{
+		_isBusy=false;
+	}
+	
+	
+	
+
 }
