@@ -14,7 +14,7 @@ grouping_support_type_id, apply_grouping_flag,online_instructions,activity_categ
 values
 (100,6,'Survey Template','Survey',10,20,null,'Help Text for Activity',
 1,null,0,0,
-null,6,'20050101','Offline  Instructions ',0,
+2,6,'20050101','Offline  Instructions ',0,
 null,null,6,17,
 null,null,null,'SurveyImage',
 1,0,'Online Instructions',1);
