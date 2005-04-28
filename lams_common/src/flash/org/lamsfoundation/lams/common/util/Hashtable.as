@@ -13,11 +13,10 @@ class Hashtable {
 	private var _watchFunctionLocation:Object;
 	private var _isBusy:Boolean;
 	
-	
-	
     //Constructor
     function Hashtable(n) {
-        _name=n;		clearBusy();
+        _name=n;        elements=[];
+		clearBusy();
     }
     
     public function put(key, val) {		setBusy();
