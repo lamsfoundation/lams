@@ -43,6 +43,8 @@ public class DateUtil
 
     /**
      * Convert your local time to Universal Time Coordinator.
+     * TODO conversion is not working properly. The returned Date object still 
+     * contain server local timezone rather than GMT time zone.
      * @param time your local time
      * @return the date UTC time which is the same as GMT.
      */

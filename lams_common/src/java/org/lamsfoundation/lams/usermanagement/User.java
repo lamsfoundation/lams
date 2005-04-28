@@ -24,7 +24,9 @@ public class User implements Serializable {
     /** persistent field */
     private String login;
 
-    /** persistent field */
+    /** persistent field ]
+     * TODO needs to be removed for security reason
+     */
     private String password;
 
     /** nullable persistent field */
