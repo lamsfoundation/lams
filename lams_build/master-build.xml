@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="LAMS" default="usage" basedir=".">
+
+    <!--  <property name="jboss.home" value="/var/jboss"/> -->
+    <property name="jboss.home" value="D:\jboss-3.2.6\"/>
+    <property name="jboss.deploy.dir" value="${jboss.home}/server/default/deploy"/>
+    <property name="assembly.dir" value="assembly"/>
+    <property name="lams.ear" value="lams.ear"/>
+    <property name="assembly.lams.ear" value="${assembly.dir}/lams.ear"/>
+    <property name="assembly.temp.ear" value="${assembly.dir}/temp.ear"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="app.xml" value="conf/j2ee/application.xml"/>
+    <property name="lams_common" value="lams_common"/>
+    <property name="lams_admin" value="lams_admin"/>
+    <property name="lams_learning" value="lams_learning"/>
+    <property name="lams_monitoring" value="lams_monitoring"/>
+    <property name="lams_authoring" value="lams_authoring"/>
+    <property name="lams_central" value="lams_central"/>
+    <property name="lams_contentrepository" value="lams_contentrepository"/>
+    <property name="sub.build.dir" value="build/lib"/>
+    <property name="lams.jar" value="${lams_common}/${sub.build.dir}/lams.jar"/>
+    <property name="lams_admin.war" value="${lams_admin}/${sub.build.dir}/lams_admin.war"/>
+    <property name="lams_learning.war" value="${lams_learning}/${sub.build.dir}/lams_learning.war"/>
+    <property name="lams_authoring.war" value="${lams_authoring}/${sub.build.dir}/lams_authoring.war"/>
+    <property name="lams_monitoring.war" value="${lams_monitoring}/${sub.build.dir}/lams_monitoring.war"/>
+    <property name="lams_central.war" value="${lams_central}/${sub.build.dir}/lams_central.war"/>
+    <property name="lams_contentrepository.jar" value="${lams_contentrepository}/${sub.build.dir}/lams_contentrepository.jar"/>
+    
+    <target name="init">
+        <mkdir dir="${assembly.dir}"/>
+    </target>
+    
+    <target name="usage" description="print usage message">
+        <echo>usage: this message</echo>
+        <echo>clean: clean the ear assembly directories</echo>
+        <echo>clean-subprojects: clean sub project build directories</echo>
+        <echo>build-subprojects: build sub projects</echo>
+        <echo>assemble-ear: assemble ear structure</echo>
+        <echo>deploy-ear: copy ear to loca jboss server</echo>
+    </target>
+    
+    <!-- clean dirs for this script only -->
+    <target name="clean" description="cleans assembly">
+        <delete includeEmptyDirs="true" dir="${assembly.dir}" includes="**/*"/>
+    </target>
+    
+    <!-- clean all projects -->
+    <target name="clean-subporjects" description="cleans sub projects">
+    </target>
+    
+    <!-- build sub-projects -->
+    <target name="build-subprojects" description="builds sub porjects">
+        <ant antfile="../${lams_common}/build.xml" target="build-jar" inheritAll="false"/>
+        <ant antfile="../${lams_contentrepository}/build.xml"  target="build-jar" inheritAll="false"/>
+        <ant antfile="../${lams_central}/build.xml" target="build-war" inheritAll="false"/>
+        <!--  <ant antfile="../${lams_authoring}/build.xml"  target="build-war" inheritAll="false"/> -->
+        <!--  <ant antfile="../${lams_learning}/build.xml" target="build-war" inheritAll="false"/> -->
+        <ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/>
+        <!--
+        <ant antfile="../${lams_admin}/build.xml" target="build-war" inheritAll="false"/>
+        -->
+    </target>
+    
+    <!-- assemble ear -->
+    <target name="assemble-ear" depends="init, clean, build-subprojects" description="Assemble lasm ear in exploded form">
+        <!-- have to copy the libs etc. to a temp location otherwise we end up with all the directories under lib as well-->
+        <mkdir dir="${assembly.dir}/temp"/>
+        <copy todir="${assembly.dir}/temp" failonerror="true" flatten="true">
+            <fileset dir="${lib.dir}">
+                <patternset id="lib.jars">
+                    <include name="**/*.jar"/>
+                    <exclude name="middlegen/*"/>
+                    <exclude name="mysql/*"/>
+                    <exclude name="xdoclet/*"/>
+                    <exclude name="httpunit/*"/>
+                    <exclude name="junit/*"/>
+                    <exclude name="strutstestcase/*"/>
+                </patternset>   
+            </fileset>
+            <fileset dir="..">
+                <include name="${lams.jar}"/>
+                <include name="${lams_contentrepository.jar}"/>
+                <include name="${lams_central.war}"/>
+                <!--<include name="lams_authoring.war"/>-->
+                <include name="${lams_monitoring.war}"/>
+                <!--  <include name="lams_learning.war"/>
+                <include name="lams_admin.war"/-->
+                
+            </fileset>
+        </copy>
+        <!-- create a temporary ear -->
+        <ear destfile="${assembly.temp.ear}" compress="false" appxml="${app.xml}">
+            <fileset dir="${assembly.dir}/temp" includes="*"/>
+        </ear>
+        <!-- remove temp lib -->
+        <delete dir="${assembly.dir}/temp" includeEmptyDirs="true"/> 
+        <!-- explode the ear (Why doesn't the EAR task support exploded format?) -->
+        <unjar src="${assembly.temp.ear}" dest="${assembly.lams.ear}"/>
+        <!-- delete temp.ear -->
+        <delete file="${assembly.temp.ear}"/>
+    </target>
+    
+    
+    <!-- deploy -->
+    <target name="deploy-ear" description="Assembles and deploy to jboss">
+        <copy todir="${jboss.deploy.dir}" overwrite="true" failonerror="true" verbose="true">
+            <fileset dir="${assembly.dir}">
+            	<include name="${lams.ear}/**/*.*"/>
+            </fileset>
+            
+        </copy>
+    </target>
+    
+</project>
