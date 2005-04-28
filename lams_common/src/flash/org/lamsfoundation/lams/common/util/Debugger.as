@@ -10,11 +10,18 @@
 */  
 class Debugger {  
 	
-     //Declarations  
+    //Declarations  
+    public static var CRITICAL:Number = 1;      //level constants
+    public static var HIGH:Number = 2;
+    public static var MED:Number = 3;
+    public static var GEN:Number = 4;
+    public static var COMP:Number = 5;
+    
     private static var _severityLevel:Number = 5;
 	private static var _allowDebug:Boolean = true;
 	
-	private static var _currentClass:String;
+	private static var _currentClass:String;
+    
 	//Constructor  
 	function Debugger() {  
 		
