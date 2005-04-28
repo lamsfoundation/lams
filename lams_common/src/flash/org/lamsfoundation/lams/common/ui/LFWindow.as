@@ -105,7 +105,6 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
     
     public function startDragging(Void):Void {
         super.startDragging();
-        //trace('drag started');
     }
 
 	//Getters+Setters
@@ -114,4 +113,14 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
         //trace('setting scrollContentPath-'+content);
         _scrollContentPath = path;
     }
+    
+    /**
+    * override parent property becuase we don't want to be able to set LFWindow content path
+    * because LWWindow 'content' is created in createChildren
+    */
+    function set contentPath(value:Object){
+        
+    }
+    
+    
 }
