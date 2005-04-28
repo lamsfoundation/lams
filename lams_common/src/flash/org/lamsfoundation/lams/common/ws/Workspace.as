@@ -34,7 +34,7 @@ class org.lamsfoundation.lams.common.ws.Workspace {
         //todo DI 07/04/05 write code user design selection, just a stub at the moment, calls itemSelected
         itemSelected(1);
         //Open the workspace dialog
-        workspaceView.createWorkspacePopup();
+        workspaceView.createWorkspacePopup(560,420);
     }
     
     private function itemSelected(designId:Number){
