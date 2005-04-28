@@ -2,6 +2,7 @@
 import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.ui.*
+import org.lamsfoundation.lams.common.dict.*
 import mx.managers.*
 
 /**
@@ -39,8 +40,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView
 		_workspace_mc._y = y;
 		_workspace_mc.bg_mc._width = w;
 		_workspace_mc.bg_mc._height = h;
-        //Workspace initially invisible
-        //_workspace_mc._visible = false;
 	}
 	
 	/*
@@ -56,9 +55,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView
     /**
     * Create a popup for the workspace
     */
-    public function createWorkspacePopup(w:Number,height:Number){
+    public function createWorkspacePopup(w:Number,h:Number){
         trace('workspace.createWorkspacePopup');
-        var popup = PopUpManager.createPopUp(_root, LFWindow, true,{title:'PopUpManager.createPopUp',closeButton:true,scrollContentPath:'workspaceDialog',_x:200,_y:200});
-        popup.setSize(550,450);
+        var popup = PopUpManager.createPopUp(_root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog',_x:200,_y:200});
+        popup.setSize(w,h);
     }
 }
