@@ -37,8 +37,12 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
     
 	public function init(Void):Void {
  	    super.init();
-        //trace('LFWindow.init()');
-        //contentPath = 'ScrollPane';
+        
+        //set up skin
+        
+        skinCloseOver  = 'LFCloseButtonOver';
+        skinCloseDown = 'LFCloseButtonDown';
+        
 	}
     
   
@@ -106,6 +110,23 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
     public function startDragging(Void):Void {
         super.startDragging();
     }
+    
+    /**
+    * overrides UIObject.setStyle to provide custom style setting
+    */
+    
+    public function setStyle(styleName:String,styleObj:Object){
+        trace('setstyle');
+        //Pass it up the inheritance chain to set any inherited styles or non-custom/LAMS style properties
+        super.setStyle(styleName,styleObj);
+        //If the button style is to be set then set it
+        if(typeof(styleObj)=='object'){
+            if(styleName=='closeButton'){
+            }
+        }
+    }
+    
+
 
 	//Getters+Setters
     [Inspectable(defaultValue='')]
@@ -121,6 +142,4 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
     function set contentPath(value:Object){
         
     }
-    
-    
 }
