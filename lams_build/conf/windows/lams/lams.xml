@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Lams PUBLIC "-//LAMS//DTD LAMS//EN" "file:///C:/lamsconf/lams.dtd">
+<Lams>
+	<ServerURL></ServerURL>
+	<LamsHome>C:/lams</LamsHome>
+	<TempDir>C:/lams/temp</TempDir>
+	<SMTPServer>mail.lib.mq.edu.au</SMTPServer>
+	<LamsSupportEmail>lams_support@melcoe.mq.edu.au</LamsSupportEmail>
+	<UploadFileMaxSize>1048576</UploadFileMaxSize>
+	<UploadLargeFileMaxSize>10485760</UploadLargeFileMaxSize>
+	<UploadFileMaxMemorySize>4096</UploadFileMaxMemorySize>
+	<ChatServerName></ChatServerName>
+	<ChatPortNumber>9800</ChatPortNumber>
+	<FileManagerDir>d:/jboss-3.2.6/server/default/deploy/upload.war</FileManagerDir>
+	<ExecutableExtensions>.bat,.bin,.com,.cmd,.exe,.msi,.msp,.ocx,.pif,.scr,.sct,.sh,.shs,.vbs</ExecutableExtensions>
+	<TicketFile>d:/jboss-3.2.6/server/default/conf/lams.tck</TicketFile>
+	<!-- UserInactiveTimeout in seconds. 86400 seconds is one day-->
+	<UserInactiveTimeout>86400</UserInactiveTimeout>
+	<!-- If a user is allowed to login with different clients at the same time-->
+	<!-- It should be always false except when running testHarness-->
+	<AllowMultipleLogin>false</AllowMultipleLogin>
+</Lams>

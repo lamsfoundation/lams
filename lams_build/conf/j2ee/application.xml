@@ -11,10 +11,98 @@
             <context-root>/lams</context-root>
 	</web>
     </module>
-    <module>
+<!--     <module>
         <web>
             <web-uri>lams_monitoring.war</web-uri>
             <context-root>/lams/lams_monitoring</context-root>
 	</web>
     </module>
+    -->
+    <!--  Third Party JAR Files -->
+	<module>
+		<java>aopalliance.jar</java>
+	</module>
+	<module>
+		<java>cglib-full-2.0.2.jar</java>
+	</module>
+	<module>
+		<java>dom4j-1.5.2.jar</java>
+	</module>
+	<module>
+		<java>ehcache-1.0.jar</java>
+	</module>
+	<module>
+		<java>hibernate2.jar</java>
+	</module>
+	<module>
+		<java>hibernate-tools.jar</java>
+	</module>
+	<module>
+		<java>jstl-1.0.jar</java>
+	</module>
+	<module>
+		<java>commons-beanutils.jar</java>
+	</module>
+	<module>
+		<java>commons-collections-3.1.jar</java>
+	</module>
+	<module>
+		<java>commons-digester.jar</java>
+	</module>
+	<module>
+		<java>commons-fileupload-1.0.jar</java>
+	</module>
+	<module>
+		<java>commons-lang-2.0.jar</java>
+	</module>
+	<module>
+		<java>commons-logging.jar</java>
+	</module>
+	<module>
+		<java>poi-2.5.1-final-20040804.jar</java>
+	</module>
+	<module>
+		<java>standard.jar</java>
+	</module>
+	<module>
+		<java>jboss-cache.jar</java>
+	</module>
+	<module>
+		<java>jgroups.jar</java>
+	</module>
+	<module>
+		<java>jdom.jar</java>
+	</module>
+	<module>
+		<java>log4j-1.2.9.jar</java>
+	</module>
+	<module>
+		<java>mysql-connector-java-3.1.7-bin.jar</java>
+	</module>
+	<module>
+		<java>odmg-3.0.jar</java>
+	</module>
+	<module>
+		<java>spring.jar</java>
+	</module>
+	<module>
+		<java>struts.jar</java>
+	</module>
+	<module>
+		<java>struts-el.jar</java>
+	</module>
+	<module>
+		<java>wddx-1.0a-lfl-0.2.jar</java>
+	</module>
+    <!--  End Third Party JAR Files -->
+    
+    <!--  Tools -->
+<!--     <module>
+        <web>
+            <web-uri>lams_tool_imscp.war</web-uri>
+            <context-root>/lams/tool/imscp</context-root>
+	</web>
+    </module>
+    -->
+    
 </application>
