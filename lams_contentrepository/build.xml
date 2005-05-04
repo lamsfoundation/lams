@@ -38,6 +38,12 @@ Ant build file.
 		<fileset dir="${lib}">
 			<include name="**/*.jar"/>
 		</fileset>
+		<fileset dir="${sharedlib}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${j2eelibs}">
+			<include name="**/*.jar"/>
+		</fileset>
 	</path>
 
 	<path id="project.classpath">
@@ -46,7 +52,6 @@ Ant build file.
 		<!-- This property is supposed to be set in eclipse  -->
 		<pathelement location="${java.class.path}" />
 	</path>
-
 	<target name="usage">
 		<echo message=""/>
 		<echo message="${project} build file"/>
