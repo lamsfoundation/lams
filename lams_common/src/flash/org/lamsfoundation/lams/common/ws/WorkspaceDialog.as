@@ -1,7 +1,6 @@
 ﻿import mx.controls.*
 import mx.utils.*
 import mx.managers.*
-import mx.managers.*
 import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
@@ -27,6 +26,8 @@ class WorkspaceDialog extends MovieClip{
     private var yCancelOffset:Number;
     
     private var fm:FocusManager;        //Reference to focus manager
+    
+    private var myLabel_lbl:Label;      //Text labels
 
 
     function WorkspaceDialog(){
@@ -41,6 +42,9 @@ class WorkspaceDialog extends MovieClip{
         
         //Set the container reference
         _container = _parent._parent;
+        
+        //Set the text on the labels
+        myLabel_lbl.text = 'text label';
         
         //Set the text for buttons
         ok_btn.label = Dictionary.getValue(1);
