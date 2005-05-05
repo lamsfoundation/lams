@@ -118,16 +118,13 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
         super.tearDown();
 
     }
+    protected String[] getContextConfigLocation() {
+		return new String[] {"WEB-INF/spring/applicationContext.xml",
+							 "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+							 "WEB-INF/spring/learningDesignApplicationContext.xml"};
+	}
 
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
-     */
-    protected String[] getContextConfigLocation()
-    {
-        return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-                			  "/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
-                			  "applicationContext.xml"};
-    }
+    
 
     //---------------------------------------------------------------------
     // Data initialization and finalization methods

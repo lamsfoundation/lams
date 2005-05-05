@@ -8,9 +8,10 @@
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 		<property name="userDAO"><ref bean="userDAO"/></property>
 		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
-		<property name="workspaceDAO"><ref bean="workspaceDAO"/></property>
+		<property name="workspaceDAO"><ref bean="userManagementWorkspaceDAO"/></property>
 		<property name="organisationDAO"><ref bean="organisationDAO"/></property>
 		<property name="authoringService"><ref bean="authoringService"/></property>
+		<property name="workspaceFolderContentDAO"><ref bean="workspaceFolderContentDAO"/></property>
 	</bean>
 	
 	<bean id="workspaceManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -26,8 +27,7 @@
 			<props>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="store*">PROPAGATION_REQUIRED</prop>
-				<prop key="copy*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>				
 			</props>
 		</property>
 	</bean>

@@ -68,6 +68,10 @@
 				<value>org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>
+				
+				<!-- Workspace related mapping files -->
+				<value>org/lamsfoundation/lams/workspace/WorkspaceFolderContent.hbm.xml</value>
+				
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -105,7 +109,7 @@
 		<property name="userOrganisationRoleDAO"><ref local="userOrganisationRoleDAO"/></property>
 		<property name="authenticationMethodDAO"><ref local="authenticationMethodDAO"/></property>
 		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
-		<property name="workspaceDAO"><ref bean="workspaceDAO"/></property>
+		<property name="userManagementWorkspaceDAO"><ref bean="userManagementWorkspaceDAO"/></property>
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 	</bean>	
 	
@@ -183,11 +187,14 @@
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>	
 	
-	<bean id="workspaceDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceDAO">
+	<bean id="userManagementWorkspaceDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="workspaceFolderDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	<bean id="workspaceFolderContentDAO" class="org.lamsfoundation.lams.workspace.dao.hibernate.WorkspaceFolderContentDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 </beans>

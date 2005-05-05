@@ -105,15 +105,9 @@ public class TestActivity extends AbstractLamsTestCase
         assertNotNull(child);
         assertEquals("verify id",TEST_CHILD_QNA_ACTIVITY_ID,child.getActivityId().longValue());
     }
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
-     */
-    protected String[] getContextConfigLocation()
-    {
-		return new String[] {"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
-		 "applicationContext.xml"};
-    }
-
+    protected String[] getContextConfigLocation() {
+		return new String[] {"WEB-INF/spring/applicationContext.xml","WEB-INF/spring/learningDesignApplicationContext.xml"};
+	}
     /**
      * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
      */

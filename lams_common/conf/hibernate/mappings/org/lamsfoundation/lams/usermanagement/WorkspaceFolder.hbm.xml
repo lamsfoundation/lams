@@ -156,6 +156,11 @@
         <one-to-many class="org.lamsfoundation.lams.learningdesign.LearningDesign"/>
     </set>
     
+    <!-- bi-directional one-to-many association to WorkspaceFolderContent -->
+    <set name="folderContent" lazy="false" inverse="true" cascade="delete">
+        <key><column name="workspace_folder_id" /></key>
+        <one-to-many class="org.lamsfoundation.lams.workspace.WorkspaceFolderContent"/>
+    </set>
 
 </class>
 </hibernate-mapping>

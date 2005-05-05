@@ -31,7 +31,7 @@ public class TestWorkspaceDAO extends AbstractLamsTestCase {
 	}
 	protected void setUp() throws Exception{	
 		super.setUp();
-		workspaceDAO =(IWorkspaceDAO)context.getBean("workspaceDAO");
+		workspaceDAO =(IWorkspaceDAO)context.getBean("userManagementWorkspaceDAO");
 	}
 	public void testGetWorkspaceByRootFolderID(){
 		boolean rootFolder = false;
@@ -40,6 +40,4 @@ public class TestWorkspaceDAO extends AbstractLamsTestCase {
 			rootFolder=true;
 		assertTrue(rootFolder);
 	}
-		
-
 }

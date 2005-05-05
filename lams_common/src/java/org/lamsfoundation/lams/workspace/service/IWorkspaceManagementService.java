@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.workspace.service;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
@@ -10,6 +11,10 @@ import org.lamsfoundation.lams.workspace.exception.WorkspaceFolderException;
  * @author Manpreet Minhas
  */
 public interface IWorkspaceManagementService {
+	
+	public static final String REPOSITORY_USERNAME ="workspaceManager";
+	public static final String REPOSITORY_PASSWORD ="flashClient";
+	public static final String REPOSITORY_WORKSPACE="FlashClientsWorkspace";
 	
 	/**
 	 * This method returns the contents of the folder with given
@@ -21,7 +26,7 @@ public interface IWorkspaceManagementService {
 	 * <ul>
 	 * <li> AUTHORING In which case all the Learning Designs in the given
 	 * 		folder are returned OR</li>
-	 * <li> MONITORING In which case only those learning Designs that are 
+	 * <li> MONITORING In which case only those Learning Designs that are 
 	 * 		valid are returned </li>
 	 * </ul>
 	 *  
@@ -51,9 +56,9 @@ public interface IWorkspaceManagementService {
 	 * 							whose contents are requested
 	 * @param mode It can be either 1(AUTHORING) or 2(MONITORING)
 	 * @return String The required information in WDDX format 
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public String getFolderContents(Integer userID, Integer workspaceFolderID, Integer mode)throws IOException;
+	public String getFolderContents(Integer userID, Integer workspaceFolderID, Integer mode)throws Exception;
 	
 	/**
 	 * This method creates a new folder under the given parentFolder
@@ -167,5 +172,54 @@ public interface IWorkspaceManagementService {
 	 * @throws IOException
 	 */
 	public String moveFolder(Integer currentFolderID,Integer targetFolderID,Integer userID)throws IOException;
+	
+	/**
+	 * This method is called every time a new content is inserted into the
+	 * given workspaceFolder. The content to be inserted can be either of 
+	 * type FILE or PACKAGE, which is indicated by <code>contentTypeID</code>.
+	 * A value of 1 indicates a FILE and a value of 2 indicates PACKAGE.
+	 * 
+	 * After updating the database with the corresponding entry of the new content
+	 * this method then updates the Repository as well.
+	 *  
+	 * @param contentTypeID The type of content being added.(FILE/PACKAGE)
+	 * @param name The name of the file
+	 * @param description The description of the file
+	 * @param createDateTime The date and time this content was created
+	 * @param lastModifiedDate The date and time this content was last modified 
+	 * @param workspaceFolderID The container(<code>workspaceFolder</code>)which
+	 * 							holds this content
+	 * @param mimeType The MIME type of the file 
+	 * @param path The physical location of the file from where it has to be read
+	 * @return String The acknowledgement/error message in WDDX format for the 
+	 * 				  FLASH client.
+	 * @throws Exception
+	 */
+	public String createWorkspaceFolderContent(Integer contentTypeID,String name,
+											   String description,Date createDateTime,
+											   Date lastModifiedDate,Integer workspaceFolderID,
+											   String mimeType, String path)throws Exception;
+	
+	/**
+	 * This method updates an existing file(<code>workspaceFolderContet</code>)
+	 * with new contents in the Reositiory. 
+	 * 
+	 * @param folderContentID The <code>folder_content_id</code> of the file 
+	 * 						  to be updated
+	 * @param path The physical location of the file from where it has to be read
+	 * @return String The acknowledgement/error message in WDDX format for FLASH
+	 * @throws Exception
+	 */
+	public String updateWorkspaceFolderContent(Long folderContentID,String path)throws Exception;
+	
+	/**
+	 * This method deletes all versions of the given content (FILE/PACKAGE)
+	 * fom the repository. 
+	 * 
+	 * @param folderContentID The content to be deleted
+	 * @return String Acknowledgement/error message in WDDX format for FLASH
+	 * @throws Exception
+	 */
+	public String deleteWorkspaceFolderContent(Long folderContentID)throws Exception;
 
 }

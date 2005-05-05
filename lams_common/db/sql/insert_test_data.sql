@@ -912,10 +912,16 @@ insert into lams_learning_design(learning_design_ui_id,description,title,first_a
 
 -- insert the test data for the content repository
 INSERT INTO lams_cr_credential (credential_id, name, password) VALUES (1, 'atool','atool');
+INSERT INTO lams_cr_credential (credential_id, name, password) VALUES (2, 'workspaceManager','flashClient');
+
 INSERT INTO lams_cr_workspace  (workspace_id, name) VALUES (1, 'atoolWorkspace');
-INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (1, 1,1);
 INSERT INTO lams_cr_workspace  (workspace_id, name) VALUES (2, 'atoolWorkspace2');
+INSERT INTO lams_cr_workspace  (workspace_id, name) VALUES (3, 'flashClientsWorkspace');
+
+
+INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (1, 1,1);
 INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (2, 2,1);
+INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (3, 3,2);
 
 INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path, next_version_id) VALUES (1, 1, 'DATANODE', 20050106103100, "/test",3);
 INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, created_date_time)
@@ -935,5 +941,12 @@ VALUES (3, 2, 1, 20050106103100);
 INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (5,3,"VERSIONDESC","Initial Version.",1);
 INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (6,3,"FILENAME","nofile.txt",1);
 INSERT INTO lams_cr_node_version_property( id, nv_id, name, value, type) VALUES (7,3,"MIMETYPE","unknown/unknown",1);														
+
+INSERT INTO lams_workspace_folder_content VALUES (1,1,'Document','Test Description','20050101','20050101',2,NULL,NULL,'DOC');
+INSERT INTO lams_workspace_folder_content VALUES (2,1,'Text File','Test Description','20050101','20050101',2,NULL,NULL,'TXT');
+INSERT INTO lams_workspace_folder_content VALUES (3,1,'Text File','Test Description','20050101','20050101',3,NULL,NULL,'TXT');
+INSERT INTO lams_workspace_folder_content VALUES (4,1,'Gif File','Test Description','20050101','20050101',3,NULL,NULL,'GIF');
+INSERT INTO lams_workspace_folder_content VALUES (5,1,'Gif2 File','Test Description','20050101','20050101',3,NULL,NULL,'GIF');
+INSERT INTO lams_workspace_folder_content VALUES (6,1,'Text2 File','Test Description','20050101','20050101',3,NULL,NULL,'TXT');
 
 SET FOREIGN_KEY_CHECKS=1;

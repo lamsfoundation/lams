@@ -45,7 +45,8 @@ DROP TABLE IF EXISTS lams_user_organisation_role;
 DROP TABLE IF EXISTS lams_workspace;
 DROP TABLE IF EXISTS lams_workspace_folder;
 DROP TABLE IF EXISTS lams_workspace_folder_type;
-
+DROP TABLE IF EXISTS lams_workspace_folder_content_type;
+DROP TABLE IF EXISTS lams_workspace_folder_content;
 
 
 SET FOREIGN_KEY_CHECKS=1;

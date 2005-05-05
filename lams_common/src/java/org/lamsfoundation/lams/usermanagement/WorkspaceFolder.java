@@ -24,10 +24,12 @@ package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 
 /**
  * @hibernate.class table="lams_workspace_folder"
@@ -89,6 +91,13 @@ public class WorkspaceFolder implements Serializable {
      * the type of workspace folder. Can be either 
      * NORMAL OR RUN_SEQUENCES */
     private Integer workspaceFolderType;
+    
+    /**
+     * A Collection of <code>WorkspaceFolderContent</code>
+     *  objects representing the content of this
+     *  folder. As of now it represents only Files.
+     */
+    private Set folderContent;
 
 	public WorkspaceFolder(String name,
 						   Integer workspaceID,
@@ -337,5 +346,26 @@ public class WorkspaceFolder implements Serializable {
 				return false;
 		}else
 			return false;
+	}
+	/**
+	 * @return Returns the folderContents.
+	 */
+	public Set getFolderContent() {
+		return folderContent;
+	}
+	/**
+	 * @param folderContents The folderContents to set.
+	 */
+	public void setFolderContent(Set folderContent) {
+		this.folderContent = folderContent;
+	}
+	/**
+	 * @param workspaceFolderContent The content to be added
+	 */
+	public void addFolderContent(WorkspaceFolderContent workspaceFolderContent){
+		if(this.folderContent==null)
+			this.folderContent = new HashSet();
+		
+		this.folderContent.add(workspaceFolderContent);
 	}
 }

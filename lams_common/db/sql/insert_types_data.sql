@@ -81,6 +81,8 @@ INSERT INTO lams_log_event_type VALUES (4, 'LEARNER_LESSON_RESUME');
 INSERT INTO lams_log_event_type VALUES (5, 'LEARNER_ACTIVITY_START');
 INSERT INTO lams_log_event_type VALUES (6, 'LEARNER_ACTIVITY_FINISH');
 
+INSERT INTO lams_workspace_folder_content_type VALUES (1,'FILE');
+INSERT INTO lams_workspace_folder_content_type VALUES (2,'PACKAGE');
 
 
 

@@ -7,6 +7,7 @@
 package org.lamsfoundation.lams.workspace;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
@@ -41,8 +42,8 @@ public class TestWorkspaceManagement extends AbstractLamsTestCase {
 	protected String getHibernateSessionFactoryName() {
 		return "coreSessionFactory";
 	}
-	public void testGetFolderContents()throws IOException{
-		String packet = workspaceManagementService.getFolderContents(new Integer(4),new Integer(2),WorkspaceManagementService.AUTHORING);		
+	public void testGetFolderContents()throws Exception{
+		String packet = workspaceManagementService.getFolderContents(new Integer(4),new Integer(4),WorkspaceManagementService.AUTHORING);		
 		System.out.println(packet);
 	}
 	public void testCopyFolder() throws IOException{
@@ -63,6 +64,20 @@ public class TestWorkspaceManagement extends AbstractLamsTestCase {
 		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(new Integer(6));
 		assertTrue(workspaceFolder.getParentWorkspaceFolder().getWorkspaceFolderId().equals(new Integer(2)));
 	}
-	
-
+	public void testCreateWorkspaceFolderContent()throws Exception{
+		String message = workspaceManagementService.createWorkspaceFolderContent(new Integer(1),
+																"Manpreet Minhas","Manpreet's Description",
+																new Date(),new Date(),
+																new Integer(3),
+																"TXT","c:/MMinhas.TXT");
+		System.out.println(message);
+	}
+	public void testUpdateWorkspaceFolderContent() throws Exception{
+		String message = workspaceManagementService.updateWorkspaceFolderContent(new Long(7),"c:/MMinhas2.txt");
+		System.out.println(message);
+	}
+	public void testDeleteWorkspaceFolderContent() throws Exception{
+		String message = workspaceManagementService.deleteWorkspaceFolderContent(new Long(7));
+		System.out.println(message);
+	}
 }

@@ -48,10 +48,10 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		userDAO = (UserDAO)context.getBean("userDAO");
 	}
 	public void testCalculateFirstActivity(){
-		learningDesign = learningDesignDAO.getLearningDesignById(new Long(2));
+		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
 		Activity activity = learningDesign.calculateFirstActivity();
 		assertNotNull(activity.getActivityId());
-		long x = 27;
+		long x = 20;
 		assertEquals(activity.getActivityId().longValue(),x);
 	}
 	protected String[] getContextConfigLocation() {
@@ -63,7 +63,7 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		System.out.println("SIZE:"+list.size());
 	}
 	public void testGetLearningDesignDTO() throws Exception{
-		learningDesign = learningDesignDAO.getLearningDesignById(new Long(2));
+		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
 		LearningDesignDTO learningDesignDTO = learningDesign.getLearningDesignDTO();		
 		String str = WDDXProcessor.serialize(learningDesignDTO);
 		System.out.println(str);		

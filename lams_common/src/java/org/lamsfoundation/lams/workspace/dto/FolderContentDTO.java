@@ -7,30 +7,32 @@
 package org.lamsfoundation.lams.workspace.dto;
 
 import java.util.Date;
+import java.util.SortedSet;
+import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
+import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 
 /**
- * @author Minhas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author Manpreet Minhas
  */
 public class FolderContentDTO {
 	
-	public static final String LESSON ="lesson";
-	public static final String DESIGN ="learningDesign";
-	public static final String FOLDER ="folder";
+	public static final String LESSON ="Lesson";
+	public static final String DESIGN ="LearningDesign";
+	public static final String FOLDER ="Folder";
+	public static final String FILE ="File";
 	
-	private String name;
-	private String description;
-	private Date creationDateTime;
-	private Date lastModifiedDateTime;
-	private String resourceType;
-	private Long resourceID;
-	private Integer permissionCode;
+	public String name;
+	public String description;
+	public Date creationDateTime;
+	public Date lastModifiedDateTime;
+	public String resourceType;
+	public Long resourceID;
+	public Integer permissionCode;
+	public Vector versionDetails;
 	
 	public FolderContentDTO(){
 		
@@ -47,6 +49,7 @@ public class FolderContentDTO {
 		this.resourceType = resourceType;
 		this.resourceID = resourceID;
 		this.permissionCode = permissionCode;
+		this.versionDetails = new Vector();
 	}
 	public FolderContentDTO(LearningDesign design, Integer permissionCode){
 		this.name = design.getTitle();
@@ -56,6 +59,7 @@ public class FolderContentDTO {
 		this.resourceType = DESIGN;
 		this.resourceID = design.getLearningDesignId();
 		this.permissionCode = permissionCode;
+		this.versionDetails = new Vector();
 	}
 	public FolderContentDTO(WorkspaceFolder workspaceFolder, Integer permissionCode){
 		this.name = workspaceFolder.getName();
@@ -65,7 +69,22 @@ public class FolderContentDTO {
 		this.resourceType = FOLDER;
 		this.resourceID = new Long(workspaceFolder.getWorkspaceFolderId().intValue());
 		this.permissionCode = permissionCode;
-	}
+		this.versionDetails = new Vector();
+	}	
+	public FolderContentDTO(Integer permissionCode, WorkspaceFolderContent workspaceFolderContent,SortedSet details){
+		this.name =workspaceFolderContent.getName();
+		this.description = workspaceFolderContent.getDescription();
+		this.creationDateTime = workspaceFolderContent.getCreateDate();
+		this.lastModifiedDateTime = workspaceFolderContent.getLastModified();
+		this.resourceID = workspaceFolderContent.getFolderContentID();
+		this.permissionCode = permissionCode;		
+		if(workspaceFolderContent.getContentTypeID().equals(WorkspaceFolderContent.CONTENT_TYPE_FILE))
+			this.resourceType = FILE;
+		else
+			this.resourceType = FOLDER;			
+		this.versionDetails = new Vector();
+		versionDetails.addAll(details);
+	}	
 	/**
 	 * @return Returns the creationDateTime.
 	 */
@@ -107,5 +126,11 @@ public class FolderContentDTO {
 	 */
 	public String getResourceType() {
 		return resourceType!=null?resourceType:WDDXTAGS.STRING_NULL_VALUE;
+	}
+	/**
+	 * @return Returns the versionDetails.
+	 */
+	public Vector getVersionDetails() {
+		return versionDetails;
 	}
 }

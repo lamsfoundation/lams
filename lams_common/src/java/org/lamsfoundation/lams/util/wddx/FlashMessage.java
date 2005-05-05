@@ -139,4 +139,9 @@ public class FlashMessage implements Serializable {
     			"No such Activity with an activity_id of " + activityID +" exists",
 				FlashMessage.ERROR);
     }
+    public static FlashMessage getNoSuchWorkspaceFolderContentExsists(String methodName, Long folderContentID){
+    	return new FlashMessage(methodName,
+    			"No such WorkspaceFolderContent with a folder_content_id of " + folderContentID +" exists",
+				FlashMessage.ERROR);
+    }
 }

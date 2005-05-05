@@ -6,14 +6,28 @@
  */
 package org.lamsfoundation.lams.workspace.service;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.Vector;
 
+import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.FileException;
+import org.lamsfoundation.lams.contentrepository.ICredentials;
+import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
+import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -26,6 +40,8 @@ import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
+import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
+import org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 import org.lamsfoundation.lams.workspace.exception.WorkspaceFolderException;
 
@@ -48,9 +64,19 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	protected IWorkspaceDAO workspaceDAO;
 	protected IOrganisationDAO organisationDAO;
 	
+	protected IWorkspaceFolderContentDAO workspaceFolderContentDAO;
+	
+	
 	protected IAuthoringService authoringService;
+	protected IRepositoryService repositoryService;
 	
-	
+	/**
+	 * @param workspaceFolderContentDAO The workspaceFolderContentDAO to set.
+	 */
+	public void setWorkspaceFolderContentDAO(
+			IWorkspaceFolderContentDAO workspaceFolderContentDAO) {
+		this.workspaceFolderContentDAO = workspaceFolderContentDAO;
+	}
 	/**
 	 * @param authoringService The authoringService to set.
 	 */
@@ -145,7 +171,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getFolderContents(java.lang.Integer, java.lang.Integer, java.lang.Integer)
 	 */
-	public String getFolderContents(Integer userID, Integer workspaceFolderID, Integer mode)throws IOException{
+	public String getFolderContents(Integer userID, Integer workspaceFolderID, Integer mode)throws Exception{
 		User user = userDAO.getUserById(userID);
 		WorkspaceFolder workspaceFolder = null;
 		Integer permissions = null;
@@ -157,7 +183,10 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					Vector contentDTO = new Vector();
 					getFolderContent(workspaceFolder,permissions,mode,contentDTO);
 					if(workspaceFolder.hasSubFolders())
-						getSubFolderDetails(workspaceFolder,permissions,contentDTO);					
+						getSubFolderDetails(workspaceFolder,permissions,contentDTO);	
+					Vector repositoryContent = getContentsFromRepository(new Long(workspaceFolderID.intValue()),permissions);
+					if(repositoryContent!=null)
+						contentDTO.addAll(repositoryContent);
 					flashMessage = new FlashMessage("getFolderContents",createFolderContentPacket(workspaceFolder,contentDTO));
 				}
 				else
@@ -511,5 +540,223 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("moveFolder",targetFolderID);			
 		}
 		return flashMessage.serializeMessage();
+	}
+	/**
+	 * This method verifies the credentials of the Workspace Manager
+	 * and gives him the Ticket to login and access the Content Repository.
+	 * A valid ticket is needed in order to access the content from the repository.
+	 * This method would be called evertime the user(Workspace Manager) receives 
+	 * a request to get the contents of the Folder or to add/update a file into
+	 * the <code>WorkspaceFodler</code> (Repository).
+	 *  
+	 * @return ITicket The ticket for repostory access
+	 */
+	private ITicket getRepositoryLoginTicket(){
+		repositoryService = RepositoryProxy.getLocalRepositoryService();
+		ICredentials credentials = new SimpleCredentials(IWorkspaceManagementService.REPOSITORY_USERNAME,
+				 										 IWorkspaceManagementService.REPOSITORY_PASSWORD.toCharArray());		
+		try{
+			ITicket ticket = repositoryService.login(credentials,IWorkspaceManagementService.REPOSITORY_WORKSPACE);
+			return ticket;
+		}catch(AccessDeniedException ae){
+			ae.printStackTrace();
+			return null;
+		}catch(WorkspaceNotFoundException we){
+			we.printStackTrace();
+			return null;			
+		}catch (LoginException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#createWorkspaceFolderContent(java.lang.Integer, java.lang.String, java.lang.String, java.util.Date, java.util.Date, java.lang.Integer, java.lang.String, java.lang.String)
+	 */
+	public String createWorkspaceFolderContent(Integer contentTypeID,String name,
+											 String description,Date createDateTime,
+											 Date lastModifiedDate,Integer workspaceFolderID,
+											 String mimeType, String path)throws Exception{
+		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
+		if(workspaceFolder!=null){
+			WorkspaceFolderContent workspaceFolderContent = new WorkspaceFolderContent(contentTypeID,name,description,createDateTime,lastModifiedDate,mimeType,workspaceFolder);
+			workspaceFolderContentDAO.insert(workspaceFolderContent);
+			try{
+				InputStream stream = new FileInputStream(path);
+				NodeKey nodeKey = addFileToRepository(stream,name,mimeType);
+				workspaceFolderContent.setUuid(nodeKey.getUuid());
+				workspaceFolderContent.setVersionID(nodeKey.getUuid());
+				workspaceFolderContentDAO.update(workspaceFolderContent);
+				flashMessage = new FlashMessage("createWorkspaceFolderContent",nodeKey);
+			}catch(AccessDeniedException ae){
+				flashMessage = new FlashMessage("createWorkspaceFolderContent",
+												"Exception occured while creating workspaceFolderContent: "+ ae.getMessage(),
+												FlashMessage.CRITICAL_ERROR);				
+			}catch(FileException fe){
+				flashMessage = new FlashMessage("createWorkspaceFolderContent",
+												"Exception occured while creating workspaceFolderContent: "+ fe.getMessage(),
+												FlashMessage.CRITICAL_ERROR);
+				
+			}catch(InvalidParameterException ip){
+				flashMessage = new FlashMessage("createWorkspaceFolderContent",
+												"Exception occured while creating workspaceFolderContent: "+ ip.getMessage(),
+												FlashMessage.CRITICAL_ERROR);
+			}
+		}else
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderExsists("createWorkspaceFolderContent",workspaceFolderID);
+		return flashMessage.serializeMessage();
+	}
+	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#updateWorkspaceFolderContent(java.lang.Long, java.io.InputStream)
+	 */
+	public String updateWorkspaceFolderContent(Long folderContentID,String path)throws Exception{
+		InputStream stream = new FileInputStream(path);
+		WorkspaceFolderContent workspaceFolderContent = workspaceFolderContentDAO.getWorkspaceFolderContentByID(folderContentID);
+		if(workspaceFolderContent!=null){
+			NodeKey nodeKey = updateFileInRepository(workspaceFolderContent,stream);
+			flashMessage = new FlashMessage("updateWorkspaceFolderContent",nodeKey);
+		}else
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderContentExsists("updateWorkspaceFolderContent",folderContentID);
+		return flashMessage.serializeMessage();
+	}
+	
+	/**
+	 * This method is called everytime a new content has to be
+	 * added to the repository. In order to do so first of all 
+	 * a valid ticket is obtained from the Repository hence
+	 * authenticating the user(WorkspaceManager) and then 
+	 * the corresponding file is added to the repository.
+	 *  
+	 * @param stream The <code>InputStream</code> representing the data to be added
+	 * @param fileName The name of the file being added
+	 * @param mimeType The MIME type of the file (eg. TXT, DOC, GIF etc)
+	 * @return NodeKey Represents the two part key - UUID and Version.
+	 * @throws AccessDeniedException
+	 * @throws FileException
+	 * @throws InvalidParameterException
+	 */
+	private NodeKey addFileToRepository(InputStream stream, String fileName, String mimeType)throws AccessDeniedException,
+																							FileException,InvalidParameterException{
+		ITicket ticket = getRepositoryLoginTicket();
+		NodeKey nodeKey = repositoryService.addFileItem(ticket,stream,fileName,mimeType,null);
+		return nodeKey;
+	}
+	/**
+	 * This method is called everytime some content has to be
+	 * updated into the repository. In order to do so first of all 
+	 * a valid ticket is obtained from the Repository hence
+	 * authenticating the user(WorkspaceManager) and then 
+	 * the corresponding file is updated to the repository.
+	 * 
+	 * @param workspaceFolderContent The content to be updated
+	 * @param stream stream The <code>InputStream</code> representing the data to be updated
+	 * @return NodeKey Represents the two part key - UUID and Version.
+	 * @throws Exception
+	 */
+	private NodeKey updateFileInRepository(WorkspaceFolderContent workspaceFolderContent,
+									   InputStream stream)throws Exception{		
+		ITicket ticket = getRepositoryLoginTicket();
+		NodeKey nodeKey = repositoryService.updateFileItem(ticket,workspaceFolderContent.getUuid(),
+														   workspaceFolderContent.getName(),
+														   stream,workspaceFolderContent.getMimeType(),null);
+		workspaceFolderContent.setUuid(nodeKey.getUuid());
+		workspaceFolderContent.setVersionID(nodeKey.getVersion());
+		workspaceFolderContentDAO.update(workspaceFolderContent);
+		return nodeKey;
+	}	
+	
+	/**
+	 * This method is called when the user knows which version of the
+	 * <code>worksapceFolderContent</code> he wants to delete.
+	 * 
+	 * The database (<code>lams_workspace_folder_content</code>)
+	 * stores information only about the latest version of the file.
+	 * So if a user deletes all the versions from the repository
+	 * one by one. there is no way the database would get to know
+	 * about the change.So every time a request is received to 
+	 * delete a content from the repository, the database is checked
+	 * against the <code>uuid</code> and <code>version_id</code>
+	 * for the given content.If found that record is also deleted.  
+	 *  
+	 * @param uuid The uuid of the <code>workspaceFolderContent</code>
+	 * @param versionID The versionID of the <code>workspaceFolderContent</code>
+	 * @param folderContentID The <code>folder_content_id</code> of the content to be deleted
+	 * @return String Acknowledgement/error message in WDDX format for FLASH 
+	 * @throws Exception
+	 */
+	
+	public String deleteContentWithVersion(Long uuid, Long versionID,Long folderContentID)throws Exception{
+		ITicket ticket = getRepositoryLoginTicket();
+		String files[] = repositoryService.deleteVersion(ticket,uuid,versionID);
+		if(files==null){
+			workspaceFolderContentDAO.deleteContentWithVersion(uuid,versionID,folderContentID);
+			flashMessage = new FlashMessage("deleteContentWithVersion","Content Successfully deleted");
+		}else
+			flashMessage = new FlashMessage("deleteContentWithVersion",
+											"Following files could not be deleted" + files,
+											FlashMessage.CRITICAL_ERROR);
+		
+		return  flashMessage.serializeMessage();		
+	}
+	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteWorkspaceFolderContent(java.lang.Long, boolean)
+	 */
+	public String deleteWorkspaceFolderContent(Long folderContentID)throws Exception{
+		WorkspaceFolderContent workspaceFolderContent = workspaceFolderContentDAO.getWorkspaceFolderContentByID(folderContentID);
+		if(workspaceFolderContent!=null){
+			Long uuid = workspaceFolderContent.getUuid();
+			Long versionID = workspaceFolderContent.getVersionID();
+			ITicket ticket = getRepositoryLoginTicket();
+			String files[] = repositoryService.deleteNode(ticket,uuid);
+			if(files!=null){
+				flashMessage = new FlashMessage("deleteWorkspaceFolderContent",
+												"Follwing files could not be deleted" + files.toString(),
+												FlashMessage.CRITICAL_ERROR);
+			}else{
+				
+				flashMessage = new FlashMessage("deleteWorkspaceFolderContent","Content deleted");
+			}
+		}else
+			flashMessage = FlashMessage.getNoSuchWorkspaceFolderContentExsists("deleteWorkspaceFolderContent",folderContentID);
+		
+		return flashMessage.serializeMessage();
+		
+	}
+	/**
+	 * TODO
+	 * This method returns the contents of the given folder from the
+	 * repository. As of now I am assuming that a folder contains only
+	 * FILES and not PACKAGES. This method would be modified in the near
+	 * future to return a list of PACKAGES contained as well.
+	 *  
+	 * For every file contained within the given <code>WorkspaceFolder</code> 
+	 * this method also returns a list of all its availabe versions.
+	 * 
+	 * @param workspaceFolderID The <code>WorkspaceFolder</code> whose contents have been
+	 * 							requested from the Repositor
+	 * @param permissions The permissions on this WorkspaceFolder and hence all its contents
+	 * @return Vector A collection of required information.
+	 * @throws Exception
+	 */
+	private Vector getContentsFromRepository(Long workspaceFolderID, Integer permissions)throws Exception{
+		List content = workspaceFolderContentDAO.getContentByWorkspaceFolder(workspaceFolderID);
+		if(content.size()==0)
+			return null;
+		else{
+			ITicket ticket = getRepositoryLoginTicket();
+			Vector repositoryContent = new Vector();
+			Iterator contentIterator = content.iterator();
+			while(contentIterator.hasNext()){
+				WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent)contentIterator.next();
+				SortedSet set = repositoryService.getVersionHistory(ticket,workspaceFolderContent.getUuid());				
+				repositoryContent.add(workspaceFolderContent.getFolderContentDTO(set,permissions));
+			}
+			return repositoryContent;
+		}
 	}
 }

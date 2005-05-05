@@ -384,6 +384,8 @@ Ant build file.
 				<pathelement location="${build.classes}"/>
 				<pathelement location="${build.test}"/>
 				<pathelement location="${hbm}"/>
+				<pathelement location="${web}"/>
+				<pathelement location="${webinf.spring}"/>
 				<pathelement location="${testweb}"/>
 				<path refid="project.classpath"/>
 			</classpath>
@@ -399,5 +401,31 @@ Ant build file.
 			<report todir="${build.report}/html"/> 
 		</junitreport>
 	</target>	
+	
+	<!-- =================================================================== -->
+	<!-- Run xdoclet for hibernate                                           -->
+	<!-- =================================================================== -->
+		<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask">
+		    <classpath refid="all-libs"/>
+		</taskdef>
+
+		<target name="webdoclet" depends="preparedirs">
+			<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
+		         <fileset dir="${src.java}">
+		            <include name="**/*Action.java" />
+		         </fileset>
+
+		         <deploymentdescriptor 
+		         				servletspec="2.3" 
+		         				destdir="${webinf}"
+					         	mergedir="${conf.xdoclet}"
+		         				sessiontimeout="${sessiontimeout}"/>
+				
+		         <strutsconfigxml 
+		         				destdir="${webinf.struts}"
+		         				version="1.2" 
+		         				mergedir="${conf.xdoclet}"/>
+		     </webdoclet>
+		</target>
 </project>
 

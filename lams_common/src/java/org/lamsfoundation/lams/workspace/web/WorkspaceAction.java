@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.workspace.web;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -69,7 +70,7 @@ public class WorkspaceAction extends DispatchAction {
 	public ActionForward getFolderContents(ActionMapping mapping,
 										   ActionForm form,
 										   HttpServletRequest request,
-										   HttpServletResponse response)throws ServletException,IOException{
+										   HttpServletResponse response)throws ServletException,Exception{
 		Integer folderID = new Integer(WebUtil.readIntParam(request,"folderID"));
 		Integer mode = new Integer(WebUtil.readIntParam(request,"mode"));		
 		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
@@ -125,6 +126,45 @@ public class WorkspaceAction extends DispatchAction {
 		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
 		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
 		String wddxPacket = workspaceManagementService.moveFolder(currentFolderID,targetFolderID,userID);
+		return mapping.findForward("success");
+	}
+	
+	public ActionForward createWorkspaceFolderContent(ActionMapping mapping,
+													  ActionForm form,
+													  HttpServletRequest request,
+													  HttpServletResponse response)throws ServletException, Exception{
+		Integer contentTypeID = new Integer(WebUtil.readIntParam(request,"contentType"));
+		String name = WebUtil.readStrParam(request,"name");
+		String description = WebUtil.readStrParam(request,"description");
+		Date createDateTime = new Date(WebUtil.readStrParam(request,"createDateTime"));
+		Date lastModifiedDate = new Date(WebUtil.readStrParam(request,"lastModifiedDateTime"));
+		Integer workspaceFolderID =  new Integer(WebUtil.readIntParam(request,"workspaceFolderID"));
+		String mimeType = WebUtil.readStrParam(request,"mimeType");
+		String path = WebUtil.readStrParam(request,"path");
+		
+		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+		String message = workspaceManagementService.createWorkspaceFolderContent(contentTypeID,name,description,
+																				 createDateTime,lastModifiedDate,workspaceFolderID,
+																				 mimeType,path);
+		return mapping.findForward("success");
+	}
+	public ActionForward updateWorkspaceFolderContent(ActionMapping mapping,
+											 ActionForm form,
+											 HttpServletRequest request,
+											 HttpServletResponse response)throws ServletException, Exception{
+		Long folderContentID = new Long(WebUtil.readLongParam(request,"folderContentID"));
+		String path = WebUtil.readStrParam(request,"path");
+		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+		String message = workspaceManagementService.updateWorkspaceFolderContent(folderContentID,path);
+		return mapping.findForward("success");
+	}
+	public ActionForward deleteAllVersionsOfContent(ActionMapping mapping,
+													ActionForm form,
+													HttpServletRequest request,
+													HttpServletResponse response)throws ServletException, Exception{
+		Long folderContentID = new Long(WebUtil.readLongParam(request,"folderContentID"));
+		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+		String message = workspaceManagementService.deleteWorkspaceFolderContent(folderContentID);
 		return mapping.findForward("success");
 	}
 

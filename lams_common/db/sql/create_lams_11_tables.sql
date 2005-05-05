@@ -673,3 +673,30 @@ CREATE TABLE lams_learning_transition (
                   REFERENCES lams_learning_design (learning_design_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
+CREATE TABLE lams_workspace_folder_content_type (
+       content_type_id INT(3) NOT NULL AUTO_INCREMENT
+     , description VARCHAR(64) NOT NULL
+     , PRIMARY KEY (content_type_id)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_workspace_folder_content (
+       folder_content_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , content_type_id INT(3) NOT NULL
+     , name VARCHAR(64) NOT NULL
+     , description VARCHAR(64) NOT NULL
+     , create_date_time DATETIME NOT NULL
+     , last_modified_date DATETIME NOT NULL
+     , workspace_folder_id BIGINT(20) NOT NULL
+     , uuid BIGINT(20)
+     , version_id BIGINT(20)
+     , mime_type VARCHAR(10)NOT NULL
+     , UNIQUE unique_content_name (name,workspace_folder_id,mime_type)
+     , UNIQUE unique_node_version (workspace_folder_id,uuid,version_id)
+     , PRIMARY KEY (folder_content_id)
+     , INDEX (workspace_folder_id)
+     , CONSTRAINT FK_lams_workspace_folder_content_1 FOREIGN KEY (workspace_folder_id)
+                  REFERENCES lams_workspace_folder (workspace_folder_id)
+     , INDEX (content_type_id)
+     , CONSTRAINT FK_lams_workspace_folder_content_2 FOREIGN KEY (content_type_id)
+                  REFERENCES lams_workspace_folder_content_type (content_type_id)
+)TYPE=InnoDB;

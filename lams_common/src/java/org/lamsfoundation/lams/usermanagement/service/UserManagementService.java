@@ -325,7 +325,7 @@ public class UserManagementService implements IUserManagementService {
 	/**
 	 * @param workspaceDAO The workspaceDAO to set.
 	 */
-	public void setWorkspaceDAO(IWorkspaceDAO workspaceDAO) {
+	public void setUserManagementWorkspaceDAO(IWorkspaceDAO workspaceDAO) {
 		this.workspaceDAO = workspaceDAO;
 	}
 	/**

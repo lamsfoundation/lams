@@ -19,6 +19,7 @@
 	<property name="src.java"                  value="${basedir}/src/java"/>
 	<property name="src.test.java"			   value="${basedir}/test/java"/>
 	<property name="conf"                      value="${basedir}/conf"/>
+	<property name="conf.xdoclet" value="${conf}/xdoclet"/>
 	<property name="conf.windows"              value="${conf}/windows"/>
 	<property name="conf.jboss.windows"        value="${conf.windows}/jboss"/>
 	<property name="conf.auth.windows"         value="${conf.windows}/authentication"/>
@@ -34,6 +35,8 @@
 	
 	<property name="web"                           value="${basedir}/web"/>
 	<property name="webinf"                        value="${web}/WEB-INF"/>
+	<property name="webinf.struts" value="${webinf}/struts"/>
+	<property name="webinf.spring" value="${webinf}/spring"/>
 	<property name="testweb"                       value="${basedir}/test/web"/>
 	<property name="testwebinf"                    value="${testweb}/WEB-INF"/>
 
@@ -71,3 +74,5 @@
 	<!-- middlegen properties -->
 	<property name="middlegen"                 value="${conf}/middlegen"/>
 	<property name="gui"                           value="true"/>	
+	
+	<property name="sessiontimeout" value="120"/>

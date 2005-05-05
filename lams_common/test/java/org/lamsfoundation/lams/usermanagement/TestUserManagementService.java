@@ -89,5 +89,9 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 		
 		return "coreSessionFactory";
 	}
+	public void testGetWorkspace()throws IOException{
+		String str = userManagementService.getWorkspace(new Integer(4));
+		System.out.println(str);
+	}
 
 }
