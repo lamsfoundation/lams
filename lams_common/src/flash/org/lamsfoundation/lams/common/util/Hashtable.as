@@ -53,7 +53,6 @@ class Hashtable {
 		setBusy();
         //trace('Hashtable.prototype.get called');
         var i = this._getIndex(o);
-        trace('i:'+i);
         if (i != this.elements.length) {
 			clearBusy();
             return this.elements[i].val;
