@@ -92,6 +92,7 @@ Ant build file.
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<target name="build-war" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
+		<copy overwrite="yes" file="${web}/css/aqua.css" tofile="${web}/css/default.css"/>
 		<war warfile="${build.lib}/${product}.war" 
   				webxml="${webinf}/web.xml">
 			<webinf dir="${webinf}">
@@ -103,9 +104,10 @@ Ant build file.
 			</webinf>
 			<fileset dir="${web}">
 				<include name="*"/>
+				<include name="css/*"/>
+				<include name="images/*"/>
 				<include name="admin/*"/>
 				<include name="doc/*"/>
-				<include name="images/*"/>
 			</fileset>
 		</war>
 	</target>

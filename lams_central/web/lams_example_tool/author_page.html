@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>sample tool</title>
+<link href="css/base.css" rel="stylesheet" type="text/css">
+<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
+<link href="../css/aqua.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+<form action="" method="post">
+<h1>Tool title</h1>
+<h2>Section heading</h2>
+<!-- always contain a group of form controls in this container div-->
+<div id="formtablecontainer">
+<!-- use the class names as below for table, td-->
+<table class="forms">
+  <tr>
+    <td class="formlabel">Field label</td>
+    <td class="formcontrol"><input type="text" name="tf1"></td>
+  </tr>
+  <tr>
+    <td class="formlabel">Different label</td>
+    <td class="formcontrol"><input type="text" name="tf2"></td>
+  </tr>
+</table>
+</div>
+<h2>Another section heading</h2>
+<div id="formtablecontainer">
+<table class="forms">
+  <tr>
+    <td class="formlabel">Option label</td>
+    <td class="formcontrol"><input type="checkbox" name="chk1" value="checkbox"></td>
+  </tr>
+ <tr>
+    <td class="formlabel">Option label</td>
+    <td class="formcontrol"><input type="checkbox" name="chk2" value="checkbox"></td>
+  </tr>
+  <tr>
+    <td class="formlabel">Radio label</td>
+    <td class="formcontrol"><input name="radiobutton1" type="radio" value="radiobutton"></td>
+  </tr>
+  <tr>
+    <td class="formlabel">Radio label</td>
+    <td class="formcontrol"><input name="radiobutton2" type="radio" value="radiobutton"></td>
+  </tr>
+</table>
+</div>
+<h2>Data display </h2>
+<div id="datatablecontainer">
+<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <th scope="col">A colum header </th>
+    <th scope="col">The other one </th>
+  </tr>
+  <tr>
+    <td>Some data </td>
+    <td>A related fact </td>
+  </tr>
+  <tr>
+    <td>Intersting data </td>
+    <td>An unrelated fact </td>
+  </tr>
+  <tr>
+    <td>Boring data </td>
+    <td>Way to boil an egg </td>
+  </tr>
+</table>
+</div>
+
+<hr>
+<a href="javascript:;" class="button">Cancel</a>
+<a href="javascript:;" class="button">OK</a>
+<p></p>
+</form>
+</body>
+</html>
