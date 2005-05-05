@@ -10,6 +10,7 @@ import org.lamsfoundation.lams.common.util.*
 dynamic class Dictionary {
 
 	private static var items:Hashtable;
+    private static var loaded:Boolean = false;
 
 	/**
 	* @method load
@@ -18,27 +19,25 @@ dynamic class Dictionary {
 	* @return 
 	*/
 	public static function load(language:String):Void {
-        trace('Dictionary-Load!!!!');
-        items = new Hashtable();
-		//TODO: DI 28/04/05 Load the information for the current language from the server for create items in here
-        items.put(0,new DictionaryItem(0,'ws_dialog_title','Workspace'));
-        items.put(1,new DictionaryItem(1,'ws_dialog_ok_button','OK'));
-        items.put(2,new DictionaryItem(2,'ws_dialog_cancel_button','Cancel'));
-	}
-    
-	/**
-	* @tooltip returns the dictionary item based on ID
-	* @param id (Number) id parameter.
-	*/
-	public static function getItemById(id:Number):DictionaryItem {
-        trace('Dictionary.getItemById');
-        return items.get(id);
+        //Only load dictionary once
+        if(!loaded) {
+            Debugger.log('Dictionary-Load',Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
+            items = new Hashtable();
+            //TODO: DI 28/04/05 Load the information for the current language from the server for create items in here
+            items.put(0,new DictionaryItem(0,'ws_dialog_title','Workspace'));
+            items.put(1,new DictionaryItem(1,'ws_dialog_ok_button','OK'));
+            items.put(2,new DictionaryItem(2,'ws_dialog_cancel_button','Cancel'));
+            
+            //Set loaded flag
+            loaded = true;
+        }
 	}
     
     /**
     * return the text value for the corresponding ID
     */
     public static function getValue(id:Number):String{
+        Debugger.log('returning item-' +id + '-' + items.get(id).value,Debugger.GEN,'getItemById','org.lamsfoundation.lams.dict.Dictionary');
         return items.get(id).value;
     }
 }
