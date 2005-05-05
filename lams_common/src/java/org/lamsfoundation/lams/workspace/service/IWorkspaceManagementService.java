@@ -221,5 +221,29 @@ public interface IWorkspaceManagementService {
 	 * @throws Exception
 	 */
 	public String deleteWorkspaceFolderContent(Long folderContentID)throws Exception;
+	
+	/**
+	 * This method is called when the user knows which version of the
+	 * <code>worksapceFolderContent</code> he wants to delete.
+	 * 
+	 * The content to be deleted can be one of the following 
+	 * <ol>
+	 * 		<li> The only version available in the repository,
+	 * 		     In which case both the records from the repository
+	 * 			  and the database should be deleted.</li>
+	 * 		<li> The latest version in the repository, in which case
+	 * 			 the database should be updated with the next available
+	 * 			 latest version.</li>
+	 * 		<li> One of the available versions in the repository, in which 
+	 * 			 case the corresponding version is deleted from the repository
+	 * 			 and database is not effected </li>
+	 * </ol>
+	 * @param uuid The uuid of the <code>workspaceFolderContent</code>
+	 * @param versionToBeDeleted The versionID of the <code>workspaceFolderContent</code>
+	 * @param folderContentID The <code>folder_content_id</code> of the content to be deleted
+	 * @return String Acknowledgement/error message in WDDX format for FLASH 
+	 * @throws Exception
+	 */	
+	public String deleteContentWithVersion(Long uuid, Long versionToBeDeleted,Long folderContentID)throws Exception;
 
 }

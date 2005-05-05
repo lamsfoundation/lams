@@ -22,7 +22,9 @@ import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
@@ -666,38 +668,57 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		workspaceFolderContent.setVersionID(nodeKey.getVersion());
 		workspaceFolderContentDAO.update(workspaceFolderContent);
 		return nodeKey;
-	}	
-	
+	}
 	/**
-	 * This method is called when the user knows which version of the
-	 * <code>worksapceFolderContent</code> he wants to delete.
-	 * 
-	 * The database (<code>lams_workspace_folder_content</code>)
-	 * stores information only about the latest version of the file.
-	 * So if a user deletes all the versions from the repository
-	 * one by one. there is no way the database would get to know
-	 * about the change.So every time a request is received to 
-	 * delete a content from the repository, the database is checked
-	 * against the <code>uuid</code> and <code>version_id</code>
-	 * for the given content.If found that record is also deleted.  
-	 *  
-	 * @param uuid The uuid of the <code>workspaceFolderContent</code>
-	 * @param versionID The versionID of the <code>workspaceFolderContent</code>
-	 * @param folderContentID The <code>folder_content_id</code> of the content to be deleted
-	 * @return String Acknowledgement/error message in WDDX format for FLASH 
-	 * @throws Exception
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteContentWithVersion(java.lang.Long, java.lang.Long, java.lang.Long)
 	 */
-	
-	public String deleteContentWithVersion(Long uuid, Long versionID,Long folderContentID)throws Exception{
+	public String deleteContentWithVersion(Long uuid, Long versionToBeDeleted,Long folderContentID)throws Exception{
+		WorkspaceFolderContent workspaceFolderContent = workspaceFolderContentDAO.getWorkspaceFolderContentByID(folderContentID);
+		Long databaseVersion = workspaceFolderContent.getVersionID();
+		
 		ITicket ticket = getRepositoryLoginTicket();
-		String files[] = repositoryService.deleteVersion(ticket,uuid,versionID);
-		if(files==null){
-			workspaceFolderContentDAO.deleteContentWithVersion(uuid,versionID,folderContentID);
-			flashMessage = new FlashMessage("deleteContentWithVersion","Content Successfully deleted");
-		}else
+		String files[]=null;
+		try{
+			files = repositoryService.deleteVersion(ticket,uuid,versionToBeDeleted);
+		}catch(ItemNotFoundException ie){
 			flashMessage = new FlashMessage("deleteContentWithVersion",
-											"Following files could not be deleted" + files,
-											FlashMessage.CRITICAL_ERROR);
+											"No such content with versionID of " + versionToBeDeleted + " found in repository",
+											FlashMessage.ERROR);
+		   return flashMessage.serializeMessage();
+		}
+		
+		/*
+		 * ItemNotFoundException exception will be thrown if the version deleted
+		 * above was the only version available in the repository. If that is the
+		 * case the corresponding record from the database should also be deleted
+		 * 
+		 * If ItemNotFoundException is not thrown that means there are some other
+		 * versions of the content that are available, and it returns the latest 
+		 * version.
+		 * 
+		 * If databaseVersion is same as versionToBeDeleted we update the database with
+		 * the next available latest version , IF NOT no changes are made to the
+		 * database.
+		 */
+	
+		try{			
+			IVersionedNode latestAvailableNode = repositoryService.getFileItem(ticket,uuid,null);
+			Long latestAvailableVersion = latestAvailableNode.getVersion();
+			if(files==null){
+				if(databaseVersion.equals(versionToBeDeleted)){
+					workspaceFolderContent.setVersionID(latestAvailableVersion);
+					workspaceFolderContentDAO.update(workspaceFolderContent);
+				}
+				flashMessage = new FlashMessage("deleteContentWithVersion","Content Successfully deleted");
+			}else
+				flashMessage = new FlashMessage("deleteContentWithVersion",
+												"Following files could not be deleted" + files,
+												FlashMessage.CRITICAL_ERROR);
+		}catch(ItemNotFoundException ie){
+			workspaceFolderContentDAO.delete(workspaceFolderContent);
+			flashMessage = new FlashMessage("deleteContentWithVersion","Content Successfully deleted");
+		}
 		
 		return  flashMessage.serializeMessage();		
 	}
