@@ -75,5 +75,6 @@
         <archive path="D:\eclipse\workspace\lams_build\lib\xdoclet\xdoclet-wsee-module-1.2.2.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\xdoclet\xdoclet-xdoclet-module-1.2.2.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\j2ee\jstl-1.0.jar"/>
+        <archive path="D:\eclipse\workspace\lams_build\lib\FCKeditor\FCKEditor-2.1.jar"/>
     </library>
 </eclipse-userlibraries>

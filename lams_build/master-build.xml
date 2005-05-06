@@ -68,6 +68,7 @@
 					<include name="cglib/*.jar" />
 					<include name="dom4j/*.jar" />
 					<include name="ehcache/*.jar" />
+					<include name="fckEditor/*.jar" />
 					<include name="hibernate/*.jar" />
 					<include name="j2ee/*.jar" />
 					<include name="jakarta-commons/*.jar" />

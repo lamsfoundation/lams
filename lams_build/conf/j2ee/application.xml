@@ -59,6 +59,9 @@
 		<java>commons-logging.jar</java>
 	</module>
 	<module>
+		<java>FCKeditor-2.1.jar</java>
+	</module>
+	<module>
 		<java>poi-2.5.1-final-20040804.jar</java>
 	</module>
 	<module>
