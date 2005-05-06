@@ -158,9 +158,17 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
         //TODO we need to remove this once all done.
         if (isSurvey(toolActivity))
         {
-            ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
+			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
             contentManager.copyToolContent(toolActivity.getToolContentId(),
                                            newToolcontentID);
+            if ( toolActivity.getDefineLater() != null &&
+                    toolActivity.getDefineLater().booleanValue() ) {
+                contentManager.setAsDefineLater(newToolcontentID);
+            }
+            if ( toolActivity.getRunOffline() != null &&
+                    toolActivity.getRunOffline().booleanValue() ) {
+            contentManager.setAsRunOffline(newToolcontentID);
+			}
         }
         return newToolcontentID;
     }
