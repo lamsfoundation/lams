@@ -1,24 +1,33 @@
 ﻿import mx.events.*
 import org.lamsfoundation.lams.common.style.*
+import org.lamsfoundation.lams.common.util.*
 
 /**
 * Manages styles throughout LAMS
 * 
-* @class StyleManager
-* @author DI
+* @class    StyleManager
+* @author   DI
+* @usage    import org.lamsfoundation.lams.common.style.*
+*           var myStyleManagerReference:StyleManager = StyleManager.getInstance();
+*           myStyleManagerReference.getStyleObject(<visual id:string>)
 */
 class StyleManager {
 
 	//Declarations
-    //Event delegation methods required for compiler
-    private var dispatchEvent:Function;
+    //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
+    private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
     
-    private var themes:Array;                   //Stores themes for the application
+    //This ensures that the StyleManager is created
+    private static var _instance:StyleManager = new StyleManager();
+    //Stores themes for the application
+    private var themes:Array;                   
     
 	//Constructor
-    function StyleManager() {
+    private function StyleManager() {
+        Debugger.log('constructor',Debugger.GEN,'constructor','org.lamsfoundation.lams.StyleManager');
+
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
         
@@ -26,45 +35,38 @@ class StyleManager {
         themes = [];
     }
     
+
     /**
     * Load themes from the Server
     */
     public function loadThemes(){
         //TODO DI 03/05/05 Stub for now but should query server to access themes
-        themes[0]
-    }
-        
-
-    /*
-    * Used to create a style for LAMS UI elements
-    */
-    private function createStyle(style:mx.styles.CSSStyleDeclaration){
-        
     }
     
     /**
-    * Broadcast updates to all registered listeners
+    * Return the single instance of the StyleManager
     */
-    public function broadcastUpdate(){
-        dispatchEvent({type:'update',target:this});
+    public static function getInstance():StyleManager{
+        return _instance;
+    }
+        
+    /**
+    * Notify registered listeners that a Styles update has happened
+    */
+    public static function broadcastThemeChanged(){
+        _instance.dispatchEvent({type:'themeChanged',target:_instance});
+        trace('broadcast');
     }
     
-    /*
-    Example of setting global styles
-    var styleObj = new mx.styles.CSSStyleDeclaration();
-    styleObj.styleName = 'newStyle';
-    
-    _global.styles.newStyle = styleObj;
-    
-    var styleObj = _global.styles.newStyle = new mx.styles.CSSStyleDeclaration();
-    styleObj.setStyle('fontFamily', 'Verdana');
-    styleObj.setStyle('fontSize', 10);
-    styleObj.setStyle('fontWeight', 'bold');
-    styleObj.setStyle('textDecoration', 'underline');
-    styleObj.setStyle('color', 0x336699);
-    styleObj.setStyle('themeColor', 'haloBlue');
-    _root.setStyle('styleName', 'newStyle');
-    */
-    //Getters+Setters
-    
+    public function getStyleObject(visualElementId:String):mx.styles.CSSStyleDeclaration{
+        //Make the styleObject for this theme/visual element and return
+        var styleObj = new mx.styles.CSSStyleDeclaration();
+        styleObj.setStyle('fontFamily', 'Arial');
+        styleObj.setStyle('fontSize', 12);
+        styleObj.setStyle('color', 0xff00000);
+        styleObj.setStyle('themeColor', 0xff0000);
+        styleObj.setStyle('borderStyle', 'outset');
+        styleObj.setStyle('LAMSStyle', 'AStyle');
+        return styleObj;        
+    }
 }
