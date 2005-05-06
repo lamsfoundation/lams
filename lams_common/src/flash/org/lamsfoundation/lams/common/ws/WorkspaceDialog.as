@@ -4,6 +4,7 @@ import mx.managers.*
 import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.style.*
 
 /**
 * @author      DI
@@ -12,37 +13,47 @@ class WorkspaceDialog extends MovieClip{
  
     //private static var OK_OFFSET:Number = 50;
     //private static var CANCEL_OFFSET:Number = 50;
-    
-    private var ok_btn:Button;           //OK+Cancel buttons
+
+    //References    
+    private var _container:MovieClip;       //The container window that holds the dialog
+    private var ok_btn:Button;              //OK+Cancel buttons
     private var cancel_btn:Button;
-    private var panel:MovieClip;         //The underlaying panel base
-    private var treeview:MovieClip;      //Treeview for navigation through workspace folder structure
+    private var panel:MovieClip;            //The underlaying panel base
+    private var treeview:MovieClip;         //Treeview for navigation through workspace folder structure
+    private var fm:FocusManager;            //Reference to focus manager
+    private var myLabel_lbl:Label;          //Text labels
+    private var styleManager:StyleManager;  //Text labels
     
-    private var _container:MovieClip;    //The container window that holds the dialog
-    
+    //Dimensions for resizing
     private var xOkOffset:Number;
     private var yOkOffset:Number;
     private var xCancelOffset:Number;
     private var yCancelOffset:Number;
     
-    private var fm:FocusManager;        //Reference to focus manager
-    
-    private var myLabel_lbl:Label;      //Text labels
 
-
+    /**
+    * constructor
+    */
     function WorkspaceDialog(){
         trace('WorkSpaceDialog.constructor');
         //Create a clip that will wait a frame before dispatching init to give components time to setup
         this.onEnterFrame = init;
     }
 
+    /**
+    * Called a frame after movie attached to allow components to initialise
+    */
     private function init(){
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
         
-        //Set the container reference
-        _container = _parent._parent;
+        //set the reference to the StyleManager
+        styleManager = StyleManager.getInstance();
         
+        //Set the container reference
+        //_container = _parent._parent;
+        Debugger.log('container=' + _container,Debugger.GEN,'init','org.lamsfoundation.lams.wsDialog');
+
         //Set the text on the labels
         myLabel_lbl.text = 'text label';
         
@@ -52,7 +63,6 @@ class WorkspaceDialog extends MovieClip{
         
         //Set up focus manager
         fm = _container.getFocusManager();
-        trace(fm);
         fm.enabled = true;
         ok_btn.setFocus();
         
@@ -71,6 +81,28 @@ class WorkspaceDialog extends MovieClip{
         yOkOffset = panel._height - ok_btn._y + ok_btn.height/2;
         xCancelOffset = panel._width - cancel_btn._x + cancel_btn.width/2;
         yCancelOffset = panel._height - cancel_btn._y + cancel_btn.height/2;
+        
+        //Register as a listener with the ThemeManager
+        styleManager.addEventListener('themeChanged',this);
+    }
+    
+    /**
+    * Event fired by StyleManager class to notify listeners that Theme has changed
+    * it is up to listeners to then query Style Manager for relevant style info
+    */
+    public function themeChanged(){
+        //The theme has changed get the new style info 
+        var styleObj = styleManager.getStyleObject('workspace');
+        //Debugger.log('styleObject : ' + styleObj,Debugger.GEN,'themeChanged','org.lamsfoundation.lams.WorkspaceDialog');
+        //Debugger.log('themeColor : ' + styleObj.getStyle('themeColor'),Debugger.GEN,'themeChanged','org.lamsfoundation.lams.WorkspaceDialog');
+        _container.setStyle('styleName',styleObj);
+    }
+    
+    /**
+    * Called on initialisation and when the Theme is changed through style manager
+    */
+    private function setStyles(){
+        //Get the style from the stylemanager
     }
 
     /**
@@ -90,7 +122,6 @@ class WorkspaceDialog extends MovieClip{
        //If validation successful commit + close parent window
     }
     
-    
     /**
     * Event dispatched by parent container when close button clicked
     */
@@ -99,24 +130,20 @@ class WorkspaceDialog extends MovieClip{
         e.target.deletePopUp();
     }
     
-    
     /**
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number){
-        Debugger.log('setSize',Debugger.GEN,'setSize','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-        
+        //Debugger.log('setSize',Debugger.GEN,'setSize','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
         //Size the panel
         panel.setSize(w,h);
 
         //Buttons
         ok_btn.move(w-xOkOffset,h-yOkOffset);
         cancel_btn.move(w-xCancelOffset,h-yCancelOffset);
-        
     }
     
     //Gets+Sets
-    
     /**
     * set the container refernce to the window holding the dialog
     */
