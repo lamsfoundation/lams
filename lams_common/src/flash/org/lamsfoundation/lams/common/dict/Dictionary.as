@@ -21,7 +21,7 @@ dynamic class Dictionary {
 	public static function load(language:String):Void {
         //Only load dictionary once
         if(!loaded) {
-            Debugger.log('Dictionary-Load',Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
+            //Debugger.log('Dictionary-Load',Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
             items = new Hashtable();
             //TODO: DI 28/04/05 Load the information for the current language from the server for create items in here
             items.put(0,new DictionaryItem(0,'ws_dialog_title','Workspace'));
@@ -37,7 +37,7 @@ dynamic class Dictionary {
     * return the text value for the corresponding ID
     */
     public static function getValue(id:Number):String{
-        Debugger.log('returning item-' +id + '-' + items.get(id).value,Debugger.GEN,'getItemById','org.lamsfoundation.lams.dict.Dictionary');
+        //Debugger.log('returning item-' +id + '-' + items.get(id).value,Debugger.GEN,'getItemById','org.lamsfoundation.lams.dict.Dictionary');
         return items.get(id).value;
     }
 }
