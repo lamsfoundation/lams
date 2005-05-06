@@ -190,18 +190,6 @@ public class Tool implements Serializable {
         this.learnerUrl = learnerUrl;
     }
 
-    /** 
-     * @hibernate.property column="supports_grouping_flag" length="1"
-     *             		   not-null="true"       
-     */
-    public boolean getSupportsGrouping() {
-        return this.supportsGrouping;
-    }
-
-    public void setSupportsGrouping(boolean supportsGrouping) {
-        this.supportsGrouping = supportsGrouping;
-    }
-
     /**
      * @hibernate.property column="supports_contribute_flag" length="1"
      *             		   not-null="true"    
