@@ -14,15 +14,17 @@ import org.lamsfoundation.lams.common.util.*
 class StyleManager {
 
 	//Declarations
+    //This ensures that the StyleManager is created
+    private static var _instance:StyleManager;
+
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
     public var removeEventListener:Function;
     
-    //This ensures that the StyleManager is created
-    private static var _instance:StyleManager = new StyleManager();
     //Stores themes for the application
-    private var themes:Array;                   
+    private var themes:Hashtable;
+    private var _selectedTheme:String;        
     
 	//Constructor
     private function StyleManager() {
@@ -32,22 +34,50 @@ class StyleManager {
         EventDispatcher.initialize(this);
         
         //Create and populate themes array
-        themes = [];
+        themes = new Hashtable('Themes');
     }
     
-
     /**
     * Load themes from the Server
     */
     public function loadThemes(){
         //TODO DI 03/05/05 Stub for now but should query server to access themes
+        //Base styles for default theme
+        var baseStyleObj = new mx.styles.CSSStyleDeclaration();
+        baseStyleObj.setStyle('color', 0xff00000);
+        baseStyleObj.setStyle('themeColor', 0xff0000);
+        baseStyleObj.setStyle('borderStyle', 'inset');
+        
+        var defaultTheme = new Theme('default',baseStyleObj);
+
+        //Workspace style object
+        var wsSO = new mx.styles.CSSStyleDeclaration();
+        wsSO.setStyle('fontFamily', 'Arial');
+        wsSO.setStyle('fontSize', 12);
+        wsSO.setStyle('color', 0x00000ff);
+        wsSO.setStyle('themeColor', 0x0000ff);
+        wsSO.setStyle('borderStyle', 'outset');
+        
+        var wsVisualElement = new VisualElement('workspace',wsSO);
+
+        //Add the workspace element to the default theme
+        defaultTheme.addVisualElement(wsVisualElement);
+        
+        //Add the default Theme to the themes   
+        themes.put(defaultTheme.name,defaultTheme);
+        
+        //Set the selected theme to the default theme initially
+        _selectedTheme = 'default';
     }
     
     /**
-    * Return the single instance of the StyleManager
-    */
+    * Retrieves an instance of the StyleManager singleton, creating it if necessary
+    */ 
     public static function getInstance():StyleManager{
-        return _instance;
+        if(StyleManager._instance == null){
+            StyleManager._instance = new StyleManager();
+        }
+        return StyleManager._instance;
     }
         
     /**
@@ -58,15 +88,25 @@ class StyleManager {
         trace('broadcast');
     }
     
+    /**
+    * sets the current theme
+    */
+    public function selectTheme(theme:String){
+        _selectedTheme = theme;
+    }
+    
+    /**
+    * Returns a style object with styles for the VisualElementId passed in
+    */
     public function getStyleObject(visualElementId:String):mx.styles.CSSStyleDeclaration{
-        //Make the styleObject for this theme/visual element and return
-        var styleObj = new mx.styles.CSSStyleDeclaration();
-        styleObj.setStyle('fontFamily', 'Arial');
-        styleObj.setStyle('fontSize', 12);
-        styleObj.setStyle('color', 0xff00000);
-        styleObj.setStyle('themeColor', 0xff0000);
-        styleObj.setStyle('borderStyle', 'outset');
-        styleObj.setStyle('LAMSStyle', 'AStyle');
-        return styleObj;        
+        //Get relevant style object from selected theme
+        //Get selected theme
+        var theme:Theme = themes.get(_selectedTheme);
+        //Get the correct visual element
+        //TODO DI 06/05/05 check for errors here with ID not found
+        var visualElement:VisualElement = theme.getVisualElement(visualElementId);
+        //Construct style object by superimposing base style and visua
+        //TODO DI 06/05/05 implement, for now just return style for visual element
+        return visualElement.styleObject;
     }
 }
