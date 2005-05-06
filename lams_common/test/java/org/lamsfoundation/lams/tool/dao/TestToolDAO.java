@@ -54,8 +54,7 @@ public class TestToolDAO extends ToolDataAccessTestCase
         assertEquals("verify service name","surveyService",testTool.getServiceName());
         assertEquals("verify display name","Survey",testTool.getToolDisplayName());
         assertEquals("verify default content id",6,testTool.getDefaultToolContentId());
-       // assertTrue("verify support grouping",!testTool.getSupportsGrouping());
-        assertTrue("verify support define later",!testTool.getSupportsDefineLater());
+        assertTrue("verify support define later",testTool.getSupportsDefineLater());
     }
     public void testGetAllTools(){
     	List list = toolDao.getAllTools();
