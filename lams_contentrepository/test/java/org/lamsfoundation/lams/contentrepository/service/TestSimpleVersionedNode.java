@@ -21,8 +21,6 @@
 
 package org.lamsfoundation.lams.contentrepository.service;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +48,7 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.ValidationException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.dao.hibernate.WorkspaceDAO;
+import org.lamsfoundation.lams.contentrepository.data.CRResources;
 
 
 
@@ -434,13 +433,22 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 	}
 
 	public void testTextFileNode() {
-		Long uuid = testFileNodeInternal(TEXT_FILEPATH, TEXT_FILENAME, null);
-		testFileNodeInternal(TEXT_FILEPATH, TEXT_FILENAME, uuid);
+		Long uuid;
+        try {
+            uuid = testFileNodeInternal(CRResources.getSingleFile(), CRResources.singleFileName, null);
+            testFileNodeInternal(CRResources.getSingleFile(), CRResources.singleFileName, uuid);
+        } catch (FileNotFoundException e) {
+            fail("Unexpected exception "+e.getMessage());
+        }
 	}
 
 	public void testBinaryFileNode() {
-		Long uuid = testFileNodeInternal(BINARY_FILEPATH, BINARY_FILENAME, null);
-		testFileNodeInternal(BINARY_FILEPATH, BINARY_FILENAME, uuid);
+        try {
+			Long uuid = testFileNodeInternal(CRResources.getZipFile(), CRResources.zipFileName, null);
+			testFileNodeInternal(CRResources.getZipFile(), CRResources.zipFileName, uuid);
+	    } catch (FileNotFoundException e) {
+	        fail("Unexpected exception "+e.getMessage());
+	    }
 	}
 
 	/*
@@ -449,22 +457,14 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 	 * if repositoryEntryExists == true then assume that there should
 	 * already be a file in the directory hence an error will be thrown.
 	 */
-	private Long testFileNodeInternal(String filePath, String filename, Long uuid) {
+	private Long testFileNodeInternal(InputStream is, String filename, Long uuid) {
 		
-		FileInputStream is = null;
 		InputStream newIs = null;
 		SimpleVersionedNode fileNode = null;
 		Long newUuid = uuid;
 		IVersionedNodeAdmin testNode = getTestNode();
 
 		try {
-			File file = new File(filePath);
-			if ( ! file.exists() || file.isDirectory() ) {
-				fail("File "+filePath+" not found on computer or is a directory. Please set this variable to a known file that may be read on this computer."
-						+" Note: this is a shortcoming in the test, it is not a failure of the repository.");
-			}
-
-			is = new FileInputStream(file);
 
 			// first try adding the file to a data node. Should fail as that's not allowed
 			try {
@@ -502,9 +502,6 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 			newIs = fileNode.getFile();
 			assertTrue("File node has an input stream.",newIs != null);
 
-		} catch (FileNotFoundException fe) {
-			fail("File "+filePath+" not found on computer. Please set this variable to a known file that may be read on this computer."
-					+" Note: this is a shortcoming in the test, it is not a failure of the repository.");
 		} catch (FileException fe2) {
 			if ( uuid != null && fe2.getMessage().indexOf("exists")!=-1) {
 				assertTrue("File exists error thrown as expected.", true);

@@ -48,19 +48,6 @@ public class BaseTestCase extends TestCase {
 	protected static final Long TEST_DATA_NODE_ID = new Long(1); // A datanode that should already be in db
 	protected static final Long TEST_FILE_NODE_ID = new Long(2); // A filenode that should already be in db	
 
-	protected final String TEXT_FILEPATH = "D:\\eclipse\\notice.html";
-	protected final String TEXT_FILENAME = "notice.html";
-	protected final String BINARY_FILEPATH = "D:\\eclipse\\startup.jar";
-	protected final String BINARY_FILENAME = "startup.jar";
-
-	// directory containing index.html and related files
-	// PACKAGE_NUM_FILES should be the number of files in the
-	// package excluding the directories e.g 1 html & 6 images = 7
-	// no matter how many directories they may be spread across.
-	protected final String PACKAGE_DIR_PATH = "C:\\temp\\girakool2003";
-	protected final String PACKAGE_TEST_FILE = "images/girafalls3.jpg";
-	protected final int PACKAGE_NUM_FILES = 7;
-	
 	public BaseTestCase(){
 		super();
 		// Uncomment the following line to get debuggging.

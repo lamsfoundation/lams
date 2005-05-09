@@ -22,7 +22,7 @@
 package org.lamsfoundation.lams.contentrepository.service;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -45,6 +45,9 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.dao.IFileDAO;
 import org.lamsfoundation.lams.contentrepository.dao.file.FileDAO;
+import org.lamsfoundation.lams.contentrepository.data.CRResources;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 
 /**
@@ -225,18 +228,22 @@ public class TestSimpleRepository extends BaseTestCase {
 	public void testFileItemDeleteVersion() {
 		IFileDAO fileDAO = (FileDAO)context.getBean("fileDAO", FileDAO.class);
 		
-		NodeKey keys = testAddFileItem(TEXT_FILEPATH, TEXT_FILENAME,null,one);
-		checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
-		keys = testAddFileItem(BINARY_FILEPATH, BINARY_FILENAME,keys.getUuid(),two);
-		checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
-		
-		deleteVersion(keys.getUuid(), two);
-		checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
-		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 1);
-				
-		deleteVersion(keys.getUuid(), one);
-		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
-		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 0);
+        try {
+            NodeKey keys = testAddFileItem(CRResources.getSingleFile(), CRResources.singleFileName,null,one);
+	        checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+			keys = testAddFileItem(CRResources.getZipFile(), CRResources.zipFileName,keys.getUuid(),two);
+			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
+			
+			deleteVersion(keys.getUuid(), two);
+			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 1);
+					
+			deleteVersion(keys.getUuid(), one);
+			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
+			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 0);
+        } catch (FileNotFoundException e) {
+            fail("Unexpected exception "+e.getMessage());
+        }
 	}
 	
 	/** create a node with two versions and test deleting them using delete node */
@@ -244,14 +251,18 @@ public class TestSimpleRepository extends BaseTestCase {
 
 		IFileDAO fileDAO = (FileDAO)context.getBean("fileDAO", FileDAO.class);
 
-		NodeKey keys = testAddFileItem(TEXT_FILEPATH, TEXT_FILENAME,null,one);
-		checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
-		testAddFileItem(BINARY_FILEPATH, BINARY_FILENAME,keys.getUuid(),two);
-		checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
-
-		deleteNode(keys.getUuid());
-		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
-		checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 0);
+		try {
+			NodeKey keys = testAddFileItem(CRResources.getSingleFile(), CRResources.singleFileName ,null,one);
+			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+			testAddFileItem(CRResources.getZipFile(), CRResources.zipFileName,keys.getUuid(),two);
+			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
+		
+			deleteNode(keys.getUuid());
+			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
+			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 0);
+        } catch (FileNotFoundException e) {
+            fail("Unexpected exception "+e.getMessage());
+        }
 	}
 	
 	/** create a node with two versions and test deleting them using delete node 
@@ -263,10 +274,15 @@ public class TestSimpleRepository extends BaseTestCase {
 
 		IFileDAO fileDAO = (FileDAO)context.getBean("fileDAO", FileDAO.class);
 
-		NodeKey keys = testAddFileItem(TEXT_FILEPATH, TEXT_FILENAME,null,one);
-		checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
-		testAddFileItem(BINARY_FILEPATH, BINARY_FILENAME,keys.getUuid(),two);
-		checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
+		NodeKey keys = null;
+		try {
+			keys = testAddFileItem(CRResources.getSingleFile(), CRResources.singleFileName ,null,one);
+			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+			testAddFileItem(CRResources.getZipFile(), CRResources.zipFileName,keys.getUuid(),two);
+			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
+        } catch (FileNotFoundException e) {
+            fail("Unexpected exception "+e.getMessage());
+        }
 		
 		String expectProbPath = null;
 		try { 
@@ -407,22 +423,13 @@ public class TestSimpleRepository extends BaseTestCase {
 		}
 	}
 	
-	private NodeKey testAddFileItem(String filePath, String filename, Long uuid, Long expectedVersion) {
+	private NodeKey testAddFileItem(InputStream file, String filename, Long uuid, Long expectedVersion) {
 		
-		InputStream isIn = null;
 		NodeKey keys = null;
 		try {
-			File file = new File(filePath);
-			if ( ! file.exists() || file.isDirectory() ) {
-				fail("File "+filePath+" not found on computer or is a directory. Please set this variable to a known file that may be read on this computer."
-						+" Note: this is a shortcoming in the test, it is not a failure of the repository.");
-			}
-
-			isIn = new FileInputStream(file);
-
 			if ( uuid == null ) {
 				// new file
-				keys = repository.addFileItem(ticket, isIn, filename, null, v1Description);
+				keys = repository.addFileItem(ticket, file, filename, null, v1Description);
 				assertTrue("File save returns uuid",keys != null && keys.getUuid() != null);
 				assertTrue("File save got expected version "+expectedVersion,
 					keys != null && keys.getVersion() != null 
@@ -430,7 +437,7 @@ public class TestSimpleRepository extends BaseTestCase {
 			} else {
 				// update existing node
 				keys = repository.updateFileItem(ticket, uuid, filename, 
-    					isIn, null, v2Description);
+				        file, null, v2Description);
 				assertTrue("File save returns same uuid",keys != null && keys.getUuid().equals(uuid));
 				assertTrue("File save got expected version "+expectedVersion,
 					keys != null && keys.getVersion() != null 
@@ -440,12 +447,10 @@ public class TestSimpleRepository extends BaseTestCase {
 
 		} catch (RepositoryCheckedException re) {
 			failUnexpectedException("testAddFileItem",re);
-		} catch (IOException ioe) {
-			failUnexpectedException("testAddFileItem",ioe);
 		} finally {
 			try {
-				if ( isIn != null ) {
-					isIn.close();
+				if ( file != null ) {
+				    file.close();
 				}
 			} catch (IOException ioe1) {
 				System.err.println("Unable to close file");
@@ -465,25 +470,24 @@ public class TestSimpleRepository extends BaseTestCase {
 
 	private NodeKey testPackageItem(Long uuid) {
 		
+	    String tempDir = null;
 		String v1Description = "Draft";
 		String v2Description = "Final";
 		NodeKey keys = null;
 		try {
-			File directory = new File(PACKAGE_DIR_PATH);
-			if ( ! directory.exists() || ! directory.isDirectory() ) {
-				fail("Directory "+PACKAGE_DIR_PATH+" not found on computer or is not a directory. Please set this variable to a directory containing an index.html file and related files."
-						+" Note: this is a shortcoming in the test, it is not a failure of the repository.");
-			}
+		    // unpack the zip file so we have a directory to play with 
+		    tempDir = ZipFileUtil.expandZip(CRResources.getZipFile(), CRResources.zipFileName);
+			File directory = new File(tempDir);
 			String[] filenames = directory.list();
 
 			if ( uuid == null ) {
-				keys = repository.addPackageItem(ticket,  PACKAGE_DIR_PATH, "index.html", v1Description);
+				keys = repository.addPackageItem(ticket,  tempDir, "index.html", v1Description);
 				assertTrue("Package save returns uuid",keys != null && keys.getUuid() != null);
 				assertTrue("Package save got version 1",
 						keys != null && keys.getVersion() != null 
 						&& keys.getVersion().longValue() == 1);
 			} else {
-				keys = repository.updatePackageItem(ticket, uuid, PACKAGE_DIR_PATH, "index.html", v2Description);
+				keys = repository.updatePackageItem(ticket, uuid, tempDir, "index.html", v2Description);
 				assertTrue("Package save returns uuid",keys != null && keys.getUuid() != null);
 				assertTrue("Package save got version >1",
 						keys != null && keys.getVersion() != null 
@@ -494,15 +498,15 @@ public class TestSimpleRepository extends BaseTestCase {
 			checkFileInPackage(keys, null);
 			
 			// now try another file in the package
-			checkFileInPackage(keys, PACKAGE_TEST_FILE);
+			checkFileInPackage(keys, CRResources.zipFileIncludesFilename);
 			
 			// check that there is the expected number of files in pacakge.
 			// expect an extra node over the number of files (for the package node)
 			List nodes = repository.getPackageNodes(ticket, keys.getUuid(), null);
 			assertTrue("Expected number of nodes found. Expected " 
-					+(PACKAGE_NUM_FILES+1)+" got "
+					+(CRResources.zipFileNumFiles+1)+" got "
 					+(nodes != null ? nodes.size() : 0 ),
-					nodes != null && nodes.size() == (PACKAGE_NUM_FILES+1));
+					nodes != null && nodes.size() == (CRResources.zipFileNumFiles+1));
 			Iterator iter = nodes.iterator();
 			if ( iter.hasNext() ) {
 				SimpleVersionedNode packageNode = (SimpleVersionedNode) iter.next();
@@ -519,7 +523,19 @@ public class TestSimpleRepository extends BaseTestCase {
 			failUnexpectedException("testPackageItem",re);
 		} catch (IOException ioe) {
 			failUnexpectedException("testPackageItem",ioe);
+	    } catch ( ZipFileUtilException e ) {
+			failUnexpectedException("testPackageItem",e);
+		} finally {
+		    // clean up - delete that temporary directory
+		    if ( tempDir != null ) {
+			    try { 
+			        ZipFileUtil.deleteDirectory(tempDir);
+			    } catch ( ZipFileUtilException e ) {
+					failUnexpectedException("testPackageItem",e);
+			    }
+		    }
 		}
+		
 		return keys;
 	}
 
