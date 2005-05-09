@@ -239,6 +239,12 @@ Ant build file.
 			<fileset dir="${test.java}">
 				<include name="**/*.xml"/>
 			</fileset>
+			<fileset dir="${test.java}">
+				<include name="**/*.txt"/>
+			</fileset>
+			<fileset dir="${test.java}">
+				<include name="**/*.zip"/>
+			</fileset>
 		</copy>
 	</target>
 
