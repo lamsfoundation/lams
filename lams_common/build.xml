@@ -325,10 +325,10 @@ Ant build file.
 	</target>
 
 	<!-- =================================================================== -->
-	<!-- Clean and rebuild the database                                      -->
+	<!-- Clean and rebuild the database. Also cleans out content repository  -->
 	<!-- =================================================================== -->
 	<target name="rebuild-db"
-		description="rebuild LAMS database. Mysql has to be running first">
+		description="rebuild LAMS database and clean out content repository. Mysql has to be running first">
 		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
 				password="${database.password}">
 			<classpath>
@@ -338,6 +338,7 @@ Ant build file.
 			<transaction src="${sql}/create_lams_11_tables.sql"/>
 			<transaction src="${sql}/insert_types_data.sql"/>
 		</sql>
+		<delete quiet="true" dir ="${contentrepository.location}"/>
 	</target>
 
 	<!-- =================================================================== -->

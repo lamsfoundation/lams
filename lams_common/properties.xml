@@ -71,6 +71,8 @@
 	<property name="database.schema"               value=""/>
 	<property name="database.catalog"              value=""/>
 
+	<property name="contentrepository.location"		value="D:/repository"/>
+	
 	<!-- middlegen properties -->
 	<property name="middlegen"                 value="${conf}/middlegen"/>
 	<property name="gui"                           value="true"/>	
