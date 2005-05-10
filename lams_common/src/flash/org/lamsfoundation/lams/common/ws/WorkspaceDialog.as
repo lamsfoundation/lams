@@ -22,7 +22,7 @@ class WorkspaceDialog extends MovieClip{
     private var treeview:MovieClip;         //Treeview for navigation through workspace folder structure
     private var fm:FocusManager;            //Reference to focus manager
     private var myLabel_lbl:Label;          //Text labels
-    private var styleManager:StyleManager;  //Text labels
+    private var themeManager:ThemeManager;  //Text labels
     
     //Dimensions for resizing
     private var xOkOffset:Number;
@@ -48,7 +48,8 @@ class WorkspaceDialog extends MovieClip{
         delete this.onEnterFrame;
         
         //set the reference to the StyleManager
-        styleManager = StyleManager.getInstance();
+        themeManager = ThemeManager.getInstance();
+        trace('*&^*-- themeManager:' +themeManager);
         
         //Set the container reference
         //_container = _parent._parent;
@@ -82,8 +83,9 @@ class WorkspaceDialog extends MovieClip{
         xCancelOffset = panel._width - cancel_btn._x + cancel_btn.width/2;
         yCancelOffset = panel._height - cancel_btn._y + cancel_btn.height/2;
         
-        //Register as a listener with the ThemeManager
-        styleManager.addEventListener('themeChanged',this);
+        //Register as listener with StyleManager and set Styles
+        themeManager.addEventListener('themeChanged',this);
+        setStyles();
     }
     
     /**
@@ -91,18 +93,29 @@ class WorkspaceDialog extends MovieClip{
     * it is up to listeners to then query Style Manager for relevant style info
     */
     public function themeChanged(){
-        //The theme has changed get the new style info 
-        var styleObj = styleManager.getStyleObject('workspace');
-        //Debugger.log('styleObject : ' + styleObj,Debugger.GEN,'themeChanged','org.lamsfoundation.lams.WorkspaceDialog');
-        //Debugger.log('themeColor : ' + styleObj.getStyle('themeColor'),Debugger.GEN,'themeChanged','org.lamsfoundation.lams.WorkspaceDialog');
-        _container.setStyle('styleName',styleObj);
+        //Theme has changed so update objects to reflect new styles
+        setStyles();
     }
     
     /**
-    * Called on initialisation and when the Theme is changed through style manager
+    * Called on initialisation and themeChanged event handler
     */
     private function setStyles(){
-        //Get the style from the stylemanager
+        //LFWindow, goes first to prevent being overwritten with inherited styles.
+        var styleObj = themeManager.getStyleObject('LFWindow');
+        _container.setStyle('styleName',styleObj);
+
+        //Get the button style from the style manager
+        styleObj = themeManager.getStyleObject('button');
+        
+        //apply to both buttons
+        Debugger.log('styleObject : ' + styleObj,Debugger.GEN,'setStyles','org.lamsfoundation.lams.WorkspaceDialog');
+        ok_btn.setStyle('styleName',styleObj);
+        cancel_btn.setStyle('styleName',styleObj);
+        
+        //Get label style and apply to label
+        styleObj = themeManager.getStyleObject('label');
+        myLabel_lbl.setStyle('styleName',styleObj);
     }
 
     /**
