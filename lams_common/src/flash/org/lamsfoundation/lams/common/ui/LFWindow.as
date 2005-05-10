@@ -114,6 +114,8 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
         trace('setstyle');
         //Pass it up the inheritance chain to set any inherited styles or non-custom/LAMS style properties
         super.setStyle(styleName,styleObj);
+        //Pass on to the scrollpane as the theme color doesn't seem to inherit correctly from the Window parent
+        scrollPane.setStyle(styleName,styleObj);
         //If the button style is to be set then set it
         if(typeof(styleObj)=='object'){
             if(styleName=='closeButton'){
