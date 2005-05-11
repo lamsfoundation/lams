@@ -1,4 +1,5 @@
-﻿import org.lamsfoundation.lams.common.ui.*
+﻿import org.lamsfoundation.lams.common.util.Debugger
+import org.lamsfoundation.lams.common.ui.*
 import mx.core.UIComponent
 import mx.styles.StyleManager
 /**
@@ -100,16 +101,20 @@ class Panel extends UIComponent
 	* @param styleProp The property to affect, can be backgroundColor or borderStyle
 	* @param newValue the value to assign to that styleProp. Colours can be in name or hex format, borders as in set borderType
 	* 
-	*/	public function setStyle(styleProp:String, newValue):Void{	//trace('Panel.setStyle');
+	*/	public function setStyle(styleProp:String, newValue):Void{		Debugger.log('styleProp:'+styleProp+' newValue:'+newValue,5,'setStyle','Panel');
 		//only process if we want to set the bkg
 		if(styleProp == "backgroundColor"){
 			//trace('Setting panel bkg to:'+newValue);
+			/*
 			if(isNaN(newValue)){
 				//colour name
 				_backgroundColour = StyleManager.getColorName(newValue);
 			}else{
 				_backgroundColour = newValue;
-			}
+			}
+			*/
+			_backgroundColour = newValue;
+			
 		}else if(styleProp == "borderStyle"){
 			//must be going for the border			_borderType = newValue;		
 		}else{
