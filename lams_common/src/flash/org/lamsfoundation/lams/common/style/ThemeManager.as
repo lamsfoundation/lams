@@ -65,35 +65,54 @@ class ThemeManager {
         //Create default theme
         var defaultTheme = new Theme('default',baseStyleObj);
 
-        //----BUTTON--------------------------------------
+        //----BUTTON------------------------------------------------
         //Style object
         var buttonSO = new mx.styles.CSSStyleDeclaration();
         buttonSO.setStyle('fontFamily', 'Arial');
         buttonSO.setStyle('fontSize', 10);
         buttonSO.setStyle('color', 0xff0000);
-        buttonSO.setStyle('themeColor', 0xff0000);
+        buttonSO.setStyle('themeColor', 0xffdd00);
         buttonSO.setStyle('borderStyle', 'outset');
-        //Custom LAMS styles
-        buttonSO.setStyle('overColor', 0xFAF270);
-        buttonSO.setStyle('lala', 0x0000ff);
+        buttonSO.setStyle('textAlign', 'left');
         
         //Visual Element
         var buttonVisualElement = new VisualElement('button',buttonSO);
         //add visual element to the default theme
         defaultTheme.addVisualElement(buttonVisualElement);
-        //------------------------------------------------
+        //----------------------------------------------------------
+
+        //----LFBUTTON----------------------------------------------
+        //NOTE:This style is used in conjunction with LFButtonSkin class. For usage, see common.style.LFButtonSkin.as
+        //Style object
+        var LFButtonSO = new mx.styles.CSSStyleDeclaration();
+        LFButtonSO.setStyle('fontFamily', 'Arial');
+        LFButtonSO.setStyle('fontSize', 10);
+        LFButtonSO.setStyle('color', 0xff0000);
+        LFButtonSO.setStyle('themeColor', 0xff0000);
+        LFButtonSO.setStyle('borderStyle', 'outset');
+        //Custom LAMS styles
+        LFButtonSO.setStyle('up', 0xCCCCCC);
+        LFButtonSO.setStyle('over', 0xFAF270);
+        LFButtonSO.setStyle('down', 0xff0000);
         
-        //----LABEL---------------------------------------
+        //Visual Element
+        var LFButtonVisualElement = new VisualElement('LFButton',LFButtonSO);
+        //add visual element to the default theme
+        defaultTheme.addVisualElement(LFButtonVisualElement);
+        //----------------------------------------------------------
+
+        
+        //----LABEL-------------------------------------------------
         //Style object
         var labelSO = new mx.styles.CSSStyleDeclaration();
-        labelSO.setStyle('fontFamily', 'Times New Roman');
+        labelSO.setStyle('fontFamily', 'Verdana');
         labelSO.setStyle('fontSize', 14);
         labelSO.setStyle('color', 0x8FBBE7);
         //Visual Element
         var labelVisualElement = new VisualElement('label',labelSO);
         //add visual element to the default theme
         defaultTheme.addVisualElement(labelVisualElement);
-        //------------------------------------------------
+        //----------------------------------------------------------
         
         //----LFWINDOW---------------------------------------
         //Style object
