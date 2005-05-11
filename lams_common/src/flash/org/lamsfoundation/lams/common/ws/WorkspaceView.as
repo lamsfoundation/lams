@@ -3,6 +3,7 @@ import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.authoring.*
 import mx.managers.*
 
 /**
@@ -56,8 +57,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView
     * Create a popup for the workspace
     */
     public function createWorkspacePopup(w:Number,h:Number){
-        trace('workspace.createWorkspacePopup');
-        var popup = PopUpManager.createPopUp(_root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog',_x:200,_y:200});
+        var popup = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog',_x:200,_y:200});
         popup.setSize(w,h);
     }
 }
