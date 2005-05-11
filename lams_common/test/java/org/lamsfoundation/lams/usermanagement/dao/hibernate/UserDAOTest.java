@@ -61,7 +61,7 @@ public class UserDAOTest extends AbstractLamsTestCase{
 		assertTrue(member);
 	}
 	protected String[] getContextConfigLocation() {
-		return new String[] {"WEB-INF/spring/applicationContext.xml","WEB-INF/spring/learningDesignApplicationContext.xml"};
+		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
 	}	
 	public void testSaveUser(){
 		User user = new User();

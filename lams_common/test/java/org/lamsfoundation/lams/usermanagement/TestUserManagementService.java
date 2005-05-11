@@ -48,7 +48,7 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
 	 */
 	protected String[] getContextConfigLocation() {
-		return new String[] {"WEB-INF/spring/applicationContext.xml","WEB-INF/spring/learningDesignApplicationContext.xml"};
+		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
 	}
 	public void testSaveOrganisation(){
 		Organisation organisation = new Organisation("Test Organisation",

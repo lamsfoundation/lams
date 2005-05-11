@@ -116,8 +116,7 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
     {
         return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
                 			  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
-                			  "WEB-INF/spring/learningDesignApplicationContext.xml",
-        					  "WEB-INF/spring/applicationContext.xml"};
+                			  "org/lamsfoundation/lams/applicationContext.xml"};
     }
     
     public void initTestToolSession()

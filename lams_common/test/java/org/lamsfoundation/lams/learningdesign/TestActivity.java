@@ -106,7 +106,7 @@ public class TestActivity extends AbstractLamsTestCase
         assertEquals("verify id",TEST_CHILD_QNA_ACTIVITY_ID,child.getActivityId().longValue());
     }
     protected String[] getContextConfigLocation() {
-		return new String[] {"WEB-INF/spring/applicationContext.xml","WEB-INF/spring/learningDesignApplicationContext.xml"};
+		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
 	}
     /**
      * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()

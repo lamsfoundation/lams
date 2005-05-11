@@ -55,8 +55,7 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		assertEquals(activity.getActivityId().longValue(),x);
 	}
 	protected String[] getContextConfigLocation() {
-		return new String[] {"WEB-INF/spring/learningDesignApplicationContext.xml",
-		 "WEB-INF/spring/applicationContext.xml"};
+		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
 	}
 	public void testGetAllValidLearningDesignsInFolder(){
 		List list = learningDesignDAO.getAllValidLearningDesignsInFolder(new Integer(1));

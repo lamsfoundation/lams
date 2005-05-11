@@ -24,7 +24,7 @@ public class TestWorkspaceDAO extends AbstractLamsTestCase {
 		super(name);
 	}
 	protected String[] getContextConfigLocation() {
-		return new String[] {"WEB-INF/spring/applicationContext.xml","WEB-INF/spring/learningDesignApplicationContext.xml"};
+		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
 	}	
 	protected String getHibernateSessionFactoryName() {
 		return "coreSessionFactory";

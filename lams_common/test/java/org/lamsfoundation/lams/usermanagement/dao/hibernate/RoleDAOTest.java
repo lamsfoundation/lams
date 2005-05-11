@@ -64,7 +64,6 @@ public class RoleDAOTest extends AbstractLamsTestCase {
      */
     protected String[] getContextConfigLocation()
     {
-    	return new String[] {"WEB-INF/spring/learningDesignApplicationContext.xml",
-		 "WEB-INF/spring/applicationContext.xml"};
+    	return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
     }
 }

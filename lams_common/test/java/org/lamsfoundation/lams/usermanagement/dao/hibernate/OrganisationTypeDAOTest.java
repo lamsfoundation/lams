@@ -48,8 +48,7 @@ public class OrganisationTypeDAOTest extends AbstractLamsTestCase{
      */
     protected String[] getContextConfigLocation()
     {
-    	return new String[] {"WEB-INF/spring/learningDesignApplicationContext.xml",
-		 "WEB-INF/spring/applicationContext.xml"};
+    	return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
     }
 	public void testGetOrganisationTypeById(){
 		errorMessage = "The name of the organisationType gotten by Id 1 is not ROOT ORGANISATION";

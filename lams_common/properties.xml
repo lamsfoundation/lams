@@ -13,7 +13,8 @@
 	<property name="xdoclet.version"               value="1.2.2"/>
 	
 	<!-- path properties -->
-	<property name="lib"                       value="${basedir}/lib"/>
+	<property name="lib" value="../lams_build/lib"/>
+	<property name="j2eelibs"  value="C:/Program Files/MyEclipse/eclipse/plugins/com.genuitec.eclipse.j2eedt.core_3.8.1/data/libraryset/1.4"/>
 	<property name="sql"                       value="${basedir}/db/sql"/>
 	<property name="src"                       value="${basedir}/src"/>
 	<property name="src.java"                  value="${basedir}/src/java"/>
@@ -52,6 +53,8 @@
 	<property name="build.test"            value="${build}/test"/>
 	
 	<property name="build.lib"                     value="${build}/lib"/>
+	<property name="build.web"                     value="${build}/web"/>
+	
 	
 	<property name="package"                   value="org/lamsfoundation/lams"/>
 	<property name="package.learningdesign"    value="${package}/learningdesign"/>

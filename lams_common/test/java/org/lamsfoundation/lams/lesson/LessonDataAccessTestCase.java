@@ -119,9 +119,8 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
 
     }
     protected String[] getContextConfigLocation() {
-		return new String[] {"WEB-INF/spring/applicationContext.xml",
-							 "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-							 "WEB-INF/spring/learningDesignApplicationContext.xml"};
+		return new String[] {"org/lamsfoundation/lams/applicationContext.xml",
+							 "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml"};
 	}
 
     

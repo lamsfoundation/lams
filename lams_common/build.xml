@@ -12,18 +12,21 @@ Ant build file.
 
 	<!-- import properties from the specified file -->
 	&properties;
-
+	
 	<path id="all-libs">
 		<fileset dir="${lib}">
 			<include name="**/*.jar"/>
 		</fileset>
+		<fileset dir="${j2eelibs}">
+				<include name="**/*.jar"/>
+		</fileset>
 	</path>
-
+	
 	<path id="project.classpath">
 		<path refid="all-libs"/>
 		<!-- Java CLASSPATH should be added as the last item -->
 		<!-- This property is supposed to be set in eclipse  -->
-		<pathelement location="${java.class.path}" />
+		<pathelement location="${java.class.path}"/>
 	</path>
 
 	<target name="usage">
@@ -176,9 +179,17 @@ Ant build file.
 		<javac srcdir="${src.java}" compiler="modern"
 	         	 	destdir="${build.classes}" deprecation="on" debug="on">
 			<classpath>
+				<pathelement location="${build.classes}"/>
 				<path refid="project.classpath"/>
 			</classpath>
 		</javac>
+		<!-- Spring files -->
+		<copy overwrite="yes" todir="${build.classes}/org/lamsfoundation/lams/">
+				<fileset dir="${src.java}/org/lamsfoundation/lams">
+						<include name="*.xml"/>
+						<include name="*.properties"/>
+				</fileset>
+		</copy>
 	</target>
 
 	<target name="compile.test" depends="compile">
@@ -195,6 +206,17 @@ Ant build file.
 			</fileset>
 		</copy>
 	</target>
+				
+	<target name="copyContext">
+		<deltree dir="${build.web}"/>
+		<mkdir dir="${build.web}"/>
+		<!--copy overwrite="yes" todir="${build.web}">
+			<fileset dir="${web}">
+				<include name="**/*.xml"/>
+				<include name="**/*.tld"/>
+			</fileset>
+		</copy-->
+	</target>
         <!-- effectively a synonym for lams-jar 
             required by the master build script
         -->
@@ -203,15 +225,13 @@ Ant build file.
 	<!-- ================================================================ -->
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
-	<target name="lams-jar" depends="compile,compile.test" description="creates jar file">
+	<target name="lams-jar" depends="compile,compile.test,copyContext" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
 		<jar jarfile="${build.lib}/${product}.jar">
-			<fileset dir="${build.classes}">
-			</fileset>
-			<fileset dir="${build.test}">
-			</fileset>			
-			<fileset dir="${hbm}">
-			</fileset>
+			<fileset dir="${build.classes}"/>
+			<fileset dir="${build.test}"/>
+			<fileset dir="${hbm}"/>
+			<fileset dir="${build.web}"/>
 		</jar>
 	</target>
 
