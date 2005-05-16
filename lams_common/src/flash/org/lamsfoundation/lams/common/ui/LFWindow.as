@@ -1,57 +1,91 @@
 ﻿import mx.containers.*
 import mx.managers.*
-import org.lamsfoundation.lams.util.*
+import mx.utils.*
+import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.ui.*
 
 /**
 * LFWindow - Extends the MM Window class and will be used for all LAMS windows + dialogs
 * @author   DI
-* 
+*  
+* TODO DI-16/05/05  Configure resize/scroll policy logic to stop scrollbars appearing spuriously on resize 
 */
-class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
+class LFWindow extends Window{
 
     //Declarations
     //Static vars
     public static var symbolOwner:Object = Window;
-    private static var MIN_WIDTH = 80;                      //Minimum window dimensions
-    private static var MIN_HEIGHT = 60;
+    //public static var symbolName:String = 'LFWindow';
+	
+    private static var MIN_WIDTH = 160;                      //Minimum window dimensions
+    private static var MIN_HEIGHT = 120;
+	
     private static var RESIZE_WIDTH_OFFSET = 10;            //Offset to place resize clip from bottom rhs of window
     private static var RESIZE_HEIGHT_OFFSET = 10;
     
-    private static var SCROLL_X_OFFSET = 3;
-    private static var SCROLL_Y_OFFSET = 30;
-    private static var SCROLL_X_PADDING = 3;
-    private static var SCROLL_Y_PADDING = 3;
+    private static var MARGIN_WIDTH:Number = 9;             //Differences between scroll content + window dimensions
+    private static var MARGIN_HEIGHT:Number = 38;
     
     //Public vars
 	public var className:String = 'LFWindow';
     
     //Private vars
-    private var resize_mc:MovieClip;
-    private var scrollPane:MovieClip;
-    private var _scrollContentPath:String;
+    private var resize_mc:MovieClip;					//Clip clicked on for resize 
+    private var _scrollContentPath:String;				//Main content of the LFWindow within a scrollpane
     private var _helpButtonHandler:Function;            //Called when help button clicked
+    private var help_btn:Button;                        //Help button reference
+    
+    private var contentOffsetWidth:Number;
+    private var contentOffsetHeight:Number;
+    
+    public var centred:Boolean=false;
+    private var setUpFinished:Boolean = false;
     
     //Constructor
     function LFWindow() {
     }
     
 	public function init(Void):Void {
+        //trace('init');
  	    super.init();
-        
+		//LFWindow contains a scroll pane which contains the content.
+        contentPath = 'ScrollPane';
+
         //set up skin
         skinCloseOver  = 'LFCloseButtonOver';
         skinCloseDown = 'LFCloseButtonDown';
+		
+		//Add event listener for complete event, fired when scrollpane is loaded
+		this.addEventListener('complete',Delegate.create(this,scrollLoaded));
+		this._visible=false;
 	}
-  
-    public function createChildren(Void):Void {
-        super.createChildren();
+	
+	/**
+	* Fired by Window when content has loaded  i.e. ScrollPane
+	*/
+	public function scrollLoaded(){
+        //trace('scrollLoaded');
 
-        //Add the scrollpane
-        scrollPane = createClassObject(mx.containers.ScrollPane,"scrollPane", getNextHighestDepth(),{contentPath:_scrollContentPath,_x:SCROLL_X_OFFSET,_y:SCROLL_Y_OFFSET});
-        //Pass in a reference to the Window (this) to the content of the scrollpane
-        scrollPane.content.container=this;
+		//Assign scroll pane content
+		content.contentPath = _scrollContentPath;
+
+		//Assign reference to container (this) acessible in dialog
+		content.content.container=this;
+
+        setSize(content.content._width+MARGIN_WIDTH,content.content._height+MARGIN_HEIGHT);
+		
+        centre();
+		this._visible = true;
+        setUpFinished =true;
+		//this.removeEventListener('complete',scrollLoaded);
+	}
+    
+    public function createChildren(Void):Void {
+        //trace('createChildren');
+        super.createChildren();
         
-        //Dynamically add extra buttons
+        //TODO DI-13/05/05 add the code to handle dynamic button addition
+        //Add extra buttons as required
         
         //Attach resize and set up resize handling 
         resize_mc = this.createChildAtDepth('resize',DepthManager.kTop);
@@ -78,48 +112,80 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
             this.stopDrag();
             delete _parent.onEnterFrame;
         }
-        
     }
     
 	public function draw(Void):Void {
+        //trace('draw');
         //Call the super methods and size after a draw.
         super.draw();
         size();
-    }    
-    
+    }   
+	
+    /**
+	* called when object is sized, e.g. draw, setSize etc.
+	*/
     public function size(Void):Void {
-        //trace('LFWindow.size');
+        //trace('size')
         super.size();
-        //Size the scrollpane
-        var w:Number = width-SCROLL_X_OFFSET-SCROLL_X_PADDING;
-        var h:Number = height-SCROLL_Y_OFFSET-SCROLL_Y_PADDING
-        scrollPane.setSize(w,h);
+        
+        //If the content is too small then put in scroll bars
+		if(content.content._width > width-MARGIN_WIDTH){
+            content.hScrollPolicy = 'on';
+        } else {
+            content.hScrollPolicy = 'off';
+        }
+        
+		if(content.content._height > height-MARGIN_HEIGHT){
+            content.vScrollPolicy = 'on';
+        } else {
+            content.vScrollPolicy = 'off';
+        }
+        
+		//content.setSize(width,height);
+        if(setUpFinished){
+		    content.content.setSize(width-MARGIN_WIDTH,height-MARGIN_HEIGHT);
+        }
         
         //Align the resize button with the bottom right
         resize_mc._x = width-RESIZE_WIDTH_OFFSET;
         resize_mc._y = height-RESIZE_HEIGHT_OFFSET;
-        
-        //Resize the scrollpane content
-        scrollPane.content.setSize(w,h);
     }
     
+	/**
+	* Drag handler
+	*/
     public function startDragging(Void):Void {
         super.startDragging();
+    }
+    
+    /**
+    * Centres the window on the stage
+    */
+    public function centre() {
+        //trace('centre');
+        //Calculate centre
+        this._x = Stage.width/2 - this.width/2;
+        this._y = Stage.height/2 - this.height/2;
     }
     
     /**
     * overrides UIObject.setStyle to provide custom style setting
     */
     public function setStyle(styleName:String,styleObj:Object){
-        trace('setstyle');
+        //trace('setstyle');
         //Pass it up the inheritance chain to set any inherited styles or non-custom/LAMS style properties
         super.setStyle(styleName,styleObj);
         //Pass on to the scrollpane as the theme color doesn't seem to inherit correctly from the Window parent
-        scrollPane.setStyle(styleName,styleObj);
-        //If the button style is to be set then set it
-        if(typeof(styleObj)=='object'){
-            if(styleName=='closeButton'){
-            }
+        content.content.setStyle(styleName,styleObj);
+        
+        //Does help button exist?
+        if (_helpButtonHandler) {
+           //If style attribute defined for help button use it. Otherwise use themeColor
+           if(styleObj.helpButtonColor) {
+                    
+           }else {
+               
+           }
         }
     }
     
@@ -141,7 +207,6 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
         if(value){
             _helpButtonHandler = value;
             //Create Help Button
-            
         }
     }
     
@@ -149,7 +214,18 @@ class org.lamsfoundation.lams.common.ui.LFWindow extends Window{
     * override parent property becuase we don't want to be able to set LFWindow content path
     * because LWWindow 'content' is created in createChildren
     */
+	/*
     function set contentPath(value:Object){
         
     }
+    */
+	
+    
+    /**
+    * Returns content inside the scrollPane
+    */
+    function get scrollContent():Object{
+        return content.content;
+    }
+    
 }
