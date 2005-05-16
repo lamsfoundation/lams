@@ -2,6 +2,7 @@
 import mx.transitions.easing.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.comms.*
 
 /**
 * Manages themes throughout LAMS using the Flash event delegation model.  Themes are comprised of Visual elements  
@@ -178,6 +179,8 @@ class ThemeManager {
         
         //Set the selected theme to the default theme initially
         _selectedTheme = 'default';
+        
+        //serialize(defaultTheme);
     }
     
     /**
@@ -224,6 +227,8 @@ class ThemeManager {
     * Serialize a Theme/visualElement/StyleObject relation
     */
     public function serialize(theme:Theme){
-        
+        var wddx = new Wddx();
+        var serializedTheme:String  = wddx.serialize(theme);
+        trace(serializedTheme);
     }
 }
