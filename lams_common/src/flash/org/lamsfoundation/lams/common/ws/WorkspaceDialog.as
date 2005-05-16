@@ -14,15 +14,20 @@ class WorkspaceDialog extends MovieClip{
     //private static var OK_OFFSET:Number = 50;
     //private static var CANCEL_OFFSET:Number = 50;
 
-    //References    
+    //References to components + clips 
     private var _container:MovieClip;       //The container window that holds the dialog
     private var ok_btn:Button;              //OK+Cancel buttons
     private var cancel_btn:Button;
     private var panel:MovieClip;            //The underlaying panel base
-    private var treeview:MovieClip;         //Treeview for navigation through workspace folder structure
-    private var fm:FocusManager;            //Reference to focus manager
+    private var treeview:Tree;         //Treeview for navigation through workspace folder structure
+    private var datagrid:DataGrid;         //The details grid
     private var myLabel_lbl:Label;          //Text labels
-    private var themeManager:ThemeManager;  //Text labels
+    private var input_txt:TextInput;        //Text labels
+    private var combo:ComboBox;        //Text labels
+    
+    
+    private var fm:FocusManager;            //Reference to focus manager
+    private var themeManager:ThemeManager;  //Theme manager
     
     //Dimensions for resizing
     private var xOkOffset:Number;
@@ -47,12 +52,13 @@ class WorkspaceDialog extends MovieClip{
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
         
+        //Set up the treeview
+        setUpTreeview();
+        
         //set the reference to the StyleManager
         themeManager = ThemeManager.getInstance();
-        trace('*&^*-- themeManager:' +themeManager);
         
         //Set the container reference
-        //_container = _parent._parent;
         Debugger.log('container=' + _container,Debugger.GEN,'init','org.lamsfoundation.lams.wsDialog');
 
         //Set the text on the labels
@@ -62,10 +68,13 @@ class WorkspaceDialog extends MovieClip{
         ok_btn.label = Dictionary.getValue(1);
         cancel_btn.label = Dictionary.getValue(2);
         
-        //Set up focus manager
+        //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();
         fm.enabled = true;
-        ok_btn.setFocus();
+        treeview.setFocus();
+        fm.defaultPushButton = ok_btn;
+        
+        Debugger.log('ok_btn.tabIndex: '+ok_btn.tabIndex,Debugger.GEN,'init','org.lamsfoundation.lams.WorkspaceDialog');
         
         //Add event listeners for ok, cancel and close buttons
         ok_btn.addEventListener('click',Delegate.create(this, ok));
@@ -78,10 +87,10 @@ class WorkspaceDialog extends MovieClip{
         Debugger.log('setting offsets',Debugger.GEN,'init','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 
         //work out offsets from bottom RHS of panel
-        xOkOffset = panel._width - ok_btn._x + ok_btn.width/2;
-        yOkOffset = panel._height - ok_btn._y + ok_btn.height/2;
-        xCancelOffset = panel._width - cancel_btn._x + cancel_btn.width/2;
-        yCancelOffset = panel._height - cancel_btn._y + cancel_btn.height/2;
+        xOkOffset = panel._width - ok_btn._x;
+        yOkOffset = panel._height - ok_btn._y;
+        xCancelOffset = panel._width - cancel_btn._x;
+        yCancelOffset = panel._height - cancel_btn._y;
         
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
@@ -116,6 +125,19 @@ class WorkspaceDialog extends MovieClip{
         //Get label style and apply to label
         styleObj = themeManager.getStyleObject('label');
         myLabel_lbl.setStyle('styleName',styleObj);
+
+        //Apply treeview style 
+        styleObj = themeManager.getStyleObject('treeview');
+        treeview.setStyle('styleName',styleObj);
+
+        //Apply datagrid style 
+        styleObj = themeManager.getStyleObject('datagrid');
+        datagrid.setStyle('styleName',styleObj);
+
+        //Apply combo style 
+        styleObj = themeManager.getStyleObject('combo');
+        combo.setStyle('styleName',styleObj);
+        
     }
 
     /**
@@ -141,6 +163,55 @@ class WorkspaceDialog extends MovieClip{
     private function click(e:Object){
         trace('WorkspaceDialog.click');
         e.target.deletePopUp();
+    }
+    
+    //Sets up the treeview to load initial data
+    private function setUpTreeview(){
+        //TODO DI 12/05/05 Make call to server to get inital workspace root folders Stub for now uses dummy XML
+        var menuXML:XML = new XML();
+        menuXML.ignoreWhite = true;
+        menuXML.load("workspace_tree.xml");
+        menuXML.onLoad = Proxy.create(this,tvXMLLoaded,menuXML);
+    }
+    
+    /**
+    * XML onLoad handler for treeview data
+    */
+    private function tvXMLLoaded (ok:Boolean,rootXML:XML){
+        if(ok){
+            //Set the XML as the data provider for the tree
+            treeview.dataProvider = rootXML.firstChild;
+            treeview.addEventListener("change", Delegate.create(this, onTvChange));
+            /*
+            //Add this function to prevent displaying [type function],[type function] when label attribute missing from XML
+            treeview.labelFunction = function(node) {
+                    return node.nodeType == 1 ? node.nodeName : node.nodeValue;
+            };
+            */
+        }
+    }
+    
+    /**
+    * Treeview data changed event handler
+    */
+    private function onTvChange (event:Object){
+        if (treeview == event.target) {
+            var node = treeview.selectedItem;
+            
+            // If this is a branch, expand/collapse it
+            if (treeview.getIsBranch(node)) {
+                treeview.setIsOpen(node, !treeview.getIsOpen(node), true);
+            }
+            
+            // If this is a hyperlink, jump to it
+            var url = node.attributes.url;
+            if (url) {
+                getURL(url, "_top");
+            }
+            
+            // Clear any selection
+            treeview.selectedNode = null;
+        }
     }
     
     /**
