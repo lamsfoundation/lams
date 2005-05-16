@@ -23,24 +23,6 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView
 		// Invoke superconstructor, which sets up MVC relationships.
 		// This view has no user inputs, so no controller is required.
 		super (m, c);
-		//
-		createWorkspace (target_mc,depth,x,y,w,h);
-	}
-	/*
-	* Creates workspace movie clip 
-	*
-	* @param   target_mc	The clip in which to create the movie clip.
-	* @param   depth   		The depth at which to create the movie clip.
-	* @param   x   			The movie clip's horizontal position in target.
-	* @param   y   			The movie clip's vertical position in target.
-	*/
-	public function createWorkspace (target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number):Void {
-        trace(target_mc);
-		_workspace_mc = target_mc.createEmptyMovieClip('workspace_mc',depth);
-		_workspace_mc._x = x;
-		_workspace_mc._y = y;
-		_workspace_mc.bg_mc._width = w;
-		_workspace_mc.bg_mc._height = h;
 	}
 	
 	/*
@@ -54,10 +36,16 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView
 	}
     
     /**
-    * Create a popup for the workspace
+    * Create a popup dialog containing workspace
+    * @param    pos - Position, either 'centre' or an object containing x + y coordinates
     */
-    public function createWorkspacePopup(w:Number,h:Number){
-        var popup = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog',_x:200,_y:200});
-        popup.setSize(w,h);
+    public function createWorkspacePopup(pos:Object){
+        //Check to see whether this should be a centered or positioned dialog
+        if(typeof(pos)=='string'){
+            var popup = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog'});
+            //popup.centre();
+        } else {
+            var popup = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog',_x:pos.x,_y:pos.y});
+        }
     }
 }
