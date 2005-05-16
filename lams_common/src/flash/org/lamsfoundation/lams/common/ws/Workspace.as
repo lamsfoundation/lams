@@ -33,8 +33,8 @@ class org.lamsfoundation.lams.common.ws.Workspace {
         trace('Workspace.userSelectItem');
         //todo DI 07/04/05 write code user design selection, just a stub at the moment, calls itemSelected
         itemSelected(1);
-        //Open the workspace dialog
-        workspaceView.createWorkspacePopup(560,420);
+        //Open the workspace dialog in the centre of the screen
+        workspaceView.createWorkspacePopup('centre');
     }
     
     private function itemSelected(designId:Number){
