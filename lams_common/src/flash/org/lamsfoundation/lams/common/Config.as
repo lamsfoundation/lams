@@ -1,20 +1,34 @@
-﻿import org.lamsfoundation.lams.common.*
+﻿import org.lamsfoundation.lams.common.*;
+import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.authoring.*;
+
 /**
 * Stores configuration data for LAMS application
 * @class	Config
 * @author	DI
 */
 class Config {
-
 	//Declarations
 
-    //Application instance is stored as a static in the application class
-    private static var _instance:Config = null;     
+    //Config instance is stored as a static in the class
+    private static var _instance:Config = null;   
+    
+    private var _configData:Object      //Object that stores configuration data
+    private var _cm:CookieMonster;
+    private var _comms:Communication;
 	private var _className = 'Config';
+    
+    private var _version:String;        //Config properties
+    private var _language:String;
+    private var _theme:String;
+    private var _rootUrl:String;
+    
 
 	//Constructor
 	private function Config() {
-        
+        //Get a ref to the cookie monster 
+        _cm = CookieMonster.getInstance();
+        _comms = Application.getInstance().getComms();
 	}
     
     /**
@@ -30,14 +44,25 @@ class Config {
     /**
     * Loads application configuration data for LAMS, can load from a URL or cookie
     */
-    function load(src:Object){
+    public function load(src:Object){
         if(typeof(src)=='string'{
             //load from URL otherwise 
         }else {
             //load from config cookie
+            _configData = _cm.open('config');
         }
     }
     
+    /**
+    * Set the default configuration properties 
+    */
+    public function setDefaults(){
+        //TODO - DI 16/05/05 Get these from server eventually
+        _version = '1.1';
+        _language = 'uk';
+        _theme = 'default';
+        _rootUrl = 'http:dolly.uklams.net/lams';
+    }
 
 	//Getters+Setters
 	function get className():String{
