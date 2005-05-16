@@ -1,4 +1,5 @@
 ﻿import mx.events.*
+import mx.transitions.easing.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.util.*
 
@@ -58,8 +59,8 @@ class ThemeManager {
         //TODO DI 03/05/05 Stub for now but should query server to access themes
         //Base style object for 'default' theme
         var baseStyleObj = new mx.styles.CSSStyleDeclaration();
-        baseStyleObj.setStyle('color', 0xff00000);
-        baseStyleObj.setStyle('themeColor', 0xff0000);
+        baseStyleObj.setStyle('color', 0x333648);
+        baseStyleObj.setStyle('themeColor', 0x266DEE);
         baseStyleObj.setStyle('borderStyle', 'inset');
         
         //Create default theme
@@ -68,12 +69,11 @@ class ThemeManager {
         //----BUTTON------------------------------------------------
         //Style object
         var buttonSO = new mx.styles.CSSStyleDeclaration();
-        buttonSO.setStyle('fontFamily', 'Arial');
+        buttonSO.setStyle('fontFamily', '_sans');
         buttonSO.setStyle('fontSize', 10);
-        buttonSO.setStyle('color', 0xff0000);
-        buttonSO.setStyle('themeColor', 0xffdd00);
-        buttonSO.setStyle('borderStyle', 'outset');
-        buttonSO.setStyle('textAlign', 'left');
+        buttonSO.setStyle('color', 0x333648);
+        buttonSO.setStyle('themeColor', 0x266DEE);
+        buttonSO.setStyle('emphasizedStyleDeclaraion', 0x266DEE);
         
         //Visual Element
         var buttonVisualElement = new VisualElement('button',buttonSO);
@@ -81,11 +81,83 @@ class ThemeManager {
         defaultTheme.addVisualElement(buttonVisualElement);
         //----------------------------------------------------------
 
+        //----LABEL-------------------------------------------------
+        //Style object
+        var labelSO = new mx.styles.CSSStyleDeclaration();
+        labelSO.setStyle('fontFamily', '_sans');
+        labelSO.setStyle('fontSize', 14);
+        labelSO.setStyle('color', 0x333648);
+        //Visual Element
+        var labelVisualElement = new VisualElement('label',labelSO);
+        //add visual element to the default theme
+        defaultTheme.addVisualElement(labelVisualElement);
+        //--------------------------------------------------------
+        
+        //----LFWINDOW--------------------------------------------
+        //Style object
+        var LFWindowSO = new mx.styles.CSSStyleDeclaration();
+        LFWindowSO.setStyle('fontFamily', '_sans');
+        LFWindowSO.setStyle('fontSize', 14);
+        LFWindowSO.setStyle('color', 0x333648);
+        LFWindowSO.setStyle('themeColor', 0x266DEE);
+        LFWindowSO.setStyle('borderStyle', 'inset');
+        //Visual Element
+        var LFWindowVisualElement = new VisualElement('LFWindow',LFWindowSO);
+        //add visual element to the default theme
+        defaultTheme.addVisualElement(LFWindowVisualElement);
+        //-----------------------------------------------------
+
+        //----TREE VIEW ---------------------------------------
+        //Style object
+        var treeviewSO = new mx.styles.CSSStyleDeclaration();
+        treeviewSO.setStyle('fontFamily', '_sans');
+        treeviewSO.setStyle('fontSize', 14);
+        treeviewSO.setStyle('color', 0x333648);
+        treeviewSO.setStyle('themeColor', 0x266DEE);
+        //treeviewSO.setStyle('rollOverColor', 0xC4C7D5);
+        treeviewSO.setStyle('openEasing', 'Elastic');
+        //Visual Element
+        var treeviewVisualElement = new VisualElement('treeview',treeviewSO);
+        //add visual element to the default theme
+        defaultTheme.addVisualElement(treeviewVisualElement);
+        //------------------------------------------------------
+        
+        //----DATA GRID------------------------------------------
+        //Style object
+        var datagridSO = new mx.styles.CSSStyleDeclaration();
+        datagridSO.setStyle('fontFamily', '_sans');
+        datagridSO.setStyle('fontSize', 14);
+        datagridSO.setStyle('color', 0x333648);
+        datagridSO.setStyle('themeColor', 0x266DEE);
+        //datagridSO.setStyle('rollOverColor', 0xC4C7D5);
+        datagridSO.setStyle('openEasing', 'Elastic');
+        //Visual Element
+        var datagridVisualElement = new VisualElement('datagrid',datagridSO);
+        //add visual element to the default theme
+        defaultTheme.addVisualElement(datagridVisualElement);
+        //------------------------------------------------------
+
+
+        //----COMBO------------------------------------------
+        //Style object
+        var comboSO = new mx.styles.CSSStyleDeclaration();
+        comboSO.setStyle('fontFamily', '_sans');
+        comboSO.setStyle('fontSize', 14);
+        comboSO.setStyle('color', 0x333648);
+        comboSO.setStyle('themeColor', 0x266DEE);
+        comboSO.setStyle('openEasing', Elastic.easeOut);
+        //Visual Element
+        var comboVisualElement = new VisualElement('combo',comboSO);
+        //add visual element to the default theme
+        defaultTheme.addVisualElement(comboVisualElement);
+        //------------------------------------------------------
+
+
         //----LFBUTTON----------------------------------------------
         //NOTE:This style is used in conjunction with LFButtonSkin class. For usage, see common.style.LFButtonSkin.as
         //Style object
         var LFButtonSO = new mx.styles.CSSStyleDeclaration();
-        LFButtonSO.setStyle('fontFamily', 'Arial');
+        LFButtonSO.setStyle('fontFamily', 'Tahoma');
         LFButtonSO.setStyle('fontSize', 10);
         LFButtonSO.setStyle('color', 0xff0000);
         LFButtonSO.setStyle('themeColor', 0xff0000);
@@ -93,40 +165,13 @@ class ThemeManager {
         //Custom LAMS styles
         LFButtonSO.setStyle('up', 0xCCCCCC);
         LFButtonSO.setStyle('over', 0xFAF270);
-        LFButtonSO.setStyle('down', 0xff0000);
-        
+        LFButtonSO.setStyle('down', 0xccff3c);
         //Visual Element
         var LFButtonVisualElement = new VisualElement('LFButton',LFButtonSO);
         //add visual element to the default theme
         defaultTheme.addVisualElement(LFButtonVisualElement);
         //----------------------------------------------------------
 
-        
-        //----LABEL-------------------------------------------------
-        //Style object
-        var labelSO = new mx.styles.CSSStyleDeclaration();
-        labelSO.setStyle('fontFamily', 'Verdana');
-        labelSO.setStyle('fontSize', 14);
-        labelSO.setStyle('color', 0x8FBBE7);
-        //Visual Element
-        var labelVisualElement = new VisualElement('label',labelSO);
-        //add visual element to the default theme
-        defaultTheme.addVisualElement(labelVisualElement);
-        //----------------------------------------------------------
-        
-        //----LFWINDOW---------------------------------------
-        //Style object
-        var LFWindowSO = new mx.styles.CSSStyleDeclaration();
-        LFWindowSO.setStyle('fontFamily', 'Times New Roman');
-        LFWindowSO.setStyle('fontSize', 14);
-        LFWindowSO.setStyle('color', 0x8FBBE7);
-        LFWindowSO.setStyle('themeColor', 0x3355ee);
-        LFWindowSO.setStyle('borderStyle', 'outset');
-        //Visual Element
-        var LFWindowVisualElement = new VisualElement('LFWindow',LFWindowSO);
-        //add visual element to the default theme
-        defaultTheme.addVisualElement(LFWindowVisualElement);
-        //------------------------------------------------
 
         //Add the default Theme to the themes   
         themes.put(defaultTheme.name,defaultTheme);
