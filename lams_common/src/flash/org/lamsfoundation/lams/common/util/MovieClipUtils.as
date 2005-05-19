@@ -2,11 +2,11 @@
 /**  
 * MovieclipUtils  
 */  
-class MovieclipUtils {  
+class MovieClipUtils {  
   
-     //Declarations  
-     //Constructor  
-  function MovieclipUtils() {  
+  //Declarations  
+  //Constructor  
+  function MovieClipUtils() {  
 
   }  
 	/**  
@@ -18,11 +18,25 @@ class MovieclipUtils {
 		trace("Method not implemented");
 		return false;
 	}
-	
-	public static function doLater():Void{
-		
+
+    /**
+    * Schedules a function to be executed after one frame
+    * @usage
+    *       import org.lamsfoundation.lams.common.util.*
+    *       doLater(Proxy.create(<scope>,<fn>,arg1,arg2.....);
+	*/
+	public static function doLater(fn:Function,durationObj:Object):Void{
+        //Create the clip and attach to root at next available depth
+		var doLater_mc:MovieClip = _root.createEmptyMovieClip('LFDoLater_mc',_root.getNextHighestDepth());
+        //Assign function to clip and set up onEnterFrame
+        doLater_mc.fn = fn;
+        doLater_mc.onEnterFrame = function () {
+            trace('doLater.onEnterFrame');
+            //Call the fn, kill the enterframe and remove the clip
+            fn.apply();
+            delete this.onEnterFrame;
+            this.removeMovieClip();
+        }
 	}
-
-
 
 }
