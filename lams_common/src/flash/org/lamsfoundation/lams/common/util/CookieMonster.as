@@ -21,15 +21,13 @@ class CookieMonster {
     
     //CookieMonster instance is stored as a static in the CookieMonster class
     private static var _instance:CookieMonster = null;     
+    private static var SO_ROOT:String = 'org.lamsfoundation.lams';
 
     private var _className = 'CookieMonster';
     private var _so:SharedObject;
 
     //Constructor    
     private function CookieMonster(){
-        //Create the LAMS shared object
-        _so = SharedObject.getLocal('org.lamsfoundation.lams','/');        
-        _so.data.name = 'LAMSData';
     }
     
     /**
@@ -52,24 +50,38 @@ class CookieMonster {
     
     /**
     * Saves the object under the name provided
+    * @param obj - The object to save in a cookie 
+    * @param name - the handle of the shared object used for reference with open();
     */
-    public function save(obj:Object,name:String){
+    public static function save(obj:Object,name:String){
         //TODO DI 16/05/05 Error handling needs to provide for size limits, duplicates etc.
         //Save the object under the named reference provided
-        if(!_so.data[name]) {
-            _so.data[name]=obj;    
-            _so.flush();
-        }
+        var _so = SharedObject.getLocal(SO_ROOT+'.'+name,'/');        
+        _so.data.name = name;
+        
+        //Append object to _so.data and save cookie
+        _so.data[name]=obj;    
+        _so.flush();
     }
     
     
     /**
-    * Saves the object under the name provided
+    * Returns (opens) the named cookie
+    * @param name - the handle of the shared object used for reference with save();
     */
-    public function open(obj:Object,name:String):Object{
+    public static function open(name:String):Object{
         //TODO DI 16/05/05 Error handling needs to provide for missing objects
-        //Save the object under the named reference provided
+        //Get named local object
+        var _so = SharedObject.getLocal(SO_ROOT+'.'+name,'/');        
         return _so.data[name];    
+    }
+    
+    /**
+    * Check whether cookie exists
+    */
+    public static function cookieExists(cookieName:String):Boolean {
+        //TODO - DI 19/05/05 Check that cookie exists
+        return true;
     }
     
     function get className():String{
