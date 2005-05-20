@@ -28,8 +28,12 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		workspaceModel.addObserver(workspaceView);
 	}
 	
-    
-    public function userSelectItem(id:Number){
+    /**
+    * This is the method called when the user opens a design
+    * 
+    * @param id - the Learning design ID 
+    */
+    public function userSelectItem(){
         trace('Workspace.userSelectItem');
         //todo DI 07/04/05 write code user design selection, just a stub at the moment, calls itemSelected
         itemSelected(1);
