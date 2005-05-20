@@ -25,6 +25,29 @@ class VisualElement {
         _name = name;
         _styleObject = styleObject;
 	}
+    
+    
+    /**
+    * Returns an object containing the serializable (data) parts of this class
+    */
+    public function toData():Object{
+        var obj:Object = {};
+        //Style object is ok as it so attach it
+        obj.styleObject = ThemeManager.styleObjectToData(_styleObject);
+        obj.name = _name;
+        return obj;
+    }
+    
+    /**
+    * Creates an instance of VisualElement from data that has been serialized
+    */
+    public static function createfromData(dataObj):VisualElement{
+        //Create the style object and populate it from data
+        var tmpSO = ThemeManager.dataToStyleObject(dataObj.styleObject);
+        //Create new instance of this
+        var obj:VisualElement = new VisualElement(dataObj.name,tmpSO);
+        return obj;
+    }
 
 	//Getters+Setters
 	function get styleObject():CSSStyleDeclaration{

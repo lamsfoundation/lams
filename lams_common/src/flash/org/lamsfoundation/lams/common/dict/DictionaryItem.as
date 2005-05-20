@@ -17,6 +17,25 @@ class DictionaryItem {
         _value = value;
 	}
     
+    /**
+    * Convert to data object for saving
+    */
+    public function toData():Object{
+        var obj:Object = {};
+        obj.id = _id;
+        obj.name = _name;
+        obj.value = _value;
+        return obj;
+    }
+    
+    /**
+    * Create Dictionary item from dataObject
+    */
+    public static function createFromData(dataobj:Object):DictionaryItem{
+        var dictionaryItem:DictionaryItem =  new DictionaryItem(dataobj.id,dataobj.name,dataobj.value)
+        return dictionaryItem;
+    }
+    
     function get name():String{
         return _name;
     }

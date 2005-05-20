@@ -40,7 +40,7 @@ class ThemeManager {
     
     //Stores themes for the application
     private var themes:Hashtable;
-    private var _selectedTheme:String;        
+    private var _selectedTheme:String;
     
 	//Constructor
     private function ThemeManager() {
@@ -57,6 +57,7 @@ class ThemeManager {
     * Load themes from the Server
     */
     public function loadThemes(){
+        
         //TODO DI 03/05/05 Stub for now but should query server to access themes
         //Base style object for 'default' theme
         var baseStyleObj = new mx.styles.CSSStyleDeclaration();
@@ -74,7 +75,7 @@ class ThemeManager {
         buttonSO.setStyle('fontSize', 10);
         buttonSO.setStyle('color', 0x333648);
         buttonSO.setStyle('themeColor', 0x266DEE);
-        buttonSO.setStyle('emphasizedStyleDeclaraion', 0x266DEE);
+        buttonSO.setStyle('emphasizedStyleDeclaration', 0x266DEE);
         
         //Visual Element
         var buttonVisualElement = new VisualElement('button',buttonSO);
@@ -153,6 +154,19 @@ class ThemeManager {
         defaultTheme.addVisualElement(comboVisualElement);
         //------------------------------------------------------
 
+        //----LF MENU-------------------------------------------
+        //Style object
+        var lfMenuSO = new mx.styles.CSSStyleDeclaration();
+        lfMenuSO.setStyle('fontFamily', '_sans');
+        lfMenuSO.setStyle('fontSize', 14);
+        lfMenuSO.setStyle('color', 0x333648);
+        lfMenuSO.setStyle('themeColor', 0x266DEE);
+        lfMenuSO.setStyle('openEasing', Elastic.easeOut);
+        //Visual Element
+        var lfMenuVisualElement = new VisualElement('LFMenuBar',lfMenuSO);
+        //add visual element to the default theme
+        defaultTheme.addVisualElement(lfMenuVisualElement);
+        //------------------------------------------------------
 
         //----LFBUTTON----------------------------------------------
         //NOTE:This style is used in conjunction with LFButtonSkin class. For usage, see common.style.LFButtonSkin.as
@@ -180,7 +194,7 @@ class ThemeManager {
         //Set the selected theme to the default theme initially
         _selectedTheme = 'default';
         
-        //serialize(defaultTheme);
+        
     }
     
     /**
@@ -196,8 +210,8 @@ class ThemeManager {
     /**
     * Notify registered listeners that a Styles update has happened
     */
-    public static function broadcastThemeChanged(){
-        _instance.dispatchEvent({type:'themeChanged',target:_instance});
+    public function broadcastThemeChanged(){
+        dispatchEvent({type:'themeChanged',target:_instance});
         trace('broadcast');
     }
     
@@ -223,6 +237,77 @@ class ThemeManager {
         return visualElement.styleObject;
     }
     
+
+    /**
+    * Returns an object containing the serializable (data) parts of this class
+    * 
+    */
+    public function toData():Object{
+        //Create the empty object for holding data
+        var obj:Object = {};
+        
+        //Create array of visual elements.
+        obj.themes = [];
+        
+        //Store the selected theme
+        obj.selectedTheme = _selectedTheme;
+        
+        //Populate from visual elements hash table
+        var hashValues:Array = themes.values();
+        for (var i=0;i<hashValues.length;i++) {
+            //Call toData method on each value to get the data only
+            obj.themes[i] = hashValues[i].toData();
+        }
+        return obj;
+    }
+    
+    /**
+    * Creates an instance of VisualElement from data that has been serialized
+    * 
+    * @param   dataObj - data object containing structure of themes needed to populate themes hash table
+    */
+    public function populateFromData(dataObj):Object{
+        //Retrieve the selected theme from the data object
+        _selectedTheme = dataObj.selectedTheme;
+        
+        //Clean out existing themes hashtable
+        themes.clear();
+        
+        //Add the themes
+        for(var i=0;i<dataObj.themes.length;i++){
+            //Get new themes based on the data object and populate themes hashtable
+            var tmpTheme:Theme = Theme.createFromData(dataObj.themes[i]);
+            themes.put(tmpTheme.name,tmpTheme);
+        }
+        return this;
+    }  
+    
+    
+    /**
+    * Save the Theme manager data to disk 
+    * @return  
+    */
+    public function saveToDisk():Void{
+        var wddx:Wddx = new Wddx();
+        //Convert to data object and then serialize before saving to a cookie
+        var dataObj = toData();
+        var sx:Object = wddx.serialize(dataObj);
+        CookieMonster.save(sx,'ThemeData');
+    }
+    
+    /**
+    * Open the Theme manager data from disk 
+    * @usage   
+    * @return  
+    */
+    public function openFromDisk():Void{
+        var wddx:Wddx = new Wddx();
+        var sx:Object = CookieMonster.open('ThemeData');
+        var dx:Object = wddx.deserialize(sx);
+        populateFromData(dx);
+    }
+    
+    
     /**
     * Serialize a Theme/visualElement/StyleObject relation
     */
@@ -231,4 +316,40 @@ class ThemeManager {
         var serializedTheme:String  = wddx.serialize(theme);
         trace(serializedTheme);
     }
+    
+    
+    /**
+     * Converts style object to a data format that can be serialized
+     * @param   so - an MX style object
+     * @return  Object
+     */
+    public static function styleObjectToData(so:Object):Object{
+        //Create return obj
+        var obj:Object = {};
+        //Parse SO to get data
+        for(var prop in so) {
+            //Dont pick up functions, just objects and variables
+            if(typeof(so[prop])!='function'){
+                //Assign style object property to object property of same name
+                obj[prop] = so.getStyle(String(prop));  
+            }
+        }
+        return obj;
+    }
+    
+    /**
+    * Converts data  to style object (inverse method for 'styleObjectToData')
+    * @usage   
+    * @param   dataObj 
+    * @return  
+    */
+    public static function dataToStyleObject(dataObj:Object):mx.styles.CSSStyleDeclaration{
+        //Create Style Object
+        var so = new mx.styles.CSSStyleDeclaration();     
+        //Parse data object and copy over properties
+        for(var prop in dataObj) {
+            so.setStyle(String(prop),dataObj[prop]);
+        }
+        return so;
+    }    
 }
