@@ -33,6 +33,7 @@ class LFMenuBar extends MovieClip {
         
         //Get a reference to the application
         app = Application.getInstance();
+        tm = ThemeManager.getInstance();
     }
 
     public function init() {
@@ -81,6 +82,13 @@ class LFMenuBar extends MovieClip {
     }  
     
     /**
+    * 
+    */
+    public function setSize(w:Number,h:Number) {
+        _mb.setSize(w,h);
+    }
+    
+    /**
     * event handler for file menu click
     */
     private function fileMenuClicked(eventObj:Object):Void{
@@ -127,5 +135,4 @@ class LFMenuBar extends MovieClip {
         var styleObj = tm.getStyleObject('LFMenuBar');
         _mb.setStyle('styleName',styleObj);
     }
-   
 }
