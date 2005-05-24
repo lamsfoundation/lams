@@ -9,7 +9,7 @@
 class Grid {
 	//constants
 	private static var LINE_THICKNESS:Number = 1;				//lines
-	private static var LINE_ALPHA:Number = 80;
+	private static var LINE_ALPHA:Number = 30;
 	private static var LINE_COLOR:Number = 0x000000;
 
 	public static var SMALL_GRID_H_SPACING:Number = 21;				           //Small grid dimensions
@@ -71,7 +71,11 @@ class Grid {
 	/**
     * Draw the grid
     */
-	public static function drawGrid(target_mc,gridWidth,gridHeight,hGap,vGap):Boolean{
+	public static function drawGrid(target_mc,gridWidth,gridHeight,hGap,vGap):Object{
+		//if the gird already exists - remove it
+		if(target_mc.grid != null){
+			target_mc.grid.removeMovieClip();
+		}
   		//Create the clip
 		var _mc:MovieClip = target_mc.createEmptyMovieClip('grid',target_mc.getNextHighestDepth());
 
@@ -81,20 +85,20 @@ class Grid {
 		}
 		//draw horizontal lines
 		var hLines:Number = Math.floor(gridWidth/hGap);
-		target_mc.lineStyle(LINE_THICKNESS,LINE_COLOR,LINE_ALPHA);
+		_mc.lineStyle(LINE_THICKNESS,LINE_COLOR,LINE_ALPHA);
 		for (var i=0; i<= hLines;i++){
 			var x:Number = i*hGap;
-			target_mc.moveTo(x,0);
-			target_mc.lineTo(x,gridHeight);
+			_mc.moveTo(x,0);
+			_mc.lineTo(x,gridHeight);
 		}
 		//draw vertical lines
 		var vLines:Number = Math.floor(gridHeight/vGap);
 		for (i=0; i<= vLines;i++){
 			var y = i*vGap;
-			target_mc.moveTo(0,y);
-			target_mc.lineTo(gridWidth,y);
+			_mc.moveTo(0,y);
+			_mc.lineTo(gridWidth,y);
 		}
-		return true;
+		return _mc;
 	}
 
 }
