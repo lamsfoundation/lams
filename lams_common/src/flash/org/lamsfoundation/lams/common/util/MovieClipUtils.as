@@ -31,12 +31,15 @@ class MovieClipUtils {
         //Assign function to clip and set up onEnterFrame
         doLater_mc.fn = fn;
         doLater_mc.onEnterFrame = function () {
-            trace('doLater.onEnterFrame');
+            //trace('doLater.onEnterFrame');
             //Call the fn, kill the enterframe and remove the clip
             fn.apply();
             delete this.onEnterFrame;
             this.removeMovieClip();
         }
 	}
+	
+
+
 
 }
