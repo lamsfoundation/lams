@@ -18,13 +18,12 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	 *
 	 * @param   target_mc	Target clip for attaching view
 	 */
-	public function Workspace (target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number){
-        //trace('workspace.constructor')
+	public function Workspace (){
 		//Create the model.
 		workspaceModel = new WorkspaceModel();
 		
 		//Create the authoring view and register with model
-		workspaceView = new WorkspaceView(workspaceModel, undefined,target_mc,depth,x,y,w,h);
+		workspaceView = new WorkspaceView(workspaceModel, undefined);
 		workspaceModel.addObserver(workspaceView);
 	}
 	

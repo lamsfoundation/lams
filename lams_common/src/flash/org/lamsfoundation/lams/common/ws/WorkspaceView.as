@@ -19,7 +19,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView
 	/*
 	* Constructor
 	*/
-	public function WorkspaceView (m:Observable, c:Controller,target_mc:MovieClip,depth:Number,x:Number,y:Number,w:Number,h:Number){
+	public function WorkspaceView (m:Observable, c:Controller){
 		// Invoke superconstructor, which sets up MVC relationships.
 		// This view has no user inputs, so no controller is required.
 		super (m, c);
