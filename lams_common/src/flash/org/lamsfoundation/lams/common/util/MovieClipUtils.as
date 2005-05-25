@@ -25,7 +25,7 @@ class MovieClipUtils {
     *       import org.lamsfoundation.lams.common.util.*
     *       doLater(Proxy.create(<scope>,<fn>,arg1,arg2.....);
 	*/
-	public static function doLater(fn:Function,durationObj:Object):Void{
+	public static function doLater(fn:Function):Void{
         //Create the clip and attach to root at next available depth
 		var doLater_mc:MovieClip = _root.createEmptyMovieClip('LFDoLater_mc',_root.getNextHighestDepth());
         //Assign function to clip and set up onEnterFrame
