@@ -267,7 +267,7 @@ Ant build file.
 	<!-- Copy the third party jar files and cofiguration files for deployment on windows-->
 	<!-- ============================================================================== -->
 	<target name="copyfiles-windows" depends="makeconfdir-windows" description="copy lib and config files">
-		<copy overwrite="yes" todir="${jboss.home.windows}/server/default/lib/">
+<!--		<copy overwrite="yes" todir="${jboss.home.windows}/server/default/lib/">
 			<fileset dir="${lib}/cglib/">
 				<include name="*.jar"/>
 			</fileset>
@@ -307,7 +307,7 @@ Ant build file.
 			<fileset dir="${lib}/jakarta-poi/">
 				<include name="*.jar"/>
 			</fileset>
-		</copy>
+		</copy> -->
 		<copy overwrite="yes" todir="${jboss.home.windows}/server/default/conf/">
 			<fileset dir="${conf.jboss.windows}/">
 				<include name="login-config.xml"/>
