@@ -7,8 +7,20 @@
     </description>
     <module>
         <web>
-            <web-uri>lams_central.war</web-uri>
+            <web-uri>lams-central.war</web-uri>
             <context-root>/lams</context-root>
+	</web>
+    </module>
+    <module>
+        <web>
+            <web-uri>lams-workspace.war</web-uri>
+            <context-root>/lams/workspace</context-root>
+	</web>
+    </module>
+    <module>
+        <web>
+            <web-uri>lams-authoring.war</web-uri>
+            <context-root>/lams/authoring</context-root>
 	</web>
     </module>
 <!--     <module>
@@ -100,12 +112,11 @@
     <!--  End Third Party JAR Files -->
     
     <!--  Tools -->
-<!--     <module>
+    <module>
         <web>
-            <web-uri>lams_tool_imscp.war</web-uri>
+            <web-uri>lams-tool-imscp.war</web-uri>
             <context-root>/lams/tool/imscp</context-root>
 	</web>
     </module>
-    -->
     
 </application>

@@ -33,7 +33,7 @@
 	</target>
 
 	<!-- clean all projects -->
-	<target name="clean-subporjects" description="cleans sub projects" />
+	<target name="clean-subprojects" description="cleans sub projects" />
 
 
 	<!-- build sub-projects -->
@@ -45,7 +45,10 @@
 			target="build-jar" inheritAll="false" />
 		<ant antfile="../${lams_central}/build.xml" target="build-war"
 			inheritAll="false" />
-		<!--  <ant antfile="../${lams_authoring}/build.xml"  target="build-war" inheritAll="false"/> -->
+		<ant antfile="../${lams_workspace}/build.xml" target="build-war"
+			inheritAll="false" />
+		<ant antfile="../${lams_authoring}/build.xml"  target="build-war"
+			inheritAll="false"/>
 		<!--  <ant antfile="../${lams_learning}/build.xml" target="build-war" inheritAll="false"/> -->
 		<!--  <ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/> -->
 		<!--
@@ -88,8 +91,11 @@
 				<include name="${lams.jar}" />
 				<include name="${lams_contentrepository.jar}" />
 				<include name="${lams_central.war}" />
-				<!--<include name="lams_authoring.war"/>
-				<include name="${lams_monitoring.war}"/>
+				<include name="${lams_workspace.jar}"/>
+				<include name="${lams_workspace.war}"/>
+				<include name="${lams_authoring.jar}"/>
+				<include name="${lams_authoring.war}"/>
+			<!-- 	<include name="${lams_monitoring.war}"/>
 				<include name="lams_learning.war"/>
 					<include name="lams_admin.war"/-->
 
