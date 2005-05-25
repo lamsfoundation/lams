@@ -41,7 +41,6 @@ Ant build file.
 		<echo message="insert-test-data --> Insert test data to database"/>
 		<echo message="lams-jar  --> Make jar archive for deployment"/>
 		<echo message="lams-war  --> Make war archive for deployment"/>
-		<echo message="copyfiles-windows --> Copy the third party jar files and cofiguration files for deployment on windows"/>
 		<echo message="middlegen-learningdesign --> Run middlegen for learningdesign tables"/>
 		<echo message="hbm2java-learningdesign  --> Run hbm2java for learningdesign mapping files"/>
 		<echo message=""/>
@@ -263,77 +262,11 @@ Ant build file.
 		</war>
 	</target>
 
-	<!-- ============================================================================== -->
-	<!-- Copy the third party jar files and cofiguration files for deployment on windows-->
-	<!-- ============================================================================== -->
-	<target name="copyfiles-windows" depends="makeconfdir-windows" description="copy lib and config files">
-<!--		<copy overwrite="yes" todir="${jboss.home.windows}/server/default/lib/">
-			<fileset dir="${lib}/cglib/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/hibernate/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/j2ee/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/jakarta-commons/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/jdom/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/log4j/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/mysql/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/odmg/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/spring/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/struts/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/aopalliance/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/jakarta-taglibs/">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${lib}/jakarta-poi/">
-				<include name="*.jar"/>
-			</fileset>
-		</copy> -->
-		<copy overwrite="yes" todir="${jboss.home.windows}/server/default/conf/">
-			<fileset dir="${conf.jboss.windows}/">
-				<include name="login-config.xml"/>
-			</fileset>
-		</copy>
-		<copy overwrite="yes" todir="${lamsconf.windows}">
-			<fileset dir="${conf.auth.windows}/">
-				<include name="*.xml"/>
-				<include name="*.dtd"/>
-			</fileset>
-			<fileset dir="${conf.lams.windows}/">
-				<include name="*.xml"/>
-				<include name="*.dtd"/>
-			</fileset>
-		</copy>
-		<copy overwrite="yes" todir="${jboss.deploy.windows}">
-			<fileset dir="${conf.jboss.windows}/service">
-				<include name="mysql*.xml"/>
-			</fileset>
-		</copy>
-	</target>
 
 	<!-- =================================================================== -->
 	<!-- Deploy the project on windows                                       -->
 	<!-- =================================================================== -->
-	<target name="deploy-lams-windows" depends="lams-jar,lams-war,copyfiles-windows">
+	<target name="deploy-lams-windows" depends="lams-jar,lams-war">
 		<delete quiet="true">
 			<fileset dir="${jboss.deploy.windows}/tmp"/>
 			<fileset dir="${jboss.deploy.windows}/work"/>
