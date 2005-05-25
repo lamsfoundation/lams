@@ -29,5 +29,6 @@
 	<classpathentry kind="lib" path="lib/wddx/wddx-1.0a-lfl-0.2.jar"/>
 	<classpathentry kind="lib" path="lib/mysql/mysql-connector-java-3.1.7-bin.jar"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE13_CONTAINER"/>
+	<classpathentry kind="src" path="/lams_workspace"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
