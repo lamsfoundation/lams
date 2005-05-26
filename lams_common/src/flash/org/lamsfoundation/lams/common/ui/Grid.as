@@ -76,6 +76,10 @@ class Grid {
 		if(target_mc.grid != null){
 			target_mc.grid.removeMovieClip();
 		}
+        //If the grid already exists remove it
+        if(target_mc.grid) {
+            target_mc.grid.removeMovieClip();
+        }
   		//Create the clip
 		var _mc:MovieClip = target_mc.createEmptyMovieClip('grid',target_mc.getNextHighestDepth());
 
