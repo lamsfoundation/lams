@@ -1,0 +1,191 @@
+<wddxPacket version='1.0'>
+      <header/>
+      <data>
+        <struct>
+          <var name='date_read_only'>
+            <dateTime>
+              2005-1-11T14:29:34+10:0
+            </dateTime>
+          </var>
+          <var name='activities'>
+            <array length='1'>
+              <struct>
+                <var name='define_later_flag'>
+                  <boolean value='false'/>
+                </var>
+                <var name='objectType'>
+                  <string>
+                    Activity
+                  </string>
+                </var>
+                <var name='id'>
+                  <number>
+                    20.0
+                  </number>
+                </var>
+                <var name='activityTransitions'>
+                  <struct>
+                    <var name='fromActivity'>
+                      <array length='0'></array>
+                    </var>
+                    <var name='toActivity'>
+                      <array length='0'></array>
+                    </var>
+                  </struct>
+                </var>
+                <var name='xcoord'>
+                  <number>
+                    -1.0
+                  </number>
+                </var>
+                <var name='create_date_time'>
+                  <dateTime>
+                    2005-1-24T9:3:35+10:0
+                  </dateTime>
+                </var>
+                <var name='learning_design_id'>
+                  <number>
+                    1.0
+                  </number>
+                </var>
+                <var name='ycoord'>
+                  <number>
+                    -1.0
+                  </number>
+                </var>
+                <var name='title'>
+                  <string>
+                    Optional Activity Title
+                  </string>
+                </var>
+                <var name='order_id'>
+                  <number>
+                    -1.0
+                  </number>
+                </var>
+                <var name='description'>
+                  <string>
+                    Optional Activity Description
+                  </string>
+                </var>
+                <var name='activityType'>
+                  <string>
+                    SequenceActivity
+                  </string>
+                </var>
+                <var name='library_activity_ui_image'>
+                  <string></string>
+                </var>
+                <var name='activity_id'>
+                  <number>
+                    1.0
+                  </number>
+                </var>
+                <var name='learning_library_id'>
+                  <number>
+                    1.0
+                  </number>
+                </var>
+                <var name='learning_activity_type_id'>
+                  <number>
+                    9.0
+                  </number>
+                </var>
+                <var name='offline_instructions'>
+                  <string></string>
+                </var>
+              </struct>
+            </array>
+          </var>
+          <var name='user_id'>
+            <number>
+              1.0
+            </number>
+          </var>
+          <var name='read_only_flag'>
+            <boolean value='false'/>
+          </var>
+          <var name='version'>
+            <string>
+              1.1
+            </string>
+          </var>
+          <var name='max_id'>
+            <number>
+              4.0
+            </number>
+          </var>
+          <var name='open_date_time'>
+            <dateTime>
+              2005-1-11T14:29:34+10:0
+            </dateTime>
+          </var>
+          <var name='create_date_time'>
+            <dateTime>
+              2005-1-11T14:29:34+10:0
+            </dateTime>
+          </var>
+          <var name='read_access'>
+            <number>
+              1.0
+            </number>
+          </var>
+          <var name='help_text'>
+            <string>
+              Help
+            </string>
+          </var>
+          <var name='write_access'>
+            <number>
+              1.0
+            </number>
+          </var>
+          <var name='parent_learning_design_id'>
+            <number>
+              1.0
+            </number>
+          </var>
+          <var name='learning_design_id'>
+            <number>
+              1.0
+            </number>
+          </var>
+          <var name='close_date_time'>
+            <dateTime>
+              2005-1-11T14:29:34+10:0
+            </dateTime>
+          </var>
+          <var name='objectType'>
+            <string>
+              LearningDesign
+            </string>
+          </var>
+          <var name='id'>
+            <number>
+              20.0
+            </number>
+          </var>
+          <var name='lesson_copy_flag'>
+            <boolean value='false'/>
+          </var>
+          <var name='valid_design_flag'>
+            <boolean value='true'/>
+          </var>
+          <var name='description'>
+            <string>
+              Description for 20
+            </string>
+          </var>
+          <var name='first_activity_id'>
+            <number>
+              1.0
+            </number>
+          </var>
+          <var name='title'>
+            <string>
+              Title for 20
+            </string>
+          </var>
+        </struct>
+      </data>
+    </wddxPacket>
