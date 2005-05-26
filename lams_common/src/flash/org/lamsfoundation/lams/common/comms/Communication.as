@@ -14,6 +14,8 @@ class org.lamsfoundation.lams.common.comms.Communication {
     private var responseXML:XML;      //XML object for server response
     private var wddx:Wddx;            //WDDX serializer/de-serializer
     
+    private var requestHandlers:Hashtable;
+    
     //TODO DI 11/04/05 Manage key/handler relationship - temp solution
     private var requestCallBack:Function;
     private var onXMLData:Function;
