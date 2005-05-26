@@ -3,32 +3,8 @@
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="src" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/cglib/cglib-full-2.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-collections-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-lang-2.0.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-logging.jar"/>
-	<classpathentry kind="lib" path="lib/jdom/jdom.jar"/>
-	<classpathentry kind="lib" path="lib/junit/junit.jar"/>
-	<classpathentry kind="lib" path="lib/log4j/log4j-1.2.9.jar"/>
-	<classpathentry kind="lib" path="lib/middlegen/middlegen-2.1.jar"/>
-	<classpathentry kind="lib" path="lib/middlegen/middlegen-hibernate-plugin-2.1.jar"/>
-	<classpathentry kind="lib" path="lib/odmg/odmg-3.0.jar"/>
-	<classpathentry kind="lib" path="lib/spring/spring.jar"/>
-	<classpathentry kind="lib" path="lib/xdoclet/maven-xdoclet-plugin-1.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/struts/struts.jar"/>
-	<classpathentry kind="lib" path="lib/dom4j/dom4j-1.5.2.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate/hibernate2.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate/hibernate-tools.jar"/>
-	<classpathentry kind="lib" path="lib/aopalliance/aopalliance.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-taglibs/standard.jar"/>
-	<classpathentry kind="lib" path="lib/strutstestcase/strutstest-2.1.3.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-beanutils.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-digester.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-fileupload-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-poi/poi-2.5.1-final-20040804.jar"/>
-	<classpathentry kind="lib" path="lib/wddx/wddx-1.0a-lfl-0.2.jar"/>
-	<classpathentry kind="lib" path="lib/mysql/mysql-connector-java-3.1.7-bin.jar"/>
-	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE13_CONTAINER"/>
 	<classpathentry kind="src" path="/lams_workspace"/>
+	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -202,6 +202,7 @@ Ant build file.
 		<copy overwrite="yes" todir="${build.test}">
 			<fileset dir="${src.test.java}">
 				<include name="**/*.xml"/>
+				<include name="**/*.zip"/>
 			</fileset>
 		</copy>
 	</target>
