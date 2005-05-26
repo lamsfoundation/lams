@@ -1,6 +1,7 @@
 ﻿import mx.controls.*
 import mx.utils.*
 import mx.managers.*
+import mx.events.*
 import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
@@ -19,12 +20,11 @@ class WorkspaceDialog extends MovieClip{
     private var ok_btn:Button;              //OK+Cancel buttons
     private var cancel_btn:Button;
     private var panel:MovieClip;            //The underlaying panel base
-    private var treeview:Tree;         //Treeview for navigation through workspace folder structure
-    private var datagrid:DataGrid;         //The details grid
+    private var treeview:Tree;              //Treeview for navigation through workspace folder structure
+    private var datagrid:DataGrid;          //The details grid
     private var myLabel_lbl:Label;          //Text labels
     private var input_txt:TextInput;        //Text labels
-    private var combo:ComboBox;        //Text labels
-    
+    private var combo:ComboBox;             //Text labels
     
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
@@ -35,12 +35,23 @@ class WorkspaceDialog extends MovieClip{
     private var xCancelOffset:Number;
     private var yCancelOffset:Number;
     
-
+    private var _okCallBack:Function;
+    private var _selectedDesignId:Number;
+    
+    //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
+    private var dispatchEvent:Function;     
+    public var addEventListener:Function;
+    public var removeEventListener:Function;
+    
+    
     /**
     * constructor
     */
     function WorkspaceDialog(){
-        trace('WorkSpaceDialog.constructor');
+        //trace('WorkSpaceDialog.constructor');
+        //Set up this class to use the Flash event delegation model
+        EventDispatcher.initialize(this);
+        
         //Create a clip that will wait a frame before dispatching init to give components time to setup
         this.onEnterFrame = init;
     }
@@ -51,6 +62,9 @@ class WorkspaceDialog extends MovieClip{
     private function init(){
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
+        
+        //TODO DI 25/05/05 ID set as 1 is just a stub, selected id from dialog should replace
+        _selectedDesignId = 1;
         
         //Set up the treeview
         setUpTreeview();
@@ -71,8 +85,8 @@ class WorkspaceDialog extends MovieClip{
         //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();
         fm.enabled = true;
-        treeview.setFocus();
-        fm.defaultPushButton = ok_btn;
+        ok_btn.setFocus();
+        //fm.defaultPushButton = ok_btn;
         
         Debugger.log('ok_btn.tabIndex: '+ok_btn.tabIndex,Debugger.GEN,'init','org.lamsfoundation.lams.WorkspaceDialog');
         
@@ -95,15 +109,22 @@ class WorkspaceDialog extends MovieClip{
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
         setStyles();
+        
+        //Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
+        _container.contentLoaded();
     }
     
     /**
     * Event fired by StyleManager class to notify listeners that Theme has changed
     * it is up to listeners to then query Style Manager for relevant style info
     */
-    public function themeChanged(){
-        //Theme has changed so update objects to reflect new styles
-        setStyles();
+    public function themeChanged(event:Object){
+        if(event.type=='themeChanged') {
+            //Theme has changed so update objects to reflect new styles
+            setStyles();
+        }else {
+            Debugger.log('themeChanged event broadcast with an object.type not equal to "themeChanged"',Debugger.CRITICAL,'themeChanged','org.lamsfoundation.lams.WorkspaceDialog');
+        }
     }
     
     /**
@@ -137,7 +158,6 @@ class WorkspaceDialog extends MovieClip{
         //Apply combo style 
         styleObj = themeManager.getStyleObject('combo');
         combo.setStyle('styleName',styleObj);
-        
     }
 
     /**
@@ -155,6 +175,9 @@ class WorkspaceDialog extends MovieClip{
     private function ok(){
         trace('OK');
        //If validation successful commit + close parent window
+       //Fire callback with selectedId
+       dispatchEvent({type:'okClicked',target:this});
+       _container.deletePopUp();
     }
     
     /**
@@ -234,5 +257,8 @@ class WorkspaceDialog extends MovieClip{
     function set container(value:MovieClip){
         _container = value;
     }
-
+    
+    function get selectedDesignId():Number { 
+        return _selectedDesignId;
+    }
 }

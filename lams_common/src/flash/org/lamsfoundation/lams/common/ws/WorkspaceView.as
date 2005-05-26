@@ -5,6 +5,7 @@ import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.authoring.*
 import mx.managers.*
+import mx.utils.*
 
 /**
 * Authoring view for the canvas
@@ -15,6 +16,8 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView
 	//Canvas clip
 	private var _workspace_mc:MovieClip;
 	private var workspaceDialog:MovieClip;
+	private var _popup:MovieClip;
+	private var okClickedCallback:Function;
 	
 	/*
 	* Constructor
@@ -39,13 +42,45 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView
     * Create a popup dialog containing workspace
     * @param    pos - Position, either 'centre' or an object containing x + y coordinates
     */
-    public function createWorkspacePopup(pos:Object){
+    public function createWorkspaceDialog(pos:Object,callBack:Function){
+        var dialog:MovieClip;
         //Check to see whether this should be a centered or positioned dialog
         if(typeof(pos)=='string'){
-            var popup = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog'});
-            //popup.centre();
+            dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog'});
         } else {
-            var popup = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog',_x:pos.x,_y:pos.y});
+            dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog',_x:pos.x,_y:pos.y});
+        }
+        //Assign dialog load handler
+        dialog.addEventListener('contentLoaded',Delegate.create(this,dialogLoaded));
+        okClickedCallback = callBack;
+    }
+    
+    /**
+    * called when the dialog is loaded
+    */
+    public function dialogLoaded(evt:Object) {
+        Debugger.log('!evt.type:'+evt.type,Debugger.GEN,'dialogLoaded','org.lamsfoundation.lams.WorkspaceView');
+        //Check type is correct
+        if(evt.type == 'contentLoaded'){
+            //Set up callback for ok button click
+            Debugger.log('!evt.target.scrollContent:'+evt.target.scrollContent,Debugger.GEN,'dialogLoaded','org.lamsfoundation.lams.WorkspaceView');
+            evt.target.scrollContent.addEventListener('okClicked',Delegate.create(this,okClicked));
+        }else {
+            //TODO DI 25/05/05 raise wrong event type error 
+        }
+    }
+    
+    /**
+    * Workspace dialog OK button clicked handler
+    */
+    private function okClicked(evt:Object) {
+        Debugger.log('!okClicked:',Debugger.GEN,'okClicked','org.lamsfoundation.lams.WorkspaceView');
+        //Check type is correct
+        if(evt.type == 'okClicked'){
+            //Call the callback, passing in the design selected designId
+            okClickedCallback(evt.target.selectedDesignId);
+        }else {
+            //TODO DI 25/05/05 raise wrong event type error 
         }
     }
 }

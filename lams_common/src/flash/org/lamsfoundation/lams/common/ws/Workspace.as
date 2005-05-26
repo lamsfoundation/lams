@@ -1,5 +1,7 @@
 ﻿import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.authoring.*
+import org.lamsfoundation.lams.common.util.*
+import mx.utils.*
 
 /**
 * 
@@ -33,14 +35,16 @@ class org.lamsfoundation.lams.common.ws.Workspace {
     * @param id - the Learning design ID 
     */
     public function userSelectItem(){
-        trace('Workspace.userSelectItem');
-        //todo DI 07/04/05 write code user design selection, just a stub at the moment, calls itemSelected
-        itemSelected(1);
         //Open the workspace dialog in the centre of the screen
-        workspaceView.createWorkspacePopup('centre');
+        workspaceView.createWorkspaceDialog('centre',Delegate.create(this,itemSelected));
     }
     
+    /**
+    * Called when design has been selected from within the workspace dialog, inovked via callback method.
+    */
     private function itemSelected(designId:Number){
+        Debugger.log('!!designID:'+designId,Debugger.GEN,'itemSelected','org.lamsfoundation.lams.Workspace');
+
         //Design has been chosen, get Canvas to open design
         Application.getInstance().getCanvas().openDesignById(designId);
     }
