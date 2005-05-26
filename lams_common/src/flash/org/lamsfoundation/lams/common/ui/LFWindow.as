@@ -41,6 +41,8 @@ class LFWindow extends Window{
     public var centred:Boolean=false;
     private var setUpFinished:Boolean = false;
     
+    private var _initObj:Object;
+    
     //Constructor
     function LFWindow() {
     }
@@ -64,20 +66,21 @@ class LFWindow extends Window{
 	* Fired by Window when content has loaded  i.e. ScrollPane
 	*/
 	public function scrollLoaded(){
-        //trace('scrollLoaded');
+        Debugger.log('--',Debugger.GEN,'scrollLoaded','org.lamsfoundation.lams.LFWindow');
 
 		//Assign scroll pane content
 		content.contentPath = _scrollContentPath;
 
 		//Assign reference to container (this) acessible in dialog
-		content.content.container=this;
-
+		content.content.container = this;
+        
+        //Set the size of the window to be greater than the content by the margin width and height
         setSize(content.content._width+MARGIN_WIDTH,content.content._height+MARGIN_HEIGHT);
 		
         centre();
 		this._visible = true;
-        setUpFinished =true;
-		//this.removeEventListener('complete',scrollLoaded);
+        setUpFinished = true;
+		this.removeEventListener('complete',scrollLoaded);
 	}
     
     public function createChildren(Void):Void {
@@ -189,13 +192,20 @@ class LFWindow extends Window{
         }
     }
     
+    /**
+    * method called by content of scrollpane when it is loaded
+    */
+    public function contentLoaded() {
+        //dispatch an onContentLoaded event to listeners
+        dispatchEvent({type:'contentLoaded',target:this});
+    }
+    
 	//Getters+Setters
     /**
     * Sets the content of the scrollpane child. Allows content to be set from outside LFWindow
     */
     [Inspectable(defaultValue='')]
     function set scrollContentPath (path:String){
-        //trace('setting scrollContentPath-'+content);
         _scrollContentPath = path;
     }
     
@@ -220,12 +230,10 @@ class LFWindow extends Window{
     }
     */
 	
-    
     /**
     * Returns content inside the scrollPane
     */
     function get scrollContent():Object{
         return content.content;
     }
-    
 }
