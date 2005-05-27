@@ -1,4 +1,5 @@
-﻿import org.lamsfoundation.lams.common.*;
+﻿import org.lamsfoundation.lams.common.comms.*
+import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.authoring.*;
 
@@ -21,7 +22,7 @@ class Config {
     private var _version:String;        //Config properties
     private var _language:String;
     private var _theme:String;
-    private var _rootUrl:String;
+    private var _serverUrl:String;
     
 
 	//Constructor
@@ -29,6 +30,7 @@ class Config {
         //Get a ref to the cookie monster 
         _cm = CookieMonster.getInstance();
         _comms = Application.getInstance().getComms();
+		setDefaults();
 	}
     
     /**
@@ -45,11 +47,11 @@ class Config {
     * Loads application configuration data for LAMS, can load from a URL or cookie
     */
     public function load(src:Object){
-        if(typeof(src)=='string'{
+        if(typeof(src)=='string'){
             //load from URL otherwise 
         }else {
-            //load from config cookie
-            _configData = _cm.open('config');
+            //load from config cookie			//TODO: FIx this
+            //_configData = _cm.open('config');
         }
     }
     
@@ -61,11 +63,19 @@ class Config {
         _version = '1.1';
         _language = 'uk';
         _theme = 'default';
-        _rootUrl = 'http:dolly.uklams.net/lams';
+        _serverUrl = 'http://dolly.uklams.net:8080/lams/';
     }
 
 	//Getters+Setters
 	function get className():String{
 		return _className;
+	}
+	
+	function set serverUrl(a):Void{
+		_serverUrl = a;
+	}
+	
+	function get serverUrl():String{
+		return _serverUrl;
 	}
 }
