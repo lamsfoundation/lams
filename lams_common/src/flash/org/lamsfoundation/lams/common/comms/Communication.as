@@ -27,7 +27,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
         //Set up error codes used in communication with server
         errorCodes=[1,2,3];
         ignoreWhite = true;
-		_global.breakpoint();
+		//_global.breakpoint();
         _serverUrl = Config.getInstance().serverUrl;		//Debugger.log('_serverUrl:'+_serverUrl,4,'Consturcutor','Communication');
         wddx = new Wddx();
     }
