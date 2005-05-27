@@ -1,5 +1,5 @@
 ﻿import org.lamsfoundation.lams.common.util.*
-import org.lamsfoundation.lams.common.comms.*
+import org.lamsfoundation.lams.common.comms.*import org.lamsfoundation.lams.common.*;
 
 /**
 * Communication - responsible for server side communication and wddx serialisation/de-serialisation
@@ -9,7 +9,6 @@ import org.lamsfoundation.lams.common.comms.*
 class org.lamsfoundation.lams.common.comms.Communication {
     private var _serverUrl:String;
     private var errorCodes:Array;
-    private var url:String;           //URL for server
     private var ignoreWhite:Boolean;  
     private var responseXML:XML;      //XML object for server response
     private var wddx:Wddx;            //WDDX serializer/de-serializer
@@ -28,7 +27,8 @@ class org.lamsfoundation.lams.common.comms.Communication {
         //Set up error codes used in communication with server
         errorCodes=[1,2,3];
         ignoreWhite = true;
-        _serverUrl = '';
+		_global.breakpoint();
+        _serverUrl = Config.getInstance().serverUrl;		Debugger.log('_serverUrl:'+_serverUrl,4,'Consturcutor','Communication');
         wddx = new Wddx();
     }
     
@@ -37,7 +37,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
     * @param requestUrl URL on the server for request script
     * @param handlerFn  a callback function to call with the response object
     */
-    public function getRequest(requestUrl:String,handlerFn:Function){
+    public function getRequest(requestUrl:String,handlerFn:Function,isFullURL){
         trace('Communication.getRequest()');
         //Create XML response object (deleting old XML if neccesary), assign data+load events and load XML
         if(responseXML!=null){
@@ -66,7 +66,11 @@ class org.lamsfoundation.lams.common.comms.Communication {
         responseXML.onLoad = Proxy.create(this,xmlOnLoad,responseXML);
         
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
-        responseXML.load(_serverUrl+requestUrl);
+        if(isFullURL){
+			responseXML.load(requestUrl);
+		}else{
+			responseXML.load(_serverUrl+requestUrl);
+		}
         //_global.breakPoint();
         //responseXML.load('sampleLearningDesign.xml');
         requestCallBack = handlerFn;
