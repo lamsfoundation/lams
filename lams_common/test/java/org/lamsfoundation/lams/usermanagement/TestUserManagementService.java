@@ -94,10 +94,5 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 	public void testGetWorkspace()throws IOException{
 		String str = userManagementService.getWorkspace(new Integer(4));
 		System.out.println(str);
-	}	
-	public void testGetAccessibleWorkspaceFolders()throws IOException{
-		String packet = userManagementService.getAccessibleWorkspaceFolders(new Integer(4));
-		System.out.println("User Accessible folders: " + packet);
 	}
-
 }
