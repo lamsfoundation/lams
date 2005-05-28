@@ -33,7 +33,7 @@ public class WorkspaceFolderDAO extends BaseDAO implements IWorkspaceFolderDAO {
 		return (WorkspaceFolder) super.find(WorkspaceFolder.class,workspaceFolderID);				
 	}
 	public WorkspaceFolder getRunSequencesFolderForUser(Integer userID){
-		String query = "from lams_workspace_folder wf where wf.user_id=? AND wf.lams_workspace_folder_type_id=2";
+		String query = "from WorkspaceFolder wf where wf.userID=? AND wf.workspaceFolderType=2";
 		List list = this.getHibernateTemplate().find(query,userID); 
 		if(list.size()!=0)
 			return (WorkspaceFolder)list.get(0);

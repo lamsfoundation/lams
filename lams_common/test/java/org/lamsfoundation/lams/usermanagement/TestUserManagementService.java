@@ -14,6 +14,7 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationTypeDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.RoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
+import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationRoleDAO;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 
 /**
@@ -30,6 +31,7 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 	protected OrganisationTypeDAO organisationTypeDAO;
 	protected UserManagementService userManagementService;
 	protected AuthenticationMethodDAO authenticationMethodDAO;
+	protected UserOrganisationRoleDAO userOrganisationRoleDAO;
 	
 	public TestUserManagementService(String name){
 		super(name);
@@ -41,10 +43,12 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 		organisationTypeDAO =(OrganisationTypeDAO)context.getBean("organisationTypeDAO");
 		userManagementService = (UserManagementService)context.getBean("userManagementService");
 		authenticationMethodDAO =(AuthenticationMethodDAO)context.getBean("authenticationMethodDAO");
-		roleDAO = (RoleDAO)context.getBean("roleDAO");				
+		roleDAO = (RoleDAO)context.getBean("roleDAO");		
+		userOrganisationRoleDAO = (UserOrganisationRoleDAO)context.getBean("userOrganisationRoleDAO");
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
 	 */
 	protected String[] getContextConfigLocation() {
@@ -59,7 +63,7 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 		Integer organisationID = userManagementService.saveOrganisation(organisation,new Integer(1));		
 		assertNotNull(organisationID);
 	}
-	public void saveUser(){
+	public void testSaveUser(){
 		User user = new User();
 		user.setLogin("Monu");
 		user.setPassword("Monu");
@@ -67,8 +71,7 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 		user.setCreateDate(new Date());
 		user.setAuthenticationMethod(authenticationMethodDAO.getAuthenticationMethodById(new Integer(2)));
 		user.setBaseOrganisation(organisationDAO.getOrganisationById(new Integer(1)));		
-		assertNotNull(userManagementService.saveUser(user, new Integer(4)));	
-		
+		assertNotNull(userManagementService.saveUser(user, new Integer(3)));		
 	}	
 	public void testMoveLearningDesign()throws IOException{
 		String packet = userManagementService.moveLearningDesign(new Long(1),new Integer(4),new Integer(1));
@@ -85,13 +88,16 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
 	 */
-	protected String getHibernateSessionFactoryName() {
-		
+	protected String getHibernateSessionFactoryName() {		
 		return "coreSessionFactory";
 	}
 	public void testGetWorkspace()throws IOException{
 		String str = userManagementService.getWorkspace(new Integer(4));
 		System.out.println(str);
+	}	
+	public void testGetAccessibleWorkspaceFolders()throws IOException{
+		String packet = userManagementService.getAccessibleWorkspaceFolders(new Integer(4));
+		System.out.println("User Accessible folders: " + packet);
 	}
 
 }

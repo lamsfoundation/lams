@@ -22,7 +22,26 @@ public class Role implements Serializable {
 	
 	public static final String AUTHOR = "AUTHOR";
 	
+	public static final String TEACHER = "TEACHER";
+	
 	public static final String SYSADMIN = "SYSADMIN";//for future use
+	
+	/**
+	 * Added by Manpreet Minhas
+	 * ***********************
+	 * final static variables indicating the various
+	 * roles available for a given user ar per the
+	 * database. New roles may be added/deleted in the
+	 * near future
+	 * 
+	 ************************************************************/
+		public static final Integer ROLE_SYSADMIN =new Integer(1);
+		public static final Integer ROLE_ADMIN =new Integer(2);
+		public static final Integer ROLE_AUTHOR =new Integer(3);
+		public static final Integer ROLE_STAFF =new Integer(4);
+		public static final Integer ROLE_LEARNER =new Integer(5);
+		public static final Integer ROLE_TEACHER =new Integer(6);
+	/***********************************************************/
 	
     /** identifier field */
     private Integer roleId;
@@ -138,6 +157,15 @@ public class Role implements Serializable {
         return new HashCodeBuilder()
             .append(getRoleId())
             .toHashCode();
+    }
+    public boolean isAuthor(){
+    	return this.roleId.equals(ROLE_AUTHOR)?true:false;
+    }
+    public boolean isTeacher(){
+    	return this.roleId.equals(ROLE_TEACHER)?true:false;
+    }
+    public boolean isStaff(){
+    	return this.roleId.equals(ROLE_STAFF)?true:false ;
     }
 
 }

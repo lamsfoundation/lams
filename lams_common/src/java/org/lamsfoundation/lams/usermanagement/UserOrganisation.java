@@ -32,6 +32,12 @@ public class UserOrganisation implements Serializable {
         this.organisation = organisation;
         this.userOrganisationRoles = userOrganisationRoles;
     }
+    
+    /**minimal constructor */
+    public UserOrganisation(User user, Organisation organisation){
+    	this.user = user;
+        this.organisation = organisation;
+    }
 
     /** default constructor */
     public UserOrganisation() {

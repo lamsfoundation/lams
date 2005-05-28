@@ -1,14 +1,17 @@
 SET FOREIGN_KEY_CHECKS=0;
 
-insert into lams_workspace values(1,null,'Lams Workspace');
-insert into lams_workspace values(2,null,'Manpreet Minhas');
-insert into lams_workspace values(3,null,'Test Workspace');
+insert into lams_workspace values(1,null,'ROOT');
+insert into lams_workspace values(2,null,'MACQUIRE UNIVERSITY');
+insert into lams_workspace values(3,null,'MELCOE');
+insert into lams_workspace values(4,null,'LAMS');
+insert into lams_workspace values(5,null,'MAMS');
+insert into lams_workspace values(6,null,'Manpreet Minhas');
 
-INSERT INTO lams_organisation VALUES (1, 'Root', 'Root Organisation',null,1,NOW(),null);
-INSERT INTO lams_organisation VALUES (2, 'Maquarie Uni', 'Macquarie University',1,2,NOW(),null);
-INSERT INTO lams_organisation VALUES (3, 'MELCOE', 'Macquarie E-learning Center',2,3,NOW(),null);
-INSERT INTO lams_organisation VALUES (4, 'LAMS', 'Lams Project Team',3,3,NOW(),1);
-INSERT INTO lams_organisation VALUES (5, 'MAMS', 'Mams Project Team',3,3,NOW(),null);
+INSERT INTO lams_organisation VALUES (1, 'Root', 'Root Organisation',null,1,NOW(),1);
+INSERT INTO lams_organisation VALUES (2, 'Maquarie Uni', 'Macquarie University',1,2,NOW(),2);
+INSERT INTO lams_organisation VALUES (3, 'MELCOE', 'Macquarie E-learning Center',2,3,NOW(),3);
+INSERT INTO lams_organisation VALUES (4, 'LAMS', 'Lams Project Team',3,3,NOW(),4);
+INSERT INTO lams_organisation VALUES (5, 'MAMS', 'Mams Project Team',3,3,NOW(),5);
 
 
 INSERT INTO lams_user_organisation VALUES (1, 1, 1);
@@ -17,7 +20,13 @@ INSERT INTO lams_user_organisation VALUES (3, 3, 2);
 INSERT INTO lams_user_organisation VALUES (4, 4, 2);
 INSERT INTO lams_user_organisation VALUES (5, 2, 3);
 INSERT INTO lams_user_organisation VALUES (6, 3, 3);
+
 INSERT INTO lams_user_organisation VALUES (7, 4, 4);
+INSERT INTO lams_user_organisation VALUES (8, 2, 4);
+INSERT INTO lams_user_organisation VALUES (9, 3, 4);
+INSERT INTO lams_user_organisation VALUES (10,5, 4);
+
+
 
 INSERT INTO lams_user_organisation_role VALUES (1, 1, 1);
 INSERT INTO lams_user_organisation_role VALUES (2, 2, 2);
@@ -33,7 +42,11 @@ INSERT INTO lams_user_organisation_role VALUES (11, 4, 5);
 INSERT INTO lams_user_organisation_role VALUES (12, 5, 4);
 INSERT INTO lams_user_organisation_role VALUES (13, 5, 5);
 INSERT INTO lams_user_organisation_role VALUES (14, 6, 3);
+
 INSERT INTO lams_user_organisation_role VALUES (15, 7, 3);
+INSERT INTO lams_user_organisation_role VALUES (16, 8, 3);
+INSERT INTO lams_user_organisation_role VALUES (17, 9, 3);
+INSERT INTO lams_user_organisation_role VALUES (18, 10,3);
 
 INSERT INTO lams_user VALUES(1, 'sysadmin','sysadmin','Mr','Fei','Yang',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'fyang@melcoe.mq.edu.au',0,NOW(),1,null,1);
 INSERT INTO lams_user VALUES(2, 'test','test','Mr','Kevin','Han',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'khan@melcoe.mq.edu.au',0,NOW(),3,null,2);
@@ -48,84 +61,53 @@ values
 (4,'mminhas','mminhas','Ms','Manpreet','Minhas','170-22','Great Western Highway',null,
 'Parramatta','NSW','Australia','029509061','0298938052','0405651097',
 '0209509062','mminhas@melcoe.mq.edu.au',
-0,'20041223',1,2,
+0,'20041223',1,6,
 4);
 
-insert into lams_workspace_folder 
-(workspace_folder_id,parent_folder_id,name,workspace_id,
-user_id,create_date_time,last_modified_date_time,
-lams_workspace_folder_type_id)
- values
-(1,null,'Lams Workspace',1,
-1,'20041223','20041223',
-1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(1,null,'ROOT',1,1,'20041223','20041223',1);
 
-insert into lams_workspace_folder 
-(workspace_folder_id,parent_folder_id,name,workspace_id,
-user_id,create_date_time,last_modified_date_time,
-lams_workspace_folder_type_id)
- values
-(2,1,'Manpreet Minhas Workspace',2,
-4,'20041223','20041223',
-1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(2,1,'MACQUAIRE UNIVERSITY',2,1,'20041223','20041223',1);
 
-insert into lams_workspace_folder 
-(workspace_folder_id,parent_folder_id,name,workspace_id,
-user_id,create_date_time,last_modified_date_time,
-lams_workspace_folder_type_id)
- values
-(3,2,'Manpreet Minhas Run Sequences Folder',2,
-4,'20041223','20041223',
-2);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(3,1,'MELCOE',3,1,'20041223','20041223',1);
 
-insert into lams_workspace_folder 
-(workspace_folder_id,parent_folder_id,name,workspace_id,
-user_id,create_date_time,last_modified_date_time,
-lams_workspace_folder_type_id)
- values
-(4,2,'MMinhas1',2,
-4,'20041223','20041223',
-1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(4,1,'LAMS',4,1,'20041223','20041223',1);
 
-insert into lams_workspace_folder 
-(workspace_folder_id,parent_folder_id,name,workspace_id,
-user_id,create_date_time,last_modified_date_time,
-lams_workspace_folder_type_id)
- values
-(5,2,'MMinhas2',2,
-4,'20041223','20041223',
-1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(5,1,'MAMS',5,1,'20041223','20041223',1);
 
-insert into lams_workspace_folder 
-(workspace_folder_id,parent_folder_id,name,workspace_id,
-user_id,create_date_time,last_modified_date_time,
-lams_workspace_folder_type_id)
- values
-(6,5,'Monu1',2,
-4,'20041223','20041223',
-1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(6,4,'Manpreet Minhas Workspace',6,4,'20041223','20041223',1);
 
-insert into lams_workspace_folder 
-(workspace_folder_id,parent_folder_id,name,workspace_id,
-user_id,create_date_time,last_modified_date_time,
-lams_workspace_folder_type_id)
- values
-(7,5,'Monu2',2,
-4,'20041223','20041223',
-1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(7,6,'Manpreet Minhas Run Sequences Folder',6,4,'20041223','20041223',2);
 
-insert into lams_workspace_folder 
-(workspace_folder_id,parent_folder_id,name,workspace_id,
-user_id,create_date_time,last_modified_date_time,
-lams_workspace_folder_type_id)
- values
-(8,1,'Test Workspace',3,
-4,'20041223','20041223',
-1);
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(8,6,'Documents',6,4,'20041223','20041223',1);
+
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(9,6,'Pictures',6,4,'20041223','20041223',1);
+
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(10,6,'Media',6,4,'20041223','20041223',1);
+
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(11,10,'Songs',6,4,'20041223','20041223',1);
+
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(12,10,'Movies',6,4,'20041223','20041223',1);
+
 
 update lams_workspace set root_folder_id = 1 where workspace_id = 1;
 update lams_workspace set root_folder_id = 2 where workspace_id = 2;
-update lams_workspace set root_folder_id = 8 where workspace_id = 3;
+update lams_workspace set root_folder_id = 3 where workspace_id = 3;
+update lams_workspace set root_folder_id = 4 where workspace_id = 4;
+update lams_workspace set root_folder_id = 5 where workspace_id = 5;
+update lams_workspace set root_folder_id = 6 where workspace_id = 6;
+
 
 -- Populates the lams_learning_library table with default libraries
 
@@ -922,6 +904,11 @@ INSERT INTO lams_cr_workspace  (workspace_id, name) VALUES (3, 'flashClientsWork
 INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (1, 1,1);
 INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (2, 2,1);
 INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (3, 3,2);
+
+-- SubmitFiles Tool related information
+INSERT INTO lams_cr_credential (credential_id, name, password) VALUES (3, 'SubmitFilesLogin','SubmitFilesPassword');
+INSERT INTO lams_cr_workspace  (workspace_id, name) VALUES (4, 'SubmitFilesWorkspace');
+INSERT INTO lams_cr_workspace_credential  (wc_id, workspace_id, credential_id) VALUES  (4,4,3);
 
 INSERT INTO lams_cr_node (node_id, workspace_id, type, created_date_time, path, next_version_id) VALUES (1, 1, 'DATANODE', 20050106103100, "/test",3);
 INSERT INTO lams_cr_node_version (nv_id, node_id, version_id, created_date_time)
