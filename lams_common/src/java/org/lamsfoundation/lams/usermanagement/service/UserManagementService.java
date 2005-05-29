@@ -7,11 +7,9 @@ package org.lamsfoundation.lams.usermanagement.service;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -25,7 +23,6 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
-import org.lamsfoundation.lams.usermanagement.dto.UserAccessFoldersDTO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
