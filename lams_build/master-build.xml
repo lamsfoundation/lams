@@ -15,15 +15,19 @@
 	<target name="usage" description="print usage message">
 		<echo>usage: this message</echo>
 		<echo>clean: clean the ear assembly directories</echo>
-		<echo>
-			clean-subprojects: clean sub project build directories
-		</echo>
+		<echo>clean-subprojects: clean sub project build directories</echo>
 		<echo>build-subprojects: build sub projects</echo>
 		<echo>assemble-ear: assemble ear structure</echo>
 		<echo>deploy-ear: copy ear to local jboss server</echo>
-		<echo>
-			copyfiles: copy configuration files to local jboss server
-		</echo>
+		<echo>copyfiles: copy configuration files to local jboss server</echo>
+		<echo>----------------------------------------------------------</echo>
+		<echo>To deploy LAMS:</echo>
+		<echo>   1. copyfiles (this only needs to be done once, or when basic configuration the files change)</echo>
+		<echo>   2. assemble-ear</echo>
+		<echo>   3. manually refresh the project</echo>
+		<echo>   4. deploy-ear</echo>
+		<echo>Do not try to assemble and deploy in the same run - if you do,</echo>
+		<echo>Eclipse may not deploy all of the newly created files.</echo>
 	</target>
 
 	<!-- clean dirs for this script only -->
