@@ -1,12 +1,29 @@
-/*
- * Created on Mar 15, 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 package org.lamsfoundation.lams.learningdesign.dto;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -17,10 +34,7 @@ import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
- * @author Minhas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author Manpreet Minhas
  */
 public class LearningDesignDTO {
 	
@@ -51,8 +65,8 @@ public class LearningDesignDTO {
 	private Date lessonStartDateTime;
 	private Date lastModifiedDateTime;
 	
-	private Hashtable activities;
-	private Hashtable transitions;
+	private ArrayList activities;
+	private ArrayList transitions;
 	
 	public LearningDesignDTO(){		
 	}
@@ -109,8 +123,8 @@ public class LearningDesignDTO {
 		this.lessonName = lessonName;
 		this.lessonStartDateTime = lessonStartDateTime;
 		this.lastModifiedDateTime = lastModifiedDateTime;
-		this.activities = new Hashtable();
-		this.transitions = new Hashtable();
+		this.activities = new ArrayList();
+		this.transitions = new ArrayList();
 	}	
 	public LearningDesignDTO(LearningDesign learningDesign){
 		this.learningDesignId = learningDesign.getLearningDesignId();
@@ -161,7 +175,30 @@ public class LearningDesignDTO {
 		this.lastModifiedDateTime = learningDesign.getLastModifiedDateTime();
 		this.activities = populateActivities(learningDesign);
 		this.transitions = populateTransitions(learningDesign);
-	}	
+	}
+	public LearningDesignDTO(Hashtable table){
+		
+		this.learningDesignUIID = (Integer)table.get("learningDesignUIID");
+		this.description = (String)table.get("description");
+		this.title = (String)table.get("title");
+		this.firstActivityUIID = (Integer)table.get("firstActivityUIID");
+		this.maxID = (Integer)table.get("maxId");
+		this.validDesign = (Boolean)table.get("validDesign");
+		this.readOnly = (Boolean)table.get("readOnly");;
+		this.dateReadOnly = (Date)table.get("dateReadOnly");
+		this.userID = (Integer)table.get("userID");
+		this.helpText = (String)table.get("helpText");
+		this.copyTypeID = (Integer)table.get("copyTypeID");
+		this.createDateTime = (Date)table.get("createDateTime");
+		this.version = (String)table.get("version");
+		this.parentLearningDesignID = (Long)table.get("parentLearningDesignID");
+		this.workspaceFolderID =(Integer)table.get(" workspaceFolderID");		
+		this.licenseText = (String)table.get("licenseText");
+		this.licenseID =(Long) table.get("licenseID");		
+		this.lastModifiedDateTime =(Date)table.get("lastModifiedDateTime");
+		this.activities = (ArrayList)table.get("activities");
+		this.transitions = (ArrayList)table.get("transitions");		
+	}
 	/**
 	 * @return Returns the copyTypeID.
 	 */
@@ -312,16 +349,16 @@ public class LearningDesignDTO {
 	public Integer getWorkspaceFolderID() {
 		return workspaceFolderID!=null?workspaceFolderID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}	
-	public Hashtable getActivities(){
+	public ArrayList getActivities(){
 		return activities;
 	}
 	/**
 	 * @return Returns the activities.
 	 */
 
-	public Hashtable populateActivities(LearningDesign design) {
-		Hashtable activities = new Hashtable();		
-		Hashtable childActivities = null;
+	public ArrayList populateActivities(LearningDesign design) {
+		ArrayList activities = new ArrayList();		
+		ArrayList childActivities = null;
 		Iterator parentIterator = design.getParentActivities().iterator();
 		while(parentIterator.hasNext()){
 			Object object = parentIterator.next();
@@ -329,38 +366,38 @@ public class LearningDesignDTO {
 			if(object instanceof ComplexActivity){
 				ComplexActivity complexActivity = (ComplexActivity)object;
 				Iterator childIterator = complexActivity.getActivities().iterator();
-				childActivities = new Hashtable();
+				childActivities = new ArrayList();
 				while(childIterator.hasNext()){
 					Activity activity =(Activity)childIterator.next();
-					childActivities.put(activity.getActivityId(),activity.getAuthoringActivityDTO());					
+					childActivities.add(activity.getAuthoringActivityDTO());					
 				}				
-				activities.put(((Activity)complexActivity).getActivityId(),((Activity)complexActivity).getAuthoringActivityDTO());
-				activities.putAll(childActivities);
+				activities.add(((Activity)complexActivity).getAuthoringActivityDTO());
+				activities.addAll(childActivities);
 			}else{
 				Activity activity = (Activity)object;
-				activities.put(activity.getActivityId(),activity.getAuthoringActivityDTO());
+				activities.add(activity.getAuthoringActivityDTO());
 			}			
 		}
 		return activities;
 	}	
-	public Hashtable populateTransitions(LearningDesign design){
-		Hashtable transitions = new Hashtable();
+	public ArrayList populateTransitions(LearningDesign design){
+		ArrayList transitions = new ArrayList();
 		if(design.getTransitions()!=null){
 			Iterator iterator = design.getTransitions().iterator();
 			while(iterator.hasNext()){
 				Transition trans  =(Transition) iterator.next();
-				transitions.put(trans.getTransitionId(),trans.getTransitionDTO());
+				transitions.add(trans.getTransitionDTO());
 			}
 		}
 		return transitions;
 	}
-	public Hashtable getTransitions(){
+	public ArrayList getTransitions(){
 		return this.transitions;
 	}	
 	/**
 	 * @param activities The activities to set.
 	 */
-	public void setActivities(Hashtable activities) {
+	public void setActivities(ArrayList activities) {
 		this.activities = activities;
 	}
 	/**
@@ -511,7 +548,7 @@ public class LearningDesignDTO {
 	/**
 	 * @param transitions The transitions to set.
 	 */
-	public void setTransitions(Hashtable transitions) {
+	public void setTransitions(ArrayList transitions) {
 		this.transitions = transitions;
 	}
 	/**
