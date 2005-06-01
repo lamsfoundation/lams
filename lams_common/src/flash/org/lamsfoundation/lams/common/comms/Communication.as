@@ -67,8 +67,10 @@ class org.lamsfoundation.lams.common.comms.Communication {
         
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
         if(isFullURL){
+			Debugger.log('Requesting:'+requestUrl,Debugger.GEN,'getRequest','Communication');			
 			responseXML.load(requestUrl);
 		}else{
+			Debugger.log('Requesting:'+_serverUrl+requestUrl,Debugger.GEN,'getRequest','Communication');			
 			responseXML.load(_serverUrl+requestUrl);
 		}
         //_global.breakPoint();
@@ -113,10 +115,18 @@ class org.lamsfoundation.lams.common.comms.Communication {
     }
     
     /**
-    * @param obj    WDDX Packet 
+	* Sends a data object to the server and directs response to handler function.
+	* 
+    * @param dto		The flash object to send. Will be WDDX serialised    
+	* @param requestUrl the url to send and load the data from
+	* @param handlerFn  the function that will handle the response (usually an ACK response)
+	* @param isFullURL  Inicates if the requestUrl is fully qualified, if false serverURL will be prepended
+	* 
+	* @usage: 
+	* 
     */
-    public function sendAndReceiveXML (obj:XML){
-        
+    public function sendAndReceive(dto:Object, requestUrl:String,handlerFn:Function,isFullURL){
+      //TODO: Implement!  
     }
     
     
