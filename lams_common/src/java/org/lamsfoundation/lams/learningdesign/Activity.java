@@ -33,6 +33,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
+import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.MonitoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
@@ -761,5 +762,8 @@ public abstract class Activity implements Serializable,Nullable {
 	public AuthoringActivityDTO getAuthoringActivityDTO()
 	{
 		return new AuthoringActivityDTO(this);
+	}
+	public LibraryActivityDTO getLibraryActivityDTO(){
+		return new LibraryActivityDTO((ToolActivity)this);
 	}
 }
