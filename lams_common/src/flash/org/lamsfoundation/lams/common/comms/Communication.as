@@ -22,13 +22,15 @@ class org.lamsfoundation.lams.common.comms.Communication {
     /**
     * Comms constructor
     */
-    function Communication(){
+    function Communication(aServerUrl:String){
         trace('Communication.constructor');
         //Set up error codes used in communication with server
         errorCodes=[1,2,3];
         ignoreWhite = true;
 		//_global.breakpoint();
-        _serverUrl = Config.getInstance().serverUrl;		//Debugger.log('_serverUrl:'+_serverUrl,4,'Consturcutor','Communication');
+		if(aServerUrl == null){
+			_serverUrl = Config.getInstance().serverUrl;
+		}		//Debugger.log('_serverUrl:'+_serverUrl,4,'Consturcutor','Communication');
         wddx = new Wddx();
     }
     
@@ -128,6 +130,18 @@ class org.lamsfoundation.lams.common.comms.Communication {
     public function sendAndReceive(dto:Object, requestUrl:String,handlerFn:Function,isFullURL){
       //TODO: Implement!  
     }
+	
+	/**
+	 * Serialzes an object into WDDX XML
+	 * @usage  	var wddxXML:XML = commsInstance.serializeObj(obj); 
+	 * @param   dto 	The object to be serialized	
+	 * @return  sXML	WDDX Serialized XML
+	 */
+	public function serializeObj(dto:Object):XML{
+		var sXML:XML = new XML();
+		sXML = wddx.serialize(dto);
+		return sXML;
+	}
     
     
     /**
