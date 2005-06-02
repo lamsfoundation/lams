@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Vector;
+
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -36,7 +38,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 /**
  * @author Manpreet Minhas
  */
-public class LearningDesignDTO {
+public class LearningDesignDTO extends BaseDTO{
 	
 	private Long learningDesignId;
 	private Integer learningDesignUIID;
@@ -178,26 +180,40 @@ public class LearningDesignDTO {
 	}
 	public LearningDesignDTO(Hashtable table){
 		
-		this.learningDesignUIID = (Integer)table.get("learningDesignUIID");
+		this.learningDesignUIID = convertToInteger(table.get("learningDesignUIID"));
 		this.description = (String)table.get("description");
 		this.title = (String)table.get("title");
-		this.firstActivityUIID = (Integer)table.get("firstActivityUIID");
-		this.maxID = (Integer)table.get("maxId");
+		this.firstActivityUIID = convertToInteger(table.get("firstActivityUIID"));
+		this.maxID = convertToInteger(table.get("maxID"));
 		this.validDesign = (Boolean)table.get("validDesign");
 		this.readOnly = (Boolean)table.get("readOnly");;
 		this.dateReadOnly = (Date)table.get("dateReadOnly");
-		this.userID = (Integer)table.get("userID");
+		this.userID = convertToInteger(table.get("userID"));
 		this.helpText = (String)table.get("helpText");
-		this.copyTypeID = (Integer)table.get("copyTypeID");
+		this.copyTypeID = convertToInteger(table.get("copyTypeID"));
 		this.createDateTime = (Date)table.get("createDateTime");
 		this.version = (String)table.get("version");
-		this.parentLearningDesignID = (Long)table.get("parentLearningDesignID");
-		this.workspaceFolderID =(Integer)table.get(" workspaceFolderID");		
-		this.licenseText = (String)table.get("licenseText");
-		this.licenseID =(Long) table.get("licenseID");		
+		this.parentLearningDesignID = convertToLong(table.get("parentLearningDesignID"));
+		this.workspaceFolderID =convertToInteger(table.get("workspaceFolderID"));
+		this.duration = convertToLong(table.get("duration"));
+		this.licenseID =convertToLong(table.get("licenseID"));
+		this.licenseText = (String)table.get("licenseText");				
 		this.lastModifiedDateTime =(Date)table.get("lastModifiedDateTime");
-		this.activities = (ArrayList)table.get("activities");
-		this.transitions = (ArrayList)table.get("transitions");		
+		
+		Vector activityDetails = (Vector)table.get("activities");
+		this.activities = new ArrayList();
+		activities.addAll(activityDetails);		
+		
+		Vector transitionDetails = (Vector)table.get("transitions");		
+		this.transitions = new ArrayList();
+		transitions.addAll(transitionDetails);
+		
+	}
+	private void extractActivities(Hashtable activityDetails){
+		
+	}
+	private void extractTransitions(Hashtable transitionDetails){
+		
 	}
 	/**
 	 * @return Returns the copyTypeID.
