@@ -23,8 +23,8 @@ class LFWindow extends Window{
     private static var RESIZE_WIDTH_OFFSET = 10;            //Offset to place resize clip from bottom rhs of window
     private static var RESIZE_HEIGHT_OFFSET = 10;
     
-    private static var MARGIN_WIDTH:Number = 9;             //Differences between scroll content + window dimensions
-    private static var MARGIN_HEIGHT:Number = 38;
+    private static var MARGIN_WIDTH:Number = 6;             //Differences between scroll content + window dimensions
+    private static var MARGIN_HEIGHT:Number = 35;
     
     //Public vars
 	public var className:String = 'LFWindow';
@@ -33,15 +33,10 @@ class LFWindow extends Window{
     private var resize_mc:MovieClip;					//Clip clicked on for resize 
     private var _scrollContentPath:String;				//Main content of the LFWindow within a scrollpane
     private var _helpButtonHandler:Function;            //Called when help button clicked
-    private var help_btn:Button;                        //Help button reference
-    
-    private var contentOffsetWidth:Number;
-    private var contentOffsetHeight:Number;
+    private var _help_btn:Button;                        //Help button reference
     
     public var centred:Boolean=false;
     private var setUpFinished:Boolean = false;
-    
-    private var _initObj:Object;
     
     //Constructor
     function LFWindow() {
