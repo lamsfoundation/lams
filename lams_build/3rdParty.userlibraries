@@ -13,12 +13,13 @@
         <archive path="D:\eclipse\workspace\lams_build\lib\httpunit\Tidy.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\httpunit\xercesImpl.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\httpunit\xmlParserAPIs.jar"/>
-        <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-commons\commons-logging.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-commons\commons-beanutils.jar"/>
-        <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-commons\commons-collections-3.1.jar"/>
+        <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-commons\commons-collections.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-commons\commons-digester.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-commons\commons-fileupload-1.0.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-commons\commons-lang-2.0.jar"/>
+        <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-commons\commons-logging.jar"/>
+        <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-commons\commons-validator.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-poi\poi-2.5.1-final-20040804.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-taglibs\standard.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\jdom\jdom.jar"/>
@@ -32,6 +33,8 @@
         <archive path="D:\eclipse\workspace\lams_build\lib\spring\spring.jar" source="D:\eclipse\workspace\lams_build\lib\spring\src\spring_src.zip"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\struts\struts-el.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\struts\struts.jar" source="D:\eclipse\workspace\lams_build\lib\struts\src\jakarta-struts-1.2.4-src.zip"/>
+        <archive path="D:\eclipse\workspace\lams_build\lib\struts\antlr.jar"/>
+        <archive path="D:\eclipse\workspace\lams_build\lib\struts\jakarta-oro.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\strutstestcase\strutstest-2.1.3.jar" source="D:\eclipse\workspace\lams_build\lib\strutstestcase\src\strutstest-213-src.zip"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\wddx\wddx-1.0a-lfl-0.2.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\xdoclet\xjavadoc-1.1.jar"/>

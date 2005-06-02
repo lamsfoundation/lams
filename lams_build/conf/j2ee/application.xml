@@ -25,11 +25,17 @@
     </module>
 <!--     <module>
         <web>
-            <web-uri>lams_monitoring.war</web-uri>
-            <context-root>/lams/lams_monitoring</context-root>
+            <web-uri>lams-monitoring.war</web-uri>
+            <context-root>/lams/monitoring</context-root>
 	</web>
     </module>
-    -->
+    <module>
+        <web>
+            <web-uri>lams-learning.war</web-uri>
+            <context-root>/lams/learning</context-root>
+	</web>
+    </module> -->
+
     <!--  Third Party JAR Files -->
 	<module>
 		<java>aopalliance.jar</java>
@@ -56,7 +62,7 @@
 		<java>commons-beanutils.jar</java>
 	</module>
 	<module>
-		<java>commons-collections-3.1.jar</java>
+		<java>commons-collections.jar</java>
 	</module>
 	<module>
 		<java>commons-digester.jar</java>
@@ -69,6 +75,9 @@
 	</module>
 	<module>
 		<java>commons-logging.jar</java>
+	</module>
+	<module>
+		<java>commons-validator.jar</java>
 	</module>
 	<module>
 		<java>FCKeditor-2.1.jar</java>
@@ -101,6 +110,12 @@
 		<java>spring.jar</java>
 	</module>
 	<module>
+		<java>antlr.jar</java>
+	</module>
+	<module>
+		<java>jakarta-oro.jar</java>
+	</module>
+	<module>
 		<java>struts.jar</java>
 	</module>
 	<module>
@@ -112,11 +127,22 @@
     <!--  End Third Party JAR Files -->
     
     <!--  Tools -->
-   <!--  <module>
+   <!--    
+   
+    <module>
         <web>
             <web-uri>lams-tool-imscp.war</web-uri>
             <context-root>/lams/tool/imscp</context-root>
-	</web>
+		</web>
     </module>
+    
+   <module>
+        <web>
+            <web-uri>lams-tool-survey.war</web-uri>
+            <context-root>/lams/tool/survey</context-root>
+		</web>
+    </module>
+
+
     -->
 </application>
