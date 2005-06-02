@@ -2,6 +2,7 @@
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.style.*
+import org.lamsfoundation.lams.common.dict.*
 import mx.controls.*
 import mx.utils.*
 
@@ -43,33 +44,34 @@ class LFMenuBar extends MovieClip {
         /*=================
             FILE MENU
         =================*/
-        file_menu = _mb.addMenu("File");
+        file_menu = _mb.addMenu(Dictionary.getValue(17));
         
         // "new" is the linkage id of the movie clip to be used as the icon for the "New" menu item.
         //file_menu.addMenuItem({label:"New", instanceName:"newInstance", icon:"new"});
-        file_menu.addMenuItem({label:"New", instanceName:"newItem"});
-        file_menu.addMenuItem({label:"Open", instanceName:"openItem"});
-        file_menu.addMenuItem({label:"Revert", instanceName:"revertItem", enabled:false});
-        file_menu.addMenuItem({label:"Close", instanceName:"closeItem"});
+        _global.breakpoint();
+        file_menu.addMenuItem({label:Dictionary.getValue(9), instanceName:"newItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue(10), instanceName:"openItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue(11), instanceName:"revertItem", enabled:false});
+        file_menu.addMenuItem({label:Dictionary.getValue(12), instanceName:"closeItem"});
         file_menu.addMenuItem({type:"separator"});
-        file_menu.addMenuItem({label:"Close", instanceName:"saveItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue(13), instanceName:"saveItem"});
 
 
         /*=================
             TOOLS MENU
         =================*/
-        tools_menu = _mb.addMenu("Tools");
-        tools_menu.addMenuItem({label:"Draw Transitional", instanceName:"drawTransitionalItem"});
-        tools_menu.addMenuItem({label:"Draw Optional", instanceName:"drawOptionalItem"});
+        tools_menu = _mb.addMenu(Dictionary.getValue(18));
+        tools_menu.addMenuItem({label:Dictionary.getValue(14), instanceName:"drawTransitionalItem"});
+        tools_menu.addMenuItem({label:Dictionary.getValue(15), instanceName:"drawOptionalItem"});
         tools_menu.addMenuItem({type:"separator"});
-        tools_menu.addMenuItem({label:"Preferences", instanceName:"prefsItem"});
+        tools_menu.addMenuItem({label:Dictionary.getValue(21), instanceName:"prefsItem"});
 
 
         /*=================
             HELP MENU
         =================*/
-        help_menu = _mb.addMenu("Help");
-        help_menu.addMenuItem({label:"About", instanceName:"helpItem"});
+        help_menu = _mb.addMenu(Dictionary.getValue(19));
+        help_menu.addMenuItem({label:Dictionary.getValue(20), instanceName:"aboutItem"});
         
         //set up listeners
         // register the listeners with the separate menus
