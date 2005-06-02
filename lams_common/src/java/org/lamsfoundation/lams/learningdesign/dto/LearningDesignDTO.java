@@ -208,13 +208,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.transitions = new ArrayList();
 		transitions.addAll(transitionDetails);
 		
-	}
-	private void extractActivities(Hashtable activityDetails){
-		
-	}
-	private void extractTransitions(Hashtable transitionDetails){
-		
-	}
+	}	
 	/**
 	 * @return Returns the copyTypeID.
 	 */
