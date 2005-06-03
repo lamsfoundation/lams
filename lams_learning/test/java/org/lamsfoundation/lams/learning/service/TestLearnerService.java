@@ -138,13 +138,19 @@ public class TestLearnerService extends AbstractLamsTestCase
     }
     protected String[] getContextConfigLocation()
     {
-        return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+        return new String[] { "classpath:/org/lamsfoundation/lams/applicationContext.xml",
+                "classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+                "classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+                "classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml",
+                "classpath:*/applicationContext.xml"};
+
+/*        return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
   			  				"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
                               "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
                               "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",          					  
         					  "applicationContext.xml",
-    			  			  "/WEB-INF/spring/learningApplicationContext.xml"};
+    			  			  "/WEB-INF/spring/learningApplicationContext.xml"}; */
     }
     
     public void testJoinLesson() throws ProgressException,LamsToolServiceException

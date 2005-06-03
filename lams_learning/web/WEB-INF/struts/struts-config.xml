@@ -18,10 +18,6 @@
       type="org.lamsfoundation.lams.learning.web.form.ActivityForm"
     />
     <form-bean
-      name="dummyToolForm"
-      type="org.lamsfoundation.lams.learning.web.form.DummyToolForm"
-    />
-    <form-bean
       name="testDblSubmitForm"
       type="org.lamsfoundation.lams.learning.web.form.TestDblSubmitForm"
     />
@@ -191,26 +187,6 @@ http://www.gnu.org/licenses/gpl.txt
       />
     </action>
     <action
-      path="/test/DummyTool"
-      type="org.lamsfoundation.lams.learning.web.action.DummyToolAction"
-      name="dummyToolForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="display"
-        path="/test/dummyTool.jsp"
-        redirect="false"
-      />
-      <forward
-        name="next"
-        path=".requestDisplay"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/CompleteActivity"
       type="org.lamsfoundation.lams.learning.web.action.CompleteActivityAction"
       name="activityForm"
@@ -298,20 +274,6 @@ http://www.gnu.org/licenses/gpl.txt
       unknown="false"
       validate="false"
     >
-    </action>
-    <action
-      path="/test/DummyLesson"
-      type="org.lamsfoundation.lams.learning.web.action.DummyLessonAction"
-      name="activityForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="displayLesson"
-        path="/DisplayActivity.do"
-        redirect="true"
-      />
     </action>
 
    <!--

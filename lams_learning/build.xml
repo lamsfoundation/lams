@@ -29,11 +29,12 @@ http://www.gnu.org/licenses/gpl.txt
 	<property file="build.properties" />
 
 	<path id="all-libs">
-		<fileset dir="${lib.dir}">
-			<include name="**/*.jar" />
-			<exclude name="**/gnujaxp.jar" />
+		<fileset dir="${sharedlib}">
+			<include name="**/*.jar"/>
 		</fileset>
-		<pathelement location="../lams_common/build/classes" />
+		<fileset dir="${j2eelibs}">
+				<include name="**/*.jar"/>
+		</fileset>
 	</path>
 
 	<path id="project.classpath">
@@ -51,9 +52,10 @@ http://www.gnu.org/licenses/gpl.txt
 		<echo message="" />
 		<echo message="Among the available targets are:" />
 		<echo message="" />
-		<echo message="build    --> build all; don't create JARs" />
-		<echo message="alljars  --> create all JAR files" />
-		<echo message="tests    --> run tests" />
+		<echo message="build-jar    --> create jar" />
+		<echo message="build-war    --> create jar and war" />
+		<echo message="update-lams-build --> copy jar file to lams_build/lib/lams" />
+		<echo message="test-report  --> run tests" />
 		<echo message="" />
 	</target>
 
@@ -91,19 +93,20 @@ http://www.gnu.org/licenses/gpl.txt
 			</classpath>
 		</javac>
   		<copy overwrite="yes" todir="${build.classes.java}">
-  			<fileset dir="${src.dir.test}">
+  			<fileset dir="${src.dir.java}">
   				<include name="*.hbm.xml"/>
   			</fileset>
   		</copy>	
 		<copy overwrite="yes"
 			todir="${build.classes.test}/${learning.path}">
-			<fileset dir="${src.dir.test}/${learning.path}">
+			<fileset dir="${src.dir.java}/${learning.path}">
 				<include name="*.xml" />
 			</fileset>
 		</copy>
   		<copy overwrite="yes" todir="${build.classes.java}/${learning.path}">
   			<fileset dir="${src.dir.java}/${learning.path}">
   				<include name="**/*.properties"/>
+				<include name="**/*.xml"/>
   			</fileset>
   		</copy>	
 	</target>
@@ -116,13 +119,18 @@ http://www.gnu.org/licenses/gpl.txt
 				<path refid="project.classpath" />
 			</classpath>
 		</javac>
+		<copy overwrite="yes" todir="${build.classes.test}">
+			<fileset dir="${src.dir.test}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
 	</target>
 	<!-- ================================================================ -->
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
 	<target name="build-jar" depends="compile.java" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
-		<jar jarfile="${build.lib}/${product}.jar">
+		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 			<fileset dir="${build.classes.java}">
 			</fileset>
 			<fileset dir="${build.classes.test}">
@@ -223,15 +231,14 @@ http://www.gnu.org/licenses/gpl.txt
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<!-- Make the war archive  for deployment             -->
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
-	<target name="build-war" depends="compile.java, webdoclet" description="creates war file">
+	<target name="build-war" depends="webdoclet, build-jar" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
-		<war warfile="${build.lib}/${product}.war" 
+		<war warfile="${build.lib}/${product}.war"   manifest="${conf.dir}/war/META-INF/MANIFEST.MF" 
   				webxml="${conf.webinf.dir}/web.xml">
 			<webinf dir="${conf.webinf.dir}">
 				<include name="*.xml"/>
 				<include name="struts/*"/>
 				<include name="jstl/*"/>
-				<include name="spring/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
 			<classes dir="${build.classes.java}"/>
@@ -248,19 +255,28 @@ http://www.gnu.org/licenses/gpl.txt
 	</target>
 
 	<!-- =================================================================== -->
+	<!-- Copy the jar file to the shared lams_build area					 -->
+	<!-- =================================================================== -->
+	<target name="update-lams-build" depends="build-jar" description="Copies the jar file to lams_build/lib/lams">
+  		<copy overwrite="yes" todir="${sharedlib}/lams/">
+  			<fileset dir="${build.lib}">
+  				<include name="${product}.jar"/>
+  			</fileset>
+  		</copy>	
+	</target>
+
+	<!-- =================================================================== -->
 	<!-- Run JUnit Tests                                                     -->
 	<!-- =================================================================== -->
-	<!-- target name="test" depends="compile.test,build-db">
+	<target name="test" depends="compile.test">
 		<mkdir dir="${build.report}" />
-		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
+		<junit printsummary="yes" haltonerror="no" haltonfailure="yes"
 			fork="yes">
 			<formatter type="plain" usefile="false" />
 			<formatter type="xml" />
 			<batchtest todir="${build.report}">
 				<fileset dir="${src.dir.test}">
 					<include name="**/Test*.java" />
-					<exclude name="**/Test*All.java" />
-					<exclude name="**/TestInitSurveySession.java" />
 					<exclude name="**/*Action.java" />
 				</fileset>
 			</batchtest>
@@ -282,6 +298,6 @@ http://www.gnu.org/licenses/gpl.txt
 			</fileset>
 			<report todir="${build.report}/html" />
 		</junitreport>
-	</target-->
+	</target>
 
 </project>

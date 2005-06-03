@@ -1,30 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
-	<classpathentry kind="src" path="test/web"/>
 	<classpathentry kind="src" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/struts/struts.jar"/>
-	<classpathentry kind="lib" path="lib/log4j/log4j-1.2.9.jar"/>
 	<classpathentry sourcepath="ECLIPSE_HOME/plugins/org.eclipse.jdt.source_3.0.0/src/org.junit_3.8.1/junitsrc.zip" kind="var" path="JUNIT_HOME/junit.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-collections-2.1.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-digester.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-lang-2.0.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-logging.jar"/>
-	<classpathentry kind="lib" path="lib/dom4j/dom4j-1.5.2.jar"/>
-	<classpathentry kind="lib" path="lib/odmg/odmg-3.0.jar"/>
-	<classpathentry sourcepath="/lams_tool_survey/src/java" kind="lib" path="lib/lams/lams-tool-survey.jar"/>
-	<classpathentry kind="lib" path="web/WEB-INF/lib/ehcache-1.0.jar"/>
-	<classpathentry kind="lib" path="web/WEB-INF/lib/mysql-connector-java-3.1.7-bin.jar"/>
-	<classpathentry sourcepath="lib/lams/src/lams-src.zip" kind="lib" path="lib/lams/lams.jar"/>
-	<classpathentry sourcepath="lib/hibernate/src/hibernate2-src.zip" kind="lib" path="lib/hibernate/hibernate2.jar"/>
-	<classpathentry kind="lib" path="lib/aopalliance/aopalliance.jar"/>
-	<classpathentry kind="lib" path="lib/spring/spring.jar"/>
-	<classpathentry kind="lib" path="lib/cglib/cglib-nodep-2.1-dev.jar"/>
-	<classpathentry kind="lib" path="lib/strutstestcase/strutstest-2.1.3.jar"/>
-	<classpathentry kind="lib" path="lib/wddx/wddx-1.0a-lfl-0.2.jar"/>
-	<classpathentry kind="lib" path="lib/jakarta-commons/commons-beanutils.jar"/>
-	<classpathentry kind="src" path="/lams_tool_survey"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
+	<classpathentry sourcepath="/lams_common" kind="lib" path="D:/eclipse/workspace/lams_build/lib/lams/lams.jar"/>
+	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-workspace.jar"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>
