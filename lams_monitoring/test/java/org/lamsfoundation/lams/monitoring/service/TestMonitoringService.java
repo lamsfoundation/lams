@@ -59,11 +59,11 @@ public class TestMonitoringService extends AbstractLamsTestCase
     private final Integer TEST_LEARNER_ID = new Integer(2);
     private final Integer TEST_STAFF_ID = new Integer(3);
     // values when demo'ing the progress engine
-    private final long TEST_LEARNING_DESIGN_ID = 2;
-    private final long TEST_COPIED_LEARNING_DESIGN_ID = 3;
+    //private final long TEST_LEARNING_DESIGN_ID = 2;
+    //private final long TEST_COPIED_LEARNING_DESIGN_ID = 3;
     // values when testing the progress engine
-//  private final long TEST_LEARNING_DESIGN_ID = 1;
-//  private final long TEST_COPIED_LEARNING_DESIGN_ID = 2;
+    private final long TEST_LEARNING_DESIGN_ID = 1;
+    private final long TEST_COPIED_LEARNING_DESIGN_ID = 2;
     private final Integer TEST_ORGANIZATION_ID = new Integer(1);
     private final Long TEST_SCHEDULE_GATE_ID = new Long(27);
     
@@ -112,14 +112,21 @@ public class TestMonitoringService extends AbstractLamsTestCase
      */
     protected String[] getContextConfigLocation()
     {
-        return new String[] { "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+        return new String[] { 
+                  "classpath:/org/lamsfoundation/lams/applicationContext.xml",
+                  "classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+  				  "classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
+  				  "classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+  				  "classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml",    
+    			  "classpath:/org/lamsfoundation/lams/tool/survey/applicationContext.xml"};    
+/*        return new String[] { "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
   			  				  "/WEB-INF/authoringApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
   			  				  "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",        					  
-				  			  "applicationContext.xml"};    
+				  			  "applicationContext.xml"}; */    
     }
     /**
      * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()

@@ -1,0 +1,2 @@
+Class-Path: ./lams.jar ./lams_monitoring.jar ./lams_learning.jar ./lams_authoring.jar ./lams_workspace.jar
+
