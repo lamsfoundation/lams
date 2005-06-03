@@ -48,7 +48,7 @@ class LFMenuBar extends MovieClip {
         
         // "new" is the linkage id of the movie clip to be used as the icon for the "New" menu item.
         //file_menu.addMenuItem({label:"New", instanceName:"newInstance", icon:"new"});
-        _global.breakpoint();
+        //_global.breakpoint();
         file_menu.addMenuItem({label:Dictionary.getValue(9), instanceName:"newItem"});
         file_menu.addMenuItem({label:Dictionary.getValue(10), instanceName:"openItem"});
         file_menu.addMenuItem({label:Dictionary.getValue(11), instanceName:"revertItem", enabled:false});
