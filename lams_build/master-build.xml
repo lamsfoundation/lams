@@ -83,6 +83,7 @@
 					<include name="jakarta-taglibs/*.jar" />
 					<include name="jboss/*.jar" />
 					<include name="jdom/*.jar" />
+					<include name="jfreechart/*.jar" />
 					<include name="log4j/*.jar" />
 					<include name="mysql/*.jar" />
 					<include name="odmg/*.jar" />

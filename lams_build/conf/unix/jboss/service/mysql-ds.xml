@@ -11,8 +11,10 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
     <jndi-name>jdbc/lams-ds</jndi-name>
     <connection-url>jdbc:mysql://localhost:3306/lams</connection-url>
     <driver-class>com.mysql.jdbc.Driver</driver-class>
-    <!-- Tell MySQL Connector to use UTF-8 character encoding -->
+    <!-- Tell MySQL Connector to use UTF-8 character encoding, -->
+    <!-- and convert MySQL zero times to null -->
     <connection-property name="characterEncoding">utf8</connection-property>
+    <connection-property name="zeroDateTimeBehavior">convertToNull</connection-property>
     <!-- Set transaction isolation level to match db -->
     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>	
     <user-name>lams</user-name>
@@ -29,8 +31,10 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
     <jndi-name>jdbc/tool-ds</jndi-name>
     <connection-url>jdbc:mysql://localhost:3306/lams</connection-url>
     <driver-class>com.mysql.jdbc.Driver</driver-class>
-    <!-- Tell MySQL Connector to use UTF-8 character encoding -->
+    <!-- Tell MySQL Connector to use UTF-8 character encoding, -->
+    <!-- and convert MySQL zero times to null -->
     <connection-property name="characterEncoding">utf8</connection-property>
+    <connection-property name="zeroDateTimeBehavior">convertToNull</connection-property>
     <!-- Set transaction isolation level to match db -->
     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>	
     <user-name>lams</user-name>
