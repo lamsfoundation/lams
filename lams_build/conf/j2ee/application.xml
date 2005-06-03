@@ -23,7 +23,7 @@
             <context-root>/lams/authoring</context-root>
 	</web>
     </module>
-<!--     <module>
+    <module>
         <web>
             <web-uri>lams-monitoring.war</web-uri>
             <context-root>/lams/monitoring</context-root>
@@ -34,7 +34,7 @@
             <web-uri>lams-learning.war</web-uri>
             <context-root>/lams/learning</context-root>
 	</web>
-    </module> -->
+    </module> 
 
     <!--  Third Party JAR Files -->
 	<module>
@@ -145,4 +145,4 @@
 
 
     -->
-</application>
+ </application>

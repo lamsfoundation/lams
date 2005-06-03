@@ -53,8 +53,8 @@
 			inheritAll="false" />
 		<ant antfile="../${lams_authoring}/build.xml"  target="build-war"
 			inheritAll="false"/>
-		<!--  <ant antfile="../${lams_learning}/build.xml" target="build-war" inheritAll="false"/> -->
-		<!--  <ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/> -->
+		<ant antfile="../${lams_learning}/build.xml" target="build-war" inheritAll="false"/>
+		<ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/>
 		<!--
 			<ant antfile="../${lams_admin}/build.xml" target="build-war" inheritAll="false"/>
 		-->
@@ -99,10 +99,11 @@
 				<include name="${lams_workspace.war}"/>
 				<include name="${lams_authoring.jar}"/>
 				<include name="${lams_authoring.war}"/>
-			<!-- 	<include name="${lams_monitoring.war}"/>
-				<include name="lams_learning.war"/>
-					<include name="lams_admin.war"/-->
-
+				<include name="${lams_monitoring.jar}"/>
+				<include name="${lams_monitoring.war}"/>
+				<include name="${lams_learning.jar}"/>
+				<include name="${lams_learning.war}"/>
+				<!-- <include name="lams_admin.war"/-->
 			</fileset>
 		</copy>
 		<!-- create a temporary ear -->
