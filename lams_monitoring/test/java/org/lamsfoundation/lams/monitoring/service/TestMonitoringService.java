@@ -113,12 +113,13 @@ public class TestMonitoringService extends AbstractLamsTestCase
     protected String[] getContextConfigLocation()
     {
         return new String[] { 
-                  "classpath:/org/lamsfoundation/lams/applicationContext.xml",
-                  "classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
-  				  "classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
-  				  "classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-  				  "classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml",    
-    			  "classpath:/org/lamsfoundation/lams/tool/survey/applicationContext.xml"};    
+        		"classpath:/org/lamsfoundation/lams/applicationContext.xml",
+        		"classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+        		"classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+          		"classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml",        					  
+          		"classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml",
+          		"classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
+        		"classpath:/org/lamsfoundation/lams/tool/survey/applicationContext.xml"};
 /*        return new String[] { "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
