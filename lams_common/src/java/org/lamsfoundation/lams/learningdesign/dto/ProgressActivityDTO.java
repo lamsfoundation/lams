@@ -37,7 +37,7 @@ public class ProgressActivityDTO
     //---------------------------------------------------------------------
     // attributes
     //---------------------------------------------------------------------
-    private Long activityId;
+    private Long activityID;
     private String activityURL;
     
     
@@ -57,16 +57,16 @@ public class ProgressActivityDTO
      */
     public ProgressActivityDTO(Long activityId,String activityURL)
     {
-        this.activityId = activityId;
+        this.activityID = activityId;
         this.activityURL = activityURL;
     }
 
     /**
-     * @return Returns the activityId.
+     * @return Returns the activityID.
      */
-    public Long getActivityId()
+    public Long getActivityID()
     {
-        return activityId;
+        return activityID;
     }
     /**
      * @return Returns the activityURL.

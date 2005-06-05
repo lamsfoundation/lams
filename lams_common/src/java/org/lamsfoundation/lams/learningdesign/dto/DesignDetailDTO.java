@@ -1,8 +1,24 @@
-/*
- * Created on Apr 11, 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 package org.lamsfoundation.lams.learningdesign.dto;
 
@@ -12,14 +28,11 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
- * @author Minhas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author Manpreet Minhas
  */
 public class DesignDetailDTO extends BaseDTO {
 	
-	private Long learningDesignId;
+	private Long learningDesignID;
 	private Integer learningDesignUIID;
 	private String description;
 	private String title;	
@@ -37,13 +50,13 @@ public class DesignDetailDTO extends BaseDTO {
 	public DesignDetailDTO(){
 		
 	}
-	public DesignDetailDTO(Long learningDesignId, Integer learningDesignUIID,
+	public DesignDetailDTO(Long learningDesignID, Integer learningDesignUIID,
 			String description, String title, Long firstActivityID,
 			Boolean validDesign, Boolean readOnly,
 			Date dateReadOnly, Integer userID, String helpText,
 			Integer copyTypeID, String version, Long parentLearningDesignID,
 			Integer workspaceFolderID) {		
-		this.learningDesignId = learningDesignId;
+		this.learningDesignID = learningDesignID;
 		this.learningDesignUIID = learningDesignUIID;
 		this.description = description;
 		this.title = title;
@@ -59,7 +72,7 @@ public class DesignDetailDTO extends BaseDTO {
 		this.workspaceFolderID = workspaceFolderID;
 	}
 	public DesignDetailDTO(LearningDesign learningDesign){
-		this.learningDesignId = learningDesign.getLearningDesignId();
+		this.learningDesignID = learningDesign.getLearningDesignId();
 		this.learningDesignUIID = learningDesign.getLearningDesignUIID();
 		this.description = learningDesign.getDescription();
 		this.title = learningDesign.getTitle();		
@@ -109,10 +122,10 @@ public class DesignDetailDTO extends BaseDTO {
 		return helpText!=null?helpText:WDDXTAGS.STRING_NULL_VALUE;
 	}
 	/**
-	 * @return Returns the learningDesignId.
+	 * @return Returns the learningDesignID.
 	 */
-	public Long getLearningDesignId() {
-		return learningDesignId!=null?learningDesignId:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	public Long getLearningDesignID() {
+		return learningDesignID!=null?learningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
 	}
 	/**
 	 * @return Returns the learningDesignUIID.

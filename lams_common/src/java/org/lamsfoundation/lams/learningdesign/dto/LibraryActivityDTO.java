@@ -49,7 +49,7 @@ public class LibraryActivityDTO extends BaseDTO {
 	 *****************************************************************************/
 	
 	/** identifier field */
-	private Long activityId;
+	private Long activityID;
 
 	/** FLASH generated value. Unique per LearningDesign.
 	 * Required by flash only.*/
@@ -86,7 +86,7 @@ public class LibraryActivityDTO extends BaseDTO {
 			String description, String title, String helpText, Integer xcoord,
 			Integer ycoord,String libraryActivityUiImage,AuthoringToolDTO tool) {
 		super();
-		this.activityId = activityId;
+		this.activityID = activityId;
 		this.activityUIID = activityUIID;
 		this.description = description;
 		this.title = title;
@@ -97,7 +97,7 @@ public class LibraryActivityDTO extends BaseDTO {
 		this.tool = tool;
 	}
 	public LibraryActivityDTO(ToolActivity activity){
-		this.activityId = activity.getActivityId();
+		this.activityID = activity.getActivityId();
 		this.activityUIID = activity.getActivityUIID();
 		this.description = activity.getDescription();
 		this.title = activity.getTitle();
@@ -114,10 +114,10 @@ public class LibraryActivityDTO extends BaseDTO {
 	
 	
 	/**
-	 * @return Returns the activityId.
+	 * @return Returns the activityID.
 	 */
-	public Long getActivityId() {
-		return activityId!=null?activityId:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	public Long getActivityID() {
+		return activityID!=null?activityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
 	}	
 	/**
 	 * @return Returns the activityUIID.

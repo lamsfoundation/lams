@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
  */
 public class LearningDesignDTO extends BaseDTO{
 	
-	private Long learningDesignId;
+	private Long learningDesignID;
 	private Integer learningDesignUIID;
 	private String description;
 	private String title;	
@@ -99,7 +99,7 @@ public class LearningDesignDTO extends BaseDTO{
 							 Date lessonStartDateTime,
 							 Date lastModifiedDateTime) {
 		super();
-		this.learningDesignId = learningDesignId;
+		this.learningDesignID = learningDesignId;
 		this.learningDesignUIID = learningDesignUIID;
 		this.description = description;
 		this.title = title;
@@ -129,7 +129,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.transitions = new ArrayList();
 	}	
 	public LearningDesignDTO(LearningDesign learningDesign){
-		this.learningDesignId = learningDesign.getLearningDesignId();
+		this.learningDesignID = learningDesign.getLearningDesignId();
 		this.learningDesignUIID = learningDesign.getLearningDesignUIID();
 		this.description = learningDesign.getDescription();
 		this.title = learningDesign.getTitle();
@@ -258,10 +258,10 @@ public class LearningDesignDTO extends BaseDTO{
 		return lastModifiedDateTime!=null?lastModifiedDateTime:WDDXTAGS.DATE_NULL_VALUE;
 	}
 	/**
-	 * @return Returns the learningDesignId.
+	 * @return Returns the learningDesignID.
 	 */
-	public Long getLearningDesignId() {
-		return learningDesignId!=null?learningDesignId:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	public Long getLearningDesignID() {
+		return learningDesignID!=null?learningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
 	}
 	/**
 	 * @return Returns the learningDesignUIID.
@@ -466,11 +466,11 @@ public class LearningDesignDTO extends BaseDTO{
 			this.lastModifiedDateTime = lastModifiedDateTime;
 	}
 	/**
-	 * @param learningDesignId The learningDesignId to set.
+	 * @param learningDesignID The learningDesignID to set.
 	 */
-	public void setLearningDesignId(Long learningDesignId) {
+	public void setLearningDesignID(Long learningDesignId) {
 		if(!learningDesignId.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			this.learningDesignId = learningDesignId;
+			this.learningDesignID = learningDesignId;
 	}
 	/**
 	 * @param learningDesignUIID The learningDesignUIID to set.

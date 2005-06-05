@@ -47,7 +47,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	 *****************************************************************************/
 	
 	/** identifier field */
-	private Long activityId;
+	private Long activityID;
 
 	/** FLASH generated value. Unique per LearningDesign.
 	 * Required by flash only.*/
@@ -173,7 +173,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/*****************************************************************************
 	 * Constructors
 	 *****************************************************************************/
-	public AuthoringActivityDTO(Long activityId, Integer activityUIID,
+	public AuthoringActivityDTO(Long activityID, Integer activityUIID,
 			String description, String title, String helpText, Integer xcoord,
 			Integer ycoord, Long parentActivityID, Integer parentUIID,
 			Integer activityTypeId, Long groupingID, Integer groupingUIID,
@@ -190,7 +190,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 			Boolean applyGrouping,Integer groupingSupportType,
 			Integer groupingType,GroupingDTO groupingDTO) {
 		super();
-		this.activityId = activityId;
+		this.activityID = activityID;
 		this.activityUIID = activityUIID;
 		this.description = description;
 		this.title = title;
@@ -234,7 +234,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	public AuthoringActivityDTO(Object object){
 		processActivityType(object);
 		Activity activity = (Activity)object;
-		this.activityId = activity.getActivityId();
+		this.activityID = activity.getActivityId();
 		this.activityUIID = activity.getActivityUIID();
 		this.description = activity.getDescription();
 		this.title = activity.getTitle();
@@ -434,10 +434,10 @@ public class AuthoringActivityDTO extends BaseDTO{
 		return activityCategoryID!=null?activityCategoryID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}
 	/**
-	 * @return Returns the activityId.
+	 * @return Returns the activityID.
 	 */
-	public Long getActivityId() {
-		return activityId!=null?activityId:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	public Long getActivityID() {
+		return activityID!=null?activityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
 	}
 	/**
 	 * @return Returns the activityTypeId.
@@ -648,11 +648,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 			this.activityCategoryID = activityCategoryID;
 	}
 	/**
-	 * @param activityId The activityId to set.
+	 * @param activityID The activityID to set.
 	 */
-	public void setActivityId(Long activityId) {
+	public void setActivityID(Long activityId) {
 		if(!activityId.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			this.activityId = activityId;
+			this.activityID = activityId;
 	}
 	/**
 	 * @param activityTypeId The activityTypeId to set.
