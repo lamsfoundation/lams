@@ -80,7 +80,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	private Integer parentUIID;
 	
 	/** The type of activity */
-	private Integer activityTypeId;
+	private Integer activityTypeID;
 	
 	/** The Grouping that applies to this activity*/
 	private Long groupingID;
@@ -199,7 +199,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.ycoord = ycoord;
 		this.parentActivityID = parentActivityID;
 		this.parentUIID = parentUIID;
-		this.activityTypeId = activityTypeId;
+		this.activityTypeID = activityTypeId;
 		this.groupingID = groupingID;
 		this.groupingUIID = groupingUIID;
 		this.orderID = orderID;
@@ -245,7 +245,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 								activity.getParentActivity().getActivityId():
 								WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
 		this.parentUIID = activity.getParentUIID();
-		this.activityTypeId = activity.getActivityTypeId();
+		this.activityTypeID = activity.getActivityTypeId();
 		
 		this.groupingID = activity.getGrouping()!=null?
 						  activity.getGrouping().getGroupingId():
@@ -292,8 +292,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 		if(activityDetails.containsKey("parentUIID"))
 			this.parentUIID =convertToInteger(activityDetails.get("parentUIID"));
 		
-		if(activityDetails.containsKey("activityTypeId"))
-			this.activityTypeId = convertToInteger(activityDetails.get("activityTypeId"));
+		if(activityDetails.containsKey("activityTypeID"))
+			this.activityTypeID = convertToInteger(activityDetails.get("activityTypeID"));
 		if(activityDetails.containsKey("groupingID"))
 			this.groupingID = convertToLong(activityDetails.get("groupingID"));
 		if(activityDetails.containsKey("groupingUIID"))
@@ -440,10 +440,10 @@ public class AuthoringActivityDTO extends BaseDTO{
 		return activityID!=null?activityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
 	}
 	/**
-	 * @return Returns the activityTypeId.
+	 * @return Returns the activityTypeID.
 	 */
-	public Integer getActivityTypeId() {
-		return activityTypeId!=null?activityTypeId:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	public Integer getActivityTypeID() {
+		return activityTypeID!=null?activityTypeID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}
 	/**
 	 * @return Returns the activityUIID.
@@ -655,11 +655,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 			this.activityID = activityId;
 	}
 	/**
-	 * @param activityTypeId The activityTypeId to set.
+	 * @param activityTypeID The activityTypeID to set.
 	 */
-	public void setActivityTypeId(Integer activityTypeId) {
+	public void setActivityTypeID(Integer activityTypeId) {
 		if(!activityTypeId.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			this.activityTypeId = activityTypeId;
+			this.activityTypeID = activityTypeId;
 	}
 	/**
 	 * @param activityUIID The activityUIID to set.
