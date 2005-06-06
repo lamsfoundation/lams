@@ -54,47 +54,20 @@ class org.lamsfoundation.lams.common.comms.Communication {
     *           }
     *           commsInstance.getRequest('http://dolly.uklams.net/lams/lams_authoring/all_library_details.xml',myObject.test,true)   
     * 
-    * @param requestURL URL on the server for request script
-    * @param handlerFn  a callback function to call with the response object
+    * @param requestURL:String  URL on the server for request script
+    * @param handler:Function   callback function to call with the response object
+  	* @param isFullURL:Boolean  Inicates if the requestURL is fully qualified, if false serverURL will be prepended
     * @returns Void
     */
     public function getRequest(requestURL:String,handler:Function,isFullURL:Boolean):Void{
-        trace('Communication.getRequest()');
-        
         //Create XML response object 
         var responseXML = new XML();
-        
-        //Add request to queue
-        addToQueue(queueID,handler);
-        
-        //Reset queueID?
-        if(queueID>=MAX_REQUESTS) {
-            queueID=0;
-        }
-        
-        //Set ondata handler to validate data returned in XML object
-        responseXML.onData = function(src){
-            if (src != undefined) {
-                //Check for login page
-                if(src.indexOf("j_security_login_page") != -1){
-                    //TODO DI 12/04/05 deal with error from session timeout/server error
-                    trace('j_security_login_page received');
-                    this.onLoad(false);
-                }else {
-                    //Data alright, must be a packet, allow onLoad event
-                    this.parseXML(src);
-                    this.loaded=true;
-                    this.onLoad(true,this);
-                }
-            } else {
-                this.onLoad(false);
-            }            
-        }
         //Assign onLoad handler
         responseXML.onLoad = Proxy.create(this,onServerResponse,queueID);
-        
-        //Increment the queueID for next time
-        queueID++;
+        //Add handler to queue
+        addToQueue(handler);        
+        //Assign onData function        
+        setOnData(responseXML);
         
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
         if(isFullURL){
@@ -106,12 +79,11 @@ class org.lamsfoundation.lams.common.comms.Communication {
 		}
     }
     
-
-    
     /**
-    * XML load handler called after data validation on XML returned from server
+    * XML load handler for getRequest()
     * @param success            XML load status
     * @param wrappedPacketXML   The wrapped XML response object 
+    * @param queueID:Number     ID of request handler on queue 
     */
     private function onServerResponse(success:Boolean,wrappedPacketXML:XML,queueID:Number){
         trace('XML loaded success:'+ success);
@@ -130,11 +102,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
                 //showAlert("System error", "<p>Sorry there has been a system error, please try the operation again. If the problem persistes please contact support</p><p>Additional information:"+responseObj.body+"</p>", "sad");
             }else{
                 //Everything is fine so lookup callback handler on queue 
-                var index:Number = getIndexByQueueID(queueID);
-                //Dispatch handler passing in object stored under messageValue
-                queue[index].handler(responseObj.messageValue);
-                //Now that request has been dealt with remove item from queue
-                removeFromQueue(queueID);
+                dispatchToHandlerByID(queueID,responseObj.messageValue);
             }            
         }else {
             //TODO DI 12/04/05 Handle onLoad error
@@ -142,11 +110,167 @@ class org.lamsfoundation.lams.common.comms.Communication {
         }
     }
     
+  
+    /**
+	* Sends a data object to the server and directs response to handler function.
+	* 
+    * @param dto:Object 		The flash object to send. Will be WDDX serialised    
+	* @param requestURL:String  The url to send and load the data from
+	* @param handler:Function   The function that will handle the response (usually an ACK response)
+	* @param isFullURL:Boolean  Inicates if the requestURL is fully qualified, if false serverURL will be prepended
+	* 
+	* @usage: 
+	* 
+    */
+    public function sendAndReceive(dto:Object, requestURL:String,handler:Function,isFullURL){
+        //Serialise the Data Transfer Object
+        var xmlToSend:XML = serializeObj(dto);
+        
+        //Assign onLoad handler
+        responseXML.onLoad = Proxy.create(this,onSendACK,queueID);
+        //Add handler to queue
+        addToQueue(handler);        
+        //Assign onData function        
+        setOnData(responseXML);
+        
+        //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
+        if(isFullURL){
+            Debugger.log('Requesting:'+requestURL,Debugger.GEN,'sendAndReceive','Communication');			
+            xmlToSend.sendAndLoad(requestURL,responseXML);
+        }else{
+            Debugger.log('Requesting:'+_serverURL+requestURL,Debugger.GEN,'sendAndReceive','Communication');			
+            xmlToSend.sendAndLoad(_serverURL+requestURL,responseXML);
+        }
+    }
+    
+    /**
+     * Received Acknowledgement from server, response to sendAndReceive() method
+     * 
+     * @usage   
+     * @param   success     
+     * @param   loadedXML   
+     * @param   queueID     
+     * @param   deserialize 
+     * @return  
+     */
+    private function onSendACK(success:Boolean,loadedXML:XML,queueID:Number,deserialize:Boolean) {
+       //TODO DI 06/06/05 find out what is required here, is it enough to assign onLoad handler to onServerResponse?
+    }
+    
+    /**
+    * Load Plain XML with optional deserialisation
+    */
+    public function loadXML(requestURL:String,handler:Function,isFullURL:Boolean,deserialize:Boolean):Void{
+        //Create XML response object 
+        var responseXML = new XML();
+        //Assign onLoad handler
+        responseXML.onLoad = Proxy.create(this,onXMLLoad,queueID,deserialize);
+        //Add handler to queue
+        addToQueue(handler);        
+        //Assign onData function        
+        setOnData(responseXML);
+        
+        //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
+        if(isFullURL){
+			Debugger.log('Requesting:'+requestURL,Debugger.GEN,'getRequest','Communication');			
+			responseXML.load(requestURL);
+		}else{
+			Debugger.log('Requesting:'+_serverURL+requestURL,Debugger.GEN,'getRequest','Communication');			
+			responseXML.load(_serverURL+requestURL);
+		}
+    }
+    
+    /**
+    * Load XML load handler for loadXML() - 
+    * 
+    * @param success:Boolean        XML load status
+    * @param loadedXML:XML          unwrapped WDDX XML 
+    * @param queueID:Number         ID of request handler on queue 
+    * @param deserialize:Boolean    flag to determin whether object should be deserialised before being passed back to handler 
+    */
+    private function onXMLLoad(success:Boolean,loadedXML:XML,queueID:Number,deserialize:Boolean) {
+        //Deserialize
+        if(deserialize){
+            //Deserialize and pass back to handler
+            var responseObj:Object = deserializeObj(loadedXML);
+            dispatchToHandlerByID(queueID,responseObj);
+        }else {
+            //Call handler, passing in XML Object
+            dispatchToHandlerByID(queueID,loadedXML);
+        }
+    }
+    
+    /**
+    * Assign the onData method for the XML object
+    * 
+    * @param xmlObject:XML  the xml object to assign the onData method
+    */
+    private function setOnData(xmlObject:XML){
+        //Set ondata handler to validate data returned in XML object
+        xmlObject.onData = function(src){
+            if (src != undefined) {
+                //Check for login page
+                if(src.indexOf("j_security_login_page") != -1){
+                    //TODO DI 12/04/05 deal with error from session timeout/server error
+                    trace('j_security_login_page received');
+                    this.onLoad(false);
+                }else {
+                    //Data alright, must be a packet, allow onLoad event
+                    this.parseXML(src);
+                    this.loaded=true;
+                    this.onLoad(true,this);
+                }
+            } else {
+                this.onLoad(false);
+            }            
+        }
+    }    
+	
+	/**
+	 * Serializes an object into WDDX XML
+	 * @usage  	var wddxXML:XML = commsInstance.serializeObj(obj); 
+	 * @param   dto 	The object to be serialized	
+	 * @return  sXML	WDDX Serialized XML
+	 */
+	public function serializeObj(dto:Object):XML{
+		var sXML:XML = new XML();
+		sXML = wddx.serialize(dto);
+		return sXML;
+	}
+    
+	/**
+	 * Deserializes WDDX XML to produce an object
+	 * @usage  	var wddxXML:XML = commsInstance.serializeObj(obj); 
+	 * @param   wddx 	The XML to be de-serialized	
+	 * @return  Object	de-serialized object
+	 */
+	public function deserializeObj(xmlObj:XML):Object{
+        var dto:Object = wddx.deserialize(xmlObj);
+		return dto;
+	}  
+    
+    /**
+    * Finds handler in queue, dispatches object to it and deletes item from queue
+    */
+    private function dispatchToHandlerByID (ID:Number,o:Object) {
+        var index:Number = getIndexByQueueID(ID);
+        //Dispatch handler passing in object stored under messageValue
+        queue[index].handler(o);
+        //Now that request has been dealt with remove item from queue
+        removeFromQueue(ID);
+    }
+    
     /**
     * Adds a key handler pair to the queue
     */
-    private function addToQueue(queueID:Number,handler:Function){
-        queue.push({queueID:queueID,handler:handler});
+    private function addToQueue(handler:Function){
+        //Add to the queue and increment the queue ID
+        queue.push({queueID:queueID++,handler:handler});
+        
+        //Reset queueID?
+        if(queueID>=MAX_REQUESTS) {
+            queueID=0;
+        }
     }
     
     /**
@@ -180,35 +304,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
         }
         //If we're here then we didn't find it return an error
         return -1;
-    }
-    
-    /**
-	* Sends a data object to the server and directs response to handler function.
-	* 
-    * @param dto		The flash object to send. Will be WDDX serialised    
-	* @param requestURL the url to send and load the data from
-	* @param handlerFn  the function that will handle the response (usually an ACK response)
-	* @param isFullURL  Inicates if the requestURL is fully qualified, if false serverURL will be prepended
-	* 
-	* @usage: 
-	* 
-    */
-    public function sendAndReceive(dto:Object, requestURL:String,handlerFn:Function,isFullURL,overrideKey:String){
-      //TODO: Implement!  
-    }
-	
-	/**
-	 * Serialzes an object into WDDX XML
-	 * @usage  	var wddxXML:XML = commsInstance.serializeObj(obj); 
-	 * @param   dto 	The object to be serialized	
-	 * @return  sXML	WDDX Serialized XML
-	 */
-	public function serializeObj(dto:Object):XML{
-		var sXML:XML = new XML();
-		sXML = wddx.serialize(dto);
-		return sXML;
-	}
-    
+    }    
     
     /**
     * returns current server URL  
@@ -217,11 +313,17 @@ class org.lamsfoundation.lams.common.comms.Communication {
         return _serverURL;
     }
 
-
     /**
     * sets current server URL  
     */
     function set serverUrl(val:String){
         _serverURL = val;
+    }
+    
+    /**
+    * @returns Number - length of the queue
+    */
+    function get queueLength():Number {
+        return queue.length;
     }
 }
