@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+<class name="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails" table="tl_lasbmt11_submission_details" >
+    <meta attribute="class-description" inherit="false">@hibernate.class table="tl_lasbmt11_submission_details" </meta>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id name="submissionID" type="java.lang.Long" column="submission_id">
+        <meta attribute="field-description"> @hibernate.id generator-class="identity"
+        						             type="java.lang.Long" column="submission_id"        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+    
+	<property name="filePath" type="java.lang.String" not-null="true" column="filePath" length="250">
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">@hibernate.property column="filePath" length="250" not-null="true" </meta>    
+    </property>
+
+    <property name="fileDescription" type="java.lang.String" not-null="true" column="fileDescription" length="250">
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">@hibernate.property column="fileDescription" length="250" not-null="true" </meta>    
+    </property>
+    
+    <property name="dateOfSubmission" type="java.sql.Timestamp" not-null="true" column="date_of_submission" length="19">
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">@hibernate.property column="date_of_submission" length="19" not-null="true" </meta>    
+    </property>
+    
+    <property name="userID" type="java.lang.Long" column="user_id" not-null="true" length="20">
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">@hibernate.property  column="user_id" length="20" not-null="true" </meta>    
+    </property>    
+    
+    <property name="uuid" type="java.lang.Long"  not-null="true" column="uuid" length="20">
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">@hibernate.property column="uuid" length="20" not-null="true" </meta>    
+    </property>
+    
+    <property name="versionID" type="java.lang.Long" not-null="true"  column="version_id" length="20">
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">@hibernate.property column="version_id" length="20" not-null="true" </meta>    
+    </property>
+    
+    <!-- bi-directional many-to-one association to SubmitFilesContent -->
+    <many-to-one name="content" class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent" not-null="true">
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">@hibernate.many-to-one not-null="true" 
+        									@hibernate.column name="content_id"         
+        </meta>
+        <column name="content_id" />
+    </many-to-one>
+    
+    <!-- one-to-one association to SubmitFilesReport -->    
+    <one-to-one name="report" class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport" cascade="delete" property-ref="submissionDetails"/>
+    
+</class>
+</hibernate-mapping>

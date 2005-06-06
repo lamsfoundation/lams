@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+
+  <!-- ========== Data Sources Definitions =================================== -->
+  <!--
+    Define your Struts data sources in a file called struts-data-sources.xml and place
+    it in your merge directory.
+  -->
+
+  <!-- ========== Form Bean Definitions =================================== -->
+  <form-beans>
+
+   <form-bean name ="SbmtAuthoringForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="title" 
+				   type="java.lang.String" 
+				   initial="Submit Files"/>
+	<form-property name="instructions" 
+				   type="java.lang.String" 
+				   initial="Please upload you files below. Maximum file size is 1.0 MB." />
+	<form-property name="contentID"
+				   type="java.lang.Long"/>
+</form-bean>
+
+<form-bean name="SbmtLearnerForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="filePath"
+				   type="java.lang.String"
+				   initial="Type the path of the File here or click the Browse button to choose"/>
+	<form-property name="fileDescription"
+				   type="java.lang.String"
+				   initial="Type the description of the file here..."/>
+	<form-property name="contentID"
+				   type="java.lang.Long"/>
+	<form-property name="userID"
+				   type="java.lang.Long"/>		
+
+	<form-property name="filesUploaded"
+				   type="java.util.List"/>
+</form-bean>
+<form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm"/>
+  </form-beans>
+
+  <!-- ========== Global Exceptions Definitions =================================== -->
+  <!--
+    Define your exceptions in a file called global-exceptions.xml and place
+    it in your merge directory.
+  -->
+
+  <!-- ========== Global Forward Definitions =================================== -->
+  <!--
+    Define your forwards in a file called global-forwards.xml and place
+    it in your merge directory.
+  -->
+
+  <!-- ========== Action Mapping Definitions =================================== -->
+   <action-mappings>
+    <action
+      path="/tool/sbmt/learner"
+      type="org.lamsfoundation.lams.tool.sbmt.web.LearnerAction"
+      name="SbmtLearnerForm"
+      scope="request"
+      input="/sbmtLearner.jsp"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="upload"
+        path="/sbmtLearner.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/monitoring"
+      type="org.lamsfoundation.lams.tool.sbmt.web.MonitoringAction"
+      name="emptyForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="report"
+        path="/allLearners.jsp"
+        redirect="false"
+      />
+      <forward
+        name="status"
+        path="/Status.jsp"
+        redirect="false"
+      />
+      <forward
+        name="userReport"
+        path="/userReport.jsp"
+        redirect="false"
+      />
+      <forward
+        name="updateMarks"
+        path="/updateMarks.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/tool/sbmt/authoring"
+      type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
+      name="SbmtAuthoringForm"
+      scope="request"
+      input="/sbmtAuthoring.jsp"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="success"
+        path="/Login.jsp"
+        redirect="false"
+      />
+    </action>
+
+    <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
+  </action-mappings>
+
+   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
+
+  <message-resources parameter="org.lamsfoundation.lams.tool.sbmt.SbmtResources" />
+
+   <!-- Define your Struts plugins in a file called struts-plugins.xml and place it in your merge directory. -->
+
+</struts-config>

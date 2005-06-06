@@ -1,0 +1,272 @@
+<?xml version="1.0"?>
+
+<!-- 
+  Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+  USA
+
+  http://www.gnu.org/licenses/gpl.txt 
+-->
+<project name="lams_tool_sbmt" basedir="." default="usage">
+
+	<!-- import properties from the specified file -->
+	<property file="build.properties"/>
+	
+	<path id="all-libs">
+			<fileset dir="${sharedlib}">
+				<include name="**/*.jar"/>
+			</fileset>
+			<fileset dir="${j2eelibs}">
+					<include name="**/*.jar"/>
+			</fileset>
+	</path>
+		
+	<path id="project.classpath">
+		<path refid="all-libs"/>
+		<!-- Java CLASSPATH should be added as the last item -->
+		<!-- This property is supposed to be set in eclipse  -->
+		<pathelement location="${java.class.path}"/>
+	</path>
+	
+	<target name="usage">
+			<echo message=""/>
+			<echo message="${project} build file"/>
+			<echo message="------------------------------------------------------"/>
+			<echo message=""/>
+			<echo message="Among the available targets are:"/>
+			<echo message=""/>
+	</target>
+	
+	<target name="init">
+			<available property="xdoclet-jars-installed" file="${sharedlib}/xdoclet/xdoclet-${xdoclet.version}.jar"/>
+	</target>
+	<!-- =================================================================== -->
+	<!-- Fails if XDoclet 1.2.x is not on classpath                          -->
+	<!-- =================================================================== -->
+	<target name="fail-if-no-xdoclet-1.2.x" unless="xdoclet-jars-installed">
+		<fail>
+	      You must download several jar files before you can build Middlegen.
+	      Execute the "download-deps" target. Then try to build again.
+
+	      If you are behind a proxy, you should define the properties
+	      http.proxyHost and http.proxyPort. Example:
+		      
+	      ant -Dhttp.proxyHost=foo.com -Dhttp.proxyPort=8080
+		      
+	      It's also possible to download the jars manually.
+	     </fail>
+		</target>
+
+		<target name="check-driver-present">
+			<available file="${db.driver.jar}" type="file" property="driver.present"/>
+		</target>
+		<target name="panic-if-driver-not-present" unless="driver.present">
+			<fail>
+		      The JDBC driver you have specified by including one of the files in ${basedir}/config/database
+		      doesn't exist. You have to download this driver separately and put it in ${database.driver.file}
+		      Please make sure you're using a version that is equal or superior to the one we looked for.
+		      If you name the driver jar file differently, please update the database.driver.file property
+		      in the ${basedir}/config/database/xxx.xml file accordingly.
+		     </fail>
+	   </target>
+	<!-- =================================================================== -->
+	<!-- Run Middlegen For LearningDesign                                                       -->
+	<!-- =================================================================== -->
+		<target name="middlegen" description="Run Middlegen For Submit Fiiles Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
+			<taskdef name="middlegen" classname="middlegen.MiddlegenTask" classpathref="all-libs" />
+			
+			<middlegen appname="lams_tool_sbmt" 
+					   prefsdir="${conf.middlegen.dir}"
+					   gui="${gui}"
+					   databaseurl="${db.url}"
+					   driver="${db.driver}"
+					   username="${db.username}"
+					   password="${db.password}"
+					   includeViews="false"
+			>
+
+				<hibernate destination="${conf.hibernate.mapping.dir}"
+						   package="${sbmt.package}" 
+						   genXDocletTags="true"
+						   javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
+				/>
+				
+				<table name="tl_lasbmt11_content"/>
+				<table name="tl_lasbmt11_report"/>
+				<table name="tl_lasbmt11_session"/>
+				<table name="tl_lasbmt11_submission_details"/>
+			</middlegen>
+
+		</target>
+
+		<!-- =================================================================== -->
+		<!-- Run hbm2java for learningdesign                                                       -->
+		<!-- =================================================================== -->
+		<target name="hbm2java" description="Generate .java from .hbm files.">
+			<taskdef  name="hbm2java"
+	         classname="net.sf.hibernate.tool.hbm2java.Hbm2JavaTask"
+	         classpathref="all-libs"
+	      />
+		
+		  <hbm2java output="${src.dir.java}">
+				<fileset dir="${conf.hibernate.mapping.dir}/${sbmt.path}">
+					<include name="*.hbm.xml"/>
+				</fileset>
+			</hbm2java>
+		</target>
+	
+		<!-- ================================================================ -->
+		<!-- Preparations									                  -->
+		<!-- ================================================================ -->
+		
+		<target name="preparedirs">
+			<mkdir dir="${build}"/>
+			<mkdir dir="${build.classes.java}"/>
+			<mkdir dir="${build.classes.test}"/>
+			<mkdir dir="${build.report}"/>
+			<mkdir dir="${build.lib}"/>
+		</target>
+	
+		<target name="clean" depends="preparedirs" description="removes all class files">
+			<delete>
+				<fileset dir="${build.classes.java}"/>
+				<fileset dir="${build.classes.test}"/>
+			</delete>
+			<mkdir dir="${build.classes.java}"/>
+			<mkdir dir="${build.classes.test}"/>
+		</target>
+
+		<target name="compile" depends="clean" description="compile java sources">
+			<javac srcdir="${src.dir.java}" compiler="modern"
+		         	 	destdir="${build.classes.java}" deprecation="on" debug="on">
+				<classpath>					
+					<path refid="project.classpath"/>
+				</classpath>
+				</javac>
+				<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/tool/sbmt/">
+								<fileset dir="${src.dir.java}/org/lamsfoundation/lams/tool/sbmt/">
+										<include name="*.xml"/>
+										<include name="*.properties"/>
+								</fileset>
+				</copy>						
+		</target>
+
+		<target name="compile.test" depends="compile">
+			<javac srcdir="${src.dir.test}" destdir="${build.classes.test}" compiler="modern">
+				<classpath>
+					<pathelement location="${build.classes.java}"/>
+					<path refid="project.classpath"/>
+				</classpath>
+			</javac>
+		</target>
+		
+		<target name="copyContext" description="copies the applicationContext.xml files to the web directory">
+			<copy overwrite="yes" todir="${build.web}">
+				<fileset dir="${conf.web.dir}">
+					<include name="**/*.xml"/>
+					<include name="**/*.tld"/>
+				</fileset>
+			</copy>
+		</target>
+	
+		<!-- ================================================================ -->
+		<!-- Make jar archive for deployment        		    	          -->
+		<!-- ================================================================ -->
+		<target name="lams-sbmt-jar" depends="compile,compile.test,copyContext" description="creates jar file">
+			<delete file="${build.lib}/${product}.jar"/>
+			<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
+				<fileset dir="${build.classes.java}"/>
+				<fileset dir="${build.classes.test}"/>
+				<fileset dir="${conf.hibernate.mapping.dir}"/>
+				<fileset dir="${build.web}"/>
+			</jar>
+		</target>
+	
+	   <!-- =================================================================== -->
+	   <!-- Run xdoclet			                                                -->
+	   <!-- =================================================================== -->
+	   	<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask">
+		    <classpath refid="all-libs"/>
+		</taskdef>
+		
+		<target name="webdoclet" depends="preparedirs">
+			<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
+
+	         <fileset dir="${src.dir.java}">
+	            <include name="**/*Action.java" />
+	            <include name="**/*Form.java" />
+	         </fileset>
+
+	         <deploymentdescriptor servletspec="2.3" destdir="${conf.webinf.dir}"
+				mergedir="${conf.xdoclet.dir}" sessiontimeout="${sessiontimeout}"/>
+				
+	         <strutsconfigxml destdir="${conf.struts.dir}" mergedir="${conf.xdoclet.dir}" version="1.2" />
+	      </webdoclet>
+	   </target>
+	
+	   <!-- ================================================ -->
+	   <!-- Make the WAR archive for deployment				 -->
+	   <!-- ================================================ -->	
+		
+	   <target name="lams-sbmt-war" depends="webdoclet,lams-sbmt-jar" description="creates war file">
+	   		<delete file="${build.lib}/${product}.war"/>	
+	   		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF"
+	   			 webxml="${conf.webinf.dir}/web.xml">
+	   			
+	   			<webinf dir="${conf.webinf.dir}">
+	   				<include name=".xml"/>
+	   				<include name="**/*.*"/>
+	   				<exclude name="web.xml"/>
+	   			</webinf>
+	   			<classes dir="${build.classes.java}"/>	
+	   			<fileset dir="${conf.web.dir}">
+						<include name="*"/>
+				</fileset>
+	   			
+	   	   </war>
+	   	
+	   </target>
+	
+		<!-- =================================================================== -->
+		<!-- Deploy the jar and war                               -->
+		<!-- =================================================================== -->
+			<target name="deploy-war" depends="lams-sbmt-war" description="Deploy the SubmitFiles tool war file and jar file">
+			<delete quiet="true">
+				<fileset dir="${jboss.deploy}/tmp"/>
+				<fileset dir="${jboss.deploy}/work"/>
+			</delete>
+			<copy file="${build.lib}/${product}.jar"
+					todir="${jboss.deploy}"/> 
+			<copy file="${build.lib}/${product}.war"
+					todir="${jboss.deploy}"/> 
+		</target>
+	
+		<!-- =================================================================== -->
+		<!-- Clean and rebuild the database. 									 -->
+		<!-- =================================================================== -->
+		<target name="rebuild-db"
+			description="rebuild Submit Files tables">
+			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+					password="${db.password}">
+				<classpath>
+					<pathelement location="${db.driver.jar}"/>
+				</classpath>
+				<transaction src="${db.scripts}/drop_lams_tool_sbmt.sql"/>
+				<transaction src="${db.scripts}/create_lams_tool_sbmt.sql"/>
+			</sql>
+			<delete quiet="true" dir ="${contentrepository.location}"/>
+		</target>
+</project>
