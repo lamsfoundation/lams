@@ -108,6 +108,7 @@ Ant build file.
 				<include name="images/*"/>
 				<include name="admin/*"/>
 				<include name="doc/*"/>
+				<include name="fckEditor/**/*"/>
 			</fileset>
 		</war>
 	</target>
