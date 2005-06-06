@@ -36,7 +36,7 @@ class MovieLoader {
 	  }  
 	  
 	  public function onLoadInit(loaded_mc):Void{
-		  //Debugger.log('mc:'+loaded_mc,Debugger.COMP,'onLoadInit','org.lamsfoundation.lams.common.util.MovieLoader');
+		  Debugger.log('mc:'+loaded_mc,Debugger.COMP,'onLoadInit','org.lamsfoundation.lams.common.util.MovieLoader');
 		  //Debugger.log('_fn:'+_fn,Debugger.COMP,'onLoadInit','org.lamsfoundation.lams.common.util.MovieLoader');
 		  var myFn = Proxy.create(_scope,_fn,loaded_mc);
 		  myFn.call();
