@@ -29,10 +29,7 @@
 		<link href="../sample.css" rel="stylesheet" type="text/css" />
 		<script type="text/javascript" src="../../fckeditor.js"></script>
 	</head>
-	<body>
-		<h1>FCKeditor - JSP - Sample 7</h1>
-		In this sample the user can edit the complete page contents and header (from 
-		&lt;HTML&gt; to &lt;/HTML&gt;).
+	<body>		
 		<hr>
 		<form action="/../sampleposteddata.jsp" method="post" target="_blank">
 			<FCK:editor id="EditorDefault" basePath="../../fckEditor/"
