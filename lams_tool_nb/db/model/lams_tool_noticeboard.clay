@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<clay-model clay-version="1.1.0">
+<database-model name="lams_tool_noticeboard" alias="" remarks="" author="" version="1.0" sql-dialect-id="jp.azzurri.clay.model.physical.dialect.MySQL_4_0_Dialect" begin-script="" end-script="">
+<database-model-description/>
+<schema-list>
+<schema name="lams" alias="" remarks="">
+<schema-description/>
+<domain-list/>
+<table-list>
+<table name="tl_lanb11_content" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="56" y="145" width="-1" height="-1"/>
+<column-list>
+<column name="nb_content_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="title" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+<column name="content" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column name="online_instructions" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column name="offline_instructions" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TEXT" jdbc-type="-1" selected-variant-pattern="TEXT" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column name="define_later" alias="" remarks="" mandatory="false" column-size="1" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="force_offline" alias="" remarks="" mandatory="false" column-size="1" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="creator_user_id" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="date_created" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="date_updated" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PK_TL_LANB11_CONTENT" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="nb_content_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list/>
+</table>
+<table name="tl_lanb11_session" alias="" remarks="">
+<table-description/>
+<table-figure-bounds x="457" y="171" width="-1" height="-1"/>
+<column-list>
+<column name="nb_session_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="nb_content_id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="session_start_date" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="session_end_date" alias="" remarks="" mandatory="false" column-size="0" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="DATETIME" jdbc-type="93" selected-variant-pattern="DATETIME" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column name="session_status" alias="" remarks="" mandatory="false" column-size="100" decimal-digits="0" default-value="" auto-increment="false">
+<column-description/>
+<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
+<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
+<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+</data-type>
+</column>
+</column-list>
+<primary-key name="PK_TL_LANB11_SESSION" alias="" remarks="">
+<primary-key-description/>
+<primary-key-column name="nb_session_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key name="FK_tl_lanb11_session_1" alias="" remarks="" referenced-table-schema="lams" referenced-table="tl_lanb11_content" referenced-key="PK_TL_LANB11_CONTENT" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="nb_content_id" referenced-key-column-name="nb_content_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list/>
+</table>
+</table-list>
+</schema>
+</schema-list>
+</database-model>
+</clay-model>

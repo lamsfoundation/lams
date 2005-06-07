@@ -1,0 +1,320 @@
+<?xml version="1.0"?>
+
+<!-- 
+The DOCTYPE declaration declares the location of database-specific parts of the
+Ant build file. 
+-->
+<!DOCTYPE project [
+	<!ENTITY properties SYSTEM "file:./properties.xml">
+]>
+
+<project name="lams_tool_noticeboard" basedir="." default="usage">
+
+	<!-- import properties from the specified file -->
+	<property file="build.properties"/>
+
+	<path id="all-libs">
+		<fileset dir="${lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${sharedlib}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${j2eelibs}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="project.classpath">
+		<path refid="all-libs"/>
+		<!-- Java CLASSPATH should be added as the last item -->
+		<!-- This property is supposed to be set in eclipse  -->
+		<pathelement location="${java.class.path}" />
+	</path>
+
+	<target name="usage">
+		<echo message=""/>
+		<echo message="${project} build file"/>
+		<echo message="------------------------------------------------------"/>
+		<echo message=""/>
+		<echo message="The available targets are:"/>
+		<echo message=""/>
+		<echo message="preparedirs --> Create the build directories"/>
+		<echo message="clean-build --> Remove all the class files"/>
+		<echo message=""/>
+	</target>
+
+	<target name="print-classpath">
+		<echo message="java.class.path = ${java.class.path}"/>
+		<property name="path.string" refid="project.classpath"/>
+		<echo message="project.classpath = ${path.string}"/>
+	</target>
+
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+	<target name="preparedirs">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build.classes.java}"/>
+		<mkdir dir="${build.classes.test}"/>
+		<mkdir dir="${build.lib}"/>
+	</target>
+
+
+	<target name="clean-build" description="removes all class files">
+		<delete dir="${build.classes.java}"/>
+		<delete dir="${build.classes.test}"/>
+		<delete dir="${build.lib}"/>
+		<mkdir dir="${build.classes.java}"/>
+		<mkdir dir="${build.classes.test}"/>
+		<mkdir dir="${build.lib}"/>
+	</target>
+
+	<!-- ================================================================ -->
+	<!-- Compilations								                  -->
+	<!-- ================================================================ -->
+	
+	<target name="compile-java" depends="clean-build" description="compile java sources">
+		<javac srcdir="${src.java}" compiler="modern"
+	         	 	destdir="${build.classes.java}" deprecation="on" debug="on">
+			<classpath>
+				<path refid="project.classpath"/>
+			</classpath>
+		</javac>
+		<copy overwrite="yes" todir="${build.classes.java}/${package}">
+			<fileset dir="${src.java}/${package}">
+					<include name="*.xml"/>
+					<include name="*.properties"/>
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${build.classes.java}/${package}/web">
+			<fileset dir="${src.java}/${package}/web">
+					<include name="*.properties"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile-test" depends="compile-java">
+		<javac destdir="${build.classes.test}" compiler="modern">
+			<src path="${src.test}"/>
+			<classpath>
+				<pathelement location="${build.classes.java}"/>
+				<path refid="project.classpath"/>
+			</classpath>
+		</javac>
+		<copy overwrite="yes" todir="${build.classes.test}">
+			<fileset dir="${src.test}">
+				<include name="**/*.xml"/>
+				<include name="**/*.zip"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Database Tasks                                             -->
+	<!-- =================================================================== -->
+		<target name="clean-db"	description="clean noticeboard tool database.">
+			<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
+					password="${database.password}">
+				<classpath>
+					<pathelement location="${database.driver.file}"/>
+				</classpath>
+				<transaction src="${sql}/drop_lams_tool_nb.sql"/>
+			</sql>
+		</target>
+		
+		<target name="init-db"	description="drop and create noticeboard tool database.">
+			<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
+								password="${database.password}">
+							<classpath>
+								<pathelement location="${database.driver.file}"/>
+							</classpath>
+				<transaction src="${sql}/init_lams_tool_nb.sql"/>
+			
+			</sql>
+		</target>
+		
+		<target name="build-db" depends="init-db" description="build noticeboard tool database.">
+			<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
+								password="${database.password}">
+							<classpath>
+								<pathelement location="${database.driver.file}"/>
+							</classpath>
+					<transaction src="${sql}/insert_lams_tool_nb_data.sql"/>
+			</sql>
+		</target>	
+	
+	
+	<!-- ================================================================ -->
+	<!-- Make jar archive for deployment        		    	          -->
+	<!-- ================================================================ -->
+	<target name="build-jar" depends="compile-java" description="creates jar file">
+		<delete file="${build.lib}/${product}.jar"/>
+		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf}/jar/META-INF/MANIFEST.MF">
+			<fileset dir="${build.classes.java}">
+			</fileset>
+			<fileset dir="${hibernate.mappings}">
+			</fileset>
+		</jar>
+	</target>
+
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<!-- Make the war archive  for deployment             -->
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<target name="build-war" depends="build-jar" description="creates war file">
+		<delete file="${build.lib}/${product}.war"/>
+		<war warfile="${build.lib}/${product}.war" 
+  				webxml="${webinf}/web.xml" manifest="${conf}/war/META-INF/MANIFEST.MF">
+			<webinf dir="${webinf}">
+				<include name="*.tld"/>
+				<include name="*.xml"/>
+				<include name="*.properties"/>
+				<exclude name="web.xml"/>
+				<include name="jstl/*.tld"/>
+				<include name="spring/*"/>
+				<include name="tiles/*.xml"/>
+			</webinf>
+			<lib dir="${build.lib}">
+				<include name="${product}.jar"/> </lib><!-- 
+			</lib>
+			<lib dir="${lib}/jakarta-commons">
+				<include name="*.jar"/>
+			</lib>
+			<lib dir="${lib}/jakarta-taglibs">
+				<include name="*.jar"/>
+			</lib>
+			<lib dir="${lib}/jaxen">  
+				<include name="*.jar"/> 
+			</lib> 
+			<lib dir="${lib}/reload_2_0_1">
+				<include name="*.jar"/>
+			</lib> -->
+			<fileset dir="${web}">
+				<include name="*"/>
+				<include name="includes/*"/>
+				<include name="images/*"/>
+				<include name="template/*"/> <!-- used by tiles -->
+			</fileset>
+		</war>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Deploy the example struts jar and war                               -->
+	<!-- =================================================================== -->
+	<target name="deploy-war" depends="build-war" description="Deploy the noticeboard tool war file and jar file">
+		<delete quiet="true">
+			<fileset dir="${jboss.deploy}/tmp"/>
+			<fileset dir="${jboss.deploy}/work"/>
+		</delete>
+		<copy file="${build.lib}/${product}.jar"
+				todir="${jboss.deploy}"/> 
+		<copy file="${build.lib}/${product}.war"
+				todir="${jboss.deploy}"/> 
+	</target>
+
+
+	<!-- =================================================================== -->
+	<!-- Run Middlegen                                                     -->
+	<!-- =================================================================== -->
+
+	   <target 
+	      name="middlegen" 
+	      description="Run Middlegen" 
+	      unless="middlegen.skip"
+	      depends=""
+	   >
+	      <taskdef
+	         name="middlegen"
+	         classname="middlegen.MiddlegenTask"
+	         classpathref="all-libs"
+	      />
+
+	      <middlegen
+	         appname="${name}"
+	         prefsdir="${middlegen}"
+	         gui="${middlegen.gui}"
+	         databaseurl="${database.url}"
+	         initialContextFactory="${java.naming.factory.initial}"
+	         providerURL="${java.naming.provider.url}"
+	         datasourceJNDIName="${datasource.jndi.name}"
+	         driver="${database.driver}"
+	         username="${database.userid}"
+	         password="${database.password}"
+	         schema="${database.schema}"
+	         catalog="lams"
+	         includeViews="false"
+	      >
+
+	         <hibernate 
+	            destination="${conf}/hibernate/mapping"
+	            package="${package.name}"
+	            genXDocletTags="true"
+	            javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
+	         	
+	         />
+
+			<table name="tl_lanb11_content" />
+	      	<table name="tl_lanb11_session" />
+	      </middlegen>
+
+	   </target>
+	
+		<!-- =================================================================== -->
+		<!-- Run JUnit Tests                                                     -->
+		<!-- =================================================================== -->
+		<target name="test" depends="compile-test,init-db"> 
+			<mkdir dir="${build.report}"/>
+			<junit printsummary="yes" haltonerror="no" haltonfailure="no"
+				   fork="yes">
+				<formatter type="plain" usefile="false"/>
+				<formatter type="xml"/>
+				<batchtest todir="${build.report}">
+					<fileset dir="${src.test}">
+						<include name="**/Test*.java"/>
+						
+					</fileset>
+				</batchtest>
+				<classpath>
+					<pathelement location="${build.classes.java}"/>
+					<pathelement location="${build.classes.test}"/>
+					<pathelement location="${hibernate.mappings}"/>
+					<pathelement location="${conf}"/>
+					<path refid="project.classpath"/>
+				</classpath>
+			</junit>
+		</target>
+		
+		<target name="test-report" depends="test">
+			<mkdir dir="${build.report}/html"/> 
+			<junitreport todir="${build.report}"> 
+				<fileset dir="${build.report}">
+					<include name="TEST-*.xml"/>
+				</fileset>
+				<report todir="${build.report}/html"/> 
+			</junitreport>
+		</target>
+	
+		<!-- =================================================================== -->
+		<!-- Generate struts xml files                             -->
+		<!-- =================================================================== -->
+		<target name="webdoclet" depends="preparedirs" description="Generate the struts xml files from the Java source (using XDoclet)">
+			<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask">
+			    <classpath refid="all-libs"/>
+			</taskdef>
+
+			<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
+				
+	         <fileset dir="${src.java}">
+	            <include name="**/*Action.java" />
+	            <include name="**/*Form.java" />
+	         </fileset>
+
+	         <deploymentdescriptor servletspec="2.3" destdir="${webinf}"
+				mergedir="${xdoclet}" sessiontimeout="${sessiontimeout}"/>
+				
+	         <strutsconfigxml destdir="${webinf}" mergedir="${xdoclet}" version="1.2"/>
+	      </webdoclet>
+		</target>
+	
+</project>
+

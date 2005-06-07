@@ -1,0 +1,15 @@
+<context-param>
+  	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+  	<param-value>org.lamsfoundation.lams.tool.noticeboard.web.ApplicationResources</param-value>
+</context-param>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml
+		</param-value>
+	</context-param>
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>	
