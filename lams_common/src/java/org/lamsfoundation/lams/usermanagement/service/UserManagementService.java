@@ -1,7 +1,24 @@
-/*
- * Created on Nov 22, 2004
- *
- * Last modified on Nov 22, 2004
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 package org.lamsfoundation.lams.usermanagement.service;
 
@@ -11,8 +28,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
-
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
@@ -35,13 +50,11 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
 /**
- * TODO Add description here
- * 
  * <p>
  * <a href="UserManagementService.java.html"> <i>View Source </i> </a>
  * </p>
  * 
- * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang </a>
+ * @author Fei Yang, Manpreet Minhas
  */
 public class UserManagementService implements IUserManagementService {
 
@@ -361,6 +374,10 @@ public class UserManagementService implements IUserManagementService {
 	public void setUserManagementWorkspaceDAO(IWorkspaceDAO workspaceDAO) {
 		this.workspaceDAO = workspaceDAO;
 	}
+	
+	/*********************************************
+	 * Utility Methods added by Manpreet Minhas
+	 *********************************************/
 
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#saveOrganisation(org.lamsfoundation.lams.usermanagement.Organisation,
@@ -430,6 +447,16 @@ public class UserManagementService implements IUserManagementService {
 		return user.getUserId();
 	}
 
+	/**
+	 * This is a utility method required by the above method
+	 * <code>saveUser</code>. It adds a new record to the  
+	 * underlying database table indicating the organisation
+	 * to which this user belongs 
+	 * 
+	 * @param user 
+	 * @param roleID
+	 * @return Integer 
+	 */
 	private Integer createUserOrganisation(User user, Integer roleID) {
 		UserOrganisation userOrganisation = new UserOrganisation();
 		userOrganisation.setOrganisation(user.getBaseOrganisation());
@@ -441,6 +468,16 @@ public class UserManagementService implements IUserManagementService {
 		return userOrganisation.getUserOrganisationId();
 	}
 
+	/**
+	 * This is a utility method required by the above method
+	 * <code>createUserOrganisation</code>. It adds a new record 
+	 * to the underlying database table indicating the Role that
+	 * the given user has in the Organisation.
+	 *  
+	 * @param userOrganisation
+	 * @param roleID
+	 * @return UserOrganisationRole
+	 */
 	private UserOrganisationRole createUserOrganisationRole(
 			UserOrganisation userOrganisation, Integer roleID) {
 		UserOrganisationRole userOrganisationRole = new UserOrganisationRole();
@@ -449,78 +486,6 @@ public class UserManagementService implements IUserManagementService {
 		userOrganisationRoleDAO.saveUserOrganisationRole(userOrganisationRole);
 		return userOrganisationRole;
 	}
-
-	/** TODO check if a user is authorized to complete this operation */
-	public String moveLearningDesign(Long learningDesignID,
-			Integer targetWorkspaceFolderID, Integer userID) throws IOException {
-		LearningDesign learningDesign = learningDesignDAO
-				.getLearningDesignById(learningDesignID);
-		if (learningDesign != null) {
-			WorkspaceFolder workspaceFolder = workspaceFolderDAO
-					.getWorkspaceFolderByID(targetWorkspaceFolderID);
-			if (workspaceFolder != null) {
-				learningDesign.setWorkspaceFolder(workspaceFolder);
-				learningDesignDAO.update(learningDesign);
-				flashMessage = new FlashMessage("moveLearningDesign",
-						targetWorkspaceFolderID);
-			} else {
-				flashMessage = new FlashMessage("moveLearningDesign",
-						"No such target workspaceFolder with a workspace_folder_id of :"
-								+ targetWorkspaceFolderID + " exists",
-						FlashMessage.ERROR);
-			}
-		} else {
-			flashMessage = new FlashMessage("moveLearningDesign",
-					"No such learning design with a learning_design_id of:"
-							+ learningDesignID + " exists", FlashMessage.ERROR);
-		}
-		return flashMessage.serializeMessage();
-	}
-
-	/**
-	 * TODO check if a user is authorized to complete this operation As of now I
-	 * am assuming that the folders CANNOT be moved across different workspaces.
-	 * If they can be moved in that case the signature of this method would be
-	 * changed
-	 */
-	public void moveWorkspaceFolder(Integer currentWorkspaceFolderID,
-			Integer targetWorkspaceFolderID, Integer userID) {
-		WorkspaceFolder currentWorkspaceFolder = workspaceFolderDAO
-				.getWorkspaceFolderByID(currentWorkspaceFolderID);
-		WorkspaceFolder targetWorkspaceFolder = workspaceFolderDAO
-				.getWorkspaceFolderByID(targetWorkspaceFolderID);
-		if (currentWorkspaceFolder != null && targetWorkspaceFolder != null) {
-			/** TODO move the contents of this folder */
-			currentWorkspaceFolder
-					.setParentWorkspaceFolder(targetWorkspaceFolder);
-			workspaceFolderDAO.update(currentWorkspaceFolder);
-		}
-	}
-
-	/**
-	 * TODO check if a user is authorized to complete this operation
-	 */
-	public void renameFolder(Integer workspaceFolderID, String newName,
-			Integer userID) {
-		WorkspaceFolder workspaceFolder = workspaceFolderDAO
-				.getWorkspaceFolderByID(workspaceFolderID);
-		if (workspaceFolder != null) {
-			workspaceFolder.setName(newName);
-			workspaceFolderDAO.update(workspaceFolder);
-		}
-	}
-
-	/** TODO check if a user is authorized to complete this operation */
-	public void renameLearningDesign(Long learningDesignID, String title,
-			Integer userID) {
-		LearningDesign learningDesign = learningDesignDAO
-				.getLearningDesignById(learningDesignID);
-		if (learningDesign != null) {
-			learningDesign.setTitle(title);
-			learningDesignDAO.update(learningDesign);
-		}
-	}
-
 	/**
 	 * @param learningDesignDAO
 	 *            The learningDesignDAO to set.
@@ -528,23 +493,6 @@ public class UserManagementService implements IUserManagementService {
 	public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 		this.learningDesignDAO = learningDesignDAO;
 	}
-
-	/**
-	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getWorkspace(java.lang.Integer)
-	 */
-	public String getWorkspace(Integer userID) throws IOException {
-		User user = userDAO.getUserById(userID);
-		if (user != null) {
-			Workspace workspace = user.getWorkspace();
-			flashMessage = new FlashMessage("getWorkspace", workspace
-					.getWorkspaceDTO());
-		} else
-			flashMessage = FlashMessage.getNoSuchUserExists("getWorkspace",
-					userID);
-
-		return flashMessage.serializeMessage();
-	}
-
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getWDDXForOrganisationsForUserByRole(java.lang.Integer,
 	 *      java.lang.String)
