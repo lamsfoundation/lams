@@ -1,5 +1,7 @@
 ﻿import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.comms.*import org.lamsfoundation.lams.common.*;
+import org.lamsfoundation.lams.common.ui.*;
+import org.lamsfoundation.lams.authoring.*;
 
 /**
 * Communication - responsible for server side communication and wddx serialisation/de-serialisation
@@ -60,6 +62,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
     * @returns Void
     */
     public function getRequest(requestURL:String,handler:Function,isFullURL:Boolean):Void{
+		Cursor.showCursor(Application.C_HOURGLASS);
         //Create XML response object 
         var responseXML = new XML();
         //Assign onLoad handler
@@ -103,7 +106,13 @@ class org.lamsfoundation.lams.common.comms.Communication {
             }else{
                 //Everything is fine so lookup callback handler on queue 
                 dispatchToHandlerByID(queueID,responseObj.messageValue);
-            }            
+            }
+			
+			
+			
+            
+			
+			
         }else {
             //TODO DI 12/04/05 Handle onLoad error
             //showAlert("System error", "<p>Communication Error</p>", "sad");
@@ -208,6 +217,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
     private function setOnData(xmlObject:XML){
         //Set ondata handler to validate data returned in XML object
         xmlObject.onData = function(src){
+			Cursor.showCursor(Application.C_DEFAULT);
             if (src != undefined) {
                 //Check for login page
                 if(src.indexOf("j_security_login_page") != -1){
