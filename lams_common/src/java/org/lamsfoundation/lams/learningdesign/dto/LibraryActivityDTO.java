@@ -76,6 +76,12 @@ public class LibraryActivityDTO extends BaseDTO {
 	 * activity in the UI*/
 	private String libraryActivityUiImage;
 	
+	/** The type of activity */
+	private Integer activityTypeID;
+	
+	/** The category of activity */
+	private Integer activityCategoryID;
+	
 	private AuthoringToolDTO tool;
 	
 	/*****************************************************************************
@@ -105,6 +111,8 @@ public class LibraryActivityDTO extends BaseDTO {
 		this.xcoord = activity.getXcoord();
 		this.ycoord = activity.getYcoord();			
 		this.libraryActivityUiImage = activity.getLibraryActivityUiImage();
+		this.activityTypeID = activity.getActivityTypeId();
+		this.activityCategoryID = activity.getActivityCategoryID();
 		this.tool = activity.getTool().getAuthoringToolDTO();
 	}
 		
@@ -166,5 +174,18 @@ public class LibraryActivityDTO extends BaseDTO {
 	 */
 	public AuthoringToolDTO getTool() {
 		return tool;
+	}
+	
+	/**
+	 * @return Returns the activityCategoryID.
+	 */
+	public Integer getActivityCategoryID() {
+		return activityCategoryID;
+	}
+	/**
+	 * @return Returns the activityTypeID.
+	 */
+	public Integer getActivityTypeID() {
+		return activityTypeID;
 	}
 }
