@@ -45,6 +45,7 @@ class Cursor {
 	 */
 	public static function showCursor(id:String):Void{
 		Debugger.log('ID:'+id,Debugger.GEN,'showCursor','Cursor');
+		//TODO: Disable the UI when wait cursor is shown
 		
 		if(id=='default'){
 			stopDrag();
