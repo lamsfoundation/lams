@@ -1,8 +1,24 @@
-/*
- * Created on Dec 6, 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
@@ -16,10 +32,7 @@ import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 
 /**
- * @author MMINHAS
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author Manpreet Minhas
  */
 public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 
@@ -29,22 +42,16 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	private static final String FIND_BY_LEARNING_DESIGN_ID = "from " + TABLENAME +" in class " + Transition.class.getName()+
 															" where learning_design_id=?";
 	
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO#getTransitionById(java.lang.Integer)
-	 */
-	public List getTransitionById(Integer ID) {		
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
+	/**
+	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO#getTransitionByTransitionID(java.lang.Long)
 	 */
 	public Transition getTransitionByTransitionID(Long transitionID) {
 		return (Transition)this.getHibernateTemplate().get(Transition.class,transitionID);
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO#getTransitionByToActivityID(java.lang.Long)
 	 */
 	public Transition getTransitionByToActivityID(Long toActivityID) {		
@@ -52,7 +59,8 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 		return (Transition)list.get(0);
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO#getTransitionByfromActivityID(java.lang.Long)
 	 */
 	public Transition getTransitionByfromActivityID(Long fromActivityID) {
