@@ -116,7 +116,7 @@ class LFMenuBar extends MovieClip {
                 break;
 				
 			case eventObj.menu.drawTransitionalItem :
-				app.getCanvas().startTransitionTool();
+				app.getCanvas().toggleTransitionTool();
 				break;
         }        
     }    
