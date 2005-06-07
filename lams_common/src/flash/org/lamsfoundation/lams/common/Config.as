@@ -11,7 +11,11 @@ import org.lamsfoundation.lams.authoring.*;
 class Config {
 	//Declarations
 
-    //Config instance is stored as a static in the class
+    //static constants
+	//MS of delacy between clicks to make a double click
+	public static var DOUBLE_CLICK_DELAY:Number = 500;
+	
+	//Config instance is stored as a static in the class
     private static var _instance:Config = null;   
     private static var CONFIG_PREFIX:String = 'config.';    //All config items stored in a cookie with prefix 'config.' 
     
@@ -25,6 +29,7 @@ class Config {
     private var _language:String;
     private var _theme:String;
     private var _serverUrl:String;
+	
     
 
 	//Constructor
