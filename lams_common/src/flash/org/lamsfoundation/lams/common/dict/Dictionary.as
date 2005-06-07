@@ -161,7 +161,7 @@ dynamic class Dictionary {
                 items.put(11,new DictionaryItem(11,'mnu_file_revert','Revert'));
                 items.put(12,new DictionaryItem(12,'mnu_file_close','Close'));
                 items.put(13,new DictionaryItem(13,'mnu_file_save','Save'));
-                items.put(14,new DictionaryItem(14,'mnu_tools_trans','Draw Transitional'));
+                items.put(14,new DictionaryItem(14,'mnu_tools_trans','Draw Transition'));
                 items.put(15,new DictionaryItem(15,'mnu_tools_opt','Draw Optional'));
                 items.put(16,new DictionaryItem(16,'mnu_tools_prefs','Preferences'));
                 items.put(17,new DictionaryItem(17,'mnu_file','File'));
