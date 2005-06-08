@@ -24,7 +24,7 @@
         <archive path="D:\eclipse\workspace\lams_build\lib\jakarta-taglibs\standard.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\jdom\jdom.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\junit\junit.jar"/>
-        <archive path="D:\eclipse\workspace\lams_build\lib\jfreechart\jfreecart-0.9.21.jar"/>
+        <archive path="D:\eclipse\workspace\lams_build\lib\jfreechart\jfreechart-0.9.21.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\jfreechart\jcommon-0.9.6.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\jfreechart\gnujaxp.jar"/>
         <archive path="D:\eclipse\workspace\lams_build\lib\log4j\log4j-1.2.9.jar"/>
