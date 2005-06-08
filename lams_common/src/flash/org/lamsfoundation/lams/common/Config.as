@@ -14,6 +14,12 @@ class Config {
     //static constants
 	//MS of delacy between clicks to make a double click
 	public static var DOUBLE_CLICK_DELAY:Number = 500;
+	//message type codes
+	public static var MESSAGE_TYPE_ERROR:Number = 1;
+	public static var MESSAGE_TYPE_CRITICAL:Number = 2;
+	public static var MESSAGE_TYPE_OK:Number = 3;
+	
+	
 	
 	//Config instance is stored as a static in the class
     private static var _instance:Config = null;   
