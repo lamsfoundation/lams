@@ -23,8 +23,6 @@
 /*
  * Created on May 19, 2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
@@ -174,7 +172,8 @@ public class NbAuthoringForm extends ActionForm {
 	
 	public void copyValuesIntoNbContent(NoticeboardContent nbContent)
 	{
-		nbContent.setContent(getContent());
+		nbContent.setTitle(getTitle());
+	    nbContent.setContent(getContent());
 		nbContent.setOnlineInstructions(getOnlineInstructions());
 		nbContent.setOfflineInstructions(getOfflineInstructions());
 		nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
