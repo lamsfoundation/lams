@@ -20,6 +20,7 @@
  */
 package org.lamsfoundation.lams.monitoring.service;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 
@@ -113,21 +114,13 @@ public class TestMonitoringService extends AbstractLamsTestCase
     protected String[] getContextConfigLocation()
     {
         return new String[] { 
-        		"classpath:/org/lamsfoundation/lams/applicationContext.xml",
-        		"classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-        		"classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
-          		"classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml",        					  
-          		"classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml",
-          		"classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
-        		"classpath:/org/lamsfoundation/lams/tool/survey/applicationContext.xml"};
-/*        return new String[] { "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
-  			  				  "/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
-  			  				  "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-  			  				  "/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
-  			  				  "/WEB-INF/authoringApplicationContext.xml",
-  			  				  "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
-  			  				  "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",        					  
-				  			  "applicationContext.xml"}; */    
+        		"/org/lamsfoundation/lams/applicationContext.xml",
+        		"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+        		"/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+          		"/org/lamsfoundation/lams/learning/learningApplicationContext.xml",        					  
+          		"/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml",
+          		"/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml",
+        		"/org/lamsfoundation/lams/tool/survey/applicationContext.xml"};            
     }
     /**
      * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
@@ -209,41 +202,42 @@ public class TestMonitoringService extends AbstractLamsTestCase
     }
     
     public void testGetAllLessons()throws IOException{
-    	String packet = monitoringService.getAllLessons();
+    	String packet = monitoringService.getAllLessons();    	
     	System.out.print(packet);
     }
     public void testGetLessonDetails() throws IOException{
-    	String packet = monitoringService.getLessonDetails(new Long(1));
+    	String packet = monitoringService.getLessonDetails(new Long(1));    	
     	System.out.print(packet);
     }
     public void testGetLessonLearners() throws IOException{
-    	String packet = monitoringService.getLessonLearners(new Long(1));
+    	String packet = monitoringService.getLessonLearners(new Long(1));    	
     	System.out.println(packet);
     }
     public void testGetLessonDesign()throws IOException{
-    	String packet = monitoringService.getLearningDesignDetails(new Long(1));
+    	String packet = monitoringService.getLearningDesignDetails(new Long(1));    	
     	System.out.println(packet);
     }
     public void testGetAllLearnersProgress() throws IOException{
-    	String packet = monitoringService.getAllLearnersProgress(new Long(1));
+    	String packet = monitoringService.getAllLearnersProgress(new Long(1));    	
     	System.out.println(packet);
     }
     public void testGetLearnerActivityURL() throws Exception{
-    	String packet = monitoringService.getLearnerActivityURL(new Long(26),new Integer(2));
+    	String packet = monitoringService.getLearnerActivityURL(new Long(25),new Integer(2));    	
     	System.out.println(packet);
     }
     public void  testGellAllContributeActivities()throws IOException{
-    	String packet = monitoringService.getAllContributeActivities(new Long(1));
+    	String packet = monitoringService.getAllContributeActivities(new Long(1));    	
     	System.out.println(packet);
     }
     public void testMoveLesson() throws IOException{
-    	String packet = monitoringService.moveLesson(new Long(1),new Integer(3),new Integer(1));
+    	String packet = monitoringService.moveLesson(new Long(1),new Integer(3),new Integer(1));    
     	System.out.println(packet);
     }
     public void testRenameLesson()throws IOException{
-    	String packet = monitoringService.renameLesson(new Long(1),"New name after renaming",new Integer(1));
+    	String packet = monitoringService.renameLesson(new Long(1),"New name after renaming",new Integer(1));    	
     	System.out.println(packet);
     }
+    
     
     
     /**
