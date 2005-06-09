@@ -20,7 +20,6 @@
  */
 package org.lamsfoundation.lams.monitoring.service;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 
@@ -222,7 +221,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
     	System.out.println(packet);
     }
     public void testGetLearnerActivityURL() throws Exception{
-    	String packet = monitoringService.getLearnerActivityURL(new Long(25),new Integer(2));    	
+    	String packet = monitoringService.getLearnerActivityURL(new Long(29),new Integer(2));    	
     	System.out.println(packet);
     }
     public void  testGellAllContributeActivities()throws IOException{
@@ -237,9 +236,6 @@ public class TestMonitoringService extends AbstractLamsTestCase
     	String packet = monitoringService.renameLesson(new Long(1),"New name after renaming",new Integer(1));    	
     	System.out.println(packet);
     }
-    
-    
-    
     /**
      * Initialize all instance variables for testing
      */
@@ -249,6 +245,10 @@ public class TestMonitoringService extends AbstractLamsTestCase
         testStaff = usermanageService.getUserById(TEST_STAFF_ID);
         testLearner = usermanageService.getUserById(TEST_LEARNER_ID);        
         testOrganisation = usermanageService.getOrganisationById(TEST_ORGANIZATION_ID);
+    }
+    public void testGetActivityContributionURL() throws IOException{
+    	String packet = monitoringService.getActivityContributionURL(new Long(29));    	
+    	System.out.println(packet);
     }
 
 }
