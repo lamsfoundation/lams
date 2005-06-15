@@ -8,7 +8,7 @@ Ant build file.
 	<!ENTITY properties SYSTEM "file:./properties.xml">
 ]>
 
-<project name="lams_tool_noticeboard" basedir="." default="usage">
+<project name="lams_tool_nb" basedir="." default="usage">
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
@@ -161,7 +161,7 @@ Ant build file.
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<!-- Make the war archive  for deployment             -->
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
-	<target name="build-war" depends="build-jar" description="creates war file">
+	<target name="build-war" depends="build-jar, webdoclet" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
 		<war warfile="${build.lib}/${product}.war" 
   				webxml="${webinf}/web.xml" manifest="${conf}/war/META-INF/MANIFEST.MF">
@@ -173,6 +173,7 @@ Ant build file.
 				<include name="jstl/*.tld"/>
 				<include name="spring/*"/>
 				<include name="tiles/*.xml"/>
+				<include name="fckeditor/tlds/*"/>
 			</webinf>
 			<lib dir="${build.lib}">
 				<include name="${product}.jar"/> </lib><!-- 
