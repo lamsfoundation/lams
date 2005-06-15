@@ -2,21 +2,22 @@
 
 <project name="LAMS" default="usage" basedir=".">
 
-	<!-- import properties from the specified file -->
+	<!-- import properties from the shared and o/s specific files -->
 	<property file="shared.properties" />
 	<property file="windows.properties" />
-	<!--<property file="linux.properties"/>-->
-
 
 	<target name="init">
-		<mkdir dir="${assembly.dir}" />
+		<mkdir dir="${assembly}" />
 	</target>
 
 	<target name="usage" description="print usage message">
+		<echo>------------ Utility Methods ------------------------</echo>
 		<echo>usage: this message</echo>
 		<echo>clean: clean the ear assembly directories</echo>
 		<echo>clean-subprojects: clean sub project build directories</echo>
 		<echo>build-subprojects: build sub projects</echo>
+		<echo>build-tool-deploy-utility: build the tool_deploy utility and update copy in lams_build</echo>
+		<echo>------------ Build/Deploy LAMS  ------------------------</echo>
 		<echo>assemble-ear: assemble ear structure</echo>
 		<echo>deploy-ear: copy ear to local jboss server</echo>
 		<echo>copyfiles: copy configuration files to local jboss server</echo>
@@ -32,7 +33,7 @@
 
 	<!-- clean dirs for this script only -->
 	<target name="clean" description="cleans assembly">
-		<delete includeEmptyDirs="true" dir="${assembly.dir}"
+		<delete includeEmptyDirs="true" dir="${assembly}"
 			includes="**/*" />
 	</target>
 
@@ -60,14 +61,46 @@
 		-->
 	</target>
 
+	<!-- build sub-projects -->
+	<target name="build-tool-deploy-utility"
+		description="builds the tool deploy utility and copy to lams_build">
+
+		<ant antfile="../${lams_tool_deploy}/build.xml" target="build"
+			inheritAll="false" />
+
+		<mkdir dir="${deploy.tool}" />
+		<mkdir dir="${deploy.tool}/lib" />
+		
+		<copy todir="${deploy.tool}" overwrite="yes" flatten="true">
+			<fileset dir="../${lams_tool_deploy}">
+				<include name="deploy.bat" />
+				<include name="deploy.sh" />
+			</fileset>
+		</copy>
+
+		<copy todir="${deploy.tool}/lib" overwrite="yes" flatten="true">
+			<fileset dir="../${lams_tool_deploy}/lib">
+				<include name="jakarta-commmons/*.jar" />
+				<include name="mysql/*.jar" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${deploy.tool}/lib" overwrite="yes" flatten="true">
+			<fileset dir="../${lams_tool_deploy}/build/lib">
+				<include name="lams-tool-deploy.jar" />
+			</fileset>
+		</copy>
+		
+	</target>
+
 	<!-- assemble ear -->
 	<target name="assemble-ear" depends="init, clean, build-subprojects"
-		description="Assemble lasm ear in exploded form">
+		description="Assemble lams ear in exploded form">
 		<!-- have to copy the libs etc. to a temp location otherwise we end up with all the directories under lib as well-->
-		<mkdir dir="${assembly.dir}/temp" />
-		<copy todir="${assembly.dir}/temp" failonerror="true"
+		<mkdir dir="${assembly}/temp" />
+		<copy todir="${assembly}/temp" failonerror="true"
 			flatten="true">
-			<fileset dir="${lib.dir}">
+			<fileset dir="${lib}">
 				<patternset id="lib.jars">
 					<!--  the desired jars are nominated explicitly so -->
 					<!--  we don't release a build only one by accident -->
@@ -94,32 +127,31 @@
 			</fileset>
 			<fileset dir="..">
 				<include name="${lams.jar}" />
-				<include name="${lams_contentrepository.jar}" />
-				<include name="${lams_central.war}" />
-				<include name="${lams_workspace.jar}"/>
-				<include name="${lams_workspace.war}"/>
-				<include name="${lams_authoring.jar}"/>
-				<include name="${lams_authoring.war}"/>
-				<include name="${lams_monitoring.jar}"/>
-				<include name="${lams_monitoring.war}"/>
-				<include name="${lams_learning.jar}"/>
-				<include name="${lams_learning.war}"/>
-				<!-- <include name="lams_admin.war"/-->
+				<include name="${lams-contentrepository.jar}" />
+				<include name="${lams-central.war}" />
+				<include name="${lams-workspace.jar}"/>
+				<include name="${lams-workspace.war}"/>
+				<include name="${lams-authoring.jar}"/>
+				<include name="${lams-authoring.war}"/>
+				<include name="${lams-monitoring.jar}"/>
+				<include name="${lams-monitoring.war}"/>
+				<include name="${lams-learning.jar}"/>
+				<include name="${lams-learning.war}"/>
+				<!-- <include name="lams-admin.war"/-->
 			</fileset>
 		</copy>
 		<!-- create a temporary ear -->
 		<ear destfile="${assembly.temp.ear}" compress="false"
 			appxml="${app.xml}">
-			<fileset dir="${assembly.dir}/temp" includes="*" />
+			<fileset dir="${assembly}/temp" includes="*" />
 		</ear>
 		<!-- remove temp lib -->
-		<delete dir="${assembly.dir}/temp" includeEmptyDirs="true" />
+		<delete dir="${assembly}/temp" includeEmptyDirs="true" />
 		<!-- explode the ear (Why doesn't the EAR task support exploded format?) -->
 		<unjar src="${assembly.temp.ear}" dest="${assembly.lams.ear}" />
 		<!-- delete temp.ear -->
 		<delete file="${assembly.temp.ear}" />
 	</target>
-
 
 	<!-- ============================================================================== -->
 	<!-- Deploy the ear file to the server                                              -->
@@ -127,15 +159,26 @@
 
 	<target name="deploy-ear" 
 		description="Deploys previously assembled ear to jboss">
-		<copy todir="${jboss.deploy.dir}" overwrite="true"
+		<copy todir="${jboss.deploy}" overwrite="true"
 			failonerror="true" verbose="true">
-			<fileset dir="${assembly.dir}">
+			<fileset dir="${assembly}">
 				<include name="${lams.ear}/**/*.*" />
 			</fileset>
 
 		</copy>
 	</target>
 
+	<!-- ============================================================================== -->
+	<!-- Deploy IMS Content Package tool to the depoloyed ear 							-->
+	<!--  Relies on the tools using the parameter jboss.deploy							-->						
+	<!-- ============================================================================== -->
+	<target name="deploy-tools">
+		<ant antfile="../${tool_imscp_dir}/build.xml" target="deploy-tool"
+				inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>
+		</ant>
+	</target>
+	
 	<!-- ============================================================================== -->
 	<!-- Copy the third party jar files and cofiguration files for deployment           -->
 	<!-- ============================================================================== -->
@@ -148,7 +191,7 @@
 
 	<target name="copyfiles" depends="makeconfdir"
 		description="copy lib and config files">
-		<copy overwrite="yes" todir="${jboss.server.dir}/conf/">
+		<copy overwrite="yes" todir="${jboss.server}/conf/">
 			<fileset dir="${conf.jboss}/">
 				<include name="login-config.xml" />
 			</fileset>
@@ -163,7 +206,7 @@
 				<include name="*.dtd" />
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${jboss.deploy.dir}">
+		<copy overwrite="yes" todir="${jboss.deploy}">
 			<fileset dir="${conf.jboss}/service">
 				<include name="mysql*.xml" />
 			</fileset>
