@@ -23,7 +23,15 @@ package org.lamsfoundation.lams.tool.deploy;
 
 /**
  * Tool Deployer Main Class
- * @author chris
+ * 
+ * Command Line Parameters:
+ * properties_file_path: mandatory
+ * forcedb: optional, defaults to false. if true, deletes any old entries in db.
+ * 
+ * Only use forceDB for development - not designed for production. If forceDB is set, 
+ * then toolSignature and toolTablesDeleteScriptPath are needed.
+ *
+ * @author Chris Perfect, modifications by Fiona Malikoff
  */
 public class Deploy
 {
@@ -40,16 +48,33 @@ public class Deploy
     public static void main(String[] args) throws Exception
     {
         
-        if ((args.length != 1) || (args[0] == null))
+        if ((args.length < 1) || (args[0] == null))
         {
-            throw new IllegalArgumentException("Usage: Deployer <properties_file_path>");
+            throw new IllegalArgumentException("Usage: Deployer <properties_file_path> <forceDB>");
         }
         
         System.out.println("Starting Tool Deploy");
         try
         {
-            System.out.println("Reading Configuration File");
-            DeployConfig config =  new DeployConfig(args[0]);
+            System.out.println("Reading Configuration File"+args[0]);
+            DeployConfig config =  new DeployConfig(args[0],true);
+            
+            Boolean forceDB = Boolean.FALSE;
+            if ( args.length == 2 &&  args[1] != null) {
+                forceDB = new Boolean(args[1]);
+            }
+            
+            if ( forceDB.booleanValue() ) {
+                System.out.println("Removing old tool entries from database");
+                ToolDBRemoveToolEntriesTask dbRemoveTask = new ToolDBRemoveToolEntriesTask();
+                dbRemoveTask.setDbUsername(config.getDbUsername());
+                dbRemoveTask.setDbPassword(config.getDbPassword());
+                dbRemoveTask.setDbDriverClass(config.getDbDriverClass());
+                dbRemoveTask.setDbDriverUrl(config.getDbDriverUrl());
+                dbRemoveTask.setToolSignature(config.getToolSignature());
+                dbRemoveTask.setToolTablesDeleteScriptPath(config.getToolTablesDeleteScriptPath());
+                dbRemoveTask.execute();
+            }
             
             System.out.println("Running Tool DB Deploy");
             ToolDBDeployTask dbDeployTask = new ToolDBDeployTask();
@@ -63,7 +88,6 @@ public class Deploy
             dbDeployTask.setToolTablesScriptPath(config.getToolTablesScriptPath());
             dbDeployTask.execute();
             
-            System.out.println("Updating application.xml");
             AddWebAppToApplicationXmlTask addWebAppTask =  new AddWebAppToApplicationXmlTask();
             addWebAppTask.setLamsEarPath(config.getLamsEarPath());
             addWebAppTask.setContextRoot(config.getToolContextRoot());

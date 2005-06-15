@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.tool.deploy;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Task to add a web application entry to an EAR application XML
@@ -44,9 +45,14 @@ public class AddWebAppToApplicationXmlTask extends UpdateApplicationXmlTask
     protected void updateApplicationXml(Document doc) throws DeployException
     {
         
-        
+        //find & remove web uri element
+        Element moduleElement = findElementWithWebURI(doc); 
+        if ( moduleElement != null ) {
+            doc.getDocumentElement().removeChild(moduleElement);
+        }
+
         //create new module
-        Element moduleElement = doc.createElement("module");
+        moduleElement = doc.createElement("module");
         Element webElement = doc.createElement("web");
         moduleElement.appendChild(webElement);
         //create new web-uri element in the web element

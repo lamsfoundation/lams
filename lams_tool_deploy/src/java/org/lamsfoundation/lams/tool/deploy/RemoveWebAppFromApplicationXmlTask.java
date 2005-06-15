@@ -23,10 +23,12 @@ package org.lamsfoundation.lams.tool.deploy;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;;
+;
 /**
- * Removes a web app entry from the LAMS Application XML
- * @author chris
+ * Removes a web app entry from the LAMS Application XML. Throws an exception
+ * if the element is not found.
+ * 
+ * @author Chris Perfect, with modifications by Fiona Malikoff
  */
 public class RemoveWebAppFromApplicationXmlTask extends UpdateApplicationXmlTask
 {
@@ -43,15 +45,14 @@ public class RemoveWebAppFromApplicationXmlTask extends UpdateApplicationXmlTask
      */
     protected void updateApplicationXml(Document doc) throws DeployException
     {
-         
-        //find & remove web uri element
-        NodeList webUriNodeList = doc.getElementsByTagName("web-uri");
-        Element matchingWebUriElement = findElementWithMatchingText(webUri, webUriNodeList);
-        Element moduleElement = (Element) matchingWebUriElement.getParentNode().getParentNode();
-        doc.getDocumentElement().removeChild(moduleElement);
-        
-        
-        
+        Element moduleElement = findElementWithWebURI(doc); 
+        if (moduleElement == null)
+        {
+            throw new DeployException("No element found with text matching \""+doc.getElementsByTagName("web-uri")+"\"");
+        } else {
+            doc.getDocumentElement().removeChild(moduleElement);
+        }
+
     }
     
 }

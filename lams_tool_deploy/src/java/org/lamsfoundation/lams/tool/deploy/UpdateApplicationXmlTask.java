@@ -120,6 +120,7 @@ public abstract class UpdateApplicationXmlTask implements Task
      */
     protected void writeApplicationXml(final Document doc) throws DeployException
     {
+        System.out.println("Writing out doc "+doc);
         try
         {
             doc.normalize();
@@ -230,16 +231,20 @@ public abstract class UpdateApplicationXmlTask implements Task
             
         }
         
-        if (matchedElement == null)
-        {
-            throw new DeployException("No element found with text matching \""+text+"\"");
-        }
-        else
-        {
-            return matchedElement;
+        return matchedElement;
+    }
+
+    /** Find a matching web element - useful for updating or deleting an existing element */
+    protected Element findElementWithWebURI(Document doc) {
+        NodeList webUriNodeList = doc.getElementsByTagName("web-uri");
+        Element matchingWebUriElement = findElementWithMatchingText(webUri, webUriNodeList);
+        if ( matchingWebUriElement != null ) {
+            return (Element) matchingWebUriElement.getParentNode().getParentNode();
+        } else {
+            return null;
         }
     }
-    
+
     /**
      * Modifies the application Xml in the required manner.
      * Abstract method to be implmented by subclasses.
