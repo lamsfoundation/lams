@@ -138,13 +138,6 @@
     <!--  Tools -->
    <!--    
    
-    <module>
-        <web>
-            <web-uri>lams-tool-imscp.war</web-uri>
-            <context-root>/lams/tool/imscp</context-root>
-		</web>
-    </module>
-    
    <module>
         <web>
             <web-uri>lams-tool-survey.war</web-uri>
