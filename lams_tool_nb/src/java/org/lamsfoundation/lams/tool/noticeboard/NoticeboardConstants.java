@@ -54,6 +54,7 @@ public class NoticeboardConstants
     // ------------------------------
     public static final String DONE = "done";
     public static final String SAVE = "save";
+ 
     
     // --------------------------------------------
     // Session Attributes
@@ -64,6 +65,9 @@ public class NoticeboardConstants
     public static final String ONLINE_INSTRUCTIONS = "onlineInstructions";
     public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
     public static final String TOOL_CONTENT_ID = "toolContentId";
+    public static final String RICH_TEXT_CONTENT = "richTextContent";
+    public static final String RICH_TEXT_ONLINE_INSTRN = "richTextOnlineInstructions";
+    public static final String RICH_TEXT_OFFLINE_INSTRN = "richTextOfflineInstructions";
     
     // ---------------------------------------------------------------------------
     // Lookup Dispatch Action Keys (used in NbAuthoringAction class),
@@ -75,7 +79,7 @@ public class NoticeboardConstants
     public static final String BUTTON_INSTRUCTIONS = "button.instructions";
     public static final String BUTTON_SAVE = "button.ok";
     public static final String BUTTON_DONE = "button.done";
-    
+   // public static final String BUTTON_CANCEL = "button.cancel";
    
     
     
