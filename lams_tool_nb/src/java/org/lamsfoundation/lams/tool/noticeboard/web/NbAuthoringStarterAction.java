@@ -49,6 +49,8 @@ import org.lamsfoundation.lams.tool.noticeboard.util.NbAuthoringUtil;
 
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 
+
+
 /**
  * Creation Date: 19-05-05
  *  
@@ -89,9 +91,10 @@ public class NbAuthoringStarterAction extends Action {
 			throw new NbApplicationException(error);
 		}
 		
-		request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, contentId);
+		NbAuthoringUtil.cleanSession(request);
 		
-						
+		request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, contentId);
+							
 		/*
 		 * Retrieve the Service
 		 */
@@ -118,6 +121,9 @@ public class NbAuthoringStarterAction extends Action {
 			//initialise the values in the form, so the values will be shown in the jsp
 			nbForm.populateFormWithNbContentValues(nbContentNew);
 				
+			setValueForRichTextContent(request, nbForm);
+			setValueForRichTextOnlineInstrn(request, nbForm);
+			setValueForRichTextOfflineInstrn(request, nbForm);
 		}
 		else
 		{
@@ -125,6 +131,10 @@ public class NbAuthoringStarterAction extends Action {
 			NoticeboardContent nb = nbService.retrieveNoticeboard(contentId);
 			
 			nbForm.populateFormWithNbContentValues(nb);
+			
+			setValueForRichTextContent(request, nbForm);
+			setValueForRichTextOnlineInstrn(request, nbForm);
+			setValueForRichTextOfflineInstrn(request, nbForm);
 			
 		}
 		
@@ -146,7 +156,48 @@ public class NbAuthoringStarterAction extends Action {
 			return true;
 		
 	}
+	/**
+	 * If the <code>content</code> attribute of the noticeboard object is NULL
+	 * then the session attribute <code>richTextContent</code> is set to an empty string.
+	 * Otherwise, <code>richTextContent</code> takes on the the value of <code>content</code>
+	 * and is stored in the session 
+	 * @param request
+	 * @param form
+	 */
+	private void setValueForRichTextContent(HttpServletRequest request, NbAuthoringForm form)
+	{
+	    if (form.getContent() != null)
+	    {
+	        request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_CONTENT, form.getContent());
+		}
+		else
+		{
+		    request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_CONTENT, "");
+		}
+	}
 	
+	private void setValueForRichTextOnlineInstrn(HttpServletRequest request, NbAuthoringForm form)
+	{
+	    if (form.getOnlineInstructions() != null)
+	    {
+	        request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN, form.getOnlineInstructions());
+		}
+		else
+		{
+		    request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN, "");
+		}
+	}
 	
+	private void setValueForRichTextOfflineInstrn(HttpServletRequest request, NbAuthoringForm form)
+	{
+	    if (form.getOfflineInstructions() != null)
+	    {
+	        request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN, form.getOfflineInstructions());
+		}
+		else
+		{
+		    request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN, "");
+		}
+	}
 	
 }

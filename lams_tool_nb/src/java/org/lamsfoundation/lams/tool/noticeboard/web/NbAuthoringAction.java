@@ -21,7 +21,6 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -39,6 +38,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 
+import org.lamsfoundation.lams.tool.noticeboard.util.NbAuthoringUtil;
 
 
 
@@ -69,6 +69,7 @@ public class NbAuthoringAction extends LookupDispatchAction {
 		map.put(NoticeboardConstants.BUTTON_INSTRUCTIONS, "instructions");
 		map.put(NoticeboardConstants.BUTTON_DONE, "done");
 		map.put(NoticeboardConstants.BUTTON_SAVE, "save");
+		
 		return map;
 	}
 
@@ -76,7 +77,10 @@ public class NbAuthoringAction extends LookupDispatchAction {
 	 * Forwards to the basic page.
 	 */
 	public ActionForward basic(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
+		
+	    copyRichTextOnlineInstrnValue(request, (NbAuthoringForm)form);
+	    copyRichTextOfflineInstrnValue(request, (NbAuthoringForm)form);
+	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
 	}
 	
 	/**
@@ -92,7 +96,9 @@ public class NbAuthoringAction extends LookupDispatchAction {
 	 */
 	
 	public ActionForward instructions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		return mapping.findForward(NoticeboardConstants.INSTRUCTIONS_PAGE);
+		copyRichTextContentValue(request, (NbAuthoringForm)form);
+		
+	    return mapping.findForward(NoticeboardConstants.INSTRUCTIONS_PAGE);
 	}	
 	
 	/**
@@ -100,7 +106,9 @@ public class NbAuthoringAction extends LookupDispatchAction {
 	 */
 	
 	public ActionForward done(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
+	    copyRichTextOnlineInstrnValue(request, (NbAuthoringForm)form);
+	    copyRichTextOfflineInstrnValue(request, (NbAuthoringForm)form);
+	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
 	}
 	
 	/**
@@ -116,42 +124,91 @@ public class NbAuthoringAction extends LookupDispatchAction {
 	public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
 		
 		NbAuthoringForm nbForm = (NbAuthoringForm)form;
-		
-		//retrieve the service
 		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-			
-		//retrieve the id
 		Long content_id = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID);
 		
-		if (content_id == null)
-		{
-			String error = "Tool content id missing. Unable to continue.";
-			
-			throw new NbApplicationException(error);
-		}
+		copyRichTextContentValue(request, nbForm);
+		copyRichTextOnlineInstrnValue(request, nbForm);
+	    copyRichTextOfflineInstrnValue(request, nbForm);
 		
-		//	retrieve the content
+		//throws exception if the content id does not exist
+		checkContentId(content_id);
+		
 		NoticeboardContent nbContent = nbService.retrieveNoticeboard(content_id);
-					
-		//update the noticeboard object
-	/*	nbContent.setNbContentId(content_id);
-		nbContent.setTitle(nbForm.getTitle());
-		nbContent.setContent(nbForm.getContent());
-		nbContent.setOnlineInstructions(nbForm.getOnlineInstructions());
-		nbContent.setOfflineInstructions(nbForm.getOfflineInstructions());
-		nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
-		*/
-		
 		nbForm.copyValuesIntoNbContent(nbContent);
-		//save the noticeboard object into the db
 		nbService.updateNoticeboard(nbContent);
 		
 		return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
 	}
 	
+	/**
+	 * The form bean property <code>content</code> is set 
+	 * with the value of <code>richTextContent</code> 
+	 * @param request
+	 * @param form
+	 */
+	private void copyRichTextContentValue(HttpServletRequest request, NbAuthoringForm form)
+	{
+	    String content = (String)request.getParameter(NoticeboardConstants.RICH_TEXT_CONTENT);
+	    if(content != null)
+	    {
+	        form.setContent(content);
+	        request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_CONTENT, content);
+	        
+	    }
+	}
 	
+	/**
+	 * The form bean property <code>onlineInstructions</code> is set 
+	 * with the value of <code>richTextOnlineInstructions</code> 
+	 * @param request
+	 * @param form
+	 */
+	private void copyRichTextOnlineInstrnValue(HttpServletRequest request, NbAuthoringForm form)
+	{
+	    String onlineInstruction = (String)request.getParameter(NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN);
+	    if(onlineInstruction != null)
+	    {
+	        form.setOnlineInstructions(onlineInstruction);
+	        request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN, onlineInstruction);
+	        
+	    }
+	}
 	
+	/**
+	 * The form bean property <code>offlineInstructions</code> is set 
+	 * with the value of <code>richTextOfflineInstructions</code> 
+	 * @param request
+	 * @param form
+	 */
+	private void copyRichTextOfflineInstrnValue(HttpServletRequest request, NbAuthoringForm form)
+	{
+	    String offlineInstruction = (String)request.getParameter(NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN);
+	    if(offlineInstruction != null)
+	    {
+	        form.setOfflineInstructions(offlineInstruction);
+	        request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN, offlineInstruction);
+	        
+	    }
+	}
 	
+	/**
+	 * It is assumed that the contentId is passed as a http parameter
+	 * if the contentId is null, an exception is thrown, otherwise proceed as normal
+	 * 
+	 * @param contentId the <code>toolContentId</code> to check
+	 */
+	private void checkContentId(Long contentId)
+	{
+	    if (contentId == null)
+		{
+			String error = "Tool content id missing. Unable to continue.";
+			
+			throw new NbApplicationException(error);
+		}
+	}
+	
+
 	
 	
 	

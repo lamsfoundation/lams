@@ -31,7 +31,6 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbAuthoringUtil;
 
 
 //import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
@@ -61,10 +60,6 @@ public class NbAuthoringForm extends ActionForm {
 	
 	private String method;
 	private String toolContentId;
-	
-	
-	
-	
 	
 	/**
 	 * @return Returns the content.
