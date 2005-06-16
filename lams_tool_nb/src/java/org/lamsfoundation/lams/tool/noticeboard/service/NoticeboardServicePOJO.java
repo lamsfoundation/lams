@@ -21,12 +21,18 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
+import java.util.Date;
+
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
+import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.springframework.dao.DataAccessException;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+
 
 /**
  * An implementation of the NoticeboardService interface.
@@ -40,9 +46,14 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	private NoticeboardContent nbContent;
 	private INoticeboardContentDAO nbContentDAO=null;
 	
+	private NoticeboardSession nbSession;
+	private INoticeboardSessionDAO nbSessionDAO = null;
+	
 	private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
 
-	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNoticeboard(Long)
+	 */
 	public NoticeboardContent retrieveNoticeboard(Long nbContentId)
 	{
 		try
@@ -59,6 +70,10 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		return nbContent;
 	}
 	
+	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#updateNoticeboard(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
+	 */
 	public void updateNoticeboard(NoticeboardContent nbContent)
 	{
 		try
@@ -74,6 +89,9 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
 	}
 	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#saveNoticeboard(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
+	 */
 	public void saveNoticeboard(NoticeboardContent nbContent)
 	{
 		try
@@ -87,6 +105,9 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		}
 	}
 	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeNoticeboardSessions(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
+	 */
 	public void removeNoticeboardSessions(NoticeboardContent nbContent)
 	{
 		try
@@ -100,7 +121,10 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		}
 		
 	}
-	
+	 
+	/**
+     * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeNoticeboard(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
+     */
 	public void removeNoticeboard(Long nbContentId)
 	{
 		try
@@ -113,6 +137,23 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 					+ e.getMessage(), e);
 		}
 	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#saveNoticeboardSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession)
+	 */
+	public void saveNoticeboardSession(NoticeboardSession nbSession)
+	{
+	    try
+	    {
+	        nbSessionDAO.saveNbSession(nbSession);
+	    }
+	    catch(DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to remove this noticeboard session: "
+	                	+e.getMessage(), e);
+	    }
+	}
+	
 	
 	/* ===============Methods implemented from ToolContentManager =============== */
 	
@@ -173,7 +214,55 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		removeNoticeboard(toolContentId);
 	}
 	
-/* getter setter methods to obtain the service bean */
+
+	/* ===============Methods implemented from ToolContentManager =============== */
+	
+	/**
+	 * Creates a new noticeboard session with noticeboard
+	 * content with id <code>toolContentId</code>
+	 * <code>toolSessionId</code> and <code>toolContentId</code> must not be null
+	 * 
+	 * @param toolSessionId the new noticeboard session id to create
+	 * @param toolContentId the tool content id which is associated with the toolSessionId
+	 */
+	public void createToolSession(Long toolSessionId, Long toolContentId)
+	{
+	    if (toolSessionId == null || toolContentId == null)
+	    {
+	        String error = "Noticeboard Session cannot be created, toolContentId or toolSessionId must not be null";
+	        throw new NbApplicationException(error);
+	    }
+	    
+	    NoticeboardContent nbContent = retrieveNoticeboard(toolContentId);
+	    
+	    NoticeboardSession nbSession = new NoticeboardSession(toolSessionId,
+	            											  nbContent,
+	            											  new Date(System.currentTimeMillis()),
+	            											  NoticeboardSession.NOT_ATTEMPTED);
+	    
+	    saveNoticeboardSession(nbSession);
+	    
+	}
+	
+/*	public String leaveToolSession(Long toolSessionId, User learner)
+	{
+	    
+	}
+    
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	{
+	    
+	}
+
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+	{
+	    
+	}
+	
+*/	
+	
+	
+	/* getter setter methods to obtain the service bean */
 	public INoticeboardContentDAO getNbContentDAO()
 	{
 		return nbContentDAO;
@@ -182,5 +271,15 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	public void setNbContentDAO(INoticeboardContentDAO nbContentDAO)
 	{
 		this.nbContentDAO = nbContentDAO;
+	}
+	
+	public INoticeboardSessionDAO getNbSessionDAO()
+	{
+	    return nbSessionDAO;
+	}
+	
+	public void setNbSessionDAO(INoticeboardSessionDAO nbSessionDAO)
+	{
+	    this.nbSessionDAO = nbSessionDAO;
 	}
 }
