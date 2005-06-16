@@ -27,8 +27,12 @@
  */
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
+import java.util.Date;
+
+
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 
 
@@ -119,11 +123,29 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	
 	public void testsaveNoticeboard()
 	{
-		//same as test retrieve
-		/**
-		 * TODO: rewrite these tests
-		 */
+		Long testToolContentId = new Long(8000);
+		String testTitle = "TestCase: saveNoticeboard()";
+		String testContent = "This is to test the saveNoticeboard() function";
+		String testOnlineInstructions = "online instructions";
+		String testOfflineInstructions = "offline instructions";
 		
+		NoticeboardContent content = new NoticeboardContent(testToolContentId,
+		        											testTitle,
+		        											testContent,
+		        											testOnlineInstructions,
+		        											testOfflineInstructions,
+		        											new Date(System.currentTimeMillis()));
+		nbService.saveNoticeboard(content);
+		
+		NoticeboardContent retrievedObject = nbService.retrieveNoticeboard(testToolContentId);
+		assertEquals(retrievedObject.getTitle(), testTitle);
+		assertEquals(retrievedObject.getContent(), testContent);
+		assertEquals(retrievedObject.getOnlineInstructions(), testOnlineInstructions);
+		assertEquals(retrievedObject.getOfflineInstructions(), testOfflineInstructions);
+		
+		//remove test data
+		nbService.removeNoticeboard(testToolContentId);
+	    
 	}
 	
 	public void testremoveNoticeboard()
@@ -141,13 +163,41 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
    	 	assertNull(emptyNbContent);
 	} 
 	
-//	public void testremoveNoticeboardSessions()
-	//{
-		/**
-		 * TODO: do this later when the session stuff is added into the survey service
-		 */
-	//}
 	
+	/**
+	 * TODO: write this test case once session stuff is done
+	 * @author mtruong
+	 *
+	 * TODO To change the template for this generated type comment go to
+	 * Window - Preferences - Java - Code Style - Code Templates
+	 */
+	public void testremoveNoticeboardSessions()
+	{
+	    
+	}
 	
-	
+	/**
+	 * TODO: finish off this function, retrieve the session from the database
+	 * and check to see if the values are correct, also delete tghe object after testing
+	 *
+	 */
+/*	public void testSaveNoticeboardSession()
+	{
+	    Long testSessionId = new Long(9000);
+	    Date created = new Date(System.currentTimeMillis());
+	    
+	    NoticeboardContent nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
+	    
+	    NoticeboardSession nbSession = new NoticeboardSession(testSessionId,
+	            												nbContent,
+	            												created,
+	            												null,
+	            												NoticeboardSession.NOT_ATTEMPTED);
+	    
+	    nbService.saveNoticeboardSession(nbSession);
+	    
+	 
+	    
+	}
+	*/
 }
