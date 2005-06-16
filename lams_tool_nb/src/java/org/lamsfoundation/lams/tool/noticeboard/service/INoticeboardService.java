@@ -22,6 +22,7 @@
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 
 /**
  * Defines the contract that the tool service provider must follow
@@ -31,34 +32,34 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 public interface INoticeboardService {
 	
 	/**
-	 * Return the noticeboard object according to the requested content id.
+	 * Return the NoticeboardContent object that has id nbContentId.
 	 *
-	 * @param nbContentid The id of the requested noticeboard object
+	 * @param nbContentid The id of the requested NoticeboardContent object
 	 * @return NoticeboardContent object or null if not found
 	 */
 
 	public NoticeboardContent retrieveNoticeboard(Long nbContentId);
 	
 	/**
-	 * Update the content of the noticeboard object with id corresponding
-	 * to that specified in the argument.
+	 * Updates the values of the NoticeboardContent object.
 	 * 
-	 * @param nbContentid The id of the requested noticeboard object
+	 * @param nbContent The NoticeboardContent object to update
 	 *
 	 */	
 	public void updateNoticeboard(NoticeboardContent nbContent);
 	
 	
 	/**
-	 * Save the content of the noticeboard object
-	 *
+	 * Save the content of the NoticeboardContent object
+	 * 
+	 * @param nbContent the NoticeboardContent object to persist
 	 */	
 	public void saveNoticeboard(NoticeboardContent nbContent);
 	
 	
 	/**
-	 * Remove the noticeboard sessions which contain the noticeboard content 
-	 * object that is specified in the argument
+	 * Removes the NoticeboardSessions which is associated with the particular 
+	 * NoticeboardContent object.
 	 * 
 	 * @param nbContent The noticeboard content in which its corresponding sessions
 	 * must be removed
@@ -75,6 +76,13 @@ public interface INoticeboardService {
 	 *
 	 */	
 	public void removeNoticeboard(Long nbContentId);
+	
+	/**
+	 * Persists the new NoticeboardSession object into the database.
+	 * 
+	 * @param nbSession the NoticeboardSession object to persist
+	 */
+	public void saveNoticeboardSession(NoticeboardSession nbSession);
 	
 	
 }
