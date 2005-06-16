@@ -31,6 +31,13 @@ import java.util.Date;
 
 public class NoticeboardSession implements Serializable {
 
+    
+    public final static String NOT_ATTEMPTED = "NOT_ATTEMPTED";
+    
+    public final static String INCOMPLETE = "INCOMPLETE";
+    
+    public static final String COMPLETED = "COMPLETED";
+    
 	/** identifier field */
 	private Long nbSessionId;
 	
@@ -70,6 +77,22 @@ public class NoticeboardSession implements Serializable {
 		this.sessionStatus = sessionStatus;
 	}
 	
+	/**
+	 * Constructor used when creating a new  noticeboardSession given
+	 * the noticeboardContent id
+	 */
+	
+	public NoticeboardSession(Long nbSessionId,
+	        				  NoticeboardContent nbContent,
+	        				  Date sessionStartDate,
+	        				  String sessionStatus)
+	{
+	    this.nbSessionId = nbSessionId;
+	    this.nbContent = nbContent;
+	    this.sessionStartDate = sessionStartDate;
+	    this.sessionEndDate = null;
+	    this.sessionStatus = sessionStatus;
+	}
 	
 	/**
 	 * 		@hibernate.many-to-one
