@@ -97,8 +97,30 @@ public class NoticeboardContent implements Serializable {
 		this.nbSessions = nbSessions;
 	}
 	
+	/**
+	 * Minimal Constructor used to initialise values for the NoticeboardContent object
+	 * @return
+	 */
 	
-	
+	public NoticeboardContent(Long nbContentId,
+	        				  String title,
+	        				  String content,
+	        				  String onlineInstructions,
+	        				  String offlineInstructions,
+	        				  Date dateCreated)
+	{
+	    this.nbContentId = nbContentId;
+		this.title = title;
+		this.content = content;
+		this.onlineInstructions = onlineInstructions;
+		this.offlineInstructions = offlineInstructions;
+		this.defineLater = false;
+		this.forceOffline = false;
+		this.creatorUserId = null;
+		this.dateCreated = dateCreated;
+		this.dateUpdated = null;
+		this.nbSessions = new TreeSet();
+	}
 	
 	
 	/**
