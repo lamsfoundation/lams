@@ -245,10 +245,10 @@
 		<echo>| create jar file                          |</echo>
 		<echo>+------------------------------------------+</echo>
 
-		<jar destfile="${build.dir}/${project}-${project.version}.jar"
+		<jar destfile="${build.dir}/${project}.jar"
             basedir="${classes.dir}"/>
 
-		<copy file="${build.dir}/${project}-${project.version}.jar"
+		<copy file="${build.dir}/${project}.jar"
             todir="${dist.dir}"/>
 	</target>
 
@@ -296,13 +296,23 @@
 		<mkdir dir="${deploy.dir}/WEB-INF/classes" />
 		<copy todir="${deploy.dir}/WEB-INF/classes">
             <fileset dir="${web.classes.dir}" includes="**/*.class"/>
-              <fileset dir="${web.dir}/struts" excludes="**/*.txt,**/*.java"/>
+              <fileset dir="${web.dir}/struts" includes="*.tld,*.xml"/>
         </copy>
+
+        <mkdir dir="${deploy.dir}/includes" />
+          <copy todir="${deploy.dir}/includes">
+              <fileset dir="${web.dir}/includes" excludes="**/*.txt,**/*.java"/>
+          </copy>
+
+        <mkdir dir="${deploy.dir}/images" />
+          <copy todir="${deploy.dir}/images">
+              <fileset dir="${web.dir}/images" includes="**/*.png,**/*.gif"/>
+          </copy>
 
 	</target>
 
     <target name="war" depends="copyweb">
-        <war destfile="${deploy.dir}/${project}-${project.version}.war"
+        <war destfile="${deploy.dir}/${project}.war"
             webxml="${deploy.dir}/WEB-INF/web.xml" basedir="${deploy.dir}" />
     </target>
 
@@ -330,7 +340,7 @@
 		<echo>| deployed war file                        |</echo>
 		<echo>+------------------------------------------+</echo>
          <copy todir="${appserver.deploy.dir}">
-            <fileset dir="${deploy.dir}" includes="${project}-${project.version}.war"/>
+            <fileset dir="${deploy.dir}" includes="${project}.war"/>
         </copy>
 	</target>
 	<!-- end navigation tasks ***************************************************************************************-->
