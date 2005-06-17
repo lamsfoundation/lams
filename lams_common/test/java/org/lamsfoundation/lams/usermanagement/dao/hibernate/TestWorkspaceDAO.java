@@ -35,7 +35,7 @@ public class TestWorkspaceDAO extends AbstractLamsTestCase {
 	}
 	public void testGetWorkspaceByRootFolderID(){
 		boolean rootFolder = false;
-		Workspace workspace =workspaceDAO.getWorkspaceByRootFolderID(new Integer(8));
+		Workspace workspace =workspaceDAO.getWorkspaceByRootFolderID(new Integer(6));
 		if(workspace!=null)
 			rootFolder=true;
 		assertTrue(rootFolder);
