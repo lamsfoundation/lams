@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.List;
+
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
@@ -47,6 +48,9 @@ public class WorkspaceDAO extends BaseDAO implements IWorkspaceDAO{
 	}
 	public Workspace getWorkspaceByRootFolderID(Integer rootFolderID){
 		List list = this.getHibernateTemplate().find(FIND_BY_ROOT_FOLDER,rootFolderID);
-		return (Workspace)list.get(0);	
+		if(list.size()!=0)
+			return (Workspace)list.get(0);
+		else
+			return null;
 	}
 }
