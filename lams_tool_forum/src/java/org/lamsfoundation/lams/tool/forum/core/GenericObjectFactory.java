@@ -1,7 +1,5 @@
 package org.lamsfoundation.lams.tool.forum.core;
 
-import org.springframework.context.ApplicationContext;
-
 /**
  * GenericObjectFactory
  */
