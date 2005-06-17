@@ -293,10 +293,10 @@ CREATE TABLE lams_user_organisation (
      , user_id BIGINT(20) NOT NULL
      , PRIMARY KEY (user_organisation_id)
      , INDEX (user_id)
-     , CONSTRAINT u_user_organisation_ibfk_1 FOREIGN KEY (user_id)
+     , CONSTRAINT FK_lams_user_organisation_1 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id) ON DELETE NO ACTION ON UPDATE NO ACTION
      , INDEX (organisation_id)
-     , CONSTRAINT u_user_organisation_ibfk_2 FOREIGN KEY (organisation_id)
+     , CONSTRAINT FK_lams_user_organisation_2 FOREIGN KEY (organisation_id)
                   REFERENCES lams_organisation (organisation_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
