@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<clay-model clay-version="1.0.5">
+<clay-model clay-version="1.1.0">
 <database-model name="user_management_2" alias="" remarks="" author="" version="1.0" sql-dialect-id="jp.azzurri.clay.model.physical.dialect.MySQL_4_0_Dialect" begin-script="" end-script="">
 <database-model-description/>
 <schema-list>
@@ -435,19 +435,19 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key name="u_user_organisation_ibfk_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_user" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
-<foreign-key-description/>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="user_id" referenced-key-column-name="user_id"/>
-</foreign-key>
-<foreign-key name="u_user_organisation_ibfk_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_organisation" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key name="FK_lams_user_organisation_2" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_organisation" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="organisation_id" referenced-key-column-name="organisation_id"/>
+</foreign-key>
+<foreign-key name="FK_lams_user_organisation_1" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="lams_user" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="user_id" referenced-key-column-name="user_id"/>
 </foreign-key>
 </foreign-key-list>
 <index-list>
