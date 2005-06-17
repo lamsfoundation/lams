@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <!-- Hibernate SessionFactory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+        <property name="dataSource">
+            <ref local="dataSource"/>
+        </property>
+
+        <!-- Must references all OR mapping files. -->
+        <property name="mappingResources">
+            <list>
+               <value>org/lamsfoundation/lams/tool/forum/persistence/GenericEntity.hbm.xml</value>
+            </list>
+        </property>
+
+        <!-- Set the type of database; changing this one property will port this to Oracle, etc. -->
+        <property name="hibernateProperties">
+            <props>
+                <!-- test only /-->
+                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+             <!--   <prop key="hibernate.dialect">net.sf.hibernate.dialect.HSQLDialect</prop>-->
+                <prop key="hibernate.dialect">net.sf.hibernate.dialect.MySQLDialect</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- Data Source -->
+   <!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" destroy-method="close">
+        <property name="driverClassName">
+            <value>org.hsqldb.jdbcDriver</value>
+        </property>
+        <property name="url">
+            <value>jdbc:hsqldb:.</value>
+        </property>
+        <property name="username">
+            <value>sa</value>
+        </property>
+        <property name="password">
+            <value></value>
+        </property>
+    </bean>
+    -->
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" destroy-method="close">
+        <property name="driverClassName">
+            <value>com.mysql.jdbc.Driver</value>
+        </property>
+        <property name="url">
+            <value>jdbc:mysql://localhost/forum</value>
+        </property>
+        <property name="username">
+            <value>root</value>
+        </property>
+        <property name="password">
+            <value>root</value>
+        </property>
+    </bean>
+
+
+    <!-- Spring Hibernate Transaction Manager -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <!-- core beans -->
+<bean id="persistenceDelegate" class="org.lamsfoundation.lams.tool.forum.core.PersistenceDelegateImpl"/>
+
+    <bean id="genericEntityDao" class="org.lamsfoundation.lams.tool.forum.persistence.GenericEntityDao">
+        <property name="sessionFactory">
+            <ref local="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="forumDao" class="org.lamsfoundation.lams.tool.forum.persistence.ForumDao">
+        <property name="sessionFactory">
+            <ref local="sessionFactory"/>
+        </property>
+    </bean>
+
+
+   <bean id="attachmentDao" class="org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao">
+        <property name="sessionFactory">
+            <ref local="sessionFactory"/>
+        </property>
+    </bean>
+
+
+   <bean id="messageDao" class="org.lamsfoundation.lams.tool.forum.persistence.MessageDao">
+        <property name="sessionFactory">
+            <ref local="sessionFactory"/>
+        </property>
+    </bean>
+
+    <!-- Managers -->
+
+
+    <bean id="forumManagerTarget" class="org.lamsfoundation.lams.tool.forum.service.ForumManagerImpl">
+        <property name="persistenceDelegate">
+            <ref local="persistenceDelegate"/>
+        </property>
+    </bean>
+
+    <bean id="forumManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref local="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref local="forumManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="createForum">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="deleteForum">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="createMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="deleteMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="modifyMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="replyToMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+
+</beans>
