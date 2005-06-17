@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JAR MODULE BUILD" default="_build">
+	<!-- begin properties *******************************************************************************************-->
+	<property name="project.dir" value="${basedir}"/>
+	<property file="${project.dir}/build.properties"/>
+	<property name="project" value="${project}"/>
+	<property name="project.displayname" value="${project} - ${project.displayname}"/>
+	<property name="project.description" value="${project} - ${project.description}"/>
+
+	<property file="build.properties"/>
+
+	<!-- fixed filesystem property structure /-->
+	<property name="src.dir" value="${project.dir}/src/java"/>
+	<property name="lib.dir" value="${project.dir}/lib"/>
+	<property name="dist.dir" value="${project.dir}/dist"/>
+	<property name="classes.dir" value="${project.dir}/classes"/>
+	<property name="build.dir" value="${project.dir}/build"/>
+  	<property name="deploy.dir" value="${project.dir}/deploy"/>
+
+    <property name="test.src.dir" value="${project.dir}/test/java"/>
+    <property name="test.lib.dir" value="${project.dir}/test/lib"/>
+    <property name="test.classes.dir" value="${project.dir}/test/classes"/>
+    <property name="test.result" value="${project.dir}//test/testresult"/>
+
+    <property name="web.dir" value="${project.dir}/web"/>
+    <property name="web.lib.dir" value="${project.dir}/web/WEB-INF/lib"/>
+    <property name="web.src.dir" value="${project.dir}/web/WEB-INF/classes"/>
+    <property name="web.classes.dir" value="${project.dir}/web/classes"/>
+
+	<!-- end properties *********************************************************************************************-->
+
+	<!-- begin path *************************************************************************************************-->
+	<path id="app.class.path">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="build.class.path">
+		<path refid="app.class.path"/>
+		<fileset dir="${lib.dir}/build">
+			<include name="**/*.jar"/>
+		</fileset>
+    </path>
+
+	<path id="web.class.path">
+		<path refid="build.class.path"/>
+        <fileset dir="${web.lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+    </path>
+
+    <path id="test.class.path">
+        <path refid="build.class.path"/>
+        <fileset dir="${test.lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+
+    </path>
+
+	<path id="hibernate.build.class.path">
+		<pathelement path="${classes.dir}"/>
+		<pathelement path="${src.dir}"/>
+		<path refid="build.class.path"/>
+    </path>
+	<!-- end path ***************************************************************************************************-->
+
+	<!-- begin tasks ***********************************************************************************************/-->
+	<target name="init">
+		<echo>+------------------------------------------+</echo>
+		<echo>| build initializing                       |</echo>
+		<echo>+------------------------------------------+</echo>
+
+		<antcall target="mkdirs"/>
+
+		<echoproperties/>
+	</target>
+
+	<target name="mkdirs">
+		<echo>+------------------------------------------+</echo>
+		<echo>| creating directory structure             |</echo>
+		<echo>+------------------------------------------+</echo>
+
+		<!-- build filesystem structure /-->
+		<mkdir dir="${classes.dir}"/>
+		<mkdir dir="${lib.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
+        <mkdir dir="${test.result}"/>
+        <mkdir dir="${web.classes.dir}"/>
+        <mkdir dir="${deploy.dir}"/>
+	</target>
+
+
+	<target name="clean" description="Delete all generated files">
+		<echo>+------------------------------------------+</echo>
+		<echo>| clean                                    |</echo>
+		<echo>+------------------------------------------+</echo>
+
+		<delete dir="${classes.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete dir="${build.dir}"/>
+        <delete dir="${test.classes.dir}"/>
+        <delete dir="${test.result}"/>
+        <delete dir="${web.classes.dir}"/>
+        <delete dir="${deploy.dir}"/>
+
+	</target>
+			
+	<target name="compile" description="Compiles the Task" depends="init">
+		<echo>+------------------------------------------+</echo>
+		<echo>| compile                                  |</echo>
+		<echo>+------------------------------------------+</echo>
+
+		<javac srcdir="${src.dir}"
+            source="1.4"
+            debug="on"
+            compiler="modern"
+            classpathref="build.class.path"
+            destdir="${classes.dir}"/>
+	</target>
+
+	<target name="hibernate" depends="compile">
+		<echo>+------------------------------------------+</echo>
+		<echo>| generating hibernate metadata            |</echo>
+		<echo>+------------------------------------------+</echo>
+
+		<taskdef name="hibernateDoclet"
+            classname="xdoclet.modules.hibernate.HibernateDocletTask"
+            classpathref="build.class.path"/>
+
+		<hibernateDoclet
+            destdir="${classes.dir}"
+            excludedtags="@version,@author"
+            force="true"
+            verbose="true">
+
+			<fileset dir="${src.dir}">
+				<include name="**/*.java"/>
+			</fileset>
+			<fileset dir="${lib.dir}">
+				<include name="propertyset-1.3-25Dec03.jar"/>
+			</fileset>
+			<hibernate version="2.0"/>
+		</hibernateDoclet>
+
+
+		<taskdef name="schemaexport"
+            classname="net.sf.hibernate.tool.hbm2ddl.SchemaExportTask"
+            classpathref="hibernate.build.class.path"/>
+
+	    <schemaexport properties="${project.dir}/mysql-hibernate.properties"
+            quiet="no"
+            text="yes"
+            drop="no"
+            delimiter=";"
+            output="${classes.dir}/mysql-schema-export.ddl">
+			<fileset dir="${classes.dir}">
+				<include name="**/*.hbm.xml"/>
+			</fileset>
+			<fileset dir="${lib.dir}">
+				<include name="propertyset-1.3*.jar"/>
+			</fileset>
+		</schemaexport>
+
+    </target>
+
+    <target name="compiletest" description="Compiles the test classes" depends="clean, compile, hibernate">
+        <echo>+------------------------------------------+</echo>
+        <echo>| compile                                  |</echo>
+        <echo>+------------------------------------------+</echo>
+         <mkdir dir="${test.classes.dir}"/>
+
+	      <copy todir="${test.classes.dir}">
+            <fileset dir="${src.dir}">
+			    <include name="**/*.xml"/>
+            </fileset>
+          </copy>
+          <copy todir="${test.classes.dir}">
+			<fileset dir="${classes.dir}">
+                <include name="**/*.class"/>
+                <include name="**/*.hbm.xml"/>
+            </fileset>
+          </copy>
+
+        <javac srcdir="${test.src.dir}"
+            source="1.4"
+            debug="on"
+            compiler="modern"
+            classpathref="test.class.path"
+            destdir="${test.classes.dir}"/>
+    </target>
+
+    <target name="junit" depends="compiletest">
+        <echo>+-------------------------------------------+</echo>
+        <echo>| run junit tests and save results in /test |</echo>
+        <echo>+-------------------------------------------+</echo>
+        <mkdir dir="${test.result}"/>
+
+        <junit dir="${project.dir}"
+             printsummary="yes"
+             errorProperty="test.failed"
+             failureProperty="test.failed">
+         <jvmarg value="-Xmx512m"/>
+         <!--
+         <jvmarg value="-ea"/>
+         <jvmarg value="-esa"/>
+         -->
+         <jvmarg value="-Djava.endorsed.dirs=${lib.dir}/endorsed"/>
+
+         <classpath id="junit.class.path">
+             <path location="${test.classes.dir}"/>
+             <path refid="test.class.path"/>
+         </classpath>
+
+         <formatter type="xml"/>
+
+
+         <batchtest fork="yes" todir="${test.result}">
+             <fileset dir="${test.src.dir}">
+                 <include name="org/lamsfoundation/lams/tool/forum/**/*.*"/>
+                 <exclude name="org/lamsfoundation/lams/tool/forum/core/BaseTestCase.java"/>
+                 <exclude name="org/lamsfoundation/lams/tool/forum/core/SpringAwareTestCase.java"/>
+             </fileset>
+         </batchtest>
+     </junit>
+    <fail message="Tests failed. Check log and/or reports." if="test.failed"/>
+    </target>
+
+    <target name="merge" description="merges dependencies for the jar file">
+		<echo>+------------------------------------------+</echo>
+		<echo>| merge stuff into jar file                |</echo>
+		<echo>+------------------------------------------+</echo>
+
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="jar" description="JARs the Task" depends="hibernate, compile, merge">
+		<echo>+------------------------------------------+</echo>
+		<echo>| create jar file                          |</echo>
+		<echo>+------------------------------------------+</echo>
+
+		<jar destfile="${build.dir}/${project}-${project.version}.jar"
+            basedir="${classes.dir}"/>
+
+		<copy file="${build.dir}/${project}-${project.version}.jar"
+            todir="${dist.dir}"/>
+	</target>
+
+    <target name="web"  description="generates xdoclet for web">
+	    <taskdef
+	        name="webdoclet"
+	        classname="xdoclet.modules.web.WebDocletTask"
+	        classpathref="web.class.path"
+	    />
+		<webdoclet destdir="${web.dir}/WEB-INF">
+	        <fileset dir="${web.src.dir}" />
+			<strutsconfigxml validatexml="true" version="1.1" mergeDir="${web.dir}/struts/config"  />
+			<!-- <jsptaglib shortname="spirit taglibs" filename="spirit.tld" /> -->
+		</webdoclet>
+        <copy todir="${web.dir}/WEB-INF">
+			<fileset dir="${web.dir}/struts" includes="*.xml"/>
+		</copy>
+	</target>
+
+    <target name="webcompile"  description="compiles web src" depends="jar">
+     	<copy todir="${web.lib.dir}">
+			<fileset dir="${build.dir}" includes="*.jar"/>
+		</copy>
+		<javac srcdir="${web.src.dir}"
+            source="1.4"
+            debug="on"
+            compiler="modern"
+            classpathref="web.class.path"
+            destdir="${web.classes.dir}"/>
+    </target>
+
+	<target name="copyweb" description="Copy " depends="web, webcompile">
+
+        <mkdir dir="${deploy.dir}/WEB-INF" />
+		<copy todir="${deploy.dir}/WEB-INF">
+			<fileset dir="${web.dir}/WEB-INF" excludes="**/*.txt,**/*.java"/>
+        </copy>
+
+		<mkdir dir="${deploy.dir}/WEB-INF/lib" />
+		<copy todir="${deploy.dir}/WEB-INF/lib">
+			<fileset dir="${lib.dir}" includes="*.jar"/>
+     		<fileset dir="${web.dir}/WEB-INF/lib" includes="*.jar"/>
+		</copy>
+
+		<mkdir dir="${deploy.dir}/WEB-INF/classes" />
+		<copy todir="${deploy.dir}/WEB-INF/classes">
+            <fileset dir="${web.classes.dir}" includes="**/*.class"/>
+              <fileset dir="${web.dir}/struts" excludes="**/*.txt,**/*.java"/>
+        </copy>
+
+	</target>
+
+    <target name="war" depends="copyweb">
+        <war destfile="${deploy.dir}/${project}-${project.version}.war"
+            webxml="${deploy.dir}/WEB-INF/web.xml" basedir="${deploy.dir}" />
+    </target>
+
+	<!-- begin navigation tasks *************************************************************************************-->
+	<target
+        name="_build"
+        depends="init, clean, mkdirs, compile, merge, hibernate, jar">
+		<echo>+------------------------------------------+</echo>
+		<echo>| built war file                           |</echo>
+		<echo>+------------------------------------------+</echo>
+	</target>
+
+	<target
+        name="_dist"
+        depends="_build">
+		<echo>+------------------------------------------+</echo>
+		<echo>| created distribution                     |</echo>
+		<echo>+------------------------------------------+</echo>
+	</target>
+
+	<target
+        name="_deploy"
+        depends="_build, war">
+		<echo>+------------------------------------------+</echo>
+		<echo>| deployed war file                        |</echo>
+		<echo>+------------------------------------------+</echo>
+         <copy todir="${appserver.deploy.dir}">
+            <fileset dir="${deploy.dir}" includes="${project}-${project.version}.war"/>
+        </copy>
+	</target>
+	<!-- end navigation tasks ***************************************************************************************-->
+	<!-- end tasks **************************************************************************************************-->
+</project>
