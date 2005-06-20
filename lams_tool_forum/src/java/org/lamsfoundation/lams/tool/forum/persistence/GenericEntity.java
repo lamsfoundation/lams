@@ -26,7 +26,7 @@ public class GenericEntity {
 	 * Gets the GenericEntity's id
 	 *
 	 * @return the id
-	 * @hibernate.id column="ID" generator-class="identity"
+	 * @hibernate.id column="ID" generator-class="native"
 	 */
 	public Long getId() {
 		return id;
