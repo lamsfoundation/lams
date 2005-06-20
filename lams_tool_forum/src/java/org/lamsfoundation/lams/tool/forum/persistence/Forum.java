@@ -101,7 +101,7 @@ public class Forum extends GenericEntity {
      *
      * @hibernate.property
      * 		column="INSTRUCTIONS"
-     *      type="text"
+     *      //type="text"
      */
     public String getInstructions() {
         return instructions;
@@ -116,7 +116,7 @@ public class Forum extends GenericEntity {
      *
      * @hibernate.property
      * 		column="ONLINEINSTRUCTIONS"
-     *      type="text"
+     *      //type="text"
      */
     public String getOnlineInstructions() {
         return onlineInstructions;
@@ -131,7 +131,7 @@ public class Forum extends GenericEntity {
      *
      * @hibernate.property
      * 		column="OFFLINEINSTRUCTIONS"
-     *      type="text"
+     *      //type="text"
      */
     public String getOfflineInstructions() {
         return offlineInstructions;
