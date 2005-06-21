@@ -27,7 +27,6 @@ public class ForumManagerImplTest extends TestCase {
         forumManager = (ForumManager) GenericObjectFactoryImpl.getInstance().lookup("forumManager");
     }
 
-
     public void testCreateAndDeleteForum() throws PersistenceException {
         List attachments = new ArrayList();
         Attachment attachment = new Attachment();
@@ -35,7 +34,7 @@ public class ForumManagerImplTest extends TestCase {
         attachment.setType(Attachment.TYPE_ONLINE);
         attachments.add(attachment);
 
-        Forum forum = forumManager.createForum(this.getForum(), attachments);
+        Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), attachments);
         assertNotNull("Forum Id is null", forum.getId());
         Forum reloadedForum = forumManager.getForum(forum.getId());
         assertEquals(reloadedForum.getTitle(), "TEST");
@@ -62,8 +61,56 @@ public class ForumManagerImplTest extends TestCase {
         }
     }
 
+    public void testCreateAndDeleteForumWithNullAttachments() throws PersistenceException {
+        Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), null);
+        assertNotNull("Forum Id is null", forum.getId());
+        Forum reloadedForum = forumManager.getForum(forum.getId());
+        assertEquals(reloadedForum.getTitle(), "TEST");
+        assertEquals(reloadedForum.getCreatedBy(), new Long("1002"));
+        assertEquals(reloadedForum.getLockWhenFinished(), true);
+        assertEquals(reloadedForum.getForceOffLine(), true);
+        assertEquals(reloadedForum.getAllowAnnomity(), false);
+        assertEquals(reloadedForum.getInstructions(), "TEST INSTRUCTIONS");
+        assertEquals(reloadedForum.getOnlineInstructions(), "TEST ONLINEINSTRUCTIONS");
+        assertEquals(reloadedForum.getOfflineInstructions(), "TEST OFFLINEINSTRUCTIONS");
+        Set reloadedAttachments = reloadedForum.getAttachments();
+        assertEquals("Forum should contains null attachments", 0, reloadedAttachments.size());
+
+        forumManager.deleteForum(forum.getId());
+        try {
+            forumManager.getForum(forum.getId());
+            fail("getForum should have barfed for non existing forum");
+        } catch (Exception e) {
+
+        }
+    }
+
+    public void testCreateAndDeleteForumWithNullInstructions() throws PersistenceException {
+        Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), false, false , false, "", "", ""), null);
+        assertNotNull("Forum Id is null", forum.getId());
+        Forum reloadedForum = forumManager.getForum(forum.getId());
+        assertEquals(reloadedForum.getTitle(), "TEST");
+        assertEquals(reloadedForum.getCreatedBy(), new Long("1002"));
+        assertEquals(reloadedForum.getLockWhenFinished(), false);
+        assertEquals(reloadedForum.getForceOffLine(), false);
+        assertEquals(reloadedForum.getAllowAnnomity(), false);
+        assertEquals(reloadedForum.getInstructions(), "");
+        assertEquals(reloadedForum.getOnlineInstructions(), "");
+        assertEquals(reloadedForum.getOfflineInstructions(), "");
+        Set reloadedAttachments = reloadedForum.getAttachments();
+        assertEquals("Forum should contains null attachments", 0, reloadedAttachments.size());
+
+        forumManager.deleteForum(forum.getId());
+        try {
+            forumManager.getForum(forum.getId());
+            fail("getForum should have barfed for non existing forum");
+        } catch (Exception e) {
+
+        }
+    }
+
     public void testCreateModifyAndDeleteMessage() throws PersistenceException {
-      Forum forum = forumManager.createForum(this.getForum(), new ArrayList());
+      Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), new ArrayList());
       Message message = forumManager.createMessage(forum.getId(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
       assertNotNull("Message Id is null", message.getId());
 
@@ -102,7 +149,7 @@ public class ForumManagerImplTest extends TestCase {
     }
 
     public void testReplyToMessage() throws PersistenceException {
-      Forum forum = forumManager.createForum(this.getForum(), new ArrayList());
+      Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), new ArrayList());
       Message message = forumManager.createMessage(forum.getId(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
       assertNotNull("Message Id is null", message.getId());
       Message reloaded = forumManager.getMessage(message.getId());
@@ -155,16 +202,16 @@ public class ForumManagerImplTest extends TestCase {
         super.tearDown();
     }
 
-    protected Forum getForum() {
-        Forum forum = new Forum();
-        forum.setTitle("TEST");
-        forum.setCreatedBy(new Long("1002"));
-        forum.setLockWhenFinished(true);
-        forum.setForceOffLine(true);
-        forum.setAllowAnnomity(false);
-        forum.setInstructions("TEST INSTRUCTIONS");
-        forum.setOfflineInstructions("TEST OFFLINEINSTRUCTIONS");
-        forum.setOnlineInstructions("TEST ONLINEINSTRUCTIONS");
+    protected Forum getForum(String title, Long createdBy, boolean lockWhenFinished,
+             boolean forceOffLine, boolean allowAnnomity, String instructions, String  onlineInstructions, String offlineInstructions) {        Forum forum = new Forum();
+        forum.setTitle(title);
+        forum.setCreatedBy(createdBy);
+        forum.setLockWhenFinished(lockWhenFinished);
+        forum.setForceOffLine(forceOffLine);
+        forum.setAllowAnnomity(allowAnnomity);
+        forum.setInstructions(instructions);
+        forum.setOfflineInstructions(offlineInstructions);
+        forum.setOnlineInstructions(onlineInstructions);
         return forum;
     }
 
