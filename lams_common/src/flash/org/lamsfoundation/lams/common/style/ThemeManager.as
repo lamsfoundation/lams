@@ -1,8 +1,11 @@
 ﻿import mx.events.*
+import mx.utils.*
 import mx.transitions.easing.*
 import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.comms.*
+import org.lamsfoundation.lams.authoring.*
 
 /**
 * Manages themes throughout LAMS using the Flash event delegation model.  Themes are comprised of Visual elements  
@@ -41,6 +44,8 @@ class ThemeManager {
     //The current theme
     private var _currentThemeName:String;
     private var _theme:Theme;
+    private var comms:Communication;
+    private var app:Application;
     
     
 	//Constructor
@@ -49,6 +54,10 @@ class ThemeManager {
 
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
+
+        //Get comms and application references        
+        app = Application.getInstance();
+        comms = app.getComms();
     }
     
     /**
@@ -58,23 +67,43 @@ class ThemeManager {
         //TODO DI 03/05/05 Stub for now but should query server to access themes
         //Set the selected theme to the default theme initially
         _currentThemeName = theme;
+        
         //Cookie or server?
-        //if(CookieMonster.cookieExists('dictionary.'+language)) {
-            //openFromDisk(theme);
-        //}else {
+        if(CookieMonster.cookieExists('theme.'+theme)) {
+            //Whilst waiting for theme to load from disk - show busy
+            Cursor.showCursor(Application.C_HOURGLASS);            
+            openFromDisk(theme);
+            Cursor.showCursor(Application.C_DEFAULT);            
+        }else {
             openFromServer(theme);
-        //}        
+        }        
     }
     
     /**
     * Opens Theme from server
     */
     public function openFromServer(theme) {
-        //TODO DI 31/05/05 Stub for now until server holds theme data
-        //when server does implement this pseudo-code will be:
-        //comms.getRequest(url,callback)
-        //this will return a structure that will be passed into createFromData()
-        createThemeFromCode(theme);
+        var callBack = Delegate.create(this,themeBackFromServer);
+        //loadXML(requestURL:String,handler:Function,isFullURL:Boolean,deserialize:Boolean)        
+        //TODO DI 08/06/05 Stub for now until server can provide theme data as wrapped packet
+        //comms.getRequest('lams_authoring/defaultTheme.xml',callBack);
+        //loadXML(requestURL,handler,isFullURL,deserialize)
+        //comms.loadXML('lams_authoring/defaultTheme.xml',callBack,false,true);
+        
+        comms.loadXML('http://dolly.uklams.net/lams/lams_authoring/' + theme + 'Theme.xml',callBack,true,true);
+        Debugger.log('Loading theme data from server for: ' + theme,Debugger.GEN,'openFromServer','ThemeManager');
+    }
+    
+    /**
+    * Opens Theme from server
+    */
+    public function themeBackFromServer(themeDTO:Object){
+        Debugger.log('theme back from server',Debugger.GEN,'themeBackFromServer','ThemeManager');
+        //Create from the server response
+        createFromData(themeDTO);
+
+        //Now that theme has been loaded by server, cache it 
+        saveToDisk();
     }
     
     
@@ -343,8 +372,36 @@ class ThemeManager {
                 //add visual element to the default theme
                 _theme.addVisualElement(LFButtonVisualElement);
                 //----------------------------------------------------------
+                break;
+            case 'ruby' :
+                //Base style object for 'default' theme
+                var baseStyleObj = new mx.styles.CSSStyleDeclaration();
+                baseStyleObj.setStyle('fontFamily', '_sans');
+                baseStyleObj.setStyle('fontSize', 10);
+                baseStyleObj.setStyle('color', 0xBE0101);
+                baseStyleObj.setStyle('themeColor', 0xFF0000);
+                baseStyleObj.setStyle('borderStyle', 'outset');
+
+                //Create default theme
+                _theme = new Theme('ruby',baseStyleObj);
+        
+                //----BUTTON------------------------------------------------
+                //Style object
+                var buttonSO = new mx.styles.CSSStyleDeclaration();
+                buttonSO.setStyle('color', 0x6D78D1);
+                
+                //Visual Element
+                var buttonVisualElement = new VisualElement('button',buttonSO);
+                //add visual element to the default theme
+                _theme.addVisualElement(buttonVisualElement);
             default:        
         }
+        
+        _currentThemeName = theme;
+        
+        //Now theme has been created save it to disk and broadcast themeChanged event
+        saveToDisk();
+        broadcastThemeChanged();
     }
     
     /**
@@ -370,13 +427,35 @@ class ThemeManager {
     * Returns a style object with styles for the VisualElementId passed in
     */
     public function getStyleObject(visualElementId:String):mx.styles.CSSStyleDeclaration{
-        //Get relevant style object from selected theme
-        //Get the correct visual element
         //TODO DI 06/05/05 check for errors here with ID not found
-        var visualElement:VisualElement = _theme.getVisualElement(visualElementId);
-        //Construct style object by superimposing base style and visua
         //TODO DI 06/05/05 implement, for now just return style for visual element
-        return visualElement.styleObject;
+
+        //Get base style object theme + overwrite properties with ones in visual element for selected theme if found 
+        var baseSO = _theme.baseStyleObject;
+
+        //Get the correct visual element
+        var visualElement:VisualElement = _theme.getVisualElement(visualElementId);
+        //Was it found?
+        if(visualElement) {
+            var customSO = visualElement.styleObject;
+            var sObj:Object;
+            
+            //Overwrite baseSO styles with those in customSO 
+            //Do this by converting both into a data object, copy over and then convert back from data object
+            customSO = styleObjectToData(customSO);
+            baseSO = styleObjectToData(baseSO);
+            
+            //Merge/overwrite
+            for (var prop in customSO){
+                baseSO[prop] = customSO[prop];
+            }  
+            
+            //Convert back
+            baseSO = dataToStyleObject(baseSO);
+        }
+        
+        //Construct style object by superimposing base style and visua
+        return baseSO;
     }
     
     /**
@@ -398,6 +477,8 @@ class ThemeManager {
     */
     public function createFromData(dataObj):Object{
         _theme = Theme.createFromData(dataObj);
+		//New theme loaded so dispatch a load event
+        dispatchEvent({type:'load',target:this});
         return this;
     }  
     
