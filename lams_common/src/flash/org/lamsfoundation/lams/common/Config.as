@@ -3,6 +3,8 @@ import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.authoring.*;
 
+import mx.events.*
+
 /**
 * Stores configuration data for LAMS application
 * @class	Config
@@ -19,8 +21,6 @@ class Config {
 	public static var MESSAGE_TYPE_CRITICAL:Number = 2;
 	public static var MESSAGE_TYPE_OK:Number = 3;
 	
-	
-	
 	//Config instance is stored as a static in the class
     private static var _instance:Config = null;   
     private static var CONFIG_PREFIX:String = 'config.';    //All config items stored in a cookie with prefix 'config.' 
@@ -35,11 +35,17 @@ class Config {
     private var _language:String;
     private var _theme:String;
     private var _serverUrl:String;
-	
     
+    //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
+    private var dispatchEvent:Function;     
+    public var addEventListener:Function;
+    public var removeEventListener:Function;
 
 	//Constructor
 	private function Config() {
+        //Set up this class to use the Flash event delegation model
+        EventDispatcher.initialize(this);
+
         //Get a ref to the cookie monster 
         _cm = CookieMonster.getInstance();
         _comms = Application.getInstance().getComms();
@@ -68,12 +74,24 @@ class Config {
     * Set the default configuration properties 
     */
     private function loadServerDefaults(){
+        //createFromCode();
+        //serverDefaultsLoaded(_configData);
+        var callBack = Proxy.create(this,serverDefaultsLoaded);
+        
+        //TODO DI 09/06/05 - When server is ready change to getRequest()
+        _comms.loadXML('http://dolly.uklams.net/lams/lams_authoring/configData.xml',callBack,true,true)
+        //_comms.loadXML('lams_authoring/configData.xml',callBack,true,true);
+    }
+    
+    /**
+    * TODO - Only to be used whilst testing with dummy data
+    */
+    private function createFromCode(){
+        _configData = {};
         //TODO - DI 16/05/05 Get these from server eventually,stub for now
-        var dummyServerDefaults = {};
-        dummyServerDefaults.version = '1.1';
-        dummyServerDefaults.language = 'en';
-        dummyServerDefaults.theme = 'default';
-        dummyServerDefaults.serverUrl = 'http://dolly.uklams.net:8080/lams/';
+        _configData.version = '1.1';
+        _configData.language = 'en';
+        _configData.theme = 'default';
 
         //Set up languages
         var languages:Array = [];
@@ -90,7 +108,7 @@ class Config {
         fr.data = 'fr';
         languages.push(fr);
         
-        dummyServerDefaults.languages = languages;
+        _configData.languages = languages;
 
         //Set up themes
         var themes:Array = [];
@@ -106,13 +124,16 @@ class Config {
         limeTheme.label = 'Lime';
         limeTheme.data = 'lime';
         themes.push(limeTheme);
-        
-        dummyServerDefaults.themes = themes;
 
-        serverDefaultsLoaded(dummyServerDefaults);
-        /*
-        _comms.getRequest('http://dolly.uklams.net/lams/lams_authoring',Proxy.create(this,itemReceivedFromServer))
-        */
+        //Lime
+        var rubyTheme:Object = {};
+        rubyTheme.label = 'Ruby';
+        rubyTheme.data = 'ruby';
+        themes.push(rubyTheme);
+
+        
+        _configData.themes = themes;
+        
     }
     
     /**
@@ -142,6 +163,9 @@ class Config {
         
         //Store final configuration in local private variable
         _configData = serverConfigData;
+        
+        //Dispatch load event
+        dispatchEvent({type:'load',target:this});
     }
     
     /**
@@ -215,9 +239,21 @@ class Config {
     /**
     * Saves one config item
     */
-    public function saveItem(ItemID:String):Boolean{
-        var res = CookieMonster.save(_configData[ItemID],CONFIG_PREFIX + String(ItemID),true);
-        return res;
+    public function saveItem(itemID:String):Boolean{
+        if(_configData[itemID]) {
+            var res = CookieMonster.save(_configData[itemID],CONFIG_PREFIX + String(itemID),true);
+            return res;
+        } else {
+            res = false;
+        }
+    }
+    
+    /**
+    * Convert a config item to data
+    */
+    public function toData():Object{
+        //At the moment toData just returns _configData as it is ready to serialize already 
+        return _configData;
     }
     
 	//Getters+Setters
