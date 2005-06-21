@@ -93,17 +93,19 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
         {
             conn.setAutoCommit(false);
             toolId = getToolId(conn);
-            learningLibraryId = getLearningLibraryId(toolId, conn);
-            
-            System.out.println("Deleting rows where toolId = "+toolId+" and learningLibraryId = "+learningLibraryId);
-            cleanupToolTables(toolId, learningLibraryId, conn);
-            
-            //run the tool table delete script
-            if ( toolTablesDeleteScriptPath == null || toolTablesDeleteScriptPath.length() == 0 ) {
-                System.err.println("Unable to run tool delete script as not specified. Later calls may fail.");
-            } else {
-                ScriptRunner runner = new ScriptRunner(readFile(toolTablesDeleteScript), conn);
-                runner.run();
+            if ( toolId != 0 ) {
+	            learningLibraryId = getLearningLibraryId(toolId, conn);
+	            
+	            System.out.println("Deleting rows where toolId = "+toolId+" and learningLibraryId = "+learningLibraryId);
+	            cleanupToolTables(toolId, learningLibraryId, conn);
+	            
+	            //run the tool table delete script
+	            if ( toolTablesDeleteScriptPath == null || toolTablesDeleteScriptPath.length() == 0 ) {
+	                System.err.println("Unable to run tool delete script as not specified. Later calls may fail.");
+	            } else {
+	                ScriptRunner runner = new ScriptRunner(readFile(toolTablesDeleteScript), conn);
+	                runner.run();
+	            }
             }
             
             //commit transaction
@@ -186,10 +188,6 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
             {
                 return results.getLong("tool_id");
             }
-            else
-            {
-                System.err.println("Tool entry cannot be found. Tool signature "+toolSignature);
-            }
         }
         catch (SQLException sqlex)
         {
@@ -215,10 +213,6 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
             if (results.next())
             {
                 return results.getLong("learning_library_id");
-            }
-            else
-            {
-                System.err.println("Learning library id cannot be found. Tool id "+toolId);
             }
         }
         catch (SQLException sqlex)

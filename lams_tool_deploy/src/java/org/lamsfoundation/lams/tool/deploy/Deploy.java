@@ -50,7 +50,9 @@ public class Deploy
         
         if ((args.length < 1) || (args[0] == null))
         {
-            throw new IllegalArgumentException("Usage: Deployer <properties_file_path> <forceDB>");
+            throw new IllegalArgumentException("Usage: Deployer <properties_file_path> <forceDB>. n" +
+            		"\nforceDB deletes the old database entries before creating the new entries." +
+            		"\nSo it should be set to false for production and true for development");
         }
         
         System.out.println("Starting Tool Deploy");
