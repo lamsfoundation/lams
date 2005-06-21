@@ -292,4 +292,89 @@
 			</sql>
 			<delete quiet="true" dir ="${contentrepository.location}"/>
 		</target>
+	
+		<!-- =================================================================== -->
+		<!-- Generate the deploy package                                         -->
+		<!-- =================================================================== -->
+		<target name="create-deploy-package" depends="lams-questionAnswer-war" 
+			description="Generate the deployment package.">
+
+			<path id="deploy.lib.classpath">
+				<fileset dir="${deploy.tool.dir}">
+					<include name="lib/*.jar"/>
+				</fileset>
+			</path> 
+				  
+			<mkdir dir="${build.deploy}"/>
+			<mkdir dir="${build.deploy}/lib"/> 
+			<mkdir dir="${build.deploy}/sql"/> 
+			 
+			<copy overwrite="yes" todir="${build.deploy}/sql">
+				<fileset dir="${sql}/">
+					<include name="create_lams_tool_qa.sql"/>
+					<include name="drop_lams_tool_qa.sql"/>
+					<include name="insert_tool_qa_data.sql"/>
+					<include name="activity_insert.sql"/>
+					<include name="library_insert.sql"/>
+					<include name="tool_insert.sql"/>
+				</fileset>
+			</copy>
+
+			<copy overwrite="yes" todir="${build.deploy}/">
+				<fileset dir="${deploy.tool.dir}">
+					<include name="*.*"/>
+				</fileset>
+			</copy>
+
+			<copy overwrite="yes" todir="${build.deploy}/lib">
+				<fileset dir="${deploy.tool.dir}/lib">
+					<include name="*.jar"/>
+				</fileset>
+			</copy>
+
+			<taskdef name="generateDeployProperties" 
+				classname="org.lamsfoundation.lams.tool.deploy.CreatePackageTask">
+			    <classpath refid="deploy.lib.classpath"/>
+			</taskdef>
+
+			<generateDeployProperties depends="compile" 
+				mode="development" 
+				outputPath="${build.deploy}"
+				dbPassword="${database.password}"
+				dbUsername="${database.userid}"
+				dbDriverUrl="${database.url}"
+				dbDriverClass="com.mysql.jdbc.Driver"
+				deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar"
+				toolSignature="${signature}"
+				toolTablesScriptPath="${sql}/create_lams_tool_qa.sql"
+				toolTablesDeleteScriptPath="${sql}/drop_lams_tool_qa.sql"
+				toolActivityInsertScriptPath="${sql}/activity_insert.sql"
+				toolLibraryInsertScriptPath="${sql}/library_insert.sql"
+				toolInsertScriptPath="${sql}/tool_insert.sql"
+				lamsEarPath="${jboss.deploy}"
+				toolContext="${toolContext}"
+				toolWebUri="${product}.war"
+				/>
+		</target>
+	
+		<target name="deploy-tool" depends="create-deploy-package" 
+			description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
+
+			<path id="deploy.classpath">
+				<fileset dir="${build.deploy}">
+					<include name="lib/*.jar"/>
+				</fileset>
+			</path> 
+
+			<echo>Deploying the ISMCP tool</echo>
+<!--		
+			<java
+				classname="org.lamsfoundation.lams.tool.deploy.Deploy"
+				classpathref="deploy.classpath"
+				fork="true">
+					<arg file="${build.deploy}/deploy.properties"/>
+					<arg value="True"/> 
+			</java>
+-->						
+		</target>
 </project>
