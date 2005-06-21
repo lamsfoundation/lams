@@ -85,20 +85,25 @@ class Debugger {
 				level = 4;
 			}			
 			if(_severityLevel >= level){
-				//trace('currentClass :' + currentClass);
+                var date:Date = new Date();
+				//Build debug log object for this entry
+				var obj = {date:date,msg:msg,level:level,func:fname};
+				
 				//if the class name has changed, then print it out
 				if(_currentClass != currentClass){
 					_currentClass = String(currentClass);
 					trace("-----------In:"+_currentClass+"-----------");
-					
+					//Add the scope to the log object
+					obj.scope = currentClass;
 				}
+				
 				//Write to trace
                 msg = "["+fname+"]"+msg
 				trace(msg);
-                var date:Date = new Date();
+				
                 
                 //Write to log
-                _msgLog.push({date:date,msg:msg,level:level});
+                _msgLog.push(obj);
                 //Dispatch update event
                 _instance.dispatchEvent({type:'update',target:_instance});
 			}
@@ -152,8 +157,14 @@ class Debugger {
             case GEN :
                 colour='#0000ff';
                 break;
-            case GEN :
+            case COMP :
                 colour='#00ff00';
+                break;
+            case HIGH :
+                colour='#E3D209';
+                break;
+            case MED :
+                colour='#CF1D92';
                 break;
             default:
                 colour='#555555';
@@ -161,13 +172,25 @@ class Debugger {
 
         //Build font tags
         var fontOpenTag:String = '<font color= "' + colour + '">'
-        var fontCloseTag:String = '</font>'
+        var fontCloseTag:String = '</font>';
+		
+		ret = fontOpenTag;
+		
+		//Add scope?
+		if(msgObj.scope){
+			ret += '*--- ' + msgObj.scope + ' ---*' +'<BR>' + ret;				
+		}
+		
         //Include date?
         if(format.date) {
-            ret = fontOpenTag + msgObj.msg + ' date : ' + msgObj.date.toString() + fontCloseTag + '<BR>';
-        } else {
-            ret = fontOpenTag +  msgObj.msg + fontCloseTag + '<BR>';
-        }
+            ret += 'date : ' + msgObj.date.toString() + ' ';
+        } 
+		
+		//Add function/method + message
+		ret += '[' + msgObj.func + ']' +  msgObj.msg;
+		
+		//Add closing font tag and line break
+		ret += fontCloseTag + '<BR>'		
         return ret;
     }
     
