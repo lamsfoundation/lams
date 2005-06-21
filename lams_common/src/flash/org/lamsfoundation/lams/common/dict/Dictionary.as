@@ -1,6 +1,7 @@
 ﻿import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.comms.*
+import org.lamsfoundation.lams.authoring.*;
 
 /**
 * Dictionary - Holds all of the LAMS text allowing LAMS to be multilingual
@@ -12,14 +13,25 @@ dynamic class Dictionary {
 
 	private var items:Hashtable;
     private var _currentLanguage:String;
+	private var comms:Communication;	
+	private var app:Application;	
     
     //Application instance is stored as a static in the application class
-    private static var _instance:Dictionary = null;     
+    private static var _instance:Dictionary = null;    
+	
+    //Defined so compiler can 'see' events added at runtime by EventDispatcher
+    private var dispatchEvent:Function;     
+    public var addEventListener:Function;
+    public var removeEventListener:Function;
 
     /**
     * Constructor - Dictionary is singleton so private 
     */
     private function Dictionary() {
+		//Get comms and application references        
+        app = Application.getInstance();
+        comms = app.getComms();		
+		mx.events.EventDispatcher.initialize(this);
         items = new Hashtable();
     }
 
@@ -43,13 +55,19 @@ dynamic class Dictionary {
         //Set Language
         this._currentLanguage = language;
         //Cookie or server?
-        //if(CookieMonster.cookieExists('dictionary.'+language)) {
-            //openFromDisk(language);
-        //}else {
-            openFromServer(language);
-        //}        
+        if(CookieMonster.cookieExists('dictionary.'+language)) {
+            openFromDisk();
+        }else {
+            openFromServer();
+        }        
 	}
-    
+	
+	/**
+	* event broadcast when a new language is loaded 
+	*/ 
+	public function broadcastInit(){
+		dispatchEvent({type:'init',target:this});		
+	}
  
     /**
     * @returns a string holding the text requested
@@ -82,7 +100,9 @@ dynamic class Dictionary {
     * Creates Dictionary info from data object
     * @param dataObj - a data Object to convert to a dictionary
     */
-    public function createFromData(dataObj:Object){
+    public function createFromData(dataObj:Object):Void{
+		Debugger.log('creating from data',Debugger.CRITICAL,'createFromData','Dictionary');
+
         //First empty hash 
         items.clear();
         
@@ -95,6 +115,8 @@ dynamic class Dictionary {
             var dictItem:DictionaryItem = DictionaryItem.createFromData(dataObj.dictionaryItems[i]);
             items.put(hashKey,dictItem);
         }
+        //Dispatch load event 
+        dispatchEvent({type:'load',target:this});
     }
     
     /**
@@ -118,20 +140,22 @@ dynamic class Dictionary {
     /**
     * Handler function for dictionary being returned from the server
     */
-    public function onDictionaryloadedFromServer(dictionaryDataObj:Object){
+    public function onDictionaryLoadedFromServer(dictionaryDataObj:Object){
+		Debugger.log('onDictionaryLoadedFromServer',Debugger.CRITICAL,'onDictionaryLoadedFromServer','Dictionary');		
         //Create the dictionary from the data obj
         createFromData(dictionaryDataObj);
+		
+        //Now that theme has been loaded by server, cache it 
+        saveToDisk();		
     }
 
     /**
     * Opens Dictionary from server
     */
     public function openFromServer() {
-        //TODO DI 31/05/05 Stub for now until server holds language
-        //when server does implement this pseudo-code will be:
-        //comms.getRequest(url,callback)
-        //this will return a structure that will be passed into createFromData()
-        createDictionaryFromCode(_currentLanguage);
+		Debugger.log('URL : '+ 'http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',Debugger.CRITICAL,'openFromServer','Dictionary');
+		var callBack = Proxy.create(this,onDictionaryLoadedFromServer);
+        comms.loadXML('http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',callBack,true,true);
     }
     
     /**
@@ -146,60 +170,62 @@ dynamic class Dictionary {
         switch (lang) {
             case 'en' : 
                 //this will return a structure that will be passed into createFromData()
-                items.put(0,new DictionaryItem(0,'ws_dlg_title','Workspace'));
-                items.put(1,new DictionaryItem(1,'ws_dlg_ok_button','OK'));
-                items.put(2,new DictionaryItem(2,'ws_dlg_cancel_button','Cancel'));
-                items.put(4,new DictionaryItem(4,'prefs_dlg_title','Preferences'));
-                items.put(5,new DictionaryItem(5,'prefs_dlg_ok','OK'));
-                items.put(6,new DictionaryItem(6,'prefs_dlg_cancel','Cancel'));
-                items.put(7,new DictionaryItem(7,'prefs_dlg_lng_lbl','Language'));
-                items.put(8,new DictionaryItem(8,'prefs_dlg_theme_lbl','Theme'));
+                items.put(0,new DictionaryItem(0,'Workspace'));
+                items.put(1,new DictionaryItem(1,'OK'));
+                items.put(2,new DictionaryItem(2,'Cancel'));
+                items.put(4,new DictionaryItem(4,'Preferences'));
+                items.put(5,new DictionaryItem(5,'OK'));
+                items.put(6,new DictionaryItem(6,'Cancel'));
+                items.put(7,new DictionaryItem(7,'Language'));
+                items.put(8,new DictionaryItem(8,'Theme'));
                 
                 //--Menu Items
-                items.put(9,new DictionaryItem(9,'mnu_file_new','New'));
-                items.put(10,new DictionaryItem(10,'mnu_file_open','Open'));
-                items.put(11,new DictionaryItem(11,'mnu_file_revert','Revert'));
-                items.put(12,new DictionaryItem(12,'mnu_file_close','Close'));
-                items.put(13,new DictionaryItem(13,'mnu_file_save','Save'));
-                items.put(14,new DictionaryItem(14,'mnu_tools_trans','Draw Transition'));
-                items.put(15,new DictionaryItem(15,'mnu_tools_opt','Draw Optional'));
-                items.put(16,new DictionaryItem(16,'mnu_tools_prefs','Preferences'));
-                items.put(17,new DictionaryItem(17,'mnu_file','File'));
-                items.put(18,new DictionaryItem(18,'mnu_tools','Tools'));
-                items.put(19,new DictionaryItem(19,'mnu_help','Help'));
-                items.put(20,new DictionaryItem(20,'mnu_help_abt','About'));
-                items.put(21,new DictionaryItem(21,'mnu_tools_prefs','Preferences'));
+                items.put(9,new DictionaryItem(9,'New'));
+                items.put(10,new DictionaryItem(10,'Open'));
+                items.put(11,new DictionaryItem(11,'Revert'));
+                items.put(12,new DictionaryItem(12,'Close'));
+                items.put(13,new DictionaryItem(13,'Save'));
+                items.put(14,new DictionaryItem(14,'Draw Transition'));
+                items.put(15,new DictionaryItem(15,'Draw Optional'));
+                items.put(16,new DictionaryItem(16,'Preferences'));
+                items.put(17,new DictionaryItem(17,'File'));
+                items.put(18,new DictionaryItem(18,'Tools'));
+                items.put(19,new DictionaryItem(19,'Help'));
+                items.put(20,new DictionaryItem(20,'About'));
+                items.put(21,new DictionaryItem(21,'Preferences'));
 
                 break;
             case 'fr' : 
                 //FRENCH TEXT
-                items.put(0,new DictionaryItem(0,'ws_dlg_title','zone de travail'));
-                items.put(1,new DictionaryItem(1,'ws_dlg_ok_button','OK'));
-                items.put(2,new DictionaryItem(2,'ws_dlg_cancel_button','Annuler'));
-                items.put(4,new DictionaryItem(4,'prefs_dlg_title','Préférences'));
-                items.put(5,new DictionaryItem(5,'prefs_dlg_ok','OK'));
-                items.put(6,new DictionaryItem(6,'prefs_dlg_cancel','Annuler'));
-                items.put(7,new DictionaryItem(7,'prefs_dlg_lng_lbl','Langue'));
-                items.put(8,new DictionaryItem(8,'prefs_dlg_theme_lbl','Thème'));
+                items.put(0,new DictionaryItem(0,'zone de travail'));
+                items.put(1,new DictionaryItem(1,'OK'));
+                items.put(2,new DictionaryItem(2,'Annuler'));
+                items.put(4,new DictionaryItem(4,'Préférences'));
+                items.put(5,new DictionaryItem(5,'OK'));
+                items.put(6,new DictionaryItem(6,'Annuler'));
+                items.put(7,new DictionaryItem(7,'Langue'));
+                items.put(8,new DictionaryItem(8,'Thème'));
 
                 //--Menu Items
-                items.put(9,new DictionaryItem(9,'mnu_file_new','Nouveau'));
-                items.put(10,new DictionaryItem(10,'mnu_file_open','Ouvert'));
-                items.put(11,new DictionaryItem(11,'mnu_file_revert','Retournez'));
-                items.put(12,new DictionaryItem(12,'mnu_file_close','Fin'));
-                items.put(13,new DictionaryItem(13,'mnu_file_save','Save'));
-                items.put(14,new DictionaryItem(14,'mnu_tools_trans','Aspiration Transitoire'));
-                items.put(15,new DictionaryItem(15,'mnu_tools_opt','Aspiration Facultative'));
-                items.put(16,new DictionaryItem(16,'mnu_tools_prefs','Préférences'));
-                items.put(17,new DictionaryItem(17,'mnu_file','Fichier'));
-                items.put(18,new DictionaryItem(18,'mnu_tools','Outils'));
-                items.put(19,new DictionaryItem(19,'mnu_tools','Aide'));
-                items.put(20,new DictionaryItem(20,'mnu_help_abt','À propos de...'));
-                items.put(21,new DictionaryItem(21,'mnu_tools_prefs','Préférences'));
+                items.put(9,new DictionaryItem(9,'Nouveau'));
+                items.put(10,new DictionaryItem(10,'Ouvert'));
+                items.put(11,new DictionaryItem(11,'Retournez'));
+                items.put(12,new DictionaryItem(12,'Fin'));
+                items.put(13,new DictionaryItem(13,'Save'));
+                items.put(14,new DictionaryItem(14,'Aspiration Transitoire'));
+                items.put(15,new DictionaryItem(15,'Aspiration Facultative'));
+                items.put(16,new DictionaryItem(16,'Préférences'));
+                items.put(17,new DictionaryItem(17,'Fichier'));
+                items.put(18,new DictionaryItem(18,'Outils'));
+                items.put(19,new DictionaryItem(19,'Aide'));
+                items.put(20,new DictionaryItem(20,'À propos de...'));
+                items.put(21,new DictionaryItem(21,'Préférences'));
                 break;
             default :
         }
-    }
+        //Dispatch load event 
+        dispatchEvent({type:'load',target:this});
+   }
     
     /**
     * Returns the currently selected language
