@@ -367,7 +367,7 @@
 			</path> 
 
 			<echo>Deploying the ISMCP tool</echo>
-<!--		
+	
 			<java
 				classname="org.lamsfoundation.lams.tool.deploy.Deploy"
 				classpathref="deploy.classpath"
@@ -375,6 +375,6 @@
 					<arg file="${build.deploy}/deploy.properties"/>
 					<arg value="True"/> 
 			</java>
--->						
+						
 		</target>
 </project>
