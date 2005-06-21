@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="test/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3RDPARTY"/>
+	<classpathentry kind="lib" path="D:/eclipse/workspace/lams_tool_qna/lib/j2ee.jar"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>

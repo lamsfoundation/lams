@@ -1,0 +1,451 @@
+/*
+ * ozgurd
+ * Created on 26/04/2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+package org.lamsfoundation.lams.tool.qa.web;
+
+/**
+ * ActionForm for the Authoring environment
+ */
+import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
+import org.lamsfoundation.lams.tool.qa.QaAppConstants;
+
+/**
+ * @author ozgurd
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class QaAuthoringForm extends ActionForm implements QaAppConstants {
+	static Logger logger = Logger.getLogger(QaAuthoringForm.class.getName());
+	
+	//controllers
+	protected String addContent;
+	protected String removeContent;
+	protected String removeAllContent;
+	protected String submitAllContent;
+	protected String submitTabDone;
+	
+	//tab controller, these may go away once the Flash wraps the jsp
+	protected String choice;
+	protected String choiceBasic;
+	protected String choiceAdvanced;
+	protected String choiceInstructions;
+	
+	//basic content
+	protected String title;
+	protected String instructions;
+	protected String questionIndex;
+	protected String isRemoveContent;
+	protected String toolContentId;
+	//instructions content
+	protected String onlineInstructions;
+	protected String offlineInstructions;
+	//advanced content
+	protected String synchInMonitor;
+	protected String reportTitle;
+	protected String monitoringReportTitle;
+	protected String endLearningMessage;
+	protected String usernameVisible;
+	protected String questionsSequenced;
+
+	//proxy controllers for Monitoring tabs 
+	protected String summaryMonitoring;
+	protected String instructionsMonitoring;
+	protected String editActivityMonitoring;
+	protected String statsMonitoring;
+
+	protected String edit;
+	
+	public void resetUserAction()
+    {
+    	this.addContent=null;	
+    	this.removeContent=null;
+    	this.removeAllContent=null;
+    	this.submitAllContent=null;
+    	this.submitTabDone=null;
+    	
+    	this.summaryMonitoring=null;
+    	this.instructionsMonitoring=null;
+    	this.editActivityMonitoring=null;
+    	this.statsMonitoring=null;
+    	this.edit=null;
+    }
+	
+	public void reset()
+	{
+		this.addContent=null;
+		this.removeContent=null;
+		this.removeAllContent=null;
+		this.submitAllContent=null;
+		this.submitTabDone=null;
+
+		this.choice=null;
+		this.choiceBasic=null;
+		this.choiceAdvanced=null;
+		this.choiceInstructions=null;
+		
+		this.title=null;
+		this.instructions=null;
+		this.questionIndex=null;
+		this.isRemoveContent=null;
+		this.toolContentId=null;
+
+		this.onlineInstructions=null;
+		this.offlineInstructions=null;
+	
+		this.endLearningMessage=null;
+		this.synchInMonitor=null;
+		this.reportTitle=null;
+		this.monitoringReportTitle=null;
+		this.questionsSequenced=null;
+    	
+		this.summaryMonitoring=null;
+    	this.instructionsMonitoring=null;
+    	this.editActivityMonitoring=null;
+    	this.statsMonitoring=null;
+    	this.edit=null;
+	}
+	
+	public void resetRadioBoxes()
+	{
+		this.synchInMonitor		=OPTION_OFF;
+		this.usernameVisible	=OPTION_OFF;
+		this.questionsSequenced	=OPTION_OFF;
+		logger.debug(logger + " " + this.getClass().getName() +  "resetting RadioBoxes to:  " + this.getSynchInMonitor());
+	}
+
+	
+	/**
+	 * @return Returns the isRemoveContent.
+	 */
+	public String getIsRemoveContent() {
+		return isRemoveContent;
+	}
+	/**
+	 * @param isRemoveContent The isRemoveContent to set.
+	 */
+	public void setIsRemoveContent(String isRemoveContent) {
+		this.isRemoveContent = isRemoveContent;
+	}
+	/**
+	 * @return Returns the questionIndex.
+	 */
+	public String getQuestionIndex() {
+		return questionIndex;
+	}
+	/**
+	 * @param questionIndex The questionIndex to set.
+	 */
+	public void setQuestionIndex(String questionIndex) {
+		this.questionIndex = questionIndex;
+	}
+	
+	/**
+	 * @return Returns the addContent.
+	 */
+	public String getAddContent() {
+		return addContent;
+	}
+	/**
+	 * @param addContent The addContent to set.
+	 */
+	public void setAddContent(String addContent) {
+		this.addContent = addContent;
+	}
+	/**
+	 * @return Returns the removeContent.
+	 */
+	public String getRemoveContent() {
+		return removeContent;
+	}
+	/**
+	 * @param removeContent The removeContent to set.
+	 */
+	public void setRemoveContent(String removeContent) {
+		this.removeContent = removeContent;
+	}
+	/**
+	 * @return Returns the removeAllContent.
+	 */
+	public String getRemoveAllContent() {
+		return removeAllContent;
+	}
+	/**
+	 * @param removeAllContent The removeAllContent to set.
+	 */
+	public void setRemoveAllContent(String removeAllContent) {
+		this.removeAllContent = removeAllContent;
+	}
+	/**
+	 * @return Returns the submitAllContent.
+	 */
+	public String getSubmitAllContent() {
+		return submitAllContent;
+	}
+	/**
+	 * @param submitAllContent The submitAllContent to set.
+	 */
+	public void setSubmitAllContent(String submitAllContent) {
+		this.submitAllContent = submitAllContent;
+	}
+	/**
+	 * @return Returns the instructions.
+	 */
+	public String getInstructions() {
+		return instructions;
+	}
+	/**
+	 * @param instructions The instructions to set.
+	 */
+	public void setInstructions(String instructions) {
+		this.instructions = instructions;
+	}
+	/**
+	 * @return Returns the title.
+	 */
+	public String getTitle() {
+		return title;
+	}
+	/**
+	 * @param title The title to set.
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	/**
+	 * @return Returns the toolContentId.
+	 */
+	public String getToolContentId() {
+		return toolContentId;
+	}
+	/**
+	 * @param toolContentId The toolContentId to set.
+	 */
+	public void setToolContentId(String toolContentId) {
+		this.toolContentId = toolContentId;
+	}
+	/**
+	 * @return Returns the offlineInstructions.
+	 */
+	public String getOfflineInstructions() {
+		return offlineInstructions;
+	}
+	/**
+	 * @param offlineInstructions The offlineInstructions to set.
+	 */
+	public void setOfflineInstructions(String offlineInstructions) {
+		this.offlineInstructions = offlineInstructions;
+	}
+	/**
+	 * @return Returns the onlineInstructions.
+	 */
+	public String getOnlineInstructions() {
+		return onlineInstructions;
+	}
+	/**
+	 * @param onlineInstructions The onlineInstructions to set.
+	 */
+	public void setOnlineInstructions(String onlineInstructions) {
+		this.onlineInstructions = onlineInstructions;
+	}
+	
+	/**
+	 * @return Returns the syncInMonitor.
+	 */
+	public String getSynchInMonitor() {
+		return synchInMonitor;
+	}
+	/**
+	 * @param syncInMonitor The syncInMonitor to set.
+	 */
+	public void setSynchInMonitor(String synchInMonitor) {
+		this.synchInMonitor = synchInMonitor;
+	}
+	
+	/**
+	 * @return Returns the choiceAdvanced.
+	 */
+	public String getChoiceAdvanced() {
+		return choiceAdvanced;
+	}
+	/**
+	 * @param choiceAdvanced The choiceAdvanced to set.
+	 */
+	public void setChoiceAdvanced(String choiceAdvanced) {
+		this.choiceAdvanced = choiceAdvanced;
+	}
+	/**
+	 * @return Returns the choiceBasic.
+	 */
+	public String getChoiceBasic() {
+		return choiceBasic;
+	}
+	/**
+	 * @param choiceBasic The choiceBasic to set.
+	 */
+	public void setChoiceBasic(String choiceBasic) {
+		this.choiceBasic = choiceBasic;
+	}
+	/**
+	 * @return Returns the choiceInstructions.
+	 */
+	public String getChoiceInstructions() {
+		return choiceInstructions;
+	}
+	/**
+	 * @param choiceInstructions The choiceInstructions to set.
+	 */
+	public void setChoiceInstructions(String choiceInstructions) {
+		this.choiceInstructions = choiceInstructions;
+	}
+	/**
+	 * @return Returns the choice.
+	 */
+	public String getChoice() {
+		return choice;
+	}
+	/**
+	 * @param choice The choice to set.
+	 */
+	public void setChoice(String choice) {
+		this.choice = choice;
+	}
+	/**
+	 * @return Returns the reportTitle.
+	 */
+	public String getReportTitle() {
+		return reportTitle;
+	}
+	/**
+	 * @param reportTitle The reportTitle to set.
+	 */
+	public void setReportTitle(String reportTitle) {
+		this.reportTitle = reportTitle;
+	}
+	/**
+	 * @return Returns the usernameVisible.
+	 */
+	public String getUsernameVisible() {
+		return usernameVisible;
+	}
+	/**
+	 * @param usernameVisible The usernameVisible to set.
+	 */
+	public void setUsernameVisible(String usernameVisible) {
+		this.usernameVisible = usernameVisible;
+	}
+	/**
+	 * @return Returns the submitTabDone.
+	 */
+	public String getSubmitTabDone() {
+		return submitTabDone;
+	}
+	/**
+	 * @param submitTabDone The submitTabDone to set.
+	 */
+	public void setSubmitTabDone(String submitTabDone) {
+		this.submitTabDone = submitTabDone;
+	}
+	
+	/**
+	 * @return Returns the questionsSequenced.
+	 */
+	public String getQuestionsSequenced() {
+		return questionsSequenced;
+	}
+	/**
+	 * @param questionsSequenced The questionsSequenced to set.
+	 */
+	public void setQuestionsSequenced(String questionsSequenced) {
+		this.questionsSequenced = questionsSequenced;
+	}
+	/**
+	 * @return Returns the endLearningMessage.
+	 */
+	public String getEndLearningMessage() {
+		return endLearningMessage;
+	}
+	/**
+	 * @param endLearningMessage The endLearningMessage to set.
+	 */
+	public void setEndLearningMessage(String endLearningMessage) {
+		this.endLearningMessage = endLearningMessage;
+	}
+	/**
+	 * @return Returns the monitoringReportTitle.
+	 */
+	public String getMonitoringReportTitle() {
+		return monitoringReportTitle;
+	}
+	/**
+	 * @param monitoringReportTitle The monitoringReportTitle to set.
+	 */
+	public void setMonitoringReportTitle(String monitoringReportTitle) {
+		this.monitoringReportTitle = monitoringReportTitle;
+	}
+	/**
+	 * @return Returns the editActivityMonitoring.
+	 */
+	public String getEditActivityMonitoring() {
+		return editActivityMonitoring;
+	}
+	/**
+	 * @param editActivityMonitoring The editActivityMonitoring to set.
+	 */
+	public void setEditActivityMonitoring(String editActivityMonitoring) {
+		this.editActivityMonitoring = editActivityMonitoring;
+	}
+	/**
+	 * @return Returns the instructionsMonitoring.
+	 */
+	public String getInstructionsMonitoring() {
+		return instructionsMonitoring;
+	}
+	/**
+	 * @param instructionsMonitoring The instructionsMonitoring to set.
+	 */
+	public void setInstructionsMonitoring(String instructionsMonitoring) {
+		this.instructionsMonitoring = instructionsMonitoring;
+	}
+	/**
+	 * @return Returns the statsMonitoring.
+	 */
+	public String getStatsMonitoring() {
+		return statsMonitoring;
+	}
+	/**
+	 * @param statsMonitoring The statsMonitoring to set.
+	 */
+	public void setStatsMonitoring(String statsMonitoring) {
+		this.statsMonitoring = statsMonitoring;
+	}
+	/**
+	 * @return Returns the summaryMonitoring.
+	 */
+	public String getSummaryMonitoring() {
+		return summaryMonitoring;
+	}
+	/**
+	 * @param summaryMonitoring The summaryMonitoring to set.
+	 */
+	public void setSummaryMonitoring(String summaryMonitoring) {
+		this.summaryMonitoring = summaryMonitoring;
+	}
+	/**
+	 * @return Returns the edit.
+	 */
+	public String getEdit() {
+		return edit;
+	}
+	/**
+	 * @param edit The edit to set.
+	 */
+	public void setEdit(String edit) {
+		this.edit = edit;
+	}
+}

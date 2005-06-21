@@ -1,0 +1,1 @@
+Class-Path: ./lams.jar ./lams-tool-questionAnswer.jar ./FCKeditor-2.1.jar ./lams_contentrepository.jar

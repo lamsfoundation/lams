@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+
+<class 
+    name="org.lamsfoundation.lams.tool.qa.QaQueUsr" 
+    table="tl_laqa11_que_usr"
+>
+    <id
+        name="queUsrId"
+        type="java.lang.Long"
+        column="que_usr_id"
+    >
+        <generator class="increment" />
+    </id>
+
+    <property
+        name="username"
+        type="java.lang.String"
+        column="username"
+        length="100"
+    >
+    </property>
+    <property
+        name="fullname"
+        type="java.lang.String"
+        column="fullname"
+        length="100"
+    >
+    </property>
+
+    
+    <many-to-one
+        name="qaSession"
+        class="org.lamsfoundation.lams.tool.qa.QaSession"
+        cascade="none"
+        outer-join="auto"
+        update="true"
+        insert="true"
+        access="property"
+    >
+        <column name="qa_session_id" />
+    </many-to-one>
+    
+  
+	<many-to-one
+            name="qaQueContent"
+            class="org.lamsfoundation.lams.tool.qa.QaQueContent"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            access="property"
+        >
+            <column
+                name="qa_que_content_id" 
+            />
+    </many-to-one>
+
+    <set
+            name="qaUsrResps"
+            lazy="false"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+              <key
+                  column="que_usr_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.qa.QaUsrResp"
+              />
+   </set>
+
+
+</class>
+</hibernate-mapping>
