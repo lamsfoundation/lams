@@ -27,14 +27,16 @@ public class ForumManagerImpl implements ForumManager {
     }
 
     public Forum createForum(Forum forum, List attachments) throws PersistenceException {
-        Set documents = new HashSet();
-        Iterator it = attachments.iterator();
-        while (it.hasNext()) {
-            Attachment attachment = (Attachment) it.next();
-            persistenceDelegate.saveOrUpdate(attachment);
-            documents.add(attachment);
+        if (attachments != null && attachments.size() !=0) {
+            Set documents = new HashSet();
+            Iterator it = attachments.iterator();
+            while (it.hasNext()) {
+                Attachment attachment = (Attachment) it.next();
+                persistenceDelegate.saveOrUpdate(attachment);
+                documents.add(attachment);
+            }
+            forum.setAttachments(documents);
         }
-        forum.setAttachments(documents);
         persistenceDelegate.saveOrUpdate(forum);
         return forum;
     }
