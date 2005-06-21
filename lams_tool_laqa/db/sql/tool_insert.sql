@@ -27,10 +27,10 @@ create_date_time
 )
 VALUES
 (
-'laicp10',
-'ImscpService',
-'IMS Content Package Reader',
-'Displays an imported IMS Content Package File.',
+'laqa11',
+'qaService',
+'Question and Answer',
+'Question and Answer Tool Description',
 NULL,
 NULL,
 0,

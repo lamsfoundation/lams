@@ -45,8 +45,8 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'Displays an imported IMS Content Package File.'
-, 'IMS Content Package Reader'
+, 'Question and Answer Description'
+, 'Question and Answer'
 , 'Put some help text here.'
 , NULL
 , NULL
@@ -77,7 +77,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, '/tool/images/tree_expand_L_node.gif'
+, '/lams/tool/laqa11/images/icon_questionanswer.swf'
 , NULL
 , NULL
 , NULL

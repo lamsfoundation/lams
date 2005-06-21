@@ -11,8 +11,8 @@ create_date_time
 )
 VALUES
 (
-'Displays an imported IMS Content Package File.',
-'IMS Content Package Reader',
+'Question and Answer Learning Library Description',
+'Question and Answer',
 0,
 NOW()
 )
