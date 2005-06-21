@@ -25,22 +25,45 @@ class LFMenuBar extends MovieClip {
     
     private var app:Application;
     private var tm:ThemeManager;
-
+	private var _dictionary:Dictionary;
+    
+    //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
+    private var dispatchEvent:Function;     
+    public var addEventListener:Function;
+    public var removeEventListener:Function;    
+    
     //Constructor    
     function LFMenuBar(){
+        mx.events.EventDispatcher.initialize(this);
         //Set up init for next frame and make invisible this frame
         this.onEnterFrame = init;
         this._visible = false;
         
-        //Get a reference to the application
+        //Get a reference to the application, ThemeManager and Dictionary
         app = Application.getInstance();
         tm = ThemeManager.getInstance();
+		_dictionary = Dictionary.getInstance();
+		_dictionary.addEventListener('init',Delegate.create(this,setupMenuItems));
     }
 
     public function init() {
-        //Kill enter frame and make visible now its initiated
-        this._visible = true;
+		Debugger.log('init called',Debugger.GEN,'init','LFMenuBar');
+
+        //Kill enter frame 
         delete this.onEnterFrame;
+        
+        //Register for theme changed events and set Initial style
+        tm.addEventListener('themeChanged',this);
+        //setStyles();
+        //Broadcast event
+        dispatchEvent({type:'load',target:this});
+    } 
+	
+	/**
+	* Set up the actual menu items
+	*/
+	private function setupMenuItems(){
+
         /*=================
             FILE MENU
         =================*/
@@ -77,14 +100,16 @@ class LFMenuBar extends MovieClip {
         // register the listeners with the separate menus
         file_menu.addEventListener("change", Delegate.create(this,fileMenuClicked));
         tools_menu.addEventListener("change", Delegate.create(this,toolsMenuClicked));
-        
-        //Register for theme changed events and set Initial style
-        tm.addEventListener('themeChanged',this);
-        setStyles();
-    }  
+		
+		//Now that menu items have been set up make the menu bar visible
+		this._visible = true;
+
+	}
     
     /**
-    * 
+    * Size function
+	* @param w:Number	width
+	* @param h:Number	height
     */
     public function setSize(w:Number,h:Number) {
         _mb.setSize(w,h);
@@ -126,11 +151,12 @@ class LFMenuBar extends MovieClip {
     * it is up to listeners to then query Style Manager for relevant style info
     */
     public function themeChanged(event:Object){
+        Debugger.log('themeChanged',Debugger.GEN,'themeChanged','LFMenuBar');        
         if(event.type=='themeChanged'){
             //Theme has changed so update objects to reflect new styles
             setStyles();
         }else {
-            Debugger.log('themeChanged event broadcast with an object.type not equal to "themeChanged"',Debugger.CRITICAL,'themeChanged','org.lamsfoundation.lams.WorkspaceDialog');
+            Debugger.log('themeChanged event broadcast with an object.type not equal to "themeChanged"',Debugger.CRITICAL,'themeChanged','LFMenuBar');
         }
     }
     
@@ -140,5 +166,9 @@ class LFMenuBar extends MovieClip {
     private function setStyles() {
         var styleObj = tm.getStyleObject('LFMenuBar');
         _mb.setStyle('styleName',styleObj);
+    }
+    
+    function get className():String { 
+        return 'LFMenuBar';
     }
 }
