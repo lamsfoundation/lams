@@ -289,7 +289,7 @@ values
 1,null,0,0,
 null,1,'20050101','Offline Instructions ',0,
 null,null,1,1,
-null,null,null,'NotebookImage',
+null,null,null,'/lams/images/icon_journal.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -303,7 +303,7 @@ values
 1,null,0,0,
 null,2,'20050101','Offline  Instructions ',0,
 null,null,2,2,
-null,null,null,'NoticeBoardImage',
+null,null,null,'/lams/images/icon_noticeboard.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -317,7 +317,7 @@ values
 1,null,0,0,
 null,3,'20050101','Offline  Instructions ',0,
 null,null,3,3,
-null,null,null,'MultipleChoiceImage',
+null,null,null,'missing.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -331,7 +331,7 @@ values
 1,null,0,0,
 null,4,'20050101','Offline  Instructions ',0,
 null,null,4,4,
-null,null,null,'QAImage',
+null,null,null,'/lams/tool/laqa/images/icon_questionanswer.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -345,7 +345,7 @@ values
 1,null,0,0,
 null,5,'20050101','Offline  Instructions ',0,
 null,null,5,5,
-null,null,null,'MBImage',
+null,null,null,'/lams/images/icon_messageboard.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -359,7 +359,7 @@ values
 1,null,0,0,
 null,6,'20050101','Offline  Instructions ',0,
 null,null,6,6,
-null,null,null,'SurveyImage',
+null,null,null,'/lams/images/icon_survey.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -373,7 +373,7 @@ values
 1,null,0,0,
 null,7,'20050101','Offline  Instructions ',0,
 null,null,7,7,
-null,null,null,'ChatImage',
+null,null,null,'/lams/images/icon_chat.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -387,7 +387,7 @@ values
 1,null,0,0,
 null,8,'20050101','Offline  Instructions ',0,
 null,null,8,8,
-null,null,null,'SRImage',
+null,null,null,'/lams/images/icon_singleresource.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -401,7 +401,7 @@ values
 1,null,0,0,
 null,9,'20050101','Offline  Instructions ',0,
 null,null,9,9,
-null,null,null,'VotingImage',
+null,null,null,'/lams/images/icon_ranking.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -415,7 +415,7 @@ values
 1,null,0,0,
 null,10,'20050101','Offline  Instructions ',0,
 null,null,10,10,
-null,null,null,'SubmitFilesImage',
+null,null,null,'/lams/images/icon_reportsubmission.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -429,7 +429,7 @@ values
 1,null,0,0,
 null,11,'20050101','Offline  Instructions ',0,
 null,null,11,11,
-null,null,null,'IMImage',
+null,null,null,'missing.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity
@@ -444,7 +444,7 @@ values
 7,null,1,0,
 1,null,'20050101','Offline Instructions ',0,
 1,1,null,null,
-null,'20050101','20050101','image',
+null,'20050101','20050101','missing.swf',
 3,1,'Online Instructions',1);
 
 insert into lams_learning_activity
@@ -459,7 +459,7 @@ values
 6,null,1,0,
 1,null,'20050101','Parallel Activity Offline  Instructions ',0,
 null,null,null,null,
-null,null,null,'image',
+null,null,null,'missing.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity
@@ -474,7 +474,7 @@ values
 8,null,1,0,
 1,null,'20050101','Sequence Activity Offline  Instructions ',0,
 null,null,null,null,
-null,null,null,'image',
+null,null,null,'missing.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity
@@ -489,7 +489,7 @@ values
 1,null,1,0,
 1,1,'20050101','Notebook Activity Offline  Instructions ',0,
 null,null,1,12,
-null,null,null,'image',
+null,null,null,'/lams/images/icon_journal.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity
@@ -504,7 +504,7 @@ values
 1,null,0,0,
 1,2,'20050101','NoticeBoard Activity Offline  Instructions ',0,
 null,null,2,13,
-null,null,null,'image',
+null,null,null,'/lams/images/icon_noticeboard.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity
@@ -519,7 +519,7 @@ values
 1,null,1,0,
 1,3,'20050101','Tool Activity Offline  Instructions ',0,
 null,null,3,14,
-null,null,null,'image',
+null,null,null,'missing.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity
@@ -534,7 +534,7 @@ values
 1,null,0,1,
 1,4,'20050101','Tool Activity Offline  Instructions ',0,
 null,null,4,15,
-null,null,null,'image',
+null,null,null,'/lams/tool/laqa/images/icon_questionanswer.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity
@@ -549,7 +549,7 @@ values
 1,100,1,0,
 1,5,'20050101','Tool Activity Offline  Instructions ',0,
 null,null,5,16,
-null,null,null,'image',
+null,null,null,'/lams/images/icon_messageboard.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity
@@ -564,7 +564,7 @@ values
 1,null,0,1,
 1,6,'20050101','Tool Activity Offline  Instructions ',0,
 null,null,6,17,
-null,null,null,'image',
+null,null,null,'/lams/images/icon_survey.swf',
 1,0,'Online Instructions',1);
 
 insert into lams_learning_activity
@@ -597,7 +597,7 @@ null,null,null,
 null,null,
 null,null,
 null,null,
-'ChatImage',
+'/lams/images/icon_chat.swf',
 null,null,
 7,
 2,1,'Online Instructions',1);
@@ -614,7 +614,7 @@ values
 1,null,0,0,
 1,8,'20050101','Tool Activity Offline  Instructions ',0,
 null,null,8,19,
-null,null,null,'image',
+null,null,null,'/lams/images/icon_singleresource.swf',
 1,0,'Online Instructions',1);
 
 -- Sample GroupingActivity with RandomGrouping 
@@ -649,7 +649,7 @@ null,null,
 null,null,
 null,null,
 null,null,
-'RandomGroupingActivityImage',
+'missing.swf',
 99,99,
 null,
 1,0,'Online Instructions',1);
@@ -684,7 +684,7 @@ null,null,null,
 null,null,
 null,null,
 null,null,
-'QNAImage',
+'/lams/tool/laqa/images/icon_questionanswer.swf',
 null,null,
 4,
 2,1,'Online Instructions',1);
@@ -719,7 +719,7 @@ null,null,null,
 null,null,
 null,null,
 null,null,
-'QNAImage',
+'/lams/tool/laqa/images/icon_questionanswer.swf',
 null,null,
 4,
 1,0,'Online Instructions',1);
@@ -756,7 +756,7 @@ null,null,
 3,0,
 null,null,
 null,null,
-'SynchGateImage',
+'missing.swf',
 null,null,
 null,
 1,0,'Online Instructions',1);
@@ -791,7 +791,7 @@ null,null,
 3,0,
 1,2,
 null,null,
-'ScheduleGateImage',
+'missing.swf',
 null,null,
 null,
 1,0,'Online Instructions',1);
@@ -826,7 +826,7 @@ null,null,
 3,0,
 null,null,
 null,null,
-'PermissionGateImage',
+'missing.swf',
 null,null,
 null,
 1,0,'Online Instructions',1);
