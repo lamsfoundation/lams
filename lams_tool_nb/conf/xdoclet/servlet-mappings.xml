@@ -3,3 +3,7 @@
 	    <url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 	
+	<servlet-mapping>
+	    <servlet-name>Connector</servlet-name>
+	    <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+	</servlet-mapping>

@@ -1,0 +1,6 @@
+<!-- Struts Tag Library Descriptors -->
+
+<taglib>
+    <taglib-uri>fck-editor</taglib-uri>
+    <taglib-location>/WEB-INF/fckEditor/tlds/FCKeditor.tld</taglib-location>
+</taglib>
