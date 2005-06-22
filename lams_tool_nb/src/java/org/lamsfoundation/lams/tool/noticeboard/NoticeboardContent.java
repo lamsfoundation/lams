@@ -23,7 +23,7 @@ package org.lamsfoundation.lams.tool.noticeboard;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.HashSet;
 
 /**
  * Persistent noticeboard object/bean that defines the content for the noticeboard tool.
@@ -34,6 +34,9 @@ import java.util.TreeSet;
 public class NoticeboardContent implements Serializable {
 	
 	/** identifier field */
+    private Long uid;
+    
+    /** non-nullable persistent field */
 	private Long nbContentId;
 	
 	/** nullable persistent field */
@@ -81,8 +84,7 @@ public class NoticeboardContent implements Serializable {
 							  boolean forceOffline,
 							  Long creatorUserId,
 							  Date dateCreated,
-							  Date dateUpdated,
-							  Set nbSessions)
+							  Date dateUpdated)
 	{
 		this.nbContentId = nbContentId;
 		this.title = title;
@@ -94,7 +96,6 @@ public class NoticeboardContent implements Serializable {
 		this.creatorUserId = creatorUserId;
 		this.dateCreated = dateCreated;
 		this.dateUpdated = dateUpdated;
-		this.nbSessions = nbSessions;
 	}
 	
 	/**
@@ -119,10 +120,10 @@ public class NoticeboardContent implements Serializable {
 		this.creatorUserId = null;
 		this.dateCreated = dateCreated;
 		this.dateUpdated = null;
-		this.nbSessions = new TreeSet();
 	}
 	
 	
+    
 	/**
 	 *		 @hibernate.property
      *       column="content"
@@ -207,11 +208,10 @@ public class NoticeboardContent implements Serializable {
 	
 	
 	/** 
-	 *		@hibernate.id
-     *      generator-class="assigned"
-     *      type="java.lang.Long"
+	 *		@hibernate.property
      *      column="nb_content_id"
-     * 
+     *      length="20"
+     *      not-null="true"
      */
 	
 	public Long getNbContentId() {
@@ -234,7 +234,7 @@ public class NoticeboardContent implements Serializable {
 	public Set getNbSessions() {
 		if (this.nbSessions == null)
 		{
-			setNbSessions(new TreeSet());
+			setNbSessions(new HashSet());
 		}
 		return nbSessions;
 	}
@@ -284,6 +284,23 @@ public class NoticeboardContent implements Serializable {
 		this.title = title;
 	}
 	
+	 /**
+      * 	@hibernate.id
+      *     generator-class="native"
+      *     type="java.lang.Long"
+      *     column="uid"
+      *     unsaved-value="0"
+      */
+    public Long getUid() {
+        return uid;
+    }
+    
+    public void setUid(Long uid) {
+        this.uid = uid;
+    }
+	
+	
+	
 	/** 
 	 * 
 	 * @param nb			NoticeboardContent object containing the content to copy from
@@ -301,8 +318,8 @@ public class NoticeboardContent implements Serializable {
 														nb.isForceOffline(),
 														nb.getCreatorUserId(),
 														nb.getDateCreated(),
-														nb.getDateUpdated(),
-														new TreeSet());
+														nb.getDateUpdated());
 		return newContent;
 	}
+   
 }

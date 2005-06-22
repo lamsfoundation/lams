@@ -39,12 +39,12 @@ public class NoticeboardSession implements Serializable {
     public static final String COMPLETED = "COMPLETED";
     
 	/** identifier field */
+    private Long uid;
+    
+    /** persistent field*/
 	private Long nbSessionId;
 	
-	/** persistent field */
-//	private Long nbContentId;
-	
-	/** nullable persistent field */
+  	/** nullable persistent field */
 	private Date sessionStartDate;
 		
 	/** nullable persistent field */
@@ -106,21 +106,12 @@ public class NoticeboardSession implements Serializable {
 	public void setNbContent(NoticeboardContent nbContent) {
 		this.nbContent = nbContent;
 	}
-	
-	/*
-	public Long getNbContentId() {
-		return nbContentId;
-	}
-
-	public void setNbContentId(Long nbContentId) {
-		this.nbContentId = nbContentId;
-	}*/
-	
+		
 	/**
-	 *		@hibernate.id
-     *  	generator-class="assigned"
-     *      type="java.lang.Long"
+	 *		@hibernate.property
      *      column="nb_session_id"
+     *      length="20"
+     *      not-null="true"
 	 */
 	public Long getNbSessionId() {
 		return nbSessionId;
@@ -168,4 +159,20 @@ public class NoticeboardSession implements Serializable {
 	public void setSessionStatus(String sessionStatus) {
 		this.sessionStatus = sessionStatus;
 	}
+	
+	/**
+     *	  	@hibernate.id
+     *      generator-class="native"
+     *      type="java.lang.Long"
+     *      column="uid"
+     *      unsaved-value="0"
+     */
+    public Long getUid() {
+        return uid;
+    }
+    
+    public void setUid(Long uid) {
+        this.uid = uid;
+    }
+	
 }
