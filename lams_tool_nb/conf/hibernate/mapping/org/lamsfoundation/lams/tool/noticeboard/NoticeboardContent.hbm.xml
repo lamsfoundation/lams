@@ -21,21 +21,37 @@
     </meta>
 
     <id
-        name="nbContentId"
+        name="uid"
         type="java.lang.Long"
-        column="nb_content_id"
+        column="uid"
+        unsaved-value="0"
     >
         <meta attribute="field-description">
            @hibernate.id
-            generator-class="assigned"
+            generator-class="native"
             type="java.lang.Long"
-            column="nb_content_id"
+            column="uid"
+            unsaved-value="0"
 
 
         </meta>
-        <generator class="assigned" />
+        <generator class="native" />
     </id>
 
+    <property
+        name="nbContentId"
+        type="java.lang.Long"
+        column="nb_content_id"
+        not-null="true"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="nb_content_id"
+            length="20"
+            not-null="true"
+        </meta>    
+    </property>
     <property
         name="title"
         type="java.lang.String"
@@ -147,12 +163,12 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional one-to-many association to TlLanb11Session -->
+    <!-- bi-directional one-to-many association to NoticeboardSession -->
     <set
         name="nbSessions"
         lazy="true"
         inverse="true"
-		cascade="none"
+		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
@@ -161,13 +177,13 @@
             cascade="none"
 
            @hibernate.collection-key
-            column="nb_content_id"
+            column="nb_content_uid"
 
            @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
+            class="org.lamsfoundation.lams.tool.noticeboard.TlLanb11Session"
         </meta>
         <key>
-            <column name="nb_content_id" />
+            <column name="nb_content_uid" />
         </key>
         <one-to-many 
             class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"

@@ -21,21 +21,37 @@
     </meta>
 
     <id
-        name="nbSessionId"
+        name="uid"
         type="java.lang.Long"
-        column="nb_session_id"
+        column="uid"
+        unsaved-value="0"
     >
         <meta attribute="field-description">
            @hibernate.id
-            generator-class="assigned"
+            generator-class="native"
             type="java.lang.Long"
-            column="nb_session_id"
+            column="uid"
+            unsaved-value="0"
 
 
         </meta>
-        <generator class="assigned" />
+        <generator class="native" />
     </id>
 
+    <property
+        name="nbSessionId"
+        type="java.lang.Long"
+        column="nb_session_id"
+        not-null="true"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="nb_session_id"
+            length="20"
+            not-null="true"
+        </meta>    
+    </property>
     <property
         name="sessionStartDate"
         type="java.sql.Timestamp"
@@ -75,18 +91,23 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional many-to-one association to TlLanb11Content -->
+    <!-- bi-directional many-to-one association to NoticeboardContent -->
     <many-to-one
         name="nbContent"
         class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent"
         not-null="true"
+        cascade="none"
+        outer-join="auto"
+        update="true"
+        insert="true"
+        access="property"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
             not-null="true"
-           @hibernate.column name="nb_content_id"         
+           @hibernate.column name="nb_content_uid"         
         </meta>
-        <column name="nb_content_id" />
+        <column name="nb_content_uid" />
     </many-to-one>
 
 </class>
