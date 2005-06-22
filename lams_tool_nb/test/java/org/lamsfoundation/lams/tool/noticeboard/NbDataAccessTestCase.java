@@ -31,7 +31,6 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardContent
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import java.util.Date;
-import java.util.TreeSet;
 
 /**
  * @author mtruong
@@ -52,7 +51,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     protected NoticeboardSession nbSession;
     
     //---------------------------------------------------------------------
-    // Constant data used for Testing
+    // DATA USED FOR TESTING PURPOSES ONLY
     //---------------------------------------------------------------------
     
     protected final long ONE_DAY = 60 * 60 * 1000 * 24;
@@ -73,7 +72,21 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	protected final Long TEST_SESSION_ID = new Long("1400");
 	protected final Date TEST_SESSION_START_DATE = new Date(System.currentTimeMillis());
 	protected final Date TEST_SESSION_END_DATE = new Date(System.currentTimeMillis() + ONE_DAY);
-	protected final String TEST_SESSION_STATUS = "Active";
+	protected final String TEST_SESSION_STATUS = NoticeboardSession.NOT_ATTEMPTED;
+	
+	//---------------------------------------------------------------------
+    // DEFAULT DATA INSERTED BY BUILD-DB ANT TASK
+    //---------------------------------------------------------------------
+	protected final Long DEFAULT_CONTENT_ID = new Long(2500);
+	protected final String DEFAULT_TITLE = "Welcome";
+	protected final String DEFAULT_CONTENT = "Welcome to these activities";
+	protected final String DEFAULT_ONLINE_INSTRUCTIONS = "Enter the online instructions here";
+	protected final String DEFAULT_OFFLINE_INSTRUCTIONS = "Enter the offline instructions here";
+	protected final boolean DEFAULT_DEFINE_LATER = false;
+	protected final boolean DEFAULT_FORCE_OFFLINE = false;
+	protected final Long DEFAULT_CREATOR_USER_ID = new Long(2300);
+	protected final Long DEFAULT_SESSION_ID = new Long(2400);
+	protected final String DEFAULT_SESSION_STATUS = NoticeboardSession.NOT_ATTEMPTED;
 	
 	
 	
@@ -111,32 +124,27 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     
     protected void initNbContentData()
     {
-    	//noticeboardDAO = (NoticeboardContentDao) this.context.getBean("nbContentDAO");
-    	/* Check to see if data exist or not, if not then add to database */
-    	
-    	
-	    	nbContent = new NoticeboardContent(TEST_NB_ID,	
-														TEST_TITLE,
-														TEST_CONTENT,
-														TEST_ONLINE_INSTRUCTIONS,
-														TEST_OFFLINE_INSTRUCTIONS,
-														TEST_DEFINE_LATER,
-														TEST_FORCE_OFFLINE,
-														TEST_CREATOR_USER_ID,
-														TEST_DATE_CREATED,
-														TEST_DATE_UPDATED,
-														new TreeSet()
-					);
+    	  	nbContent = new NoticeboardContent(TEST_NB_ID,	
+												TEST_TITLE,
+												TEST_CONTENT,
+												TEST_ONLINE_INSTRUCTIONS,
+												TEST_OFFLINE_INSTRUCTIONS,
+												TEST_DEFINE_LATER,
+												TEST_FORCE_OFFLINE,
+												TEST_CREATOR_USER_ID,
+												TEST_DATE_CREATED,
+												TEST_DATE_UPDATED);
 	    	
 	    	noticeboardDAO.saveNbContent(nbContent);
 	 
 	}
     
-    protected void cleanNbContentData()
+    protected void cleanNbContentData(Long contentId)
     {
-    	noticeboardDAO.removeNoticeboard(TEST_NB_ID);
+    	noticeboardDAO.removeNoticeboard(contentId);
     }
     
+   
     protected Long getTestNoticeboardId()
     {
         return this.TEST_NB_ID;
@@ -145,7 +153,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     protected void initNbSessionContent()
     {
 
-    	NoticeboardContent nb = noticeboardDAO.getNbContentById(TEST_NB_ID);
+    	NoticeboardContent nb = noticeboardDAO.findNbContentById(TEST_NB_ID);
     	
     	nbSession = new NoticeboardSession(TEST_SESSION_ID,
     									   nb,
@@ -160,29 +168,68 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     	
     }
     
-    protected void cleanNbSessionContent()
-    {
-    	nbSessionDAO.removeNbSession(TEST_SESSION_ID);
-    }
-    
-    protected void cleanNbCopiedContent()
-    {
-    	noticeboardDAO.removeNoticeboard(TEST_COPYNB_ID);
-    }
-    
+   
     protected void initAllData()
     {
     	initNbContentData();
     	initNbSessionContent();    	
     }
     
-    protected void cleanAllData()
+    //===========================
+    // Helper Methods
+    //===========================
+     
+    protected void assertNbSessionIsNull(Long id)
     {
-    	cleanNbSessionContent();
-    	cleanNbContentData();
-    	
+        NoticeboardSession nbSession = nbSessionDAO.findNbSessionById(id);
+   	   assertNull(nbSession);
     }
     
+    protected void assertNbContentIsNull(Long id)
+    {
+        NoticeboardContent nbContent = noticeboardDAO.findNbContentById(id);
+   	   assertNull(nbContent);
+    }
+    
+    protected void assertContentEqualsTestData(NoticeboardContent content)
+    {
+        	
+    		assertEquals(content.getTitle(), TEST_TITLE);
+    		assertEquals(content.getContent(), TEST_CONTENT);
+    		assertEquals(content.getOnlineInstructions(), TEST_ONLINE_INSTRUCTIONS);
+    		assertEquals(content.getOfflineInstructions(), TEST_OFFLINE_INSTRUCTIONS);
+    		assertEquals(content.isDefineLater(), TEST_DEFINE_LATER);
+    		assertEquals(content.isForceOffline(), TEST_FORCE_OFFLINE);
+    		assertEquals(content.getCreatorUserId(), TEST_CREATOR_USER_ID);
+    		assertEquals(content.getDateCreated(), TEST_DATE_CREATED);
+    }
+    
+    protected void assertContentEqualsDefaultData(NoticeboardContent content)
+    {
+        	assertEquals(content.getNbContentId(), DEFAULT_CONTENT_ID);   	
+    		assertEquals(content.getTitle(), DEFAULT_TITLE);
+    		assertEquals(content.getContent(), DEFAULT_CONTENT);
+    		assertEquals(content.getOnlineInstructions(), DEFAULT_ONLINE_INSTRUCTIONS);
+    		assertEquals(content.getOfflineInstructions(), DEFAULT_OFFLINE_INSTRUCTIONS);
+    		assertEquals(content.isDefineLater(), DEFAULT_DEFINE_LATER);
+    		assertEquals(content.isForceOffline(), DEFAULT_FORCE_OFFLINE);
+    		assertEquals(content.getCreatorUserId(), DEFAULT_CREATOR_USER_ID);
+     } 
+    
+    protected void assertEqualsForSessionContent(NoticeboardSession ns)
+    {
+        assertEquals("Validate session id ",ns.getNbSessionId(), TEST_SESSION_ID);
+		assertEquals("Validate content id ",ns.getNbContent().getNbContentId(), TEST_NB_ID);
+		assertEquals("Validate session start date", ns.getSessionStartDate(), TEST_SESSION_START_DATE);
+		assertEquals("Validate session end date", ns.getSessionEndDate(), TEST_SESSION_END_DATE);
+		assertEquals("Validate session status", ns.getSessionStatus(), TEST_SESSION_STATUS);
+    }
+    
+    protected void assertSessionObjectIsNull(Long sessionId)
+    {
+        NoticeboardSession nsObject = nbSessionDAO.findNbSessionById(sessionId);
+        assertNull(nsObject);
+    }
     /*
      * 
      * @author mtruong
