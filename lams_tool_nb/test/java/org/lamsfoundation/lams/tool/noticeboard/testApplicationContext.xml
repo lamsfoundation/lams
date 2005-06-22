@@ -69,7 +69,7 @@
 		<property name="target">
 			<bean class="org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServicePOJO">
 				<property name="nbContentDAO"><ref bean="nbContentDAO"/></property>
-			
+				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
 			</bean>
 		</property>
 	</bean>  
