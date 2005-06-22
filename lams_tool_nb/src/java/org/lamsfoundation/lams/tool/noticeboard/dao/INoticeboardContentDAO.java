@@ -30,9 +30,9 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
  */
 public interface INoticeboardContentDAO {
 	
-	public NoticeboardContent getNbContentById(Long nbContentId);
+	public NoticeboardContent getNbContentByUID(Long uid);
 	
-	public NoticeboardContent loadNbContentById(Long nbContentId);
+	public NoticeboardContent findNbContentById(Long nbContentId);
 	
 	public NoticeboardContent getNbContentBySession(Long nbSessionId);
     
@@ -40,6 +40,8 @@ public interface INoticeboardContentDAO {
     
     public void updateNbContent(NoticeboardContent nbContent);
 
+    public void removeNoticeboard(NoticeboardContent nbContent);
+    
     public void removeNoticeboard(Long nbContentId);
     
     public void removeNbSessions(NoticeboardContent nbContent);

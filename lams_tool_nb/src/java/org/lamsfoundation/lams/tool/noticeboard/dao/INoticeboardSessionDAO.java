@@ -30,14 +30,18 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
  */
 public interface INoticeboardSessionDAO {
 	
-	public NoticeboardSession getNbSessionById(Long nbSessionId);
+	public NoticeboardSession findNbSessionById(Long nbSessionId);
 	
-	public NoticeboardSession loadNbSessionById(Long nbSessionId);
-    
-    public void saveNbSession(NoticeboardSession nbSession);
+	public NoticeboardSession getNbSessionByUID(Long nbSessionId);
+	
+	public void saveNbSession(NoticeboardSession nbSession);
     
     public void updateNbSession(NoticeboardSession nbSession);
 
+    public void removeNbSessionByUID(Long uid);
+    
+    public void removeNbSession(NoticeboardSession nbSession);
+    
     public void removeNbSession(Long nbSessionId);
 
 }
