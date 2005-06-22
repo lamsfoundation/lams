@@ -47,7 +47,6 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	private INoticeboardService nbService = null;
 	
 	private boolean cleanContentData = true;
-	private boolean cleanAllData = true;
 	private boolean cleanCopyContent = false;
 	
 	
@@ -71,21 +70,15 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 		super.tearDown();
 		
 		//delete data
-		 if (cleanAllData)
-	     {
-		 	super.cleanAllData();
-	     }
-	     else
-	     {
-	     	 if(cleanContentData)
-	     	 {
-	     	 	super.cleanNbContentData();
-	     	 }
-	     }
+		if(cleanContentData)
+        {
+        	super.cleanNbContentData(TEST_NB_ID);
+        }
+       
 	     
 		 if(cleanCopyContent)
 	     {
-	     	super.cleanNbCopiedContent();
+	     	super.cleanNbContentData(TEST_COPYNB_ID);
 	     }
      }
 	
@@ -101,14 +94,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 		// check whether this new object contains the right content
 		assertEquals(nbContent.getNbContentId(), TEST_COPYNB_ID);
 	    	
-	    assertEquals(nbContent.getTitle(), TEST_TITLE);
-	   	assertEquals(nbContent.getContent(), TEST_CONTENT);
-	   	assertEquals(nbContent.getOnlineInstructions(), TEST_ONLINE_INSTRUCTIONS);
-	   	assertEquals(nbContent.getOfflineInstructions(), TEST_OFFLINE_INSTRUCTIONS);
-	   	assertEquals(nbContent.isDefineLater(), TEST_DEFINE_LATER);
-    	assertEquals(nbContent.isForceOffline(), TEST_FORCE_OFFLINE);	    	
-    	assertEquals(nbContent.getCreatorUserId(), TEST_CREATOR_USER_ID);
-	    assertEquals(nbContent.getDateCreated(), TEST_DATE_CREATED); 
+		assertContentEqualsTestData(nbContent);
 	}
 	
 	public void testsetAsDefineLater()
@@ -129,7 +115,6 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	
 	public void testremoveToolContent()
 	{
-		cleanAllData = false;
 		cleanContentData = false;
 		nbContentManager.removeToolContent(TEST_NB_ID);
 		
