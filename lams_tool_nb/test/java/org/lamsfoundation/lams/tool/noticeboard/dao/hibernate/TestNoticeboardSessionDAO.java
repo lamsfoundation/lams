@@ -19,31 +19,31 @@
  *http://www.gnu.org/licenses/gpl.txt
  */
 
-/*
- * Created on May 16, 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
+
+import java.util.Date;
 
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
-//import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-//import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+
 
 
 /**
  * @author mtruong
  *
+ * JUnit Test Cases to test the NoticeboardSessionDAO class
  */
 public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
 	
 	private NoticeboardSessionDAO nbSessionDAO;
 	private NoticeboardContentDAO nbContentDAO;
+	private NoticeboardSession nbSession = null;
+	private NoticeboardContent nbContent = null;
 	
-	private boolean cleanSessionContentData = true;
+	
+	//private boolean cleanSessionContentData = false;
+	private boolean cleanContentData = true;
 	
 	public TestNoticeboardSessionDAO(String name)
 	{
@@ -58,10 +58,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         
         nbContentDAO = (NoticeboardContentDAO) this.context.getBean("nbContentDAO");
         nbSessionDAO = (NoticeboardSessionDAO) this.context.getBean("nbSessionDAO");
-      
-        /* initialise data for noticeboard content and create a session containing this data */
-        this.initNbContentData();
-        this.initNbSessionContent();
+        super.initAllData();
     }
 	 
 	/**
@@ -69,97 +66,112 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
 	 */
     protected void tearDown() throws Exception {
         super.tearDown();
-        //remove noticeboard content after each test
-        if (cleanSessionContentData)
+        if(cleanContentData)
         {
-        	
-        	super.cleanAllData();
-        	
+        	super.cleanNbContentData(TEST_NB_ID);
         }
-        else
-        {
-        	super.cleanNbContentData();
-        }
+       
     }
 
-    public void testgetNbSessionById()
+    public void testgetNbSessionByUID()
     {
-       	
-		//NoticeboardSession newNbSession = nbSessionDAO.getNbSessionById(TEST_SESSION_ID);
-    	nbSession = nbSessionDAO.getNbSessionById(TEST_SESSION_ID);
-    	
-    	
-		assertEquals("Validate session id ",nbSession.getNbSessionId(), TEST_SESSION_ID);
-		assertEquals("Validate content id ",nbSession.getNbContent().getNbContentId(), TEST_NB_ID);
-		assertEquals("Validate session start date", nbSession.getSessionStartDate(), TEST_SESSION_START_DATE);
-		assertEquals("Validate session end date", nbSession.getSessionEndDate(), TEST_SESSION_END_DATE);
-		assertEquals("Validate session status", nbSession.getSessionStatus(), TEST_SESSION_STATUS);
-		
-		
+       nbSession = nbSessionDAO.getNbSessionByUID(new Long(1)); //default test data which is always in db
+        
+       assertEquals(nbSession.getNbSessionId(), DEFAULT_SESSION_ID);
+       assertEquals(nbSession.getSessionStatus(), DEFAULT_SESSION_STATUS);
+        
     }
- 
-    public void testloadNbSessionById()
-    {
-    	nbSession = nbSessionDAO.loadNbSessionById(TEST_SESSION_ID);
     
-		assertEquals("Validate session id ",nbSession.getNbSessionId(), TEST_SESSION_ID);
-		assertEquals("Validate content id ",nbSession.getNbContent().getNbContentId(), TEST_NB_ID);
-		assertEquals("Validate session start date", nbSession.getSessionStartDate(), TEST_SESSION_START_DATE);
-		assertEquals("Validate session end date", nbSession.getSessionEndDate(), TEST_SESSION_END_DATE);
-		assertEquals("Validate session status", nbSession.getSessionStatus(), TEST_SESSION_STATUS);
-		
+    public void testfindNbSessionById()
+    {
+        nbSession = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
+        assertEqualsForSessionContent(nbSession);
+        
+        Long nonExistentSessionId = new Long(7657);
+        assertSessionObjectIsNull(nonExistentSessionId); 
     }
-   
+    
     public void testsaveNbSession()
     {
-    	/* remove data that has been setup by setUp() */
-    	this.cleanNbSessionContent();
-    	
-    	NoticeboardContent nb = nbContentDAO.getNbContentById(TEST_NB_ID);
-    	
-    	nbSession = new NoticeboardSession(TEST_SESSION_ID,
-    									   nb,
-										   TEST_SESSION_START_DATE,
-										   TEST_SESSION_END_DATE,
-										   TEST_SESSION_STATUS);
-    		
-    	nbSessionDAO.saveNbSession(nbSession);
-    	
-    	assertEquals("Validate session id ",nbSession.getNbSessionId(), TEST_SESSION_ID);
-		assertEquals("Validate content id ",nbSession.getNbContent().getNbContentId(), TEST_NB_ID);
-		assertEquals("Validate session start date", nbSession.getSessionStartDate(), TEST_SESSION_START_DATE);
-		assertEquals("Validate session end date", nbSession.getSessionEndDate(), TEST_SESSION_END_DATE);
-		assertEquals("Validate session status", nbSession.getSessionStatus(), TEST_SESSION_STATUS);
-    	
-    	
-    }
+        NoticeboardContent nbContentToReference = nbContentDAO.findNbContentById(TEST_NB_ID);
+        
+        Long newSessionId = new Long(2222);
+        Date newDateCreated = new Date(System.currentTimeMillis());
+        NoticeboardSession newSessionObject = new NoticeboardSession(newSessionId,
+                													nbContentToReference,
+                													newDateCreated,
+                													NoticeboardSession.NOT_ATTEMPTED);
+        
+        nbContentToReference.getNbSessions().add(newSessionObject);
+        nbContentDAO.updateNbContent(nbContentToReference);
+        
+        nbSessionDAO.saveNbSession(newSessionObject);
+        
+        //Retrieve the newly added session object and test its values
+        
+        nbSession = nbSessionDAO.findNbSessionById(newSessionId);
+        
+        assertEquals(nbSession.getNbSessionId(), newSessionId);
+        assertEquals(nbSession.getSessionStartDate(), newDateCreated);
+        
+    } 
     
- 
     public void testupdateNbSession()
     {
-    	String sessionStatus = "Suspended";
-    	
-    	nbSession = nbSessionDAO.getNbSessionById(TEST_SESSION_ID);
-    	
-    	nbSession.setSessionStatus(sessionStatus);
-    	
-    	nbSessionDAO.updateNbSession(nbSession);
-    	
-    	assertEquals("Validate session id ",nbSession.getNbSessionId(), TEST_SESSION_ID);
-    	assertEquals("Validate new session status",nbSession.getSessionStatus(), sessionStatus);
-	}
+        nbSession = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
+        
+        nbSession.setSessionStatus(NoticeboardSession.COMPLETED);
+        
+        nbSessionDAO.updateNbSession(nbSession);
+        
+        NoticeboardSession updatedSession = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
+        
+        assertEquals(updatedSession.getSessionStatus(), NoticeboardSession.COMPLETED);
+    } 
     
-  
-    public void testremoveNbSession()
+    public void testremoveNbSessionByUID()
     {
-    	cleanSessionContentData = false;
-    	nbSessionDAO.removeNbSession(TEST_SESSION_ID);
-    	
-    	NoticeboardSession session = new NoticeboardSession();
-    	
-    	assertNull(session.getNbSessionId());
-   
+        NoticeboardSession existingSession = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
+        Long uid = existingSession.getUid();
+        
+        NoticeboardContent referencedContent = existingSession.getNbContent();
+        
+        nbSessionDAO.removeNbSessionByUID(uid);
+        referencedContent.getNbSessions().remove(existingSession);
+        
+        nbContentDAO.updateNbContent(referencedContent);
+        
+        assertSessionObjectIsNull(TEST_SESSION_ID);
     }
     
     
+    public void testremoveNbSessionById()
+    {
+        nbSession = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
+        nbContent = nbSession.getNbContent();
+        nbContent.getNbSessions().remove(nbSession);
+        
+        nbSessionDAO.removeNbSession(TEST_SESSION_ID);
+        
+        nbContentDAO.updateNbContent(nbContent);
+        
+        assertSessionObjectIsNull(TEST_SESSION_ID);
+        
+    }
+    
+    public void testremoveNbSession()
+    {
+        nbSession = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
+        nbContent = nbSession.getNbContent();
+        nbContent.getNbSessions().remove(nbSession);
+        
+        nbSessionDAO.removeNbSession(nbSession);
+        
+        nbContentDAO.updateNbContent(nbContent);
+        
+        assertSessionObjectIsNull(TEST_SESSION_ID);
+    } 
+    
+    
+   
 }

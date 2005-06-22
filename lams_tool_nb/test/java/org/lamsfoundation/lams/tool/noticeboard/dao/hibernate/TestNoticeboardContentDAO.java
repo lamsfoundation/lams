@@ -27,27 +27,18 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardContentDAO;
-
-import org.springframework.orm.hibernate.HibernateObjectRetrievalFailureException;
-
-
-//import java.util.*;
 
 /**
  * @author mtruong
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * JUnit Test Cases to test the NoticeboardContentDAO class
  */
 public class TestNoticeboardContentDAO extends NbDataAccessTestCase
 {
 	private NoticeboardContentDAO noticeboardDAO;
 	private NoticeboardSessionDAO nbSessionDAO;
-	//private NoticeboardContent noticeboardContent;
-    private boolean cleanContentData = true;
-	private boolean cleanAllData = true;
+	private boolean cleanContentData = true;
     
 	public TestNoticeboardContentDAO(String name)
 	{
@@ -62,80 +53,77 @@ public class TestNoticeboardContentDAO extends NbDataAccessTestCase
         //set up default noticeboard content for each test
         noticeboardDAO = (NoticeboardContentDAO) this.context.getBean("nbContentDAO");
         nbSessionDAO = (NoticeboardSessionDAO) this.context.getBean("nbSessionDAO");
-        this.initNbContentData();
-	    this.initNbSessionContent();
-        //super.initAllData();
+       	super.initAllData();
     }
 	 
 	/**
 	 * @see NbDataAccessTestCase#tearDown()
 	 */
-    protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception 
+    {
         super.tearDown();
         //remove noticeboard content after each test
-        if (cleanAllData)
+        if(cleanContentData)
         {
-        	super.cleanAllData();
-        }
-        else if(cleanContentData)
-        {
-        	super.cleanNbContentData();
+        	super.cleanNbContentData(TEST_NB_ID);
         }
     }
     
-    public void testgetNbContentById()
+   
+    public void testgetNbContentByUID()
     {
-    	/* Retrieve the previously saved noticeboard object from the database */
+       nbContent = noticeboardDAO.getNbContentByUID(new Long(1));
+       
+       assertEquals(nbContent.getUid(), new Long(1));
+       assertContentEqualsDefaultData(nbContent);
+	  
+    } 
+
+   public void testfindNbContentByID()
+    {
+        nbContent = noticeboardDAO.findNbContentById(TEST_NB_ID);
+       
+        assertContentEqualsTestData(nbContent);
     	
-    	nbContent = noticeboardDAO.getNbContentById(getTestNoticeboardId());
-    	
-    	/* Ensure that all content is what is was suppose to be */
-    	//assertEquals(noticeboardContent.getNoticeboardId(), TEST_NB_ID);
-    	
-    	assertEquals(nbContent.getTitle(), TEST_TITLE);
-    	assertEquals(nbContent.getContent(), TEST_CONTENT);
-    	assertEquals(nbContent.getOnlineInstructions(), TEST_ONLINE_INSTRUCTIONS);
-    	assertEquals(nbContent.getOfflineInstructions(), TEST_OFFLINE_INSTRUCTIONS);
-    	assertEquals(nbContent.isDefineLater(), TEST_DEFINE_LATER);
-    	assertEquals(nbContent.isForceOffline(), TEST_FORCE_OFFLINE);
-    	assertEquals(nbContent.getCreatorUserId(), TEST_CREATOR_USER_ID);
-    	assertEquals(nbContent.getDateCreated(), TEST_DATE_CREATED);
-    	
-    	
-    	
-    }
     
-    public void testloadNbContentById(Long nbContentId)
-	{
-    	/* Retrieve the previously saved noticeboard object from the database */
-    	
-    	nbContent = noticeboardDAO.loadNbContentById(getTestNoticeboardId());
-    	
-    	/* Ensure that all content is what is was suppose to be */
-    	//assertEquals(noticeboardContent.getNoticeboardId(), TEST_NB_ID);
-    	
-    	assertEquals(nbContent.getTitle(), TEST_TITLE);
-    	assertEquals(nbContent.getContent(), TEST_CONTENT);
-    	assertEquals(nbContent.getOnlineInstructions(), TEST_ONLINE_INSTRUCTIONS);
-    	assertEquals(nbContent.getOfflineInstructions(), TEST_OFFLINE_INSTRUCTIONS);
-    	assertEquals(nbContent.isDefineLater(), TEST_DEFINE_LATER);
-    	assertEquals(nbContent.isForceOffline(), TEST_FORCE_OFFLINE);
-    	assertEquals(nbContent.getCreatorUserId(), TEST_CREATOR_USER_ID);
-    	assertEquals(nbContent.getDateCreated(), TEST_DATE_CREATED);
-	}
+    	 // Test to see if trying to retrieve a non-existent object would 
+    	 // return null or not.
+    	 
+    	Long nonExistentId = new Long(88777);
+    	assertNbContentIsNull(nonExistentId);
+    } 
+ 
+
+   public void testremoveNoticeboard()
+   {
+       cleanContentData = false;
+      
+       
+       nbContent = noticeboardDAO.findNbContentById(TEST_NB_ID);
+       
+       noticeboardDAO.removeNoticeboard(nbContent);
+       
+       assertNbSessionIsNull(TEST_SESSION_ID); //check if child table is deleted
+  	   assertNbContentIsNull(TEST_NB_ID);
+   } 
+  
+  public void testremoveNoticeboardById()
+    {
+        cleanContentData = false;
+   	 	
+	   
+   	 	noticeboardDAO.removeNoticeboard(TEST_NB_ID);
+   	 	
+   	 	assertNbSessionIsNull(TEST_SESSION_ID);
+   	 	assertNbContentIsNull(TEST_NB_ID);
+    } 
+    
     
     public void testgetNbContentBySession()
     {
     	nbContent = noticeboardDAO.getNbContentBySession(TEST_SESSION_ID);
     	
-    	assertEquals(nbContent.getTitle(), TEST_TITLE);
-    	assertEquals(nbContent.getContent(), TEST_CONTENT);
-    	assertEquals(nbContent.getOnlineInstructions(), TEST_ONLINE_INSTRUCTIONS);
-    	assertEquals(nbContent.getOfflineInstructions(), TEST_OFFLINE_INSTRUCTIONS);
-    	assertEquals(nbContent.isDefineLater(), TEST_DEFINE_LATER);
-    	assertEquals(nbContent.isForceOffline(), TEST_FORCE_OFFLINE);
-    	assertEquals(nbContent.getCreatorUserId(), TEST_CREATOR_USER_ID);
-    	assertEquals(nbContent.getDateCreated(), TEST_DATE_CREATED);
+    	assertContentEqualsTestData(nbContent);
     }
     
     public void testsaveNbContent()
@@ -145,81 +133,46 @@ public class TestNoticeboardContentDAO extends NbDataAccessTestCase
     	 * TODO: change this, actually test the save method
     	 */
     	
+    
+    	nbContent = noticeboardDAO.findNbContentById(getTestNoticeboardId());
     	
-    	nbContent = noticeboardDAO.loadNbContentById(getTestNoticeboardId());
+    	assertContentEqualsTestData(nbContent);
     	
-    	assertEquals(nbContent.getNbContentId(), getTestNoticeboardId());
-    	
-    	assertEquals(nbContent.getTitle(), TEST_TITLE);
-    	assertEquals(nbContent.getContent(), TEST_CONTENT);
-    	assertEquals(nbContent.getOnlineInstructions(), TEST_ONLINE_INSTRUCTIONS);
-    	assertEquals(nbContent.getOfflineInstructions(), TEST_OFFLINE_INSTRUCTIONS);
-    	assertEquals(nbContent.isDefineLater(), TEST_DEFINE_LATER);
-    	assertEquals(nbContent.isForceOffline(), TEST_FORCE_OFFLINE);
-    	assertEquals(nbContent.getCreatorUserId(), TEST_CREATOR_USER_ID);
-    	assertEquals(nbContent.getDateCreated(), TEST_DATE_CREATED);
-    	
-    }
+    } 
     
     public void testupdateNbContent()
     {
     	// Update the noticeboard to have a new value for its content field 
     	String newContent = "New updated content";
     	
-    	nbContent = noticeboardDAO.loadNbContentById(getTestNoticeboardId());
+    	nbContent = noticeboardDAO.findNbContentById(getTestNoticeboardId());
     	nbContent.setContent(newContent);
     	
     	noticeboardDAO.updateNbContent(nbContent);
     	
     	//Check whether the value has been updated
     	
-    	nbContent = noticeboardDAO.getNbContentById(getTestNoticeboardId());
+    	nbContent = noticeboardDAO.findNbContentById(getTestNoticeboardId());
     	
     	assertEquals(nbContent.getContent(), newContent);
     	
-    }
-  
-    public void testremoveNoticeboard() 
-    {
-    	 cleanContentData = false;
-    	 cleanAllData = false;
-    	 NoticeboardContent nb = noticeboardDAO.getNbContentById(TEST_NB_ID);
-    	 noticeboardDAO.removeNbSessions(nb);
-    	 noticeboardDAO.removeNoticeboard(TEST_NB_ID);
-    	 try
-		 {	
-    	 	
-    	 	NoticeboardContent emptyNbContent = noticeboardDAO.getNbContentById(TEST_NB_ID);
-    	 	fail("An exception should be raised as the object has already been deleted");
-		 }
-    	 catch (HibernateObjectRetrievalFailureException e)
-		 {
-    	 	assertTrue(true);
-		 } 
-    	 
-    }
- 
+    }  
+    
     public void testremoveNbSessions()
     {
     	
-    	cleanAllData = false;
-    	cleanContentData = true;
+    	nbContent = noticeboardDAO.findNbContentById(getTestNoticeboardId());
     	
-    	nbContent = noticeboardDAO.getNbContentById(getTestNoticeboardId());
     	
     	noticeboardDAO.removeNbSessions(nbContent);
-    	NoticeboardContent nb = noticeboardDAO.getNbContentById(getTestNoticeboardId());
-    	try
-		{
-    		NoticeboardSession nbSession = nbSessionDAO.getNbSessionById(TEST_SESSION_ID);
-    		fail("An exception should be raised");
-		}
-    	catch (HibernateObjectRetrievalFailureException e)
-		{
-    		assertTrue(true);
-		}
-   	
+    	nbContent.getNbSessions().clear(); //Have to remove/empty the collection before deleting it.
+    	//otherwise exception will occur
+    	noticeboardDAO.updateNbContent(nbContent);
+    	NoticeboardContent nb = noticeboardDAO.findNbContentById(getTestNoticeboardId());
+    	assertNotNull(nb);
+    	assertNbSessionIsNull(TEST_SESSION_ID);   	
     }
    
     
+ 
 }
