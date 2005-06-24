@@ -12,7 +12,6 @@ import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.lamsfoundation.lams.usermanagement.User;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -30,6 +29,7 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * TODO: change DEVELOPMENT_FLAG to false once the container creates and passes users to the tool
@@ -75,6 +75,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    logger.debug(logger + " " + this.getClass().getName() +  "retrieving qaService from proxy: " + qaService);
 		    request.getSession().setAttribute(TOOL_SERVICE, qaService);		
 		}
+		
+		logger.debug(logger + " " + this.getClass().getName() +  "attempte retrieving tool with signatute : " + MY_SIGNATURE);
+		long contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE );
+		logger.debug(logger + " " + this.getClass().getName() +  "retrieved tool default contentId: " + contentId);
 		
 		/**
 	     * mark the http session as an authoring activity 

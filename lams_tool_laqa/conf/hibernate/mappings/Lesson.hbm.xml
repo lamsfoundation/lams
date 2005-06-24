@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+
+<hibernate-mapping>
+
+
+	<class name="org.lamsfoundation.lams.lesson.Lesson"
+		table="lams_lesson">
+
+		<meta attribute="implement-equals" inherit="false">true</meta>
+
+		<id name="lessonId" type="java.lang.Long" column="lesson_id">
+			<generator class="identity" />
+		</id>
+    	<property name="lessonDescription" type="java.lang.String" 
+    			 column="description" length="65535">
+	    </property>
+    	<property name="lessonName" type="java.lang.String" not-null="true"
+        	 	 column="name" length="255">
+     	</property>
+		<property name="createDateTime" type="java.sql.Timestamp"
+			column="create_date_time" not-null="true" length="19">
+		</property>
+		<property name="startDateTime" type="java.sql.Timestamp"
+			column="start_date_time" length="19">
+		</property>
+		<property name="endDateTime" type="java.sql.Timestamp"
+			column="end_date_time" length="19">
+		</property>
+		<property name="scheduleStartDate" type="java.sql.Timestamp"
+			column="schedule_start_date_time" length="19">
+		</property>
+		<property name="scheduleEndDate" type="java.sql.Timestamp"
+			column="schedule_end_date_time" length="19">
+		</property>				
+		<property name="lessonStateId" type="java.lang.Integer"
+			column="lesson_state_id" length="3">
+		</property>
+		<!-- Associations -->
+		
+		<!-- bi-directional many-to-one association to User -->
+		<many-to-one name="user"
+			class="org.lamsfoundation.lams.usermanagement.User"
+			not-null="true">
+			<column name="user_id" />
+		</many-to-one>
+
+		<!-- bi-directional many-to-one association to LearningDesign -->
+		<many-to-one name="learningDesign"
+			class="org.lamsfoundation.lams.learningdesign.LearningDesign"
+			not-null="true">
+			<column name="learning_design_id" />
+		</many-to-one>
+		
+		<!-- bi-directional one-to-many association to LearnerProgress -->
+		<set name="learnerProgresses" lazy="true" inverse="true"
+			cascade="all-delete-orphan">
+			<key>
+				<column name="lesson_id" />
+			</key>
+			<one-to-many
+				class="org.lamsfoundation.lams.lesson.LearnerProgress" />
+		</set>
+		
+		<!-- bi-directional many-to-one association to LessonClass -->
+		<many-to-one name="lessonClass"
+			class="org.lamsfoundation.lams.lesson.LessonClass"
+			column="class_grouping_id"
+			unique="true"
+			not-null="false" 
+			cascade = "all"/>
+
+		<!-- bi-directional many-to-one association to Organisation -->
+		<many-to-one name="organisation"
+			class="org.lamsfoundation.lams.usermanagement.Organisation"
+			not-null="false">
+			<column name="organisation_id" />
+		</many-to-one>
+
+	</class>
+	
+	<sql-query name="activeLessons">
+		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
+		SELECT DISTINCT {lesson.*}
+		  FROM lams_lesson {lesson},
+		    lams_grouping,
+		    lams_group,
+		    lams_user_group
+		  WHERE ({lesson}.class_grouping_id = lams_grouping.grouping_id)
+		    AND (lams_grouping.grouping_id = lams_group.grouping_id)
+		    AND (lams_group.group_id = lams_user_group.group_id)
+		    AND ({lesson}.lesson_state_id IN (3,4,5))		    
+		    AND (lams_user_group.user_id = :userId)
+	</sql-query>
+	
+	<sql-query name="activeLearners">
+		<return alias="learner" class="org.lamsfoundation.lams.usermanagement.User" />
+		SELECT DISTINCT {learner.*}
+		  FROM lams_user {learner},
+		       lams_learner_progress
+		  WHERE ({learner}.user_id = lams_learner_progress.user_id)
+		  AND   (lams_learner_progress.lesson_id  = :lessonId)
+	</sql-query>
+</hibernate-mapping>

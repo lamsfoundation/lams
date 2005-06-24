@@ -13,7 +13,7 @@ VALUES (10,
 INSERT INTO tl_laqa11_que_content (qa_que_content_id, 
 									question, 
 									display_order, 
-									qa_content_id) VALUES (20,'What is the capital of Uruguay?',1,10);
+									qa_content_id) VALUES (20,'What is the name of this activity?',1,10);
 
 
 

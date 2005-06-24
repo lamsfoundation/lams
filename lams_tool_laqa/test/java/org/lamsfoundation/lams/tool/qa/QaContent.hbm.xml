@@ -41,11 +41,31 @@
         column="instructions"
         length="255"
     />
-    
+
+
+   <property
+            name="defineLater"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
+            column="define_later"
+   />
+
+
+   <property
+            name="runOffline"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
+            column="run_offline"
+   />
+
 
     <property
         name="creationDate"
-        type="java.util.Date"
+        type="java.lang.String"
         update="true"
         insert="true"
         access="property"        
@@ -66,12 +86,12 @@
 
 
    <property
-            name="defineLater"
+            name="questionsSequenced"
             type="boolean"
             update="true"
             insert="true"
             access="property"
-            column="define_later"
+            column="questions_sequenced"
    />
 
     <property
@@ -94,6 +114,16 @@
         length="100"
     />
     
+
+    <property
+        name="monitoringReportTitle"
+        type="java.lang.String"
+        update="true"
+        insert="true"
+        access="property"        
+        column="monitoring_report_title"
+        length="100"
+    />
  
  
     <property
@@ -116,7 +146,18 @@
         column="synch_in_monitor"
         length="1"
     />
-
+    
+    <property
+        name="contentLocked"
+        type="boolean"
+        update="true"
+        insert="true"
+        access="property"        
+        column="content_locked"
+        length="1"
+    />
+    
+    
     
     <property
         name="offlineInstructions"
@@ -137,6 +178,17 @@
         column="online_instructions"
         length="65535"
     />
+    
+    <property
+        name="endLearningMessage"
+        type="java.lang.String"
+        update="true"
+        insert="true"
+        access="property"        
+        column="end_learning_message"
+        length="65535"
+    />
+    
 
    	 <set
             name="qaQueContents"

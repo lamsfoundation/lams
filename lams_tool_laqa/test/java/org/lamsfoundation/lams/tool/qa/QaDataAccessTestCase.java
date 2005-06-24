@@ -68,7 +68,7 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     protected String[] getContextConfigLocation()
     {
     	System.out.println("QaDataAccessTestCase will be configured");
-        return new String[] {"qaCompactApplicationContext.xml"};
+        return new String[] {"/org/lamsfoundation/lams/qa/qaApplicationContext.xml"};
     }
     
     protected String getHibernateSessionFactoryName()

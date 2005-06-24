@@ -57,25 +57,6 @@
         </many-to-one>
 
 
-        <set
-            name="qaQueUsers"
-            lazy="false"
-            inverse="true"
-            cascade="none"
-            sort="unsorted"
-        >
-              <key
-                  column="qa_que_content_id"
-              >
-              </key>
-
-              <one-to-many
-                  class="org.lamsfoundation.lams.tool.qa.QaQueUsr"
-              />
-
-        </set>
-
-
  		<set
             name="qaUsrResps"
             lazy="false"

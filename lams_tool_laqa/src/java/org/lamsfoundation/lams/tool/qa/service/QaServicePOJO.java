@@ -26,6 +26,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -45,7 +46,6 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.dao.DataAccessException;
-
 
 
 /**
@@ -80,7 +80,7 @@ public class QaServicePOJO implements
     
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
-    
+        
     static Logger logger = Logger.getLogger(QaMonitoringAction.class.getName());
 
 
@@ -1067,6 +1067,22 @@ public class QaServicePOJO implements
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("not yet implemented");
     }
+    
+    public Tool getToolBySignature(String toolSignature)
+    {
+    	logger.debug(logger + " " + this.getClass().getName() +  "attempt retrieving tool with signature : " + toolSignature);
+    	Tool tool=toolService.getToolBySignature(toolSignature);
+    	logger.debug(logger + " " + this.getClass().getName() +  " " + "retrieved tool: " + tool);
+	    return tool;
+    }
+    
+    public long getToolDefaultContentIdBySignature(String toolSignature)
+    {
+    	long contentId=toolService.getToolDefaultContentIdBySignature(toolSignature);
+    	logger.debug(logger + " " + this.getClass().getName() +  " " + "tool default contentId : " + contentId);
+	    return contentId;
+    }
+    
 
     /**
 	 * @return Returns the qaDAO.

@@ -9,7 +9,7 @@
 
 package org.lamsfoundation.lams.tool.qa;
 
-import java.util.Iterator;
+import org.lamsfoundation.lams.tool.Tool;
 
 
 /*
@@ -26,9 +26,11 @@ import java.util.Iterator;
 
 public class TestQaContent extends QaDataAccessTestCase
 {
+	public org.lamsfoundation.lams.tool.dao.IToolDAO toolDAO;
 	protected void setUp() throws Exception
     {
         super.setUp();
+      	System.out.println(this.getClass().getName() + " \nTestQaContent started: ");
     }
 
     protected void tearDown() throws Exception
@@ -92,7 +94,7 @@ public class TestQaContent extends QaDataAccessTestCase
    */
     
     
-
+/*
 
     public void testCreateDefaultQaContent()
     {
@@ -108,7 +110,7 @@ public class TestQaContent extends QaDataAccessTestCase
     	}
     }
 
-   
+*/   
     
     
   /*  
@@ -159,5 +161,12 @@ public class TestQaContent extends QaDataAccessTestCase
     	System.out.println(this.getClass().getName() + "qaContent loaded : " + qaContent);
     }
     
+    public void testCoreToolClass()
+    {
+    	Tool tool=toolDAO.getToolBySignature("laqa11");
+    	System.out.println(this.getClass().getName() + "the tool is : " + tool);
+    }
+
+
     
 }

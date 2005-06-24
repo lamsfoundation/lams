@@ -24,6 +24,17 @@
         length="65535"
     >
     </property>
+    
+    <property
+            name="hidden"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
+            column="hidden"
+   >
+   </property>
+    
     <property
         name="attemptTime"
         type="java.util.Date"
@@ -31,6 +42,27 @@
         length="10"
     >
     </property>
+
+
+    <property
+        name="queUsrId"
+        type="java.lang.Long"
+        column="que_usr_id"
+        update="false"
+        insert="false"
+    >
+    </property>
+
+
+    <property
+        name="qaQueContentId"
+        type="java.lang.Long"
+        column="qa_que_content_id"
+        update="false"
+        insert="false"
+    >
+    </property>
+
 
    <many-to-one
             name="qaQueContent"

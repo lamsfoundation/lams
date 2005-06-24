@@ -18,6 +18,8 @@ public interface QaAppConstants {
 	 * Currently we are hardcoding the default content id.
      * This will be replaced when the deploy logic automatically assigns a default content id in the deploy script.
      */
+	
+	public static final String MY_SIGNATURE 							="laqa11";
 	public static final long DEFAULT_CONTENT_ID 						=10;
     public static final long DEFAULT_QUE_CONTENT_ID 					=20;
 

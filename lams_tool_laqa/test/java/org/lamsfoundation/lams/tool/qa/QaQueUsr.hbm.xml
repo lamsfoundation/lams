@@ -14,7 +14,7 @@
         type="java.lang.Long"
         column="que_usr_id"
     >
-        <generator class="increment" />
+        <generator class="assigned" />
     </id>
 
     <property
@@ -32,6 +32,14 @@
     >
     </property>
 
+    <property
+        name="qaSessionId"
+        type="java.lang.Long"
+        column="qa_session_id"
+        update="false"
+        insert="false"
+    >
+    </property>
     
     <many-to-one
         name="qaSession"
@@ -45,21 +53,6 @@
         <column name="qa_session_id" />
     </many-to-one>
     
-  
-	<many-to-one
-            name="qaQueContent"
-            class="org.lamsfoundation.lams.tool.qa.QaQueContent"
-            cascade="none"
-            outer-join="auto"
-            update="true"
-            insert="true"
-            access="property"
-        >
-            <column
-                name="qa_que_content_id" 
-            />
-    </many-to-one>
-
     <set
             name="qaUsrResps"
             lazy="false"
@@ -69,7 +62,7 @@
         >
 
               <key
-                  column="que_usr_id"
+                  column="que_usr_id" 
               >
               </key>
 

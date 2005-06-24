@@ -1,3 +1,10 @@
+DROP TABLE IF EXISTS lams.tl_laqa11_usr_resp;
+DROP TABLE IF EXISTS lams.tl_laqa11_que_usr;
+DROP TABLE IF EXISTS lams.tl_laqa11_que_content;
+DROP TABLE IF EXISTS lams.tl_laqa11_session;
+DROP TABLE IF EXISTS lams.tl_laqa11_content;
+
+
 CREATE TABLE lams.tl_laqa11_content (
        qa_content_id BIGINT(20) NOT NULL
      , title VARCHAR(100) DEFAULT 'Questions and Answers'
@@ -69,4 +76,18 @@ CREATE TABLE lams.tl_laqa11_usr_resp (
      , CONSTRAINT FK_tl_laqa11_usr_resp_3 FOREIGN KEY (que_usr_id)
                   REFERENCES lams.tl_laqa11_que_usr (que_usr_id)
 )TYPE=InnoDB;
+
+
+
+-- test data for content table
+INSERT INTO tl_laqa11_content (qa_content_id, 
+								creation_date
+								) 
+VALUES (${default_content_id},
+		NOW());
+
+
+
+
+
 

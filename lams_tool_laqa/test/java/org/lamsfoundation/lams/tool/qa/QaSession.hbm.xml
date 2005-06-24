@@ -22,7 +22,7 @@
 
     <property
         name="session_start_date"
-        type="java.sql.Date"
+        type="java.util.Date"
         update="true"
         insert="true"
         access="property"
@@ -32,7 +32,7 @@
     
     <property
         name="session_end_date"
-        type="java.sql.Date"
+        type="java.util.Date"
         update="true"
         insert="true"
         access="property"
@@ -50,6 +50,17 @@
         length="100"
     />
     
+    <property
+        name="qaContentId"
+        type="java.lang.Long"
+        update="false"
+        insert="false"
+        access="property"
+        column="qa_content_id"
+        length="20"
+    />
+
+    
    <many-to-one
         name="qaContent"
         class="org.lamsfoundation.lams.tool.qa.QaContent"
@@ -63,8 +74,7 @@
             name="qa_content_id" 
         />
     </many-to-one>
-
-
+    
     <set
         name="qaQueUsers"
         lazy="false"
@@ -79,7 +89,7 @@
             class="org.lamsfoundation.lams.tool.qa.QaQueUsr"
         />
     </set>
-
+    
 
 </class>
 </hibernate-mapping>

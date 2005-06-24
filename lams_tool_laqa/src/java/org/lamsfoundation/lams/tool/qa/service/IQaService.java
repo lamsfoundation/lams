@@ -20,6 +20,7 @@
  */
 package org.lamsfoundation.lams.tool.qa.service;
 
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
@@ -178,6 +179,10 @@ public interface IQaService
      */
     public String leaveToolSession(Long toolSessionId, User learner);
     
+    public Tool getToolBySignature(String toolSignature);
+    
+    public long getToolDefaultContentIdBySignature(String toolSignature);
+        
     public int countSessionUser(QaSession qaSession);
 	
 }
