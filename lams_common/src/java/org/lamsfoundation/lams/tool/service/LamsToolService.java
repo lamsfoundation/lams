@@ -24,6 +24,9 @@ package org.lamsfoundation.lams.tool.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.dao.IToolDAO;
+
 
 /**
  * 
@@ -31,10 +34,12 @@ import java.util.List;
  * @since  2005-3-17
  * @version
  * 
+ * @author Ozgur Demirtas 24/06/2005
+ * 
  */
 public class LamsToolService implements ILamsToolService
 {
-
+	protected IToolDAO toolDAO;
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getAllPotentialLearners(long)
      */
@@ -42,5 +47,27 @@ public class LamsToolService implements ILamsToolService
     {
         return null;
     }
+    
+    public Tool getToolBySignature(final String toolSignature)
+    {
+    	return toolDAO.getToolBySignature(toolSignature);  	
+    }
 
+    public long getToolDefaultContentIdBySignature(final String toolSignature)
+    {
+    	return toolDAO.getToolDefaultContentIdBySignature(toolSignature);
+    }
+	
+	/**
+	 * @return Returns the toolDAO.
+	 */
+	public IToolDAO getToolDAO() {
+		return toolDAO;
+	}
+	/**
+	 * @param toolDAO The toolDAO to set.
+	 */
+	public void setToolDAO(IToolDAO toolDAO) {
+		this.toolDAO = toolDAO;
+	}
 }

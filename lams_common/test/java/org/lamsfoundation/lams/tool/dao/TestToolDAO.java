@@ -11,12 +11,14 @@ package org.lamsfoundation.lams.tool.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolDataAccessTestCase;
 
 
 /**
  * 
  * @author Jacky Fang 9/02/2005
+ * updated: Ozgur Demirtas 24/06/2005
  * 
  */
 public class TestToolDAO extends ToolDataAccessTestCase
@@ -47,6 +49,12 @@ public class TestToolDAO extends ToolDataAccessTestCase
         super(arg0);
     }
 
+    public void testGetToolBySignature()
+    {
+    	Tool testTool = toolDao.getToolBySignature("voting_signature");
+        assertEquals(new Long(9),testTool.getToolId());
+    }
+
     public void testGetToolByID()
     {
         testTool = toolDao.getToolByID(super.TEST_TOOL_ID);
@@ -56,9 +64,11 @@ public class TestToolDAO extends ToolDataAccessTestCase
         assertEquals("verify default content id",6,testTool.getDefaultToolContentId());
         assertTrue("verify support define later",testTool.getSupportsDefineLater());
     }
+
     public void testGetAllTools(){
     	List list = toolDao.getAllTools();
     	assertNotNull(list);    	
     }
 
+    
 }

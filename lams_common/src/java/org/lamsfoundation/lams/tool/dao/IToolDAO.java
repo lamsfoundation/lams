@@ -17,6 +17,7 @@ import org.lamsfoundation.lams.tool.Tool;
 /**
  * 
  * @author Jacky Fang 8/02/2005
+ * updated: Ozgur Demirtas 24/06/2005
  * 
  */
 public interface IToolDAO
@@ -24,5 +25,6 @@ public interface IToolDAO
 
     public Tool getToolByID(Long toolID);
     public List getAllTools();
-    
+    public Tool getToolBySignature(final String toolSignature);
+    public long getToolDefaultContentIdBySignature(final String toolSignature);
 }

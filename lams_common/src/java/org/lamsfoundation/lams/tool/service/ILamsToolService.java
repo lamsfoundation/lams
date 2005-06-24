@@ -24,6 +24,8 @@ package org.lamsfoundation.lams.tool.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.Tool;
+
 
 /**
  * This interface defines all the service available for self contained tool
@@ -32,6 +34,7 @@ import java.util.List;
  * 
  * @author chris
  * @author Jacky Fang
+ * @author Ozgur Demirtas 24/06/2005
  */
 public interface ILamsToolService
 {
@@ -46,5 +49,8 @@ public interface ILamsToolService
      * @exception in case of any problems.
      */
     public List getAllPotentialLearners(long toolContentID) throws LamsToolServiceException;
-
+    
+    public Tool getToolBySignature(final String toolSignature);
+    
+    public long getToolDefaultContentIdBySignature(final String toolSignature);
 }
