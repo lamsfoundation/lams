@@ -72,17 +72,26 @@ public class TestGateAction extends AbstractLamsStrutsTestCase
      */
     protected String getContextConfigLocation()
     {
-        return 	"/WEB-INF/spring/applicationContext.xml "
-   				+"/WEB-INF/spring/monitoringApplicationContext.xml "
-   				+"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
-   				+"/WEB-INF/spring/authoringApplicationContext.xml "
-   				+"/WEB-INF/spring/learningApplicationContext.xml "
-   				+"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
-   				+"/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml "
-   				+"/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml";
+        return 	"/org/lamsfoundation/lams/applicationContext.xml "+
+		"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "+
+		"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "+
+  		"/org/lamsfoundation/lams/learning/learningApplicationContext.xml "+        					  
+  		"/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml "+
+  		"/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml "+
+		"/org/lamsfoundation/lams/tool/survey/applicationContext.xml ";  
 
     }
-    
+  /*  protected String getContextConfigLocation()
+    {
+        return 	"/WEB-INF/spring/applicationContext.xml "
+    	+"/WEB-INF/spring/monitoringApplicationContext.xml "
+		+"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
+		+"/WEB-INF/spring/authoringApplicationContext.xml "
+		+"/WEB-INF/spring/learningApplicationContext.xml "
+		+"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
+		+"/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml "
+		+"/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml";
+    } */
     /**
      * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getHibernateSessionFactoryBeanName()
      */
@@ -107,7 +116,7 @@ public class TestGateAction extends AbstractLamsStrutsTestCase
     {
         addRequestParameter("method", "viewGate");
         addRequestParameter("lessonId",TEST_LESSON_ID);
-        addRequestParameter("activityId",TEST_SYNCH_GATE_ID);
+        addRequestParameter("activityId",TEST_SCHEUDLE_GATE_ID); 
         
         actionPerform();
         
@@ -119,7 +128,7 @@ public class TestGateAction extends AbstractLamsStrutsTestCase
     {
         addRequestParameter("method", "viewGate");
         addRequestParameter("lessonId",TEST_LESSON_ID);
-        addRequestParameter("activityId",TEST_SYNCH_GATE_ID);
+        addRequestParameter("activityId",TEST_PERMISSION_GATE_ID);
         
         actionPerform();
         
@@ -135,6 +144,6 @@ public class TestGateAction extends AbstractLamsStrutsTestCase
         actionPerform();
         
         verifyNoActionErrors();
-        verifyTilesForward("openGate",".openGate");
+        verifyTilesForward("viewSynchGate",".viewSynchGate");
     }
 }
