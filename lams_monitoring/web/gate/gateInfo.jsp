@@ -14,6 +14,6 @@
 <tr> 
 	<td class="bodyBold">
 	<c:out value="${GateForm.map.waitingLearners}"/> out of <c:out value="${GateForm.map.totalLearners}"/>
-	re waiting in front of the gate.
+	are waiting in front of the gate.
 	</td>
 </tr>
