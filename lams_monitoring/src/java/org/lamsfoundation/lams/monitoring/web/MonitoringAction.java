@@ -247,5 +247,30 @@ public class MonitoringAction extends LamsDispatchAction
     	String wddxPacket = monitoringService.renameLesson(lessonID,name,userID);
     	return outputPacket(mapping, request, response, wddxPacket, "details");
     }
+    
+    public ActionForward checkGateStatus(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        
+        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
+        Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
+        String wddxPacket = monitoringService.checkGateStatus(activityID, lessonID);
+       // request.setAttribute(USE_JSP_OUTPUT, "1");
+        return outputPacket(mapping, request, response, wddxPacket, "details");
+        
+    }
+    
+    public ActionForward releaseGate(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        Long activityID = new Long(WebUtil.readLongParam(request, "activityID"));
+        String wddxPacket = monitoringService.releaseGate(activityID);
+       // request.setAttribute(USE_JSP_OUTPUT, "1");
+        return outputPacket(mapping, request, response, wddxPacket, "details");
+    }
 
 }
