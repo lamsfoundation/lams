@@ -263,7 +263,7 @@ Ant build file.
 		<!-- =================================================================== -->
 		<!-- Run JUnit Tests                                                     -->
 		<!-- =================================================================== -->
-		<target name="test" depends="compile-test,init-db"> 
+		<target name="test" depends="compile-test,build-db"> 
 			<mkdir dir="${build.report}"/>
 			<junit printsummary="yes" haltonerror="no" haltonfailure="no"
 				   fork="yes">
@@ -316,6 +316,31 @@ Ant build file.
 	         <strutsconfigxml destdir="${webinf}" mergedir="${xdoclet}" version="1.2"/>
 	      </webdoclet>
 		</target>
+	
+	<!-- =================================================================== -->
+		<!-- Generate hibernate xml files                             -->
+		<!-- =================================================================== -->
+		<target name="generate-hbm-files" 
+				description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)"
+				depends="">
+			
+			<taskdef name="hibernatedoclet"
+				classname="xdoclet.modules.hibernate.HibernateDocletTask"
+				classpathref="all-libs"/>
+			
+			<echo message="Building hbm.xml files using XDoclet"/>
+
+			<hibernatedoclet
+				destdir="${hibernate.mappings}"
+				excludedtags="@version,@author,@todo"
+				force="true">
+					<fileset dir="${src.java}">
+						<include name="**/*.java"/>
+					</fileset>
+				<hibernate version="2.0"/>
+			</hibernatedoclet>
+		</target>
+
 	
 </project>
 
