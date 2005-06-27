@@ -128,7 +128,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
     {
         return "coreSessionFactory";
     }
-    public void testInitializeLesson()
+   public void testInitializeLesson()
     {
         
         Lesson testLesson = monitoringService.initializeLesson("Test_Lesson",
@@ -235,20 +235,44 @@ public class TestMonitoringService extends AbstractLamsTestCase
     public void testRenameLesson()throws IOException{
     	String packet = monitoringService.renameLesson(new Long(1),"New name after renaming",new Integer(1));    	
     	System.out.println(packet);
-    }
+    } 
     /**
      * Initialize all instance variables for testing
      */
-    private void initializeTestingData()
+   private void initializeTestingData()
     {
         testUser = usermanageService.getUserById(TEST_USER_ID);
         testStaff = usermanageService.getUserById(TEST_STAFF_ID);
         testLearner = usermanageService.getUserById(TEST_LEARNER_ID);        
         testOrganisation = usermanageService.getOrganisationById(TEST_ORGANIZATION_ID);
     }
-    public void testGetActivityContributionURL() throws IOException{
+   public void testGetActivityContributionURL() throws IOException{
     	String packet = monitoringService.getActivityContributionURL(new Long(29));    	
     	System.out.println(packet);
+    } 
+    
+    public void testCheckGateStatus() throws IOException
+    {
+	     Long syncGateID = new Long(33);
+	     Long scheduleGateID = new Long(34);
+	     Long permissionGateID = new Long(35);
+	     Long lessonID = new Long(2);
+    
+        
+        String packet = monitoringService.checkGateStatus(scheduleGateID, lessonID); //schedule gate
+        System.out.println(packet);
+        
+    }
+    
+    public void testReleaseGate() throws IOException
+    {
+        Long syncGateID = new Long(33);
+	    Long scheduleGateID = new Long(34);
+	    Long permissionGateID = new Long(35);
+	    
+	    String packet = monitoringService.releaseGate(syncGateID); //schedule gate
+        System.out.println(packet);
+        
     }
 
 }
