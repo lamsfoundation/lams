@@ -22,6 +22,7 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,9 +32,12 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
+
+
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
@@ -68,6 +72,8 @@ import org.quartz.Trigger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 
 /**
  * <p>This is the major service facade for all monitoring functionalities. It is 
@@ -104,6 +110,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private IUserManagementService userManagementService;
     private Scheduler scheduler;
     private ApplicationContext applicationContext;
+    
+    private ILearnerService learnerService;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
@@ -197,6 +205,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         this.scheduler = scheduler;
     }
+    
+    /**
+     * @param learnerService The learnerService to set
+     */
+    public void setLearnerService(ILearnerService learnerService)
+    {
+        this.learnerService = learnerService;
+    }
+    
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
@@ -525,6 +542,55 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 	return flashMessage.serializeMessage();
 	 }
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#checkGateStatus(java.lang.Long, java.lang.Long)
+	 */
+	public String checkGateStatus(Long activityID, Long lessonID) throws IOException
+	{
+	    GateActivity gate = (GateActivity)activityDAO.getActivityByActivityId(activityID);
+	    Lesson lesson = lessonDAO.getLesson(lessonID); //used to calculate the total learners.
+	    
+	    if(gate==null || lesson==null){
+	    		flashMessage = new FlashMessage("checkGateStatus",
+	    										"Invalid activityID/lessonID :" + activityID + " : " + lessonID,
+												FlashMessage.ERROR);
+	    }
+	    else
+	    { 
+	        Hashtable table = new Hashtable();
+	        table = createGateStatusInfo(activityID, gate);
+	        flashMessage = new FlashMessage("checkGateStatus", table);
+	    }
+	    return flashMessage.serializeMessage();
+	}
+	
+	/**
+	 * (non-javadoc)
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#releaseGate(java.lang.Long)
+	 */
+	public String releaseGate(Long activityID)throws IOException
+	{
+	    GateActivity gate = (GateActivity)activityDAO.getActivityByActivityId(activityID);
+	    if (gate ==null)
+	    {
+	        flashMessage = new FlashMessage("releaseGate", 
+	                						"Invalid activityID :" + activityID, 
+	                						FlashMessage.ERROR);
+	    }
+	    else
+	    {
+	        //release gate
+	        gate = openGate(activityID);
+	     
+	        flashMessage = new FlashMessage("releaseGate", gate.getGateOpen());
+ 
+	    }
+	    return flashMessage.serializeMessage();
+	    
+	}
+	
+	
 	
     //---------------------------------------------------------------------
     // Helper Methods - create lesson
@@ -796,5 +862,24 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         return (JobDetail)applicationContext.getBean("closeScheduleGateJob");
     }
+    
+    private Hashtable createGateStatusInfo(Long activityID, GateActivity gate)
+    {
+        Hashtable table = new Hashtable();
+        table.put("activityID", activityID);
+	    table.put("gateOpen", gate.getGateOpen());
+	    table.put("activityLevelID", gate.getGateActivityLevelId()); 
+	    table.put("waitingLearners", new Integer(gate.getWaitingLearners().size()));
+	    if (gate.isScheduleGate())
+	    {
+	        ScheduleGateActivity scheduleGate = (ScheduleGateActivity)gate;
+	        table.put("startingTime", scheduleGate.getGateStartDateTime());
+	        table.put("endingTime", scheduleGate.getGateEndDateTime());
+	    }
+        return table;
+    }
+    
+   
+  
 
 }
