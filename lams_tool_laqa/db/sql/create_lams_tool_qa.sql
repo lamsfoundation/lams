@@ -87,6 +87,12 @@ VALUES (${default_content_id},
 		NOW());
 
 
+-- test data for content questions table
+INSERT INTO tl_laqa11_que_content (qa_que_content_id, 
+									question, 
+									display_order, 
+									qa_content_id) VALUES (1,'What is the capital of Russia?',1,${default_content_id});
+
 
 
 

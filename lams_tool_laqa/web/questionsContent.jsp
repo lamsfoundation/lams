@@ -8,6 +8,7 @@
 			 	requestScope.userExceptionDefaultContentNotAvailable == 'true' || 
 			 	requestScope.userExceptionUserIdNotAvailable == 'true' || 
 			 	requestScope.userExceptionUserIdNotNumeric == 'true' || 
+			 	requestScope.userExceptionDefaultContentNotSetup == 'true' || 
 			 	requestScope.userExceptionDefaultQuestionContentNotAvailable == 'true'}"> 	
 		<table align=center> <!-- Dave to take off-->
 			<tr> <td class="error">   
@@ -19,6 +20,7 @@
 	<c:if test="${requestScope.userExceptionNumberFormat != 'true'  && 
 				  requestScope.userExceptionDefaultContentNotAvailable != 'true'  && 
 				  requestScope.userExceptionUserIdNotAvailable != 'true'  && 
+				  requestScope.userExceptionDefaultContentNotSetup != 'true'  && 				  
   				  requestScope.userExceptionUserIdNotNumeric != 'true'  && 
 				  requestScope.userExceptionDefaultQuestionContentNotAvailable != 'true'}"> 	
 		<!-- Dave to do the styling-->

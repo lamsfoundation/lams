@@ -26,7 +26,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -1068,17 +1068,18 @@ public class QaServicePOJO implements
         throw new UnsupportedOperationException("not yet implemented");
     }
     
-    public Tool getToolBySignature(String toolSignature)
+    public BasicToolVO getToolBySignature(String toolSignature) throws QaApplicationException
     {
     	logger.debug(logger + " " + this.getClass().getName() +  "attempt retrieving tool with signature : " + toolSignature);
-    	Tool tool=toolService.getToolBySignature(toolSignature);
+    	BasicToolVO tool=toolService.getToolBySignature(toolSignature);
     	logger.debug(logger + " " + this.getClass().getName() +  " " + "retrieved tool: " + tool);
 	    return tool;
     }
     
-    public long getToolDefaultContentIdBySignature(String toolSignature)
+    public long getToolDefaultContentIdBySignature(String toolSignature) throws QaApplicationException
     {
-    	long contentId=toolService.getToolDefaultContentIdBySignature(toolSignature);
+    	long contentId=0;
+    	contentId=toolService.getToolDefaultContentIdBySignature(toolSignature);
     	logger.debug(logger + " " + this.getClass().getName() +  " " + "tool default contentId : " + contentId);
 	    return contentId;
     }

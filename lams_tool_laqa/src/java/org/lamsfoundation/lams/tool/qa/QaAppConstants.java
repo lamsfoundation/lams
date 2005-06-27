@@ -20,8 +20,8 @@ public interface QaAppConstants {
      */
 	
 	public static final String MY_SIGNATURE 							="laqa11";
-	public static final long DEFAULT_CONTENT_ID 						=10;
-    public static final long DEFAULT_QUE_CONTENT_ID 					=20;
+	public static final long DEFAULT_CONTENT_ID 						=0;
+    public static final long DEFAULT_QUE_CONTENT_ID 					=1;
 
 	/**
 	 * temporarily refers to an existing content id for an incoming tool session id, won't need it in deployment environment 
@@ -133,6 +133,7 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS ="userExceptionOnlyContentAndNoSessions";
     public static final String USER_EXCEPTION_USERID_EXISTING			="userExceptionUserIdExisting";
     public static final String USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED	="userExceptionMonitoringTabContentIdRequired";
+    public static final String USER_EXCEPTION_DEAFULTCONTENT_NOTSETUP	="userExceptionDefaultContentNotSetup";
     
     
     /**

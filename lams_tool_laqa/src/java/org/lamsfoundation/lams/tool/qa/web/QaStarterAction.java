@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * TODO: change DEVELOPMENT_FLAG to false once the container creates and passes users to the tool
  * Assumption: Session attribute ATTR_USERDATA will be passed to the tool to hold User object 
  * 
- * DEFAULT_CONTENT_ID  is hardcoded for the moment, it will probably go.
+ * 
  * DEFAULT_QUE_CONTENT_ID is hardcoded for the moment, it will probably go.
  * 
  * We won't need to create a mock user once the usernames are defined properly in the container and passed to the tool
@@ -76,9 +76,28 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    request.getSession().setAttribute(TOOL_SERVICE, qaService);		
 		}
 		
-		logger.debug(logger + " " + this.getClass().getName() +  "attempte retrieving tool with signatute : " + MY_SIGNATURE);
-		long contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE );
-		logger.debug(logger + " " + this.getClass().getName() +  "retrieved tool default contentId: " + contentId);
+		try
+		{
+			logger.debug(logger + " " + this.getClass().getName() +  "attempte retrieving tool with signatute : " + MY_SIGNATURE);
+			long contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+			logger.debug(logger + " " + this.getClass().getName() +  "retrieved tool default contentId: " + contentId);
+			if (contentId == 0)
+			{
+				logger.debug(logger + " " + this.getClass().getName() +  "default content id has not been setup");
+				persistError(request,"error.defaultContent.notSetup");
+		    	request.setAttribute(USER_EXCEPTION_DEAFULTCONTENT_NOTSETUP, new Boolean(true));
+				return (mapping.findForward(LOAD_QUESTIONS));	
+			}
+		}
+		catch(QaApplicationException e)
+		{
+			logger.debug(logger + " " + this.getClass().getName() +  "error getting the default content id: " + e.getMessage());
+			persistError(request,"error.defaultContent.notSetup");
+	    	request.setAttribute(USER_EXCEPTION_DEAFULTCONTENT_NOTSETUP, new Boolean(true));
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
+		
+		
 		
 		/**
 	     * mark the http session as an authoring activity 
@@ -114,7 +133,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			{
 		    	persistError(request,"error.userId.notNumeric");
 				request.setAttribute(USER_EXCEPTION_USERID_NOTNUMERIC, new Boolean(true));
-				logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + LOAD_QUESTIONS);
 				return (mapping.findForward(LOAD_QUESTIONS));
 			}
 		}
@@ -124,7 +142,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    	logger.debug(logger + " " + this.getClass().getName() +  "error: The tool expects userId");
 	    	persistError(request,"error.authoringUser.notAvailable");
 	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-			logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + MONITORING_ERROR);
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
 	    
@@ -204,8 +221,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    /**
 		     * get default content from db, user never created any content before
 		     */
-		    logger.debug(logger + " " + this.getClass().getName() +  " " + "getting default content with id:" + DEFAULT_CONTENT_ID);
-		    QaContent defaultQaContent = qaService.retrieveQa(DEFAULT_CONTENT_ID);
+			long contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+		    logger.debug(logger + " " + this.getClass().getName() +  " " + "getting default content with id:" + contentId);
+		    
+		    QaContent defaultQaContent = qaService.retrieveQa(contentId);
 			logger.debug(logger + " " + this.getClass().getName() +  " " + defaultQaContent);
 			
 			/**
@@ -216,7 +235,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			
 			if (defaultQaContent == null)
 			{
-				logger.debug(logger + " " + this.getClass().getName() +  "Exception occured: " + " No DEFAULT_CONTENT_ID");
+				logger.debug(logger + " " + this.getClass().getName() +  "Exception occured: " + " No default content");
 				request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE, new Boolean(true));
 				persistError(request,"error.defaultContent.notAvailable");
 				return (mapping.findForward(LOAD_QUESTIONS));
@@ -237,7 +256,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    	
 	    	if (defaultQaQueContent == null)
 			{
-	    		logger.debug(logger + " " + this.getClass().getName() +  "Exception occured: " + " No DEFAULT_CONTENT_ID");
+	    		logger.debug(logger + " " + this.getClass().getName() +  "Exception occured: " + " No default content");
 	    		request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
 				persistError(request,"error.defaultQuestionContent.notAvailable");
 				return (mapping.findForward(LOAD_QUESTIONS));

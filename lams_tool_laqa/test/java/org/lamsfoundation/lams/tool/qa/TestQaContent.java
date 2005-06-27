@@ -9,7 +9,7 @@
 
 package org.lamsfoundation.lams.tool.qa;
 
-import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.BasicToolVO;
 
 
 /*
@@ -163,7 +163,7 @@ public class TestQaContent extends QaDataAccessTestCase
     
     public void testCoreToolClass()
     {
-    	Tool tool=toolDAO.getToolBySignature("laqa11");
+    	BasicToolVO tool=toolDAO.getToolBySignature("laqa11");
     	System.out.println(this.getClass().getName() + "the tool is : " + tool);
     }
 

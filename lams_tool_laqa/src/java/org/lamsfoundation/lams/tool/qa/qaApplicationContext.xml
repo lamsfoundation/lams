@@ -40,29 +40,7 @@
 				<value>/WEB-INF/QaQueUsr.hbm.xml</value>
 				<value>/WEB-INF/QaUsrResp.hbm.xml</value>
 
-				<value>/WEB-INF/Tool.hbm.xml</value>
-				<value>/WEB-INF/Activity.hbm.xml</value>
-				<value>/WEB-INF/ToolSession.hbm.xml</value>
-				<value>/WEB-INF/Lesson.hbm.xml</value>
-				<value>/WEB-INF/User.hbm.xml</value>
-				<value>/WEB-INF/Transition.hbm.xml</value>
-				<value>/WEB-INF/Group.hbm.xml</value>
-				<value>/WEB-INF/Grouping.hbm.xml</value>
-				<value>/WEB-INF/LearnerProgress.hbm.xml</value>
-				<value>/WEB-INF/LearningDesign.hbm.xml</value>
-				<value>/WEB-INF/LearningLibrary.hbm.xml</value>
-				<value>/WEB-INF/License.hbm.xml</value>
-				<value>/WEB-INF/AuthenticationMethod.hbm.xml</value>
-				<value>/WEB-INF/AuthenticationMethodType.hbm.xml</value>
-				<value>/WEB-INF/Organisation.hbm.xml</value>
-				<value>/WEB-INF/Role.hbm.xml</value>
-				<value>/WEB-INF/ToolContent.hbm.xml</value>
-				<value>/WEB-INF/UserOrganisation.hbm.xml</value>
-				<value>/WEB-INF/OrganisationType.hbm.xml</value>
-				<value>/WEB-INF/UserOrganisationRole.hbm.xml</value>
-				<value>/WEB-INF/Workspace.hbm.xml</value>
-				<value>/WEB-INF/WorkspaceFolder.hbm.xml</value>
-				<value>/WEB-INF/WorkspaceFolderContent.hbm.xml</value>
+				<value>/WEB-INF/BasicToolVO.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
