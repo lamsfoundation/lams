@@ -11,7 +11,7 @@ package org.lamsfoundation.lams.tool.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.ToolDataAccessTestCase;
 
 
@@ -51,7 +51,7 @@ public class TestToolDAO extends ToolDataAccessTestCase
 
     public void testGetToolBySignature()
     {
-    	Tool testTool = toolDao.getToolBySignature("voting_signature");
+    	BasicToolVO testTool = toolDao.getToolBySignature("voting_signature");
         assertEquals(new Long(9),testTool.getToolId());
     }
 

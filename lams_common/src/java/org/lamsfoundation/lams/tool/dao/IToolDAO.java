@@ -11,6 +11,7 @@ package org.lamsfoundation.lams.tool.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 
 
@@ -25,6 +26,6 @@ public interface IToolDAO
 
     public Tool getToolByID(Long toolID);
     public List getAllTools();
-    public Tool getToolBySignature(final String toolSignature);
+    public BasicToolVO getToolBySignature(final String toolSignature);
     public long getToolDefaultContentIdBySignature(final String toolSignature);
 }

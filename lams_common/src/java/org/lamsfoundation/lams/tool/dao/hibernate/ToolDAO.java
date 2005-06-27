@@ -14,6 +14,7 @@ import java.util.List;
 import net.sf.hibernate.HibernateException;
 import net.sf.hibernate.Session;
 
+import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.springframework.orm.hibernate.HibernateCallback;
@@ -29,7 +30,7 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 public class ToolDAO extends HibernateDaoSupport implements IToolDAO
 {
 	private static final String FIND_ALL = "from obj in class " + Tool.class.getName();
-	private static final String LOAD_TOOL_BY_SIG = "from tool in class Tool where tool.toolSignature=:toolSignature";
+	private static final String LOAD_TOOL_BY_SIG = "from tool in class BasicToolVO where tool.toolSignature=:toolSignature";
 	
 	
     /**
@@ -44,9 +45,9 @@ public class ToolDAO extends HibernateDaoSupport implements IToolDAO
     	return this.getHibernateTemplate().find(FIND_ALL);
     }
     
-    public Tool getToolBySignature(final String toolSignature)
+    public BasicToolVO getToolBySignature(final String toolSignature)
     {
-        return (Tool) getHibernateTemplate().execute(new HibernateCallback()
+        return (BasicToolVO) getHibernateTemplate().execute(new HibernateCallback()
          {
              public Object doInHibernate(Session session) throws HibernateException
              {
@@ -59,7 +60,7 @@ public class ToolDAO extends HibernateDaoSupport implements IToolDAO
 
     public long getToolDefaultContentIdBySignature(final String toolSignature)
     {
-        Tool tool= (Tool) getHibernateTemplate().execute(new HibernateCallback()
+    	BasicToolVO tool= (BasicToolVO) getHibernateTemplate().execute(new HibernateCallback()
          {
              public Object doInHibernate(Session session) throws HibernateException
              {
