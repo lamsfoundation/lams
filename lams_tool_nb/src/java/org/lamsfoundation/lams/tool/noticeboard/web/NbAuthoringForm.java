@@ -24,6 +24,9 @@
  * Created on May 19, 2005
  *
  */
+
+
+
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import java.util.Date;
@@ -49,6 +52,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
  *
  * ----------------XDoclet Tags--------------------
  */
+
 public class NbAuthoringForm extends ActionForm {
 	
 	static Logger logger = Logger.getLogger(NbAuthoringForm.class.getName());
