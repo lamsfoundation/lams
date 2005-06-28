@@ -47,7 +47,8 @@
 							imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
 							linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
 							height="400"
-						><%=session.getAttribute("richTextContent")%>
+						><c:out value="${NbAuthoringForm.content}" escapeXml="false" />
+					
 						</FCK:editor>
 					</td>
 				</tr>

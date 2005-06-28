@@ -40,7 +40,7 @@
 							imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
 							linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
 							height="300"
-						><%=session.getAttribute("richTextOnlineInstructions")%>
+						><c:out value="${NbAuthoringForm.onlineInstructions}" escapeXml="false"/>
 						</FCK:editor>
 					</td>
 				</tr>
@@ -60,7 +60,7 @@
 							imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
 							linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
 							height="300"
-						><%=session.getAttribute("richTextOfflineInstructions")%>
+						><c:out value="${NbAuthoringForm.offlineInstructions}" escapeXml="false" />
 						</FCK:editor>
 					</td>
 				</tr> 
