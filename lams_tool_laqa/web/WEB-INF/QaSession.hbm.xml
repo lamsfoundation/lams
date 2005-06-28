@@ -17,7 +17,7 @@
         type="java.lang.Long"
         column="qa_session_id"
     >
-        <generator class="assigned"/>
+		    <generator class="assigned"/>
     </id>
 
     <property

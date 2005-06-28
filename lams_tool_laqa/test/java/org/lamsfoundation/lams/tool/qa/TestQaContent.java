@@ -10,6 +10,8 @@
 package org.lamsfoundation.lams.tool.qa;
 
 import org.lamsfoundation.lams.tool.BasicToolVO;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
+
 
 
 /*
@@ -27,10 +29,11 @@ import org.lamsfoundation.lams.tool.BasicToolVO;
 public class TestQaContent extends QaDataAccessTestCase
 {
 	public org.lamsfoundation.lams.tool.dao.IToolDAO toolDAO;
+	public ILamsToolService lamsToolService;
+	
 	protected void setUp() throws Exception
     {
         super.setUp();
-      	System.out.println(this.getClass().getName() + " \nTestQaContent started: ");
     }
 
     protected void tearDown() throws Exception
@@ -154,19 +157,14 @@ public class TestQaContent extends QaDataAccessTestCase
     	System.out.println(this.getClass().getName() + " DEFAULT_CONTENT_ID removed");
     }
     */
-    
+ 
+    /*
     public void testRemoveQaContent()
     {
     	QaContent qaContent = qaContentDAO.loadQaById(TEST_NONEXISTING_CONTENT_ID);
     	System.out.println(this.getClass().getName() + "qaContent loaded : " + qaContent);
     }
+    */
     
-    public void testCoreToolClass()
-    {
-    	BasicToolVO tool=toolDAO.getToolBySignature("laqa11");
-    	System.out.println(this.getClass().getName() + "the tool is : " + tool);
-    }
-
-
     
 }

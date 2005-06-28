@@ -19,8 +19,9 @@
         type="java.lang.Long"
         column="qa_content_id"
     >
-        <generator class="assigned" />
+	    <generator class="assigned"/>
     </id>
+
 
     <property
         name="title"

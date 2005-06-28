@@ -18,8 +18,7 @@
             column="qa_que_content_id"
             type="java.lang.Long"
         >
-            <generator class="increment">
-            </generator>
+		    <generator class="increment"/>
         </id>
 
         <property

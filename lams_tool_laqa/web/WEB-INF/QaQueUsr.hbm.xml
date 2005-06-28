@@ -14,7 +14,7 @@
         type="java.lang.Long"
         column="que_usr_id"
     >
-        <generator class="assigned" />
+		    <generator class="assigned"/>
     </id>
 
     <property
@@ -70,7 +70,6 @@
                   class="org.lamsfoundation.lams.tool.qa.QaUsrResp"
               />
    </set>
-
 
 </class>
 </hibernate-mapping>

@@ -14,7 +14,7 @@
         type="java.lang.Long"
         column="response_id"
     >
-        <generator class="increment" />
+		    <generator class="increment"/>
     </id>
 
     <property
