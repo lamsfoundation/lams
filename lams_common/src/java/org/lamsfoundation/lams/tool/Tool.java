@@ -503,4 +503,9 @@ public class Tool implements Serializable {
     	return new AuthoringToolDTO(this);
     }
 
+    public BasicToolVO createBasicToolVO() {
+    	BasicToolVO vo = new BasicToolVO();
+    	vo.setAuthorUrl(this.getAuthorUrl());
+    	return vo;
+    }
 }

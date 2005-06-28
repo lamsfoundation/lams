@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.BasicToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 
 
@@ -39,8 +40,9 @@ import org.lamsfoundation.lams.tool.dao.IToolDAO;
  */
 public class LamsToolService implements ILamsToolService
 {
-	protected IToolDAO toolDAO;
+	public IToolDAO toolDAO;
     /**
+     * TODO Implement me!
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getAllPotentialLearners(long)
      */
     public List getAllPotentialLearners(long toolContentID) throws LamsToolServiceException
@@ -50,7 +52,8 @@ public class LamsToolService implements ILamsToolService
     
     public BasicToolVO getToolBySignature(final String toolSignature)
     {
-    	return toolDAO.getToolBySignature(toolSignature);  	
+    	Tool tool = toolDAO.getToolBySignature(toolSignature);  	
+    	return tool.createBasicToolVO();    	
     }
 
     public long getToolDefaultContentIdBySignature(final String toolSignature)

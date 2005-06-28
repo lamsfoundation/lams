@@ -52,19 +52,22 @@
 		</property>
 	</bean>   	
 	
-	<bean id="lamsToolServiceTarget" class="org.lamsfoundation.lams.tool.service.LamsCoreToolService"
-		singleton="false"
-	>
-	</bean>
-	
 	<bean id="lamsToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="target"><ref local="lamsToolServiceTarget"/></property>
+		<property name="target">
+				<bean class="org.lamsfoundation.lams.tool.service.LamsToolService">
+					<property name="toolDAO"><ref bean="toolDAO"/></property>	
+				</bean>
+			</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
 			</props>
 		</property>
-	</bean>   
+	</bean>  
 		
 </beans>
+
+
+
+	
