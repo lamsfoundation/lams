@@ -76,9 +76,13 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    request.getSession().setAttribute(TOOL_SERVICE, qaService);		
 		}
 		
+		/**
+		 * retrive the default content id based on tool signature
+		 */
+
 		try
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "attempte retrieving tool with signatute : " + MY_SIGNATURE);
+			logger.debug(logger + " " + this.getClass().getName() +  "attempt retrieving tool with signatute : " + MY_SIGNATURE);
 			long contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
 			logger.debug(logger + " " + this.getClass().getName() +  "retrieved tool default contentId: " + contentId);
 			if (contentId == 0)
@@ -89,14 +93,14 @@ public class QaStarterAction extends Action implements QaAppConstants {
 				return (mapping.findForward(LOAD_QUESTIONS));	
 			}
 		}
-		catch(QaApplicationException e)
+		catch(Exception e)
 		{
 			logger.debug(logger + " " + this.getClass().getName() +  "error getting the default content id: " + e.getMessage());
 			persistError(request,"error.defaultContent.notSetup");
 	    	request.setAttribute(USER_EXCEPTION_DEAFULTCONTENT_NOTSETUP, new Boolean(true));
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
-		
+
 		
 		
 		/**

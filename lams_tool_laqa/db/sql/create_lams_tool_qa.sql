@@ -88,10 +88,9 @@ VALUES (${default_content_id},
 
 
 -- test data for content questions table
-INSERT INTO tl_laqa11_que_content (qa_que_content_id, 
-									question, 
+INSERT INTO tl_laqa11_que_content (question, 
 									display_order, 
-									qa_content_id) VALUES (1,'What is the capital of Russia?',1,${default_content_id});
+									qa_content_id) VALUES ('What is the capital of Russia?',1,${default_content_id});
 
 
 

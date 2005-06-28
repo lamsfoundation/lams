@@ -1079,6 +1079,7 @@ public class QaServicePOJO implements
     public long getToolDefaultContentIdBySignature(String toolSignature) throws QaApplicationException
     {
     	long contentId=0;
+    	logger.debug(logger + " " + this.getClass().getName() +  "before attempting retrieving tool with signature : " + toolSignature);
     	contentId=toolService.getToolDefaultContentIdBySignature(toolSignature);
     	logger.debug(logger + " " + this.getClass().getName() +  " " + "tool default contentId : " + contentId);
 	    return contentId;

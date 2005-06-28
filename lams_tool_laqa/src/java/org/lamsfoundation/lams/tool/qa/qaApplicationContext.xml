@@ -39,8 +39,6 @@
 				<value>/WEB-INF/QaQueContent.hbm.xml</value>
 				<value>/WEB-INF/QaQueUsr.hbm.xml</value>
 				<value>/WEB-INF/QaUsrResp.hbm.xml</value>
-
-				<value>/WEB-INF/BasicToolVO.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -65,84 +63,6 @@
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 
-	<!--  core beans -->
-	
-	<bean id="toolDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
-	</bean>
-	
-	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
-	</bean>
-	
-	<bean id="roleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.RoleDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
-	</bean>
-	
-	<bean id="organisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
-	</bean>
-
-	<bean id="organisationTypeDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationTypeDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
-	</bean>
-
-	<bean id="authenticationMethodDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.AuthenticationMethodDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
-	</bean>
-
-	<bean id="userOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
-	</bean>
-
-	<bean id="userOrganisationRoleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationRoleDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
-	</bean>	
-	
-	
-	<!-- LAMS primary business object: Hibernate impleSmentation -->
-	<bean id="userManagementServiceTarget" class="org.lamsfoundation.lams.usermanagement.service.UserManagementService"
-		singleton="false"
-	>
-		<property name="userDAO"><ref local="userDAO"/></property>
-		<property name="roleDAO"><ref local="roleDAO"/></property>
-		<property name="organisationDAO"><ref local="organisationDAO"/></property>
-		<property name="organisationTypeDAO"><ref local="organisationTypeDAO"/></property>
-		<property name="userOrganisationDAO"><ref local="userOrganisationDAO"/></property>
-		<property name="userOrganisationRoleDAO"><ref local="userOrganisationRoleDAO"/></property>
-		<property name="authenticationMethodDAO"><ref local="authenticationMethodDAO"/></property>
-	</bean>	
-	
-	<!-- LAMS primary business object: Hibernate impleSmentation -->
-	<bean id="lamsToolServiceTarget" class="org.lamsfoundation.lams.tool.service.LamsToolService"
-		singleton="false"
-	>
-		<property name="toolDAO"><ref local="toolDAO"/></property>
-	</bean>	
-	
-	
-	<!--
-		- A parent bean definition which is a base definition for transaction proxies.
-		- It's marked as abstract, since it's not supposed to be instantiated itself.
-		- We set shared transaction attributes here, following our naming patterns.
-		- The attributes can still be overridden in child bean definitions.
-    -->
-	<bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="target"><ref local="lamsToolServiceTarget"/></property>
-		<property name="transactionAttributes">
-			<props>
-				<prop key="create*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-				<prop key="copy*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-				<prop key="save*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
-				<prop key="update*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-				<prop key="get*">PROPAGATION_REQUIRED,readOnly,-QacpApplicationException</prop>
-				<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-			</props>
-		</property>
-	</bean>
-	
-	
 	<!-- tool beans -->
 	<bean id="qaContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaContentDAO">
 		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
@@ -166,27 +86,30 @@
 	<!-- end of tool beans -->
 	
 
-	<bean id="qaService" parent="baseTransactionProxy">
-		<property name="target">
-			<bean class="org.lamsfoundation.lams.tool.qa.service.QaServicePOJO">
-				<property name="qaDAO"><ref bean="qaContentDAO"/></property>
-				<property name="qaSessionDAO"><ref bean="qaSessionDAO"/></property>
-				<property name="qaQueUsrDAO"><ref bean="qaQueUsrDAO"/></property>
-				<property name="qaQueContentDAO"><ref bean="qaQueContentDAO"/></property>
-				<property name="qaUsrRespDAO"><ref bean="qaUsrRespDAO"/></property>								
-				<!-- <property name="userManagementService"><ref bean="baseTransactionProxy"/></property> -->
-				<property name="toolService"><ref bean="baseTransactionProxy"/></property>			
-			</bean>
-		</property>
-		<property name="transactionAttributes">
-			<props>
-				<prop key="configureContentRepository">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-			</props>
-		</property>
+	<bean id="qaService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+			<property name="target">
+				<bean class="org.lamsfoundation.lams.tool.qa.service.QaServicePOJO">
+					<property name="qaDAO"><ref bean="qaContentDAO"/></property>
+					<property name="qaSessionDAO"><ref bean="qaSessionDAO"/></property>
+					<property name="qaQueUsrDAO"><ref bean="qaQueUsrDAO"/></property>
+					<property name="qaQueContentDAO"><ref bean="qaQueContentDAO"/></property>
+					<property name="qaUsrRespDAO"><ref bean="qaUsrRespDAO"/></property>								
+					<!-- <property name="userManagementService"><ref bean="baseTransactionProxy"/></property> -->
+					<property name="toolService"><ref bean="lamsToolService"/></property>
+				</bean>
+			</property>
+			<property name="transactionAttributes">
+				<props>
+					<prop key="create*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="copy*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="save*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
+					<prop key="update*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="get*">PROPAGATION_REQUIRED,readOnly,-QacpApplicationException</prop>
+					<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="configureContentRepository">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+				</props>
+			</property>
 	</bean>  
-
-	<!--  DAO classes -->
-	
-	
 
 </beans>
