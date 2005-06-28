@@ -51,9 +51,14 @@
 
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
-	<bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" 
-	  	  abstract="true">
+	<bean id="nbService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServicePOJO">
+				<property name="nbContentDAO"><ref bean="nbContentDAO"/></property>
+				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
+			</bean>
+		</property>
 		<property name="transactionAttributes">
 			<props>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
@@ -72,14 +77,14 @@
 		- but this is cleaner as there is no need to ever access the unwrapped object.
 		-->
 
-	<bean id="nbService" parent="baseTransactionProxy">
+<!--  	<bean id="nbService" parent="baseTransactionProxy">
 		<property name="target">
 			<bean class="org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServicePOJO">
 				<property name="nbContentDAO"><ref bean="nbContentDAO"/></property>
 				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
 			</bean>
 		</property>
-	</bean>  
+	</bean>  -->
 
 	<!--  DAO classes -->
 	<bean id="nbContentDAO" class="org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardContentDAO">
