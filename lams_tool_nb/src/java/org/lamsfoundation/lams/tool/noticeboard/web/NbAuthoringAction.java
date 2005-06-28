@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 
 import org.lamsfoundation.lams.tool.noticeboard.util.NbAuthoringUtil;
-
+import org.lamsfoundation.lams.util.WebUtil;
 
 
 /**
@@ -78,8 +78,8 @@ public class NbAuthoringAction extends LookupDispatchAction {
 	 */
 	public ActionForward basic(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		
-	    copyRichTextOnlineInstrnValue(request, (NbAuthoringForm)form);
-	    copyRichTextOfflineInstrnValue(request, (NbAuthoringForm)form);
+	    NbAuthoringForm nbForm = (NbAuthoringForm)form;
+	    copyInstructionFormProperty(request, nbForm);
 	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
 	}
 	
@@ -96,8 +96,8 @@ public class NbAuthoringAction extends LookupDispatchAction {
 	 */
 	
 	public ActionForward instructions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		copyRichTextContentValue(request, (NbAuthoringForm)form);
-		
+	    NbAuthoringForm nbForm = (NbAuthoringForm)form;
+	    copyInstructionFormProperty(request, nbForm);
 	    return mapping.findForward(NoticeboardConstants.INSTRUCTIONS_PAGE);
 	}	
 	
@@ -106,8 +106,8 @@ public class NbAuthoringAction extends LookupDispatchAction {
 	 */
 	
 	public ActionForward done(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	    copyRichTextOnlineInstrnValue(request, (NbAuthoringForm)form);
-	    copyRichTextOfflineInstrnValue(request, (NbAuthoringForm)form);
+	    NbAuthoringForm nbForm = (NbAuthoringForm)form;
+	    copyInstructionFormProperty(request, nbForm);
 	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
 	}
 	
@@ -124,12 +124,10 @@ public class NbAuthoringAction extends LookupDispatchAction {
 	public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
 		
 		NbAuthoringForm nbForm = (NbAuthoringForm)form;
-		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-		Long content_id = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID);
+		copyInstructionFormProperty(request, nbForm);
 		
-		copyRichTextContentValue(request, nbForm);
-		copyRichTextOnlineInstrnValue(request, nbForm);
-	    copyRichTextOfflineInstrnValue(request, nbForm);
+		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+		Long content_id = NbAuthoringUtil.convertToLong(nbForm.getToolContentId());
 		
 		//throws exception if the content id does not exist
 		checkContentId(content_id);
@@ -141,56 +139,7 @@ public class NbAuthoringAction extends LookupDispatchAction {
 		return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
 	}
 	
-	/**
-	 * The form bean property <code>content</code> is set 
-	 * with the value of <code>richTextContent</code> 
-	 * @param request
-	 * @param form
-	 */
-	private void copyRichTextContentValue(HttpServletRequest request, NbAuthoringForm form)
-	{
-	    String content = (String)request.getParameter(NoticeboardConstants.RICH_TEXT_CONTENT);
-	    if(content != null)
-	    {
-	        form.setContent(content);
-	        request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_CONTENT, content);
-	        
-	    }
-	}
 	
-	/**
-	 * The form bean property <code>onlineInstructions</code> is set 
-	 * with the value of <code>richTextOnlineInstructions</code> 
-	 * @param request
-	 * @param form
-	 */
-	private void copyRichTextOnlineInstrnValue(HttpServletRequest request, NbAuthoringForm form)
-	{
-	    String onlineInstruction = (String)request.getParameter(NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN);
-	    if(onlineInstruction != null)
-	    {
-	        form.setOnlineInstructions(onlineInstruction);
-	        request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN, onlineInstruction);
-	        
-	    }
-	}
-	
-	/**
-	 * The form bean property <code>offlineInstructions</code> is set 
-	 * with the value of <code>richTextOfflineInstructions</code> 
-	 * @param request
-	 * @param form
-	 */
-	private void copyRichTextOfflineInstrnValue(HttpServletRequest request, NbAuthoringForm form)
-	{
-	    String offlineInstruction = (String)request.getParameter(NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN);
-	    if(offlineInstruction != null)
-	    {
-	        form.setOfflineInstructions(offlineInstruction);
-	        request.getSession().setAttribute(NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN, offlineInstruction);
-	        
-	    }
-	}
 	
 	/**
 	 * It is assumed that the contentId is passed as a http parameter
@@ -208,6 +157,30 @@ public class NbAuthoringAction extends LookupDispatchAction {
 		}
 	}
 	
+	/**
+	 * This method copies the values of the request parameters <code>richTextOnlineInstructions</code>
+	 * <code>richTextOfflineInstructions</code> <code>richTextContent</code> into the form properties
+	 * onlineInstructions, offlineInstructions and content respectively.
+	 * If a null value is returned for the request parameter, the form value is not modified.
+	 * The request parameters are set as optional because the form spans amongst two pages. 
+	 * 
+	 * @param request HttpServlet request
+	 * @param form The ActionForm class containing data submitted by the forms.
+	 */
+	private void copyInstructionFormProperty(HttpServletRequest request, NbAuthoringForm form)
+	{
+	    String onlineInstruction = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN, true);
+	    String offlineInstruction = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN, true);
+	  	String content = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_CONTENT, true);
+	   
+	  	if(content != null)
+	  	    form.setContent(content);
+	  	if(onlineInstruction != null)
+	        form.setOnlineInstructions(onlineInstruction);
+	  	if(offlineInstruction != null)
+	  	    form.setOfflineInstructions(offlineInstruction);
+	  
+	}
 
 	
 	
