@@ -35,13 +35,16 @@ import org.lamsfoundation.lams.usermanagement.User;
  * TODO: change DEVELOPMENT_FLAG to false once the container creates and passes users to the tool
  * Assumption: Session attribute ATTR_USERDATA will be passed to the tool to hold User object 
  * 
+ * CONTENT_LOCKED refers to content being in use or not: Any students answered that content?
+ * For future CONTENT_LOCKED ->CONTENT_IN_USE 
  * 
  * DEFAULT_QUE_CONTENT_ID is hardcoded for the moment, it will probably go.
  * 
  * We won't need to create a mock user once the usernames are defined properly in the container and passed to the tool
    take off User mockUser=QaUtils.createMockUser();
  * 
- * QaStarterAction loads the default content and initialize the presentation Map
+ * QaStarterAction loads the default content and initializes the presentation Map
+ * Requests can come either from authoring envuironment or from the monitoring environment for Edit Activity screen
  * 
  * */
 
@@ -77,13 +80,13 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		}
 		
 		/**
-		 * retrive the default content id based on tool signature
+		 * retrieve the default content id based on tool signature
 		 */
-
+		long contentId=0;
 		try
 		{
 			logger.debug(logger + " " + this.getClass().getName() +  "attempt retrieving tool with signatute : " + MY_SIGNATURE);
-			long contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+			contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
 			logger.debug(logger + " " + this.getClass().getName() +  "retrieved tool default contentId: " + contentId);
 			if (contentId == 0)
 			{
@@ -101,7 +104,34 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
 
-		
+		/**
+		 * retrieve the default question content id based on default content id determined above
+		 */
+		try
+		{
+			logger.debug(logger + " " + this.getClass().getName() +  "retrieve the default question content id based on default content id: " + contentId);
+			QaQueContent qaQueContent=qaService.getToolDefaultQuestionContent(contentId);
+			logger.debug(logger + " " + this.getClass().getName() +  "using QaQueContent: " + qaQueContent);
+			if (qaQueContent == null)
+			{
+				logger.debug(logger + " " + this.getClass().getName() +  "Exception occured: " + " No default question content");
+	    		request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
+				persistError(request,"error.defaultQuestionContent.notAvailable");
+				return (mapping.findForward(LOAD_QUESTIONS));
+			}
+			/**
+        	 * display a single sample question
+        	 */
+    		System.out.println(this.getClass().getName() + " set default qa que content to: " + qaQueContent.getQuestion() );
+    		request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, qaQueContent.getQuestion());
+		}
+		catch(Exception e)
+		{
+			logger.debug(logger + " " + this.getClass().getName() +  "Exception occured: " + " No default question content");
+    		request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
+			persistError(request,"error.defaultQuestionContent.notAvailable");
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
 		
 		/**
 	     * mark the http session as an authoring activity 
@@ -165,7 +195,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		Boolean startMonitoringSummaryRequest=(Boolean)request.getAttribute(START_MONITORING_SUMMARY_REQUEST);
 		if ((startMonitoringSummaryRequest != null) && (startMonitoringSummaryRequest.booleanValue()))
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "will render Monitoring summary screen");
+			logger.debug(logger + " " + this.getClass().getName() +  "will render Monitoring Edit Activity screen");
 		    if  ((isMonitoringEditActivityVisited != null) && (isMonitoringEditActivityVisited.booleanValue()))
 		    {
 		    	if (monitoredContentId != null)
@@ -225,7 +255,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    /**
 		     * get default content from db, user never created any content before
 		     */
-			long contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+			contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
 		    logger.debug(logger + " " + this.getClass().getName() +  " " + "getting default content with id:" + contentId);
 		    
 		    QaContent defaultQaContent = qaService.retrieveQa(contentId);
@@ -252,27 +282,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			qaAuthoringForm.setQuestionsSequenced(OFF);
 			qaAuthoringForm.setSynchInMonitor(OFF);
 			
-			/**
-			 * get default question content
-			 */
-			QaQueContent defaultQaQueContent = qaService.retrieveQaQue(DEFAULT_QUE_CONTENT_ID);
-	    	logger.debug(logger + " " + this.getClass().getName() +  " " + defaultQaQueContent);
-	    	
-	    	if (defaultQaQueContent == null)
-			{
-	    		logger.debug(logger + " " + this.getClass().getName() +  "Exception occured: " + " No default content");
-	    		request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
-				persistError(request,"error.defaultQuestionContent.notAvailable");
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
-	    	
-        	/**
-        	 * display a single sample question
-        	 */
-    		System.out.println(this.getClass().getName() + " set default qa que content to: " + defaultQaQueContent.getQuestion() );
-    		request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, defaultQaQueContent.getQuestion());
-			
-	    	mapQuestionContent.clear();
+			mapQuestionContent.clear();
 	    	/**
 	    	 * place the default question as the first entry in the Map
 	    	 */
@@ -283,7 +293,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		{
 			/**
 			 * fetch the existing content from db, user will be presented with her previously created content data
-			 * Note that the content might have been LOCKED if one or more learner has started activuties with this content
+			 * Note that the content might have been LOCKED(content in use) if one or more learner has started activities with this content
 			 */
 		    logger.debug(logger + " " + this.getClass().getName() +  " " + "getting existing content with id:" + toolContentId);
 		    QaContent defaultQaContent = qaService.retrieveQa(toolContentId);
@@ -308,7 +318,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			QaUtils.setDefaultSessionAttributes(request, defaultQaContent, qaAuthoringForm);
 			
 			/**
-			 * determine the satus of radio boxes
+			 * determine the status of radio boxes
 			 */
 			logger.debug(logger + " " + this.getClass().getName() +  "IS_USERNAME_VISIBLE: " + defaultQaContent.isUsernameVisible());
 		    logger.debug(logger + " " + this.getClass().getName() +  "set UsernameVisible to : " + defaultQaContent.isUsernameVisible());
@@ -327,16 +337,16 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    else
 		    	qaAuthoringForm.setQuestionsSequenced(OFF);
 		    
-		    request.getSession().setAttribute(IS_USERNAME_VISIBLE_MONITORING, new Boolean(defaultQaContent.isUsernameVisible()));
-		    request.getSession().setAttribute(IS_SYNCH_INMONITOR_MONITORING, new Boolean(defaultQaContent.isSynchInMonitor()));
-		    request.getSession().setAttribute(IS_QUESTIONS_SEQUENCED_MONITORING, new Boolean(defaultQaContent.isQuestionsSequenced()));
-		    request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(defaultQaContent.isDefineLater()));
-		    request.getSession().setAttribute(REPORT_TITLE, defaultQaContent.getReportTitle());
-		    request.getSession().setAttribute(MONITORING_REPORT_TITLE, defaultQaContent.getMonitoringReportTitle());
-		    request.getSession().setAttribute(OFFLINE_INSTRUCTIONS, defaultQaContent.getOfflineInstructions());
-		    request.getSession().setAttribute(ONLINE_INSTRUCTIONS, defaultQaContent.getOnlineInstructions());
-		    request.getSession().setAttribute(END_LEARNING_MESSSAGE, defaultQaContent.getEndLearningMessage());
-		    request.getSession().setAttribute(CREATION_DATE, defaultQaContent.getCreationDate());
+		    request.getSession().setAttribute(IS_USERNAME_VISIBLE_MONITORING, 	new Boolean(defaultQaContent.isUsernameVisible()));
+		    request.getSession().setAttribute(IS_SYNCH_INMONITOR_MONITORING, 	new Boolean(defaultQaContent.isSynchInMonitor()));
+		    request.getSession().setAttribute(IS_QUESTIONS_SEQUENCED_MONITORING,new Boolean(defaultQaContent.isQuestionsSequenced()));
+		    request.getSession().setAttribute(IS_DEFINE_LATER, 					new Boolean(defaultQaContent.isDefineLater()));
+		    request.getSession().setAttribute(REPORT_TITLE, 					defaultQaContent.getReportTitle());
+		    request.getSession().setAttribute(MONITORING_REPORT_TITLE, 			defaultQaContent.getMonitoringReportTitle());
+		    request.getSession().setAttribute(OFFLINE_INSTRUCTIONS, 			defaultQaContent.getOfflineInstructions());
+		    request.getSession().setAttribute(ONLINE_INSTRUCTIONS, 				defaultQaContent.getOnlineInstructions());
+		    request.getSession().setAttribute(END_LEARNING_MESSSAGE, 			defaultQaContent.getEndLearningMessage());
+		    request.getSession().setAttribute(CREATION_DATE, 					defaultQaContent.getCreationDate());
 		    
 		    logger.debug(logger + " " + this.getClass().getName() +  "IS_QUESTIONS_SEQUENCED_MONITORING: " + 
 		    								request.getSession().getAttribute(IS_QUESTIONS_SEQUENCED_MONITORING));

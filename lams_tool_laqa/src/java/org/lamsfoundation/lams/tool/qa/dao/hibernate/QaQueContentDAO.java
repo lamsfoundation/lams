@@ -6,9 +6,13 @@
  */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
+import net.sf.hibernate.HibernateException;
+import net.sf.hibernate.Session;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
+import org.springframework.orm.hibernate.HibernateCallback;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 
@@ -23,6 +27,21 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueContentDAO {
 	 	static Logger logger = Logger.getLogger(QaQueContentDAO.class.getName());
+	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from qaQueContent in class QaQueContent where qaQueContent.qaContentId=:qaContentId";
+	 	
+	 	public QaQueContent getToolDefaultQuestionContent(final long qaContentId)
+	    {
+	        return (QaQueContent) getHibernateTemplate().execute(new HibernateCallback()
+	         {
+	             public Object doInHibernate(Session session) throws HibernateException
+	             {
+	                 return session.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
+	                               .setLong("qaContentId", qaContentId)
+	                               .uniqueResult();
+	             }
+	         });
+	    }
+
 	 	
 	 	public QaQueContent getQaQueById(long qaQueContentId)
 	 	{

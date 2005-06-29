@@ -1084,7 +1084,14 @@ public class QaServicePOJO implements
     	logger.debug(logger + " " + this.getClass().getName() +  " " + "tool default contentId : " + contentId);
 	    return contentId;
     }
-    
+
+    public QaQueContent getToolDefaultQuestionContent(long contentId) throws QaApplicationException
+    {
+    	logger.debug(logger + " " + this.getClass().getName() +  "before attempting retrieving QaQueContent with contentId : " + contentId);
+    	QaQueContent qaQueContent=qaQueContentDAO.getToolDefaultQuestionContent(contentId);
+    	logger.debug(logger + " " + this.getClass().getName() +  "retrieved QaQueContent : " + qaQueContent);
+    	return qaQueContent; 
+    }
 
     /**
 	 * @return Returns the qaDAO.

@@ -182,7 +182,9 @@ public interface IQaService
     public BasicToolVO getToolBySignature(String toolSignature);
     
     public long getToolDefaultContentIdBySignature(String toolSignature);
-        
+    
+    public QaQueContent getToolDefaultQuestionContent(long contentId);
+            
     public int countSessionUser(QaSession qaSession);
 	
 }

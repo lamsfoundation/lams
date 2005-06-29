@@ -32,6 +32,8 @@ public interface IQaQueContentDAO
 {
     public QaQueContent getQaQueById(long qaQueContentId);
     
+    public QaQueContent getToolDefaultQuestionContent(final long qaContentId);
+    
     public void createQueContent(QaQueContent queContent);
     
     public void removeQueContent(long qaQueContentId);

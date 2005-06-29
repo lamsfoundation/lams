@@ -77,6 +77,8 @@ public class QaQueContent implements Serializable,Comparable, Nullable
     /** nullable persistent field */
     private boolean isOptional;
 
+    /** nullable persistent field */
+    private Long qaContentId;
     
     /** default constructor */
     public QaQueContent()
@@ -342,4 +344,16 @@ public class QaQueContent implements Serializable,Comparable, Nullable
     }
 
     
+	/**
+	 * @return Returns the qaContentId.
+	 */
+	public Long getQaContentId() {
+		return qaContentId;
+	}
+	/**
+	 * @param qaContentId The qaContentId to set.
+	 */
+	public void setQaContentId(Long qaContentId) {
+		this.qaContentId = qaContentId;
+	}
 }
