@@ -27,7 +27,7 @@ public class ForumTest extends TestCase {
         Forum entity = new Forum();
         entity.setTitle("Lams Forum");
         entity.setLockWhenFinished(false);
-        entity.setForceOffLine(true);
+        entity.setForceOffline(true);
         entity.setAllowAnnomity(true);
         entity.setCreatedBy(new Long("1000"));
 
@@ -70,7 +70,7 @@ public class ForumTest extends TestCase {
         assertEquals("date difference in database and memory", entity.getUpdated().getTime()/1000, reloaded.getUpdated().getTime()/1000);
          assertEquals("title should be Lams Forum", "Lams Forum", reloaded.getTitle());
         assertEquals("lockWhenFinished should be false", false, reloaded.getLockWhenFinished());
-        assertEquals("forceOffline should be true", true, reloaded.getForceOffLine());
+        assertEquals("forceOffline should be true", true, reloaded.getForceOffline());
         assertEquals("allowAnnomity should be true", true, reloaded.getAllowAnnomity());
             //validate attachment relations
         assertEquals("should have 1 attachments", 1, reloaded.getAttachments().size());
