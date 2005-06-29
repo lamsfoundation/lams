@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+																								 <!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN" "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd">
+<tiles-definitions>
+	<!--
+		This is a default layout which has a header and body
+	-->
+	<definition name="tiles:defaultLayout" path="/includes/defaultLayout.jsp">
+    	<put name="body" value=""/>
+    	<put name="header" value="/includes/header.jsp"/>
+	</definition>
+
+	<!--
+		This is a layout which has a header, footer and body.
+		This layout also displays the page header (pageIcon + pageTitleKey)
+		at the top of the page
+	-->
+	<definition name="tiles:layout" path="/includes/layout.jsp">
+    	<put name="pageIcon" value="icon_settings_s.gif"/>
+    	<put name="pageTitleKey" value=""/>
+    	<put name="body" value=""/>
+    	<put name="header" value="/includes/header.jsp"/>
+    	<put name="footer" value="/includes/footer.jsp"/>
+	</definition>
+
+    <definition name="tiles:/authoring/forum/create" path="/includes/tabsLayout.jsp" >
+       	<put name="pageIcon" value="icon_settings_s.gif"/>
+       	<put name="pageTitleKey" value="title.forum.add"/>
+        <put name="selectedIndex" value="0" />
+        <put name="parameterName" value="selected" />
+        <put name="actionName" value="/forum/authoring/forum/create.do" />
+        <put name="header" value="/includes/header.jsp"/>
+        <put name="footer" value="/includes/footer.jsp"/>
+        <putList name="tabList" >
+            <item value="Basic" link="/WEB-INF/jsps/authoring/forum/basic.jsp" classtype="org.apache.struts.tiles.beans.SimpleMenuItem" />
+            <item value="Advanced" link="/WEB-INF/jsps/authoring/forum/advanced.jsp" classtype="org.apache.struts.tiles.beans.SimpleMenuItem" />
+            <item value="Instructions" link="/WEB-INF/jsps/authoring/forum/instructions.jsp" classtype="org.apache.struts.tiles.beans.SimpleMenuItem" />
+        </putList>
+    </definition>
+
+    <definition name="tiles:/authoring/forum/edit" path="/includes/tabsLayout.jsp" >
+       	<put name="pageIcon" value="icon_settings_s.gif"/>
+       	<put name="pageTitleKey" value="title.forum.edit"/>
+        <put name="selectedIndex" value="0" />
+        <put name="parameterName" value="selected" />
+        <put name="actionName" value="/forum/authoring/forum/edit.do" />
+        <put name="header" value="/includes/header.jsp"/>
+        <put name="footer" value="/includes/footer.jsp"/>
+        <putList name="tabList" >
+            <item value="Basic" link="/WEB-INF/jsps/authoring/forum/editBasic.jsp" classtype="org.apache.struts.tiles.beans.SimpleMenuItem" />
+            <item value="Advanced" link="/WEB-INF/jsps/authoring/forum/editAdvanced.jsp" classtype="org.apache.struts.tiles.beans.SimpleMenuItem" />
+            <item value="Instructions" link="/WEB-INF/jsps/authoring/forum/editInstructions.jsp" classtype="org.apache.struts.tiles.beans.SimpleMenuItem" />
+        </putList>
+    </definition>
+	<!-- B: Generic -->
+
+	<definition name="tiles:/error" extends="tiles:layout">
+    	<put name="body" value="/includes/error.jsp"/>
+	</definition>
+
+	<definition name="tiles:/blank" extends="tiles:layout">
+    	<put name="body" value="/includes/blank.jsp"/>
+	</definition>
+	<!-- E: Generic -->
+
+	<!-- B: Forum -->
+	<definition name="tiles:/authoring/forum/instructions" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.forum.add"/>
+    	<put name="body" value="/WEB-INF/jsps/authoring/forum/instructions.jsp"/>
+	</definition>
+
+    <definition name="tiles:/authoring/forum/basic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.forum.add"/>
+    	<put name="body" value="/WEB-INF/jsps/authoring/forum/basic.jsp"/>
+	</definition>
+
+	<definition name="tiles:/authoring/forum/view" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.forum.view"/>
+    	<put name="body" value="/WEB-INF/jsps/authoring/forum/view.jsp"/>
+	</definition>
+
+	<definition name="tiles:/authoring/forum/success" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.forum.delete"/>
+    	<put name="body" value="/WEB-INF/jsps/authoring/forum/success.jsp"/>
+	</definition>
+
+    <definition name="tiles:/authoring/forum/newTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.add"/>
+    	<put name="body" value="/WEB-INF/jsps/authoring/message/create.jsp"/>
+	</definition>
+
+
+    <definition name="tiles:/authoring/message/edit" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.delete"/>
+    	<put name="body" value="/WEB-INF/jsps/authoring/message/edit.jsp"/>
+	</definition>
+
+
+	<!-- E: Forum -->
+
+	<!-- B: Message -->
+    <definition name="tiles:/learning/forum/open" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.forum.open"/>
+    	<put name="body" value="/WEB-INF/jsps/learning/forum/open.jsp"/>
+	</definition>
+
+    <definition name="tiles:/learning/message/open" extends="tiles:layout">
+          <put name="pageTitleKey" value="title.messageTopic.open"/>
+          <put name="body" value="/WEB-INF/jsps/learning/message/open.jsp"/>
+    </definition>
+
+    <definition name="tiles:/learning/message/post" extends="tiles:layout">
+          <put name="pageTitleKey" value="title.message.reply"/>
+          <put name="body" value="/WEB-INF/jsps/learning/message/reply.jsp"/>
+    </definition>
+
+    <!--
+	<definition name="tiles:/learning/message/create" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.add"/>
+    	<put name="body" value="/WEB-INF/jsps/learning/message/create.jsp"/>
+	</definition>
+
+	<definition name="tiles:/learning/message/edit" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.edit"/>
+    	<put name="body" value="/WEB-INF/jsps/learning/message/edit.jsp"/>
+	</definition>
+	<definition name="tiles:/learning/message/view" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.view"/>
+    	<put name="body" value="/WEB-INF/jsps/learning/message/view.jsp"/>
+	</definition>
+
+	<definition name="tiles:/learning/message/sucess" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.delete"/>
+    	<put name="body" value="/WEB-INF/jsps/learning/message/success.jsp"/>
+	</definition>
+    -->
+
+	<!-- E: Message -->
+
+</tiles-definitions>
