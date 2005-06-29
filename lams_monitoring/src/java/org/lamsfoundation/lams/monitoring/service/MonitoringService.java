@@ -32,7 +32,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
-import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -871,6 +870,15 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    table.put("gateOpen", gate.getGateOpen());
 	    table.put("activityLevelID", gate.getGateActivityLevelId()); 
 	    table.put("learnersWaiting", new Integer(gate.getWaitingLearners().size()));
+	    
+	    /* if the gate is a schedule gate, include the information about gate opening 
+	     * and gate closing times */
+	    if (gate.isScheduleGate())
+	    {
+	        ScheduleGateActivity scheduleGate = (ScheduleGateActivity)gate;
+	        table.put("gateStartTime", scheduleGate.getGateStartDateTime());
+	        table.put("gateEndTime", scheduleGate.getGateEndDateTime());
+	    }
 	    return table;
     }
     
