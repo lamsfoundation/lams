@@ -49,6 +49,7 @@ public class TestQaUsrResp extends QaDataAccessTestCase
     	
 		QaUsrResp qaUsrResp= new QaUsrResp("I am from Mars",false,
 											new Date(System.currentTimeMillis()),
+											"",
 											qaQueContent,
 											getExistingUser("randomstriker","Michael Random"));
 		qaUsrRespDAO.createUserResponse(qaUsrResp);

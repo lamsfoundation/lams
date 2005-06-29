@@ -118,6 +118,7 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     {
     	QaUsrResp qaUsrResp= new QaUsrResp(response, false,
 											new Date(System.currentTimeMillis()),
+											"",
 											qaQueContent,
 											getExistingUser("randomstriker","Michael Random"));
 		qaUsrRespDAO.createUserResponse(qaUsrResp);
@@ -130,6 +131,7 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     	
 		QaUsrResp qaUsrResp= new QaUsrResp(response, false,
 											new Date(System.currentTimeMillis()),
+											"",
 											qaQueContent,
 											getExistingUser("randomstriker","Michael Random"));
 		qaUsrRespDAO.createUserResponse(qaUsrResp);

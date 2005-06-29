@@ -9,7 +9,8 @@
 
 package org.lamsfoundation.lams.tool.qa;
 
-import org.lamsfoundation.lams.tool.BasicToolVO;
+import java.util.TimeZone;
+
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 
 
@@ -166,5 +167,10 @@ public class TestQaContent extends QaDataAccessTestCase
     }
     */
     
+    public void testTimeZone()
+    {
+    	TimeZone timeZone=TimeZone.getDefault();
+    	System.out.println("timeZone: " + timeZone.getDisplayName());
+    }
     
 }

@@ -79,6 +79,7 @@ public class QaContent implements Serializable {
 	
     /** nullable persistent field */
     private Date updateDate;
+    
 	
 	/** persistent field */
     private Set qaQueContents;
@@ -112,7 +113,7 @@ public class QaContent implements Serializable {
 	                 boolean 	contentLocked,
 	                 String		creationDate,
 	                 Date 		updateDate,
-					 Set 		qaQueContents,
+	                 Set 		qaQueContents,
 	                 Set 		qaSessions)
     {
         this.qaContentId 		 = qaContentId;
@@ -129,7 +130,7 @@ public class QaContent implements Serializable {
         this.questionsSequenced	 = questionsSequenced;
         this.usernameVisible 	 = usernameVisible;
         this.synchInMonitor 	 = synchInMonitor;
-        this.contentLocked		 =contentLocked;
+        this.contentLocked		 = contentLocked;
         this.creationDate 		 = creationDate;
         this.updateDate 		 = updateDate;
         this.qaQueContents 		 = qaQueContents;
@@ -165,7 +166,7 @@ public class QaContent implements Serializable {
 					 qa.isContentLocked(),
                      qa.getCreationDate(),
                      qa.getUpdateDate(),
-                     new TreeSet(),
+					 new TreeSet(),
                      new TreeSet());
     	logger.debug(logger + " " + "QaContent" +  " " + "before doing deepCopyQaQueContent");
     	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));

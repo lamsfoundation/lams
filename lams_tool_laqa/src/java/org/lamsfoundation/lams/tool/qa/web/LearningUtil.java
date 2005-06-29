@@ -228,8 +228,12 @@ public class LearningUtil implements QaAppConstants{
                 														 " question: " + question + " answer: " + answer);
         		
                 
+                String timezone=(String)request.getSession().getAttribute(TIMEZONE);
+                if (timezone == null) timezone="";
+                
             	QaUsrResp qaUsrResp= new QaUsrResp(answer,false,
 						new Date(System.currentTimeMillis()),
+						timezone,
 						qaQueContent,
 						qaQueUsr); 
 
@@ -534,11 +538,13 @@ public class LearningUtil implements QaAppConstants{
 			    			 * place these whether username visible or not
 			    			 */
 			    			
-			    			logger.debug(logger + " " + this.getClass().getName() +  "setting attemptTime:   " + "aTime" + questionIndex +""+ responseIndex + "---------" + qaUsrResp.getAttemptTime());
+			    			logger.debug(logger + " " + this.getClass().getName() +  "setting attemptTime:   " + "aTime" + questionIndex +""+ responseIndex + 
+			    																"---------" + qaUsrResp.getAttemptTime() +"-----" + qaUsrResp.getTimezone() );
 			    			
 			    			request.getSession().setAttribute(ANSWER + questionIndex +""+ responseIndex, qaUsrResp.getAnswer());
 			    			request.getSession().setAttribute(ATIME + questionIndex +""+ responseIndex, qaUsrResp.getAttemptTime());
-		    	    		
+			    			request.getSession().setAttribute(TIMEZONE + questionIndex +""+ responseIndex, qaUsrResp.getTimezone());
+						    			
 		    	    		if (qaQueUsr.getUsername().equalsIgnoreCase(toolUser.getLogin()))
 		    	    		{
 		    	    			request.getSession().setAttribute(FULLNAME + questionIndex +""+ responseIndex, qaQueUsr.getFullname());

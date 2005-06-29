@@ -66,6 +66,7 @@ CREATE TABLE lams.tl_laqa11_usr_resp (
      , hidden TINYINT(1) DEFAULT 0
      , answer VARCHAR(255)
      , attempt_time DATETIME
+     , time_zone VARCHAR(255)
      , que_usr_id BIGINT(20) NOT NULL
      , qa_que_content_id BIGINT(20) NOT NULL
      , PRIMARY KEY (response_id)

@@ -216,6 +216,7 @@ public interface QaAppConstants {
     public static final String RESPONSE_HIDDEN							="responseHidden";
     public static final String CURRENTLEARNER_FULLNAME					="currentLearnerFullname";
     public static final String ATTR_USERDATA 							="qa_user";
+    public static final String TIMEZONE									="timeZone";
     /**
      * following tell whether author prefers to  have the questions listed all in one page or listed sequentially. The default is all in one page.
      */

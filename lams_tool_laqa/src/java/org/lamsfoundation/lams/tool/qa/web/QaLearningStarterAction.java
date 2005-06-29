@@ -7,12 +7,12 @@ package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.lamsfoundation.lams.usermanagement.User;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -32,14 +32,13 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * 
  * @author ozgurd
  *
- * Learner mode takes in the parameters TOOL_SESSION_ID and TOOL_CONTENT_ID
- *
- * Make a note to change QaAppConstants.DEVELOPMENT_FLAG to false in deployment.
+ * Learner mode takes in the parameters USER_ID, TOOL_SESSION_ID and TOOL_CONTENT_ID
  *
  * This class is used to load the default content and initialize the presentation Map for Learner mode 
  * 
@@ -210,6 +209,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			}
 	    }
 
+	    TimeZone timeZone=TimeZone.getDefault();
+	    logger.debug(logger + " " + this.getClass().getName() +  "current qaSession: " + timeZone.getDisplayName());
+	    request.getSession().setAttribute(TIMEZONE, timeZone.getDisplayName());
+	    	    
 	    /**
 	     * By now, the passed tool session id MUST exist in the db through the calling of:
 	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.

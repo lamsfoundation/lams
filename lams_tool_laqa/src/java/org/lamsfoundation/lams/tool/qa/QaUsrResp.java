@@ -8,7 +8,6 @@ import java.util.List;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
 
 
 /**
@@ -45,29 +44,36 @@ public class QaUsrResp implements Serializable, Comparable {
     /** nullable persistent field */
     private QaQueUsr qaQueUser;
 
+    /** nullable persistent field */
+    private String timezone;
+    
     /** full constructor */
      public QaUsrResp(Long responseId,
     				String answer,
     				boolean hidden,
-    				Date attemptTime, 
+    				Date attemptTime,
+    				String timezone,
     				QaQueContent qaQueContent, 
     				QaQueUsr qaQueUser) {
      	this.responseId =responseId;
         this.answer = answer;
         this.hidden = hidden;
         this.attemptTime = attemptTime;
+        this.timezone = timezone;
         this.qaQueContent = qaQueContent;
         this.qaQueUser = qaQueUser;
     }
     
     public QaUsrResp(String answer,
     				boolean hidden,
-    				Date attemptTime, 
+    				Date attemptTime,
+    				String timezone,
     				QaQueContent qaQueContent, 
     				QaQueUsr qaQueUser) {
         this.answer = answer;
         this.hidden = hidden;
         this.attemptTime = attemptTime;
+        this.timezone = timezone;
         this.qaQueContent = qaQueContent;
         this.qaQueUser = qaQueUser;
     }
@@ -97,6 +103,7 @@ public class QaUsrResp implements Serializable, Comparable {
                              response.getAnswer(),
                              response.isHidden(),
                              response.getAttemptTime(),
+							 response.getTimezone(),
                              response.getQaQueContent(),
                              response.qaQueUser);
     }
@@ -312,5 +319,18 @@ public class QaUsrResp implements Serializable, Comparable {
 	 */
 	public void setHidden(boolean hidden) {
 		this.hidden = hidden;
+	}
+	
+	/**
+	 * @return Returns the timezone.
+	 */
+	public String getTimezone() {
+		return timezone;
+	}
+	/**
+	 * @param timezone The timezone to set.
+	 */
+	public void setTimezone(String timezone) {
+		this.timezone = timezone;
 	}
 }

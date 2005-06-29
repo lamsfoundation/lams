@@ -29,7 +29,8 @@
 	  				 	<tr> 
 							 <td> &nbsp&nbsp&nbsp <fmt:message key="label.learning.user"/>	</td>  
 	  						 <td> &nbsp&nbsp&nbsp <fmt:message key="label.learning.attemptTime"/></td>
-	  						 <td> &nbsp&nbsp&nbsp <fmt:message key="label.learning.response"/> 	</td>
+ 	  						 <td> &nbsp&nbsp&nbsp <fmt:message key="label.learning.timezone"/></td>
+	  						 <td> &nbsp&nbsp&nbsp <fmt:message key="label.learning.response"/></td>
 			  			</tr>				 
 			  			
 							<c:set var="ansIndex" scope="request" value="0"/>
@@ -38,14 +39,18 @@
 								
 							  	<%String fullName="fullName" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
 							  	  String aTime="aTime" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+				  	  		  	  String timeZone="timeZone" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
 								  String answer="answer" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
 							   	  String currentLearnerFullname=(String) request.getSession().getAttribute("currentLearnerFullname");
 							   	  								  
 								  fullName= (String) request.getSession().getAttribute(fullName);
 						 	   	  java.util.Date attemptTime= (java.util.Date) request.getSession().getAttribute(aTime);
+  						 	   	  timeZone= (String) request.getSession().getAttribute(timeZone);
 						 	   	  answer= (String) request.getSession().getAttribute(answer);
+						 	   	  
 								  request.setAttribute("fullName", fullName);
 						 	   	  request.setAttribute("attemptTime", attemptTime);
+						 	   	  request.setAttribute("timeZone", timeZone);
 						 	   	  request.setAttribute("answer", answer);
 						 	   	  request.setAttribute("currentLearnerFullname", currentLearnerFullname);
 								%>
@@ -98,6 +103,15 @@
 												&nbsp&nbsp&nbsp  <c:out value="${requestScope.attemptTime}"/> 
 											</td>  
 										<%}%>					
+
+										 <% if (timeZone != null)
+										 	{
+										 %>
+											<td>  
+												&nbsp&nbsp&nbsp  <c:out value="${requestScope.timeZone}"/> 
+											</td>  
+										<%}%>					
+
 
 										 <% if (answer != null)
 										 	{

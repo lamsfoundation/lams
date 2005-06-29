@@ -38,11 +38,6 @@ import org.lamsfoundation.lams.usermanagement.User;
  * CONTENT_LOCKED refers to content being in use or not: Any students answered that content?
  * For future CONTENT_LOCKED ->CONTENT_IN_USE 
  * 
- * DEFAULT_QUE_CONTENT_ID is hardcoded for the moment, it will probably go.
- * 
- * We won't need to create a mock user once the usernames are defined properly in the container and passed to the tool
-   take off User mockUser=QaUtils.createMockUser();
- * 
  * QaStarterAction loads the default content and initializes the presentation Map
  * Requests can come either from authoring envuironment or from the monitoring environment for Edit Activity screen
  * 
