@@ -295,7 +295,8 @@
 
 		<mkdir dir="${deploy.dir}/WEB-INF/classes" />
 		<copy todir="${deploy.dir}/WEB-INF/classes">
-            <fileset dir="${web.classes.dir}" includes="**/*.class"/>
+              <fileset dir="${web.classes.dir}" includes="**/*.class"/>
+              <fileset dir="${web.src.dir}" includes="log4j.properties"/>
               <fileset dir="${web.dir}/struts" includes="*.tld,*.xml"/>
         </copy>
 
