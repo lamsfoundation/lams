@@ -14,7 +14,6 @@ import java.util.List;
 import net.sf.hibernate.HibernateException;
 import net.sf.hibernate.Session;
 
-import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.springframework.orm.hibernate.HibernateCallback;
