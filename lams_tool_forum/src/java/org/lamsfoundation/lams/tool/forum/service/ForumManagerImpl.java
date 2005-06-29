@@ -6,10 +6,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceDelegate;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,10 +23,11 @@ public class ForumManagerImpl implements ForumManager {
         this.persistenceDelegate = persistenceDelegate;
     }
 
-    public Forum createForum(Forum forum, List attachments) throws PersistenceException {
+    public Forum createForum(Forum forum, Map attachments, Map topics) throws PersistenceException {
         if (attachments != null && attachments.size() !=0) {
             Set documents = new HashSet();
-            Iterator it = attachments.iterator();
+            Collection attachmentList = attachments.values();
+            Iterator it = attachmentList.iterator();
             while (it.hasNext()) {
                 Attachment attachment = (Attachment) it.next();
                 persistenceDelegate.saveOrUpdate(attachment);
@@ -38,28 +36,53 @@ public class ForumManagerImpl implements ForumManager {
             forum.setAttachments(documents);
         }
         persistenceDelegate.saveOrUpdate(forum);
+
+        //save topics of forum
+        if (topics != null && topics.size() !=0) {
+          Collection topicList = topics.values();
+          Iterator it = topicList.iterator();
+          while (it.hasNext()) {
+                Message message = (Message) it.next();
+                message.setIsAuthored(true);
+                this.createMessage(forum.getId(), message);
+          }
+        }
         return forum;
     }
 
-    public Forum editForum(Forum forum, List attachments) throws PersistenceException {
+    public Forum editForum(Forum forum, Map attachments, Map topics) throws PersistenceException {
         Forum reloaded = this.getForum(forum.getId());
         reloaded.setTitle(forum.getTitle());
         reloaded.setCreatedBy(forum.getCreatedBy());
         reloaded.setLockWhenFinished(forum.getLockWhenFinished());
-        reloaded.setForceOffLine(forum.getForceOffLine());
+        reloaded.setForceOffline(forum.getForceOffline());
         reloaded.setAllowAnnomity(forum.getAllowAnnomity());
         reloaded.setInstructions(forum.getInstructions());
         reloaded.setOnlineInstructions(forum.getOnlineInstructions());
         reloaded.setOfflineInstructions(forum.getOfflineInstructions());
-        Set documents = new HashSet();
-        Iterator it = attachments.iterator();
-        while (it.hasNext()) {
-            Attachment attachment = (Attachment) it.next();
-            persistenceDelegate.saveOrUpdate(attachment);
-            documents.add(attachment);
+        if (attachments != null && attachments.size() !=0) {
+            Set documents = reloaded.getAttachments();
+            Collection attachmentList = attachments.values();
+            Iterator it = attachmentList.iterator();
+            while (it.hasNext()) {
+                Attachment attachment = (Attachment) it.next();
+                persistenceDelegate.saveOrUpdate(attachment);
+                documents.add(attachment);
+            }
+            forum.setAttachments(documents);
         }
-        reloaded.setAttachments(documents);
         persistenceDelegate.saveOrUpdate(reloaded);
+
+        //save topics of forum
+        if (topics != null && topics.size() !=0) {
+          Collection topicList = topics.values();
+          Iterator it = topicList.iterator();
+          while (it.hasNext()) {
+                Message message = (Message) it.next();
+                this.createMessage(forum.getId(), message);
+          }
+        }
+
         return forum;
     }
 
@@ -70,6 +93,15 @@ public class ForumManagerImpl implements ForumManager {
     public void deleteForum(Long forumId) throws PersistenceException {
         Forum forum = this.getForum(forumId);
         persistenceDelegate.delete(forum);
+    }
+
+    public List getTopics(Long forumId) throws PersistenceException {
+        return persistenceDelegate.findByNamedQuery(Message.class, "allAuthoredMessagesOfForum", forumId);
+    }
+
+    public void deleteForumAttachment(Long attachmentId) throws PersistenceException {
+        Attachment attachment = (Attachment) this.persistenceDelegate.getById(Attachment.class, attachmentId);
+        persistenceDelegate.delete(attachment);
     }
 
     public Message createMessage(Long forumId, Message message) throws PersistenceException {
@@ -100,6 +132,8 @@ public class ForumManagerImpl implements ForumManager {
     public Message replyToMessage(Long messageId, Message replyMessage) throws PersistenceException {
         Message message = this.getMessage(messageId);
         replyMessage.setForum(message.getForum());
+        replyMessage.setParent(message);
+        persistenceDelegate.saveOrUpdate(replyMessage);
         Set replies = message.getReplies();
         if (replies == null) {
             replies = new HashSet();

@@ -10,7 +10,7 @@ import java.util.Date;
  * @hibernate.joined-subclass-key column="id"
  *
  * @hibernate.query name="allMessages" query="from Message message"
- * @hibernate.query name="allAuthoredMessagesByForum" query="from Message message where message.forum = ? AND message.isAuthored = true"
+ * @hibernate.query name="allAuthoredMessagesOfForum" query="from Message message where message.forum.id = ? AND message.isAuthored = true"
  * @hibernate.query name="allMessagesByForum" query="from Message message where message.forum = ?"
  */
 public class Message extends GenericEntity {
@@ -18,6 +18,7 @@ public class Message extends GenericEntity {
 	protected String body;
     protected boolean isAuthored;
 	protected boolean isAnnonymous;
+    protected Message parent;
     protected Set replies;
     protected Forum forum;
 
@@ -138,5 +139,16 @@ public class Message extends GenericEntity {
     public void setForum(Forum forum) {
          this.forum = forum;
      }
+
+	/**
+	 * @param parent The parent of this Message
+     */
+    public void setParent(Message parent) {
+        this.parent = parent;
+    }
+
+    public Message getParent() {
+        return parent;
+    }
 
 }

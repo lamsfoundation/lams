@@ -65,7 +65,7 @@ public class Forum extends GenericEntity {
 	 * 		column="FORCEOFFLINE"
 	 *
 	 */
-	public boolean getForceOffLine() {
+	public boolean getForceOffline() {
 		return forceOffline;
 	}
     
@@ -74,7 +74,7 @@ public class Forum extends GenericEntity {
 	 *
 	 *
 	 */
-	public void setForceOffLine(boolean forceOffline) {
+	public void setForceOffline(boolean forceOffline) {
 		this.forceOffline = forceOffline;
 	}
 

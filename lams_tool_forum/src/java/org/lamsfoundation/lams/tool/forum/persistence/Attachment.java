@@ -16,10 +16,10 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 public class Attachment extends GenericEntity {
     protected byte[] data;
     protected boolean type;
+    protected String name;
     protected String contentType;
     public final static boolean TYPE_ONLINE = true;
     public final static boolean TYPE_OFFLINE = false;
-
 
     /**
      * @hibernate.property column="DATA"
@@ -50,6 +50,17 @@ public class Attachment extends GenericEntity {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    /**
+     * @hibernate.property column="NAME"
+     */
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

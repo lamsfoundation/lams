@@ -6,6 +6,7 @@ import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,10 +17,12 @@ import java.util.List;
  */
 public interface ForumManager {
 
-    public Forum createForum(Forum forum, List attachments) throws PersistenceException;
-    public Forum editForum(Forum forum, List attachments) throws PersistenceException;
+    public Forum createForum(Forum forum, Map attachments, Map topics) throws PersistenceException;
+    public Forum editForum(Forum forum, Map attachments, Map topics) throws PersistenceException;
     public Forum getForum(Long forumId) throws PersistenceException;
     public void deleteForum(Long forumId) throws PersistenceException;
+    public List getTopics(Long forumId) throws PersistenceException;
+    public void deleteForumAttachment(Long attachmentId) throws PersistenceException;
     public Message createMessage(Long forumId, Message message) throws PersistenceException ;
     public Message editMessage(Message message) throws PersistenceException;
     public Message getMessage(Long messageId) throws PersistenceException;
