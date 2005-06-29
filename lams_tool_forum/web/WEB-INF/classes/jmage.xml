@@ -1,0 +1,34 @@
+<jmage>
+    <properties>
+        <!-- Uncomment and change this to the location of your resource directory /-->
+        <!--        <property name="resourcedir" value="/resource"/>-->
+
+        <!-- this setting autofixes PNG transparency on Internet Explorer, comment this out if experiencing /-->
+        <!-- issues with other user agents /-->
+        <property name="fixPNGonIE" value="true"/>
+
+        <!-- Uncomment and change this to the location of your cache directory /-->
+        <property name="cachedir" value="/cache"/>
+    </properties>
+
+    <!-- Add custom ResourceFactories here /-->
+    <resourcemanager pool="10">
+        <factory class="org.jmage.resource.DefaultImageFactory" cachesize="25" cachetype="memory"/>
+        <factory class="org.jmage.resource.FontFactory"/>
+    </resourcemanager>
+
+    <!-- Add custom FilterChainFactories here /-->
+    <filterchainmanager pool="10">
+        <factory class="org.jmage.filterchain.SimpleFilterChainFactory"/>
+        <factory class="org.jmage.filterchain.XmlFilterChainFactory" cachesize="10" cachetype="memory"/>
+    </filterchainmanager>
+
+    <!-- Add custom ImageEncoders here /-->
+    <encodermanager pool="10">
+        <factory class="org.jmage.encoder.DefaultImageEncoder"/>
+        <factory class="org.jmage.encoder.GifEncoder"/>
+    </encodermanager>
+
+    <!-- Change this to any RequestDispatcher implementation /-->
+    <requestdispatcher class="org.jmage.dispatcher.FilteringRequestDispatcher" pool="10" cachesize="50" cachetype="memory"/>
+</jmage>
