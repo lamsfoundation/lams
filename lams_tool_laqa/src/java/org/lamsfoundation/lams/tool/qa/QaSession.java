@@ -32,6 +32,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.ToolSession;
 
 
 /**
@@ -41,7 +42,7 @@ import org.apache.log4j.Logger;
  * 
  * Holds tool sessions 
  */
-public class QaSession implements Serializable,Comparable, Nullable
+public class QaSession extends ToolSession implements Serializable,Comparable, Nullable
 {
 	static Logger logger = Logger.getLogger(QaSession.class.getName());
 	
