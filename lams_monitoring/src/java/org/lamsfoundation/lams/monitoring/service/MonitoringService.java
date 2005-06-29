@@ -867,16 +867,11 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         Hashtable table = new Hashtable();
         table.put("activityID", activityID);
+        table.put("activityTypeID", gate.getActivityTypeId());
 	    table.put("gateOpen", gate.getGateOpen());
 	    table.put("activityLevelID", gate.getGateActivityLevelId()); 
-	    table.put("waitingLearners", new Integer(gate.getWaitingLearners().size()));
-	    if (gate.isScheduleGate())
-	    {
-	        ScheduleGateActivity scheduleGate = (ScheduleGateActivity)gate;
-	        table.put("startingTime", scheduleGate.getGateStartDateTime());
-	        table.put("endingTime", scheduleGate.getGateEndDateTime());
-	    }
-        return table;
+	    table.put("learnersWaiting", new Integer(gate.getWaitingLearners().size()));
+	    return table;
     }
     
    
