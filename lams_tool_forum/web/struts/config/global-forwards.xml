@@ -1,0 +1,6 @@
+	<!-- B: global forwards -->
+	<global-forwards>
+        <forward   name="forum.error"	path="tiles:/error.jsp"/>
+	</global-forwards>
+	<!-- E: global forwards -->
+
