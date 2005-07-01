@@ -269,6 +269,14 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		}
 		logger.debug(logger + " " + this.getClass().getName() +  "SELECTION_CASE: " + SELECTION_CASE);
 		
+		boolean useSelectedToolSessionId=false;
+		String selectedToolSessionId = (String) request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION);
+		if ((selectedToolSessionId != null) && (SELECTION_CASE == 3) && (READABLE_TOOL_SESSION_COUNT.intValue()  == 2))
+		{
+			useSelectedToolSessionId=true;
+		}
+		
+		
 		if ((qaMonitoringForm.getEditReport() == null) && (qaMonitoringForm.getUpdateReport() == null))
 		{
 			logger.debug(logger + " " + this.getClass().getName() +  "no editReport or updateReport selected");
@@ -323,7 +331,17 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		for (int toolSessionIdCounter=1; toolSessionIdCounter < READABLE_TOOL_SESSION_COUNT.intValue(); toolSessionIdCounter++)
 		{
 			logger.debug(logger + " " + this.getClass().getName() +  "toolSessionIdCounter: " + toolSessionIdCounter);
-			String strToolSessionId=(String) originalSessionList.get(""+toolSessionIdCounter);
+			String strToolSessionId="";
+			if (useSelectedToolSessionId)
+			{
+				strToolSessionId=(String) request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION);
+				logger.debug(logger + " " + this.getClass().getName() +  "using strToolSessionId: " +strToolSessionId);
+			}
+			else
+			{
+				strToolSessionId=(String) originalSessionList.get(""+toolSessionIdCounter);
+				logger.debug(logger + " " + this.getClass().getName() +  "using strToolSessionId from the session: ");
+			}
 			logger.debug(logger + " " + this.getClass().getName() +  "original strToolSessionId: " + strToolSessionId);
 					    
 		    String strRetrievableToolSessionId="";
