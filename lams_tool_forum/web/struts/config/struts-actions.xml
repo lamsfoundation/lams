@@ -40,7 +40,6 @@
             <forward name="success"		path="/authoring/forum/edit.do?selected=2"/>
         </action>
 
-
         <action    path="/authoring/forum/advanced"
         	type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
 			name="forumForm"
@@ -75,10 +74,10 @@
 			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
 			name="forumForm"
 			validate="true"
-            input="tiles:/authoring/forum/edit.do"
+            input="/authoring/forum/edit.do"
 			parameter="editForum"
 			scope="session">
-			<forward name="success"		path="tites:/authoring/forum/edit"/>
+			<forward name="success"		path="/authoring/forum/edit.do"/>
 		</action>
 
         <action    path="/authoring/forum/deleteAttachment"

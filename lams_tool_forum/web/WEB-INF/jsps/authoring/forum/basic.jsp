@@ -1,5 +1,6 @@
 <%@ include file="/includes/taglibs.jsp" %>
 <%@ include file="/includes/messages.jsp" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="displaytag" prefix="display" %>
 <%@ taglib uri="jmage" prefix="jm" %>
 

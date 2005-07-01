@@ -29,6 +29,11 @@ public class ForumForm extends ValidatorForm {
     private FormFile offlineFile;
     private FormFile onlineFile;
     protected Map attachments;
+    protected boolean lockWhenFinished;
+	protected boolean forceOffline;
+	protected boolean allowAnnomity;
+
+
     private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
     public ForumForm() {
@@ -59,6 +64,30 @@ public class ForumForm extends ValidatorForm {
 
     public FormFile getOfflineFile() {
         return offlineFile;
+    }
+
+    public boolean getAllowAnnomity() {
+        return allowAnnomity;
+    }
+
+    public void setAllowAnnomity(boolean allowAnnomity) {
+        this.allowAnnomity = allowAnnomity;
+    }
+
+    public boolean getLockWhenFinished() {
+        return lockWhenFinished;
+    }
+
+    public void setLockWhenFinished(boolean lockWhenFinished) {
+        this.lockWhenFinished = lockWhenFinished;
+    }
+
+    public boolean getForceOffline() {
+        return forceOffline;
+    }
+
+    public void setForceOffline(boolean forceOffline) {
+        this.forceOffline = forceOffline;
     }
 
     public void setAttachments(Map attachments) {

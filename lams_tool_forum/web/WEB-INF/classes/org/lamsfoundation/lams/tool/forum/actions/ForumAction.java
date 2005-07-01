@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.tool.forum.actions;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.*;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
@@ -11,14 +10,11 @@ import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.service.ForumManager;
 import org.lamsfoundation.lams.tool.forum.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.forms.MessageForm;
-import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
-import org.lamsfoundation.lams.tool.forum.util.FileUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.File;
 import java.util.*;
 
 /**
@@ -78,24 +74,25 @@ public class ForumAction extends Action {
                                               HttpServletRequest request,
                                               HttpServletResponse response)
             throws IOException, ServletException, Exception {
-      ForumForm forumForm = (ForumForm) form;
-      Forum forum = forumForm.getForum();
-      Map topics = (Map) request.getSession().getAttribute("topics");
-      forum = this.forumManager.createForum(forum, forumForm.getAttachments(), topics);
-      forumForm.setForum(forum);
+        ForumForm forumForm = (ForumForm) form;
+        Forum forum = forumForm.getForum();
 
-      //populate topics with new topics
-      List topicList = this.forumManager.getTopics(forum.getId());
-      topics = new HashMap();
-      Iterator it = topicList.iterator();
-      while (it.hasNext()) {
-        Message message = (Message) it.next();
-        topics.put(message.getSubject(), message);
-      }
+        Map topics = (Map) request.getSession().getAttribute("topics");
+        forum = this.forumManager.createForum(forum, forumForm.getAttachments(), topics);
+        forumForm.setForum(forum);
 
-      request.getSession().setAttribute("topics", topics);
-      request.getSession().setAttribute("topicList", topicList);
-      return mapping.findForward("success");
+        //populate topics with new topics
+        List topicList = this.forumManager.getTopics(forum.getId());
+        topics = new HashMap();
+        Iterator it = topicList.iterator();
+        while (it.hasNext()) {
+            Message message = (Message) it.next();
+            topics.put(message.getSubject(), message);
+        }
+
+        request.getSession().setAttribute("topics", topics);
+        request.getSession().setAttribute("topicList", topicList);
+        return mapping.findForward("success");
   }
 
   public ActionForward editForum(ActionMapping mapping,
@@ -103,11 +100,12 @@ public class ForumAction extends Action {
                                               HttpServletRequest request,
                                               HttpServletResponse response)
             throws IOException, ServletException, Exception {
-      ForumForm forumForm = (ForumForm) form;
-      Forum forum = forumForm.getForum();
-      Map topics = (Map) request.getSession().getAttribute("topics");
-      this.forumManager.editForum(forum, forumForm.getAttachments(), topics);
-      return mapping.findForward("success");
+        ForumForm forumForm = (ForumForm) form;
+        Forum forum = forumForm.getForum();
+
+        Map topics = (Map) request.getSession().getAttribute("topics");
+        this.forumManager.editForum(forum, forumForm.getAttachments(), topics);
+        return mapping.findForward("success");
   }
 
   public ActionForward getForum(ActionMapping mapping,
@@ -115,23 +113,24 @@ public class ForumAction extends Action {
                                               HttpServletRequest request,
                                               HttpServletResponse response)
           throws IOException, ServletException, Exception {
-      Long forumId = new Long((String) request.getParameter("forumId"));
-      Forum forum = forumManager.getForum(forumId);
-      List topicList = this.forumManager.getTopics(forum.getId());
-      ForumForm forumForm = new ForumForm();
-      forumForm.setForum(forum);
-      request.getSession().setAttribute("forum", forumForm);
+        Long forumId = new Long((String) request.getParameter("forumId"));
+        Forum forum = forumManager.getForum(forumId);
+        List topicList = this.forumManager.getTopics(forum.getId());
+        ForumForm forumForm = new ForumForm();
 
-      Map topics = new HashMap();
-      Iterator it = topicList.iterator();
-      while (it.hasNext()) {
-         Message message = (Message) it.next();
-         topics.put(message.getSubject(), message);
-      }
+        forumForm.setForum(forum);
+        request.getSession().setAttribute("forum", forumForm);
 
-      request.getSession().setAttribute("topics", topics);
-      request.getSession().setAttribute("topicList", topicList);
-      return mapping.findForward("success");
+        Map topics = new HashMap();
+        Iterator it = topicList.iterator();
+        while (it.hasNext()) {
+            Message message = (Message) it.next();
+            topics.put(message.getSubject(), message);
+        }
+
+        request.getSession().setAttribute("topics", topics);
+        request.getSession().setAttribute("topicList", topicList);
+        return mapping.findForward("success");
   }
 
   public ActionForward deleteForum(ActionMapping mapping,
@@ -139,9 +138,9 @@ public class ForumAction extends Action {
                                               HttpServletRequest request,
                                               HttpServletResponse response)
           throws IOException, ServletException, Exception {
-      Long forumId = new Long((String) request.getParameter("forumId"));
-      forumManager.deleteForum(forumId);
-      return (mapping.findForward("success"));
+        Long forumId = new Long((String) request.getParameter("forumId"));
+        forumManager.deleteForum(forumId);
+        return (mapping.findForward("success"));
   }
 
    public ActionForward createTopic(ActionMapping mapping,
@@ -149,29 +148,29 @@ public class ForumAction extends Action {
                                               HttpServletRequest request,
                                               HttpServletResponse response)
           throws IOException, ServletException, PersistenceException {
-      MessageForm messageForm = (MessageForm) form;
-      Message message = messageForm.getMessage();
-      Map topics = (Map) request.getSession().getAttribute("topics");
-      if (topics ==  null) {
-          topics = new HashMap();
-      }
-      topics.put(message.getSubject(), message);
-      request.getSession().setAttribute("topics", topics);
-      request.getSession().setAttribute("topicList", new ArrayList(topics.values()));
-      return mapping.findForward("success");
-   }
+        MessageForm messageForm = (MessageForm) form;
+        Message message = messageForm.getMessage();
+        Map topics = (Map) request.getSession().getAttribute("topics");
+        if (topics ==  null) {
+            topics = new HashMap();
+        }
+        topics.put(message.getSubject(), message);
+        request.getSession().setAttribute("topics", topics);
+        request.getSession().setAttribute("topicList", new ArrayList(topics.values()));
+        return mapping.findForward("success");
+    }
 
-   public ActionForward saveInstructions(ActionMapping mapping,
+    public ActionForward saveInstructions(ActionMapping mapping,
                                               ActionForm form,
                                               HttpServletRequest request,
                                               HttpServletResponse response)
           throws IOException, ServletException, PersistenceException {
-      ForumForm forumForm = (ForumForm) form;
-      Collection entries = forumForm.getAttachments().values();
-      List attachmentList = new ArrayList(entries);
-      request.getSession().setAttribute("attachmentList", attachmentList);
-      return mapping.findForward("success");
-   }
+        ForumForm forumForm = (ForumForm) form;
+        Collection entries = forumForm.getAttachments().values();
+        List attachmentList = new ArrayList(entries);
+        request.getSession().setAttribute("attachmentList", attachmentList);
+        return mapping.findForward("success");
+    }
 
     public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws PersistenceException {
         ActionForward forward = new ActionForward();

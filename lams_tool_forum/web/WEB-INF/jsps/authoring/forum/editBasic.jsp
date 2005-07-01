@@ -1,5 +1,6 @@
 <%@ include file="/includes/taglibs.jsp" %>
 <%@ include file="/includes/messages.jsp" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="displaytag" prefix="display" %>
 <%@ taglib uri="jmage" prefix="jm" %>
 
@@ -8,7 +9,7 @@
 <div align="center">
 <%-- <legend><bean:message key="title.forum.details" /></legend> --%>
 <html:form action="/authoring/forum/editForum.do" focus="forum.title"
-	styleId="forumForm" onsubmit="return validateForumForm(this);" >
+	styleId="advancedForm" onsubmit="return validateForumForm(this);" >
 <fieldset>
 <%@ include file="includes/basic.jsp" %>
  </fieldset>
