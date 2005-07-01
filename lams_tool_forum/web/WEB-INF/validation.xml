@@ -33,13 +33,15 @@
 						<var-value>50</var-value>
 					</var>
 			</field>
-            <field property="message.body" depends="required, maxlength">
+            <field property="message.body" depends="required">
 				<arg0 key="message.label.body"/>
+                <!--
 				<arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
 					<var>
 						<var-name>maxlength</var-name>
-						<var-value>2000</var-value>
+						<var-value>200000</var-value>
 					</var>
+                 -->
 			</field>
 
 		</form>
