@@ -45,6 +45,7 @@ public class Message extends GenericEntity {
 	 *
 	 * @hibernate.property 
 	 * 		column="BODY"
+     *      type="text"
 	 *  	 
 	 */
 	public String getBody() {
