@@ -20,6 +20,9 @@
  */
 package org.lamsfoundation.lams.tool.qa.dao;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 
 
@@ -33,6 +36,8 @@ public interface IQaQueContentDAO
     public QaQueContent getQaQueById(long qaQueContentId);
     
     public QaQueContent getToolDefaultQuestionContent(final long qaContentId);
+    
+    public List getQuestionIndsForContent(QaContent qa);
     
     public void createQueContent(QaQueContent queContent);
     

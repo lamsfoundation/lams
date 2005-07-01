@@ -20,6 +20,8 @@
  */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
@@ -34,8 +36,9 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 public class QaSessionDAO extends HibernateDaoSupport implements
                                                          IQaSessionDAO
 {
-	private static final String COUNT_SESSION_INCOMPLITE = "select qaSession.session_status from QaSession qaSession where qaSession.session_status='INCOMPLETE' and qaSession.qaContentId = :qa";
-	private static final String COUNT_SESSION_ACTIVITY   = "select qaSession.session_status from QaSession qaSession where qaSession.qaContentId = :qa";
+	private static final String COUNT_SESSION_INCOMPLITE 	= "select qaSession.session_status from QaSession qaSession where qaSession.session_status='INCOMPLETE' and qaSession.qaContentId = :qa";
+	private static final String COUNT_SESSION_ACTIVITY   	= "select qaSession.session_status from QaSession qaSession where qaSession.qaContentId = :qa";
+	private static final String GET_SESSION_IDS_FOR_CONTENT = "select qaSession.qaSessionId    from QaSession qaSession where qaSession.qaContentId = :qa";
 	
 	
 	public int countIncompleteSession(QaContent qa)
@@ -52,6 +55,15 @@ public class QaSessionDAO extends HibernateDaoSupport implements
                 qa)).size();
     }
 	
+    
+    public List getToolSessionsForContent(QaContent qa)
+    {
+    	   
+		  List lisToolSessionIds=(getHibernateTemplate().findByNamedParam(GET_SESSION_IDS_FOR_CONTENT,
+                "qa",
+                qa));
+		  return lisToolSessionIds;
+    }
 	
     /**
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#getSurveySessionById(long)

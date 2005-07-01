@@ -9,6 +9,8 @@
 
 package org.lamsfoundation.lams.tool.qa;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.TimeZone;
 
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -171,6 +173,13 @@ public class TestQaContent extends QaDataAccessTestCase
     {
     	TimeZone timeZone=TimeZone.getDefault();
     	System.out.println("timeZone: " + timeZone.getDisplayName());
+    }
+    
+    public void testDateTime()
+    {
+    	 Date now = new Date();
+    	 System.out.println("10. " + DateFormat.getDateTimeInstance(
+         DateFormat.LONG, DateFormat.LONG).format(now));	
     }
     
 }

@@ -20,6 +20,8 @@
  */
 package org.lamsfoundation.lams.tool.qa.service;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
@@ -183,9 +185,11 @@ public interface IQaService
     
     public long getToolDefaultContentIdBySignature(String toolSignature);
     
-    public QaQueContent getToolDefaultQuestionContent(long contentId);
-            
     public int countSessionUser(QaSession qaSession);
+    
+    public List getToolSessionsForContent(QaContent qa);
+    
+    public QaQueContent getToolDefaultQuestionContent(long contentId);
 	
 }
 

@@ -104,7 +104,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		 */
 		try
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "retrieve the default question content id based on default content id: " + contentId);
+			logger.debug(logger + " " + this.getClass().getName() +  "retrieve the default question content based on default contentId: " + contentId);
 			QaQueContent qaQueContent=qaService.getToolDefaultQuestionContent(contentId);
 			logger.debug(logger + " " + this.getClass().getName() +  "using QaQueContent: " + qaQueContent);
 			if (qaQueContent == null)
@@ -117,7 +117,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			/**
         	 * display a single sample question
         	 */
-    		System.out.println(this.getClass().getName() + " set default qa que content to: " + qaQueContent.getQuestion() );
+    		System.out.println(this.getClass().getName() + "set default qa que content to: " + qaQueContent.getQuestion() );
     		request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, qaQueContent.getQuestion());
 		}
 		catch(Exception e)

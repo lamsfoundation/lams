@@ -210,9 +210,12 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    }
 
 	    TimeZone timeZone=TimeZone.getDefault();
-	    logger.debug(logger + " " + this.getClass().getName() +  "current qaSession: " + timeZone.getDisplayName());
+	    logger.debug(logger + " " + this.getClass().getName() +  "current timezone: " + timeZone.getDisplayName());
 	    request.getSession().setAttribute(TIMEZONE, timeZone.getDisplayName());
-	    	    
+	    logger.debug(logger + " " + this.getClass().getName() +  "current timezone id: " + timeZone.getID());
+	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
+	    
+	    
 	    /**
 	     * By now, the passed tool session id MUST exist in the db through the calling of:
 	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.

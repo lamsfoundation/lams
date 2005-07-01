@@ -19,6 +19,10 @@
 
 package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +40,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -72,6 +77,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    /**
 	     * obtain and setup the current user's data 
 	     */
+
 	    String userId="";
 	    User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
 	    if (toolUser != null)
@@ -102,8 +108,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			return (mapping.findForward(MONITORING_REPORT));
 		}
 		logger.debug(logger + " " + this.getClass().getName() +  "TOOL_USER is:" + request.getSession().getAttribute(TOOL_USER));
-	    
-	    String toolContentId=request.getParameter(TOOL_CONTENT_ID);
+		
+		String toolContentId=request.getParameter(TOOL_CONTENT_ID);
 	    logger.debug(logger + " " + this.getClass().getName() +  "TOOL_CONTENT_ID: " + toolContentId);
 	    
 	    Long initialMonitoringContentId=(Long) request.getSession().getAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID);
@@ -111,7 +117,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    
 	    if ((toolContentId == null) || (toolContentId.length() == 0))
 	    {
-	    	logger.debug(logger + "Warning!: passing TOOL_CONTENT_ID is optional. Since it is null, we will derive it from tool session(s).");
+	    	logger.debug(logger + "Warning!: toolContentId is not available!");
 	    }
 	    else if (initialMonitoringContentId != null)
 	    {
@@ -153,18 +159,26 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			logger.debug(logger + " " + this.getClass().getName() +  "qaContent: " + qaContent);
 			request.getSession().setAttribute(MONITORED_OFFLINE_INSTRUCTIONS, qaContent.getOfflineInstructions());
 			request.getSession().setAttribute(MONITORED_ONLINE_INSTRUCTIONS, qaContent.getOnlineInstructions());
-			logger.debug(logger + " " + this.getClass().getName() +  "session updated with on/off instructions");
+			logger.debug(logger + " " + this.getClass().getName() +  "session updated with online/offline instructions");
 		}
 		
 		/**
-		 * find out if only content id but no tool sessions has been passed 
+		 * find out if only content id but no tool sessions has been passed
+		 * since with the updated tool contract only userId+toolContentId is passed
+		 * this will always return true 
 		 */
+		
 		boolean isOnlyContentIdAvailable = isOnlyContentIdAvailable(request);
 		logger.debug(logger + "final isOnlyContentIdAvailable: " + isOnlyContentIdAvailable);
 		
 		request.getSession().setAttribute(NO_TOOL_SESSIONS_AVAILABLE, new Boolean(false));
 		if (isOnlyContentIdAvailable == false)
 		{
+			/**
+			 * this block of code will normally never run!
+			 */
+			logger.debug(logger + "Warning! We are not supposed to reach here.");
+			/*
 			logger.debug(logger + "found sessions: isOnlyContentIdAvailable: " + isOnlyContentIdAvailable);
 			if ((toolContentId != null) && (toolContentId.length() > 0)) 
 			{
@@ -206,13 +220,14 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 				return (mapping.findForward(MONITORING_REPORT));
 			}
 			qaMonitoringForm.setSummary("summary");
+			*/
 		}
 		else
 		{
-			logger.debug(logger + "found sessions: isOnlyContentIdAvailable: " + isOnlyContentIdAvailable);
-			logger.debug(logger + "no tool sessions passed");
+			logger.debug(logger + "isOnlyContentIdAvailable: " + isOnlyContentIdAvailable);
+			logger.debug(logger + "no tool sessions passed and they will be populated from toolContentId.");
 			qaMonitoringForm.resetUserAction();
-			logger.debug(logger + "no tool sessions passed");
+		/*
 			persistError(request,"error.content.onlyContentAndNoSessions");
     		request.setAttribute(USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS, new Boolean(true));
     		request.getSession().setAttribute(NO_TOOL_SESSIONS_AVAILABLE, new Boolean(true));
@@ -220,6 +235,31 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			request.getSession().setAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID, new Long(toolContentId));
 			logger.debug(logger + "INITIAL_MONITORING_TOOL_CONTENT_ID: " + request.getSession().getAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID));
 			return (mapping.findForward(MONITORING_REPORT));
+		*/
+			logger.debug(logger + "getting qaContent for toolContentId: " + toolContentId);
+			QaContent qaContent=qaService.loadQa(new Long(toolContentId).longValue());
+			logger.debug(logger + "retrieved qaContent: " + qaContent);
+			List listToolSessionIds=qaService.getToolSessionsForContent(qaContent);
+			logger.debug(logger + "retrieved listToolSessionIds: " + listToolSessionIds);
+			
+			Map originalSessionList= new TreeMap(new QaStringComparator());
+			Iterator sessionIdsIterator=listToolSessionIds.iterator();
+			int sessionIdCounter=1;
+			while (sessionIdsIterator.hasNext())
+			{
+				Long derivedToolSessionId=(Long) sessionIdsIterator.next();
+				logger.debug("derivedToolSessionId: " + derivedToolSessionId);
+				originalSessionList.put(new Integer(sessionIdCounter).toString(), derivedToolSessionId.toString());
+				sessionIdCounter++;
+			}
+			logger.debug(logger + "constructed originalSessionList: " + originalSessionList);
+			
+			if (originalSessionList.size() == 0)
+				request.getSession().setAttribute(NO_TOOL_SESSIONS_AVAILABLE, new Boolean(true));
+			else
+				request.getSession().setAttribute(ORIGINAL_TOOL_SESSIONS,originalSessionList);			
+			
+			qaMonitoringForm.setSummary("summary");
 		}
 		
 	    String strFromToolContentId="";

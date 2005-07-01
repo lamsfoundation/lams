@@ -5,6 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3RDPARTY"/>
 	<classpathentry kind="lib" path="D:/eclipse/workspace/lams_tool_laqa/ext-lib/j2ee.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/lams/lams.jar"/>
-	<classpathentry kind="output" path="classes"/>
+	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
+	<classpathentry kind="output" path="build/classes"/>
 </classpath>

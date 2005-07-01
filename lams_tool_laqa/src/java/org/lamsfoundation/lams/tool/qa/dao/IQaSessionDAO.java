@@ -20,6 +20,8 @@
  */
 package org.lamsfoundation.lams.tool.qa.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 
@@ -33,6 +35,8 @@ public interface IQaSessionDAO
 	public int countIncompleteSession(QaContent qa);
     
 	public QaSession getQaSessionById(long qaSessionId);
+	
+	public List getToolSessionsForContent(QaContent qa);
 	
 	public QaSession getQaSessionOrNullById(long qaSessionId);
 	

@@ -1093,6 +1093,14 @@ public class QaServicePOJO implements
     	return qaQueContent; 
     }
 
+    
+    public List getToolSessionsForContent(QaContent qa)
+    {
+    	logger.debug(logger + " " + this.getClass().getName() +  "attempt retrieving listToolSessionIds for : " + qa);
+    	List listToolSessionIds=qaSessionDAO.getToolSessionsForContent(qa);
+    	return listToolSessionIds;
+    }
+    
     /**
 	 * @return Returns the qaDAO.
 	 */

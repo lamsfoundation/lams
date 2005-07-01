@@ -14,7 +14,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
-import org.lamsfoundation.lams.usermanagement.User;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -27,6 +26,7 @@ import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * 
@@ -543,6 +543,8 @@ public class LearningUtil implements QaAppConstants{
 			    			
 			    			request.getSession().setAttribute(ANSWER + questionIndex +""+ responseIndex, qaUsrResp.getAnswer());
 			    			request.getSession().setAttribute(ATIME + questionIndex +""+ responseIndex, qaUsrResp.getAttemptTime());
+			    			request.getSession().setAttribute(FORMATTED_ATIME + questionIndex +""+ responseIndex, QaUtils.getFormattedDateString(qaUsrResp.getAttemptTime()));
+			    			logger.debug(logger + " " + this.getClass().getName() +  "setting formattedDatetime");
 			    			request.getSession().setAttribute(TIMEZONE + questionIndex +""+ responseIndex, qaUsrResp.getTimezone());
 						    			
 		    	    		if (qaQueUsr.getUsername().equalsIgnoreCase(toolUser.getLogin()))

@@ -7,6 +7,8 @@
 package org.lamsfoundation.lams.tool.qa;
 
 import java.security.Principal;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
@@ -322,12 +324,21 @@ public abstract class QaUtils implements QaAppConstants {
     	IQaService qaService =QaUtils.getToolService(request);
 	    QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId);
     	
-	    logger.debug(logger + " " + " QaUtils " +  "retrieving qaSession: " + qaSession);
-	    
 	    if (qaSession == null) 
 	    	return false;
 	    
 		return true;	
 	}
+	
+
+	public static String getFormattedDateString(Date date)
+	{
+		logger.debug(logger + " " + " QaUtils getFormattedDateString: " +  
+				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
+		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
+	}
+	
+	
+	
 	
 }

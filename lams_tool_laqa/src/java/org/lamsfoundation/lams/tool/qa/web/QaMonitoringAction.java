@@ -123,6 +123,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 		
 		Boolean noToolSessionsAvailable=(Boolean)request.getSession().getAttribute(NO_TOOL_SESSIONS_AVAILABLE);
+		logger.debug(logger + " " + this.getClass().getName() +  "generateSummaryScreen has noToolSessionsAvailable: " + noToolSessionsAvailable);
 		if ((noToolSessionsAvailable !=null) && (noToolSessionsAvailable.booleanValue()))
 		{
 			qaMonitoringForm.resetUserAction();
@@ -311,18 +312,20 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 	    request.getSession().setAttribute(NO_AVAILABLE_SESSIONS,new Boolean(false));
 	    logger.debug(logger + " " + this.getClass().getName() +  "NO_AVAILABLE_SESSIONS: " + false);
 	    
+	    logger.debug(logger + " " + this.getClass().getName() +  "retrieving ORIGINAL_TOOL_SESSIONS");
+	    Map originalSessionList=(Map)request.getSession().getAttribute(ORIGINAL_TOOL_SESSIONS);
+	    logger.debug(logger + " " + this.getClass().getName() +  "retrieved ORIGINAL_TOOL_SESSIONS : " + originalSessionList);
 		/**
 		 *  monitoredToolSessionsCounter holds the total number of valid toolSessionIds passed to the monitoring url
 		 */
-		
 		logger.debug(logger + " " + this.getClass().getName() +  "READABLE_TOOL_SESSION_COUNT: " + READABLE_TOOL_SESSION_COUNT);
 		int monitoredToolSessionsCounter=0;
 		for (int toolSessionIdCounter=1; toolSessionIdCounter < READABLE_TOOL_SESSION_COUNT.intValue(); toolSessionIdCounter++)
 		{
 			logger.debug(logger + " " + this.getClass().getName() +  "toolSessionIdCounter: " + toolSessionIdCounter);
-			String strToolSessionId=request.getParameter(TOOL_SESSION_ID + toolSessionIdCounter);
-		    logger.debug(logger + " " + this.getClass().getName() +  "TOOL_SESSION_ID: " + strToolSessionId);
-		    
+			String strToolSessionId=(String) originalSessionList.get(""+toolSessionIdCounter);
+			logger.debug(logger + " " + this.getClass().getName() +  "original strToolSessionId: " + strToolSessionId);
+					    
 		    String strRetrievableToolSessionId="";
 		    /**
 		     * catering for un-formatted monitoring url

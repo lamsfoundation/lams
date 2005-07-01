@@ -201,6 +201,7 @@ public interface QaAppConstants {
     public static final String INITIAL_MONITORING_TOOL_CONTENT_ID  		="initialMonitoringToolContentId";
     public static final String IS_MONITORING_DEFINE_LATER  		   		="isMonitoringDefineLater";
     public static final String NO_TOOL_SESSIONS_AVAILABLE				="noToolSessionAvailable";
+    public static final String ORIGINAL_TOOL_SESSIONS					="originalToolSessions";
     
     public static final String MONITORED_OFFLINE_INSTRUCTIONS			="monitoredOfflineInstructions";
     public static final String MONITORED_ONLINE_INSTRUCTIONS			="monitoredOnlineInstructions";
@@ -211,12 +212,15 @@ public interface QaAppConstants {
      */
     public static final String FULLNAME									="fullName";
     public static final String ANSWER									="answer";
-    public static final String ATIME									="aTime"; 
+    public static final String ATIME									="aTime";
+    public static final String FORMATTED_ATIME							="formattedAtime";
     public static final String RESPONSE_ID								="responseId";
     public static final String RESPONSE_HIDDEN							="responseHidden";
     public static final String CURRENTLEARNER_FULLNAME					="currentLearnerFullname";
     public static final String ATTR_USERDATA 							="qa_user";
     public static final String TIMEZONE									="timeZone";
+    public static final String TIMEZONE_ID								="timeZoneId";
+    
     /**
      * following tell whether author prefers to  have the questions listed all in one page or listed sequentially. The default is all in one page.
      */

@@ -37,19 +37,22 @@
 					  		<c:forEach var="subEntry" items="${mainEntry.value}">
 								<c:set var="ansIndex" scope="request" value="${ansIndex +1}"/>
 								
-							  	<%String fullName="fullName" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
-							  	  String aTime="aTime" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
-				  	  		  	  String timeZone="timeZone" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
-								  String answer="answer" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+							  	<%String fullName	="fullName" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+							  	  String aTime		="aTime" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+							  	  String formattedAtime="formattedAtime" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+							  	  String timeZone	="timeZone" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+								  String answer		="answer" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
 							   	  String currentLearnerFullname=(String) request.getSession().getAttribute("currentLearnerFullname");
 							   	  								  
-								  fullName= (String) request.getSession().getAttribute(fullName);
+								  fullName			= (String) request.getSession().getAttribute(fullName);
 						 	   	  java.util.Date attemptTime= (java.util.Date) request.getSession().getAttribute(aTime);
-  						 	   	  timeZone= (String) request.getSession().getAttribute(timeZone);
-						 	   	  answer= (String) request.getSession().getAttribute(answer);
+						 	   	  formattedAtime 	=(String) request.getSession().getAttribute(formattedAtime);
+  						 	   	  timeZone			= (String) request.getSession().getAttribute(timeZone);
+						 	   	  answer			= (String) request.getSession().getAttribute(answer);
 						 	   	  
 								  request.setAttribute("fullName", fullName);
 						 	   	  request.setAttribute("attemptTime", attemptTime);
+						 	   	  request.setAttribute("formattedAtime", formattedAtime);
 						 	   	  request.setAttribute("timeZone", timeZone);
 						 	   	  request.setAttribute("answer", answer);
 						 	   	  request.setAttribute("currentLearnerFullname", currentLearnerFullname);
@@ -96,11 +99,15 @@
 										</c:if>		
 										<%}%>					
 
-										 <% if (attemptTime != null)
+										
+
+										 <% if (formattedAtime != null)
 										 	{
 										 %>
 											<td>  
-												&nbsp&nbsp&nbsp  <c:out value="${requestScope.attemptTime}"/> 
+												&nbsp&nbsp&nbsp  
+												 <!-- <fmt:formatDate value="${requestScope.attemptTime}" type="both" timeStyle="long"/> -->
+												 <c:out value="${requestScope.formattedAtime}"/> 
 											</td>  
 										<%}%>					
 

@@ -20,7 +20,7 @@
 
   http://www.gnu.org/licenses/gpl.txt 
 -->
-<project name="lams_tool_questionAnswer" basedir="." default="usage">
+<project name="lams_tool_laqa" basedir="." default="usage">
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
@@ -183,7 +183,8 @@
 					<include name="**/*.properties"/>
 				</fileset>
 				</copy>
-				<copy overwrite="yes" todir="${build.web.includes}">	
+		<!--
+			<copy overwrite="yes" todir="${build.web.includes}">	
 					<fileset dir="${conf.includes.dir}">
 						<include name="**/*.jsp"/>
 					</fileset>
@@ -193,6 +194,7 @@
 						<include name="**/*.jsp"/>
 					</fileset>
 				</copy>
+		-->
 		</target>
 	
 		<!-- ================================================================ -->
@@ -252,12 +254,15 @@
 	   			<fileset dir="${conf.web.dir}">
 						<include name="*"/>
 				</fileset>
+				<!--
 	   			<fileset dir="${conf.includes.dir}">
 						<include name="*"/>
 				</fileset>
 	   			<fileset dir="${conf.template.dir}">
 						<include name="*"/>
 				</fileset>
+				-->
+
 	   	   </war>
 	   	
 	   </target>
@@ -288,7 +293,6 @@
 				</classpath>
 				<transaction src="${db.scripts}/drop_lams_tool_qa.sql"/>
 				<transaction src="${db.scripts}/create_lams_tool_qa.sql"/>
-				<transaction src="${db.scripts}/insert_tool_qa_data.sql"/>
 			</sql>
 			<delete quiet="true" dir ="${contentrepository.location}"/>
 		</target>
@@ -327,9 +331,8 @@
 			 
 			<copy overwrite="yes" todir="${build.deploy}/sql">
 				<fileset dir="${sql}/">
-					<include name="create_lams_tool_qa.sql"/>
 					<include name="drop_lams_tool_qa.sql"/>
-					<include name="insert_tool_qa_data.sql"/>
+					<include name="create_lams_tool_qa.sql"/>
 					<include name="activity_insert.sql"/>
 					<include name="library_insert.sql"/>
 					<include name="tool_insert.sql"/>
@@ -393,4 +396,33 @@
 			</java>
 						
 		</target>
+	
+			<target name="test-QaContent" depends="compile.test"> 
+				<mkdir dir="${build.report}"/>
+				<copy file="${webinf}/web.xml" todir="${testwebinf}" overwrite="true"/>		
+				<copy file="${webinf}/struts/struts-config.xml" todir="${testwebinf}" overwrite="true"/>			
+				<copy file="${webinf}/tiles/tiles-defs.xml" todir="${testwebinf}/tiles" overwrite="true"/>			
+				<junit printsummary="yes" haltonerror="no" haltonfailure="no"
+					   fork="yes">
+					<formatter type="plain" usefile="false"/>
+					<formatter type="xml"/>
+					<batchtest todir="${build.report}">
+						<fileset dir="${src.test.java}">
+							<include name="**/TestQaContent.java"/>
+
+						</fileset>
+					</batchtest>
+					<classpath>
+						<pathelement location="${build.classes}"/>
+						<pathelement location="${build.test}"/>
+						<pathelement location="${hbm}"/>
+						<pathelement location="${web}"/>
+						<pathelement location="${webinf.spring}"/>
+						<pathelement location="${testweb}"/>
+						<path refid="project.classpath"/>
+					</classpath>
+				</junit>
+			</target>
+
+	
 </project>
