@@ -11,6 +11,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
+ * 
+ * @author Ozgur Demirtas
+ * 
  * QaUsrResp Value Object
  * The value object that maps to our model database table: tl_laqa11_usr_resp
  * The relevant hibernate mapping resides in: QaQueResp.hbm.xml

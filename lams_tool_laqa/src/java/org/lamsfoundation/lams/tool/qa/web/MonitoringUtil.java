@@ -23,7 +23,7 @@ import org.lamsfoundation.lams.tool.qa.service.IQaService;
 /**
  * 
  * Keeps all operations needed for Monitoring mode. 
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  */
 public class MonitoringUtil implements QaAppConstants{
@@ -37,11 +37,11 @@ public class MonitoringUtil implements QaAppConstants{
 	
 	public boolean isSessionsSync(HttpServletRequest request, long toolContentId)
 	{
-		logger.debug(logger + " " + this.getClass().getName() +  " " + "start of isSessionsSync with toolContentId: " + toolContentId);
+		logger.debug("start of isSessionsSync with toolContentId: " + toolContentId);
     	IQaService qaService =QaUtils.getToolService(request);
     	
     	QaContent qaContent =qaService.loadQa(toolContentId); 
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieving qaContent: " + qaContent);
+    	logger.debug("retrieving qaContent: " + qaContent);
     
     	/**
     	 * iterate all the tool sessions, if even one session is INCOMPLETE, the functions returns false
@@ -52,7 +52,7 @@ public class MonitoringUtil implements QaAppConstants{
             while (sessionIterator.hasNext())
             {
             	QaSession qaSession=(QaSession)sessionIterator.next(); 
-            	logger.debug(logger + " " + this.getClass().getName() +  "iterated qaSession : " + qaSession);
+            	logger.debug("iterated qaSession : " + qaSession);
             	if (qaSession.getSession_status().equalsIgnoreCase(QaSession.INCOMPLETE))
             		return false;
             }
@@ -72,7 +72,7 @@ public class MonitoringUtil implements QaAppConstants{
 		request.getSession().removeAttribute(DATAMAP_EDITABLE_RESPONSE_ID);
 		request.getSession().removeAttribute(DATAMAP_HIDDEN_RESPONSE_ID);
 		
-		//remove session attributes used commonly
+		/** remove session attributes used commonly */
 		request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
 		request.getSession().removeAttribute(REPORT_TITLE_MONITOR);
 		request.getSession().removeAttribute(IS_ALL_SESSIONS_COMPLETED);
@@ -99,7 +99,7 @@ public class MonitoringUtil implements QaAppConstants{
 	     * copyToolContent(Long fromContentId, Long toContentId)  
 	     */
 	    strFromToolContentId=request.getParameter(FROM_TOOL_CONTENT_ID);
-		logger.debug(logger + " " + " startLesson"  +  "FROM_TOOL_CONTENT_ID: " + strFromToolContentId);
+		logger.debug("startLesson"  +  "FROM_TOOL_CONTENT_ID: " + strFromToolContentId);
 	    if (strFromToolContentId == null)
 	    {
 	    	throw new QaApplicationException("Exception occured: " +
@@ -107,7 +107,7 @@ public class MonitoringUtil implements QaAppConstants{
 	    }
 	    
 	    strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
-	    logger.debug(logger + " " + " startLesson" +  "TO_TOOL_CONTENT_ID: " + strToToolContentId);
+	    logger.debug("startLesson" +  "TO_TOOL_CONTENT_ID: " + strToToolContentId);
 	    if (strToToolContentId == null)
 	    {
 	    	throw new QaApplicationException("Exception occured: " +
@@ -142,7 +142,7 @@ public class MonitoringUtil implements QaAppConstants{
 		 * TESTED to work
 		 */
 		strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
-	    logger.debug(logger + " " + this.getClass().getName() +  "TO_TOOL_CONTENT_ID: " + strToToolContentId);
+	    logger.debug("TO_TOOL_CONTENT_ID: " + strToToolContentId);
 	    if (strToToolContentId == null)
 	    {
 	    	throw new QaApplicationException("Exception occured: " +
@@ -160,11 +160,11 @@ public class MonitoringUtil implements QaAppConstants{
 		 * Parameter: userId
 		 */
 		qaMonitoringForm.resetUserAction();
-		logger.debug(logger + " " + this.getClass().getName() +  "request for forceComplete");
+		logger.debug("request for forceComplete");
 		String userId=request.getParameter(MONITOR_USER_ID);
-		logger.debug(logger + " " + this.getClass().getName() +  "MONITOR_USER_ID: " + userId);
+		logger.debug("MONITOR_USER_ID: " + userId);
 		qaService.setAsForceComplete(new Long(userId));
-		logger.debug(logger + " " + this.getClass().getName() +  "end of setAsForceComplete with userId: " + userId);
+		logger.debug("end of setAsForceComplete with userId: " + userId);
 	}
 	
 	
@@ -203,25 +203,25 @@ public class MonitoringUtil implements QaAppConstants{
 		
 		if (choiceTypeMonitoringSummary != null)
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "CHOICE_TYPE_MONITORING_SUMMARY");
+			logger.debug("CHOICE_TYPE_MONITORING_SUMMARY");
 			request.getSession().setAttribute(CHOICE_MONITORING,CHOICE_TYPE_MONITORING_SUMMARY);
 		}
 		else if ((choiceTypeMonitoringInstructions != null) || (qaMonitoringForm.getSubmitMonitoringInstructions() != null))
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "CHOICE_TYPE_MONITORING_INSTRUCTIONS");
+			logger.debug("CHOICE_TYPE_MONITORING_INSTRUCTIONS");
 			request.getSession().setAttribute(CHOICE_MONITORING,CHOICE_TYPE_MONITORING_INSTRUCTIONS);
 		}
 		else if (choiceTypeMonitoringEditActivity != null)
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "CHOICE_TYPE_MONITORING_EDITACTIVITY");
+			logger.debug("CHOICE_TYPE_MONITORING_EDITACTIVITY");
 			request.getSession().setAttribute(CHOICE_MONITORING,CHOICE_TYPE_MONITORING_EDITACTIVITY);
 		}
 		else if (choiceTypeMonitoringStats != null)
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "CHOICE_TYPE_MONITORING_STATS");
+			logger.debug("CHOICE_TYPE_MONITORING_STATS");
 			request.getSession().setAttribute(CHOICE_MONITORING,CHOICE_TYPE_MONITORING_STATS);
 		}
-		logger.debug(logger + " " + this.getClass().getName() +  "CHOICE_MONITORING is:" + request.getSession().getAttribute(CHOICE_MONITORING));
+		logger.debug("CHOICE_MONITORING is:" + request.getSession().getAttribute(CHOICE_MONITORING));
 		
 		/** reset tab controllers */
 		qaMonitoringForm.setSummary(null);
@@ -236,8 +236,8 @@ public class MonitoringUtil implements QaAppConstants{
 		Boolean monitoringEditActivityVisited = (Boolean) request.getSession().getAttribute(MONITORING_EDITACTIVITY_VISITED);
 		Boolean monitoringStatsVisited 		  = (Boolean) request.getSession().getAttribute(MONITORING_STATS_VISITED);
 		
-		logger.debug(logger + " " + this.getClass().getName() +  "isNonDefaultScreensVisited:" + monitoringInstructionsVisited 
-															  + " " + monitoringEditActivityVisited + " " + monitoringStatsVisited);
+		logger.debug("isNonDefaultScreensVisited:" + monitoringInstructionsVisited  + " " + 
+													monitoringEditActivityVisited + " " + monitoringStatsVisited);
 		 
 		if ((monitoringInstructionsVisited != null) && (monitoringInstructionsVisited.booleanValue()))
 			return true;
@@ -255,24 +255,24 @@ public class MonitoringUtil implements QaAppConstants{
 	{
 		IQaService qaService=QaUtils.getToolService(request);
 		
-		logger.debug(logger + " " + this.getClass().getName() +  "load response with responseId: " + new Long(responseId).longValue());
+		logger.debug("load response with responseId: " + new Long(responseId).longValue());
 		QaUsrResp qaUsrResp=qaService.retrieveQaUsrResp(new Long(responseId).longValue());   
-		logger.debug(logger + " " + this.getClass().getName() +  "loaded user response:  " + qaUsrResp);
+		logger.debug("loaded user response:  " + qaUsrResp);
 		qaUsrResp.setAnswer(updatedResponse);
 		qaService.updateQaUsrResp(qaUsrResp);
-		logger.debug(logger + " " + this.getClass().getName() +  "updated user response in the db:  " + qaUsrResp);
+		logger.debug("updated user response in the db:  " + qaUsrResp);
 	}
 	
 	public void hideResponse(HttpServletRequest request, String responseId)
 	{
 		IQaService qaService=QaUtils.getToolService(request);
 		
-		logger.debug(logger + " " + this.getClass().getName() +  "load response with responseId for hiding: " + new Long(responseId).longValue());
+		logger.debug("load response with responseId for hiding: " + new Long(responseId).longValue());
 		QaUsrResp qaUsrResp=qaService.retrieveQaUsrResp(new Long(responseId).longValue());   
-		logger.debug(logger + " " + this.getClass().getName() +  "loaded user response:  " + qaUsrResp);
+		logger.debug("loaded user response:  " + qaUsrResp);
 		qaUsrResp.setHidden(true);
 		qaService.updateQaUsrResp(qaUsrResp);
-		logger.debug(logger + " " + this.getClass().getName() +  "updated user response in the db:  " + qaUsrResp);
+		logger.debug("updated user response in the db:  " + qaUsrResp);
 	}
 	
 	
@@ -280,11 +280,11 @@ public class MonitoringUtil implements QaAppConstants{
 	{
 		IQaService qaService=QaUtils.getToolService(request);
 		
-		logger.debug(logger + " " + this.getClass().getName() +  "load response with responseId for un-hiding: " + new Long(responseId).longValue());
+		logger.debug("load response with responseId for un-hiding: " + new Long(responseId).longValue());
 		QaUsrResp qaUsrResp=qaService.retrieveQaUsrResp(new Long(responseId).longValue());   
-		logger.debug(logger + " " + this.getClass().getName() +  "loaded user response:  " + qaUsrResp);
+		logger.debug("loaded user response:  " + qaUsrResp);
 		qaUsrResp.setHidden(false);
 		qaService.updateQaUsrResp(qaUsrResp);
-		logger.debug(logger + " " + this.getClass().getName() +  "updated user response in the db:  " + qaUsrResp);
+		logger.debug("updated user response in the db:  " + qaUsrResp);
 	}
 }

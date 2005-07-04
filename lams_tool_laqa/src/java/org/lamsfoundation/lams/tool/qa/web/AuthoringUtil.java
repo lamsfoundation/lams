@@ -29,7 +29,7 @@ import org.lamsfoundation.lams.tool.qa.service.IQaService;
 /**
  * 
  * Keeps all operations needed for Authoring mode. 
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  */
 public class AuthoringUtil implements QaAppConstants{
@@ -42,17 +42,16 @@ public class AuthoringUtil implements QaAppConstants{
      */
     protected void reconstructQuestionContentMapForAdd(Map mapQuestionContent, HttpServletRequest request)
     {
-    	logger.debug(logger + " " + this.getClass().getName() +  "pre-add Map content: " + mapQuestionContent);
-    	logger.debug(logger + " " + this.getClass().getName() +  "pre-add Map size: " + mapQuestionContent.size());
+    	logger.debug("pre-add Map content: " + mapQuestionContent);
+    	logger.debug("pre-add Map size: " + mapQuestionContent.size());
     	
-    	//repopulate the Map
     	repopulateMap(mapQuestionContent, request);
     	
     	mapQuestionContent.put(new Long(mapQuestionContent.size()+1).toString(), "");
     	request.getSession().setAttribute("mapQuestionContent", mapQuestionContent);
 	     
-    	logger.debug(logger + " " + this.getClass().getName() +  "post-add Map is: " + mapQuestionContent);    	
-	   	logger.debug(logger + " " + this.getClass().getName() +  "post-add count " + mapQuestionContent.size());
+    	logger.debug("post-add Map is: " + mapQuestionContent);    	
+	   	logger.debug("post-add count " + mapQuestionContent.size());
     }
 
 
@@ -64,24 +63,21 @@ public class AuthoringUtil implements QaAppConstants{
     protected void reconstructQuestionContentMapForRemove(Map mapQuestionContent, HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
     {
     	 	String questionIndex =qaAuthoringForm.getQuestionIndex();
-    	 	logger.debug(logger + " " + this.getClass().getName() +  "pre-delete map content:  " + mapQuestionContent);
-    	 	logger.debug(logger + " " + this.getClass().getName() +  "questionIndex: " + questionIndex);
+    	 	logger.debug("pre-delete map content:  " + mapQuestionContent);
+    	 	logger.debug("questionIndex: " + questionIndex);
     	 	
     	 	long longQuestionIndex= new Long(questionIndex).longValue();
+    	 	logger.debug("pre-delete count: " + mapQuestionContent.size());
     	 	
-    	 	logger.debug(logger + " " + this.getClass().getName() +  "pre-delete count: " + mapQuestionContent.size());
-    	 	
-        	//repopulate the Map
         	repopulateMap(mapQuestionContent, request);
-        	logger.debug(logger + " " + this.getClass().getName() +  "after repopulateMap");
-        	logger.debug(logger + " " + this.getClass().getName() +  "questionIndex: " + questionIndex);
+        	logger.debug("post-repopulateMap questionIndex: " + questionIndex);
         	
 	 		mapQuestionContent.remove(new Long(longQuestionIndex).toString());	
-	 		logger.debug(logger + " " + this.getClass().getName() +  "removed the question content with index: " + longQuestionIndex);
+	 		logger.debug("removed the question content with index: " + longQuestionIndex);
 	 		request.getSession().setAttribute("mapQuestionContent", mapQuestionContent);
 	    	
-	    	logger.debug(logger + " " + this.getClass().getName() +  "post-delete count " + mapQuestionContent.size());
-	    	logger.debug(logger + " " + this.getClass().getName() +  "post-delete map content:  " + mapQuestionContent);
+	    	logger.debug("post-delete count " + mapQuestionContent.size());
+	    	logger.debug("post-delete map content:  " + mapQuestionContent);
     }
 
     
@@ -92,10 +88,9 @@ public class AuthoringUtil implements QaAppConstants{
     */
     protected  void reconstructQuestionContentMapForSubmit(Map mapQuestionContent, HttpServletRequest request)
     {
-    	logger.debug(logger + " " + this.getClass().getName() +  "pre-submit Map:" + mapQuestionContent);
-    	logger.debug(logger + " " + this.getClass().getName() +  "pre-submit Map size :" + mapQuestionContent.size());
+    	logger.debug("pre-submit Map:" + mapQuestionContent);
+    	logger.debug("pre-submit Map size :" + mapQuestionContent.size());
     	
-    	//repopulate the Map
     	repopulateMap(mapQuestionContent, request);
     	Map mapFinalQuestionContent = new TreeMap(new QaComparator());
     	
@@ -105,13 +100,13 @@ public class AuthoringUtil implements QaAppConstants{
 	        if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
     		{
 	        	mapFinalQuestionContent.put(pairs.getKey(), pairs.getValue());
-	        	logger.debug(logger + " " + this.getClass().getName() + "Adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+	        	logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
     		}
 	    }
 	    
 	    mapQuestionContent=(TreeMap)mapFinalQuestionContent;
 	    request.getSession().setAttribute("mapQuestionContent", mapQuestionContent);
-	    logger.debug(logger + " " + this.getClass().getName() +  "post-submit Map:" + mapQuestionContent);
+	    logger.debug("post-submit Map:" + mapQuestionContent);
     }
     
     
@@ -122,14 +117,13 @@ public class AuthoringUtil implements QaAppConstants{
      */
     protected void repopulateMap(Map mapQuestionContent, HttpServletRequest request)
     {
-    	logger.debug(logger + " " + this.getClass().getName() +  "queIndex: " + request.getSession().getAttribute("queIndex"));
+    	logger.debug("queIndex: " + request.getSession().getAttribute("queIndex"));
     	long queIndex= new Long(request.getSession().getAttribute("queIndex").toString()).longValue();
-    	logger.debug(logger + " " + this.getClass().getName() +  "queIndex: " + queIndex);
+    	logger.debug("queIndex: " + queIndex);
 
-    	//if there is data in the Map remaining from previous session remove those
+    	/** if there is data in the Map remaining from previous session remove those */
 		mapQuestionContent.clear();
-		logger.debug(logger + " " + this.getClass().getName() +  "Map got initialized: " + mapQuestionContent);
-		
+		logger.debug("Map got initialized: " + mapQuestionContent);
 		
 		for (long i=0; i < queIndex ; i++)
 		{
@@ -137,13 +131,13 @@ public class AuthoringUtil implements QaAppConstants{
 			if (i==0)
     		{
     			request.getSession().setAttribute("defaultQuestionContent", candidateQuestionEntry);
-    			logger.debug(logger + " " + this.getClass().getName() +  "defaultQuestionContent set to: " + candidateQuestionEntry);
+    			logger.debug("defaultQuestionContent set to: " + candidateQuestionEntry);
     		}
 			if ((candidateQuestionEntry != null) && (candidateQuestionEntry.length() > 0))
 			{
-				logger.debug(logger + " " + this.getClass().getName() +  "using key: " + i);
+				logger.debug("using key: " + i);
 				mapQuestionContent.put(new Long(i+1).toString(), candidateQuestionEntry);
-				logger.debug(logger + " " + this.getClass().getName() +  "added new entry: ");	
+				logger.debug("added new entry.");	
 			}
 		}
     }
@@ -172,27 +166,27 @@ public class AuthoringUtil implements QaAppConstants{
     	String choiceAdvanced=qaAuthoringForm.getChoiceAdvanced();
     	String choiceInstructions=qaAuthoringForm.getChoiceInstructions();
     	
-    	//make the Basic tab the default one
+    	/** make the Basic tab the default one */
     	request.getSession().setAttribute(CHOICE,CHOICE_TYPE_BASIC);
     	
 		if (choiceBasic != null)
 		{
-    		logger.debug(logger + " " + this.getClass().getName() +  "CHOICE_TYPE_BASIC");
+    		logger.debug("CHOICE_TYPE_BASIC");
     		request.getSession().setAttribute(CHOICE,CHOICE_TYPE_BASIC);
 		}
     	else if (choiceAdvanced != null)
     	{
-    		logger.debug(logger + " " + this.getClass().getName() +  "CHOICE_TYPE_ADVANCED");
+    		logger.debug("CHOICE_TYPE_ADVANCED");
     		request.getSession().setAttribute(CHOICE,CHOICE_TYPE_ADVANCED);
     	}
     	else if (choiceInstructions != null)
     	{
-    		logger.debug(logger + " " + this.getClass().getName() +  "CHOICE_TYPE_INSTRUCTIONS");
+    		logger.debug("CHOICE_TYPE_INSTRUCTIONS");
     		request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
     	}
 
-    	logger.debug(logger + " " + this.getClass().getName() +  "CHOICE is:" + request.getSession().getAttribute(CHOICE));
-    	//reset tab controllers
+    	logger.debug("CHOICE is:" + request.getSession().getAttribute(CHOICE));
+    	/** reset tab controllers */
 		qaAuthoringForm.choiceBasic=null;
 		qaAuthoringForm.choiceAdvanced=null;
 		qaAuthoringForm.choiceInstructions=null;
@@ -213,20 +207,18 @@ public class AuthoringUtil implements QaAppConstants{
 			request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(false));
 		}
 			
-		logger.debug(logger + " " + this.getClass().getName() +  "QaCTION, START_MONITORING_SUMMARY_REQUEST: " + 
-											request.getAttribute(START_MONITORING_SUMMARY_REQUEST));
-		
-		logger.debug(logger + " " + this.getClass().getName() +  "formIndex:" + request.getAttribute(FORM_INDEX));
+		logger.debug("START_MONITORING_SUMMARY_REQUEST: " + request.getAttribute(START_MONITORING_SUMMARY_REQUEST));
+		logger.debug("formIndex:" + request.getAttribute(FORM_INDEX));
 
 		request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(false));
 		if (qaAuthoringForm.getEdit() != null)
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "request for editActivity - editmode");
+			logger.debug("request for editActivity - editmode");
 	    	IQaService qaService =QaUtils.getToolService(request);
 	    	Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
-		    logger.debug(logger + " " + this.getClass().getName() +  "MONITORED_CONTENT_ID: " + monitoredContentId);
+		    logger.debug("MONITORED_CONTENT_ID: " + monitoredContentId);
 		    qaService.setAsDefineLater(monitoredContentId);
-		    logger.debug(logger + " " + this.getClass().getName() +  "MONITORED_CONTENT_ID has been marked as defineLater: ");
+		    logger.debug("MONITORED_CONTENT_ID has been marked as defineLater: ");
 			request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
 		}
 		else
@@ -246,19 +238,18 @@ public class AuthoringUtil implements QaAppConstants{
      */
     protected QaContent createContent(Map mapQuestionContent, HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
     {
-    	//get the service
     	IQaService qaService =QaUtils.getToolService(request);
     	
-    	//the tool content id is passed from the container to the tool and placed into session in the QaStarterAction
+    	/** the tool content id is passed from the container to the tool and placed into session in the QaStarterAction */
     	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (!toolContentId.equals("")))
     	{
-    		logger.debug(logger + " " + this.getClass().getName() +  "passed TOOL_CONTENT_ID : " + new Long(toolContentId));
-    		//delete the existing content in the database before applying new content
+    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
+    		/**delete the existing content in the database before applying new content*/
     		qaService.deleteQaById(new Long(toolContentId));
-    		logger.debug(logger + " " + this.getClass().getName() +  "post-deletion existing content");
+    		logger.debug("post-deletion existing content");
 		}
-    	logger.debug(logger + " " + this.getClass().getName() +  "using TOOL_CONTENT_ID: " +  toolContentId);
+    	logger.debug("using TOOL_CONTENT_ID: " +  toolContentId);
     	request.getSession().setAttribute(TOOL_CONTENT_ID,toolContentId);
     	
     	boolean isQuestionsSequenced=false;
@@ -278,7 +269,7 @@ public class AuthoringUtil implements QaAppConstants{
 	    Boolean renderMonitoringEditActivity=(Boolean)request.getSession().getAttribute(RENDER_MONITORING_EDITACTIVITY);
 		if ((renderMonitoringEditActivity != null) && (renderMonitoringEditActivity.booleanValue()))
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "getting booleans based on editActivity");
+			logger.debug("getting booleans based on editActivity");
 			isQuestionsSequencedBoolean=(Boolean)request.getSession().getAttribute(IS_QUESTIONS_SEQUENCED_MONITORING);
 		    isSynchInMonitorBoolean=(Boolean)request.getSession().getAttribute(IS_SYNCH_INMONITOR_MONITORING);
 		    isUsernameVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE_MONITORING);
@@ -300,17 +291,16 @@ public class AuthoringUtil implements QaAppConstants{
 		}
 		else
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "getting booleans based on normal flow: ");
-			logger.debug(logger + " " + this.getClass().getName() +  "isQuestionsSequenced: " +  qaAuthoringForm.getQuestionsSequenced());
+			logger.debug("getting booleans based on normal flow: ");
+			logger.debug("isQuestionsSequenced: " +  qaAuthoringForm.getQuestionsSequenced());
 	    	if (qaAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
 	    		isQuestionsSequenced=true;
 	    	
-	    	logger.debug(logger + " " + this.getClass().getName() +  "isSynchInMonitor: " +  qaAuthoringForm.getSynchInMonitor());
+	    	logger.debug("isSynchInMonitor: " +  qaAuthoringForm.getSynchInMonitor());
 	    	if (qaAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
 	    		isSynchInMonitor=true;
 	    	
-	    	
-	    	logger.debug(logger + " " + this.getClass().getName() +  "isUsernameVisible: " +  qaAuthoringForm.getUsernameVisible());
+	    	logger.debug("isUsernameVisible: " +  qaAuthoringForm.getUsernameVisible());
 	    	if (qaAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
 	    		isUsernameVisible=true;
 	    	
@@ -324,25 +314,24 @@ public class AuthoringUtil implements QaAppConstants{
 		if (creationDate == null)
 			creationDate=new Date(System.currentTimeMillis()).toString();
 			
-    	
-    	//obtain user object from the session
+    	/**obtain user object from the session*/
     	User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieving toolUser: " + toolUser);
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieving toolUser userId: " + toolUser.getUserId());
+    	logger.debug("retrieving toolUser: " + toolUser);
+    	logger.debug("retrieving toolUser userId: " + toolUser.getUserId());
     	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieving toolUser fullname: " + fullName);
+    	logger.debug("retrieving toolUser fullname: " + fullName);
     	long userId=toolUser.getUserId().longValue();
     	
-    	//create a new qa content and leave the default content intact
+    	/** create a new qa content and leave the default content intact*/
     	QaContent qa = new QaContent();
 		qa.setQaContentId(new Long(toolContentId));
 		qa.setTitle(qaAuthoringForm.getTitle());
 		qa.setInstructions(qaAuthoringForm.getInstructions());
-		qa.setCreationDate(creationDate); //preserve this from the db 
-		qa.setUpdateDate(new Date(System.currentTimeMillis())); //keep updating this one
-		qa.setCreatedBy(userId); //make sure we are setting the userId from the User object above
+		qa.setCreationDate(creationDate); /**preserve this from the db*/ 
+		qa.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
+		qa.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
 	    qa.setUsernameVisible(isUsernameVisible);
-	    qa.setQuestionsSequenced(isQuestionsSequenced); //the default question listing in learner mode will be all in the same page
+	    qa.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
 	    qa.setSynchInMonitor(isSynchInMonitor);
 	    qa.setOnlineInstructions(onlineInstructions);
 	    qa.setOfflineInstructions(offlineInstructions);
@@ -351,12 +340,11 @@ public class AuthoringUtil implements QaAppConstants{
 	    qa.setMonitoringReportTitle(monitoringReportTitle);
 	    qa.setQaQueContents(new TreeSet());
 	    qa.setQaSessions(new TreeSet());
-	    logger.debug(logger + " " + this.getClass().getName() +  "qa content :" +  qa);
+	    logger.debug("qa content :" +  qa);
     	
-    	//create the content in the db
+    	/**create the content in the db*/
         qaService.createQa(qa);
-        logger.debug(logger + " " + this.getClass().getName() +  "qa created with content id: " + toolContentId);
-        
+        logger.debug("qa created with content id: " + toolContentId);
         return qa;
     }
 
@@ -376,9 +364,9 @@ public class AuthoringUtil implements QaAppConstants{
         while (itMap.hasNext()) 
 	    {
 	        Map.Entry pairs = (Map.Entry)itMap.next();
-	        logger.debug(logger + " " + this.getClass().getName() + "Using the pair: " +  pairs.getKey() + " = " + pairs.getValue());
+	        logger.debug("using the pair: " +  pairs.getKey() + " = " + pairs.getValue());
 	        
-	        //make sure question entered is NOT blank
+	        /**make sure question entered is NOT blank*/
 	        if (pairs.getValue().toString().length() != 0)
 	        {	        	
 		        QaQueContent queContent=  new QaQueContent(pairs.getValue().toString(), 
@@ -387,14 +375,13 @@ public class AuthoringUtil implements QaAppConstants{
 															null,
 															null);
 	        
-   			logger.debug(logger + " " + this.getClass().getName() +  " queContent: " + queContent);
+   			logger.debug("queContent: " + queContent);
    			qaService.createQaQue(queContent);
-   			logger.debug(logger + " " + this.getClass().getName() +  "a qaQueContent created:");
+   			logger.debug("a qaQueContent created:");
 	        }
 	    }
-	    logger.debug(logger + " " + this.getClass().getName() +  "all questions in the Map persisted:");
+	    logger.debug("all questions in the Map persisted:");
     }
-    
     
     
     /** remove existing content data from the db
@@ -412,7 +399,7 @@ public class AuthoringUtil implements QaAppConstants{
     protected void removeAllDBContent(HttpServletRequest request)
     {
     	IQaService qaService =QaUtils.getToolService(request);
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieve qaService: " + qaService);
+    	logger.debug("retrieve qaService: " + qaService);
     	String toolContentId=null;
     	
     	if (request.getSession().getAttribute(TOOL_CONTENT_ID) != null)
@@ -420,7 +407,7 @@ public class AuthoringUtil implements QaAppConstants{
     	
     	if ((toolContentId != null) && (!toolContentId.equals(""))) 
 		{
-    		logger.debug(logger + " " + this.getClass().getName() +  "simulate container behaviour by calling: removeToolContent with: " + new Long(toolContentId));
+    		logger.debug("simulate container behaviour by calling: removeToolContent with: " + new Long(toolContentId));
     		/**
     		 * we are calling removeToolContent to clear content tables although this method normally 
     		 * gets called only in the monitoring mode automatically by the core.
@@ -428,8 +415,8 @@ public class AuthoringUtil implements QaAppConstants{
     		 * Having this method here also makes sure that this contract has implemented and tested properly. 
     		 */
     		qaService.removeToolContent(new Long(toolContentId));
-    		logger.debug(logger + " " + this.getClass().getName() +  "simulated container behaviour by calling: removeToolContent with: " + toolContentId);
-    		logger.debug(logger + " " + this.getClass().getName() +  "removed content from database for content id:" + toolContentId);
+    		logger.debug("simulated container behaviour by calling: removeToolContent with: " + toolContentId);
+    		logger.debug("removed content from database for content id:" + toolContentId);
 		}
     }
     
@@ -442,16 +429,15 @@ public class AuthoringUtil implements QaAppConstants{
     public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
     {
     	IQaService qaService =QaUtils.getToolService(request);
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieve qaService: " + qaService);
     	
     	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (!toolContentId.equals("")))
     	{
-    		logger.debug(logger + " " + this.getClass().getName() +  "passed TOOL_CONTENT_ID : " + new Long(toolContentId));
+    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
     		qaService.setAsRunOffline(new Long(toolContentId));
-    		logger.debug(logger + " " + this.getClass().getName() +  "post-RunAsOffline");
+    		logger.debug("post-RunAsOffline");
 		}
-    	logger.debug(logger + " " + this.getClass().getName() +  "end of simulating RunOffline on content id: " + toolContentId);
+    	logger.debug("end of simulating RunOffline on content id: " + toolContentId);
     }
 	
     /**
@@ -462,16 +448,15 @@ public class AuthoringUtil implements QaAppConstants{
     public void simulatePropertyInspector_setAsDefineLater(HttpServletRequest request)
     {
     	IQaService qaService =QaUtils.getToolService(request);
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieve qaService: " + qaService);
     	
     	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (!toolContentId.equals("")))
     	{
-    		logger.debug(logger + " " + this.getClass().getName() +  "passed TOOL_CONTENT_ID : " + new Long(toolContentId));
+    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
     		qaService.setAsDefineLater(new Long(toolContentId));
-    		logger.debug(logger + " " + this.getClass().getName() +  "post-setAsDefineLater");
+    		logger.debug("post-setAsDefineLater");
 		}
-    	logger.debug(logger + " " + this.getClass().getName() +  "end of simulating setAsDefineLater on content id: " + toolContentId);
+    	logger.debug("end of simulating setAsDefineLater on content id: " + toolContentId);
     }
 	
 }

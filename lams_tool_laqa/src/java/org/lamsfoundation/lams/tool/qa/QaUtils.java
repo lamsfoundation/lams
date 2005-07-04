@@ -29,8 +29,9 @@ import org.lamsfoundation.lams.usermanagement.User;
  * We use the same  userId property as the user table key when we are saving learner responses and associated user data. 
  *   * 
  */
+
 /**
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates

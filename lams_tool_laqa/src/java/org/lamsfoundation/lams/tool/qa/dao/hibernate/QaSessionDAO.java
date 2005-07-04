@@ -30,7 +30,7 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 
 /**
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  */
 public class QaSessionDAO extends HibernateDaoSupport implements

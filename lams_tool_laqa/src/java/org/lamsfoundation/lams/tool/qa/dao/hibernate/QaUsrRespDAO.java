@@ -22,7 +22,6 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import net.sf.hibernate.Hibernate;
 
-import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
@@ -31,7 +30,7 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 /**
  * 
- * @author ozgurd
+ * @author Ozgur Demirtas
  * 
  */
 public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO

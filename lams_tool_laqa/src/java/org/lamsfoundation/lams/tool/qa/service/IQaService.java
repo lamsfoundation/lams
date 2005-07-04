@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * This interface define the contract that all Survey service provider must
  * follow.
  * 
- * @author ozgurd
+ * @author Ozgur Demirtas
  */
 public interface IQaService 
 {

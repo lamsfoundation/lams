@@ -6,7 +6,9 @@
  */
 
 /**
- * 
+ * @author Ozgur Demirtas
+ 
+ * *  
  * Monitoring screen does have 4 tabs:
  * 		Summary		: default tab, either all sessions by default or single sessions selected, enable edit responses and hide responses
  * 		Instructions: Online+offline instructions+multipe file uploads + new table
@@ -16,6 +18,7 @@
  * 
  * SUMMARY_TOOL_SESSIONS keeps all the passed toolSessionIds in an arrayList.
  */
+
 
 package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
@@ -53,7 +56,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
   								throws IOException, ServletException, QaApplicationException 
 	{
 		QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-    	logger.debug(logger + " " + this.getClass().getName() +  "started monitoring mode : " + qaMonitoringForm);
     	
 		/**
 		 * retrive the service
@@ -62,12 +64,11 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
     	qaService =(IQaService)request.getSession().getAttribute(TOOL_SERVICE);
     	if (qaService == null)
     	{
-    		logger.debug(logger + " " + this.getClass().getName() +  "qaService is not found yet:");
     		qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-    	    logger.debug(logger + " " + this.getClass().getName() +  "retrieving qaService from the session: " + qaService);
+    	    logger.debug("retrieving qaService from the session: " + qaService);
     	    request.getSession().setAttribute(TOOL_SERVICE, qaService);	
     	}
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieved qaService: " + qaService);
+    	logger.debug("retrieved qaService: " + qaService);
 	    
 	    /**
 	     * mark the http session as an authoring activity 
@@ -94,26 +95,26 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			{
 		    	persistError(request,"error.userId.notNumeric");
 				request.setAttribute(USER_EXCEPTION_USERID_NOTNUMERIC, new Boolean(true));
-				logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + LOAD_QUESTIONS);
+				logger.debug("forwarding to: " + MONITORING_REPORT);
 				return (mapping.findForward(MONITORING_REPORT));
 			}
 		}
 	    
 	    if ((userId == null) || (userId.length()==0))
 		{
-	    	logger.debug(logger + " " + this.getClass().getName() +  "error: The tool expects userId");
+	    	logger.debug("error: The tool expects userId");
 	    	persistError(request,"error.authoringUser.notAvailable");
 	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-			logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + MONITORING_ERROR);
+			logger.debug("forwarding to: " + MONITORING_REPORT);
 			return (mapping.findForward(MONITORING_REPORT));
 		}
-		logger.debug(logger + " " + this.getClass().getName() +  "TOOL_USER is:" + request.getSession().getAttribute(TOOL_USER));
+		logger.debug("TOOL_USER is:" + request.getSession().getAttribute(TOOL_USER));
 		
 		String toolContentId=request.getParameter(TOOL_CONTENT_ID);
-	    logger.debug(logger + " " + this.getClass().getName() +  "TOOL_CONTENT_ID: " + toolContentId);
+	    logger.debug("TOOL_CONTENT_ID: " + toolContentId);
 	    
 	    Long initialMonitoringContentId=(Long) request.getSession().getAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID);
-	    logger.debug(logger + " " + this.getClass().getName() +  "INITIAL_MONITORING_TOOL_CONTENT_ID: " + initialMonitoringContentId);
+	    logger.debug("INITIAL_MONITORING_TOOL_CONTENT_ID: " + initialMonitoringContentId);
 	    
 	    if ((toolContentId == null) || (toolContentId.length() == 0))
 	    {
@@ -121,7 +122,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    }
 	    else if (initialMonitoringContentId != null)
 	    {
-	    	logger.debug(logger + " " + this.getClass().getName() +  "using INITIAL_MONITORING_TOOL_CONTENT_ID: " + initialMonitoringContentId);
+	    	logger.debug("using INITIAL_MONITORING_TOOL_CONTENT_ID: " + initialMonitoringContentId);
 	    	toolContentId=initialMonitoringContentId.toString();
 	    }
 
@@ -129,12 +130,12 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		{
 		    if ((toolContentId != null) && (toolContentId.length() > 0)) 
 		    {
-		    	logger.debug(logger + "Since TOOL_CONTENT_ID has been passed explicitly we will refer to that one instead of the one derived from tool sessions");
+		    	logger.debug("Since TOOL_CONTENT_ID has been passed explicitly we will refer to that one instead of the one derived from tool sessions");
 		    	if (!QaUtils.existsContent(new Long(toolContentId).longValue(), request))
 		    	{
 		    		persistError(request,"error.content.doesNotExist");
 		    		request.setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true));
-					logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + MONITORING_ERROR);
+					logger.debug("forwarding to: " + MONITORING_ERROR);
 					return (mapping.findForward(MONITORING_REPORT));
 		    	}
 		    	request.getSession().setAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID, new Long(toolContentId));	
@@ -144,10 +145,10 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		{
 	    	persistError(request,"error.numberFormatException");
 			request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
-			logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + MONITORING_ERROR);
+			logger.debug("forwarding to: " + MONITORING_ERROR);
 			return (mapping.findForward(MONITORING_REPORT));
 		}
-		logger.debug(logger + "final INITIAL_MONITORING_TOOL_CONTENT_ID: " + 	request.getSession().getAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID));
+		logger.debug("final INITIAL_MONITORING_TOOL_CONTENT_ID: " + request.getSession().getAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID));
 		
 		/**
 		 * load the values for online and offline instructions
@@ -156,10 +157,10 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		if (initialMonitoringContentId != null)
 		{
 			QaContent qaContent=qaService.retrieveQa(initialMonitoringContentId.longValue());
-			logger.debug(logger + " " + this.getClass().getName() +  "qaContent: " + qaContent);
+			logger.debug("qaContent: " + qaContent);
 			request.getSession().setAttribute(MONITORED_OFFLINE_INSTRUCTIONS, qaContent.getOfflineInstructions());
 			request.getSession().setAttribute(MONITORED_ONLINE_INSTRUCTIONS, qaContent.getOnlineInstructions());
-			logger.debug(logger + " " + this.getClass().getName() +  "session updated with online/offline instructions");
+			logger.debug("session updated with online/offline instructions");
 		}
 		
 		/**
@@ -169,7 +170,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		 */
 		
 		boolean isOnlyContentIdAvailable = isOnlyContentIdAvailable(request);
-		logger.debug(logger + "final isOnlyContentIdAvailable: " + isOnlyContentIdAvailable);
+		logger.debug("final isOnlyContentIdAvailable: " + isOnlyContentIdAvailable);
 		
 		request.getSession().setAttribute(NO_TOOL_SESSIONS_AVAILABLE, new Boolean(false));
 		if (isOnlyContentIdAvailable == false)
@@ -177,7 +178,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			/**
 			 * this block of code will normally never run!
 			 */
-			logger.debug(logger + "Warning! We are not supposed to reach here.");
+			logger.debug("Warning! We are not supposed to reach here!");
 			/*
 			logger.debug(logger + "found sessions: isOnlyContentIdAvailable: " + isOnlyContentIdAvailable);
 			if ((toolContentId != null) && (toolContentId.length() > 0)) 
@@ -224,23 +225,14 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		}
 		else
 		{
-			logger.debug(logger + "isOnlyContentIdAvailable: " + isOnlyContentIdAvailable);
-			logger.debug(logger + "no tool sessions passed and they will be populated from toolContentId.");
+			logger.debug("isOnlyContentIdAvailable: " + isOnlyContentIdAvailable);
+			logger.debug("no tool sessions passed and they will be populated from toolContentId.");
 			qaMonitoringForm.resetUserAction();
-		/*
-			persistError(request,"error.content.onlyContentAndNoSessions");
-    		request.setAttribute(USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS, new Boolean(true));
-    		request.getSession().setAttribute(NO_TOOL_SESSIONS_AVAILABLE, new Boolean(true));
-			logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + MONITORING_REPORT);
-			request.getSession().setAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID, new Long(toolContentId));
-			logger.debug(logger + "INITIAL_MONITORING_TOOL_CONTENT_ID: " + request.getSession().getAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID));
-			return (mapping.findForward(MONITORING_REPORT));
-		*/
-			logger.debug(logger + "getting qaContent for toolContentId: " + toolContentId);
+			logger.debug("getting qaContent for toolContentId: " + toolContentId);
 			QaContent qaContent=qaService.loadQa(new Long(toolContentId).longValue());
-			logger.debug(logger + "retrieved qaContent: " + qaContent);
+			logger.debug("retrieved qaContent: " + qaContent);
 			List listToolSessionIds=qaService.getToolSessionsForContent(qaContent);
-			logger.debug(logger + "retrieved listToolSessionIds: " + listToolSessionIds);
+			logger.debug("retrieved listToolSessionIds: " + listToolSessionIds);
 			
 			Map originalSessionList= new TreeMap(new QaStringComparator());
 			Iterator sessionIdsIterator=listToolSessionIds.iterator();
@@ -252,7 +244,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 				originalSessionList.put(new Integer(sessionIdCounter).toString(), derivedToolSessionId.toString());
 				sessionIdCounter++;
 			}
-			logger.debug(logger + "constructed originalSessionList: " + originalSessionList);
+			logger.debug("constructed originalSessionList: " + originalSessionList);
 			
 			if (originalSessionList.size() == 0)
 				request.getSession().setAttribute(NO_TOOL_SESSIONS_AVAILABLE, new Boolean(true));
@@ -277,7 +269,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    	     * copyToolContent(Long fromContentId, Long toContentId)  
 	    	     */
 	    	    strFromToolContentId=request.getParameter(FROM_TOOL_CONTENT_ID);
-	    		logger.debug(logger + " " + this.getClass().getName() +  "FROM_TOOL_CONTENT_ID: " + strFromToolContentId);
+	    		logger.debug("FROM_TOOL_CONTENT_ID: " + strFromToolContentId);
 	    	    if (strFromToolContentId == null)
 	    	    {
 	    	    	throw new QaApplicationException("Exception occured: " +
@@ -285,7 +277,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    	    }
 	    	    
 	    	    strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
-	    	    logger.debug(logger + " " + this.getClass().getName() +  "TO_TOOL_CONTENT_ID: " + strToToolContentId);
+	    	    logger.debug("TO_TOOL_CONTENT_ID: " + strToToolContentId);
 	    	    if (strToToolContentId == null)
 	    	    {
 	    	    	throw new QaApplicationException("Exception occured: " +
@@ -311,7 +303,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    		 * TESTED to work
 		    	 */
 	    		strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
-	    	    logger.debug(logger + " " + this.getClass().getName() +  "TO_TOOL_CONTENT_ID: " + strToToolContentId);
+	    	    logger.debug("TO_TOOL_CONTENT_ID: " + strToToolContentId);
 	    	    if (strToToolContentId == null)
 	    	    {
 	    	    	throw new QaApplicationException("Exception occured: " +
@@ -328,11 +320,11 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    		 * Parameter: userId
 	    		 */
 	    		qaMonitoringForm.resetUserAction();
-	    		logger.debug(logger + " " + this.getClass().getName() +  "request for forceComplete");
+	    		logger.debug("request for forceComplete");
 	    		userId=request.getParameter(MONITOR_USER_ID);
-	    		logger.debug(logger + " " + this.getClass().getName() +  "MONITOR_USER_ID: " + userId);
+	    		logger.debug("MONITOR_USER_ID: " + userId);
 	    		qaService.setAsForceComplete(new Long(userId));
-	    		logger.debug(logger + " " + this.getClass().getName() +  "end of setAsForceComplete with userId: " + userId);
+	    		logger.debug("end of setAsForceComplete with userId: " + userId);
 	    	}
 	    	/**
 	    	 * summary tab is one of the main tabs in monitoring screen, summary is the default tab
@@ -340,24 +332,24 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    	else if (qaMonitoringForm.getSummary() != null)
 	    	{
 	    		qaMonitoringForm.resetUserAction();
-	    		logger.debug(logger + " " + this.getClass().getName() +  "do generateToolSessionDataMap");
+	    		logger.debug("do generateToolSessionDataMap");
 	    		QaMonitoringAction  qaMonitoringAction= new QaMonitoringAction();
 	    		return qaMonitoringAction.generateToolSessionDataMap(mapping,form,request,response);
 	    	}
 	    	else if (qaMonitoringForm.getInstructions() != null)
 	    	{
 	    		qaMonitoringForm.resetUserAction();
-	    		logger.debug(logger + " " + this.getClass().getName() +  "request for instructions");
+	    		logger.debug("request for instructions");
 	    	}
 	    	else if (qaMonitoringForm.getEditActivity() != null)
 	    	{
 	    		qaMonitoringForm.resetUserAction();
-	    		logger.debug(logger + " " + this.getClass().getName() +  "request for editActivity");
+	    		logger.debug("request for editActivity");
 	    	}
 	    	else if (qaMonitoringForm.getStats() != null)
 	    	{
 	    		qaMonitoringForm.resetUserAction();
-	    		logger.debug(logger + " " + this.getClass().getName() +  "request for stats");
+	    		logger.debug("request for stats");
 	    	}
 		return null;
 	}
@@ -382,12 +374,12 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		if (existsContentId && (!existsToolSession))
 		{
-    		logger.debug(logger + " " + this.getClass().getName() +  "OnlyContentIdAvailable");
+    		logger.debug("OnlyContentIdAvailable");
 			return true;
 		}
 		else
 		{
-			logger.debug(logger + " " + this.getClass().getName() +  "Not OnlyContentIdAvailable");
+			logger.debug("Not OnlyContentIdAvailable");
 			return false;
 		}
 	}
@@ -401,7 +393,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		for (int toolSessionIdCounter=1; toolSessionIdCounter < MAX_TOOL_SESSION_COUNT.intValue(); toolSessionIdCounter++)
 		{
 			String strToolSessionId=request.getParameter(TOOL_SESSION_ID + toolSessionIdCounter);
-		    logger.debug(logger + " " + this.getClass().getName() +  "TOOL_SESSION_ID: " + strToolSessionId);
+		    logger.debug("TOOL_SESSION_ID: " + strToolSessionId);
 		    if ((strToolSessionId != null) && (strToolSessionId.length() > 0))
 		    {
 		    	QaSession qaSession=null;
@@ -417,18 +409,17 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		    	if (qaSession != null)
 		    	{
 		    		QaContent qaContent=qaSession.getQaContent();
-		    	    logger.debug(logger + " " + this.getClass().getName() +  "using qaContent: " + qaContent);
-		    	    logger.debug(logger + " " + this.getClass().getName() +  "qaContent id versus toolSession's content id: " + toolContentId + 
-		    	    														" versus " + qaContent.getQaContentId());
+		    	    logger.debug("using qaContent: " + qaContent);
+		    	    logger.debug("qaContent id versus toolSession's content id: " + toolContentId + " versus " + qaContent.getQaContentId());
 		    	    if (!qaContent.getQaContentId().equals(toolContentId))
 		    	    {
-		    	    	logger.debug(logger + " " + this.getClass().getName() +  "qaContent and toolSesion not compatible:");
+		    	    	logger.debug("qaContent and toolSesion not compatible:");
 		    	    	return false;
 		    	    }
 		    	}
 		    	else
 		    	{
-		    		logger.debug(logger + " " + this.getClass().getName() +  "error: TOOL_SESSION_ID passed does not refer to an existing tool session.");
+		    		logger.debug("error: TOOL_SESSION_ID passed does not refer to an existing tool session.");
 		    		request.setAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST, new Boolean(true));
 		    		break;
 		    	}
@@ -436,18 +427,18 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		    
 		    if ((strToolSessionId == null) && (toolSessionIdCounter == 1))
 		    {
-		    	logger.debug(logger + " " + this.getClass().getName() +  "error: TOOL_SESSION_IDs not passed in the right format");
+		    	logger.debug("error: TOOL_SESSION_IDs not passed in the right format");
 		    	request.setAttribute(USER_EXCEPTION_WRONG_FORMAT, new Boolean(true));
 		    	break;
 		    }
 		    if ((strToolSessionId != null) && (strToolSessionId.length() == 0) && (toolSessionIdCounter == 1))
 		    {
-		    	logger.debug(logger + " " + this.getClass().getName() +  "error: TOOL_SESSION_IDs not passed in the right format");
+		    	logger.debug("error: TOOL_SESSION_IDs not passed in the right format");
 		    	request.setAttribute(USER_EXCEPTION_WRONG_FORMAT, new Boolean(true));
 		    	break;
 		    }
 		}
-		logger.debug(logger + " " + this.getClass().getName() +  "qaContent and toolSesion compatible:");
+		logger.debug("qaContent and toolSesion compatible:");
 		return true;
 	}
 	
@@ -460,7 +451,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	{
 		ActionMessages errors= new ActionMessages();
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-		logger.debug(logger + " " + this.getClass().getName() +  "add " + message +"  to ActionMessages:");
+		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
 	}
 }  

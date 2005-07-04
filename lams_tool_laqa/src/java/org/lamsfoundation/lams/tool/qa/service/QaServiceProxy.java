@@ -35,11 +35,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * In this way, the presentation tier will no longer be aware of the changes in
  * service layer. Therefore we can feel free to switch the business logic
  * implementation.</p>
+ * 
+ * @author Ozgur Demirtas
  *
  */
 public class QaServiceProxy
 {
-	//private IQaService lnkIQaService;
     /**
      * Return the survey domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.

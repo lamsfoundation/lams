@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * 
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  * Learner mode takes in the parameters USER_ID, TOOL_SESSION_ID and TOOL_CONTENT_ID
  *
@@ -75,7 +75,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		 * reset the question index to 1
 		 */
 		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		logger.debug(logger + " " + this.getClass().getName() +  "CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
 
 		/**
 		 * reset the current answer
@@ -92,7 +92,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		 * retrive the service
 		 */
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	    logger.debug(logger + " " + this.getClass().getName() +  "retrieving qaService: " + qaService);
+	    logger.debug("retrieving qaService: " + qaService);
 	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
 	    
 	    /**
@@ -106,10 +106,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    String userId=request.getParameter(USER_ID);
 	    if ((userId == null) || (userId.length()==0))
 		{
-	    	logger.debug(logger + " " + this.getClass().getName() +  "error: The tool expects userId");
+	    	logger.debug("error: The tool expects userId");
 	    	persistError(request,"error.authoringUser.notAvailable");
 	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-			logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + LOAD);
+			logger.debug("forwarding to: " + LOAD);
 			return (mapping.findForward(LOAD));
 		}
 	    
@@ -122,21 +122,21 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		{
 	    	persistError(request,"error.userId.notNumeric");
 			request.setAttribute(USER_EXCEPTION_USERID_NOTNUMERIC, new Boolean(true));
-			logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + LOAD);
+			logger.debug("forwarding to: " + LOAD);
 			return (mapping.findForward(LOAD));
 		}
-	    logger.debug(logger + " " + this.getClass().getName() +  "TOOL_USER is:" + request.getSession().getAttribute(TOOL_USER));
+	    logger.debug("TOOL_USER is:" + request.getSession().getAttribute(TOOL_USER));
 	    
 	    /**
 	     * verify that userID does not already exist in the db
 	     */
 	    QaQueUsr qaQueUsr=qaService.loadQaQueUsr(new Long(userId));
-	    logger.debug(logger + " " + this.getClass().getName() +  "QaQueUsr:" + qaQueUsr);
+	    logger.debug("QaQueUsr:" + qaQueUsr);
 	    if (qaQueUsr != null)
 	    {
 	    	persistError(request,"error.userId.existing");
 			request.setAttribute(USER_EXCEPTION_USERID_EXISTING, new Boolean(true));
-			logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + LOAD);
+			logger.debug("forwarding to: " + LOAD);
 			return (mapping.findForward(LOAD));
 	    }
 	    
@@ -149,7 +149,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    {
 	    	persistError(request, "error.contentId.required");
 	    	request.setAttribute(USER_EXCEPTION_CONTENTID_REQUIRED, new Boolean(true));
-			logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + LOAD);
+			logger.debug("forwarding to: " + LOAD);
 			return (mapping.findForward(LOAD));
 	    }
 	    else
@@ -157,14 +157,14 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	try
 			{
 	    		toolContentId=new Long(strToolContentId).longValue();
-		    	logger.debug(logger + " " + this.getClass().getName() +  "passed TOOL_CONTENT_ID : " + new Long(toolContentId));
+		    	logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
 		    	request.getSession().setAttribute(TOOL_CONTENT_ID,new Long(toolContentId));	
 			}
 	       	catch(NumberFormatException e)
 			{
 	       		persistError(request, "error.contentId.numberFormatException");
 				request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
-				logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + LOAD);
+				logger.debug("forwarding to: " + LOAD);
 				return (mapping.findForward(LOAD));
 			}
 	    }
@@ -173,7 +173,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	{
        		persistError(request, "error.content.doesNotExist");
     		request.setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true));
-			logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + LOAD);
+			logger.debug("forwarding to: " + LOAD);
 			return (mapping.findForward(LOAD));
     	}
 	    
@@ -188,7 +188,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    {
 	    	persistError(request, "error.toolSessionId.required");
 	    	request.setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true));
-			logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + LOAD);
+			logger.debug("forwarding to: " + LOAD);
 			return (mapping.findForward(LOAD));
 	    }
 	    else
@@ -196,23 +196,23 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	try
 			{
 	    		toolSessionId=new Long(strToolSessionId).longValue();
-		    	logger.debug(logger + " " + this.getClass().getName() +  "passed TOOL_SESSION_ID : " + new Long(toolSessionId));
+		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
 		    	request.getSession().setAttribute(TOOL_SESSION_ID,new Long(toolSessionId));	
 			}
 	    	catch(NumberFormatException e)
 			{
 	    		persistError(request, "error.sessionId.numberFormatException");
-	    		logger.debug(logger + " " + this.getClass().getName() +  "add error.sessionId.numberFormatException to ActionMessages: ");
+	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
 				request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
-				logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + LOAD);
+				logger.debug("forwarding to: " + LOAD);
 				return (mapping.findForward(LOAD));
 			}
 	    }
 
 	    TimeZone timeZone=TimeZone.getDefault();
-	    logger.debug(logger + " " + this.getClass().getName() +  "current timezone: " + timeZone.getDisplayName());
+	    logger.debug("current timezone: " + timeZone.getDisplayName());
 	    request.getSession().setAttribute(TIMEZONE, timeZone.getDisplayName());
-	    logger.debug(logger + " " + this.getClass().getName() +  "current timezone id: " + timeZone.getID());
+	    logger.debug("current timezone id: " + timeZone.getID());
 	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
 	    
 	    
@@ -225,10 +225,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		if (!QaUtils.existsSession(toolSessionId, request)) 
 		{
 				Long currentToolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-				logger.debug(logger + " " + this.getClass().getName() +  "Simulating container behaviour: calling createToolSession with toolSessionId : " + 
-												new Long(toolSessionId) + " and toolContentId: " + currentToolContentId);
+				logger.debug("simulating container behaviour: calling createToolSession with toolSessionId : " + 
+						new Long(toolSessionId) + " and toolContentId: " + currentToolContentId);
 				qaService.createToolSession(new Long(toolSessionId), currentToolContentId);
-				logger.debug(logger + " " + this.getClass().getName() +  "Simulated container behaviour:"); 
+				logger.debug("simulated container behaviour."); 
 		}
 		
 		/**
@@ -237,7 +237,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		 */
 		
 		QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId);
-	    logger.debug(logger + " " + this.getClass().getName() +  "retrieving qaSession: " + qaSession);
+	    logger.debug("retrieving qaSession: " + qaSession);
 	    /**
 	     * find out what content this tool session is referring to
 	     * get the content for this tool session (many to one mapping)
@@ -247,26 +247,26 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     * Each passed tool session id points to a particular content. Many to one mapping.
 	     */
 		qaContent=qaSession.getQaContent();
-	    logger.debug(logger + " " + this.getClass().getName() +  "using qaContent: " + qaContent);
+	    logger.debug("using qaContent: " + qaContent);
 	    
 	    /**
 	     * The content we retrieved above must have been created before in Authoring time. 
 	     * And the passed tool session id already refers to it.
 	     */
 	    	    
-		logger.debug(logger + " " + this.getClass().getName() +  "REPORT_TITLE_LEARNER: " + qaContent.getReportTitle());
+		logger.debug("REPORT_TITLE_LEARNER: " + qaContent.getReportTitle());
 	    request.getSession().setAttribute(REPORT_TITLE_LEARNER,qaContent.getReportTitle());
 	    
 	    request.getSession().setAttribute(END_LEARNING_MESSAGE,qaContent.getEndLearningMessage());
-	    logger.debug(logger + " " + this.getClass().getName() +  "END_LEARNING_MESSAGE: " + qaContent.getEndLearningMessage());
+	    logger.debug("END_LEARNING_MESSAGE: " + qaContent.getEndLearningMessage());
 	    
-	    logger.debug(logger + " " + this.getClass().getName() +  "IS_TOOL_ACTIVITY_OFFLINE: " + qaContent.isRunOffline());
+	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + qaContent.isRunOffline());
 	    request.getSession().setAttribute(IS_TOOL_ACTIVITY_OFFLINE, new Boolean(qaContent.isRunOffline()).toString());
 	    
-	    logger.debug(logger + " " + this.getClass().getName() +  "IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
+	    logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
 	    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(qaContent.isUsernameVisible()));
 	
-	    logger.debug(logger + " " + this.getClass().getName() +  "IS_DEFINE_LATER: " + qaContent.isDefineLater());
+	    logger.debug("IS_DEFINE_LATER: " + qaContent.isDefineLater());
 	    request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(qaContent.isDefineLater()));
 	    
 	    /**
@@ -274,7 +274,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     */
 	    request.getSession().setAttribute(CHECK_ALL_SESSIONS_COMPLETED, new Boolean(false));
 	    	    
-	    logger.debug(logger + " " + this.getClass().getName() +  "IS_QUESTIONS_SEQUENCED: " + qaContent.isQuestionsSequenced());
+	    logger.debug("IS_QUESTIONS_SEQUENCED: " + qaContent.isQuestionsSequenced());
 	    String feedBackType="";
     	if (qaContent.isQuestionsSequenced())
     	{
@@ -286,7 +286,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_COMBINED);
     		feedBackType=FEEDBACK_TYPE_COMBINED;
 	    }
-	    logger.debug(logger + " " + this.getClass().getName() +  "QUESTION_LISTING_MODE: " + request.getSession().getAttribute(QUESTION_LISTING_MODE));
+	    logger.debug("QUESTION_LISTING_MODE: " + request.getSession().getAttribute(QUESTION_LISTING_MODE));
 	    
     	/**
     	 * fetch question content from content
@@ -310,13 +310,13 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		
     	request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
     	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestions);
-    	logger.debug(logger + " " + this.getClass().getName() +  "qaContent has : " + mapQuestions.size() + " entries.");
+    	logger.debug("qaContent has : " + mapQuestions.size() + " entries.");
     	
     	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestions.size()).toString());
     	String userFeedback= feedBackType + request.getSession().getAttribute(TOTAL_QUESTION_COUNT) + QUESTIONS;
     	request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
     	
-		logger.debug(logger + " " + this.getClass().getName() +  "forwarding to learning screen");
+		logger.debug("forwarding to: " + LOAD);
 		return (mapping.findForward(LOAD));
   } 
 	
@@ -329,7 +329,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	{
 		ActionMessages errors= new ActionMessages();
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-		logger.debug(logger + " " + this.getClass().getName() +  "add " + message +"  to ActionMessages:");
+		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
 	}
 }  

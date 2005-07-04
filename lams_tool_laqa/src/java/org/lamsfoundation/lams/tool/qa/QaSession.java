@@ -35,6 +35,9 @@ import org.apache.log4j.Logger;
 
 
 /**
+ * 
+ * @author Ozgur Demirtas 
+ *  
  * QaSession Value Object
  * The value object that maps to our model database table: tl_laqa11_session
  * The relevant hibernate mapping resides in: QaSession.hbm.xml

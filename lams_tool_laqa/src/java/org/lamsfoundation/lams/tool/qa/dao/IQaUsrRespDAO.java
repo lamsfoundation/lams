@@ -25,7 +25,7 @@ import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 
 /**
  * 
- * @author ozgurd
+ * @author Ozgur Demirtas
  * 
  */
 public interface IQaUsrRespDAO

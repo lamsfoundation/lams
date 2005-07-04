@@ -18,7 +18,7 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 
 /**
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
@@ -49,8 +49,7 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	 	 */
 	 	public QaContent loadQaById(long qaId)
 	    {
-	    	logger.debug(logger + " " + this.getClass().getName() +  " " + "loadQaById called with: " + qaId);
-	        return (QaContent) this.getHibernateTemplate().get(QaContent.class, new Long(qaId));
+	    	return (QaContent) this.getHibernateTemplate().get(QaContent.class, new Long(qaId));
 	    }
 
 	 	
@@ -104,7 +103,6 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	    /** GETS CALLED BY CONTRACT
 	     */
 	    public void removeAllQaSession(QaContent qaContent){
-	    	logger.debug(logger + " " + this.getClass().getName() +  " " + "before removing all sessions: ");
 	    	this.getHibernateTemplate().deleteAll(qaContent.getQaSessions());	
 	    }
 	    

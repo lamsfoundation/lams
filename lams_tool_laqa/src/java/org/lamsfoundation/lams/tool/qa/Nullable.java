@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.qa;
  * The domain object that allows NULL as return value should implement this
  * interface.
  * 
- * @author ozgurd
+ * @author Ozgur Demirtas
  * 
  */
 public interface Nullable

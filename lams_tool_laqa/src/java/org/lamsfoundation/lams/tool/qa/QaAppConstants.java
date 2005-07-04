@@ -7,7 +7,7 @@
 package org.lamsfoundation.lams.tool.qa;
 
 /**
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  * TODO: Check back the constants with "Attention"
  * Holds constants used throughout the application

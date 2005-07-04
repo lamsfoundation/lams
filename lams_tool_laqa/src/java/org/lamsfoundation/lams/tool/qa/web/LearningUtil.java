@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  * 
  * Keeps all operations needed for Learning mode. 
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  */
 public class LearningUtil implements QaAppConstants{
@@ -47,34 +47,34 @@ public class LearningUtil implements QaAppConstants{
         /**
          * retrive contentId from the http session
          */
-        logger.debug(logger + " " + this.getClass().getName() +  "attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
+        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
         Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
         QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
         
-        logger.debug(logger + " " + this.getClass().getName() +  "retrieving qaContent: " + qaContent);
+        logger.debug("retrieving qaContent: " + qaContent);
         Iterator sessionIterator=qaContent.getQaSessions().iterator();
         while (sessionIterator.hasNext())
         {
         	QaSession qaSession=(QaSession)sessionIterator.next(); 
-        	logger.debug(logger + " " + this.getClass().getName() +  "iterated qaSession : " + qaSession);
+        	logger.debug("iterated qaSession : " + qaSession);
         	
         	Iterator sessionUsersIterator=qaSession.getQaQueUsers().iterator();
         	while (sessionUsersIterator.hasNext())
         	{
         		QaQueUsr qaQueUsr=(QaQueUsr) sessionUsersIterator.next();
-        		logger.debug(logger + " " + this.getClass().getName() +  "iterated qaQueUsr : " + qaQueUsr);
+        		logger.debug("iterated qaQueUsr : " + qaQueUsr);
         		
         		Iterator sessionUsersResponsesIterator=qaQueUsr.getQaUsrResps().iterator();
         		while (sessionUsersResponsesIterator.hasNext())
             	{
         			QaUsrResp qaUsrResp=(QaUsrResp)sessionUsersResponsesIterator.next();
-        			logger.debug(logger + " " + this.getClass().getName() +  "iterated qaUsrResp : " + qaUsrResp);
+        			logger.debug("iterated qaUsrResp : " + qaUsrResp);
         			qaService.removeUserResponse(qaUsrResp);
-        			logger.debug(logger + " " + this.getClass().getName() +  "removed qaUsrResp : " + qaUsrResp);
+        			logger.debug("removed qaUsrResp : " + qaUsrResp);
             	}
         	}
         }
-        logger.debug(logger + " " + this.getClass().getName() +  "end of deleteSessionUsersAndResponses()");
+        logger.debug("end of deleteSessionUsersAndResponses()");
     }
 
 
@@ -92,11 +92,11 @@ public class LearningUtil implements QaAppConstants{
         /**
          * retrive contentId from the http session
          */
-        logger.debug(logger + " " + this.getClass().getName() +  "attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
+        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
         Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
         QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
         
-        logger.debug(logger + " " + this.getClass().getName() +  "retrieving qaContent: " + qaContent);
+        logger.debug("retrieving qaContent: " + qaContent);
         
         /**
          * get iterator of questions collection
@@ -105,11 +105,11 @@ public class LearningUtil implements QaAppConstants{
     	while (contentIterator.hasNext())
     	{
     		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
-    		logger.debug(logger + " " + this.getClass().getName() +  "retrieving qaQueContent: " + qaQueContent);
+    		logger.debug("retrieving qaQueContent: " + qaQueContent);
     		if (qaQueContent != null)
     		{
     			Set qaQueUsers=qaQueContent.getQaQueUsers();
-    			logger.debug(logger + " " + this.getClass().getName() +  "qaQueUsers size: " + qaQueUsers.size());
+    			logger.debug("qaQueUsers size: " + qaQueUsers.size());
         		/**
         		 * iterate users and delete them
         		 */
@@ -117,29 +117,29 @@ public class LearningUtil implements QaAppConstants{
         		while (usersIterator.hasNext())
             	{
         			QaQueUsr qaQueUsr=(QaQueUsr) usersIterator.next();
-        			logger.debug(logger + " " + this.getClass().getName() +  "retrieving qaQueUsr: " + qaQueUsr);
+        			logger.debug("retrieving qaQueUsr: " + qaQueUsr);
         			if (qaQueUsr != null)
         			{
         				Set qaUsrResps=qaQueUsr.getQaUsrResps();
-    					logger.debug(logger + " " + this.getClass().getName() +  "retrieving user's all responses : " + qaUsrResps);
+    					logger.debug("retrieving user's all responses : " + qaUsrResps);
         				Iterator responsesIterator=qaUsrResps.iterator();
         				while (responsesIterator.hasNext())
         				{
         					QaUsrResp qaUsrResp=(QaUsrResp)responsesIterator.next();
         					if (qaUsrResp != null)
         					{
-        						logger.debug(logger + " " + this.getClass().getName() +  "retrieving qaUsrResp: " + qaUsrResp);
+        						logger.debug("retrieving qaUsrResp: " + qaUsrResp);
         						qaService.removeUserResponse(qaUsrResp);
-								logger.debug(logger + " " + this.getClass().getName() +  "removed qaUsrResp with id:"  + qaUsrResp.getResponseId());
+								logger.debug("removed qaUsrResp with id:"  + qaUsrResp.getResponseId());
         					}
         				}
         				qaService.deleteQaQueUsr(qaQueUsr);
-        				logger.debug(logger + " " + this.getClass().getName() +  "deleted user: " + qaQueUsr);
+        				logger.debug("deleted user: " + qaQueUsr);
         			}
             	}
     		}
     	}
-    	logger.debug(logger + " " + this.getClass().getName() +  "end of deleteExistingUsersAndResponses()");
+    	logger.debug("end of deleteExistingUsersAndResponses()");
     }
 
     
@@ -153,42 +153,42 @@ public class LearningUtil implements QaAppConstants{
     protected void createUsersAndResponses(Map mapAnswers, HttpServletRequest request)
     {
     	IQaService qaService =QaUtils.getToolService(request);
-        logger.debug(logger + " " + this.getClass().getName() +  "createUsers-retrieving qaService: " + qaService);
+        logger.debug("createUsers-retrieving qaService: " + qaService);
         
         User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieving toolUser: " + toolUser);
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieving toolUser userId: " + toolUser.getUserId());
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieving toolUser username: " + toolUser.getLogin());
+    	logger.debug("retrieving toolUser: " + toolUser);
+    	logger.debug("retrieving toolUser userId: " + toolUser.getUserId());
+    	logger.debug("retrieving toolUser username: " + toolUser.getLogin());
     	/**
     	 * !!double check this!!
     	 */
     	String userName=toolUser.getLogin(); 
     	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieving toolUser fullname: " + fullName);
+    	logger.debug("retrieving toolUser fullname: " + fullName);
     	
     	Long userId=new Long(toolUser.getUserId().longValue());
     	
         /**
          * retrive contentId from the http session
          */
-        logger.debug(logger + " " + this.getClass().getName() +  "createUsers-attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
+        logger.debug("createUsers-attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
         Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
         /**
          * obtain QaContent to be used in creating QaQueUsr
          */  
         QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
-        logger.debug(logger + " " + this.getClass().getName() +  "createUsers-retrieving qaContent: " + qaContent);
+        logger.debug("createUsers-retrieving qaContent: " + qaContent);
 
         /**
          * get QaSession to be used in creating QaQueUsr
          */
         Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-        logger.debug(logger + " " + this.getClass().getName() +  "createUsers-retrieving toolSessionId: " + toolSessionId);
+        logger.debug("createUsers-retrieving toolSessionId: " + toolSessionId);
         QaSession qaSession = qaService.retrieveQaSessionOrNullById(toolSessionId.longValue()); 
-        logger.debug(logger + " " + this.getClass().getName() +  "createUsers-retrieving qaSession: " + qaSession);
+        logger.debug("createUsers-retrieving qaSession: " + qaSession);
         
         Iterator contentIterator=qaContent.getQaQueContents().iterator();
-    	logger.debug(logger + " " + this.getClass().getName() +  "createUsers-attempt iteration questions");
+    	logger.debug("createUsers-attempt iteration questions");
     	
     	QaQueUsr qaQueUsr= new QaQueUsr(userId,
 										userName,
@@ -197,13 +197,12 @@ public class LearningUtil implements QaAppConstants{
 										qaSession, 
 										new TreeSet());
 						    	
-    	logger.debug(logger + " " + this.getClass().getName() +  "createUsers-qaQueUsr: " + qaQueUsr);
+    	logger.debug("createQaQueUsr - qaQueUsr: " + qaQueUsr);
     	if (qaQueUsr != null)
         {
         	qaService.createQaQueUsr(qaQueUsr);
-            logger.debug(logger + " " + this.getClass().getName() +  "createUsers-qaQueUsr created in the db: " + qaQueUsr);	
+            logger.debug("createUsers-qaQueUsr created in the db: " + qaQueUsr);	
         }
-    	
     	
         while (contentIterator.hasNext())
     	{
@@ -224,10 +223,9 @@ public class LearningUtil implements QaAppConstants{
         		 */
         		String answer=(String)mapAnswers.get(displayOrder);
         		
-                logger.debug(logger + " " + this.getClass().getName() +  "iterationg question-answers: displayOrder: " + displayOrder + 
-                														 " question: " + question + " answer: " + answer);
+                logger.debug("iterationg question-answers: displayOrder: " + displayOrder + 
+         													 " question: " + question + " answer: " + answer);
         		
-                
                 String timezone=(String)request.getSession().getAttribute(TIMEZONE);
                 if (timezone == null) timezone="";
                 
@@ -237,16 +235,16 @@ public class LearningUtil implements QaAppConstants{
 						qaQueContent,
 						qaQueUsr); 
 
-				logger.debug(logger + " " + this.getClass().getName() +  "iterationg qaUsrResp: " + qaUsrResp);
+				logger.debug("iterationg qaUsrResp: " + qaUsrResp);
 				if (qaUsrResp != null)
 				{
 					qaService.createQaUsrResp(qaUsrResp);
-					logger.debug(logger + " " + this.getClass().getName() +  "created qaUsrResp in the db");	
+					logger.debug("created qaUsrResp in the db");	
 				}
                 
     		}
         }
-        logger.debug(logger + " " + this.getClass().getName() +  "both users and their responses created in the db");
+        logger.debug("both the users and their responses created in the db");
     }
 
     
@@ -267,14 +265,14 @@ public class LearningUtil implements QaAppConstants{
     	 * find out the current tool session
     	 */
     	Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
-    	logger.debug(logger + " " + this.getClass().getName() +  "processUserResponses using toolSessionId: " + toolSessionId);
+    	logger.debug("processUserResponses using toolSessionId: " + toolSessionId);
     	
     	/**
     	 * holds all the tool sessions passed in from the url
     	 * used in monitoring mode
     	 */
     	Map mapToolSessions=(Map)request.getSession().getAttribute(MAP_TOOL_SESSIONS);
-		logger.debug(logger + " " + this.getClass().getName() +  "retrieving MAP_TOOL_SESSIONS from the session: " + mapToolSessions);
+		logger.debug("retrieving MAP_TOOL_SESSIONS from the session: " + mapToolSessions);
 		
 		
 		/**
@@ -282,51 +280,51 @@ public class LearningUtil implements QaAppConstants{
     	 * used in learning mode
     	 */
     	Map mapMainReport= new TreeMap(new QaStringComparator());
-    	logger.debug(logger + " " + this.getClass().getName() +  "mapMainReport created with QaStringComparator");
+    	logger.debug("mapMainReport created with QaStringComparator");
     	
     	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug(logger + " " + this.getClass().getName() +  "current toolContentId: " + toolContentId);
+    	logger.debug("current toolContentId: " + toolContentId);
     	QaContent qaContent=qaService.loadQa(toolContentId.longValue());
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieve qaContent: " + qaContent);
+    	logger.debug("retrieve qaContent: " + qaContent);
     	
     	Iterator contentIterator=qaContent.getQaQueContents().iterator();
-    	logger.debug(logger + " " + this.getClass().getName() +  "content iteration count: " + qaContent.getQaQueContents().size());
+    	logger.debug("content iteration count: " + qaContent.getQaQueContents().size());
     	
     	int questionIndex=0;
     	/**
     	 * used to iterate responses to questions within the tool sessions in the jsp level in the monitoring mode
     	 */
     	Map mapQuestions= new TreeMap(new QaStringComparator());
-    	logger.debug(logger + " " + this.getClass().getName() +  "mapQuestions created with QaStringComparator");
+    	logger.debug("mapQuestions created with QaStringComparator");
     	
     	/**
     	 * used to iterate questions within the tool sessions in the jsp level in the monitoring mode
     	 */
     	Map mapMonitoringQuestions= new TreeMap(new QaStringComparator());
-    	logger.debug(logger + " " + this.getClass().getName() +  "mapMonitoringQuestions created with QaStringComparator");
+    	logger.debug("mapMonitoringQuestions created with QaStringComparator");
     	
     	while (contentIterator.hasNext())
     	{
     		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
-        	logger.debug(logger + " " + this.getClass().getName() +  "retrieve qaQueContent: " + qaQueContent);
+        	logger.debug("retrieve qaQueContent: " + qaQueContent);
         	if (qaQueContent != null)
     		{
         		/**
         		 * obtain All responses from ALL users to this question
         		 */
         		Set qaUsrResps=qaQueContent.getQaUsrResps();
-        		logger.debug(logger + " " + this.getClass().getName() +  "the set of user responses qaUsrResps: " + qaUsrResps);
+        		logger.debug("the set of user responses qaUsrResps: " + qaUsrResps);
         		
         		/**
         		 * deal with all responses
         		 */
         		questionIndex=questionIndex+1;
-        		logger.debug(logger + " " + this.getClass().getName() +  "current questionIndex: " + questionIndex);
+        		logger.debug("current questionIndex: " + questionIndex);
         		
         		String targetMode=(String )request.getSession().getAttribute(TARGET_MODE);
-            	logger.debug(logger + " " + this.getClass().getName() +  "TARGET_MODE: " + targetMode);
+            	logger.debug("TARGET_MODE: " + targetMode);
             	
-            	logger.debug(logger + " " + this.getClass().getName() +  "buidLearnerReport for TARGET_MODE: " + targetMode);
+            	logger.debug("buidLearnerReport for TARGET_MODE: " + targetMode);
             	if (targetMode.equalsIgnoreCase(TARGET_MODE_MONITORING))
             	{
             		Map mapUserResponses=processUserResponses(request, qaUsrResps, questionIndex, new TreeMap());
@@ -334,18 +332,18 @@ public class LearningUtil implements QaAppConstants{
             		 * Map mapQuestions for holding the question index /responses pair 
             		 */
             		mapQuestions.put(new Integer(questionIndex).toString(),mapUserResponses);
-            		logger.debug(logger + " " + this.getClass().getName() +  "getting mapQuestions: " + mapQuestions);
+            		logger.debug("getting mapQuestions: " + mapQuestions);
             		/**
             		 * Map mapQuestions for holding the questions themselves 
             		 */
             		mapMonitoringQuestions.put(new Integer(questionIndex).toString(),qaQueContent.getQuestion());
-            		logger.debug(logger + " " + this.getClass().getName() +  "getting mapMonitoringQuestions: " + mapMonitoringQuestions);
+            		logger.debug("getting mapMonitoringQuestions: " + mapMonitoringQuestions);
             		request.getSession().setAttribute(MAP_MONITORING_QUESTIONS,mapMonitoringQuestions);
             		
             		mapToolSessions.put(toolSessionId.toString(), mapQuestions);
-            		logger.debug(logger + " " + this.getClass().getName() +  "mapToolSessionsupdated: " + mapToolSessions);
+            		logger.debug("mapToolSessionsupdated: " + mapToolSessions);
             		request.getSession().setAttribute(MAP_TOOL_SESSIONS,mapToolSessions);
-            		logger.debug(logger + " " + this.getClass().getName() +  "MAP_TOOL_SESSIONS  in session updated: " + mapToolSessions);	
+            		logger.debug("MAP_TOOL_SESSIONS  in session updated: " + mapToolSessions);	
             	}
             	else
             	{
@@ -355,11 +353,9 @@ public class LearningUtil implements QaAppConstants{
             	}
         	}
     	}
-		logger.debug(logger + " " + this.getClass().getName() +  "mapMainReport: " + mapMainReport);
+		logger.debug("mapMainReport: " + mapMainReport);
 		request.getSession().setAttribute(MAP_MAIN_REPORT, mapMainReport);
     }
-    
-    
     
     
     /**
@@ -380,27 +376,26 @@ public class LearningUtil implements QaAppConstants{
      */
     protected Map processUserResponses(HttpServletRequest request, Set qaUsrResps, int questionIndex, Map mapUserResponses)
     {
-    	logger.debug(logger + " " + this.getClass().getName() +  "will be processing user responses: ");
+    	logger.debug("will be processing user responses: ");
     	
     	/**
     	 * find out the current tool session
     	 */
     	Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
-    	logger.debug(logger + " " + this.getClass().getName() +  "processUserResponses using toolSessionId: " + toolSessionId);
-    	
+    	logger.debug("processUserResponses using toolSessionId: " + toolSessionId);
     	
     	/**
     	 * find out the tool's mode. We produce different reports for learning and monitoring
     	 */
     	String targetMode=(String )request.getSession().getAttribute(TARGET_MODE);
-    	logger.debug(logger + " " + this.getClass().getName() +  "TARGET_MODE: " + targetMode);
+    	logger.debug("TARGET_MODE: " + targetMode);
     	
     	if (targetMode.equalsIgnoreCase(TARGET_MODE_MONITORING))
 		{
-    		logger.debug(logger + " " + this.getClass().getName() +  "processUserResponses for TARGET_MODE: " + targetMode);
+    		logger.debug("processUserResponses for TARGET_MODE: " + targetMode);
     		
     		if (qaUsrResps.isEmpty())
-        		logger.debug(logger + " " + this.getClass().getName() +  "the set of user responses for a particular question is empty.");	
+        		logger.debug("the set of user responses for a particular question is empty.");	
         	
         	Iterator itResps=qaUsrResps.iterator();
         	/**
@@ -410,29 +405,29 @@ public class LearningUtil implements QaAppConstants{
         	while (itResps.hasNext())
         	{
         		QaUsrResp qaUsrResp=(QaUsrResp)itResps.next();
-        		logger.debug(logger + " " + this.getClass().getName() +  "using qaUsrResp: " + qaUsrResp + " with responseIndex: " + responseIndex);
+        		logger.debug("using qaUsrResp: " + qaUsrResp + " with responseIndex: " + responseIndex);
         		/**
         		 * Don't include the blank answers in the report. Make sure it is the requirement.
         		 */
         		if ((qaUsrResp != null) && (qaUsrResp.getAnswer() != null) && (!qaUsrResp.getAnswer().equals("")))
         		{
-        			logger.debug(logger + " " + this.getClass().getName() +  "iterated qaUsrResp:" + qaUsrResp);
-        			logger.debug(logger + " " + this.getClass().getName() +  "isResponseHidden:   " + qaUsrResp.isHidden());
+        			logger.debug("iterated qaUsrResp:" + qaUsrResp);
+        			logger.debug("isResponseHidden:   " + qaUsrResp.isHidden());
     	    		QaQueUsr qaQueUsr=qaUsrResp.getQaQueUser();
     	    		//find out what you need to display: fullname or login (userName)?
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "iterated qaQueUsr fullName:" + qaQueUsr.getFullname());
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "iterated qaQueUsr userName:" + qaQueUsr.getUsername());
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "iterated qaQueUsr userName:" + qaQueUsr.getQaSession());
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "using responseIndex: " + responseIndex);
+    	    		logger.debug("iterated qaQueUsr fullName:" + qaQueUsr.getFullname());
+    	    		logger.debug("iterated qaQueUsr userName:" + qaQueUsr.getUsername());
+    	    		logger.debug("iterated qaQueUsr userName:" + qaQueUsr.getQaSession());
+    	    		logger.debug("using responseIndex: " + responseIndex);
     	    		
     	    		QaSession qaSession=qaQueUsr.getQaSession();
     	    		if (toolSessionId.equals(qaSession.getQaSessionId()))
     	    		{
     	    			responseIndex=responseIndex+1;
-		    			logger.debug(logger + " " + this.getClass().getName() +  "responseIndex incremented to: " + responseIndex);
+		    			logger.debug("responseIndex incremented to: " + responseIndex);
 		    			mapUserResponses.put(new Integer(responseIndex).toString(), qaQueUsr.getFullname() + " " + qaUsrResp.getAttemptTime() + " " + qaUsrResp.getAnswer());
-		    			logger.debug(logger + " " + this.getClass().getName() +  "setting attemptTime:   " + "aTime" + questionIndex +""+ responseIndex + "---------" + qaUsrResp.getAttemptTime());
-		    			logger.debug(logger + " " + this.getClass().getName() +  "setting final monitoring report data with:" + toolSessionId + " " + questionIndex + " " + responseIndex);
+		    			logger.debug("setting attemptTime:   " + "aTime" + questionIndex +""+ responseIndex + "---------" + qaUsrResp.getAttemptTime());
+		    			logger.debug("setting final monitoring report data with:" + toolSessionId + " " + questionIndex + " " + responseIndex);
 		    			
 		    			request.getSession().setAttribute(FULLNAME + toolSessionId + "" + questionIndex +""+ responseIndex, qaQueUsr.getFullname());	
 		    			request.getSession().setAttribute(ANSWER + toolSessionId + "" + questionIndex +""+ responseIndex, qaUsrResp.getAnswer());
@@ -440,21 +435,20 @@ public class LearningUtil implements QaAppConstants{
 		    			request.getSession().setAttribute(RESPONSE_ID + toolSessionId + "" + questionIndex +""+ responseIndex, qaUsrResp.getResponseId());
 		    			
 		    			boolean isResponseHidden=qaUsrResp.isHidden();
-		    			logger.debug(logger + " " + this.getClass().getName() +  "isResponseHidden:   " + isResponseHidden);
+		    			logger.debug("isResponseHidden:   " + isResponseHidden);
 	    				request.getSession().setAttribute(RESPONSE_HIDDEN + toolSessionId + "" + questionIndex +""+ responseIndex, new Boolean(isResponseHidden));
     	    		}
     	    	}
         	 }
-    		
     	}
     	else if (targetMode.equalsIgnoreCase(TARGET_MODE_LEARNING))
     	{
-    		logger.debug(logger + " " + this.getClass().getName() +  "processUserResponses for TARGET_MODE: " + targetMode);
+    		logger.debug("processUserResponses for TARGET_MODE: " + targetMode);
     		/**
         	 * find out whos is the current user. Important to know for reporting responses in learning mode 
         	 */
         	User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
-        	logger.debug(logger + " " + this.getClass().getName() +  "retrieving toolUser: " + toolUser + " userName: " + toolUser.getLogin());
+        	logger.debug("retrieving toolUser: " + toolUser + " userName: " + toolUser.getLogin());
         	/**
         	 * !!double check if String userName=toolUser.getLogin(); 
         	 */
@@ -465,11 +459,11 @@ public class LearningUtil implements QaAppConstants{
         	 * Only applies to learning mode.
         	 */
         	Boolean isUsernameVisible=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
-        	logger.debug(logger + " " + this.getClass().getName() +  "IS_USERNAME_VISIBLE: " + isUsernameVisible);
+        	logger.debug("IS_USERNAME_VISIBLE: " + isUsernameVisible);
     		
     		
         	if (qaUsrResps.isEmpty())
-        		logger.debug(logger + " " + this.getClass().getName() +  "the set of user responses for a particular question is empty.");	
+        		logger.debug("the set of user responses for a particular question is empty.");	
         	
         	Iterator itResps=qaUsrResps.iterator();
         	/**
@@ -479,19 +473,19 @@ public class LearningUtil implements QaAppConstants{
         	while (itResps.hasNext())
         	{
         		QaUsrResp qaUsrResp=(QaUsrResp)itResps.next();
-        		logger.debug(logger + " " + this.getClass().getName() +  "using qaUsrResp: " + qaUsrResp + " with responseIndex: " + responseIndex);
+        		logger.debug("using qaUsrResp: " + qaUsrResp + " with responseIndex: " + responseIndex);
         		/**
         		 * Don't include the blank answers in the report. Make sure it is the requirement.
         		 */
         		if ((qaUsrResp != null) && (!qaUsrResp.isHidden()) && (qaUsrResp.getAnswer() != null) && (!qaUsrResp.getAnswer().equals("")))
         		{
-        			logger.debug(logger + " " + this.getClass().getName() +  "iterated qaUsrResp:" + qaUsrResp);
+        			logger.debug("iterated qaUsrResp:" + qaUsrResp);
     	    		QaQueUsr qaQueUsr=qaUsrResp.getQaQueUser();
     	    		//find out what you need to display: fullname or login (userName)?
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "iterated qaQueUsr fullName:" + qaQueUsr.getFullname());
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "iterated qaQueUsr userName:" + qaQueUsr.getUsername());
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "iterated qaQueUsr userName:" + qaQueUsr.getQaSession());
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "using responseIndex: " + responseIndex);
+    	    		logger.debug("iterated qaQueUsr fullName:" + qaQueUsr.getFullname());
+    	    		logger.debug("iterated qaQueUsr userName:" + qaQueUsr.getUsername());
+    	    		logger.debug("iterated qaQueUsr userName:" + qaQueUsr.getQaSession());
+    	    		logger.debug("using responseIndex: " + responseIndex);
     	    		
     	    		/**
     	    		 * find out if the current tool user's login(userName) is the same as the iterated user's userName.
@@ -508,58 +502,58 @@ public class LearningUtil implements QaAppConstants{
     	    		 * get user's tool session
     	    		 */
     	    		QaSession qaSession=qaQueUsr.getQaSession();
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "iterated qaQueUsr userName:" + qaSession.getQaSessionId());
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "incoming toolSessionId versus user's toolSessionId:" + toolSessionId + " versus " + qaSession.getQaSessionId());
+    	    		logger.debug("iterated qaQueUsr userName:" + qaSession.getQaSessionId());
+    	    		logger.debug("incoming toolSessionId versus user's toolSessionId:" + toolSessionId + " versus " + qaSession.getQaSessionId());
     	    		    	    		
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "toolSessionId versus iterated session id: " + toolSessionId + "--" + qaSession.getQaSessionId());
-    	    		logger.debug(logger + " " + this.getClass().getName() +  "learner report includes only those responses in the same tool session: " + toolSessionId);
+    	    		logger.debug("toolSessionId versus iterated session id: " + toolSessionId + "--" + qaSession.getQaSessionId());
+    	    		logger.debug("learner report includes only those responses in the same tool session: " + toolSessionId);
     	    		if (toolSessionId.equals(qaSession.getQaSessionId()))
     	    		{
     	    			
 	    	    			responseIndex=responseIndex+1;
-	    	    			logger.debug(logger + " " + this.getClass().getName() +  "responseIndex incremented to: " + responseIndex);
+	    	    			logger.debug("responseIndex incremented to: " + responseIndex);
 			    			if (isUsernameVisible.booleanValue())
 			    			{
-			    				logger.debug(logger + " " + this.getClass().getName() +  "IS_USERNAME_VISIBLE:" + isUsernameVisible.booleanValue());
+			    				logger.debug("IS_USERNAME_VISIBLE:" + isUsernameVisible.booleanValue());
 		    	    			mapUserResponses.put(new Integer(responseIndex).toString(), qaQueUsr.getFullname() + " " + qaUsrResp.getAttemptTime() + " " + qaUsrResp.getAnswer());
-		        	    		logger.debug(logger + " " + this.getClass().getName() +  "Building request level response data with: " + 
+		        	    		logger.debug("Building request level response data with: " + 
 		        	    															"fullname" + questionIndex +""+ responseIndex);
 		        	    		request.getSession().setAttribute(FULLNAME + questionIndex +""+ responseIndex, qaQueUsr.getFullname());
 		        	    	
 			    			}
 			    			else /** we won't display the usernames of these users*/
 			    			{
-			    				logger.debug(logger + " " + this.getClass().getName() +  "IS_USERNAME_VISIBLE:" + isUsernameVisible.booleanValue());
+			    				logger.debug("IS_USERNAME_VISIBLE:" + isUsernameVisible.booleanValue());
 			    				mapUserResponses.put(new Integer(responseIndex).toString(), " " + qaUsrResp.getAttemptTime() + " " + qaUsrResp.getAnswer());
-		        	    		logger.debug(logger + " " + this.getClass().getName() +  "Building request level response data with: " + 
+		        	    		logger.debug("Building request level response data with: " + 
 		        	    															"aTime" + questionIndex +""+ responseIndex);
 			    			}
 			    			/**
 			    			 * place these whether username visible or not
 			    			 */
 			    			
-			    			logger.debug(logger + " " + this.getClass().getName() +  "setting attemptTime:   " + "aTime" + questionIndex +""+ responseIndex + 
+			    			logger.debug("setting attemptTime:   " + "aTime" + questionIndex +""+ responseIndex + 
 			    																"---------" + qaUsrResp.getAttemptTime() +"-----" + qaUsrResp.getTimezone() );
 			    			
 			    			request.getSession().setAttribute(ANSWER + questionIndex +""+ responseIndex, qaUsrResp.getAnswer());
 			    			request.getSession().setAttribute(ATIME + questionIndex +""+ responseIndex, qaUsrResp.getAttemptTime());
 			    			request.getSession().setAttribute(FORMATTED_ATIME + questionIndex +""+ responseIndex, QaUtils.getFormattedDateString(qaUsrResp.getAttemptTime()));
-			    			logger.debug(logger + " " + this.getClass().getName() +  "setting formattedDatetime");
+			    			logger.debug("setting formattedDatetime");
 			    			request.getSession().setAttribute(TIMEZONE + questionIndex +""+ responseIndex, qaUsrResp.getTimezone());
 						    			
 		    	    		if (qaQueUsr.getUsername().equalsIgnoreCase(toolUser.getLogin()))
 		    	    		{
 		    	    			request.getSession().setAttribute(FULLNAME + questionIndex +""+ responseIndex, qaQueUsr.getFullname());
-		    	    			logger.debug(logger + " " + this.getClass().getName() +  "include fullName for current learner:   " + "fullName" + questionIndex +""+ responseIndex + "---" + qaQueUsr.getFullname());
-		    	    			logger.debug(logger + " " + this.getClass().getName() +  "current learner:" + qaQueUsr.getUsername());
+		    	    			logger.debug("include fullName for current learner:   " + "fullName" + questionIndex +""+ responseIndex + "---" + qaQueUsr.getFullname());
+		    	    			logger.debug("current learner:" + qaQueUsr.getUsername());
 		    	    			request.getSession().setAttribute(CURRENTLEARNER_FULLNAME , qaQueUsr.getFullname());
-		    	    			logger.debug(logger + " " + this.getClass().getName() +  "current learner fullname:" + qaQueUsr.getFullname());
+		    	    			logger.debug("current learner fullname:" + qaQueUsr.getFullname());
 		    	    		}
     	    		}
     	    	}
         	 }
     	}
-    	logger.debug(logger + " " + this.getClass().getName() +  "Learner report MAP_USER_RESPONSES: " + mapUserResponses);
+    	logger.debug("Learner report MAP_USER_RESPONSES: " + mapUserResponses);
     	return mapUserResponses;
    	}
 
@@ -573,9 +567,9 @@ public class LearningUtil implements QaAppConstants{
     protected void feedBackAnswersProgress(HttpServletRequest request, int currentQuestionIndex)
     {
     	String totalQuestionCount=(String)request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
-    	logger.debug(logger + " " + this.getClass().getName() +  "totalQuestionCount: " + totalQuestionCount);
+    	logger.debug("totalQuestionCount: " + totalQuestionCount);
     	int remainingQuestionCount=new Long(totalQuestionCount).intValue() - currentQuestionIndex +1;
-    	logger.debug(logger + " " + this.getClass().getName() +  "remainingQuestionCount: " + remainingQuestionCount);
+    	logger.debug("remainingQuestionCount: " + remainingQuestionCount);
     	String userFeedback="";
     	if (remainingQuestionCount != 0)
     		userFeedback= "Remaining question count: " + remainingQuestionCount;
@@ -589,14 +583,13 @@ public class LearningUtil implements QaAppConstants{
     {
     	IQaService qaService =QaUtils.getToolService(request);
         Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	logger.debug(logger + " " + this.getClass().getName() +  "current toolContentId: " + toolContentId);
+    	logger.debug("current toolContentId: " + toolContentId);
     	QaContent qaContent=qaService.loadQa(toolContentId.longValue());
-    	logger.debug(logger + " " + this.getClass().getName() +  "retrieve qaContent: " + qaContent);
+    	logger.debug("retrieve qaContent: " + qaContent);
     	
         qaContent.setContentLocked(true);
-        logger.debug(logger + " " + this.getClass().getName() +  " " + "content with id : " + toolContentId + "has been marked LOCKED");
+        logger.debug("content with id : " + toolContentId + "has been marked LOCKED");
         qaService.updateQa(qaContent);
-        logger.debug(logger + " " + this.getClass().getName() +  " " + "content with id : " + toolContentId + "has been marked LOCKED and updated in the db");
+        logger.debug("content with id : " + toolContentId + "has been marked LOCKED and updated in the db");
     }
-        
 }

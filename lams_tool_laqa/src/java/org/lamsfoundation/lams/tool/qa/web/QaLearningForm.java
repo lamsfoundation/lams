@@ -10,21 +10,19 @@ package org.lamsfoundation.lams.tool.qa.web;
 /**
  * ActionForm for the Learning environment
  */
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 
 /**
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class QaLearningForm extends ActionForm implements QaAppConstants {
-	static Logger logger = Logger.getLogger(QaLearningForm.class.getName());
 	protected String answer;
 	protected String currentQuestionIndex;
-	//controller
+	/** form controllers */
 	protected String submitAnswersContent;
 	protected String getNextQuestion;
 	protected String getPreviousQuestion;

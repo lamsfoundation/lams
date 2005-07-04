@@ -22,10 +22,13 @@ package org.lamsfoundation.lams.tool.qa;
 
 
 /**
- * This is a constant utility class that defines all constants that needs to be 
+ * 
+ * @author Ozgur Demirtas
+ 
+ * 
+ * * This is a constant utility class that defines all constants that needs to be 
  * shared around the qa tool.
  * 
- * @author ozgurd
  *
  */
 

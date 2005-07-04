@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.qa;
  * not suppose to be try and catched in any level. The struts should be taking
  * care of handling this exception.</p>
  * 
- * @author ozgurd
+* @author Ozgur Demirtas
  * 
  */
 public class QaApplicationException extends RuntimeException

@@ -20,7 +20,7 @@
 
   http://www.gnu.org/licenses/gpl.txt 
 -->
-<project name="lams_tool_laqa" basedir="." default="usage">
+<project name="lams_tool_laqa11" basedir="." default="usage">
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
@@ -88,7 +88,7 @@
 		<target name="middlegen" description="Run Middlegen For Submit Fiiles Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
 			<taskdef name="middlegen" classname="middlegen.MiddlegenTask" classpathref="all-libs" />
 			
-			<middlegen appname="lams_tool_questionAnswer" 
+			<middlegen appname="lams_tool_laqa11" 
 					   prefsdir="${conf.middlegen.dir}"
 					   gui="${gui}"
 					   databaseurl="${db.url}"
@@ -99,7 +99,7 @@
 			>
 
 				<hibernate destination="${conf.hibernate.mapping.dir}"
-						   package="${questionAnswer.package}" 
+						   package="${laqa11.package}" 
 						   genXDocletTags="true"
 						   javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
 				/>
@@ -122,7 +122,7 @@
 	      />
 		
 		  <hbm2java output="${src.dir.java}">
-				<fileset dir="${conf.hibernate.mapping.dir}/${questionAnswer.path}">
+				<fileset dir="${conf.hibernate.mapping.dir}/${laqa11.path}">
 					<include name="*.hbm.xml"/>
 				</fileset>
 			</hbm2java>
@@ -200,7 +200,7 @@
 		<!-- ================================================================ -->
 		<!-- Make jar archive for deployment        		    	          -->
 		<!-- ================================================================ -->
-		<target name="lams-questionAnswer-jar" depends="compile,compile.test,copyContext" description="creates jar file">
+		<target name="lams-laqa11-jar" depends="compile,compile.test,copyContext" description="creates jar file">
 			<delete file="${build.lib}/${product}.jar"/>
 			<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 				<fileset dir="${build.classes.java}"/>
@@ -238,7 +238,7 @@
 	   <!-- Make the WAR archive for deployment				 -->
 	   <!-- ================================================ -->	
 		
-	   <target name="lams-questionAnswer-war" depends="lams-questionAnswer-jar" description="creates war file">
+	   <target name="lams-laqa11-war" depends="lams-laqa11-jar" description="creates war file">
 	   		<delete file="${build.lib}/${product}.war"/>	
 	   		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF"
 	   			 webxml="${conf.webinf.dir}/web.xml">
@@ -270,7 +270,7 @@
 		<!-- =================================================================== -->
 		<!-- Deploy the jar and war                               -->
 		<!-- =================================================================== -->
-			<target name="deploy-war" depends="lams-questionAnswer-war" description="Deploy the SubmitFiles tool war file and jar file">
+			<target name="deploy-war" depends="lams-laqa11-war" description="Deploy the SubmitFiles tool war file and jar file">
 			<delete quiet="true">
 				<fileset dir="${jboss.deploy}/tmp"/>
 				<fileset dir="${jboss.deploy}/work"/>
@@ -316,7 +316,7 @@
 		<!-- =================================================================== -->
 		<!-- Generate the deploy package                                         -->
 		<!-- =================================================================== -->
-		<target name="create-deploy-package" depends="lams-questionAnswer-war" 
+		<target name="create-deploy-package" depends="lams-laqa11-war" 
 			description="Generate the deployment package.">
 
 			<path id="deploy.lib.classpath">

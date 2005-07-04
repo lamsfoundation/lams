@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 
 /**
  * 
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  */
 public interface IQaContentDAO

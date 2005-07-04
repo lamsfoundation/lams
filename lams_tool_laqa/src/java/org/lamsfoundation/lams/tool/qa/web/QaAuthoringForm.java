@@ -10,42 +10,39 @@ package org.lamsfoundation.lams.tool.qa.web;
 /**
  * ActionForm for the Authoring environment
  */
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 
 /**
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class QaAuthoringForm extends ActionForm implements QaAppConstants {
-	static Logger logger = Logger.getLogger(QaAuthoringForm.class.getName());
-	
-	//controllers
+	/** form controllers */
 	protected String addContent;
 	protected String removeContent;
 	protected String removeAllContent;
 	protected String submitAllContent;
 	protected String submitTabDone;
 	
-	//tab controller, these may go away once the Flash wraps the jsp
+	/** tab controller, these may go away once the Flash wraps the jsp */
 	protected String choice;
 	protected String choiceBasic;
 	protected String choiceAdvanced;
 	protected String choiceInstructions;
 	
-	//basic content
+	/** basic content */
 	protected String title;
 	protected String instructions;
 	protected String questionIndex;
 	protected String isRemoveContent;
 	protected String toolContentId;
-	//instructions content
+	/** instructions content */
 	protected String onlineInstructions;
 	protected String offlineInstructions;
-	//advanced content
+	/** advanced content */
 	protected String synchInMonitor;
 	protected String reportTitle;
 	protected String monitoringReportTitle;
@@ -53,7 +50,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	protected String usernameVisible;
 	protected String questionsSequenced;
 
-	//proxy controllers for Monitoring tabs 
+	/** proxy controllers for Monitoring tabs */ 
 	protected String summaryMonitoring;
 	protected String instructionsMonitoring;
 	protected String editActivityMonitoring;
@@ -116,7 +113,6 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 		this.synchInMonitor		=OPTION_OFF;
 		this.usernameVisible	=OPTION_OFF;
 		this.questionsSequenced	=OPTION_OFF;
-		logger.debug(logger + " " + this.getClass().getName() +  "resetting RadioBoxes to:  " + this.getSynchInMonitor());
 	}
 
 	
