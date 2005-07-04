@@ -80,7 +80,7 @@
 		<java>commons-validator.jar</java>
 	</module>
 	<module>
-		<java>FCKeditor-2.1.jar</java>
+		<java>FCKeditor-2.2.jar</java>
 	</module>
 	<module>
 		<java>poi-2.5.1-final-20040804.jar</java>
