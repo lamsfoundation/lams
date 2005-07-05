@@ -56,7 +56,7 @@
         name="title"
         type="java.lang.String"
         column="title"
-        length="255"
+        
     >
         <meta attribute="field-description">
            @hibernate.property
@@ -68,7 +68,7 @@
         name="content"
         type="java.lang.String"
         column="content"
-        length="65535"
+        
     >
         <meta attribute="field-description">
            @hibernate.property
@@ -80,7 +80,7 @@
         name="onlineInstructions"
         type="java.lang.String"
         column="online_instructions"
-        length="65535"
+        
     >
         <meta attribute="field-description">
            @hibernate.property
@@ -92,7 +92,7 @@
         name="offlineInstructions"
         type="java.lang.String"
         column="offline_instructions"
-        length="65535"
+       
     >
         <meta attribute="field-description">
            @hibernate.property
@@ -124,6 +124,20 @@
             length="1"
         </meta>    
     </property>
+    
+     <property
+        name="contentInUse"
+        type="boolean"
+        column="content_in_use"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="contentInUse"
+            length="1"
+        </meta>    
+    </property>
+    
     <property
         name="creatorUserId"
         type="java.lang.Long"
@@ -174,13 +188,13 @@
            @hibernate.set
             lazy="true"
             inverse="true"
-            cascade="none"
+            cascade="all-delete-orphan"
 
            @hibernate.collection-key
             column="nb_content_uid"
 
            @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.tool.noticeboard.TlLanb11Session"
+            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
         </meta>
         <key>
             <column name="nb_content_uid" />

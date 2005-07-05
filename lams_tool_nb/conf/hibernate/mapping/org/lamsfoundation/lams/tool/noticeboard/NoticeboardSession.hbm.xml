@@ -109,6 +109,34 @@
         </meta>
         <column name="nb_content_uid" />
     </many-to-one>
+    
+    <!-- bi-directional one-to-many association to NoticeboardUser -->
+    <set
+        name="nbUsers"
+        lazy="true"
+        inverse="true"
+		cascade="all-delete-orphan"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
 
+           @hibernate.collection-key
+            column="nb_session_uid"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser"
+        </meta>
+        <key>
+            <column name="nb_session_uid" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser"
+        />
+    </set>
+
+	
 </class>
 </hibernate-mapping>
