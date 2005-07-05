@@ -51,17 +51,17 @@ public class TestToolDAO extends ToolDataAccessTestCase
 
     public void testGetToolBySignature()
     {
-    	Tool Tool = toolDao.getToolBySignature("chat_signature");
-        assertEquals(new Long(8),testTool.getToolId());
+    	testTool = toolDao.getToolBySignature(TEST_TOOL_SIG);
+        assertEquals(TEST_TOOL_ID,testTool.getToolId());
     }
 
     public void testGetToolByID()
     {
         testTool = toolDao.getToolByID(super.TEST_TOOL_ID);
-        assertEquals("verify signature","survey_signature",testTool.getToolSignature());
-        assertEquals("verify service name","surveyService",testTool.getServiceName());
-        assertEquals("verify display name","Survey",testTool.getToolDisplayName());
-        assertEquals("verify default content id",6,testTool.getDefaultToolContentId());
+        assertEquals("verify signature",TEST_TOOL_SIG,testTool.getToolSignature());
+        assertEquals("verify service name",TEST_TOOL_SERVICE_NAME,testTool.getServiceName());
+        assertEquals("verify display name",TEST_TOOL_DISPLAY_NAME,testTool.getToolDisplayName());
+        assertEquals("verify default content id",TEST_TOOL_DEFAULT_CONTENT_ID,testTool.getDefaultToolContentId());
         assertTrue("verify support define later",testTool.getSupportsDefineLater());
     }
 

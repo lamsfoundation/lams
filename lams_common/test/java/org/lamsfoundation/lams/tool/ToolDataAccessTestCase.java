@@ -53,6 +53,11 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
     
     //Test tool id - survey tool
     protected final Long TEST_TOOL_ID = new Long(6);
+    protected final String TEST_TOOL_SIG = "survey_signature";
+    protected final String TEST_TOOL_SERVICE_NAME = "surveyService";
+    protected final String TEST_TOOL_DISPLAY_NAME = "Survey";
+    protected final long TEST_TOOL_DEFAULT_CONTENT_ID = 6;
+
     protected Tool testTool;
     protected ToolSession ngToolSession;
     protected ToolSession gToolSession;
