@@ -30,14 +30,13 @@ import java.util.Date;
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 
 
 /**
  * @author mtruong
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class TestNoticeboardServicePOJO extends NbDataAccessTestCase 
 {
@@ -45,6 +44,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	private INoticeboardService nbService = null;
 	private NoticeboardContent nbContent;
 	private NoticeboardSession nbSession;
+	private NoticeboardUser nbUser;
 	
 	private boolean cleanContentData = true;
 
@@ -74,6 +74,11 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
        
 	}
 
+	
+	/* ==============================================================================
+	 * Methods for access to NoticeboardContent objects
+	 * ==============================================================================
+	 */
 	public void testRetrieveNoticeboardByUID()
 	{
 	    nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
@@ -141,16 +146,16 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 		nbService.removeNoticeboard(testToolContentId);
 	}
 	
-	/**
-	 * TODO: finish this one after testing sesssion
-	 *
-	 */
-	/*public void testremoveNoticeboardSessions()
+	public void testremoveNoticeboardSessions()
 	{
 	    nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
-	    nbService.removeNoticeboardSessions(nbContent);
 	    
-	} */
+	    nbService.removeNoticeboardSessionsFromContent(nbContent);
+	    
+	    nbSession = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);
+	    assertNull(nbSession);
+	    
+	} 
 	
 	public void testRemoveNoticeboardByID()
 	{
@@ -169,6 +174,11 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    NoticeboardContent nb = nbService.retrieveNoticeboard(TEST_NB_ID);
 	    assertNull(nb);
 	}
+	
+	/* ==============================================================================
+	 * Methods for access to NoticeboardSession objects
+	 * ==============================================================================
+	 */
 	
 	public void testRetrieveNoticeboardSession()
 	{
@@ -200,7 +210,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	            												nbContent,
 	            												created,
 	            												NoticeboardSession.NOT_ATTEMPTED); 
-	   nbContent.getNbSessions().add(nbSession);
+	
 	   nbService.saveNoticeboardSession(nbSession);
 	 
 	    
@@ -232,14 +242,9 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	
 	public void testRemoveSessionByID()
 	{
-	    nbSession = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);
-	    
-	    nbContent = nbSession.getNbContent();
-	    nbContent.getNbSessions().remove(nbSession);
-	    
+	 
 	    nbService.removeSession(TEST_SESSION_ID);
-	    nbService.updateNoticeboard(nbContent);
-	    
+	 	    
 	    assertSessionObjectIsNull(TEST_SESSION_ID);
 	}
 	
@@ -247,12 +252,8 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	{
 	    nbSession = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);
 	    
-	    nbContent = nbSession.getNbContent();
-	    nbContent.getNbSessions().remove(nbSession);
-	    
 	    nbService.removeSession(nbSession);
-	    nbService.updateNoticeboard(nbContent);
-	    
+		    
 	    assertSessionObjectIsNull(TEST_SESSION_ID);
 	    
 	}
@@ -261,17 +262,87 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	{
 	    nbSession = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);
 	    Long uid = nbSession.getUid();
-	    
-	    nbContent = nbSession.getNbContent();
-	    nbContent.getNbSessions().remove(nbSession);
-	    
+	
 	    nbService.removeSessionByUID(uid);
-	    nbService.updateNoticeboard(nbContent);
-	    
+		    
 	    assertSessionObjectIsNull(TEST_SESSION_ID);
 
 	}
 
+	public void testRemoveNoticeboardUsersFromSession()
+	{
+	    nbSession = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);	    
+	    
+	    nbService.removeNoticeboardUsersFromSession(nbSession);
+	    
+	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID);
+	    assertNull(nbUser);
+	    
+	}
+	
+	/* ==============================================================================
+	 * Methods for access to NoticeboardUser objects
+	 * ==============================================================================
+	 */
+	public void testRetrieveNoticeboardUser()
+	{
+	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID);
+	    
+	    assertEqualsForNbUser(nbUser);
+	}
+
+	public void testRetrieveNoticeboardUserByUID()
+	{
+	    nbUser = nbService.retrieveNoticeboardUserByUID(new Long(1));
+	    
+	    assertEqualsForDefaultNbUser(nbUser);
+	}
+	
+	public void testSaveNoticeboardUser()
+	{
+	    Long newUserId = new Long(8756);
+	    nbSession = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);
+	    
+	    NoticeboardUser user = new NoticeboardUser(newUserId, nbSession);
+	    
+	  
+	    nbService.saveNoticeboardUser(user);
+	    
+	    NoticeboardUser userInDb = nbService.retrieveNoticeboardUser(newUserId);
+	    assertEquals(userInDb.getUserId(), newUserId);
+	    assertEquals(userInDb.getNbSession().getNbSessionId(), TEST_SESSION_ID);
+	}
+	
+	public void testUpdateNoticeboardUser()
+	{
+	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID);
+	    nbUser.setUserStatus(NoticeboardUser.COMPLETED);
+	    
+	    nbService.updateNoticeboardUser(nbUser);
+	    
+	    NoticeboardUser updatedUser = nbService.retrieveNoticeboardUser(TEST_USER_ID);
+	    
+	    assertEquals(updatedUser.getUserStatus(), NoticeboardUser.COMPLETED);
+	}
+	
+	public void testRemoveUserById()
+	{
+	  
+	    nbService.removeUser(TEST_USER_ID);
+	    
+	    assertUserObjectIsNull(TEST_USER_ID);
+	  
+	}
+	
+	public void testRemoveUser()
+	{
+	    nbUser = nbService.retrieveNoticeboardUser(TEST_USER_ID);
+	
+	    nbService.removeUser(nbUser);
+	    
+	    assertUserObjectIsNull(TEST_USER_ID);
+	  
+	}
 }
 	
 	

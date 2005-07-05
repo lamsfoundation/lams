@@ -73,7 +73,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
        
     }
 
-    public void testgetNbSessionByUID()
+   public void testgetNbSessionByUID()
     {
        nbSession = nbSessionDAO.getNbSessionByUID(new Long(1)); //default test data which is always in db
         
@@ -172,6 +172,25 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         assertSessionObjectIsNull(TEST_SESSION_ID);
     } 
     
+    public void testGetNbSessionByUser()
+    {
+        nbSession = nbSessionDAO.getNbSessionByUser(TEST_USER_ID);
+        assertEqualsForSessionContent(nbSession);
+    }
+    
+    public void testRemoveNbUsers()
+    {
+        nbSession = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
+        
+        nbSessionDAO.removeNbUsers(nbSession);
+        nbSession.getNbUsers().clear();
+        nbSessionDAO.updateNbSession(nbSession);
+        
+        NoticeboardSession ns = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
+        
+        assertNotNull(ns);
+        assertUserObjectIsNull(TEST_USER_ID);
+    }
     
    
 }

@@ -25,6 +25,10 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate.HibernateCallback;
+
+import net.sf.hibernate.HibernateException;
+import net.sf.hibernate.Session;
 
 /**
  * @author mtruong
@@ -33,6 +37,10 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 public class NoticeboardSessionDAO extends HibernateDaoSupport implements INoticeboardSessionDAO {
 	
+    private static final String LOAD_NBSESSION_BY_USER = "select ns from NoticeboardSession ns left join fetch "
+        + "ns.nbUsers user where user.userId=:userId";
+
+    
     /**
 	 * <p>Return the persistent instance of a NoticeboardSession  
 	 * with the given identifier <code>uid</code>, returns null if not found. </p>
@@ -130,4 +138,40 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
         this.getHibernateTemplate().delete(nbSession);
     }
 
+    /**
+     * <p> Returns the persistent instance of NoticeboardSession
+     * associated with the given noticeboard user, with user id <code>userId</code>, 
+     * returns null if not found.
+     * 
+     * @param userId The noticeboard user id
+     * @return a persistent instance of NoticeboardSessions or null if not found.
+     */	
+	public NoticeboardSession getNbSessionByUser(final Long userId)
+	{
+		 return (NoticeboardSession) getHibernateTemplate().execute(new HibernateCallback()
+                {
+
+                    public Object doInHibernate(Session session) throws HibernateException
+                    {
+                        return session.createQuery(LOAD_NBSESSION_BY_USER)
+                                      .setLong("userId",
+                                      		userId.longValue())
+                                      .uniqueResult();
+                    }
+                });
+	}
+	
+	 /**
+     * <p>Deletes all instances of NoticeboardUser that are associated
+     * with the given instance of NoticeboardSession</p>
+     * 
+     * @param nbSession The instance of NoticeboardSession in which corresponding instances of NoticeboardUser should be deleted.
+     */
+	public void removeNbUsers(NoticeboardSession nbSession)
+    {
+    	this.getHibernateTemplate().deleteAll(nbSession.getNbUsers());
+    }
+	
+	
+    	
 }

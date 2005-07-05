@@ -75,6 +75,7 @@ public class TestNoticeboardContentDAO extends NbDataAccessTestCase
        nbContent = noticeboardDAO.getNbContentByUID(new Long(1));
        
        assertEquals(nbContent.getUid(), new Long(1));
+       assertEquals(nbContent.getNbContentId(), DEFAULT_CONTENT_ID);
        assertContentEqualsDefaultData(nbContent);
 	  
     } 
