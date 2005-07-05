@@ -22,24 +22,29 @@
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import java.util.Date;
-
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
+import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.springframework.dao.DataAccessException;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
+import org.lamsfoundation.lams.usermanagement.User;
+
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 
 
 /**
  * An implementation of the NoticeboardService interface.
  * @author mtruong
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class NoticeboardServicePOJO implements INoticeboardService, ToolContentManager {
 
@@ -48,6 +53,10 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	
 	private NoticeboardSession nbSession;
 	private INoticeboardSessionDAO nbSessionDAO = null;
+	private ILearnerService learnerService;
+	
+	private NoticeboardUser nbUser;
+	private INoticeboardUserDAO nbUserDAO=null;
 	
 	private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
 
@@ -151,10 +160,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	/**
 	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeNoticeboardSessions(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
 	 */
-	public void removeNoticeboardSessions(NoticeboardContent nbContent)
+	public void removeNoticeboardSessionsFromContent(NoticeboardContent nbContent)
 	{
 		try
 		{
+		    nbContent.getNbSessions().clear();
+		    updateNoticeboard(nbContent);
+		    
 			nbContentDAO.removeNbSessions(nbContent);
 		}
 		catch (DataAccessException e)
@@ -197,6 +209,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		}
 	}
 	
+		
 	/* ==============================================================================
 	 * Methods for access to NoticeboardSession objects
 	 * ==============================================================================
@@ -248,6 +261,10 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	{
 	    try
 	    {
+	        NoticeboardContent content = nbSession.getNbContent();
+	        content.getNbSessions().add(nbSession);
+	        updateNoticeboard(content);
+	        
 	        nbSessionDAO.saveNbSession(nbSession);
 	    }
 	    catch(DataAccessException e)
@@ -280,7 +297,12 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	{
 	    try
 		{
-			nbSessionDAO.removeNbSession(nbSessionId);
+	        NoticeboardSession sessionToDelete = retrieveNoticeboardSession(nbSessionId);
+	        NoticeboardContent contentReferredBySession = sessionToDelete.getNbContent();
+	        //un-associate the session from content
+	        contentReferredBySession.getNbSessions().remove(sessionToDelete);
+	        nbSessionDAO.removeNbSession(nbSessionId);
+	        updateNoticeboard(contentReferredBySession);
 		}
 		catch (DataAccessException e)
 		{
@@ -296,7 +318,12 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	{
 	    try
 		{
+	        NoticeboardContent contentReferredBySession = nbSession.getNbContent();
+	        //un-associate the session from content
+	        contentReferredBySession.getNbSessions().remove(nbSession);
+	              
 			nbSessionDAO.removeNbSession(nbSession);
+			updateNoticeboard(contentReferredBySession);
 		}
 		catch (DataAccessException e)
 		{
@@ -312,7 +339,14 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	{
 	    try
 		{
+	        NoticeboardSession sessionToDelete = retrieveNoticeboardSessionByUID(uid);
+	        NoticeboardContent nbContent = sessionToDelete.getNbContent();
+	        nbContent.getNbSessions().remove(sessionToDelete);
+	       
 			nbSessionDAO.removeNbSessionByUID(uid);
+			
+			updateNoticeboard(nbContent);
+			      
 		}
 		catch (DataAccessException e)
 		{
@@ -321,6 +355,186 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		}
 	}
 	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeNoticeboardUsersFromSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession)
+	 */
+	public void removeNoticeboardUsersFromSession(NoticeboardSession nbSession)
+	{
+		try
+		{
+		    nbSession.getNbUsers().clear();
+		    updateNoticeboardSession(nbSession);
+		    
+			nbSessionDAO.removeNbUsers(nbSession);
+		}
+		catch (DataAccessException e)
+		{
+			throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to remove the users associated with this noticeboard session instance: "
+														+ e.getMessage(), e);
+		}
+		
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNbSessionByUserID(java.lang.Long)
+	 */
+	public NoticeboardSession retrieveNbSessionByUserID(Long userId)
+	{
+		try
+		{
+			nbSession = nbSessionDAO.getNbSessionByUser(userId);
+		}
+		catch (DataAccessException e)
+		{
+			throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to retrieve noticeboard session instance "
+														+ e.getMessage(), e);
+		}
+		return nbSession;
+		
+	}
+	
+	
+	/* ==============================================================================
+	 * Methods for access to NoticeboardUser objects
+	 * ==============================================================================
+	 */
+	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNoticeboardUser(java.lang.Long)
+	 */
+	public NoticeboardUser retrieveNoticeboardUser(Long nbUserId)
+	{
+	    try
+		{
+			nbUser = nbUserDAO.getNbUserByID(nbUserId);
+		}
+		catch (DataAccessException e)
+		{
+			throw new NbApplicationException("An exception has occured when trying to retrieve noticeboard user: "
+                                                         + e.getMessage(),
+														   e);
+		}
+		
+		return nbUser;
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNoticeboardUserByUID(Long)
+	 */
+	public NoticeboardUser retrieveNoticeboardUserByUID(Long uid)
+	{
+	    try
+	    {
+	        nbUser = nbUserDAO.getNbUserByUID(uid);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new NbApplicationException("An exception has occured while trying to retrieve noticeboard user: "
+	                							+ e.getMessage(),
+	                							e);
+	    }
+	    return nbUser;
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#saveNoticeboardUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
+	 */
+	public void saveNoticeboardUser(NoticeboardUser nbUser)
+	{
+		try
+		{
+		    NoticeboardSession session = nbUser.getNbSession();
+		    session.getNbUsers().add(nbUser);
+		    updateNoticeboardSession(session);
+		    
+			nbUserDAO.saveNbUser(nbUser);
+		}
+		catch (DataAccessException e)
+		{
+			throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to save the noticeboard user object: "
+														+ e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#updateNoticeboardUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
+	 */
+	public void updateNoticeboardUser(NoticeboardUser nbUser)
+	{
+		try
+		{
+			nbUserDAO.updateNbUser(nbUser);
+		}
+		catch (DataAccessException e)
+		{
+			throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to update the noticeboard user object: "
+														+ e.getMessage(), e);
+		}
+	}
+	
+		
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
+	 */
+	public void removeUser(NoticeboardUser nbUser)
+	{
+		try
+		{
+		    NoticeboardSession session = nbUser.getNbSession();
+		    session.getNbUsers().remove(nbUser);
+		    
+			nbUserDAO.removeNbUser(nbUser);
+			
+			updateNoticeboardSession(session);
+		}
+		catch (DataAccessException e)
+		{
+			throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to remove the noticeboard user object: "
+														+ e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeUser(java.lang.Long)
+	 */
+	public void removeUser(Long nbUserId)
+	{
+		try
+		{
+		    NoticeboardUser user = retrieveNoticeboardUser(nbUserId);
+		    NoticeboardSession session = user.getNbSession();
+		    session.getNbUsers().remove(user);
+			nbUserDAO.removeNbUser(nbUserId);
+			
+			updateNoticeboardSession(session);
+		}
+		catch (DataAccessException e)
+		{
+			throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to remove the noticeboard user object: "
+														+ e.getMessage(), e);
+		}
+	}
+
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#isFlagSet(java.lang.Long, java.lang.String) */
+	public boolean isFlagSet(Long contentId, int flag)
+	{
+	    NoticeboardContent obj = retrieveNoticeboard(contentId);
+	    switch (flag)
+	    {
+	    	case NoticeboardConstants.FLAG_DEFINE_LATER:
+	    	    return (obj.isDefineLater());
+	    	  //  break;
+	    	case NoticeboardConstants.FLAG_CONTENT_IN_USE:
+	    		return (obj.isContentInUse());
+	    	//	break;
+	    	case NoticeboardConstants.FLAG_RUN_OFFLINE:
+	    		return(obj.isForceOffline()); 
+	    //		break;
+	    	default:
+	    	    throw new NbApplicationException("Invalid flag");
+	    }
+	  
+	}
 	
 	/* ===============Methods implemented from ToolContentManager =============== */
 	
@@ -377,7 +591,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	}
 	
 
-	/* ===============Methods implemented from ToolContentManager =============== */
+	/* ===============Methods implemented from ToolSessionManager =============== */
 	
 	/**
 	 * Creates a new noticeboard session with noticeboard
@@ -406,22 +620,22 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    
 	}
 	
-/*	public String leaveToolSession(Long toolSessionId, User learner)
+	public String leaveToolSession(Long toolSessionId, User learner)
 	{
-	    
+	   return learnerService.completeToolSession(toolSessionId, learner);
 	}
     
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
+	  public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
 	{
-	    
+	    throw new UnsupportedOperationException("not yet implemented");
 	}
 
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
 	{
-	    
+	    throw new UnsupportedOperationException("not yet implemented");
 	}
 	
-*/	
+
 	
 	
 	/* getter setter methods to obtain the service bean */
@@ -443,5 +657,15 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	public void setNbSessionDAO(INoticeboardSessionDAO nbSessionDAO)
 	{
 	    this.nbSessionDAO = nbSessionDAO;
+	}
+	
+	public INoticeboardUserDAO getNbUserDAO()
+	{
+	    return nbUserDAO;
+	}
+	
+	public void setNbUserDAO(INoticeboardUserDAO nbUserDAO)
+	{
+	    this.nbUserDAO = nbUserDAO;
 	}
 }
