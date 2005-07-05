@@ -45,7 +45,7 @@ public interface IVersionedNodeAdmin extends IVersionedNode {
      * is incompatible with the type of the specified property or if
      * value is incompatible with (i.e. can not be converted to) type.
      */
-    public void  setProperty(String name, String value, int type) throws RepositoryCheckedException ;
+    public void  setProperty(String name, Object value, int type) throws RepositoryCheckedException ;
 
     /**
      * Sets the property to a STRING value. 

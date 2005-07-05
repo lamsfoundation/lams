@@ -129,6 +129,7 @@
 				<prop key="deleteVersion">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
 				<prop key="deleteNode">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
 				<prop key="logout">PROPAGATION_SUPPORTS,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="setProperty">PROPAGATION_SUPPORTS,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
 				<!--  Read only methods -->
 				<prop key="getFileItem">PROPAGATION_REQUIRED,readOnly,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
 				<prop key="getVersionHistory">PROPAGATION_REQUIRED,readOnly,-RepositoryCheckedException,-RepositoryRuntimeException</prop>

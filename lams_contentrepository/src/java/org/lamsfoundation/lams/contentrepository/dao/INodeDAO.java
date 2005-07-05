@@ -35,7 +35,7 @@ public interface INodeDAO {
 
 	public Object find(Class objClass, Serializable id);
 
-	public void insert(Object object);		
+	public void saveOrUpdate(Object object);		
 
 	public void update(Object object);
 

@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.IValue;
 import org.lamsfoundation.lams.contentrepository.IVersionDetail;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.ItemExistsException;
@@ -41,6 +42,7 @@ import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.NodeType;
+import org.lamsfoundation.lams.contentrepository.PropertyType;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.dao.IFileDAO;
@@ -463,9 +465,11 @@ public class TestSimpleRepository extends BaseTestCase {
 
 	}
 
+	/** Tests that a package item can be created, update and that at property can be set. */
 	public void testPackageItem() {
 		NodeKey keys = testPackageItem(null);
 		testPackageItem(keys.getUuid());
+		testSetProperty(keys);
 	}
 
 	private NodeKey testPackageItem(Long uuid) {
@@ -537,6 +541,42 @@ public class TestSimpleRepository extends BaseTestCase {
 		}
 		
 		return keys;
+	}
+
+	private void testSetProperty(NodeKey keys) {
+	    String propertyName = "CUSTOM";
+	    Boolean value = Boolean.TRUE;
+	    
+		List nodes;
+        try {
+            nodes = repository.getPackageNodes(ticket, keys.getUuid(), keys.getVersion());
+	        Iterator iter = nodes.iterator();
+			if ( iter.hasNext() ) {
+				SimpleVersionedNode packageNode = (SimpleVersionedNode) iter.next();
+				assertTrue("First node is the package node. (A)",
+					packageNode.isNodeType(NodeType.PACKAGENODE));
+				repository.setProperty(ticket, keys.getUuid(), keys.getVersion(), propertyName, value, PropertyType.BOOLEAN); 			
+			} else {
+			    fail("No nodes found for package "+keys);
+			}
+			
+			// now, is the property set?
+			nodes = repository.getPackageNodes(ticket, keys.getUuid(), keys.getVersion());
+			iter = nodes.iterator();
+			if ( iter.hasNext() ) {
+				SimpleVersionedNode packageNode = (SimpleVersionedNode) iter.next();
+				assertTrue("First node is the package node. (B)",
+					packageNode.isNodeType(NodeType.PACKAGENODE));
+				IValue newValue = packageNode.getProperty(propertyName);
+				assertTrue("newValue is a TRUE Boolean", 
+				        Boolean.TRUE.equals(newValue.getBoolean()) && newValue.getType()==PropertyType.BOOLEAN);
+			} else {
+			    fail("No nodes found for package "+keys);
+			}
+        } catch (RepositoryCheckedException e) {
+			failUnexpectedException("testSetProperty",e);
+        }
+
 	}
 
 	/**

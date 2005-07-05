@@ -68,5 +68,5 @@ public interface IValue {
 	 *
      * @throws ValueFormatException If able to convert the value to a boolean.
      */
-    public boolean getBoolean() throws ValueFormatException;
+    public Boolean getBoolean() throws ValueFormatException;
 }

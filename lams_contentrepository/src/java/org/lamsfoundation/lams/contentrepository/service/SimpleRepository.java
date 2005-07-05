@@ -723,7 +723,26 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
  	}
 
 	
-	/* (non-Javadoc)
+	/**
+     * Sets the property to a value, based on the specified type.  Removes the property if the value is null.
+     * Use this for custom properties only - change the filename or mimetype at your own risk.
+     *
+     * @param name  The name of a property of this node
+     * @param value The value to be assigned
+     * @param type  The type of the property
+     * @throws ValidationException if the call has made the node invalid. This would occur if the
+     * call had set the filename to blank.
+     */
+    public void setProperty(ITicket ticket, Long uuid, Long versionId, String name, Object value, int type) 
+    		throws  AccessDeniedException, ItemNotFoundException, ValidationException {
+	
+        // check that the previous version was a file node - error otherwise
+        SimpleVersionedNode node = getNode(ticket.getWorkspaceId(),uuid,versionId);
+        node.setProperty(name, value, type);
+        node.saveDB(null);
+    }
+
+    /* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#updatePackageItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public String[] deleteNode(ITicket ticket, Long uuid) 

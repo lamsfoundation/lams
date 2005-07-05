@@ -147,15 +147,15 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 
 		if ( expectedBoolean != null ) {
 			try {
-				boolean val = iValue.getBoolean();
+				Boolean val = iValue.getBoolean();
 				assertTrue("Property accessable as boolean ("+val+")",
-						val == expectedBoolean.booleanValue());
+						expectedBoolean.equals(val));
 			} catch (ValueFormatException e1) {
 				failUnexpectedException(e1);
 			}
 		} else {
 			try {
-				boolean val = iValue.getBoolean();
+				Boolean val = iValue.getBoolean();
 				fail("ValueFormatException exception expected. Value returned as "+val);
 			} catch (ValueFormatException e1) {
 				assertTrue("ValueFormatException thrown as expected",true);

@@ -261,7 +261,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#setProperty(java.lang.String, java.lang.String, int)
 	 */
-	public void setProperty(String name, String value, int type) {
+	public void setProperty(String name, Object value, int type) {
 		nodeObjectInitilised("Unable to set property "+name+" to value "+value);
 		nodeVersion.setProperty(name, value, type);
 	}
@@ -681,8 +681,12 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		return node.getNodeId();
 	}
 
-	/** validate node and save the database changes */
-	private void saveDB(String versionDescription) throws ValidationException {
+	/** Just save the db changes to the current node. 
+	 * If files have been added, please call Long save(String versionDescription, List childNodes).
+	 * This method will validate the node and save the database changes 
+	 * @param versionDescription optional. If supplied will set the version description 
+	 */
+	protected void saveDB(String versionDescription) throws ValidationException {
 		validateNode();
 
 		// nodeDAO to take care of insert or update (uses saveOrUpdate)
@@ -691,7 +695,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		if ( versionDescription != null )
 			nodeVersion.setVersionDescription(versionDescription);
 	
-		nodeDAO.insert(node);
+		nodeDAO.saveOrUpdate(node);
 		
 		// child nodes are done manually as the set is lazy loaded
 		// and can't work out how to do that properly using the DAO template!
@@ -700,7 +704,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 			Iterator iter = childNodes.iterator();
 			while ( iter.hasNext() ) {
 				CrNode node = (CrNode) iter.next();
-				nodeDAO.insert(node);
+				nodeDAO.saveOrUpdate(node);
 			}
 		}
 

@@ -38,6 +38,8 @@ import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
+import org.lamsfoundation.lams.contentrepository.ValidationException;
+import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 
 /**
@@ -201,6 +203,19 @@ public interface IRepositoryService {
 			String startFile, String versionDescription)
 			throws AccessDeniedException, ItemNotFoundException, 
 			FileException, InvalidParameterException ;
+
+    /**
+     * Sets the property to a value, based on the specified type.  Removes the property if the value is null.
+     *
+     * @param name  The name of a property of this node
+     * @param value The value to be assigned
+     * @param type  The type of the property
+     * @throws ValueFormatException if the type or format of a value
+     * is incompatible with the type of the specified property or if
+     * value is incompatible with (i.e. can not be converted to) type.
+     */
+    public void setProperty(ITicket ticket, Long uuid, Long versionId, String name, Object value, int type) 
+		throws  AccessDeniedException, ItemNotFoundException, ValidationException ;
 
 	/** 
 	 * Get an item from the repository based on the UUID. This

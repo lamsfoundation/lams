@@ -252,8 +252,8 @@ public class CrNodeVersionProperty implements IValue,Serializable {
     /**
 	 * Returns a boolean representation of the value. 
      */
-    public boolean getBoolean() throws ValueFormatException {    
-   		return Boolean.valueOf(value).booleanValue();
+    public Boolean getBoolean() throws ValueFormatException {    
+   		return Boolean.valueOf(value);
     }
     
 }

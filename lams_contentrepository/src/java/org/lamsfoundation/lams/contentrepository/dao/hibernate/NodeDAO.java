@@ -45,7 +45,7 @@ public class NodeDAO extends HibernateDaoSupport implements INodeDAO  {
 		return this.getHibernateTemplate().load(objClass,id);
 	}
 	
-	public void insert(Object object) {
+	public void saveOrUpdate(Object object) {
 		this.getHibernateTemplate().saveOrUpdate(object);		
 	}
 
