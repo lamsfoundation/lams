@@ -191,8 +191,44 @@
             classpathref="test.class.path"
             destdir="${test.classes.dir}"/>
     </target>
+	
+	
+	<!-- =================================================================== -->
+	<!-- Forum Database tasks                                               -->
+	<!-- =================================================================== -->
+	<target name="clean-db"	description="clean forum database.">
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+				password="${db.password}">			
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+			<transaction src="${db.scripts}/cleanup_lams_tool_forum.sql"/>
+		</sql>
+	</target>
+	
+	<target name="init-db"	description="drop and create forum database.">
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+				password="${db.password}">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+			<transaction src="${db.scripts}/drop_lams_tool_forum.sql"/>
+			<transaction src="${db.scripts}/create_lams_tool_forum.sql"/>
+		</sql>
+	</target>
+	
+	<target name="build-db"	depends="init-db" 
+							description="build qa tool database.">
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+				password="${db.password}">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+			<transaction src="${db.scripts}/insert_lams_tool_forum_data.sql"/>
+		</sql>
+	</target>
 
-    <target name="junit" depends="compiletest">
+    <target name="junit" depends="compiletest, init-db">
         <echo>+-------------------------------------------+</echo>
         <echo>| run junit tests and save results in /test |</echo>
         <echo>+-------------------------------------------+</echo>
