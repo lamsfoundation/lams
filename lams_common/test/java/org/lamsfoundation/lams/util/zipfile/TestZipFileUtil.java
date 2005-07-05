@@ -142,12 +142,16 @@ public class TestZipFileUtil extends TestCase {
      */
     public void testCleanupOldFiles() {
 
-		Calendar foureDaysAgo = new GregorianCalendar();
-		foureDaysAgo.add(Calendar.DAY_OF_MONTH,-4);
-		long fourDaysAgoMilliseconds = foureDaysAgo.getTimeInMillis();
 
         try {
-            // create the three directories and stick a file in each directory to 
+            // clean up any old directories so they don't interfere with test.
+            ZipFileUtil.cleanupOldFiles(5);
+            
+    		Calendar foureDaysAgo = new GregorianCalendar();
+    		foureDaysAgo.add(Calendar.DAY_OF_MONTH,-4);
+    		long fourDaysAgoMilliseconds = foureDaysAgo.getTimeInMillis();
+
+    		// create the three directories and stick a file in each directory to 
             // test the recursive delete.
             String testDirToDelete = ZipFileUtil.prepareTempDirectory("todelete.zip");
             writeFile(testDirToDelete, testFilename, testFileContents);
