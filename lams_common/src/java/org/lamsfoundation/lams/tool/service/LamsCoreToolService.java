@@ -31,6 +31,9 @@ import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.BeansException;
@@ -133,9 +136,10 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     }
     
     /**
+     * @throws ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolsToCreateSession(java.lang.Long, org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public void notifyToolsToCreateSession(Long toolSessionId, ToolActivity activity)
+    public void notifyToolsToCreateSession(Long toolSessionId, ToolActivity activity) throws ToolException
     {
         ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity);
 
@@ -148,9 +152,11 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      * Make a copy of all tools content which belongs to this learning design.
      * 
      * @param toolActivity the tool activity defined in the design.
+     * @throws DataMissingException, ToolException
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#notifyToolToCopyContent(org.lamsfoundation.lams.learningdesign.ToolActivity)
      */
-    public Long notifyToolToCopyContent(ToolActivity toolActivity)
+    public Long notifyToolToCopyContent(ToolActivity toolActivity) 
+    		throws DataMissingException, ToolException
     {
         Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
         //This is just for testing purpose because surveyService is the only 

@@ -4,9 +4,8 @@
  * Created on 11 January 2005, 13:56
  */
 
-package org.lamsfoundation.lams.tool.service;
+package org.lamsfoundation.lams.tool.exception;
 
-import org.lamsfoundation.lams.tool.exception.ToolException;
 
 /**
  * Type of ToolException thrown by the LamsToolService

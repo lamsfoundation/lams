@@ -21,6 +21,10 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool;
 
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
+
 
 /**
  * Tool interface that defines the contract regarding tool content manipulation.
@@ -32,33 +36,53 @@ package org.lamsfoundation.lams.tool;
 public interface ToolContentManager
 {
     /**
-     * Make a copy of requested tool content. It will be needed by lams to 
-     * create a copy of learning design and start a new tool session.
+     * Make a copy of requested tool content. It will be needed by LAMS to 
+     * create a copy of learning design and start a new tool session. If 
+     * no content exists with the given tool content id, then use the 
+     * default content id.
+     * 
      * @param fromContentId the original tool content id.
      * @param toContentId the destination tool content id.
+     * @throws ToolException if an error occurs e.g. defaultContent is missing
      */
-    public void copyToolContent(Long fromContentId, Long toContentId);	
-    
+    public void copyToolContent(Long fromContentId, Long toContentId)	
+    	throws ToolException;
+   
     /** This tool content should be define later, that is, the 
      * teacher will define the content at runtime. The toolContentId
      * should already exist in the tool. This method will normally be
      * called after copyToolContent.
      * @param toolContentId the tool content id of the tool content to be changed.
-     */
-    public void setAsDefineLater(Long toolContentId);
+     * @throws DataMissingException if no tool content matches the toolContentId 
+     * @throws ToolException if any other error occurs
+      */
+    public void setAsDefineLater(Long toolContentId)
+    	throws DataMissingException, ToolException;
+
 
     /** This tool content should be setup to run offline, that is, the 
      * activity will be done offline. The toolContentId
      * should already exist in the tool. This method will normally be
      * called after copyToolContent.
      * @param toolContentId the tool content id of the tool content to be changed.
+     * @throws DataMissingException if no tool content matches the toolContentId 
+     * @throws ToolException if any other error occurs
      */
-    public void setAsRunOffline(Long toolContentId);
-    
+    public void setAsRunOffline(Long toolContentId)
+    	throws DataMissingException, ToolException;
+
     /**
      * Remove tool's content according specified the content id. It will be 
-     * needed by lams to modify the learning design.
+     * needed by lams to modify the learning design. Note: if session data 
+     * for this toolContentId exists and removeSessionData = false, then
+     * the tool should throw SessionDataExists.
+     * 
+     * If no matching data exists, return without throwing an exception.
+     * 
      * @param toolContentId the requested tool content id.
+     * @param removeSessionData should it remove any related session data?
+     * @throws ToolException if any other error occurs
      */
-    public void removeToolContent(Long toolContentId);
+    public void removeToolContent(Long toolContentId, boolean removeSessionData) 
+    	throws SessionDataExistsException, ToolException;
 }

@@ -4,7 +4,7 @@
  * Created on 11 January 2005, 13:55
  */
 
-package org.lamsfoundation.lams.tool;
+package org.lamsfoundation.lams.tool.exception;
 
 /**
  * Type of exception thrown by Tool operations and interfaces.
