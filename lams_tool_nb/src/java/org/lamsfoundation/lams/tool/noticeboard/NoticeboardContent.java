@@ -56,6 +56,9 @@ public class NoticeboardContent implements Serializable {
 	
 	/** nullable persistent field */
 	private boolean forceOffline;
+
+	/** nullable persistent field */
+	private boolean contentInUse;
 	
 	/** nullable persistent field */
 	private Long creatorUserId;
@@ -206,6 +209,21 @@ public class NoticeboardContent implements Serializable {
 		this.forceOffline = forceOffline;
 	}
 	
+	 /** 
+	 *		@hibernate.property
+     *		column="content_in_use"
+     *		length="1"
+     */
+    
+    public boolean isContentInUse() {
+        return contentInUse;
+    }
+    /**
+     * @param contentInUse The contentInUse to set.
+     */
+    public void setContentInUse(boolean contentInUse) {
+        this.contentInUse = contentInUse;
+    }
 	
 	/** 
 	 *		@hibernate.property
@@ -225,7 +243,7 @@ public class NoticeboardContent implements Serializable {
 	 * 		@hibernate.set
      *      lazy="true"
      *      inverse="true"
-     *      cascade="none"
+     *      cascade="all-delete-orphan"
      *     	@hibernate.collection-key
      *      column="nb_content_id"
      *     	@hibernate.collection-one-to-many
@@ -299,8 +317,7 @@ public class NoticeboardContent implements Serializable {
         this.uid = uid;
     }
 	
-	
-	
+    
 	/** 
 	 * 
 	 * @param nb			NoticeboardContent object containing the content to copy from
@@ -321,5 +338,6 @@ public class NoticeboardContent implements Serializable {
 														nb.getDateUpdated());
 		return newContent;
 	}
+   
    
 }
