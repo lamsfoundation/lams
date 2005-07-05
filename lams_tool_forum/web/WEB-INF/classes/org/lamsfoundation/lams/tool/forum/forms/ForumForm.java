@@ -4,6 +4,8 @@ import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.FileUtils;
+import org.lamsfoundation.lams.tool.forum.util.ContentHandler;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.apache.struts.upload.FormFile;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
@@ -32,7 +34,7 @@ public class ForumForm extends ValidatorForm {
     protected boolean lockWhenFinished;
 	protected boolean forceOffline;
 	protected boolean allowAnnomity;
-
+    protected ContentHandler contentHander;
 
     private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
@@ -101,22 +103,30 @@ public class ForumForm extends ValidatorForm {
     public ActionErrors validate(ActionMapping mapping,
             javax.servlet.http.HttpServletRequest request) {
 		ActionErrors errors = super.validate(mapping, request);
-		try{
+        ActionError ae;
+        ContentHandler contentHandler;
+        try{
            // if ("".equals(forum.getTitle())) {
              //   ActionError error = new ActionError("error.valueReqd");
 			   // errors.add("forum.title", error);
            // }
+         try {
+            contentHandler = ContentHandler.getInstance();
+         } catch (Exception e) {
+            ae = new ActionError("error.inputFileTooLarge");
+            errors.add("onlineFile", ae);
+            throw e;
+         }
 			if (onlineFile != null && !(onlineFile.getFileName().trim().equals(""))) {
 				    if (onlineFile.getFileSize() > ForumConstants.MAX_FILE_SIZE) {
-					    ActionError ae = new ActionError("error.inputFileTooLarge");
+					    ae = new ActionError("error.inputFileTooLarge");
 					    errors.add("onlineFile", ae);
 			} else {
                         String fileName = onlineFile.getFileName();
+                        NodeKey node = ContentHandler.uploadFile(onlineFile.getInputStream(), fileName, onlineFile.getContentType());
 					    Attachment attachment = new Attachment();
-					    File afile = FileUtils.getFile(fileName, onlineFile.getInputStream());
                         attachment.setName(fileName);
-					    attachment.setContentType(onlineFile.getContentType());
-					    attachment.setData(FileUtils.getBytes(afile));
+					    attachment.setUuid(node.getUuid());
                         attachment.setType(Attachment.TYPE_ONLINE);
                         attachments.put(fileName, attachment);
                         onlineFile = null;
@@ -124,15 +134,14 @@ public class ForumForm extends ValidatorForm {
 			}
 			if (offlineFile != null && !(offlineFile.getFileName().trim().equals(""))) {
 				    if (offlineFile.getFileSize() > ForumConstants.MAX_FILE_SIZE) {
-					    ActionError ae = new ActionError("error.inputFileTooLarge");
+					    ae = new ActionError("error.inputFileTooLarge");
 					    errors.add("offlineFile", ae);
 				    } else {
                         String fileName = offlineFile.getFileName();
+                        NodeKey node = ContentHandler.uploadFile(onlineFile.getInputStream(), fileName, onlineFile.getContentType());
 					    Attachment attachment = new Attachment();
-					    File afile = FileUtils.getFile(fileName, offlineFile.getInputStream());
                         attachment.setName(fileName);
-					    attachment.setContentType(offlineFile.getContentType());
-					    attachment.setData(FileUtils.getBytes(afile));
+                        attachment.setUuid(node.getUuid());
                         attachment.setType(Attachment.TYPE_OFFLINE);
                         attachments.put(fileName, attachment);
                         offlineFile = null;

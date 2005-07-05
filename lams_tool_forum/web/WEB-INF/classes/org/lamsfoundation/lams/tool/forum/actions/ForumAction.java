@@ -10,11 +10,13 @@ import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.service.ForumManager;
 import org.lamsfoundation.lams.tool.forum.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.forms.MessageForm;
+import org.lamsfoundation.lams.tool.forum.util.ContentHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.File;
 import java.util.*;
 
 /**
@@ -172,13 +174,16 @@ public class ForumAction extends Action {
         return mapping.findForward("success");
     }
 
-    public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws PersistenceException {
+    public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         ActionForward forward = new ActionForward();
 		forward.setPath(mapping.getInput());
         String fileName = (String) request.getParameter("fileName");
         ForumForm forumForm = (ForumForm) form;
         Map attachments = forumForm.getAttachments();
         Attachment attachment = (Attachment) attachments.remove(fileName);
+        ContentHandler handler = ContentHandler.getInstance();
+        //File file = ContentHandler.getFile(attachment.getName(), attachment.getUuid());
+        ContentHandler.deleteFile(attachment.getUuid());
         if (attachment.getId() !=null) {
             this.forumManager.deleteForumAttachment(attachment.getId());
         }
