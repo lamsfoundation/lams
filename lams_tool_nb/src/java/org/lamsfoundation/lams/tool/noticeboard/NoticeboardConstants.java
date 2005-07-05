@@ -49,9 +49,19 @@ public class NoticeboardConstants
     public static final String ADVANCED_PAGE = "advanced";
     public static final String INSTRUCTIONS_PAGE = "instructions";
     
+   
+    public static final String DISPLAY_LEARNER_CONTENT = "displayLearnerContent";
+    
+    public static final String TOOL_ACCESS_MODE_LEARNER = "learner";
+    public static final String TOOL_ACCESS_MODE_AUTHOR = "author";
+    public static final String TOOL_ACCESS_MODE_TEACHER = "teacher";
+    
+  
+    
     // ------------------------------
     // Action Names
     // ------------------------------
+    
     public static final String DONE = "done";
     public static final String SAVE = "save";
  
@@ -60,17 +70,25 @@ public class NoticeboardConstants
     // Session Attributes
     // --------------------------------------------
     
-    public static final String TITLE = "title";
+ 
+  /*  public static final String TITLE = "title";
     public static final String CONTENT = "content";
     public static final String ONLINE_INSTRUCTIONS = "onlineInstructions";
-    public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
-    public static final String TOOL_CONTENT_ID = "toolContentId";
+    public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";*/
+    public static final String TOOL_CONTENT_ID = "toolContentId";  //request + session variable
+    public static final String RICH_TEXT_TITLE = "richTextTitle";
     public static final String RICH_TEXT_CONTENT = "richTextContent";
     public static final String RICH_TEXT_ONLINE_INSTRN = "richTextOnlineInstructions";
     public static final String RICH_TEXT_OFFLINE_INSTRN = "richTextOfflineInstructions";
     
+  // public static final String READ_ONLY_MODE = "readOnlyMode";
+    public static final String IS_TOOL_COMPLETED = "isToolCompleted";
+    
+    public static final String USER_ID = "userID";
+    public static final String TOOL_SESSION_ID = "toolSessionID";
+    
     // ---------------------------------------------------------------------------
-    // Lookup Dispatch Action Keys (used in NbAuthoringAction class),
+    // Lookup Dispatch Action Keys (used in NbAuthoringAction class, NbLearnerAction),
     // labels used in ApplicationResources.properties
     // ---------------------------------------------------------------------------
     
@@ -79,7 +97,17 @@ public class NoticeboardConstants
     public static final String BUTTON_INSTRUCTIONS = "button.instructions";
     public static final String BUTTON_SAVE = "button.ok";
     public static final String BUTTON_DONE = "button.done";
+    public static final String BUTTON_FINISH = "button.finish";
    // public static final String BUTTON_CANCEL = "button.cancel";
+    
+    
+   //--------------
+   // Flags
+   //--------------
+    
+    public static final int FLAG_DEFINE_LATER = 1;
+    public static final int FLAG_CONTENT_IN_USE = 2;
+    public static final int FLAG_RUN_OFFLINE = 3;
    
     
     
