@@ -1,6 +1,7 @@
 USE lams;
 
 -- Ensure an existing table does not exist
+DROP TABLE IF EXISTS lams.tl_lanb11_user;
 DROP TABLE IF EXISTS lams.tl_lanb11_session;
 DROP TABLE IF EXISTS lams.tl_lanb11_content;
 
@@ -8,12 +9,13 @@ DROP TABLE IF EXISTS lams.tl_lanb11_content;
 CREATE TABLE lams.tl_lanb11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , nb_content_id BIGINT(20) UNIQUE NOT NULL
-     , title VARCHAR(255)
+     , title TEXT
      , content TEXT
      , online_instructions TEXT
      , offline_instructions TEXT
      , define_later TINYINT(1)
      , force_offline TINYINT(1)
+     , content_in_use TINYINT(1)
      , creator_user_id BIGINT(20)
      , date_created DATETIME
      , date_updated DATETIME
@@ -33,3 +35,15 @@ CREATE TABLE lams.tl_lanb11_session (
                   REFERENCES lams.tl_lanb11_content (uid)
 )TYPE=InnoDB;
 
+CREATE TABLE lams.tl_lanb11_user (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , user_id BIGINT(20) UNIQUE NOT NULL
+     , nb_session_uid BIGINT(20) NOT NULL
+     , username VARCHAR(50)
+     , fullname VARCHAR(50)
+     , user_status VARCHAR(50)
+     , PRIMARY KEY (uid)
+     , INDEX (nb_session_uid)
+     , CONSTRAINT FK_tl_lanb11_user_1 FOREIGN KEY (nb_session_uid)
+                  REFERENCES lams.tl_lanb11_session (uid)
+)TYPE=InnoDB;

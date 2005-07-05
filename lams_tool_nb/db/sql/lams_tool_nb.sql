@@ -1,7 +1,7 @@
 CREATE TABLE lams.tl_lanb11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , nb_content_id BIGINT(20) UNIQUE NOT NULL
-     , title VARCHAR(255)
+     , title TEXT
      , content TEXT
      , online_instructions TEXT
      , offline_instructions TEXT
@@ -24,5 +24,18 @@ CREATE TABLE lams.tl_lanb11_session (
      , INDEX (nb_content_uid)
      , CONSTRAINT FK_tl_lanb11_session_1 FOREIGN KEY (nb_content_uid)
                   REFERENCES lams.tl_lanb11_content (uid)
+)TYPE=InnoDB;
+
+CREATE TABLE lams.tl_lanb11_user (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , user_id BIGINT(20) UNIQUE NOT NULL
+     , nb_session_uid BIGINT(20) NOT NULL
+     , username VARCHAR(50)
+     , fullname VARCHAR(50)
+     , user_status VARCHAR(50)
+     , PRIMARY KEY (uid)
+     , INDEX (nb_session_uid)
+     , CONSTRAINT FK_tl_lanb11_user_1 FOREIGN KEY (nb_session_uid)
+                  REFERENCES lams.tl_lanb11_session (uid)
 )TYPE=InnoDB;
 
