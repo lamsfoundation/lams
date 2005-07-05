@@ -22,6 +22,7 @@
 
 /*
  * Created on May 11, 2005
+ * Modified: 1 July 2005
  */
 
 package org.lamsfoundation.lams.tool.noticeboard;
@@ -29,6 +30,7 @@ package org.lamsfoundation.lams.tool.noticeboard;
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardSessionDAO;
+import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import java.util.Date;
 
@@ -43,12 +45,14 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     //---------------------------------------------------------------------
     private NoticeboardContentDAO noticeboardDAO;
     private NoticeboardSessionDAO nbSessionDAO;
+    private NoticeboardUserDAO nbUserDAO;
    
     //---------------------------------------------------------------------
     // Domain Object instances
     //---------------------------------------------------------------------
     protected NoticeboardContent nbContent;
     protected NoticeboardSession nbSession;
+    protected NoticeboardUser nbUser;
     
     //---------------------------------------------------------------------
     // DATA USED FOR TESTING PURPOSES ONLY
@@ -69,10 +73,15 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	protected final Date TEST_DATE_UPDATED = new Date();
 	protected final Long TEST_CREATOR_USER_ID = new Long(1300);
 	
-	protected final Long TEST_SESSION_ID = new Long("1400");
+	protected final Long TEST_SESSION_ID = new Long(1400);
 	protected final Date TEST_SESSION_START_DATE = new Date(System.currentTimeMillis());
 	protected final Date TEST_SESSION_END_DATE = new Date(System.currentTimeMillis() + ONE_DAY);
 	protected final String TEST_SESSION_STATUS = NoticeboardSession.NOT_ATTEMPTED;
+	
+	protected final Long TEST_USER_ID = new Long(1600);
+	protected final String TEST_USERNAME = "testUsername";
+	protected final String TEST_FULLNAME = "Hamish Andy";
+	protected final String TEST_USER_STATUS = NoticeboardUser.INCOMPLETE;
 	
 	//---------------------------------------------------------------------
     // DEFAULT DATA INSERTED BY BUILD-DB ANT TASK
@@ -87,6 +96,10 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	protected final Long DEFAULT_CREATOR_USER_ID = new Long(2300);
 	protected final Long DEFAULT_SESSION_ID = new Long(2400);
 	protected final String DEFAULT_SESSION_STATUS = NoticeboardSession.NOT_ATTEMPTED;
+	protected final Long DEFAULT_USER_ID = new Long(2600);
+	protected final String DEFAULT_USERNAME = "test";
+	protected final String DEFAULT_FULLNAME = "test";
+	protected final String DEFAULT_USER_STATUS = NoticeboardUser.INCOMPLETE;
 	
 	
 	
@@ -104,6 +117,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
         super.setUp();
         noticeboardDAO = (NoticeboardContentDAO) this.context.getBean("nbContentDAO");
         nbSessionDAO = (NoticeboardSessionDAO) this.context.getBean("nbSessionDAO");
+        nbUserDAO = (NoticeboardUserDAO) this.context.getBean("nbUserDAO");
     }
 
     protected void tearDown() throws Exception {
@@ -142,6 +156,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     protected void cleanNbContentData(Long contentId)
     {
     	noticeboardDAO.removeNoticeboard(contentId);
+    	//it correspondingly removes all the sessions and users along with it.
     }
     
    
@@ -168,11 +183,26 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     	
     }
     
+    protected void initNbUserData()
+    {
+        NoticeboardSession ns = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
+        
+        NoticeboardUser user = new NoticeboardUser(TEST_USER_ID,
+                									ns,
+                									TEST_USERNAME,
+                									TEST_FULLNAME,
+                									TEST_USER_STATUS);
+        
+        nbUserDAO.saveNbUser(user);
+        
+        ns.getNbUsers().add(user);
+    }
    
     protected void initAllData()
     {
     	initNbContentData();
-    	initNbSessionContent();    	
+    	initNbSessionContent();    
+    	initNbUserData();
     }
     
     //===========================
@@ -206,7 +236,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     
     protected void assertContentEqualsDefaultData(NoticeboardContent content)
     {
-        	assertEquals(content.getNbContentId(), DEFAULT_CONTENT_ID);   	
+        	
     		assertEquals(content.getTitle(), DEFAULT_TITLE);
     		assertEquals(content.getContent(), DEFAULT_CONTENT);
     		assertEquals(content.getOnlineInstructions(), DEFAULT_ONLINE_INSTRUCTIONS);
@@ -230,12 +260,30 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
         NoticeboardSession nsObject = nbSessionDAO.findNbSessionById(sessionId);
         assertNull(nsObject);
     }
-    /*
-     * 
-     * @author mtruong
-     *
-     * TODO write a test case to test the getter and setter methods 
-     * for the POJO
-     */
     
+    protected void assertEqualsForNbUser(NoticeboardUser user)
+    {
+        assertEquals("Validate user id",user.getUserId(), TEST_USER_ID);
+		assertEquals("Validate username",user.getUsername(), TEST_USERNAME);
+		assertEquals("Validate fullname", user.getFullname(), TEST_FULLNAME);
+		assertEquals("Validate user status", user.getUserStatus(), TEST_USER_STATUS);	
+		assertEquals("Validate session id",user.getNbSession().getNbSessionId(), TEST_SESSION_ID);
+		
+    }
+    
+    protected void assertEqualsForDefaultNbUser(NoticeboardUser user)
+    {
+        assertEquals("Validate user id",user.getUserId(), DEFAULT_USER_ID);
+		assertEquals("Validate username",user.getUsername(), DEFAULT_USERNAME);
+		assertEquals("Validate fullname", user.getFullname(), DEFAULT_FULLNAME);
+		assertEquals("Validate user status", user.getUserStatus(), DEFAULT_USER_STATUS);	
+		assertEquals("Validate session id",user.getNbSession().getNbSessionId(), DEFAULT_SESSION_ID);
+		
+    }
+  
+    protected void assertUserObjectIsNull(Long userId)
+    {
+        NoticeboardUser user = nbUserDAO.getNbUserByID(userId);
+        assertNull(user);
+    }
 }
