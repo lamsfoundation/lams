@@ -207,9 +207,13 @@ public interface IRepositoryService {
     /**
      * Sets the property to a value, based on the specified type.  Removes the property if the value is null.
      *
+     * @param ticket Mandatory
+     * @pararm uuid Mandatory
+     * @pararm versionId Mandatory
      * @param name  The name of a property of this node
      * @param value The value to be assigned
-     * @param type  The type of the property
+     * @param type  The type of the property. See org.lamsfoundation.lams.contentrepository.PropertyType
+     * for values.
      * @throws ValueFormatException if the type or format of a value
      * is incompatible with the type of the specified property or if
      * value is incompatible with (i.e. can not be converted to) type.
