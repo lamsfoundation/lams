@@ -14,23 +14,22 @@ package org.lamsfoundation.lams.tool.forum.persistence;
  * @hibernate.query name="getAttachmentbyType" query="from Attachment attachment where attachment.type = ?"
  */
 public class Attachment extends GenericEntity {
-    protected byte[] data;
+    protected Long uuid;
     protected boolean type;
     protected String name;
-    protected String contentType;
     public final static boolean TYPE_ONLINE = true;
     public final static boolean TYPE_OFFLINE = false;
 
     /**
-     * @hibernate.property column="DATA"
-     * 					   type="binary"
+     * @hibernate.property column="UUID"
+     *
      */
-    public byte[] getData() {
-        return data;
+    public Long getUuid() {
+        return uuid;
     }
 
-    public void setData(byte[] data) {
-        this.data = data;
+    public void setUuid(Long uuid) {
+        this.uuid = uuid;
     }
 
     /**
@@ -44,14 +43,6 @@ public class Attachment extends GenericEntity {
         this.type = type;
     }
 
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
     /**
      * @hibernate.property column="NAME"
      */
@@ -62,5 +53,6 @@ public class Attachment extends GenericEntity {
     public void setName(String name) {
         this.name = name;
     }
+
 
 }
