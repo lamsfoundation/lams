@@ -47,6 +47,8 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
@@ -134,9 +136,10 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long,
 	 *      java.lang.Long)
 	 */
-	public void copyToolContent(Long fromContentId, Long toContentId) {
+	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
+	    // TODO fix this to use the default content id - shouldn't throw the exception
 		if (fromContentId == null || toContentId == null)
-			throw new SubmitFilesException(
+			throw new ToolException(
 					"Failed to create the SubmitFiles tool seession");
 
 		SubmitFilesContent fromContent = submitFilesContentDAO
@@ -171,11 +174,11 @@ public class SubmitFilesService implements ToolContentManager,
 	 * 
 	 * @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long)
 	 */
-	public void removeToolContent(Long toolContentId)throws SubmitFilesException{
+	public void removeToolContent(Long toolContentId, boolean removeSessionData)throws DataMissingException {
 		SubmitFilesContent submitFilesContent = submitFilesContentDAO
 				.getContentByID(toolContentId);
 		if (submitFilesContent == null)
-			throw new SubmitFilesException(
+			throw new DataMissingException(
 					"No such content with a contentID of : " + toolContentId
 							+ " exists");
 		else {
@@ -190,6 +193,7 @@ public class SubmitFilesService implements ToolContentManager,
 				submitFilesContentDAO.delete(submitFilesContent);
 			}			
 		}
+		//TODO check for related session data and delete as appropriate
 	}
 
 	/**
@@ -414,6 +418,17 @@ public class SubmitFilesService implements ToolContentManager,
 		return null;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#removeToolSession(java.lang.Long)
+	 */
+	public void removeToolSession(Long toolSessionId)
+	   throws DataMissingException, ToolException{
+			// TODO Auto-generated method stub
+			return;
+	}
+	
 	/**
 	 * (non-Javadoc)
 	 * 

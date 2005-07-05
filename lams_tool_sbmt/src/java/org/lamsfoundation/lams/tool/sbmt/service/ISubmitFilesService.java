@@ -119,8 +119,6 @@ public interface ISubmitFilesService {
 	 */
 	public List getFilesUploadedByUser(Long userID, Long contentID);
 	
-	public void removeToolContent(Long contentID);
-	
 	/**
 	 * This method is required in the monitoring enviornment
 	 * when the teacher wants to view all the learners who have
