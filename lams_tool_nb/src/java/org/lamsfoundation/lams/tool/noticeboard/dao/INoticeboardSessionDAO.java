@@ -24,8 +24,8 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 
 
 /**
- * Interface for the NoticeboardContent DAO, defines methods needed to access/modify
- * noticeboard content
+ * Interface for the NoticeboardSession DAO, defines methods needed to access/modify
+ * noticeboard session
  * @author mtruong
  */
 public interface INoticeboardSessionDAO {
@@ -43,5 +43,9 @@ public interface INoticeboardSessionDAO {
     public void removeNbSession(NoticeboardSession nbSession);
     
     public void removeNbSession(Long nbSessionId);
+    
+    public NoticeboardSession getNbSessionByUser(Long userId); /** TODO: write testcase and def for getNbSessionByUser */
+    
+    public void removeNbUsers(NoticeboardSession nbSession); /** TODO: write testcase and def for removeNbUsers */
 
 }
