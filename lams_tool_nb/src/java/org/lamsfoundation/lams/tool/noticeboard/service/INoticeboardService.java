@@ -23,7 +23,8 @@ package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
-;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+
 
 /**
  * Defines the contract that the tool service provider must follow
@@ -84,7 +85,7 @@ public interface INoticeboardService {
      * 
      * @param nbContent The instance of NoticeboardContent in which corresponding instances of NoticeboardSession should be deleted.
      */
-	public void removeNoticeboardSessions(NoticeboardContent nbContent);
+	public void removeNoticeboardSessionsFromContent(NoticeboardContent nbContent);
 	
 	/**
      * <p>Delete the given instance of NoticeboardContent with the
@@ -161,4 +162,90 @@ public interface INoticeboardService {
      * @param uid an identifier for the NoticeboardSession instance. 
      */
     public void removeSessionByUID(Long uid);
+    
+    /**
+     * <p>Deletes all instances of NoticeboardUser that are associated
+     * with the given instance of NoticeboardSession</p>
+     * 
+     * @param nbSession The instance of NoticeboardSession in which corresponding instances of NoticeboardUser should be deleted.
+     */
+	public void removeNoticeboardUsersFromSession(NoticeboardSession nbSession);
+	
+	  /**
+     * <p> Returns the persistent instance of NoticeboardSession
+     * with the given noticeboard user id<code>userId</code>, returns null if not found.
+     * 
+     * @param userId The user id
+     * @return a persistent instance of NoticeboardSession or null if not found.
+     */	
+	public NoticeboardSession retrieveNbSessionByUserID(Long userId);
+    
+    //===================================================================
+    // NoticeboardUser access methods
+    //===================================================================
+    /**
+	 * <p> Return the persistent instance of a NoticeboardUser
+	 * with the given user id<code>nbUserId</code>,
+	 * returns null if not found.</p>
+	 * 
+	 * @param nbUserId The user id of the instance of NoticeboardUser
+	 * @return the persistent instance of a NoticeboardUser or null if not found.
+	 */
+	public NoticeboardUser retrieveNoticeboardUser(Long nbUserId);
+	
+	/**
+	 * <p>Return the persistent instance of a NoticeboardUser  
+	 * with the given identifier <code>uid</code>, returns null if not found. </p>
+	 * 
+	 * @param uid an identifier for the NoticeboardUser object.
+	 * @return the persistent instance of a NoticeboardUser or null if not found
+	 */
+	public NoticeboardUser retrieveNoticeboardUserByUID(Long uid);
+	
+	/**
+	 * Persists the new NoticeboardUser object into the database.
+	 * 
+	 * @param nbUser the NoticeboardUser object to persist
+	 */
+	public void saveNoticeboardUser(NoticeboardUser nbUser);
+	
+	
+	/**
+	 * Updates the values of the noticeboard user.
+	 * @param nbUser
+	 */
+	public void updateNoticeboardUser(NoticeboardUser nbUser);
+	
+	/**
+	 * Remove the noticeboard user object with user id of
+	 * that specified in the argument.
+	 * 
+	 * @param nbUserId The id of the requested noticeboard object
+	 *
+	 */	
+	public void removeUser(Long nbUserId);
+	
+	 /**
+     * <p>Delete the given instance of NoticeboardUser</p>
+     * 
+     * @param nbUser The instance of NoticeboardUser to delete. 
+     */
+    public void removeUser(NoticeboardUser nbUser);
+    
+  
+    
+    /**
+     * <p>Performs a check on the flag indicated by <code>flag</code>
+     * In this noticeboard tool, there are 3 possible flags:
+     * <li>defineLater</li>
+     * <li>contentInUse</li>
+     * <li>runOffline</li>
+     * <br>Returns true if the flag is set, false otherwise <p>
+     * 
+     * @param contentId The tool content id
+     * @param flag The flag to check, can take the following set of values (defineLater, contentInUse, runOffline)
+     * @return Returns true if flag is set, false otherwise
+     */
+    public boolean isFlagSet(Long contentId, int flag);
+    
 }
