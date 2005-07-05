@@ -198,10 +198,12 @@
 	<!-- =================================================================== -->
 	<target name="clean-db"	description="clean forum database.">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}">			
-			<fileset dir="${lib.dir}">
-				<include name="**/*.jar"/>
-			</fileset>
+				password="${db.password}">
+
+         <classpath id="junit.class.path">
+             <path refid="build.class.path"/>
+         </classpath>
+
 			<transaction src="${db.scripts}/cleanup_lams_tool_forum.sql"/>
 		</sql>
 	</target>
@@ -209,9 +211,9 @@
 	<target name="init-db"	description="drop and create forum database.">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 				password="${db.password}">
-			<fileset dir="${lib.dir}">
-				<include name="**/*.jar"/>
-			</fileset>
+            <classpath>
+                <path refid="build.class.path"/>
+			</classpath>
 			<transaction src="${db.scripts}/drop_lams_tool_forum.sql"/>
 			<transaction src="${db.scripts}/create_lams_tool_forum.sql"/>
 		</sql>
@@ -221,9 +223,9 @@
 							description="build qa tool database.">
 		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 				password="${db.password}">
-			<fileset dir="${lib.dir}">
-				<include name="**/*.jar"/>
-			</fileset>
+            <classpath>
+			    <path refid="build.class.path"/>
+			</classpath>
 			<transaction src="${db.scripts}/insert_lams_tool_forum_data.sql"/>
 		</sql>
 	</target>
