@@ -387,7 +387,7 @@ public class LearningUtil implements QaAppConstants{
     	/**
     	 * find out the tool's mode. We produce different reports for learning and monitoring
     	 */
-    	String targetMode=(String )request.getSession().getAttribute(TARGET_MODE);
+    	String targetMode=(String)request.getSession().getAttribute(TARGET_MODE);
     	logger.debug("TARGET_MODE: " + targetMode);
     	
     	if (targetMode.equalsIgnoreCase(TARGET_MODE_MONITORING))

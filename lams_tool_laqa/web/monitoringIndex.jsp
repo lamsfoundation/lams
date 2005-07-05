@@ -9,25 +9,16 @@
 	<!-- this form temporarily represents tool icon in monitoring environment, 
 	remove this form once the tool is deployed into monitoring environment -->
 <%
-	String fromToolContentId="6666666";
-	String toToolContentId="4071202367667828685";
-	String toolSessionId="11237955877394927";
-	String userId="1068924863";
+	String fromToolContentId="1234";
+	String toToolContentId="4321";
+	String toolSessionId="999888";
+	String userId="123123";
 	String toolUrl="/monitoringStarter?toolSessionId=" + toolSessionId + 
 											"&fromToolContentId=" + fromToolContentId + 
 											"&toToolContentId=" + toToolContentId +
 											"&userId=" + userId;
 
 
-	userId="222";
-	String toolContentId="6666";
-	String toolSessionId1="1234567";
-	String toolSessionId2="";
-	String toolSessionId3="";
-
-	String multipleSessionstoolUrl="/monitoringStarter?userId=" + userId+ "&toolContentId=" + toolContentId + "&toolSessionId1=" + toolSessionId1 + 
-															"&toolSessionId2=" + toolSessionId2 +
-															"&toolSessionId3=" + toolSessionId3; 
 
 %>
 
@@ -51,19 +42,6 @@
 </html:form>
 
 <br>
-
-<!--Dave, starting off the real monitoring jsp page -->
-<html:form action="<%=multipleSessionstoolUrl%>" method="post">
-	<table align=center> <!-- Dave to take off-->
-		<tr>
-			<td>
-				<html:submit property="summary" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-					<bean:message key="button.summary"/>
-				</html:submit> 
-			</td>
-		</tr>
-	</table>
-</html:form>
 
 
 

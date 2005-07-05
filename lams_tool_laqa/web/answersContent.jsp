@@ -46,13 +46,13 @@
 				</td></tr>
 			</c:if> 		
 			<c:if test="${sessionScope.isDefineLater == 'false'}"> 			
-				<c:if test="${sessionScope.isToolActivityOnline == 'true'}"> 			
+				<c:if test="${sessionScope.isToolActivityOffline == 'true'}"> 			
 					<tr> <td class="error">
 						<fmt:message key="label.learning.forceOfflineMessage"/>
 					</td></tr>
 				</c:if> 		
 			
-				<c:if test="${sessionScope.isToolActivityOnline == 'false'}"> 			
+				<c:if test="${sessionScope.isToolActivityOffline == 'false'}"> 			
 					<tr> <td class="error">
 						<c:out value="${sessionScope.userFeedback}"/>
 					</td></tr>

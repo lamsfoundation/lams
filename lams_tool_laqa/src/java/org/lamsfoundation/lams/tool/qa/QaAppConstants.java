@@ -158,7 +158,7 @@ public interface QaAppConstants {
     public static final String MONITORING_REPORT_TITLE					="monitoringReportTitle"; 
     public static final String REPORT_TITLE_LEARNER						="reportTitleLearner"; 
     public static final String END_LEARNING_MESSAGE						="endLearningMessage";
-    public static final String IS_TOOL_ACTIVITY_OFFLINE					="isToolActivityOnline";
+    public static final String IS_TOOL_ACTIVITY_OFFLINE					="isToolActivityOffline";
     public static final String IS_USERNAME_VISIBLE						="isUsernameVisible";
     public static final String IS_ALL_SESSIONS_COMPLETED				="isAllSessionsCompleted";
     public static final String CHECK_ALL_SESSIONS_COMPLETED				="checkAllSessionsCompleted";

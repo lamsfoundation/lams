@@ -270,20 +270,11 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    	     */
 	    	    strFromToolContentId=request.getParameter(FROM_TOOL_CONTENT_ID);
 	    		logger.debug("FROM_TOOL_CONTENT_ID: " + strFromToolContentId);
-	    	    if (strFromToolContentId == null)
-	    	    {
-	    	    	throw new QaApplicationException("Exception occured: " +
-	    	    			"Tool expects a legitimate FROM_TOOL_CONTENT_ID from the container. Can't continue!");
-	    	    }
 	    	    
-	    	    strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
+	    		strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
 	    	    logger.debug("TO_TOOL_CONTENT_ID: " + strToToolContentId);
-	    	    if (strToToolContentId == null)
-	    	    {
-	    	    	throw new QaApplicationException("Exception occured: " +
-	    	    			"Tool expects a legitimate TO_TOOL_CONTENT_ID from the container. Can't continue!");
-	    	    }
 	    		qaService.copyToolContent(new Long(strFromToolContentId), new Long(strToToolContentId));
+	    		logger.debug("test successfull: copyToolContent.");
 		    	
 		    	/** calls to these two methods will be made from Monitoring Service bean optionally depending on
 		    	 *  the the tool is setup for DefineLater and (or) RunOffline 

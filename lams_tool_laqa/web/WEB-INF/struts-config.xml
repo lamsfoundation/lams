@@ -63,11 +63,18 @@
 	<!--Learning Starter  -->
    <action path="/learningStarter" type="org.lamsfoundation.lams.tool.qa.web.QaLearningStarterAction" 
    			name="QaLearningForm" input=".learningStarter"> 
-	  	<forward
-		    name="load"
-		    path=".answers"
-		    redirect="true"
-	  	/>
+	  <forward
+	    name="load"
+	    path=".answers"
+	    redirect="true"
+	  />
+	  	
+      <forward
+        name="learnerReport"
+        path=".learnerReport"
+        redirect="true"
+      />
+	  	
 	</action>  
 	<!--Monitoring Starter  -->
 	<action path="/monitoringStarter" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction" 

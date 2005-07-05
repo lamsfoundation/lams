@@ -322,8 +322,10 @@ public abstract class QaUtils implements QaAppConstants {
 		/**
 		 * get the service
 		 */
+		logger.debug("existsSession");
     	IQaService qaService =QaUtils.getToolService(request);
 	    QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId);
+	    logger.debug("qaSession:" + qaSession);
     	
 	    if (qaSession == null) 
 	    	return false;
