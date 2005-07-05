@@ -23,6 +23,8 @@ package org.lamsfoundation.lams.tool.noticeboard;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author mtruong
@@ -55,6 +57,9 @@ public class NoticeboardSession implements Serializable {
 	
 	/** persistent field */
 	private NoticeboardContent nbContent;
+	
+	/** persistent field */
+	private Set nbUsers;
 	
 	/** default constructor */
 	public NoticeboardSession()
@@ -175,4 +180,29 @@ public class NoticeboardSession implements Serializable {
         this.uid = uid;
     }
 	
+    /**
+     * @hibernate.set
+     *      lazy="true"
+     *      inverse="true"
+     *      cascade="all-delete-orphan"
+  	 *
+ 	 * @hibernate.collection-key
+	 * 		column="nb_session_uid"
+	 * @hibernate.collection-one-to-many
+	 *      class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser"
+     */
+    public Set getNbUsers() {
+        if (this.nbUsers == null)
+		{
+			setNbUsers(new HashSet());
+		}
+    
+        return nbUsers;
+    }
+    /**
+     * @param nbUsers The nbUsers to set.
+     */
+    public void setNbUsers(Set nbUsers) {
+        this.nbUsers = nbUsers;
+    }
 }
