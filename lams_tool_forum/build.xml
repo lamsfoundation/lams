@@ -310,6 +310,10 @@
               <fileset dir="${web.dir}/images" includes="**/*.png,**/*.gif"/>
           </copy>
 
+         <mkdir dir="${deploy.dir}/FCKeditor" />
+            <copy todir="${deploy.dir}/FCKeditor">
+              <fileset dir="${web.dir}/FCKeditor" includes="**/*.*"/>
+            </copy>
 	</target>
 
     <target name="war" depends="copyweb">
@@ -326,9 +330,16 @@
 		<echo>+------------------------------------------+</echo>
 	</target>
 
+    <!-- EAR Related Targets -->
+
 	<target
         name="_dist"
         depends="_build">
+        <!--<ear destfile="${deploy.dir}/${project}.ear" appxml="${project.dir}/application.xml">
+            <fileset dir="${deploy.dir}" includes="${project}.war" />
+        </ear>
+        -->
+
 		<echo>+------------------------------------------+</echo>
 		<echo>| created distribution                     |</echo>
 		<echo>+------------------------------------------+</echo>
