@@ -40,20 +40,20 @@
 							  	<%String fullName	="fullName" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
 							  	  String aTime		="aTime" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
 							  	  String formattedAtime="formattedAtime" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
-							  	  String timeZone	="timeZone" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+							  	  String timeZoneId	="timeZoneId" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
 								  String answer		="answer" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
 							   	  String currentLearnerFullname=(String) request.getSession().getAttribute("currentLearnerFullname");
 							   	  								  
 								  fullName			= (String) request.getSession().getAttribute(fullName);
 						 	   	  java.util.Date attemptTime= (java.util.Date) request.getSession().getAttribute(aTime);
 						 	   	  formattedAtime 	=(String) request.getSession().getAttribute(formattedAtime);
-  						 	   	  timeZone			= (String) request.getSession().getAttribute(timeZone);
+  						 	   	  timeZoneId		= (String) request.getSession().getAttribute(timeZoneId);
 						 	   	  answer			= (String) request.getSession().getAttribute(answer);
 						 	   	  
 								  request.setAttribute("fullName", fullName);
 						 	   	  request.setAttribute("attemptTime", attemptTime);
 						 	   	  request.setAttribute("formattedAtime", formattedAtime);
-						 	   	  request.setAttribute("timeZone", timeZone);
+						 	   	  request.setAttribute("timeZoneId", timeZoneId);
 						 	   	  request.setAttribute("answer", answer);
 						 	   	  request.setAttribute("currentLearnerFullname", currentLearnerFullname);
 								%>
@@ -111,11 +111,11 @@
 											</td>  
 										<%}%>					
 
-										 <% if (timeZone != null)
+										 <% if (timeZoneId != null)
 										 	{
 										 %>
 											<td>  
-												&nbsp&nbsp&nbsp  <c:out value="${requestScope.timeZone}"/> 
+												&nbsp&nbsp&nbsp  <c:out value="${requestScope.timeZoneId}"/> 
 											</td>  
 										<%}%>					
 

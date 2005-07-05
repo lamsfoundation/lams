@@ -7,7 +7,6 @@ package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
@@ -146,7 +145,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    /**
 	     * persist time zone information to session scope. 
 	     */
-	    persistTimeZone(request);
+	    QaUtils.persistTimeZone(request);
 	    
 	    /**
 	     * obtain and setup the current user's data 
@@ -355,14 +354,4 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
 	}
-	
-	public void persistTimeZone(HttpServletRequest request)
-	{
-		TimeZone timeZone=TimeZone.getDefault();
-	    logger.debug("current timezone: " + timeZone.getDisplayName());
-	    request.getSession().setAttribute(TIMEZONE, timeZone.getDisplayName());
-	    logger.debug("current timezone id: " + timeZone.getID());
-	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
-	}
-	
 }  

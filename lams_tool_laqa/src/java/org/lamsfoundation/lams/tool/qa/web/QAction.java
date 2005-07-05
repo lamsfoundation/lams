@@ -46,6 +46,12 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * 
+ * change the logic about completion status
+ *
+ */
+
+/**
+ * 
  * once lams_learning is ready and appContext file is src/ then FINISH toool session will work.
  * 
  */
@@ -529,9 +535,16 @@ public class QAction extends DispatchAction implements QaAppConstants
                 IQaService qaService =QaUtils.getToolService(request);
                 QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
                 qaSession.setSession_end_date(new Date(System.currentTimeMillis()));
-                qaSession.setSession_status(COMPLETED);
-                qaService.updateQaSession(qaSession);
-                logger.debug("tool session has been marked COMPLETE: " + qaSession);
+                
+                /*
+                 * change the logic about completion status 
+                 */
+                
+                /* qaSession.setSession_status(COMPLETED); 
+                   qaService.updateQaSession(qaSession);
+                   logger.debug("tool session has been marked COMPLETE: " + qaSession);
+                */
+                
                 /*
                 ILearnerService learnerService =LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
                 logger.debug(logger + " " + this.getClass().getName() +  "learnerService: " + learnerService);

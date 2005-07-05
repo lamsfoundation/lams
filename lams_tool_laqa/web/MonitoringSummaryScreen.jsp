@@ -81,6 +81,7 @@
 				  				 	<tr> 
 										 <td> &nbsp&nbsp&nbsp <fmt:message key="label.learning.user"/>	</td>  
 				  						 <td> &nbsp&nbsp&nbsp <fmt:message key="label.learning.attemptTime"/></td>
+			  	  						 <td> &nbsp&nbsp&nbsp <fmt:message key="label.learning.timezone"/></td>
 				  						 <td> &nbsp&nbsp&nbsp <fmt:message key="label.learning.response"/> 	</td>
 						  			</tr>				 
 						  			
@@ -88,17 +89,23 @@
 								  		<c:forEach var="subEntry" items="${mainEntry.value}">
 											<c:set var="ansIndex" scope="request" value="${ansIndex +1}"/>
 										  	<%
-										  	  String sectionSessionId=(String)request.getAttribute("sectionSessionId");
-										  	  String fullName="fullName" + sectionSessionId + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
-										  	  String aTime="aTime" + sectionSessionId + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
-											  String answer="answer" + sectionSessionId + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
-		  									  String responseId="responseId" + sectionSessionId + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
-		  									  String responseHidden="responseHidden" + sectionSessionId + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+										  	  String sectionSessionId	=(String)request.getAttribute("sectionSessionId");
+										  	  String fullName			="fullName" + sectionSessionId + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+										  	  String aTime				="aTime" + sectionSessionId + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+										  	  String timeZoneId			="timeZoneId" + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+											  String answer				="answer" + sectionSessionId + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+		  									  String responseId			="responseId" + sectionSessionId + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
+		  									  String responseHidden		="responseHidden" + sectionSessionId + request.getAttribute("queIndex") + request.getAttribute("ansIndex");
 											  
-											  fullName= (String) request.getSession().getAttribute(fullName);
+											  fullName = (String) request.getSession().getAttribute(fullName);
 											  request.setAttribute("fullName", fullName);
+
 									 	   	  java.util.Date attemptTime= (java.util.Date) request.getSession().getAttribute(aTime);
 									 	   	  request.setAttribute("attemptTime", attemptTime);
+
+	  	    						 	   	  timeZoneId= (String) request.getSession().getAttribute(timeZoneId);
+						 	   	  			  request.setAttribute("timeZoneId", timeZoneId);									 	   	  
+						 	   	  			  
 									 	   	  answer= (String) request.getSession().getAttribute(answer);
 									 	   	  request.setAttribute("answer", answer);
 									 	   	  Long longResponseId= (Long) request.getSession().getAttribute(responseId);
@@ -120,7 +127,13 @@
 															  		&nbsp&nbsp&nbsp  <c:out value="${requestScope.attemptTime}"/>
 														</td>  
 													</c:if>							  													
-													
+
+													<c:if test="${requestScope.timeZoneId != ''}"> 														
+														<td>  
+															  		&nbsp&nbsp&nbsp  <c:out value="${requestScope.timeZoneId}"/>
+														</td>  
+													</c:if>							  													
+
 													<c:if test="${requestScope.responseId == sessionScope.dataMapEditableResponseId}"> 			
 															<td>  
 																	&nbsp&nbsp&nbsp <html:text property="updatedResponse" value="${requestScope.answer}" 

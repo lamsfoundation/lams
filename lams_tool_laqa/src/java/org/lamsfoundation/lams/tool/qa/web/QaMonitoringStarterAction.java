@@ -69,7 +69,12 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
     	    request.getSession().setAttribute(TOOL_SERVICE, qaService);	
     	}
     	logger.debug("retrieved qaService: " + qaService);
-	    
+    	
+    	/**
+	     * persist time zone information to session scope. 
+	     */
+	    QaUtils.persistTimeZone(request);
+    	
 	    /**
 	     * mark the http session as an authoring activity 
 	     */

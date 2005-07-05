@@ -226,12 +226,12 @@ public class LearningUtil implements QaAppConstants{
                 logger.debug("iterationg question-answers: displayOrder: " + displayOrder + 
          													 " question: " + question + " answer: " + answer);
         		
-                String timezone=(String)request.getSession().getAttribute(TIMEZONE);
-                if (timezone == null) timezone="";
+                String timezoneId=(String)request.getSession().getAttribute(TIMEZONE_ID);
+                if (timezoneId == null) timezoneId="";
                 
             	QaUsrResp qaUsrResp= new QaUsrResp(answer,false,
 						new Date(System.currentTimeMillis()),
-						timezone,
+						timezoneId,
 						qaQueContent,
 						qaQueUsr); 
 
@@ -432,6 +432,7 @@ public class LearningUtil implements QaAppConstants{
 		    			request.getSession().setAttribute(FULLNAME + toolSessionId + "" + questionIndex +""+ responseIndex, qaQueUsr.getFullname());	
 		    			request.getSession().setAttribute(ANSWER + toolSessionId + "" + questionIndex +""+ responseIndex, qaUsrResp.getAnswer());
 		    			request.getSession().setAttribute(ATIME + toolSessionId + "" + questionIndex +""+ responseIndex, qaUsrResp.getAttemptTime());
+		    			request.getSession().setAttribute(TIMEZONE_ID + questionIndex + "" + responseIndex, qaUsrResp.getTimezone());
 		    			request.getSession().setAttribute(RESPONSE_ID + toolSessionId + "" + questionIndex +""+ responseIndex, qaUsrResp.getResponseId());
 		    			
 		    			boolean isResponseHidden=qaUsrResp.isHidden();
@@ -539,7 +540,7 @@ public class LearningUtil implements QaAppConstants{
 			    			request.getSession().setAttribute(ATIME + questionIndex +""+ responseIndex, qaUsrResp.getAttemptTime());
 			    			request.getSession().setAttribute(FORMATTED_ATIME + questionIndex +""+ responseIndex, QaUtils.getFormattedDateString(qaUsrResp.getAttemptTime()));
 			    			logger.debug("setting formattedDatetime");
-			    			request.getSession().setAttribute(TIMEZONE + questionIndex +""+ responseIndex, qaUsrResp.getTimezone());
+			    			request.getSession().setAttribute(TIMEZONE_ID + questionIndex +""+ responseIndex, qaUsrResp.getTimezone());
 						    			
 		    	    		if (qaQueUsr.getUsername().equalsIgnoreCase(toolUser.getLogin()))
 		    	    		{

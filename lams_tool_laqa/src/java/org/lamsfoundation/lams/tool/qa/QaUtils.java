@@ -10,6 +10,7 @@ import java.security.Principal;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Random;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -341,7 +342,13 @@ public abstract class QaUtils implements QaAppConstants {
 		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 	}
 	
-	
-	
+	public static void persistTimeZone(HttpServletRequest request)
+	{
+		TimeZone timeZone=TimeZone.getDefault();
+	    logger.debug("current timezone: " + timeZone.getDisplayName());
+	    request.getSession().setAttribute(TIMEZONE, timeZone.getDisplayName());
+	    logger.debug("current timezone id: " + timeZone.getID());
+	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
+	}
 	
 }
