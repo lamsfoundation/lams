@@ -27,6 +27,7 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.actions.LookupDispatchAction;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -60,8 +61,9 @@ import org.lamsfoundation.lams.util.WebUtil;
 
 public class NbAuthoringAction extends LookupDispatchAction {
 	
-
-	protected Map getKeyMethodMap()
+    static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());
+	
+    protected Map getKeyMethodMap()
 	{
 		Map map = new HashMap();
 		map.put(NoticeboardConstants.BUTTON_BASIC, "basic" );
@@ -172,7 +174,10 @@ public class NbAuthoringAction extends LookupDispatchAction {
 	    String onlineInstruction = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN, true);
 	    String offlineInstruction = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN, true);
 	  	String content = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_CONTENT, true);
-	   
+	  	String title = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_TITLE, true);
+
+	  	if(title != null)
+	  	    form.setTitle(title);
 	  	if(content != null)
 	  	    form.setContent(content);
 	  	if(onlineInstruction != null)
