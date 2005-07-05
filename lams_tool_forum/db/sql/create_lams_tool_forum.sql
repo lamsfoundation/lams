@@ -1,59 +1,43 @@
-CREATE TABLE DEFAULT_SCHEMA.genericentity (
-       ID BIGINT(20) NOT NULL AUTO_INCREMENT
-     , CREATED DATETIME
-     , UPDATED DATETIME
-     , CREATEDBY BIGINT(20)
-     , MODIFIEDBY BIGINT(20)
-     , PRIMARY KEY (ID)
-)TYPE=InnoDB;
-
-CREATE TABLE DEFAULT_SCHEMA.forum (
-       id BIGINT(20) NOT NULL DEFAULT 0
-     , TITLE VARCHAR(255)
-     , ALLOWANNOMITY TINYINT(1)
-     , FORCEOFFLINE TINYINT(1)
-     , LOCKWHENFINISHED TINYINT(1)
-     , INSTRUCTIONS VARCHAR(255)
-     , ONLINEINSTRUCTIONS VARCHAR(255)
-     , OFFLINEINSTRUCTIONS VARCHAR(255)
-     , PRIMARY KEY (id)
-     , INDEX (id)
-     , CONSTRAINT FK3FF9501D1B FOREIGN KEY (id)
-                  REFERENCES DEFAULT_SCHEMA.genericentity (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
-CREATE TABLE DEFAULT_SCHEMA.message (
-       id BIGINT(20) NOT NULL DEFAULT 0
-     , SUBJECT VARCHAR(255)
-     , BODY TEXT
-     , ISAUTHORED TINYINT(1)
-     , ISANNONYMOUS TINYINT(1)
-     , FORUM BIGINT(20)
-     , PARENT BIGINT(20)
-     , PRIMARY KEY (id)
-     , INDEX (id)
-     , CONSTRAINT FK63B68BE7D1B FOREIGN KEY (id)
-                  REFERENCES DEFAULT_SCHEMA.genericentity (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (FORUM)
-     , CONSTRAINT FK63B68BE73FF9501 FOREIGN KEY (FORUM)
-                  REFERENCES DEFAULT_SCHEMA.forum (id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (PARENT)
-     , CONSTRAINT FK63B68BE78C3DFCAA FOREIGN KEY (PARENT)
-                  REFERENCES DEFAULT_SCHEMA.message (id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
-CREATE TABLE DEFAULT_SCHEMA.attachment (
-       id BIGINT(20) NOT NULL DEFAULT 0
-     , UUID BIGINT(20)
-     , TYPE TINYINT(1)
-     , NAME VARCHAR(255)
-     , FORUM BIGINT(20)
-     , PRIMARY KEY (id)
-     , INDEX (id)
-     , CONSTRAINT FKA7E14523D1B FOREIGN KEY (id)
-                  REFERENCES DEFAULT_SCHEMA.genericentity (ID) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (FORUM)
-     , CONSTRAINT FKA7E145233FF9501 FOREIGN KEY (FORUM)
-                  REFERENCES DEFAULT_SCHEMA.forum (id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
+create table ATTACHMENT (
+   id bigint not null,
+   UUID bigint,
+   TYPE bit,
+   NAME varchar(255),
+   FORUM bigint,
+   primary key (id)
+);
+create table FORUM (
+   id bigint not null,
+   TITLE varchar(255),
+   ALLOWANNOMITY bit,
+   FORCEOFFLINE bit,
+   LOCKWHENFINISHED bit,
+   INSTRUCTIONS varchar(255),
+   ONLINEINSTRUCTIONS varchar(255),
+   OFFLINEINSTRUCTIONS varchar(255),
+   primary key (id)
+);
+create table GENERICENTITY (
+   ID bigint not null auto_increment,
+   CREATED datetime,
+   UPDATED datetime,
+   CREATEDBY bigint,
+   MODIFIEDBY bigint,
+   primary key (ID)
+);
+create table MESSAGE (
+   id bigint not null,
+   SUBJECT varchar(255),
+   BODY text,
+   ISAUTHORED bit,
+   ISANNONYMOUS bit,
+   FORUM bigint,
+   PARENT bigint,
+   primary key (id)
+);
+alter table ATTACHMENT add index FKA7E145233FF9501 (FORUM), add constraint FKA7E145233FF9501 foreign key (FORUM) references FORUM (id);
+alter table ATTACHMENT add index FKA7E14523D1B (id), add constraint FKA7E14523D1B foreign key (id) references GENERICENTITY (ID);
+alter table FORUM add index FK3FF9501D1B (id), add constraint FK3FF9501D1B foreign key (id) references GENERICENTITY (ID);
+alter table MESSAGE add index FK63B68BE78C3DFCAA (PARENT), add constraint FK63B68BE78C3DFCAA foreign key (PARENT) references MESSAGE (id);
+alter table MESSAGE add index FK63B68BE73FF9501 (FORUM), add constraint FK63B68BE73FF9501 foreign key (FORUM) references FORUM (id);
+alter table MESSAGE add index FK63B68BE7D1B (id), add constraint FK63B68BE7D1B foreign key (id) references GENERICENTITY (ID);
