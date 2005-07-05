@@ -35,7 +35,7 @@ public class ForumTest extends TestCase {
 
         AttachmentDao attachmentDao = (AttachmentDao) GenericObjectFactoryImpl.getInstance().lookup(AttachmentDao.class);
         Attachment instructions = new Attachment();
-        instructions.setData("instructions byte array".getBytes());
+        instructions.setName("instructions");
         instructions.setType(true);
         attachments.add(instructions);
         attachmentDao.saveOrUpdate(instructions);
@@ -79,7 +79,7 @@ public class ForumTest extends TestCase {
         assertTrue("reloaded set does not contain instructions attachment", reloadedSet.contains(instructions));
         Attachment[] child = (Attachment[]) reloadedSet.toArray(new Attachment[0]);
         assertEquals("attachments type should be same", instructions.getType(), child[0].getType());
-        assertEquals("attachment bytes should be the same", new String(instructions.getData()), new String(child[0].getData()));
+        assertEquals("attachment bytes should be the same", new String(instructions.getName()), new String(child[0].getName()));
 
         //find
         List values = dao.findByNamedQuery("allForums");

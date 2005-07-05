@@ -23,7 +23,7 @@ public class AttachmentTest extends TestCase {
         //Populate an Attachment entity for test purposes
         AttachmentDao attachmentDao = (AttachmentDao) GenericObjectFactoryImpl.getInstance().lookup(AttachmentDao.class);
         Attachment instructions = new Attachment();
-        instructions.setData("instructions byte array".getBytes());
+        instructions.setName("instructions");
         instructions.setType(false);
         attachmentDao.saveOrUpdate(instructions);
 
@@ -34,7 +34,7 @@ public class AttachmentTest extends TestCase {
         //load
 
         Attachment reloaded = (Attachment) dao.getById(instructions.getId());
-        assertEquals("persisted and reloaded byte array should be equal", "instructions byte array", new String(instructions.getData()));
+        assertEquals("persisted and reloaded byte array should be equal", "instructions", instructions.getName());
 
         //find
         List values = dao.findByNamedQuery("allAttachments");
