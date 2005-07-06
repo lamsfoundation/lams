@@ -3,79 +3,88 @@
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
-<table width="45%" align="center" border="0" cellspacing="1" cellpadding="1" bgcolor="#FFFFFF">
-<html:form action="/tool/nb/authoring" target="_self" >
-	<tr>
-		<td width="33%">
-			<html:submit property="method">
-				<fmt:message key="button.basic" />
-			</html:submit>
-		</td>
-		<td width="33%">
-			<html:submit property="method" disabled="true">
-				<fmt:message key="button.advanced" />
-			</html:submit>
-		</td>
-		<td width="33%">
-			<html:submit property="method">
-				<fmt:message key="button.instructions" />
-			</html:submit>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="3">
-			<hr />
-		</td>
-	</tr>
+<html:form action="/tool/nb/authoring" target="_self" enctype="multipart/form-data" >
+<div id="datatablecontainer">
+<table width="100%" align="center">
+<tr>
+	<td align="center">
+	<html:submit property="method" styleClass="button">
 	
-	<tr>
-		<td colspan="3"> 
-			<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
-				<tr>
-					<td colspan="2"><fmt:message key="instructions.onlineInstructions" /></td>
-				</tr>
-				<tr>
-					<td colspan="2">
-						<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/"
-							imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
-							linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-							height="300"
-						><c:out value="${NbAuthoringForm.onlineInstructions}" escapeXml="false"/>
-						</FCK:editor>
-					</td>
-				</tr>
-		<!--		<tr>
-					<td colspan="2">
-						<html:textarea property="onlineInstructions" rows="10" cols="55" />
-					</td>
-				</tr> -->
+				<fmt:message key="button.basic" />
+		</html:submit>
+	
+		<html:submit property="method" disabled="true" styleClass="button">
+			<fmt:message key="button.advanced" />
+		</html:submit>
+	
+		<html:submit property="method" styleClass="button">
+			<fmt:message key="button.instructions" />
+		</html:submit>
+	</td>
+</tr>
+</table>
+</div>
+
 						
-			<tr>
-					<td colspan="2"><fmt:message key="instructions.offlineInstructions" /></td>
+<div id="formtablecontainer">
+<table class="forms">
+	<tr>
+		<td>
+			<table width="65%" align="center">
+				<tr>
+					<td class="formlabel"><fmt:message key="instructions.onlineInstructions" /></td>
+					<td class="formcontrol">
+							<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/"
+								imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
+								linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
+								height="200"
+								width="85%">
+								<c:out value="${NbAuthoringForm.onlineInstructions}" escapeXml="false" />
+							</FCK:editor>
+					</td>
 				</tr>
 				
 				<tr>
-					<td colspan="2">
+					<td class="formlabel">
+						<fmt:message key="instructions.uploadOnlineInstr" />
+					</td>
+					<td class="formcontrol">
+					</td>						
+				</tr>
+				<tr>
+					<td class="formlabel"><fmt:message key="instructions.offlineInstructions" /></td>
+					<td class="formcontrol">
 						<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckEditor/"
-							imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
-							linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-							height="300"
-						><c:out value="${NbAuthoringForm.offlineInstructions}" escapeXml="false" />
+								imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
+								linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
+								width="85%"
+								height="200">
+							<c:out value="${NbAuthoringForm.offlineInstructions}" escapeXml="false" />
 						</FCK:editor>
 					</td>
-				</tr> 
-			<!--	<tr>
-					<td colspan="2"><html:textarea property="offlineInstructions" rows="10" cols="55" /></td>
-				</tr> -->
-				<html:hidden property="onlineInstructions" />
-				<html:hidden property="offlineInstructions" />
+				</tr>
 				<tr>
-					<td colspan="2" align="right"><html:submit property="method"><fmt:message key="button.done"/></html:submit>
+					<td class="formlabel">
+						<fmt:message key="instructions.uploadOfflineInstr" />
+					</td>
+					<td class="formcontrol">
+					</td>						
 				</tr>
 			</table>
 		</td>
 	</tr>
-	<html:hidden property="title" />
-	<html:hidden property="content" />
-</html:form>
 </table>
+</div>
+
+<div id="datatablecontainer">
+<table width="100%" align="center">
+<tr>
+	<td align="center"><html:submit property="method"><fmt:message key="button.done"/></html:submit>
+	</td>
+</tr>
+</table>
+</div>
+				<html:hidden property="onlineInstructions" />
+				<html:hidden property="offlineInstructions" />
+				
+</html:form>
