@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.tool.ToolDataAccessTestCase;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 
 
 /**
