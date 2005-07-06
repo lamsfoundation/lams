@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -40,19 +39,16 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
-
-import org.lamsfoundation.lams.lesson.Lesson;
-
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
-
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
-
-import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 /**
  * This class is a facade over the Learning middle tier.
@@ -407,6 +403,11 @@ public class LearnerService implements ILearnerService
             log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
     		throw new LearnerServiceException(e.getMessage());
         }
+        catch (ToolException e)
+        {
+            log.error("error occurred in 'createToolSessionFor':"+e.getMessage());
+    		throw new LearnerServiceException(e.getMessage());
+        }
     }
     
     /**
@@ -443,7 +444,7 @@ public class LearnerService implements ILearnerService
      * @param learner
      * @throws LamsToolServiceException
      */
-    private void createToolSessionFor(ToolActivity toolActivity,User learner,Lesson lesson) throws LamsToolServiceException
+    private void createToolSessionFor(ToolActivity toolActivity,User learner,Lesson lesson) throws LamsToolServiceException, ToolException
     {
         ToolSession toolSession = lamsCoreToolService.createToolSession(learner,toolActivity,lesson);
         
