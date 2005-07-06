@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry output="WEB-INF/classes" kind="src" path="src/java"/>
-	<classpathentry output="WEB-INF/classes" kind="src" path="test/java"/>
-	<classpathentry output="WEB-INF/classes" kind="src" path="web"/>
-	<classpathentry output="WEB-INF/classes" kind="src" path="conf/hibernate/mappings"/>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-workspace.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-authoring.jar"/>
@@ -11,5 +9,5 @@
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams_contentrepository.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
-	<classpathentry kind="output" path="WEB-INF/classes"/>
+	<classpathentry kind="output" path="build/classes"/>
 </classpath>
