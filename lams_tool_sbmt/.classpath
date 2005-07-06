@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/java"/>
-	<classpathentry kind="src" path="test/java"/>
-	<classpathentry kind="src" path="web"/>
-	<classpathentry kind="src" path="conf/hibernate/mappings"/>
+	<classpathentry output="WEB-INF/classes" kind="src" path="src/java"/>
+	<classpathentry output="WEB-INF/classes" kind="src" path="test/java"/>
+	<classpathentry output="WEB-INF/classes" kind="src" path="web"/>
+	<classpathentry output="WEB-INF/classes" kind="src" path="conf/hibernate/mappings"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
-	<classpathentry kind="lib" path="E:/lams_common/lib/j2ee/j2ee.jar"/>
-	<classpathentry sourcepath="D:/eclipse/workspace/lams_common/src/java" kind="lib" path="D:/eclipse/workspace/lams_build/lib/lams/lams.jar"/>
-	<classpathentry kind="lib" path="D:/eclipse/workspace/lams_build/lib/lams/lams_contentrepository.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-workspace.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-authoring.jar"/>
-	<classpathentry kind="output" path="classes"/>
+	<classpathentry kind="lib" path="/lams_build/lib/lams/lams.jar"/>
+	<classpathentry kind="lib" path="/lams_build/lib/lams/lams_contentrepository.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
+	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
+	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>
