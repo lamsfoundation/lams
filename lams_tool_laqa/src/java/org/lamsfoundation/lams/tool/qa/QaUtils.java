@@ -351,4 +351,32 @@ public abstract class QaUtils implements QaAppConstants {
 	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
 	}
 	
+	public static void persistRichText(HttpServletRequest request)
+	{
+		String richTextOfflineInstructions="";
+    	String richTextOnlineInstructions="";
+    	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+    	logger.debug("richTextOfflineInstructions from session: " + richTextOfflineInstructions);
+    	
+    	richTextOnlineInstructions = (String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+    	logger.debug("richTextOnlineInstructions from session: " + richTextOnlineInstructions);
+    	
+    	if ((richTextOfflineInstructions == null) || (richTextOfflineInstructions.equals("")))
+    	{
+    		richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
+    		logger.debug("read aparameter richTextOfflineInstructions: " + richTextOfflineInstructions);
+    	}
+		
+    	if ((richTextOnlineInstructions == null) || (richTextOnlineInstructions.equals("")))
+    	{
+    		richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
+    		logger.debug("read aparameter richTextOnlineInstructions: " + richTextOnlineInstructions);
+    	}
+	    
+	    logger.debug("final richTextOfflineInstructions: " + richTextOfflineInstructions);
+	    logger.debug("final richTextOnlineInstructions: " + richTextOnlineInstructions);
+	    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);
+	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);
+	}
+	   	
 }

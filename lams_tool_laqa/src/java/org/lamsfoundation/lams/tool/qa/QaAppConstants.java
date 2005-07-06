@@ -99,6 +99,8 @@ public interface QaAppConstants {
     public static final String IS_SYNCH_INMONITOR_MONITORING			="isSynchInMonitorMonitoring";
     public static final String IS_QUESTIONS_SEQUENCED_MONITORING		="isQuestionsSequencedMonitoring";
     public static final String USER_ID									="userId";
+    public static final String RICHTEXT_OFFLINEINSTRUCTIONS				="richTextOfflineInstructions";
+    public static final String RICHTEXT_ONLINEINSTRUCTIONS				="richTextOnlineInstructions";
     
     
     /**

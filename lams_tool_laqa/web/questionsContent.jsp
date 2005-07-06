@@ -3,6 +3,7 @@
 <%@ taglib uri="/WEB-INF/struts-logic-el.tld" prefix="logic-el" %>
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
 
 	<c:if test="${requestScope.userExceptionNumberFormat == 'true' || 
 			 	requestScope.userExceptionDefaultContentNotAvailable == 'true' || 

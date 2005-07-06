@@ -3,26 +3,39 @@
 <%@ taglib uri="/WEB-INF/struts-logic-el.tld" prefix="logic-el" %>
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
-
+<%@ taglib uri="fck-editor" prefix="FCK" %>
 
 		<tr> <td>
 			<table>
-          		<tr>
-          			<td>
+				<tr> 
+					<td>
           				<fmt:message key="label.offlineInstructions" />
           			</td>
-          			<td>
-          				<html:textarea property="offlineInstructions" rows="5" cols="50"/>
-          			</td>
-          		</tr>
-          		<tr>
+					<td> 
+					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckEditor/"
+					      imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
+					      linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
+						  height="300"
+						  width="100%">
+						  <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />						  
+					</FCK:editor>
+					</td> 
+				</tr>
+				
+          		<tr> 
           			<td>
           				<fmt:message key="label.onlineInstructions" />
           			</td>
-          			<td>
-          				<html:textarea property="onlineInstructions"  rows="5" cols="50"/>
-          			</td>
-          		</tr>	
+					<td> 
+					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/"
+					      imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
+					      linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
+						  height="300"
+						  width="100%">
+  						  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
+					</FCK:editor>
+					</td> 
+				</tr>
           		</table>	  	
 
 			  	<hr>

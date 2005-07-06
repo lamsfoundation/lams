@@ -269,7 +269,7 @@ public class AuthoringUtil implements QaAppConstants{
 	    Boolean renderMonitoringEditActivity=(Boolean)request.getSession().getAttribute(RENDER_MONITORING_EDITACTIVITY);
 		if ((renderMonitoringEditActivity != null) && (renderMonitoringEditActivity.booleanValue()))
 		{
-			logger.debug("getting booleans based on editActivity");
+			logger.debug("getting properties based on editActivity: All properties available from the http session.");
 			isQuestionsSequencedBoolean=(Boolean)request.getSession().getAttribute(IS_QUESTIONS_SEQUENCED_MONITORING);
 		    isSynchInMonitorBoolean=(Boolean)request.getSession().getAttribute(IS_SYNCH_INMONITOR_MONITORING);
 		    isUsernameVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE_MONITORING);
@@ -291,7 +291,7 @@ public class AuthoringUtil implements QaAppConstants{
 		}
 		else
 		{
-			logger.debug("getting booleans based on normal flow: ");
+			logger.debug("getting properties based on normal flow: Properties available from form and request parameters.");
 			logger.debug("isQuestionsSequenced: " +  qaAuthoringForm.getQuestionsSequenced());
 	    	if (qaAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
 	    		isQuestionsSequenced=true;
@@ -308,6 +308,12 @@ public class AuthoringUtil implements QaAppConstants{
 		    monitoringReportTitle=qaAuthoringForm.getMonitoringReportTitle();
 		    offlineInstructions=qaAuthoringForm.getOnlineInstructions();
 		    onlineInstructions=qaAuthoringForm.getOfflineInstructions();
+		    
+		    /**
+		     * read and persist rich text parameters
+		     */
+		    QaUtils.persistRichText(request);
+		 
 		    endLearningMessage=qaAuthoringForm.getEndLearningMessage();
 		}
 		creationDate=(String)request.getSession().getAttribute(CREATION_DATE);

@@ -170,8 +170,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 public class QAction extends DispatchAction implements QaAppConstants
 {
 	static Logger logger = Logger.getLogger(QAction.class.getName());
-
-	public static Integer READABLE_TOOL_SESSION_COUNT = new Integer(1);
 	
     /** 
      * <p>Struts dispatch method.</p> 
@@ -228,10 +226,19 @@ public class QAction extends DispatchAction implements QaAppConstants
     	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
     	
     	/**
+	     * read and persist rich text parameters
+	     */
+	    QaUtils.persistRichText(request);
+	    logger.debug("QAction: rich text set to session scope");
+	    
+    	/**
     	 * the status of define later is determined from the property inspector and 
     	 * by now, we know whether it is on or off
     	 * 
     	 * enable-disable tool html elements based on "define later" status
+    	 */
+    	/*
+    	 * double check QaUtils.getDefineLaterStatus()
     	 */
     	boolean defineLaterStatus=QaUtils.getDefineLaterStatus();
     	
@@ -296,6 +303,8 @@ public class QAction extends DispatchAction implements QaAppConstants
         else if (userAction.equalsIgnoreCase(SUBMIT_TAB_DONE))
         {
         	logger.debug("user is done with this tab.");
+        	QaUtils.persistRichText(request);
+    	    logger.debug("SUBMIT_TAB_DONE: rich text set to session scope");
         	qaAuthoringForm.resetUserAction();
         	return (mapping.findForward(LOAD_QUESTIONS));
         }/**submit questions contained in the Map*/
@@ -529,13 +538,12 @@ public class QAction extends DispatchAction implements QaAppConstants
                 logger.debug("simulating container behaviour by calling  " +
 							 "leaveToolSession() with toolSessionId: " +  toolSessionId + " and user: " + user);
                 
-                /**
-                 * mark the tool session as COMPLETE
-                 */
                 IQaService qaService =QaUtils.getToolService(request);
                 QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
                 qaSession.setSession_end_date(new Date(System.currentTimeMillis()));
-                
+                /**
+                 *  ?? mark the tool session as COMPLETE ??
+                 */
                 /*
                  * change the logic about completion status 
                  */
