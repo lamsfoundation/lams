@@ -44,7 +44,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
       <title><tiles:getAsString name="title"/></title>
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
-	  <link href="<%=pathToShare%>/learner.css" rel="stylesheet" type="text/css">
+	  <link href="/lams/css/aqua.css" rel="stylesheet" type="text/css">
 	  <script language="JavaScript" type="text/JavaScript">
 	        <!--
 	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
@@ -55,26 +55,23 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
     </head>
     
-    <body bgcolor="#9DC5EC" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" summary="This table is being used for layout purposes only">
-      <table width="95%" border="0" cellspacing="0" cellpadding="0" align="center">
+    <body summary="This table is being used for layout purposes only">
+      
         <!-- header -->
         <c:set var="pageheader" scope="session"><tiles:getAsString name="pageHeader"/></c:set>
-		<tr><td>
-		<tiles:insert attribute="header" />
-		</td></tr>
+		
+	
+		<h1>
+		<c:out value="${sessionScope.pageheader}"/>
+		</h1>
         <!-- end of header -->
         
         <!-- main content -->
-		<tr><td>
+		
         <tiles:insert attribute="content" />
-		</td></tr>
+	
         <!--end of main content-->
         
-        <!--footer-->
-		<tr><td>
-        <tiles:insert attribute="footer" />
-		</td></tr>
-        <!-- end of footer -->
-      </table>
+       
     </body>
 </html:html>
