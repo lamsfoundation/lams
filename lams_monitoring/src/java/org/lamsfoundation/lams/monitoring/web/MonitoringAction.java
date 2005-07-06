@@ -36,7 +36,7 @@ import org.apache.struts.action.ActionMapping;
 
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
-import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 

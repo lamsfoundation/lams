@@ -26,7 +26,7 @@ import java.util.List;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 

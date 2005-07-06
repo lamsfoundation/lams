@@ -22,9 +22,9 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -32,11 +32,10 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
-
-
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
@@ -53,8 +52,10 @@ import org.lamsfoundation.lams.lesson.dao.ILessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
-import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
@@ -71,8 +72,6 @@ import org.quartz.Trigger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 
 /**
  * <p>This is the major service facade for all monitoring functionalities. It is 
@@ -243,8 +242,27 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             Activity currentActivity = (Activity) i.next();
             if (currentActivity.isToolActivity())
             {
-                Long newContentId = lamsCoreToolService.notifyToolToCopyContent((ToolActivity) currentActivity);
-                ((ToolActivity) currentActivity).setToolContentId(newContentId);
+                try {
+                    Long newContentId = newContentId = lamsCoreToolService.notifyToolToCopyContent((ToolActivity) currentActivity);
+                    ((ToolActivity) currentActivity).setToolContentId(newContentId);
+
+                } catch (DataMissingException e) {
+                    String error = "Unable to initialise the lesson. Data is missing for activity "+currentActivity.getActivityUIID()
+                            +" in learning design "+learningDesignId
+                            +" default content may be missing for the tool. Error was "
+                            +e.getMessage();
+                    log.error(error,e);
+                    throw new MonitoringServiceException(error,e);
+                } catch (ToolException e) {
+                    String error = "Unable to initialise the lesson. Tool encountered an error copying the data is missing for activity "
+                            +currentActivity.getActivityUIID()
+                            +" in learning design "+learningDesignId
+                            +" default content may be missing for the tool. Error was "
+                            +e.getMessage();
+                    log.error(error,e);
+                    throw new MonitoringServiceException(error,e);
+                }
+
             }
         }
         authoringService.updateLearningDesign(copiedLearningDesign);
@@ -706,10 +724,20 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         }
         catch (LamsToolServiceException e)
         {
-            throw new MonitoringServiceException("Error occurred at " +
-                                         		"[initToolSessionFor]- Fail to call tool services",e);
-        }
-    }
+	        String error = "Unable to initialise tool session. Fail to call tool services. Error was "
+	             +e.getMessage();
+	         log.error(error,e);
+	         throw new MonitoringServiceException(error,e);
+		 }
+		 catch (ToolException e)
+		 {
+		     String error = "Unable to initialise tool session. Tool encountered an error. Error was "
+		         +e.getMessage();
+		     log.error(error,e);
+		     throw new MonitoringServiceException(error,e);
+		 }   
+     }
+    
 
     /**
      * Returns whether we should initialize tool session or not. Tool sessions
