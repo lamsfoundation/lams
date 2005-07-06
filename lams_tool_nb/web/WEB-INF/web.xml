@@ -79,10 +79,27 @@
 	    </init-param>
 	    <load-on-startup>2</load-on-startup>
     </servlet>
+ <servlet>
+		<servlet-name>Connector</servlet-name>
+		<servlet-class>com.fredck.FCKeditor.connector.ConnectorServlet</servlet-class>
+		<init-param>
+			<param-name>baseDir</param-name>
+			<param-value>/UserFiles/</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+</servlet>
 
   	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 	    <url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	    <servlet-name>Connector</servlet-name>
+	    <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 	</servlet-mapping>
 
    <session-config>
@@ -103,10 +120,12 @@
    <!ELEMENT error-page ((error-code | exception-type), location)>
    -->
 
-  <!--
-  To add taglibs by xml, create a file called taglibs.xml and place it
-  in your merge dir.
-  -->
+  <!-- Struts Tag Library Descriptors -->
+
+<taglib>
+    <taglib-uri>fck-editor</taglib-uri>
+    <taglib-location>/WEB-INF/fckEditor/tlds/FCKeditor.tld</taglib-location>
+</taglib>
 
    <!--
    To set up security settings for your web app, create a file named web-security.xml, put it in your project's mergedir.
