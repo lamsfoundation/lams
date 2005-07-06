@@ -59,4 +59,9 @@ public interface IFileDAO {
 	public String getFilePath(Long uuid, Long versionId) 
 						throws FileException;
 
+	/**
+	 * Is there a file on disk? Used to validate file nodes
+	 */
+	public boolean fileExists(Long uuid, Long versionId )
+						throws FileException;
 }

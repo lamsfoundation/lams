@@ -491,7 +491,6 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
             .append("node", node)
             .append("nodeVersion", nodeVersion)
             .append("newIStream", newIStream)
-            .append("ticket", ticket)
             .toString();
 	}
 	
@@ -538,7 +537,9 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 	 * <UL>
 	 * <LI>All nodes must have a node type and created date.
 	 * <LI>Root nodes must not have a file
-	 * <LI>File nodes must have a file, must have a MIMETYPE property
+	 * <LI>File nodes must have a file, must have a MIMETYPE property. Note:
+	 * we could just be doing a setProperty save, in which case the file
+	 * will already exist.
 	 * <LI>Package nodes must not have a file, must have a INITIALPATH property
 	 * @throws ValidationException if problems exist.
 	 */
@@ -560,8 +561,19 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 				errors = errors + "\nCreated datetimestamp is missing. ";
 			
 			if ( isNodeType(NodeType.FILENODE) ) {
-				if ( newIStream == null )
-					errors = errors + "\nNode is a file node but the file is missing. ";
+			    Long uuid = node.getNodeId();
+			    Long versionId = nodeVersion.getVersionId();
+			    try {
+				    // if it is a new node or a new version then it must have a file, otherwise check on disk.
+			        // version id will always be set. uuid isn't set until the record is written to the db,
+			        // but don't want to rely on that if we can help it in case it changes in future.
+					if ( newIStream == null &&
+					     ( uuid == null || !fileDAO.fileExists(uuid, versionId)) )
+						errors = errors + "\nNode is a file node but the file is missing. ";
+			    } catch (FileException fe){
+			        errors = "Unable to validation node due to file exception: "+fe.getMessage();
+			        log.error("File exception occured while validating node "+this.toString(), fe);
+			    }
 				if ( ! hasProperty(PropertyName.FILENAME) )
 					errors = errors + "\nNode is a file node but the filename is unknown";
 			} else {
@@ -579,7 +591,9 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		}
 	}
 	
-	/** Save the changes to this node.
+	/** Save the changes to this node. This method must be called when saving a file
+	 * or package node for the first time - it does both the database and the file 
+	 * saves.
 	 * 
 	 * If it is a file node, then it writes out the db changes and then saves 
 	 * the file.

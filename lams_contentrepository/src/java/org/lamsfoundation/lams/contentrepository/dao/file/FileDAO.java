@@ -222,6 +222,16 @@ public class FileDAO implements IFileDAO {
 	}
 
 	/**
+	 * Is there a file on disk? Used to validate file nodes
+	 */
+	public boolean fileExists(Long uuid, Long versionId )
+						throws FileException {
+	    File file = new File( getFilePath(uuid, versionId));
+	    return ( file.exists() );	    
+	}
+
+	/* ***************** Getters and setters for Spring  *****************/
+	/**
 	 * @return Returns the repositoryLocation.
 	 */
 	public String getRepositoryLocation() {

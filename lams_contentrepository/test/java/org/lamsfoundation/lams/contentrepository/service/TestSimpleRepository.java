@@ -243,12 +243,13 @@ public class TestSimpleRepository extends BaseTestCase {
 			deleteVersion(keys.getUuid(), one);
 			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
 			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 0);
+			
         } catch (FileNotFoundException e) {
             fail("Unexpected exception "+e.getMessage());
         }
 	}
 	
-	/** create a node with two versions and test deleting them using delete node */
+	/** create a node with two versions and test deleting them using delete node. ALso tests set property */
 	public void testFileItemDeleteNode() {
 
 		IFileDAO fileDAO = (FileDAO)context.getBean("fileDAO", FileDAO.class);
@@ -259,6 +260,8 @@ public class TestSimpleRepository extends BaseTestCase {
 			testAddFileItem(CRResources.getZipFile(), CRResources.zipFileName,keys.getUuid(),two);
 			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
 		
+			testSetPropertyFile(keys);
+
 			deleteNode(keys.getUuid());
 			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
 			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 0);
@@ -469,7 +472,7 @@ public class TestSimpleRepository extends BaseTestCase {
 	public void testPackageItem() {
 		NodeKey keys = testPackageItem(null);
 		testPackageItem(keys.getUuid());
-		testSetProperty(keys);
+		testSetPropertyPackage(keys);
 	}
 
 	private NodeKey testPackageItem(Long uuid) {
@@ -543,8 +546,8 @@ public class TestSimpleRepository extends BaseTestCase {
 		return keys;
 	}
 
-	private void testSetProperty(NodeKey keys) {
-	    String propertyName = "CUSTOM";
+	private void testSetPropertyPackage(NodeKey keys) {
+	    String propertyName = "CUSTOMA";
 	    Boolean value = Boolean.TRUE;
 	    
 		List nodes;
@@ -573,6 +576,27 @@ public class TestSimpleRepository extends BaseTestCase {
 			} else {
 			    fail("No nodes found for package "+keys);
 			}
+        } catch (RepositoryCheckedException e) {
+			failUnexpectedException("testSetProperty",e);
+        }
+
+	}
+
+	private void testSetPropertyFile(NodeKey keys) {
+	    String propertyName = "CUSTOMB";
+	    String value = "avalue";
+	    
+        try {
+            IVersionedNode node = repository.getFileItem(ticket, keys.getUuid(), keys.getVersion());
+            assertTrue("File node found (A)", node != null && node.isNodeType(NodeType.FILENODE));
+            repository.setProperty(ticket, keys.getUuid(), keys.getVersion(), propertyName, value, PropertyType.BOOLEAN); 			
+			
+			// now, is the property set?
+            node = repository.getFileItem(ticket, keys.getUuid(), keys.getVersion());
+            assertTrue("File node found (A)", node != null && node.isNodeType(NodeType.FILENODE));
+			IValue newValue = node.getProperty(propertyName);
+			assertEquals("newValue "+newValue+" equals "+value, value, newValue.getString());
+			
         } catch (RepositoryCheckedException e) {
 			failUnexpectedException("testSetProperty",e);
         }
