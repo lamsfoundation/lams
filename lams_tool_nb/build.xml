@@ -256,6 +256,7 @@ Ant build file.
 
 			<table name="tl_lanb11_content" />
 	      	<table name="tl_lanb11_session" />
+	      	<table name="tl_lanb11_user" />
 	      </middlegen>
 
 	   </target>

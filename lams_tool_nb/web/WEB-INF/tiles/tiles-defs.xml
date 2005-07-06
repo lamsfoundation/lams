@@ -44,14 +44,24 @@
 		<put name="pageHeader" value = "Noticeboard"/>
 		<put name="content" value="/nbInstructions.jsp" />	
 	</definition>
-	
-	
-	
+
+<!-- ============= Noticeboard Learner Page Definitions ====================== -->	
+	<definition name=".learnerContent" extends=".baseDef" >
+		<put name="title" value="Noticeboard"/>
+		<put name="pageHeader" value = "Noticeboard"/>
+		<put name="content" value="/learnerContent.jsp" />	
+	</definition>
 	
 <!-- ============= Noticeboard Authoring Starter Page Definitions ====================== -->	
-	<definition name=".starter" extends=".baseDef" >
+	<definition name=".authoringStarter" extends=".baseDef" >
 		<put name="title" value="Starter for Noticeboard"/>
 		<put name="pageHeader" value = "Starter for Noticeboard"/>
-		<put name="content" value="/index.jsp" />	
+		<put name="content" value="/authoringIndex.jsp" />	
+	</definition>
+	
+	<definition name=".learnerStarter" extends=".baseDef" >
+		<put name="title" value="Starter for Noticeboard"/>
+		<put name="pageHeader" value = "Starter for Noticeboard"/>
+		<put name="content" value="/learnerIndex.jsp" />	
 	</definition>
 </tiles-definitions>

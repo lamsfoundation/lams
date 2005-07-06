@@ -14,6 +14,10 @@
   <form-beans>
 
     <form-bean
+      name="NbLearnerForm"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerForm"
+    />
+    <form-bean
       name="NbAuthoringForm"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringForm"
     />
@@ -39,11 +43,26 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
+      path="/tool/nb/starter/learner"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
+      name="NbLearnerForm"
+      scope="session"
+      input=".learnerStarter"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayLearnerContent"
+        path=".learnerContent"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/tool/nb/starter/authoring"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringStarterAction"
       name="NbAuthoringForm"
       scope="session"
-      input="/index.jsp"
+      input=".authoringStarter"
       unknown="false"
       validate="false"
     >
@@ -81,6 +100,22 @@
       <forward
         name="instructions"
         path=".nb_instructions"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/tool/nb/learner"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
+      name="NbLearnerForm"
+      scope="session"
+      input=".learnerContent"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayLearnerContent"
+        path=".learnerContent"
         redirect="false"
       />
     </action>
