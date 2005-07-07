@@ -1,12 +1,6 @@
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
-/**
- * Created by IntelliJ IDEA.
- * User: conradb
- * Date: 7/07/2005
- * Time: 16:44:50
- * To change this template use File | Settings | File Templates.
- */ import org.apache.struts.action.Action;
+import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionForm;
@@ -16,14 +10,10 @@ import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.web.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
+import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.permissions.Permission;
-import org.lamsfoundation.lams.tool.forum.permissions.PermissionManagerImpl;
 import org.lamsfoundation.lams.tool.forum.permissions.PermissionManager;
-import org.lamsfoundation.lams.tool.forum.actions.*;
-import org.lamsfoundation.lams.tool.forum.web.ForumForm;
-import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
