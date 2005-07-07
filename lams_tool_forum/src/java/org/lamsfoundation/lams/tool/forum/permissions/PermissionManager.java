@@ -9,6 +9,6 @@ package org.lamsfoundation.lams.tool.forum.permissions;
  */
 public interface PermissionManager {
 
-   public boolean hasPermission(Long userID, byte permission);
+   public boolean hasPermission(Long userID, String permission);
 
 }

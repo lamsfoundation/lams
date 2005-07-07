@@ -8,8 +8,8 @@ package org.lamsfoundation.lams.tool.forum.permissions;
  * To change this template use File | Settings | File Templates.
  */
 public class Permission {
-    public static byte READ = 1;
-    public static byte WRITE = 2;
-    public static byte MODERATE = 3;
-    public static byte ALL = 4;
+    public final static String READ = "READ";
+    public final static String WRITE = "WRITE";
+    public final static String MODERATE = "MODERATE";
+    public final static String ALL = "ALL";
 }

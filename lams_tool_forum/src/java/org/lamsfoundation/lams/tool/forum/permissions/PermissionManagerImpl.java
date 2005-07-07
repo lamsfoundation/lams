@@ -13,7 +13,9 @@ public class PermissionManagerImpl implements PermissionManager {
     * TODO for now return true
     *
    */
-    public boolean hasPermission(Long userID, byte permission) {
+    public boolean hasPermission(Long userID, String permission) {
         return true;
     }
+
+
 }
