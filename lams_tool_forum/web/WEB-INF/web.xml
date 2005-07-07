@@ -44,6 +44,7 @@
 		<session-timeout>20</session-timeout>    <!-- 20 minutes -->
 	</session-config>
 
+    <!--
     <servlet>
             <servlet-name>Connector</servlet-name>
             <servlet-class>com.fredck.FCKeditor.connector.ConnectorServlet</servlet-class>
@@ -64,7 +65,7 @@
           <servlet-name>Connector</servlet-name>
           <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
     </servlet-mapping>
-
+    -->
 
   <!-- The Usual Welcome File List -->
   <welcome-file-list>
@@ -89,25 +90,10 @@
     <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
   </taglib>
 
-   <taglib>
-        <taglib-uri>displaytag</taglib-uri>
-        <taglib-location>/WEB-INF/displaytag.tld</taglib-location>
-   </taglib>
-
-    <taglib>
-        <taglib-uri>jmage</taglib-uri>
-        <taglib-location>/WEB-INF/jmage.tld</taglib-location>
-    </taglib>
-
     <taglib>
         <taglib-uri>forum</taglib-uri>
         <taglib-location>/WEB-INF/forum.tld</taglib-location>
     </taglib>
-
-    <taglib>
-         <taglib-uri>fck-editor</taglib-uri>
-         <taglib-location>/WEB-INF/FCKeditor.tld</taglib-location>
-     </taglib>
 
   <!-- Struts Tag Library Descriptors -->
   <taglib>
