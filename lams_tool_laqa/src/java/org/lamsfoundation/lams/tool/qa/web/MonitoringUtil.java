@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -85,7 +86,7 @@ public class MonitoringUtil implements QaAppConstants{
 	}
 
 	
-	public void startLesson(QaMonitoringForm qaMonitoringForm, HttpServletRequest request)
+	public void startLesson(QaMonitoringForm qaMonitoringForm, HttpServletRequest request) throws ToolException
 	{
 		IQaService qaService=QaUtils.getToolService(request);
 		
@@ -113,7 +114,16 @@ public class MonitoringUtil implements QaAppConstants{
 	    	throw new QaApplicationException("Exception occured: " +
 	    			"Tool expects a legitimate TO_TOOL_CONTENT_ID from the container. Can't continue!");
 	    }
-		qaService.copyToolContent(new Long(strFromToolContentId), new Long(strToToolContentId));
+	    
+	    try
+		{
+	    	qaService.copyToolContent(new Long(strFromToolContentId), new Long(strToToolContentId));	
+	    }
+	    catch(ToolException e)
+		{
+	    	logger.debug("exception copying content.");
+	    	throw e;
+		}
 		
 		/** calls to these two methods will be made from Monitoring Service bean optionally depending on
 		 *  the the tool is setup for DefineLater and (or) RunOffline 

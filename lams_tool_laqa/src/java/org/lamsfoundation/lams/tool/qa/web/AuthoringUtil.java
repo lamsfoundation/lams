@@ -19,6 +19,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -32,7 +34,7 @@ import org.lamsfoundation.lams.tool.qa.service.IQaService;
  * @author Ozgur Demirtas
  *
  */
-public class AuthoringUtil implements QaAppConstants{
+public class AuthoringUtil implements QaAppConstants {
 	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
 	
     /**
@@ -159,7 +161,7 @@ public class AuthoringUtil implements QaAppConstants{
     protected void findSelectedTab(ActionMapping mapping,
 					            ActionForm form,
 					            HttpServletRequest request,
-					            HttpServletResponse response)
+					            HttpServletResponse response) 
     {
     	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
     	String choiceBasic=qaAuthoringForm.getChoiceBasic();
@@ -217,7 +219,18 @@ public class AuthoringUtil implements QaAppConstants{
 	    	IQaService qaService =QaUtils.getToolService(request);
 	    	Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
 		    logger.debug("MONITORED_CONTENT_ID: " + monitoredContentId);
-		    qaService.setAsDefineLater(monitoredContentId);
+		    
+		    try
+			{
+		    	qaService.setAsDefineLater(monitoredContentId);
+			}
+		    catch (ToolException e)
+			{
+		    	logger.debug("We should never come here.");
+		    	logger.debug("Warning! ToolException occurred");
+			}
+			
+		    
 		    logger.debug("MONITORED_CONTENT_ID has been marked as defineLater: ");
 			request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
 		}
@@ -452,7 +465,15 @@ public class AuthoringUtil implements QaAppConstants{
     	if ((toolContentId != null) && (!toolContentId.equals("")))
     	{
     		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
-    		qaService.setAsRunOffline(new Long(toolContentId));
+    		try
+			{
+    			qaService.setAsRunOffline(new Long(toolContentId));	
+			}
+    		catch(ToolException e)
+			{
+    			logger.debug("we should never come here");
+			}
+    		
     		logger.debug("post-RunAsOffline");
 		}
     	logger.debug("end of simulating RunOffline on content id: " + toolContentId);
@@ -471,7 +492,15 @@ public class AuthoringUtil implements QaAppConstants{
     	if ((toolContentId != null) && (!toolContentId.equals("")))
     	{
     		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
-    		qaService.setAsDefineLater(new Long(toolContentId));
+    		try
+			{
+    			qaService.setAsDefineLater(new Long(toolContentId));	
+    		}
+    		catch(ToolException e)
+			{
+    			logger.debug("we should never come here");
+			}
+    		
     		logger.debug("post-setAsDefineLater");
 		}
     	logger.debug("end of simulating setAsDefineLater on content id: " + toolContentId);

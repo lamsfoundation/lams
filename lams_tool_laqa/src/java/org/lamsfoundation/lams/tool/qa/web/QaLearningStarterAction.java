@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
@@ -220,8 +221,16 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 				Long currentToolContentId= new Long(1234);
 				logger.debug("simulating container behaviour: calling createToolSession with toolSessionId : " + 
 						new Long(toolSessionId) + " and toolContentId: " + currentToolContentId);
-				qaService.createToolSession(new Long(toolSessionId), currentToolContentId);
-				logger.debug("simulated container behaviour."); 
+				try
+				{
+					qaService.createToolSession(new Long(toolSessionId), currentToolContentId);
+					logger.debug("simulated container behaviour.");
+				}
+				catch(ToolException e)
+				{
+					logger.debug("we should never come here.");
+				}
+				 
 		}
 		
 		/**

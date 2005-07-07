@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -53,7 +54,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	static Logger logger = Logger.getLogger(QaMonitoringStarterAction.class.getName());
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-  								throws IOException, ServletException, QaApplicationException 
+  								throws IOException, ServletException, QaApplicationException, ToolException 
 	{
 		QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
     	
@@ -278,7 +279,15 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    	    
 	    		strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
 	    	    logger.debug("TO_TOOL_CONTENT_ID: " + strToToolContentId);
-	    		qaService.copyToolContent(new Long(strFromToolContentId), new Long(strToToolContentId));
+	    	    try
+				{
+	    	    	qaService.copyToolContent(new Long(strFromToolContentId), new Long(strToToolContentId));	
+				}
+	    		catch(ToolException e)
+				{
+			    	logger.debug("exception copying content.");
+			    	throw e;
+				}
 	    		logger.debug("test successfull: copyToolContent.");
 		    	
 		    	/** calls to these two methods will be made from Monitoring Service bean optionally depending on

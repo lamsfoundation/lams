@@ -23,6 +23,9 @@ package org.lamsfoundation.lams.tool.qa.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.BasicToolVO;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
@@ -83,7 +86,7 @@ public interface IQaService
      */
 	public QaSession retrieveQaSession(long qaSessionId);
 	
-	public QaSession retrieveQaSessionOrNullById(long qaSessionId);
+	public QaSession retrieveQaSessionOrNullById(long qaSessionId) throws QaApplicationException;
 		
 	public void createQaSession(QaSession qaSession);
 	
@@ -104,6 +107,8 @@ public interface IQaService
 	public void createQa(QaContent qa);
 	
 	public void deleteQa(QaContent qa);
+    
+	public void deleteQaSession(QaSession QaSession) throws QaApplicationException;
 	
 	public void deleteUsrRespByQueId(Long qaQueId);
 	
@@ -124,13 +129,13 @@ public interface IQaService
      * @param fromContentId
      * @param toContentId
      */
-    public void copyToolContent(Long fromContentId, Long toContentId);
+    public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
     
-    public void setAsDefineLater(Long toolContentId);
+    public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException;
     
     public void unsetAsDefineLater(Long toolContentId);
     
-    public void setAsRunOffline(Long toolContentId);
+    public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException;
     
     /**
      * TO BE DEFINED AS PART OF MAIN TOOL API
@@ -168,7 +173,7 @@ public interface IQaService
      * @param toolSessionId
      * @param toolContentId
      */
-    public void createToolSession(Long toolSessionId, Long toolContentId);
+    public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException;
     
     /**
      * leaveToolSession(Long toolSessionId, User learner) should ideally should not be part this interface as it is
@@ -179,7 +184,7 @@ public interface IQaService
      * @param toolSessionId
      * @param toolContentId
      */
-    public String leaveToolSession(Long toolSessionId, User learner);
+    public String leaveToolSession(Long toolSessionId,User learner) throws DataMissingException, ToolException;
     
     public BasicToolVO getToolBySignature(String toolSignature);
     
