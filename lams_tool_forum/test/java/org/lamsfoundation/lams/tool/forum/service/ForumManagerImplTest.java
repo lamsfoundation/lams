@@ -28,8 +28,6 @@ public class ForumManagerImplTest extends TestCase {
     public void testCreateAndDeleteForum() throws PersistenceException {
         Map attachments = new HashMap();
         Attachment attachment = new Attachment();
-        attachment.setName("test");
-        attachment.setType(Attachment.TYPE_ONLINE);
         attachments.put("test file", attachment);
 
         Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), attachments, null);
@@ -45,9 +43,6 @@ public class ForumManagerImplTest extends TestCase {
         assertEquals(reloadedForum.getOfflineInstructions(), "TEST OFFLINEINSTRUCTIONS");
         Set reloadedAttachments = reloadedForum.getAttachments();
         Attachment reloadedAttachment = (Attachment) (reloadedAttachments.toArray(new Attachment[0]))[0];
-        assertEquals(reloadedAttachment.getType(), attachment.getType());
-        assertEquals(new String(reloadedAttachment.getName()), new String(attachment.getName()));
-
         assertTrue("Forum should contains attachment", reloadedAttachments.contains(attachment));
 
         forumManager.deleteForum(forum.getId());
