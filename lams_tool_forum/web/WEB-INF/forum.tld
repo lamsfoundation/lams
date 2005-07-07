@@ -23,7 +23,7 @@
 
 	<tag>
     <name>messagemap</name>
-    <tagclass>org.lamsfoundation.lams.tool.forum.util.MessageMapTag</tagclass>
+    <tagclass>org.lamsfoundation.lams.tool.forum.web.util.MessageMapTag</tagclass>
     <bodycontent>empty</bodycontent>
     <info>
 		Generate a messagemap
