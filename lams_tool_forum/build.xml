@@ -298,14 +298,15 @@
 	    />
 		<webdoclet destdir="${web.dir}/WEB-INF">
 	        <fileset dir="${web.src.dir}" />
-			<strutsconfigxml validatexml="true" version="1.1" mergeDir="${web.dir}/struts/config"  />
+			<strutsconfigxml validatexml="true" version="1.1" mergeDir="${web.dir}/WEB-INF/struts/config"  />
 			<!-- <jsptaglib shortname="spirit taglibs" filename="spirit.tld" /> -->
 		</webdoclet>
         <copy todir="${web.dir}/WEB-INF">
-			<fileset dir="${web.dir}/struts" includes="*.xml"/>
+			<fileset dir="${web.dir}/WEB-INF/struts" includes="*.xml"/>
 		</copy>
 	</target>
 
+    <!--
     <target name="webcompile"  description="compiles web src" depends="jar">
      	<copy todir="${web.lib.dir}">
 			<fileset dir="${build.dir}" includes="*.jar"/>
@@ -317,8 +318,9 @@
             classpathref="web.class.path"
             destdir="${web.classes.dir}"/>
     </target>
+    -->
 
-	<target name="copyweb" description="Copy " depends="web, webcompile">
+	<target name="copyweb" description="Copy " depends="web">
 
         <mkdir dir="${deploy.dir}/WEB-INF" />
 		<copy todir="${deploy.dir}/WEB-INF">
@@ -335,7 +337,6 @@
 		<copy todir="${deploy.dir}/WEB-INF/classes">
               <fileset dir="${web.classes.dir}" includes="**/*.class"/>
               <fileset dir="${web.src.dir}" includes="log4j.properties"/>
-              <fileset dir="${web.dir}/struts" includes="*.tld,*.xml"/>
         </copy>
 
         <mkdir dir="${deploy.dir}/includes" />
