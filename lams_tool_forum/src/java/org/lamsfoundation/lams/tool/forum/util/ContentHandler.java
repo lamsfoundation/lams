@@ -18,9 +18,9 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class ContentHandler {
-  private String repositoryWorkspaceName = "forumworkspace";
-  private String repositoryUser = "forum";
-  private char[] repositoryId = {'l','a','m','s','-','f','o','r','u','m'};
+  private static String repositoryWorkspaceName = "forumworkspace";
+  private static String repositoryUser = "forum";
+  private static char[] repositoryId = {'l','a','m','s','-','f','o','r','u','m'};
   private static IRepositoryService repService;
   private static ICredentials cred;
   private static ITicket ticket;
@@ -28,23 +28,16 @@ public class ContentHandler {
 
   private static Logger log = Logger.getLogger(ContentHandler.class.getName());
 
-  private ContentHandler() throws Exception {
-    this.configureContentRepository();
-    this.getTicket();
+  static {
+      try {
+        configureContentRepository();
+        getTicket();
+      } catch (Exception e) {
+          log.error("could not initialize contenthandler");
+      }
   }
 
-  public static ContentHandler getInstance() {
-    try {
-        if (contentHandler == null) {
-            contentHandler = new ContentHandler();
-        }
-    } catch (Exception e) {
-        log.error("could not initialize contenthandler");
-    }
-      return contentHandler;
-  }
-
-   private void configureContentRepository() throws Exception {
+   private static void configureContentRepository() throws Exception {
       repService = RepositoryProxy.getLocalRepositoryService();
       cred = new SimpleCredentials(repositoryUser, repositoryId);
         try {
@@ -61,7 +54,7 @@ public class ContentHandler {
         }
     }
 
-    private ITicket getTicket( ) throws Exception {
+    private static ITicket getTicket( ) throws Exception {
 	    //repService = RepositoryProxy.getLocalRepositoryService();
 		ICredentials credentials = new SimpleCredentials(repositoryUser, repositoryId);
 		try {
@@ -80,14 +73,18 @@ public class ContentHandler {
 
     public static NodeKey uploadFile(InputStream stream, String fileName, String mimeType) throws Exception {
 	    return repService.addFileItem(ticket, stream, fileName, mimeType, null);
+
     }
+
+    public static void setProperty(Long uuid, Long version, String propertyName, String val) throws Exception {
+        repService.setProperty(ticket, uuid, version, propertyName, val, PropertyType.STRING);
+	}
 
     public static void deleteFile(Long id) throws Exception {
          repService.deleteNode(ticket, id);
     }
 
     public static File getFile(String name, Long uuid) throws Exception, FileException, ItemNotFoundException {
-        //IVersionedNode node = repService.getFileItem(this.ticket, uuid, new Long("0"));
         IVersionedNode node = repService.getFileItem(ticket, uuid, null);
         return FileUtils.getFile(name, node.getFile());
     }

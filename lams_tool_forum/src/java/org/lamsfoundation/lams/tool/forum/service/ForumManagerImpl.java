@@ -5,6 +5,8 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceDelegate;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
+import org.lamsfoundation.lams.tool.forum.util.ContentHandler;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
 
 import java.util.*;
 
@@ -102,6 +104,7 @@ public class ForumManagerImpl implements ForumManager {
     public void deleteForumAttachment(Long attachmentId) throws PersistenceException {
         Attachment attachment = (Attachment) this.persistenceDelegate.getById(Attachment.class, attachmentId);
         persistenceDelegate.delete(attachment);
+
     }
 
     public Message createMessage(Long forumId, Message message) throws PersistenceException {
@@ -114,6 +117,7 @@ public class ForumManagerImpl implements ForumManager {
         Message reloaded = this.getMessage(message.getId());
         reloaded.setModifiedBy(message.getModifiedBy());
         reloaded.setIsAnnonymous(message.getIsAnnonymous());
+        reloaded.setIsAuthored(message.getIsAuthored());
         reloaded.setSubject(message.getSubject());
         reloaded.setBody(message.getBody());
         persistenceDelegate.saveOrUpdate(message);
