@@ -36,20 +36,13 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
 
-    <attribute>
-	  <!-- If true, an ordered list will be generated.
-		-->
-      <name>ordered</name>
-      <required>false</required>
-      <rtexprvalue>true</rtexprvalue>
-    </attribute>
 
 
     <attribute>
 	  <!-- The action path
 		-->
       <name>path</name>
-      <required>false</required>
+      <required>true</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>
 
@@ -61,6 +54,17 @@
       <required>true</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>
-	</tag>
+
+
+    <attribute>
+	  <!-- If topicId. The root of all Messages
+		-->
+      <name>mode</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+
+    </tag>
 
 </taglib>
