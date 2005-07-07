@@ -29,7 +29,7 @@
                         <logic:iterate name="forumTopics" id="topic">
                         <tr>
                          	<td valign="MIDDLE"><bean:write name="topic" property="subject"/></td>
-                            <td colspan="2" valign="MIDDLE"><html:link page="/learning/message/open.do"  paramId="topicId" paramName="topic" paramProperty="id" styleClass="nav"><b><bean:message key="label.open"/></b></html:link></td>
+                            <td colspan="2" valign="MIDDLE"><html:link page="/learning/message/openTopic.do"  paramId="topicId" paramName="topic" paramProperty="id" styleClass="nav"><b><bean:message key="label.open"/></b></html:link></td>
                         </tr>
                         </logic:iterate>
                           </table>

@@ -11,6 +11,7 @@ import org.lamsfoundation.lams.tool.forum.service.ForumManager;
 import org.lamsfoundation.lams.tool.forum.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.forms.MessageForm;
 import org.lamsfoundation.lams.tool.forum.util.ContentHandler;
+import org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -104,7 +105,6 @@ public class ForumAction extends Action {
             throws IOException, ServletException, Exception {
         ForumForm forumForm = (ForumForm) form;
         Forum forum = forumForm.getForum();
-
         Map topics = (Map) request.getSession().getAttribute("topics");
         this.forumManager.editForum(forum, forumForm.getAttachments(), topics);
         return mapping.findForward("success");
@@ -132,6 +132,30 @@ public class ForumAction extends Action {
 
         request.getSession().setAttribute("topics", topics);
         request.getSession().setAttribute("topicList", topicList);
+
+        List attachmentList = new ArrayList();
+        Collection entries = forum.getAttachments();
+        it = entries.iterator();
+        while (it.hasNext()) {
+            Attachment attachment = (Attachment) it.next();
+            ContentHandler handler = new ContentHandler();
+            Set properties = handler.getFileProperties(attachment.getUuid());
+            Iterator propIt = properties.iterator();
+            while (propIt.hasNext()) {
+                CrNodeVersionProperty property = (CrNodeVersionProperty) propIt.next();
+                if ("FILENAME".equals(property.getName())) {
+                    attachment.setName(property.getValue());
+                }
+                if ("TYPE".equals(property.getName())) {
+                    attachment.setType(property.getValue());
+                }
+                if ("MIMETYPE".equals(property.getName())) {
+                    attachment.setContentType(property.getValue());
+                }
+            }
+            attachmentList.add(attachment);
+        }
+        request.getSession().setAttribute("attachmentList", attachmentList);
         return mapping.findForward("success");
   }
 
@@ -178,13 +202,12 @@ public class ForumAction extends Action {
         ActionForward forward = new ActionForward();
 		forward.setPath(mapping.getInput());
         String fileName = (String) request.getParameter("fileName");
+        String type = (String) request.getParameter("type");
         ForumForm forumForm = (ForumForm) form;
         Map attachments = forumForm.getAttachments();
-        Attachment attachment = (Attachment) attachments.remove(fileName);
-        ContentHandler handler = ContentHandler.getInstance();
-        //File file = ContentHandler.getFile(attachment.getName(), attachment.getUuid());
+        Attachment attachment = (Attachment) attachments.remove(fileName + "-" + type);
         ContentHandler.deleteFile(attachment.getUuid());
-        if (attachment.getId() !=null) {
+        if (attachment.getId() != null) {
             this.forumManager.deleteForumAttachment(attachment.getId());
         }
         List attachmentList = new ArrayList(attachments.values());

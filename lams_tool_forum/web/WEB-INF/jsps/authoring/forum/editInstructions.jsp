@@ -39,8 +39,9 @@
                         <tr>
                          	<td valign="MIDDLE"><bean:write name="attachment" property="name"/></td>
                          	<td valign="MIDDLE"><bean:write name="attachment" property="type"/></td>
-                            <td colspan="2" valign="MIDDLE"><html:link page="/authoring/forum/edit/deleteAttachment.do"  paramId="fileName" paramName="attachment" paramProperty="name" styleClass="nav"><b><bean:message key="label.delete"/></b></html:link></td>
-                        </tr>
+                            <bean:define id="type" name="attachment" property="type" />
+                            <bean:define id="fileName" name="attachment" property="name" />
+                            <td colspan="2" valign="MIDDLE"><a href="/forum/authoring/forum/deleteAttachment.do?type=<%= type %>&fileName=<%= fileName %>"><b><bean:message key="label.delete"/></b></a></td>  
                         </logic:iterate>
                           </table>
                      </div>

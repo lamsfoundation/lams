@@ -12,6 +12,9 @@ import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.forms.MessageForm;
+import org.lamsfoundation.lams.tool.forum.permissions.Permission;
+import org.lamsfoundation.lams.tool.forum.permissions.PermissionManagerImpl;
+import org.lamsfoundation.lams.tool.forum.permissions.PermissionManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,15 +32,14 @@ import java.util.List;
 public class LearningAction extends Action {
   private static Logger log = Logger.getLogger(LearningAction.class.getName());
   private ForumManager forumManager;
+  private PermissionManager permissionManager;
 
-  public void setForumManager(ForumManager forumManager) {
-      this.forumManager = forumManager;
-  }
 
   public LearningAction() {
        this.forumManager = (ForumManager) GenericObjectFactoryImpl.getInstance().lookup("forumManager");
-      //GenericObjectFactoryImpl.getInstance().configure(this);
+       this.permissionManager = (PermissionManager) GenericObjectFactoryImpl.getInstance().lookup("permissionManager");
   }
+
    public final ActionForward execute(ActionMapping mapping, ActionForm form,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
   		String param = mapping.getParameter();
@@ -47,7 +49,10 @@ public class LearningAction extends Action {
 	  	if (param.equals("editMessage")) {
        		return editMessage(mapping, form, request, response);
         }
-		if (param.equals("openMessage")) {
+		if (param.equals("openTopic")) {
+       		return getTopic(mapping, form, request, response);
+        }
+       	if (param.equals("getMessage")) {
        		return getMessage(mapping, form, request, response);
         }
         if (param.equals("deleteMessage")) {
@@ -100,7 +105,8 @@ public class LearningAction extends Action {
                  throws IOException, ServletException, PersistenceException {
        MessageForm messageForm = (MessageForm) form;
        Message message = messageForm.getMessage();
-       this.forumManager.editMessage(message);
+       message = this.forumManager.editMessage(message);
+       request.setAttribute("topicId", messageForm.getTopicId());
        return mapping.findForward("success");
      }
 
@@ -129,23 +135,43 @@ public class LearningAction extends Action {
          return mapping.findForward("success");
      }
 
+     public ActionForward getTopic(ActionMapping mapping,
+                                               ActionForm form,
+                                               HttpServletRequest request,
+                                               HttpServletResponse response)
+           throws IOException, ServletException, Exception {
+       Long topicId = new Long((String) request.getParameter("topicId"));
+       Message message = forumManager.getMessage(topicId);
+       request.setAttribute("message", message);
+       Long userId = null;
+       try {
+           userId = new Long((String) request.getParameter("userId"));
+       } catch (Exception e) {
+           //will always be null for now as we are handling tool independently from user for now later we have to get
+           //the current logged used from the session
+       }
+       boolean moderate = permissionManager.hasPermission(userId, Permission.MODERATE);
+       String permissionType = Permission.WRITE;
+       if (moderate) {
+           permissionType = Permission.MODERATE;
+       }
+       request.setAttribute("permission", permissionType);
+       return mapping.findForward("success");
+    }
+
     public ActionForward getMessage(ActionMapping mapping,
                                                ActionForm form,
                                                HttpServletRequest request,
                                                HttpServletResponse response)
            throws IOException, ServletException, Exception {
        Long topicId = new Long((String) request.getParameter("topicId"));
-
-       /*
-       Long messageId = new Long((String) request.getParameter("parentId"));
+       Long messageId = new Long((String) request.getParameter("messageId"));
        Message message = forumManager.getMessage(messageId);
-       */
-
-       Message message = forumManager.getMessage(topicId);
-       request.setAttribute("message", message);
+       MessageForm messageForm = new MessageForm();
+       messageForm.setMessage(message);
+       messageForm.setTopicId(topicId);
+       request.setAttribute("messageForm", messageForm);
        return mapping.findForward("success");
    }
-
-
 
 }

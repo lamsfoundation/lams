@@ -20,6 +20,7 @@ import java.util.*;
  *
  * 	Message Form.
  *	@struts.form name="forumForm"
+ *
  *  Created by IntelliJ IDEA.
  * User: conradb
  * Date: 10/06/2005
@@ -32,8 +33,8 @@ public class ForumForm extends ValidatorForm {
     private FormFile onlineFile;
     protected Map attachments;
     protected boolean lockWhenFinished;
-	protected boolean forceOffline;
-	protected boolean allowAnnomity;
+    protected boolean forceOffline;
+    protected boolean allowAnnomity;
     protected ContentHandler contentHander;
 
     private static Logger logger = Logger.getLogger(ForumForm.class.getName());
@@ -93,7 +94,7 @@ public class ForumForm extends ValidatorForm {
     }
 
     public void setAttachments(Map attachments) {
-      this.attachments = attachments;
+        this.attachments = attachments;
     }
 
     public Map getAttachments() {
@@ -101,56 +102,57 @@ public class ForumForm extends ValidatorForm {
     }
 
     public ActionErrors validate(ActionMapping mapping,
-            javax.servlet.http.HttpServletRequest request) {
-		ActionErrors errors = super.validate(mapping, request);
+                                 javax.servlet.http.HttpServletRequest request) {
+        ActionErrors errors = super.validate(mapping, request);
         ActionError ae;
         ContentHandler contentHandler;
         try{
-           // if ("".equals(forum.getTitle())) {
-             //   ActionError error = new ActionError("error.valueReqd");
-			   // errors.add("forum.title", error);
-           // }
-         try {
-            contentHandler = ContentHandler.getInstance();
-         } catch (Exception e) {
-            ae = new ActionError("error.inputFileTooLarge");
-            errors.add("onlineFile", ae);
-            throw e;
-         }
-			if (onlineFile != null && !(onlineFile.getFileName().trim().equals(""))) {
-				    if (onlineFile.getFileSize() > ForumConstants.MAX_FILE_SIZE) {
-					    ae = new ActionError("error.inputFileTooLarge");
-					    errors.add("onlineFile", ae);
-			} else {
-                        String fileName = onlineFile.getFileName();
+            if ("".equals(forum.getTitle())) {
+               ActionError error = new ActionError("error.valueReqd");
+               errors.add("forum.title", error);
+            }
+            if (onlineFile != null && !(onlineFile.getFileName().trim().equals(""))) {
+                if (onlineFile.getFileSize() > ForumConstants.MAX_FILE_SIZE) {
+                    ae = new ActionError("error.inputFileTooLarge");
+                    errors.add("onlineFile", ae);
+                } else {
+                    String fileName = onlineFile.getFileName();
+                    if (!attachments.containsKey(fileName +"-" + Attachment.TYPE_ONLINE)) {
                         NodeKey node = ContentHandler.uploadFile(onlineFile.getInputStream(), fileName, onlineFile.getContentType());
-					    Attachment attachment = new Attachment();
+                        ContentHandler.setProperty(node.getUuid(), node.getVersion(), "TYPE", Attachment.TYPE_ONLINE);
+                        Attachment attachment = new Attachment();
                         attachment.setName(fileName);
-					    attachment.setUuid(node.getUuid());
+                        attachment.setStream(onlineFile.getInputStream());
+                        attachment.setUuid(node.getUuid());
                         attachment.setType(Attachment.TYPE_ONLINE);
-                        attachments.put(fileName, attachment);
+                        attachments.put(fileName + "-" + Attachment.TYPE_ONLINE, attachment);
                         onlineFile = null;
-				    }
-			}
-			if (offlineFile != null && !(offlineFile.getFileName().trim().equals(""))) {
-				    if (offlineFile.getFileSize() > ForumConstants.MAX_FILE_SIZE) {
-					    ae = new ActionError("error.inputFileTooLarge");
-					    errors.add("offlineFile", ae);
-				    } else {
-                        String fileName = offlineFile.getFileName();
-                        NodeKey node = ContentHandler.uploadFile(onlineFile.getInputStream(), fileName, onlineFile.getContentType());
-					    Attachment attachment = new Attachment();
+                    }
+                }
+            }
+            if (offlineFile != null && !(offlineFile.getFileName().trim().equals(""))) {
+                if (offlineFile.getFileSize() > ForumConstants.MAX_FILE_SIZE) {
+                    ae = new ActionError("error.inputFileTooLarge");
+                    errors.add("offlineFile", ae);
+                } else {
+                    String fileName = offlineFile.getFileName();
+                    if (!attachments.containsKey(fileName +"-" + Attachment.TYPE_OFFLINE)) {
+                        NodeKey node = ContentHandler.uploadFile(offlineFile.getInputStream(), fileName, offlineFile.getContentType());
+                        ContentHandler.setProperty(node.getUuid(), node.getVersion(), "TYPE", Attachment.TYPE_OFFLINE);
+                        Attachment attachment = new Attachment();
                         attachment.setName(fileName);
+                        attachment.setStream(offlineFile.getInputStream());
                         attachment.setUuid(node.getUuid());
                         attachment.setType(Attachment.TYPE_OFFLINE);
-                        attachments.put(fileName, attachment);
+                        attachments.put(fileName + "-" + Attachment.TYPE_OFFLINE, attachment);
                         offlineFile = null;
-				    }
-		    }
-		} catch (Exception e) {
-			logger.error("", e);
-		}
-		return errors;
-	}
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+        return errors;
+    }
 
 }

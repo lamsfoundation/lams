@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.tool.forum.util;
 
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.permissions.Permission;
 
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspException;
@@ -23,8 +24,8 @@ public class MessageMapTag extends TagSupport {
 
     private Logger log = Logger.getLogger(MessageMapTag.class.getName());
     private Set replies = null;
-    private String ordered = "ul";
-    private String path;
+    private String path="";
+    private String mode;
     private String topicId;
 
     private SimpleDateFormat formatter = new SimpleDateFormat("dd:MM:yy hh:mm a");
@@ -45,10 +46,8 @@ public class MessageMapTag extends TagSupport {
         this.replies = replies;
     }
 
-    public void setOrdered(String ordered) {
-        if (ordered.equals("true")) {
-            this.ordered = "ol";
-        }
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 
     /**
@@ -71,18 +70,8 @@ public class MessageMapTag extends TagSupport {
             String output = "";
                 Iterator it = replies.iterator();
 
-                /*
                 while (it.hasNext()) {
-                    output = output + "<" + ordered + ">" + getThreadView((Message) it.next())
-                    + "\n</" + ordered +">";
-                }
-                output =  output + "<br/><br/>";
-                //output = output + " <table style=\"background-color:#ffffff;\" cellspacing=\"3\" cellpadding=\"3\" width=\"100%\">";
-                it = replies.iterator();
-                */
-
-                while (it.hasNext()) {
-                    String indentPrefix = "<table style=\"background-color:#ffffff;\" cellspacing=\"1\" cellpadding=\"1\" width=\"100%\">\n";
+                    String indentPrefix = "<table class=\"forumTable\">\n";
                     String indentPostfix = "</table>\n<br/><br/>\n";
                     int level = 0;
                     output = output + this.getIndentedView(level, indentPrefix, indentPostfix, (Message) it.next());
@@ -102,41 +91,14 @@ public class MessageMapTag extends TagSupport {
     public void release() {
         super.release();
         replies = null;
-        ordered = "ul";
-    }
-
-    private StringBuffer getThreadView(Message reply) throws Exception {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("\n<li><a href=\"");
-        String id = "#" + reply.getId();
-        buffer.append(id + "\">");
-        buffer.append(reply.getBody());
-        buffer.append("</a>");
-        buffer.append(" <i> - </i> ");
-        buffer.append(formatter.format(reply.getCreated()));
-        Set subReplies = reply.getReplies();
-
-        if (subReplies != null) {
-            buffer.append("\n<");
-            buffer.append(ordered);
-            buffer.append(">");
-            Iterator it = subReplies.iterator();
-            while (it.hasNext()) {
-                buffer.append(getThreadView((Message) it.next()));
-            }
-            buffer.append("\n</");
-            buffer.append(ordered);
-            buffer.append(">");
-        }
-        buffer.append("</li>");
-        return buffer;
     }
 
     private StringBuffer getIndentedView(int level, String indentPrefix, String indentPostfix, Message reply) throws Exception {
         StringBuffer buffer = new StringBuffer();
         buffer.append(indentPrefix);
         buffer.append("<tr>\n");
+
+        //Creadted By Link
         buffer.append("<td>\n");
         if (reply.getCreatedBy() == null) {
             buffer.append("<b>Anonymous</b>\n");
@@ -144,33 +106,55 @@ public class MessageMapTag extends TagSupport {
           buffer.append("<b>" + reply.getCreatedBy() + "</b>\n");
         }
         buffer.append("</td>\n");
+
+        //Created Date
         buffer.append("<td>\n");
         buffer.append("<i>" + formatter.format(reply.getCreated()) + "</i>\n");
         buffer.append("</td>\n");
-        buffer.append("<td>\n");
-        buffer.append("<a href=\"/forum/learning/message/post.do?topicId=");
-        buffer.append(topicId);
-        buffer.append("&parentId=");
-        buffer.append(reply.getId() + "\">");
-        buffer.append("<b>Reply</b>");
-        buffer.append("</a>\n");
-        buffer.append("</td>\n");
+
+        //Edit Link
+        if (Permission.MODERATE.equals(mode)) {
+            buffer.append("<td>\n");
+            //buffer.append("<a href=\"/forum/learning/message/getMessage.do?topicId=");
+            buffer.append("<a href=\"" + path + "?topicId=");
+            buffer.append(topicId);
+            buffer.append("&messageId=");
+            buffer.append(reply.getId() + "\">");
+            buffer.append("<b>Edit</b>");
+            buffer.append("</a>\n");
+            buffer.append("</td>\n");
+        }
+
+        //Reply To Link
+        if (Permission.MODERATE.equals(mode) || Permission.WRITE.equals(mode)) {
+            buffer.append("<td>\n");
+            buffer.append("<a href=\"/forum/learning/message/post.do?topicId=");
+            buffer.append(topicId);
+            buffer.append("&parentId=");
+            buffer.append(reply.getId() + "\">");
+            buffer.append("<b>Reply</b>");
+            buffer.append("</a>\n");
+            buffer.append("</td>\n");
+        }
+
+        //Body of Message
         buffer.append("<tr>\n");
-        buffer.append("<td colspan=\"3\">\n");
+        buffer.append("<td>\n");
         buffer.append(reply.getBody());
         buffer.append("</td>\n");
         buffer.append("</tr>\n");
+
+        //Intented Replies of the Messages
         buffer.append(indentPostfix);
         Iterator it = reply.getReplies().iterator();
         level = level + 2;
         while (it.hasNext()) {
             StringBuffer preFix = new StringBuffer();
-            preFix.append("<table cellspacing=\"1\" cellpadding=\"1\" width=\"100%\">\n");
+            preFix.append("<table class=\"forumTable\">\n");
             preFix.append("<tr>\n");
             preFix.append("<td colspan=\"" + level + "\"\\>\n");
             preFix.append("<td>");
-            preFix.append("<table style=\"background-color:#ffffff;\" cellspacing=\"1\" cellpadding=\"1\" width=\"100%\">\n");
-
+            preFix.append("<table class=\"forumTable\">\n");
             StringBuffer postFix = new StringBuffer();
             postFix.append("</table>\n");
             postFix.append("</td>\n");
