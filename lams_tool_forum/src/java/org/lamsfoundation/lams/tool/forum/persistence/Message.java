@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * @author conradb
  *
- * @hibernate.joined-subclass table="MESSAGE"
+ * @hibernate.joined-subclass table="tl_lafrum11_message"
  * @hibernate.joined-subclass-key column="id"
  *
  * @hibernate.query name="allMessages" query="from Message message"

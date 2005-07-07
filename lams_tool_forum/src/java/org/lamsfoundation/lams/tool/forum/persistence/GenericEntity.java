@@ -7,7 +7,7 @@ import java.util.Date;
  * @author conradb
  *
  *
- * @hibernate.class table="GENERICENTITY"
+ * @hibernate.class table="tl_lafrum11_genericentity"
  *
  * @hibernate.query name="all" query="from GenericEntity genericEntity"
  */

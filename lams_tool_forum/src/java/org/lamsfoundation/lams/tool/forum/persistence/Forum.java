@@ -6,7 +6,7 @@ import java.util.Set;
  * Forum
  * @author conradb
  *
- * @hibernate.joined-subclass table="FORUM"
+ * @hibernate.joined-subclass table="tl_lafrum11_forum"
  * @hibernate.joined-subclass-key column="id"
  *
  * @hibernate.query name="allForums" query="from Forum forum"

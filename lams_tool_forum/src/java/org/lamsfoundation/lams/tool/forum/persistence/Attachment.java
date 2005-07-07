@@ -1,5 +1,7 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
+import java.io.InputStream;
+
 /**
  * @author conradb
  *
@@ -7,7 +9,7 @@ package org.lamsfoundation.lams.tool.forum.persistence;
  * and must belong to a Forum.
  * 
  *
- * @hibernate.joined-subclass table="ATTACHMENT"
+ * @hibernate.joined-subclass table="tl_lafrum11_attachment"
  * @hibernate.joined-subclass-key column="id"
  *
  * @hibernate.query name="allAttachments" query="from Attachment attachment"
@@ -15,10 +17,13 @@ package org.lamsfoundation.lams.tool.forum.persistence;
  */
 public class Attachment extends GenericEntity {
     protected Long uuid;
-    protected boolean type;
+    protected Long version;
+    protected String type;
     protected String name;
-    public final static boolean TYPE_ONLINE = true;
-    public final static boolean TYPE_OFFLINE = false;
+    protected InputStream inputStream;
+    protected String contentType;
+    public final static String TYPE_ONLINE = "ONLINE";
+    public final static String TYPE_OFFLINE = "OFFLINE";
 
     /**
      * @hibernate.property column="UUID"
@@ -33,19 +38,25 @@ public class Attachment extends GenericEntity {
     }
 
     /**
-     * @hibernate.property column="TYPE"
+     * @hibernate.property column="VERSION"
+     *
      */
-    public boolean getType() {
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public String getType() {
         return type;
     }
 
-    public void setType(boolean type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    /**
-     * @hibernate.property column="NAME"
-     */
     public String getName() {
         return name;
     }
@@ -54,5 +65,20 @@ public class Attachment extends GenericEntity {
         this.name = name;
     }
 
+    public InputStream getInputStream() {
+        return inputStream;
+    }
+
+    public void setStream(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
 
 }
