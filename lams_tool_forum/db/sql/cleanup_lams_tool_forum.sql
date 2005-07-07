@@ -1,4 +1,5 @@
-DELETE FROM ATTACHMENT;
-DELETE FROM MESSAGE;
-DELETE FROM FORUM;
-DELETE FROM GENERICENTITY;
+delete from tl_lafrum11_attachment;
+delete from tl_lafrum11_forum;
+delete from tl_lafrum11_genericentity;
+delete from tl_lafrum11_message;
+
