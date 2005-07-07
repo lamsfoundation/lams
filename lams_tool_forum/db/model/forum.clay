@@ -12,9 +12,9 @@
 <schema-description/>
 <domain-list/>
 <table-list>
-<table name="attachment" alias="" remarks="">
+<table name="tl_lafrum11_attachment" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="64" y="90" width="-1" height="-1"/>
+<table-figure-bounds x="103" y="192" width="-1" height="-1"/>
 <column-list>
 <column name="id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
 <column-description/>
@@ -42,24 +42,17 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="TYPE" alias="" remarks="" mandatory="false" column-size="1" decimal-digits="0" default-value="" auto-increment="false">
+<column name="VERSION" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
 <column-description/>
-<data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
-<variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
-<variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
-<variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
-<variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
-<variant type-name-pattern="TINYINT UNSIGNED"/>
-<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="TINYINT ZEROFILL"/>
-</data-type>
-</column>
-<column name="NAME" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="" auto-increment="false">
-<column-description/>
-<data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
-<variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
-<variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
+<data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant type-name-pattern="BIGINT(%n)" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="19"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
 <column name="FORUM" alias="" remarks="" mandatory="false" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
@@ -82,14 +75,14 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key name="FKA7E14523D1B" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="genericentity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key name="FK389AD9A2D1B" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="tl_lafrum11_genericentity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="id" referenced-key-column-name="ID"/>
 </foreign-key>
-<foreign-key name="FKA7E145233FF9501" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="forum" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key name="FK389AD9A23FF9501" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="tl_lafrum11_forum" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -102,19 +95,19 @@
 <index-description/>
 <index-column name="id" sort="ASC"/>
 </index>
-<index name="FKA7E145233FF9501" alias="" remarks="" unique="false">
+<index name="FK389AD9A23FF9501" alias="" remarks="" unique="false">
 <index-description/>
 <index-column name="FORUM" sort="ASC"/>
 </index>
-<index name="FKA7E14523D1B" alias="" remarks="" unique="false">
+<index name="FK389AD9A2D1B" alias="" remarks="" unique="false">
 <index-description/>
 <index-column name="id" sort="ASC"/>
 </index>
 </index-list>
 </table>
-<table name="forum" alias="" remarks="">
+<table name="tl_lafrum11_forum" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="290" y="339" width="-1" height="-1"/>
+<table-figure-bounds x="469" y="428" width="-1" height="-1"/>
 <column-list>
 <column name="id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
 <column-description/>
@@ -203,7 +196,7 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key name="FK3FF9501D1B" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="genericentity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key name="FK87917942D1B" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="tl_lafrum11_genericentity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -216,15 +209,15 @@
 <index-description/>
 <index-column name="id" sort="ASC"/>
 </index>
-<index name="FK3FF9501D1B" alias="" remarks="" unique="false">
+<index name="FK87917942D1B" alias="" remarks="" unique="false">
 <index-description/>
 <index-column name="id" sort="ASC"/>
 </index>
 </index-list>
 </table>
-<table name="genericentity" alias="" remarks="">
+<table name="tl_lafrum11_genericentity" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="337" y="33" width="-1" height="-1"/>
+<table-figure-bounds x="361" y="26" width="-1" height="-1"/>
 <column-list>
 <column name="ID" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="true">
 <column-description/>
@@ -291,9 +284,9 @@
 </index>
 </index-list>
 </table>
-<table name="message" alias="" remarks="">
+<table name="tl_lafrum11_message" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="621" y="137" width="-1" height="-1"/>
+<table-figure-bounds x="728" y="132" width="-1" height="-1"/>
 <column-list>
 <column name="id" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="0" auto-increment="false">
 <column-description/>
@@ -380,21 +373,21 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key name="FK63B68BE7D1B" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="genericentity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key name="FK4A6067E8D1B" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="tl_lafrum11_genericentity" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="id" referenced-key-column-name="ID"/>
 </foreign-key>
-<foreign-key name="FK63B68BE73FF9501" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="forum" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key name="FK4A6067E83FF9501" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="tl_lafrum11_forum" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="FORUM" referenced-key-column-name="id"/>
 </foreign-key>
-<foreign-key name="FK63B68BE78C3DFCAA" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="message" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
+<foreign-key name="FK4A6067E88C3DFCAA" alias="" remarks="" referenced-table-schema="DEFAULT_SCHEMA" referenced-table="tl_lafrum11_message" referenced-key="PRIMARY" on-update="NO ACTION" on-delete="NO ACTION" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
@@ -407,15 +400,15 @@
 <index-description/>
 <index-column name="id" sort="ASC"/>
 </index>
-<index name="FK63B68BE78C3DFCAA" alias="" remarks="" unique="false">
-<index-description/>
-<index-column name="PARENT" sort="ASC"/>
-</index>
-<index name="FK63B68BE73FF9501" alias="" remarks="" unique="false">
+<index name="FK4A6067E83FF9501" alias="" remarks="" unique="false">
 <index-description/>
 <index-column name="FORUM" sort="ASC"/>
 </index>
-<index name="FK63B68BE7D1B" alias="" remarks="" unique="false">
+<index name="FK4A6067E88C3DFCAA" alias="" remarks="" unique="false">
+<index-description/>
+<index-column name="PARENT" sort="ASC"/>
+</index>
+<index name="FK4A6067E8D1B" alias="" remarks="" unique="false">
 <index-description/>
 <index-column name="id" sort="ASC"/>
 </index>
