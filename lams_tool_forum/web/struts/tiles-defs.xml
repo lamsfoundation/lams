@@ -62,7 +62,7 @@
 	</definition>
 	<!-- E: Generic -->
 
-	<!-- B: Forum -->
+	<!-- B: Authoring -->
 	<definition name="tiles:/authoring/forum/instructions" extends="tiles:layout">
     	<put name="pageTitleKey" value="title.forum.add"/>
     	<put name="body" value="/WEB-INF/jsps/authoring/forum/instructions.jsp"/>
@@ -95,13 +95,19 @@
 	</definition>
 
 
-	<!-- E: Forum -->
+	<!-- E: Authoring -->
 
-	<!-- B: Message -->
+	<!-- B: Learning -->
     <definition name="tiles:/learning/forum/open" extends="tiles:layout">
     	<put name="pageTitleKey" value="title.forum.open"/>
     	<put name="body" value="/WEB-INF/jsps/learning/forum/open.jsp"/>
 	</definition>
+
+    <definition name="tiles:/learning/message/getMessage" extends="tiles:layout">
+          <put name="pageTitleKey" value="title.message.edit"/>
+          <put name="body" value="/WEB-INF/jsps/learning/message/edit.jsp"/>
+    </definition>
+
 
     <definition name="tiles:/learning/message/open" extends="tiles:layout">
           <put name="pageTitleKey" value="title.messageTopic.open"/>
