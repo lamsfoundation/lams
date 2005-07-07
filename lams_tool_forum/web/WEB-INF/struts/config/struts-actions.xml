@@ -20,7 +20,7 @@
 		    type="org.apache.struts.actions.ForwardAction" parameter="tiles:/authoring/forum/edit" />
 
         <action    path="/authoring/forum/instructions"
-        	type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+        	type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			name="forumForm"
 			validate="true"
             input="/authoring/forum/create.do?selected=2"
@@ -31,7 +31,7 @@
 
 
         <action    path="/authoring/forum/editInstructions"
-            type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+            type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
             name="forumForm"
             validate="true"
             input="/authoring/forum/edit.do?selected=2"
@@ -41,7 +41,7 @@
         </action>
 
         <action    path="/authoring/forum/advanced"
-        	type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+        	type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			name="forumForm"
 			validate="true"
             input="/authoring/forum/create.do?selected=1"
@@ -51,7 +51,7 @@
         </action>
 
         <action    path="/authoring/forum/editAdvanced"
-        	type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+        	type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			name="forumForm"
 			validate="true"
             input="/authoring/forum/edit.do?selected=1"
@@ -61,7 +61,7 @@
         </action>
 
         <action    path="/authoring/forum/createForum"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			name="forumForm"
 			validate="true"
             input="tiles:/authoring/forum/create"
@@ -71,14 +71,14 @@
         </action>
 
         <action    path="/authoring/forum/getForum"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			parameter="getForum"
 			scope="session">
             <forward name="success"		path="tiles:/authoring/forum/edit"/>
         </action>
 
 		<action    path="/authoring/forum/editForum"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			name="forumForm"
 			validate="true"
             input="/authoring/forum/edit.do"
@@ -88,7 +88,7 @@
 		</action>
 
         <action    path="/authoring/forum/deleteAttachment"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			name="forumForm"
 			validate="true"
 			parameter="deleteAttachment"
@@ -97,7 +97,7 @@
         </action>
 
         <action    path="/authoring/forum/edit/deleteAttachment"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			name="forumForm"
 			validate="true"
 			parameter="deleteAttachment"
@@ -109,7 +109,7 @@
 		    type="org.apache.struts.actions.ForwardAction" parameter="tiles:/authoring/forum/newTopic" />
 
 		<action    path="/authoring/forum/createTopic"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			name="messageForm"
 			validate="true"
             input="tiles:/authoring/forum/newTopic"
@@ -119,7 +119,7 @@
 		</action>
 
         <action    path="/authoring/forum/deleteTopic"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
             input="tiles:/authoring/forum/create"
 			parameter="deleteTopic"
             scope="request">
@@ -127,7 +127,7 @@
         </action>
 
         <action    path="/authoring/forum/edit/deleteTopic"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
             input="tiles:/authoring/forum/create"
 			parameter="deleteTopic"
             scope="request">
@@ -135,7 +135,7 @@
         </action>
 
         <action    path="/authoring/forum/getForum"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			validate="true"
 			parameter="getForum"
 			scope="request">
@@ -143,7 +143,7 @@
 		</action>
 
 		<action    path="/authoring/forum/delete"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			parameter="deleteForum"
 			scope="request">
 			<forward name="success"		path="titles:/authoring/forum/success"/>
@@ -152,35 +152,35 @@
 		<!-- Message related actions -->
 
     	<action    path="/learning/forum/open"
-			type="org.lamsfoundation.lams.tool.forum.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			parameter="openForum"
 			scope="request">
 			<forward name="success"		path="tiles:/learning/forum/open"/>
 		</action>
 
     	<action    path="/learning/message/openTopic"
-			type="org.lamsfoundation.lams.tool.forum.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			parameter="openTopic"
 			scope="request">
 			<forward name="success"		path="tiles:/learning/message/open"/>
 		</action>
 
     	<action    path="/learning/message/getMessage"
-			type="org.lamsfoundation.lams.tool.forum.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			parameter="getMessage"
 			scope="request">
 			<forward name="success"		path="tiles:/learning/message/getMessage"/>
 		</action>
 
     	<action    path="/learning/message/post"
-		     type="org.lamsfoundation.lams.tool.forum.actions.LearningAction"
+		     type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			parameter="post"
 			scope="request">
 			<forward name="success"		path="tiles:/learning/message/post"/>
 		</action>
 
 		<action    path="/learning/message/reply"
-			type="org.lamsfoundation.lams.tool.forum.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			name="messageForm"
 			validate="true"
 			input="tiles:/learning/message/post"
@@ -190,7 +190,7 @@
 		</action>
 
 		<action    path="/learning/message/editMessage"
-			type="org.lamsfoundation.lams.tool.forum.actions.LearningAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			name="messageForm"
 			validate="true"
 			input="tiles:/learning/message/getMessage"
@@ -200,7 +200,7 @@
 		</action>
 
 		<action    path="/learning/message/delete"
-			type="org.lamsfoundation.lams.tool.forum.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
 			parameter="deleteMessage"
 			scope="request">
 			<forward name="success"		path="/learing/message/open.do"/>
