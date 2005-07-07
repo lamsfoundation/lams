@@ -192,43 +192,6 @@
             destdir="${test.classes.dir}"/>
     </target>
 	
-	
-	<!-- =================================================================== -->
-	<!-- Forum Database tasks                                               -->
-	<!-- =================================================================== -->
-	<target name="clean-db"	description="clean forum database.">
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}">
-
-         <classpath id="junit.class.path">
-             <path refid="build.class.path"/>
-         </classpath>
-
-			<transaction src="${db.scripts}/cleanup_lams_tool_forum.sql"/>
-		</sql>
-	</target>
-	
-	<target name="init-db"	description="drop and create forum database.">
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}">
-            <classpath>
-                <path refid="build.class.path"/>
-			</classpath>
-			<transaction src="${db.scripts}/drop_lams_tool_forum.sql"/>
-			<transaction src="${db.scripts}/create_lams_tool_forum.sql"/>
-		</sql>
-	</target>
-	
-	<target name="build-db"	depends="init-db" 
-							description="build qa tool database.">
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}">
-            <classpath>
-			    <path refid="build.class.path"/>
-			</classpath>
-			<transaction src="${db.scripts}/insert_lams_tool_forum_data.sql"/>
-		</sql>
-	</target>
 
     <target name="junit" depends="compiletest, init-db">
         <echo>+-------------------------------------------+</echo>
@@ -289,6 +252,43 @@
 		<copy file="${build.dir}/${project}.jar"
             todir="${dist.dir}"/>
 	</target>
+
+    <!-- =================================================================== -->
+    <!-- Forum Database tasks                                               -->
+    <!-- =================================================================== -->
+    <target name="clean-db"	description="clean forum database.">
+        <sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+                password="${db.password}">
+
+         <classpath id="junit.class.path">
+             <path refid="build.class.path"/>
+         </classpath>
+
+            <transaction src="${db.scripts}/cleanup_lams_tool_forum.sql"/>
+        </sql>
+    </target>
+
+    <target name="init-db"	description="drop and create forum database.">
+        <sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+                password="${db.password}">
+            <classpath>
+                <path refid="build.class.path"/>
+            </classpath>
+            <transaction src="${db.scripts}/drop_lams_tool_forum.sql"/>
+            <transaction src="${db.scripts}/create_lams_tool_forum.sql"/>
+        </sql>
+    </target>
+
+    <target name="build-db"	depends="init-db"
+                            description="build qa tool database.">
+        <sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+                password="${db.password}">
+            <classpath>
+                <path refid="build.class.path"/>
+            </classpath>
+            <transaction src="${db.scripts}/insert_lams_tool_forum_data.sql"/>
+        </sql>
+    </target>
 
     <target name="web"  description="generates xdoclet for web">
 	    <taskdef
