@@ -24,8 +24,10 @@
 
     <property name="web.dir" value="${project.dir}/web"/>
     <property name="web.lib.dir" value="${project.dir}/web/WEB-INF/lib"/>
+    <!--
     <property name="web.src.dir" value="${project.dir}/web/WEB-INF/classes"/>
     <property name="web.classes.dir" value="${project.dir}/web/classes"/>
+    -->
 
 	<!-- end properties *********************************************************************************************-->
 
@@ -39,13 +41,6 @@
 	<path id="build.class.path">
 		<path refid="app.class.path"/>
 		<fileset dir="${lib.dir}/build">
-			<include name="**/*.jar"/>
-		</fileset>
-    </path>
-
-	<path id="web.class.path">
-		<path refid="build.class.path"/>
-        <fileset dir="${web.lib.dir}">
 			<include name="**/*.jar"/>
 		</fileset>
     </path>
@@ -88,7 +83,9 @@
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${test.classes.dir}"/>
         <mkdir dir="${test.result}"/>
+        <!--
         <mkdir dir="${web.classes.dir}"/>
+        -->
         <mkdir dir="${deploy.dir}"/>
 	</target>
 
@@ -103,11 +100,13 @@
 		<delete dir="${build.dir}"/>
         <delete dir="${test.classes.dir}"/>
         <delete dir="${test.result}"/>
+        <!--
         <delete dir="${web.classes.dir}"/>
+        -->
         <delete dir="${deploy.dir}"/>
 
 	</target>
-			
+
 	<target name="compile" description="Compiles the Task" depends="init">
 		<echo>+------------------------------------------+</echo>
 		<echo>| compile                                  |</echo>
@@ -294,10 +293,10 @@
 	    <taskdef
 	        name="webdoclet"
 	        classname="xdoclet.modules.web.WebDocletTask"
-	        classpathref="web.class.path"
+	        classpathref="build.class.path"
 	    />
 		<webdoclet destdir="${web.dir}/WEB-INF">
-	        <fileset dir="${web.src.dir}" />
+	        <fileset dir="${src.dir}" />
 			<strutsconfigxml validatexml="true" version="1.1" mergeDir="${web.dir}/WEB-INF/struts/config"  />
 			<!-- <jsptaglib shortname="spirit taglibs" filename="spirit.tld" /> -->
 		</webdoclet>
@@ -321,22 +320,22 @@
     -->
 
 	<target name="copyweb" description="Copy " depends="web">
-
         <mkdir dir="${deploy.dir}/WEB-INF" />
 		<copy todir="${deploy.dir}/WEB-INF">
-			<fileset dir="${web.dir}/WEB-INF" excludes="**/*.txt,**/*.java"/>
+			<fileset dir="${web.dir}/WEB-INF/struts" includes="**/*.tld"/>
+            <fileset dir="${web.dir}/WEB-INF" excludes="**/struts/"/>
+
         </copy>
 
 		<mkdir dir="${deploy.dir}/WEB-INF/lib" />
 		<copy todir="${deploy.dir}/WEB-INF/lib">
 			<fileset dir="${lib.dir}" includes="*.jar"/>
-     		<fileset dir="${web.dir}/WEB-INF/lib" includes="*.jar"/>
+            <fileset dir="${build.dir}" includes="*.jar"/>
 		</copy>
 
-		<mkdir dir="${deploy.dir}/WEB-INF/classes" />
-		<copy todir="${deploy.dir}/WEB-INF/classes">
-              <fileset dir="${web.classes.dir}" includes="**/*.class"/>
-              <fileset dir="${web.src.dir}" includes="log4j.properties"/>
+		<mkdir dir="${deploy.dir}/jsps" />
+		<copy todir="${deploy.dir}/jsps">
+              <fileset dir="${web.dir}/jsps" includes="**/*.jsp"/>
         </copy>
 
         <mkdir dir="${deploy.dir}/includes" />
