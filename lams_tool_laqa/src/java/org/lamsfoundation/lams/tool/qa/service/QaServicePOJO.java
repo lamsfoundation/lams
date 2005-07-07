@@ -30,6 +30,9 @@ import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
@@ -938,6 +941,13 @@ public class QaServicePOJO implements
     	}
     }
     
+    
+    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
+	{
+	
+	}
+    
+    
     /**
 	 * it is possible that the tool session id already exists in the tool sessions table
 	 * as the users from the same session are involved.
@@ -1017,6 +1027,13 @@ public class QaServicePOJO implements
 		
     }
 
+    
+    public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException
+	{
+    	
+	}
+    
+    
     
     /**FIX THIS ONE!!!!
      * TO BE TESTED

@@ -319,6 +319,18 @@ public class AuthoringUtil implements QaAppConstants{
 		creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
 		if (creationDate == null)
 			creationDate=new Date(System.currentTimeMillis()).toString();
+		
+		
+		String richTextOfflineInstructions="";
+    	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+    	logger.debug("createContent:  richTextOfflineInstructions from session: " + richTextOfflineInstructions);
+    	if (richTextOfflineInstructions == null) richTextOfflineInstructions="";
+    	
+    	String richTextOnlineInstructions="";
+    	richTextOnlineInstructions = (String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+    	logger.debug("createContent richTextOnlineInstructions from session: " + richTextOnlineInstructions);
+    	if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
+		
 			
     	/**obtain user object from the session*/
     	User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
@@ -339,8 +351,8 @@ public class AuthoringUtil implements QaAppConstants{
 	    qa.setUsernameVisible(isUsernameVisible);
 	    qa.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
 	    qa.setSynchInMonitor(isSynchInMonitor);
-	    qa.setOnlineInstructions(onlineInstructions);
-	    qa.setOfflineInstructions(offlineInstructions);
+	    qa.setOnlineInstructions(richTextOnlineInstructions);
+	    qa.setOfflineInstructions(richTextOfflineInstructions);
 	    qa.setEndLearningMessage(endLearningMessage);
 	    qa.setReportTitle(reportTitle);
 	    qa.setMonitoringReportTitle(monitoringReportTitle);

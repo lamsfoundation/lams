@@ -144,7 +144,7 @@ public abstract class QaUtils implements QaAppConstants {
 
     public static void setDefaultSessionAttributes(HttpServletRequest request, QaContent defaultQaContent, QaAuthoringForm qaAuthoringForm)
 	{
-		//should never be null anyway as default content MUST exist in the db
+		/**should never be null anyway as default content MUST exist in the db*/
 		if (defaultQaContent != null)
 		{		
 			qaAuthoringForm.setTitle(defaultQaContent.getTitle());
@@ -157,8 +157,10 @@ public abstract class QaUtils implements QaAppConstants {
 			
 			request.getSession().setAttribute(TITLE,qaAuthoringForm.getTitle());
 			request.getSession().setAttribute(INSTRUCTIONS,qaAuthoringForm.getInstructions());
+			
+			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,defaultQaContent.getOfflineInstructions());
+		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,defaultQaContent.getOnlineInstructions());
 		}
-		
 	}
     
     
