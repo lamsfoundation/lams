@@ -275,4 +275,9 @@ td.calendarDay:hover {
 	text-align: center;
 	vertical-align: middle;
 	width: 50;
+} .forumTable {
+    background-color:#ffffff;
+    cellspacing="1";
+    cellpadding="1";
+    width="100%";
 }
