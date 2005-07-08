@@ -388,7 +388,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    request.getSession().setAttribute(ONLINE_INSTRUCTIONS, 				defaultQaContent.getOnlineInstructions());
 		    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,		defaultQaContent.getOfflineInstructions());
 		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,		defaultQaContent.getOnlineInstructions());
-		    logger.debug("QaStarter set both rich text online and offline instructions: ");
+		    request.getSession().setAttribute(RICHTEXT_TITLE,					defaultQaContent.getTitle());
+		    request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,			defaultQaContent.getInstructions());
+		    logger.debug("QaStarter set all 4 rich text properties");
 		    
 		    request.getSession().setAttribute(END_LEARNING_MESSSAGE, 			defaultQaContent.getEndLearningMessage());
 		    request.getSession().setAttribute(CREATION_DATE, 					defaultQaContent.getCreationDate());
