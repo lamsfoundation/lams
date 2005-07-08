@@ -11,7 +11,8 @@
 
 	<!-- fixed filesystem property structure /-->
 	<property name="src.dir" value="${project.dir}/src/java"/>
-	<property name="lib.dir" value="${project.dir}/lib"/>
+    <property name="lib.build.dir" value="${build.lib}"/>
+	<property name="lib.dir" value="${shared.lib}"/>
 	<property name="dist.dir" value="${project.dir}/dist"/>
 	<property name="classes.dir" value="${project.dir}/classes"/>
 	<property name="build.dir" value="${project.dir}/build"/>
@@ -32,19 +33,24 @@
 	<!-- end properties *********************************************************************************************-->
 
 	<!-- begin path *************************************************************************************************-->
-	<path id="app.class.path">
+	<!--
+    <path id="app.class.path">
 		<fileset dir="${lib.dir}">
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
+    -->
 
 	<path id="build.class.path">
-		<path refid="app.class.path"/>
-		<fileset dir="${lib.dir}/build">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+       	<fileset dir="${lib.build.dir}">
 			<include name="**/*.jar"/>
 		</fileset>
     </path>
 
+    <!--
     <path id="test.class.path">
         <path refid="build.class.path"/>
         <fileset dir="${test.lib.dir}">
@@ -52,6 +58,7 @@
         </fileset>
 
     </path>
+    -->
 
 	<path id="hibernate.build.class.path">
 		<pathelement path="${classes.dir}"/>
@@ -187,7 +194,7 @@
             source="1.4"
             debug="on"
             compiler="modern"
-            classpathref="test.class.path"
+            classpathref="build.class.path"
             destdir="${test.classes.dir}"/>
     </target>
 	
@@ -211,7 +218,7 @@
 
          <classpath id="junit.class.path">
              <path location="${test.classes.dir}"/>
-             <path refid="test.class.path"/>
+             <path refid="build.class.path"/>
          </classpath>
 
          <formatter type="xml"/>
@@ -305,21 +312,7 @@
 		</copy>
 	</target>
 
-    <!--
-    <target name="webcompile"  description="compiles web src" depends="jar">
-     	<copy todir="${web.lib.dir}">
-			<fileset dir="${build.dir}" includes="*.jar"/>
-		</copy>
-		<javac srcdir="${web.src.dir}"
-            source="1.4"
-            debug="on"
-            compiler="modern"
-            classpathref="web.class.path"
-            destdir="${web.classes.dir}"/>
-    </target>
-    -->
-
-	<target name="copyweb" description="Copy " depends="web">
+	<target name="copyweb" description="Copy " depends="web, jar">
         <mkdir dir="${deploy.dir}/WEB-INF" />
 		<copy todir="${deploy.dir}/WEB-INF">
 			<fileset dir="${web.dir}/WEB-INF/struts" includes="**/*.tld"/>
@@ -350,10 +343,6 @@
 
 	</target>
 
-    <target name="war" depends="copyweb">
-        <war destfile="${deploy.dir}/${project}.war"
-            webxml="${deploy.dir}/WEB-INF/web.xml" basedir="${deploy.dir}" />
-    </target>
 
 	<!-- begin navigation tasks *************************************************************************************-->
 	<target
@@ -364,24 +353,17 @@
 		<echo>+------------------------------------------+</echo>
 	</target>
 
+
+    <target name="war" depends="copyweb">
+            <war destfile="${deploy.dir}/${project}.war"
+                webxml="${deploy.dir}/WEB-INF/web.xml" basedir="${deploy.dir}" />
+    </target>
+
     <!-- EAR Related Targets -->
 
 	<target
-        name="_dist"
-        depends="_build">
-        <!--<ear destfile="${deploy.dir}/${project}.ear" appxml="${project.dir}/application.xml">
-            <fileset dir="${deploy.dir}" includes="${project}.war" />
-        </ear>
-        -->
-
-		<echo>+------------------------------------------+</echo>
-		<echo>| created distribution                     |</echo>
-		<echo>+------------------------------------------+</echo>
-	</target>
-
-	<target
         name="_deploy"
-        depends="_build, war">
+        depends="war">
 		<echo>+------------------------------------------+</echo>
 		<echo>| deployed war file                        |</echo>
 		<echo>+------------------------------------------+</echo>
