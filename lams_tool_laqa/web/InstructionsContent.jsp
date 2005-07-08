@@ -5,17 +5,16 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
+<div id="richTextContainer">
 		<tr> <td>
 			<table>
 				<tr> 
 					<td>
           				<fmt:message key="label.offlineInstructions" />
           			</td>
-					<td> 
+					<td NOWRAP width=700>
 					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckEditor/"
-					      imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
-					      linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-						  height="300"
+					      height="200"
 						  width="100%">
 						  <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />						  
 					</FCK:editor>
@@ -26,11 +25,9 @@
           			<td>
           				<fmt:message key="label.onlineInstructions" />
           			</td>
-					<td> 
+					<td NOWRAP width=700>
 					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/"
-					      imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
-					      linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-						  height="300"
+					      height="200"
 						  width="100%">
   						  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
 					</FCK:editor>
@@ -40,13 +37,14 @@
 
 			  	<hr>
 				<table>
-          		<tr>
-					 <td colspan=2> 
-						 <html:submit property="submitTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-							<bean:message key="button.done"/>
-						</html:submit>
-					</td> 
-				</tr>
-			</table>
-		</td>
-		</tr>
+	          		<tr>
+						 <td colspan=2> 
+							 <html:submit property="submitTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+								<bean:message key="button.done"/>
+							</html:submit>
+						</td> 
+					</tr>
+				</table>
+
+		</td></tr>
+</div>

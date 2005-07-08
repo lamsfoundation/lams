@@ -5,6 +5,8 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
+<tr>
+<td>
 	<c:if test="${requestScope.userExceptionNumberFormat == 'true' || 
 			 	requestScope.userExceptionDefaultContentNotAvailable == 'true' || 
 			 	requestScope.userExceptionUserIdNotAvailable == 'true' || 
@@ -117,4 +119,6 @@
 			</table>
 			</html:form>
 	</c:if>						
+	
+ <td> </tr>
 	

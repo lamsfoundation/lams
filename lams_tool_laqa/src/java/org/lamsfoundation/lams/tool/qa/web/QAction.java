@@ -36,8 +36,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
@@ -228,12 +226,6 @@ public class QAction extends DispatchAction implements QaAppConstants
     	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
     	
     	/**
-	     * read and persist rich text parameters
-	     */
-	    QaUtils.persistRichText(request);
-	    logger.debug("QAction: rich text set to session scope");
-	    
-    	/**
     	 * the status of define later is determined from the property inspector and 
     	 * by now, we know whether it is on or off
     	 * 
@@ -306,8 +298,7 @@ public class QAction extends DispatchAction implements QaAppConstants
         {
         	logger.debug("user is done with this tab.");
         	QaUtils.persistRichText(request);
-    	    logger.debug("SUBMIT_TAB_DONE: rich text set to session scope");
-        	qaAuthoringForm.resetUserAction();
+    	    qaAuthoringForm.resetUserAction();
         	return (mapping.findForward(LOAD_QUESTIONS));
         }/**submit questions contained in the Map*/
         else if (userAction.equalsIgnoreCase(SUBMIT_ALL_CONTENT))
@@ -396,6 +387,7 @@ public class QAction extends DispatchAction implements QaAppConstants
         else
         {
         	logger.debug("Warning!: Uncatered-for user action: " + userAction);
+        	QaUtils.persistRichText(request);
         }
 
         /**reset all user actions*/

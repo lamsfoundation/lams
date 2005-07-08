@@ -14,12 +14,10 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.lamsfoundation.lams.usermanagement.User;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
@@ -27,6 +25,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * 
@@ -325,7 +324,7 @@ public class AuthoringUtil implements QaAppConstants {
 		    /**
 		     * read and persist rich text parameters
 		     */
-		    QaUtils.persistRichText(request);
+		    //QaUtils.persistRichText(request);
 		 
 		    endLearningMessage=qaAuthoringForm.getEndLearningMessage();
 		}
@@ -334,6 +333,7 @@ public class AuthoringUtil implements QaAppConstants {
 			creationDate=new Date(System.currentTimeMillis()).toString();
 		
 		
+		/** read rich text vallues */
 		String richTextOfflineInstructions="";
     	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
     	logger.debug("createContent:  richTextOfflineInstructions from session: " + richTextOfflineInstructions);
@@ -343,7 +343,17 @@ public class AuthoringUtil implements QaAppConstants {
     	richTextOnlineInstructions = (String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
     	logger.debug("createContent richTextOnlineInstructions from session: " + richTextOnlineInstructions);
     	if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
-		
+    	
+    	String richTextTitle="";
+    	richTextTitle = (String)request.getSession().getAttribute(RICHTEXT_TITLE);
+    	logger.debug("createContent richTextTitle from session: " + richTextTitle);
+    	if (richTextTitle == null) richTextTitle="";
+    	
+    	String richTextInstructions="";
+    	richTextInstructions = (String)request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
+    	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
+    	if (richTextInstructions == null) richTextInstructions="";
+    	
 			
     	/**obtain user object from the session*/
     	User toolUser=(User)request.getSession().getAttribute(TOOL_USER);

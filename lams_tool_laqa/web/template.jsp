@@ -43,17 +43,17 @@ http://www.gnu.org/licenses/gpl.txt
     </head>
     
     <body bgcolor="#9DC5EC" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-      <table width="95%" border="0" cellspacing="0" cellpadding="0" align="center">
-        <!-- header -->
-        <c:set var="pageheader" scope="session"><tiles:getAsString name="pageHeader"/></c:set>
-		<tiles:insert attribute="header" />
-        <!-- end of header -->
-        <!-- main content -->
-        <tiles:insert attribute="content" />
-        <!--end of main content-->
-        <!--footer-->
-        <tiles:insert attribute="footer" />
-        <!-- end of footer -->
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center"> 
+	        <!-- header -->
+	        <c:set var="pageheader" scope="session"><tiles:getAsString name="pageHeader"/></c:set>
+			<tiles:insert attribute="header" />
+	        <!-- end of header -->
+	        <!-- main content -->
+	        <tiles:insert attribute="content" />
+	        <!--end of main content-->
+	        <!--footer-->
+	        <tiles:insert attribute="footer" />
+	        <!-- end of footer -->
       </table>
     </body>
 </html:html>

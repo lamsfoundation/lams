@@ -355,30 +355,35 @@ public abstract class QaUtils implements QaAppConstants {
 	
 	public static void persistRichText(HttpServletRequest request)
 	{
-		String richTextOfflineInstructions="";
-    	String richTextOnlineInstructions="";
-    	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
-    	logger.debug("richTextOfflineInstructions from session: " + richTextOfflineInstructions);
-    	
-    	richTextOnlineInstructions = (String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
-    	logger.debug("richTextOnlineInstructions from session: " + richTextOnlineInstructions);
-    	
-    	if ((richTextOfflineInstructions == null) || (richTextOfflineInstructions.equals("")))
-    	{
-    		richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
-    		logger.debug("read aparameter richTextOfflineInstructions: " + richTextOfflineInstructions);
-    	}
+		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
+		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
+		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
+		logger.debug("read parameter richTextOnlineInstructions: " + richTextOnlineInstructions);
 		
-    	if ((richTextOnlineInstructions == null) || (richTextOnlineInstructions.equals("")))
-    	{
-    		richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
-    		logger.debug("read aparameter richTextOnlineInstructions: " + richTextOnlineInstructions);
-    	}
-	    
-	    logger.debug("final richTextOfflineInstructions: " + richTextOfflineInstructions);
-	    logger.debug("final richTextOnlineInstructions: " + richTextOnlineInstructions);
-	    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);
-	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);
+		if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);	
+		}
+		
+		if ((richTextOnlineInstructions != null) && (richTextOnlineInstructions.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);	
+		}
+		
+		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
+		logger.debug("read parameter richTextTitle: " + richTextTitle);
+		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
+		logger.debug("read parameter richTextInstructions: " + richTextInstructions);
+		
+		if ((richTextTitle != null) && (richTextTitle.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
+		}
+		
+		if ((richTextInstructions != null) && (richTextInstructions.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
+		}
 	}
-	   	
+
 }

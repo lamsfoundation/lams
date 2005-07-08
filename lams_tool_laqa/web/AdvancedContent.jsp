@@ -4,6 +4,7 @@
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 
+<div id="advancedTabContainer">
 		<tr> <td>
 			<table>
 				<tr>
@@ -49,7 +50,7 @@
 						 <bean:message key="option.off"/>
 						</html:radio>
 	      			</td>
-		         </tr>
+		        </tr>
 		         
 		         <tr> 
 			 		<td> <fmt:message key="label.report.title"/>: </td>
@@ -83,8 +84,9 @@
 					</td> 
 				</tr>
   			</table>
-		</td>
-		</tr>
+		
+		</td></tr>
+</div>
 
 
 		
