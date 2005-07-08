@@ -36,7 +36,7 @@ public class ForumForm extends ValidatorForm {
     protected boolean allowAnnomity;
     protected ContentHandler contentHander;
 
-    private static Logger logger = Logger.getLogger(org.lamsfoundation.lams.tool.forum.web.ForumForm.class.getName());
+    private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
     public ForumForm() {
         this.forum = new Forum();

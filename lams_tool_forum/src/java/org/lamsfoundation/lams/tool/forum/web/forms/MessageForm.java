@@ -23,7 +23,7 @@ public class MessageForm extends ValidatorForm {
     protected Long forumId;
     protected Long parentId;
     protected Long topicId;
-    private static Logger logger = Logger.getLogger(org.lamsfoundation.lams.tool.forum.web.ForumForm.class.getName());
+    private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
     public MessageForm() {
         this.message = new Message();
