@@ -312,7 +312,7 @@
 		</copy>
 	</target>
 
-	<target name="copyweb" description="Copy " depends="web, jar">
+	<target name="copyweb" description="Copy " depends="_build, web">
         <mkdir dir="${deploy.dir}/WEB-INF" />
 		<copy todir="${deploy.dir}/WEB-INF">
 			<fileset dir="${web.dir}/WEB-INF/struts" includes="**/*.tld"/>
