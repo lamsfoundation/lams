@@ -89,30 +89,12 @@ public class PersistenceDelegateImpl implements PersistenceDelegate {
 
     protected Class identifyDaoType(Class subType) throws PersistenceException {
         Class genericEntityDaoType = null;
-        String[] classNameHierarchy = this.getGenericEntityClassNameHierarchy(subType);
-
-        for (int i = 0; i < classNameHierarchy.length; i++) {
-            try {
-                genericEntityDaoType = Class.forName(classNameHierarchy[i] + DAO);
-                break;
-            } catch (Exception e) {
-                continue;
-            }
-        }
-        if (genericEntityDaoType == null) {
+        try {
+            genericEntityDaoType = Class.forName(subType.getName() + DAO);
+        } catch (ClassNotFoundException cnfe) {
             throw new PersistenceException(DAO_TYPE_ERROR + subType);
         }
         return genericEntityDaoType;
     }
 
-    protected String[] getGenericEntityClassNameHierarchy(Class subType) {
-        ArrayList classNames = new ArrayList();
-        classNames.add(subType.getName());
-
-        while (!Object.class.equals(subType.getSuperclass())) {
-            subType = subType.getSuperclass();
-            classNames.add(subType.getName());
-        }
-        return (String[]) classNames.toArray(new String[0]);
-    }
 }
