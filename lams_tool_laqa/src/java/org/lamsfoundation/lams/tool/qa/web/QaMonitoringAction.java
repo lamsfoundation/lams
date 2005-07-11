@@ -131,7 +131,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		{
 			qaMonitoringForm.resetUserAction();
 			logger.debug("detected noToolSessionsAvailable:" + noToolSessionsAvailable);
-			persistError(request,"error.content.onlyContentAndNoSessions");
+			persistError(request,"error.content.noToolSessions");
 			request.setAttribute(USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS, new Boolean(true));
 			logger.debug("forwarding to: " + MONITORING_REPORT);
 			return (mapping.findForward(MONITORING_REPORT));	
@@ -603,7 +603,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		{
 			qaMonitoringForm.resetUserAction();
 			logger.debug("detected noToolSessionsAvailable:" + noToolSessionsAvailable);
-			persistError(request,"error.content.onlyContentAndNoSessions");
+			persistError(request,"error.content.noToolSessions");
 			request.setAttribute(USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS, new Boolean(true));
 			logger.debug("forwarding to: " + MONITORING_REPORT);
 			return (mapping.findForward(MONITORING_REPORT));	

@@ -10,7 +10,7 @@
 			<table>
 				<tr> 
 					<td>
-          				<fmt:message key="label.offlineInstructions" />
+          				<fmt:message key="label.offlineInstructions" />:
           			</td>
 					<td NOWRAP width=700>
 					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckEditor/"
@@ -23,7 +23,7 @@
 				
           		<tr> 
           			<td>
-          				<fmt:message key="label.onlineInstructions" />
+          				<fmt:message key="label.onlineInstructions" />:
           			</td>
 					<td NOWRAP width=700>
 					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/"

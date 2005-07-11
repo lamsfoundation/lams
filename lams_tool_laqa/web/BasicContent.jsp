@@ -97,22 +97,14 @@
 						<tr> 
 					 		<td> <bean:message key="label.authoring.title"/>: </td>
 					 		<td NOWRAP width=700>
-							<FCK:editor id="richTextTitle" basePath="/lams/fckEditor/"
-							      height="200"
-								  width="100%">
-								  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
-							</FCK:editor>
+						 		<c:out value="${sessionScope.richTextTitle}" escapeXml="false" />
 							</td> 
 					  	</tr>
 
 					  	<tr> 
-					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
+					 		<td> <bean:message key="label.authoring.instructions"/>: </td> test
 							<td NOWRAP width=700>
-							<FCK:editor id="richTextInstructions" basePath="/lams/fckEditor/"
-							      height="200"
-								  width="100%">
-								  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
-							</FCK:editor>
+							  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
 							</td>
 						</tr>
 				

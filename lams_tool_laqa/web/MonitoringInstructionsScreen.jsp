@@ -26,32 +26,21 @@
 
 <c:if test="${requestScope.userExceptionMonitoringTabContentIdRequired != 'true'}"> 	
 	<table align=center> <!-- Dave to take off-->
-			<tr> 
+		<tr> 
 					<td>
-          				<fmt:message key="label.offlineInstructions" />
+          				<fmt:message key="label.offlineInstructions" />:
           			</td>
 					<td NOWRAP width=700>
-					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckEditor/"
-						  disabled="true"
-					      height="200"
-						  width="100%">
-						  <c:out value="${sessionScope.monitoredOfflineInstructions}" escapeXml="false" />						  
-					</FCK:editor>
+						<c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />
 					</td> 
 				</tr>
-	
-	<tr> 
+		 <tr> 
           			<td>
-          				<fmt:message key="label.onlineInstructions" />
+          				<fmt:message key="label.onlineInstructions"/>:
           			</td>
 					<td NOWRAP width=700>
-					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/" 
-						  disabled="true"
-					      height="200"
-						  width="100%">
-  						  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
-					</FCK:editor>
+						<c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />
 					</td> 
-				</tr>
+		</tr>
 	</table>      		
 </c:if>		
