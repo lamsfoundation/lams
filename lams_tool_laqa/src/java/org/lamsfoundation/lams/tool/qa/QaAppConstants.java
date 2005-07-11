@@ -103,6 +103,7 @@ public interface QaAppConstants {
     public static final String RICHTEXT_ONLINEINSTRUCTIONS				="richTextOnlineInstructions";
     public static final String RICHTEXT_TITLE							="richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS					="richTextInstructions";
+    public static final String RICHTEXT_BLANK							="<p>&nbsp;</p>";
     
     
     /**

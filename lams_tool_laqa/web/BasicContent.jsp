@@ -89,23 +89,32 @@
 		</c:if>	
 	
 		
-		<c:if test="${sessionScope.editActivityEditMode=='false'}"> 			
-			<c:if test="${requestScope.startMonitoringSummaryRequest == 'true'}"> 			
+		<c:if test="${sessionScope.editActivityEditMode=='false'}"> 
+			<c:if test="${requestScope.startMonitoringSummaryRequest == 'true'}"> 
 			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
 			<tr> <td>
 					<table>
 						<tr> 
-					 		<td> <fmt:message key="label.authoring.title"/>: </td>
-					 		<td> 
-								<c:out value="${sessionScope.title}"/>
-					 		</td>
+					 		<td> <bean:message key="label.authoring.title"/>: </td>
+					 		<td NOWRAP width=700>
+							<FCK:editor id="richTextTitle" basePath="/lams/fckEditor/"
+							      height="200"
+								  width="100%">
+								  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
+							</FCK:editor>
+							</td> 
 					  	</tr>
+
 					  	<tr> 
-					 		<td> <fmt:message key="label.authoring.instructions"/>: </td>
-					 		<td> 
-								<c:out value="${sessionScope.instructions}"/>			 		
-					 		</td>
-					  	</tr>
+					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
+							<td NOWRAP width=700>
+							<FCK:editor id="richTextInstructions" basePath="/lams/fckEditor/"
+							      height="200"
+								  width="100%">
+								  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
+							</FCK:editor>
+							</td>
+						</tr>
 				
 			 		<!--default question content, this entry can not be deleted but can be updated -->
 		

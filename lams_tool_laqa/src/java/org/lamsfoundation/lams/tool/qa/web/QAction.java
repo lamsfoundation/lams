@@ -309,13 +309,18 @@ public class QAction extends DispatchAction implements QaAppConstants
         	 * full form validation should be performed only in standard authoring mode, but not in monitoring EditActivity
         	 */
 
-        	if ((qaAuthoringForm.getTitle() == null) || (qaAuthoringForm.getTitle().length() == 0))
+        	String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
+        	logger.debug("richTextTitle: " + richTextTitle);
+        	String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
+        	logger.debug("richTextInstructions: " + richTextInstructions);
+        	
+        	if ((richTextTitle == null) || (richTextTitle.length() == 0) || richTextTitle.equalsIgnoreCase(RICHTEXT_BLANK))
     		{
         		errors.add(Globals.ERROR_KEY,new ActionMessage("error.title"));
     			logger.debug("add title to ActionMessages");
     		}
 
-    		if ((qaAuthoringForm.getInstructions() == null) || (qaAuthoringForm.getInstructions().length() == 0))
+    		if ((richTextInstructions == null) || (richTextInstructions.length() == 0) || richTextInstructions.equalsIgnoreCase(RICHTEXT_BLANK))
     		{
     			errors.add(Globals.ERROR_KEY, new ActionMessage("error.instructions"));
     			logger.debug("add instructions to ActionMessages: ");
