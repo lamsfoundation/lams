@@ -366,8 +366,8 @@ public class AuthoringUtil implements QaAppConstants {
     	/** create a new qa content and leave the default content intact*/
     	QaContent qa = new QaContent();
 		qa.setQaContentId(new Long(toolContentId));
-		qa.setTitle(qaAuthoringForm.getTitle());
-		qa.setInstructions(qaAuthoringForm.getInstructions());
+		qa.setTitle(richTextTitle);
+		qa.setInstructions(richTextInstructions);
 		qa.setCreationDate(creationDate); /**preserve this from the db*/ 
 		qa.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
 		qa.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/

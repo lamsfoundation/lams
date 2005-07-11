@@ -158,7 +158,9 @@ public abstract class QaUtils implements QaAppConstants {
 			request.getSession().setAttribute(TITLE,qaAuthoringForm.getTitle());
 			request.getSession().setAttribute(INSTRUCTIONS,qaAuthoringForm.getInstructions());
 			
-			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,defaultQaContent.getOfflineInstructions());
+			request.getSession().setAttribute(RICHTEXT_TITLE, defaultQaContent.getTitle());
+		    request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS, defaultQaContent.getInstructions());
+		    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,defaultQaContent.getOfflineInstructions());
 		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,defaultQaContent.getOnlineInstructions());
 		}
 	}

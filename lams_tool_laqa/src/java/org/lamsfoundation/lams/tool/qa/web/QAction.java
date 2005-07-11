@@ -276,7 +276,8 @@ public class QAction extends DispatchAction implements QaAppConstants
         }
         logger.debug("user action is: " + userAction);
 
-        /** add a new question to Map */
+        QaUtils.persistRichText(request);
+    	/** add a new question to Map */
         if (userAction.equalsIgnoreCase(ADD_NEW_QUESTION)) 
 		{
         	request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
@@ -297,7 +298,6 @@ public class QAction extends DispatchAction implements QaAppConstants
         else if (userAction.equalsIgnoreCase(SUBMIT_TAB_DONE))
         {
         	logger.debug("user is done with this tab.");
-        	QaUtils.persistRichText(request);
     	    qaAuthoringForm.resetUserAction();
         	return (mapping.findForward(LOAD_QUESTIONS));
         }/**submit questions contained in the Map*/
@@ -387,7 +387,6 @@ public class QAction extends DispatchAction implements QaAppConstants
         else
         {
         	logger.debug("Warning!: Uncatered-for user action: " + userAction);
-        	QaUtils.persistRichText(request);
         }
 
         /**reset all user actions*/
