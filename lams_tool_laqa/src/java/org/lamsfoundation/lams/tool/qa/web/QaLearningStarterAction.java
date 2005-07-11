@@ -259,7 +259,14 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     * The content we retrieved above must have been created before in Authoring time. 
 	     * And the passed tool session id already refers to it.
 	     */
-	    	    
+	    
+	    
+	    logger.debug("ACTIVITY_TITLE: " + qaContent.getTitle());
+	    request.getSession().setAttribute(ACTIVITY_TITLE,qaContent.getTitle());
+	    
+	    logger.debug("ACTIVITY_INSTRUCTIONS: " + qaContent.getInstructions());
+	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS,qaContent.getInstructions());
+	    
 		logger.debug("REPORT_TITLE_LEARNER: " + qaContent.getReportTitle());
 	    request.getSession().setAttribute(REPORT_TITLE_LEARNER,qaContent.getReportTitle());
 	    

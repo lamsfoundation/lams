@@ -1,7 +1,7 @@
 CREATE TABLE lams.tl_laqa11_content (
        qa_content_id BIGINT(20) NOT NULL
-     , title VARCHAR(100) NOT NULL DEFAULT 'Questions and Answers'
-     , instructions VARCHAR(255) NOT NULL DEFAULT 'Please, take a minute to answer the following questions.'
+     , title VARCHAR(250) NOT NULL DEFAULT 'Questions and Answers'
+     , instructions VARCHAR(250) NOT NULL DEFAULT 'Please, take a minute to answer the following questions.'
      , creation_date VARCHAR(100)
      , update_date DATETIME
      , questions_sequenced TINYINT(1) NOT NULL
@@ -12,8 +12,8 @@ CREATE TABLE lams.tl_laqa11_content (
      , run_offline TINYINT(1) DEFAULT 0
      , define_later TINYINT(1) NOT NULL DEFAULT 0
      , synch_in_monitor TINYINT(1) NOT NULL DEFAULT 0
-     , offline_instructions VARCHAR(255) DEFAULT 'offline instructions'
-     , online_instructions VARCHAR(255) DEFAULT 'online instructions'
+     , offline_instructions VARCHAR(250) DEFAULT 'offline instructions'
+     , online_instructions VARCHAR(250) DEFAULT 'online instructions'
      , end_learning_message VARCHAR(150) DEFAULT 'Thank you!'
      , content_locked TINYINT(1) DEFAULT 0
      , PRIMARY KEY (qa_content_id)
@@ -70,7 +70,7 @@ CREATE TABLE lams.tl_laqa11_usr_resp (
                   REFERENCES lams.tl_laqa11_que_usr (que_usr_id)
 )TYPE=InnoDB;
 
--- test data for content table
+-- data for content table
 INSERT INTO tl_laqa11_content (qa_content_id, 
 								creation_date
 								) 
@@ -78,11 +78,8 @@ VALUES (${default_content_id},
 		NOW());
 
 
--- test data for content questions table
+-- data for content questions table
 INSERT INTO tl_laqa11_que_content (question, 
 									display_order, 
 									qa_content_id) VALUES ('What is the capital of Russia?',1,${default_content_id});
-
-
-
 

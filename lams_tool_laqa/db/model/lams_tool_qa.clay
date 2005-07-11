@@ -90,14 +90,14 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="title" alias="" remarks="" mandatory="true" column-size="255" decimal-digits="0" default-value="Questions and Answers" auto-increment="false">
+<column name="title" alias="" remarks="" mandatory="true" column-size="250" decimal-digits="0" default-value="Questions and Answers" auto-increment="false">
 <column-description/>
 <data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
 <variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
 </data-type>
 </column>
-<column name="instructions" alias="" remarks="" mandatory="true" column-size="255" decimal-digits="0" default-value="Please, take a minute to answer the following questions." auto-increment="false">
+<column name="instructions" alias="" remarks="" mandatory="true" column-size="250" decimal-digits="0" default-value="Please, take a minute to answer the following questions." auto-increment="false">
 <column-description/>
 <data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
@@ -209,14 +209,14 @@
 <variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
-<column name="offline_instructions" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="offline instructions" auto-increment="false">
+<column name="offline_instructions" alias="" remarks="" mandatory="false" column-size="250" decimal-digits="0" default-value="offline instructions" auto-increment="false">
 <column-description/>
 <data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>
 <variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
 </data-type>
 </column>
-<column name="online_instructions" alias="" remarks="" mandatory="false" column-size="255" decimal-digits="0" default-value="online instructions" auto-increment="false">
+<column name="online_instructions" alias="" remarks="" mandatory="false" column-size="250" decimal-digits="0" default-value="online instructions" auto-increment="false">
 <column-description/>
 <data-type name="VARCHAR" jdbc-type="12" selected-variant-pattern="VARCHAR(%n)" literal-prefix="'" literal-suffix="'">
 <variant type-name-pattern="VARCHAR(%n)" precision-variable="%n" precision-min="1" precision-max="255"/>

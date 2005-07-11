@@ -173,8 +173,9 @@ public interface QaAppConstants {
     public static final String MAP_USER_RESPONSES						="mapUserResponses";
     public static final String MAP_MAIN_REPORT							="mapMainReport";
     public static final String MAP_STATS								="mapStats";
-    
-    
+    public static final String ACTIVITY_TITLE							="activityTitle";
+    public static final String ACTIVITY_INSTRUCTIONS					="activityInstructions";
+        
     /**
      * Monitoring Mode constants
      */

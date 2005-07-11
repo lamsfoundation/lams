@@ -33,7 +33,7 @@
 		<br>
 		<table align=center> <!-- Dave to take off-->
 			<tr><td>
-				<fmt:message key="label.learning.qa"/>
+				<c:out value="${sessionScope.activityTitle}" escapeXml="false"/>
 			</td></tr>
 			
 			<tr> <td class="error">
@@ -53,8 +53,12 @@
 				</c:if> 		
 			
 				<c:if test="${sessionScope.isToolActivityOffline == 'false'}"> 			
+					<tr><td>
+						<c:out value="${sessionScope.activityInstructions}" escapeXml="false"/>
+					</td></tr>
+		
 					<tr> <td class="error">
-						<c:out value="${sessionScope.userFeedback}"/>
+						<c:out value="${sessionScope.userFeedback}" escapeXml="true"/>
 					</td></tr>
 				
 					<c:choose> 
