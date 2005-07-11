@@ -25,9 +25,9 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 
 /**
  * @author Manpreet Minhas
- * 
+ * @author Steve.Ni
  * @struts.action 
- * 			path="/tool/sbmt/learner"
+ * 			path="/learner"
  * 			parameter="method"
  * 			name="SbmtLearnerForm"
  * 			input="/sbmtLearner.jsp"

@@ -57,7 +57,7 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/tool/sbmt/learner"
+      path="/learner"
       type="org.lamsfoundation.lams.tool.sbmt.web.LearnerAction"
       name="SbmtLearnerForm"
       scope="request"
@@ -103,7 +103,7 @@
       />
     </action>
     <action
-      path="/tool/sbmt/authoring"
+      path="/authoring"
       type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
       name="SbmtAuthoringForm"
       scope="request"

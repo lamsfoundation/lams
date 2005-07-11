@@ -27,7 +27,7 @@ create_date_time
 )
 VALUES
 (
-'sbmt',
+'lasbmt11',
 'sbmtService',
 'Submit File',
 'Submit File Tool Description',

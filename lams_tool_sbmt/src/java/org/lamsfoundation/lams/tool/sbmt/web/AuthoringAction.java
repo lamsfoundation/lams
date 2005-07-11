@@ -22,7 +22,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
  * @author Manpreet Minhas
  * 
  * @struts.action 
- * 				path="/tool/sbmt/authoring" 
+ * 				path="/authoring" 
  * 				parameter="method"
  * 				name="SbmtAuthoringForm"
  * 				input="/sbmtAuthoring.jsp" 
