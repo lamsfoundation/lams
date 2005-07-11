@@ -493,6 +493,21 @@ public class SubmitFilesService implements ToolContentManager,
 	}
 	/**
 	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getUsers(java.lang.Long)
+	 */
+	public List getUsers(Long contentID){
+		List users = submissionDetailsDAO.getUsersForContent(contentID);
+		Iterator iterator = users.iterator();
+		List table = new ArrayList();
+		while(iterator.hasNext()){
+			Long userID = (Long)iterator.next();			
+			User user = userDAO.getUserById(new Integer(userID.intValue()));
+			table.add(user.getUserDTO());
+		}
+		return table;
+	}
+	/**
+	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#generateReport(java.lang.Long)
 	 */
 	public Hashtable generateReport(Long contentID){
@@ -596,4 +611,5 @@ public class SubmitFilesService implements ToolContentManager,
 			throw new SubmitFilesException("ItemNotFoundException occured while trying to download file " + ie.getMessage());			
 		}
 	}
+
 }

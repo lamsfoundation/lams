@@ -82,6 +82,11 @@
       validate="true"
     >
       <forward
+        name="userlist"
+        path="/userlist.jsp"
+        redirect="false"
+      />
+      <forward
         name="report"
         path="/allLearners.jsp"
         redirect="false"

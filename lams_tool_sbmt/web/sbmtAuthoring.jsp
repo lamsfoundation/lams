@@ -15,7 +15,7 @@
   </head>
   
   <body>
-    <html:form action="/tool/sbmt/authoring?method=updateContent" method="post" focus="login">
+    <html:form action="authoring?method=updateContent" method="post" focus="login">
       <bean:message key="label.authoring.heading"/>
       <table width="100%" height="190" border="0" 
       		 align="center" cellpadding="5" cellspacing="0" 

@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.util.WebUtil;
  * 				scope="request"
  * 				name="emptyForm" 				
  * 
+ * @struts.action-forward name="userlist" path="/userlist.jsp"
  * @struts.action-forward name="report" path="/allLearners.jsp"
  * @struts.action-forward name="status" path="/Status.jsp"
  * @struts.action-forward name="userReport" path="/userReport.jsp"
@@ -61,6 +62,27 @@ public class MonitoringAction extends DispatchAction {
 			   .getSubmitFilesService(this.getServlet()
 			   .getServletContext());
 	}
+	/**
+	 * List all user for monitor staff choose which user need to do report marking.
+	 * It is first step to do report marking.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public ActionForward userList(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+		Long contentID =new Long(WebUtil.readLongParam(request,"contentID"));		
+		submitFilesService = getSubmitFilesService();
+		List userList = submitFilesService.getUsers(contentID);
+		request.getSession().setAttribute("contentID",contentID);
+		request.getSession().setAttribute("USERLIST",userList);
+		return mapping.findForward("userlist");
+	}
+	
 	public ActionForward generateReport(ActionMapping mapping,
 							   ActionForm form,
 							   HttpServletRequest request,

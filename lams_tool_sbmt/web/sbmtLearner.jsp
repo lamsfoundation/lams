@@ -41,23 +41,23 @@
 				<logic:iterate id="filesUploaded" name="SbmtLearnerForm" property="filesUploaded">				
 				<tr>
 				<!--First Row displaying the name of the File -->
-				<td scope="col"><BR><b><bean:message key="label.learner.fileName"/></b></td>
-				<td scope="col"><BR><bean:write name="filesUploaded" property="filePath"/></td>
+				<td><BR><b><bean:message key="label.learner.fileName"/></b></td>
+				<td><BR><bean:write name="filesUploaded" property="filePath"/></td>
 				</tr>
 				<tr>
 				<!--Second Row displaying the description of the File -->
-				<td scope="col"><b><bean:message key="label.learner.fileDescription"/></b></td>
-				<td scope="col"><bean:write name="filesUploaded" property="fileDescription"/></td>
+				<td><b><bean:message key="label.learner.fileDescription"/></b></td>
+				<td><bean:write name="filesUploaded" property="fileDescription"/></td>
 				</tr>
 				<tr>
 				<!--Third row displaying the date of submission of the File -->
-				<td scope="col"><b><bean:message key="label.learner.time"/></b></td>
-				<td scope="col"><bean:write name="filesUploaded" property="dateOfSubmission"/></td>
+				<td><b><bean:message key="label.learner.time"/></b></td>
+				<td><bean:write name="filesUploaded" property="dateOfSubmission"/></td>
 				</tr>
 				<tr>
 				<!--Fourth row displaying the comments -->
-				<td scope="col"><b><bean:message key="label.learner.comments"/></b></td>
-				<td scope="col"><logic:notEmpty name="filesUploaded" property="comments">
+				<td><b><bean:message key="label.learner.comments"/></b></td>
+				<td><logic:notEmpty name="filesUploaded" property="comments">
 						<bean:write name="filesUploaded" property="comments"/><br>
 				</logic:notEmpty>
 				<logic:empty  name="filesUploaded" property="comments">
@@ -67,8 +67,8 @@
 				</tr>
 				<tr>
 				<!--Fifth row displaying the marks-->
-				<td scope="col"><b><bean:message key="label.learner.marks"/></b></td>
-				<td scope="col"><logic:notEmpty name="filesUploaded" property="marks">
+				<td><b><bean:message key="label.learner.marks"/></b></td>
+				<td><logic:notEmpty name="filesUploaded" property="marks">
 						<bean:write name="filesUploaded" property="marks"/><br>
 				</logic:notEmpty>
 				<logic:empty name="filesUploaded" property="marks">

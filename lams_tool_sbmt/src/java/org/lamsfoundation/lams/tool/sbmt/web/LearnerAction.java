@@ -41,6 +41,23 @@ public class LearnerAction extends DispatchAction {
 	public ISubmitFilesService submitFilesService;
 	public static Logger logger = Logger.getLogger(LearnerAction.class);
 	
+	public ActionForward listFiles(ActionMapping mapping,
+									ActionForm form,
+									HttpServletRequest request,
+									HttpServletResponse response){
+		
+		DynaActionForm authForm= (DynaActionForm)form;
+		
+		Long contentID =(Long) authForm.get("contentID");
+		Long userID = (Long)authForm.get("userID");
+		
+		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());				
+		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,contentID);
+		authForm.set("filesUploaded",filesUploaded);
+		return mapping.getInputForward();
+		
+	}
+	
 	public ActionForward uploadFile(ActionMapping mapping,
 									ActionForm form,
 									HttpServletRequest request,

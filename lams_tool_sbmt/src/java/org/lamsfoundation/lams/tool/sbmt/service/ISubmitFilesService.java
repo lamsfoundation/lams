@@ -118,7 +118,11 @@ public interface ISubmitFilesService {
 	 * @return List The list of required objects.
 	 */
 	public List getFilesUploadedByUser(Long userID, Long contentID);
-	
+	/**
+	 * Get information of all users who have submitted file.
+	 * @return The user information list
+	 */
+	public List getUsers(Long contentID);
 	/**
 	 * This method is required in the monitoring enviornment
 	 * when the teacher wants to view all the learners who have
