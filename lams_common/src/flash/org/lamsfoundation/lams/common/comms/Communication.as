@@ -107,12 +107,6 @@ class org.lamsfoundation.lams.common.comms.Communication {
                 //Everything is fine so lookup callback handler on queue 
                 dispatchToHandlerByID(queueID,responseObj.messageValue);
             }
-			
-			
-			
-            
-			
-			
         }else {
             //TODO DI 12/04/05 Handle onLoad error
             //showAlert("System error", "<p>Communication Error</p>", "sad");
@@ -181,10 +175,10 @@ class org.lamsfoundation.lams.common.comms.Communication {
         
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
         if(isFullURL){
-			Debugger.log('Requesting:'+requestURL,Debugger.GEN,'getRequest','Communication');			
+			Debugger.log('Requesting:'+requestURL,Debugger.GEN,'loadXML','Communication');			
 			responseXML.load(requestURL);
 		}else{
-			Debugger.log('Requesting:'+_serverURL+requestURL,Debugger.GEN,'getRequest','Communication');			
+			Debugger.log('Requesting:'+_serverURL+requestURL,Debugger.GEN,'loadXML','Communication');			
 			responseXML.load(_serverURL+requestURL);
 		}
     }
