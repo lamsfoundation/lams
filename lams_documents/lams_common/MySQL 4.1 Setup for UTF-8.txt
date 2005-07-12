@@ -72,6 +72,11 @@ config file /etc/my.cnf like the following:
 transaction-isolation=READ-COMMITTED
 
 
-Note that according to the documentation you should be able to change the system variables to achieve these changes (or at least make changes that produce the same results) using the SET GLOBAL <variable>=<value> commands like we do in MySQL 4.0. Unfortunately the SET GLOBAL does not seem to work for many of the system variables 4.1 (though it doesn't produce an error).
+Note that according to the documentation you should be able to change 
+the system variables to achieve these changes (or at least make changes 
+that produce the same results) using the SET GLOBAL <variable>=<value> 
+commands like we do in MySQL 4.0. Unfortunately the SET GLOBAL does not 
+seem to work for many of the system variables 4.1 (though it doesn't 
+produce an error).
 
 Chris
