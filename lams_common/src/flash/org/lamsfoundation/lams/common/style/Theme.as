@@ -91,4 +91,8 @@ class Theme {
 	function get className():String{
 		return _className;
 	}
+    
+    function get baseStyleObject():Object{
+        return _baseStyleObject;
+    }
 }
