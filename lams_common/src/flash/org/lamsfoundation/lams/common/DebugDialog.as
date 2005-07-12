@@ -23,10 +23,15 @@ class DebugDialog extends MovieClip implements Dialog{
     private var ok_btn:Button;         //OK+Cancel buttons
     private var cancel_btn:Button;
     private var test_btn:Button;
+    private var assign_btn:Button;     //Assign property
+    private var serialize_btn:Button;  //Serialize an object and trace
+    private var showProps_btn:Button;  //Serialize an object and trace
+    private var clear_btn:Button;  //Clear text area
     
     private var panel:MovieClip;       //The underlaying panel base
     
     private var messages_ta:TextArea;
+    private var input_ti:TextInput;     //For inputting text for assign and eval
     
    
     private var fm:FocusManager;            //Reference to focus manager
@@ -76,14 +81,10 @@ class DebugDialog extends MovieClip implements Dialog{
         setupEvents();
         setupOffsets();
         setStyles();
-        
-        test_btn.onRelease = function () {
-            _global.breakpoint();
-            Debugger.log('CRITICAL ERROR',Debugger.CRITICAL,'click','debugDialog');            
-        }
-        
         showDebugLog();
+        messages_ta.wordWrap = false;
     }
+    
     
     private function setupOffsets() {
         //work out offsets from bottom RHS of panel
@@ -106,6 +107,11 @@ class DebugDialog extends MovieClip implements Dialog{
         
         //Register with the Debugger class to pick up log messages
         debug.addEventListener('update',Delegate.create(this, onDebugUpdate))
+        
+        assign_btn.addEventListener('click',Delegate.create(this, assignProperty));
+        serialize_btn.addEventListener('click',Delegate.create(this, serialize));
+        showProps_btn.addEventListener('click',Delegate.create(this, showProperties));
+        clear_btn.addEventListener('click',Delegate.create(this, clearText));
     }
     
     /**
@@ -152,7 +158,104 @@ class DebugDialog extends MovieClip implements Dialog{
         ok_btn.setStyle('styleName',styleObj);
         cancel_btn.setStyle('styleName',styleObj);
     }
+    
+    //This will make the assignment
+    private function assignProperty() {
+        //Get the text to assign
+        var text_str:String = input_ti.text;
+        
+        if(text_str != '' && text_str!=undefined && text_str.indexOf('=')>0) {
+            var beginPos:Number = 0;
+            var endPos:Number = text_str.indexOf('=');
+            var obj_str:String = text_str.substr(0,endPos);
+            //var obj = eval(obj_str);
+            //get the property which is after the = sign
+            var prop = text_str.substr(endPos+1,text_str.length-endPos);
+            //trace('obj_str :' + obj_str);
+            //trace('prop :' + prop);
+           
+            //Make the assignment
+            //obj = prop;
+            var o:String = '_root'
+            var p:String = '_root._x';
+            var val:String = '500'
+            //setProperty(o,p,val);
+            //setProperty(obj,prop,
+        } else {
+            traceMsg('Missing = sign or invalid string');
+        }
+    }
 
+    /**
+    * Evaluates a user defined string to an object, serializes the result and prints it
+    */
+    private function serialize() {
+        //Get the text to assign
+        var text_str:String = input_ti.text;
+        //Need the text before equals
+        var obj:Object = eval(text_str);
+        if(obj) {
+            //Check if toData or itemToData (for config class) methods exist
+            if(obj.toData || obj.itemToData){
+                if(obj.itemToData){
+                    var data = obj.itemToData();
+                } else {
+                    var data = obj.toData();
+                }
+                //Get comms and serialize object
+                var comms = Application.getInstance().getComms();
+                var sx:String = comms.serializeObj(data);
+                //Write out the serialized object
+                messages_ta.html=false;
+                traceMsg('serializing \n' + input_ti.text +'\n \n' + sx);
+                messages_ta.html=true;
+                //Copy to clipboard
+                System.setClipboard(sx);
+            }else {
+                traceMsg("no 'toData' or 'itemToData' method or found for :" + text_str);
+            }
+        } else {
+            traceMsg("can't find object :" + text_str);
+        }
+    }
+    
+    /**
+    * Shows the properties of the object entered into the textInput
+    */
+    function showProperties() {
+        var text_str:String = input_ti.text;
+        if(text_str != '' || text_str!=undefined ) {
+    //		ASSetPropFlags(_global, null, 6, 1);
+            //Eval the target
+            var target = eval(text_str);
+            var i=0;
+            if(target!=undefined) {
+                traceMsg(text_str + ' = ' + target);
+                for (var x in target) {
+                    i++;
+                    traceMsg(i add '.obj: ' add [x] add '  val: ' add target[x]);
+                }
+            } else {
+                traceMsg("Can't find " add text_str);
+            }
+        }
+    }
+    
+    /**
+    * traces a message to the debug text area
+    */
+    private function traceMsg(msg:String) {
+        messages_ta.text+= msg;
+        messages_ta.vPosition = messages_ta.maxVPosition;
+    }
+    
+    /**
+    * Clears the text in the text area
+    */
+    private function clearText() {
+        messages_ta.text = '';
+    }
+    
     /**
     * Called by the cancel button 
     */
@@ -192,12 +295,22 @@ class DebugDialog extends MovieClip implements Dialog{
     */
     public function setSize(w:Number,h:Number):Void{
         //Debugger.log('setSize',Debugger.GEN,'setSize','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
-        //Size the panel
-        panel.setSize(w,h);
-
-        //Buttons
-        ok_btn.move(w-xOkOffset,h-yOkOffset);
-        cancel_btn.move(w-xCancelOffset,h-yCancelOffset);
+        if(w>400 && h>260){
+            //Size the panel
+            panel.setSize(w,h);
+            //Buttons
+            ok_btn.move(w-xOkOffset-20,h-yOkOffset-20);
+            cancel_btn.move(w-xCancelOffset-20,h-yCancelOffset-20);
+        
+            //Resize text area
+            messages_ta.setSize(w-40,h-133);
+    
+            //align buttons        
+            clear_btn._y = showProps_btn._y = serialize_btn._y = assign_btn._y = test_btn._y = h - 75;
+            
+            input_ti.setSize(w-40,input_ti.height);
+            input_ti._y = h - 104;
+        }
     }
     
     //Gets+Sets
