@@ -4,3 +4,4 @@
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 
+<h1> can be handy at some stage for testing </h1>

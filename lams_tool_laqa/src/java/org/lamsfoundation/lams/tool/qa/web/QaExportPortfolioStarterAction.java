@@ -11,10 +11,15 @@
  * <lams base path>/<tool's export portfolio url>&mode=learner&toolSessionId=231&userId=<learners user id>
 */
 
+/**
+	Most of the code base for the export portfolio are re-used functionality from monitoring action and jsps.
+	We make use of TARGET_MODE_LEARNING and TARGET_MODE_MONITORING  since these are the flags in the monitoring codebase 
+	to differentiate between learner and teacher modes.
+*/
+
 
 package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -207,11 +212,16 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
 		logger.debug("toolSessionId: " + toolSessionId);
 
+		/**
+			whether the request is of mode learner or teacher, we construct a single listToolSessions object and 
+			build the report based on that object.
+		*/
 		List listToolSessions=null;
 		if (mode.equalsIgnoreCase(LEARNER))
 		{
 			logger.debug("generate portfolio for mode: " + mode);
 			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_LEARNING);
+			/** a single toolSessionId */
 			listToolSessions.add(1, toolSessionId);
 			logger.debug("listToolSessions: " + listToolSessions);
 		}
@@ -250,7 +260,9 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			toolSessionCounter++;
 		}
 		
+		/** the flag to differentiate between request for monitoring versus request for portfolio */
 		request.setAttribute(PORTFOLIO_REQUEST, new Boolean(true));
+		logger.debug("generate portfolio jsp for mode: " + mode);
 		return (mapping.findForward(PORTFOLIO_REPORT));		
 	}
 		

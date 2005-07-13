@@ -104,15 +104,13 @@
 																			  		<c:out value="${requestScope.answer}"/>
 																		</td>  
 																		<td>  
-																		  	&nbsp&nbsp&nbsp  
-															  				<html:submit property="editReport" styleClass="linkbutton"  
+																			<c:if test="${requestScope.portfolioRequest != 'true'}"> 			
+																			  	&nbsp&nbsp&nbsp  
+															  					<html:submit property="editReport" styleClass="linkbutton"  
 															  											onclick="selectResponse(${requestScope.responseId})">
-															  					
-																		<c:if test="${requestScope.portfolioRequest != 'true'}"> 			
-																				<fmt:message key="label.edit"/>
-																		</c:if>							  																					
-																				
-																			</html:submit>
+																					<fmt:message key="label.edit"/>
+																				</html:submit>
+																			</c:if>							  																					
 																		</td>  
 	
 																		<td>  
@@ -123,30 +121,30 @@
 																			</html:submit>
 																		</td>  
 																	</c:if>																
+	
 																	<c:if test="${requestScope.responseHidden == 'false'}"> 			
 																		<td>  
 																			  		&nbsp&nbsp&nbsp 
 																			  		<c:out value="${requestScope.answer}"/>
 																		</td>  
 																		<td>  
-																		  	&nbsp&nbsp&nbsp  
-															  				<html:submit property="editReport" styleClass="linkbutton"  
+																			<c:if test="${requestScope.portfolioRequest != 'true'}">																		
+																		  		&nbsp&nbsp&nbsp  
+															  					<html:submit property="editReport" styleClass="linkbutton"  
 															  											onclick="selectResponse(${requestScope.responseId})">
-																			<c:if test="${requestScope.portfolioRequest != 'true'}"> 																		  											
-																				<fmt:message key="label.edit"/>
+																					<fmt:message key="label.edit"/>
+																				</html:submit>
 																			</c:if>							  																																									
-																				
-																			</html:submit>
 																		</td>  
 	
 																	<td>  
-																	  	&nbsp&nbsp&nbsp  
-														  				<html:submit property="hideReport" styleClass="linkbutton"  
+														  				<c:if test="${requestScope.portfolioRequest != 'true'}">																	
+																		  	&nbsp&nbsp&nbsp  
+															  				<html:submit property="hideReport" styleClass="linkbutton"  
 														  											onclick="hideResponse(${requestScope.responseId})">
-														  				<c:if test="${requestScope.portfolioRequest != 'true'}">														  											
-																			<fmt:message key="label.hide"/>
+																				<fmt:message key="label.hide"/>
+																			</html:submit>																			
 																		</c:if>							  																																																												
-																		</html:submit>
 																	</td>  
 																	</c:if>																
 																</c:if>	
@@ -155,14 +153,16 @@
 																	<td>  
 																				&nbsp&nbsp&nbsp <fmt:message key="label.hidden"/> : <c:out value="${requestScope.answer}"/> 
 																	</td>  
+			
 																	<td>  
-																	  	&nbsp&nbsp&nbsp  
-														  				<html:submit property="editReport" styleClass="linkbutton"  
-														  											onclick="selectResponse(${requestScope.responseId})">
-														  				<c:if test="${requestScope.portfolioRequest != 'true'}"> 																		  											
-																			<fmt:message key="label.edit"/>
+														  				<c:if test="${requestScope.portfolioRequest != 'true'}"> 																		  																												
+																		  	&nbsp&nbsp&nbsp  
+															  				<html:submit property="editReport" styleClass="linkbutton"  
+															  											onclick="selectResponse(${requestScope.responseId})">
+																				<fmt:message key="label.edit"/>
+																			</html:submit>																			
 																		</c:if>																																			
-																		</html:submit>
+		
 																	</td>  
 																	<td>  
 																	  	&nbsp&nbsp&nbsp  

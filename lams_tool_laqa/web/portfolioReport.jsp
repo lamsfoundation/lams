@@ -11,6 +11,7 @@
 				requestScope.userExceptionNumberFormat 			== 'true' ||
 				requestScope.userExceptionToolSessionIdRequired	== 'true' ||
 				requestScope.userExceptionContentIdRequired		== 'true' ||
+				requestScope.userExceptionNoToolSessions		== 'true' ||
 				requestScope.userExceptionContentDoesNotExist	== 'true' }"> 	
 		<table align=center> <!-- Dave to take off-->
 			<tr> <td class="error">   
@@ -25,7 +26,8 @@
 				  requestScope.userExceptionNumberFormat 		!= 'true' &&
   				  requestScope.userExceptionToolSessionIdRequired != 'true' &&
 				  requestScope.userExceptionContentIdRequired	  != 'true' &&
-				  requestScope.userExceptionContentDoesNotExist != 'true' 
+				  requestScope.userExceptionNoToolSessions		  != 'true' &&				  
+				  requestScope.userExceptionContentDoesNotExist   != 'true' 
 				}"> 	
 		<table align=center> <!-- Dave to take off-->
 				<jsp:include page="groupsReport.jsp" />	
