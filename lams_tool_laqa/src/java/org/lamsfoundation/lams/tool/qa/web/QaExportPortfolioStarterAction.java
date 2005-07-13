@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
@@ -157,8 +158,18 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 				logger.debug("forwarding to: " + PORTFOLIO_REPORT);
 				return (mapping.findForward(PORTFOLIO_REPORT));
 			}
-			logger.debug("final toolSessionId :" + toolSessionId);
+			logger.debug("final toolSessionId before exists test :" + toolSessionId);
 		}
+		
+		QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
+		if (qaSession == null)
+		{
+	    	persistError(request,"error.toolSession.doesNotExist");
+			request.setAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST, new Boolean(true));
+			logger.debug("forwarding to: " + PORTFOLIO_REPORT);
+			return (mapping.findForward(PORTFOLIO_REPORT));
+		}
+		logger.debug("final toolSessionId :" + toolSessionId);
 		
 		String strToolContentId="";
 		Long toolContentId=null;

@@ -12,6 +12,7 @@
 				requestScope.userExceptionToolSessionIdRequired	== 'true' ||
 				requestScope.userExceptionContentIdRequired		== 'true' ||
 				requestScope.userExceptionNoToolSessions		== 'true' ||
+				requestScope.userExceptionToolSessionDoesNotExist == 'true' ||
 				requestScope.userExceptionContentDoesNotExist	== 'true' }"> 	
 		<table align=center> <!-- Dave to take off-->
 			<tr> <td class="error">   
@@ -20,14 +21,15 @@
 		</table>
 	</c:if>						
 	
-	<c:if test="${requestScope.userExceptionUserIdNotNumeric 	!= 'true' && 
-				  requestScope.userExceptionUserIdNotAvailable 	!= 'true' && 
-				  requestScope.userExceptionModeRequired 		!= 'true' &&
-				  requestScope.userExceptionNumberFormat 		!= 'true' &&
-  				  requestScope.userExceptionToolSessionIdRequired != 'true' &&
-				  requestScope.userExceptionContentIdRequired	  != 'true' &&
-				  requestScope.userExceptionNoToolSessions		  != 'true' &&				  
-				  requestScope.userExceptionContentDoesNotExist   != 'true' 
+	<c:if test="${requestScope.userExceptionUserIdNotNumeric 		!= 'true' && 
+				  requestScope.userExceptionUserIdNotAvailable 		!= 'true' && 
+				  requestScope.userExceptionModeRequired 			!= 'true' &&
+				  requestScope.userExceptionNumberFormat 			!= 'true' &&
+  				  requestScope.userExceptionToolSessionIdRequired 	!= 'true' &&
+				  requestScope.userExceptionContentIdRequired	  	!= 'true' &&
+				  requestScope.userExceptionNoToolSessions		  	!= 'true' &&
+  				  requestScope.userExceptionToolSessionDoesNotExist != 'true' &&
+				  requestScope.userExceptionContentDoesNotExist   	!= 'true' 
 				}"> 	
 		<table align=center> <!-- Dave to take off-->
 				<jsp:include page="groupsReport.jsp" />	
