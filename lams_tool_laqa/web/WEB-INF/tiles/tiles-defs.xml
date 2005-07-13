@@ -86,6 +86,19 @@ http://www.gnu.org/licenses/gpl.txt
 	</definition>
 
 
+	<definition name=".exportPortfolioStarter" extends=".baseDef" >
+		<put name="title" value="Starter for Q/A Export Portfolio"/>
+		<put name="pageHeader" value = "Starter for Q/A Export Portfolio"/>
+		<put name="content" value="/exportPortfolioIndex.jsp" />	
+	</definition>
+
+	<definition name=".portfolioReport" extends=".baseDef" >
+		<put name="title" value="Portfolio Report"/>
+		<put name="pageHeader" value = "Portfolio Report"/>
+		<put name="content" value="/portfolioReport.jsp" />	
+	</definition>
+
+
 <!-- ============= Qa Monitoring Starter Page Definitions ====================== -->	
 	<definition name=".monitoringStarter" extends=".baseDef" >
 		<put name="title" value="Starter for Q/A Monitoring"/>

@@ -35,6 +35,7 @@ public interface QaAppConstants {
 	public static final String TARGET_MODE_AUTHORING					="Authoring";
 	public static final String TARGET_MODE_LEARNING						="Learning";
 	public static final String TARGET_MODE_MONITORING					="Monitoring";
+	public static final String TARGET_MODE_EXPORT_PORTFOLIO				="ExportPortfolio";
 	
 	public static final String AUTHORING_STARTER						="starter";
 	public static final String LEARNING_STARTER							="learningStarter";
@@ -140,7 +141,15 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED	="userExceptionMonitoringTabContentIdRequired";
     public static final String USER_EXCEPTION_DEAFULTCONTENT_NOTSETUP	="userExceptionDefaultContentNotSetup";
     
-    
+    /**
+     * export portfolio constants
+     */
+    public static final String MODE										="mode";  
+    public static final String LEARNER									="learner"; 
+    public static final String TEACHER									="teacher";
+    public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";					
+    public static final String PORTFOLIO_REPORT							="portfolioReport";
+        
     /**
      * user actions
      */

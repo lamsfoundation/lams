@@ -189,6 +189,23 @@
 
 </action>
 
+
+<!--Export Portfoloio Starter  -->
+ <action
+      path="/exportPortfolioStarter"
+      type="org.lamsfoundation.lams.tool.qa.web.QaExportPortfolioStarterAction"
+      name="QaExportPortfolioForm"
+      scope="session"
+      input=".exportPortfolioStarter"
+    >
+      	<forward
+        name="portfolioReport"
+        path=".portfolioReport"
+        redirect="true"
+      />	
+    
+ </action>
+
  </action-mappings>
 
   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
