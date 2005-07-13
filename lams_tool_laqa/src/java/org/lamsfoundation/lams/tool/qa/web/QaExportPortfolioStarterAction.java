@@ -250,6 +250,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			toolSessionCounter++;
 		}
 		
+		request.setAttribute(PORTFOLIO_REQUEST, new Boolean(true));
 		return (mapping.findForward(PORTFOLIO_REPORT));		
 	}
 		

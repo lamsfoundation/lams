@@ -27,7 +27,9 @@
 				  requestScope.userExceptionContentIdRequired	  != 'true' &&
 				  requestScope.userExceptionContentDoesNotExist != 'true' 
 				}"> 	
-					<h3> main portfoloio report </h3>
+		<table align=center> <!-- Dave to take off-->
+				<jsp:include page="groupsReport.jsp" />	
+		</table>
 	</c:if>						
 		
 	

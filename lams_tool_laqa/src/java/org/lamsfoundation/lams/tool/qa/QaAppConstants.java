@@ -150,7 +150,7 @@ public interface QaAppConstants {
     public static final String TEACHER									="teacher";
     public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";					
     public static final String PORTFOLIO_REPORT							="portfolioReport";
-    public static final int    MAX_GROUPS_COUNT							=100;
+    public static final String PORTFOLIO_REQUEST						="portfolioRequest";
         
     /**
      * user actions
