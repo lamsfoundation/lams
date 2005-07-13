@@ -14,6 +14,9 @@
 
 package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +33,8 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
+import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -58,7 +63,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 	    /**
 	     * mark the http session as an authoring activity 
 	     */
-	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_EXPORT_PORTFOLIO);
+	    //request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_EXPORT_PORTFOLIO);
 	    
 	    /**
 	     * obtain and setup the current user's data 
@@ -91,7 +96,6 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		}
 		logger.debug("TOOL_USER is:" + request.getSession().getAttribute(TOOL_USER));
 		
-		
 		String mode="";
 		mode=request.getParameter(MODE);
 		logger.debug("mode: " + mode);
@@ -114,6 +118,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			logger.debug("forwarding to: " + PORTFOLIO_REPORT);
 			return (mapping.findForward(PORTFOLIO_REPORT));
 		}
+		request.getSession().setAttribute(MODE,mode);
 		
 		String strToolSessionId="";
 		Long toolSessionId=null;
@@ -187,6 +192,68 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			}
 		}
 	
+		/**
+			at this point we have session attributes TOOL_CONTENT_ID, TOOL_SESSION_ID and TOOL_USER AND MODE ready to use  
+		*/
+	
+		mode=(String)request.getSession().getAttribute(MODE);
+		logger.debug("mode is: " + mode);
+			
+		toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+		logger.debug("toolContentId: " + toolContentId);
+		
+		toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+		logger.debug("toolSessionId: " + toolSessionId);
+
+		int toolSessionCount=0;				
+		ArrayList toolSessions = new ArrayList();
+		if (mode.equalsIgnoreCase(LEARNER))
+		{
+			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_LEARNING);
+			logger.debug("generate portfolio for mode: " + mode);
+			ArrayList singleToolSession= new ArrayList();
+			singleToolSession.add(toolSessionId);
+			logger.debug("singleToolSession: " + singleToolSession);
+			toolSessions=singleToolSession;
+			logger.debug("toolSessions: " + toolSessions);
+			toolSessionCount=1;
+		}
+		else
+		{
+			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_MONITORING);
+			logger.debug("generate portfolio for mode: " + mode);
+			/** we already know that this content exists in the db */
+			QaContent qa=qaService.loadQa(toolContentId.longValue());
+			logger.debug("qa: " + qa);
+			toolSessions= (ArrayList)qaService.getToolSessionsForContent(qa);
+			logger.debug("toolSessions: " + toolSessions);
+			toolSessionCount=toolSessions.size();
+		}
+		logger.debug("final toolSessions: " + toolSessions);
+		logger.debug("toolSessionCount: " + toolSessionCount);
+		
+		if (toolSessionCount == 0)
+		{
+	    	persistError(request,"error.content.noToolSessions");
+			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true));
+			logger.debug("forwarding to: " + PORTFOLIO_REPORT);
+			return (mapping.findForward(PORTFOLIO_REPORT));
+		}
+		
+		Map mapToolSessions= new TreeMap(new QaStringComparator());
+		request.getSession().setAttribute(MAP_TOOL_SESSIONS,mapToolSessions);
+		LearningUtil learningUtil= new LearningUtil();
+		for (int toolSessionIdIndex=1; toolSessionIdIndex <= toolSessionCount; toolSessionIdIndex++)
+		{
+			logger.debug("toolSessionIdIndex: " + toolSessionIdIndex);
+			Long currentToolSession=(Long)toolSessions.get(toolSessionIdIndex);
+			logger.debug("current currentToolSession: " + currentToolSession);
+			request.getSession().setAttribute(TOOL_SESSION_ID, currentToolSession);
+			
+			learningUtil.buidLearnerReport(request, toolSessionIdIndex);
+		}
+		
+
 		return (mapping.findForward(PORTFOLIO_REPORT));		
 	}
 		

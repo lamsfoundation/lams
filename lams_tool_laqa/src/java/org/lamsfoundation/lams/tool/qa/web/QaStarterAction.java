@@ -133,7 +133,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			{
 				logger.debug("default content id has not been setup");
 				persistError(request,"error.defaultContent.notSetup");
-		    	request.setAttribute(USER_EXCEPTION_DEAFULTCONTENT_NOTSETUP, new Boolean(true));
+		    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
 				return (mapping.findForward(LOAD_QUESTIONS));	
 			}
 		}
@@ -141,7 +141,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		{
 			logger.debug("error getting the default content id: " + e.getMessage());
 			persistError(request,"error.defaultContent.notSetup");
-	    	request.setAttribute(USER_EXCEPTION_DEAFULTCONTENT_NOTSETUP, new Boolean(true));
+	    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
 

@@ -45,7 +45,7 @@ public class MonitoringUtil implements QaAppConstants{
     	logger.debug("retrieving qaContent: " + qaContent);
     
     	/**
-    	 * iterate all the tool sessions, if even one session is INCOMPLETE, the functions returns false
+    	 * iterate all the tool sessions, if even one session is INCOMPLETE, the function returns false
     	 */
     	if (qaContent != null)
     	{

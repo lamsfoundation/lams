@@ -136,7 +136,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		{
 		    if ((toolContentId != null) && (toolContentId.length() > 0)) 
 		    {
-		    	logger.debug("Since TOOL_CONTENT_ID has been passed explicitly we will refer to that one instead of the one derived from tool sessions");
 		    	if (!QaUtils.existsContent(new Long(toolContentId).longValue(), request))
 		    	{
 		    		persistError(request,"error.content.doesNotExist");
@@ -185,49 +184,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			 * this block of code will normally never run!
 			 */
 			logger.debug("Warning! We are not supposed to reach here!");
-			/*
-			logger.debug(logger + "found sessions: isOnlyContentIdAvailable: " + isOnlyContentIdAvailable);
-			if ((toolContentId != null) && (toolContentId.length() > 0)) 
-			{
-				boolean isToolSessionCompatibleToContent=isToolSessionCompatibleToContent(new Long(toolContentId), request);
-				logger.debug(logger + "isToolSessionCompatibleToContent: " + isToolSessionCompatibleToContent);
-				if (!isToolSessionCompatibleToContent)
-				{
-			    	persistError(request,"error.contentAndToolSession.notCompatible");
-					request.setAttribute(USER_EXCEPTION_UNCOMPATIBLE_IDS, new Boolean(true));
-					logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + MONITORING_ERROR);
-					return (mapping.findForward(MONITORING_REPORT));
-				}
-			}
-			
-			Boolean userExceptionNumberFormat=(Boolean)request.getAttribute(USER_EXCEPTION_NUMBERFORMAT);
-			logger.debug(logger + "userExceptionNumberFormat: " + userExceptionNumberFormat);
-			if ((userExceptionNumberFormat != null) && (userExceptionNumberFormat.booleanValue()))
-			{
-				persistError(request,"error.numberFormatException");
-				logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + MONITORING_ERROR);
-				return (mapping.findForward(MONITORING_REPORT));
-			}
-			
-			Boolean userExceptionWrongFormat=(Boolean)request.getAttribute(USER_EXCEPTION_WRONG_FORMAT);
-			logger.debug(logger + "userExceptionWrongFormat: " + userExceptionWrongFormat);
-			if ((userExceptionWrongFormat != null) && (userExceptionWrongFormat.booleanValue()))
-			{
-				persistError(request,"error.toolSessions.wrongFormat");
-				logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + MONITORING_ERROR);
-				return (mapping.findForward(MONITORING_REPORT));
-			}
-			
-			Boolean userExceptionToolSessionDoesNotExist=(Boolean)request.getAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST);
-			logger.debug(logger + "userExceptionToolSessionDoesNotExist: " + userExceptionToolSessionDoesNotExist);
-			if ((userExceptionToolSessionDoesNotExist != null) && (userExceptionToolSessionDoesNotExist.booleanValue()))
-			{
-				persistError(request,"error.toolSessions.doesNotExist");
-				logger.debug(logger + " " + this.getClass().getName() +  "forwarding to: " + MONITORING_ERROR);
-				return (mapping.findForward(MONITORING_REPORT));
-			}
-			qaMonitoringForm.setSummary("summary");
-			*/
 		}
 		else
 		{

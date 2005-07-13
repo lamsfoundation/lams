@@ -321,7 +321,7 @@ public class LearningUtil implements QaAppConstants{
         		questionIndex=questionIndex+1;
         		logger.debug("current questionIndex: " + questionIndex);
         		
-        		String targetMode=(String )request.getSession().getAttribute(TARGET_MODE);
+        		String targetMode=(String) request.getSession().getAttribute(TARGET_MODE);
             	logger.debug("TARGET_MODE: " + targetMode);
             	
             	logger.debug("buidLearnerReport for TARGET_MODE: " + targetMode);
