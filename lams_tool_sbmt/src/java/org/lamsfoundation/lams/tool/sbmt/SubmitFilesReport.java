@@ -90,7 +90,7 @@ public class SubmitFilesReport implements Serializable,Cloneable{
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */
-	protected Object clone() throws CloneNotSupportedException {
+	public Object clone() {
 		
 		Object obj = null;
 		try {

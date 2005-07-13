@@ -206,18 +206,22 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 		try {
 			obj = super.clone();
 			//clone SubmitFIleSession object
-			Iterator iter = toolSession.iterator();
-			Set set = new TreeSet();
-			while(iter.hasNext())
-				set.add(((SubmitFilesSession)iter.next()).clone());
-			((SubmitFilesContent)obj).toolSession = set;
+			if(toolSession != null ){
+				Iterator iter = toolSession.iterator();
+				Set set = new TreeSet();
+				while(iter.hasNext())
+					set.add(((SubmitFilesSession)iter.next()).clone());
+				((SubmitFilesContent)obj).toolSession = set;
+			}
 			
 			//clone SubmissionDetails object
-			iter = submissionDetails.iterator();
-			set = new TreeSet();
-			while(iter.hasNext())
-				set.add(((SubmissionDetails)iter.next()).clone());
-			((SubmitFilesContent)obj).submissionDetails = set;
+			if(submissionDetails != null){
+				Iterator iter = submissionDetails.iterator();
+				Set set = new TreeSet();
+				while(iter.hasNext())
+					set.add(((SubmissionDetails)iter.next()).clone());
+				((SubmitFilesContent)obj).submissionDetails = set;
+			}
 			
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + SubmissionDetails.class + " failed");
