@@ -15,6 +15,8 @@
 package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -205,34 +207,27 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
 		logger.debug("toolSessionId: " + toolSessionId);
 
-		int toolSessionCount=0;				
-		ArrayList toolSessions = new ArrayList();
+		List listToolSessions=null;
 		if (mode.equalsIgnoreCase(LEARNER))
 		{
-			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_LEARNING);
 			logger.debug("generate portfolio for mode: " + mode);
-			ArrayList singleToolSession= new ArrayList();
-			singleToolSession.add(toolSessionId);
-			logger.debug("singleToolSession: " + singleToolSession);
-			toolSessions=singleToolSession;
-			logger.debug("toolSessions: " + toolSessions);
-			toolSessionCount=1;
+			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_LEARNING);
+			listToolSessions.add(1, toolSessionId);
+			logger.debug("listToolSessions: " + listToolSessions);
 		}
 		else
 		{
-			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_MONITORING);
 			logger.debug("generate portfolio for mode: " + mode);
+			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_MONITORING);
+
 			/** we already know that this content exists in the db */
 			QaContent qa=qaService.loadQa(toolContentId.longValue());
 			logger.debug("qa: " + qa);
-			toolSessions= (ArrayList)qaService.getToolSessionsForContent(qa);
-			logger.debug("toolSessions: " + toolSessions);
-			toolSessionCount=toolSessions.size();
+			listToolSessions= qaService.getToolSessionsForContent(qa);
+			logger.debug("listToolSessions: " + listToolSessions);
 		}
-		logger.debug("final toolSessions: " + toolSessions);
-		logger.debug("toolSessionCount: " + toolSessionCount);
 		
-		if (toolSessionCount == 0)
+		if (listToolSessions.size() == 0)
 		{
 	    	persistError(request,"error.content.noToolSessions");
 			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true));
@@ -243,17 +238,18 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		Map mapToolSessions= new TreeMap(new QaStringComparator());
 		request.getSession().setAttribute(MAP_TOOL_SESSIONS,mapToolSessions);
 		LearningUtil learningUtil= new LearningUtil();
-		for (int toolSessionIdIndex=1; toolSessionIdIndex <= toolSessionCount; toolSessionIdIndex++)
+		
+		Iterator sessionListIterator=listToolSessions.iterator();
+		int toolSessionCounter=1;
+		while (sessionListIterator.hasNext())
 		{
-			logger.debug("toolSessionIdIndex: " + toolSessionIdIndex);
-			Long currentToolSession=(Long)toolSessions.get(toolSessionIdIndex);
-			logger.debug("current currentToolSession: " + currentToolSession);
-			request.getSession().setAttribute(TOOL_SESSION_ID, currentToolSession);
-			
-			learningUtil.buidLearnerReport(request, toolSessionIdIndex);
+			toolSessionId=(Long)sessionListIterator.next();
+			logger.debug("toolSessionId: " + toolSessionId);
+			request.getSession().setAttribute(TOOL_SESSION_ID, toolSessionId);
+			learningUtil.buidLearnerReport(request, toolSessionCounter);
+			toolSessionCounter++;
 		}
 		
-
 		return (mapping.findForward(PORTFOLIO_REPORT));		
 	}
 		
