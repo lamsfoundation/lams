@@ -146,7 +146,7 @@ public class MonitoringAction extends DispatchAction {
 								  HttpServletResponse response){
 		Long contentID =new Long(WebUtil.readLongParam(request,"contentID"));
 		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
-		Long reportID = new Long(WebUtil.readLongParam(request,"reportID"));
+		Long detailID = new Long(WebUtil.readLongParam(request,"detailID"));
 		
 		submitFilesService = getSubmitFilesService();
 		
@@ -154,7 +154,7 @@ public class MonitoringAction extends DispatchAction {
 		request.getSession().setAttribute("user",
 										  submitFilesService.getUserDetails(userID));
 		request.getSession().setAttribute("fileDetails",
-										  submitFilesService.getFileDetails(reportID));
+										  submitFilesService.getFileDetails(detailID));
 		return mapping.findForward("updateMarks");
 }
 

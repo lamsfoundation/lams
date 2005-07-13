@@ -50,7 +50,7 @@ public class TestSubmitFilesSession extends AbstractLamsTestCase {
 	}
 	public void testAddSubmitFilesSession(){
 		submitFilesContent = submitFilesContentDAO.getContentByID(new Long(1));
-		submitFilesSession = new SubmitFilesSession(new Integer(1),submitFilesContent);
+		submitFilesSession = new SubmitFilesSession(new Long(1),SubmitFilesSession.INCOMPLETE);
 		submitFilesSessionDAO.insert(submitFilesSession);
 		assertNotNull(submitFilesSession.getSessionID());
 	}

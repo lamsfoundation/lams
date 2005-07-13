@@ -4,12 +4,17 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 
 
 /** 
  * @hibernate.class table="tl_lasbmt11_session"
 */
-public class SubmitFilesSession implements Serializable {
+public class SubmitFilesSession implements Serializable{
+	private static Logger log = Logger.getLogger(SubmitFilesSession.class);
+	
+    public final static int INCOMPLETE = 0;
+    public final static int COMPLETED = 1;
     
 	/** identifier field */
     private Long sessionID;
@@ -17,13 +22,10 @@ public class SubmitFilesSession implements Serializable {
     /** persistent field */
     private Integer status;
 
-    /** persistent field */
-    private SubmitFilesContent contentID;
-
     /** full constructor */
-    public SubmitFilesSession(Integer status, SubmitFilesContent contentID) {
-        this.status = status;
-        this.contentID = contentID;
+    public SubmitFilesSession(Long sessionID,int status) {
+    	this.sessionID = sessionID;
+        this.status = new Integer(status);
     }
 
     /** default constructor */
@@ -52,18 +54,6 @@ public class SubmitFilesSession implements Serializable {
         this.status = status;
     }
 
-    /** 
-     * @hibernate.many-to-one not-null="true" 
-     * @hibernate.column name="content_id"         
-     *         
-     */
-    public SubmitFilesContent getContentID() {
-        return this.contentID;
-    }
-
-    public void setContentID(SubmitFilesContent contentID) {
-        this.contentID = contentID;
-    }
 
     public String toString() {
         return new ToStringBuilder(this)
@@ -79,7 +69,6 @@ public class SubmitFilesSession implements Serializable {
         return new EqualsBuilder()
             .append(this.getSessionID(), castOther.getSessionID())
             .append(this.getStatus(), castOther.getStatus())
-            .append(this.getContentID(), castOther.getContentID())
             .isEquals();
     }
 
@@ -87,8 +76,19 @@ public class SubmitFilesSession implements Serializable {
         return new HashCodeBuilder()
             .append(getSessionID())
             .append(getStatus())
-            .append(getContentID())
             .toHashCode();
     }
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	protected Object clone() throws CloneNotSupportedException {
+		Object obj = null;
+		try {
+			obj = super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + SubmissionDetails.class + " failed");
+		}
+		return obj;
+	}
 }

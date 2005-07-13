@@ -22,4 +22,11 @@ public class SubmitFilesContentDAO extends BaseDAO implements ISubmitFilesConten
 	public SubmitFilesContent getContentByID(Long contentID) {
 		return (SubmitFilesContent) super.find(SubmitFilesContent.class,contentID);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO#save(org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent)
+	 */
+	public void save(SubmitFilesContent content) {
+		this.getHibernateTemplate().save(content);		
+	}
 }

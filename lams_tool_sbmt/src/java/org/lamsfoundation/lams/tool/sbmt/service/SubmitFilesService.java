@@ -31,7 +31,9 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -52,18 +54,20 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
-import org.lamsfoundation.lams.tool.sbmt.dto.LearnerDetailsDTO;
-import org.lamsfoundation.lams.tool.sbmt.dto.StatusReportDTO;
-import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
+import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.LearnerDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.StatusReportDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.springframework.dao.DataAccessException;
 
 /**
  * @author Manpreet Minhas
@@ -71,6 +75,8 @@ import org.lamsfoundation.lams.util.wddx.FlashMessage;
 public class SubmitFilesService implements ToolContentManager,
 		ToolSessionManager, ISubmitFilesService {
 
+	private static Logger log = Logger.getLogger(SubmitFilesService.class);
+	
 	private ISubmitFilesContentDAO submitFilesContentDAO;
 
 	private ISubmitFilesReportDAO submitFilesReportDAO;
@@ -144,30 +150,62 @@ public class SubmitFilesService implements ToolContentManager,
 
 		SubmitFilesContent fromContent = submitFilesContentDAO
 				.getContentByID(fromContentId);
-		SubmitFilesContent toContent = SubmitFilesContent.newInstance(
-				fromContent, toContentId);
+		SubmitFilesContent toContent = (SubmitFilesContent) fromContent.clone();
+		//reset some new attributes for toContent
+		toContent.setContentID(toContentId);
+		toContent.setToolSession(new TreeSet());
+		
 		submitFilesContentDAO.insert(toContent);
 	}
-
+    /**
+     * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsRunOffline(java.lang.Long)
+     */
+    public void setAsRunOffline(Long toolContentId)
+    {
+        //pre-condition validation
+        if (toolContentId == null)
+            throw new SubmitFilesException("Fail to set tool content to run offline - "
+                    + " based on null toolContentId");
+        try
+        {
+            SubmitFilesContent content = submitFilesContentDAO.getContentByID(toolContentId);
+            if ( content == null ) {
+                content = duplicateDefaultToolContent(toolContentId);
+            }
+            content.setRunOffline(true);
+            submitFilesContentDAO.save(content);
+        }
+        catch (DataAccessException e)
+        {
+            throw new SubmitFilesException("Exception occured when LAMS is setting content to run offline"
+                                                  + e.getMessage(),e);
+        }
+    }
+    
 	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsDefineLater(java.lang.Long)
-	 */
-	public void setAsDefineLater(Long toolContentId) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsRunOffline(java.lang.Long)
-	 */
-	public void setAsRunOffline(Long toolContentId) {
-		// TODO Auto-generated method stub
-
-	}
+     * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsDefineLater(java.lang.Long)
+     */
+    public void setAsDefineLater(Long toolContentId) {
+        //pre-condition validation
+        if (toolContentId == null)
+            throw new SubmitFilesException("Fail to set tool content to define later - "
+                    + " based on null toolContentId");
+        try
+        {
+        	SubmitFilesContent content = submitFilesContentDAO.getContentByID(toolContentId);
+            if ( content == null ) {
+                content = duplicateDefaultToolContent(toolContentId);
+            }
+            content.setDefineLater(true);
+            submitFilesContentDAO.save(content);
+        }
+        catch (DataAccessException e)
+        {
+            throw new SubmitFilesException("Exception occured when LAMS is setting content to run define later"
+                                                  + e.getMessage(),e);
+        }
+       
+    }
 
 	/**
 	 * (non-Javadoc)
@@ -341,9 +379,9 @@ public class SubmitFilesService implements ToolContentManager,
 			NodeKey nodeKey = uploadFileToRepository(stream, fileName, mimeType);
 			SubmissionDetails details = new SubmissionDetails(filePath,fileDescription,dateOfSubmission,
 															  nodeKey.getUuid(),nodeKey.getVersion(),
-															  userID,content);
+															  userID);
 			submissionDetailsDAO.insert(details);
-			submitFilesReportDAO.insert(new SubmitFilesReport(details));
+			submitFilesReportDAO.insert(details.getReport());
 		}
 	}	
 
@@ -383,7 +421,30 @@ public class SubmitFilesService implements ToolContentManager,
 	 *      java.lang.Long)
 	 */
 	public void createToolSession(Long toolSessionId, Long toolContentId) {
-		// TODO Auto-generated method stub
+        //pre-condition validation
+        if (toolSessionId == null || toolContentId == null)
+            throw new SubmitFilesException("Fail to create a submission session"
+                    + " based on null toolSessionId or toolContentId");
+
+        log.debug("Start to create submission session based on toolSessionId["
+                + toolSessionId.longValue() + "] and toolContentId["
+                + toolContentId.longValue() + "]");
+        try
+        {
+            SubmitFilesContent submitContent = submitFilesContentDAO.getContentByID(toolContentId);
+
+            SubmitFilesSession submitSession = new SubmitFilesSession (toolSessionId,
+            												SubmitFilesSession.INCOMPLETE);
+                                                            
+            submitFilesSessionDAO.createSession(submitSession);
+            log.debug("Survey session created");
+        }
+        catch (DataAccessException e)
+        {
+            throw new SubmitFilesException("Exception occured when lams is creating"
+                                                         + " a submission Session: "
+                                                         + e.getMessage(),e);
+        }
 
 	}
 
@@ -483,13 +544,9 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 		return details;
 	}
-	public FileDetailsDTO getFileDetails(Long reportID){
-		SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
-		if(report!=null){
-			SubmissionDetails details = report.getSubmissionDetails();
-			return new FileDetailsDTO(details,report);			
-		}else
-			return null;
+	public FileDetailsDTO getFileDetails(Long detailID){
+			SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
+			return new FileDetailsDTO(details);			
 	}
 	/**
 	 * (non-Javadoc)
@@ -611,5 +668,14 @@ public class SubmitFilesService implements ToolContentManager,
 			throw new SubmitFilesException("ItemNotFoundException occured while trying to download file " + ie.getMessage());			
 		}
 	}
+    /**
+	 * @param toolContentId
+	 * @return
+	 */
+	private SubmitFilesContent duplicateDefaultToolContent(Long toolContentId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

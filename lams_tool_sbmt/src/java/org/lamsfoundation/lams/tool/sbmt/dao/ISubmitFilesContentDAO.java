@@ -21,6 +21,14 @@ public interface ISubmitFilesContentDAO extends IBaseDAO{
 	 * @param contentID The contentID to be looked up
 	 * @return SubmitFilesContent The required populated object
 	 */
-	public SubmitFilesContent getContentByID(Long contentID);	
+	public SubmitFilesContent getContentByID(Long contentID);
+
+	/**
+	 * Save the given content. If the content existed, then update the old
+	 * content by new given content.
+	 *  
+	 * @param content
+	 */
+	public void save(SubmitFilesContent content);	
 	
 }

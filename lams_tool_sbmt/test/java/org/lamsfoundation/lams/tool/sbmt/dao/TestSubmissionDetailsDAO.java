@@ -53,8 +53,7 @@ public class TestSubmissionDetailsDAO extends AbstractLamsTestCase {
 	public void testAddDetails(){	
 		SubmitFilesContent content = submitFilesContentDAO.getContentByID(new Long(1));
 		SubmissionDetails details = new SubmissionDetails("filePath","fileDescription",new Date(),
-															  new Long(1),new Long(1),new Long(1),
-															  content);															  
+															  new Long(1),new Long(1),new Long(1));															  
 		submissionDetailsDAO.insert(details);
 		assertNotNull(details.getSubmissionID());
 	}

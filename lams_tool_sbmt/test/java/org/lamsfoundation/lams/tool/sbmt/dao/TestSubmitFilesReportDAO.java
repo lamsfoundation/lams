@@ -51,7 +51,7 @@ public class TestSubmitFilesReportDAO extends AbstractLamsTestCase {
 	public void testAddSubmitFilesReport(){
 		submitFilesContent = submitFilesContentDAO.getContentByID(new Long(1));
 		
-		submitFilesReport = new SubmitFilesReport(submissionDetailsDAO.getSubmissionDetailsByID(new Long(1)));
+		submitFilesReport = submissionDetailsDAO.getSubmissionDetailsByID(new Long(1)).getReport();
 		submitFilesReportDAO.insert(submitFilesReport);
 		assertNotNull(submitFilesReport.getReportID());
 	}	

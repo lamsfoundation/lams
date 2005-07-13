@@ -139,7 +139,7 @@ public interface ISubmitFilesService {
 	
 	public UserDTO getUserDetails(Long userID);
 	
-	public FileDetailsDTO getFileDetails(Long reportID);
+	public FileDetailsDTO getFileDetails(Long detailID);
 	
 	public InputStream downloadFile(Long uuid, Long versionID);
 }

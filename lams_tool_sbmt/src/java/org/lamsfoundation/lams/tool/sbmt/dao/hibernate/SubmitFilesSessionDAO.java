@@ -24,4 +24,11 @@ public class SubmitFilesSessionDAO extends BaseDAO implements
 		 return (SubmitFilesSession) super.find(SubmitFilesSession.class,sessionID);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO#createSession(org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession)
+	 */
+	public void createSession(SubmitFilesSession submitSession) {
+		 this.getHibernateTemplate().save(submitSession);
+	}
+
 }

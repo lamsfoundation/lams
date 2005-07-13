@@ -2,16 +2,17 @@ package org.lamsfoundation.lams.tool.sbmt;
 
 import java.io.Serializable;
 import java.util.Date;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 
 
 /** 
  * @hibernate.class table="tl_lasbmt11_report"
 */
-public class SubmitFilesReport implements Serializable {
-
+public class SubmitFilesReport implements Serializable,Cloneable{
+	private static Logger log = Logger.getLogger(SubmitFilesReport.class);
+	
     /** identifier field */
     private Long reportID;
 
@@ -24,26 +25,16 @@ public class SubmitFilesReport implements Serializable {
     /** nullable persistent field */
     private Date dateMarksReleased;
     
-    /** persistent field */
-    private SubmissionDetails submissionDetails;    
-
     /** full constructor */
-    public SubmitFilesReport(String comments, Long marks, Date dateMarksReleased, SubmissionDetails submissionDetails) {
+    public SubmitFilesReport(String comments, Long marks, Date dateMarksReleased) {
         this.comments = comments;
         this.marks = marks;
-        this.dateMarksReleased = dateMarksReleased;        
-        this.submissionDetails = submissionDetails;
+        this.dateMarksReleased = dateMarksReleased;
     }
 
     /** default constructor */
     public SubmitFilesReport() {
-    }
-
-    /** minimal constructor */
-    public SubmitFilesReport(SubmissionDetails submissionDetails) {        
-        this.submissionDetails = submissionDetails;
-    }
-
+	}
     /** 
      * @hibernate.id generator-class="identity" type="java.lang.Long" column="report_id"
      */
@@ -87,19 +78,6 @@ public class SubmitFilesReport implements Serializable {
     public void setDateMarksReleased(Date dateMarksReleased) {
         this.dateMarksReleased = dateMarksReleased;
     }  
-
-    /** 
-     * @hibernate.many-to-one not-null="true" 
-     * @hibernate.column name="submission_id"
-     */
-    public SubmissionDetails getSubmissionDetails() {
-        return this.submissionDetails;
-    }
-
-    public void setSubmissionDetails(SubmissionDetails submissionDetails) {
-        this.submissionDetails = submissionDetails;
-    }
-
     public String toString() {
         return new ToStringBuilder(this)
             .append("reportID", getReportID())
@@ -107,5 +85,19 @@ public class SubmitFilesReport implements Serializable {
             .append("marks", getMarks())
             .append("dateMarksReleased", getDateMarksReleased())   
             .toString();
-    }    
+    }
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	protected Object clone() throws CloneNotSupportedException {
+		
+		Object obj = null;
+		try {
+			obj = super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + SubmitFilesReport.class + " failed");
+		}
+		return obj;
+	}
 }

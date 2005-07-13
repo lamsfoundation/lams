@@ -1,18 +1,21 @@
 package org.lamsfoundation.lams.tool.sbmt;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
+
 
 /**
  * @hibernate.class table="tl_lasbmt11_content"
  */
-public class SubmitFilesContent implements Serializable {
-
+public class SubmitFilesContent implements Serializable,Cloneable {
+	private static Logger log = Logger.getLogger(SubmitFilesContent.class);
 	/** identifier field */
 	private Long contentID;
 
@@ -27,6 +30,12 @@ public class SubmitFilesContent implements Serializable {
 	
 	/** persistent field */
 	private Set submissionDetails;
+
+	/** persistent field */
+	private boolean defineLater;
+	/** persistent field */
+	private boolean runOffline;
+
 
 	/** full constructor */
 	public SubmitFilesContent(String title, String instructions,
@@ -151,6 +160,8 @@ public class SubmitFilesContent implements Serializable {
 	}
 
 	/**
+	 * @hibernate.collection-one-to-many 
+	 * 
 	 * @return Returns the submissionDetails.
 	 */
 	public Set getSubmissionDetails() {
@@ -162,4 +173,57 @@ public class SubmitFilesContent implements Serializable {
 	public void setSubmissionDetails(Set submissionDetails) {
 		this.submissionDetails = submissionDetails;
 	}
+    /** 
+     * @hibernate.property column="defineLater" length="1"
+     *         
+     */
+    public boolean isDefineLater()
+    {
+        return this.defineLater;
+    }
+
+    public void setDefineLater(boolean defineLater)
+    {
+        this.defineLater = defineLater;
+    }
+
+    /** 
+     * @hibernate.property column="runOffline" length="1"
+     *         
+     */
+    public boolean isRunOffline()
+    {
+        return this.runOffline;
+    }
+
+    public void setRunOffline(boolean runOffline)
+    {
+        this.runOffline = runOffline;
+    }
+    
+    public Object clone(){
+		Object obj = null;
+		try {
+			obj = super.clone();
+			//clone SubmitFIleSession object
+			Iterator iter = toolSession.iterator();
+			Set set = new TreeSet();
+			while(iter.hasNext())
+				set.add(((SubmitFilesSession)iter.next()).clone());
+			((SubmitFilesContent)obj).toolSession = set;
+			
+			//clone SubmissionDetails object
+			iter = submissionDetails.iterator();
+			set = new TreeSet();
+			while(iter.hasNext())
+				set.add(((SubmissionDetails)iter.next()).clone());
+			((SubmitFilesContent)obj).submissionDetails = set;
+			
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + SubmissionDetails.class + " failed");
+		}
+		
+		return obj;
+	}
+
 }

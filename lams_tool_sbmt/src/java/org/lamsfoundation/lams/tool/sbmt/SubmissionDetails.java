@@ -2,16 +2,18 @@ package org.lamsfoundation.lams.tool.sbmt;
 
 import java.io.Serializable;
 import java.util.Date;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
+
 
 /**
  * @hibernate.class table="tl_lasbmt11_submission_details"
  */
-public class SubmissionDetails implements Serializable {
-
+public class SubmissionDetails implements Serializable,Cloneable{
+	private static Logger log = Logger.getLogger(SubmissionDetails.class);
+	
 	/** identifier field */
 	private Long submissionID;
 
@@ -32,9 +34,6 @@ public class SubmissionDetails implements Serializable {
 
 	/** persistent field */
 	private Long versionID;
-
-	/** persistent field */
-	private SubmitFilesContent content;
 	
 	/** persistent field */
 	private SubmitFilesReport report;
@@ -49,7 +48,6 @@ public class SubmissionDetails implements Serializable {
 		this.dateOfSubmission = dateOfSubmission;
 		this.uuid = uuid;
 		this.versionID = versionID;
-		this.content = content;
 		this.report = report;
 		this.userID = userID;
 	}
@@ -61,14 +59,13 @@ public class SubmissionDetails implements Serializable {
 	/** minimal constructor */
 	public SubmissionDetails(String filePath,String fileDescription,
 							 Date dateOfSubmission, Long uuid,
-							 Long versionID,Long userID, SubmitFilesContent content) {
+							 Long versionID,Long userID) {
 		this.filePath = filePath;
 		this.fileDescription = fileDescription;
 		this.dateOfSubmission = dateOfSubmission;
 		this.uuid = uuid;
 		this.versionID = versionID;
 		this.userID = userID;
-		this.content = content;
 	}
 
 	/**
@@ -138,19 +135,6 @@ public class SubmissionDetails implements Serializable {
 		this.versionID = versionID;
 	}
 
-	/**
-	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="content_id"
-	 *  
-	 */
-	public SubmitFilesContent getContent() {
-		return this.content;
-	}
-
-	public void setContent(SubmitFilesContent content) {
-		this.content = content;
-	}
-
 	public String toString() {
 		return new ToStringBuilder(this)
 				.append("submissionID",getSubmissionID()).append("filePath", getFilePath())
@@ -175,7 +159,6 @@ public class SubmissionDetails implements Serializable {
 				this.getDateOfSubmission(), castOther.getDateOfSubmission())
 				.append(this.getUuid(), castOther.getUuid())
 				.append(this.getVersionID(), castOther.getVersionID())				
-				.append(this.getContent(), castOther.getContent())
 				.append(this.getReport(),castOther.getReport())
 				.append(this.getUserID(),castOther.getUserID())
 				.isEquals();
@@ -185,10 +168,12 @@ public class SubmissionDetails implements Serializable {
 		return new HashCodeBuilder().append(getSubmissionID()).append(
 				getFilePath()).append(getFileDescription()).append(
 				getDateOfSubmission()).append(getUuid()).append(getVersionID())
-				.append(getContent()).append(getReport()).append(getUserID()).toHashCode();
+				.append(getReport()).append(getUserID()).toHashCode();
 	}
 
 	/**
+     * @hibernate.many-to-one not-null="true" 
+     * @hibernate.column name="report_id"
 	 * @return Returns the report.
 	 */
 	public SubmitFilesReport getReport() {
@@ -212,5 +197,19 @@ public class SubmissionDetails implements Serializable {
 	 */
 	public void setUserID(Long userID) {
 		this.userID = userID;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	protected Object clone() throws CloneNotSupportedException {
+		Object obj = null;
+		try {
+			obj = super.clone();
+			((SubmissionDetails)obj).report = (SubmitFilesReport) this.report.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + SubmissionDetails.class + " failed");
+		}
+		return obj;
 	}
 }

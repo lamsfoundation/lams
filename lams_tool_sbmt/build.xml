@@ -85,7 +85,7 @@
 	<!-- =================================================================== -->
 	<!-- Run Middlegen For LearningDesign                                                       -->
 	<!-- =================================================================== -->
-		<target name="middlegen" description="Run Middlegen For Submit Fiiles Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
+		<target name="middlegen" description="Run Middlegen For Submit Files Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
 			<taskdef name="middlegen" classname="middlegen.MiddlegenTask" classpathref="all-libs" />
 			
 			<middlegen appname="lams_tool_sbmt" 
@@ -112,22 +112,7 @@
 
 		</target>
 
-		<!-- =================================================================== -->
-		<!-- Run hbm2java for learningdesign                                                       -->
-		<!-- =================================================================== -->
-		<target name="hbm2java" description="Generate .java from .hbm files.">
-			<taskdef  name="hbm2java"
-	         classname="net.sf.hibernate.tool.hbm2java.Hbm2JavaTask"
-	         classpathref="all-libs"
-	      />
-		
-		  <hbm2java output="${src.dir.java}">
-				<fileset dir="${conf.hibernate.mapping.dir}/${sbmt.path}">
-					<include name="*.hbm.xml"/>
-				</fileset>
-			</hbm2java>
-		</target>
-	
+
 		<!-- ================================================================ -->
 		<!-- Preparations									                  -->
 		<!-- ================================================================ -->

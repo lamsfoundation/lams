@@ -23,4 +23,10 @@ public interface ISubmitFilesSessionDAO extends IBaseDAO {
 	 */
 	public SubmitFilesSession getSessionByID(Long sessionID);
 
+	/**
+	 * @param submitSession
+	 */
+	public void createSession(SubmitFilesSession submitSession);
+	
+
 }
