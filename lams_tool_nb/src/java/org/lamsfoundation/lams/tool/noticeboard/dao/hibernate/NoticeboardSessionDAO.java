@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 
 import java.util.List;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 import org.springframework.orm.hibernate.HibernateCallback;
@@ -172,6 +173,20 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
     	this.getHibernateTemplate().deleteAll(nbSession.getNbUsers());
     }
 	
-	
+	 /**
+     * <p>Creates and persists an instance of NoticeboardUser which is associated
+     * with the NoticeboardSession with tool session id <code>nbSessionId</code> </p>
+     * 
+     * @param nbSessionId The tool session id
+     * @param user The instance of NoticeboardUser
+     */
+	public void addNbUsers(Long nbSessionId, NoticeboardUser user)
+	{
+	    NoticeboardSession session = findNbSessionById(nbSessionId);
+	    user.setNbSession(session);
+	    session.getNbUsers().add(user);
+	    this.getHibernateTemplate().saveOrUpdate(user);
+	    this.getHibernateTemplate().saveOrUpdateCopy(session);	    
+	}
     	
 }
