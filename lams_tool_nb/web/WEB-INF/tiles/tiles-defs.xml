@@ -20,6 +20,14 @@
 		<put name="pageHeader" value = "System Exception"/>
 		<put name="content" value="/error.jsp" />	
 	</definition>
+
+<!-- ============= Exception Page Definitions ====================== -->	
+	<definition name=".message" extends=".baseDef" >
+		<put name="title" value="Alert"/>
+		<put name="pageHeader" value = "Noticeboard Alert"/>
+		<put name="content" value="/message.jsp" />	
+	</definition>
+	
 <!-- ============= Noticeboard Authoring Page Definitions ====================== -->	
 	<definition name=".nbForm" extends=".baseDef" >
 		<put name="title" value="Noticeboard"/>
