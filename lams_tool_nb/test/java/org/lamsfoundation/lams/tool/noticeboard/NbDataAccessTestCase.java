@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardSession
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import java.util.Date;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 
 /**
  * @author mtruong
@@ -86,15 +87,15 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	//---------------------------------------------------------------------
     // DEFAULT DATA INSERTED BY BUILD-DB ANT TASK
     //---------------------------------------------------------------------
-	protected final Long DEFAULT_CONTENT_ID = new Long(2500);
+	protected final Long DEFAULT_CONTENT_ID = NoticeboardConstants.DEFAULT_CONTENT_ID;
 	protected final String DEFAULT_TITLE = "Welcome";
 	protected final String DEFAULT_CONTENT = "Welcome to these activities";
 	protected final String DEFAULT_ONLINE_INSTRUCTIONS = "Enter the online instructions here";
 	protected final String DEFAULT_OFFLINE_INSTRUCTIONS = "Enter the offline instructions here";
 	protected final boolean DEFAULT_DEFINE_LATER = false;
 	protected final boolean DEFAULT_FORCE_OFFLINE = false;
-	protected final Long DEFAULT_CREATOR_USER_ID = new Long(2300);
-	protected final Long DEFAULT_SESSION_ID = new Long(2400);
+	protected final Long DEFAULT_CREATOR_USER_ID = NoticeboardConstants.DEFAULT_CREATOR_ID;
+	protected final Long DEFAULT_SESSION_ID = NoticeboardConstants.DEFAULT_SESSION_ID;
 	protected final String DEFAULT_SESSION_STATUS = NoticeboardSession.NOT_ATTEMPTED;
 	protected final Long DEFAULT_USER_ID = new Long(2600);
 	protected final String DEFAULT_USERNAME = "test";
@@ -203,6 +204,28 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     	initNbContentData();
     	initNbSessionContent();    
     	initNbUserData();
+    }
+    
+    protected void restoreDefaultContent()
+    {
+        nbContent = new NoticeboardContent(DEFAULT_CONTENT_ID,	
+                DEFAULT_TITLE,
+                DEFAULT_CONTENT,
+                DEFAULT_ONLINE_INSTRUCTIONS,
+                DEFAULT_OFFLINE_INSTRUCTIONS,
+                DEFAULT_DEFINE_LATER,
+                DEFAULT_FORCE_OFFLINE,
+				DEFAULT_CREATOR_USER_ID,
+				TEST_DATE_CREATED,
+				TEST_DATE_UPDATED);
+
+        noticeboardDAO.saveNbContent(nbContent);
+        
+        nbSession = new NoticeboardSession(DEFAULT_SESSION_ID,
+                							nbContent,
+                							TEST_DATE_CREATED,
+                							DEFAULT_SESSION_STATUS);
+        nbSessionDAO.saveNbSession(nbSession);
     }
     
     //===========================
