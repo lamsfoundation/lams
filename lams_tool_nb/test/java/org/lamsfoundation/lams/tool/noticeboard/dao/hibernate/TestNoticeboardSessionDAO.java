@@ -26,6 +26,7 @@ import java.util.Date;
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 
 
 
@@ -38,6 +39,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
 	
 	private NoticeboardSessionDAO nbSessionDAO;
 	private NoticeboardContentDAO nbContentDAO;
+	private NoticeboardUserDAO nbUserDAO;
 	private NoticeboardSession nbSession = null;
 	private NoticeboardContent nbContent = null;
 	
@@ -58,6 +60,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         
         nbContentDAO = (NoticeboardContentDAO) this.context.getBean("nbContentDAO");
         nbSessionDAO = (NoticeboardSessionDAO) this.context.getBean("nbSessionDAO");
+        nbUserDAO = (NoticeboardUserDAO) this.context.getBean("nbUserDAO");
         super.initAllData();
     }
 	 
@@ -192,5 +195,16 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         assertUserObjectIsNull(TEST_USER_ID);
     }
     
+    public void testAddUsers()
+    {
+        Long newUserId = new Long(123);
+        NoticeboardUser newUser = new NoticeboardUser(newUserId);
+        
+        nbSessionDAO.addNbUsers(TEST_SESSION_ID, newUser);
+        
+        NoticeboardUser retrievedUser = nbUserDAO.getNbUserByID(newUserId);
+        
+        assertEquals(retrievedUser.getNbSession().getNbSessionId(), TEST_SESSION_ID);
+    }
    
 }

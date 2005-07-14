@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardContentDAO;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 
 /**
  * @author mtruong
@@ -175,5 +176,16 @@ public class TestNoticeboardContentDAO extends NbDataAccessTestCase
     }
    
     
- 
+    public void testAddSession()
+    {
+        Long newSessionId = new Long(87);
+        NoticeboardSession newSession = new NoticeboardSession(newSessionId);
+        
+        noticeboardDAO.addNbSession(TEST_NB_ID, newSession);
+        
+        NoticeboardSession retrievedSession = nbSessionDAO.findNbSessionById(newSessionId);
+        
+        assertEquals(retrievedSession.getNbContent().getNbContentId(), TEST_NB_ID);
+        
+    }
 }
