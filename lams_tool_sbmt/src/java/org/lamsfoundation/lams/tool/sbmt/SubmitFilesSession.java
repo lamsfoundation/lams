@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 /** 
  * @hibernate.class table="tl_lasbmt11_session"
 */
-public class SubmitFilesSession implements Serializable{
+public class SubmitFilesSession implements Serializable,Cloneable{
 	private static Logger log = Logger.getLogger(SubmitFilesSession.class);
 	
     public final static int INCOMPLETE = 0;
@@ -82,7 +82,7 @@ public class SubmitFilesSession implements Serializable{
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */
-	protected Object clone() throws CloneNotSupportedException {
+	public Object clone()  {
 		Object obj = null;
 		try {
 			obj = super.clone();

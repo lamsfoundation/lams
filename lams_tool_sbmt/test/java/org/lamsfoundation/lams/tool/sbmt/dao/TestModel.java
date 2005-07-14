@@ -21,14 +21,16 @@
 package org.lamsfoundation.lams.tool.sbmt.dao;
 
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
+import junit.framework.TestCase;
 
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
-
-import junit.framework.TestCase;
 
 /**
  * @author Steve.Ni
@@ -60,6 +62,14 @@ public class TestModel extends TestCase {
 	private static boolean deB = true;
 	private static boolean offA = false;
 	private static boolean offB = false;
+	//session data
+	private static Long sessA = new Long(100);
+	private static Integer statA = new Integer(100);
+	private static Long sessB = new Long(200);
+	private static Integer statB = new Integer(200);
+	//detail data
+	private String filePathA = "fpA";
+	private String filePathB = "fpB";
 	
 	private SubmitFilesContent content;
 	private SubmitFilesReport report;
@@ -94,6 +104,51 @@ public class TestModel extends TestCase {
 				
 	}
 	/*
+	 * Class under test for SubmitFilesSession clone()
+	 */
+	public void testSessionClone() {
+		fillSessionA(session);
+		SubmitFilesSession sessionC = (SubmitFilesSession) session.clone();
+		fillSessionB(session);
+		
+		assertEquals(sessionC.getSessionID(),sessA);
+		assertEquals(sessionC.getStatus(),statA);
+		
+	}	
+	/*
+	 * Class under test for SubmitFilesSession clone()
+	 */
+	public void testDetailClone() {
+		fillDetailA(detail);
+		SubmissionDetails detailC = (SubmissionDetails) detail.clone();
+		fillDetailB(detail);
+		
+		assertEquals(detailC.getFilePath(),filePathA);
+		SubmitFilesReport report = new SubmitFilesReport(); 
+		fillReportA(report);
+		assertEquals(detailC.getReport(),report);
+		
+	}	
+	/**
+	 * @param detail2
+	 */
+	private void fillDetailA(SubmissionDetails detail) {
+		detail.setFilePath(filePathA);
+		SubmitFilesReport report = new SubmitFilesReport(); 
+		fillReportA(report);
+		detail.setReport(report);
+	}
+	/**
+	 * @param detail2
+	 */
+	private void fillDetailB(SubmissionDetails detail) {
+		detail.setFilePath(filePathB);
+		SubmitFilesReport report = new SubmitFilesReport(); 
+		fillReportB(report);
+		detail.setReport(report);
+	}
+	
+	/*
 	 * Class under test for SubmitFilesContent clone()
 	 */
 	public void testContentClone() {
@@ -105,11 +160,35 @@ public class TestModel extends TestCase {
 		assertEquals(contentC.getTitle(),titA);
 		assertEquals(contentC.isDefineLater(),deA);
 		assertEquals(contentC.isRunOffline(),offA);
-//		assertEquals(contentC.getSubmissionDetails(),insA);
-//		assertEquals(contentC.getToolSession(),insA);
+		//test SubmissionDetails Set 
+		Iterator iter = contentC.getSubmissionDetails().iterator();
+		SubmissionDetails detail = new SubmissionDetails();
+		fillDetailA(detail);
+		assertEquals(iter.next(),detail);
+		//test SubmitFilesSession l Set 
+		iter = contentC.getToolSession().iterator();
+		SubmitFilesSession session = new SubmitFilesSession();
+		fillSessionA(session);
+		assertEquals(iter.next(),session);
+		
+		//do more test to ensure origial object keep desired values "B"
+		assertEquals(content.getInstructions(),insB);
+		assertEquals(content.getTitle(),titB);
+		assertEquals(content.isDefineLater(),deB);
+		assertEquals(content.isRunOffline(),offB);
+		//test SubmissionDetails Set 
+		iter = content.getSubmissionDetails().iterator();
+		detail = new SubmissionDetails();
+		fillDetailB(detail);
+		assertEquals(iter.next(),detail);
+		//test SubmitFilesSession l Set 
+		iter = content.getToolSession().iterator();
+		session = new SubmitFilesSession();
+		fillSessionB(session);
+		assertEquals(iter.next(),session);
 		
 	}
-	
+	//================Fill init data for model object==========
 	private void fillReportA(SubmitFilesReport report){
 		report.setComments(commA);
 		Calendar cal = Calendar.getInstance();
@@ -131,16 +210,43 @@ public class TestModel extends TestCase {
 		content.setInstructions(insA);
 		content.setRunOffline(offA);
 		content.setTitle(titA);
-//		content.setSubmissionDetails();
-//		content.setToolSession();
+		//fill details
+		SubmissionDetails detail = new SubmissionDetails();
+		fillDetailA(detail);
+		Set details = new TreeSet();
+		details.add(detail);
+		content.setSubmissionDetails(details);
+		//fill sessions
+		SubmitFilesSession session = new SubmitFilesSession();
+		fillSessionA(session);
+		Set sessions = new TreeSet();
+		sessions.add(session);
+		content.setToolSession(sessions);
 	}
 	private void fillContentB(SubmitFilesContent content){
 		content.setDefineLater(deB);
 		content.setInstructions(insB);
 		content.setRunOffline(offB);
 		content.setTitle(titB);
-//		content.setSubmissionDetails();
-//		content.setToolSession();
+		//fill details
+		SubmissionDetails detail = new SubmissionDetails();
+		fillDetailB(detail);
+		Set details = new TreeSet();
+		details.add(detail);
+		content.setSubmissionDetails(details);
+		//fill sessions
+		SubmitFilesSession session = new SubmitFilesSession();
+		fillSessionB(session);
+		Set sessions = new TreeSet();
+		sessions.add(session);
+		content.setToolSession(sessions);
 	}
-	
+	private void fillSessionA(SubmitFilesSession session){
+		session.setSessionID(sessA);
+		session.setStatus(statA);
+	}
+	private void fillSessionB(SubmitFilesSession session){
+		session.setSessionID(sessB);
+		session.setStatus(statB);
+	}
 }

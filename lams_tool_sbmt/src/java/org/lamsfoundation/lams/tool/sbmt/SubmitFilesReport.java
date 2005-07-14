@@ -3,6 +3,8 @@ package org.lamsfoundation.lams.tool.sbmt;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 
@@ -99,5 +101,26 @@ public class SubmitFilesReport implements Serializable,Cloneable{
 			log.error("When clone " + SubmitFilesReport.class + " failed");
 		}
 		return obj;
+	}
+
+	public boolean equals(Object other) {
+	    if ( (this == other ) ) return true;
+	    if ( !(other instanceof SubmitFilesReport) ) return false;
+	    SubmitFilesReport castOther = (SubmitFilesReport) other;
+	    return new EqualsBuilder()
+	        .append(this.getReportID(), castOther.getReportID())
+	        .append(this.getComments(), castOther.getComments())
+	        .append(this.getMarks(), castOther.getMarks())
+	        .append(this.getDateMarksReleased(), castOther.getDateMarksReleased())
+	        .isEquals();
+	}
+
+	public int hashCode() {
+	    return new HashCodeBuilder()
+	        .append(getReportID())
+	        .append(getComments())
+	        .append(getMarks())
+	        .append(getDateMarksReleased())
+	        .toHashCode();
 	}
 }

@@ -143,6 +143,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 				.append("uuid",getUuid())
 				.append("versionID", getVersionID())
 				.append("userID",getUserID())
+				.append("report",getReport())
 				.toString();
 	}
 
@@ -202,11 +203,12 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */
-	protected Object clone() throws CloneNotSupportedException {
+	public Object clone()  {
 		Object obj = null;
 		try {
 			obj = super.clone();
-			((SubmissionDetails)obj).report = (SubmitFilesReport) this.report.clone();
+			if(this.report != null)
+				((SubmissionDetails)obj).report = (SubmitFilesReport) this.report.clone();
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + SubmissionDetails.class + " failed");
 		}
