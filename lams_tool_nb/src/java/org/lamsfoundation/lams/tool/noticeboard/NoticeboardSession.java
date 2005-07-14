@@ -59,7 +59,7 @@ public class NoticeboardSession implements Serializable {
 	private NoticeboardContent nbContent;
 	
 	/** persistent field */
-	private Set nbUsers;
+	private Set nbUsers = new HashSet();
 	
 	/** default constructor */
 	public NoticeboardSession()
@@ -97,6 +97,22 @@ public class NoticeboardSession implements Serializable {
 	    this.sessionStartDate = sessionStartDate;
 	    this.sessionEndDate = null;
 	    this.sessionStatus = sessionStatus;
+	}
+	
+	public NoticeboardSession(Long nbSessionId,
+	        					NoticeboardContent nbContent)
+	{
+	    this.nbSessionId = nbSessionId;
+	    this.nbContent = nbContent;
+	    this.sessionStartDate = new Date(System.currentTimeMillis());
+		this.sessionStatus = NoticeboardSession.INCOMPLETE;
+	}
+	
+	public NoticeboardSession(Long nbSessionId)
+	{
+	    this.nbSessionId = nbSessionId;
+	    this.sessionStartDate = new Date(System.currentTimeMillis());
+		this.sessionStatus = NoticeboardSession.INCOMPLETE;
 	}
 	
 	/**
@@ -205,4 +221,6 @@ public class NoticeboardSession implements Serializable {
     public void setNbUsers(Set nbUsers) {
         this.nbUsers = nbUsers;
     }
+    
+   
 }
