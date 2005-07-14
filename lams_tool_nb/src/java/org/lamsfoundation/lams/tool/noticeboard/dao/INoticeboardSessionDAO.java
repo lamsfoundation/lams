@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.tool.noticeboard.dao;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 
 
 /**
@@ -48,4 +49,5 @@ public interface INoticeboardSessionDAO {
     
     public void removeNbUsers(NoticeboardSession nbSession); /** TODO: write testcase and def for removeNbUsers */
 
+    public void addNbUsers(Long nbSessionId, NoticeboardUser user);
 }
