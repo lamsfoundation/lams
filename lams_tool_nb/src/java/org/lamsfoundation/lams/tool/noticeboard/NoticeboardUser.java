@@ -52,7 +52,14 @@ public class NoticeboardUser implements Serializable {
     public NoticeboardUser(Long userId, NoticeboardSession nbSession)
     {
         this.userId = userId;
-        this.nbSession = nbSession;        
+        this.nbSession = nbSession;   
+        this.userStatus = NoticeboardUser.INCOMPLETE;
+    }
+    
+    public NoticeboardUser(Long userId)
+    {
+        this.userId = userId;
+        this.userStatus = NoticeboardUser.INCOMPLETE;
     }
     
     /** full constructor */
