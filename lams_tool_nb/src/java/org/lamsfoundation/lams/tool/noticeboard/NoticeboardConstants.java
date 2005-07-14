@@ -49,12 +49,14 @@ public class NoticeboardConstants
     public static final String ADVANCED_PAGE = "advanced";
     public static final String INSTRUCTIONS_PAGE = "instructions";
     
-   
+    public static final String DISPLAY_MESSAGE = "displayMessage";
     public static final String DISPLAY_LEARNER_CONTENT = "displayLearnerContent";
     
     public static final String TOOL_ACCESS_MODE_LEARNER = "learner";
     public static final String TOOL_ACCESS_MODE_AUTHOR = "author";
     public static final String TOOL_ACCESS_MODE_TEACHER = "teacher";
+    
+    
     
   
     
@@ -81,8 +83,8 @@ public class NoticeboardConstants
     public static final String RICH_TEXT_ONLINE_INSTRN = "richTextOnlineInstructions";
     public static final String RICH_TEXT_OFFLINE_INSTRN = "richTextOfflineInstructions";
     
-  // public static final String READ_ONLY_MODE = "readOnlyMode";
-    public static final String IS_TOOL_COMPLETED = "isToolCompleted";
+    public static final String READ_ONLY_MODE = "readOnlyMode";
+   // public static final String IS_TOOL_COMPLETED = "isToolCompleted";
     
     public static final String USER_ID = "userID";
     public static final String TOOL_SESSION_ID = "toolSessionID";
@@ -109,6 +111,10 @@ public class NoticeboardConstants
     public static final int FLAG_CONTENT_IN_USE = 2;
     public static final int FLAG_RUN_OFFLINE = 3;
    
+    //------------------------------
+    // Error Keys/Messages
+    //------------------------------
     
+    public static final String ERROR_NBAPPLICATION = "error.exception.NbApplication";
     
 }
