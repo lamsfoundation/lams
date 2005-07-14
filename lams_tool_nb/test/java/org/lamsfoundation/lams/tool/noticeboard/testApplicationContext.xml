@@ -62,6 +62,7 @@
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
 				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean> 
