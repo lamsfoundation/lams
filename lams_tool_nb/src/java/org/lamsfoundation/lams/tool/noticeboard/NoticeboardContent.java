@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.HashSet;
 
+
 /**
  * Persistent noticeboard object/bean that defines the content for the noticeboard tool.
  * Provides accessors and mutators to get/set noticeboard attributes
@@ -70,7 +71,7 @@ public class NoticeboardContent implements Serializable {
 	private Date dateUpdated;
 	
 	/** persistent field */
-	private Set nbSessions;
+	private Set nbSessions = new HashSet();
 	
 	/** default constructor */
 	public NoticeboardContent()
@@ -339,5 +340,5 @@ public class NoticeboardContent implements Serializable {
 		return newContent;
 	}
    
-   
+	
 }
