@@ -36,8 +36,6 @@
 					<td class="formlabel"><fmt:message key="basic.title" /></td>
 					<td class="formcontrol">
 							<FCK:editor id="richTextTitle" basePath="/lams/fckEditor/"
-								imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
-								linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
 								height="150"
 								width="85%">
 								<c:out value="${NbAuthoringForm.title}" escapeXml="false" />
@@ -48,8 +46,6 @@
 					<td class="formlabel"><fmt:message key="basic.content" /></td>
 					<td class="formcontrol">
 						<FCK:editor id="richTextContent" basePath="/lams/fckEditor/"
-								imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
-								linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
 								width="85%"
 								height="400">
 							<c:out value="${NbAuthoringForm.content}" escapeXml="false" />
