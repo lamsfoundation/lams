@@ -43,7 +43,7 @@ http://www.gnu.org/licenses/gpl.txt
     </head>
     
     <body bgcolor="#9DC5EC" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-      <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center"> 
+      <table width="900" border="0" cellspacing="0" cellpadding="0" align="center"> 
 	        <!-- header -->
 	        <c:set var="pageheader" scope="session"><tiles:getAsString name="pageHeader"/></c:set>
 			<tiles:insert attribute="header" />

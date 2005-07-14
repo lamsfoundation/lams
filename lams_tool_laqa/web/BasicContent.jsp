@@ -10,10 +10,10 @@
 		<c:if test="${(requestScope.startMonitoringSummaryRequest != 'true')  || (sessionScope.editActivityEditMode=='true') }"> 			
 			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
 			<tr> <td>
-					<table>
+					<table> 
 						<tr> 
 					 		<td> <bean:message key="label.authoring.title"/>: </td>
-					 		<td NOWRAP width=700>
+					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
 							<FCK:editor id="richTextTitle" basePath="/lams/fckEditor/"
 							      height="200"
 								  width="100%">
@@ -23,7 +23,7 @@
 					  	</tr>
 					  	<tr> 
 					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
-							<td NOWRAP width=700>
+					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
 							<FCK:editor id="richTextInstructions" basePath="/lams/fckEditor/"
 							      height="200"
 								  width="100%">
@@ -96,14 +96,14 @@
 					<table>
 						<tr> 
 					 		<td> <bean:message key="label.authoring.title"/>: </td>
-					 		<td NOWRAP width=700>
+					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
 						 		<c:out value="${sessionScope.richTextTitle}" escapeXml="false" />
 							</td> 
 					  	</tr>
 
 					  	<tr> 
-					 		<td> <bean:message key="label.authoring.instructions"/>: </td> test
-							<td NOWRAP width=700>
+					 		<td> <bean:message key="label.authoring.instructions"/>: </td> 
+					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
 							  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
 							</td>
 						</tr>

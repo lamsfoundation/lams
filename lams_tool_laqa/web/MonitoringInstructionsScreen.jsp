@@ -31,7 +31,7 @@
           				<fmt:message key="label.offlineInstructions" />:
           			</td>
 					<td NOWRAP width=700>
-						<c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />
+						<c:out value="${sessionScope.monitoredOfflineInstructions}" escapeXml="false" />
 					</td> 
 				</tr>
 		 <tr> 
@@ -39,7 +39,7 @@
           				<fmt:message key="label.onlineInstructions"/>:
           			</td>
 					<td NOWRAP width=700>
-						<c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />
+						<c:out value="${sessionScope.monitoredOnlineInstructions}" escapeXml="false" />
 					</td> 
 		</tr>
 	</table>      		
