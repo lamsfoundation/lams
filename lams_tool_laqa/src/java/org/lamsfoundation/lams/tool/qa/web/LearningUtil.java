@@ -459,6 +459,7 @@ public class LearningUtil implements QaAppConstants{
         	 * A boolean true isUsernameVisible indicates that all user names to be displayed.
         	 * Only applies to learning mode.
         	 */
+        	
         	Boolean isUsernameVisible=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE);
         	logger.debug("IS_USERNAME_VISIBLE: " + isUsernameVisible);
     		

@@ -138,6 +138,7 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_USERID_NOTNUMERIC			="userExceptionUserIdNotNumeric";
     public static final String USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS ="userExceptionOnlyContentAndNoSessions";
     public static final String USER_EXCEPTION_USERID_EXISTING			="userExceptionUserIdExisting";
+    public static final String USER_EXCEPTION_USER_DOESNOTEXIST			="userExceptionUserDoesNotExist";
     public static final String USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED	="userExceptionMonitoringTabContentIdRequired";
     public static final String USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP	="userExceptionDefaultContentNotSetup";
     public static final String USER_EXCEPTION_NO_TOOL_SESSIONS			="userExceptionNoToolSessions";
@@ -151,6 +152,7 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";					
     public static final String PORTFOLIO_REPORT							="portfolioReport";
     public static final String PORTFOLIO_REQUEST						="portfolioRequest";
+    public static final int    MAX_GROUPS_COUNT							=250;						
         
     /**
      * user actions

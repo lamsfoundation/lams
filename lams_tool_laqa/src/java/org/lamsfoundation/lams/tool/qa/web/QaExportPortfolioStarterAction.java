@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
@@ -82,7 +83,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		logger.debug("userId: " + userId);
 	    try
 		{
-	    	User user=QaUtils.createStandardUser(new Integer(userId));
+	    	User user=QaUtils.createSimpleUser(new Integer(userId));
 	    	request.getSession().setAttribute(TOOL_USER, user);
 		}
 	    catch(NumberFormatException e)
@@ -159,15 +160,16 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 				return (mapping.findForward(PORTFOLIO_REPORT));
 			}
 			logger.debug("final toolSessionId before exists test :" + toolSessionId);
-		}
 		
-		QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
-		if (qaSession == null)
-		{
-	    	persistError(request,"error.toolSession.doesNotExist");
-			request.setAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST, new Boolean(true));
-			logger.debug("forwarding to: " + PORTFOLIO_REPORT);
-			return (mapping.findForward(PORTFOLIO_REPORT));
+		
+			QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
+			if (qaSession == null)
+			{
+		    	persistError(request,"error.toolSession.doesNotExist");
+				request.setAttribute(USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST, new Boolean(true));
+				logger.debug("forwarding to: " + PORTFOLIO_REPORT);
+				return (mapping.findForward(PORTFOLIO_REPORT));
+			}
 		}
 		logger.debug("final toolSessionId :" + toolSessionId);
 		
@@ -216,28 +218,59 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 	
 		mode=(String)request.getSession().getAttribute(MODE);
 		logger.debug("mode is: " + mode);
-			
-		toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-		logger.debug("toolContentId: " + toolContentId);
 		
-		toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-		logger.debug("toolSessionId: " + toolSessionId);
-
-		/**
-			whether the request is of mode learner or teacher, we construct a single listToolSessions object and 
-			build the report based on that object.
-		*/
-		List listToolSessions=null;
+		Map mapToolSessions= new TreeMap(new QaStringComparator());
+		request.getSession().setAttribute(MAP_TOOL_SESSIONS,mapToolSessions);
+		LearningUtil learningUtil= new LearningUtil();
+		
 		if (mode.equalsIgnoreCase(LEARNER))
 		{
+			toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+			logger.debug("toolSessionId: " + toolSessionId);
+			
+			QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
+			QaContent qaContent=qaSession.getQaContent();
+		    logger.debug("using qaContent: " + qaContent);
+		    logger.debug("using qaContent id : " + qaContent.getQaContentId());
+		    request.getSession().setAttribute(TOOL_CONTENT_ID, qaContent.getQaContentId());
+		    
+		    /** is other learner's full name visible to this learner */
+		    logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
+		    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(qaContent.isUsernameVisible()));
+		    
+		    logger.debug("TOOL_USER is:" + request.getSession().getAttribute(TOOL_USER));
+		    User toolUser= (User)request.getSession().getAttribute(TOOL_USER);
+		    logger.debug("TOOL_USER id:" + toolUser.getUserId());
+		    
+		    QaQueUsr qaQueUsr=qaService.loadQaQueUsr(new Long(toolUser.getUserId().longValue()));
+		    logger.debug("qaQueUsr:" + qaQueUsr);
+		    
+		    if (qaQueUsr != null)
+		    {
+		    	request.getSession().setAttribute(CURRENTLEARNER_FULLNAME , qaQueUsr.getFullname());
+			    logger.debug("current learner fullname:" + qaQueUsr.getFullname());	
+		    }
+		    else
+		    {
+		    	persistError(request,"error.user.doesNotExist");
+				request.setAttribute(USER_EXCEPTION_USER_DOESNOTEXIST, new Boolean(true));
+				logger.debug("forwarding to: " + PORTFOLIO_REPORT);
+				return (mapping.findForward(PORTFOLIO_REPORT));
+		    }
+		    	
 			logger.debug("generate portfolio for mode: " + mode);
 			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_LEARNING);
 			/** a single toolSessionId */
-			listToolSessions.add(1, toolSessionId);
-			logger.debug("listToolSessions: " + listToolSessions);
+			request.getSession().setAttribute(TOOL_SESSION_ID, toolSessionId);
+			logger.debug("build a learner report:");
+			learningUtil.buidLearnerReport(request, 1);
 		}
 		else
 		{
+			toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+			logger.debug("toolContentId: " + toolContentId);
+			
+			List listToolSessions=null;
 			logger.debug("generate portfolio for mode: " + mode);
 			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_MONITORING);
 
@@ -246,34 +279,31 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			logger.debug("qa: " + qa);
 			listToolSessions= qaService.getToolSessionsForContent(qa);
 			logger.debug("listToolSessions: " + listToolSessions);
-		}
-		
-		if (listToolSessions.size() == 0)
-		{
-	    	persistError(request,"error.content.noToolSessions");
-			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true));
-			logger.debug("forwarding to: " + PORTFOLIO_REPORT);
-			return (mapping.findForward(PORTFOLIO_REPORT));
-		}
-		
-		Map mapToolSessions= new TreeMap(new QaStringComparator());
-		request.getSession().setAttribute(MAP_TOOL_SESSIONS,mapToolSessions);
-		LearningUtil learningUtil= new LearningUtil();
-		
-		Iterator sessionListIterator=listToolSessions.iterator();
-		int toolSessionCounter=1;
-		while (sessionListIterator.hasNext())
-		{
-			toolSessionId=(Long)sessionListIterator.next();
-			logger.debug("toolSessionId: " + toolSessionId);
-			request.getSession().setAttribute(TOOL_SESSION_ID, toolSessionId);
-			learningUtil.buidLearnerReport(request, toolSessionCounter);
-			toolSessionCounter++;
+			
+			if (listToolSessions.size() == 0)
+			{
+		    	persistError(request,"error.content.noToolSessions");
+				request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true));
+				logger.debug("forwarding to: " + PORTFOLIO_REPORT);
+				return (mapping.findForward(PORTFOLIO_REPORT));
+			}
+			
+			Iterator sessionListIterator=listToolSessions.iterator();
+			int toolSessionCounter=1;
+			while (sessionListIterator.hasNext())
+			{
+				toolSessionId=(Long)sessionListIterator.next();
+				logger.debug("toolSessionId: " + toolSessionId);
+				request.getSession().setAttribute(TOOL_SESSION_ID, toolSessionId);
+				learningUtil.buidLearnerReport(request, toolSessionCounter);
+				toolSessionCounter++;
+			}
 		}
 		
 		/** the flag to differentiate between request for monitoring versus request for portfolio */
 		request.setAttribute(PORTFOLIO_REQUEST, new Boolean(true));
 		logger.debug("generate portfolio jsp for mode: " + mode);
+		logger.debug("mapToolSessions: " + request.getSession().getAttribute(MAP_TOOL_SESSIONS));
 		return (mapping.findForward(PORTFOLIO_REPORT));		
 	}
 		

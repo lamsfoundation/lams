@@ -270,16 +270,12 @@ public abstract class QaUtils implements QaAppConstants {
 	}
 	
 	
-	public static User createAuthoringUser(Integer userId)
+	
+	public static User createSimpleUser(Integer userId)
 	{
 		User user=new User();
 		user.setUserId(userId);
 		return user;
-	}
-	
-	public static User createStandardUser(Integer userId)
-	{
-		return createAuthoringUser(userId);
 	}
 	
 	public static User createUser(Integer userId)
