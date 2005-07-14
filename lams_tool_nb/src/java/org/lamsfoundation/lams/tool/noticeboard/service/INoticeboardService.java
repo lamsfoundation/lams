@@ -37,13 +37,7 @@ public interface INoticeboardService {
     // NoticeboardContent access methods
     //===================================================================	
     
-    /**
-     * <p>Retrieve an instance of NoticeboardContent with the given
-     * identifier <code>uid</code> </p>
-     * @param uid The given unique identifier of the NoticeboardContent instance
-     * @return an instance of NoticeboardContent
-     */
-    public NoticeboardContent retrieveNoticeboardByUID(Long uid);
+  
     
     /**
      * <p> Returns the persistent instance of NoticeboardContent
@@ -116,15 +110,7 @@ public interface INoticeboardService {
 	 */
 	public NoticeboardSession retrieveNoticeboardSession(Long nbSessionId);
 	
-	/**
-	 * <p>Return the persistent instance of a NoticeboardSession  
-	 * with the given identifier <code>uid</code>, returns null if not found. </p>
-	 * 
-	 * @param uid an identifier for the NoticeboardSession object.
-	 * @return the persistent instance of a NoticeboardSession or null if not found
-	 */
-	public NoticeboardSession retrieveNoticeboardSessionByUID(Long uid);
-	
+
 	/**
 	 * Persists the new NoticeboardSession object into the database.
 	 * 
@@ -155,14 +141,7 @@ public interface INoticeboardService {
      */
     public void removeSession(NoticeboardSession nbSession);
     
-    /**
-     * <p>Delete the given instance of NoticeboardSession with the
-     * given identifier <code>uid</code>
-     * 
-     * @param uid an identifier for the NoticeboardSession instance. 
-     */
-    public void removeSessionByUID(Long uid);
-    
+     
     /**
      * <p>Deletes all instances of NoticeboardUser that are associated
      * with the given instance of NoticeboardSession</p>
@@ -193,14 +172,6 @@ public interface INoticeboardService {
 	 */
 	public NoticeboardUser retrieveNoticeboardUser(Long nbUserId);
 	
-	/**
-	 * <p>Return the persistent instance of a NoticeboardUser  
-	 * with the given identifier <code>uid</code>, returns null if not found. </p>
-	 * 
-	 * @param uid an identifier for the NoticeboardUser object.
-	 * @return the persistent instance of a NoticeboardUser or null if not found
-	 */
-	public NoticeboardUser retrieveNoticeboardUserByUID(Long uid);
 	
 	/**
 	 * Persists the new NoticeboardUser object into the database.
@@ -231,21 +202,24 @@ public interface INoticeboardService {
      * @param nbUser The instance of NoticeboardUser to delete. 
      */
     public void removeUser(NoticeboardUser nbUser);
-    
-  
+ 
+    /**
+     * <p> Saves the instance of NoticeboardSession to the database. 
+     * This instance is added to the collection of sessions from 
+     * NoticeboardContent with tool content id <code>nbContentId</code> </p>
+     * 
+     * @param nbContentId The tool content Id
+     * @param session The instance of NoticeboardSession to persist
+     */
+    public void addSession(Long nbContentId, NoticeboardSession session);
     
     /**
-     * <p>Performs a check on the flag indicated by <code>flag</code>
-     * In this noticeboard tool, there are 3 possible flags:
-     * <li>defineLater</li>
-     * <li>contentInUse</li>
-     * <li>runOffline</li>
-     * <br>Returns true if the flag is set, false otherwise <p>
+     * <p>Saves the instance of NoticeboardUser to the database.
+     * <code>nbUser</code> is added to the collection of users from 
+     * NoticeboardSession with tool session id <code>nbSessionId</code> </p>
      * 
-     * @param contentId The tool content id
-     * @param flag The flag to check, can take the following set of values (defineLater, contentInUse, runOffline)
-     * @return Returns true if flag is set, false otherwise
+     * @param nbSessionId The tool session id
+     * @param user The instance of NoticeboardUser to persist
      */
-    public boolean isFlagSet(Long contentId, int flag);
-    
+    public void addUser(Long nbSessionId, NoticeboardUser nbUser);
 }
