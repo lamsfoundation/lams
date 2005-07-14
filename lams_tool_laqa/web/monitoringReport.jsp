@@ -19,13 +19,13 @@
 		</table>
 	</c:if>						
 	
-	<c:if test="${requestScope.userExceptionWrongFormat 		!= 'true'  && 
-				  requestScope.userExceptionUncompatibleIds 	!= 'true'  && 
-				  requestScope.userExceptionContentDoesNotExist != 'true' &&
-				  requestScope.userExceptionUserIdNotNumeric 	!= 'true' &&
-				  requestScope.userExceptionUserIdNotAvailable 	!= 'true' &&				  				  
+	<c:if test="${requestScope.userExceptionWrongFormat 			!= 'true' && 
+				  requestScope.userExceptionUncompatibleIds 		!= 'true' && 
+				  requestScope.userExceptionContentDoesNotExist 	!= 'true' &&
+				  requestScope.userExceptionUserIdNotNumeric 		!= 'true' &&
+				  requestScope.userExceptionUserIdNotAvailable 		!= 'true' &&				  				  
 				  requestScope.userExceptionToolSessionDoesNotExist != 'true' &&				  
-				  requestScope.userExceptionNumberFormat 		!= true}"> 	
+				  requestScope.userExceptionNumberFormat 			!= true}"> 	
 		<!-- this form is exists temporarily to represent tool icon, remove this form once the tool is deployed into authoring environment -->
 		<html:form  action="/monitoring?method=generateToolSessionDataMap&validate=false" method="POST" target="_self">
 		

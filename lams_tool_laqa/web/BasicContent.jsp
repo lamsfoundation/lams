@@ -10,7 +10,7 @@
 		<c:if test="${(requestScope.startMonitoringSummaryRequest != 'true')  || (sessionScope.editActivityEditMode=='true') }"> 			
 			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
 			<tr> <td>
-					<table> 
+					<table align=center> 
 						<tr> 
 					 		<td> <bean:message key="label.authoring.title"/>: </td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
@@ -93,7 +93,7 @@
 			<c:if test="${requestScope.startMonitoringSummaryRequest == 'true'}"> 
 			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
 			<tr> <td>
-					<table>
+					<table align=center>
 						<tr> 
 					 		<td> <bean:message key="label.authoring.title"/>: </td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->

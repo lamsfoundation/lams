@@ -94,7 +94,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			userId=request.getParameter(USER_ID);
 		    try
 			{
-		    	User user=QaUtils.createAuthoringUser(new Integer(userId));
+		    	User user=QaUtils.createSimpleUser(new Integer(userId));
 		    	request.getSession().setAttribute(TOOL_USER, user);
 			}
 		    catch(NumberFormatException e)

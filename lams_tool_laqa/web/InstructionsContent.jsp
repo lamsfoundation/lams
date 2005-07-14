@@ -7,7 +7,7 @@
 
 <div id="richTextContainer">
 		<tr> <td>
-			<table>
+			<table align=center>
 				<tr> 
 					<td>
           				<fmt:message key="label.offlineInstructions" />:

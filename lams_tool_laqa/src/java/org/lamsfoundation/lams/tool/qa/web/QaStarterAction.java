@@ -201,7 +201,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    try
 			{
 		    	/* Check QaUtils.createAuthoringUser again User Management Service is ready */
-		    	User user=QaUtils.createAuthoringUser(new Integer(userId)); 
+		    	User user=QaUtils.createSimpleUser(new Integer(userId)); 
 		    	request.getSession().setAttribute(TOOL_USER, user);
 			}
 		    catch(NumberFormatException e)

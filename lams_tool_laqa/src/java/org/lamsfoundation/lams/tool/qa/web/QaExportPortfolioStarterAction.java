@@ -17,6 +17,9 @@
 	to differentiate between learner and teacher modes.
 */
 
+/**
+ * Revisit when user management service is ready to include current user's name in the jsp. 
+ */
 
 package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
