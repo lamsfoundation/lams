@@ -1,54 +1,70 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
-    
-<hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport"
+        table="tl_lasbmt11_report"
+        dynamic-update="false"
+        dynamic-insert="false"
+        select-before-update="false"
+        optimistic-lock="version"
+    >
 
-<class name="org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport"  table="tl_lasbmt11_report">
-    <meta attribute="class-description" inherit="false">@hibernate.class table="tl_lasbmt11_report"</meta>
-    <meta attribute="implement-equals" inherit="false">true</meta>
+        <id
+            name="reportID"
+            column="report_id"
+            type="java.lang.Long"
+        >
+            <generator class="identity">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-SubmitFilesReport.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
 
-    <id name="reportID" type="java.lang.Long" column="report_id" >
-        <meta attribute="field-description">@hibernate.id generator-class="identity" type="java.lang.Long" column="report_id"</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <generator class="identity"/>
-    </id>
+        <property
+            name="comments"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
+            column="comments"
+            length="250"
+        />
 
-    <property name="comments" type="java.lang.String" column="comments" length="250">
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">@hibernate.property column="comments" length="250"</meta>    
-    </property>
-    
-    <property name="marks" type="java.lang.Long" column="marks" length="20" >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">@hibernate.property column="marks" length="20"</meta>    
-    </property>
-    
-    <property name="dateMarksReleased" type="java.sql.Timestamp" column="date_marks_released" length="19" >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">@hibernate.property column="date_marks_released" length="19" </meta>    
-    </property>
-        
-    <!-- Associations -->
-  
-    <!-- bi-directional many-to-one association to SubmissionDetails -->
-    <many-to-one name="submissionDetails" class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"  unique="true" not-null="true">        
-        <meta attribute="field-description">@hibernate.many-to-one unique="true"
-        									@hibernate.many-to-one not-null="true" 
-        									@hibernate.column name="submission_id"         
-        </meta>
-        <column name="submission_id" />
-    </many-to-one>
+        <property
+            name="marks"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            access="property"
+            column="marks"
+            length="20"
+        />
 
-</class>
+        <property
+            name="dateMarksReleased"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            access="property"
+            column="date_marks_released"
+            length="19"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-SubmitFilesReport.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
 </hibernate-mapping>

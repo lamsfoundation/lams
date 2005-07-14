@@ -40,7 +40,10 @@
 		<!-- This property is supposed to be set in eclipse  -->
 		<pathelement location="${java.class.path}"/>
 	</path>
-	
+	<path id="schemaexport.classpath">
+		<path refid="project.classpath"/>
+		<pathelement location="${build.classes.java}"/>
+	</path>
 	<target name="usage">
 			<echo message=""/>
 			<echo message="${project} build file"/>
@@ -111,8 +114,56 @@
 			</middlegen>
 
 		</target>
-
-
+		<!-- ************************************************************** -->
+		<!-- Hibernate and xDoclet targets -->
+		<!-- ************************************************************** -->
+	
+		<target name="generate-hbm" 
+				description="Generates Hibernate class descriptor files."
+			depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present,preparedirs">
+			    <!-- Define the hibernatedoclet task -->
+			    <taskdef name="hibernatedoclet"
+			        classname="xdoclet.modules.hibernate.HibernateDocletTask"
+		            classpathref="project.classpath">
+			    </taskdef>    
+	
+			    <!-- Execute the hibernatedoclet task -->
+			    <hibernatedoclet
+			        destdir="${conf.hibernate.mapping.dir}"
+			        excludedtags="@version,@author,@todo"
+			        force="true"
+			        verbose="true">
+			        <fileset dir="${src.dir.java}">
+			            <include name="**/*/*.java"/>
+			        </fileset>
+			        <!-- hibernate 1 and hibernate 2 mapping files are not fully compatible-->
+			        <hibernate version="2.0"/>
+			    </hibernatedoclet>
+			</target>
+	
+			
+			<!-- exports all the hbm mappings to the specified database -->
+			<target name="schemaexport" description="Exports all hbm.xml files in {conf.hibernate.mapping.dir}/hbm"
+				depends="generate-hbm">
+			    <echo message="Run the schema export for all hbm.xml files in ${conf.hibernate.mapping.dir}/hbm"/>
+				<taskdef
+					name="schemaexport"
+					classname="net.sf.hibernate.tool.hbm2ddl.SchemaExportTask"
+					classpathref="schemaexport.classpath"
+					>
+				</taskdef>
+				<schemaexport
+					properties="${conf.hibernate.mapping.dir}/hibernate.properties"
+					quiet="no"
+					text="no"
+					drop="no"
+					delimiter=";"
+					output="${db.scripts}/table-schema.sql">
+					<fileset dir="${conf.hibernate.mapping.dir}">
+						<include name="**/*.hbm.xml"/>
+					</fileset>
+				</schemaexport>	
+			</target>	
 		<!-- ================================================================ -->
 		<!-- Preparations									                  -->
 		<!-- ================================================================ -->

@@ -1,60 +1,100 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
-    
-<hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent"
+        table="tl_lasbmt11_content"
+        dynamic-update="false"
+        dynamic-insert="false"
+        select-before-update="false"
+        optimistic-lock="version"
+    >
 
-<class name="org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent" table="tl_lasbmt11_content" >
-    <meta attribute="class-description" inherit="false">@hibernate.class table="tl_lasbmt11_content" </meta>
-    <meta attribute="implement-equals" inherit="false">true</meta>
+        <id
+            name="contentID"
+            column="content_id"
+            type="java.lang.Long"
+        >
+            <generator class="assigned">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-SubmitFilesContent.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
 
-    <id name="contentID" type="java.lang.Long" column="content_id">
-        <meta attribute="field-description"> @hibernate.id generator-class="assigned"
-        						             type="java.lang.Long" column="content_id"        </meta>
-        <meta attribute="use-in-equals">true</meta>
-        <generator class="assigned" />
-    </id>
+        <property
+            name="title"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
+            column="title"
+            length="64"
+            not-null="true"
+        />
 
-    <property name="title" type="java.lang.String" column="title" not-null="true" length="64" >
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">@hibernate.property column="title" length="64" not-null="true"</meta>    
-    </property>
-    
-    <property name="instructions" type="java.lang.String" column="instructions" not-null="true" length="64">
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">@hibernate.property column="instructions" length="64" not-null="true"</meta>    
-    </property>
-        
-    <!-- Associations -->
-    
-    <!-- bi-directional one-to-many association to SubmitFilesSession -->
-    <set name="toolSession" lazy="true" inverse="true" cascade="all-delete-orphan">
-        <meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
-        									@hibernate.collection-key column="content_id" 
-        									@hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
-        </meta>
-        <key><column name="content_id" /></key>
-        <one-to-many class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"/>
-    </set>
-    
-    <!-- bi-directional one-to-many association to SubmissionDetails -->
-    <set name="submissionDetails" lazy="true" inverse="true" cascade="all-delete-orphan">
-    	<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
-        									@hibernate.collection-key column="content_id" 
-        									@hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"
-        </meta>
-    	<key><column name="content_id" /></key>
-    	<one-to-many class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"/>
-    </set>
+        <property
+            name="instructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
+            column="instructions"
+            length="64"
+        />
 
-</class>
+        <set
+            name="toolSession"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+              <key
+                  column="content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
+              />
+
+        </set>
+
+        <property
+            name="defineLater"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
+            column="defineLater"
+            length="1"
+        />
+
+        <property
+            name="runOffline"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
+            column="runOffline"
+            length="1"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-SubmitFilesContent.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
 </hibernate-mapping>

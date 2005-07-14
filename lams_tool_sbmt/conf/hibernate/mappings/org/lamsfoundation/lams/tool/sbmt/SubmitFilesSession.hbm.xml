@@ -1,42 +1,70 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
-    
-<hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
 
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
+        table="tl_lasbmt11_session"
+        dynamic-update="false"
+        dynamic-insert="false"
+        select-before-update="false"
+        optimistic-lock="version"
+    >
 
-<class name="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"  table="tl_lasbmt11_session">
-    <meta attribute="class-description" inherit="false">@hibernate.class table="tl_lasbmt11_session"</meta>
-    <meta attribute="implement-equals" inherit="false">true</meta>
+        <id
+            name="sessionID"
+            column="session_id"
+            type="java.lang.Long"
+        >
+            <generator class="identity">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-SubmitFilesSession.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
 
-    <id name="sessionID" type="java.lang.Long" column="session_id">
-        <meta attribute="field-description">@hibernate.id generator-class="identity" type="java.lang.Long" column="session_id"</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <generator class="identity" />
-    </id>
+        <property
+            name="status"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            access="property"
+            column="status"
+            length="11"
+            not-null="true"
+        />
 
-    <property name="status" type="java.lang.Integer" column="status" not-null="true" length="11">
-        <meta attribute="use-in-tostring">true</meta>
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">@hibernate.property column="status" length="11" not-null="true" </meta>    
-    </property>
+        <set
+            name="submissionDetails"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
 
-    <!-- Associations -->
-  
-    <!-- bi-directional many-to-one association to SubmitFilesContent -->
-    <many-to-one name="contentID" class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent" not-null="true">
-        <meta attribute="use-in-equals">true</meta>
-        <meta attribute="field-description">@hibernate.many-to-one not-null="true" 
-        									@hibernate.column name="content_id"         
-        </meta>
-        <column name="content_id" />
-    </many-to-one>
+              <key
+                  column="session_id"
+              >
+              </key>
 
-</class>
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"
+              />
+
+        </set>
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-SubmitFilesSession.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
 </hibernate-mapping>

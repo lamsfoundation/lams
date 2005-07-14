@@ -1,6 +1,10 @@
 package org.lamsfoundation.lams.tool.sbmt;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,6 +25,9 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 
     /** persistent field */
     private Integer status;
+	
+	/** persistent field */
+	private Set submissionDetails;
 
     /** full constructor */
     public SubmitFilesSession(Long sessionID,int status) {
@@ -86,9 +93,34 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 		Object obj = null;
 		try {
 			obj = super.clone();
+			//clone SubmissionDetails object
+			if(submissionDetails != null){
+				Iterator iter = submissionDetails.iterator();
+				Set set = new TreeSet();
+				while(iter.hasNext())
+					set.add(((SubmissionDetails)iter.next()).clone());
+				((SubmitFilesSession)obj).submissionDetails = set;
+			}
+			
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + SubmissionDetails.class + " failed");
 		}
 		return obj;
+	}
+	/**
+	 * @hibernate.collection-one-to-many 
+	 * class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"
+	 * @hibernate.collection-key column="session_id"
+	 * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
+	 * @return Returns the submissionDetails.
+	 */
+	public Set getSubmissionDetails() {
+		return submissionDetails;
+	}
+	/**
+	 * @param submissionDetails The submissionDetails to set.
+	 */
+	public void setSubmissionDetails(Set submissionDetails) {
+		this.submissionDetails = submissionDetails;
 	}
 }

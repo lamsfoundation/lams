@@ -38,36 +38,31 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	/** persistent field */
 	private SubmitFilesReport report;
 
-	/** full constructor */
-	public SubmissionDetails(String filePath,String fileDescription, 
-										Date dateOfSubmission, Long uuid,
-										Long versionID,SubmitFilesContent content,
-										SubmitFilesReport report,Long userID) {
-		this.filePath = filePath;
-		this.fileDescription = fileDescription;
-		this.dateOfSubmission = dateOfSubmission;
-		this.uuid = uuid;
-		this.versionID = versionID;
-		this.report = report;
-		this.userID = userID;
-	}
-
+	
 	/** default constructor */
 	public SubmissionDetails() {
 	}
 
-	/** minimal constructor */
-	public SubmissionDetails(String filePath,String fileDescription,
-							 Date dateOfSubmission, Long uuid,
-							 Long versionID,Long userID) {
-		this.filePath = filePath;
-		this.fileDescription = fileDescription;
-		this.dateOfSubmission = dateOfSubmission;
-		this.uuid = uuid;
-		this.versionID = versionID;
-		this.userID = userID;
+	/** full constructor */
+	public SubmissionDetails(String filePath, String fileDescription, Date dateOfSubmission, Long userID, Long uuid, Long versionID, org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport report) {
+	    this.filePath = filePath;
+	    this.fileDescription = fileDescription;
+	    this.dateOfSubmission = dateOfSubmission;
+	    this.userID = userID;
+	    this.uuid = uuid;
+	    this.versionID = versionID;
+	    this.report = report;
 	}
 
+	/** minimal constructor */
+	public SubmissionDetails(String filePath, String fileDescription, Date dateOfSubmission, Long userID, Long uuid, Long versionID) {
+	    this.filePath = filePath;
+	    this.fileDescription = fileDescription;
+	    this.dateOfSubmission = dateOfSubmission;
+	    this.userID = userID;
+	    this.uuid = uuid;
+	    this.versionID = versionID;
+	}
 	/**
 	 * @hibernate.id generator-class="identity" type="java.lang.Long"
 	 *               column="submission_id"
@@ -173,15 +168,16 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-     * @hibernate.many-to-one not-null="true" 
-     * @hibernate.column name="report_id"
+	 * @hibernate.many-to-one not-null="true"
+	 * @hibernate.column name="report_id"
 	 * @return Returns the report.
 	 */
 	public SubmitFilesReport getReport() {
 		return report;
 	}
 	/**
-	 * @param report The report to set.
+	 * @param report
+	 *            The report to set.
 	 */
 	public void setReport(SubmitFilesReport report) {
 		this.report = report;
@@ -194,13 +190,16 @@ public class SubmissionDetails implements Serializable,Cloneable{
 		return userID;
 	}
 	/**
-	 * @param userID The userID to set.
+	 * @param userID
+	 *            The userID to set.
 	 */
 	public void setUserID(Long userID) {
 		this.userID = userID;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#clone()
 	 */
 	public Object clone()  {
@@ -214,4 +213,5 @@ public class SubmissionDetails implements Serializable,Cloneable{
 		}
 		return obj;
 	}
+
 }

@@ -27,9 +27,6 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	
 	/** persistent field */
 	private Set toolSession;
-	
-	/** persistent field */
-	private Set submissionDetails;
 
 	/** persistent field */
 	private boolean defineLater;
@@ -39,11 +36,10 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 
 	/** full constructor */
 	public SubmitFilesContent(String title, String instructions,
-							  Set toolSession,Set submissionDetails) {
+							  Set toolSession) {
 		this.title = title;
 		this.instructions = instructions;		
 		this.toolSession = toolSession;
-		this.submissionDetails = submissionDetails;
 	}
 
 	/** default constructor */
@@ -54,14 +50,13 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	public SubmitFilesContent(Long contentID, 
 							  String title,
 							  String instructions,
-							  Set toolSession,
-							  Set submissionDetails) {
+							  Set toolSession
+							  ) {
 		super();
 		this.contentID = contentID;
 		this.title = title;
 		this.instructions = instructions;
 		this.toolSession = toolSession;
-		this.submissionDetails = submissionDetails;
 	}
 	
 	public SubmitFilesContent(Long contentID, String title, String instructions){
@@ -83,7 +78,6 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 		SubmitFilesContent newContent = new SubmitFilesContent(newContentID,
 															   content.getTitle(), 
 															   content.getInstructions(),
-															   new TreeSet(),
 															   new TreeSet());		
 		return newContent;
 	}
@@ -159,20 +153,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 				.append(getInstructions()).toHashCode();
 	}
 
-	/**
-	 * @hibernate.collection-one-to-many 
-	 * 
-	 * @return Returns the submissionDetails.
-	 */
-	public Set getSubmissionDetails() {
-		return submissionDetails;
-	}
-	/**
-	 * @param submissionDetails The submissionDetails to set.
-	 */
-	public void setSubmissionDetails(Set submissionDetails) {
-		this.submissionDetails = submissionDetails;
-	}
+
     /** 
      * @hibernate.property column="defineLater" length="1"
      *         
@@ -213,16 +194,6 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 					set.add(((SubmitFilesSession)iter.next()).clone());
 				((SubmitFilesContent)obj).toolSession = set;
 			}
-			
-			//clone SubmissionDetails object
-			if(submissionDetails != null){
-				Iterator iter = submissionDetails.iterator();
-				Set set = new TreeSet();
-				while(iter.hasNext())
-					set.add(((SubmissionDetails)iter.next()).clone());
-				((SubmitFilesContent)obj).submissionDetails = set;
-			}
-			
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + SubmissionDetails.class + " failed");
 		}
