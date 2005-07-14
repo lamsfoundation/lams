@@ -79,16 +79,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	 * Methods for access to NoticeboardContent objects
 	 * ==============================================================================
 	 */
-	public void testRetrieveNoticeboardByUID()
-	{
-	    nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
-	    Long uid = nbContent.getUid();
-	    
-	    NoticeboardContent testObject = nbService.retrieveNoticeboardByUID(uid);
 		
-	    assertContentEqualsTestData(testObject);
-	}
-	
 	public void testRetrieveNoticeboard()
 	{
 	    nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
@@ -186,15 +177,6 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    assertEqualsForSessionContent(nbSession);
 	}
 	
-	public void testRetrieveNoticeboardSessionByUID()
-	{
-	    nbSession = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);
-	    Long uid = nbSession.getUid();
-	    
-	    NoticeboardSession testSession = nbService.retrieveNoticeboardSessionByUID(uid);
-		
-	    assertEqualsForSessionContent(testSession);
-	}
 	
 	public void testSaveNoticeboardSession()
 	{
@@ -210,11 +192,10 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	            												nbContent,
 	            												created,
 	            												NoticeboardSession.NOT_ATTEMPTED); 
-	
-	   nbService.saveNoticeboardSession(nbSession);
+	    nbService.addSession(testContentId, nbSession);
 	 
 	    
-	   NoticeboardSession retrievedSession = nbService.retrieveNoticeboardSession(testSessionId);
+	   	NoticeboardSession retrievedSession = nbService.retrieveNoticeboardSession(testSessionId);
 	    
 	    assertEquals(retrievedSession.getNbContent().getNbContentId(), testContentId);
 	    assertEquals(retrievedSession.getSessionStartDate(), created);
@@ -258,17 +239,6 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    
 	}
 	
-	public void testRemoveSessionByUID()
-	{
-	    nbSession = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);
-	    Long uid = nbSession.getUid();
-	
-	    nbService.removeSessionByUID(uid);
-		    
-	    assertSessionObjectIsNull(TEST_SESSION_ID);
-
-	}
-
 	public void testRemoveNoticeboardUsersFromSession()
 	{
 	    nbSession = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);	    
@@ -291,12 +261,6 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    assertEqualsForNbUser(nbUser);
 	}
 
-	public void testRetrieveNoticeboardUserByUID()
-	{
-	    nbUser = nbService.retrieveNoticeboardUserByUID(new Long(1));
-	    
-	    assertEqualsForDefaultNbUser(nbUser);
-	}
 	
 	public void testSaveNoticeboardUser()
 	{
@@ -343,6 +307,29 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    assertUserObjectIsNull(TEST_USER_ID);
 	  
 	}
+	
+	public void testAddSession()
+	{
+	    Long toolSessionId = new Long(99);
+	    NoticeboardSession newSession = new NoticeboardSession(toolSessionId);
+        nbService.addSession(TEST_NB_ID, newSession);
+        
+        NoticeboardSession session = nbService.retrieveNoticeboardSession(toolSessionId);
+        assertEquals(session.getNbContent().getNbContentId(), TEST_NB_ID);
+       
+	}
+	
+	public void testAddUser()
+	{
+	    Long userId = new Long(88);
+	    NoticeboardUser newUser = new NoticeboardUser(userId);
+        nbService.addUser(TEST_SESSION_ID, newUser);
+        
+        NoticeboardUser user = nbService.retrieveNoticeboardUser(userId);
+        assertEquals(user.getNbSession().getNbSessionId(), TEST_SESSION_ID);
+	}
+	
+	
 }
 	
 	

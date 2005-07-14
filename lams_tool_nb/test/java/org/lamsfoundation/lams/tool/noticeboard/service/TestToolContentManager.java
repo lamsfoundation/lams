@@ -28,8 +28,11 @@ package org.lamsfoundation.lams.tool.noticeboard.service;
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
+import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 
-
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 
 /**
  * @author mtruong
@@ -55,6 +58,8 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	{
 		super.setUp();
 		//setup some data
+		this.nbContent = null;
+		this.nbSession = null;
 		nbContentManager = (ToolContentManager)this.context.getBean("nbService");
 		nbService = (INoticeboardService)this.context.getBean("nbService");
 		this.initNbContentData();
@@ -77,8 +82,10 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	     	super.cleanNbContentData(TEST_COPYNB_ID);
 	     }
      }
-	
-	public void testcopyToolContent()
+	/*
+	 * Normal Use case
+	 */
+	public void testcopyToolContent() throws ToolException
 	{
 		//ensure that the copied data is deleted after use
 		cleanCopyContent = true;
@@ -91,32 +98,267 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 		assertEquals(nbContent.getNbContentId(), TEST_COPYNB_ID);
 	    	
 		assertContentEqualsTestData(nbContent);
+	} 
+	
+	/*
+	 * Error case: toContentId not supplied
+	 */
+	
+	public void testCopyToolContentWithToContentIdNull() throws ToolException
+	{
+	    cleanCopyContent = true;
+	    try
+	    {
+	        nbContentManager.copyToolContent(TEST_NB_ID, null);
+	       fail("A ToolException should have been raised as toContentId is missing");
+	    }
+	    catch(ToolException e)
+	    {
+	        assertTrue(true);
+	    }
 	}
 	
-	public void testsetAsDefineLater()
+	/*
+	 * Alternative case: the fromContentId supplied is null, default content is used.
+	 */
+	public void testCopyToolContentWithFromContentIdNull() throws ToolException
 	{
-		nbContentManager.setAsDefineLater(TEST_NB_ID);
+	    cleanCopyContent = true;
+	    try
+	    {
+	        nbContentManager.copyToolContent(null, TEST_COPYNB_ID);
+	        
+	        nbContent = nbService.retrieveNoticeboard(TEST_COPYNB_ID);
+	        assertEquals(nbContent.getNbContentId(), TEST_COPYNB_ID);
+	        assertContentEqualsDefaultData(nbContent);
+	        
+	        
+	    }
+	    catch(ToolException e)
+	    {
+	        assertFalse(false); //an exception should not have been thrown since default content is there
+	    }
+	}
+	
+	/*
+	 * Alternative case: the fromContentId supplied does not exist in the db, default content is used.
+	 */
+	public void testCopyToolContentWithInvalidFromContentId() throws ToolException
+	{
+	    cleanCopyContent = true;
+	    try
+	    {
+	        nbContentManager.copyToolContent(new Long(76), TEST_COPYNB_ID);
+	        
+	        nbContent = nbService.retrieveNoticeboard(TEST_COPYNB_ID);
+	        assertEquals(nbContent.getNbContentId(), TEST_COPYNB_ID);
+	        assertContentEqualsDefaultData(nbContent);
+	    }
+	    catch(ToolException e)
+	    {
+	        assertFalse(true); //an exception should not have been thrown since default content is there
+	    }
+	}
+	
+	/*
+	 * Error case: Default content is missing, throws DataMissingException
+	 */
+	public void testCopyToolContentWithDefaultContentMissing() throws ToolException
+	{
+	   // cleanCopyContent = true;
+	    
+	    //remove the default content so it will trigger the exception
+	    nbService.removeNoticeboard(NoticeboardConstants.DEFAULT_CONTENT_ID);
+	    
+	    try
+	    {
+	        nbContentManager.copyToolContent(null, TEST_COPYNB_ID);
+	        fail("A ToolException should have been raised as the fromContentId is missing" +
+	        		" and default content is missing.");
+	     
+	    }
+	    catch(ToolException e)
+	    {
+	        assertTrue(true); //an exception should not have been thrown since default content is there
+	    }
+	    
+	    this.restoreDefaultContent();
+	}
+	
+	/*
+	 * Normal case: 
+	 */
+	
+	public void testSetAsDefineLater() throws ToolException, DataMissingException
+	{
+	    nbContentManager.setAsDefineLater(TEST_NB_ID);
 		
 		nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
 		
 		assertTrue(nbContent.isDefineLater());
 	}
 	
-	public void testsetAsRunOffline()
+	/*
+	 * Error case: supplied parameter toolContentId is null, ToolException is thrown
+	 */
+	public void testSetAsDefineLaterWithIdNull() throws ToolException, DataMissingException
+	{
+	    try
+	    {
+	        nbContentManager.setAsDefineLater(null);
+	        fail("A ToolException should have been raised as the toolContentId is null");
+	    }
+	    catch(ToolException e)
+	    {
+	        assertTrue(true);
+	    }
+	}
+	
+	/*
+	 * Error case: The tool content is missing for the supplied toolContentId, throws DataMissingException
+	 */
+	public void testSetAsDefineLaterWithInvalidId() throws ToolException, DataMissingException
+	{
+	    try
+	    {
+	        Long idWithNoContent = new Long(8767);
+	        nbContentManager.setAsDefineLater(idWithNoContent);
+	        fail("A ToolException should have been raised as the tool content is missing for the supplied toolContentId: "+idWithNoContent);
+	    }
+	    catch(DataMissingException e)
+	    {
+	        assertTrue(true);
+	    }
+	}
+	
+	/*
+	 * Normal case for: setAsRunOffline(Long toolContentId)
+	 */
+	
+	public void testsetAsRunOffline() throws DataMissingException, ToolException
 	{
 		nbContentManager.setAsRunOffline(TEST_NB_ID);
 		nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
 		assertTrue(nbContent.isForceOffline());
 	}
 	
-	public void testremoveToolContent()
+	/*
+	 * Error case: supplied parameter toolContentId is null, ToolException is thrown
+	 */
+	public void testSetAsRunOfflineWithIdNull() throws ToolException, DataMissingException
 	{
-		cleanContentData = false;
-		nbContentManager.removeToolContent(TEST_NB_ID);
-		
-			nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
-			assertNull(nbContent);
+	    try
+	    {
+	        nbContentManager.setAsRunOffline(null);
+	        fail("A ToolException should have been raised as the toolContentId is null");
+	    }
+	    catch(ToolException e)
+	    {
+	        assertTrue(true);
+	    }
+	}
+	/*
+	 * Error case: The tool content is missing for the supplied toolContentId, throws DataMissingException
+	 */
 	
+	public void testSetAsRunOfflineWithInvalidId() throws ToolException, DataMissingException
+	{
+	    try
+	    {
+	        Long idWithNoContent = new Long(8767);
+	        nbContentManager.setAsRunOffline(idWithNoContent);
+	        fail("A ToolException should have been raised as the tool content is missing for the supplied toolContentId: "+idWithNoContent);
+	    }
+	    catch(DataMissingException e)
+	    {
+	        assertTrue(true);
+	    }
+	}
+	
+	/*
+	 * Normal case:
+	 * @author mtruong
+	 */
+	
+	public void testRemoveToolContent() throws ToolException, SessionDataExistsException
+	{
+	    cleanContentData = false;
+	    
+		nbContentManager.removeToolContent(TEST_NB_ID, true);		
+		nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
+		assertNull(nbContent);
+	}
+	
+	/*
+	 * Error case: toolContentId is null, throws ToolException
+	 */
+	public void testRemoveToolContentWithIdNull() throws ToolException, SessionDataExistsException
+	{
+	    cleanContentData = true;
+	    try
+	    {
+	        nbContentManager.removeToolContent(null, true);
+	        fail("An exception should be raised as the supplied toolContentId is null");
+	    }
+	    catch (ToolException e)
+	    {
+	        assertTrue(true);
+	    }
+	}
+	
+	/*
+	 * Error case: toolContentId is invalid (no content is defined for that id), throws DataMissingException
+	 */
+	public void testRemoveToolContentWithInvalidId() throws ToolException, SessionDataExistsException
+	{
+	    cleanContentData = true;
+	    try
+	    {
+	        Long nonExistentId = new Long(89879);
+	        nbContentManager.removeToolContent(nonExistentId, true);
+	        fail("An exception should be raised as the supplied toolContentId does not have content data");
+	    }
+	    catch (DataMissingException e)
+	    {
+	        assertTrue(true);
+	    }
+	}
+	
+	/*
+	 * Exception case: session data exists, and removeSessionData flag is set to false, throws SessionDataExistsException
+	 */
+	
+	public void testRemoveToolContentWithFlagSetToFalseAndSessionDataExists() throws ToolException, SessionDataExistsException
+	{
+	    cleanContentData = true;
+	    try
+	    {
+	        nbContentManager.removeToolContent(TEST_NB_ID, false);
+	        fail("An exception should be raised as session data exists, but removeSessionData is false. Cannot Continue to remove tool content");
+	    }
+	    catch(SessionDataExistsException e)
+	    {
+	        assertTrue(true);
+	    }
+	}
+	
+	/*
+	 * Alternative case: the flag removeSessionData=false, but no session data exists, return without throwing exception
+	 */
+	public void testRemoveToolContentWithFlagSetToFalseAndNoSessionData() throws ToolException, SessionDataExistsException
+	{
+	    cleanContentData = false;
+	    
+	    //remove session data
+	    nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
+	    nbContent.getNbSessions().clear();
+	    nbService.updateNoticeboard(nbContent);
+	    
+	    nbContentManager.removeToolContent(TEST_NB_ID, false);
+	    
+	    nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
+		assertNull(nbContent);
+  
 	}
 	
 	
