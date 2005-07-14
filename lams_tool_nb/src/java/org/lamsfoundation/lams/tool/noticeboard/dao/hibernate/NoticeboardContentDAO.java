@@ -27,6 +27,7 @@ import java.lang.Long;
 import net.sf.hibernate.HibernateException;
 import net.sf.hibernate.Session;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.springframework.orm.hibernate.HibernateCallback;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
@@ -158,6 +159,24 @@ public class NoticeboardContentDAO extends HibernateDaoSupport implements INotic
     public void removeNbSessions(NoticeboardContent nbContent)
     {
     	this.getHibernateTemplate().deleteAll(nbContent.getNbSessions());
+    }
+    
+    /**
+     * <p>Creates a persistent instance of NoticeboardSession which is associated
+     * with the NoticeboardContent with tool content id <code>nbContentId</code> 
+     * </p>
+     * 
+     * @param nbContentId The tool content id
+     * @param nbSession The instance of NoticeboardSession to add
+     */
+    public void addNbSession(Long nbContentId, NoticeboardSession nbSession)
+    {
+        NoticeboardContent content = findNbContentById(nbContentId);
+        nbSession.setNbContent(content);
+        content.getNbSessions().add(nbSession);
+        this.getHibernateTemplate().saveOrUpdate(nbSession);
+        this.getHibernateTemplate().saveOrUpdate(content);
+        
     }
   
 }
