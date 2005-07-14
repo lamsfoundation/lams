@@ -21,7 +21,7 @@
 package org.lamsfoundation.lams.tool.noticeboard.dao;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 
 /**
  * Interface for the NoticeboardContent DAO, defines methods needed to access/modify
@@ -45,5 +45,7 @@ public interface INoticeboardContentDAO {
     public void removeNoticeboard(Long nbContentId);
     
     public void removeNbSessions(NoticeboardContent nbContent);
-
-}
+    
+    public void addNbSession(Long nbContentId, NoticeboardSession nbSession);
+    
+  }
