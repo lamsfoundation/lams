@@ -25,8 +25,8 @@
 </div>
 
 <div id="formtablecontainer">
-<c:if test="${sessionScope.isToolCompleted != 'true'}" >
-<table>
+<c:if test="${sessionScope.readOnlyMode != 'true'}" >
+<table width="100%">
 <tr>
 	<td align="right">
 		<html:submit property="method"><fmt:message key="button.finish"/></html:submit>

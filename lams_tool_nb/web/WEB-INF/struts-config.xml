@@ -48,12 +48,18 @@
       name="NbLearnerForm"
       scope="session"
       input=".learnerStarter"
+      parameter="mode"
       unknown="false"
       validate="false"
     >
       <forward
         name="displayLearnerContent"
         path=".learnerContent"
+        redirect="false"
+      />
+      <forward
+        name="displayMessage"
+        path=".message"
         redirect="false"
       />
     </action>

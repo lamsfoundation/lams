@@ -38,7 +38,7 @@ VALUES (null,
 		LAST_INSERT_ID(),
 		now(),
 		now(),
-		'NOT_ATTEMPTED');
+		'INCOMPLETE');
 		
 INSERT INTO tl_lanb11_user ( 	uid,
 								user_id,

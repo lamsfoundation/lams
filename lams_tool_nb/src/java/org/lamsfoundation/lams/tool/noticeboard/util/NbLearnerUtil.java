@@ -26,30 +26,17 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 /**
  * @author mtruong
  *
+ *	Date created: 30 June 2005
  */
-public class NbAuthoringUtil {
+public class NbLearnerUtil {
 
-	 private NbAuthoringUtil() {}
-	 
-	 /**
-	  * Converts the request parameter <code>toolContentId</code>, from a string to a Long
-	  * @author mtruong
-	  */
-
-	 	public static Long convertToLong(String toolContentId)
-	 	{
-	 		Long contentId = new Long(Long.parseLong(toolContentId));
-	 		return contentId;
-	 	}
-	 	
-	 /*
-	  * Not needed anymore, using ActionForm to persist the values
-	  */
-	 	public static void cleanSession(HttpServletRequest request)
-	 	{
-	 	    request.getSession().removeAttribute(NoticeboardConstants.TOOL_CONTENT_ID);
-	 	    request.getSession().removeAttribute(NoticeboardConstants.RICH_TEXT_CONTENT);
-	 	    request.getSession().removeAttribute(NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN);
-	 	    request.getSession().removeAttribute(NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN);
-	 	}
+    private NbLearnerUtil() {}
+    
+    public static void cleanSession(HttpServletRequest request)
+    {
+        request.getSession().removeAttribute(NoticeboardConstants.READ_ONLY_MODE);
+      //  request.getSession().removeAttribute(NoticeboardConstants.IS_TOOL_COMPLETED);
+    }
+    
+    
 }

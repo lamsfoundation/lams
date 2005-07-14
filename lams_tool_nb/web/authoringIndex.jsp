@@ -13,7 +13,7 @@ String url = "/tool/nb/starter/authoring?toolContentId="+355;
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
   <head>
-	   <title>Noticeboard Starter Page</title>
+	   <title>Noticeboard Author Starter Page</title>
   </head>
   
   <body>

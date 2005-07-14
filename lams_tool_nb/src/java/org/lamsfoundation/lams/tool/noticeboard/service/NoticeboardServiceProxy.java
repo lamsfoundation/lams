@@ -47,6 +47,4 @@ public class NoticeboardServiceProxy {
 		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
 	    return wac.getBean("nbService");
 	}
-
-	
 }
