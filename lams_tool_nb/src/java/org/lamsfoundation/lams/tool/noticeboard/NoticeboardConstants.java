@@ -56,7 +56,7 @@ public class NoticeboardConstants
     public static final String TOOL_ACCESS_MODE_AUTHOR = "author";
     public static final String TOOL_ACCESS_MODE_TEACHER = "teacher";
     
-    
+    public static final String MONITOR_PAGE = "monitorPage";
     
   
     
@@ -72,11 +72,15 @@ public class NoticeboardConstants
     // Session Attributes
     // --------------------------------------------
     
- 
-  /*  public static final String TITLE = "title";
+    //used in monitoring
+    public static final String TITLE = "title";
     public static final String CONTENT = "content";
     public static final String ONLINE_INSTRUCTIONS = "onlineInstructions";
-    public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";*/
+    public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
+    public static final String TOOL_CONTENT_ID_INMONITORMODE = "toolContentIdInMonitor";
+    public static final String CONTENT_IN_USE = "contentInUse";
+    
+    //used in authoring
     public static final String TOOL_CONTENT_ID = "toolContentId";  //request + session variable
     public static final String RICH_TEXT_TITLE = "richTextTitle";
     public static final String RICH_TEXT_CONTENT = "richTextContent";
@@ -101,6 +105,9 @@ public class NoticeboardConstants
     public static final String BUTTON_DONE = "button.done";
     public static final String BUTTON_FINISH = "button.finish";
    // public static final String BUTTON_CANCEL = "button.cancel";
+    public static final String BUTTON_EDIT_ACTIVITY = "button.editActivity";
+    public static final String BUTTON_SUMMARY = "button.summary";
+    public static final String BUTTON_STATISTICS = "button.statistics";
     
     
    //--------------
