@@ -379,8 +379,7 @@ public class SubmitFilesService implements ToolContentManager,
 		else {
 			NodeKey nodeKey = uploadFileToRepository(stream, fileName, mimeType);
 			SubmissionDetails details = new SubmissionDetails(filePath,fileDescription,dateOfSubmission,
-															  nodeKey.getUuid(),nodeKey.getVersion(),
-															  userID);
+															  userID,nodeKey.getUuid(),nodeKey.getVersion());
 			//update session, then insert the detail too.
 			Set detailSet = session.getSubmissionDetails();
 			detailSet.add(details);

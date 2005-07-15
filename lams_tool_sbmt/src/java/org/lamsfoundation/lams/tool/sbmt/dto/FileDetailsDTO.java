@@ -62,11 +62,12 @@ public class FileDetailsDTO implements Serializable{
 		this.dateOfSubmission = details.getDateOfSubmission();
 		this.uuID = details.getUuid();
 		this.versionID = details.getVersionID();
-		
-		this.reportID = report.getReportID();
-		this.dateMarksReleased = report.getDateMarksReleased();		
-		this.comments = report.getComments();
-		this.marks = report.getMarks();
+		if(report != null){
+			this.reportID = report.getReportID();
+			this.dateMarksReleased = report.getDateMarksReleased();		
+			this.comments = report.getComments();
+			this.marks = report.getMarks();
+		}
 	}
 	public FileDetailsDTO(SubmissionDetails details){
 		
