@@ -20,7 +20,7 @@
 
   http://www.gnu.org/licenses/gpl.txt 
 -->
-<project name="lams_tool_sbmt" basedir="." default="usage">
+<project name="lams_tool_lasbmt11" basedir="." default="usage">
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
@@ -266,6 +266,7 @@
 	   				<include name=".xml"/>
 	   				<include name="**/*.*"/>
 	   				<exclude name="web.xml"/>
+	   				<exclude name="classes/**"/>
 	   			</webinf>
 	   			<classes dir="${build.classes.java}"/>	
 	   			<fileset dir="${conf.web.dir}">
@@ -306,7 +307,7 @@
 			</sql>
 			<delete quiet="true" dir ="${contentrepository.location}"/>
 		</target>
-	
+x
 	<!-- =================================================================== -->
 	<!-- Generate the deploy package                                         -->
 	<!-- =================================================================== -->
@@ -379,7 +380,7 @@
 			</fileset>
 		</path> 
 
-		<echo>Deploying the Question and Answer tool</echo>
+		<echo>Deploying the Submission tool</echo>
 
 		<java
 			classname="org.lamsfoundation.lams.tool.deploy.Deploy"
