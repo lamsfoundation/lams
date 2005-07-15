@@ -19,12 +19,28 @@
  *http://www.gnu.org/licenses/gpl.txt
  */
 package org.lamsfoundation.lams.tool.qa.service;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.FileException;
+import org.lamsfoundation.lams.contentrepository.ICredentials;
+import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.LoginException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
+import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -40,6 +56,7 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.SubmissionDetails;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
@@ -49,6 +66,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.dao.DataAccessException;
+
 
 
 /**
@@ -74,6 +92,8 @@ public class QaServicePOJO implements
                               IQaService, ToolContentManager, ToolSessionManager, QaAppConstants
                
 {
+	static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
+	
 	private IQaContentDAO 		qaDAO;
     private IQaQueContentDAO 	qaQueContentDAO;
     private IQaSessionDAO 		qaSessionDAO;
@@ -82,8 +102,10 @@ public class QaServicePOJO implements
     
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
+    
+    private IRepositoryService repositoryService;
         
-    static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
+    
 
 
     public QaServicePOJO(){}
@@ -112,6 +134,39 @@ public class QaServicePOJO implements
     {
         this.qaUsrRespDAO = qaUsrRespDAO;
     }
+
+    /**
+	 * @return Returns the qaDAO.
+	 */
+	public IQaContentDAO getQaDAO() {
+		return qaDAO;
+	}
+	/**
+	 * @return Returns the qaSessionDAO.
+	 */
+	public IQaSessionDAO getQaSessionDAO() {
+		return qaSessionDAO;
+	}
+	/**
+	 * @return Returns the qaUsrRespDAO.
+	 */
+	public IQaUsrRespDAO getQaUsrRespDAO() {
+		return qaUsrRespDAO;
+	}
+
+	/**
+	 * @return Returns the repositoryService.
+	 */
+	public IRepositoryService getRepositoryService() {
+		return repositoryService;
+	}
+	/**
+	 * @param repositoryService The repositoryService to set.
+	 */
+	public void setRepositoryService(IRepositoryService repositoryService) {
+		this.repositoryService = repositoryService;
+	}
+
     
     
     public void setUserManagementService(IUserManagementService userManagementService)
@@ -1238,29 +1293,195 @@ public class QaServicePOJO implements
     	return listToolSessionIds;
     }
     
-    /**
-	 * @return Returns the qaDAO.
-	 */
-	public IQaContentDAO getQaDAO() {
-		return qaDAO;
-	}
+    
+    
 	/**
-	 * @return Returns the qaSessionDAO.
+	 * This method verifies the credentials of the SubmitFiles Tool and gives it
+	 * the <code>Ticket</code> to login and access the Content Repository.
+	 * 
+	 * A valid ticket is needed in order to access the content from the
+	 * repository. This method would be called evertime the tool needs to
+	 * upload/download files from the content repository.
+	 * 
+	 * @return ITicket The ticket for repostory access
+	 * @throws SubmitFilesException
 	 */
-	public IQaSessionDAO getQaSessionDAO() {
-		return qaSessionDAO;
+	public ITicket getRepositoryLoginTicket() throws QaApplicationException {
+		repositoryService = RepositoryProxy.getLocalRepositoryService();
+    	logger.debug("retrieved repositoryService : " + repositoryService);
+		
+		ICredentials credentials = new SimpleCredentials(
+				IQaService.QA_LOGIN,
+				IQaService.QA_PASSWORD.toCharArray());
+		try {
+			ITicket ticket = repositoryService.login(credentials,
+					IQaService.QA_WORKSPACE);
+			logger.debug("retrieved ticket: " + ticket);
+			return ticket;
+		} catch (AccessDeniedException e) {
+			throw new QaApplicationException("Access Denied to repository."
+					+ e.getMessage());
+		} catch (WorkspaceNotFoundException e) {
+			throw new QaApplicationException("Workspace not found."
+					+ e.getMessage());
+		} catch (LoginException e) {
+			throw new QaApplicationException("Login failed." + e.getMessage());
+		}
 	}
+	
+	
 	/**
-	 * @return Returns the qaUsrRespDAO.
+	 * This method deletes the content with the given <code>uuid</code> and
+	 * <code>versionID</code> from the content repository
+	 * 
+	 * @param uuid
+	 *            The <code>uuid</code> of the node to be deleted
+	 * @param versionID
+	 *            The <code>version_id</code> of the node to be deleted.
+	 * @throws SubmitFilesException
 	 */
-	public IQaUsrRespDAO getQaUsrRespDAO() {
-		return qaUsrRespDAO;
+	public void deleteFromRepository(Long uuid, Long versionID)
+			throws QaApplicationException {
+		ITicket ticket = getRepositoryLoginTicket();
+		logger.debug("retrieved ticket: " + ticket);
+		try {
+			String files[] = repositoryService.deleteVersion(ticket, uuid,versionID);
+			logger.debug("retrieved files: " + files);
+		} catch (Exception e) {
+			throw new QaApplicationException(
+					"Exception occured while deleting files from"
+							+ " the repository " + e.getMessage());
+		}
+	}
+	
+	
+	/**
+	 * This method is called everytime a new content has to be added to the
+	 * repository. In order to do so first of all a valid ticket is obtained
+	 * from the Repository hence authenticating the tool(SubmitFiles) and then
+	 * the corresponding file is added to the repository.
+	 * 
+	 * @param stream
+	 *            The <code>InputStream</code> representing the data to be
+	 *            added
+	 * @param fileName
+	 *            The name of the file being added
+	 * @param mimeType
+	 *            The MIME type of the file (eg. TXT, DOC, GIF etc)
+	 * @return NodeKey Represents the two part key - UUID and Version.
+	 * @throws SubmitFilesException
+	 */
+	public NodeKey uploadFileToRepository(InputStream stream, String fileName,
+			String mimeType) throws QaApplicationException {
+		ITicket ticket = getRepositoryLoginTicket();
+		try {
+			NodeKey nodeKey = repositoryService.addFileItem(ticket, stream,
+					fileName, mimeType, null);
+			logger.debug("retrieved nodeKey: " + nodeKey);
+			return nodeKey;
+		} catch (Exception e) {
+			throw new QaApplicationException("Exception occured while trying to"
+					+ " upload file into the repository" + e.getMessage());
+		}
 	}
 
-	
-	public void buildLearnerReport()
-	{
-		
+	public InputStream downloadFile(Long uuid, Long versionID)throws QaApplicationException{
+		ITicket ticket = getRepositoryLoginTicket();		
+		try{
+			IVersionedNode node = repositoryService.getFileItem(ticket,uuid,null);
+			logger.debug("retrieved node: " + node);
+			return node.getFile();
+		}catch(AccessDeniedException e){
+			throw new QaApplicationException("AccessDeniedException occured while trying to download file " + e.getMessage());
+		}catch(FileException e){
+			throw new QaApplicationException("FileException occured while trying to download file " + e.getMessage());
+		}catch(ItemNotFoundException e){
+			throw new QaApplicationException("ItemNotFoundException occured while trying to download file " + e.getMessage());			
+		}
 	}
 	
+	public void uploadFile(Long toolContentId, String filePath,
+						   String fileDescription, Long userID) throws QaApplicationException{
+		try{
+			File file = new File(filePath);
+			logger.debug("retrieved file: " + file);			
+			String fileName = file.getName();
+			logger.debug("retrieved fileName: " + fileName);
+			String mimeType = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length());
+			FileInputStream stream = new FileInputStream(file);
+			uploadFile(stream,toolContentId,filePath,fileDescription,fileName,mimeType,new Date(),userID);
+			logger.debug("end of uploadFile: " + fileName);
+		}catch(FileNotFoundException e){
+			throw new QaApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+		}
+	}
+	
+	
+	/**
+	 * This method is called when the user requests to upload a file. It's a
+	 * three step process.
+	 * <ol>
+	 * <li>Firstly, the tool authenticates itself and obtains a valid ticket
+	 * from the respository</li>
+	 * <li>Secondly, using the above ticket it uploads the file to the
+	 * repository. Upon successful uploading of the file, repository returns a
+	 * <code>NodeKey</code> object which is a unique indentifier of the file
+	 * in the repsoitory</li>
+	 * <li>Finally, this information is updated into the database for the given
+	 * contentID in the following tables
+	 * 	<ul>
+	 * 		<li><code>tl_lasbmt11_submission_details</code></li>
+	 * 		<li><code>tl_lasbmt11_report</code></li>
+	 * 	</ul>
+	 * </li>
+	 * </ol>
+	 * 
+	 * @param stream
+	 *            The <code>InputStream</code> representing the data to be
+	 *            uploaded
+	 * @param contentID
+	 *            The <code>contentID</code> of the file being uploaded
+	 * @param filePath
+	 *            The physical path of the file
+	 * @param fileDescription
+	 *            The description of the file
+	 * @param fileName
+	 *            The name of the file being added
+	 * @param mimeType
+	 *            The MIME type of the file (eg. TXT, DOC, GIF etc)
+	 * @param dateOfSubmission
+	 *            The date this file was uploaded by the user
+	 * @param userID
+	 * 			  The <code>User</code> who has uploaded the file.
+	 * @throws SubmitFilesException
+	 */
+	private void uploadFile(InputStream stream, Long toolContentId, String filePath,
+							String fileDescription, String fileName, String mimeType,
+							Date dateOfSubmission, Long userID) throws QaApplicationException {
+
+		QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
+    	logger.debug("retrieving qaContent: " + qaContent);
+		
+		if (qaContent == null)
+		{
+			logger.debug("no content with toolContentId: " + toolContentId);
+			throw new QaApplicationException(
+					"No such content with a toolContentId of: " + toolContentId
+							+ " found.");
+		}
+		else 
+		{
+			NodeKey nodeKey = uploadFileToRepository(stream, fileName, mimeType);
+			SubmissionDetails details = new SubmissionDetails(filePath,fileDescription,dateOfSubmission,
+															  nodeKey.getUuid(),nodeKey.getVersion(),
+															  userID);
+			logger.debug("details: " + details);
+			//submissionDetailsDAO.insert(details);
+		}
+	}	
+
+
+	
+	
+		
 }

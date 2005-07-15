@@ -20,8 +20,11 @@
  */
 package org.lamsfoundation.lams.tool.qa.service;
 
+import java.io.InputStream;
 import java.util.List;
 
+import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -42,6 +45,12 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public interface IQaService 
 {
+	public static final String QA_LOGIN = "qaLogin";
+
+	public static final String QA_PASSWORD = "qaPassword";
+
+	public static final String QA_WORKSPACE = "qaWorkspace";
+	
 	/**
      * Return the qa object according to the requested content id.
      * @param toolContentId the tool content id
@@ -195,6 +204,13 @@ public interface IQaService
     public List getToolSessionsForContent(QaContent qa);
     
     public QaQueContent getToolDefaultQuestionContent(long contentId);
+    
+    public ITicket getRepositoryLoginTicket() throws QaApplicationException;
+    
+    public void deleteFromRepository(Long uuid, Long versionID) throws QaApplicationException;
+    
+	public NodeKey uploadFileToRepository(InputStream stream, String fileName, String mimeType) throws QaApplicationException;
 	
+	public InputStream downloadFile(Long uuid, Long versionID)throws QaApplicationException;
 }
 
