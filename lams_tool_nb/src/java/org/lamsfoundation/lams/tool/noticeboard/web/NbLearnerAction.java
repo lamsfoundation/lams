@@ -84,8 +84,8 @@ public class NbLearnerAction extends LookupDispatchAction {
     public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		
 	  NbLearnerForm learnerForm = (NbLearnerForm)form;
-	  Long toolSessionID = learnerForm.getToolSessionID();
-	  Long userID = learnerForm.getUserID();
+	  Long toolSessionID = learnerForm.getToolSessionId();
+	  Long userID = learnerForm.getUserId();
 	  INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 	 /** TODO: learnerServiceProxy causes an exception, fix this up later */
 	  // ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
@@ -103,7 +103,7 @@ public class NbLearnerAction extends LookupDispatchAction {
 		  
 		  //Notify the progress engine of the user's completion
 		  User user = new User();
-		  user.setUserId(new Integer(learnerForm.getUserID().toString()));
+		  user.setUserId(new Integer(learnerForm.getUserId().toString()));
 		  /** TODO: cannot use this yet as learnerservice causes an exception, fix this up later */
 		 // learnerService.completeToolSession(learnerForm.getToolSessionID(), user);
 		  

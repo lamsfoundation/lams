@@ -90,9 +90,9 @@ public class NbLearnerStarterAction extends DispatchAction {
         ActionMessages message = new ActionMessages();
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         
-        Long userId = learnerForm.getUserID();
-        Long toolSessionId = learnerForm.getToolSessionID();
-        Long toolContentId = learnerForm.getToolContentID();
+        Long userId = learnerForm.getUserId();
+        Long toolSessionId = learnerForm.getToolSessionId();
+        Long toolContentId = learnerForm.getToolContentId();
         
         if(userId == null || toolSessionId ==null || toolContentId==null)
 		{
@@ -163,7 +163,7 @@ public class NbLearnerStarterAction extends DispatchAction {
         /* will show a different screen if defineLater flag is set and running in preview mode */
         NbLearnerForm nbForm = (NbLearnerForm)form;
         NbLearnerUtil.cleanSession(request);
-        Long toolContentId = nbForm.getToolContentID();
+        Long toolContentId = nbForm.getToolContentId();
         saveMessages(request, null);
         
         ActionMessages message = new ActionMessages();
