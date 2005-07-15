@@ -43,7 +43,7 @@
         <set
             name="submissionDetails"
             lazy="true"
-            inverse="true"
+            inverse="false"
             cascade="all-delete-orphan"
             sort="unsorted"
         >

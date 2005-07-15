@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 
 /**
  * @author Manpreet Minhas
@@ -41,8 +42,13 @@ public interface ISubmissionDetailsDAO extends IBaseDAO {
 	 * @param contentID The <code>content_id</code> to be looked up
 	 * @return List The list of required objects.
 	 */
-	public List getSubmissionDetailsForUserByContent(Long userID,Long contentID);
+	public List getSubmissionDetailsForUserBySession(Long userID,Long contentID);
 	
 	public List getUsersForContent(Long contentID);
 
+	/**
+	 * Save or update the given <code>SubmitFilesSession</code> value.
+	 * @param session
+	 */
+	public void saveOrUpdate(SubmitFilesSession session);
 }

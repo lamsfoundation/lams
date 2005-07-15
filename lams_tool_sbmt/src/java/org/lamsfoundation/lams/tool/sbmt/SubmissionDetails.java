@@ -43,17 +43,6 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	public SubmissionDetails() {
 	}
 
-	/** full constructor */
-	public SubmissionDetails(String filePath, String fileDescription, Date dateOfSubmission, Long userID, Long uuid, Long versionID, org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport report) {
-	    this.filePath = filePath;
-	    this.fileDescription = fileDescription;
-	    this.dateOfSubmission = dateOfSubmission;
-	    this.userID = userID;
-	    this.uuid = uuid;
-	    this.versionID = versionID;
-	    this.report = report;
-	}
-
 	/** minimal constructor */
 	public SubmissionDetails(String filePath, String fileDescription, Date dateOfSubmission, Long userID, Long uuid, Long versionID) {
 	    this.filePath = filePath;
@@ -168,7 +157,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.many-to-one not-null="true"
+	 * @hibernate.many-to-one not-null="false"
 	 * @hibernate.column name="report_id"
 	 * @return Returns the report.
 	 */

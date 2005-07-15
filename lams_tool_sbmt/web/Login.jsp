@@ -8,13 +8,13 @@
 		session.setAttribute("instructions","Upload you file by this tool");
 	%>
 	<form name="learnerForm" method="get" action="learner.do">
-		<input type ="hidden" name="contentID" value="1">
+		<input type ="hidden" name="toolSessionID" value="1">
 		<input type ="hidden" name="userID" value="1">
 		<input type ="hidden" name="method" value="listFiles">
 		<input type="submit" name="submit" value="Learner1 Logon">
 	</form>
 	<form name="learnerForm" method="get" action="learner.do">
-		<input type ="hidden" name="contentID" value="1">
+		<input type ="hidden" name="toolSessionID" value="1">
 		<input type ="hidden" name="userID" value="2">
 		<input type ="hidden" name="method" value="listFiles">
 		<input type="submit" name="submit" value="Learner2 Logon">

@@ -48,11 +48,11 @@ public class LearnerAction extends DispatchAction {
 		
 		DynaActionForm authForm= (DynaActionForm)form;
 		
-		Long contentID =(Long) authForm.get("contentID");
+		Long sessionID =(Long) authForm.get("toolSessionID");
 		Long userID = (Long)authForm.get("userID");
 		
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());				
-		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,contentID);
+		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		authForm.set("filesUploaded",filesUploaded);
 		return mapping.getInputForward();
 		
@@ -65,15 +65,15 @@ public class LearnerAction extends DispatchAction {
 		
 		DynaActionForm authForm= (DynaActionForm)form;
 		
-		Long contentID =(Long) authForm.get("contentID");
+		Long sessionID =(Long) authForm.get("toolSessionID");
 		String filePath = (String) authForm.get("filePath");
 		String fileDescription = (String) authForm.get("fileDescription");
 		Long userID = (Long)authForm.get("userID");
 		
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());				
 		try{
-			submitFilesService.uploadFile(contentID,filePath,fileDescription,userID);
-			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,contentID);
+			submitFilesService.uploadFile(sessionID,filePath,fileDescription,userID);
+			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 			authForm.set("filesUploaded",filesUploaded);
 			return mapping.getInputForward();			
 		}catch(SubmitFilesException se){

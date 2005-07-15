@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -350,8 +351,8 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @param stream
 	 *            The <code>InputStream</code> representing the data to be
 	 *            uploaded
-	 * @param contentID
-	 *            The <code>contentID</code> of the file being uploaded
+	 * @param sessionID
+	 *            The <code>ToolSessionID</code> of the file being uploaded
 	 * @param filePath
 	 *            The physical path of the file
 	 * @param fileDescription
@@ -366,22 +367,25 @@ public class SubmitFilesService implements ToolContentManager,
 	 * 			  The <code>User</code> who has uploaded the file.
 	 * @throws SubmitFilesException
 	 */
-	private void uploadFile(InputStream stream, Long contentID, String filePath,
+	private void uploadFile(InputStream stream, Long sessionID, String filePath,
 							String fileDescription, String fileName, String mimeType,
 							Date dateOfSubmission, Long userID) throws SubmitFilesException {
 
-		SubmitFilesContent content = submitFilesContentDAO.getContentByID(contentID);
-		if (content == null)
+		SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(sessionID);
+		if (session == null)
 			throw new SubmitFilesException(
-					"No such content with a contentID of: " + contentID
+					"No such session with a ToolSessionID of: " + sessionID
 							+ " found.");
 		else {
 			NodeKey nodeKey = uploadFileToRepository(stream, fileName, mimeType);
 			SubmissionDetails details = new SubmissionDetails(filePath,fileDescription,dateOfSubmission,
 															  nodeKey.getUuid(),nodeKey.getVersion(),
 															  userID);
-			submissionDetailsDAO.insert(details);
-			submitFilesReportDAO.insert(details.getReport());
+			//update session, then insert the detail too.
+			Set detailSet = session.getSubmissionDetails();
+			detailSet.add(details);
+			session.setSubmissionDetails(detailSet);
+			submissionDetailsDAO.saveOrUpdate(session);
 		}
 	}	
 
@@ -496,15 +500,14 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#uploadFile(java.lang.Long,
 	 *      java.lang.String, java.lang.String)
 	 */
-	public void uploadFile(Long contentID, String filePath,
+	public void uploadFile(Long sessionID, String filePath,
 						   String fileDescription, Long userID) throws SubmitFilesException{
-		SubmitFilesContent submitFilesContent = submitFilesContentDAO.getContentByID(contentID);
 		try{
 			File file = new File(filePath);
 			String fileName = file.getName();
 			String mimeType = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length());
 			FileInputStream stream = new FileInputStream(file);
-			uploadFile(stream,contentID,filePath,fileDescription,fileName,mimeType,new Date(),userID);			
+			uploadFile(stream,sessionID,filePath,fileDescription,fileName,mimeType,new Date(),userID);			
 		}catch(FileNotFoundException fe){
 			throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + fe.getMessage());
 		}
@@ -515,8 +518,8 @@ public class SubmitFilesService implements ToolContentManager,
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long, java.lang.Long)
 	 */
-	public List getFilesUploadedByUser(Long userID, Long contentID){
-		List list =  submissionDetailsDAO.getSubmissionDetailsForUserByContent(userID,contentID);
+	public List getFilesUploadedByUser(Long userID, Long sessionID){
+		List list =  submissionDetailsDAO.getSubmissionDetailsForUserBySession(userID,sessionID);
 		if(list!=null)
 			return getDetails(list.iterator());			
 		else
@@ -574,7 +577,7 @@ public class SubmitFilesService implements ToolContentManager,
 		while(iterator.hasNext()){
 			Long userID = (Long)iterator.next();			
 			User user = userDAO.getUserById(new Integer(userID.intValue()));
-			List userDetails = submissionDetailsDAO.getSubmissionDetailsForUserByContent(userID,contentID);
+			List userDetails = submissionDetailsDAO.getSubmissionDetailsForUserBySession(userID,contentID);
 			table.put(user.getUserDTO(),getUserDetails(userDetails.iterator()));
 		}
 		return table;
@@ -621,7 +624,7 @@ public class SubmitFilesService implements ToolContentManager,
 		Iterator iterator = users.iterator();
 		while(iterator.hasNext()){
 			Long userID = (Long)iterator.next();
-			List allFiles = submissionDetailsDAO.getSubmissionDetailsForUserByContent(userID,contentID);			
+			List allFiles = submissionDetailsDAO.getSubmissionDetailsForUserBySession(userID,contentID);			
 			boolean unmarked = hasUnmarkedContent(allFiles.iterator());
 			details.add(getStatusDetails(userID,unmarked));
 		}

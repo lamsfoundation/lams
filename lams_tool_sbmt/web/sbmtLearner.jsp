@@ -87,7 +87,7 @@
       <p><html:errors/></p>
       <table class="forms">
       	<!-- Hidden fields -->
-      	<html:hidden property="contentID" value="${param.contentID}"/>
+      	<html:hidden property="toolSessionID" value="${param.toolSessionID}"/>
       	<html:hidden property="userID" value ="${param.userID}"/>
       	
       	<!--File path row -->

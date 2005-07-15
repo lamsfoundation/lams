@@ -29,8 +29,8 @@ CREATE TABLE tl_lasbmt11_session (
 
 CREATE TABLE tl_lasbmt11_submission_details (
        submission_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , session_id BIGINT(20) NOT NULL
-     , report_id BIGINT(20)  NOT NULL
+     , session_id BIGINT(20)
+     , report_id BIGINT(20)
      , filePath VARCHAR(250) NOT NULL
      , fileDescription VARCHAR(250) NOT NULL
      , date_of_submission DATETIME NOT NULL
@@ -45,4 +45,8 @@ CREATE TABLE tl_lasbmt11_submission_details (
      , CONSTRAINT FK_tl_lasbmt11_submission_details_2 FOREIGN KEY (report_id)
                   REFERENCES tl_lasbmt11_report (report_id)
 )TYPE=InnoDB;
+
+INSERT INTO `tl_lasbmt11_content` (content_id,title,instructions) values(1,"Java Submission","Submit your java programs");
+INSERT INTO `tl_lasbmt11_session` (session_id,content_id,status) values(1,1,1);
 SET FOREIGN_KEY_CHECKS=1;
+

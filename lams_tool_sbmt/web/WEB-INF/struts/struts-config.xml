@@ -31,7 +31,7 @@
 	<form-property name="fileDescription"
 				   type="java.lang.String"
 				   initial="Type the description of the file here..."/>
-	<form-property name="contentID"
+	<form-property name="toolSessionID"
 				   type="java.lang.Long"/>
 	<form-property name="userID"
 				   type="java.lang.Long"/>		

@@ -113,7 +113,17 @@ public class TestModel extends TestCase {
 		
 		assertEquals(sessionC.getSessionID(),sessA);
 		assertEquals(sessionC.getStatus(),statA);
-		
+		//test SubmissionDetails Set 
+		Iterator iter = sessionC.getSubmissionDetails().iterator();
+		SubmissionDetails detail = new SubmissionDetails();
+		fillDetailA(detail);
+		assertEquals(iter.next(),detail);
+		//test SubmissionDetails Set 
+		iter = session.getSubmissionDetails().iterator();
+		detail = new SubmissionDetails();
+		fillDetailB(detail);
+		assertEquals(iter.next(),detail);
+
 	}	
 	/*
 	 * Class under test for SubmitFilesSession clone()
@@ -129,24 +139,7 @@ public class TestModel extends TestCase {
 		assertEquals(detailC.getReport(),report);
 		
 	}	
-	/**
-	 * @param detail2
-	 */
-	private void fillDetailA(SubmissionDetails detail) {
-		detail.setFilePath(filePathA);
-		SubmitFilesReport report = new SubmitFilesReport(); 
-		fillReportA(report);
-		detail.setReport(report);
-	}
-	/**
-	 * @param detail2
-	 */
-	private void fillDetailB(SubmissionDetails detail) {
-		detail.setFilePath(filePathB);
-		SubmitFilesReport report = new SubmitFilesReport(); 
-		fillReportB(report);
-		detail.setReport(report);
-	}
+
 	
 	/*
 	 * Class under test for SubmitFilesContent clone()
@@ -160,13 +153,8 @@ public class TestModel extends TestCase {
 		assertEquals(contentC.getTitle(),titA);
 		assertEquals(contentC.isDefineLater(),deA);
 		assertEquals(contentC.isRunOffline(),offA);
-		//test SubmissionDetails Set 
-		Iterator iter = contentC.getSubmissionDetails().iterator();
-		SubmissionDetails detail = new SubmissionDetails();
-		fillDetailA(detail);
-		assertEquals(iter.next(),detail);
 		//test SubmitFilesSession l Set 
-		iter = contentC.getToolSession().iterator();
+		Iterator iter = contentC.getToolSession().iterator();
 		SubmitFilesSession session = new SubmitFilesSession();
 		fillSessionA(session);
 		assertEquals(iter.next(),session);
@@ -176,11 +164,6 @@ public class TestModel extends TestCase {
 		assertEquals(content.getTitle(),titB);
 		assertEquals(content.isDefineLater(),deB);
 		assertEquals(content.isRunOffline(),offB);
-		//test SubmissionDetails Set 
-		iter = content.getSubmissionDetails().iterator();
-		detail = new SubmissionDetails();
-		fillDetailB(detail);
-		assertEquals(iter.next(),detail);
 		//test SubmitFilesSession l Set 
 		iter = content.getToolSession().iterator();
 		session = new SubmitFilesSession();
@@ -210,12 +193,6 @@ public class TestModel extends TestCase {
 		content.setInstructions(insA);
 		content.setRunOffline(offA);
 		content.setTitle(titA);
-		//fill details
-		SubmissionDetails detail = new SubmissionDetails();
-		fillDetailA(detail);
-		Set details = new TreeSet();
-		details.add(detail);
-		content.setSubmissionDetails(details);
 		//fill sessions
 		SubmitFilesSession session = new SubmitFilesSession();
 		fillSessionA(session);
@@ -228,12 +205,7 @@ public class TestModel extends TestCase {
 		content.setInstructions(insB);
 		content.setRunOffline(offB);
 		content.setTitle(titB);
-		//fill details
-		SubmissionDetails detail = new SubmissionDetails();
-		fillDetailB(detail);
-		Set details = new TreeSet();
-		details.add(detail);
-		content.setSubmissionDetails(details);
+
 		//fill sessions
 		SubmitFilesSession session = new SubmitFilesSession();
 		fillSessionB(session);
@@ -244,9 +216,41 @@ public class TestModel extends TestCase {
 	private void fillSessionA(SubmitFilesSession session){
 		session.setSessionID(sessA);
 		session.setStatus(statA);
+		//fill details
+		SubmissionDetails detail = new SubmissionDetails();
+		fillDetailA(detail);
+		Set details = new TreeSet();
+		details.add(detail);
+		session.setSubmissionDetails(details);
+
 	}
 	private void fillSessionB(SubmitFilesSession session){
 		session.setSessionID(sessB);
 		session.setStatus(statB);
+		//fill details
+		SubmissionDetails detail = new SubmissionDetails();
+		fillDetailB(detail);
+		Set details = new TreeSet();
+		details.add(detail);
+		session.setSubmissionDetails(details);
+	}
+	
+	/**
+	 * @param detail2
+	 */
+	private void fillDetailA(SubmissionDetails detail) {
+		detail.setFilePath(filePathA);
+		SubmitFilesReport report = new SubmitFilesReport(); 
+		fillReportA(report);
+		detail.setReport(report);
+	}
+	/**
+	 * @param detail2
+	 */
+	private void fillDetailB(SubmissionDetails detail) {
+		detail.setFilePath(filePathB);
+		SubmitFilesReport report = new SubmitFilesReport(); 
+		fillReportB(report);
+		detail.setReport(report);
 	}
 }

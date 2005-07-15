@@ -114,10 +114,10 @@ public interface ISubmitFilesService {
 	 * uploads them one by one.
 	 * 
 	 * @param userID The <code>user_id</code> of the <code>User</code>
-	 * @param contentID The <code>content_id</code> to be looked up
+	 * @param sessionID The <code>session_id</code> to be looked up
 	 * @return List The list of required objects.
 	 */
-	public List getFilesUploadedByUser(Long userID, Long contentID);
+	public List getFilesUploadedByUser(Long userID, Long sessionID);
 	/**
 	 * Get information of all users who have submitted file.
 	 * @return The user information list

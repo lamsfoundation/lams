@@ -7,11 +7,15 @@
 package org.lamsfoundation.lams.tool.sbmt.dao;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import net.sf.hibernate.HibernateException;
 
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 
 
 /**
@@ -21,6 +25,7 @@ public class TestSubmissionDetailsDAO extends AbstractLamsTestCase {
 	
 	protected ISubmissionDetailsDAO submissionDetailsDAO;
 	protected ISubmitFilesContentDAO submitFilesContentDAO;
+	private ISubmitFilesSessionDAO submitFilesSessionDAO;
 	
 	public TestSubmissionDetailsDAO(String name){
 		super(name);
@@ -48,14 +53,24 @@ public class TestSubmissionDetailsDAO extends AbstractLamsTestCase {
 		super.setUp();
 		submissionDetailsDAO = (ISubmissionDetailsDAO)context.getBean("submissionDetailsDAO");
 		submitFilesContentDAO = (ISubmitFilesContentDAO)context.getBean("submitFilesContentDAO");
+		submitFilesSessionDAO = (ISubmitFilesSessionDAO)context.getBean("submitFilesSessionDAO");
 	}
 	
 	public void testAddDetails(){	
-		SubmitFilesContent content = submitFilesContentDAO.getContentByID(new Long(1));
+		SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(new Long(1));
 		SubmissionDetails details = new SubmissionDetails("filePath","fileDescription",new Date(),
-															  new Long(1),new Long(1),new Long(1));															  
-		submissionDetailsDAO.insert(details);
-		assertNotNull(details.getSubmissionID());
+															  new Long(1),new Long(1),new Long(1));
+		
+		Set detailSet = session.getSubmissionDetails();
+		detailSet.add(details);
+		session.setSubmissionDetails(detailSet);
+		submissionDetailsDAO.saveOrUpdate(session);
+//		detailSet = session.getSubmissionDetails();
+//		Iterator iter = detailSet.iterator();
+//		while(iter.hasNext()){
+//			
+//		}
+		
 	}
 	public void testGetDistinctUser(){
 		List list = submissionDetailsDAO.getUsersForContent(new Long(1));
