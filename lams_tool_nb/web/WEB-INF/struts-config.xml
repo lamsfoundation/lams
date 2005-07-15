@@ -14,6 +14,10 @@
   <form-beans>
 
     <form-bean
+      name="NbMonitoringForm"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringForm"
+    />
+    <form-bean
       name="NbLearnerForm"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerForm"
     />
@@ -110,6 +114,22 @@
       />
     </action>
     <action
+      path="/tool/nb/monitoring"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
+      name="NbMonitoringForm"
+      scope="session"
+      input=".monitoringContent"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="monitorPage"
+        path=".monitoringContent"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/tool/nb/learner"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
       name="NbLearnerForm"
@@ -122,6 +142,21 @@
       <forward
         name="displayLearnerContent"
         path=".learnerContent"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/tool/nb/starter/monitor"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringStarterAction"
+      name="NbMonitoringForm"
+      scope="session"
+      input=".monitoringStarter"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="monitorPage"
+        path=".monitoringContent"
         redirect="false"
       />
     </action>
