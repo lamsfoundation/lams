@@ -95,8 +95,8 @@
 					<property name="qaQueUsrDAO"><ref bean="qaQueUsrDAO"/></property>
 					<property name="qaQueContentDAO"><ref bean="qaQueContentDAO"/></property>
 					<property name="qaUsrRespDAO"><ref bean="qaUsrRespDAO"/></property>								
-					<!-- <property name="userManagementService"><ref bean="baseTransactionProxy"/></property> -->
 					<property name="toolService"><ref bean="lamsToolService"/></property>
+					<property name="repositoryService"><ref bean="repositoryService"/></property>
 				</bean>
 			</property>
 			<property name="transactionAttributes">
@@ -107,7 +107,7 @@
 					<prop key="update*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="get*">PROPAGATION_REQUIRED,readOnly,-QacpApplicationException</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="configureContentRepository">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<!--  <prop key="configureContentRepository">PROPAGATION_REQUIRED,-QaApplicationException</prop> -->
 				</props>
 			</property>
 	</bean>  

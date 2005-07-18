@@ -388,5 +388,17 @@ public abstract class QaUtils implements QaAppConstants {
 			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
 		}
 	}
+	
+	public static void configureContentRepository(HttpServletRequest request)
+	{
+		logger.debug("attempt configureContentRepository");
+    	IQaService qaService =QaUtils.getToolService(request);
+    	logger.debug("retrieving qaService from session: " + qaService);
+    	logger.debug("calling configureContentRepository()");
+	    qaService.configureContentRepository();
+	    logger.debug("configureContentRepository ran successfully");
+	}
+	
+	
 
 }

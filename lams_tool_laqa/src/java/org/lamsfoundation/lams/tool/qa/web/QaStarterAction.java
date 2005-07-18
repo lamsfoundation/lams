@@ -101,7 +101,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, QaApplicationException {
-
+		
 		QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 		qaAuthoringForm.resetRadioBoxes();
 		
@@ -119,6 +119,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    logger.debug("retrieving qaService from proxy: " + qaService);
 		    request.getSession().setAttribute(TOOL_SERVICE, qaService);		
 		}
+		
+		QaUtils.configureContentRepository(request);
 		
 		/**
 		 * retrieve the default content id based on tool signature

@@ -34,9 +34,11 @@ import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.ItemExistsException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
@@ -94,6 +96,13 @@ public class QaServicePOJO implements
 {
 	static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
 	
+	/*repository access related constants */
+	private final String repositoryUser 		= "laqa11";
+	private final char[] repositoryId 			= {'l','a','q','a','_','1', '1'}; 
+	private final String repositoryWorkspace 	= "laqa11";
+	private IRepositoryService repositoryService;
+	private ICredentials cred;
+		
 	private IQaContentDAO 		qaDAO;
     private IQaQueContentDAO 	qaQueContentDAO;
     private IQaSessionDAO 		qaSessionDAO;
@@ -103,11 +112,29 @@ public class QaServicePOJO implements
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
     
-    private IRepositoryService repositoryService;
-        
     
-
-
+    public void configureContentRepository() throws QaApplicationException {
+    	logger.debug("retrieved repService: "+ repositoryService);
+        cred = new SimpleCredentials(repositoryUser, repositoryId);
+        logger.debug("retrieved cred: "+ cred);
+          try 
+		  {
+          	repositoryService.createCredentials(cred);
+          	logger.debug("created credentails.");
+          	repositoryService.addWorkspace(cred,repositoryWorkspace);
+          	logger.debug("created workspace.");
+          } catch (ItemExistsException ie) {
+              logger.warn("Tried to configure repository but it "
+  	        		+" appears to be already configured. Exception thrown by repository being ignored. ", ie);
+          } catch (RepositoryCheckedException e) {
+              String error = "Error occured while trying to configure repository."
+  				+" Unable to recover from error: "+e.getMessage();
+  		    logger.error(error, e);
+  			throw new QaApplicationException(error,e);
+          }
+      }
+    
+    
     public QaServicePOJO(){}
     
     public void setQaDAO(IQaContentDAO qaDAO)
@@ -1311,11 +1338,11 @@ public class QaServicePOJO implements
     	logger.debug("retrieved repositoryService : " + repositoryService);
 		
 		ICredentials credentials = new SimpleCredentials(
-				IQaService.QA_LOGIN,
-				IQaService.QA_PASSWORD.toCharArray());
+				repositoryUser,
+				repositoryId);
 		try {
 			ITicket ticket = repositoryService.login(credentials,
-					IQaService.QA_WORKSPACE);
+					repositoryWorkspace);
 			logger.debug("retrieved ticket: " + ticket);
 			return ticket;
 		} catch (AccessDeniedException e) {
@@ -1371,8 +1398,7 @@ public class QaServicePOJO implements
 	 * @return NodeKey Represents the two part key - UUID and Version.
 	 * @throws SubmitFilesException
 	 */
-	public NodeKey uploadFileToRepository(InputStream stream, String fileName,
-			String mimeType) throws QaApplicationException {
+	public NodeKey uploadFileToRepository(InputStream stream, String fileName,String mimeType) throws QaApplicationException {
 		ITicket ticket = getRepositoryLoginTicket();
 		try {
 			NodeKey nodeKey = repositoryService.addFileItem(ticket, stream,
@@ -1400,8 +1426,7 @@ public class QaServicePOJO implements
 		}
 	}
 	
-	public void uploadFile(Long toolContentId, String filePath,
-						   String fileDescription, Long userID) throws QaApplicationException{
+	public void uploadFile(Long toolContentId, String filePath, String fileDescription, Long userID) throws QaApplicationException{
 		try{
 			File file = new File(filePath);
 			logger.debug("retrieved file: " + file);			
@@ -1455,9 +1480,7 @@ public class QaServicePOJO implements
 	 * 			  The <code>User</code> who has uploaded the file.
 	 * @throws SubmitFilesException
 	 */
-	private void uploadFile(InputStream stream, Long toolContentId, String filePath,
-							String fileDescription, String fileName, String mimeType,
-							Date dateOfSubmission, Long userID) throws QaApplicationException {
+	public void uploadFile(InputStream stream, Long toolContentId, String filePath, String fileDescription, String fileName, String mimeType,Date dateOfSubmission, Long userID) throws QaApplicationException {
 
 		QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
     	logger.debug("retrieving qaContent: " + qaContent);
@@ -1480,8 +1503,5 @@ public class QaServicePOJO implements
 		}
 	}	
 
-
-	
-	
 		
 }

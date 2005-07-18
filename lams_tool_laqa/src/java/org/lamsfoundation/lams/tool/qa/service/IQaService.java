@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.tool.qa.service;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -45,12 +46,6 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public interface IQaService 
 {
-	public static final String QA_LOGIN = "qaLogin";
-
-	public static final String QA_PASSWORD = "qaPassword";
-
-	public static final String QA_WORKSPACE = "qaWorkspace";
-	
 	/**
      * Return the qa object according to the requested content id.
      * @param toolContentId the tool content id
@@ -205,12 +200,20 @@ public interface IQaService
     
     public QaQueContent getToolDefaultQuestionContent(long contentId);
     
+    /** repository access related methods  from here: */
+    public void configureContentRepository() throws QaApplicationException;
+    
     public ITicket getRepositoryLoginTicket() throws QaApplicationException;
     
     public void deleteFromRepository(Long uuid, Long versionID) throws QaApplicationException;
+
+    public NodeKey uploadFileToRepository(InputStream stream, String fileName, String mimeType) throws QaApplicationException;
     
-	public NodeKey uploadFileToRepository(InputStream stream, String fileName, String mimeType) throws QaApplicationException;
+    public void uploadFile(Long toolContentId, String filePath, String fileDescription, Long userID) throws QaApplicationException;
 	
 	public InputStream downloadFile(Long uuid, Long versionID)throws QaApplicationException;
+	
+	public void uploadFile(InputStream stream, Long toolContentId, String filePath, String fileDescription, String fileName, String mimeType,Date dateOfSubmission, Long userID) throws QaApplicationException;
+	/** repository access related methods  till here */
 }
 
