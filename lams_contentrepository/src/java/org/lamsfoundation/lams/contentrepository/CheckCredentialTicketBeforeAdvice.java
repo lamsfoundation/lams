@@ -55,6 +55,11 @@ public class CheckCredentialTicketBeforeAdvice implements MethodBeforeAdvice {
 					+" Checking credential/ticket "
 					+( args != null && args.length > 0 ? args[0] : "null"));
 		}
+
+		if ( m!=null && "toString".equals(m.getName()) ) {
+		    // don't check toString - let it through
+		    return;
+		}
 		
 		if ( args == null || args[0] == null ) { 
 
