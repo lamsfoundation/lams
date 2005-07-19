@@ -43,7 +43,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<c:if test='${sessionScope.contentInUse != "true"}'>
 		<tr>
 			<td align="right">
-				<a href="<%=url%>" class="button" target="_blank" ><fmt:message key="button.edit"/></a>		
+				<html:link forward="forwardToAuthorPage" paramName="NbMonitoringForm" paramProperty="toolContentId" paramId="toolContentId" styleClass="button">
+					<fmt:message key="button.edit" />
+				</html:link>
+					<!-- <html:submit property="method" styleClass="button"><fmt:message key="button.edit"/></html:submit> -->
 			</td>	
 		</tr>
 	</c:if>
