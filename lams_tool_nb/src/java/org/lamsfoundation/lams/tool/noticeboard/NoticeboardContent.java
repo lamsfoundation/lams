@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 /**
  * Persistent noticeboard object/bean that defines the content for the noticeboard tool.
  * Provides accessors and mutators to get/set noticeboard attributes
@@ -86,6 +87,7 @@ public class NoticeboardContent implements Serializable {
 							  String offlineInstructions,
 							  boolean defineLater,
 							  boolean forceOffline,
+							  boolean contentInUse,
 							  Long creatorUserId,
 							  Date dateCreated,
 							  Date dateUpdated)
@@ -97,6 +99,7 @@ public class NoticeboardContent implements Serializable {
 		this.offlineInstructions = offlineInstructions;
 		this.defineLater = defineLater;
 		this.forceOffline = forceOffline;
+		this.contentInUse = contentInUse;
 		this.creatorUserId = creatorUserId;
 		this.dateCreated = dateCreated;
 		this.dateUpdated = dateUpdated;
@@ -121,6 +124,7 @@ public class NoticeboardContent implements Serializable {
 		this.offlineInstructions = offlineInstructions;
 		this.defineLater = false;
 		this.forceOffline = false;
+		this.contentInUse = false;
 		this.creatorUserId = null;
 		this.dateCreated = dateCreated;
 		this.dateUpdated = null;
@@ -334,6 +338,7 @@ public class NoticeboardContent implements Serializable {
 														nb.getOfflineInstructions(),
 														nb.isDefineLater(),
 														nb.isForceOffline(),
+														nb.isContentInUse(),
 														nb.getCreatorUserId(),
 														nb.getDateCreated(),
 														nb.getDateUpdated());
@@ -341,4 +346,5 @@ public class NoticeboardContent implements Serializable {
 	}
    
 	
+ 
 }
