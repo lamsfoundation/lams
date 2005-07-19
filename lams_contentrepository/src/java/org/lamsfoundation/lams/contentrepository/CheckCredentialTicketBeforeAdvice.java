@@ -49,31 +49,21 @@ public class CheckCredentialTicketBeforeAdvice implements MethodBeforeAdvice {
 			throws AccessDeniedException,	RepositoryRuntimeException {
 		// assume that the first argument is the ticket or credential
 
-		/**
-		 * Fiona, uncommented the logger below, July, 19th, 2005 Ozgur
-		 */
-		
-		/*
 		if ( log.isDebugEnabled() ) {
 			log.debug("Method "
 					+( m!=null ? m.getName() : "null")
 					+" Checking credential/ticket "
 					+( args != null && args.length > 0 ? args[0] : "null"));
 		}
-		*/
+
+		if ( m!=null && "toString".equals(m.getName()) ) {
+		    // don't check toString - let it through
+		    return;
+		}
 		
-		/**
-		 * Fiona, Should access to repository be denied when this occurs? , July, 19th, 2005 Ozgur
-		 */
 		if ( args == null || args[0] == null ) { 
-			
-			log.debug("No ticket/credential supplied. Should access to repository be denied: args:" + args);
-			if (args != null)
-			{
-				log.debug("No ticket/credential supplied. Should access to repository be denied: args[0]:" + args[0]);
-			}
-			/** no more throw  exception */
-			//throw new AccessDeniedException("No ticket/credential supplied. Access to repository denied.");
+
+			throw new AccessDeniedException("No ticket/credential supplied. Access to repository denied.");
 
 		} else {
 
