@@ -14,7 +14,7 @@
 	
 				<fmt:message key="button.basic" />
 		</html:submit>
-	
+		<c:if test="${sessionScope.defineLater != 'true'}">
 		<html:submit property="method" disabled="true" styleClass="button">
 			<fmt:message key="button.advanced" />
 		</html:submit>
@@ -22,6 +22,7 @@
 		<html:submit property="method" styleClass="button">
 			<fmt:message key="button.instructions" />
 		</html:submit>
+		</c:if>
 	</td>
 </tr>
 </table>
