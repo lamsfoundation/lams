@@ -9,10 +9,6 @@
     <class
         name="org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent"
         table="tl_lasbmt11_content"
-        dynamic-update="false"
-        dynamic-insert="false"
-        select-before-update="false"
-        optimistic-lock="version"
     >
 
         <id
@@ -34,7 +30,6 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="title"
             length="64"
             not-null="true"
@@ -45,7 +40,6 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="instructions"
             length="64"
         />
@@ -58,14 +52,14 @@
             sort="unsorted"
         >
 
-              <key
-                  column="content_id"
-              >
-              </key>
+            <key
+                column="content_id"
+            >
+            </key>
 
-              <one-to-many
+            <one-to-many
                   class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
-              />
+            />
 
         </set>
 
@@ -74,7 +68,6 @@
             type="boolean"
             update="true"
             insert="true"
-            access="property"
             column="defineLater"
             length="1"
         />
@@ -84,7 +77,6 @@
             type="boolean"
             update="true"
             insert="true"
-            access="property"
             column="runOffline"
             length="1"
         />

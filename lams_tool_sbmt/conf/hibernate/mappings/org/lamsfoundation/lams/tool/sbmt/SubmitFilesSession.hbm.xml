@@ -9,10 +9,6 @@
     <class
         name="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
         table="tl_lasbmt11_session"
-        dynamic-update="false"
-        dynamic-insert="false"
-        select-before-update="false"
-        optimistic-lock="version"
     >
 
         <id
@@ -34,7 +30,6 @@
             type="java.lang.Integer"
             update="true"
             insert="true"
-            access="property"
             column="status"
             length="11"
             not-null="true"
@@ -43,19 +38,19 @@
         <set
             name="submissionDetails"
             lazy="true"
-            inverse="false"
+            inverse="true"
             cascade="all-delete-orphan"
             sort="unsorted"
         >
 
-              <key
-                  column="session_id"
-              >
-              </key>
+            <key
+                column="session_id"
+            >
+            </key>
 
-              <one-to-many
+            <one-to-many
                   class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"
-              />
+            />
 
         </set>
 

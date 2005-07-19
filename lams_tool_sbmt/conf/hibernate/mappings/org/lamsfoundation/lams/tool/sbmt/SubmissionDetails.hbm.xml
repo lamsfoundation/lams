@@ -9,10 +9,6 @@
     <class
         name="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"
         table="tl_lasbmt11_submission_details"
-        dynamic-update="false"
-        dynamic-insert="false"
-        select-before-update="false"
-        optimistic-lock="version"
     >
 
         <id
@@ -34,7 +30,6 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="filePath"
             length="250"
         />
@@ -44,7 +39,6 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="fileDescription"
             length="250"
         />
@@ -54,7 +48,6 @@
             type="java.util.Date"
             update="true"
             insert="true"
-            access="property"
             column="date_of_submission"
             length="19"
         />
@@ -64,7 +57,6 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            access="property"
             column="uuid"
             length="20"
         />
@@ -74,33 +66,36 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            access="property"
             column="version_id"
             length="20"
         />
 
-        <many-to-one
+        <one-to-one
             name="report"
             class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport"
-            cascade="none"
+            cascade="all"
             outer-join="auto"
-            update="true"
-            insert="true"
-            access="property"
-        >
-            <column
-                name="report_id" 
-            />
-        </many-to-one>
+            constrained="false"
+            foreign-key="report_id"
+        />
 
         <property
             name="userID"
             type="java.lang.Long"
             update="true"
             insert="true"
-            access="property"
             column="user_id"
             length="20"
+        />
+
+        <many-to-one
+            name="submitFileSession"
+            class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
+            cascade="save-update"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="session_id"
         />
 
         <!--
