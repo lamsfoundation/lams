@@ -16,6 +16,9 @@
 	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
 	<link href="css/aqua.css" rel="stylesheet" type="text/css">
 
+		<html:javascript formName="SbmtLearnerForm"
+        method="validateForm"/>
+
   </head>
   
   <body>
@@ -47,7 +50,7 @@
 				<tr>
 				<!--Second Row displaying the description of the File -->
 				<td><b><bean:message key="label.learner.fileDescription"/></b></td>
-				<td><bean:write name="filesUploaded" property="fileDescription"/></td>
+				<td><bean:write name="filesUploaded" property="fileDescription" filter="false"/></td>
 				</tr>
 				<tr>
 				<!--Third row displaying the date of submission of the File -->
@@ -58,7 +61,7 @@
 				<!--Fourth row displaying the comments -->
 				<td><b><bean:message key="label.learner.comments"/></b></td>
 				<td><logic:notEmpty name="filesUploaded" property="comments">
-						<bean:write name="filesUploaded" property="comments"/><br>
+						<bean:write name="filesUploaded" property="comments" filter="false"/><br>
 				</logic:notEmpty>
 				<logic:empty  name="filesUploaded" property="comments">
 						<bean:message key="label.learner.notAvailable"/><br>
@@ -83,7 +86,7 @@
 	</div>
 					
   	<div id="formtablecontainer">
-    <html:form action="/learner?method=uploadFile" method="post" >
+    <html:form action="/learner?method=uploadFile" method="post" focus="filePath"  onsubmit="return validateForm(this);">
       <p><html:errors/></p>
       <table class="forms">
       	<!-- Hidden fields -->

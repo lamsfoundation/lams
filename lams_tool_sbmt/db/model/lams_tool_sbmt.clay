@@ -64,19 +64,6 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="submission_id" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="submission_id" remarks="">
-<column-description></column-description>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
 <column alias="comments" auto-increment="false" column-size="250" decimal-digits="0" default-value="" mandatory="true" name="comments" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
@@ -109,15 +96,7 @@
 <primary-key-column name="report_id"/>
 </primary-key>
 <unique-key-list/>
-<foreign-key-list>
-<foreign-key alias="" name="FK_tl_lasbmt11_report_1" on-delete="" on-update="" referenced-key="PK_TL_LASBMT11_SUBMISSION_DETAILS" referenced-table="tl_lasbmt11_submission_details" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="submission_id" referenced-key-column-name="submission_id"/>
-</foreign-key>
-</foreign-key-list>
+<foreign-key-list/>
 <index-list/>
 </table>
 <table alias="tl_lasbmt11_session" name="tl_lasbmt11_session" remarks="">
@@ -269,6 +248,19 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
+<column alias="report_id" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="report_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key alias="" name="PK_TL_LASBMT11_SUBMISSION_DETAILS" remarks="">
 <primary-key-description></primary-key-description>
@@ -282,6 +274,13 @@
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
 <foreign-key-column column-name="session_id" referenced-key-column-name="session_id"/>
+</foreign-key>
+<foreign-key alias="" name="FK_tl_lasbmt11_submission_details_2" on-delete="" on-update="" referenced-key="PK_TL_LASBMT11_REPORT" referenced-table="tl_lasbmt11_report" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="report_id" referenced-key-column-name="report_id"/>
 </foreign-key>
 </foreign-key-list>
 <index-list/>

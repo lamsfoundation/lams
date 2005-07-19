@@ -24,7 +24,7 @@
 				   type="java.lang.Long"/>
 </form-bean>
 
-<form-bean name="SbmtLearnerForm" type="org.apache.struts.action.DynaActionForm">
+<form-bean name="SbmtLearnerForm" type="org.apache.struts.validator.DynaValidatorForm">
 	<form-property name="filePath"
 				   type="java.lang.String"
 				   initial="Type the path of the File here or click the Browse button to choose"/>
@@ -39,6 +39,7 @@
 	<form-property name="filesUploaded"
 				   type="java.util.List"/>
 </form-bean>
+
 <form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm"/>
   </form-beans>
 
@@ -131,6 +132,10 @@
 
   <message-resources parameter="org.lamsfoundation.lams.tool.sbmt.SbmtResources" />
 
-   <!-- Define your Struts plugins in a file called struts-plugins.xml and place it in your merge directory. -->
+    <plug-in className="org.apache.struts.validator.ValidatorPlugIn">
+    <set-property property="pathnames"
+                     value="/WEB-INF/struts/validator-rules.xml,
+                            /WEB-INF/struts/validation.xml"/>
+  </plug-in>
 
 </struts-config>

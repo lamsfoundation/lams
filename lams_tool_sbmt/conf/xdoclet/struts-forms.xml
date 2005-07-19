@@ -10,7 +10,8 @@
 				   
 </form-bean>
 
-<form-bean name="SbmtLearnerForm" type="org.apache.struts.action.DynaActionForm">
+
+<form-bean name="SbmtLearnerForm" type="org.apache.struts.validator.DynaValidatorForm">
 	<form-property name="filePath"
 				   type="java.lang.String"
 				   initial="Type the path of the File here or click the Browse button to choose"/>
@@ -28,4 +29,6 @@
 	<form-property name="filesUploaded"
 				   type="java.util.List"/>
 </form-bean>
+
+
 <form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm"/>
