@@ -72,7 +72,7 @@ public class NbMonitoringAction extends LookupDispatchAction {
 		return map;
 	}
     
-    /**
+   /**
      * 
      * @param mapping
      * @param form
@@ -86,21 +86,19 @@ public class NbMonitoringAction extends LookupDispatchAction {
         Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-		
-		if (isContentEditable(content))
+		NbMonitoringUtil.copyValuesIntoSession(request, content);
+		if (NbMonitoringUtil.isContentEditable(content))
 		{
-		    request.getSession().removeAttribute(NoticeboardConstants.CONTENT_IN_USE);
-		    
-		    request.getSession().setAttribute(NoticeboardConstants.TITLE, content.getTitle());
-	        request.getSession().setAttribute(NoticeboardConstants.CONTENT, content.getContent());
+		    request.getSession().setAttribute(NoticeboardConstants.CONTENT_IN_USE, "false"); //used in jsp page to allow the edit button to show, so that author can edit page
+		    request.getSession().setAttribute(NoticeboardConstants.DEFINE_LATER, "true");
 		}
 		else
 		{
 		   request.getSession().setAttribute(NoticeboardConstants.CONTENT_IN_USE, "true");
 		}
-		//copyValuesIntoSession(request, content);
+				
+		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
 		
-        return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
     
     /**
@@ -112,16 +110,13 @@ public class NbMonitoringAction extends LookupDispatchAction {
      * @return
      */
     public ActionForward instructions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        NbMonitoringForm monitorForm = (NbMonitoringForm)form;
-       // NbMonitoringUtil.cleanSession(request);
+     
         Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
+  
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-		//copyValuesIntoSession(request, content);
+		NbMonitoringUtil.copyValuesIntoSession(request, content);
 		
-		request.getSession().setAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS, content.getOnlineInstructions());
-        request.getSession().setAttribute(NoticeboardConstants.OFFLINE_INSTRUCTIONS, content.getOfflineInstructions());
-        
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
     
@@ -134,7 +129,12 @@ public class NbMonitoringAction extends LookupDispatchAction {
      * @return
      */
     public ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
+        Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
+        INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+   		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
+   		NbMonitoringUtil.copyValuesIntoSession(request, content);
+        
+   		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
     
     /**
@@ -149,49 +149,5 @@ public class NbMonitoringAction extends LookupDispatchAction {
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
     
-    /**
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private void copyValuesIntoSession(HttpServletRequest request, NoticeboardContent content)
-    {
-        request.getSession().setAttribute(NoticeboardConstants.TITLE, content.getTitle());
-        request.getSession().setAttribute(NoticeboardConstants.CONTENT, content.getContent());
-        request.getSession().setAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS, content.getOnlineInstructions());
-        request.getSession().setAttribute(NoticeboardConstants.OFFLINE_INSTRUCTIONS, content.getOfflineInstructions());
-    }
-    
-    /**
-     * <p> This method checks the two tool content flags, defineLater and contentInUse
-     * to determine whether the tool content is modifiable or not. Returns true is content is
-     * modifiable and false otherwise 
-     * <br>Tool content is modifiable if:
-     * <li>defineLater is set to true</li>
-     * <li>defineLater is set to false and contentInUse is set to false</li>
-     * <br>Tool content is not modifiable if:
-     * <li>contentInUse is set to true</li></p>
-     * @param content The instance of NoticeboardContent to check
-     * @return true if content is modifiable and false otherwise
-     * @throws NbApplicationException
-     */
-    private boolean isContentEditable(NoticeboardContent content) throws NbApplicationException
-    {
-        if ( (content.isDefineLater() == true) && (content.isContentInUse()==true) )
-        {
-            throw new NbApplicationException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
-                    //return false;
-        }
-        else if ( (content.isDefineLater() == true) && (content.isContentInUse() == false))
-            return true;
-        else if ( (content.isDefineLater() == false) && (content.isContentInUse() == false))
-            return true;
-        else //  (content.isContentInUse()==true && content.isDefineLater() == false)
-            return false;
-        
-     }
-
+   
 }
