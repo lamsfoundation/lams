@@ -20,7 +20,7 @@
   <body>
 
   	<div id="datatablecontainer">
-  		
+  		<table class="forms">
   		<c:set var="userlist" scope="request" value="${sessionScope.USERLIST}"/>
   		<logic:notEmpty name="userlist">
 			<logic:iterate id="element" name="userlist">
@@ -31,9 +31,9 @@
 				<bean:define id="details" name="element" property="userID"/>
 
 				<html:hidden property="userID" value="${details}"/>
-				<td><b><bean:write name="element" property="firstName"/> <bean:write name="element" property="lastName"/></b></td>
-				<td><b><bean:write name="element" property="login"/></b></td>
-				<td><b><html:submit property="Mark" value="Mark"/></b></td>
+				<td class="formlabel"><b><bean:write name="element" property="firstName"/> <bean:write name="element" property="lastName"/></b></td>
+				<td class="formlabel"><b><bean:write name="element" property="login"/></b></td>
+				<td class="formcontrol"><b><html:submit property="Mark" value="Mark"/></b></td>
 				</html:form>
 				</tr>		
 			</logic:iterate>

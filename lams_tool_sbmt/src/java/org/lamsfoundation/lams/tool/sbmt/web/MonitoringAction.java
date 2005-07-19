@@ -162,6 +162,4 @@ public class MonitoringAction extends DispatchAction {
 		return mapping.findForward("report");
 	}
 
-
-
 }
