@@ -34,6 +34,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbMonitoringUtil;
@@ -69,10 +70,19 @@ public class NbMonitoringStarterAction extends Action {
         monitorForm.reset();
         NbMonitoringUtil.cleanSession(request);
         Long toolContentId = new Long(WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID));
+        monitorForm.setToolContentId(toolContentId.toString());
+        
         request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE, toolContentId);
+        
+        NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
+        NbMonitoringUtil.copyValuesIntoSession(request, content);
+        
+        
         
         //get the list of tool session ids
         
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
+   
+   
 }
