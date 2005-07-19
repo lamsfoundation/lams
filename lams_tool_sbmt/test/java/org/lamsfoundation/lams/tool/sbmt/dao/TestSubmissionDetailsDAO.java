@@ -73,7 +73,7 @@ public class TestSubmissionDetailsDAO extends AbstractLamsTestCase {
 		
 	}
 	public void testGetDistinctUser(){
-		List list = submissionDetailsDAO.getUsersForContent(new Long(1));
+		List list = submissionDetailsDAO.getUsersForSession(new Long(1));
 		assertEquals(list.size(),3);
 	}
 

@@ -380,6 +380,9 @@ public class SubmitFilesService implements ToolContentManager,
 			NodeKey nodeKey = uploadFileToRepository(stream, fileName, mimeType);
 			SubmissionDetails details = new SubmissionDetails(filePath,fileDescription,dateOfSubmission,
 															  userID,nodeKey.getUuid(),nodeKey.getVersion());
+			SubmitFilesReport report = new SubmitFilesReport();
+			details.setReport(report);
+			details.setSubmitFileSession(session);
 			//update session, then insert the detail too.
 			Set detailSet = session.getSubmissionDetails();
 			detailSet.add(details);
@@ -554,8 +557,8 @@ public class SubmitFilesService implements ToolContentManager,
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getUsers(java.lang.Long)
 	 */
-	public List getUsers(Long contentID){
-		List users = submissionDetailsDAO.getUsersForContent(contentID);
+	public List getUsers(Long sessionID){
+		List users = submissionDetailsDAO.getUsersForSession(sessionID);
 		Iterator iterator = users.iterator();
 		List table = new ArrayList();
 		while(iterator.hasNext()){
@@ -569,14 +572,14 @@ public class SubmitFilesService implements ToolContentManager,
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#generateReport(java.lang.Long)
 	 */
-	public Hashtable generateReport(Long contentID){
-		List users = submissionDetailsDAO.getUsersForContent(contentID);
+	public Hashtable generateReport(Long sessionID){
+		List users = submissionDetailsDAO.getUsersForSession(sessionID);
 		Iterator iterator = users.iterator();
 		Hashtable table = new Hashtable();
 		while(iterator.hasNext()){
 			Long userID = (Long)iterator.next();			
 			User user = userDAO.getUserById(new Integer(userID.intValue()));
-			List userDetails = submissionDetailsDAO.getSubmissionDetailsForUserBySession(userID,contentID);
+			List userDetails = submissionDetailsDAO.getSubmissionDetailsForUserBySession(userID,sessionID);
 			table.put(user.getUserDTO(),getUserDetails(userDetails.iterator()));
 		}
 		return table;
@@ -617,13 +620,13 @@ public class SubmitFilesService implements ToolContentManager,
 									 report.getDateMarksReleased());
 	}	
 	
-	public ArrayList getStatus(Long contentID){		
+	public ArrayList getStatus(Long sessionID){		
 		ArrayList details = new ArrayList();
-		List users = submissionDetailsDAO.getUsersForContent(contentID);
+		List users = submissionDetailsDAO.getUsersForSession(sessionID);
 		Iterator iterator = users.iterator();
 		while(iterator.hasNext()){
 			Long userID = (Long)iterator.next();
-			List allFiles = submissionDetailsDAO.getSubmissionDetailsForUserBySession(userID,contentID);			
+			List allFiles = submissionDetailsDAO.getSubmissionDetailsForUserBySession(userID,sessionID);			
 			boolean unmarked = hasUnmarkedContent(allFiles.iterator());
 			details.add(getStatusDetails(userID,unmarked));
 		}

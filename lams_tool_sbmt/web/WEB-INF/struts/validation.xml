@@ -7,7 +7,7 @@
   <formset>
   <form name="SbmtLearnerForm">
 	<field property="filePath" depends="required">
-		<arg key="learner.from.filepath.displayname"/>
+		<arg key="SbmtLearnerForm.filePath"/>
 	</field>
 </form>
 

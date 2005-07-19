@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
  */
 public class FileDetailsDTO implements Serializable{
 	
+	private Long submissionID;
 	private Long reportID;
 	private String filePath;
 	private String fileDescription;
@@ -44,9 +45,10 @@ public class FileDetailsDTO implements Serializable{
 	private Long versionID;
 	
 	/** Miinimal Constructor*/
-	public FileDetailsDTO(String filePath, String fileDescription,
+	public FileDetailsDTO(Long submissionID, String filePath, String fileDescription,
 			Date dateOfSubmission,Long reportID, String comments, Long marks) {
 		super();		
+		this.submissionID = submissionID;
 		this.filePath = filePath;
 		this.fileDescription = fileDescription;
 		this.dateOfSubmission = dateOfSubmission;
@@ -56,7 +58,8 @@ public class FileDetailsDTO implements Serializable{
 	}	
 	
 	public FileDetailsDTO(SubmissionDetails details, SubmitFilesReport report){
-		
+
+		this.submissionID = details.getSubmissionID();
 		this.filePath = details.getFilePath();
 		this.fileDescription = details.getFileDescription();
 		this.dateOfSubmission = details.getDateOfSubmission();
@@ -71,6 +74,7 @@ public class FileDetailsDTO implements Serializable{
 	}
 	public FileDetailsDTO(SubmissionDetails details){
 		
+		this.submissionID = details.getSubmissionID();
 		this.filePath = details.getFilePath();
 		this.fileDescription = details.getFileDescription();
 		this.dateOfSubmission = details.getDateOfSubmission();
@@ -193,5 +197,17 @@ public class FileDetailsDTO implements Serializable{
 	 */
 	public void setVersionID(Long versionID) {
 		this.versionID = versionID;
+	}
+	/**
+	 * @return Returns the submissionID.
+	 */
+	public Long getSubmissionID() {
+		return submissionID;
+	}
+	/**
+	 * @param submissionID The submissionID to set.
+	 */
+	public void setSubmissionID(Long submissionID) {
+		this.submissionID = submissionID;
 	}
 }

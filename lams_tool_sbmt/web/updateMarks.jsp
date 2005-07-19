@@ -16,7 +16,7 @@
   <body>
 		  <c:set var="details" value="${sessionScope.fileDetails}"/>
 		  <c:set var="user" value="${sessionScope.user}" />
-		  <c:set var="contentID" value="${sessionScope.contentID}" />		  
+		  <c:set var="toolSessionID" value="${sessionScope.toolSessionID}" />		  
 		  <b>Please assign a mark and a comment for the report by 
 		  		 <c:out value="${user.login}" /> , <c:out value="${user.firstName}" />  <c:out value="${user.lastName}" /> 	
 		  </b>
@@ -25,7 +25,7 @@
 					File Description: <c:out value="${details.fileDescription}" /><br/>
 					Date of Submission: <c:out value="${details.dateOfSubmission}" /><br/>
 					<form name="commentForm" action="monitoring.do?method=updateMarks"  method="post">	
-							 <input type="hidden" name="contentID" value=<c:out value="${contentID}"/> />						
+							 <input type="hidden" name="toolSessionID" value=<c:out value="${toolSessionID}"/> />						
 							 <input type="hidden" name="reportID" value=<c:out value="${details.reportID}"/> />						
  							 <input type="hidden" name="userID" value=<c:out value="${user.userID}"/> />						 							 
                 	Marks:<input type="text" name="marks" value=<c:out value="${details.marks}" /> ></br>

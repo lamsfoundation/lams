@@ -38,6 +38,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	/** persistent field */
 	private SubmitFilesReport report;
 
+	private SubmitFilesSession submitFileSession;
 	
 	/** default constructor */
 	public SubmissionDetails() {
@@ -157,8 +158,8 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.many-to-one not-null="false"
-	 * @hibernate.column name="report_id"
+	 * @hibernate.one-to-one cascade="all" not-null="false"
+	 * foreign-key="report_id"
 	 * @return Returns the report.
 	 */
 	public SubmitFilesReport getReport() {
@@ -203,4 +204,17 @@ public class SubmissionDetails implements Serializable,Cloneable{
 		return obj;
 	}
 
+	/**
+	 * @hibernate.many-to-one column="session_id" cascade="save-update" 
+	 * @return Returns the submitFileSession.
+	 */
+	public SubmitFilesSession getSubmitFileSession() {
+		return submitFileSession;
+	}
+	/**
+	 * @param submitFileSession The submitFileSession to set.
+	 */
+	public void setSubmitFileSession(SubmitFilesSession submitFileSession) {
+		this.submitFileSession = submitFileSession;
+	}
 }

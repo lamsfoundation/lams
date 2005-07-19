@@ -108,7 +108,7 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 		return obj;
 	}
 	/**
-	 * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
+	 * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
 	 * @hibernate.collection-one-to-many 
 	 * class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"
 	 * @hibernate.collection-key column="session_id"

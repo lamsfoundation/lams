@@ -28,11 +28,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -75,58 +76,56 @@ public class MonitoringAction extends DispatchAction {
 			   ActionForm form,
 			   HttpServletRequest request,
 			   HttpServletResponse response){
-		Long contentID =new Long(WebUtil.readLongParam(request,"contentID"));		
+		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));		
 		submitFilesService = getSubmitFilesService();
-		List userList = submitFilesService.getUsers(contentID);
-		request.getSession().setAttribute("contentID",contentID);
+		List userList = submitFilesService.getUsers(sessionID);
+		request.getSession().setAttribute("toolSessionID",sessionID);
 		request.getSession().setAttribute("USERLIST",userList);
 		return mapping.findForward("userlist");
-	}
-	
-	public ActionForward generateReport(ActionMapping mapping,
-							   ActionForm form,
-							   HttpServletRequest request,
-							   HttpServletResponse response){
-		Long contentID =new Long(WebUtil.readLongParam(request,"contentID"));		
-		submitFilesService = getSubmitFilesService();
-		Hashtable report = submitFilesService.generateReport(contentID);
-		request.getSession().setAttribute("contentID",contentID);
-		request.getSession().setAttribute("report",report);
-		return mapping.findForward("report");
-	}
-	
-	public ActionForward getStatus(ActionMapping mapping,
-							   ActionForm form,
-							   HttpServletRequest request,
-							   HttpServletResponse response){		
-		Long contentID =new Long(WebUtil.readLongParam(request,"contentID"));
-		submitFilesService = getSubmitFilesService();		
-		ArrayList status = submitFilesService.getStatus(contentID);
-		request.getSession().setAttribute("contentID",contentID);		
-		request.getSession().setAttribute("status",status);
-		return mapping.findForward("status");
 	}
 	public ActionForward getFilesUploadedByUser(ActionMapping mapping,
 							   ActionForm form,
 							   HttpServletRequest request,
 							   HttpServletResponse response){
-		Long contentID =new Long(WebUtil.readLongParam(request,"contentID"));
+		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
 		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
 		submitFilesService = getSubmitFilesService();
-		List report = submitFilesService.getFilesUploadedByUser(userID,contentID);		
-		request.getSession().setAttribute("contentID",contentID);
+		//return FileDetailsDTO list according to the given userID and sessionID
+		List files = submitFilesService.getFilesUploadedByUser(userID,sessionID);		
+		request.getSession().setAttribute("toolSessionID",sessionID);
 		request.getSession().setAttribute("user",
 										  submitFilesService.getUserDetails(userID));
-		request.getSession().setAttribute("userReport",report);
+		request.getSession().setAttribute("userReport",files);
 		return mapping.findForward("userReport");
+	}
+	public ActionForward markFile(ActionMapping mapping,
+			  ActionForm form,
+			  HttpServletRequest request,
+			  HttpServletResponse response){
+		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
+		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
+		Long detailID = new Long(WebUtil.readLongParam(request,"detailID"));
+		
+		submitFilesService = getSubmitFilesService();
+		
+		request.getSession().setAttribute("toolSessionID",sessionID);
+		request.getSession().setAttribute("user",
+							  submitFilesService.getUserDetails(userID));
+		request.getSession().setAttribute("fileDetails",
+							  submitFilesService.getFileDetails(detailID));
+		return mapping.findForward("updateMarks");
 	}
 	
 	public ActionForward updateMarks(ActionMapping mapping,
 							   ActionForm form,
 							   HttpServletRequest request,
 							   HttpServletResponse response){
-		Long contentID =new Long(WebUtil.readLongParam(request,"contentID"));
-		Long reportID =new Long(WebUtil.readLongParam(request,"reportID"));
+		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
+		String reportIDStr = request.getParameter("reportID");
+		Long reportID = new Long(-1);
+		if(!StringUtils.isEmpty(reportIDStr))
+			reportID = Long.valueOf(reportIDStr);
+
 		Long marks = new Long(WebUtil.readLongParam(request,"marks"));
 		String comments = WebUtil.readStrParam(request,"comments");
 		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
@@ -134,28 +133,35 @@ public class MonitoringAction extends DispatchAction {
 		submitFilesService = getSubmitFilesService();
 		
 		submitFilesService.updateMarks(reportID,marks,comments);
-		List report = submitFilesService.getFilesUploadedByUser(userID,contentID);
+		List report = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		request.getSession().setAttribute("userReport",report);
-		request.getSession().setAttribute("contentID",contentID);
+		request.getSession().setAttribute("toolSessionID",sessionID);
 		request.getSession().setAttribute("userID",userID);		
 		return mapping.findForward("userReport");
 	}
-	public ActionForward markFile(ActionMapping mapping,
-								  ActionForm form,
-								  HttpServletRequest request,
-								  HttpServletResponse response){
-		Long contentID =new Long(WebUtil.readLongParam(request,"contentID"));
-		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
-		Long detailID = new Long(WebUtil.readLongParam(request,"detailID"));
-		
+	//TODO
+	public ActionForward getStatus(ActionMapping mapping,
+							   ActionForm form,
+							   HttpServletRequest request,
+							   HttpServletResponse response){		
+		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
+		submitFilesService = getSubmitFilesService();		
+		ArrayList status = submitFilesService.getStatus(sessionID);
+		request.getSession().setAttribute("toolSessionID",sessionID);		
+		request.getSession().setAttribute("status",status);
+		return mapping.findForward("status");
+	}
+	public ActionForward generateReport(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		Long sessionID = new Long(WebUtil.readLongParam(request,
+				"toolSessionID"));
 		submitFilesService = getSubmitFilesService();
-		
-		request.getSession().setAttribute("contentID",contentID);
-		request.getSession().setAttribute("user",
-										  submitFilesService.getUserDetails(userID));
-		request.getSession().setAttribute("fileDetails",
-										  submitFilesService.getFileDetails(detailID));
-		return mapping.findForward("updateMarks");
-}
+		Hashtable report = submitFilesService.generateReport(sessionID);
+		request.getSession().setAttribute("toolSessionID", sessionID);
+		request.getSession().setAttribute("report", report);
+		return mapping.findForward("report");
+	}
+
+
 
 }

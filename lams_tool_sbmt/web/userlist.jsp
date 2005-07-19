@@ -27,7 +27,7 @@
 				<tr>
 				<html:form  action="/monitoring">
 				<html:hidden property="method" value="getFilesUploadedByUser"/>
-				<html:hidden property="contentID" value="${contentID}"/>
+				<html:hidden property="toolSessionID" value="${toolSessionID}"/>
 				<bean:define id="details" name="element" property="userID"/>
 
 				<html:hidden property="userID" value="${details}"/>

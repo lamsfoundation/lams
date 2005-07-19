@@ -44,7 +44,7 @@ public interface ISubmissionDetailsDAO extends IBaseDAO {
 	 */
 	public List getSubmissionDetailsForUserBySession(Long userID,Long contentID);
 	
-	public List getUsersForContent(Long contentID);
+	public List getUsersForSession(Long contentID);
 
 	/**
 	 * Save or update the given <code>SubmitFilesSession</code> value.

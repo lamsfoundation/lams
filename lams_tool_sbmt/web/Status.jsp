@@ -15,10 +15,10 @@
   <body>		  
   		<table border="1">
 		 <c:set var="status" value="${sessionScope.status}"/>		 
-		 <c:set var="contentID"  value="${sessionScope.contentID}"/>		 		 
+		 <c:set var="toolSessionID"  value="${sessionScope.toolSessionID}"/>		 		 
   		 <c:forEach items="${status}" var="user">
 			 <c:set var="userID"  value="${user.userID}"/>		 		 
-			 <form action="monitoring.do?method=getFilesUploadedByUser&contentID=<c:out value='${contentID}'/>&userID=<c:out value='${userID}'/>"   method="post">					 
+			 <form action="monitoring.do?method=getFilesUploadedByUser&toolSessionID=<c:out value='${toolSessionID}'/>&userID=<c:out value='${userID}'/>"   method="post">					 
 				 <c:out value="${userID}"/>
 				 <c:out value="${user.login}"/>
 				 <c:out value="${user.fullName}"/>

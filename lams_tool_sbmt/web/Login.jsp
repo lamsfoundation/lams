@@ -21,7 +21,7 @@
 	</form>
 
 	<form name="monitoringForm" method="get" action="monitoring.do">
-		<input type ="hidden" name="contentID" value="1">
+		<input type ="hidden" name="toolSessionID" value="1">
 		<input type ="hidden" name="method" value="userList">
 		<input type="submit" name="submit" value="Monitoring Logon">
 	</form>

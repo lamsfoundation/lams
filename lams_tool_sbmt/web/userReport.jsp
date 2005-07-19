@@ -45,8 +45,9 @@
 								</c:otherwise>
 							</c:choose>
 			<form action="monitoring.do?method=markFile" method="post">
+					<input type="hidden" name="detailID" value=<c:out value='${details.submissionID}' /> >
 					<input type="hidden" name="reportID" value=<c:out value='${details.reportID}' /> >
-					<input type="hidden" name="contentID" value=<c:out value='${sessionScope.contentID}' /> >
+					<input type="hidden" name="toolSessionID" value=<c:out value='${sessionScope.toolSessionID}' /> >
 					<input type="hidden" name="userID" value=<c:out value='${user.userID}' /> >
 					<input type="submit" value="Update Marks"/>
 			</form>

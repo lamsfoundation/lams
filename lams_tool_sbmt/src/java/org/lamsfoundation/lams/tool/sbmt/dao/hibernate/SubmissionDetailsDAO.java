@@ -34,7 +34,7 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 															" in class " + SubmissionDetails.class.getName() +
 															" where user_id=? AND session_id=?";
 	private static final String FIND_DISTINCT_USER = " select distinct details.userID from SubmissionDetails details " +
-													 " where details.content =:contentID";
+													 " where details.submitFileSession =:sessionID";
 
 
 	/**
@@ -65,11 +65,11 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 		return list;
 	}
 	
-	public List getUsersForContent(final Long contentID){			
+	public List getUsersForSession(final Long sessionID){			
 		return (List) this.getHibernateTemplate().execute(new HibernateCallback(){
 			public Object doInHibernate(Session session) throws HibernateException{
 				return session.createQuery(FIND_DISTINCT_USER)
-							  .setLong("contentID",contentID.longValue())
+							  .setLong("sessionID",sessionID.longValue())
 							  .list();
 			}
 		});		
