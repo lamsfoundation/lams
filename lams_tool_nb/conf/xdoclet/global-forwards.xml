@@ -1,0 +1,4 @@
+<global-forwards>
+ 	<forward name="forwardToAuthorPage"
+          path="/tool/nb/starter/authoring.do"/>
+ </global-forwards> 
