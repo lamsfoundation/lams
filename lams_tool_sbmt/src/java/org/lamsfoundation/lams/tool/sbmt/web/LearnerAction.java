@@ -54,6 +54,9 @@ public class LearnerAction extends DispatchAction {
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());				
 		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		authForm.set("filesUploaded",filesUploaded);
+		
+		//to avoid user without patience click "upload" button too fast 
+		saveToken(request);
 		return mapping.getInputForward();
 		
 	}
@@ -62,6 +65,10 @@ public class LearnerAction extends DispatchAction {
 									ActionForm form,
 									HttpServletRequest request,
 									HttpServletResponse response){
+		
+		if(!isTokenValid(request,true)){
+			return returnErrors(mapping,request,"submit.upload.twice","upload");
+		}
 		
 		DynaActionForm authForm= (DynaActionForm)form;
 		
