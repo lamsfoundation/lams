@@ -48,6 +48,7 @@ public class NoticeboardConstants
     public static final String BASIC_PAGE = "basic";
     public static final String ADVANCED_PAGE = "advanced";
     public static final String INSTRUCTIONS_PAGE = "instructions";
+   
     
     public static final String DISPLAY_MESSAGE = "displayMessage";
     public static final String DISPLAY_LEARNER_CONTENT = "displayLearnerContent";
@@ -57,8 +58,6 @@ public class NoticeboardConstants
     public static final String TOOL_ACCESS_MODE_TEACHER = "teacher";
     
     public static final String MONITOR_PAGE = "monitorPage";
-    
-  
     
     // ------------------------------
     // Action Names
@@ -79,6 +78,7 @@ public class NoticeboardConstants
     public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
     public static final String TOOL_CONTENT_ID_INMONITORMODE = "toolContentIdInMonitor";
     public static final String CONTENT_IN_USE = "contentInUse";
+    public static final String DEFINE_LATER = "defineLater";
     
     //used in authoring
     public static final String TOOL_CONTENT_ID = "toolContentId";  //request + session variable
@@ -108,6 +108,7 @@ public class NoticeboardConstants
     public static final String BUTTON_EDIT_ACTIVITY = "button.editActivity";
     public static final String BUTTON_SUMMARY = "button.summary";
     public static final String BUTTON_STATISTICS = "button.statistics";
+    public static final String BUTTON_EDIT = "button.edit";
     
     
    //--------------
