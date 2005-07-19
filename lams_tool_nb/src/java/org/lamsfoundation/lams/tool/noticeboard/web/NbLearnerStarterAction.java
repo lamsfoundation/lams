@@ -118,7 +118,7 @@ public class NbLearnerStarterAction extends DispatchAction {
         {
             /* Set the ContentInUse flag to true, and defineLater flag to false */
             nbContent.setContentInUse(true);
-            nbContent.setDefineLater(false);
+          //  nbContent.setDefineLater(false); /* defineLater should be false anyway */
             nbService.updateNoticeboard(nbContent);
             
 	       if (nbSession != null)

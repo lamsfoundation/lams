@@ -22,7 +22,10 @@
 package org.lamsfoundation.lams.tool.noticeboard.util;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 
 /**
  * @author mtruong
@@ -40,5 +43,41 @@ public class NbMonitoringUtil {
         request.getSession().removeAttribute(NoticeboardConstants.OFFLINE_INSTRUCTIONS);
         request.getSession().removeAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS);
         request.getSession().removeAttribute(NoticeboardConstants.CONTENT_IN_USE);
+    }
+    
+    /**
+     * <p> This method checks the two tool content flags, defineLater and contentInUse
+     * to determine whether the tool content is modifiable or not. Returns true is content is
+     * modifiable and false otherwise 
+     * <br>Tool content is modifiable if:
+     * <li>defineLater is set to true</li>
+     * <li>defineLater is set to false and contentInUse is set to false</li>
+     * <br>Tool content is not modifiable if:
+     * <li>contentInUse is set to true</li></p>
+     * @param content The instance of NoticeboardContent to check
+     * @return true if content is modifiable and false otherwise
+     * @throws NbApplicationException
+     */
+    public static boolean isContentEditable(NoticeboardContent content) throws NbApplicationException
+    {
+        if ( (content.isDefineLater() == true) && (content.isContentInUse()==true) )
+        {
+            throw new NbApplicationException("An exception has occurred: There is a bug in this tool, conflicting flags are set");
+                    //return false;
+        }
+        else if ( (content.isDefineLater() == true) && (content.isContentInUse() == false))
+            return true;
+        else if ( (content.isDefineLater() == false) && (content.isContentInUse() == false))
+            return true;
+        else //  (content.isContentInUse()==true && content.isDefineLater() == false)
+            return false;
+    }
+    
+   	public static void copyValuesIntoSession(HttpServletRequest request, NoticeboardContent content)
+    {
+        request.getSession().setAttribute(NoticeboardConstants.TITLE, content.getTitle());
+        request.getSession().setAttribute(NoticeboardConstants.CONTENT, content.getContent());
+        request.getSession().setAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS, content.getOnlineInstructions());
+        request.getSession().setAttribute(NoticeboardConstants.OFFLINE_INSTRUCTIONS, content.getOfflineInstructions());
     }
 }

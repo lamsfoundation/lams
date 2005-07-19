@@ -48,7 +48,10 @@ import org.lamsfoundation.lams.tool.noticeboard.util.NbAuthoringUtil;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 
 import org.lamsfoundation.lams.util.WebUtil;
-
+import org.lamsfoundation.lams.tool.noticeboard.util.NbMonitoringUtil; 
+/**TODO: change into one utility class */
+import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.ActionMessage;
 
 
 /**
@@ -59,6 +62,7 @@ import org.lamsfoundation.lams.util.WebUtil;
  * @struts:action path="/tool/nb/starter/authoring" name="NbAuthoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringStarterAction"
  *                input=".authoringStarter" validate="false" 
  * @struts:action-forward name="basic" path=".nb_basic"
+ * @struts:action-forward name="displayMessage" path=".message"
  * ----------------XDoclet Tags--------------------
  */
 
@@ -67,7 +71,7 @@ public class NbAuthoringStarterAction extends Action {
 	static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());
 	
 	/**
-	 * This struts action class gets called when the author double clicks
+	 * This struts actionservlet gets called when the author double clicks
 	 * on the tool icon. If the toolContentId already exists in the tool content 
 	 * table, the content is then extracted from the content table and is displayed. 
 	 * Otherwise, if the toolContentId does not exist in the content table, a new 
@@ -83,8 +87,9 @@ public class NbAuthoringStarterAction extends Action {
 		
 		NbAuthoringForm nbForm = (NbAuthoringForm)form;
 		
-	//	Long contentId = NbAuthoringUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
-		Long contentId = NbAuthoringUtil.convertToLong(nbForm.getToolContentId());
+		Long contentId = NbAuthoringUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
+		nbForm.setToolContentId(contentId.toString());
+	//	Long contentId = NbAuthoringUtil.convertToLong(nbForm.getToolContentId());
 		if(contentId == null)
 		{
 			String error = "Tool content id missing. Unable to continue.";
@@ -113,6 +118,8 @@ public class NbAuthoringStarterAction extends Action {
 			        												nb.getOfflineInstructions(),
 			        												new Date(System.currentTimeMillis()));
 			
+			nbContentNew.setDefineLater(true); //the author would currently be editing this content, so set defineLater to true so students cant access activity
+			
 			//save new tool content into db
 			nbService.saveNoticeboard(nbContentNew);
 			
@@ -121,12 +128,33 @@ public class NbAuthoringStarterAction extends Action {
 				
 		
 		}
-		else
+		else //content already exists on the database
 		{
 			//get the values from the database
 			NoticeboardContent nb = nbService.retrieveNoticeboard(contentId);
 			
-			nbForm.populateFormWithNbContentValues(nb);
+			/* If retrieving existing content, check whether the contentInUse flag is set, if set, the
+			 * author is not allowed to edit content 
+			 */
+			
+			if (NbMonitoringUtil.isContentEditable(nb))
+			{
+			    /* Define later set to true when the edit activity tab is brought up 
+			     * So that users cannot start using the content while the staff member is editing the content */
+			    nbForm.populateFormWithNbContentValues(nb);
+			    nb.setDefineLater(true);
+			    nbService.updateNoticeboard(nb);
+			}
+			else
+			{
+			    //The contentInUse flag is set and a user has already reached this activity.
+			    saveMessages(request, null); //ensure there are no existing messages
+			    ActionMessages message = new ActionMessages();
+			    message.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.contentInUseSet"));
+			    saveMessages(request, message);
+			    return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
+			    
+			}
 			
 		
 		}
