@@ -39,10 +39,10 @@
   -->
 
   <!-- ========== Global Forward Definitions =================================== -->
-  <!--
-    Define your forwards in a file called global-forwards.xml and place
-    it in your merge directory.
-  -->
+  <global-forwards>
+ 	<forward name="forwardToAuthorPage"
+          path="/tool/nb/starter/authoring.do"/>
+ </global-forwards> 
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
@@ -79,6 +79,11 @@
       <forward
         name="basic"
         path=".nb_basic"
+        redirect="false"
+      />
+      <forward
+        name="displayMessage"
+        path=".message"
         redirect="false"
       />
     </action>
