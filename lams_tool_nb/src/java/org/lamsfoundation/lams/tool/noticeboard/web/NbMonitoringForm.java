@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
+import java.util.Map;
 
 /**
  * @author mtruong
@@ -53,8 +54,22 @@ public class NbMonitoringForm extends ActionForm {
     
     private String method;
     
+    private Map parametersToAppend;
+    
 
     
+    /**
+     * @return Returns the parametersToAppend.
+     */
+    public Map getParametersToAppend() {
+        return parametersToAppend;
+    }
+    /**
+     * @param parametersToAppend The parametersToAppend to set.
+     */
+    public void setParametersToAppend(Map parametersToAppend) {
+        this.parametersToAppend = parametersToAppend;
+    }
     /**
      * @return Returns the method.
      */
@@ -84,6 +99,7 @@ public class NbMonitoringForm extends ActionForm {
 	{
 		this.method = null;
 		this.toolContentId = null;
+		this.parametersToAppend = null;
 			
 	}
  
