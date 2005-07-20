@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbMonitoringUtil;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 
 /**
@@ -85,8 +85,8 @@ public class NbMonitoringAction extends LookupDispatchAction {
         Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-		NbMonitoringUtil.copyValuesIntoSession(request, content);
-		if (NbMonitoringUtil.isContentEditable(content))
+		NbWebUtil.copyValuesIntoSession(request, content);
+		if (NbWebUtil.isContentEditable(content))
 		{
 		  //  request.getSession().setAttribute(NoticeboardConstants.CONTENT_IN_USE, "false"); //used in jsp page to allow the edit button to show, so that author can edit page
 		    // request.getSession().setAttribute(NoticeboardConstants.DEFINE_LATER, "true");
@@ -124,7 +124,7 @@ public class NbMonitoringAction extends LookupDispatchAction {
   
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-		NbMonitoringUtil.copyValuesIntoSession(request, content);
+		NbWebUtil.copyValuesIntoSession(request, content);
 		
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
@@ -141,7 +141,7 @@ public class NbMonitoringAction extends LookupDispatchAction {
         Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
    		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-   		NbMonitoringUtil.copyValuesIntoSession(request, content);
+   		NbWebUtil.copyValuesIntoSession(request, content);
         
    		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }

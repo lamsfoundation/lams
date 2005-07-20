@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbMonitoringUtil;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
@@ -68,14 +68,14 @@ public class NbMonitoringStarterAction extends Action {
         
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         monitorForm.reset();
-        NbMonitoringUtil.cleanSession(request);
+        NbWebUtil.cleanMonitoringSession(request);
         Long toolContentId = new Long(WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID));
         monitorForm.setToolContentId(toolContentId.toString());
         
         request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE, toolContentId);
         
         NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
-        NbMonitoringUtil.copyValuesIntoSession(request, content);
+        NbWebUtil.copyValuesIntoSession(request, content);
         
         
         

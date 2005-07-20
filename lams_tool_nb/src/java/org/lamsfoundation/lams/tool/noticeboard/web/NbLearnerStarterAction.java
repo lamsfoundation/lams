@@ -54,10 +54,8 @@ import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerForm;
 
-import org.lamsfoundation.lams.tool.noticeboard.util.NbLearnerUtil;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.apache.struts.util.MessageResources;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionMessage;
 /**
@@ -82,7 +80,7 @@ public class NbLearnerStarterAction extends DispatchAction {
         NoticeboardContent nbContent = null;
         NoticeboardSession nbSession = null;
         NoticeboardUser nbUser = null;
-        NbLearnerUtil.cleanSession(request);
+        NbWebUtil.cleanLearnerSession(request);
         saveMessages(request, null);
         
         NbLearnerForm learnerForm = (NbLearnerForm)form;
@@ -162,7 +160,7 @@ public class NbLearnerStarterAction extends DispatchAction {
         
         /* will show a different screen if defineLater flag is set and running in preview mode */
         NbLearnerForm nbForm = (NbLearnerForm)form;
-        NbLearnerUtil.cleanSession(request);
+        NbWebUtil.cleanLearnerSession(request);
         Long toolContentId = nbForm.getToolContentId();
         saveMessages(request, null);
         
