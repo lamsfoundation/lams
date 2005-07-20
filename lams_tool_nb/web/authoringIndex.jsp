@@ -5,7 +5,7 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
-String url = "/tool/nb/starter/authoring?toolContentId="+355;
+String url = "/starter/authoring?toolContentId="+355;
 %>
 
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
