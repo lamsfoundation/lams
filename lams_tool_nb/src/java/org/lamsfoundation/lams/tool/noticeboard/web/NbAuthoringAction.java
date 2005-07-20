@@ -35,13 +35,11 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
-
+import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 
-import org.lamsfoundation.lams.tool.noticeboard.util.NbAuthoringUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-
 
 /**
  * Creation Date: 20-05-05
@@ -129,7 +127,7 @@ public class NbAuthoringAction extends LookupDispatchAction {
 		copyInstructionFormProperty(request, nbForm);
 		
 		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-		Long content_id = NbAuthoringUtil.convertToLong(nbForm.getToolContentId());
+		Long content_id = NbWebUtil.convertToLong(nbForm.getToolContentId());
 		
 		//throws exception if the content id does not exist
 		checkContentId(content_id);
@@ -139,14 +137,7 @@ public class NbAuthoringAction extends LookupDispatchAction {
 		/* Author has finished editing the content and mark the defineLater flag to false */
 		nbContent.setDefineLater(false);
 		nbService.updateNoticeboard(nbContent);
-		
-		if(request.getSession().getAttribute(NoticeboardConstants.DEFINE_LATER) != null)
-		{
-		//if defineLater session variable is set (set in monitoring by edit activity action , reset/remove this attribute. */
-		   request.getSession().setAttribute(NoticeboardConstants.DEFINE_LATER, "false");
-		}
-		
-		
+			
 		return mapping.findForward(NoticeboardConstants.BASIC_PAGE); /** TODO: once the content is saved, should close the window */
 	}
 	
