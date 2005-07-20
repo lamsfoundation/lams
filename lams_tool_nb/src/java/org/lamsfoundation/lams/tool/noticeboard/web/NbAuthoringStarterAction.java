@@ -43,12 +43,9 @@ import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbAuthoringUtil;
-
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 
-import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbMonitoringUtil; 
+import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil; 
 /**TODO: change into one utility class */
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionMessage;
@@ -87,7 +84,7 @@ public class NbAuthoringStarterAction extends Action {
 		
 		NbAuthoringForm nbForm = (NbAuthoringForm)form;
 		
-		Long contentId = NbAuthoringUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
+		Long contentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
 		nbForm.setToolContentId(contentId.toString());
 
 		if(contentId == null)
@@ -104,7 +101,7 @@ public class NbAuthoringStarterAction extends Action {
 		nbForm.setDefineLater((String)request.getParameter(NoticeboardConstants.DEFINE_LATER));
 
 		
-		NbAuthoringUtil.cleanSession(request); /** TODO: remove this, info no longer stored in session, using ActionForms instead */
+		NbWebUtil.cleanAuthoringSession(request); 
 		
 		request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, contentId);
 							
@@ -126,7 +123,7 @@ public class NbAuthoringStarterAction extends Action {
 			        												nb.getOfflineInstructions(),
 			        												new Date(System.currentTimeMillis()));
 			
-			nbContentNew.setDefineLater(true); //the author would currently be editing this content, so set defineLater to true so students cant access activity
+			nbContentNew = setTrueIfDefineLaterIsSet(nbForm, nbContentNew);
 			
 			//save new tool content into db
 			nbService.saveNoticeboard(nbContentNew);
@@ -145,12 +142,12 @@ public class NbAuthoringStarterAction extends Action {
 			 * author is not allowed to edit content 
 			 */
 			
-			if (NbMonitoringUtil.isContentEditable(nb))
+			if (NbWebUtil.isContentEditable(nb))
 			{
 			    /* Define later set to true when the edit activity tab is brought up 
 			     * So that users cannot start using the content while the staff member is editing the content */
 			    nbForm.populateFormWithNbContentValues(nb);
-			    nb.setDefineLater(true);
+			    nb = setTrueIfDefineLaterIsSet(nbForm, nb);
 			    nbService.updateNoticeboard(nb);
 			}
 			else
@@ -184,6 +181,19 @@ public class NbAuthoringStarterAction extends Action {
 		else
 			return true;
 		
+	}
+	
+	private NoticeboardContent setTrueIfDefineLaterIsSet(NbAuthoringForm form, NoticeboardContent content)
+	{
+	    if(form.getDefineLater() != null)
+	    {
+	        if (form.getDefineLater().equals("true"))
+	        {
+	            //if the defineLater flag is set to true, then set defineLater in the NoticeboardContent object to true too
+	            content.setDefineLater(true);
+	        }
+	    }
+	    return content;
 	}
 	
 	
