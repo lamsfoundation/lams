@@ -44,7 +44,7 @@ public class NoticeboardConstants
     // Action Forward names
     // -------------------------------------------
     
-    public static final String LOAD_NB_FORM = "loadNbForm";
+  
     public static final String BASIC_PAGE = "basic";
     public static final String ADVANCED_PAGE = "advanced";
     public static final String INSTRUCTIONS_PAGE = "instructions";
@@ -77,8 +77,9 @@ public class NoticeboardConstants
     public static final String ONLINE_INSTRUCTIONS = "onlineInstructions";
     public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
     public static final String TOOL_CONTENT_ID_INMONITORMODE = "toolContentIdInMonitor";
-    public static final String CONTENT_IN_USE = "contentInUse";
+ 
     public static final String DEFINE_LATER = "defineLater";
+    public static final String PAGE_EDITABLE = "isPageEditable";
     
     //used in authoring
     public static final String TOOL_CONTENT_ID = "toolContentId";  //request + session variable
