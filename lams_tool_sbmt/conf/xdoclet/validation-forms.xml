@@ -1,6 +1,6 @@
 <form name="SbmtLearnerForm">
 	<field property="filePath" depends="required">
-		<arg key="SbmtLearnerForm.filePath"/>
+		<arg key="learner.form.filepath.displayname"/>
 	</field>
 </form>
 

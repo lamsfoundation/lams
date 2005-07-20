@@ -65,7 +65,7 @@
       input="/sbmtLearner.jsp"
       parameter="method"
       unknown="false"
-      validate="true"
+      validate="false"
     >
       <forward
         name="upload"

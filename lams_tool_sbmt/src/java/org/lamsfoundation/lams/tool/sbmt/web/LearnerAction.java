@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
  * 			name="SbmtLearnerForm"
  * 			input="/sbmtLearner.jsp"
  * 			scope="request"
- * 			validate="true"
+ * 			validate="false"
  * 
  * @struts.action-forward name="upload" path="/sbmtLearner.jsp"
  */

@@ -33,7 +33,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -120,16 +123,36 @@ public class MonitoringAction extends DispatchAction {
 							   ActionForm form,
 							   HttpServletRequest request,
 							   HttpServletResponse response){
-		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
+		//check whether the mark is validate
+		Long marks = null;
+		ActionMessages errors = new ActionMessages();  
+		try {
+			marks = new Long(WebUtil.readLongParam(request,"marks"));
+		} catch (IllegalArgumentException e) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("monitoring.mark.input.error",e.getMessage()));
+		}
+		//if marks is invalid long, then throw error message directly.
+		String comments = WebUtil.readStrParam(request,"comments",true);
+		if(!errors.isEmpty()){
+			//to echo back to error page.
+			FileDetailsDTO details = (FileDetailsDTO) request.getSession().getAttribute("fileDetails");
+			if(details != null){
+				details.setComments(comments);
+			}
+			saveErrors(request,errors);
+			return mapping.findForward("updateMarks");
+		}
+		
+		//get other request parameters
 		String reportIDStr = request.getParameter("reportID");
 		Long reportID = new Long(-1);
 		if(!StringUtils.isEmpty(reportIDStr))
 			reportID = Long.valueOf(reportIDStr);
 
-		Long marks = new Long(WebUtil.readLongParam(request,"marks"));
-		String comments = WebUtil.readStrParam(request,"comments");
+		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
 		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
 		
+		//get service then update report table
 		submitFilesService = getSubmitFilesService();
 		
 		submitFilesService.updateMarks(reportID,marks,comments);

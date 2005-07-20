@@ -34,6 +34,7 @@
 					</tr>
 		</table>
 		<table class="forms">
+					<tr><td colspan="2"><html:errors/></td></tr>
 					<form name="commentForm" action="monitoring.do?method=updateMarks"  method="post">	
 							 <input type="hidden" name="toolSessionID" value=<c:out value="${toolSessionID}"/> />						
 							 <input type="hidden" name="reportID" value=<c:out value="${details.reportID}"/> />						
