@@ -59,8 +59,8 @@ import org.apache.struts.action.ActionMessage;
  *  
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/tool/nb/starter/authoring" name="NbAuthoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringStarterAction"
- *                input=".authoringStarter" validate="false" 
+ * @struts:action path="/starter/authoring" name="NbAuthoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringStarterAction"
+ *                validate="false" 
  * @struts:action-forward name="basic" path=".nb_basic"
  * @struts:action-forward name="displayMessage" path=".message"
  * ----------------XDoclet Tags--------------------
@@ -89,12 +89,20 @@ public class NbAuthoringStarterAction extends Action {
 		
 		Long contentId = NbAuthoringUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
 		nbForm.setToolContentId(contentId.toString());
-	//	Long contentId = NbAuthoringUtil.convertToLong(nbForm.getToolContentId());
+
 		if(contentId == null)
 		{
 			String error = "Tool content id missing. Unable to continue.";
 			throw new NbApplicationException(error);
 		}
+		
+		/* if there is a defineLater request parameter, set the form value
+		 * If a defineLater request parameter is not present, then it is just set to null.
+		 * This is used in the basic screen, if defineLater is set, then in the basic page,
+		 * the three tabs {Basic, Advanced, Instructions} are not visible.
+		 */
+		nbForm.setDefineLater((String)request.getParameter(NoticeboardConstants.DEFINE_LATER));
+
 		
 		NbAuthoringUtil.cleanSession(request); /** TODO: remove this, info no longer stored in session, using ActionForms instead */
 		

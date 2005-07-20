@@ -56,7 +56,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  *  
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/tool/nb/learner" name="NbLearnerForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
+ * @struts:action path="/learner" name="NbLearnerForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
  *                input=".learnerContent" validate="false" parameter="method"
  * @struts:action-forward name="displayLearnerContent" path=".learnerContent"
  * ----------------XDoclet Tags--------------------
