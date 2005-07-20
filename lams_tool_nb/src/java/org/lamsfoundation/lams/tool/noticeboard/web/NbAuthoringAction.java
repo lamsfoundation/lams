@@ -48,10 +48,10 @@ import org.lamsfoundation.lams.util.WebUtil;
  * Modified Date: 03-06-05
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/tool/nb/authoring" name="NbAuthoringForm" scope="session"
+ * @struts:action path="/authoring" name="NbAuthoringForm" scope="session"
  * 				  type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
- *                input=".nbForm" parameter="method"
- * @struts:action-forward name="loadNbForm" path=".nbForm"
+ *                parameter="method"
+ * 
  * @struts:action-forward name="basic" path=".nb_basic"
  * @struts:action-forward name="advanced" path=".nb_advanced"
  * @struts:action-forward name="instructions" path=".nb_instructions"
@@ -136,9 +136,18 @@ public class NbAuthoringAction extends LookupDispatchAction {
 		
 		NoticeboardContent nbContent = nbService.retrieveNoticeboard(content_id);
 		nbForm.copyValuesIntoNbContent(nbContent);
+		/* Author has finished editing the content and mark the defineLater flag to false */
+		nbContent.setDefineLater(false);
 		nbService.updateNoticeboard(nbContent);
 		
-		return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
+		if(request.getSession().getAttribute(NoticeboardConstants.DEFINE_LATER) != null)
+		{
+		//if defineLater session variable is set (set in monitoring by edit activity action , reset/remove this attribute. */
+		   request.getSession().setAttribute(NoticeboardConstants.DEFINE_LATER, "false");
+		}
+		
+		
+		return mapping.findForward(NoticeboardConstants.BASIC_PAGE); /** TODO: once the content is saved, should close the window */
 	}
 	
 	
