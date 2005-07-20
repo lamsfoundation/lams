@@ -65,7 +65,7 @@ import org.apache.struts.action.ActionMessage;
  *  
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/tool/nb/starter/learner" name="NbLearnerForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
+ * @struts:action path="/starter/learner" name="NbLearnerForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
  *                input=".learnerStarter" validate="false" parameter="mode"
  * @struts:action-forward name="displayLearnerContent" path=".learnerContent"
  * @struts:action-forward name="displayMessage" path=".message"
