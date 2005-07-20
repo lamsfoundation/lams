@@ -1,1 +1,8 @@
 org.lamsfoundation.lams.contentrepository
+org.lamsfoundation.lams.contentrepository.client
+org.lamsfoundation.lams.contentrepository.dao
+org.lamsfoundation.lams.contentrepository.dao.file
+org.lamsfoundation.lams.contentrepository.dao.hibernate
+org.lamsfoundation.lams.contentrepository.service
+org.lamsfoundation.lams.contentrepository.struts.action
+org.lamsfoundation.lams.contentrepository.struts.form

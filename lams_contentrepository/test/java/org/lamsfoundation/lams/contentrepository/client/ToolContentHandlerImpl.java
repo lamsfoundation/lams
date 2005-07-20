@@ -20,7 +20,6 @@ http://www.gnu.org/licenses/gpl.txt
 */
 package org.lamsfoundation.lams.contentrepository.client;
 
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 
 /**
  * 

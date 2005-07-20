@@ -37,17 +37,23 @@ import org.lamsfoundation.lams.contentrepository.PropertyType;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.data.CRResources;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 
 /**
- * Handles a simple connection to the content repository, and allows a file to be stored and
- * retrieved. It can be used by LAMS tools to do the handling the files for
- * offline and online instructions. It is a very simple client, in that
+ * Handles the connection to the content repository, and allows a file 
+ * to be stored and retrieved. 
+ * <p>
+ * It can be used by LAMS tools to do the handling the files for
+ * offline and online instructions. Every file that is stored needs
+ * to be marked as either an Offline or Online file.
+ * <p>
+ * It is a very simple client, in that
  * it only handles files (and not packages) and will not keep versions 
  * of files - to do a new version of a file, the old version is deleted
  * and the new version added.
- *
+ *<p>
  * To use this class:
  * <UL>
  * <LI>You must be using Spring. Include the Content Repository's 
@@ -57,16 +63,44 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * repositoryId(). These methods are required to set up the credential 
  * and workspace.
  * <LI>Define your Handler class as a bean in your own Spring context file.
- * It must include a parameter repositoryService, which references a local
+ * It <em>must</em> include a parameter repositoryService, which references a local
  * value of repositoryService. The "repositoryService" is defined in the 
  * Content Repository's applicationContext.xml.
  * </UL>
  * For example:
  * <pre>
- * 	<bean id="toolContentHandler" class="your class name here">
- * 		<property name="repositoryService"><ref local="coreSessionFactory"/></property>
- *	</bean>  
+ * 	&lt;bean id="toolContentHandler" class="your class name here"&gt;
+ * 		&lt;property name="repositoryService"&gt;&lt;ref local="coreSessionFactory"/>&lt;/property&gt;
+ *	&lt;/bean&gt; 
  * </pre>
+ * 
+ * You do not need to include repositoryService as a instance variable
+ * in your own class as it is already defined in the ToolContentHandler abstract class.
+ * <p>
+ * The methods you are likely to use are:
+ * <UL>
+ * <LI>NodeKey uploadFile(InputStream stream, String fileName, String mimeType, String fileProperty)<BR>
+ * 	Saves a file in the content repository, marking it as online or offline according to the fileProperty
+ * <LI>void deleteFile(Long uuid)<BR>
+ *	Gets rid of a file you don't want any more
+ * <LI>IVersionedNode getFileNode(Long uuid)<BR> 
+ *  Gets the file node from the repository. To get the file stream, do getFileNode().getFile()
+ * <LI>boolean isOffline(IVersionedNode node), boolean isOnline(IVersionedNode node)<BR>
+ *  Is this an offline or offline file.
+ * </UL>
+ * For example:<BR>
+ * <pre>
+ * NodeKey offlineNodeKey = handler.uploadFile(istream, fileName, fileMimeType, ToolContentHandlerImpl.TYPE_OFFLINE);<BR>
+ * Long uuid = offlineNodeKey.getUuid();<BR>
+ * IVersionedNode node = handler.getFileNode(uuid);<BR>
+ * IStream fileStreamToWriteSomewhere = node.getFile());<BR>
+ * boolean isOffline = handler.isOffline(node);<BR>
+ * </pre><p>
+ * Please read the javadoc on each method for more information on the exceptions thrown
+ * and on the mandatory parameters.
+ *<p>
+ * If you want to see this class used, have a look at the test code in org.lamsfoundation.lams.contentrepository.client
+ * in the test/java area.
  * 
  * @author conradb, Fiona Malikoff
  */
