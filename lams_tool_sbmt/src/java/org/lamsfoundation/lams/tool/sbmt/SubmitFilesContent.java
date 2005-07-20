@@ -83,7 +83,8 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	}
 
 	/**
-	 * @hibernate.id generator-class="assigned" type="java.lang.Long"
+	 * @hibernate.id generator-class="assigned" 
+	 * 				 type="java.lang.Long"
 	 *               column="content_id"
 	 */
 	public Long getContentID() {

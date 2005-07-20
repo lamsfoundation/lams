@@ -7,6 +7,16 @@
 		session.setAttribute("title","Submission Upload");
 		session.setAttribute("instructions","Upload you file by this tool");
 	%>
+	<form name="authoring" method="get" action="authoring.do">
+		<input type ="hidden" name="toolContentID" value="1">
+		<input type ="hidden" name="method" value="initPage">
+		<input type="submit" name="submit" value="Author1 Logon">
+	</form>		
+	<form name="authoring" method="get" action="authoring.do">
+		<input type ="hidden" name="toolContentID" value="2">
+		<input type ="hidden" name="method" value="initPage">
+		<input type="submit" name="submit" value="Author2 Logon">
+	</form>		
 	<form name="learnerForm" method="get" action="learner.do">
 		<input type ="hidden" name="toolSessionID" value="1">
 		<input type ="hidden" name="userID" value="1">

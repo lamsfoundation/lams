@@ -245,7 +245,8 @@ public class SubmitFilesService implements ToolContentManager,
 			String instructions) {
 		SubmitFilesContent submitFilesContent = new SubmitFilesContent(
 				contentID, title, instructions);
-		submitFilesContentDAO.insert(submitFilesContent);
+		
+		submitFilesContentDAO.save(submitFilesContent);
 	}
 
 	/**

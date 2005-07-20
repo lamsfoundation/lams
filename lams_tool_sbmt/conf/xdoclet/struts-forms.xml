@@ -5,7 +5,7 @@
 	<form-property name="instructions" 
 				   type="java.lang.String" 
 				   initial="Please upload you files below. Maximum file size is 1.0 MB." />
-	<form-property name="contentID"
+	<form-property name="toolContentID"
 				   type="java.lang.Long"/>
 				   
 </form-bean>

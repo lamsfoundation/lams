@@ -20,7 +20,7 @@
 	<form-property name="instructions" 
 				   type="java.lang.String" 
 				   initial="Please upload you files below. Maximum file size is 1.0 MB." />
-	<form-property name="contentID"
+	<form-property name="toolContentID"
 				   type="java.lang.Long"/>
 </form-bean>
 
@@ -121,6 +121,11 @@
       <forward
         name="success"
         path="/Login.jsp"
+        redirect="false"
+      />
+      <forward
+        name="initpage"
+        path="/sbmtAuthoring.jsp"
         redirect="false"
       />
     </action>

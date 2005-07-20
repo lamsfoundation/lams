@@ -1,7 +1,7 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 CREATE TABLE tl_lasbmt11_content (
-       content_id BIGINT(20) NOT NULL AUTO_INCREMENT
+       content_id BIGINT(20) NOT NULL
      , title VARCHAR(64) NOT NULL
      , instructions VARCHAR(64) NOT NULL
      , defineLater TINYINT(1)
