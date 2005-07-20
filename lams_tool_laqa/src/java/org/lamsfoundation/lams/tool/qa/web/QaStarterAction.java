@@ -61,6 +61,10 @@
 *
 */
 
+/*
+ * check back QaUtils.configureContentRepository(request);
+ */
+
 package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
 import java.util.Iterator;
@@ -120,7 +124,40 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    request.getSession().setAttribute(TOOL_SERVICE, qaService);		
 		}
 		
-		QaUtils.configureContentRepository(request);
+		//QaUtils.configureContentRepository(request);
+		
+	    /**
+	     * obtain and setup the current user's data 
+	     */
+	    String userId="";
+	    User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
+	    if (toolUser != null)
+	    	userId=toolUser.getUserId().toString();
+		else
+		{
+			userId=request.getParameter(USER_ID);
+			if ((userId == null) || (userId.length()==0))
+			{
+		    	logger.debug("error: The tool expects userId");
+		    	persistError(request,"error.authoringUser.notAvailable");
+		    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
+				return (mapping.findForward(LOAD_QUESTIONS));
+			}
+			
+		    try
+			{
+		    	/* Check QaUtils.createAuthoringUser again User Management Service is ready */
+		    	User user=QaUtils.createSimpleUser(new Integer(userId)); 
+		    	request.getSession().setAttribute(TOOL_USER, user);
+			}
+		    catch(NumberFormatException e)
+			{
+		    	persistError(request,"error.userId.notNumeric");
+				request.setAttribute(USER_EXCEPTION_USERID_NOTNUMERIC, new Boolean(true));
+				return (mapping.findForward(LOAD_QUESTIONS));
+			}
+		}
+		
 		
 		/**
 		 * retrieve the default content id based on tool signature
@@ -190,38 +227,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(false));
 	    request.setAttribute(FORM_INDEX, "0");
 		
-	    /**
-	     * obtain and setup the current user's data 
-	     */
-	    String userId="";
-	    User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
-	    if (toolUser != null)
-	    	userId=toolUser.getUserId().toString();
-		else
-		{
-			userId=request.getParameter(USER_ID);
-		    try
-			{
-		    	/* Check QaUtils.createAuthoringUser again User Management Service is ready */
-		    	User user=QaUtils.createSimpleUser(new Integer(userId)); 
-		    	request.getSession().setAttribute(TOOL_USER, user);
-			}
-		    catch(NumberFormatException e)
-			{
-		    	persistError(request,"error.userId.notNumeric");
-				request.setAttribute(USER_EXCEPTION_USERID_NOTNUMERIC, new Boolean(true));
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
-		}
-	    
-	    if ((userId == null) || (userId.length()==0))
-		{
-	    	logger.debug("error: The tool expects userId");
-	    	persistError(request,"error.authoringUser.notAvailable");
-	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
-	    
 	    
 	    /**
 	     * find out whether the request is coming from monitoring module for EditActivity tab or from authoring environment url
