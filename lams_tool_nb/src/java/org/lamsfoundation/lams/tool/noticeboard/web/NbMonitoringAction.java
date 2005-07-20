@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
  *  
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/tool/nb/monitoring" name="NbMonitoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
+ * @struts:action path="/monitoring" name="NbMonitoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
  *                input=".monitoringContent" validate="false" parameter="method"
  * @struts:action-forward name="monitorPage" path=".monitoringContent"
  * ----------------XDoclet Tags--------------------
@@ -81,20 +81,29 @@ public class NbMonitoringAction extends LookupDispatchAction {
      * @return
      */
     public ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        NbMonitoringForm monitorForm = (NbMonitoringForm)form;
-                
+        NbMonitoringForm monitorForm = (NbMonitoringForm)form;                
         Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 		NbMonitoringUtil.copyValuesIntoSession(request, content);
 		if (NbMonitoringUtil.isContentEditable(content))
 		{
-		    request.getSession().setAttribute(NoticeboardConstants.CONTENT_IN_USE, "false"); //used in jsp page to allow the edit button to show, so that author can edit page
-		    request.getSession().setAttribute(NoticeboardConstants.DEFINE_LATER, "true");
+		  //  request.getSession().setAttribute(NoticeboardConstants.CONTENT_IN_USE, "false"); //used in jsp page to allow the edit button to show, so that author can edit page
+		    // request.getSession().setAttribute(NoticeboardConstants.DEFINE_LATER, "true");
+		    request.setAttribute(NoticeboardConstants.PAGE_EDITABLE, "true");
+		    
+		    //set up the request parameters to append to the URL
+		    Map map = new HashMap();
+		    map.put(NoticeboardConstants.TOOL_CONTENT_ID, monitorForm.getToolContentId());
+		    map.put(NoticeboardConstants.DEFINE_LATER, "true");
+		    
+		    monitorForm.setParametersToAppend(map);
+		    
+		  
 		}
 		else
 		{
-		   request.getSession().setAttribute(NoticeboardConstants.CONTENT_IN_USE, "true");
+		   request.setAttribute(NoticeboardConstants.PAGE_EDITABLE, "false");
 		}
 				
 		return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
