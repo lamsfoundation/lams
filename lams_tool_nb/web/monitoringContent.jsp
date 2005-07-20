@@ -5,7 +5,7 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
-<html:form action="/tool/nb/monitoring" target="_self">
+<html:form action="/monitoring" target="_self">
 <div id="datatablecontainer">
 <table width="100%" align="center">
 <tr>
@@ -33,16 +33,16 @@
 <div id="datatablecontainer">
 <c:choose>
         <c:when test='${NbMonitoringForm.method == "Instructions"}'>
-           <%@ include file="nbActivityInstructions.jsp" %>
+           <%@ include file="m_Instructions.jsp" %>
         </c:when>
          <c:when test='${NbMonitoringForm.method == "Edit Activity"}'>
-           <%@ include file="nbActivityContent.jsp" %>
+           <%@ include file="m_EditActivity.jsp" %>
         </c:when>
         <c:when test='${NbMonitoringForm.method == "Statistics"}'>
-           <%@ include file="nbStatistics.jsp" %>
+           <%@ include file="m_Statistics.jsp" %>
         </c:when>
         <c:otherwise> 
-      	   <%@ include file="nbSummary.jsp" %>
+      	   <%@ include file="m_Summary.jsp" %>
         </c:otherwise>
 </c:choose>
 </div>

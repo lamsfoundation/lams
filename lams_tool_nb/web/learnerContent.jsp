@@ -3,7 +3,7 @@
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 
 
-<html:form action="/tool/nb/learner" target="_self" >
+<html:form action="/learner" target="_self" >
 <hr>
 <div id="datatablecontainer">
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">
