@@ -36,6 +36,7 @@ import java.net.URL;
 public class CRResources {
 
     public static final String singleFileName = "TextFile.txt";
+    public static final String singleFileMimeType = "text/plain";
 
     public static final String zipFileName = "bopcp.zip";
 	public static final String zipFileIncludesFilename = "index.html";

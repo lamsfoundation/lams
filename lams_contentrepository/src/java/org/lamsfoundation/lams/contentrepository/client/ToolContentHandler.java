@@ -1,0 +1,306 @@
+/* 
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt 
+*/
+package org.lamsfoundation.lams.contentrepository.client;
+
+import java.io.InputStream;
+
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.FileException;
+import org.lamsfoundation.lams.contentrepository.ICredentials;
+import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.IValue;
+import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.ItemExistsException;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.PropertyType;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.ValueFormatException;
+import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+
+/**
+ * Handles a simple connection to the content repository, and allows a file to be stored and
+ * retrieved. It can be used by LAMS tools to do the handling the files for
+ * offline and online instructions. It is a very simple client, in that
+ * it only handles files (and not packages) and will not keep versions 
+ * of files - to do a new version of a file, the old version is deleted
+ * and the new version added.
+ *
+ * To use this class:
+ * <UL>
+ * <LI>You must be using Spring. Include the Content Repository's 
+ * applicationContext.xml in your Spring context.
+ * <LI>Create a class that extends ToolContentHandler and implements
+ * getRepositoryWorkspaceName(), getRepositoryUser() and
+ * repositoryId(). These methods are required to set up the credential 
+ * and workspace.
+ * <LI>Define your Handler class as a bean in your own Spring context file.
+ * It must include a parameter repositoryService, which references a local
+ * value of repositoryService. The "repositoryService" is defined in the 
+ * Content Repository's applicationContext.xml.
+ * </UL>
+ * For example:
+ * <pre>
+ * 	<bean id="toolContentHandler" class="your class name here">
+ * 		<property name="repositoryService"><ref local="coreSessionFactory"/></property>
+ *	</bean>  
+ * </pre>
+ * 
+ * @author conradb, Fiona Malikoff
+ */
+public abstract class ToolContentHandler {
+
+    /** File is for Online Instructions */
+    public final static String TYPE_ONLINE = "ONLINE";
+    /** File is for Offline Instructions */
+    public final static String TYPE_OFFLINE = "OFFLINE";
+
+    /** The "name" used to store the online/offline property in the repository */
+    public final static String FILE_TYPE_PROPERTY_NAME = "TYPE";
+
+    private IRepositoryService repositoryService;
+    private ITicket ticket;
+    private boolean productionMode = true;
+	  
+    protected Logger log = Logger.getLogger(ToolContentHandler.class.getName());
+    
+  /**
+   * @return Returns the repositoryWorkspaceName.
+   */
+  public abstract String getRepositoryWorkspaceName() ;
+
+  /**
+   * @return Returns the repositoryUser.
+   */
+  public abstract String getRepositoryUser();
+
+  /**
+   * @return Returns the repository identification string. This is the
+   * "password" field the credential.
+   */
+  public abstract char[] getRepositoryId(); 
+
+   private void configureContentRepository() throws RepositoryCheckedException {
+		ICredentials cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
+		try {
+		    getRepositoryService().createCredentials(cred);
+		    getRepositoryService().addWorkspace(cred,getRepositoryWorkspaceName());
+		} catch (ItemExistsException ie) {
+		    log.warn("Tried to configure repository but it "
+		    		+" appears to be already configured."
+		    		+"Workspace name "+getRepositoryWorkspaceName()
+		    		+". Exception thrown by repository being ignored. ", ie);
+		} catch (RepositoryCheckedException e) {
+		    log.error("Error occured while trying to configure repository."
+		    		+"Workspace name "+getRepositoryWorkspaceName()
+					+" Unable to recover from error: "+e.getMessage(), e);
+			throw e;
+		}
+    }
+
+    /**
+     * Get the ticket to access the repository. If the workspace/credential
+     * hasn't been set up, then it will be set up automatically.
+     * 
+     * @forceLogin set to true if tried to do something and got access denied. This may happen
+     * if the repository loses the ticket.
+     * @return the repository ticket 
+     */
+    protected ITicket getTicket( boolean forceLogin ) throws RepositoryCheckedException {
+		if ( ticket == null || forceLogin ) {
+			ICredentials cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
+			try {
+				try { 
+				    ticket = getRepositoryService().login(cred, getRepositoryWorkspaceName());
+				} catch ( WorkspaceNotFoundException e ) {
+					log.error("Content Repository workspace "+getRepositoryWorkspaceName()
+					        +" not configured. Attempting to configure now.");
+					configureContentRepository();
+					ticket = getRepositoryService().login(cred, getRepositoryWorkspaceName());
+				}
+			} catch ( RepositoryCheckedException e ) {
+				log.error("Unable to get ticket for workspace "+getRepositoryWorkspaceName(),e);
+				throw e;
+			}
+		}
+		return ticket;
+	}
+
+    /**
+     * Save a file in the content repository.
+     * 
+     * @param stream Input filestream. Mandatory.
+     * @param fileName Input filename. Mandatory.
+     * @param mimeType Mimetype of file. Optional.
+     * @param fileProperty is this for online or offline instructions? Should be TYPE_ONLINE or TYPE_OFFLINE. Mandatory.
+     * @return key to the new content repository node
+     * @throws InvalidParameterException One of the mandatory parameters is missing.
+     * @throws FileException An error occured writing the input stream to disk.
+     * @throws RepositoryCheckedException Some other error occured.
+     */
+    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType, String fileProperty) throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
+        if ( fileProperty == null )
+            throw new InvalidParameterException("uploadFile: fileProperty parameter empty. Should be either TYPE_ONLINE or TYPE_OFFLINE");
+	    
+        NodeKey nodeKey = null;
+        try {
+		    try {
+		        nodeKey = getRepositoryService().addFileItem(getTicket(false), stream, fileName, mimeType, null);
+		    } catch (AccessDeniedException e) {
+		        log.warn("Unable to access repository to add file "+fileName
+					+"AccessDeniedException: "+e.getMessage()+" Retrying login.");
+	            nodeKey = getRepositoryService().addFileItem(getTicket(true), stream, fileName, mimeType, null);
+		    }
+	        
+		    try {
+			    getRepositoryService().setProperty(getTicket(false), nodeKey.getUuid(), nodeKey.getVersion(), FILE_TYPE_PROPERTY_NAME, fileProperty, PropertyType.STRING);
+		    } catch (AccessDeniedException e) {
+		        log.warn("Unable to access repository to set offline/online parameter "+fileName
+					+"AccessDeniedException: "+e.getMessage()+" Retrying login.");
+			    getRepositoryService().setProperty(getTicket(true), nodeKey.getUuid(), nodeKey.getVersion(), FILE_TYPE_PROPERTY_NAME, fileProperty, PropertyType.STRING);
+		    }
+
+	    } catch (RepositoryCheckedException e2) {
+	        log.warn("Unable to to uploadFile"+fileName
+					+"Repository Exception: "+e2.getMessage()+" Retry not possible.");
+	        throw e2;
+	    }
+
+        return nodeKey;
+    }
+
+    /** 
+     * Delete a file node.  If the node does not exist, then nothing happens (ie ItemNotFoundException is NOT thrown). 
+     * @param uuid id of the file node. Mandatory
+     * @throws InvalidParameterException One of the mandatory parameters is missing.
+     * @throws RepositoryCheckedException Some other error occured.
+     */
+    public void deleteFile(Long uuid) throws InvalidParameterException, RepositoryCheckedException {
+        try {
+		    try {
+		        getRepositoryService().deleteNode(getTicket(false), uuid);
+		    } catch (AccessDeniedException e) {
+		        log.warn("Unable to access repository to delete file id"+uuid
+					+"AccessDeniedException: "+e.getMessage()+" Retrying login.");
+		        getRepositoryService().deleteNode(getTicket(true), uuid);
+		    } 
+        } catch (ItemNotFoundException e1) {
+            // didn't exist so don't need to delete. Ignore problem.
+        } catch (RepositoryCheckedException e2) {
+		        log.error("Unable delete file id"+uuid
+						+"Repository Exception: "+e2.getMessage()+" Retry not possible.");
+		        throw e2;
+	    }
+    }
+
+    /** Get a file node. 
+     * @param uuid id of the file node. Mandatory
+     * @throws FileException An error occured writing the input stream to disk.
+     * @throws ItemNotFoundException This file node does not exist, so cannot delete it.
+     * @throws RepositoryCheckedException Some other error occured.
+     */
+    public IVersionedNode getFileNode(Long uuid) throws ItemNotFoundException, FileException, RepositoryCheckedException {
+        try {
+	        try {
+	            return getRepositoryService().getFileItem(getTicket(false), uuid, null);
+		    } catch (AccessDeniedException e) {
+		        log.warn("Unable to access repository to get file id"+uuid
+					+"AccessDeniedException: "+e.getMessage()+" Retrying login.");
+		        return getRepositoryService().getFileItem(getTicket(true), uuid, null);
+		    }
+	    } catch (RepositoryCheckedException e2) {
+	        log.warn("Unable to to get file id"+uuid
+					+"Repository Exception: "+e2.getMessage()+" Retry not possible.");
+	        throw e2;
+	    }
+}
+
+    public boolean isOffline(IVersionedNode node) {
+        return checkType(node, TYPE_OFFLINE);
+    }
+    
+    public boolean isOnline(IVersionedNode node) {
+        return checkType(node, TYPE_ONLINE);
+    }
+    
+    /** Check the FILE_TYPE_PROPERTY_NAME property against the expectedType.
+     * 
+     * @param node should not be null
+     * @param expectedType must not be null
+     * @return true if match, false otherwise.
+     */
+    protected boolean checkType(IVersionedNode node, String expectedType) {
+        IValue property = node.getProperty(FILE_TYPE_PROPERTY_NAME);
+        String value = null;
+        try {
+            value = property != null ? property.getString() : null;
+        } catch (ValueFormatException e) {
+            // hmm, not expecting this - so need to return false...
+            // leave value as null;
+        }
+        return ( node != null && expectedType!= null && expectedType.equals(value));
+    }
+
+
+    
+/*    protected File getFile(String fileName, InputStream is) throws FileNotFoundException, Exception {
+        InputStream in = new BufferedInputStream(is, 500);
+        File file = new File(fileName);
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(file), 500);
+        int bytes;
+        while ((bytes = in.available()) >  0) {
+            byte[] byteArray = new byte[bytes];
+            in.read(byteArray);
+            out.write(byteArray);
+        }
+        in.close();
+        out.close();
+        out.flush();
+        return file;
+    }
+
+    protected byte[] getBytes(File file) throws FileNotFoundException, Exception {
+        byte[] byteArray = new byte[(int) file.length()];
+        FileInputStream stream = new FileInputStream(file);
+        stream.read(byteArray);
+        stream.close();
+        return byteArray;
+    } */
+    
+    /* *** Required for Spring bean creation **************************/
+    
+    /**
+     * @return Returns the repositoryService.
+     */
+    public IRepositoryService getRepositoryService() {
+        return repositoryService;
+    }
+    /**
+     * @param repositoryService The repositoryService to set.
+     */
+    public void setRepositoryService(IRepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
+    }
+}
