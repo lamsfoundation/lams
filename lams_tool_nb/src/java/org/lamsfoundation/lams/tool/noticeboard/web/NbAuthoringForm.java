@@ -64,7 +64,20 @@ public class NbAuthoringForm extends ActionForm {
 	
 	private String method;
 	private String toolContentId;
+	private String defineLater;
 	
+    /**
+     * @return Returns the defineLater.
+     */
+    public String getDefineLater() {
+        return defineLater;
+    }
+    /**
+     * @param defineLater The defineLater to set.
+     */
+    public void setDefineLater(String defineLater) {
+        this.defineLater = defineLater;
+    }
 	/**
 	 * @return Returns the content.
 	 */
