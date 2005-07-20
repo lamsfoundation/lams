@@ -51,7 +51,7 @@ import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
  *  
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/tool/nb/starter/monitor" name="NbMonitoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringStarterAction"
+ * @struts:action path="/starter/monitor" name="NbMonitoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringStarterAction"
  *                input=".monitoringStarter" validate="false" 
  * @struts:action-forward name="monitorPage" path=".monitoringContent"
  * ----------------XDoclet Tags--------------------
