@@ -6,6 +6,9 @@
  */
 package org.lamsfoundation.lams.tool.qa.web;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,8 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
+import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
@@ -320,12 +326,6 @@ public class AuthoringUtil implements QaAppConstants {
 		    monitoringReportTitle=qaAuthoringForm.getMonitoringReportTitle();
 		    offlineInstructions=qaAuthoringForm.getOnlineInstructions();
 		    onlineInstructions=qaAuthoringForm.getOfflineInstructions();
-		    
-		    /**
-		     * read and persist rich text parameters
-		     */
-		    //QaUtils.persistRichText(request);
-		 
 		    endLearningMessage=qaAuthoringForm.getEndLearningMessage();
 		}
 		creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
@@ -333,7 +333,7 @@ public class AuthoringUtil implements QaAppConstants {
 			creationDate=new Date(System.currentTimeMillis()).toString();
 		
 		
-		/** read rich text vallues */
+		/** read rich text values */
 		String richTextOfflineInstructions="";
     	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
     	logger.debug("createContent:  richTextOfflineInstructions from session: " + richTextOfflineInstructions);
@@ -353,6 +353,40 @@ public class AuthoringUtil implements QaAppConstants {
     	richTextInstructions = (String)request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
     	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
     	if (richTextInstructions == null) richTextInstructions="";
+    	
+    	/** read uploaded file informtion */
+    	
+    	logger.debug("retrieve theOfflineFileName.");
+    	FormFile theOfflineFile = qaAuthoringForm.getTheOfflineFile();
+    	logger.debug("retrieved theOfflineFile: " + theOfflineFile);
+    	
+    	try
+		{
+    		InputStream offlineFileInputStream = theOfflineFile.getInputStream();
+    		logger.debug("retrieved offlineFileInputStream: " + offlineFileInputStream);
+    		String offlineFileName=theOfflineFile.getFileName();
+    		logger.debug("retrieved offlineFileName: " + offlineFileName);
+        	NodeKey nodeKey=qaService.uploadFileToRepository(offlineFileInputStream, offlineFileName);
+        	logger.debug("repository returned nodeKey: " + nodeKey);
+        	logger.debug("repository returned nodeKey uuid: " + nodeKey.getUuid());
+    	}
+    	catch(FileNotFoundException e)
+		{
+    		logger.debug("exception occured, offline file not found : " + e.getMessage());
+    		//possibly give warning to user in request scope
+		}
+    	catch(IOException e)
+		{
+    		logger.debug("exception occured in offline file transfer: " + e.getMessage());
+    		//possibly give warning to user in request scope
+		}
+    	catch(QaApplicationException e)
+		{
+    		logger.debug("exception occured in accessing the repository server: " + e.getMessage());
+    		//possibly give warning to user in request scope
+		}
+    	
+    	
     	
 			
     	/**obtain user object from the session*/

@@ -6,7 +6,7 @@
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
 <div id="basicTabContainer">	
-		<c:set var="formIndex" scope="session" value="${requestScope.formIndex}"/>
+		<c:out value="${sessionScope.formIndex}" />						  
 		<c:if test="${(requestScope.startMonitoringSummaryRequest != 'true')  || (sessionScope.editActivityEditMode=='true') }"> 			
 			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
 			<tr> <td>

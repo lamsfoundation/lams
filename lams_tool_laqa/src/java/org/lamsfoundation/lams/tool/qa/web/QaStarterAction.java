@@ -123,8 +123,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    logger.debug("retrieving qaService from proxy: " + qaService);
 		    request.getSession().setAttribute(TOOL_SERVICE, qaService);		
 		}
-		
-		//QaUtils.configureContentRepository(request);
+		/** souble check if this is a good place to call */
+		QaUtils.configureContentRepository(request);
 		
 	    /**
 	     * obtain and setup the current user's data 
@@ -225,7 +225,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    request.getSession().setAttribute(CHOICE_TYPE_INSTRUCTIONS,CHOICE_TYPE_INSTRUCTIONS);
 	
 	    request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(false));
-	    request.setAttribute(FORM_INDEX, "0");
+	    request.getSession().setAttribute(FORM_INDEX, "0");
+	    logger.debug("FORM_INDEX set to: " +  request.getSession().getAttribute(FORM_INDEX));
 		
 	    
 	    /**

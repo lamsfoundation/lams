@@ -105,6 +105,10 @@ public interface QaAppConstants {
     public static final String RICHTEXT_TITLE							="richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS					="richTextInstructions";
     public static final String RICHTEXT_BLANK							="<p>&nbsp;</p>";
+    public static final String THE_OFFLINE_FILE							="theOfflineFile";
+    public static final String THE_ONLINE_FILE							="theOnlineFile";
+    public static final String THE_OFFLINE_FILENAME						="theOfflineFileName";
+    public static final String THE_ONLINE_FILENAME						="theOnlineFileName";
     
     
     /**

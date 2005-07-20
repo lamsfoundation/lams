@@ -2,10 +2,10 @@ package org.lamsfoundation.lams.tool.qa;
 
 import java.io.Serializable;
 import java.util.Date;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.log4j.Logger;
 
 public class SubmissionDetails implements Serializable{
 	/** identifier field */
@@ -27,20 +27,28 @@ public class SubmissionDetails implements Serializable{
 	private Long uuid;
 
 	/** persistent field */
-	private Long versionID;
+	private Long versionId;
 	
 	/** default constructor */
 	public SubmissionDetails() {
 	}
 
 	/** full constructor */
-	public SubmissionDetails(String filePath, String fileDescription, Date dateOfSubmission, Long userID, Long uuid, Long versionID) {
+	public SubmissionDetails(String filePath, Long uuid, Long versionId) {
+	    this.filePath = filePath;
+	    this.uuid = uuid;
+	    this.versionId = versionId;
+	}
+	
+	
+	/** full constructor */
+	public SubmissionDetails(String filePath, String fileDescription, Date dateOfSubmission, Long userID, Long uuid, Long versionId) {
 	    this.filePath = filePath;
 	    this.fileDescription = fileDescription;
 	    this.dateOfSubmission = dateOfSubmission;
 	    this.userID = userID;
 	    this.uuid = uuid;
-	    this.versionID = versionID;
+	    this.versionId = versionId;
 	}
 
 	/**
@@ -103,11 +111,11 @@ public class SubmissionDetails implements Serializable{
 	 * @hibernate.property column="version_id" length="20"
 	 */
 	public Long getVersionID() {
-		return this.versionID;
+		return this.versionId;
 	}
 
 	public void setVersionID(Long versionID) {
-		this.versionID = versionID;
+		this.versionId = versionID;
 	}
 
 	public String toString() {
@@ -158,5 +166,17 @@ public class SubmissionDetails implements Serializable{
 	 */
 	public void setUserID(Long userID) {
 		this.userID = userID;
+	}
+	/**
+	 * @return Returns the versionId.
+	 */
+	public Long getVersionId() {
+		return versionId;
+	}
+	/**
+	 * @param versionId The versionId to set.
+	 */
+	public void setVersionId(Long versionId) {
+		this.versionId = versionId;
 	}
 }

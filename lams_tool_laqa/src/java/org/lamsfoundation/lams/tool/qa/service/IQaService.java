@@ -207,13 +207,10 @@ public interface IQaService
     
     public void deleteFromRepository(Long uuid, Long versionID) throws QaApplicationException;
 
-    public NodeKey uploadFileToRepository(InputStream stream, String fileName, String mimeType) throws QaApplicationException;
+    public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws QaApplicationException;
     
-    public void uploadFile(Long toolContentId, String filePath, String fileDescription, Long userID) throws QaApplicationException;
+    public InputStream downloadFile(Long uuid, Long versionID)throws QaApplicationException;
 	
-	public InputStream downloadFile(Long uuid, Long versionID)throws QaApplicationException;
-	
-	public void uploadFile(InputStream stream, Long toolContentId, String filePath, String fileDescription, String fileName, String mimeType,Date dateOfSubmission, Long userID) throws QaApplicationException;
 	/** repository access related methods  till here */
 }
 

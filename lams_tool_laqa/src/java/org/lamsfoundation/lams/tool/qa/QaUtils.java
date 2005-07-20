@@ -398,7 +398,5 @@ public abstract class QaUtils implements QaAppConstants {
 	    qaService.configureContentRepository();
 	    logger.debug("configureContentRepository ran successfully");
 	}
-	
-	
 
 }

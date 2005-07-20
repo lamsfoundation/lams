@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
+import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
@@ -277,6 +279,9 @@ public class QAction extends DispatchAction implements QaAppConstants
         logger.debug("user action is: " + userAction);
 
         QaUtils.persistRichText(request);
+        //logger.debug("before calling persistUploadFileInformation");
+        //QaUtils.persistUploadFileInformation(request);
+        
     	/** add a new question to Map */
         if (userAction.equalsIgnoreCase(ADD_NEW_QUESTION)) 
 		{

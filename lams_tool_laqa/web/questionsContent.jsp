@@ -29,7 +29,7 @@
 		<!-- Dave to do the styling-->
 		<!-- this form is exists temporarily to represent tool icon, remove this form once the tool is deployed into authoring environment -->
 		<c:if test="${requestScope.startMonitoringSummaryRequest == 'true'}"> 			
-			<html:form  action="/authoring?method=loadMonitoring&validate=false" method="POST" target="_self">
+			<html:form  action="/authoring?method=loadMonitoring&validate=false" enctype="multipart/form-data" method="POST" target="_self">
 				<table align=center> <!-- Dave to take off--> 
 				<tr>
 						<td>
@@ -54,7 +54,7 @@
 			</html:form>		
 		</c:if>						
 		
-		<html:form  action="/authoring?method=loadQ&validate=false" method="POST" target="_self">
+		<html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
 		<table align=center> <!-- Dave to take off--> 
 			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
 				<tr><td>

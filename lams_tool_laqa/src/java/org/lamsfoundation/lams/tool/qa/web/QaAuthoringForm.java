@@ -12,6 +12,7 @@ package org.lamsfoundation.lams.tool.qa.web;
  */
 import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
+import org.apache.struts.upload.FormFile;
 
 /**
  * @author Ozgur Demirtas
@@ -26,6 +27,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	protected String removeAllContent;
 	protected String submitAllContent;
 	protected String submitTabDone;
+	protected String submitOfflineFile;
 	
 	/** tab controller, these may go away once the Flash wraps the jsp */
 	protected String choice;
@@ -42,6 +44,9 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	/** instructions content */
 	protected String onlineInstructions;
 	protected String offlineInstructions;
+	protected FormFile theOfflineFile;
+	protected FormFile theOnlineFile;
+	
 	/** advanced content */
 	protected String synchInMonitor;
 	protected String reportTitle;
@@ -49,7 +54,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	protected String endLearningMessage;
 	protected String usernameVisible;
 	protected String questionsSequenced;
-
+	
 	/** proxy controllers for Monitoring tabs */ 
 	protected String summaryMonitoring;
 	protected String instructionsMonitoring;
@@ -65,6 +70,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
     	this.removeAllContent=null;
     	this.submitAllContent=null;
     	this.submitTabDone=null;
+    	this.submitOfflineFile=null;
     	
     	this.summaryMonitoring=null;
     	this.instructionsMonitoring=null;
@@ -80,6 +86,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 		this.removeAllContent=null;
 		this.submitAllContent=null;
 		this.submitTabDone=null;
+		this.submitOfflineFile=null;
 
 		this.choice=null;
 		this.choiceBasic=null;
@@ -443,5 +450,42 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	 */
 	public void setEdit(String edit) {
 		this.edit = edit;
+	}
+	
+	/**
+	 * @return Returns the submitOfflineFile.
+	 */
+	public String getSubmitOfflineFile() {
+		return submitOfflineFile;
+	}
+	/**
+	 * @param submitOfflineFile The submitOfflineFile to set.
+	 */
+	public void setSubmitOfflineFile(String submitOfflineFile) {
+		this.submitOfflineFile = submitOfflineFile;
+	}
+	/**
+	 * @param theOfflineFile The theOfflineFile to set.
+	 */
+	public void setTheOfflineFile(FormFile theOfflineFile) {
+		this.theOfflineFile = theOfflineFile;
+	}
+	/**
+	 * @param theOnlineFile The theOnlineFile to set.
+	 */
+	public void setTheOnlineFile(FormFile theOnlineFile) {
+		this.theOnlineFile = theOnlineFile;
+	}
+	/**
+	 * @return Returns the theOfflineFile.
+	 */
+	public FormFile getTheOfflineFile() {
+		return theOfflineFile;
+	}
+	/**
+	 * @return Returns the theOnlineFile.
+	 */
+	public FormFile getTheOnlineFile() {
+		return theOnlineFile;
 	}
 }

@@ -19,9 +19,6 @@
  *http://www.gnu.org/licenses/gpl.txt
  */
 package org.lamsfoundation.lams.tool.qa.service;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
@@ -58,7 +55,6 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
-import org.lamsfoundation.lams.tool.qa.SubmissionDetails;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
@@ -114,7 +110,7 @@ public class QaServicePOJO implements
     
     
     public void configureContentRepository() throws QaApplicationException {
-    	logger.debug("retrieved repService: "+ repositoryService);
+    	logger.debug("retrieved repService: " + repositoryService);
         cred = new SimpleCredentials(repositoryUser, repositoryId);
         logger.debug("retrieved cred: "+ cred);
           try 
@@ -1398,12 +1394,15 @@ public class QaServicePOJO implements
 	 * @return NodeKey Represents the two part key - UUID and Version.
 	 * @throws SubmitFilesException
 	 */
-	public NodeKey uploadFileToRepository(InputStream stream, String fileName,String mimeType) throws QaApplicationException {
+	public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws QaApplicationException {
+		logger.debug("attempt getting the ticket");
 		ITicket ticket = getRepositoryLoginTicket();
+		logger.debug("retrieved ticket: " + ticket);
+		
 		try {
 			NodeKey nodeKey = repositoryService.addFileItem(ticket, stream,
-					fileName, mimeType, null);
-			logger.debug("retrieved nodeKey: " + nodeKey);
+					fileName, null, null);
+			logger.debug("retrieved nodeKey from repository service: " + nodeKey);
 			return nodeKey;
 		} catch (Exception e) {
 			throw new QaApplicationException("Exception occured while trying to"
@@ -1425,83 +1424,5 @@ public class QaServicePOJO implements
 			throw new QaApplicationException("ItemNotFoundException occured while trying to download file " + e.getMessage());			
 		}
 	}
-	
-	public void uploadFile(Long toolContentId, String filePath, String fileDescription, Long userID) throws QaApplicationException{
-		try{
-			File file = new File(filePath);
-			logger.debug("retrieved file: " + file);			
-			String fileName = file.getName();
-			logger.debug("retrieved fileName: " + fileName);
-			String mimeType = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length());
-			FileInputStream stream = new FileInputStream(file);
-			uploadFile(stream,toolContentId,filePath,fileDescription,fileName,mimeType,new Date(),userID);
-			logger.debug("end of uploadFile: " + fileName);
-		}catch(FileNotFoundException e){
-			throw new QaApplicationException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-		}
-	}
-	
-	
-	/**
-	 * This method is called when the user requests to upload a file. It's a
-	 * three step process.
-	 * <ol>
-	 * <li>Firstly, the tool authenticates itself and obtains a valid ticket
-	 * from the respository</li>
-	 * <li>Secondly, using the above ticket it uploads the file to the
-	 * repository. Upon successful uploading of the file, repository returns a
-	 * <code>NodeKey</code> object which is a unique indentifier of the file
-	 * in the repsoitory</li>
-	 * <li>Finally, this information is updated into the database for the given
-	 * contentID in the following tables
-	 * 	<ul>
-	 * 		<li><code>tl_lasbmt11_submission_details</code></li>
-	 * 		<li><code>tl_lasbmt11_report</code></li>
-	 * 	</ul>
-	 * </li>
-	 * </ol>
-	 * 
-	 * @param stream
-	 *            The <code>InputStream</code> representing the data to be
-	 *            uploaded
-	 * @param contentID
-	 *            The <code>contentID</code> of the file being uploaded
-	 * @param filePath
-	 *            The physical path of the file
-	 * @param fileDescription
-	 *            The description of the file
-	 * @param fileName
-	 *            The name of the file being added
-	 * @param mimeType
-	 *            The MIME type of the file (eg. TXT, DOC, GIF etc)
-	 * @param dateOfSubmission
-	 *            The date this file was uploaded by the user
-	 * @param userID
-	 * 			  The <code>User</code> who has uploaded the file.
-	 * @throws SubmitFilesException
-	 */
-	public void uploadFile(InputStream stream, Long toolContentId, String filePath, String fileDescription, String fileName, String mimeType,Date dateOfSubmission, Long userID) throws QaApplicationException {
 
-		QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
-    	logger.debug("retrieving qaContent: " + qaContent);
-		
-		if (qaContent == null)
-		{
-			logger.debug("no content with toolContentId: " + toolContentId);
-			throw new QaApplicationException(
-					"No such content with a toolContentId of: " + toolContentId
-							+ " found.");
-		}
-		else 
-		{
-			NodeKey nodeKey = uploadFileToRepository(stream, fileName, mimeType);
-			SubmissionDetails details = new SubmissionDetails(filePath,fileDescription,dateOfSubmission,
-															  nodeKey.getUuid(),nodeKey.getVersion(),
-															  userID);
-			logger.debug("details: " + details);
-			//submissionDetailsDAO.insert(details);
-		}
-	}	
-
-		
 }
