@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
@@ -147,5 +148,12 @@ public interface ISubmitFilesService {
 	 * @return
 	 */
 	public SubmitFilesSession getSessionById(Long sessionID);
-	public InputStream downloadFile(Long uuid, Long versionID);
+	public IVersionedNode downloadFile(Long uuid, Long versionID);
+
+	/**
+	 * Release marks and comments information to learners, for a special session.
+	 * @param sessionID
+	 * @return success return true, otherwise return false.
+	 */
+	public boolean releaseMarksForSession(Long sessionID);
 }

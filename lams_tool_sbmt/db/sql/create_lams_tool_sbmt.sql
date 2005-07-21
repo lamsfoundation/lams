@@ -46,7 +46,7 @@ CREATE TABLE tl_lasbmt11_submission_details (
                   REFERENCES tl_lasbmt11_report (report_id)
 )TYPE=InnoDB;
 
-INSERT INTO `tl_lasbmt11_content` (content_id,title,instructions) values(1,"Java Submission","Submit your java programs");
+INSERT INTO `tl_lasbmt11_content` (content_id,title,instructions,defineLater,runOffline) values(1,"Java Submission","Submit your java programs",0,0);
 INSERT INTO `tl_lasbmt11_session` (session_id,content_id,status) values(1,1,1);
 SET FOREIGN_KEY_CHECKS=1;
 

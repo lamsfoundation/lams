@@ -33,6 +33,9 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 	private static final String FIND_FOR_USER_BY_SESSION = "from " + TABLENAME +
 															" in class " + SubmissionDetails.class.getName() +
 															" where user_id=? AND session_id=?";
+	private static final String FIND_BY_SESSION = "from " + TABLENAME +
+													" in class " + SubmissionDetails.class.getName() +
+													" where session_id=?";
 	private static final String FIND_DISTINCT_USER = " select distinct details.userID from SubmissionDetails details " +
 													 " where details.submitFileSession =:sessionID";
 
@@ -82,5 +85,14 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 		
 		this.getSession().setFlushMode(FlushMode.AUTO);
 		this.getHibernateTemplate().saveOrUpdate(session);
+	}
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO#getSubmissionDetailsBySession(java.lang.Long)
+	 */
+	public List getSubmissionDetailsBySession(Long sessionID) {
+		List list = this.getHibernateTemplate().find(FIND_BY_SESSION, 
+				 new Object[]{sessionID},
+				 new Type[]{Hibernate.LONG});
+		return list;
 	}
 }

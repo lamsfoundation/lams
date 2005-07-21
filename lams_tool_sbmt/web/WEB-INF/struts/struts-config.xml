@@ -88,8 +88,13 @@
         redirect="false"
       />
       <forward
-        name="report"
-        path="/allLearners.jsp"
+        name="userReport"
+        path="/userReport.jsp"
+        redirect="false"
+      />
+      <forward
+        name="updateMarks"
+        path="/updateMarks.jsp"
         redirect="false"
       />
       <forward
@@ -98,13 +103,8 @@
         redirect="false"
       />
       <forward
-        name="userReport"
-        path="/userReport.jsp"
-        redirect="false"
-      />
-      <forward
-        name="updateMarks"
-        path="/updateMarks.jsp"
+        name="report"
+        path="/allLearners.jsp"
         redirect="false"
       />
     </action>

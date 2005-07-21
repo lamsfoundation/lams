@@ -22,6 +22,8 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.web;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -36,6 +38,9 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.contentrepository.FileException;
+import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
@@ -51,10 +56,11 @@ import org.lamsfoundation.lams.util.WebUtil;
  * 				name="emptyForm" 				
  * 
  * @struts.action-forward name="userlist" path="/userlist.jsp"
- * @struts.action-forward name="report" path="/allLearners.jsp"
- * @struts.action-forward name="status" path="/Status.jsp"
  * @struts.action-forward name="userReport" path="/userReport.jsp"
  * @struts.action-forward name="updateMarks" path="/updateMarks.jsp"
+ * 
+ * @struts.action-forward name="status" path="/Status.jsp"
+ * @struts.action-forward name="report" path="/allLearners.jsp"
  * 				
  */
 public class MonitoringAction extends DispatchAction {
@@ -162,6 +168,75 @@ public class MonitoringAction extends DispatchAction {
 		request.getSession().setAttribute("userID",userID);		
 		return mapping.findForward("userReport");
 	}
+	/**
+	 * Download upload file for a special submission detail.  
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	
+	public ActionForward downloadFile(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+		Long versionID =new Long(WebUtil.readLongParam(request,"versionID"));
+		Long uuID = new Long(WebUtil.readLongParam(request,"uuID"));
+		
+		ISubmitFilesService service = getSubmitFilesService();
+		IVersionedNode node = service.downloadFile(uuID,versionID);
+		int len;
+		ActionMessages errors = new ActionMessages();
+		try {
+			InputStream is = node.getFile();
+			String mineType = node.getProperty("MIMETYPE").getString();
+			response.setContentType(mineType);
+			String header = "attachment; filename=\"" + node.getProperty("FILENAME").getString() + "\";";
+			response.setHeader("Content-Disposition",header);
+			byte[] data = new byte[4 * 1024];
+			while(is != null && (len = is.read(data)) != -1){
+				response.getOutputStream().write(data,0,len);
+			}
+			response.getOutputStream().flush();
+		} catch (Exception e) {
+			log.error(e);
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("monitoring.download.error",e.toString()));
+		}
+		//if download throw any exception, then display it in current page.
+		if(!errors.isEmpty()){
+			saveErrors(request,errors);
+			return mapping.findForward("userReport");
+		}
+			
+		return null;
+	}
+	public ActionForward viewAllMarks(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+		return null;
+	}
+	public ActionForward releaseMarks(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+
+		//get service then update report table
+		submitFilesService = getSubmitFilesService();
+		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
+		submitFilesService.releaseMarksForSession(sessionID);
+		//todo: need display some success info
+		return mapping.findForward("userReport");
+	}
+	public ActionForward downloadMarks(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+		return null;
+	}
+	
+	
 	//TODO
 	public ActionForward getStatus(ActionMapping mapping,
 							   ActionForm form,

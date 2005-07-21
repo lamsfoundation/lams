@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -183,6 +184,15 @@ public class SubmitFilesService implements ToolContentManager,
         }
     }
     
+	/**
+	 * @param toolContentId
+	 * @return
+	 */
+	private SubmitFilesContent duplicateDefaultToolContent(Long toolContentId) {
+		//TODO
+		return null;
+	}
+
 	/**
      * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsDefineLater(java.lang.Long)
      */
@@ -661,11 +671,11 @@ public class SubmitFilesService implements ToolContentManager,
 		User user = userDAO.getUserById(new Integer(userID.intValue()));
 		return user.getUserDTO();
 	}
-	public InputStream downloadFile(Long uuid, Long versionID)throws SubmitFilesException{
+	public IVersionedNode downloadFile(Long uuid, Long versionID)throws SubmitFilesException{
 		ITicket ticket = getRepositoryLoginTicket();		
 		try{
 			IVersionedNode node = repositoryService.getFileItem(ticket,uuid,null);
-			return node.getFile();
+			return node;
 		}catch(AccessDeniedException ae){
 			throw new SubmitFilesException("AccessDeniedException occured while trying to download file " + ae.getMessage());
 		}catch(FileException fe){
@@ -677,14 +687,21 @@ public class SubmitFilesService implements ToolContentManager,
 	public SubmitFilesSession getSessionById(Long sessionID){
 		return submitFilesSessionDAO.getSessionByID(sessionID);
 	}
-    /**
-	 * @param toolContentId
-	 * @return
-	 */
-	private SubmitFilesContent duplicateDefaultToolContent(Long toolContentId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
+	public boolean releaseMarksForSession(Long sessionID){
+		List list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
+		Iterator iter = list.iterator();
+		SubmissionDetails details;
+		SubmitFilesReport report;
+		Date now = Calendar.getInstance().getTime();
+		while(iter.hasNext()){
+			details = (SubmissionDetails) iter.next();
+			report = details.getReport();
+			report.setDateMarksReleased(now);
+			submitFilesReportDAO.updateReport(report);
+		}
+		//current there is no false return
+		return true;
+	}
 
 }

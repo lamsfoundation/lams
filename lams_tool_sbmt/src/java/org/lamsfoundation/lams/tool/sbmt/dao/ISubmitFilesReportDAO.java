@@ -33,4 +33,9 @@ public interface ISubmitFilesReportDAO extends IBaseDAO {
 	 */
 	public SubmitFilesReport getReportBySubmissionID(Long submissionID);
 
+	/**
+	 * @param report
+	 */
+	public void updateReport(SubmitFilesReport report);
+
 }

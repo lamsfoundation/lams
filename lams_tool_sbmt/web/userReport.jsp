@@ -2,7 +2,7 @@
 <%@ page language="java"%>
 
 <%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-html-el" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 <%@ taglib uri="tags-c" prefix="c" %>
@@ -26,7 +26,10 @@
 	<c:forEach items="${filesUploaded}"  var ="details" >			
 		<span><p>			
 		<tr>
-			<td>File Path: </td><td><c:out value="${details.filePath}" /></td>
+			<td>
+			File Path: </td><td><c:out value="${details.filePath}" /> 
+			(<a href="monitoring.do?method=downloadFile&uuID=<c:out value="${details.uuID}" /> &versionID=<c:out value="${details.versionID}" /> ">Download</a>)
+			</td>
 		</tr>
 		<tr>
 			<td>File Description: </td><td><c:out value="${details.fileDescription}"  escapeXml="false"/></td>

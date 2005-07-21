@@ -39,7 +39,31 @@
 			</logic:iterate>
   		</logic:notEmpty>  		
 		</table>
-  		
+  		<table class="forms">
+	  		<tr>
+		  			<td class="formcontrol">
+		  			<html:form  action="/monitoring">
+		  				<INPUT type="hidden" name="method" value="viewAllMarks">
+						<INPUT type="hidden" name="toolSessionID" value="<c:out value="${toolSessionID}" />"/>
+			  			<html:submit property="viewAllMarks" value="View all marks"/>
+	  				</html:form>
+		  			</td>
+		  			<td class="formcontrol">
+		  			<html:form  action="/monitoring">
+		  				<INPUT type="hidden" name="method" value="releaseMarks">
+						<INPUT type="hidden" name="toolSessionID" value="<c:out value="${toolSessionID}" />"/>
+			  			<html:submit property="releaseMarks" value="Release marks"/>
+	  				</html:form>
+		  			</td>
+		  			<td class="formcontrol">
+		  			<html:form  action="/monitoring">
+		  				<INPUT type="hidden" name="method" value="downloadMarks">
+						<INPUT type="hidden" name="toolSessionID" value="<c:out value="${toolSessionID}" />"/>
+			  			<html:submit property="downloadMarks" value="Download marks"/>
+	  				</html:form>
+		  			</td>
+	  		</tr>
+  		</table>
 	</div>
 					
   </body>

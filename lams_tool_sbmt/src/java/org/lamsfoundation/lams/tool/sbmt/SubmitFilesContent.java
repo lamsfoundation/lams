@@ -157,7 +157,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 
     /** 
      * @hibernate.property column="defineLater" length="1"
-     *         
+     *  not-null="true"
      */
     public boolean isDefineLater()
     {
@@ -171,7 +171,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 
     /** 
      * @hibernate.property column="runOffline" length="1"
-     *         
+     * not-null="true"
      */
     public boolean isRunOffline()
     {

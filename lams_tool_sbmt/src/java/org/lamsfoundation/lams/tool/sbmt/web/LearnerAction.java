@@ -6,6 +6,7 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.web;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
@@ -60,16 +62,16 @@ public class LearnerAction extends DispatchAction {
 		
 		HttpSession httpSession = request.getSession(true);
 		httpSession.setAttribute("content",content);
-		
+
 		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-		authForm.set("filesUploaded",filesUploaded);
+		listUploadFiles(authForm, filesUploaded);
 		
 		//to avoid user without patience click "upload" button too fast 
 		saveToken(request);
 		return mapping.getInputForward();
 		
 	}
-	
+
 	public ActionForward uploadFile(ActionMapping mapping,
 									ActionForm form,
 									HttpServletRequest request,
@@ -79,9 +81,10 @@ public class LearnerAction extends DispatchAction {
 		if(!isTokenValid(request,true)){
 			Long sessionID =(Long) authForm.get("toolSessionID");
 			Long userID = (Long)authForm.get("userID");
-			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());				
+			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-			authForm.set("filesUploaded",filesUploaded);
+
+			listUploadFiles(authForm, filesUploaded);
 			return returnErrors(mapping,request,"submit.upload.twice","upload");
 		}
 		
@@ -96,7 +99,7 @@ public class LearnerAction extends DispatchAction {
 		try{
 			submitFilesService.uploadFile(sessionID,filePath,fileDescription,userID);
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-			authForm.set("filesUploaded",filesUploaded);
+			listUploadFiles(authForm, filesUploaded);
 			return mapping.getInputForward();			
 		}catch(SubmitFilesException se){
 			logger.error("uploadFile: Submit Files Exception has occured" + se.getMessage());
@@ -123,5 +126,24 @@ public class LearnerAction extends DispatchAction {
 		saveErrors(request,messages);
 		return mapping.findForward(forward);
 	}
-
+	
+	/**
+	 * Fill file list uploaded by the special user into web form. Remove the unauthorized mark and
+	 * comment information according to the release flag (release date). 
+	 * @param authForm
+	 * @param sessionID
+	 * @param userID
+	 */
+	private void listUploadFiles(DynaActionForm authForm, List filesUploaded) {
+		//if Monitoring does not release marks, then screen this mark and comment content.
+		Iterator iter = filesUploaded.iterator();
+		while(iter.hasNext()){
+			FileDetailsDTO dto = (FileDetailsDTO) iter.next();
+			if(dto.getDateMarksReleased() == null){
+				dto.setComments(null);
+				dto.setMarks(null);
+			}
+		}
+		authForm.set("filesUploaded",filesUploaded);
+	}
 }
