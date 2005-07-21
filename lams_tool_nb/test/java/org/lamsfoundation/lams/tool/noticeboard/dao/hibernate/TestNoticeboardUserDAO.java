@@ -66,15 +66,7 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	     }
 	 }
 	 
-	 public void testGetNbUserByUID()
-	 {
-	     nbUser = nbUserDAO.getNbUserByUID(new Long(1));
-	     
-	     assertEquals(nbUser.getUserId(), DEFAULT_USER_ID);
-	     assertEquals(nbUser.getFullname(), DEFAULT_FULLNAME);
-	     assertEquals(nbUser.getUsername(), DEFAULT_USERNAME);
-	     assertEquals(nbUser.getUserStatus(), DEFAULT_USER_STATUS);
-	 }
+	
 	 
 	 public void testGetNbUserByID()
 	 {
@@ -140,6 +132,15 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 		 nbSessionDAO.updateNbSession(nbSession);
 		    
 		 assertUserObjectIsNull(TEST_USER_ID);
+	 }
+	 
+	 public void testGetNumberOfUsers()
+	 {
+	     nbUser = nbUserDAO.getNbUserByID(TEST_USER_ID);
+	     nbSession = nbUser.getNbSession();
+	     int numberOfUsers = nbUserDAO.getNumberOfUsers(nbSession);
+	     System.out.println(numberOfUsers);
+	     assertEquals(numberOfUsers, 1);
 	 }
 
 }
