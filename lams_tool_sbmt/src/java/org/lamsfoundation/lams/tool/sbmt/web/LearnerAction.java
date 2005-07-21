@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -19,6 +20,8 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
@@ -50,8 +53,14 @@ public class LearnerAction extends DispatchAction {
 		
 		Long sessionID =(Long) authForm.get("toolSessionID");
 		Long userID = (Long)authForm.get("userID");
+		//get submission information from content table.E.g., title, instruction
+		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
+		SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
+		SubmitFilesContent content = session.getContent();
 		
-		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());				
+		HttpSession httpSession = request.getSession(true);
+		httpSession.setAttribute("content",content);
+		
 		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		authForm.set("filesUploaded",filesUploaded);
 		

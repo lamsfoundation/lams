@@ -29,6 +29,9 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 	/** persistent field */
 	private Set submissionDetails;
 
+	/** persistent field, but not cloned to avoid to clone block*/
+	private SubmitFilesContent content;
+	
     /** full constructor */
     public SubmitFilesSession(Long sessionID,int status) {
     	this.sessionID = sessionID;
@@ -122,5 +125,19 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 	 */
 	public void setSubmissionDetails(Set submissionDetails) {
 		this.submissionDetails = submissionDetails;
+	}
+	/**
+	 * @hibernate.many-to-one column="content_id"
+	 * 
+	 * @return Returns the content.
+	 */
+	public SubmitFilesContent getContent() {
+		return content;
+	}
+	/**
+	 * @param content The content to set.
+	 */
+	public void setContent(SubmitFilesContent content) {
+		this.content = content;
 	}
 }

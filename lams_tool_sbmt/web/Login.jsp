@@ -3,10 +3,6 @@
 <head><title>Learning Design Details</title></head>
 	
 <body>
-	<%
-		session.setAttribute("title","Submission Upload");
-		session.setAttribute("instructions","Upload you file by this tool");
-	%>
 	<form name="authoring" method="get" action="authoring.do">
 		<input type ="hidden" name="toolContentID" value="1">
 		<input type ="hidden" name="method" value="initPage">

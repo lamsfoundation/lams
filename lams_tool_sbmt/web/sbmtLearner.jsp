@@ -12,7 +12,7 @@
   <head>
     <html:base />
     
-    <title><c:out value="${sessionScope.title}"/></title>    
+    <title><c:out value="${content.title}"/></title>    
 	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
 	<link href="css/aqua.css" rel="stylesheet" type="text/css">
 
@@ -22,8 +22,8 @@
   </head>
   
   <body>
-  	<H1><c:out value="${sessionScope.title}"/></H1>
-  	<H2><c:out value="${sessionScope.instructions}"/></H2>
+  	<H1><c:out value="${content.title}"/></H1>
+  	<H2><c:out value="${content.instructions}"/></H2>
   	<div id="datatablecontainer">
   	<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
 	<logic:present name="SbmtLearnerForm" property="filesUploaded">

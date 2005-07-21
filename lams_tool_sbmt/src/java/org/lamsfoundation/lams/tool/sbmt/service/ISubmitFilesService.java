@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -140,6 +141,11 @@ public interface ISubmitFilesService {
 	public UserDTO getUserDetails(Long userID);
 	
 	public FileDetailsDTO getFileDetails(Long detailID);
-	
+	/**
+	 * Get SubmitFilesSession instance according to the given session id.
+	 * @param sessionID
+	 * @return
+	 */
+	public SubmitFilesSession getSessionById(Long sessionID);
 	public InputStream downloadFile(Long uuid, Long versionID);
 }

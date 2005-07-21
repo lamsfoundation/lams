@@ -7,10 +7,12 @@
 package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
 import net.sf.hibernate.FlushMode;
+import net.sf.hibernate.HibernateException;
 
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
+import org.springframework.dao.DataAccessResourceFailureException;
 
 /**
  * @author Manpreet Minhas
@@ -29,7 +31,8 @@ public class SubmitFilesContentDAO extends BaseDAO implements ISubmitFilesConten
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO#save(org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent)
 	 */
 	public void save(SubmitFilesContent content) {
-		this.getSession().setFlushMode(FlushMode.AUTO);
-		this.getHibernateTemplate().saveOrUpdate(content);
+		this.getSession().setFlushMode(FlushMode.COMMIT);
+		this.getHibernateTemplate().save(content);
+		this.getHibernateTemplate().flush();
 	}
 }

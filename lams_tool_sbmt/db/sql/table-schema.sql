@@ -1,4 +1,5 @@
 alter table tl_lasbmt11_submission_details drop foreign key FK1411A53C630DDF64;
+alter table tl_lasbmt11_session drop foreign key FKEC8C77C9FC4BEA1;
 drop table if exists tl_lasbmt11_report;
 drop table if exists tl_lasbmt11_content;
 drop table if exists tl_lasbmt11_submission_details;
@@ -36,3 +37,4 @@ create table tl_lasbmt11_session (
    primary key (session_id)
 );
 alter table tl_lasbmt11_submission_details add index FK1411A53C630DDF64 (session_id), add constraint FK1411A53C630DDF64 foreign key (session_id) references tl_lasbmt11_session (session_id);
+alter table tl_lasbmt11_session add index FKEC8C77C9FC4BEA1 (content_id), add constraint FKEC8C77C9FC4BEA1 foreign key (content_id) references tl_lasbmt11_content (content_id);

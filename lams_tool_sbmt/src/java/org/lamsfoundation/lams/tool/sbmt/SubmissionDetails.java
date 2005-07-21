@@ -38,6 +38,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	/** persistent field */
 	private SubmitFilesReport report;
 
+	/** persistent field, but not cloned to avoid to clone block*/
 	private SubmitFilesSession submitFileSession;
 	
 	/** default constructor */

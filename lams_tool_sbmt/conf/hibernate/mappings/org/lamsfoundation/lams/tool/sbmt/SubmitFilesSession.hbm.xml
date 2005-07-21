@@ -54,6 +54,16 @@
 
         </set>
 
+        <many-to-one
+            name="content"
+            class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="content_id"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-SubmitFilesSession.xml

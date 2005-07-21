@@ -674,6 +674,9 @@ public class SubmitFilesService implements ToolContentManager,
 			throw new SubmitFilesException("ItemNotFoundException occured while trying to download file " + ie.getMessage());			
 		}
 	}
+	public SubmitFilesSession getSessionById(Long sessionID){
+		return submitFilesSessionDAO.getSessionByID(sessionID);
+	}
     /**
 	 * @param toolContentId
 	 * @return
