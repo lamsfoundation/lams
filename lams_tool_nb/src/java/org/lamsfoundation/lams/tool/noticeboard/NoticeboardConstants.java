@@ -80,6 +80,8 @@ public class NoticeboardConstants
  
     public static final String DEFINE_LATER = "defineLater";
     public static final String PAGE_EDITABLE = "isPageEditable";
+    public static final String TOTAL_LEARNERS = "totalLearners";
+    public static final String GROUP_STATS_MAP = "groupStatsMap";
     
     //used in authoring
     public static final String TOOL_CONTENT_ID = "toolContentId";  //request + session variable
