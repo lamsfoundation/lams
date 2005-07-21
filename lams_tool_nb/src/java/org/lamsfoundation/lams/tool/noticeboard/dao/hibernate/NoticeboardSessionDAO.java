@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 
 import java.util.List;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
@@ -40,6 +41,10 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
 	
     private static final String LOAD_NBSESSION_BY_USER = "select ns from NoticeboardSession ns left join fetch "
         + "ns.nbUsers user where user.userId=:userId";
+    
+    private static final String GET_SESSIONS_FROM_CONTENT = "select ns.nbSessionId from NoticeboardSession ns where ns.nbContent= :nbContent";
+    
+    
 
     
     /**
@@ -187,6 +192,13 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
 	    session.getNbUsers().add(user);
 	    this.getHibernateTemplate().saveOrUpdate(user);
 	    this.getHibernateTemplate().saveOrUpdateCopy(session);	    
+	}
+	
+	public List getSessionsFromContent(NoticeboardContent nbContent)
+	{
+	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT,
+	            "nbContent",
+				nbContent));
 	}
     	
 }
