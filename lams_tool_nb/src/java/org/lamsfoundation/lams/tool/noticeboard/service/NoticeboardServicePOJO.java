@@ -349,6 +349,21 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		
 	}
 	
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#getSessionIdsFromContent(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent) */
+	public List getSessionIdsFromContent(NoticeboardContent content)
+	{
+	    List list = null;
+	    try
+	    {
+	        list = nbSessionDAO.getSessionsFromContent(content);
+	    }
+	    catch(DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to the list of session ids from content "
+					+ e.getMessage(), e);
+	    }
+	    return list;
+	}
 	
 	/* ==============================================================================
 	 * Methods for access to NoticeboardUser objects
@@ -481,6 +496,48 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to create user: "
 					+ e.getMessage(), e);
 	    }
+	}
+	
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#getNumberOfUsersInSession(org.lamsfoundation.lams.tool.noticeboard.oticeboardSession) */
+	public int getNumberOfUsersInSession(NoticeboardSession session)
+	{
+	    int numberOfUsers;
+	    try
+	    {
+	        numberOfUsers = nbUserDAO.getNumberOfUsers(session);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to get the number of users in the session: "
+					+ e.getMessage(), e);
+	    }
+	    return numberOfUsers;
+	}
+	
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#calculateTotalNumberOfUsers(java.lang.Long) */
+	public int calculateTotalNumberOfUsers(Long toolContentId)
+	{
+	    int totalNumberOfUsers = 0;
+	    try
+	    {
+	        nbContent = retrieveNoticeboard(toolContentId);
+	        List listOfSessionIds = getSessionIdsFromContent(nbContent);
+	        
+	        Iterator i = listOfSessionIds.iterator();
+	        
+	        while(i.hasNext())
+	        {
+	            Long sessionId = (Long)i.next();
+	            int usersInThisSession = getNumberOfUsersInSession(retrieveNoticeboardSession(sessionId));
+	            totalNumberOfUsers = totalNumberOfUsers + usersInThisSession;
+	        }
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while calculating the total number of users in tool activity "
+					+ e.getMessage(), e);
+	    }
+	    return totalNumberOfUsers;
 	}
 	
 	/* ===============Methods implemented from ToolContentManager =============== */

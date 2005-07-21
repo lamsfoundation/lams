@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.noticeboard.service;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import java.util.List;
 
 
 /**
@@ -222,4 +223,29 @@ public interface INoticeboardService {
      * @param user The instance of NoticeboardUser to persist
      */
     public void addUser(Long nbSessionId, NoticeboardUser nbUser);
+    
+    /**
+     * <p>Retrieves a list of the session IDs from the given instance of NoticeboardContent</p> 
+     * @param content 
+     * @return list of session ids (Long)
+     */
+    public List getSessionIdsFromContent(NoticeboardContent content);
+    
+    /**
+     * <p>Returns the number of users in this session</p>
+     * @param session
+     * @return The number of users in the session
+     */
+    public int getNumberOfUsersInSession(NoticeboardSession session);
+    
+    /**
+     * <p>Finds the number of learners that have participated in this tool activity
+     * with the given toolContentId. It finds all the toolSessionIds relating to this
+     * toolContentId, and calculates the number of users in each tool session(group).
+     * Returns the total number of users across all sessions </p>
+     * @param toolContentId 
+     * @return the total number of users for this tool activity
+     */
+    public int calculateTotalNumberOfUsers(Long toolContentId);
+    
 }
