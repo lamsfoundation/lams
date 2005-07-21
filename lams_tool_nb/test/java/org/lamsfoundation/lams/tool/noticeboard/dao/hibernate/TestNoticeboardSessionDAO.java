@@ -22,6 +22,9 @@
 package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Iterator;
+
 
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
@@ -205,6 +208,23 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         NoticeboardUser retrievedUser = nbUserDAO.getNbUserByID(newUserId);
         
         assertEquals(retrievedUser.getNbSession().getNbSessionId(), TEST_SESSION_ID);
+    }
+    
+    public void testGetSessionsFromContent()
+    {
+        nbSession = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
+        NoticeboardContent content = nbSession.getNbContent();
+        List list = nbSessionDAO.getSessionsFromContent(content);
+        assertEquals(list.size(), 1);
+        
+        Iterator i = list.iterator();
+        
+        while (i.hasNext())
+        {
+            Long sessionID = (Long)i.next();
+            assertEquals(sessionID, TEST_SESSION_ID);
+        }
+        
     }
    
 }
