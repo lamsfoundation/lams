@@ -29,10 +29,15 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+
 /**
  * @author mtruong
  */
 public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticeboardUserDAO {
+    
+    private static final String COUNT_USERS_IN_SESSION = "select nu.userId from NoticeboardUser nu where nu.nbSession= :nbSession";
+  
     
     /**
 	 * <p>Return the persistent instance of a NoticeboardUser 
@@ -115,6 +120,20 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
     public void removeNbUser(NoticeboardUser nbUser)
     {
         this.getHibernateTemplate().delete(nbUser);
+    }
+    
+    /**
+     * Returns the number of users that are in this particular
+     * session.
+     * 
+     * @param nbSession
+     * @return the number of users that are in this session
+     */
+    public int getNumberOfUsers(NoticeboardSession nbSession)
+    {
+        return (getHibernateTemplate().findByNamedParam(COUNT_USERS_IN_SESSION,
+	            "nbSession",
+				nbSession)).size();
     }
     
     
