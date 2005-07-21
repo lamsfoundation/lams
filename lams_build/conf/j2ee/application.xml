@@ -68,7 +68,7 @@
 		<java>commons-digester.jar</java>
 	</module>
 	<module>
-		<java>commons-fileupload-1.0.jar</java>
+		<java>commons-fileupload.jar</java>
 	</module>
 	<module>
 		<java>commons-lang-2.0.jar</java>
