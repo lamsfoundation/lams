@@ -86,14 +86,11 @@ public class QaContent implements Serializable {
     
     /** persistent field */
     private Set qaSessions;
+    
+    /** persistent field */
+    private Set qaUploadedFiles;
 
-    
-    /** default constructor */
-    public QaContent() 
-    {
-	    logger.debug(logger + " " + this.getClass().getName() +  "in constructor: QaContent()");
-    }
-    
+    public QaContent(){};
     
     /** full constructor */
     public QaContent(Long 		qaContentId,
@@ -114,7 +111,8 @@ public class QaContent implements Serializable {
 	                 String		creationDate,
 	                 Date 		updateDate,
 	                 Set 		qaQueContents,
-	                 Set 		qaSessions)
+	                 Set 		qaSessions,
+					 Set 		qaUploadedFiles)
     {
         this.qaContentId 		 = qaContentId;
         this.title 				 = title;
@@ -135,6 +133,7 @@ public class QaContent implements Serializable {
         this.updateDate 		 = updateDate;
         this.qaQueContents 		 = qaQueContents;
         this.qaSessions 		 = qaSessions;
+        this.qaUploadedFiles	 = qaUploadedFiles;
         logger.debug(logger + " " + this.getClass().getName() +  "in full constructor: QaContent()");
     }
     
@@ -166,6 +165,7 @@ public class QaContent implements Serializable {
 					 qa.isContentLocked(),
                      qa.getCreationDate(),
                      qa.getUpdateDate(),
+					 new TreeSet(),
 					 new TreeSet(),
                      new TreeSet());
     	logger.debug(logger + " " + "QaContent" +  " " + "before doing deepCopyQaQueContent");
@@ -481,5 +481,17 @@ public class QaContent implements Serializable {
 	 */
 	public void setContentLocked(boolean contentLocked) {
 		this.contentLocked = contentLocked;
+	}
+	/**
+	 * @return Returns the qaUploadedFiles.
+	 */
+	public Set getQaUploadedFiles() {
+		return qaUploadedFiles;
+	}
+	/**
+	 * @param qaUploadedFiles The qaUploadedFiles to set.
+	 */
+	public void setQaUploadedFiles(Set qaUploadedFiles) {
+		this.qaUploadedFiles = qaUploadedFiles;
 	}
 }

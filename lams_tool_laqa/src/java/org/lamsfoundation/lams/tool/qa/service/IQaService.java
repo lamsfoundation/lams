@@ -212,5 +212,6 @@ public interface IQaService
     public InputStream downloadFile(Long uuid, Long versionID)throws QaApplicationException;
 	
 	/** repository access related methods  till here */
+    public void persistFile(String uuid, boolean isOnlineFile, String fileName, QaContent qaContent) throws QaApplicationException;
 }
 

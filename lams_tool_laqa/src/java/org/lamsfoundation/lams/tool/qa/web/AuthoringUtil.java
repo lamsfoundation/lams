@@ -360,16 +360,18 @@ public class AuthoringUtil implements QaAppConstants {
     	FormFile theOfflineFile = qaAuthoringForm.getTheOfflineFile();
     	logger.debug("retrieved theOfflineFile: " + theOfflineFile);
     	
+    	String offlineFileName="";
+    	NodeKey nodeKey=null;
     	try
 		{
     		InputStream offlineFileInputStream = theOfflineFile.getInputStream();
     		logger.debug("retrieved offlineFileInputStream: " + offlineFileInputStream);
-    		String offlineFileName=theOfflineFile.getFileName();
+    		offlineFileName=theOfflineFile.getFileName();
     		logger.debug("retrieved offlineFileName: " + offlineFileName);
-        	NodeKey nodeKey=qaService.uploadFileToRepository(offlineFileInputStream, offlineFileName);
+        	nodeKey=qaService.uploadFileToRepository(offlineFileInputStream, offlineFileName);
         	logger.debug("repository returned nodeKey: " + nodeKey);
         	logger.debug("repository returned nodeKey uuid: " + nodeKey.getUuid());
-    	}
+        }
     	catch(FileNotFoundException e)
 		{
     		logger.debug("exception occured, offline file not found : " + e.getMessage());
@@ -385,10 +387,7 @@ public class AuthoringUtil implements QaAppConstants {
     		logger.debug("exception occured in accessing the repository server: " + e.getMessage());
     		//possibly give warning to user in request scope
 		}
-    	
-    	
-    	
-			
+    		
     	/**obtain user object from the session*/
     	User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
     	logger.debug("retrieving toolUser: " + toolUser);
@@ -415,11 +414,17 @@ public class AuthoringUtil implements QaAppConstants {
 	    qa.setMonitoringReportTitle(monitoringReportTitle);
 	    qa.setQaQueContents(new TreeSet());
 	    qa.setQaSessions(new TreeSet());
+	    qa.setQaUploadedFiles(new TreeSet());
 	    logger.debug("qa content :" +  qa);
     	
     	/**create the content in the db*/
         qaService.createQa(qa);
         logger.debug("qa created with content id: " + toolContentId);
+        
+        logger.debug("start persisting offline file information to db...");
+    	qaService.persistFile(nodeKey.getUuid().toString(),false, offlineFileName,qa);
+    	logger.debug("successfully persisted file info");
+        
         return qa;
     }
 

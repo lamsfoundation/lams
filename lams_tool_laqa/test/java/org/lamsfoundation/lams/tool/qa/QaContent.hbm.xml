@@ -225,6 +225,26 @@
               />
 
     </set>
+    
+   	<set
+            name="qaUploadedFiles"
+            lazy="false"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+              <key
+                  column="qa_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.qa.QaUploadedFile"
+              />
+
+    </set> 
+    
+    
 
 </class>
 </hibernate-mapping>

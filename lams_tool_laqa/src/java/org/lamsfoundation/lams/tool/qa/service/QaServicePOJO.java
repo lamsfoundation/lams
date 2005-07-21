@@ -54,11 +54,13 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
+import org.lamsfoundation.lams.tool.qa.dao.IQaUploadedFileDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -104,6 +106,7 @@ public class QaServicePOJO implements
     private IQaSessionDAO 		qaSessionDAO;
     private IQaQueUsrDAO 		qaQueUsrDAO;
     private IQaUsrRespDAO 		qaUsrRespDAO;
+    private IQaUploadedFileDAO  qaUploadedFileDAO;
     
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
@@ -1424,5 +1427,91 @@ public class QaServicePOJO implements
 			throw new QaApplicationException("ItemNotFoundException occured while trying to download file " + e.getMessage());			
 		}
 	}
+	
+	public void persistFile(String uuid, boolean isOnlineFile, String fileName, QaContent qaContent) throws QaApplicationException {
+		logger.debug("attempt persisting file to the db: " + uuid + " " + isOnlineFile + " " + fileName + " " + qaContent);
+		QaUploadedFile qaUploadedFile= new QaUploadedFile(uuid, isOnlineFile, fileName, qaContent);
+		logger.debug("created qaUploadedFile: " + qaUploadedFile);
+		qaUploadedFileDAO.saveUploadFile(qaUploadedFile);
+		logger.debug("persisted qaUploadedFile: " + qaUploadedFile);
+	}
 
+	/**
+	 * @return Returns the logger.
+	 */
+	public static Logger getLogger() {
+		return logger;
+	}
+	/**
+	 * @param logger The logger to set.
+	 */
+	public static void setLogger(Logger logger) {
+		QaServicePOJO.logger = logger;
+	}
+	/**
+	 * @return Returns the cred.
+	 */
+	public ICredentials getCred() {
+		return cred;
+	}
+	/**
+	 * @param cred The cred to set.
+	 */
+	public void setCred(ICredentials cred) {
+		this.cred = cred;
+	}
+	/**
+	 * @return Returns the qaUploadedFileDAO.
+	 */
+	public IQaUploadedFileDAO getQaUploadedFileDAO() {
+		return qaUploadedFileDAO;
+	}
+	/**
+	 * @param qaUploadedFileDAO The qaUploadedFileDAO to set.
+	 */
+	public void setQaUploadedFileDAO(IQaUploadedFileDAO qaUploadedFileDAO) {
+		this.qaUploadedFileDAO = qaUploadedFileDAO;
+	}
+	/**
+	 * @return Returns the repositoryId.
+	 */
+	public char[] getRepositoryId() {
+		return repositoryId;
+	}
+	/**
+	 * @return Returns the repositoryUser.
+	 */
+	public String getRepositoryUser() {
+		return repositoryUser;
+	}
+	/**
+	 * @return Returns the repositoryWorkspace.
+	 */
+	public String getRepositoryWorkspace() {
+		return repositoryWorkspace;
+	}
+	/**
+	 * @return Returns the qaQueContentDAO.
+	 */
+	public IQaQueContentDAO getQaQueContentDAO() {
+		return qaQueContentDAO;
+	}
+	/**
+	 * @return Returns the qaQueUsrDAO.
+	 */
+	public IQaQueUsrDAO getQaQueUsrDAO() {
+		return qaQueUsrDAO;
+	}
+	/**
+	 * @return Returns the toolService.
+	 */
+	public ILamsToolService getToolService() {
+		return toolService;
+	}
+	/**
+	 * @return Returns the userManagementService.
+	 */
+	public IUserManagementService getUserManagementService() {
+		return userManagementService;
+	}
 }

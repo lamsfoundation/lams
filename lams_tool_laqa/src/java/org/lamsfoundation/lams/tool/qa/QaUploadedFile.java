@@ -51,7 +51,7 @@ public class QaUploadedFile implements Serializable
     private String uuid;
 
     /** persistent field */
-    private boolean isOnlineFile;
+    private boolean fileOnline;
     
     /** persistent field */
     private String fileName;
@@ -61,15 +61,31 @@ public class QaUploadedFile implements Serializable
     /** persistent field */
     private QaContent qaContent;
     
-    
+    public QaUploadedFile(){};
+
     /** full constructor */
+    public QaUploadedFile(Long submissionId,
+    					String uuid, 
+    					boolean fileOnline, 
+    					String fileName,
+						QaContent qaContent)  
+    {
+    	this.submissionId=submissionId;
+        this.uuid = uuid;
+        this.fileOnline = fileOnline;
+        this.fileName = fileName;
+        this.qaContent=qaContent;
+    }
+
+    
+
     public QaUploadedFile(String uuid, 
-    					boolean isOnlineFile, 
+    					boolean fileOnline, 
     					String fileName,
 						QaContent qaContent)  
     {
         this.uuid = uuid;
-        this.isOnlineFile = isOnlineFile;
+        this.fileOnline = fileOnline;
         this.fileName = fileName;
         this.qaContent=qaContent;
     }
@@ -109,18 +125,7 @@ public class QaUploadedFile implements Serializable
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	/**
-	 * @return Returns the isOnlineFile.
-	 */
-	public boolean isOnlineFile() {
-		return isOnlineFile;
-	}
-	/**
-	 * @param isOnlineFile The isOnlineFile to set.
-	 */
-	public void setOnlineFile(boolean isOnlineFile) {
-		this.isOnlineFile = isOnlineFile;
-	}
+	
 	/**
 	 * @return Returns the qaContent.
 	 */
@@ -168,5 +173,17 @@ public class QaUploadedFile implements Serializable
 	 */
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+	/**
+	 * @return Returns the fileOnline.
+	 */
+	public boolean isFileOnline() {
+		return fileOnline;
+	}
+	/**
+	 * @param fileOnline The fileOnline to set.
+	 */
+	public void setFileOnline(boolean fileOnline) {
+		this.fileOnline = fileOnline;
 	}
 }
