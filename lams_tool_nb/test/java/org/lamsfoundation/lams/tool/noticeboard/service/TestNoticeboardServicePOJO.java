@@ -26,6 +26,9 @@
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Iterator;
+
 
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
@@ -329,7 +332,89 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
         assertEquals(user.getNbSession().getNbSessionId(), TEST_SESSION_ID);
 	}
 	
+	public void testGetSessionIdsFromContent()
+	{
+	    NoticeboardContent content = nbService.retrieveNoticeboard(TEST_NB_ID);
+	    List list = nbService.getSessionIdsFromContent(content);
+	    
+	    assertEquals(list.size(), 1);
+	    Iterator i = list.iterator();
+        
+        while (i.hasNext())
+        {
+            Long sessionID = (Long)i.next();
+            assertEquals(sessionID, TEST_SESSION_ID);
+        }
+	}
 	
+	public void testGetNumberOfUsersInSession()
+	{
+	    NoticeboardSession session = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);
+	    int numberOfUsers = nbService.getNumberOfUsersInSession(session);
+	    assertEquals(numberOfUsers, 1);
+	    
+	    //now add more users in the session
+	    Long userId1 = new Long(34);
+	    Long userId2 = new Long(35);
+	    NoticeboardUser user1 = new NoticeboardUser(userId1, session);
+	    NoticeboardUser user2 = new NoticeboardUser(userId2, session);
+	    nbService.saveNoticeboardUser(user1);
+	    nbService.saveNoticeboardUser(user2);
+	    
+	    //now retrieve and there should be 3 users for this session
+	    nbSession = nbService.retrieveNoticeboardSession(TEST_SESSION_ID);
+	    int newNumberOfUsers = nbService.getNumberOfUsersInSession(nbSession);
+	    assertEquals(newNumberOfUsers, 3);
+	    
+	  //  int totalNumberOfLearners = nbService.calculateTotalNumberOfUsers(TEST_NB_ID);
+	    //assertEquals(totalNumberOfLearners, 3);
+	}
+	
+	public void testCalculateTotalNumberOfUsers()
+	{
+	    /* add more sessions relating to the test tool content id and add more users in each session
+	     * then calculate the total number of users for this tool activity
+	     */
+	    Long sessionId1, sessionId2, sessionId3;
+	    Long userId1, userId2, userId3, userId4, userId5, userId6;
+	    NoticeboardSession session1, session2, session3;
+	    NoticeboardUser user1Sess1, user2Sess1, user3Sess1, user4Sess2, user5Sess2, user6Sess3;
+	    nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
+	    //create more sessions
+	    sessionId1 = new Long(456); sessionId2 = new Long(457); sessionId3 = new Long(458);
+	    userId1 = new Long(567); userId2 = new Long(568); userId3 = new Long(569);
+	    userId4 = new Long(570); userId5 = new Long(571); userId6 = new Long(572);
+	    
+	    session1 = new NoticeboardSession(sessionId1, nbContent);
+	    session2 = new NoticeboardSession(sessionId2, nbContent);
+	    session3 = new NoticeboardSession(sessionId3, nbContent);
+	    
+	    user1Sess1 = new NoticeboardUser(userId1, session1);
+	    user2Sess1 = new NoticeboardUser(userId2, session1);
+	    user3Sess1 = new NoticeboardUser(userId3, session1);
+	    user4Sess2 = new NoticeboardUser(userId4, session2);
+	    user5Sess2 = new NoticeboardUser(userId5, session2);
+	    user6Sess3 = new NoticeboardUser(userId6, session3);
+	    
+	    //persist new test data to database
+	    nbService.saveNoticeboardSession(session1);
+	    nbService.saveNoticeboardSession(session2);
+	    nbService.saveNoticeboardSession(session3);
+	    
+	    nbService.saveNoticeboardUser(user1Sess1);
+	    nbService.saveNoticeboardUser(user2Sess1);
+	    nbService.saveNoticeboardUser(user3Sess1);
+	    nbService.saveNoticeboardUser(user4Sess2);
+	    nbService.saveNoticeboardUser(user5Sess2);
+	    nbService.saveNoticeboardUser(user6Sess3);
+	    
+	    //now test the function
+	    int totalUsers = nbService.calculateTotalNumberOfUsers(TEST_NB_ID);
+	    assertEquals("testing the total number of users", totalUsers, 7);
+	    
+	    
+	    
+	}
 }
 	
 	
