@@ -70,6 +70,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	protected final String TEST_OFFLINE_INSTRUCTIONS = "Put your offline instructions here";
 	protected final boolean TEST_DEFINE_LATER = false;
 	protected final boolean TEST_FORCE_OFFLINE = false;
+	protected final boolean TEST_CONTENT_IN_USE = false;
 	protected final Date TEST_DATE_CREATED = new Date(System.currentTimeMillis());
 	protected final Date TEST_DATE_UPDATED = new Date();
 	protected final Long TEST_CREATOR_USER_ID = new Long(1300);
@@ -94,9 +95,10 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	protected final String DEFAULT_OFFLINE_INSTRUCTIONS = "Enter the offline instructions here";
 	protected final boolean DEFAULT_DEFINE_LATER = false;
 	protected final boolean DEFAULT_FORCE_OFFLINE = false;
+	protected final boolean DEFAULT_CONTENT_IN_USE = false;
 	protected final Long DEFAULT_CREATOR_USER_ID = NoticeboardConstants.DEFAULT_CREATOR_ID;
 	protected final Long DEFAULT_SESSION_ID = NoticeboardConstants.DEFAULT_SESSION_ID;
-	protected final String DEFAULT_SESSION_STATUS = NoticeboardSession.NOT_ATTEMPTED;
+	protected final String DEFAULT_SESSION_STATUS = NoticeboardSession.INCOMPLETE;
 	protected final Long DEFAULT_USER_ID = new Long(2600);
 	protected final String DEFAULT_USERNAME = "test";
 	protected final String DEFAULT_FULLNAME = "test";
@@ -145,6 +147,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 												TEST_ONLINE_INSTRUCTIONS,
 												TEST_OFFLINE_INSTRUCTIONS,
 												TEST_DEFINE_LATER,
+												TEST_CONTENT_IN_USE,
 												TEST_FORCE_OFFLINE,
 												TEST_CREATOR_USER_ID,
 												TEST_DATE_CREATED,
@@ -215,6 +218,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
                 DEFAULT_OFFLINE_INSTRUCTIONS,
                 DEFAULT_DEFINE_LATER,
                 DEFAULT_FORCE_OFFLINE,
+                DEFAULT_CONTENT_IN_USE,
 				DEFAULT_CREATOR_USER_ID,
 				TEST_DATE_CREATED,
 				TEST_DATE_UPDATED);
