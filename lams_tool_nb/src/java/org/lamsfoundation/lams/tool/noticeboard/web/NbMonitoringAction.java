@@ -27,6 +27,8 @@ package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -82,7 +84,8 @@ public class NbMonitoringAction extends LookupDispatchAction {
      */
     public ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         NbMonitoringForm monitorForm = (NbMonitoringForm)form;                
-        Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
+       // Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
+        Long toolContentId = getToolContentId(request);
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 		NbWebUtil.copyValuesIntoSession(request, content);
@@ -120,8 +123,8 @@ public class NbMonitoringAction extends LookupDispatchAction {
      */
     public ActionForward instructions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
      
-        Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
-  
+        //Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
+        Long toolContentId = getToolContentId(request);
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 		NbWebUtil.copyValuesIntoSession(request, content);
@@ -138,7 +141,8 @@ public class NbMonitoringAction extends LookupDispatchAction {
      * @return
      */
     public ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
+       // Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
+        Long toolContentId = getToolContentId(request);
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
    		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
    		NbWebUtil.copyValuesIntoSession(request, content);
@@ -155,7 +159,37 @@ public class NbMonitoringAction extends LookupDispatchAction {
      * @return
      */
     public ActionForward statistics(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        
+        INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+        Map map = new HashMap();
+        Long toolContentId = getToolContentId(request);
+        NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
+        
+        //Get the total number of learners that have participated in this tool activity
+        int totalNumberOfUsers = nbService.calculateTotalNumberOfUsers(toolContentId);
+        request.setAttribute(NoticeboardConstants.TOTAL_LEARNERS, new Integer(totalNumberOfUsers));    
+        
+        //Now get the number of learners for each individual group (if any)
+        List listOfSessionIds = nbService.getSessionIdsFromContent(content);
+        Iterator i = listOfSessionIds.iterator();
+        int groupNum = 1;
+        while (i.hasNext())
+        {
+           
+            Long sessionId = (Long)i.next();
+            int numUsersInSession = nbService.getNumberOfUsersInSession(nbService.retrieveNoticeboardSession(sessionId));
+            map.put(new Integer(groupNum), new Integer(numUsersInSession));
+            groupNum++;
+        }
+        request.setAttribute(NoticeboardConstants.GROUP_STATS_MAP, map);
+        
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
+    }
+    
+    private Long getToolContentId(HttpServletRequest request)
+    {
+        Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
+        return toolContentId;
     }
     
    
