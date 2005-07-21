@@ -20,6 +20,9 @@
  */
 package org.lamsfoundation.lams.tool.noticeboard.dao;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 
@@ -50,4 +53,6 @@ public interface INoticeboardSessionDAO {
     public void removeNbUsers(NoticeboardSession nbSession); /** TODO: write testcase and def for removeNbUsers */
 
     public void addNbUsers(Long nbSessionId, NoticeboardUser user);
+    
+    public List getSessionsFromContent(NoticeboardContent nbContent);
 }
