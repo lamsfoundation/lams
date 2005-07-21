@@ -23,19 +23,22 @@ package org.lamsfoundation.lams.web.action;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.actions.DispatchAction;
+import org.apache.struts.actions.LookupDispatchAction;
 import org.lamsfoundation.lams.web.util.TokenProcessor;
 
 /**
- * @author daveg
- *
+ * Extension to the Struts LookupDispatchAction. Differences:
+ * <OL>
+ * <LI>Uses the LAMS TokenProcessor rather than the Struts TokenProcessor
+ * Reason for this unknown as the coder who implemented it failed to say why!
+ * </OL>
+ * 
+ * @author Fiona Malikoff
  */
-public abstract class LamsDispatchAction extends DispatchAction {
+public abstract class LamsLookupDispatchAction extends LookupDispatchAction {
     
-    protected static String className = "Action";
-	
-    protected static TokenProcessor token = TokenProcessor.getInstance();
-    protected static Logger log = Logger.getLogger(LamsDispatchAction.class);    
+    private static TokenProcessor token = TokenProcessor.getInstance();
+    protected static Logger log = Logger.getLogger(LamsLookupDispatchAction.class);    
 
 	protected void saveToken(javax.servlet.http.HttpServletRequest request) {
         token.saveToken(request);
@@ -61,4 +64,5 @@ public abstract class LamsDispatchAction extends DispatchAction {
     	return token.getForward(request, true);
     }*/
     
+ 
 }
