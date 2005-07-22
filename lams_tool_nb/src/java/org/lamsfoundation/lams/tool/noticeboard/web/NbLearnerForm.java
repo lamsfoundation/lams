@@ -48,11 +48,11 @@ public class NbLearnerForm extends ActionForm{
     
     private String content;
     
-    private Long userId;
+    private String userId;
     
-    private Long toolSessionId;
+    private String toolSessionId;
     
-    private Long toolContentId;
+    private String toolContentId;
     
     private String method;
     
@@ -63,37 +63,37 @@ public class NbLearnerForm extends ActionForm{
     /**
      * @return Returns the toolContentID.
      */
-    public Long getToolContentId() {
+    public String getToolContentId() {
         return toolContentId;
     }
     /**
      * @param toolContentID The toolContentID to set.
      */
-    public void setToolContentId(Long toolContentID) {
+    public void setToolContentId(String toolContentID) {
         this.toolContentId = toolContentID;
     }
     /**
      * @return Returns the toolSessionID.
      */
-    public Long getToolSessionId() {
+    public String getToolSessionId() {
         return toolSessionId;
     }
     /**
      * @param toolSessionID The toolSessionID to set.
      */
-    public void setToolSessionId(Long toolSessionID) {
+    public void setToolSessionId(String toolSessionID) {
         this.toolSessionId = toolSessionID;
     }
     /**
      * @return Returns the userID.
      */
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
     /**
      * @param userID The userID to set.
      */
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
     /**
@@ -138,6 +138,11 @@ public class NbLearnerForm extends ActionForm{
 	{
 		this.content = null;
 		this.title = null;
+		this.toolContentId = null;
+		this.toolSessionId = null;
+		this.userId = null;
+		this.method = null;
+		this.mode = null;
 			
 	}
     
