@@ -28,7 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.actions.LookupDispatchAction;
+//import org.apache.struts.actions.LookupDispatchAction;
+import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -50,6 +51,11 @@ import org.lamsfoundation.lams.util.WebUtil;
  * 				  type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
  *                parameter="method"
  * 
+ * @struts.action-exception key="error.exception.NbApplication" scope="request"
+ *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+ *                          path=".error"
+ *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+ * 
  * @struts:action-forward name="basic" path=".nb_basic"
  * @struts:action-forward name="advanced" path=".nb_advanced"
  * @struts:action-forward name="instructions" path=".nb_instructions"
@@ -57,7 +63,7 @@ import org.lamsfoundation.lams.util.WebUtil;
  * ----------------XDoclet Tags--------------------
  */
 
-public class NbAuthoringAction extends LookupDispatchAction {
+public class NbAuthoringAction extends LamsLookupDispatchAction {
 	
     static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());
 	
@@ -127,6 +133,13 @@ public class NbAuthoringAction extends LookupDispatchAction {
 		copyInstructionFormProperty(request, nbForm);
 		
 		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+		String idAsString = nbForm.getToolContentId();
+		if (idAsString == null)
+		{
+		    String error = "Unable to continue. Tool content id missing";
+		    logger.error(error);
+			throw new NbApplicationException(error);
+		}
 		Long content_id = NbWebUtil.convertToLong(nbForm.getToolContentId());
 		
 		//throws exception if the content id does not exist
@@ -153,7 +166,7 @@ public class NbAuthoringAction extends LookupDispatchAction {
 	{
 	    if (contentId == null)
 		{
-			String error = "Tool content id missing. Unable to continue.";
+			String error = "Unable to continue. Tool content id missing.";
 			
 			throw new NbApplicationException(error);
 		}
