@@ -76,7 +76,7 @@
 			// enf if
 			index++;
 		%>
-		<td class="<%=styleClass%>"><a href="<%=href%>" /><%=tab.getValue()%></a></td>
+		<td class="<%=styleClass%>"><a href='<html:rewrite page="<%=href%>"/>'/><%=tab.getValue()%></a></td>
 		<td width="1" ></td>
 		</logic:iterate>
 		</tr>

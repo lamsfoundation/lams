@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/css" %>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
 body {
 	behavior:url("<html:rewrite page="/includes/csshover.htc" />");
 	font-family: Verdana, Helvetica;

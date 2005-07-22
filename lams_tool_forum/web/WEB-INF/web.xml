@@ -1,93 +1,112 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE web-app
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-    "http://java.sun.com/dtd/web-app_2_3.dtd">
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
-<web-app>
-
+<web-app >
     <display-name>forum</display-name>
     <description>
 		Forum tool
     </description>
 
-  <!-- Action Servlet Configuration -->
-  <servlet>
-    <servlet-name>action</servlet-name>
-    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-    <init-param>
-      <param-name>config</param-name>
-      <param-value>/WEB-INF/struts-config.xml</param-value>
-    </init-param>
-    <init-param>
-      <param-name>debug</param-name>
-      <param-value>1</param-value>
-    </init-param>
-    <init-param>
-      <param-name>detail</param-name>
-      <param-value>1</param-value>
-    </init-param>
-    <init-param>
-      <param-name>validate</param-name>
-      <param-value>true</param-value>
-    </init-param>
-    <load-on-startup>2</load-on-startup>
-  </servlet>
-
-
-  <servlet-mapping>
-    <servlet-name>action</servlet-name>
-    <url-pattern>*.do</url-pattern>
-  </servlet-mapping>
-
-	<session-config>
-		<session-timeout>20</session-timeout>    <!-- 20 minutes -->
-	</session-config>
-
     <!--
-    <servlet>
-            <servlet-name>Connector</servlet-name>
-            <servlet-class>com.fredck.FCKeditor.connector.ConnectorServlet</servlet-class>
-            <init-param>
-                  <param-name>baseDir</param-name>
-                  <param-value>/UserFiles/</param-value>
-            </init-param>
-            <init-param>
-                  <param-name>debug</param-name>
-                  <param-value>false</param-value>
-            </init-param>
-            <load-on-startup>1</load-on-startup>
-    </servlet>
-
-
-
-    <servlet-mapping>
-          <servlet-name>Connector</servlet-name>
-          <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
-    </servlet-mapping>
+    To use non XDoclet filters, create a filters.xml file that
+    contains the additional filters (eg Sitemesh) and place it in your
+    project's merge dir.  Don't include filter-mappings in this file,
+    include them in a file called filter-mappings.xml and put that in
+    the same directory.
     -->
 
-  <!-- The Usual Welcome File List -->
-  <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>index.html</welcome-file>
-  </welcome-file-list>
+    <!--
+    To use non XDoclet filter-mappings, create a filter-mappings.xml file that
+    contains the additional filter-mappings and place it in your
+    project's merge dir.
+    -->
 
-  <!-- Struts Tag Library Descriptors -->
+    <!--
+    To use non XDoclet listeners, create a listeners.xml file that
+    contains the additional listeners and place it in your
+    project's merge dir.
+    -->
+
+     <!--
+	  - Loads the root application context of this web app at startup,
+	  - by default from "/WEB-INF/applicationContext.xml".
+		- Note that it is preferable to use ContextLoaderListener in a servlet container
+		- that follows the Servlet 2.4 initialization order (most Servlet 2.3 containers do).
+		-
+	  - Use WebApplicationContextUtils.getWebApplicationContext(servletContext)
+	  - to access it anywhere in the web application, outside of the framework.
+	  -
+	  - The root context is the parent of all servlet-specific contexts.
+	  - This means that its beans are automatically available in these child contexts,
+	  - both for getBean(name) calls and (external) bean references.
+	-->
+	<servlet>
+		<servlet-name>context</servlet-name>
+		<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet>
+	    <servlet-name>action</servlet-name>
+	    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+	    <init-param>
+	      <param-name>config</param-name>
+	      <param-value>/WEB-INF/struts-config.xml</param-value>
+	    </init-param>
+	    <init-param>
+	      <param-name>debug</param-name>
+	      <param-value>999</param-value>
+	    </init-param>
+	    <init-param>
+	      <param-name>detail</param-name>
+	      <param-value>2</param-value>
+	    </init-param>
+	    <init-param>
+	      <param-name>validate</param-name>
+	      <param-value>true</param-value>
+	    </init-param>
+	    <load-on-startup>2</load-on-startup>
+    </servlet>
+
+  	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+	    <url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+   <session-config>
+      <session-timeout>120</session-timeout>
+   </session-config>
+
+   <!--
+   To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
+   Organize mime-mappings.xml following this DTD slice:
+
+   <!ELEMENT mime-mapping (extension, mime-type)>
+   -->
+
+   <!--
+   To specify error pages, create a file named error-pages.xml, put it in your project's mergedir.
+   Organize error-pages.xml following this DTD slice:
+
+   <!ELEMENT error-page ((error-code | exception-type), location)>
+   -->
+
+        <!-- Struts Tag Library Descriptors -->
 
   <taglib>
-    <taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
-    <taglib-location>/WEB-INF/struts-bean.tld</taglib-location>
+    <taglib-uri>/WEB-INF/struts/struts-bean.tld</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-bean.tld</taglib-location>
   </taglib>
 
   <taglib>
-    <taglib-uri>/WEB-INF/struts-html.tld</taglib-uri>
-    <taglib-location>/WEB-INF/struts-html.tld</taglib-location>
+    <taglib-uri>/WEB-INF/struts/struts-html.tld</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-html.tld</taglib-location>
   </taglib>
 
   <taglib>
-    <taglib-uri>/WEB-INF/struts-logic.tld</taglib-uri>
-    <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
+    <taglib-uri>/WEB-INF/struts/struts-logic.tld</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-logic.tld</taglib-location>
   </taglib>
 
     <taglib>
@@ -101,7 +120,24 @@
     <taglib-location>/WEB-INF/taglibs-datetime.tld</taglib-location>
   </taglib>
 
+   <!--
+   To set up security settings for your web app, create a file named web-security.xml, put it in your project's mergedir.
+   Organize web-security.xml following this DTD slice:
 
+   <!ELEMENT security-constraint (display-name?, web-resource-collection+, auth-constraint?, user-data-constraint?)>
+   <!ELEMENT web-resource-collection (web-resource-name, description?, url-pattern*, http-method*)>
+   <!ELEMENT web-resource-name (#PCDATA)>
+   <!ELEMENT url-pattern (#PCDATA)>
+   <!ELEMENT http-method (#PCDATA)>
+   <!ELEMENT user-data-constraint (description?, transport-guarantee)>
+   <!ELEMENT transport-guarantee (#PCDATA)>
+
+   <!ELEMENT login-config (auth-method?, realm-name?, form-login-config?)>
+   <!ELEMENT auth-method (#PCDATA)>
+   <!ELEMENT realm-name (#PCDATA)>
+   <!ELEMENT form-login-config (form-login-page, form-error-page)>
+   <!ELEMENT form-login-page (#PCDATA)>
+   <!ELEMENT form-error-page (#PCDATA)>
+   -->
 
 </web-app>
-

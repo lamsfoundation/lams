@@ -27,7 +27,7 @@
        	<put name="pageTitleKey" value="title.forum.add"/>
         <put name="selectedIndex" value="0" />
         <put name="parameterName" value="selected" />
-        <put name="actionName" value="/forum/authoring/forum/create.do" />
+        <put name="actionName" value="/authoring/forum/create.do" />
         <put name="header" value="/includes/header.jsp"/>
         <put name="footer" value="/includes/footer.jsp"/>
         <putList name="tabList" >
@@ -42,7 +42,7 @@
        	<put name="pageTitleKey" value="title.forum.edit"/>
         <put name="selectedIndex" value="0" />
         <put name="parameterName" value="selected" />
-        <put name="actionName" value="/forum/authoring/forum/edit.do" />
+        <put name="actionName" value="/authoring/forum/edit.do" />
         <put name="header" value="/includes/header.jsp"/>
         <put name="footer" value="/includes/footer.jsp"/>
         <putList name="tabList" >
