@@ -68,6 +68,7 @@
 package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -101,17 +102,22 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	 * A Map  data structure is used to present the UI.
 	 * It is fetched by subsequent Action classes to manipulate its content and gets parsed in the presentation layer for display.
 	 */
-	protected Map mapQuestionContent= new TreeMap(new QaComparator());
-	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, QaApplicationException {
+	
+		Map mapQuestionContent= new TreeMap(new QaComparator());
+		LinkedList listUploadedOfflineFiles= new LinkedList();
+		LinkedList listUploadedOnlineFiles= new LinkedList();
 		
 		QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 		qaAuthoringForm.resetRadioBoxes();
 		
 		request.getSession().setAttribute(IS_DEFINE_LATER,"false");
 		request.getSession().setAttribute(DISABLE_TOOL,"");
-
+		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
+		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
+		
+		
 		/**
 		 * retrive the service
 		 */

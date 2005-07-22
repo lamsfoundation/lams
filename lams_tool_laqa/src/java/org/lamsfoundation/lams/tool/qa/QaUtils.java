@@ -6,15 +6,22 @@
  */
 package org.lamsfoundation.lams.tool.qa;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -398,5 +405,99 @@ public abstract class QaUtils implements QaAppConstants {
 	    qaService.configureContentRepository();
 	    logger.debug("configureContentRepository ran successfully");
 	}
-
+	
+	public static void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm, boolean isOfflineFile)
+	{
+		logger.debug("attempt addFileToContentRepository");
+    	IQaService qaService =QaUtils.getToolService(request);
+    	
+    	LinkedList listUploadedOfflineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILES);
+    	logger.debug("listUploadedOfflineFiles: " + listUploadedOfflineFiles);
+    	LinkedList listUploadedOnlineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES);
+    	logger.debug("listUploadedOnlineFiles: " + listUploadedOnlineFiles);
+    	
+    	
+    	if (isOfflineFile)
+    	{
+    		/** read uploaded file informtion  - offline file*/
+    		logger.debug("retrieve theOfflineFile.");
+    		FormFile theOfflineFile = qaAuthoringForm.getTheOfflineFile();
+    		logger.debug("retrieved theOfflineFile: " + theOfflineFile);
+    		
+    		String offlineFileName="";
+    		NodeKey nodeKey=null;
+    		String offlineFileUuid="";
+    		try
+    		{
+    			InputStream offlineFileInputStream = theOfflineFile.getInputStream();
+    			logger.debug("retrieved offlineFileInputStream: " + offlineFileInputStream);
+    			offlineFileName=theOfflineFile.getFileName();
+    			logger.debug("retrieved offlineFileName: " + offlineFileName);
+    	    	nodeKey=qaService.uploadFileToRepository(offlineFileInputStream, offlineFileName);
+    	    	logger.debug("repository returned nodeKey: " + nodeKey);
+    	    	logger.debug("repository returned offlineFileUuid nodeKey uuid: " + nodeKey.getUuid());
+    	    	offlineFileUuid=nodeKey.getUuid().toString();
+    	    	logger.debug("offline file added to contentRepository");
+    	    	listUploadedOfflineFiles.add(offlineFileUuid + "~" + offlineFileName);
+    	    	logger.debug("listUploadedOfflineFiles updated: " + listUploadedOfflineFiles);
+    	    	request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
+    	    }
+    		catch(FileNotFoundException e)
+    		{
+    			logger.debug("exception occured, offline file not found : " + e.getMessage());
+    			//possibly give warning to user in request scope
+    		}
+    		catch(IOException e)
+    		{
+    			logger.debug("exception occured in offline file transfer: " + e.getMessage());
+    			//possibly give warning to user in request scope
+    		}
+    		catch(QaApplicationException e)
+    		{
+    			logger.debug("exception occured in accessing the repository server: " + e.getMessage());
+    			//possibly give warning to user in request scope
+    		}
+    	}
+    	else
+    	{
+    		/** read uploaded file information  - online file*/
+    		logger.debug("retrieve theOnlineFile");
+    		FormFile theOnlineFile = qaAuthoringForm.getTheOnlineFile();
+    		logger.debug("retrieved theOnlineFile: " + theOnlineFile);
+    		
+    		String onlineFileName="";
+    		NodeKey nodeKey=null;
+    		String onlineFileUuid="";
+    		try
+    		{
+    			InputStream onlineFileInputStream = theOnlineFile.getInputStream();
+    			logger.debug("retrieved onlineFileInputStream: " + onlineFileInputStream);
+    			onlineFileName=theOnlineFile.getFileName();
+    			logger.debug("retrieved onlineFileName: " + onlineFileName);
+    	    	nodeKey=qaService.uploadFileToRepository(onlineFileInputStream, onlineFileName);
+    	    	logger.debug("repository returned nodeKey: " + nodeKey);
+    	    	logger.debug("repository returned onlineFileUuid nodeKey uuid: " + nodeKey.getUuid());
+    	    	onlineFileUuid=nodeKey.getUuid().toString();
+    	    	logger.debug("online file added to contentRepository");
+    	    	listUploadedOnlineFiles.add(onlineFileUuid + "~" + onlineFileName);
+    	    	logger.debug("listUploadedOnlineFiles updated: " + listUploadedOnlineFiles);
+    	    	request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
+    	    }
+    		catch(FileNotFoundException e)
+    		{
+    			logger.debug("exception occured, online file not found : " + e.getMessage());
+    			//possibly give warning to user in request scope
+    		}
+    		catch(IOException e)
+    		{
+    			logger.debug("exception occured in online file transfer: " + e.getMessage());
+    			//possibly give warning to user in request scope
+    		}
+    		catch(QaApplicationException e)
+    		{
+    			logger.debug("exception occured in accessing the repository server: " + e.getMessage());
+    			//possibly give warning to user in request scope
+    		}	
+    	}
+	}
 }

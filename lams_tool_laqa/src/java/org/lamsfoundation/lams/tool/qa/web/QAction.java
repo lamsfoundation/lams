@@ -227,6 +227,7 @@ public class QAction extends DispatchAction implements QaAppConstants
     	
     	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
     	
+    	
     	/**
     	 * the status of define later is determined from the property inspector and 
     	 * by now, we know whether it is on or off
@@ -276,13 +277,19 @@ public class QAction extends DispatchAction implements QaAppConstants
         {
         	userAction=SUBMIT_ALL_CONTENT;
         }
+        else if (qaAuthoringForm.getSubmitOfflineFile() != null)
+        {
+        	userAction=SUBMIT_OFFLINE_FILE;
+        }
+        else if (qaAuthoringForm.getSubmitOnlineFile() != null)
+		{
+        	userAction=SUBMIT_ONLINE_FILE;
+		}
         logger.debug("user action is: " + userAction);
 
         QaUtils.persistRichText(request);
-        //logger.debug("before calling persistUploadFileInformation");
-        //QaUtils.persistUploadFileInformation(request);
         
-    	/** add a new question to Map */
+        /** add a new question to Map */
         if (userAction.equalsIgnoreCase(ADD_NEW_QUESTION)) 
 		{
         	request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
@@ -300,6 +307,20 @@ public class QAction extends DispatchAction implements QaAppConstants
             qaAuthoringForm.resetUserAction();
         	return (mapping.findForward(LOAD_STARTER));
 		}
+        else if (userAction.equalsIgnoreCase(SUBMIT_OFFLINE_FILE))
+        {
+            logger.debug("will submit offline file: " + userAction);
+            QaUtils.addFileToContentRepository(request, qaAuthoringForm, true);
+            logger.debug("offline file added to repository successfully.");
+            qaAuthoringForm.resetUserAction();
+        }
+        else if (userAction.equalsIgnoreCase(SUBMIT_ONLINE_FILE))
+        {
+        	logger.debug("will submit online file: " + userAction);
+        	QaUtils.addFileToContentRepository(request, qaAuthoringForm, false);
+        	logger.debug("online file added to repository successfully.");
+        	qaAuthoringForm.resetUserAction();
+        }
         else if (userAction.equalsIgnoreCase(SUBMIT_TAB_DONE))
         {
         	logger.debug("user is done with this tab.");
