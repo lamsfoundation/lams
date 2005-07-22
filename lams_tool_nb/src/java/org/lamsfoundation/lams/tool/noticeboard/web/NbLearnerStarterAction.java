@@ -39,8 +39,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.action.Action;
+//import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -55,7 +56,7 @@ import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerForm;
 
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
-import org.apache.struts.util.MessageResources;
+
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionMessage;
 /**
@@ -65,12 +66,16 @@ import org.apache.struts.action.ActionMessage;
  * 
  * @struts:action path="/starter/learner" name="NbLearnerForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
  *                input=".learnerStarter" validate="false" parameter="mode"
+ * @struts.action-exception key="error.exception.NbApplication" scope="request"
+ *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+ *                          path=".error"
+ *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayLearnerContent" path=".learnerContent"
  * @struts:action-forward name="displayMessage" path=".message"
  * ----------------XDoclet Tags--------------------
  */
 
-public class NbLearnerStarterAction extends DispatchAction {
+public class NbLearnerStarterAction extends LamsDispatchAction {
     
     static Logger logger = Logger.getLogger(NbLearnerStarterAction.class.getName());
        
@@ -88,20 +93,28 @@ public class NbLearnerStarterAction extends DispatchAction {
         ActionMessages message = new ActionMessages();
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         
-        Long userId = learnerForm.getUserId();
-        Long toolSessionId = learnerForm.getToolSessionId();
-        Long toolContentId = learnerForm.getToolContentId();
+        Long userId = NbWebUtil.convertToLong(learnerForm.getUserId());
+        Long toolSessionId = NbWebUtil.convertToLong(learnerForm.getToolSessionId());
+        Long toolContentId = NbWebUtil.convertToLong(learnerForm.getToolContentId());
         
         if(userId == null || toolSessionId ==null || toolContentId==null)
 		{
-			String error = "userId,  tool session id or tool content id is missing. Unable to continue";
-			log.error(error);
+			String error = "Unable to continue. The user ID, tool session ID or tool contentID is missing.";
+			logger.error(error);
 			throw new NbApplicationException(error);
 		}
 
 	        nbContent = nbService.retrieveNoticeboard(toolContentId);
 	        nbSession = nbService.retrieveNoticeboardSession(toolSessionId);
 	        nbUser = nbService.retrieveNoticeboardUser(userId);
+	        
+	    if(nbContent == null)
+		{
+			String error = "Unable to continue as the data is missing from the database";
+			logger.error(error);				
+			throw new NbApplicationException(error);
+		}   
+	        
         /*
          * Checks to see if the defineLater or runOffline flag is set.
          * If the particular flag is set, control is forwarded to jsp page
@@ -161,12 +174,25 @@ public class NbLearnerStarterAction extends DispatchAction {
         /* will show a different screen if defineLater flag is set and running in preview mode */
         NbLearnerForm nbForm = (NbLearnerForm)form;
         NbWebUtil.cleanLearnerSession(request);
-        Long toolContentId = nbForm.getToolContentId();
+        Long toolContentId = NbWebUtil.convertToLong(nbForm.getToolContentId());
+        if (toolContentId == null)
+        {
+            String error = "Unable to continue. The user ID, tool session ID or tool contentID is missing.";
+			logger.error(error);
+			throw new NbApplicationException(error);
+        }
         saveMessages(request, null);
         
         ActionMessages message = new ActionMessages();
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         NoticeboardContent nbContent = nbService.retrieveNoticeboard(toolContentId);
+        
+        if (nbContent == null)
+        {
+            String error = "Unable to continue as there is data missing from the database";
+			logger.error(error);
+			throw new NbApplicationException(error);
+        }
         
         if (displayMessageToAuthor(nbContent, message))
         {
