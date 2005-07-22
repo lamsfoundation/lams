@@ -354,14 +354,14 @@ public class AuthoringUtil implements QaAppConstants {
     	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
     	if (richTextInstructions == null) richTextInstructions="";
     	
-    	/** read uploaded file informtion */
-    	
-    	logger.debug("retrieve theOfflineFileName.");
+    	/** read uploaded file informtion  - offline file*/
+    	logger.debug("retrieve theOfflineFile.");
     	FormFile theOfflineFile = qaAuthoringForm.getTheOfflineFile();
     	logger.debug("retrieved theOfflineFile: " + theOfflineFile);
     	
     	String offlineFileName="";
     	NodeKey nodeKey=null;
+    	String offlineFileUuid="";
     	try
 		{
     		InputStream offlineFileInputStream = theOfflineFile.getInputStream();
@@ -370,7 +370,8 @@ public class AuthoringUtil implements QaAppConstants {
     		logger.debug("retrieved offlineFileName: " + offlineFileName);
         	nodeKey=qaService.uploadFileToRepository(offlineFileInputStream, offlineFileName);
         	logger.debug("repository returned nodeKey: " + nodeKey);
-        	logger.debug("repository returned nodeKey uuid: " + nodeKey.getUuid());
+        	logger.debug("repository returned offlineFileUuid nodeKey uuid: " + nodeKey.getUuid());
+        	offlineFileUuid=nodeKey.getUuid().toString();
         }
     	catch(FileNotFoundException e)
 		{
@@ -387,6 +388,42 @@ public class AuthoringUtil implements QaAppConstants {
     		logger.debug("exception occured in accessing the repository server: " + e.getMessage());
     		//possibly give warning to user in request scope
 		}
+    	
+    	/** read uploaded file informtion  - online file*/
+    	logger.debug("retrieve theOnlineFile");
+    	FormFile theOnlineFile = qaAuthoringForm.getTheOnlineFile();
+    	logger.debug("retrieved theOnlineFile: " + theOnlineFile);
+    	
+    	String onlineFileName="";
+    	nodeKey=null;
+    	String onlineFileUuid="";
+    	try
+		{
+    		InputStream onlineFileInputStream = theOnlineFile.getInputStream();
+    		logger.debug("retrieved onlineFileInputStream: " + onlineFileInputStream);
+    		onlineFileName=theOnlineFile.getFileName();
+    		logger.debug("retrieved onlineFileName: " + onlineFileName);
+        	nodeKey=qaService.uploadFileToRepository(onlineFileInputStream, onlineFileName);
+        	logger.debug("repository returned nodeKey: " + nodeKey);
+        	logger.debug("repository returned onlineFileUuid nodeKey uuid: " + nodeKey.getUuid());
+        	onlineFileUuid=nodeKey.getUuid().toString();
+        }
+    	catch(FileNotFoundException e)
+		{
+    		logger.debug("exception occured, online file not found : " + e.getMessage());
+    		//possibly give warning to user in request scope
+		}
+    	catch(IOException e)
+		{
+    		logger.debug("exception occured in online file transfer: " + e.getMessage());
+    		//possibly give warning to user in request scope
+		}
+    	catch(QaApplicationException e)
+		{
+    		logger.debug("exception occured in accessing the repository server: " + e.getMessage());
+    		//possibly give warning to user in request scope
+		}
+    	
     		
     	/**obtain user object from the session*/
     	User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
@@ -422,9 +459,13 @@ public class AuthoringUtil implements QaAppConstants {
         logger.debug("qa created with content id: " + toolContentId);
         
         logger.debug("start persisting offline file information to db...");
-    	qaService.persistFile(nodeKey.getUuid().toString(),false, offlineFileName,qa);
-    	logger.debug("successfully persisted file info");
-        
+    	qaService.persistFile(offlineFileUuid,false, offlineFileName,qa);
+    	logger.debug("successfully persisted offline file info");
+    	
+    	logger.debug("start persisting online file information to db...");
+    	qaService.persistFile(onlineFileUuid,true, onlineFileName,qa);
+    	logger.debug("successfully persisted online file info");
+    	
         return qa;
     }
 

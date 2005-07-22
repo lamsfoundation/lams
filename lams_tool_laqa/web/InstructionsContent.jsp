@@ -6,7 +6,6 @@
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
 <div id="richTextContainer">
-		<c:out value="${sessionScope.formIndex}" />						  
 		<tr> <td>
 			<table align=center>
 				<tr> 
@@ -52,8 +51,12 @@
           				<fmt:message key="label.onlineFiles" />:
           			</td>
           			<td NOWRAP> 
-          				online upload
+						<html:file  property="theOnlineFile"></html:file>
+					 	<html:submit property="submitOnlineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+								<bean:message key="label.upload"/>
+						</html:submit>
 					</td> 
+
 				</tr>
 				
           		</table>	  	

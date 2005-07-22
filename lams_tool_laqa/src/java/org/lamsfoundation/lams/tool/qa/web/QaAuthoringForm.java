@@ -28,6 +28,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	protected String submitAllContent;
 	protected String submitTabDone;
 	protected String submitOfflineFile;
+	protected String submitOnlineFile;
 	
 	/** tab controller, these may go away once the Flash wraps the jsp */
 	protected String choice;
@@ -71,6 +72,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
     	this.submitAllContent=null;
     	this.submitTabDone=null;
     	this.submitOfflineFile=null;
+    	this.submitOnlineFile=null;
     	
     	this.summaryMonitoring=null;
     	this.instructionsMonitoring=null;
@@ -87,6 +89,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 		this.submitAllContent=null;
 		this.submitTabDone=null;
 		this.submitOfflineFile=null;
+		this.submitOnlineFile=null;
 
 		this.choice=null;
 		this.choiceBasic=null;
@@ -487,5 +490,17 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	 */
 	public FormFile getTheOnlineFile() {
 		return theOnlineFile;
+	}
+	/**
+	 * @return Returns the submitOnlineFile.
+	 */
+	public String getSubmitOnlineFile() {
+		return submitOnlineFile;
+	}
+	/**
+	 * @param submitOnlineFile The submitOnlineFile to set.
+	 */
+	public void setSubmitOnlineFile(String submitOnlineFile) {
+		this.submitOnlineFile = submitOnlineFile;
 	}
 }
