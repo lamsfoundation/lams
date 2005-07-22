@@ -32,7 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import org.apache.struts.action.Action;
+//import org.apache.struts.action.Action;
+import org.lamsfoundation.lams.web.action.LamsAction;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -49,6 +50,7 @@ import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 /**TODO: change into one utility class */
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionMessage;
+import org.apache.struts.util.MessageResources;
 
 
 /**
@@ -58,12 +60,21 @@ import org.apache.struts.action.ActionMessage;
  * 
  * @struts:action path="/starter/authoring" name="NbAuthoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringStarterAction"
  *                validate="false" 
+ * @struts.action-exception key="error.exception.NbApplication" scope="request"
+ *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+ *                          path=".error"
+ *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+ * @struts.action-exception key="error.exception.NbApplication" scope="request"
+ *                          type="java.lang.NullPointerException"
+ *                          path=".error"
+ *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+ * 
  * @struts:action-forward name="basic" path=".nb_basic"
  * @struts:action-forward name="displayMessage" path=".message"
  * ----------------XDoclet Tags--------------------
  */
 
-public class NbAuthoringStarterAction extends Action {
+public class NbAuthoringStarterAction extends LamsAction {
 	
 	static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());
 	
@@ -82,16 +93,20 @@ public class NbAuthoringStarterAction extends Action {
 	 */
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
 		
+	    MessageResources resources = getResources(request);
+	    
 		NbAuthoringForm nbForm = (NbAuthoringForm)form;
 		
 		Long contentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
-		nbForm.setToolContentId(contentId.toString());
-
+		
 		if(contentId == null)
-		{
-			String error = "Tool content id missing. Unable to continue.";
+		{		    
+			//String error = "Tool content id missing. Unable to continue.";
+		    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "Tool Content Id");
+		    logger.error(error);
 			throw new NbApplicationException(error);
 		}
+		nbForm.setToolContentId(contentId.toString());
 		
 		/* if there is a defineLater request parameter, set the form value
 		 * If a defineLater request parameter is not present, then it is just set to null.
@@ -114,6 +129,8 @@ public class NbAuthoringStarterAction extends Action {
 		{
 			//	Pre-fill the form with the default content
 			NoticeboardContent nb =	nbService.retrieveNoticeboard(NoticeboardConstants.DEFAULT_CONTENT_ID);
+			
+			/** TODO: add a check to see if object is null */
 			
 			//create a new noticeboard object and prefill with default content, save to database
 			NoticeboardContent nbContentNew = new NoticeboardContent(contentId,
