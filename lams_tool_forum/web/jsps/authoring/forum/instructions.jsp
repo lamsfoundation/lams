@@ -1,7 +1,7 @@
 <%@ include file="/includes/taglibs.jsp" %>
 <%@ include file="/includes/messages.jsp" %>
 <html:errors property="error" />
-<html:javascript formName="forumForm" dynamicJavascript="false" staticJavascript="false"/>
+<html:javascript formName="forumForm" dynamicJavascript="true" staticJavascript="false"/>
 <div align="center">
 <%-- <legend><bean:message key="title.forum.details" /></legend> --%>
 <html:form action="/authoring/forum/instructions.do" focus="forum.title"
