@@ -37,7 +37,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.LookupDispatchAction;
+//import org.apache.struts.actions.LookupDispatchAction;
+import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
@@ -57,10 +58,14 @@ import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
  * 
  * @struts:action path="/monitoring" name="NbMonitoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
  *                input=".monitoringContent" validate="false" parameter="method"
+ * @struts.action-exception key="error.exception.NbApplication" scope="request"
+ *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+ *                          path=".error"
+ *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * @struts:action-forward name="monitorPage" path=".monitoringContent"
  * ----------------XDoclet Tags--------------------
  */
-public class NbMonitoringAction extends LookupDispatchAction {
+public class NbMonitoringAction extends LamsLookupDispatchAction {
     
     static Logger logger = Logger.getLogger(NbMonitoringAction.class.getName());
     

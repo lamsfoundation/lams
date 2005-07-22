@@ -33,7 +33,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.struts.actions.LookupDispatchAction;
+//import org.apache.struts.actions.LookupDispatchAction;
+import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
 import org.apache.log4j.Logger;
 
 
@@ -49,6 +50,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 
 
 /**
@@ -58,10 +60,14 @@ import org.lamsfoundation.lams.usermanagement.User;
  * 
  * @struts:action path="/learner" name="NbLearnerForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
  *                input=".learnerContent" validate="false" parameter="method"
+ * @struts.action-exception key="error.exception.NbApplication" scope="request"
+ *                type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+ *                path=".error"
+ *                handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayLearnerContent" path=".learnerContent"
  * ----------------XDoclet Tags--------------------
  */
-public class NbLearnerAction extends LookupDispatchAction {
+public class NbLearnerAction extends LamsLookupDispatchAction {
 
     static Logger logger = Logger.getLogger(NbLearnerAction.class.getName());
     
@@ -81,11 +87,18 @@ public class NbLearnerAction extends LookupDispatchAction {
      * @param response
      * @return
      */
-    public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
 		
 	  NbLearnerForm learnerForm = (NbLearnerForm)form;
-	  Long toolSessionID = learnerForm.getToolSessionId();
-	  Long userID = learnerForm.getUserId();
+	  Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionId());
+	  Long userID = NbWebUtil.convertToLong(learnerForm.getUserId());
+	  
+	  if (toolSessionID == null || userID == null)
+	  {
+	      String error = "Unable to continue. The parameters tool session id or user id is missing";
+	      logger.error(error);
+	      throw new NbApplicationException(error);
+	  }
 	  INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 	 /** TODO: learnerServiceProxy causes an exception, fix this up later */
 	  // ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
