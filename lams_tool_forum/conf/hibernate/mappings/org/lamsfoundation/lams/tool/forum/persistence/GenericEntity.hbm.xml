@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.forum.persistence.GenericEntity"
+        table="tl_lafrum11_genericentity"
+        dynamic-update="false"
+        dynamic-insert="false"
+        select-before-update="false"
+        optimistic-lock="version"
+    >
+
+        <id
+            name="id"
+            column="ID"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-GenericEntity.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="created"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            access="property"
+            column="CREATED"
+        />
+
+        <property
+            name="updated"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            access="property"
+            column="UPDATED"
+        />
+
+        <property
+            name="createdBy"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            access="property"
+            column="CREATEDBY"
+        />
+
+        <property
+            name="modifiedBy"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            access="property"
+            column="MODIFIEDBY"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-GenericEntity.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+        <joined-subclass
+            name="org.lamsfoundation.lams.tool.forum.persistence.Message"
+            table="tl_lafrum11_message"
+            dynamic-update="false"
+            dynamic-insert="false"
+        >
+        <key
+            column="id"
+        />
+        <property
+            name="subject"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
+            column="SUBJECT"
+        />
+
+        <property
+            name="body"
+            type="text"
+            update="true"
+            insert="true"
+            access="property"
+            column="BODY"
+        />
+
+        <property
+            name="isAuthored"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
+            column="ISAUTHORED"
+        />
+
+        <property
+            name="isAnnonymous"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
+            column="ISANNONYMOUS"
+        />
+
+        <set
+            name="replies"
+            table="MESSAGE"
+            lazy="false"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+        >
+
+              <key
+                  column="PARENT"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+              />
+
+        </set>
+
+        <many-to-one
+            name="forum"
+            class="org.lamsfoundation.lams.tool.forum.persistence.Forum"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            access="property"
+            column="FORUM"
+        />
+
+        </joined-subclass>
+        <joined-subclass
+            name="org.lamsfoundation.lams.tool.forum.persistence.Forum"
+            table="tl_lafrum11_forum"
+            dynamic-update="false"
+            dynamic-insert="false"
+        >
+        <key
+            column="id"
+        />
+        <property
+            name="title"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
+            column="TITLE"
+        />
+
+        <property
+            name="allowAnnomity"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
+            column="ALLOWANNOMITY"
+        />
+
+        <property
+            name="forceOffline"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
+            column="FORCEOFFLINE"
+        />
+
+        <property
+            name="lockWhenFinished"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
+            column="LOCKWHENFINISHED"
+        />
+
+        <property
+            name="instructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
+            column="INSTRUCTIONS"
+        />
+
+        <property
+            name="onlineInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
+            column="ONLINEINSTRUCTIONS"
+        />
+
+        <property
+            name="offlineInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
+            column="OFFLINEINSTRUCTIONS"
+        />
+
+        <set
+            name="attachments"
+            table="ATTACHMENT"
+            lazy="false"
+            inverse="false"
+            cascade="none"
+            sort="unsorted"
+        >
+
+              <key
+                  column="FORUM"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
+              />
+
+        </set>
+
+        </joined-subclass>
+        <joined-subclass
+            name="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
+            table="tl_lafrum11_attachment"
+            dynamic-update="false"
+            dynamic-insert="false"
+        >
+        <key
+            column="id"
+        />
+        <property
+            name="uuid"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            access="property"
+            column="UUID"
+        />
+
+        <property
+            name="version"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            access="property"
+            column="VERSION"
+        />
+
+        </joined-subclass>
+
+    </class>
+
+        <query name="all"><![CDATA[
+            from GenericEntity genericEntity
+        ]]></query>
+        <query name="allMessages"><![CDATA[
+            from Message message
+        ]]></query>
+        <query name="allAuthoredMessagesOfForum"><![CDATA[
+            from Message message where message.forum.id = ? AND message.isAuthored = true
+        ]]></query>
+        <query name="allMessagesByForum"><![CDATA[
+            from Message message where message.forum = ?
+        ]]></query>
+        <query name="allForums"><![CDATA[
+            from Forum forum
+        ]]></query>
+        <query name="allAttachments"><![CDATA[
+            from Attachment attachment
+        ]]></query>
+        <query name="getAttachmentbyType"><![CDATA[
+            from Attachment attachment where attachment.type = ?
+        ]]></query>
+
+</hibernate-mapping>
