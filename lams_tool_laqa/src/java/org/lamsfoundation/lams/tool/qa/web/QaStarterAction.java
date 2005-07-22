@@ -106,8 +106,13 @@ public class QaStarterAction extends Action implements QaAppConstants {
   								throws IOException, ServletException, QaApplicationException {
 	
 		Map mapQuestionContent= new TreeMap(new QaComparator());
+		/** these two are for repository access */
 		LinkedList listUploadedOfflineFiles= new LinkedList();
 		LinkedList listUploadedOnlineFiles= new LinkedList();
+		
+		/** these two are for jsp */
+		LinkedList listUploadedOfflineFileNames= new LinkedList();
+		LinkedList listUploadedOnlineFileNames= new LinkedList();
 		
 		QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 		qaAuthoringForm.resetRadioBoxes();
@@ -117,6 +122,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
 		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
 		
+		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
+		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
 		
 		/**
 		 * retrive the service
@@ -343,6 +350,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    	 */
 			mapQuestionContent.put(INITIAL_QUESTION_COUNT,request.getSession().getAttribute(DEFAULT_QUESTION_CONTENT));
 			logger.debug("Map initialized with default contentid to: " + mapQuestionContent);
+
+			/** retrieve uploaded offline file names */
+			
+			
 		}
 		else
 		{

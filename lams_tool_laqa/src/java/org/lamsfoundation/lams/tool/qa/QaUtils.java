@@ -13,7 +13,6 @@ import java.security.Principal;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 
@@ -416,6 +415,11 @@ public abstract class QaUtils implements QaAppConstants {
     	LinkedList listUploadedOnlineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES);
     	logger.debug("listUploadedOnlineFiles: " + listUploadedOnlineFiles);
     	
+    	LinkedList listUploadedOfflineFileNames = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
+    	logger.debug("listUploadedOfflineFileNames: " + listUploadedOfflineFileNames);
+    	LinkedList listUploadedOnlineFileNames = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
+    	logger.debug("listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
+    	
     	
     	if (isOfflineFile)
     	{
@@ -441,6 +445,9 @@ public abstract class QaUtils implements QaAppConstants {
     	    	listUploadedOfflineFiles.add(offlineFileUuid + "~" + offlineFileName);
     	    	logger.debug("listUploadedOfflineFiles updated: " + listUploadedOfflineFiles);
     	    	request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
+    	    	
+    	    	listUploadedOfflineFileNames.add(offlineFileName);
+    	    	request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
     	    }
     		catch(FileNotFoundException e)
     		{
@@ -482,6 +489,9 @@ public abstract class QaUtils implements QaAppConstants {
     	    	listUploadedOnlineFiles.add(onlineFileUuid + "~" + onlineFileName);
     	    	logger.debug("listUploadedOnlineFiles updated: " + listUploadedOnlineFiles);
     	    	request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
+    	    	
+    	    	listUploadedOnlineFileNames.add(onlineFileName);
+    	    	request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
     	    }
     		catch(FileNotFoundException e)
     		{

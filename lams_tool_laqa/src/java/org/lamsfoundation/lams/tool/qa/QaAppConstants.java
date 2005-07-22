@@ -113,6 +113,8 @@ public interface QaAppConstants {
     public static final String SUBMIT_ONLINE_FILE						="submitOnlineFile";
     public static final String LIST_UPLOADED_OFFLINE_FILES				="listUploadedOfflineFiles";
     public static final String LIST_UPLOADED_ONLINE_FILES				="listUploadedOnlineFiles";
+    public static final String LIST_UPLOADED_OFFLINE_FILENAMES			="listUploadedOfflineFileNames";
+    public static final String LIST_UPLOADED_ONLINE_FILENAMES			="listUploadedOnlineFileNames";
     
     
     /**

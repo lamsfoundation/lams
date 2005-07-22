@@ -19,11 +19,12 @@
 						  <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />						  
 					</FCK:editor>
 					</td> 
+					
 				</tr>
 
 				<tr> 
 					<td>
-          				<fmt:message key="label.offlineFiles" />:
+          				<fmt:message key="label.offlineFiles" />
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOfflineFile"></html:file>
@@ -31,11 +32,21 @@
 								<bean:message key="label.upload"/>
 						</html:submit>
 					</td> 
-				</tr>
 
+				</tr>
+				<tr> 
+					<td>
+          				<fmt:message key="label.uploadedOfflineFiles" />
+          			</td>
+					<td>
+						<c:forEach var='item' items='${sessionScope.listUploadedOfflineFileNames}'>
+				            <li><c:out value='${item}'/></li>
+	         			</c:forEach>
+					</td> 
+				</tr>
           		<tr> 
           			<td>
-          				<fmt:message key="label.onlineInstructions" />:
+          				<fmt:message key="label.onlineInstructions" />
           			</td>
 					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
 					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/"
@@ -48,7 +59,7 @@
 				
 				<tr> 
 					<td>
-          				<fmt:message key="label.onlineFiles" />:
+          				<fmt:message key="label.onlineFiles" />
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOnlineFile"></html:file>
@@ -56,8 +67,19 @@
 								<bean:message key="label.upload"/>
 						</html:submit>
 					</td> 
-
+				
 				</tr>
+				<tr>
+					<td>
+          				<fmt:message key="label.uploadedOnlineFiles" />
+          			</td>
+					<td>
+						<c:forEach var='item' items='${sessionScope.listUploadedOnlineFileNames}'>
+				            <li><c:out value='${item}'/></li>
+	         			</c:forEach>
+					</td> 
+				</tr>
+				
 				
           		</table>	  	
 			  	<hr>

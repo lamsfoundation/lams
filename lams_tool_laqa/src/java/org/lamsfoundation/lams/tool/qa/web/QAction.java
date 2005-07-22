@@ -313,6 +313,9 @@ public class QAction extends DispatchAction implements QaAppConstants
             QaUtils.addFileToContentRepository(request, qaAuthoringForm, true);
             logger.debug("offline file added to repository successfully.");
             qaAuthoringForm.resetUserAction();
+            request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
+            logger.debug("forward back to instructions screen");
+           	return (mapping.findForward(LOAD_QUESTIONS));
         }
         else if (userAction.equalsIgnoreCase(SUBMIT_ONLINE_FILE))
         {
@@ -320,6 +323,9 @@ public class QAction extends DispatchAction implements QaAppConstants
         	QaUtils.addFileToContentRepository(request, qaAuthoringForm, false);
         	logger.debug("online file added to repository successfully.");
         	qaAuthoringForm.resetUserAction();
+        	request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
+        	logger.debug("forward back to instructions screen");
+           	return (mapping.findForward(LOAD_QUESTIONS));
         }
         else if (userAction.equalsIgnoreCase(SUBMIT_TAB_DONE))
         {
