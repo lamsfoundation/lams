@@ -1,7 +1,7 @@
 <%@ include file="/includes/taglibs.jsp" %>
 <%@ include file="/includes/messages.jsp" %>
 <html:errors property="error" />
-<html:javascript formName="forumForm" dynamicJavascript="true" staticJavascript="false"/>
+<html:javascript formName="forumForm" dynamicJavascript="false" staticJavascript="false"/>
 <div align="center">
 <%-- <legend><bean:message key="title.forum.details" /></legend> --%>
 <html:form action="/authoring/forum/instructions.do" focus="forum.title"
@@ -38,7 +38,7 @@
                          	<td valign="MIDDLE"><bean:write name="attachment" property="type"/></td>
                             <bean:define id="type" name="attachment" property="type" />
                             <bean:define id="fileName" name="attachment" property="name" />
-                            <td colspan="2" valign="MIDDLE"><a href="/forum/authoring/forum/deleteAttachment.do?type=<%= type %>&fileName=<%= fileName %>"><b><bean:message key="label.delete"/></b></a></td>
+                            <td colspan="2" valign="MIDDLE"><a href="/authoring/forum/deleteAttachment.do?type=<%= type %>&fileName=<%= fileName %>"><b><bean:message key="label.delete"/></b></a></td>
                         </tr>
                         </logic:iterate>
                           </table>

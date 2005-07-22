@@ -2,7 +2,7 @@
 <%@ include file="/includes/messages.jsp" %>
 
 <html:errors property="error" />
-<html:javascript formName="messageForm" dynamicJavascript="true" staticJavascript="false"/>
+<html:javascript formName="messageForm" dynamicJavascript="false" staticJavascript="false"/>
 <div align="center">
 <html:form action="/authoring/forum/createTopic.do" focus="message.subject"
 	styleId="messageForm" onsubmit="return validateMessageForm(this);" >
