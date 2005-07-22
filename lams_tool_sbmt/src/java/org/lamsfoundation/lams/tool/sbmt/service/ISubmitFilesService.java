@@ -20,10 +20,10 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.service;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
@@ -121,6 +121,21 @@ public interface ISubmitFilesService {
 	 */
 	public List getFilesUploadedByUser(Long userID, Long sessionID);
 	/**
+	 * This method returns a list of files that were uploaded by the
+	 * given <code>contentID</code>.
+	 * 
+	 * This method is used in the authoring enviornment for displaying 
+	 * the files being uploaded by the given session, as the user 
+	 * uploads them one by one.
+	 * 
+	 * @param sessionID The <code>session_id</code> to be looked up
+	 * @return List The list of required objects.
+	 * @param sessionID
+	 * @return
+	 */
+	public Map getFilesUploadedBySession(Long sessionID);
+
+	/**
 	 * Get information of all users who have submitted file.
 	 * @return The user information list
 	 */
@@ -156,4 +171,5 @@ public interface ISubmitFilesService {
 	 * @return success return true, otherwise return false.
 	 */
 	public boolean releaseMarksForSession(Long sessionID);
+
 }

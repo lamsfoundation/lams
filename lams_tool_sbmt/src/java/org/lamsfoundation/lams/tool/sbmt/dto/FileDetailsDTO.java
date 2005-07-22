@@ -27,12 +27,20 @@ import java.util.Date;
 
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * @author Manpreet Minhas
  */
 public class FileDetailsDTO implements Serializable{
 	
+	/**
+	 * For Serializable
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	private Long userID;
 	private Long submissionID;
 	private Long reportID;
 	private String filePath;
@@ -43,6 +51,8 @@ public class FileDetailsDTO implements Serializable{
 	private Long marks;
 	private Long uuID;
 	private Long versionID;
+	
+	private UserDTO userDTO;
 	
 	/** Miinimal Constructor*/
 	public FileDetailsDTO(Long submissionID, String filePath, String fileDescription,
@@ -59,6 +69,7 @@ public class FileDetailsDTO implements Serializable{
 	
 	public FileDetailsDTO(SubmissionDetails details, SubmitFilesReport report){
 
+		this.userID = details.getUserID();
 		this.submissionID = details.getSubmissionID();
 		this.filePath = details.getFilePath();
 		this.fileDescription = details.getFileDescription();
@@ -71,6 +82,10 @@ public class FileDetailsDTO implements Serializable{
 			this.comments = report.getComments();
 			this.marks = report.getMarks();
 		}
+	}
+	public FileDetailsDTO(SubmissionDetails details, SubmitFilesReport report,UserDTO userDTO){
+		this(details,report);
+		this.userDTO = userDTO;
 	}
 	public FileDetailsDTO(SubmissionDetails details){
 		
@@ -209,5 +224,33 @@ public class FileDetailsDTO implements Serializable{
 	 */
 	public void setSubmissionID(Long submissionID) {
 		this.submissionID = submissionID;
+	}
+
+	/**
+	 * @return Returns the userID.
+	 */
+	public Long getUserID() {
+		return userID;
+	}
+
+	/**
+	 * @param userID The userID to set.
+	 */
+	public void setUserID(Long userID) {
+		this.userID = userID;
+	}
+
+	/**
+	 * @return Returns the userDTO.
+	 */
+	public UserDTO getUserDTO() {
+		return userDTO;
+	}
+
+	/**
+	 * @param userDTO The userDTO to set.
+	 */
+	public void setUserDTO(UserDTO userDTO) {
+		this.userDTO = userDTO;
 	}
 }

@@ -11,61 +11,81 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
   <head>    
-    <title>All Learners</title>
+    <title>All Learner Submission Details</title>
+    
+  	<link href="css/aqua.css" rel="stylesheet" type="text/css">
+  	
   </head>  
   <body>
-  		<table border="1">
-  		<c:set var="report" scope="request" value="${sessionScope.report}"/>
-  		<logic:notEmpty name="report">
-			<logic:iterate id="element" name="report">
+		<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+		<c:forEach items="${report}"  var ="user" >		
+			<c:set var="filesUploaded" value="${user.value}"/>
+			<c:set var="first" value="true"/>
+			<c:forEach items="${filesUploaded}"  var ="details" >			
+				<span><p>			
+					<c:if test="${first}">
+						<c:set var="first" value="false"/>
+					    <tr>
+					    	<td colspan="2">
+					    	<c:out value="${details.userDTO.firstName}"/> <c:out value="${details.userDTO.lastName}"/>,
+					    	<c:out value="${details.userDTO.login}"/>, provides following submisstion:
+					    	</td>
+					    <tr>
+				    </c:if>
 				<tr>
-				<td><span><p>
-				<b><bean:write name="element" property="key.login"/><br/>
-				<bean:write name="element" property="key.firstName"/>
-				<bean:write name="element" property="key.lastName"/></b></p></span></td>
-				<td>
-				<bean:define id="details" name="element" property="value"/>
-				<logic:iterate id="dt" name="details">
-					<span><p>
-					<bean:message key="label.learner.fileName"/>
-					<bean:write name="dt" property="name"/><br/>
-					
-					<bean:message key="label.learner.fileDescription"/>
-					<bean:write name="dt" property="fileDescription"/><br/>
-					
-					<bean:message key="label.learner.dateOfSubmission"/>
-					<bean:write name="dt" property="dateOfSubmission"/><br/>
-					
-					<bean:message key="label.learner.comments"/>
-					<logic:empty name="dt" property="comments">
-						<bean:message key="label.learner.notAvailable"/><br/>
-					</logic:empty>
-					<logic:notEmpty name="dt" property="comments">
-						<bean:write name="dt" property="comments"/><br/>
-					</logic:notEmpty>
-					
-					<bean:message key="label.learner.marks"/>
-					<logic:empty name="dt" property="marks">
-						<bean:message key="label.learner.notAvailable"/><br/>
-					</logic:empty>
-					<logic:notEmpty name="dt" property="marks">
-						<bean:write name="dt" property="marks"/><br/>
-					</logic:notEmpty>
-					
-					<bean:message key="label.learner.dateMarksReleased"/>
-					<logic:notEmpty name="dt" property="dateMarksReleased">
-						<bean:write name="dt" property="dateMarksReleased"/><br/>
-					</logic:notEmpty>
-					<logic:empty name="dt" property="dateMarksReleased">
-						<bean:message key="label.learner.notAvailable"/><br/>
-					</logic:empty>
-					</p></span>
-				</logic:iterate>		
-				</td>
-				</tr>		
-			</logic:iterate>
-  		</logic:notEmpty>  		
-		</table>
+					<td>
+					File Path: </td>
+					<td><c:out value="${details.filePath}" /> 
+					(<a href="monitoring.do?method=downloadFile&uuID=<c:out value="${details.uuID}" /> &versionID=<c:out value="${details.versionID}" /> ">Download</a>)
+					</td>
+				</tr>
+				<tr>
+					<td>File Description: </td><td><c:out value="${details.fileDescription}"  escapeXml="false"/></td>
+				</tr>
+				<tr>
+					<td>Date of Submission: </td><td><c:out value="${details.dateOfSubmission}" /></td>
+				</tr>
+				<tr>
+					<td>Marks:</td>
+					<td> 		<c:choose>
+										<c:when test="${empty details.marks}">
+											<c:out value="Not Available"/>
+										</c:when>
+										<c:otherwise>
+											<c:out value="${details.marks}" escapeXml="false"/>
+										</c:otherwise>
+									</c:choose>
+					</td>
+				</tr>			
+				<tr>
+					<td>Comments:</td>
+					<td>
+									<c:choose>
+										<c:when test="${empty details.comments}">
+											<c:out value="Not Available"/>								
+										</c:when>
+										<c:otherwise>
+											<c:out value="${details.comments}" escapeXml="false"/>
+										</c:otherwise>
+									</c:choose>
+					</td>
+				</tr>
+		
+				<tr>
+					<td colspan="2">
+					<form action="monitoring.do?method=markFile" method="post">
+							<input type="hidden" name="detailID" value=<c:out value='${details.submissionID}' /> >
+							<input type="hidden" name="reportID" value=<c:out value='${details.reportID}' /> >
+							<input type="hidden" name="userID" value=<c:out value='${details.userID}' /> >
+							<input type="hidden" name="toolSessionID" value=<c:out value='${sessionScope.toolSessionID}' /> >
+							<input type="submit" value="Update Marks"/>
+					</form>
+					</td>
+				</tr>
+				</span>
+			</c:forEach>
+		</c:forEach>
+		</table>						
   </body>
 </html:html>
 

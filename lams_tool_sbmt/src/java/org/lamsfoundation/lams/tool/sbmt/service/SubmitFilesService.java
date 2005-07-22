@@ -29,9 +29,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -538,6 +540,42 @@ public class SubmitFilesService implements ToolContentManager,
 		else
 			return null;
 	}
+	public Map getFilesUploadedBySession(Long sessionID) {
+		List list =  submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
+		if(list!=null){
+			return getUserFileDetailsMap(list);
+		}
+		else
+			return null;
+	}
+	/**
+	 * This method save SubmissionDetails list into a map container: key is user id,
+	 * value is a list container, which contains all <code>FileDetailsDTO</code> object belong to
+	 * this user.
+	 * 
+	 * @param list
+	 * @return
+	 */
+	private Map getUserFileDetailsMap(List list) {
+		Map map = new HashMap();
+		Iterator iterator = list.iterator();
+		List element;
+		while(iterator.hasNext()){
+			SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
+			SubmitFilesReport report = submissionDetails.getReport();
+			UserDTO user = getUserDetails(submissionDetails.getUserID());
+			
+			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report,user);
+			element = (List) map.get(submissionDetails.getUserID());
+			//if it is first time to this user, creating a new ArrayList for this user.
+			if(element == null)
+				element = new ArrayList();
+			element.add(detailDto);
+			map.put(submissionDetails.getUserID(),element);
+		}
+		return map;
+	}
+
 	/** 
 	 * This is a utility method used by <code>getFilesUploadedByUser</code>
 	 * method to generate a list of data transfer objects containing the
@@ -555,8 +593,8 @@ public class SubmitFilesService implements ToolContentManager,
 		while(iterator.hasNext()){
 			SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
 			SubmitFilesReport report = submissionDetails.getReport();
-			FileDetailsDTO reportDTO = new FileDetailsDTO(submissionDetails,report);
-			details.add(reportDTO);
+			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report);
+			details.add(detailDto);
 		}
 		return details;
 	}
@@ -621,7 +659,6 @@ public class SubmitFilesService implements ToolContentManager,
 	 */
 	private LearnerDetailsDTO getLearnerDetailsDTO(SubmissionDetails details, 
 												  SubmitFilesReport report){
-		Integer userID = new Integer(details.getUserID().intValue());		
 		File file = new File(details.getFilePath());		
 		return new LearnerDetailsDTO(file.getName(),
 									 details.getFileDescription(),
@@ -703,5 +740,9 @@ public class SubmitFilesService implements ToolContentManager,
 		//current there is no false return
 		return true;
 	}
+
+
+
+
 
 }

@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -215,7 +216,17 @@ public class MonitoringAction extends DispatchAction {
 			   ActionForm form,
 			   HttpServletRequest request,
 			   HttpServletResponse response){
-		return null;
+		
+		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
+		submitFilesService = getSubmitFilesService();
+		//return FileDetailsDTO list according to the given sessionID
+		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);		
+		request.getSession().setAttribute("toolSessionID",sessionID);
+//		request.getSession().setAttribute("user",
+//										  submitFilesService.getUserDetails(userID));
+		request.getSession().setAttribute("report",userFilesMap);
+		return mapping.findForward("report");
+
 	}
 	public ActionForward releaseMarks(ActionMapping mapping,
 			   ActionForm form,
