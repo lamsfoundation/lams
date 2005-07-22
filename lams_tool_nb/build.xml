@@ -173,6 +173,7 @@ Ant build file.
 				<include name="jstl/*.tld"/>
 				<include name="spring/*"/>
 				<include name="tiles/*.xml"/>
+				<include name="struts/*"/>
 				<include name="fckeditor/tlds/*"/>
 			</webinf>
 			<lib dir="${build.lib}">
