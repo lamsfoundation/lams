@@ -1,6 +1,5 @@
 
 <%@ page language="java"%>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-html-el" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
@@ -23,7 +22,7 @@
   
   <body>
   	<H1><c:out value="${content.title}"/></H1>
-  	<H2><c:out value="${content.instructions}"/></H2>
+  	<H2><c:out value="${content.instructions}" escapeXml="false"/></H2>
   	<div id="datatablecontainer">
   	<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
 	<logic:present name="SbmtLearnerForm" property="filesUploaded">
@@ -102,13 +101,8 @@
         <tr>
           <td class="formlabel"><bean:message key="label.learner.fileDescription"/></td>
           <td class="formcontrol">
-            <FCK:editor id="fileDescription" 
-    			basePath="/lams/fckEditor/"
-    			height="150"    
-    			width="85%">                                     
-			</FCK:editor>
-
-            </td>
+          <html:textarea property="fileDescription" />
+           </td>
         </tr>
         <tr>
           <td class="formcontrol"><html:submit><bean:message key="label.learner.upload"/></html:submit></td>
