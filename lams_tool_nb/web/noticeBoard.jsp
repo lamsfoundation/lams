@@ -1,4 +1,4 @@
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 

@@ -1,6 +1,6 @@
 <%@ page language="java" import="java.util.*" %>
 <%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants" %>
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";

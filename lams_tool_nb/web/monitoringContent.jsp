@@ -1,8 +1,8 @@
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
 <html:form action="/monitoring" target="_self">

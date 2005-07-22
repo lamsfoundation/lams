@@ -1,4 +1,4 @@
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
@@ -35,8 +35,6 @@
 					<td class="formlabel"><fmt:message key="instructions.onlineInstructions" /></td>
 					<td class="formcontrol">
 							<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/"
-								imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
-								linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
 								height="200"
 								width="85%">
 								<c:out value="${NbAuthoringForm.onlineInstructions}" escapeXml="false" />
@@ -55,8 +53,6 @@
 					<td class="formlabel"><fmt:message key="instructions.offlineInstructions" /></td>
 					<td class="formcontrol">
 						<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckEditor/"
-								imageBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector"
-								linkBrowserURL="/lams/fckEditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
 								width="85%"
 								height="200">
 							<c:out value="${NbAuthoringForm.offlineInstructions}" escapeXml="false" />

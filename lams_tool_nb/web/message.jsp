@@ -1,6 +1,6 @@
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
 
 <div id="datatablecontainer">

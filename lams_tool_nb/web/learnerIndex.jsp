@@ -1,6 +1,7 @@
 <%@ page language="java" import="java.util.*" %>
 <%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants" %>
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -8,7 +9,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 String url = "/starter/learner?userId="+555+"&toolSessionId="+455+"&toolContentId="+355+"&mode=learner";
 %>
 
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
+
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
