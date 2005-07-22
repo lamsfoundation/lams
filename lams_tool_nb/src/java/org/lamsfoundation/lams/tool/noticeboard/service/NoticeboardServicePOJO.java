@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 
 
+
 /**
  * An implementation of the NoticeboardService interface.
  * @author mtruong
@@ -81,12 +82,19 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	/**
 	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNoticeboard(Long)
 	 */
-	public NoticeboardContent retrieveNoticeboard(Long nbContentId)
+	public NoticeboardContent retrieveNoticeboard(Long nbContentId) throws NbApplicationException
 	{
+	    if (nbContentId == null)
+	    {
+	        String error = "Unable to continue. The tool content id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	       
 		try
 		{
 			nbContent = nbContentDAO.findNbContentById(nbContentId);
-			
+						
 		}
 		catch (DataAccessException e)
 		{
@@ -103,6 +111,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	 */
 	public NoticeboardContent retrieveNoticeboardBySessionID(Long nbSessionId)
 	{
+	    if (nbSessionId == null)
+	    {
+	        String error = "Unable to continue. The tool session id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    
 	    try
 		{
 			nbContent = nbContentDAO.getNbContentBySession(nbSessionId);
@@ -177,6 +192,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      */
 	public void removeNoticeboard(Long nbContentId)
 	{
+	    if (nbContentId == null)
+	    {
+	        String error = "Unable to continue. The tool content id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    
 		try
 		{
 			nbContentDAO.removeNoticeboard(nbContentId);
@@ -215,6 +237,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	 */
 	public NoticeboardSession retrieveNoticeboardSession(Long nbSessionId)
 	{
+	    if (nbSessionId == null)
+	    {
+	        String error = "Unable to continue. The tool session id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    
 	    try
 	    {
 	        nbSession = nbSessionDAO.findNbSessionById(nbSessionId);
@@ -273,6 +302,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	 */
 	public void removeSession(Long nbSessionId)
 	{
+	    if (nbSessionId == null)
+	    {
+	        String error = "Unable to continue. The tool session id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    
 	    try
 		{
 	        NoticeboardSession sessionToDelete = retrieveNoticeboardSession(nbSessionId);
@@ -336,6 +372,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	 */
 	public NoticeboardSession retrieveNbSessionByUserID(Long userId)
 	{
+	    if (userId == null)
+	    {
+	        String error = "Unable to continue. The tool session id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    
 		try
 		{
 			nbSession = nbSessionDAO.getNbSessionByUser(userId);
@@ -375,6 +418,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	 */
 	public NoticeboardUser retrieveNoticeboardUser(Long nbUserId)
 	{
+	    if (nbUserId == null)
+	    {
+	        String error = "Unable to continue. The user id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    
 	    try
 		{
 			nbUser = nbUserDAO.getNbUserByID(nbUserId);
@@ -454,6 +504,12 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	 */
 	public void removeUser(Long nbUserId)
 	{
+	    if (nbUserId == null)
+	    {
+	        String error = "Unable to continue. The user id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
 		try
 		{
 		    NoticeboardUser user = retrieveNoticeboardUser(nbUserId);
@@ -473,6 +529,14 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#addSession(java.lang.Long, org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
 	public void addSession(Long nbContentId, NoticeboardSession session)
     {
+
+	    if (nbContentId == null || session == null)
+	    {
+	        String error = "Unable to continue. The tool content id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    
         try
 		{
 		    nbContentDAO.addNbSession(nbContentId, session);
@@ -487,6 +551,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#addUser(java.lang.Long, org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
 	public void addUser(Long nbSessionId, NoticeboardUser user)
 	{
+
+	    if (nbSessionId == null)
+	    {
+	        String error = "Unable to continue. The tool session id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    } 
 	    try
 	    {
 	        nbSessionDAO.addNbUsers(nbSessionId, user);
@@ -517,6 +588,14 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#calculateTotalNumberOfUsers(java.lang.Long) */
 	public int calculateTotalNumberOfUsers(Long toolContentId)
 	{
+
+	    if (toolContentId == null)
+	    {
+	        String error = "Unable to continue. The tool content id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    
 	    int totalNumberOfUsers = 0;
 	    try
 	    {
