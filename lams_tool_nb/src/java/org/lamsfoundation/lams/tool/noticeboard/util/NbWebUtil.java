@@ -52,8 +52,15 @@ public class NbWebUtil {
 
 	 	public static Long convertToLong(String toolContentId)
 	 	{
-	 		Long contentId = new Long(Long.parseLong(toolContentId));
-	 		return contentId;
+	 	    try
+	 	    {
+	 	        return new Long(toolContentId);
+	 	    }
+	 	    catch (NumberFormatException e)
+	 	    {
+	 	        return null;
+	 	    }
+	 		
 	 	}
 	 	
 	 	public static void cleanAuthoringSession(HttpServletRequest request)
