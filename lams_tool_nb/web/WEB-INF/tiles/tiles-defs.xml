@@ -18,7 +18,7 @@
 	<definition name=".error" extends=".baseDef" >
 		<put name="title" value="System Error Page"/>
 		<put name="pageHeader" value = "System Exception"/>
-		<put name="content" value="/error.jsp" />	
+		<put name="content" value="/errorbox.jsp" />	
 	</definition>
 
 <!-- ============= Exception Page Definitions ====================== -->	

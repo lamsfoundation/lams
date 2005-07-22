@@ -41,13 +41,13 @@
   <!-- ========== Global Forward Definitions =================================== -->
   <global-forwards>
  	<forward name="forwardToAuthorPage"
-          path="/tool/nb/starter/authoring.do"/>
+          path="/starter/authoring.do"/>
  </global-forwards> 
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/tool/nb/starter/learner"
+      path="/starter/learner"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
       name="NbLearnerForm"
       scope="session"
@@ -56,6 +56,13 @@
       unknown="false"
       validate="false"
     >
+      <exception
+        key="error.exception.NbApplication"
+        type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
       <forward
         name="displayLearnerContent"
         path=".learnerContent"
@@ -68,14 +75,27 @@
       />
     </action>
     <action
-      path="/tool/nb/starter/authoring"
+      path="/starter/authoring"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringStarterAction"
       name="NbAuthoringForm"
       scope="session"
-      input=".authoringStarter"
       unknown="false"
       validate="false"
     >
+      <exception
+        key="error.exception.NbApplication"
+        type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
+      <exception
+        key="error.exception.NbApplication"
+        type="java.lang.NullPointerException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
       <forward
         name="basic"
         path=".nb_basic"
@@ -88,19 +108,20 @@
       />
     </action>
     <action
-      path="/tool/nb/authoring"
+      path="/authoring"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
       name="NbAuthoringForm"
       scope="session"
-      input=".nbForm"
       parameter="method"
       unknown="false"
       validate="true"
     >
-      <forward
-        name="loadNbForm"
-        path=".nbForm"
-        redirect="false"
+      <exception
+        key="error.exception.NbApplication"
+        type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
       />
       <forward
         name="basic"
@@ -119,7 +140,7 @@
       />
     </action>
     <action
-      path="/tool/nb/monitoring"
+      path="/monitoring"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
       name="NbMonitoringForm"
       scope="session"
@@ -128,6 +149,13 @@
       unknown="false"
       validate="false"
     >
+      <exception
+        key="error.exception.NbApplication"
+        type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
       <forward
         name="monitorPage"
         path=".monitoringContent"
@@ -135,7 +163,7 @@
       />
     </action>
     <action
-      path="/tool/nb/learner"
+      path="/learner"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"
       name="NbLearnerForm"
       scope="session"
@@ -144,6 +172,13 @@
       unknown="false"
       validate="false"
     >
+      <exception
+        key="error.exception.NbApplication"
+        type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
       <forward
         name="displayLearnerContent"
         path=".learnerContent"
@@ -151,7 +186,7 @@
       />
     </action>
     <action
-      path="/tool/nb/starter/monitor"
+      path="/starter/monitor"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringStarterAction"
       name="NbMonitoringForm"
       scope="session"
@@ -159,6 +194,13 @@
       unknown="false"
       validate="false"
     >
+      <exception
+        key="error.exception.NbApplication"
+        type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
       <forward
         name="monitorPage"
         path=".monitoringContent"
