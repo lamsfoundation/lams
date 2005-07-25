@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport"
+        table="tl_lasbmt11_report"
+    >
+
+        <id
+            name="reportID"
+            column="report_id"
+            type="java.lang.Long"
+        >
+            <generator class="identity">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-SubmitFilesReport.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="comments"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="comments"
+            length="250"
+        />
+
+        <property
+            name="marks"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="marks"
+            length="20"
+        />
+
+        <property
+            name="dateMarksReleased"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="date_marks_released"
+            length="19"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-SubmitFilesReport.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>
