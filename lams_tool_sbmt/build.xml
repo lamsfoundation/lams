@@ -372,7 +372,7 @@
 			/>
 	</target>
 
-	<target name="deploy-tool" depends="create-deploy-package" 
+	<target name="deploy-tool" depends="delete-exploded-tool-folder,create-deploy-package" 
 		description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
 
 		<path id="deploy.classpath">
@@ -392,5 +392,26 @@
 		</java>
 					
 	</target>
-
+	<target name="delete-exploded-tool-folder" description="delete old tool exploded tool folder">
+		<!-- delete old war folder tree -->
+		<delete quiet="true" includeemptydirs="true" verbose="true">
+			<fileset dir="${jboss.deploy}/${product}.war">
+			    <include name="**"/>
+			</fileset>
+		</delete>
+	</target>
+	<target name="explode-tool" depends="deploy-tool" description="explode tool jar and war package to a war folder">
+		<!-- rename war file to avoid name conflict -->
+		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war"/>
+		<!-- explode the ear -->
+		<unjar src="${jboss.deploy}/${product}.jar" dest="${jboss.deploy}/${product}.war" />
+		<unjar src="${jboss.deploy}/temp-${product}.war" dest="${jboss.deploy}/${product}.war" />
+		<!-- delete war and jar files -->
+		<delete>
+			<fileset dir="${jboss.deploy}">
+			    <include name="temp-${product}.war"/>
+			    <include name="${product}.jar"/>
+			</fileset>
+		</delete>
+	</target>
 </project>
