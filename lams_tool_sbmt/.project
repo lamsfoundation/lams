@@ -52,4 +52,11 @@
 		<nature>org.springframework.ide.eclipse.beans.core.beansnature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>JBOSS_DEPLOY</name>
+			<type>2</type>
+			<location>D:/jboss-3.2.6/server/default/deploy/lams.ear/lams-tool-lasbmt11.war/WEB-INF/classes</location>
+		</link>
+	</linkedResources>
 </projectDescription>
