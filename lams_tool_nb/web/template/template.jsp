@@ -19,8 +19,8 @@
   http://www.gnu.org/licenses/gpl.txt 
 -->
 
-<%@ taglib uri="/WEB-INF/struts-tiles.tld" prefix="tiles" %>
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts/struts-tiles.tld" prefix="tiles" %>
+<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 
