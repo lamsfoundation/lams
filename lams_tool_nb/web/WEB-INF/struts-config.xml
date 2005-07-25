@@ -22,6 +22,10 @@
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerForm"
     />
     <form-bean
+      name="NbExportForm"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbExportForm"
+    />
+    <form-bean
       name="NbAuthoringForm"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringForm"
     />
@@ -136,6 +140,28 @@
       <forward
         name="instructions"
         path=".nb_instructions"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/exportPortfolio"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbExportAction"
+      name="NbExportForm"
+      scope="session"
+      parameter="mode"
+      unknown="false"
+      validate="false"
+    >
+      <exception
+        key="error.exception.NbApplication"
+        type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
+      <forward
+        name="exportPortfolio"
+        path=".exportPortfolio"
         redirect="false"
       />
     </action>

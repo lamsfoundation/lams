@@ -82,6 +82,7 @@ public class NoticeboardConstants
     public static final String PAGE_EDITABLE = "isPageEditable";
     public static final String TOTAL_LEARNERS = "totalLearners";
     public static final String GROUP_STATS_MAP = "groupStatsMap";
+    public static final String EXPORT_PORTFOLIO = "exportPortfolio";
     
     //used in authoring
     public static final String TOOL_CONTENT_ID = "toolContentId";  //request + session variable
@@ -93,8 +94,8 @@ public class NoticeboardConstants
     public static final String READ_ONLY_MODE = "readOnlyMode";
    // public static final String IS_TOOL_COMPLETED = "isToolCompleted";
     
-    public static final String USER_ID = "userID";
-    public static final String TOOL_SESSION_ID = "toolSessionID";
+    public static final String USER_ID = "userId";
+    public static final String TOOL_SESSION_ID = "toolSessionId";
     
     // ---------------------------------------------------------------------------
     // Lookup Dispatch Action Keys (used in NbAuthoringAction class, NbLearnerAction),
