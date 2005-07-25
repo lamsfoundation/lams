@@ -78,7 +78,16 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
 		map.put(NoticeboardConstants.BUTTON_SUMMARY, "summary");
 		return map;
 	}
+
     
+    public ActionForward unspecified(
+    		ActionMapping mapping,
+    		ActionForm form,
+    		HttpServletRequest request,
+    		HttpServletResponse response)
+    {
+        return summary(mapping, form, request, response);
+    }
    /**
      * 
      * @param mapping

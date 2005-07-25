@@ -79,6 +79,15 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
     
     static Logger logger = Logger.getLogger(NbLearnerStarterAction.class.getName());
        
+    public ActionForward unspecified(
+    		ActionMapping mapping,
+    		ActionForm form,
+    		HttpServletRequest request,
+    		HttpServletResponse response)
+    {
+        
+        return learner(mapping, form, request, response);
+    }
    
     public ActionForward learner(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
 

@@ -78,6 +78,17 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		
 		return map;
 	}
+    
+    public ActionForward unspecified(
+    		ActionMapping mapping,
+    		ActionForm form,
+    		HttpServletRequest request,
+    		HttpServletResponse response)
+    {
+        NbAuthoringForm nbForm = (NbAuthoringForm)form;
+	    copyInstructionFormProperty(request, nbForm);
+	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
+    }
 
 	/**
 	 * Forwards to the basic page.
