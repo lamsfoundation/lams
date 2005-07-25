@@ -75,9 +75,12 @@
 		<put name="content" value="/learnerIndex.jsp" />	
 	</definition>
 	
-	<definition name=".monitoringStarter" extends=".baseDef" >
-		<put name="title" value="Starter for Noticeboard"/>
-		<put name="pageHeader" value = "Starter for Noticeboard"/>
-		<put name="content" value="/monitoringIndex.jsp" />	
+	
+<!-- ============= Noticeboard Export Page Definitions ====================== -->	
+
+<definition name=".exportPortfolio" extends=".baseDef" >
+		<put name="title" value="Noticeboard"/>
+		<put name="pageHeader" value = "Noticeboard"/>
+		<put name="content" value="/exportPortfolio.jsp" />	
 	</definition>
 </tiles-definitions>
