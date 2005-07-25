@@ -139,6 +139,12 @@
 			        <!-- hibernate 1 and hibernate 2 mapping files are not fully compatible-->
 			        <hibernate version="2.0"/>
 			    </hibernatedoclet>
+				<!-- copy hbm.xml to src folder. This makes hbm.xml can be synchronized with classes folder in eclipse -->
+				<copy overwrite="yes" todir="${src.dir.java}">
+					<fileset dir="${conf.hibernate.mapping.dir}">
+						<include name="**/*.hbm.xml"/>
+					</fileset>
+				</copy>
 			</target>
 	
 			
@@ -394,12 +400,19 @@
 	</target>
 	<target name="delete-exploded-tool-folder" description="delete old tool exploded tool folder">
 		<!-- delete old war folder tree -->
-		<delete quiet="true" includeemptydirs="true" verbose="true">
+		<delete quiet="true" includeemptydirs="true">
 			<fileset dir="${jboss.deploy}/${product}.war">
 			    <include name="**"/>
 			</fileset>
 		</delete>
+		<!-- if use explode tool target when jboss is running, explode may be failed and left the the temp folder. Here try to delete the temp folder -->
+		<delete quiet="true" includeemptydirs="true">
+			<fileset dir="${jboss.deploy}/temp-${product}.war">
+			    <include name="**"/>
+			</fileset>
+		</delete>
 	</target>
+	
 	<target name="explode-tool" depends="deploy-tool" description="explode tool jar and war package to a war folder">
 		<!-- rename war file to avoid name conflict -->
 		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war"/>
@@ -414,4 +427,16 @@
 			</fileset>
 		</delete>
 	</target>
+	
+    <!-- ================================= 
+          target: synchronize-jsp              
+         ================================= -->
+    <target name="synchronize-deploy" description="copy non-java file into deploy folder">
+        <copy verbose="yes" todir="${jboss.deploy}/${product}.war">
+        	<fileset dir="${conf.web.dir}">
+        		<include name="**/*.*"/>
+        	</fileset>
+        </copy>
+    </target>
+
 </project>
