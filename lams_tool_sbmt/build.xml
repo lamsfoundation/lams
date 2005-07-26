@@ -150,7 +150,7 @@
 			
 			<!-- exports all the hbm mappings to the specified database -->
 			<target name="schemaexport" description="Exports all hbm.xml files in {conf.hibernate.mapping.dir}/hbm"
-				depends="generate-hbm">
+				depends="compile,generate-hbm">
 			    <echo message="Run the schema export for all hbm.xml files in ${conf.hibernate.mapping.dir}/hbm"/>
 				<taskdef
 					name="schemaexport"
@@ -276,8 +276,9 @@
 	   				<exclude name="classes/**"/>
 	   			</webinf>
 	   			<classes dir="${build.classes.java}"/>	
+	   			<!-- front end programs like HTML, JSP, CSS etc. -->
 	   			<fileset dir="${conf.web.dir}">
-						<include name="*"/>
+						<include name="**/*.jsp"/>
 						<include name="css/*"/>
 				</fileset>
 	   			
@@ -288,7 +289,7 @@
 		<!-- =================================================================== -->
 		<!-- Deploy the jar and war                               -->
 		<!-- =================================================================== -->
-			<target name="deploy-war" depends="lams-sbmt-war" description="Deploy the SubmitFiles tool war file and jar file">
+		<target name="deploy-war" depends="lams-sbmt-war" description="Deploy the SubmitFiles tool war file and jar file">
 			<delete quiet="true">
 				<fileset dir="${jboss.deploy}/tmp"/>
 				<fileset dir="${jboss.deploy}/work"/>

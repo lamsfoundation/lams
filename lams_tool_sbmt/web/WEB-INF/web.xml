@@ -11,6 +11,10 @@
 		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
 	</param-value>
 </context-param>
+<context-param>
+	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+	<param-value>org.lamsfoundation.lams.tool.sbmt.SbmtResources</param-value>
+</context-param>
 
     <filter>
     <filter-name>hibernateFilter</filter-name>
@@ -104,8 +108,9 @@
    <!ELEMENT error-page ((error-code | exception-type), location)>
    -->
 
-  <!-- Struts Tag Library Descriptors -->
-
+<!--  ======================================================== -->	
+<!-- Struts Tag Library Descriptors -->
+<!--  ======================================================== -->	
 <taglib>
     <taglib-uri>tags-bean</taglib-uri>
     <taglib-location>/WEB-INF/struts/tlds/struts-bean.tld</taglib-location>
@@ -150,6 +155,31 @@
     <taglib-uri>tags-c</taglib-uri>
     <taglib-location>/WEB-INF/struts/tlds/c.tld</taglib-location>
 </taglib>
+<!--  ======================================================== -->	
+<!--  JSTL Tag Library -->
+<!--  ======================================================== -->	
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/fmt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/tlds/fmt.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/fmt-rt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/tlds/fmt-rt.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/tlds/c.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/core-rt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/tlds/c-rt.tld</taglib-location>
+  </taglib>
+<!--  ======================================================== -->	
+<!--   Customized Tag Library -->
+<!--  ======================================================== -->	
 <taglib>
     <taglib-uri>fck-editor</taglib-uri>
     <taglib-location>/WEB-INF/fckEditor/tlds/FCKeditor.tld</taglib-location>

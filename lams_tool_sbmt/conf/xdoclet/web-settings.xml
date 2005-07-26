@@ -6,3 +6,7 @@
 		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
 	</param-value>
 </context-param>
+<context-param>
+	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+	<param-value>org.lamsfoundation.lams.tool.sbmt.SbmtResources</param-value>
+</context-param>
