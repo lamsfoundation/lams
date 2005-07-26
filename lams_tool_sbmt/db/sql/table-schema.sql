@@ -1,7 +1,9 @@
+alter table tl_lasbmt11_instruction_files drop foreign key FKA75538F9FC4BEA1;
 alter table tl_lasbmt11_submission_details drop foreign key FK1411A53C630DDF64;
 alter table tl_lasbmt11_session drop foreign key FKEC8C77C9FC4BEA1;
 drop table if exists tl_lasbmt11_report;
 drop table if exists tl_lasbmt11_content;
+drop table if exists tl_lasbmt11_instruction_files;
 drop table if exists tl_lasbmt11_submission_details;
 drop table if exists tl_lasbmt11_session;
 create table tl_lasbmt11_report (
@@ -14,10 +16,21 @@ create table tl_lasbmt11_report (
 create table tl_lasbmt11_content (
    content_id bigint not null,
    title varchar(64) not null,
-   instructions varchar(64),
-   defineLater bit,
-   runOffline bit,
+   instruction text,
+   define_later bit not null,
+   run_offline bit not null,
+   offline_instruction text,
+   online_instruction text,
+   run_offline_instruction text,
+   content_in_use bit,
    primary key (content_id)
+);
+create table tl_lasbmt11_instruction_files (
+   file_id bigint not null auto_increment,
+   uuid bigint,
+   version_id bigint,
+   content_id bigint,
+   primary key (file_id)
 );
 create table tl_lasbmt11_submission_details (
    submission_id bigint not null auto_increment,
@@ -36,5 +49,6 @@ create table tl_lasbmt11_session (
    content_id bigint,
    primary key (session_id)
 );
+alter table tl_lasbmt11_instruction_files add index FKA75538F9FC4BEA1 (content_id), add constraint FKA75538F9FC4BEA1 foreign key (content_id) references tl_lasbmt11_content (content_id);
 alter table tl_lasbmt11_submission_details add index FK1411A53C630DDF64 (session_id), add constraint FK1411A53C630DDF64 foreign key (session_id) references tl_lasbmt11_session (session_id);
 alter table tl_lasbmt11_session add index FKEC8C77C9FC4BEA1 (content_id), add constraint FKEC8C77C9FC4BEA1 foreign key (content_id) references tl_lasbmt11_content (content_id);

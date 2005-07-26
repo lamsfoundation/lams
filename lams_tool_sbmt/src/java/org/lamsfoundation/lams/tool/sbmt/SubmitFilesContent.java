@@ -13,8 +13,12 @@ import org.apache.log4j.Logger;
 
 /**
  * @hibernate.class table="tl_lasbmt11_content"
+ * @serial 9072799761861936838L
  */
 public class SubmitFilesContent implements Serializable,Cloneable {
+
+	private static final long serialVersionUID = 9072799761861936838L;
+
 	private static Logger log = Logger.getLogger(SubmitFilesContent.class);
 	/** identifier field */
 	private Long contentID;
@@ -23,7 +27,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	private String title;
 
 	/** nullable persistent field */
-	private String instructions;
+	private String instruction;
 	
 	/** persistent field */
 	private Set toolSession;
@@ -33,12 +37,25 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	/** persistent field */
 	private boolean runOffline;
 
+	/** persistent field */
+	private String runOfflineInstruction;
+	
+	/** persistent field */
+	private boolean contentInUse;
+	
+	/** persistent field */
+	private String offlineInstruction;
 
+	/** persistent field */
+	private String onlineInstruction;
+
+	private Set instructionFiles;
+	
 	/** full constructor */
 	public SubmitFilesContent(String title, String instructions,
 							  Set toolSession) {
 		this.title = title;
-		this.instructions = instructions;		
+		this.instruction = instructions;		
 		this.toolSession = toolSession;
 	}
 
@@ -55,14 +72,14 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 		super();
 		this.contentID = contentID;
 		this.title = title;
-		this.instructions = instructions;
+		this.instruction = instructions;
 		this.toolSession = toolSession;
 	}
 	
 	public SubmitFilesContent(Long contentID, String title, String instructions){
 		this.contentID = contentID;
 		this.title = title;
-		this.instructions = instructions;
+		this.instruction = instructions;
 	}
 
 	/**
@@ -77,7 +94,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 
 		SubmitFilesContent newContent = new SubmitFilesContent(newContentID,
 															   content.getTitle(), 
-															   content.getInstructions(),
+															   content.getInstruction(),
 															   new TreeSet());		
 		return newContent;
 	}
@@ -107,14 +124,14 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	}
 
 	/**
-	 * @hibernate.property column="instructions" length="64"
+	 * @hibernate.property column="instruction" type="text"
 	 */
-	public String getInstructions() {
-		return this.instructions;
+	public String getInstruction() {
+		return this.instruction;
 	}
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
+	public void setInstruction(String instructions) {
+		this.instruction = instructions;
 	}	
 
 	/**
@@ -134,7 +151,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	public String toString() {
 		return new ToStringBuilder(this).append("contentID", getContentID())
 				.append("title", getTitle()).append("instructions",
-						getInstructions()).toString();
+						getInstruction()).toString();
 	}
 
 	public boolean equals(Object other) {
@@ -145,18 +162,18 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 		SubmitFilesContent castOther = (SubmitFilesContent) other;
 		return new EqualsBuilder().append(this.getContentID(),
 				castOther.getContentID()).append(this.getTitle(),
-				castOther.getTitle()).append(this.getInstructions(),
-				castOther.getInstructions()).isEquals();
+				castOther.getTitle()).append(this.getInstruction(),
+				castOther.getInstruction()).isEquals();
 	}
 
 	public int hashCode() {
 		return new HashCodeBuilder().append(getContentID()).append(getTitle())
-				.append(getInstructions()).toHashCode();
+				.append(getInstruction()).toHashCode();
 	}
 
 
     /** 
-     * @hibernate.property column="defineLater" length="1"
+     * @hibernate.property column="define_later" length="1"
      *  not-null="true"
      */
     public boolean isDefineLater()
@@ -170,7 +187,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
     }
 
     /** 
-     * @hibernate.property column="runOffline" length="1"
+     * @hibernate.property column="run_offline" length="1"
      * not-null="true"
      */
     public boolean isRunOffline()
@@ -182,6 +199,84 @@ public class SubmitFilesContent implements Serializable,Cloneable {
     {
         this.runOffline = runOffline;
     }
+
+	/**
+	 * @hibernate.property column="offline_instruction" type="text"
+	 * @return Returns the offlineInstruction.
+	 */
+	public String getOfflineInstruction() {
+		return offlineInstruction;
+	}
+
+	/**
+	 * @param offlineInstruction The offlineInstruction to set.
+	 */
+	public void setOfflineInstruction(String offlineInstruction) {
+		this.offlineInstruction = offlineInstruction;
+	}
+
+	/**
+	 * @hibernate.property column="online_instruction" type="text"
+	 * @return Returns the onlineInstruction.
+	 */
+	public String getOnlineInstruction() {
+		return onlineInstruction;
+	}
+
+	/**
+	 * @param onlineInstruction The onlineInstruction to set.
+	 */
+	public void setOnlineInstruction(String onlineInstruction) {
+		this.onlineInstruction = onlineInstruction;
+	}
+
+	/**
+	 * @hibernate.property column="run_offline_instruction" type="text"
+	 * @return Returns the runOfflineInstruction.
+	 */
+	public String getRunOfflineInstruction() {
+		return runOfflineInstruction;
+	}
+
+	/**
+	 * @param runOfflineInstruction The runOfflineInstruction to set.
+	 */
+	public void setRunOfflineInstruction(String runOfflineInstruction) {
+		this.runOfflineInstruction = runOfflineInstruction;
+	}
+
+	/**
+	 * @hibernate.property column="content_in_use" length="1"
+	 * @return Returns the contentInUse.
+	 */
+	public boolean isContentInUse() {
+		return contentInUse;
+	}
+
+	/**
+	 * @param contentInUse The contentInUse to set.
+	 */
+	public void setContentInUse(boolean contentInUse) {
+		this.contentInUse = contentInUse;
+	}
+
+	/**
+ 	 * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
+	 * @hibernate.collection-key column="content_id"
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.sbmt.InstructionFiles"
+	 * 
+	 * @return Returns the instrctionFiles.
+	 */
+	public Set getInstrctionFiles() {
+		return instructionFiles;
+	}
+
+	/**
+	 * @param instrctionFiles The instrctionFiles to set.
+	 */
+	public void setInstrctionFiles(Set instrctionFiles) {
+		this.instructionFiles = instrctionFiles;
+	}
     
     public Object clone(){
 		Object obj = null;
@@ -194,6 +289,14 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 				while(iter.hasNext())
 					set.add(((SubmitFilesSession)iter.next()).clone());
 				((SubmitFilesContent)obj).toolSession = set;
+			}
+			//clone InstructionFiles object
+			if(instructionFiles != null ){
+				Iterator iter = instructionFiles.iterator();
+				Set set = new TreeSet();
+				while(iter.hasNext())
+					set.add(((InstructionFiles)iter.next()).clone());
+				((SubmitFilesContent)obj).instructionFiles= set;
 			}
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + SubmissionDetails.class + " failed");

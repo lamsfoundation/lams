@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.sbmt.InstructionFiles"
+        table="tl_lasbmt11_instruction_files"
+    >
+
+        <id
+            name="fileID"
+            column="file_id"
+            type="java.lang.Long"
+        >
+            <generator class="identity">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-InstructionFiles.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="uuID"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="uuid"
+            length="20"
+        />
+
+        <property
+            name="versionID"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="version_id"
+            length="20"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-InstructionFiles.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>

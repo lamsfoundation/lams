@@ -36,12 +36,11 @@
         />
 
         <property
-            name="instructions"
-            type="java.lang.String"
+            name="instruction"
+            type="text"
             update="true"
             insert="true"
-            column="instructions"
-            length="64"
+            column="instruction"
         />
 
         <set
@@ -68,8 +67,9 @@
             type="boolean"
             update="true"
             insert="true"
-            column="defineLater"
+            column="define_later"
             length="1"
+            not-null="true"
         />
 
         <property
@@ -77,9 +77,62 @@
             type="boolean"
             update="true"
             insert="true"
-            column="runOffline"
+            column="run_offline"
+            length="1"
+            not-null="true"
+        />
+
+        <property
+            name="offlineInstruction"
+            type="text"
+            update="true"
+            insert="true"
+            column="offline_instruction"
+        />
+
+        <property
+            name="onlineInstruction"
+            type="text"
+            update="true"
+            insert="true"
+            column="online_instruction"
+        />
+
+        <property
+            name="runOfflineInstruction"
+            type="text"
+            update="true"
+            insert="true"
+            column="run_offline_instruction"
+        />
+
+        <property
+            name="contentInUse"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="content_in_use"
             length="1"
         />
+
+        <set
+            name="instrctionFiles"
+            lazy="true"
+            inverse="false"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="content_id"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.sbmt.InstructionFiles"
+            />
+
+        </set>
 
         <!--
             To add non XDoclet property mappings, create a file named

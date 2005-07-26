@@ -70,7 +70,6 @@ import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -92,8 +91,6 @@ public class SubmitFilesService implements ToolContentManager,
 	private IUserDAO userDAO;
 
 	private IRepositoryService repositoryService;
-
-	private FlashMessage flashMessage;
 
 	/***************************************************************************
 	 * Property Injection Methods

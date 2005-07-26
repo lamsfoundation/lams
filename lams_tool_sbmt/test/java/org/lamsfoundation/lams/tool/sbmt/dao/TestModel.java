@@ -149,7 +149,7 @@ public class TestModel extends TestCase {
 		SubmitFilesContent contentC = (SubmitFilesContent) content.clone();
 		fillContentB(content);
 		
-		assertEquals(contentC.getInstructions(),insA);
+		assertEquals(contentC.getInstruction(),insA);
 		assertEquals(contentC.getTitle(),titA);
 		assertEquals(contentC.isDefineLater(),deA);
 		assertEquals(contentC.isRunOffline(),offA);
@@ -160,7 +160,7 @@ public class TestModel extends TestCase {
 		assertEquals(iter.next(),session);
 		
 		//do more test to ensure origial object keep desired values "B"
-		assertEquals(content.getInstructions(),insB);
+		assertEquals(content.getInstruction(),insB);
 		assertEquals(content.getTitle(),titB);
 		assertEquals(content.isDefineLater(),deB);
 		assertEquals(content.isRunOffline(),offB);
@@ -190,7 +190,7 @@ public class TestModel extends TestCase {
 	}
 	private void fillContentA(SubmitFilesContent content){
 		content.setDefineLater(deA);
-		content.setInstructions(insA);
+		content.setInstruction(insA);
 		content.setRunOffline(offA);
 		content.setTitle(titA);
 		//fill sessions
@@ -202,7 +202,7 @@ public class TestModel extends TestCase {
 	}
 	private void fillContentB(SubmitFilesContent content){
 		content.setDefineLater(deB);
-		content.setInstructions(insB);
+		content.setInstruction(insB);
 		content.setRunOffline(offB);
 		content.setTitle(titB);
 

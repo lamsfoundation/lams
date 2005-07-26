@@ -11,8 +11,12 @@ import org.apache.log4j.Logger;
 
 /** 
  * @hibernate.class table="tl_lasbmt11_report"
+ * @serial  -3415065437595925246L
 */
 public class SubmitFilesReport implements Serializable,Cloneable{
+
+	private static final long serialVersionUID = -3415065437595925246L;
+
 	private static Logger log = Logger.getLogger(SubmitFilesReport.class);
 	
     /** identifier field */

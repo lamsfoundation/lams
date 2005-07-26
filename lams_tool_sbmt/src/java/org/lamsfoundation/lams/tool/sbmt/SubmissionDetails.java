@@ -10,8 +10,12 @@ import org.apache.log4j.Logger;
 
 /**
  * @hibernate.class table="tl_lasbmt11_submission_details"
+ * @serial 5093528405144051727L
  */
 public class SubmissionDetails implements Serializable,Cloneable{
+
+	private static final long serialVersionUID = 5093528405144051727L;
+
 	private static Logger log = Logger.getLogger(SubmissionDetails.class);
 	
 	/** identifier field */
@@ -159,7 +163,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.one-to-one cascade="all" not-null="false"
+	 * @hibernate.one-to-one  cascade="all" not-null="false"
 	 * foreign-key="report_id"
 	 * @return Returns the report.
 	 */

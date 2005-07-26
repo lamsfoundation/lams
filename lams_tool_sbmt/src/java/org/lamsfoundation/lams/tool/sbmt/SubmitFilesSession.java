@@ -13,8 +13,12 @@ import org.apache.log4j.Logger;
 
 /** 
  * @hibernate.class table="tl_lasbmt11_session"
+ * @serial 3399851325547422573L
 */
 public class SubmitFilesSession implements Serializable,Cloneable{
+
+	private static final long serialVersionUID = 3399851325547422573L;
+
 	private static Logger log = Logger.getLogger(SubmitFilesSession.class);
 	
     public final static int INCOMPLETE = 0;

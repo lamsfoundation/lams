@@ -23,6 +23,7 @@
 				<value>org/lamsfoundation/lams/tool/sbmt/SubmitFilesReport.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/sbmt/SubmitFilesSession.hbm.xml</value>				
 				<value>org/lamsfoundation/lams/tool/sbmt/SubmissionDetails.hbm.xml</value>				
+				<value>org/lamsfoundation/lams/tool/sbmt/InstructionFiles.hbm.xml</value>				
 			</list>
 		</property>
 		<property name="hibernateProperties">
