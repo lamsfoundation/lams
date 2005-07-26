@@ -21,6 +21,7 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.contentrepository.client;
 
 import java.io.InputStream;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
@@ -64,14 +65,17 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * <LI>Define your Handler class as a bean in your own Spring context file.
  * It <em>must</em> include a parameter repositoryService, which references a local
  * value of repositoryService. The "repositoryService" is defined in the 
- * Content Repository's applicationContext.xml.
+ * Content Repository's applicationContext.xml. The name "toolContentHandler" 
+ * (IToolContentHandler.SPRING_BEAN_NAME) is also essential as the Download servlet 
+ * looks for it by this name.
  * </UL>
  * For example:
  * <pre>
  * 	&lt;bean id="toolContentHandler" class="your class name here"&gt;
- * 		&lt;property name="repositoryService"&gt;&lt;ref local="coreSessionFactory"/>&lt;/property&gt;
+ * 		&lt;property name="repositoryService"&gt; &lt;ref bean="repositoryService"/&lt;/property&gt;
  *	&lt;/bean&gt; 
  * </pre>
+ * 
  * 
  * You do not need to include repositoryService as a instance variable
  * in your own class as it is already defined in the ToolContentHandler abstract class.
@@ -100,18 +104,17 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  *<p>
  * If you want to see this class used, have a look at the test code in org.lamsfoundation.lams.contentrepository.client
  * in the test/java area.
+ * <p>
+ * You may be wondering why we don't make the workspaceName, user, id, etc 
+ * parameters in the Spring file, rather than creating a concrete class. Using
+ * the Spring file would be easier, but then the id (equivalent to passsword)
+ * is easier to hack. The id is a char[], rather than a String for 
+ * security. If you don't care that your tool's id is stored as a String
+ * then you can include it in your Spring file.
  * 
  * @author conradb, Fiona Malikoff
  */
-public abstract class ToolContentHandler {
-
-    /** File is for Online Instructions */
-    public final static String TYPE_ONLINE = "ONLINE";
-    /** File is for Offline Instructions */
-    public final static String TYPE_OFFLINE = "OFFLINE";
-
-    /** The "name" used to store the online/offline property in the repository */
-    public final static String FILE_TYPE_PROPERTY_NAME = "TYPE";
+public abstract class ToolContentHandler implements IToolContentHandler {
 
     private IRepositoryService repositoryService;
     private ITicket ticket;
@@ -161,7 +164,7 @@ public abstract class ToolContentHandler {
      * if the repository loses the ticket.
      * @return the repository ticket 
      */
-    protected ITicket getTicket( boolean forceLogin ) throws RepositoryCheckedException {
+    public ITicket getTicket( boolean forceLogin ) throws RepositoryCheckedException {
 		if ( ticket == null || forceLogin ) {
 			ICredentials cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
 			try {
@@ -268,7 +271,34 @@ public abstract class ToolContentHandler {
 					+"Repository Exception: "+e2.getMessage()+" Retry not possible.");
 	        throw e2;
 	    }
-}
+    }
+
+    /** Get just the properties of a file. Convenience method - equivalent of 
+     * calling getFileNode(uuid).getProperties(). Useful if all you want are 
+     * the properties and you don't want to access the file itself.
+     * 
+     * @param uuid id of the file node. Mandatory
+     * @throws FileException An error occured writing the input stream to disk.
+     * @throws ItemNotFoundException This file node does not exist, so cannot delete it.
+     * @throws RepositoryCheckedException Some other error occured.
+     */
+    public Set getFileProperties(Long uuid) throws ItemNotFoundException, FileException, RepositoryCheckedException {
+        try {
+	        try {
+	            IVersionedNode node = getRepositoryService().getFileItem(getTicket(false), uuid, null);
+	            return node != null ? node.getProperties() : null;
+		    } catch (AccessDeniedException e) {
+		        log.warn("Unable to access repository to get file id"+uuid
+					+"AccessDeniedException: "+e.getMessage()+" Retrying login.");
+		        IVersionedNode node = getRepositoryService().getFileItem(getTicket(true), uuid, null);
+	            return node != null ? node.getProperties() : null;
+		    }
+	    } catch (RepositoryCheckedException e2) {
+	        log.warn("Unable to to get file id"+uuid
+					+"Repository Exception: "+e2.getMessage()+" Retry not possible.");
+	        throw e2;
+	    }
+    }
 
     public boolean isOffline(IVersionedNode node) {
         return checkType(node, TYPE_OFFLINE);

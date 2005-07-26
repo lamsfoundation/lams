@@ -130,4 +130,8 @@
         </property>
     </bean>
 
+	<bean id="toolContentHandler" class="org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+
 </beans>

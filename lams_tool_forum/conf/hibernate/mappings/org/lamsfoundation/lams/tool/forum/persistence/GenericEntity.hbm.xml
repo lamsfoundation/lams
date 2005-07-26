@@ -9,10 +9,6 @@
     <class
         name="org.lamsfoundation.lams.tool.forum.persistence.GenericEntity"
         table="tl_lafrum11_genericentity"
-        dynamic-update="false"
-        dynamic-insert="false"
-        select-before-update="false"
-        optimistic-lock="version"
     >
 
         <id
@@ -34,7 +30,6 @@
             type="java.util.Date"
             update="true"
             insert="true"
-            access="property"
             column="CREATED"
         />
 
@@ -43,7 +38,6 @@
             type="java.util.Date"
             update="true"
             insert="true"
-            access="property"
             column="UPDATED"
         />
 
@@ -52,7 +46,6 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            access="property"
             column="CREATEDBY"
         />
 
@@ -61,7 +54,6 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            access="property"
             column="MODIFIEDBY"
         />
 
@@ -74,18 +66,15 @@
         <joined-subclass
             name="org.lamsfoundation.lams.tool.forum.persistence.Message"
             table="tl_lafrum11_message"
-            dynamic-update="false"
-            dynamic-insert="false"
         >
-        <key
-            column="id"
-        />
+            <key
+                column="id"
+            />
         <property
             name="subject"
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="SUBJECT"
         />
 
@@ -94,7 +83,6 @@
             type="text"
             update="true"
             insert="true"
-            access="property"
             column="BODY"
         />
 
@@ -103,7 +91,6 @@
             type="boolean"
             update="true"
             insert="true"
-            access="property"
             column="ISAUTHORED"
         />
 
@@ -112,7 +99,6 @@
             type="boolean"
             update="true"
             insert="true"
-            access="property"
             column="ISANNONYMOUS"
         />
 
@@ -125,14 +111,14 @@
             sort="unsorted"
         >
 
-              <key
-                  column="PARENT"
-              >
-              </key>
+            <key
+                column="PARENT"
+            >
+            </key>
 
-              <one-to-many
+            <one-to-many
                   class="org.lamsfoundation.lams.tool.forum.persistence.Message"
-              />
+            />
 
         </set>
 
@@ -143,7 +129,6 @@
             outer-join="auto"
             update="true"
             insert="true"
-            access="property"
             column="FORUM"
         />
 
@@ -151,18 +136,15 @@
         <joined-subclass
             name="org.lamsfoundation.lams.tool.forum.persistence.Forum"
             table="tl_lafrum11_forum"
-            dynamic-update="false"
-            dynamic-insert="false"
         >
-        <key
-            column="id"
-        />
+            <key
+                column="id"
+            />
         <property
             name="title"
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="TITLE"
         />
 
@@ -171,7 +153,6 @@
             type="boolean"
             update="true"
             insert="true"
-            access="property"
             column="ALLOWANNOMITY"
         />
 
@@ -180,7 +161,6 @@
             type="boolean"
             update="true"
             insert="true"
-            access="property"
             column="FORCEOFFLINE"
         />
 
@@ -189,7 +169,6 @@
             type="boolean"
             update="true"
             insert="true"
-            access="property"
             column="LOCKWHENFINISHED"
         />
 
@@ -198,7 +177,6 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="INSTRUCTIONS"
         />
 
@@ -207,7 +185,6 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="ONLINEINSTRUCTIONS"
         />
 
@@ -216,7 +193,6 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="OFFLINEINSTRUCTIONS"
         />
 
@@ -229,14 +205,14 @@
             sort="unsorted"
         >
 
-              <key
-                  column="FORUM"
-              >
-              </key>
+            <key
+                column="FORUM"
+            >
+            </key>
 
-              <one-to-many
+            <one-to-many
                   class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
-              />
+            />
 
         </set>
 
@@ -244,18 +220,15 @@
         <joined-subclass
             name="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
             table="tl_lafrum11_attachment"
-            dynamic-update="false"
-            dynamic-insert="false"
         >
-        <key
-            column="id"
-        />
+            <key
+                column="id"
+            />
         <property
             name="uuid"
             type="java.lang.Long"
             update="true"
             insert="true"
-            access="property"
             column="UUID"
         />
 
@@ -264,7 +237,6 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            access="property"
             column="VERSION"
         />
 

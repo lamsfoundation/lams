@@ -173,6 +173,10 @@
 	<!--  Relies on the tools using the parameter jboss.deploy							-->						
 	<!-- ============================================================================== -->
 	<target name="deploy-tools">
+		<ant antfile="../${tool_forum_dir}/build.xml" target="deploy-tool"
+				inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>
+		</ant>
 		<ant antfile="../${tool_imscp_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>

@@ -7,6 +7,22 @@
     <description>
 		Forum tool
     </description>
+<context-param>
+  	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+  	<param-value>org.lamsfoundation.lams.tool.imscp.web.ApplicationResources</param-value>
+</context-param>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
+	  		classpath:/forumApplicationContext.xml
+		</param-value>
+	</context-param>
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>	
 
     <!--
     To use non XDoclet filters, create a filters.xml file that
@@ -68,11 +84,23 @@
 	    </init-param>
 	    <load-on-startup>2</load-on-startup>
     </servlet>
+ 	<!--  The download servlet, reused from the content repository jar -->
+	<servlet>
+		<description>Download file(s)</description>
+		<display-name>Download file</display-name>
+		<servlet-name>Download</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.tool.forum.web.actions.ForumDownload</servlet-class>
+<!-- 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.Download</servlet-class> -->
+	</servlet>
 
   	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 	    <url-pattern>*.do</url-pattern>
 	</servlet-mapping>
+	  <servlet-mapping>
+    <servlet-name>Download</servlet-name>
+    	<url-pattern>/download/*</url-pattern>
+  	</servlet-mapping>
 
    <session-config>
       <session-timeout>120</session-timeout>

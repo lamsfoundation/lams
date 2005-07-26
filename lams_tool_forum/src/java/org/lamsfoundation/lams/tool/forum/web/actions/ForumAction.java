@@ -1,27 +1,41 @@
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionForm;
-import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.forum.service.ForumManager;
-import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
-import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
-import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
-import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
-import org.lamsfoundation.lams.tool.forum.util.ContentHandler;
-import org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.*;
+
+import org.apache.log4j.Logger;
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
+import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
+import org.lamsfoundation.lams.tool.forum.persistence.Forum;
+import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.service.ForumManager;
+import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
+import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
+import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
+import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,15 +47,34 @@ import java.util.*;
 public class ForumAction extends Action {
   private static Logger log = Logger.getLogger(ForumAction.class.getName());
   private ForumManager forumManager;
+  private ForumToolContentHandler toolContentHandler;
 
   public void setForumManager(ForumManager forumManager) {
       this.forumManager = forumManager;
   }
 
-  public ForumAction() {
-       this.forumManager = (ForumManager) GenericObjectFactoryImpl.getInstance().lookup("forumManager");
+  //public ForumAction() {
+       //this.forumManager = (ForumManager) GenericObjectFactoryImpl.getInstance().lookup(ForumConstants.FORUM_MANAGER);
+       //this.toolContentHandler = (ForumToolContentHandler) GenericObjectFactoryImpl.getInstance().lookup(ForumConstants.CONTENT_HANDLER);
       //GenericObjectFactoryImpl.getInstance().configure(this);
-  }
+  //}
+
+  	private ForumManager getForumManager() {
+  	    if ( forumManager == null ) {
+  	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+  	      forumManager = (ForumManager) wac.getBean(ForumConstants.FORUM_MANAGER);
+  	    }
+  	    return forumManager;
+  	}
+
+  	private ForumToolContentHandler getToolContentHandler() {
+  	    if ( toolContentHandler == null ) {
+  	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+  	    toolContentHandler = (ForumToolContentHandler) wac.getBean(ForumToolContentHandler.SPRING_BEAN_NAME);
+  	    }
+  	    return toolContentHandler;
+  	}
+
 	public final ActionForward execute(ActionMapping mapping, ActionForm form,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
   		String param = mapping.getParameter();
@@ -84,11 +117,11 @@ public class ForumAction extends Action {
         Forum forum = forumForm.getForum();
 
         Map topics = (Map) request.getSession().getAttribute("topics");
-        forum = this.forumManager.createForum(forum, forumForm.getAttachments(), topics);
+        forum = getForumManager().createForum(forum, forumForm.getAttachments(), topics);
         forumForm.setForum(forum);
 
         //populate topics with new topics
-        List topicList = this.forumManager.getTopics(forum.getId());
+        List topicList = getForumManager().getTopics(forum.getId());
         topics = new HashMap();
         Iterator it = topicList.iterator();
         while (it.hasNext()) {
@@ -109,7 +142,7 @@ public class ForumAction extends Action {
         ForumForm forumForm = (ForumForm) form;
         Forum forum = forumForm.getForum();
         Map topics = (Map) request.getSession().getAttribute("topics");
-        this.forumManager.editForum(forum, forumForm.getAttachments(), topics);
+        getForumManager().editForum(forum, forumForm.getAttachments(), topics);
         return mapping.findForward("success");
   }
 
@@ -119,8 +152,8 @@ public class ForumAction extends Action {
                                               HttpServletResponse response)
           throws IOException, ServletException, Exception {
         Long forumId = new Long((String) request.getParameter("forumId"));
-        Forum forum = forumManager.getForum(forumId);
-        List topicList = this.forumManager.getTopics(forum.getId());
+        Forum forum = getForumManager().getForum(forumId);
+        List topicList = getForumManager().getTopics(forum.getId());
         ForumForm forumForm = new ForumForm();
 
         forumForm.setForum(forum);
@@ -142,7 +175,7 @@ public class ForumAction extends Action {
         while (it.hasNext()) {
             Attachment attachment = (Attachment) it.next();
             //ContentHandler handler = new ContentHandler();
-            Set properties = ContentHandler.getFileProperties(attachment.getUuid());
+            Set properties = getToolContentHandler().getFileProperties(attachment.getUuid());
             Iterator propIt = properties.iterator();
             while (propIt.hasNext()) {
                 CrNodeVersionProperty property = (CrNodeVersionProperty) propIt.next();
@@ -168,7 +201,7 @@ public class ForumAction extends Action {
                                               HttpServletResponse response)
           throws IOException, ServletException, Exception {
         Long forumId = new Long((String) request.getParameter("forumId"));
-        forumManager.deleteForum(forumId);
+        getForumManager().deleteForum(forumId);
         return (mapping.findForward("success"));
   }
 
@@ -195,10 +228,56 @@ public class ForumAction extends Action {
                                               HttpServletResponse response)
           throws IOException, ServletException, PersistenceException {
         ForumForm forumForm = (ForumForm) form;
+
+        try {
+            processFile(forumForm, forumForm.getOnlineFile(), Attachment.TYPE_ONLINE);
+            processFile(forumForm, forumForm.getOfflineFile(), Attachment.TYPE_OFFLINE);
+        } catch (FileNotFoundException e) {
+            // TODO Create proper error message and return to user
+            log.error("Unable to uploadfile",e);
+            throw new IOException("Unable to upload file, exception was "+e.getMessage());
+        } catch (IOException e) {
+            log.error("Unable to uploadfile",e);
+            throw new IOException("Unable to upload file, exception was "+e.getMessage());
+        } catch (RepositoryCheckedException e) {
+            log.error("Unable to uploadfile",e);
+            throw new IOException("Unable to upload file, exception was "+e.getMessage());
+        }
+            
         Collection entries = forumForm.getAttachments().values();
         List attachmentList = new ArrayList(entries);
         request.getSession().setAttribute("attachmentList", attachmentList);
         return mapping.findForward("success");
+    }
+
+    /**
+     * Process an uploaded file.
+     * 
+     * @param forumForm
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
+     */
+    private void processFile(ForumForm forumForm, FormFile file, String attachmentType) 
+    	throws InvalidParameterException, FileNotFoundException, RepositoryCheckedException, IOException {
+        
+        Map attachmentsMap = forumForm.getAttachments();
+        if (file!= null && !(file.getFileName().trim().equals(""))) {
+            String fileName = file.getFileName();
+            String keyName = fileName + "-" + attachmentType;
+            if (!attachmentsMap.containsKey(keyName)) {
+                NodeKey node = getToolContentHandler().uploadFile(file.getInputStream(), fileName, 
+                        file.getContentType(), attachmentType);
+                Attachment attachment = new Attachment();
+                attachment.setName(fileName);
+                attachment.setStream(file.getInputStream());
+                attachment.setUuid(node.getUuid());
+                attachment.setType(attachmentType);
+                attachmentsMap.put(keyName, attachment);
+                forumForm.setOnlineFile(null);
+            }
+        }
     }
 
     public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -209,9 +288,9 @@ public class ForumAction extends Action {
         ForumForm forumForm = (ForumForm) form;
         Map attachments = forumForm.getAttachments();
         Attachment attachment = (Attachment) attachments.remove(fileName + "-" + type);
-        ContentHandler.deleteFile(attachment.getUuid());
+        getToolContentHandler().deleteFile(attachment.getUuid());
         if (attachment.getId() != null) {
-            this.forumManager.deleteForumAttachment(attachment.getId());
+            getForumManager().deleteForumAttachment(attachment.getId());
         }
         List attachmentList = new ArrayList(attachments.values());
         request.getSession().setAttribute("attachmentList", attachmentList);
@@ -223,7 +302,7 @@ public class ForumAction extends Action {
         Map topics = (Map) request.getSession().getAttribute("topics");
         Message topic = (Message) topics.remove(topicName);
         if (topic.getId() != null) {
-            this.forumManager.deleteMessage(topic.getId());
+            getForumManager().deleteMessage(topic.getId());
         }
         request.getSession().setAttribute("topics", topics);
         request.getSession().setAttribute("topicList", new ArrayList(topics.values()));

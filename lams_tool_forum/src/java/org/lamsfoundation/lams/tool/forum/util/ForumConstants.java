@@ -9,4 +9,8 @@ package org.lamsfoundation.lams.tool.forum.util;
  */
 public interface ForumConstants {
     public final static int MAX_FILE_SIZE = 250 * 1000;
+   
+    public final static String FORUM_MANAGER = "forumManager";
+    public final static String CONTENT_HANDLER = "toolContentHandler";
+    
 }

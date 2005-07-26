@@ -39,5 +39,12 @@
 	    <load-on-startup>2</load-on-startup>
     </servlet>
    
-    
+ 	<!--  The download servlet, reused from the content repository jar -->
+	<servlet>
+		<description>Download file(s)</description>
+		<display-name>Download file</display-name>
+		<servlet-name>Download</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.tool.forum.web.actions.ForumDownload</servlet-class>
+<!-- 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.Download</servlet-class> -->
+	</servlet>
     

@@ -1,19 +1,16 @@
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
-import org.apache.struts.validator.ValidatorForm;
-import org.apache.struts.upload.FormFile;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionError;
-import org.apache.log4j.Logger;
+import org.apache.struts.upload.FormFile;
+import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
-import org.lamsfoundation.lams.tool.forum.util.ContentHandler;
-import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-
-import java.util.Map;
-import java.util.HashMap;
+import org.lamsfoundation.lams.util.UploadFileUtil;
 
 /**
  *
@@ -34,7 +31,6 @@ public class ForumForm extends ValidatorForm {
     protected boolean lockWhenFinished;
     protected boolean forceOffline;
     protected boolean allowAnnomity;
-    protected ContentHandler contentHander;
 
     private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
@@ -100,6 +96,10 @@ public class ForumForm extends ValidatorForm {
         return this.attachments;
     }
 
+    private float convertToMeg( int numBytes ) {
+        return numBytes != 0 ? numBytes / 1024 / 1024 : 0;
+    }
+    
     public ActionErrors validate(ActionMapping mapping,
                                  javax.servlet.http.HttpServletRequest request) {
         ActionErrors errors = super.validate(mapping, request);
@@ -109,43 +109,15 @@ public class ForumForm extends ValidatorForm {
                ActionError error = new ActionError("error.valueReqd");
                errors.add("forum.title", error);
             }
-            if (onlineFile != null && !(onlineFile.getFileName().trim().equals(""))) {
-                if (onlineFile.getFileSize() > ForumConstants.MAX_FILE_SIZE) {
+            if (onlineFile != null && !(onlineFile.getFileName().trim().equals("")) &&
+                    convertToMeg(onlineFile.getFileSize()) > UploadFileUtil.getMaxFileSize()) {
                     ae = new ActionError("error.inputFileTooLarge");
                     errors.add("onlineFile", ae);
-                } else {
-                    String fileName = onlineFile.getFileName();
-                    if (!attachments.containsKey(fileName +"-" + Attachment.TYPE_ONLINE)) {
-                        NodeKey node = ContentHandler.uploadFile(onlineFile.getInputStream(), fileName, onlineFile.getContentType());
-                        ContentHandler.setProperty(node.getUuid(), node.getVersion(), "TYPE", Attachment.TYPE_ONLINE);
-                        Attachment attachment = new Attachment();
-                        attachment.setName(fileName);
-                        attachment.setStream(onlineFile.getInputStream());
-                        attachment.setUuid(node.getUuid());
-                        attachment.setType(Attachment.TYPE_ONLINE);
-                        attachments.put(fileName + "-" + Attachment.TYPE_ONLINE, attachment);
-                        onlineFile = null;
-                    }
-                }
             }
-            if (offlineFile != null && !(offlineFile.getFileName().trim().equals(""))) {
-                if (offlineFile.getFileSize() > ForumConstants.MAX_FILE_SIZE) {
+            if (offlineFile != null && !(offlineFile.getFileName().trim().equals("")) && 
+                    convertToMeg(offlineFile.getFileSize()) > UploadFileUtil.getMaxFileSize()) {
                     ae = new ActionError("error.inputFileTooLarge");
                     errors.add("offlineFile", ae);
-                } else {
-                    String fileName = offlineFile.getFileName();
-                    if (!attachments.containsKey(fileName +"-" + Attachment.TYPE_OFFLINE)) {
-                        NodeKey node = ContentHandler.uploadFile(offlineFile.getInputStream(), fileName, offlineFile.getContentType());
-                        ContentHandler.setProperty(node.getUuid(), node.getVersion(), "TYPE", Attachment.TYPE_OFFLINE);
-                        Attachment attachment = new Attachment();
-                        attachment.setName(fileName);
-                        attachment.setStream(offlineFile.getInputStream());
-                        attachment.setUuid(node.getUuid());
-                        attachment.setType(Attachment.TYPE_OFFLINE);
-                        attachments.put(fileName + "-" + Attachment.TYPE_OFFLINE, attachment);
-                        offlineFile = null;
-                    }
-                }
             }
         } catch (Exception e) {
             logger.error("", e);

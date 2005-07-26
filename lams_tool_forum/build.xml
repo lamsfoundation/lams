@@ -275,7 +275,7 @@
 	        classname="xdoclet.modules.web.WebDocletTask"
 	        classpathref="project.classpath"
 	    />
-		<webdoclet destdir="${webinf.dir}" force="${xdoclet.force}" 
+		<webdoclet destDir="${webinf.dir}" force="${xdoclet.force}" 
 			mergedir="${xdoclet.dir}" >
 			
          <fileset dir="${src.dir}">

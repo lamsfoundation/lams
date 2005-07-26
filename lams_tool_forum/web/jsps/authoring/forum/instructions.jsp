@@ -30,7 +30,7 @@
                         <tr>
                           		<td valign="MIDDLE"><b>FILE NAME</b></td>
                           		<td valign="MIDDLE"><b>TYPE</b></td>
-                                <td colspan="2"/>
+                                <td colspan="3"/>
                         </tr>
                         <logic:iterate name="attachmentList" id="attachment">
                         <tr>
@@ -38,7 +38,10 @@
                          	<td valign="MIDDLE"><bean:write name="attachment" property="type"/></td>
                             <bean:define id="type" name="attachment" property="type" />
                             <bean:define id="fileName" name="attachment" property="name" />
-                            <td colspan="2" valign="MIDDLE"><a href="/authoring/forum/deleteAttachment.do?type=<%= type %>&fileName=<%= fileName %>"><b><bean:message key="label.delete"/></b></a></td>
+                            <bean:define id="uuid" name="attachment" property="uuid" />
+                            <td valign="MIDDLE"><a href="/authoring/forum/download/uuid=<%=uuid%>&preferDownload=true"><b><bean:message key="label.view"/></b></a></td>
+                            <td valign="MIDDLE"><a href="/authoring/forum/download/uuid=<%=uuid%>&preferDownload=false"><b><bean:message key="label.download"/></b></a></td>
+                            <td valign="MIDDLE"><a href="/authoring/forum/deleteAttachment.do?type=<%= type %>&fileName=<%= fileName %>"><b><bean:message key="label.delete"/></b></a></td>
                         </tr>
                         </logic:iterate>
                           </table>
