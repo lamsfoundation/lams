@@ -131,7 +131,7 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 		this.submissionDetails = submissionDetails;
 	}
 	/**
-	 * @hibernate.many-to-one column="content_id"
+	 * @hibernate.many-to-one column="content_id" cascade="none"
 	 * 
 	 * @return Returns the content.
 	 */
