@@ -11,10 +11,10 @@
 <tlibversion>1.2</tlibversion>
 <jspversion>1.1</jspversion>
 <shortname>tiles</shortname>
-<uri>http://struts.apache.org/tags-tiles</uri>
+<uri>http://struts.apache.org/tags-tiles-el</uri>
 <tag>
 <name>insert</name>
-<tagclass>org.apache.struts.taglib.tiles.InsertTag</tagclass>
+<tagclass>org.apache.strutsel.taglib.tiles.ELInsertTag</tagclass>
 <bodycontent>JSP</bodycontent>
 <attribute>
 <name>template</name>
@@ -89,7 +89,7 @@
 </tag>
 <tag>
 <name>definition</name>
-<tagclass>org.apache.struts.taglib.tiles.DefinitionTag</tagclass>
+<tagclass>org.apache.strutsel.taglib.tiles.ELDefinitionTag</tagclass>
 <bodycontent>JSP</bodycontent>
 <attribute>
 <name>id</name>
@@ -124,7 +124,7 @@
 </tag>
 <tag>
 <name>put</name>
-<tagclass>org.apache.struts.taglib.tiles.PutTag</tagclass>
+<tagclass>org.apache.strutsel.taglib.tiles.ELPutTag</tagclass>
 <bodycontent>JSP</bodycontent>
 <attribute>
 <name>name</name>
@@ -174,7 +174,7 @@
 </tag>
 <tag>
 <name>putList</name>
-<tagclass>org.apache.struts.taglib.tiles.PutListTag</tagclass>
+<tagclass>org.apache.strutsel.taglib.tiles.ELPutListTag</tagclass>
 <bodycontent>JSP</bodycontent>
 <attribute>
 <name>name</name>
@@ -184,7 +184,7 @@
 </tag>
 <tag>
 <name>add</name>
-<tagclass>org.apache.struts.taglib.tiles.AddTag</tagclass>
+<tagclass>org.apache.strutsel.taglib.tiles.ELAddTag</tagclass>
 <bodycontent>JSP</bodycontent>
 <attribute>
 <name>value</name>
@@ -229,7 +229,7 @@
 </tag>
 <tag>
 <name>get</name>
-<tagclass>org.apache.struts.taglib.tiles.GetTag</tagclass>
+<tagclass>org.apache.strutsel.taglib.tiles.ELGetTag</tagclass>
 <bodycontent>empty</bodycontent>
 <attribute>
 <name>name</name>
@@ -254,7 +254,7 @@
 </tag>
 <tag>
 <name>getAsString</name>
-<tagclass>org.apache.struts.taglib.tiles.GetAttributeTag</tagclass>
+<tagclass>org.apache.strutsel.taglib.tiles.ELGetAttributeTag</tagclass>
 <bodycontent>empty</bodycontent>
 <attribute>
 <name>name</name>
@@ -274,8 +274,7 @@
 </tag>
 <tag>
 <name>useAttribute</name>
-<tagclass>org.apache.struts.taglib.tiles.UseAttributeTag</tagclass>
-<teiclass>org.apache.struts.taglib.tiles.UseAttributeTei</teiclass>
+<tagclass>org.apache.strutsel.taglib.tiles.ELUseAttributeTag</tagclass>
 <bodycontent>empty</bodycontent>
 <attribute>
 <name>id</name>
@@ -305,7 +304,7 @@
 </tag>
 <tag>
 <name>importAttribute</name>
-<tagclass>org.apache.struts.taglib.tiles.ImportAttributeTag</tagclass>
+<tagclass>org.apache.strutsel.taglib.tiles.ELImportAttributeTag</tagclass>
 <bodycontent>empty</bodycontent>
 <attribute>
 <name>name</name>
@@ -325,7 +324,7 @@
 </tag>
 <tag>
 <name>initComponentDefinitions</name>
-<tagclass>org.apache.struts.taglib.tiles.InitDefinitionsTag</tagclass>
+<tagclass>org.apache.strutsel.taglib.tiles.ELInitDefinitionsTag</tagclass>
 <bodycontent>empty</bodycontent>
 <attribute>
 <name>file</name>
