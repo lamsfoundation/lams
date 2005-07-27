@@ -418,7 +418,8 @@
 		<!-- rename war file to avoid name conflict -->
 		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war"/>
 		<!-- explode the ear -->
-		<unjar src="${jboss.deploy}/${product}.jar" dest="${jboss.deploy}/${product}.war" />
+		<!-- Don't explode jar file, becuase classes in jar will conflict with those same classes files in war -->
+		<!--<unjar src="${jboss.deploy}/${product}.jar" dest="${jboss.deploy}/${product}.war" />-->
 		<unjar src="${jboss.deploy}/temp-${product}.war" dest="${jboss.deploy}/${product}.war" />
 		<!-- delete war and jar files -->
 		<delete>
