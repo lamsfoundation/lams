@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -49,35 +50,35 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * This is a specialised servlet that supports the downloading of single
  * files and the rendering of packages. 
- * 
+ * <p>
  * It has a rather odd format - you can call it initially with 
- * the file/package uuid (and optional version) using 
- * download?uuid=&lt;uuid&gt;&version=&lt;version&gt;.
+ * the file/package uuid (and optional version and preferDownload parameters) using <BR>
+ * download?uuid=&lt;uuid&gt;&version=&lt;version&gt;&preferDownload=[true|false].
+ * <p>
  * If it is a file, then the file is downloaded. If it is a package, then
- * it redirects to download/&lt;uuid&gt;/&lt;version&gt;/relPath 
+ * it redirects to download/&lt;uuid&gt;/&lt;version&gt;/relPath?preferDownload=false
  * where the &lt;uuid&gt; and &lt;version&gt; are the uuid and version
  * of the package node.
- * 
+ * <p>
  * The download/&lt;uuid&gt;/&lt;version&gt;/relPath should only be used 
  * internally - the servlet should be called with the parameter
  * version initially.
- * 
+ * <p>
  * This / format allows the relative pathed links
  * within an html file to work properly. 
- * 
+ * <p>
  * If you want to try to download the file rather than display the file,
  * add the parameter preferDownload=true to the url. This is only meaningful
  * for a file - it is ignored for packages.
- *
- * The servlet accesses the content repository via a tool's ToolContentHandler 
- * implementation. It looks for the bean IToolContentHandler.SPRING_BEAN_NAME
- * in the web based Spring context. If you do not have a  ToolContentHandler
- * implementation then this servlet will not work. If you have an implementation
- * but you use a different name for the bean in the Spring context, then you
- * will need to override the getToolContentHandler() method in this servlet.
- * @see org.lamsfoundation.lams.contentrepository.client.IToolContentHandler
+ * <p>
+ * This is an abstract class, to allow other modules to customise the
+ * repository access. To implement, you must implement getTicket() 
+ * and getRepositoryService(). If you are using ToolContentHandler,
+ * then you can use ToolDownload, which is a concrete implementation
+ * of this class using the ToolContentHandler. 
  *  
  * @author Fiona Malikoff
+ * @see org.lamsfoundation.lams.contentrepository.client.ToolDownload
  */
 
 /* A package node could be handled by either getting the
@@ -102,34 +103,27 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
   <copy input stream to page output stream>
 */
 
-public class Download extends HttpServlet {
+public abstract class Download extends HttpServlet {
 
 	public static final String UUID_NAME = "uuid";
 	public static final String VERSION_NAME = "version";
 	public static final String PREFER_DOWNLOAD = "preferDownload";
 
 	protected static Logger log = Logger.getLogger(Download.class);
-	protected static IToolContentHandler toolContentHandler = null;
-	
+
 	private static final String expectedFormat = 
 			"Expected format /download?"
 			+UUID_NAME
 			+"<num>&"
 			+VERSION_NAME
-			+"=<num> (version number optional) or /download/<uuid>/<version>/<relPath>";
-	/**
-	 * Constructor of the object.
-	 */
-	public Download() {
-		super();
-	}
+			+"=<num>"
+			+PREFER_DOWNLOAD
+			+"=<true|false> (version number optional) or /download/<uuid>/<version>/<relPath>";
 
-	/**
-	 * Destruction of the servlet. <br>
-	 */
-	public void destroy() {
-		super.destroy(); 
-	}
+	/** Get the ticket that may be used to access the repository.
+*/
+	public abstract ITicket getTicket() throws RepositoryCheckedException;
+	public abstract IRepositoryService getRepositoryService() throws RepositoryCheckedException;
 
 	/**
 	 * The doGet method of the servlet. <br>
@@ -158,7 +152,7 @@ public class Download extends HttpServlet {
 		
 		long start = System.currentTimeMillis();
 
-		ITicket ticket = getToolContentHandler().getTicket(false);
+		ITicket ticket = getTicket();
 		if ( ticket == null ) {
 		    throw new RepositoryCheckedException("Unable to get ticket - getTicket(false) returned null");
 		}
@@ -244,15 +238,15 @@ public class Download extends HttpServlet {
 	 * the call here so it can be debugged.
 	 */
 	private IVersionedNode getFileItem(ITicket ticket, Long uuid, Long version, String relPathString) 
-				throws AccessDeniedException, ItemNotFoundException, FileException {
+				throws RepositoryCheckedException {
 		try { 
 			IVersionedNode node = null;
 			if ( relPathString != null ) {
 				// get file in package
-				node = getToolContentHandler().getRepositoryService().getFileItem(ticket,uuid, version, relPathString);
+				node = getRepositoryService().getFileItem(ticket,uuid, version, relPathString);
 			} else {
 				// get node
-				node = getToolContentHandler().getRepositoryService().getFileItem(ticket,uuid, version);
+				node = getRepositoryService().getFileItem(ticket,uuid, version);
 			}
 			return node;
 		} catch ( RuntimeException e ) {
@@ -372,15 +366,6 @@ public class Download extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 	    doGet(request, response);
-	}
-
-	public IToolContentHandler getToolContentHandler() {
-	    if ( toolContentHandler == null ) {
-	    	log.debug("Download  servlet calling context and getting repository singleton.");
-	        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	    	toolContentHandler = (IToolContentHandler)wac.getBean(IToolContentHandler.SPRING_BEAN_NAME);
-	    }
-		return toolContentHandler;
 	}
 
 	protected static Long getLong(String longAsString) {

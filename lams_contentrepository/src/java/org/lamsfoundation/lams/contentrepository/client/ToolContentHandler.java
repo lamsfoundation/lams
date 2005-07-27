@@ -66,7 +66,7 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * It <em>must</em> include a parameter repositoryService, which references a local
  * value of repositoryService. The "repositoryService" is defined in the 
  * Content Repository's applicationContext.xml. The name "toolContentHandler" 
- * (IToolContentHandler.SPRING_BEAN_NAME) is also essential as the Download servlet 
+ * (IToolContentHandler.SPRING_BEAN_NAME) is also essential as the ToolDownload servlet 
  * looks for it by this name.
  * </UL>
  * For example:

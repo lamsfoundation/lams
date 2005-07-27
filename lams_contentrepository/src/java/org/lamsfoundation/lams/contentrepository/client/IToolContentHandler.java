@@ -33,17 +33,14 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 
 /**
- * ToolContentHander is an abstract class that implements most of the functionality
- * of the interface. Each tool extends the abstract class and implements the remaining
- * functionality (which is tool specific).
- * 
- * This interface exists so that the Download servlet (@see org.lamsfoundation.lams.contentrepository.client.Download.java)
- * can get to the Repository via ToolContentHandler. It needs to call the tool's 
+ * IToolContentHandler defines the ContentHandler interface used by the tools.
+ * This interface exists so that the ToolDownload servlet can get to the 
+ * Repository via ToolContentHandler. It needs to call the tool's 
  * concrete class,  which must be defined in the Spring context as "toolContentHandler" 
- * (see SPRING_BEAN_NAME). The Download servlet looks for it by name, so if you change
- * the name, you will also need to extend the Download servlet to use your own name.
+ * (see SPRING_BEAN_NAME). 
  * 
- * For more details on using this class, @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler.
+ * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler
+ * @see org.lamsfoundation.lams.contentrepository.client.Download
  * @author Fiona Malikoff
  */
 public interface IToolContentHandler {
