@@ -33,7 +33,6 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from qaQueContent in class QaQueContent where qaQueContent.qaContentId=:qaContentId";
 	 	private static final String GET_QUESTION_IDS_FOR_CONTENT = "select qaQueContent.qaQueContentId from QaQueContent qaQueContent where qaQueContent.qaContentId = :qa";
 		
-	 	
 	 	public QaQueContent getToolDefaultQuestionContent(final long qaContentId)
 	    {
 	        return (QaQueContent) getHibernateTemplate().execute(new HibernateCallback()

@@ -77,8 +77,6 @@ public class QaUploadedFile implements Serializable
         this.qaContent=qaContent;
     }
 
-    
-
     public QaUploadedFile(String uuid, 
     					boolean fileOnline, 
     					String fileName,

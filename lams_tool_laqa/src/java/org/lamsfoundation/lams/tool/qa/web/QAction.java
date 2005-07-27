@@ -21,7 +21,6 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
 
@@ -37,7 +36,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
@@ -227,6 +225,7 @@ public class QAction extends DispatchAction implements QaAppConstants
     	
     	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
     	
+    	IQaService qaService =QaUtils.getToolService(request);
     	
     	/**
     	 * the status of define later is determined from the property inspector and 
@@ -399,8 +398,7 @@ public class QAction extends DispatchAction implements QaAppConstants
         	/**
         	 * look after defineLater flag
         	 */
-    		IQaService qaService =QaUtils.getToolService(request);
-	    	Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
+    		Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
 		    logger.debug("MONITORED_CONTENT_ID: " + monitoredContentId);
 		    if (monitoredContentId != null)
 		    {

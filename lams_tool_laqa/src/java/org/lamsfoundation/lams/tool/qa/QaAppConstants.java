@@ -115,6 +115,11 @@ public interface QaAppConstants {
     public static final String LIST_UPLOADED_ONLINE_FILES				="listUploadedOnlineFiles";
     public static final String LIST_UPLOADED_OFFLINE_FILENAMES			="listUploadedOfflineFileNames";
     public static final String LIST_UPLOADED_ONLINE_FILENAMES			="listUploadedOnlineFileNames";
+    public static final String LIST_UPLOADED_OFFLINE_FILES_UUID			="listUploadedOfflineFilesUuid";
+    public static final String LIST_UPLOADED_OFFLINE_FILES_NAME			="listUploadedOfflineFilesName";
+    public static final String LIST_UPLOADED_ONLINE_FILES_UUID			="listUploadedOnlineFilesUuid";
+    public static final String LIST_UPLOADED_ONLINE_FILES_NAME			="listUploadedOnlineFilesName";
+    public static final String POPULATED_UPLOADED_FILESDATA				="populateUploadedFilesData";
     
     
     /**

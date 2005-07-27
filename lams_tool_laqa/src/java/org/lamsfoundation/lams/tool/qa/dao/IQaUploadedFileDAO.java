@@ -20,6 +20,9 @@
  */
 package org.lamsfoundation.lams.tool.qa.dao;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 
 /**
@@ -42,6 +45,18 @@ public interface IQaUploadedFileDAO
 	    public void removeUploadFile(Long submissionId);
 	    
 	    public void deleteUploadFile(QaUploadedFile qaUploadedFile);
+	    
+	    public List retrieveQaUploadedFiles(QaContent qa, boolean fileOnline);
+	    
+	    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa);
+	    
+	    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa);
+	    
+	    public List retrieveQaUploadedOfflineFilesName(QaContent qa);
+	    
+	    public List retrieveQaUploadedOnlineFilesName(QaContent qa);
+	    
+	    public void cleanUploadedFilesMetaData();
 	    
 	    public void flush();
 }

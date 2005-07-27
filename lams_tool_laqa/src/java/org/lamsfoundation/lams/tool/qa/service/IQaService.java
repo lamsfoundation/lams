@@ -21,7 +21,6 @@
 package org.lamsfoundation.lams.tool.qa.service;
 
 import java.io.InputStream;
-import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -213,5 +212,18 @@ public interface IQaService
 	
 	/** repository access related methods  till here */
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, QaContent qaContent) throws QaApplicationException;
+    
+    public List retrieveQaUploadedFiles(QaContent qa, boolean fileOnline) throws QaApplicationException;
+    
+    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa);
+    
+    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa);
+    
+    public List retrieveQaUploadedOfflineFilesName(QaContent qa);
+    
+    public List retrieveQaUploadedOnlineFilesName(QaContent qa);
+    
+    public void cleanUploadedFilesMetaData() throws QaApplicationException;
+    
 }
 

@@ -535,6 +535,78 @@ public class QaServicePOJO implements
         }
     }
     
+    public List retrieveQaUploadedFiles(QaContent qa, boolean fileOnline) throws QaApplicationException
+    {
+        try
+        {
+            return qaUploadedFileDAO.retrieveQaUploadedFiles(qa, fileOnline);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+    
+    
+    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa)
+    {
+    	try
+        {
+            return qaUploadedFileDAO.retrieveQaUploadedOfflineFilesUuid(qa);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: offline + uuids "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+    
+    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa)
+    {
+    	try
+        {
+            return qaUploadedFileDAO.retrieveQaUploadedOnlineFilesUuid(qa);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: online + uuids "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+    
+    public List retrieveQaUploadedOfflineFilesName(QaContent qa)
+    {
+    	try
+        {
+            return qaUploadedFileDAO.retrieveQaUploadedOfflineFilesName(qa);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: offline + fileNames "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
+    
+    public List retrieveQaUploadedOnlineFilesName(QaContent qa)
+    {
+    	try
+        {
+            return qaUploadedFileDAO.retrieveQaUploadedOnlineFilesName(qa);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: online + fileNames "
+                                                         + e.getMessage(),
+														   e);
+        }
+    	
+    }
+    
     
     
     public int countTotalNumberOfUserResponsed(QaContent qa) throws QaApplicationException
@@ -1428,6 +1500,9 @@ public class QaServicePOJO implements
 		}
 	}
 	
+	/**
+	 * adds a new entry to the uploaded files table
+	 */
 	public void persistFile(String uuid, boolean isOnlineFile, String fileName, QaContent qaContent) throws QaApplicationException {
 		logger.debug("attempt persisting file to the db: " + uuid + " " + isOnlineFile + " " + fileName + " " + qaContent);
 		QaUploadedFile qaUploadedFile= new QaUploadedFile(uuid, isOnlineFile, fileName, qaContent);
@@ -1436,6 +1511,16 @@ public class QaServicePOJO implements
 		logger.debug("persisted qaUploadedFile: " + qaUploadedFile);
 	}
 
+	/**
+	 * removes all the entries in the uploaded files table
+	 */
+	public void cleanUploadedFilesMetaData() throws QaApplicationException {
+		logger.debug("attempt cleaning up uploaded file meta data table from the db");
+		qaUploadedFileDAO.cleanUploadedFilesMetaData();
+		logger.debug("files meta data has been cleaned up");
+	}
+    
+	
 	/**
 	 * @return Returns the logger.
 	 */

@@ -383,6 +383,10 @@ public class AuthoringUtil implements QaAppConstants {
         qaService.createQa(qa);
         logger.debug("qa created with content id: " + toolContentId);
         
+        logger.debug("attempt cleaning files meta data from the db");
+        qaService.cleanUploadedFilesMetaData();
+		logger.debug("cleaned up files meta data from the db");
+		
         LinkedList listUploadedOfflineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILES);
     	logger.debug("final listUploadedOfflineFiles: " + listUploadedOfflineFiles);
     	LinkedList listUploadedOnlineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES);

@@ -69,6 +69,7 @@ package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -107,6 +108,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	
 		Map mapQuestionContent= new TreeMap(new QaComparator());
 		/** these two are for repository access */
+		/**holds the final offline files  list */
 		LinkedList listUploadedOfflineFiles= new LinkedList();
 		LinkedList listUploadedOnlineFiles= new LinkedList();
 		
@@ -124,6 +126,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		
 		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
 		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
+		
 		
 		/**
 		 * retrive the service
@@ -351,8 +354,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			mapQuestionContent.put(INITIAL_QUESTION_COUNT,request.getSession().getAttribute(DEFAULT_QUESTION_CONTENT));
 			logger.debug("Map initialized with default contentid to: " + mapQuestionContent);
 
-			/** retrieve uploaded offline file names */
+			/** set  uploaded offline file names to empty list*/
+			List listOfflineFileNames=new LinkedList();
 			
+			/** set  uploaded online file names to empty list*/
+			List listOnlineFileNames=new LinkedList();
 			
 		}
 		else
@@ -423,7 +429,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    logger.debug("IS_QUESTIONS_SEQUENCED_MONITORING: " + request.getSession().getAttribute(IS_QUESTIONS_SEQUENCED_MONITORING));
 		    logger.debug("IS_DEFINE_LATER: " + request.getSession().getAttribute(IS_DEFINE_LATER));
 		    
-			/**
+		    QaUtils.populateUploadedFilesData(request, defaultQaContent);
+		    logger.debug("populated UploadedFilesData");
+		    
+		    /**
 			 * get the existing question content
 			 */
 			logger.debug("setting existing content data from the db");
