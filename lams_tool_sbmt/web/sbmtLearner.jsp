@@ -22,7 +22,7 @@
   
   <body>
   	<H1><c:out value="${content.title}"/></H1>
-  	<H2><c:out value="${content.instructions}" escapeXml="false"/></H2>
+  	<H2><c:out value="${content.instruction}" escapeXml="false"/></H2>
   	<div id="datatablecontainer">
   	<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
 	<logic:present name="SbmtLearnerForm" property="filesUploaded">
@@ -85,7 +85,7 @@
 	</div>
 					
   	<div id="formtablecontainer">
-    <html:form action="/learner?method=uploadFile" method="post" focus="filePath"  onsubmit="return validateForm(this);">
+    <html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data" focus="filePath"  onsubmit="return validateForm(this);">
       <p><html:errors/></p>
       <table class="forms">
       	<!-- Hidden fields -->

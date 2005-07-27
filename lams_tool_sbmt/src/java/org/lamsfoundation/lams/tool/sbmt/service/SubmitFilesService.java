@@ -23,8 +23,8 @@
 package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -363,8 +364,6 @@ public class SubmitFilesService implements ToolContentManager,
 	 *            uploaded
 	 * @param sessionID
 	 *            The <code>ToolSessionID</code> of the file being uploaded
-	 * @param filePath
-	 *            The physical path of the file
 	 * @param fileDescription
 	 *            The description of the file
 	 * @param fileName
@@ -377,7 +376,7 @@ public class SubmitFilesService implements ToolContentManager,
 	 * 			  The <code>User</code> who has uploaded the file.
 	 * @throws SubmitFilesException
 	 */
-	private void uploadFile(InputStream stream, Long sessionID, String filePath,
+	private void uploadFile(InputStream stream, Long sessionID, 
 							String fileDescription, String fileName, String mimeType,
 							Date dateOfSubmission, Long userID) throws SubmitFilesException {
 
@@ -388,7 +387,7 @@ public class SubmitFilesService implements ToolContentManager,
 							+ " found.");
 		else {
 			NodeKey nodeKey = uploadFileToRepository(stream, fileName, mimeType);
-			SubmissionDetails details = new SubmissionDetails(filePath,fileDescription,dateOfSubmission,
+			SubmissionDetails details = new SubmissionDetails(fileName,fileDescription,dateOfSubmission,
 															  userID,nodeKey.getUuid(),nodeKey.getVersion());
 			SubmitFilesReport report = new SubmitFilesReport();
 			details.setReport(report);
@@ -512,16 +511,17 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#uploadFile(java.lang.Long,
 	 *      java.lang.String, java.lang.String)
 	 */
-	public void uploadFile(Long sessionID, String filePath,
+	public void uploadFile(Long sessionID, FormFile uploadFile,
 						   String fileDescription, Long userID) throws SubmitFilesException{
 		try{
-			File file = new File(filePath);
-			String fileName = file.getName();
+			String fileName = uploadFile.getFileName();
 			String mimeType = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length());
-			FileInputStream stream = new FileInputStream(file);
-			uploadFile(stream,sessionID,filePath,fileDescription,fileName,mimeType,new Date(),userID);			
+			InputStream stream = uploadFile.getInputStream();
+			uploadFile(stream,sessionID,fileDescription,fileName,mimeType,new Date(),userID);			
 		}catch(FileNotFoundException fe){
 			throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + fe.getMessage());
+		} catch (IOException e) {
+			throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
 		}
 
 	}

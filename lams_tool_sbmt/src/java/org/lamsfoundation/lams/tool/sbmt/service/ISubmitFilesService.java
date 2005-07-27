@@ -25,6 +25,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
@@ -95,16 +96,15 @@ public interface ISubmitFilesService {
 	 * 
 	 * @param contentID
 	 *            The content_id of the record to be updated in the database
-	 * @param filePath
-	 *            The physical location of the file from where it has to be
-	 *            uploaded
+	 * @param uploadedFile
+	 *            The STRUTS org.apache.struts.upload.FormFile type
 	 * @param fileDescription
 	 *            The description of the file being uploaded.
 	 * @param userID
 	 * 			  The <code>User</code> who has uploaded the file.
 	 * @throws SubmitFilesException
 	 */
-	public void uploadFile(Long contentID, String filePath,
+	public void uploadFile(Long contentID, FormFile uploadedFile,
 			String fileDescription, Long userID) throws SubmitFilesException;
 	
 	/**

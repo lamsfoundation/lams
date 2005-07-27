@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
+import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
@@ -90,14 +91,14 @@ public class LearnerAction extends DispatchAction {
 		
 		Long sessionID =(Long) authForm.get("toolSessionID");
 		Long userID = (Long)authForm.get("userID");
-		String filePath = (String) authForm.get("filePath");
+		FormFile uploadedFile= (FormFile) authForm.get("filePath");
 		String fileDescription = (String) authForm.get("fileDescription");
-		
+
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 		//to avoid user without patience click "upload" button too fast 
 		saveToken(request);
 		try{
-			submitFilesService.uploadFile(sessionID,filePath,fileDescription,userID);
+			submitFilesService.uploadFile(sessionID,uploadedFile,fileDescription,userID);
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 			listUploadFiles(authForm, filesUploaded);
 			return mapping.getInputForward();			

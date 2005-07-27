@@ -1,10 +1,8 @@
 <form-bean name ="SbmtAuthoringForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="title" 
-				   type="java.lang.String" 
-				   initial="Submit Files"/>
+				   type="java.lang.String" />
 	<form-property name="instructions" 
-				   type="java.lang.String" 
-				   initial="Please upload you files below. Maximum file size is 1.0 MB." />
+				   type="java.lang.String" />
 	<form-property name="toolContentID"
 				   type="java.lang.Long"/>
 				   
@@ -13,12 +11,10 @@
 
 <form-bean name="SbmtLearnerForm" type="org.apache.struts.validator.DynaValidatorForm">
 	<form-property name="filePath"
-				   type="java.lang.String"
-				   initial="Type the path of the File here or click the Browse button to choose"/>
+				   type="org.apache.struts.upload.FormFile"/>
 	
 	<form-property name="fileDescription"
-				   type="java.lang.String"
-				   initial="Type the description of the file here..."/>
+				   type="java.lang.String"/>
 	
 	<form-property name="toolSessionID"
 				   type="java.lang.Long"/>
