@@ -402,7 +402,14 @@
 				<copy file="${webinf}/web.xml" todir="${testwebinf}" overwrite="true"/>		
 				<copy file="${webinf}/struts/struts-config.xml" todir="${testwebinf}" overwrite="true"/>			
 				<copy file="${webinf}/tiles/tiles-defs.xml" todir="${testwebinf}/tiles" overwrite="true"/>			
-				<junit printsummary="yes" haltonerror="no" haltonfailure="no"
+				<copy overwrite="yes" todir="${build.classes.test}/org/lamsfoundation/lams/tool/qa/">
+								<fileset dir="${src.dir.test}/org/lamsfoundation/lams/tool/qa/">
+										<include name="*.xml"/>
+										<include name="*.properties"/>
+					   				    <exclude name="web.xml"/>
+								</fileset>
+				</copy>						
+								<junit printsummary="yes" haltonerror="no" haltonfailure="no"
 					   fork="yes">
 					<formatter type="plain" usefile="false"/>
 					<formatter type="xml"/>
@@ -413,8 +420,8 @@
 						</fileset>
 					</batchtest>
 					<classpath>
-						<pathelement location="${build.classes}"/>
-						<pathelement location="${build.test}"/>
+						<pathelement location="${build.classes.java}"/>
+						<pathelement location="${build.classes.test}"/>
 						<pathelement location="${hbm}"/>
 						<pathelement location="${web}"/>
 						<pathelement location="${webinf.spring}"/>
@@ -423,6 +430,16 @@
 					</classpath>
 				</junit>
 			</target>
+
+	<target name="test-report" depends="compile.test">
+		<mkdir dir="${build.report}/html"/> 
+		<junitreport todir="${build.report}"> 
+			<fileset dir="${build.report}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report todir="${build.report}/html"/> 
+		</junitreport>
+	</target>
 
 	
 </project>
