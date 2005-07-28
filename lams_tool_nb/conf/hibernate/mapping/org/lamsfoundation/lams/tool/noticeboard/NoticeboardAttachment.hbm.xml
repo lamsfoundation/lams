@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment" 
+    table="tl_lanb11_attachment"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="tl_lanb11_attachment"
+    </meta>
+
+    <id
+        name="attachmentId"
+        type="java.lang.Long"
+        column="attachment_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Long"
+            column="attachment_id"
+
+
+        </meta>
+        <generator class="native" />
+    </id>
+
+    <property
+        name="filename"
+        type="java.lang.String"
+        column="filename"
+        not-null="true"
+        length="50"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="filename"
+            length="50"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="uuid"
+        type="java.lang.Long"
+        column="uuid"
+        not-null="true"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="uuid"
+            length="20"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="versionId"
+        type="java.lang.Long"
+        column="version_id"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="version_id"
+            length="20"
+        </meta>    
+    </property>
+    <property
+        name="isOnline"
+        type="boolean"
+        column="is_online"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="is_online"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to TlLanb11Content -->
+    <many-to-one
+        name="nbContent"
+        class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent"
+        not-null="true"
+        cascade="none"
+        outer-join="auto"
+        update="true"
+        insert="true"
+        access="property"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="nb_content_uid"         
+        </meta>
+        <column name="nb_content_uid" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>
