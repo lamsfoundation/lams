@@ -2,6 +2,7 @@ USE lams;
 
 -- Ensure an existing table does not exist
 DROP TABLE IF EXISTS lams.tl_lanb11_user;
+DROP TABLE IF EXISTS lams.tl_lanb11_attachment;
 DROP TABLE IF EXISTS lams.tl_lanb11_session;
 DROP TABLE IF EXISTS lams.tl_lanb11_content;
 
@@ -46,4 +47,17 @@ CREATE TABLE lams.tl_lanb11_user (
      , INDEX (nb_session_uid)
      , CONSTRAINT FK_tl_lanb11_user_1 FOREIGN KEY (nb_session_uid)
                   REFERENCES lams.tl_lanb11_session (uid)
+)TYPE=InnoDB;
+
+CREATE TABLE lams.tl_lanb11_attachment (
+       attachment_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , nb_content_uid BIGINT(20) NOT NULL
+     , filename VARCHAR(50) NOT NULL
+     , uuid BIGINT(20) NOT NULL
+     , version_id BIGINT(20)
+     , isOnline TINYINT(1) NOT NULL
+     , PRIMARY KEY (attachment_id)
+     , INDEX (nb_content_uid)
+     , CONSTRAINT FK_tl_lanb11_attachment_1 FOREIGN KEY (nb_content_uid)
+                  REFERENCES lams.tl_lanb11_content (uid)
 )TYPE=InnoDB;
