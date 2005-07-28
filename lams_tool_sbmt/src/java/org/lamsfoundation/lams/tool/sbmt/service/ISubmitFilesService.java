@@ -48,15 +48,8 @@ public interface ISubmitFilesService {
 	/**
 	 * This method adds a new content record to the database.
 	 * 
-	 * @param contentID
-	 *            The <code>content_id</code> of the new record
-	 * @param title
-	 *            The title of the tool
-	 * @param instructions
-	 *            The instructions for working with that tool
 	 */
-	public void addSubmitFilesContent(Long contentID, String title,
-			String instructions);
+	public void addSubmitFilesContent(SubmitFilesContent content);
 
 	/**
 	 * Updates the record in the database
@@ -93,20 +86,20 @@ public interface ISubmitFilesService {
 	 * <li>It first uploads the file to the content repository</li>
 	 * <li>And then it updates the database</li>
 	 * </ol>
-	 * 
-	 * @param contentID
-	 *            The content_id of the record to be updated in the database
-	 * @param uploadedFile
-	 *            The STRUTS org.apache.struts.upload.FormFile type
 	 * @param fileDescription
 	 *            The description of the file being uploaded.
 	 * @param userID
 	 * 			  The <code>User</code> who has uploaded the file.
+	 * @param contentID
+	 *            The content_id of the record to be updated in the database
+	 * @param uploadedFile
+	 *            The STRUTS org.apache.struts.upload.FormFile type
+	 * 
 	 * @throws SubmitFilesException
 	 */
-	public void uploadFile(Long contentID, FormFile uploadedFile,
-			String fileDescription, Long userID) throws SubmitFilesException;
-	
+	public void uploadFileToSession(Long sessionID, FormFile uploadFile,
+			   String fileDescription, Long userID) throws SubmitFilesException;
+	public void uploadFileToContent(Long contentID, FormFile uploadFile, String fileType) throws SubmitFilesException;
 	/**
 	 * This method returns a list of files that were uploaded by the
 	 * given <code>User<code> for given <code>contentID</code>.

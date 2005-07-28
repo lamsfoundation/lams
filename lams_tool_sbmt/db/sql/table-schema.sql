@@ -23,12 +23,14 @@ create table tl_lasbmt11_content (
    online_instruction text,
    run_offline_instruction text,
    content_in_use bit,
+   lock_on_finished bit,
    primary key (content_id)
 );
 create table tl_lasbmt11_instruction_files (
    file_id bigint not null auto_increment,
    uuid bigint,
    version_id bigint,
+   type varchar(20),
    content_id bigint,
    primary key (file_id)
 );

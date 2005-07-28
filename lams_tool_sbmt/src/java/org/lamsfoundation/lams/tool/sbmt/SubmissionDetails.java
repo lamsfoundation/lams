@@ -48,16 +48,6 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	/** default constructor */
 	public SubmissionDetails() {
 	}
-
-	/** minimal constructor */
-	public SubmissionDetails(String filePath, String fileDescription, Date dateOfSubmission, Long userID, Long uuid, Long versionID) {
-	    this.filePath = filePath;
-	    this.fileDescription = fileDescription;
-	    this.dateOfSubmission = dateOfSubmission;
-	    this.userID = userID;
-	    this.uuid = uuid;
-	    this.versionID = versionID;
-	}
 	/**
 	 * @hibernate.id generator-class="identity" type="java.lang.Long"
 	 *               column="submission_id"

@@ -1,5 +1,4 @@
 SET FOREIGN_KEY_CHECKS=0;
-
 CREATE TABLE tl_lasbmt11_content (
        content_id BIGINT(20) NOT NULL DEFAULT 0
      , title VARCHAR(64) NOT NULL
@@ -10,6 +9,7 @@ CREATE TABLE tl_lasbmt11_content (
      , online_instruction TEXT
      , run_offline_instruction TEXT
      , content_in_use TINYINT(1)
+     , lock_on_finished TINYINT(1)
      , PRIMARY KEY (content_id)
 )TYPE=InnoDB;
 
@@ -35,6 +35,7 @@ CREATE TABLE tl_lasbmt11_instruction_files (
        file_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , uuid BIGINT(20)
      , version_id BIGINT(20)
+     , type VARCHAR(20)
      , content_id BIGINT(20)
      , PRIMARY KEY (file_id)
      , INDEX (content_id)
@@ -57,6 +58,7 @@ CREATE TABLE tl_lasbmt11_submission_details (
                   REFERENCES tl_lasbmt11_session (session_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
 
-INSERT INTO `tl_lasbmt11_content` (content_id,title,instruction,define_later,run_offline,content_in_use) values(1,"Java Submission","Submit your java programs",0,0,0);
+
+INSERT INTO `tl_lasbmt11_content` (content_id,title,instruction,define_later,run_offline,content_in_use,lock_on_finished) values(1,"Java Submission","Submit your java programs",0,0,0,0);
 INSERT INTO `tl_lasbmt11_session` (session_id,content_id,status) values(1,1,1);
 SET FOREIGN_KEY_CHECKS=1;

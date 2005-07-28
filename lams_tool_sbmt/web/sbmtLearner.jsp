@@ -89,8 +89,8 @@
       <p><html:errors/></p>
       <table class="forms">
       	<!-- Hidden fields -->
-      	<html:hidden property="toolSessionID" value="${param.toolSessionID}"/>
-      	<html:hidden property="userID" value ="${param.userID}"/>
+      	<html:hidden property="toolSessionID" value="${requestScope.toolSessionID}"/>
+      	<html:hidden property="userID" value ="${requestScope.userID}"/>
       	
       	<!--File path row -->
         <tr>

@@ -9,7 +9,7 @@
 <table-list>
 <table alias="" name="tl_lasbmt11_content" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="151" y="33"/>
+<table-figure-bounds height="-1" width="-1" x="127" y="20"/>
 <column-list>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="0" mandatory="true" name="content_id" remarks="">
 <column-description></column-description>
@@ -94,6 +94,19 @@
 <variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="lock_on_finished" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key alias="" name="PRIMARY" remarks="">
 <primary-key-description></primary-key-description>
@@ -110,7 +123,7 @@
 </table>
 <table alias="" name="tl_lasbmt11_instruction_files" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="185" y="314"/>
+<table-figure-bounds height="-1" width="-1" x="173" y="266"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="file_id" remarks="">
 <column-description></column-description>
@@ -149,6 +162,13 @@
 <variant type-name-pattern="BIGINT UNSIGNED"/>
 <variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
 <variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="type" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="content_id" remarks="">
@@ -192,7 +212,7 @@
 </table>
 <table alias="" name="tl_lasbmt11_report" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="810" y="292"/>
+<table-figure-bounds height="-1" width="-1" x="555" y="83"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="report_id" remarks="">
 <column-description></column-description>
@@ -249,7 +269,7 @@
 </table>
 <table alias="" name="tl_lasbmt11_session" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="603" y="48"/>
+<table-figure-bounds height="-1" width="-1" x="805" y="235"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="session_id" remarks="">
 <column-description></column-description>
@@ -318,7 +338,7 @@
 </table>
 <table alias="" name="tl_lasbmt11_submission_details" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="564" y="221"/>
+<table-figure-bounds height="-1" width="-1" x="503" y="316"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="submission_id" remarks="">
 <column-description></column-description>

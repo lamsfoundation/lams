@@ -18,8 +18,16 @@
 				   type="java.lang.String" />
 	<form-property name="instructions" 
 				   type="java.lang.String" />
+	<form-property name="offlineInstruction" 
+				   type="java.lang.String" />
+	<form-property name="onlineInstruction" 
+				   type="java.lang.String" />
 	<form-property name="toolContentID"
 				   type="java.lang.Long"/>
+	<form-property name="lockOnFinished"
+				   type="java.lang.Long"/>		   
+	<form-property name="filename"
+				   type="org.apache.struts.upload.FormFile"/>
 </form-bean>
 
 <form-bean name="SbmtLearnerForm" type="org.apache.struts.validator.DynaValidatorForm">
@@ -109,19 +117,14 @@
       type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
       name="SbmtAuthoringForm"
       scope="request"
-      input="/sbmtAuthoring.jsp"
-      parameter="method"
+      input="/authoring/authoring.jsp"
+      parameter="action"
       unknown="false"
       validate="true"
     >
       <forward
         name="success"
-        path="/Login.jsp"
-        redirect="false"
-      />
-      <forward
-        name="initpage"
-        path="/sbmtAuthoring.jsp"
+        path="/authoring/success.jsp"
         redirect="false"
       />
     </action>

@@ -51,6 +51,9 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 
 	private Set instructionFiles;
 	
+	/** persistent field */
+	private boolean lockOnFinished;
+
 	/** full constructor */
 	public SubmitFilesContent(String title, String instructions,
 							  Set toolSession) {
@@ -265,18 +268,35 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	 * @hibernate.collection-key column="content_id"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.sbmt.InstructionFiles"
 	 * 
-	 * @return Returns the instrctionFiles.
+	 * @return Returns the instructionFiles.
 	 */
-	public Set getInstrctionFiles() {
+	public Set getInstructionFiles() {
 		return instructionFiles;
 	}
 
 	/**
-	 * @param instrctionFiles The instrctionFiles to set.
+	 * @param instructionFiles The instructionFiles to set.
 	 */
-	public void setInstrctionFiles(Set instrctionFiles) {
-		this.instructionFiles = instrctionFiles;
+	public void setInstructionFiles(Set instructionFiles) {
+		this.instructionFiles = instructionFiles;
 	}
+
+	/**
+	 * 
+	 * @hibernate.property column="lock_on_finished" length="1"
+	 * @return Returns the lockOnFinished.
+	 */
+	public boolean isLockOnFinished() {
+		return lockOnFinished;
+	}
+
+	/**
+	 * @param lockOnFinished The lockOnFinished to set.
+	 */
+	public void setLockOnFinished(boolean lockOnFinished) {
+		this.lockOnFinished = lockOnFinished;
+	}
+
     
     public Object clone(){
 		Object obj = null;

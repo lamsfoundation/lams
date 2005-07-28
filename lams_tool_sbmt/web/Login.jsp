@@ -5,7 +5,6 @@
 <body>
 	<form name="authoring" method="get" action="authoring.do">
 		<input type ="hidden" name="toolContentID" value="1">
-		<input type ="hidden" name="method" value="initPage">
 		<input type="submit" name="submit" value="Author1 Logon">
 	</form>		
 	<form name="authoring" method="get" action="authoring.do">

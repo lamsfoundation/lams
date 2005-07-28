@@ -25,11 +25,11 @@ package org.lamsfoundation.lams.tool.sbmt.service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
@@ -44,10 +45,13 @@ import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
@@ -56,6 +60,7 @@ import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
@@ -68,6 +73,7 @@ import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.LearnerDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatusReportDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -89,6 +95,7 @@ public class SubmitFilesService implements ToolContentManager,
 	
 	private ISubmissionDetailsDAO submissionDetailsDAO;
 	
+	private SbmtToolContentHandler toolContentHandler;
 	private IUserDAO userDAO;
 
 	private IRepositoryService repositoryService;
@@ -130,6 +137,21 @@ public class SubmitFilesService implements ToolContentManager,
 	public void setSubmissionDetailsDAO(
 			ISubmissionDetailsDAO submissionDetailsDAO) {
 		this.submissionDetailsDAO = submissionDetailsDAO;
+	}
+	
+
+	/**
+	 * @return Returns the toolContentHandler.
+	 */
+	public SbmtToolContentHandler getToolContentHandler() {
+		return toolContentHandler;
+	}
+
+	/**
+	 * @param toolContentHandler The toolContentHandler to set.
+	 */
+	public void setToolContentHandler(SbmtToolContentHandler toolContentHandler) {
+		this.toolContentHandler = toolContentHandler;
 	}
 	
 	/**
@@ -248,15 +270,10 @@ public class SubmitFilesService implements ToolContentManager,
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#addSubmitFilesContent(java.lang.Long,
-	 *      java.lang.String, java.lang.String)
+	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#addSubmitFilesContent(SubmitFilesContent)
 	 */
-	public void addSubmitFilesContent(Long contentID, String title,
-			String instructions) {
-		SubmitFilesContent submitFilesContent = new SubmitFilesContent(
-				contentID, title, instructions);
-		
-		submitFilesContentDAO.save(submitFilesContent);
+	public void addSubmitFilesContent(SubmitFilesContent content) {
+		submitFilesContentDAO.save(content);
 	}
 
 	/**
@@ -332,7 +349,7 @@ public class SubmitFilesService implements ToolContentManager,
 			throws SubmitFilesException {
 		ITicket ticket = getRepositoryLoginTicket();
 		try {
-			String files[] = repositoryService.deleteVersion(ticket, uuid,versionID);
+			repositoryService.deleteVersion(ticket, uuid,versionID);
 		} catch (Exception e) {
 			throw new SubmitFilesException(
 					"Exception occured while deleting files from"
@@ -340,94 +357,6 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 	}
 
-	/**
-	 * This method is called when the user requests to upload a file. It's a
-	 * three step process.
-	 * <ol>
-	 * <li>Firstly, the tool authenticates itself and obtains a valid ticket
-	 * from the respository</li>
-	 * <li>Secondly, using the above ticket it uploads the file to the
-	 * repository. Upon successful uploading of the file, repository returns a
-	 * <code>NodeKey</code> object which is a unique indentifier of the file
-	 * in the repsoitory</li>
-	 * <li>Finally, this information is updated into the database for the given
-	 * contentID in the following tables
-	 * 	<ul>
-	 * 		<li><code>tl_lasbmt11_submission_details</code></li>
-	 * 		<li><code>tl_lasbmt11_report</code></li>
-	 * 	</ul>
-	 * </li>
-	 * </ol>
-	 * 
-	 * @param stream
-	 *            The <code>InputStream</code> representing the data to be
-	 *            uploaded
-	 * @param sessionID
-	 *            The <code>ToolSessionID</code> of the file being uploaded
-	 * @param fileDescription
-	 *            The description of the file
-	 * @param fileName
-	 *            The name of the file being added
-	 * @param mimeType
-	 *            The MIME type of the file (eg. TXT, DOC, GIF etc)
-	 * @param dateOfSubmission
-	 *            The date this file was uploaded by the user
-	 * @param userID
-	 * 			  The <code>User</code> who has uploaded the file.
-	 * @throws SubmitFilesException
-	 */
-	private void uploadFile(InputStream stream, Long sessionID, 
-							String fileDescription, String fileName, String mimeType,
-							Date dateOfSubmission, Long userID) throws SubmitFilesException {
-
-		SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(sessionID);
-		if (session == null)
-			throw new SubmitFilesException(
-					"No such session with a ToolSessionID of: " + sessionID
-							+ " found.");
-		else {
-			NodeKey nodeKey = uploadFileToRepository(stream, fileName, mimeType);
-			SubmissionDetails details = new SubmissionDetails(fileName,fileDescription,dateOfSubmission,
-															  userID,nodeKey.getUuid(),nodeKey.getVersion());
-			SubmitFilesReport report = new SubmitFilesReport();
-			details.setReport(report);
-			details.setSubmitFileSession(session);
-			//update session, then insert the detail too.
-			Set detailSet = session.getSubmissionDetails();
-			detailSet.add(details);
-			session.setSubmissionDetails(detailSet);
-			submissionDetailsDAO.saveOrUpdate(session);
-		}
-	}	
-
-	/**
-	 * This method is called everytime a new content has to be added to the
-	 * repository. In order to do so first of all a valid ticket is obtained
-	 * from the Repository hence authenticating the tool(SubmitFiles) and then
-	 * the corresponding file is added to the repository.
-	 * 
-	 * @param stream
-	 *            The <code>InputStream</code> representing the data to be
-	 *            added
-	 * @param fileName
-	 *            The name of the file being added
-	 * @param mimeType
-	 *            The MIME type of the file (eg. TXT, DOC, GIF etc)
-	 * @return NodeKey Represents the two part key - UUID and Version.
-	 * @throws SubmitFilesException
-	 */
-	public NodeKey uploadFileToRepository(InputStream stream, String fileName,
-			String mimeType) throws SubmitFilesException {
-		ITicket ticket = getRepositoryLoginTicket();
-		try {
-			NodeKey nodeKey = repositoryService.addFileItem(ticket, stream,
-					fileName, mimeType, null);
-			return nodeKey;
-		} catch (Exception e) {
-			throw new SubmitFilesException("Exception occured while trying to"
-					+ " upload file into the repository" + e.getMessage());
-		}
-	}
 
 	/**
 	 * (non-Javadoc)
@@ -504,28 +433,99 @@ public class SubmitFilesService implements ToolContentManager,
 			// TODO Auto-generated method stub
 			return;
 	}
-	
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#uploadFile(java.lang.Long,
-	 *      java.lang.String, java.lang.String)
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToContent(Long,FormFile ) 
 	 */
-	public void uploadFile(Long sessionID, FormFile uploadFile,
+	public void uploadFileToContent(Long contentID, FormFile uploadFile,String fileType) throws SubmitFilesException{
+		
+		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
+			throw new SubmitFilesException("Could not find upload file: " + uploadFile);
+		
+		SubmitFilesContent content = submitFilesContentDAO.getContentByID(contentID);
+		if (content == null)
+			throw new SubmitFilesException(
+					"No such content with a contentID of: " + contentID
+							+ " found.");
+		
+		NodeKey nodeKey = processFile(uploadFile,fileType);
+		
+		Set fileSet = content.getInstructionFiles();
+		if(fileSet == null)
+			fileSet = new HashSet();
+		InstructionFiles file = new InstructionFiles();
+		file.setType(fileType);
+		file.setUuID(nodeKey.getUuid());
+		file.setVersionID(nodeKey.getVersion());
+		fileSet.add(file);
+		submitFilesContentDAO.save(content);
+	}
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToSession(Long,FormFile,String,Long ) 
+	 */
+	public void uploadFileToSession(Long sessionID, FormFile uploadFile,
 						   String fileDescription, Long userID) throws SubmitFilesException{
-		try{
-			String fileName = uploadFile.getFileName();
-			String mimeType = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length());
-			InputStream stream = uploadFile.getInputStream();
-			uploadFile(stream,sessionID,fileDescription,fileName,mimeType,new Date(),userID);			
-		}catch(FileNotFoundException fe){
-			throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + fe.getMessage());
-		} catch (IOException e) {
-			throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-		}
+			
+			if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
+				throw new SubmitFilesException("Could not find upload file: " + uploadFile);
+			
+			SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(sessionID);
+			if (session == null)
+				throw new SubmitFilesException(
+						"No such session with a sessionID of: " + sessionID
+								+ " found.");
+			
+			NodeKey nodeKey = processFile(uploadFile,IToolContentHandler.TYPE_ONLINE);
+			
+			SubmissionDetails details = new SubmissionDetails();
+			details.setFileDescription(fileDescription);
+			details.setFilePath(uploadFile.getFileName());
+			details.setDateOfSubmission(new Date());
+			details.setUserID(userID);
+			details.setUuid(nodeKey.getUuid());
+			details.setVersionID(nodeKey.getVersion());
+			SubmitFilesReport report = new SubmitFilesReport();
+			details.setReport(report);
+			details.setSubmitFileSession(session);
+			
+			//update session, then insert the detail too.
+			Set detailSet = session.getSubmissionDetails();
+			detailSet.add(details);
+			session.setSubmissionDetails(detailSet);
+			submissionDetailsDAO.saveOrUpdate(session);
 
 	}
-	
+    /**
+     * Process an uploaded file.
+     * 
+     * @param forumForm
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
+     */
+    private NodeKey processFile(FormFile file, String fileType){
+    	NodeKey node = null;
+        if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
+            String fileName = file.getFileName();
+            try {
+				node = getToolContentHandler().uploadFile(file.getInputStream(), fileName, 
+				        file.getContentType(), fileType);
+			} catch (InvalidParameterException e) {
+				throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (FileNotFoundException e) {
+				throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (RepositoryCheckedException e) {
+				throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (IOException e) {
+				throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			}
+          }
+        return node;
+    }
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long, java.lang.Long)
@@ -737,9 +737,6 @@ public class SubmitFilesService implements ToolContentManager,
 		//current there is no false return
 		return true;
 	}
-
-
-
 
 
 }

@@ -116,7 +116,7 @@
         />
 
         <set
-            name="instrctionFiles"
+            name="instructionFiles"
             lazy="true"
             inverse="false"
             cascade="all-delete-orphan"
@@ -133,6 +133,15 @@
             />
 
         </set>
+
+        <property
+            name="lockOnFinished"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="lock_on_finished"
+            length="1"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

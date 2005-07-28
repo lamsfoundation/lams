@@ -60,7 +60,7 @@ NULL
 , NULL
 , 0
 , NULL
-, ${learning_library_id}
+, 2
 , NOW()
 , 0
 , 'Do it yourself'
@@ -68,7 +68,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, ${tool_id}
+, 2
 , NULL
 , 4
 , NULL

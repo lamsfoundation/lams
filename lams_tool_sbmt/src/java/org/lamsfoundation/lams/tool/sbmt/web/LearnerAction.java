@@ -6,13 +6,17 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.web;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -22,12 +26,19 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Manpreet Minhas
@@ -67,7 +78,9 @@ public class LearnerAction extends DispatchAction {
 		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		listUploadFiles(authForm, filesUploaded);
 		
-		//to avoid user without patience click "upload" button too fast 
+		//to avoid user without patience click "upload" button too fast
+		request.setAttribute("userID",userID);
+		request.setAttribute("toolSessionID",sessionID);
 		saveToken(request);
 		return mapping.getInputForward();
 		
@@ -86,6 +99,8 @@ public class LearnerAction extends DispatchAction {
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 
 			listUploadFiles(authForm, filesUploaded);
+			request.setAttribute("userID",userID);
+			request.setAttribute("toolSessionID",sessionID);
 			return returnErrors(mapping,request,"submit.upload.twice","upload");
 		}
 		
@@ -98,9 +113,11 @@ public class LearnerAction extends DispatchAction {
 		//to avoid user without patience click "upload" button too fast 
 		saveToken(request);
 		try{
-			submitFilesService.uploadFile(sessionID,uploadedFile,fileDescription,userID);
+			submitFilesService.uploadFileToSession(sessionID,uploadedFile,fileDescription,userID);
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 			listUploadFiles(authForm, filesUploaded);
+			request.setAttribute("userID",userID);
+			request.setAttribute("toolSessionID",sessionID);
 			return mapping.getInputForward();			
 		}catch(SubmitFilesException se){
 			logger.error("uploadFile: Submit Files Exception has occured" + se.getMessage());
@@ -147,4 +164,6 @@ public class LearnerAction extends DispatchAction {
 		}
 		authForm.set("filesUploaded",filesUploaded);
 	}
+
+
 }

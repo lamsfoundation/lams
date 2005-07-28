@@ -67,6 +67,7 @@
 		<property name="submitFilesSessionDAO"><ref bean="submitFilesSessionDAO"/></property>
 		<property name="submitFilesReportDAO"><ref bean="submitFilesReportDAO"/></property>
 		<property name="submissionDetailsDAO"><ref bean="submissionDetailsDAO"/></property>
+		<property name="toolContentHandler"><ref bean="toolContentHandler"/></property>
 		<property name="userDAO"><ref bean="userDAO"/></property>
 	</bean>
 	
@@ -88,5 +89,8 @@
 			</props>
 		</property>
 	</bean>	
+	<bean id="toolContentHandler" class="org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
 	
 </beans>
