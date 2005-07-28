@@ -14,9 +14,9 @@ Ant build file.
 	<property file="build.properties"/>
 
 	<path id="all-libs">
-		<fileset dir="${lib}">
+	<!-- 	<fileset dir="${lib}">
 			<include name="**/*.jar"/>
-		</fileset>
+		</fileset> -->
 		<fileset dir="${sharedlib}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -177,20 +177,7 @@ Ant build file.
 				<include name="fckeditor/tlds/*"/>
 			</webinf>
 			<lib dir="${build.lib}">
-				<include name="${product}.jar"/> </lib><!-- 
-			</lib>
-			<lib dir="${lib}/jakarta-commons">
-				<include name="*.jar"/>
-			</lib>
-			<lib dir="${lib}/jakarta-taglibs">
-				<include name="*.jar"/>
-			</lib>
-			<lib dir="${lib}/jaxen">  
-				<include name="*.jar"/> 
-			</lib> 
-			<lib dir="${lib}/reload_2_0_1">
-				<include name="*.jar"/>
-			</lib> -->
+				<include name="${product}.jar"/> </lib>
 			<fileset dir="${web}">
 				<include name="*"/>
 				<include name="includes/*"/>
