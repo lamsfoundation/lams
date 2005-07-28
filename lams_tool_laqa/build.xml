@@ -430,16 +430,5 @@
 					</classpath>
 				</junit>
 			</target>
-
-	<target name="test-report" depends="compile.test">
-		<mkdir dir="${build.report}/html"/> 
-		<junitreport todir="${build.report}"> 
-			<fileset dir="${build.report}">
-				<include name="TEST-*.xml"/>
-			</fileset>
-			<report todir="${build.report}/html"/> 
-		</junitreport>
-	</target>
-
 	
 </project>

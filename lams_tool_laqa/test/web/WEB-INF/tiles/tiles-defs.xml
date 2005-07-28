@@ -19,9 +19,6 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-<!DOCTYPE tiles-definitions PUBLIC
-   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
-   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
  
 <tiles-definitions>
 <!-- ============= template Definitions ====================== -->
@@ -83,6 +80,19 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="title" value="Monitoring Error"/>
 		<put name="pageHeader" value = "Monitoring Error"/>
 		<put name="content" value="/monitoringErrorScreen.jsp" />	
+	</definition>
+
+
+	<definition name=".exportPortfolioStarter" extends=".baseDef" >
+		<put name="title" value="Starter for Q/A Export Portfolio"/>
+		<put name="pageHeader" value = "Starter for Q/A Export Portfolio"/>
+		<put name="content" value="/exportPortfolioIndex.jsp" />	
+	</definition>
+
+	<definition name=".portfolioReport" extends=".baseDef" >
+		<put name="title" value="Portfolio Report"/>
+		<put name="pageHeader" value = "Portfolio Report"/>
+		<put name="content" value="/portfolioReport.jsp" />	
 	</definition>
 
 
