@@ -74,6 +74,8 @@ public class NoticeboardContent implements Serializable {
 	/** persistent field */
 	private Set nbSessions = new HashSet();
 	
+	private Set nbAttachments = new HashSet();
+	
 	/** default constructor */
 	public NoticeboardContent()
 	{
@@ -250,7 +252,7 @@ public class NoticeboardContent implements Serializable {
      *      inverse="true"
      *      cascade="all-delete-orphan"
      *     	@hibernate.collection-key
-     *      column="nb_content_id"
+     *      column="nb_content_uid"
      *     	@hibernate.collection-one-to-many
      *      class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
      */
@@ -265,6 +267,28 @@ public class NoticeboardContent implements Serializable {
 	public void setNbSessions(Set nbSessions) {
 		this.nbSessions = nbSessions;
 	}
+	
+	/**
+     *  	@hibernate.set
+     *      lazy="true"
+     *      inverse="true"
+     *      cascade="all-delete-orphan"
+     *      @hibernate.collection-key
+     *      column="nb_content_uid"
+     * 		@hibernate.collection-one-to-many
+     *      class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment"
+     */
+    public Set getNbAttachments() {
+        return nbAttachments;
+    }
+    /**
+     * @param nbAttachments The nbAttachments to set.
+     */
+    public void setNbAttachments(Set nbAttachments) {
+        this.nbAttachments = nbAttachments;
+    }
+	
+	
 	
 	/**
 	 * 
@@ -322,6 +346,11 @@ public class NoticeboardContent implements Serializable {
         this.uid = uid;
     }
 	
+
+   
+    
+    
+    
     
 	/** 
 	 * 
