@@ -30,9 +30,11 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
+import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO;
 
 import org.springframework.dao.DataAccessException;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
@@ -68,6 +70,9 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	
 	private NoticeboardUser nbUser;
 	private INoticeboardUserDAO nbUserDAO=null;
+	
+	private NoticeboardAttachment nbAttachment;
+	private INoticeboardAttachmentDAO nbAttachmentDAO = null;
 	
 	private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
 
@@ -619,6 +624,99 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    return totalNumberOfUsers;
 	}
 	
+	/* ==============================================================================
+	 * Methods for access to NoticeboardUser objects
+	 * ==============================================================================
+	 */
+	
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveAttachment(java.lang.Long) */
+	public NoticeboardAttachment retrieveAttachment(Long attachmentId)
+	{
+	    if (attachmentId == null)
+	    {
+	        String error = "Unable to continue. The attachment id is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    
+	    try
+	    {
+	        return nbAttachmentDAO.retrieveAttachment(attachmentId);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to retrieve the attachment "
+	                + e.getMessage(), e);
+	    }
+	}
+	
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveAttachmentByUuid(java.lang.Long) */
+	public NoticeboardAttachment retrieveAttachmentByUuid(Long uuid)
+	{
+	    if (uuid == null)
+	    {
+	        String error = "Unable to continue. The uuid is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    try
+	    {
+	        return nbAttachmentDAO.retrieveAttachmentByUuid(uuid);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to retrieve the attachment "
+	                + e.getMessage(), e);
+	    }
+	}
+	
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#getAttachmentIdsFromContent(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent) */
+	public List getAttachmentIdsFromContent(NoticeboardContent nbContent)
+	{
+	    try
+	    {
+	        return nbAttachmentDAO.getAttachmentIdsFromContent(nbContent);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to retrieve the list of attachment ids "
+	                + e.getMessage(), e);
+	    }
+	}
+	
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#saveAttachment(org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment) */
+	public void saveAttachment(NoticeboardAttachment attachment)
+	{
+	    try
+	    {
+	        nbAttachmentDAO.saveAttachment(attachment);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to save the attachment "
+	                + e.getMessage(), e);
+	    }
+	}
+	
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeAttachment(org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment) */
+	public void removeAttachment(NoticeboardAttachment attachment)
+	{
+	    try
+	    {
+	        nbAttachmentDAO.removeAttachment(attachment);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to remove this attachment"
+	                + e.getMessage(), e);
+	    }
+	}
+	
+	
+	
+	
+	
+	
 	/* ===============Methods implemented from ToolContentManager =============== */
 	
 	/** @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long, java.lang.Long)*/
@@ -856,4 +954,14 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	{
 	    this.nbUserDAO = nbUserDAO;
 	}
+	
+	
+    
+    public INoticeboardAttachmentDAO getNbAttachmentDAO() {
+        return nbAttachmentDAO;
+    }
+   
+    public void setNbAttachmentDAO(INoticeboardAttachmentDAO nbAttachmentDAO) {
+        this.nbAttachmentDAO = nbAttachmentDAO;
+    }
 }

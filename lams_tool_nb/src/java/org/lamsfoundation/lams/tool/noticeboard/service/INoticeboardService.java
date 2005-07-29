@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.noticeboard.service;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import java.util.List;
 
 
@@ -247,5 +248,44 @@ public interface INoticeboardService {
      * @return the total number of users for this tool activity
      */
     public int calculateTotalNumberOfUsers(Long toolContentId);
+    
+    //===================================================================
+    // NoticeboardAttachment access methods
+    //===================================================================
+    
+    /**
+	 * <p>Retrieve an instance of NoticeboardAttachment with the given
+     * attachment id <code>attachmentId</code> </p>
+     * @param attachmentId The id for the attachment file
+     * @return an instance of NoticeboardAttachment
+     */
+    public NoticeboardAttachment retrieveAttachment(Long attachmentId);
+    
+    /**
+	 * <p>Retrieve the file attachment with the given uuid </p>
+     * @param uuid The unique identifier for the file, corresponds to the uuid for the file stored in content repository
+     * @return an instance of NoticeboardAttachment
+     */
+    public NoticeboardAttachment retrieveAttachmentByUuid(Long uuid);
+    
+    /**
+     * <p>Retrieve the list of attachment ids with the given instance of NoticeboardContent</p>
+     * @param nbContent The given instance of NoticeboardContent
+     * @return List. the list of attachment ids (java.lang.Long)
+     */
+    public List getAttachmentIdsFromContent(NoticeboardContent nbContent);
+    
+    /**
+     * <p> Saves (persists) or update the NoticeboardAttachment object in the
+     * database.</p>
+     * @param attachment The instance of NoticeboardAttachment to save
+     */
+    public void saveAttachment(NoticeboardAttachment attachment);
+    
+    /**
+     * Removes the NoticeboardAttachment object from the database.
+     * @param attachment The instance of NoticeboardAttachment to delete.
+     */
+    public void removeAttachment(NoticeboardAttachment attachment);
     
 }
