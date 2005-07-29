@@ -44,21 +44,66 @@ public class NoticeboardAttachment implements Serializable {
     private String filename;
     private Long uuid;
     private Long versionId;
-    private boolean isOnline;
+    private boolean onlineFile;
 
+    /**default constructor */
+    public NoticeboardAttachment() {}
+    
+    /** minimal constructor */
+    public NoticeboardAttachment(Long attachmentId,
+            					 NoticeboardContent nbContent,
+            					 String filename,
+            					 boolean isOnline)
+    {
+        this.attachmentId = attachmentId;
+        this.nbContent = nbContent;
+        this.filename = filename;
+        this.onlineFile = isOnline;
+    }
+    
+    /**full constructor */
+    public NoticeboardAttachment(Long attachmentId,
+								 NoticeboardContent nbContent,
+								 String filename,
+								 Long uuid,
+								 Long versionId,
+								 boolean isOnline)
+    {
+        this.attachmentId = attachmentId;
+        this.nbContent = nbContent;
+        this.filename = filename;
+        this.uuid = uuid;
+        this.versionId = versionId;
+        this.onlineFile = isOnline;
+    }
+    
+    
+    
     /**
+     *		@hibernate.id
+     *      generator-class="native"
+     *      type="java.lang.Long"
+     *      column="attachment_id"
+     * 
      * @return Returns the attachmentId.
      */
     public Long getAttachmentId() {
         return attachmentId;
     }
+    
     /**
      * @param attachmentId The attachmentId to set.
      */
     public void setAttachmentId(Long attachmentId) {
         this.attachmentId = attachmentId;
     }
+    
     /**
+     * 		@hibernate.property
+     *      column="filename"
+     *      length="50"
+     *      not-null="true"
+     * 
      * @return Returns the filename.
      */
     public String getFilename() {
@@ -70,19 +115,30 @@ public class NoticeboardAttachment implements Serializable {
     public void setFilename(String filename) {
         this.filename = filename;
     }
+   
     /**
+     * 		@hibernate.property
+     *       column="online_file"
+     *       length="1"
+     *       not-null="true"
+     * 
      * @return Returns the isOnline.
      */
-    public boolean isOnline() {
-        return isOnline;
+    public boolean isOnlineFile() {
+        return onlineFile;
     }
     /**
      * @param isOnline The isOnline to set.
      */
-    public void setOnline(boolean isOnline) {
-        this.isOnline = isOnline;
+    public void setOnlineFile(boolean isOnline) {
+        this.onlineFile = isOnline;
     }
+   
     /**
+     * 		@hibernate.many-to-one
+     *       not-null="true"
+     *      @hibernate.column name="nb_content_uid" 
+     * 
      * @return Returns the nbContent.
      */
     public NoticeboardContent getNbContent() {
@@ -94,7 +150,12 @@ public class NoticeboardAttachment implements Serializable {
     public void setNbContent(NoticeboardContent nbContent) {
         this.nbContent = nbContent;
     }
+   
     /**
+     * 		@hibernate.property
+     *       column="uuid"
+     *       length="20"
+     * 
      * @return Returns the uuid.
      */
     public Long getUuid() {
@@ -106,7 +167,12 @@ public class NoticeboardAttachment implements Serializable {
     public void setUuid(Long uuid) {
         this.uuid = uuid;
     }
+   
     /**
+     * 		@hibernate.property
+     *       column="version_id"
+     *       length="20"
+     * 
      * @return Returns the versionId.
      */
     public Long getVersionId() {
