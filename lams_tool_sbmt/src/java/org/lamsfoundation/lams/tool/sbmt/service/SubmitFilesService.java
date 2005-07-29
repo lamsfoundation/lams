@@ -292,7 +292,13 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getSubmitFilesContent(java.lang.Long)
 	 */
 	public SubmitFilesContent getSubmitFilesContent(Long contentID) {
-		return submitFilesContentDAO.getContentByID(contentID);
+		SubmitFilesContent content = new SubmitFilesContent();
+		try {
+			content = submitFilesContentDAO.getContentByID(contentID);
+		} catch (Exception e) {
+			log.error("Could not find the content by givn ID:"+contentID+". Excpetion is " + e);
+		}
+		return content;
 	}
 
 	/**
@@ -458,6 +464,7 @@ public class SubmitFilesService implements ToolContentManager,
 		file.setType(fileType);
 		file.setUuID(nodeKey.getUuid());
 		file.setVersionID(nodeKey.getVersion());
+		file.setName(uploadFile.getFileName());
 		fileSet.add(file);
 		submitFilesContentDAO.save(content);
 	}

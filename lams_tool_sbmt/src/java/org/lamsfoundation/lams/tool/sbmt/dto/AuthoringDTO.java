@@ -69,13 +69,15 @@ public class AuthoringDTO implements Serializable {
 		onlineFiles = new ArrayList();
 		offlineFiles = new ArrayList();
 		Set fileSet = content.getInstructionFiles();
-		Iterator iter = fileSet.iterator();
-		while(iter.hasNext()){
-			InstructionFiles file = (InstructionFiles) iter.next();
-			if(StringUtils.equalsIgnoreCase(file.getType(),IToolContentHandler.TYPE_OFFLINE))
-				offlineFiles.add(file);
-			else
-				onlineFiles.add(file);
+		if(fileSet != null){
+			Iterator iter = fileSet.iterator();
+			while(iter.hasNext()){
+				InstructionFiles file = (InstructionFiles) iter.next();
+				if(StringUtils.equalsIgnoreCase(file.getType(),IToolContentHandler.TYPE_OFFLINE))
+					offlineFiles.add(file);
+				else
+					onlineFiles.add(file);
+			}
 		}
 		
 	}

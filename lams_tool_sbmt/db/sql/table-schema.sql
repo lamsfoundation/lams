@@ -31,6 +31,7 @@ create table tl_lasbmt11_instruction_files (
    uuid bigint,
    version_id bigint,
    type varchar(20),
+   name varchar(255),
    content_id bigint,
    primary key (file_id)
 );

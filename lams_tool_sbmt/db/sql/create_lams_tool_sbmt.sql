@@ -36,6 +36,7 @@ CREATE TABLE tl_lasbmt11_instruction_files (
      , uuid BIGINT(20)
      , version_id BIGINT(20)
      , type VARCHAR(20)
+     , name VARCHAR(255)
      , content_id BIGINT(20)
      , PRIMARY KEY (file_id)
      , INDEX (content_id)
@@ -57,6 +58,7 @@ CREATE TABLE tl_lasbmt11_submission_details (
      , CONSTRAINT FK1411A53C630DDF64 FOREIGN KEY (session_id)
                   REFERENCES tl_lasbmt11_session (session_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
+
 
 
 INSERT INTO `tl_lasbmt11_content` (content_id,title,instruction,define_later,run_offline,content_in_use,lock_on_finished) values(1,"Java Submission","Submit your java programs",0,0,0,0);

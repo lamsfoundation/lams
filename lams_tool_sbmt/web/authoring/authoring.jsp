@@ -17,14 +17,15 @@
 </head>
 
 <body>
-<html:form action="authoring?method=updateContent" method="post"
-	focus="login"  enctype="multipart/form-data">
+<html:form action="authoring" method="post"
+	focus="title"  enctype="multipart/form-data">
+	<html:errors/>
 	<div id="basic">
 	<h1><fmt:message key="label.authoring.heading.basic" /></h1>
 	<h1><fmt:message key="label.authoring.heading.basic.desc" /></h1>
 	<table class="forms">
 		<!--hidden field contentID passed by flash-->
-		<html:hidden property="toolContentID" value="${toolContentID}" />
+		<html:hidden property="toolContentID" value="${authoring.contentID}" />
 		<!-- Title Row -->
 		<tr>
 			<td class="formlabel"><fmt:message key="label.authoring.basic.title" />:</td>
@@ -35,6 +36,7 @@
 			<td class="formlabel"><fmt:message key="label.authoring.basic.instruction" />:</td>
 			<td class="formcontrol"><FCK:editor id="instructions"
 				basePath="/lams/fckEditor/" height="150" width="85%">
+				<c:out value="${authoring.instruction}" escapeXml="false"/>
 			</FCK:editor></td>
 		</tr>
 	</table>
@@ -53,17 +55,26 @@
 				key="label.authoring.online.instruction" />:</td>
 			<td class="formcontrol"><FCK:editor id="onlineInstruction"
 				basePath="/lams/fckEditor/" height="150" width="85%">
+				<c:out value="${authoring.onlineInstruction}" escapeXml="false"/>
 			</FCK:editor></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td class="formcontrol">
+				<c:forEach var="file" items="${authoring.onlineFiles}">
+					<li><c:out value="${file.name}"/></li>
+				</c:forEach>
+			</td>
 		</tr>
 		<tr>
 			<td class="formlabel">
 				<fmt:message key="label.authoring.online.file" />:
 			</td>
 			<td class="formcontrol">
-				<html:file property="filename">
+				<html:file property="onlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
-				<html:submit property="submit">
+				<html:submit property="action">
 					<fmt:message key="label.authoring.upload.online.button" />
 				</html:submit>
 			</td>
@@ -73,17 +84,26 @@
 				key="label.authoring.offline.instruction" />:</td>
 			<td class="formcontrol"><FCK:editor id="offlineInstruction"
 				basePath="/lams/fckEditor/" height="150" width="85%">
+				<c:out value="${authoring.offlineInstruction}" escapeXml="false"/>
 			</FCK:editor></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td class="formcontrol">
+				<c:forEach var="file" items="${authoring.offlineFiles}">
+					<li><c:out value="${file.name}"/></li>
+				</c:forEach>
+			</td>
 		</tr>
 		<tr>
 			<td class="formlabel">
 				<fmt:message key="label.authoring.offline.file" />:
 			</td>
 			<td class="formcontrol">
-				<html:file property="filename">
+				<html:file property="offlineFile">
 					<fmt:message key="label.authoring.choosefile.button" />
 				</html:file>
-				<html:submit property="submit">
+				<html:submit property="action">
 					<fmt:message key="label.authoring.upload.offline.button" />
 				</html:submit>
 			</td>
@@ -102,9 +122,9 @@
 		<!-- Instructions Row -->
 		<tr>
 			<td class="formcontrol">
-				<html:radio property="lockOnFinished" value="1">
+				<html:checkbox property="lockOnFinished" value="1">
 					<fmt:message key="label.authoring.advance.lock.on.finished" />
-				</html:radio>
+				</html:checkbox>
 			</td>
 		</tr>
 	</table>
@@ -117,7 +137,7 @@
 				<fmt:message key="label.authoring.cancel.button" />
 			</html:button></td>
 			<td class="formcontrol">
-			<html:submit property="submit">
+			<html:submit property="action">
 				<fmt:message key="label.authoring.save.button" />
 			</html:submit></td>
 	</table>

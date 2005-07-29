@@ -25,8 +25,10 @@
 	<form-property name="toolContentID"
 				   type="java.lang.Long"/>
 	<form-property name="lockOnFinished"
-				   type="java.lang.Long"/>		   
-	<form-property name="filename"
+				   type="java.lang.String"/>		   
+	<form-property name="onlineFile"
+				   type="org.apache.struts.upload.FormFile"/>
+	<form-property name="offlineFile"
 				   type="org.apache.struts.upload.FormFile"/>
 </form-bean>
 
@@ -122,6 +124,11 @@
       unknown="false"
       validate="true"
     >
+      <exception
+        key="authoring.exception"
+        type="org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException"
+        path="/authoring/authoring.jsp"
+      />
       <forward
         name="success"
         path="/authoring/success.jsp"

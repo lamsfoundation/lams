@@ -15,9 +15,12 @@
 				   type="java.lang.Long"/>
 				   
 	<form-property name="lockOnFinished"
-				   type="java.lang.Long"/>		   
+				   type="java.lang.String"/>		   
 				   
-	<form-property name="filename"
+	<form-property name="onlineFile"
+				   type="org.apache.struts.upload.FormFile"/>
+				   
+	<form-property name="offlineFile"
 				   type="org.apache.struts.upload.FormFile"/>
 </form-bean>
 

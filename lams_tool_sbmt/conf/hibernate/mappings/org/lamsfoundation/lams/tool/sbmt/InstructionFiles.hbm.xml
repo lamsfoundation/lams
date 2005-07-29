@@ -52,6 +52,15 @@
             length="20"
         />
 
+        <property
+            name="name"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="name"
+            length="255"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-InstructionFiles.xml

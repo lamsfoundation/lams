@@ -35,6 +35,7 @@ public class InstructionFiles implements Serializable,Cloneable{
 	private Long fileID;
 	private Long uuID;
 	private Long versionID;
+	private String name;
 	private String type;
 	/**
      * @hibernate.id generator-class="identity" type="java.lang.Long" column="file_id"
@@ -99,5 +100,18 @@ public class InstructionFiles implements Serializable,Cloneable{
 	 */
 	public void setType(String type) {
 		this.type = type;
+	}
+	/**
+	 * @hibernate.property column="name" length="255"
+	 * @return Returns the name.
+	 */
+	public String getName() {
+		return name;
+	}
+	/**
+	 * @param name The name to set.
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 }
