@@ -128,7 +128,7 @@ public class NoticeboardConstants
     //------------------------------
     
     public static final String ERROR_NBAPPLICATION = "error.exception.NbApplication";
-    
+    public static final String ERROR_MANDATORY="error.mandatoryField";
     public static final String ERR_MISSING_PARAM = "error.missingParam";
     
 }
