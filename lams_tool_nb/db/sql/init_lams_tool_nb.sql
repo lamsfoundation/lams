@@ -53,9 +53,9 @@ CREATE TABLE lams.tl_lanb11_attachment (
        attachment_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , nb_content_uid BIGINT(20) NOT NULL
      , filename VARCHAR(50) NOT NULL
-     , uuid BIGINT(20) NOT NULL
+     , uuid BIGINT(20) 
      , version_id BIGINT(20)
-     , isOnline TINYINT(1) NOT NULL
+     , online_file TINYINT(1) NOT NULL
      , PRIMARY KEY (attachment_id)
      , INDEX (nb_content_uid)
      , CONSTRAINT FK_tl_lanb11_attachment_1 FOREIGN KEY (nb_content_uid)

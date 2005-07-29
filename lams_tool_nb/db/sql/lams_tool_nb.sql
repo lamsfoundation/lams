@@ -7,6 +7,7 @@ CREATE TABLE lams.tl_lanb11_content (
      , offline_instructions TEXT
      , define_later TINYINT(1)
      , force_offline TINYINT(1)
+     , content_in_use TINYINT(1)
      , creator_user_id BIGINT(20)
      , date_created DATETIME
      , date_updated DATETIME
@@ -37,5 +38,19 @@ CREATE TABLE lams.tl_lanb11_user (
      , INDEX (nb_session_uid)
      , CONSTRAINT FK_tl_lanb11_user_1 FOREIGN KEY (nb_session_uid)
                   REFERENCES lams.tl_lanb11_session (uid)
+)TYPE=InnoDB;
+
+
+CREATE TABLE lams.tl_lanb11_attachment (
+       attachment_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , nb_content_uid BIGINT(20) NOT NULL
+     , filename VARCHAR(50) NOT NULL
+     , uuid BIGINT(20)
+     , version_id BIGINT(20)
+     , online_file TINYINT(1) NOT NULL
+     , PRIMARY KEY (attachment_id)
+     , INDEX (nb_content_uid)
+     , CONSTRAINT FK_tl_lanb11_attachment_1 FOREIGN KEY (nb_content_uid)
+                  REFERENCES lams.tl_lanb11_content (uid)
 )TYPE=InnoDB;
 

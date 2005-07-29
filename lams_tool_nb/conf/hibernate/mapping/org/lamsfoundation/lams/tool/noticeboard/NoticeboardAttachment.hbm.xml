@@ -54,14 +54,12 @@
         name="uuid"
         type="java.lang.Long"
         column="uuid"
-        not-null="true"
         length="20"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="uuid"
             length="20"
-            not-null="true"
         </meta>    
     </property>
     <property
@@ -77,15 +75,15 @@
         </meta>    
     </property>
     <property
-        name="isOnline"
+        name="onlineFile"
         type="boolean"
-        column="is_online"
+        column="online_file"
         not-null="true"
         length="1"
     >
         <meta attribute="field-description">
            @hibernate.property
-            column="is_online"
+            column="online_file"
             length="1"
             not-null="true"
         </meta>    
@@ -93,7 +91,7 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional many-to-one association to TlLanb11Content -->
+    <!-- bi-directional many-to-one association to NoticeboardContent -->
     <many-to-one
         name="nbContent"
         class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent"

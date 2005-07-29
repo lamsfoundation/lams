@@ -203,6 +203,34 @@
             class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
         />
     </set>
+    
+    <!-- bi-directional one-to-many association to TlLanb11Attachment -->
+    <set
+        name="nbAttachments"
+        lazy="true"
+        inverse="true"
+		cascade="all-delete-orphan"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+
+           @hibernate.collection-key
+            column="nb_content_uid"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment"
+        </meta>
+        <key>
+            <column name="nb_content_uid" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment"
+        />
+    </set>
+    
 
 </class>
 </hibernate-mapping>
