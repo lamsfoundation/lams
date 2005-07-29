@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 
 
@@ -48,6 +49,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	private NoticeboardContent nbContent;
 	private NoticeboardSession nbSession;
 	private NoticeboardUser nbUser;
+	private NoticeboardAttachment attachment;
 	
 	private boolean cleanContentData = true;
 
@@ -60,9 +62,10 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		//setup some data
+		
 		nbService = (INoticeboardService)this.context.getBean("nbService");
 		super.initAllData();
+		
 	}
 	
 	protected void tearDown() throws Exception
@@ -413,6 +416,54 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    assertEquals("testing the total number of users", totalUsers, 7);
 	    
 	    
+	    
+	}
+	
+	/* ==============================================================================
+	 * Methods for access to NoticeboardAttachment objects
+	 * ==============================================================================
+	 */
+	
+	public void testRetrieveAttachment()
+	{
+	    initNbAttachmentData();
+	    //test retrieveAttachmentByUuid
+	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
+	    
+	    assertAttachmentData(attachment);
+	    /* test getAttachmentsFromContent which will return a list of attachment ids, which we can use in the next method call to
+	     retrieveAttachment which takes in the attachmentId as the parameter. */
+	    List idList = nbService.getAttachmentIdsFromContent(nbService.retrieveNoticeboard(TEST_NB_ID));
+	    
+	    //test retrieveAttachment (by attachmentId, which was retrieved from the previous method)
+	    attachment = nbService.retrieveAttachment((Long)idList.get(0));
+	    assertAttachmentData(attachment);
+	}
+	
+	public void testSaveAttachment()
+	{
+	    String newFilename = "NoticeboardInstructions.txt";
+	    initNbAttachmentData();
+	    
+	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
+	    attachment.setFilename(newFilename);
+	    
+	    nbService.saveAttachment(attachment);
+	    
+	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
+	    assertEquals(attachment.getFilename(), newFilename);
+	}
+	
+	public void testRemoveAttachment()
+	{
+	    initNbAttachmentData();
+	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
+	    
+	    nbService.removeAttachment(attachment);
+	   
+	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
+	    
+	    assertNull(attachment);
 	    
 	}
 }
