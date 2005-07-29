@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardUserDAO;
+import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardAttachmentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import java.util.Date;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
@@ -47,6 +48,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     private NoticeboardContentDAO noticeboardDAO;
     private NoticeboardSessionDAO nbSessionDAO;
     private NoticeboardUserDAO nbUserDAO;
+    private NoticeboardAttachmentDAO attachmentDAO;
    
     //---------------------------------------------------------------------
     // Domain Object instances
@@ -54,6 +56,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     protected NoticeboardContent nbContent;
     protected NoticeboardSession nbSession;
     protected NoticeboardUser nbUser;
+
     
     //---------------------------------------------------------------------
     // DATA USED FOR TESTING PURPOSES ONLY
@@ -84,6 +87,11 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	protected final String TEST_USERNAME = "testUsername";
 	protected final String TEST_FULLNAME = "Hamish Andy";
 	protected final String TEST_USER_STATUS = NoticeboardUser.INCOMPLETE;
+	
+	protected final String TEST_FILENAME = "testFilename";
+	protected final boolean TEST_IS_ONLINE_FILE = true;
+	protected final Long TEST_UUID =  new Long(2002);
+	    
 	
 	//---------------------------------------------------------------------
     // DEFAULT DATA INSERTED BY BUILD-DB ANT TASK
@@ -121,6 +129,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
         noticeboardDAO = (NoticeboardContentDAO) this.context.getBean("nbContentDAO");
         nbSessionDAO = (NoticeboardSessionDAO) this.context.getBean("nbSessionDAO");
         nbUserDAO = (NoticeboardUserDAO) this.context.getBean("nbUserDAO");
+        attachmentDAO = (NoticeboardAttachmentDAO)this.context.getBean("nbAttachmentDAO");
     }
 
     protected void tearDown() throws Exception {
@@ -200,6 +209,20 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
         nbUserDAO.saveNbUser(user);
         
         ns.getNbUsers().add(user);
+    }
+    
+    protected void initNbAttachmentData()
+    {
+        NoticeboardAttachment attachment = new NoticeboardAttachment();
+        NoticeboardContent nb = noticeboardDAO.findNbContentById(TEST_NB_ID);
+        
+        attachment.setFilename(TEST_FILENAME);
+        attachment.setOnlineFile(TEST_IS_ONLINE_FILE);
+        attachment.setNbContent(nbContent);
+        attachment.setUuid(TEST_UUID);
+	     
+	    attachmentDAO.saveAttachment(attachment);
+        
     }
    
     protected void initAllData()
@@ -313,4 +336,12 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
         NoticeboardUser user = nbUserDAO.getNbUserByID(userId);
         assertNull(user);
     }
+    
+    protected void assertAttachmentData(NoticeboardAttachment attachment)
+	 {
+	     assertEquals("Validating the filename:", attachment.getFilename(), TEST_FILENAME);
+	     assertEquals("Validating whether it is an online file", attachment.isOnlineFile(), TEST_IS_ONLINE_FILE);
+	     assertEquals("Validating the tool content id", attachment.getNbContent().getNbContentId(), TEST_NB_ID);
+	     assertEquals("Validating the Uuid", attachment.getUuid(), TEST_UUID);
+	 }
 }
