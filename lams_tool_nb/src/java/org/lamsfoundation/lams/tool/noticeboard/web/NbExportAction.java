@@ -84,6 +84,13 @@ public class NbExportAction extends LamsDispatchAction {
         } */
         
         NoticeboardContent content = session.getNbContent();
+        
+        if (content == null)
+        {
+            String error="Data is missing from the database. Unable to Continue";
+            logger.error(error);
+            throw new NbApplicationException(error);
+        }
         //check if user belong to that session too.
         
         //check if the given user exists on the db or not, if they are not, do not export content.
