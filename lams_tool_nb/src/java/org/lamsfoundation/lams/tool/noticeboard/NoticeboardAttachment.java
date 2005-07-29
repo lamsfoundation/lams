@@ -50,26 +50,22 @@ public class NoticeboardAttachment implements Serializable {
     public NoticeboardAttachment() {}
     
     /** minimal constructor */
-    public NoticeboardAttachment(Long attachmentId,
-            					 NoticeboardContent nbContent,
+    public NoticeboardAttachment(NoticeboardContent nbContent,
             					 String filename,
             					 boolean isOnline)
     {
-        this.attachmentId = attachmentId;
         this.nbContent = nbContent;
         this.filename = filename;
         this.onlineFile = isOnline;
     }
     
     /**full constructor */
-    public NoticeboardAttachment(Long attachmentId,
-								 NoticeboardContent nbContent,
+    public NoticeboardAttachment(NoticeboardContent nbContent,
 								 String filename,
 								 Long uuid,
 								 Long versionId,
 								 boolean isOnline)
     {
-        this.attachmentId = attachmentId;
         this.nbContent = nbContent;
         this.filename = filename;
         this.uuid = uuid;
