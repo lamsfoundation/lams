@@ -7,7 +7,7 @@
 	<classpathentry kind="lib" path="lib/quartz/quartz.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams.jar"/>
-	<classpathentry kind="lib" path="D:/eclipse/workspace/lams_build/lib/lams/lams-learning.jar"/>
+	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>
 	<classpathentry kind="lib" path="lib/lams/lams-tool-survey.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/gnujaxp.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/jcommon-0.9.6.jar"/>
