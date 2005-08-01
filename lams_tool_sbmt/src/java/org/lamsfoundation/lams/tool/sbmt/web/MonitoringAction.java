@@ -39,9 +39,12 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 
 
@@ -54,9 +57,10 @@ import org.lamsfoundation.lams.util.WebUtil;
  * 				name="emptyForm" 				
  * 
  * @struts.action-forward name="userlist" path="/monitoring/alluserlist.jsp"
- * @struts.action-forward name="userReport" path="/monitoring/usermarkslist.jsp"
+ * @struts.action-forward name="userMarks" path="/monitoring/usermarkslist.jsp"
  * @struts.action-forward name="updateMarks" path="/monitoring/updatemarks.jsp"
- * @struts.action-forward name="report" path="/monitoring/viewallmarks.jsp"
+ * @struts.action-forward name="allUserMarks" path="/monitoring/viewallmarks.jsp"
+ * @struts.action-forward name="instructions" path="/monitoring/instructions.jsp"
  * 
  * @struts.action-forward name="status" path="/Status.jsp"
  * 				
@@ -90,6 +94,14 @@ public class MonitoringAction extends DispatchAction {
 		request.getSession().setAttribute("USERLIST",userList);
 		return mapping.findForward("userlist");
 	}
+	/**
+	 * Display special user's marks information. 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward getFilesUploadedByUser(ActionMapping mapping,
 							   ActionForm form,
 							   HttpServletRequest request,
@@ -103,8 +115,16 @@ public class MonitoringAction extends DispatchAction {
 		request.getSession().setAttribute("user",
 										  submitFilesService.getUserDetails(userID));
 		request.getSession().setAttribute("userReport",files);
-		return mapping.findForward("userReport");
+		return mapping.findForward("userMarks");
 	}
+	/**
+	 * Display empty update mark page.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward markFile(ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
@@ -164,7 +184,7 @@ public class MonitoringAction extends DispatchAction {
 		request.getSession().setAttribute("userReport",report);
 		request.getSession().setAttribute("toolSessionID",sessionID);
 		request.getSession().setAttribute("userID",userID);		
-		return mapping.findForward("userReport");
+		return mapping.findForward("userMarks");
 	}
 	/**
 	 * Download upload file for a special submission detail.  
@@ -204,7 +224,7 @@ public class MonitoringAction extends DispatchAction {
 		//if download throw any exception, then display it in current page.
 		if(!errors.isEmpty()){
 			saveErrors(request,errors);
-			return mapping.findForward("userReport");
+			return mapping.findForward("userMarks");
 		}
 			
 		return null;
@@ -222,7 +242,7 @@ public class MonitoringAction extends DispatchAction {
 //		request.getSession().setAttribute("user",
 //										  submitFilesService.getUserDetails(userID));
 		request.getSession().setAttribute("report",userFilesMap);
-		return mapping.findForward("report");
+		return mapping.findForward("allUserMarks");
 
 	}
 	public ActionForward releaseMarks(ActionMapping mapping,
@@ -235,7 +255,7 @@ public class MonitoringAction extends DispatchAction {
 		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
 		submitFilesService.releaseMarksForSession(sessionID);
 		//todo: need display some success info
-		return mapping.findForward("userReport");
+		return mapping.findForward("userMarks");
 	}
 	public ActionForward downloadMarks(ActionMapping mapping,
 			   ActionForm form,
@@ -244,7 +264,25 @@ public class MonitoringAction extends DispatchAction {
 		return null;
 	}
 	
-	
+	public ActionForward instructions(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+		
+		Long contentID = new Long(WebUtil.readLongParam(request,"toolContentID"));
+		
+		//get back the upload file list and display them on page
+		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
+				.getServlet().getServletContext());
+		
+		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
+		//if this content does not exist, then reset the contentID to current value to keep it on HTML page.
+		persistContent.setContentID(contentID);
+		
+		AuthoringDTO authorDto = new AuthoringDTO(persistContent);
+		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
+		return mapping.findForward("instructions");
+	}
 	//TODO
 	public ActionForward getStatus(ActionMapping mapping,
 							   ActionForm form,
@@ -265,7 +303,7 @@ public class MonitoringAction extends DispatchAction {
 		Hashtable report = submitFilesService.generateReport(sessionID);
 		request.getSession().setAttribute("toolSessionID", sessionID);
 		request.getSession().setAttribute("report", report);
-		return mapping.findForward("report");
+		return mapping.findForward("allUserMarks");
 	}
 
 }

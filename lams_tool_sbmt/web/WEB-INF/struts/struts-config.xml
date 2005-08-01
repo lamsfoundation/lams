@@ -94,7 +94,7 @@
         redirect="false"
       />
       <forward
-        name="userReport"
+        name="userMarks"
         path="/monitoring/usermarkslist.jsp"
         redirect="false"
       />
@@ -104,8 +104,13 @@
         redirect="false"
       />
       <forward
-        name="report"
+        name="allUserMarks"
         path="/monitoring/viewallmarks.jsp"
+        redirect="false"
+      />
+      <forward
+        name="instructions"
+        path="/monitoring/instructions.jsp"
         redirect="false"
       />
       <forward

@@ -30,6 +30,11 @@
 		<input type ="hidden" name="method" value="userList">
 		<input type="submit" name="submit" value="Monitoring Logon">
 	</form>
+	<form name="monitoringForm" method="get" action="monitoring.do">
+		<input type ="hidden" name="toolContentID" value="1">
+		<input type ="hidden" name="method" value="instructions">
+		<input type="submit" name="submit" value="Monitoring Instructions">
+	</form>
 
 </body>
 </html>
