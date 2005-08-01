@@ -13,7 +13,8 @@
 <html:base />
 <title>Submit Files</title>
 <!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-<link href="../css/aqua.css" rel="stylesheet" type="text/css">
+<link href="../includes/css/aqua.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../includes/javascript/common.js"></script>
 </head>
 
 <body>
@@ -62,7 +63,17 @@
 			<td></td>
 			<td class="formcontrol">
 				<c:forEach var="file" items="${authoring.onlineFiles}">
-					<li><c:out value="${file.name}"/></li>
+					<li><c:out value="${file.name}"/>
+					<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
+						<fmt:message key="label.view"/>
+					</html:link>
+					<html:link href="../download/?uuid=${file.uuID}&preferDownload=true">
+						<fmt:message key="label.download"/>
+					</html:link>
+					<html:link property="action" href="../authoring.do?uuid=${file.uuID}&versionID=${file.versionID}">
+						<fmt:message key="label.authoring.online.delete"/>
+					</html:link>
+					</li>
 				</c:forEach>
 			</td>
 		</tr>
@@ -92,6 +103,15 @@
 			<td class="formcontrol">
 				<c:forEach var="file" items="${authoring.offlineFiles}">
 					<li><c:out value="${file.name}"/></li>
+					<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
+						<fmt:message key="label.view"/>
+					</html:link>
+					<html:link href="../download/?uuid=${file.uuID}&preferDownload=true">
+						<fmt:message key="label.download"/>
+					</html:link>
+					<html:link property="action" href="../authoring.do?uuid=${file.uuID}&versionID=${file.versionID}">
+						<fmt:message key="label.authoring.offline.delete"/>
+					</html:link>					
 				</c:forEach>
 			</td>
 		</tr>

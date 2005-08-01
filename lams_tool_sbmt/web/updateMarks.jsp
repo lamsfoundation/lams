@@ -13,7 +13,7 @@
 <html:html locale="true">
   <head>    
     <title>Files Submitted</title>
-    <link href="css/aqua.css" rel="stylesheet" type="text/css">
+    <link href="includes/css/aqua.css" rel="stylesheet" type="text/css">
   </head>  
   <body>
 		  <c:set var="details" value="${sessionScope.fileDetails}"/>

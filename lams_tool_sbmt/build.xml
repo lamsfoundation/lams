@@ -279,7 +279,7 @@
 	   			<!-- front end programs like HTML, JSP, CSS etc. -->
 	   			<fileset dir="${conf.web.dir}">
 						<include name="**/*.jsp"/>
-						<include name="css/*"/>
+						<include name="includes/**"/>
 				</fileset>
 	   			
 	   	   </war>

@@ -147,13 +147,58 @@ public class AuthoringAction extends LookupDispatchAction {
 		return mapping.getInputForward();
 
 	}
+	/**
+	 * Delete online file
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public ActionForward deleteOffline(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		return deleteFile(mapping, form, IToolContentHandler.TYPE_OFFLINE,request);
+	}
+	/**
+	 * Delete offline file
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public ActionForward deleteOnline(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) {
+		return deleteFile(mapping, form, IToolContentHandler.TYPE_ONLINE,request);
+	}
+	
+	private ActionForward deleteFile(ActionMapping mapping, ActionForm form, String type, HttpServletRequest request) {
+
+		SubmitFilesContent content = getContent(form);
+		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
+				.getServlet().getServletContext());
+
+		Long uuid = new Long(WebUtil.readLongParam(request,"uuid"));
+		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
+		submitFilesService.deleteFromRepository(uuid,versionID);
+		
+		//send back the upload file list and display them on page
+		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(content.getContentID());
+		content.setInstructionFiles(persistContent.getInstructionFiles());
+		AuthoringDTO authorDto = new AuthoringDTO(content);
+		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
+		return mapping.getInputForward();
+		
+	}
 
 	protected Map getKeyMethodMap() {
 		Map map = new HashMap();
 		map.put("label.authoring.upload.online.button", "uploadOnline");
 		map.put("label.authoring.upload.offline.button", "uploadOffline");
 		map.put("label.authoring.save.button", "updateContent");
-
+		map.put("label.authoring.online.delete","deleteOnline");
+		map.put("label.authoring.offline.delete","deleteOffline");
+		
 		return map;
 	}
 

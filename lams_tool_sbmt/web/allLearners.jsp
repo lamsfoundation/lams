@@ -13,7 +13,7 @@
   <head>    
     <title>All Learner Submission Details</title>
     
-  	<link href="css/aqua.css" rel="stylesheet" type="text/css">
+  	<link href="includes/css/aqua.css" rel="stylesheet" type="text/css">
   	
   </head>  
   <body>

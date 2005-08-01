@@ -165,4 +165,5 @@ public interface ISubmitFilesService {
 	 */
 	public boolean releaseMarksForSession(Long sessionID);
 
+	public void deleteFromRepository(Long uuid, Long versionID);
 }
