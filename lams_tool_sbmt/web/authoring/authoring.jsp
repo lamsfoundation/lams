@@ -13,8 +13,8 @@
 <html:base />
 <title>Submit Files</title>
 <!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-<link href="../includes/css/aqua.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="../includes/javascript/common.js"></script>
+<link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="<html:rewrite page='/includes/javascript/common.js'/>"></script>
 </head>
 
 <body>

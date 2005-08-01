@@ -13,10 +13,11 @@
   <head>    
     <title>All Learner Submission Details</title>
     
-  	<link href="includes/css/aqua.css" rel="stylesheet" type="text/css">
+  	<link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
   	
   </head>  
   <body>
+
 		<table width="100%"  border="0" cellspacing="0" cellpadding="0">
 		<c:forEach items="${report}"  var ="user" >		
 			<c:set var="filesUploaded" value="${user.value}"/>

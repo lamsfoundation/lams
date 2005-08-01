@@ -322,13 +322,13 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @throws SubmitFilesException
 	 */
 	private ITicket getRepositoryLoginTicket() throws SubmitFilesException {
-		repositoryService = RepositoryProxy.getLocalRepositoryService();
+		repositoryService = RepositoryProxy.getRepositoryService();
 		ICredentials credentials = new SimpleCredentials(
-				ISubmitFilesService.SBMT_LOGIN,
-				ISubmitFilesService.SBMT_PASSWORD.toCharArray());
+				SbmtToolContentHandler.repositoryUser,
+				SbmtToolContentHandler.repositoryId);
 		try {
 			ITicket ticket = repositoryService.login(credentials,
-					ISubmitFilesService.SBMT_WORKSPACE);
+					SbmtToolContentHandler.repositoryWorkspaceName);
 			return ticket;
 		} catch (AccessDeniedException ae) {
 			throw new SubmitFilesException("Access Denied to repository."

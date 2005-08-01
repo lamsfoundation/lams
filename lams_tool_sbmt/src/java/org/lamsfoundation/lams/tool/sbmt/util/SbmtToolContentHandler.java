@@ -24,9 +24,9 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 
 public class SbmtToolContentHandler extends ToolContentHandler {
 
-    private static String repositoryWorkspaceName = "SubmitFilesWorkspace";
-    private static String repositoryUser = "SubmitFilesLogin";
-    private static char[] repositoryId = {'S','u','b','m','i','t','F','i','l','e','s','P','a','s','s','w','o','r','d'}; //SubmitFilesPassword
+    public static String repositoryWorkspaceName = "SubmitFilesWorkspace";
+    public static String repositoryUser = "SubmitFilesLogin";
+    public static char[] repositoryId = {'S','u','b','m','i','t','F','i','l','e','s','P','a','s','s','w','o','r','d'}; //SubmitFilesPassword
     
 	public String getRepositoryWorkspaceName() {
 		return repositoryWorkspaceName;

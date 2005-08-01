@@ -39,11 +39,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 public interface ISubmitFilesService {
 
-	public static final String SBMT_LOGIN = "SubmitFilesLogin";
-
-	public static final String SBMT_PASSWORD = "SubmitFilesPassword";
-
-	public static final String SBMT_WORKSPACE = "SubmitFilesWorkspace";
 
 	/**
 	 * This method adds a new content record to the database.

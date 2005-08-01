@@ -22,7 +22,6 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.web;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -39,9 +38,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
@@ -56,12 +53,12 @@ import org.lamsfoundation.lams.util.WebUtil;
  * 				scope="request"
  * 				name="emptyForm" 				
  * 
- * @struts.action-forward name="userlist" path="/userlist.jsp"
- * @struts.action-forward name="userReport" path="/userReport.jsp"
- * @struts.action-forward name="updateMarks" path="/updateMarks.jsp"
+ * @struts.action-forward name="userlist" path="/monitoring/alluserlist.jsp"
+ * @struts.action-forward name="userReport" path="/monitoring/usermarkslist.jsp"
+ * @struts.action-forward name="updateMarks" path="/monitoring/updatemarks.jsp"
+ * @struts.action-forward name="report" path="/monitoring/viewallmarks.jsp"
  * 
  * @struts.action-forward name="status" path="/Status.jsp"
- * @struts.action-forward name="report" path="/allLearners.jsp"
  * 				
  */
 public class MonitoringAction extends DispatchAction {

@@ -68,14 +68,14 @@
       type="org.lamsfoundation.lams.tool.sbmt.web.LearnerAction"
       name="SbmtLearnerForm"
       scope="request"
-      input="/sbmtLearner.jsp"
+      input="/learner/sbmtLearner.jsp"
       parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
         name="upload"
-        path="/sbmtLearner.jsp"
+        path="/learner/sbmtLearner.jsp"
         redirect="false"
       />
     </action>
@@ -90,27 +90,27 @@
     >
       <forward
         name="userlist"
-        path="/userlist.jsp"
+        path="/monitoring/alluserlist.jsp"
         redirect="false"
       />
       <forward
         name="userReport"
-        path="/userReport.jsp"
+        path="/monitoring/usermarkslist.jsp"
         redirect="false"
       />
       <forward
         name="updateMarks"
-        path="/updateMarks.jsp"
+        path="/monitoring/updatemarks.jsp"
+        redirect="false"
+      />
+      <forward
+        name="report"
+        path="/monitoring/viewallmarks.jsp"
         redirect="false"
       />
       <forward
         name="status"
         path="/Status.jsp"
-        redirect="false"
-      />
-      <forward
-        name="report"
-        path="/allLearners.jsp"
         redirect="false"
       />
     </action>
