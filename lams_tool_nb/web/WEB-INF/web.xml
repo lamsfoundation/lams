@@ -11,6 +11,7 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			classpath:/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml
+			classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
 		</param-value>
 	</context-param>
 	<listener>
