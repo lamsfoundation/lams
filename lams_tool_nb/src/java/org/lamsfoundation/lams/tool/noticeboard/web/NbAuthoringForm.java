@@ -30,10 +30,24 @@
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionMessage;
+
+import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.util.MessageResources;
+import javax.servlet.http.HttpServletRequest;
+
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
+
+import org.apache.struts.upload.FormFile;
 
 
 //import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
@@ -66,6 +80,52 @@ public class NbAuthoringForm extends ActionForm {
 	private String toolContentId;
 	private String defineLater;
 	
+	private FormFile onlineFile;
+	private FormFile offlineFile;
+	private Map attachments = new HashMap();
+	
+    
+	 /**
+     * @return Returns the attachments.
+     */
+    public Map getAttachments() {
+        if (attachments == null)
+        {
+            return new HashMap();
+        }
+        return attachments;
+    }
+    /**
+     * @param attachments The attachments to set.
+     */
+    public void setAttachments(Map attachments) {
+        this.attachments = attachments;
+    }
+	
+	/**
+     * @return Returns the offlineFile.
+     */
+    public FormFile getOfflineFile() {
+        return offlineFile;
+    }
+    /**
+     * @param offlineFile The offlineFile to set.
+     */
+    public void setOfflineFile(FormFile offlineFile) {
+        this.offlineFile = offlineFile;
+    }
+    /**
+     * @return Returns the onlineFile.
+     */
+    public FormFile getOnlineFile() {
+        return onlineFile;
+    }
+    /**
+     * @param onlineFile The onlineFile to set.
+     */
+    public void setOnlineFile(FormFile onlineFile) {
+        this.onlineFile = onlineFile;
+    }
     /**
      * @return Returns the defineLater.
      */
@@ -162,11 +222,14 @@ public class NbAuthoringForm extends ActionForm {
 
 	public void reset()
 	{
-		this.content = null;
-		this.title = null;
-		this.onlineInstructions = null;
-		this.offlineInstructions = null;
-	
+	//	this.content = null;
+		//this.title = null;
+		//this.onlineInstructions = null;
+		//this.offlineInstructions = null;
+	    this.method= null;
+	    this.defineLater = null;
+	    this.onlineFile = null;
+	    this.offlineFile = null;
 	}
 	
 	/**
@@ -191,5 +254,28 @@ public class NbAuthoringForm extends ActionForm {
 		nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
 	}
 	
+	public ActionErrors validate(ActionMapping mapping, HttpServletRequest request)
+	{
+	    ActionErrors errors = new ActionErrors();
+	    //check the tool content id
+	    //check the title and instructions
+	    
+	    MessageResources resources =
+            (MessageResources) request.getAttribute(Globals.MESSAGES_KEY);
+	    
+	    if (toolContentId == null)
+	    {
+	        errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(NoticeboardConstants.ERROR_MANDATORY, "Tool COntent id"));
+	    }
+	    if (title==null || title.length()==0)
+	    {
+	        errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(NoticeboardConstants.ERROR_MANDATORY, "Title"));
+	    }
+	    
+	    return errors; 
+	    
+	}
+	
 
+  
 }
