@@ -269,6 +269,14 @@ public interface INoticeboardService {
     public NoticeboardAttachment retrieveAttachmentByUuid(Long uuid);
     
     /**
+	 * <p>Retrieve an instance of NoticeboardAttachment with the 
+     * filename <code>filename</code> </p>
+     * @param filename The filename of the attachment that you want to retrieve
+     * @return an instance of NoticeboardAttachment
+     */
+    public NoticeboardAttachment retrieveAttachmentByFilename(String filename);
+    
+    /**
      * <p>Retrieve the list of attachment ids with the given instance of NoticeboardContent</p>
      * @param nbContent The given instance of NoticeboardContent
      * @return List. the list of attachment ids (java.lang.Long)

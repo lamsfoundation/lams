@@ -669,6 +669,26 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	                + e.getMessage(), e);
 	    }
 	}
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveAttachment(java.lang.String) */
+	public NoticeboardAttachment retrieveAttachmentByFilename(String filename)
+	{
+	    if (filename == null || filename.trim().length() == 0)
+	    {
+	        String error = "Unable to continue. The filename is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    try
+	    {
+	        return nbAttachmentDAO.retrieveAttachmentByFilename(filename);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to retrieve the attachment with filename " + filename + " "
+	                + e.getMessage(), e);
+	    }
+	}
+	
 	
 	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#getAttachmentIdsFromContent(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent) */
 	public List getAttachmentIdsFromContent(NoticeboardContent nbContent)
