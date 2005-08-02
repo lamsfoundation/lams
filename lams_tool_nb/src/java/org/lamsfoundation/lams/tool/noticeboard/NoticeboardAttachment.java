@@ -45,6 +45,9 @@ public class NoticeboardAttachment implements Serializable {
     private Long uuid;
     private Long versionId;
     private boolean onlineFile;
+    
+    public final static String TYPE_ONLINE = "ONLINE";
+    public final static String TYPE_OFFLINE = "OFFLINE";
 
     /**default constructor */
     public NoticeboardAttachment() {}
@@ -151,6 +154,7 @@ public class NoticeboardAttachment implements Serializable {
      * 		@hibernate.property
      *       column="uuid"
      *       length="20"
+     * 		 not-null="true"
      * 
      * @return Returns the uuid.
      */
@@ -179,5 +183,15 @@ public class NoticeboardAttachment implements Serializable {
      */
     public void setVersionId(Long versionId) {
         this.versionId = versionId;
+    }
+    
+    public String returnFileType()
+    {
+        if (isOnlineFile())
+        {
+            return TYPE_ONLINE;
+        }
+        else
+            return TYPE_OFFLINE;
     }
 }
