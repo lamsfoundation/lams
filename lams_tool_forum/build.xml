@@ -396,7 +396,7 @@
 			</fileset>
 		</path> 
 
-		<echo>Deploying the ISMCP tool</echo>
+		<echo>Deploying the Forum tool</echo>
 	
 		<java
 			classname="org.lamsfoundation.lams.tool.deploy.Deploy"
