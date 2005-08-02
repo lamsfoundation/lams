@@ -28,7 +28,10 @@
  */
 package org.lamsfoundation.lams.tool.noticeboard.util;
 
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
@@ -66,6 +69,7 @@ public class NbWebUtil {
 	 	public static void cleanAuthoringSession(HttpServletRequest request)
 	 	{
 	 	    request.getSession().removeAttribute(NoticeboardConstants.TOOL_CONTENT_ID);
+	 	    request.getSession().removeAttribute(NoticeboardConstants.ATTACHMENT_LIST);
 	 	}
 	 	
 	 	public static void cleanLearnerSession(HttpServletRequest request)
@@ -118,5 +122,12 @@ public class NbWebUtil {
 	         request.getSession().setAttribute(NoticeboardConstants.CONTENT, content.getContent());
 	         request.getSession().setAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS, content.getOnlineInstructions());
 	         request.getSession().setAttribute(NoticeboardConstants.OFFLINE_INSTRUCTIONS, content.getOfflineInstructions());
+	    }
+	    
+	    public static void addUploadsToSession(HttpServletRequest request, Map map)
+	    {
+	        Collection entries = map.values();
+	        List attachmentList = new ArrayList(entries);
+	        request.getSession().setAttribute(NoticeboardConstants.ATTACHMENT_LIST, attachmentList);
 	    }
 }

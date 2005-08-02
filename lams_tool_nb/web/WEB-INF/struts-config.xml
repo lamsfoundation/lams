@@ -55,7 +55,6 @@
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
       name="NbLearnerForm"
       scope="session"
-      input=".learnerStarter"
       parameter="mode"
       unknown="false"
       validate="false"
@@ -216,7 +215,6 @@
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringStarterAction"
       name="NbMonitoringForm"
       scope="session"
-      input=".monitoringStarter"
       unknown="false"
       validate="false"
     >
