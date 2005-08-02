@@ -91,6 +91,8 @@ public class NoticeboardConstants
     public static final String RICH_TEXT_ONLINE_INSTRN = "richTextOnlineInstructions";
     public static final String RICH_TEXT_OFFLINE_INSTRN = "richTextOfflineInstructions";
     
+    public static final String ATTACHMENT_LIST = "attachmentList";
+    
     public static final String READ_ONLY_MODE = "readOnlyMode";
    // public static final String IS_TOOL_COMPLETED = "isToolCompleted";
     
@@ -113,6 +115,7 @@ public class NoticeboardConstants
     public static final String BUTTON_SUMMARY = "button.summary";
     public static final String BUTTON_STATISTICS = "button.statistics";
     public static final String BUTTON_EDIT = "button.edit";
+    public static final String BUTTON_UPLOAD = "button.upload";
     
     
    //--------------
