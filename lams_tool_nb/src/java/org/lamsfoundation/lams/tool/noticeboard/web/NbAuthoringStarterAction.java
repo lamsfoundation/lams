@@ -26,6 +26,9 @@
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,10 +50,12 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil; 
-/**TODO: change into one utility class */
+
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.util.MessageResources;
+
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 
 
 /**
@@ -97,6 +102,8 @@ public class NbAuthoringStarterAction extends LamsAction {
 	    
 		NbAuthoringForm nbForm = (NbAuthoringForm)form;
 		
+		NbWebUtil.cleanAuthoringSession(request); 
+		
 		Long contentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
 		
 		if(contentId == null)
@@ -116,7 +123,7 @@ public class NbAuthoringStarterAction extends LamsAction {
 		nbForm.setDefineLater((String)request.getParameter(NoticeboardConstants.DEFINE_LATER));
 
 		
-		NbWebUtil.cleanAuthoringSession(request); 
+		
 		
 		request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, contentId);
 							
@@ -166,6 +173,9 @@ public class NbAuthoringStarterAction extends LamsAction {
 			    nbForm.populateFormWithNbContentValues(nb);
 			    nb = setTrueIfDefineLaterIsSet(nbForm, nb);
 			    nbService.updateNoticeboard(nb);
+			    
+			    /** TODO: setup values in the instructions map */
+			 
 			}
 			else
 			{
@@ -178,6 +188,20 @@ public class NbAuthoringStarterAction extends LamsAction {
 			    
 			}
 			
+			//Setup the map containing the files that have been uploaded for this particular tool content id
+			Map attachmentMap = nbForm.getAttachments();
+			
+			List attachmentIdList = nbService.getAttachmentIdsFromContent(nb);
+			for (int i=0; i<attachmentIdList.size(); i++)
+			{
+			    NoticeboardAttachment file = nbService.retrieveAttachment((Long)attachmentIdList.get(i));
+			    String fileType = file.returnFileType();
+			    String keyName = file.getFilename() + "-" + fileType;
+			    attachmentMap.put(keyName, file);
+			}
+			nbForm.setAttachments(attachmentMap);
+			
+			NbWebUtil.addUploadsToSession(request, attachmentMap);
 		
 		}
 		
