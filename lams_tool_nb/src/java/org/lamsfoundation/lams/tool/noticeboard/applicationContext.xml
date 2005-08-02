@@ -29,6 +29,7 @@
 				<value>org/lamsfoundation/lams/tool/noticeboard/NoticeboardContent.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/noticeboard/NoticeboardSession.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/noticeboard/NoticeboardUser.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/noticeboard/NoticeboardAttachment.hbm.xml</value> 
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -59,6 +60,7 @@
 				<property name="nbContentDAO"><ref bean="nbContentDAO"/></property>
 				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
 				<property name="nbUserDAO"><ref bean="nbUserDAO"/></property>
+				<property name="nbAttachmentDAO"><ref bean="nbAttachmentDAO"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -102,5 +104,13 @@
 	<bean id="nbUserDAO" class="org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardUserDAO">
 		<property name="sessionFactory"><ref local="nbSessionFactory"/></property>
 	</bean>
+	
+	<bean id="nbAttachmentDAO" class="org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardAttachmentDAO">
+		<property name="sessionFactory"><ref local="nbSessionFactory"/></property>
+	</bean>
+	
+	<bean id="toolContentHandler" class="org.lamsfoundation.lams.tool.noticeboard.util.NbToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
 
 </beans>
