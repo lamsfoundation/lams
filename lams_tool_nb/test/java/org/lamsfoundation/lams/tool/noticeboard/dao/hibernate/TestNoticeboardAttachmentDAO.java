@@ -10,6 +10,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardAttachmentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import java.util.List;
 
 /**
@@ -66,7 +67,12 @@ public class TestNoticeboardAttachmentDAO extends NbDataAccessTestCase {
 	     nbAttachment = attachmentDao.retrieveAttachment((Long)attachmentIds.get(0));
 	     assertAttachmentData(nbAttachment);
 	     
+	     //test retrieveAttachment (by filename as the parameter
+	     nbAttachment = attachmentDao.retrieveAttachmentByFilename(TEST_FILENAME);
+	     assertAttachmentData(nbAttachment);
 	 }
+	 
+
 	 
 	 public void testSaveAttachment()
 	 {
