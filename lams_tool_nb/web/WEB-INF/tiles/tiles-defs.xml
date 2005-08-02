@@ -62,19 +62,6 @@
 		<put name="content" value="/monitoringContent.jsp" />	
 	</definition>
 
-<!-- ============= Noticeboard Starter Page Definitions ====================== -->	
-	<definition name=".authoringStarter" extends=".baseDef" >
-		<put name="title" value="Starter for Noticeboard"/>
-		<put name="pageHeader" value = "Starter for Noticeboard"/>
-		<put name="content" value="/authoringIndex.jsp" />	
-	</definition>
-	
-	<definition name=".learnerStarter" extends=".baseDef" >
-		<put name="title" value="Starter for Noticeboard"/>
-		<put name="pageHeader" value = "Starter for Noticeboard"/>
-		<put name="content" value="/learnerIndex.jsp" />	
-	</definition>
-	
 	
 <!-- ============= Noticeboard Export Page Definitions ====================== -->	
 
