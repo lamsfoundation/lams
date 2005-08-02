@@ -41,6 +41,21 @@ public class NoticeboardAttachmentDAO extends HibernateDaoSupport implements INo
         }
     }
     
+    public NoticeboardAttachment retrieveAttachmentByFilename(String filename)
+    {
+        String query= "from NoticeboardAttachment na where na.filename=?";
+        List attachments = getHibernateTemplate().find(query,filename);
+        if (attachments!= null && attachments.size() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            return (NoticeboardAttachment)attachments.get(0);
+        }
+    }
+    
+    
     /* get the list of attachment ids which have the toolcontentid equals to that of nbCotnetn.getNbContentId */
     public List getAttachmentIdsFromContent(NoticeboardContent nbContent)
     {
