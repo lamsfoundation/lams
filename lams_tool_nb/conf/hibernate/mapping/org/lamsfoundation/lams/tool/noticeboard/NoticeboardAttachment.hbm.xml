@@ -54,11 +54,13 @@
         name="uuid"
         type="java.lang.Long"
         column="uuid"
+        not-null="true"
         length="20"
     >
         <meta attribute="field-description">
            @hibernate.property
             column="uuid"
+            not-null="true"
             length="20"
         </meta>    
     </property>
