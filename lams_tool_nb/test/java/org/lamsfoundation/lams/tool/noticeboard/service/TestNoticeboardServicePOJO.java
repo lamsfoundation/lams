@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Iterator;
 
 
+import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
@@ -438,11 +439,52 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    //test retrieveAttachment (by attachmentId, which was retrieved from the previous method)
 	    attachment = nbService.retrieveAttachment((Long)idList.get(0));
 	    assertAttachmentData(attachment);
+	    
+	    //test retrieveAttachmentByFilename;
+	    attachment = nbService.retrieveAttachmentByFilename(TEST_FILENAME);
+	    assertAttachmentData(attachment);
 	}
+	
+	 public void testRetrieveAttachmentWithNullParameters() throws NbApplicationException
+	 {
+	     //retrieve attachment by filename
+	     try
+	     {
+	         nbService.retrieveAttachmentByFilename(null);
+	         fail("An exception should have been thrown as a null value has been given for the argument");
+	     }
+	     catch (NbApplicationException e)
+	     {
+	         assertTrue(true);
+	     }
+	     
+	     //retrieve attachment by attachment id
+	     try
+	     {
+	         nbService.retrieveAttachment(null);
+	         fail("An exception should have been thrown as a null value has been given for the argument");
+	     }
+	     catch (NbApplicationException e)
+	     {
+	         assertTrue(true);
+	     }
+	     
+	     //retrieve attachment by uuid
+	     try
+	     {
+	         nbService.retrieveAttachmentByUuid(null);
+	         fail("An exception should have been thrown as a null value has been given for the argument");
+	     }
+	     catch (NbApplicationException e)
+	     {
+	         assertTrue(true);
+	     }
+	     
+	 }
 	
 	public void testSaveAttachment()
 	{
-	    String newFilename = "NoticeboardInstructions.txt";
+	  /*  String newFilename = "NoticeboardInstructions.txt";
 	    initNbAttachmentData();
 	    
 	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
@@ -451,7 +493,20 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    nbService.saveAttachment(attachment);
 	    
 	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
-	    assertEquals(attachment.getFilename(), newFilename);
+	    assertEquals(attachment.getFilename(), newFilename); */
+	    String filename = "OnlineInstructions.txt";
+	    boolean isOnline = true;
+	    Long uuid = new Long(2);
+	    
+	    NoticeboardAttachment file = new NoticeboardAttachment();
+	    nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
+	    file.setNbContent(nbContent);
+	    file.setFilename(filename);
+	    file.setOnlineFile(isOnline);
+	    file.setUuid(uuid);
+	    
+	    nbService.saveAttachment(file);
+	    
 	}
 	
 	public void testRemoveAttachment()
