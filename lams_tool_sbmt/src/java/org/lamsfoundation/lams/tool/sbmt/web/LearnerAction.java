@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -25,6 +24,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.LearnerDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
@@ -52,6 +52,7 @@ public class LearnerAction extends DispatchAction {
 									HttpServletRequest request,
 									HttpServletResponse response){
 		
+
 		DynaActionForm authForm= (DynaActionForm)form;
 		
 		Long sessionID =(Long) authForm.get("toolSessionID");
@@ -60,16 +61,12 @@ public class LearnerAction extends DispatchAction {
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 		SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 		SubmitFilesContent content = session.getContent();
-		
-		HttpSession httpSession = request.getSession(true);
-		httpSession.setAttribute("content",content);
 
 		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-		listUploadFiles(authForm, filesUploaded);
+		listUploadFiles(request, filesUploaded);
 		
+		setLearnerDTO(request, sessionID, userID, content);
 		//to avoid user without patience click "upload" button too fast
-		request.setAttribute("userID",userID);
-		request.setAttribute("toolSessionID",sessionID);
 		saveToken(request);
 		return mapping.getInputForward();
 		
@@ -87,9 +84,12 @@ public class LearnerAction extends DispatchAction {
 			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 
-			listUploadFiles(authForm, filesUploaded);
-			request.setAttribute("userID",userID);
-			request.setAttribute("toolSessionID",sessionID);
+			listUploadFiles(request, filesUploaded);
+			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
+			SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
+			SubmitFilesContent content = session.getContent();
+
+			setLearnerDTO(request, sessionID, userID, content);
 			return returnErrors(mapping,request,"submit.upload.twice","upload");
 		}
 		
@@ -104,9 +104,11 @@ public class LearnerAction extends DispatchAction {
 		try{
 			submitFilesService.uploadFileToSession(sessionID,uploadedFile,fileDescription,userID);
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-			listUploadFiles(authForm, filesUploaded);
-			request.setAttribute("userID",userID);
-			request.setAttribute("toolSessionID",sessionID);
+			listUploadFiles(request, filesUploaded);
+			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
+			SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
+			SubmitFilesContent content = session.getContent();
+			setLearnerDTO(request, sessionID, userID, content);
 			return mapping.getInputForward();			
 		}catch(SubmitFilesException se){
 			logger.error("uploadFile: Submit Files Exception has occured" + se.getMessage());
@@ -141,7 +143,7 @@ public class LearnerAction extends DispatchAction {
 	 * @param sessionID
 	 * @param userID
 	 */
-	private void listUploadFiles(DynaActionForm authForm, List filesUploaded) {
+	private void listUploadFiles(HttpServletRequest request, List filesUploaded) {
 		//if Monitoring does not release marks, then screen this mark and comment content.
 		Iterator iter = filesUploaded.iterator();
 		while(iter.hasNext()){
@@ -151,8 +153,22 @@ public class LearnerAction extends DispatchAction {
 				dto.setMarks(null);
 			}
 		}
-		authForm.set("filesUploaded",filesUploaded);
+		request.setAttribute("filesUploaded",filesUploaded);
 	}
 
-
+	/**
+	 * @param request
+	 * @param sessionID
+	 * @param userID
+	 * @param content
+	 */
+	private void setLearnerDTO(HttpServletRequest request, Long sessionID, Long userID, SubmitFilesContent content) {
+		LearnerDetailsDTO dto = new LearnerDetailsDTO();
+		dto.setToolSessionID(sessionID);
+		dto.setUserID(userID);
+		dto.setContentInstruction(content.getInstruction());
+		dto.setContentLockOnFinished(content.isLockOnFinished());
+		dto.setContentTitle(content.getTitle());
+		request.setAttribute("learner",dto);
+	}
 }

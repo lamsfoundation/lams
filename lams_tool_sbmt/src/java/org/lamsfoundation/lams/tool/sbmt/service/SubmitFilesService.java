@@ -22,7 +22,6 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.service;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -663,13 +662,19 @@ public class SubmitFilesService implements ToolContentManager,
 	 */
 	private LearnerDetailsDTO getLearnerDetailsDTO(SubmissionDetails details, 
 												  SubmitFilesReport report){
-		File file = new File(details.getFilePath());		
-		return new LearnerDetailsDTO(file.getName(),
-									 details.getFileDescription(),
-									 details.getDateOfSubmission(),
-									 report.getComments(),
-									 report.getMarks(),
-									 report.getDateMarksReleased());
+		LearnerDetailsDTO dto = new LearnerDetailsDTO();
+		dto.setComments(report.getComments());
+//		dto.setContentInstruction()
+//		dto.setContentLockOnFinished()
+//		dto.setContentTitle()
+		dto.setDateMarksReleased(report.getDateMarksReleased());
+		dto.setDateOfSubmission(details.getDateOfSubmission());
+		dto.setFileDescription(details.getFileDescription());
+		dto.setMarks(report.getMarks());
+//		dto.setName();
+//		dto.setToolSessionID()
+//		dto.setUserID()
+		return dto;
 	}	
 	
 	public ArrayList getStatus(Long sessionID){		
