@@ -43,6 +43,8 @@ public interface INoticeboardAttachmentDAO {
     
     public NoticeboardAttachment retrieveAttachmentByUuid(Long uuid);
     
+    public NoticeboardAttachment retrieveAttachmentByFilename(String filename);
+    
     public List getAttachmentIdsFromContent(NoticeboardContent nbContent);
     
     public void saveAttachment(NoticeboardAttachment attachment);
