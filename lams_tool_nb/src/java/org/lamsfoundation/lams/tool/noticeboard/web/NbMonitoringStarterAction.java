@@ -52,7 +52,7 @@ import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
  * ----------------XDoclet Tags--------------------
  * 
  * @struts:action path="/starter/monitor" name="NbMonitoringForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringStarterAction"
- *                input=".monitoringStarter" validate="false" 
+ *               validate="false" 
  * @struts.action-exception key="error.exception.NbApplication" scope="request"
  *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
  *                          path=".error"
