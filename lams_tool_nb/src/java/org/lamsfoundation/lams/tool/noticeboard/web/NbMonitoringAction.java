@@ -62,6 +62,10 @@ import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
  *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
  *                          path=".error"
  *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+ * @struts.action-exception key="error.exception.NbApplication" scope="request"
+ *                          type="java.lang.NullPointerException"
+ *                          path=".error"
+ *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * @struts:action-forward name="monitorPage" path=".monitoringContent"
  * ----------------XDoclet Tags--------------------
  */
