@@ -51,4 +51,6 @@ public interface INoticeboardAttachmentDAO {
     
     public void removeAttachment(NoticeboardAttachment attachment);
     
+    public void removeAttachment(Long uuid);
+    
 }
