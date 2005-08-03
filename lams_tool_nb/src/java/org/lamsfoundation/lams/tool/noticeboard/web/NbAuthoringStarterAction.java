@@ -83,6 +83,8 @@ public class NbAuthoringStarterAction extends LamsAction {
 	
 	static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());
 	
+	public final static String FORM="NbAuthoringForm";
+	
 	/**
 	 * This struts actionservlet gets called when the author double clicks
 	 * on the tool icon. If the toolContentId already exists in the tool content 
@@ -100,8 +102,8 @@ public class NbAuthoringStarterAction extends LamsAction {
 		
 	    MessageResources resources = getResources(request);
 	    
-		NbAuthoringForm nbForm = (NbAuthoringForm)form;
-		
+	    //to ensure that we are working with a new form, not one from previous session
+		NbAuthoringForm nbForm = new NbAuthoringForm();		
 		NbWebUtil.cleanAuthoringSession(request); 
 		
 		Long contentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
@@ -122,15 +124,13 @@ public class NbAuthoringStarterAction extends LamsAction {
 		 */
 		nbForm.setDefineLater((String)request.getParameter(NoticeboardConstants.DEFINE_LATER));
 
-		
-		
-		
 		request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, contentId);
 							
 		/*
 		 * Retrieve the Service
 		 */
 		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+		Map attachmentMap = nbForm.getAttachments();
 		
 		if (!contentExists(nbService, contentId))
 		{
@@ -154,7 +154,9 @@ public class NbAuthoringStarterAction extends LamsAction {
 			
 			//initialise the values in the form, so the values will be shown in the jsp
 			nbForm.populateFormWithNbContentValues(nbContentNew);
-				
+			
+			
+							
 		
 		}
 		else //content already exists on the database
@@ -189,8 +191,7 @@ public class NbAuthoringStarterAction extends LamsAction {
 			}
 			
 			//Setup the map containing the files that have been uploaded for this particular tool content id
-			Map attachmentMap = nbForm.getAttachments();
-			
+						
 			List attachmentIdList = nbService.getAttachmentIdsFromContent(nb);
 			for (int i=0; i<attachmentIdList.size(); i++)
 			{
@@ -201,9 +202,11 @@ public class NbAuthoringStarterAction extends LamsAction {
 			}
 			nbForm.setAttachments(attachmentMap);
 			
-			NbWebUtil.addUploadsToSession(request, attachmentMap);
+			
 		
 		}
+		NbWebUtil.addUploadsToSession(request, attachmentMap);
+		request.getSession().setAttribute(FORM, nbForm);
 		
 		return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
 	}
