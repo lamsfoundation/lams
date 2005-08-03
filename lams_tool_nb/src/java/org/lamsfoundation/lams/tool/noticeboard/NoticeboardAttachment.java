@@ -194,4 +194,9 @@ public class NoticeboardAttachment implements Serializable {
         else
             return TYPE_OFFLINE;
     }
+    
+    public String returnKeyName()
+    {
+        return (getFilename() + "-" + returnFileType());
+    }
 }
