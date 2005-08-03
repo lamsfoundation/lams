@@ -98,6 +98,7 @@ public class NoticeboardConstants
     
     public static final String USER_ID = "userId";
     public static final String TOOL_SESSION_ID = "toolSessionId";
+    public static final String UUID = "uuid";
     
     // ---------------------------------------------------------------------------
     // Lookup Dispatch Action Keys (used in NbAuthoringAction class, NbLearnerAction),
@@ -116,6 +117,7 @@ public class NoticeboardConstants
     public static final String BUTTON_STATISTICS = "button.statistics";
     public static final String BUTTON_EDIT = "button.edit";
     public static final String BUTTON_UPLOAD = "button.upload";
+    public static final String LINK_DELETE="link.delete";
     
     
    //--------------
