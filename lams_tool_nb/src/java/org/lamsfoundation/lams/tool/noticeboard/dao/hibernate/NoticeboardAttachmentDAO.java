@@ -73,5 +73,9 @@ public class NoticeboardAttachmentDAO extends HibernateDaoSupport implements INo
     {
         this.getHibernateTemplate().delete(attachment);
     }
-
+    
+    public void removeAttachment(Long uuid)
+    {
+        this.getHibernateTemplate().delete(retrieveAttachmentByUuid(uuid));
+    }
 }
