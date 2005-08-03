@@ -67,6 +67,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
  *                          path=".error"
  *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+ * @struts.action-exception key="error.exception.NbApplication" scope="request"
+ *                          type="java.lang.NullPointerException"
+ *                          path=".error"
+ *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * 
  * @struts:action-forward name="basic" path=".nb_basic"
  * @struts:action-forward name="advanced" path=".nb_advanced"
@@ -99,6 +103,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		map.put(NoticeboardConstants.BUTTON_DONE, "done");
 		map.put(NoticeboardConstants.BUTTON_SAVE, "save");
 		map.put(NoticeboardConstants.BUTTON_UPLOAD, "upload");
+		map.put(NoticeboardConstants.LINK_DELETE, "deleteAttachment");
 		
 		return map;
 	}
@@ -113,7 +118,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     		HttpServletResponse response)
     {
         NbAuthoringForm nbForm = (NbAuthoringForm)form;
-	    copyInstructionFormProperty(request, nbForm);
+        copyAuthoringFormValuesIntoFormBean(request, nbForm);
 	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
     }
 
@@ -123,7 +128,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	public ActionForward basic(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		
 	    NbAuthoringForm nbForm = (NbAuthoringForm)form;
-	    copyInstructionFormProperty(request, nbForm);
+	    copyAuthoringFormValuesIntoFormBean(request, nbForm);
 	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
 	}
 	
@@ -141,7 +146,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	
 	public ActionForward instructions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 	    NbAuthoringForm nbForm = (NbAuthoringForm)form;
-	    copyInstructionFormProperty(request, nbForm);
+	    copyAuthoringFormValuesIntoFormBean(request, nbForm);
 	    return mapping.findForward(NoticeboardConstants.INSTRUCTIONS_PAGE);
 	}	
 	
@@ -151,7 +156,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	
 	public ActionForward done(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 	    NbAuthoringForm nbForm = (NbAuthoringForm)form;
-	    copyInstructionFormProperty(request, nbForm);
+	    copyAuthoringFormValuesIntoFormBean(request, nbForm);
 	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
 	}
 	
@@ -168,7 +173,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
 		
 		NbAuthoringForm nbForm = (NbAuthoringForm)form;
-		copyInstructionFormProperty(request, nbForm);
+		copyAuthoringFormValuesIntoFormBean(request, nbForm);
 		
 		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 		String idAsString = nbForm.getToolContentId();
@@ -212,6 +217,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	    	//set up the values in the map
 	    	//call the uploadFile method from toolContentHandler
 	    	NbAuthoringForm nbForm = (NbAuthoringForm)form;
+	    	copyAuthoringFormValuesIntoFormBean(request, nbForm);
 	    	FormFile theFile;
 	    	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 			
@@ -275,7 +281,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 				    	nbService.saveAttachment(file);
 		    	    }
 		    	    
-			    	String keyName = file.getFilename() + "-" + fileType;
+			    	String keyName = file.returnKeyName();
 				    
 			    	//add the files to the map
 			    	Map attachmentMap = nbForm.getAttachments();
@@ -303,6 +309,51 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	    	return mapping.findForward(NoticeboardConstants.INSTRUCTIONS_PAGE);
 	}
 	
+	
+	public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+		throws InvalidParameterException, RepositoryCheckedException, NbApplicationException {
+	
+	    Long uuid = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.UUID));
+	    
+	    NbAuthoringForm nbForm = (NbAuthoringForm)form;
+	   // copyAuthoringFormValuesIntoFormBean(request, nbForm);
+	    
+    	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+	    
+    	if (uuid == null)
+    	{
+    	    String error = "Unable to continue. The file uuid is missing.";
+			logger.error(error);
+			throw new NbApplicationException(error);
+    	}
+    	NoticeboardAttachment attachment = nbService.retrieveAttachmentByUuid(uuid);
+       	String keyName = attachment.returnKeyName();
+    	
+    	//remove entry from map
+    	Map attachmentMap = nbForm.getAttachments();
+    	attachmentMap.remove(keyName);
+    	NbWebUtil.addUploadsToSession(request, attachmentMap);
+    	
+    	//remove entry from content repository
+    	try
+    	{
+    	    getToolContentHandler().deleteFile(uuid);
+    	}
+    	catch (RepositoryCheckedException e) {
+            logger.error("Unable to delete file",e);
+            throw new NbApplicationException("Unable to delete file, exception was "+e.getMessage());
+    	}		
+    	
+    	//remove entry from db
+    	nbService.removeAttachment(attachment);
+    	
+    	
+	   
+	    return mapping.findForward(NoticeboardConstants.INSTRUCTIONS_PAGE);
+	}
+	
+	
+	
 	/**
 	 * It is assumed that the contentId is passed as a http parameter
 	 * if the contentId is null, an exception is thrown, otherwise proceed as normal
@@ -329,7 +380,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	 * @param request HttpServlet request
 	 * @param form The ActionForm class containing data submitted by the forms.
 	 */
-	private void copyInstructionFormProperty(HttpServletRequest request, NbAuthoringForm form)
+	private void copyAuthoringFormValuesIntoFormBean(HttpServletRequest request, NbAuthoringForm form)
 	{
 	    String onlineInstruction = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN, true);
 	    String offlineInstruction = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN, true);
