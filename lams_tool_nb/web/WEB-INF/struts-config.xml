@@ -126,6 +126,13 @@
         path=".error"
         scope="request"
       />
+      <exception
+        key="error.exception.NbApplication"
+        type="java.lang.NullPointerException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
       <forward
         name="basic"
         path=".nb_basic"
@@ -181,6 +188,13 @@
         path=".error"
         scope="request"
       />
+      <exception
+        key="error.exception.NbApplication"
+        type="java.lang.NullPointerException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
       <forward
         name="monitorPage"
         path=".monitoringContent"
@@ -221,6 +235,13 @@
       <exception
         key="error.exception.NbApplication"
         type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
+      <exception
+        key="error.exception.NbApplication"
+        type="java.lang.NullPointerException"
         handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
         path=".error"
         scope="request"

@@ -86,33 +86,52 @@
 		        	<bean:size id="count" name="attachmentList" />
 		                  <logic:notEqual name="count" value="0">
 		                  
-		                        <table align="center">
+		                   <!--     <table align="center">
 		                        <tr>
 		                          		<th scope="col"><fmt:message key="label.filename" /></th>
 		                          		<th scope="col"><fmt:message key="label.type" /></th>
 		                          		<th>&nbsp;</th>
 		                                
+		                        </tr> -->
+		                        
+		                         <table width="70%" align="left">
+		                        <tr>
+		                          		<td><fmt:message key="label.filename" /></td>
+		                          		<td><fmt:message key="label.type" /></td>
+		                          		<td>&nbsp;</td>
+		                                
 		                        </tr>
 		                        <logic:iterate name="attachmentList" id="attachment">
-		                        <tr>
-		                         	
-		                         	<td><bean:write name="attachment" property="filename"/></td>
-		                         	<td>
-		                         		<c:choose>
-				                         	<c:when test="${attachment.onlineFile}" >
-				                         		<fmt:message key="instructions.type.online" />
-				                         	</c:when>
-				                         	<c:otherwise>
-				                         		<fmt:message key="instructions.type.offline" />
-				                         	</c:otherwise>
-			                         	</c:choose>
-			                         </td>
-			                         <td>
-			                         		<fmt:message key="label.view" />
-			                         		<fmt:message key="label.download" />
-			                         		<fmt:message key="label.delete" />
-			                         </td>
-		                        </tr>
+		                        <!--	<bean:define id="view">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=false</bean:define>
+									<bean:define id="download">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=true</bean:define>
+                             -->
+                             	<bean:define id="uuid" name="attachment" property="uuid" />
+			                        <tr>
+			                         	
+			                         	<td><bean:write name="attachment" property="filename"/></td>
+			                         	<td>
+			                         		<c:choose>
+					                         	<c:when test="${attachment.onlineFile}" >
+					                         		<fmt:message key="instructions.type.online" />
+					                         	</c:when>
+					                         	<c:otherwise>
+					                         		<fmt:message key="instructions.type.offline" />
+					                         	</c:otherwise>
+				                         	</c:choose>
+				                         </td>
+				                        
+				                         <td>
+				                         		<fmt:message key="link.view" />
+				                         		<fmt:message key="link.download" />
+				                         	<html:link page="/authoring.do?method=Delete" 
+				                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
+				                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
+				                         	target="_self">
+				                         			<fmt:message key="link.delete" />
+				                         		</html:link> 
+				                         		
+				                         </td>
+			                        </tr>
 		                        </logic:iterate>
 		                          </table>
 		                  
@@ -123,13 +142,15 @@
 		</tr>
 	</table>
 </div>
+<hr>
 
 <div id="datatablecontainer">
 <table width="100%" align="center">
-<tr>
-	<td align="center"><html:submit property="method"><fmt:message key="button.done"/></html:submit>
-	</td>
-</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td align="center"><html:submit property="method"><fmt:message key="button.done"/></html:submit>
+		</td>
+	</tr>
 </table>
 </div>
 				<html:hidden property="onlineInstructions" />
