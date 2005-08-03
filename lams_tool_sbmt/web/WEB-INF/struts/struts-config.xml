@@ -78,6 +78,11 @@
         path="/learner/sbmtLearner.jsp"
         redirect="false"
       />
+      <forward
+        name="finish"
+        path="/learner/finish.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/monitoring"

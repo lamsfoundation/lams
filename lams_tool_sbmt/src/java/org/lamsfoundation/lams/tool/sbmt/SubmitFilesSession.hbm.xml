@@ -54,6 +54,25 @@
 
         </set>
 
+        <set
+            name="learners"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="session_id"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.sbmt.Learner"
+            />
+
+        </set>
+
         <many-to-one
             name="content"
             class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent"

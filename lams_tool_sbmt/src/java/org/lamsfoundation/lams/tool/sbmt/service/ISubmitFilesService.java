@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
@@ -161,4 +162,19 @@ public interface ISubmitFilesService {
 	public boolean releaseMarksForSession(Long sessionID);
 
 	public void deleteFromRepository(Long uuid, Long versionID);
+	/**
+	 * When learner finish submission, it invokes this function and will remark the <code>finished</code> field.
+	 * 
+	 * @param sessionID
+	 * @param userID
+	 */
+	public void finishSubmission(Long sessionID, Long userID);
+	/**
+	 * Get learner by given <code>toolSessionID</code> and <code>userID</code>.
+	 *  
+	 * @param sessionID
+	 * @param userID
+	 * @return
+	 */
+	public Learner getLearner(Long sessionID, Long userID);
 }

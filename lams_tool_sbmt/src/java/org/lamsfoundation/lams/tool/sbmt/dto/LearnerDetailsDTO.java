@@ -17,14 +17,18 @@ import java.util.List;
 public class LearnerDetailsDTO implements Serializable{
 	
 	private static final long serialVersionUID = 5900249986365640342L;
-	private Long userID;
 	private Long toolSessionID;
-	private String name;
+
+	private Long userID;
+	private String userName;
+	private String fileName;
 	private String fileDescription;
-	private Date dateOfSubmission;
 	private String comments;	
 	private Long marks;	
+	private Date dateOfSubmission;
 	private Date dateMarksReleased;
+	//If lockOnFinished is true, and learner finished the submission, this flag will be true.
+	private boolean locked;
 	
 	private String contentTitle;
 	private String contentInstruction;
@@ -83,14 +87,14 @@ public class LearnerDetailsDTO implements Serializable{
 	/**
 	 * @return Returns the name.
 	 */
-	public String getName() {
-		return name;
+	public String getFileName() {
+		return fileName;
 	}
 	/**
 	 * @param name The name to set.
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setFileName(String name) {
+		this.fileName = name;
 	}	
 	/**
 	 * @return Returns the marks.
@@ -175,5 +179,29 @@ public class LearnerDetailsDTO implements Serializable{
 	 */
 	public void setFilesUploaded(List filesUploaded) {
 		this.filesUploaded = filesUploaded;
+	}
+	/**
+	 * @return Returns the locked.
+	 */
+	public boolean isLocked() {
+		return locked;
+	}
+	/**
+	 * @param locked The locked to set.
+	 */
+	public void setLocked(boolean locked) {
+		this.locked = locked;
+	}
+	/**
+	 * @return Returns the userName.
+	 */
+	public String getUserName() {
+		return userName;
+	}
+	/**
+	 * @param userName The userName to set.
+	 */
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 }

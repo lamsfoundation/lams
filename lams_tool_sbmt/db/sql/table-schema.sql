@@ -1,8 +1,10 @@
 alter table tl_lasbmt11_instruction_files drop foreign key FKA75538F9FC4BEA1;
 alter table tl_lasbmt11_submission_details drop foreign key FK1411A53C630DDF64;
+alter table tl_lasbmt11_submission_details drop foreign key FK1411A53C3A4D8629;
 alter table tl_lasbmt11_session drop foreign key FKEC8C77C9FC4BEA1;
 drop table if exists tl_lasbmt11_report;
 drop table if exists tl_lasbmt11_content;
+drop table if exists tl_lasbmt11_session_learners;
 drop table if exists tl_lasbmt11_instruction_files;
 drop table if exists tl_lasbmt11_submission_details;
 drop table if exists tl_lasbmt11_session;
@@ -26,6 +28,13 @@ create table tl_lasbmt11_content (
    lock_on_finished bit,
    primary key (content_id)
 );
+create table tl_lasbmt11_session_learners (
+   learner_id bigint not null auto_increment,
+   user_id bigint,
+   finished bit,
+   session_id bigint,
+   primary key (learner_id)
+);
 create table tl_lasbmt11_instruction_files (
    file_id bigint not null auto_increment,
    uuid bigint,
@@ -42,8 +51,8 @@ create table tl_lasbmt11_submission_details (
    date_of_submission datetime,
    uuid bigint,
    version_id bigint,
-   user_id bigint,
    session_id bigint,
+   learner_id bigint,
    primary key (submission_id)
 );
 create table tl_lasbmt11_session (
@@ -54,4 +63,5 @@ create table tl_lasbmt11_session (
 );
 alter table tl_lasbmt11_instruction_files add index FKA75538F9FC4BEA1 (content_id), add constraint FKA75538F9FC4BEA1 foreign key (content_id) references tl_lasbmt11_content (content_id);
 alter table tl_lasbmt11_submission_details add index FK1411A53C630DDF64 (session_id), add constraint FK1411A53C630DDF64 foreign key (session_id) references tl_lasbmt11_session (session_id);
+alter table tl_lasbmt11_submission_details add index FK1411A53C3A4D8629 (learner_id), add constraint FK1411A53C3A4D8629 foreign key (learner_id) references tl_lasbmt11_session_learners (learner_id);
 alter table tl_lasbmt11_session add index FKEC8C77C9FC4BEA1 (content_id), add constraint FKEC8C77C9FC4BEA1 foreign key (content_id) references tl_lasbmt11_content (content_id);

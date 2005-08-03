@@ -1,4 +1,20 @@
 SET FOREIGN_KEY_CHECKS=0;
+CREATE TABLE tl_lasbmt11_report (
+       report_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , comments VARCHAR(250)
+     , marks BIGINT(20)
+     , date_marks_released DATETIME
+     , PRIMARY KEY (report_id)
+);
+
+CREATE TABLE tl_lasbmt11_session_learners (
+       learner_id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , user_id BIGINT(20)
+     , finished TINYINT(1)
+     , session_id BIGINT(20)
+     , PRIMARY KEY (learner_id)
+)TYPE=InnoDB;
+
 CREATE TABLE tl_lasbmt11_content (
        content_id BIGINT(20) NOT NULL DEFAULT 0
      , title VARCHAR(64) NOT NULL
@@ -12,14 +28,6 @@ CREATE TABLE tl_lasbmt11_content (
      , lock_on_finished TINYINT(1)
      , PRIMARY KEY (content_id)
 )TYPE=InnoDB;
-
-CREATE TABLE tl_lasbmt11_report (
-       report_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , comments VARCHAR(250)
-     , marks BIGINT(20)
-     , date_marks_released DATETIME
-     , PRIMARY KEY (report_id)
-);
 
 CREATE TABLE tl_lasbmt11_session (
        session_id BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -51,15 +59,16 @@ CREATE TABLE tl_lasbmt11_submission_details (
      , date_of_submission DATETIME
      , uuid BIGINT(20)
      , version_id BIGINT(20)
-     , user_id BIGINT(20)
      , session_id BIGINT(20)
+     , learner_id BIGINT(20)
      , PRIMARY KEY (submission_id)
+     , INDEX (learner_id)
+     , CONSTRAINT FK1411A53C3A4D8629 FOREIGN KEY (learner_id)
+                  REFERENCES tl_lasbmt11_session_learners (learner_id) ON DELETE NO ACTION ON UPDATE NO ACTION
      , INDEX (session_id)
      , CONSTRAINT FK1411A53C630DDF64 FOREIGN KEY (session_id)
                   REFERENCES tl_lasbmt11_session (session_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
-
-
 
 INSERT INTO `tl_lasbmt11_content` (content_id,title,instruction,define_later,run_offline,content_in_use,lock_on_finished) values(1,"Java Submission","Submit your java programs",0,0,0,0);
 INSERT INTO `tl_lasbmt11_session` (session_id,content_id,status) values(1,1,1);

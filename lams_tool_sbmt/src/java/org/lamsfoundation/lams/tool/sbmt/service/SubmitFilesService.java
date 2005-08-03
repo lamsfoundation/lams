@@ -60,10 +60,12 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
+import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
+import org.lamsfoundation.lams.tool.sbmt.dao.ILearnerDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
@@ -93,6 +95,8 @@ public class SubmitFilesService implements ToolContentManager,
 	private ISubmitFilesSessionDAO submitFilesSessionDAO;
 	
 	private ISubmissionDetailsDAO submissionDetailsDAO;
+
+	private ILearnerDAO learnerDAO;
 	
 	private SbmtToolContentHandler toolContentHandler;
 	private IUserDAO userDAO;
@@ -159,6 +163,22 @@ public class SubmitFilesService implements ToolContentManager,
 	public void setUserDAO(IUserDAO userDAO) {
 		this.userDAO = userDAO;
 	}
+
+	/**
+	 * @return Returns the learnerDAO.
+	 */
+	public ILearnerDAO getLearnerDAO() {
+		return learnerDAO;
+	}
+
+	/**
+	 * @param learnerDAO The learnerDAO to set.
+	 */
+	public void setLearnerDAO(ILearnerDAO learnerDAO) {
+		this.learnerDAO = learnerDAO;
+	}
+
+
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -490,7 +510,15 @@ public class SubmitFilesService implements ToolContentManager,
 			details.setFileDescription(fileDescription);
 			details.setFilePath(uploadFile.getFileName());
 			details.setDateOfSubmission(new Date());
-			details.setUserID(userID);
+			
+			Learner learner = learnerDAO.getLearner(sessionID,userID);
+			if(learner == null)
+				learner = new Learner();
+			learner.setUserID(userID);
+			learner.setFinished(false);
+			learner.setSessionID(sessionID);
+			
+			details.setLearner(learner);
 			details.setUuid(nodeKey.getUuid());
 			details.setVersionID(nodeKey.getVersion());
 			SubmitFilesReport report = new SubmitFilesReport();
@@ -537,69 +565,54 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long, java.lang.Long)
 	 */
 	public List getFilesUploadedByUser(Long userID, Long sessionID){
-		List list =  submissionDetailsDAO.getSubmissionDetailsForUserBySession(userID,sessionID);
-		if(list!=null)
-			return getDetails(list.iterator());			
-		else
-			return null;
-	}
-	public Map getFilesUploadedBySession(Long sessionID) {
-		List list =  submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
+		List list =  learnerDAO.getSubmissionDetailsForUserBySession(userID,sessionID);
 		if(list!=null){
-			return getUserFileDetailsMap(list);
-		}
-		else
+			Iterator iterator = list.iterator();
+			ArrayList details = new ArrayList();
+			while(iterator.hasNext()){
+				SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
+				SubmitFilesReport report = submissionDetails.getReport();
+				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report);
+				details.add(detailDto);
+			}
+			return details;
+
+		}else
 			return null;
 	}
 	/**
 	 * This method save SubmissionDetails list into a map container: key is user id,
 	 * value is a list container, which contains all <code>FileDetailsDTO</code> object belong to
 	 * this user.
-	 * 
-	 * @param list
-	 * @return
 	 */
-	private Map getUserFileDetailsMap(List list) {
-		Map map = new HashMap();
-		Iterator iterator = list.iterator();
-		List element;
-		while(iterator.hasNext()){
-			SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
-			SubmitFilesReport report = submissionDetails.getReport();
-			UserDTO user = getUserDetails(submissionDetails.getUserID());
-			
-			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report,user);
-			element = (List) map.get(submissionDetails.getUserID());
-			//if it is first time to this user, creating a new ArrayList for this user.
-			if(element == null)
-				element = new ArrayList();
-			element.add(detailDto);
-			map.put(submissionDetails.getUserID(),element);
+	public Map getFilesUploadedBySession(Long sessionID) {
+		List list =  submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
+		if(list!=null){
+			Map map = new HashMap();
+			Iterator iterator = list.iterator();
+			List element;
+			while(iterator.hasNext()){
+				SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
+				SubmitFilesReport report = submissionDetails.getReport();
+				Learner learner = submissionDetails.getLearner();
+				if(learner == null){
+					log.error("Could not find learer for special submission item:" + submissionDetails);
+					return null;
+				}
+				UserDTO user = getUserDetails(learner.getUserID());
+				
+				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report,user);
+				element = (List) map.get(learner.getUserID());
+				//if it is first time to this user, creating a new ArrayList for this user.
+				if(element == null)
+					element = new ArrayList();
+				element.add(detailDto);
+				map.put(learner.getUserID(),element);
+			}
+			return map;
 		}
-		return map;
-	}
-
-	/** 
-	 * This is a utility method used by <code>getFilesUploadedByUser</code>
-	 * method to generate a list of data transfer objects containing the
-	 * details of files uploaded by a given user. 
-	 * 
-	 * It combines the submission details and the reporting deatils 
-	 * to generate a generic DTO tailored according to the 
-	 * application requirements.
-	 * 
-	 * @param iterator
-	 * @return ArrayList 
-	 */
-	private ArrayList getDetails(Iterator iterator){
-		ArrayList details = new ArrayList();
-		while(iterator.hasNext()){
-			SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
-			SubmitFilesReport report = submissionDetails.getReport();
-			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report);
-			details.add(detailDto);
-		}
-		return details;
+		else
+			return null;
 	}
 	public FileDetailsDTO getFileDetails(Long detailID){
 			SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
@@ -631,7 +644,7 @@ public class SubmitFilesService implements ToolContentManager,
 		while(iterator.hasNext()){
 			Long userID = (Long)iterator.next();			
 			User user = userDAO.getUserById(new Integer(userID.intValue()));
-			List userDetails = submissionDetailsDAO.getSubmissionDetailsForUserBySession(userID,sessionID);
+			List userDetails = learnerDAO.getSubmissionDetailsForUserBySession(userID,sessionID);
 			table.put(user.getUserDTO(),getUserDetails(userDetails.iterator()));
 		}
 		return table;
@@ -683,7 +696,7 @@ public class SubmitFilesService implements ToolContentManager,
 		Iterator iterator = users.iterator();
 		while(iterator.hasNext()){
 			Long userID = (Long)iterator.next();
-			List allFiles = submissionDetailsDAO.getSubmissionDetailsForUserBySession(userID,sessionID);			
+			List allFiles = learnerDAO.getSubmissionDetailsForUserBySession(userID,sessionID);			
 			boolean unmarked = hasUnmarkedContent(allFiles.iterator());
 			details.add(getStatusDetails(userID,unmarked));
 		}
@@ -749,6 +762,23 @@ public class SubmitFilesService implements ToolContentManager,
 		//current there is no false return
 		return true;
 	}
+	public void finishSubmission(Long sessionID, Long userID){
+		Learner learner = learnerDAO.getLearner(sessionID,userID);
+		if(learner == null){
+			learner = new Learner();
+			learner.setFinished(true);
+			learner.setUserID(userID);
+			learner.setSessionID(sessionID);
+			learnerDAO.saveLearner(learner);
+		}else{
+			learner.setFinished(true);
+			learnerDAO.updateLearer(learner);
+		}
+	}
 
 
+
+	public Learner getLearner(Long sessionID, Long userID) {
+		return learnerDAO.getLearner(sessionID,userID);
+	}
 }

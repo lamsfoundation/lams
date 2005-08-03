@@ -79,15 +79,6 @@
             foreign-key="report_id"
         />
 
-        <property
-            name="userID"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="user_id"
-            length="20"
-        />
-
         <many-to-one
             name="submitFileSession"
             class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
@@ -96,6 +87,16 @@
             update="true"
             insert="true"
             column="session_id"
+        />
+
+        <many-to-one
+            name="learner"
+            class="org.lamsfoundation.lams.tool.sbmt.Learner"
+            cascade="save-update"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="learner_id"
         />
 
         <!--

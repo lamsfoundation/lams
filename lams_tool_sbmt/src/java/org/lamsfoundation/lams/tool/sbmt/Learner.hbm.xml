@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.sbmt.Learner"
+        table="tl_lasbmt11_session_learners"
+    >
+
+        <id
+            name="learnerID"
+            column="learner_id"
+            type="java.lang.Long"
+        >
+            <generator class="identity">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-Learner.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="userID"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="user_id"
+            length="20"
+        />
+
+        <property
+            name="finished"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="finished"
+            length="1"
+        />
+
+        <property
+            name="sessionID"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="session_id"
+            length="20"
+        />
+
+        <set
+            name="submissionDetails"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="learner_id"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.sbmt.SubmissionDetails"
+            />
+
+        </set>
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-Learner.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>

@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.sbmt.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -47,6 +48,7 @@ public class FileDetailsDTO implements Serializable{
 	private String fileDescription;
 	private Date dateOfSubmission;
 	private Date dateMarksReleased;
+	private boolean finished;
 	private String comments;	
 	private Long marks;
 	private Long uuID;
@@ -54,22 +56,15 @@ public class FileDetailsDTO implements Serializable{
 	
 	private UserDTO userDTO;
 	
-	/** Miinimal Constructor*/
-	public FileDetailsDTO(Long submissionID, String filePath, String fileDescription,
-			Date dateOfSubmission,Long reportID, String comments, Long marks) {
-		super();		
-		this.submissionID = submissionID;
-		this.filePath = filePath;
-		this.fileDescription = fileDescription;
-		this.dateOfSubmission = dateOfSubmission;
-		this.reportID = reportID;
-		this.comments = comments;
-		this.marks = marks;
-	}	
-	
+
 	public FileDetailsDTO(SubmissionDetails details, SubmitFilesReport report){
 
-		this.userID = details.getUserID();
+		Learner learner = details.getLearner();
+		if(learner != null){
+			this.userID = learner.getUserID();
+			this.finished = learner.isFinished();
+		}
+		
 		this.submissionID = details.getSubmissionID();
 		this.filePath = details.getFilePath();
 		this.fileDescription = details.getFileDescription();
@@ -252,5 +247,17 @@ public class FileDetailsDTO implements Serializable{
 	 */
 	public void setUserDTO(UserDTO userDTO) {
 		this.userDTO = userDTO;
+	}
+	/**
+	 * @return Returns the finished.
+	 */
+	public boolean isFinished() {
+		return finished;
+	}
+	/**
+	 * @param finished The finished to set.
+	 */
+	public void setFinished(boolean finished) {
+		this.finished = finished;
 	}
 }

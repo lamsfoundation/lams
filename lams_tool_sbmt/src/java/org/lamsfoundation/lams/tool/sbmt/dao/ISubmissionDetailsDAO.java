@@ -33,16 +33,7 @@ public interface ISubmissionDetailsDAO extends IBaseDAO {
 	 * @return List The list of required details
 	 */
 	public List getSubmissionDetailsByContentID(Long contentID);
-	
-	/**
-	 * This method returns a list of files that were uploaded by the
-	 * given <code>User<code> for given <code>contentID</code>.
-	 * 
-	 * @param userID The <code>user_id</code> of the <code>User</code>
-	 * @param contentID The <code>content_id</code> to be looked up
-	 * @return List The list of required objects.
-	 */
-	public List getSubmissionDetailsForUserBySession(Long userID,Long contentID);
+
 	
 	public List getUsersForSession(Long contentID);
 

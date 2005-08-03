@@ -33,6 +33,9 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 	/** persistent field */
 	private Set submissionDetails;
 
+	/** persistent field */
+	private Set learners;
+
 	/** persistent field, but not cloned to avoid to clone block*/
 	private SubmitFilesContent content;
 	
@@ -129,6 +132,23 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 	 */
 	public void setSubmissionDetails(Set submissionDetails) {
 		this.submissionDetails = submissionDetails;
+	}
+	/**
+	 * @hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan"
+	 * @hibernate.collection-one-to-many 
+	 * class="org.lamsfoundation.lams.tool.sbmt.Learner"
+	 * @hibernate.collection-key column="session_id"
+	 * 
+	 * @return Returns the learners.
+	 */
+	public Set getLearners() {
+		return learners;
+	}
+	/**
+	 * @param submissionDetails The submissionDetails to set.
+	 */
+	public void setLearners(Set learners) {
+		this.learners = learners;
 	}
 	/**
 	 * @hibernate.many-to-one column="content_id" cascade="none"

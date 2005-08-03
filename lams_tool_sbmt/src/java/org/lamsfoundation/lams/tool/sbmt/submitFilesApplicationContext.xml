@@ -24,6 +24,7 @@
 				<value>org/lamsfoundation/lams/tool/sbmt/SubmitFilesSession.hbm.xml</value>				
 				<value>org/lamsfoundation/lams/tool/sbmt/SubmissionDetails.hbm.xml</value>				
 				<value>org/lamsfoundation/lams/tool/sbmt/InstructionFiles.hbm.xml</value>				
+				<value>org/lamsfoundation/lams/tool/sbmt/Learner.hbm.xml</value>				
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -61,12 +62,17 @@
 	<bean id="submissionDetailsDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.SubmissionDetailsDAO">
 		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
 	</bean>
+
+	<bean id="learnerDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.LearnerDAO">
+		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
+	</bean>
 	
 	<bean id="submitFilesServiceTarget" class="org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesService">
 		<property name="submitFilesContentDAO"><ref bean="submitFilesContentDAO"/></property>
 		<property name="submitFilesSessionDAO"><ref bean="submitFilesSessionDAO"/></property>
 		<property name="submitFilesReportDAO"><ref bean="submitFilesReportDAO"/></property>
 		<property name="submissionDetailsDAO"><ref bean="submissionDetailsDAO"/></property>
+		<property name="learnerDAO"><ref bean="learnerDAO"/></property>
 		<property name="toolContentHandler"><ref bean="toolContentHandler"/></property>
 		<property name="userDAO"><ref bean="userDAO"/></property>
 	</bean>

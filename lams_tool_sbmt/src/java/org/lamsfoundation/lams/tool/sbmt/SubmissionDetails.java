@@ -29,19 +29,19 @@ public class SubmissionDetails implements Serializable,Cloneable{
 
 	/** persistent field */
 	private Date dateOfSubmission;
-	
-	/** persistent field */
-	private Long userID;
 
 	/** persistent field */
 	private Long uuid;
 
 	/** persistent field */
 	private Long versionID;
+
 	
 	/** persistent field */
 	private SubmitFilesReport report;
 
+	private Learner learner;
+	
 	/** persistent field, but not cloned to avoid to clone block*/
 	private SubmitFilesSession submitFileSession;
 	
@@ -122,7 +122,6 @@ public class SubmissionDetails implements Serializable,Cloneable{
 				.append("dateOfSubmission", getDateOfSubmission())
 				.append("uuid",getUuid())
 				.append("versionID", getVersionID())
-				.append("userID",getUserID())
 				.append("report",getReport())
 				.toString();
 	}
@@ -141,7 +140,6 @@ public class SubmissionDetails implements Serializable,Cloneable{
 				.append(this.getUuid(), castOther.getUuid())
 				.append(this.getVersionID(), castOther.getVersionID())				
 				.append(this.getReport(),castOther.getReport())
-				.append(this.getUserID(),castOther.getUserID())
 				.isEquals();
 	}
 
@@ -149,7 +147,7 @@ public class SubmissionDetails implements Serializable,Cloneable{
 		return new HashCodeBuilder().append(getSubmissionID()).append(
 				getFilePath()).append(getFileDescription()).append(
 				getDateOfSubmission()).append(getUuid()).append(getVersionID())
-				.append(getReport()).append(getUserID()).toHashCode();
+				.append(getReport()).toHashCode();
 	}
 
 	/**
@@ -166,20 +164,6 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	 */
 	public void setReport(SubmitFilesReport report) {
 		this.report = report;
-	}
-	/**
-	 * @hibernate.property column="user_id" length="20"
-	 * @return Returns the userID.
-	 */
-	public Long getUserID() {
-		return userID;
-	}
-	/**
-	 * @param userID
-	 *            The userID to set.
-	 */
-	public void setUserID(Long userID) {
-		this.userID = userID;
 	}
 
 	/*
@@ -212,4 +196,19 @@ public class SubmissionDetails implements Serializable,Cloneable{
 	public void setSubmitFileSession(SubmitFilesSession submitFileSession) {
 		this.submitFileSession = submitFileSession;
 	}
+	/**
+	/**
+	 * @hibernate.many-to-one column="learner_id" cascade="save-update"
+	 * @return Returns the learner.
+	 */
+	public Learner getLearner() {
+		return learner;
+	}
+	/**
+	 * @param learner The learner to set.
+	 */
+	public void setLearner(Learner learner) {
+		this.learner = learner;
+	}
+
 }

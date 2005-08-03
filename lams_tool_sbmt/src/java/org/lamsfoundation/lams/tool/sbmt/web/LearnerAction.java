@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
@@ -41,6 +42,8 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
  * 			validate="false"
  * 
  * @struts.action-forward name="upload" path="/learner/sbmtLearner.jsp"
+ * @struts.action-forward name="finish" path="/learner/finish.jsp"
+ * 
  */
 public class LearnerAction extends DispatchAction {
 	
@@ -54,24 +57,30 @@ public class LearnerAction extends DispatchAction {
 		
 
 		DynaActionForm authForm= (DynaActionForm)form;
-		
 		Long sessionID =(Long) authForm.get("toolSessionID");
 		Long userID = (Long)authForm.get("userID");
+		
 		//get submission information from content table.E.g., title, instruction
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 		SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 		SubmitFilesContent content = session.getContent();
-
 		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-		listUploadFiles(request, filesUploaded);
-		
-		setLearnerDTO(request, sessionID, userID, content);
+		Learner learner = submitFilesService.getLearner(sessionID,userID);
+		setLearnerDTO(request, sessionID,userID,learner, content, filesUploaded);
 		//to avoid user without patience click "upload" button too fast
 		saveToken(request);
 		return mapping.getInputForward();
 		
 	}
-
+	/**
+	 * Implements learner upload submission function. This function also display the page again for learner uploading
+	 * more submission use. 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward uploadFile(ActionMapping mapping,
 									ActionForm form,
 									HttpServletRequest request,
@@ -84,12 +93,11 @@ public class LearnerAction extends DispatchAction {
 			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 
-			listUploadFiles(request, filesUploaded);
 			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 			SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 			SubmitFilesContent content = session.getContent();
-
-			setLearnerDTO(request, sessionID, userID, content);
+			Learner learner = submitFilesService.getLearner(sessionID,userID);
+			setLearnerDTO(request, sessionID,userID,learner, content, filesUploaded);
 			return returnErrors(mapping,request,"submit.upload.twice","upload");
 		}
 		
@@ -104,18 +112,39 @@ public class LearnerAction extends DispatchAction {
 		try{
 			submitFilesService.uploadFileToSession(sessionID,uploadedFile,fileDescription,userID);
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-			listUploadFiles(request, filesUploaded);
 			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 			SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 			SubmitFilesContent content = session.getContent();
-			setLearnerDTO(request, sessionID, userID, content);
+			Learner learner = submitFilesService.getLearner(sessionID,userID);
+			setLearnerDTO(request,sessionID,userID, learner, content, filesUploaded);
 			return mapping.getInputForward();			
 		}catch(SubmitFilesException se){
 			logger.error("uploadFile: Submit Files Exception has occured" + se.getMessage());
 			return returnErrors(mapping,request,se.getMessage(),"upload");
 		}
 	}
-	
+	/**
+	 * Learner choose finish upload button, will invoke this function. This function will mark the <code>finished</code> 
+	 * field by special toolSessionID and userID.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public ActionForward finish(ActionMapping mapping,
+			ActionForm form,
+			HttpServletRequest request,
+			HttpServletResponse response){
+		DynaActionForm authForm= (DynaActionForm)form;
+		Long sessionID =(Long) authForm.get("toolSessionID");
+		Long userID = (Long)authForm.get("userID");
+		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
+		submitFilesService.finishSubmission(sessionID,userID);
+
+		return mapping.findForward("finish");
+	}
 	/**
 	 * This is a utily function for forwarding the errors to
 	 * the respective JSP page indicated by <code>forward</code>
@@ -136,39 +165,43 @@ public class LearnerAction extends DispatchAction {
 		return mapping.findForward(forward);
 	}
 	
-	/**
-	 * Fill file list uploaded by the special user into web form. Remove the unauthorized mark and
-	 * comment information according to the release flag (release date). 
-	 * @param authForm
-	 * @param sessionID
-	 * @param userID
-	 */
-	private void listUploadFiles(HttpServletRequest request, List filesUploaded) {
-		//if Monitoring does not release marks, then screen this mark and comment content.
-		Iterator iter = filesUploaded.iterator();
-		while(iter.hasNext()){
-			FileDetailsDTO dto = (FileDetailsDTO) iter.next();
-			if(dto.getDateMarksReleased() == null){
-				dto.setComments(null);
-				dto.setMarks(null);
-			}
-		}
-		request.setAttribute("filesUploaded",filesUploaded);
-	}
 
 	/**
+	 * 
+	 * Set information into learner DTO object for page display.
+	 * Fill file list uploaded by the special user into web form. Remove the unauthorized mark and comments.
 	 * @param request
 	 * @param sessionID
 	 * @param userID
 	 * @param content
+	 * @param filesUploaded 
 	 */
-	private void setLearnerDTO(HttpServletRequest request, Long sessionID, Long userID, SubmitFilesContent content) {
+	private void setLearnerDTO(HttpServletRequest request,Long sessionID,Long userID, Learner learner, SubmitFilesContent content, List filesUploaded) {
+		
 		LearnerDetailsDTO dto = new LearnerDetailsDTO();
+		//don't use learner data, becuase these 2 values come from web page. Learner maybe empty.
 		dto.setToolSessionID(sessionID);
 		dto.setUserID(userID);
-		dto.setContentInstruction(content.getInstruction());
-		dto.setContentLockOnFinished(content.isLockOnFinished());
-		dto.setContentTitle(content.getTitle());
+		if(learner != null){
+			dto.setLocked(learner.isFinished());
+			//if Monitoring does not release marks, then screen this mark and comment content.
+			if(filesUploaded != null){
+				Iterator iter = filesUploaded.iterator();
+				while(iter.hasNext()){
+					FileDetailsDTO filedto = (FileDetailsDTO) iter.next();
+					if(filedto .getDateMarksReleased() == null){
+						filedto .setComments(null);
+						filedto .setMarks(null);
+					}
+				}
+			}
+			dto.setFilesUploaded(filesUploaded);
+		}
+		if(content != null){
+			dto.setContentInstruction(content.getInstruction());
+			dto.setContentLockOnFinished(content.isLockOnFinished());
+			dto.setContentTitle(content.getTitle());
+		}
 		request.setAttribute("learner",dto);
 	}
 }
