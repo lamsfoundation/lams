@@ -296,4 +296,11 @@ public interface INoticeboardService {
      */
     public void removeAttachment(NoticeboardAttachment attachment);
     
+    /**
+     * Removes the NoticeboardAttachment object from the database
+     * with uuid <code>uuid</code>
+     * @param uuid The uuid of the file
+     */
+    public void removeAttachmentByUuid(Long uuid);
+    
 }

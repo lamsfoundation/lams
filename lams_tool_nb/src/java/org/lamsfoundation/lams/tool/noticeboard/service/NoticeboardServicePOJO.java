@@ -732,7 +732,25 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    }
 	}
 	
-	
+	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeAttachmentByUuid(java.lang.Long) */
+	public void removeAttachmentByUuid(Long uuid)
+	{
+	    if (uuid == null)
+	    {
+	        String error = "Unable to continue. The uuid is missing";
+	        log.error(error);
+	        throw new NbApplicationException(error);
+	    }
+	    try
+	    {
+	        nbAttachmentDAO.removeAttachment(uuid);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to remove the attachment with UUid" + uuid + " "
+	                + e.getMessage(), e);
+	    }
+	}
 	
 	
 	
