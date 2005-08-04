@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
@@ -95,7 +96,16 @@ public interface ISubmitFilesService {
 	 */
 	public void uploadFileToSession(Long sessionID, FormFile uploadFile,
 			   String fileDescription, Long userID) throws SubmitFilesException;
-	public void uploadFileToContent(Long contentID, FormFile uploadFile, String fileType) throws SubmitFilesException;
+	/**
+	 * Upload file to repository and persist relative attributes into database.
+	 *   
+	 * @param contentID
+	 * @param uploadFile
+	 * @param fileType
+	 * @return If successs, return an instance of <code>InstructionFile</code>. Otherwise, return null.
+	 * @throws SubmitFilesException
+	 */
+	public InstructionFiles uploadFileToContent(Long contentID, FormFile uploadFile, String fileType) throws SubmitFilesException;
 	/**
 	 * This method returns a list of files that were uploaded by the
 	 * given <code>User<code> for given <code>contentID</code>.

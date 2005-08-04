@@ -27,7 +27,7 @@
 	<h1><fmt:message key="label.authoring.heading.basic.desc" /></h1>
 	<table class="forms">
 		<!--hidden field contentID passed by flash-->
-		<html:hidden property="toolContentID" value="${authoring.contentID}" />
+		<html:hidden property="toolContentID"/>
 		<!-- Title Row -->
 		<tr>
 			<td class="formlabel"><fmt:message key="label.authoring.basic.title" />:</td>
@@ -48,7 +48,6 @@
 	<h2><fmt:message key="label.authoring.heading.instructions.desc" /></h2>
 	<table class="forms">
 		<!--hidden field contentID passed by flash-->
-		<html:hidden property="toolContentID" value="${toolContentID}" />
 		<tr>
 		</tr>
 		<!-- Instructions Row -->
@@ -148,8 +147,6 @@
 	<h1><fmt:message key="label.authoring.heading.advance" /></h1>
 	<h2><fmt:message key="label.authoring.heading.advance.desc" /></h2>
 	<table class="forms">
-		<!--hidden field contentID passed by flash-->
-		<html:hidden property="toolContentID" value="${toolContentID}" />
 		<tr>
 		</tr>
 		<!-- Instructions Row -->

@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
@@ -466,8 +468,8 @@ public class SubmitFilesService implements ToolContentManager,
 	 * 
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToContent(Long,FormFile ) 
 	 */
-	public void uploadFileToContent(Long contentID, FormFile uploadFile,String fileType) throws SubmitFilesException{
-		
+	public InstructionFiles uploadFileToContent(Long contentID, FormFile uploadFile,String fileType) throws SubmitFilesException{
+		InstructionFiles refile = null;
 		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
 			throw new SubmitFilesException("Could not find upload file: " + uploadFile);
 		
@@ -489,6 +491,14 @@ public class SubmitFilesService implements ToolContentManager,
 		file.setName(uploadFile.getFileName());
 		fileSet.add(file);
 		submitFilesContentDAO.save(content);
+		
+		refile = new InstructionFiles();
+		try {
+			PropertyUtils.copyProperties(refile,file);
+		} catch (Exception e) {
+			throw new SubmitFilesException("Could not get return InstructionFile instance" +e.getMessage());
+		}
+		return refile;
 	}
 	/**
 	 * (non-Javadoc)

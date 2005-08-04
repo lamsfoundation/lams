@@ -56,6 +56,8 @@ public class AuthoringDTO implements Serializable {
 	public AuthoringDTO(){
 	}
 	public AuthoringDTO(SubmitFilesContent content){
+		if(content == null)
+			return;
 		try {
 			PropertyUtils.copyProperties(this,content);
 		} catch (IllegalAccessException e) {
