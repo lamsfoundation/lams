@@ -61,7 +61,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts:action path="/authoring" name="NbAuthoringForm" scope="session"
  * 				  type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
- *                parameter="method"
+ *                parameter="method" validate="false"
  * 
  * @struts.action-exception key="error.exception.NbApplication" scope="request"
  *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
@@ -255,16 +255,16 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		    	         */
 		    	        getToolContentHandler().deleteFile(file.getUuid());
 		    	        
-		    	        NodeKey node = getToolContentHandler().uploadFile(theFile.getInputStream(), theFile.getFileName(), 
+		    	        nbService.removeAttachment(file);
+		    	        
+		    	      /*  NodeKey node = getToolContentHandler().uploadFile(theFile.getInputStream(), theFile.getFileName(), 
 		                        theFile.getContentType(), fileType); 
 		    	        
 		    	        file.setUuid(node.getUuid()); //only need to update the uuid, the rest of the info is the same
 		    	        file.setVersionId(node.getVersion());
-		    	        nbService.saveAttachment(file);
+		    	        nbService.saveAttachment(file); */
 		    	        
 		    		}
-		    	    else
-		    	    {
 		    	        /**
 		    	         * This is a new file and so is saved to the content repository.
 		    	         * 
@@ -279,7 +279,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 				    	file.setUuid(node.getUuid());
 				    	file.setVersionId(node.getVersion()); /** TODO: change versionId to version */
 				    	nbService.saveAttachment(file);
-		    	    }
+		    	    
 		    	    
 			    	String keyName = file.returnKeyName();
 				    
