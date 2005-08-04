@@ -83,6 +83,11 @@
         path="/learner/finish.jsp"
         redirect="false"
       />
+      <forward
+        name="contentInUse"
+        path="/learner/contentinuse.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/monitoring"

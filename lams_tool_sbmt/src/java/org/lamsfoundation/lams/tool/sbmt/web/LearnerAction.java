@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
  * 
  * @struts.action-forward name="upload" path="/learner/sbmtLearner.jsp"
  * @struts.action-forward name="finish" path="/learner/finish.jsp"
+ * @struts.action-forward name="contentInUse" path="/learner/contentinuse.jsp"
  * 
  */
 public class LearnerAction extends DispatchAction {
@@ -64,6 +65,10 @@ public class LearnerAction extends DispatchAction {
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 		SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 		SubmitFilesContent content = session.getContent();
+		//if content in use, return special page.
+		if(content.isContentInUse())
+			return mapping.findForward("contentInUse");
+		
 		List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		Learner learner = submitFilesService.getLearner(sessionID,userID);
 		setLearnerDTO(request, sessionID,userID,learner, content, filesUploaded);
