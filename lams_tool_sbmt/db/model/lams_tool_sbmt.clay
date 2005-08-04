@@ -123,7 +123,7 @@
 </table>
 <table alias="" name="tl_lasbmt11_instruction_files" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="439" y="-16"/>
+<table-figure-bounds height="-1" width="-1" x="30" y="263"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="file_id" remarks="">
 <column-description></column-description>
@@ -219,7 +219,7 @@
 </table>
 <table alias="" name="tl_lasbmt11_report" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="437" y="121"/>
+<table-figure-bounds height="-1" width="-1" x="201" y="163"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="report_id" remarks="">
 <column-description></column-description>
@@ -276,7 +276,7 @@
 </table>
 <table alias="" name="tl_lasbmt11_session" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="436" y="233"/>
+<table-figure-bounds height="-1" width="-1" x="629" y="9"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="session_id" remarks="">
 <column-description></column-description>
@@ -345,7 +345,7 @@
 </table>
 <table alias="" name="tl_lasbmt11_session_learners" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="477" y="367"/>
+<table-figure-bounds height="-1" width="-1" x="241" y="337"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="learner_id" remarks="">
 <column-description></column-description>
@@ -415,7 +415,7 @@
 </table>
 <table alias="" name="tl_lasbmt11_submission_details" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="125" y="327"/>
+<table-figure-bounds height="-1" width="-1" x="641" y="290"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="submission_id" remarks="">
 <column-description></column-description>

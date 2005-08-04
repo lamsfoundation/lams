@@ -125,6 +125,14 @@
       />
     </action>
     <action
+      path="/deletefile"
+      type="org.lamsfoundation.lams.tool.sbmt.web.DeleteFileAction"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+    </action>
+    <action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
       name="SbmtAuthoringForm"

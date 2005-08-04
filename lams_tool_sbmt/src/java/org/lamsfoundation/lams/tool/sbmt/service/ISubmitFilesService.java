@@ -162,6 +162,7 @@ public interface ISubmitFilesService {
 	public boolean releaseMarksForSession(Long sessionID);
 
 	public void deleteFromRepository(Long uuid, Long versionID);
+	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 	/**
 	 * When learner finish submission, it invokes this function and will remark the <code>finished</code> field.
 	 * 

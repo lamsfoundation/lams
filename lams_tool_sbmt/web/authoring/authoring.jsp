@@ -15,6 +15,7 @@
 <!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
 <link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="<html:rewrite page='/includes/javascript/common.js'/>"></script>
+<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 </head>
 
 <body>
@@ -62,6 +63,7 @@
 		<tr>
 			<td></td>
 			<td class="formcontrol">
+				<div id="onlinefile">
 				<c:forEach var="file" items="${authoring.onlineFiles}">
 					<li><c:out value="${file.name}"/>
 					<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
@@ -70,11 +72,15 @@
 					<html:link href="../download/?uuid=${file.uuID}&preferDownload=true">
 						<fmt:message key="label.download"/>
 					</html:link>
-					<html:link property="action" href="../authoring.do?uuid=${file.uuID}&versionID=${file.versionID}">
+					<c:set var="deleteonline">
+					<html:rewrite page="/deletefile.do?method=deleteOnlineFile&toolContentID=${authoring.contentID}&uuID=${file.uuID}&versionID=${file.versionID}"/>
+					</c:set>
+					<html:link href="javascript:loadDoc('${deleteonline}','onlinefile')">
 						<fmt:message key="label.authoring.online.delete"/>
-					</html:link>
+					</html:link>					
 					</li>
 				</c:forEach>
+				</div>
 			</td>
 		</tr>
 		<tr>
@@ -90,6 +96,7 @@
 				</html:submit>
 			</td>
 		</tr>	
+		<!------------Offline Instructions ----------------------->
 		<tr>
 			<td class="formlabel"><fmt:message
 				key="label.authoring.offline.instruction" />:</td>
@@ -101,18 +108,24 @@
 		<tr>
 			<td></td>
 			<td class="formcontrol">
+				<div id="offlinefile">
 				<c:forEach var="file" items="${authoring.offlineFiles}">
-					<li><c:out value="${file.name}"/></li>
+					<li><c:out value="${file.name}"/>
 					<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
 						<fmt:message key="label.view"/>
 					</html:link>
 					<html:link href="../download/?uuid=${file.uuID}&preferDownload=true">
 						<fmt:message key="label.download"/>
 					</html:link>
-					<html:link property="action" href="../authoring.do?uuid=${file.uuID}&versionID=${file.versionID}">
+					<c:set var="deleteoffline">
+					<html:rewrite page="/deletefile.do?method=deleteOfflineFile&toolContentID=${authoring.contentID}&uuID=${file.uuID}&versionID=${file.versionID}"/>
+					</c:set>
+					<html:link href="javascript:loadDoc('${deleteoffline}','offlinefile')">
 						<fmt:message key="label.authoring.offline.delete"/>
 					</html:link>					
+					</li>
 				</c:forEach>
+				</div>
 			</td>
 		</tr>
 		<tr>

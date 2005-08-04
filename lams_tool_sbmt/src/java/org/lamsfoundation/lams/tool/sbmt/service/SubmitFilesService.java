@@ -382,6 +382,9 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 	}
 
+	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type){
+		submitFilesContentDAO.deleteInstructionFile(contentID, uuid, versionID, type);
+	}
 
 	/**
 	 * (non-Javadoc)
