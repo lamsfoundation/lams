@@ -26,7 +26,9 @@
 </tr>
 </table>
 </div>
+	
 
+	
 						
 <div id="formtablecontainer">
 <table class="forms">
@@ -102,10 +104,11 @@
 		                                
 		                        </tr>
 		                        <logic:iterate name="attachmentList" id="attachment">
-		                        <!--	<bean:define id="view">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=false</bean:define>
+		                        	<bean:define id="view">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=false</bean:define>
 									<bean:define id="download">/download/?uuid=<bean:write name="attachment" property="uuid"/>&preferDownload=true</bean:define>
-                             -->
+                          
                              	<bean:define id="uuid" name="attachment" property="uuid" />
+                             
 			                        <tr>
 			                         	
 			                         	<td><bean:write name="attachment" property="filename"/></td>
@@ -121,15 +124,28 @@
 				                         </td>
 				                        
 				                         <td>
-				                         		<fmt:message key="link.view" />
-				                         		<fmt:message key="link.download" />
-				                         	<html:link page="/authoring.do?method=Delete" 
-				                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
-				                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
-				                         	target="_self">
-				                         			<fmt:message key="link.delete" />
-				                         		</html:link> 
-				                         		
+					                         <table>
+						                         <tr>
+						                         	<td>
+						                       			<a href="javascript:launchInstructionsPopup('download/?uuid=46&preferDownload=false')" class="button">
+						                         		<fmt:message key="link.view" />
+						                         		</a>
+						                         	</td>
+						                         	<td>
+							                         		<html:link page="<%=download%>" styleClass="button">
+							                         			<fmt:message key="link.download" />
+							                         		</html:link>
+						                         	</td>
+						                         	<td>
+							                         	<html:link page="/authoring.do?method=Delete" 
+							                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
+							                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
+							                         	target="_self" styleClass="button">
+							                         			<fmt:message key="link.delete" />
+							                         	</html:link> 
+							                     	</td>
+						                         </tr>
+					                         </table>
 				                         </td>
 			                        </tr>
 		                        </logic:iterate>

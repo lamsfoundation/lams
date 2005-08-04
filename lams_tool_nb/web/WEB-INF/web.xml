@@ -94,6 +94,15 @@
 		<load-on-startup>1</load-on-startup>
 </servlet>
 
+<!--  The download servlet, reused from the content repository jar -->
+	<servlet>
+		<description>Instructions Download</description>
+		<display-name>Instructions Download</display-name>
+		<servlet-name>download</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
+	    <load-on-startup>3</load-on-startup>
+	</servlet>
+
   	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 	    <url-pattern>*.do</url-pattern>
@@ -102,6 +111,10 @@
 	    <servlet-name>Connector</servlet-name>
 	    <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>download</servlet-name>
+		<url-pattern>/download/*</url-pattern>
+  	</servlet-mapping>
 
    <session-config>
       <session-timeout>120</session-timeout>
