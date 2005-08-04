@@ -39,13 +39,13 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">
     <head>
-      <html:base target="../"/>
+      <html:base/>
 	  <fmt:setBundle basename = "org.lamsfoundation.lams.tool.noticeboard.web.ApplicationResources" />
       <title><tiles:getAsString name="title"/></title>
+      <script src="<%=pathToShare%>/common.js"></script>
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
 	   <link href="<%=pathToShare%>/css/aqua.css" rel="stylesheet" type="text/css"> 
-		<script src="<%=pathToShare%>/common.js"></script>
 	
 	 
     </head>
