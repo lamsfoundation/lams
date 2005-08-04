@@ -24,7 +24,7 @@ import org.springframework.orm.hibernate.HibernateTemplate;
 public class SubmitFilesContentDAO extends BaseDAO implements ISubmitFilesContentDAO {
 
 	private static final String FIND_INSTRUCTION_FILE = "from " + InstructionFiles.class.getName() 
-													+ " where content_id=? and uuid=? and version_id=? and type=?";
+													+ " as i where content_id=? and i.uuID=? and i.versionID=? and i.type=?";
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO#getContentByID(java.lang.Long)
