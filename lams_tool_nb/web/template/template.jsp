@@ -40,19 +40,14 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 <html:html locale = "true">
     <head>
       <html:base target="../"/>
-	  <fmt:setBundle basename = "org.lamsfoundation.lams.tool.imscp.web.ApplicationResources" />
+	  <fmt:setBundle basename = "org.lamsfoundation.lams.tool.noticeboard.web.ApplicationResources" />
       <title><tiles:getAsString name="title"/></title>
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
-	  <link href="/lams/css/aqua.css" rel="stylesheet" type="text/css">
-	  <script language="JavaScript" type="text/JavaScript">
-	        <!--
-	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
-	            obj.className=new_style;
-	        }
-	        //-->
-	  </script>
-	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
+	   <link href="<%=pathToShare%>/css/aqua.css" rel="stylesheet" type="text/css"> 
+		<script src="<%=pathToShare%>/common.js"></script>
+	
+	 
     </head>
     
     <body summary="This table is being used for layout purposes only">
