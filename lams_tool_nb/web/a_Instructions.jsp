@@ -52,6 +52,7 @@
 					</td>
 					<td class="formcontrol">
 						<html:file property="onlineFile" /><html:submit property="method"><fmt:message key="button.upload" /></html:submit>
+											
 					</td>						
 				</tr>
 				<tr>
@@ -127,7 +128,7 @@
 					                         <table>
 						                         <tr>
 						                         	<td>
-						                       			<a href="javascript:launchInstructionsPopup('download/?uuid=46&preferDownload=false')" class="button">
+						                       			<a href='javascript:launchInstructionsPopup("<html:rewrite page='<%=view%>'/>")' class="button">
 						                         		<fmt:message key="link.view" />
 						                         		</a>
 						                         	</td>
