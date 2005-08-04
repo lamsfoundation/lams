@@ -26,7 +26,7 @@ http://www.gnu.org/licenses/gpl.txt
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">
     <head>
-       <html:base target="../"/>
+       <html:base/>
 	  <fmt:setBundle basename = "org.lamsfoundation.lams.monitoring.MonitoringResources" />
       <title><tiles:getAsString name="title"/></title>
       <meta http-equiv="pragma" content="no-cache">
