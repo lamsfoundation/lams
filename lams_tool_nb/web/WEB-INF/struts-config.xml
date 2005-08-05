@@ -100,13 +100,13 @@
         scope="request"
       />
       <forward
-        name="basic"
-        path=".nb_basic"
+        name="displayMessage"
+        path=".message"
         redirect="false"
       />
       <forward
-        name="displayMessage"
-        path=".message"
+        name="authoringContent"
+        path=".authoringContent"
         redirect="false"
       />
     </action>
@@ -115,6 +115,7 @@
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
       name="NbAuthoringForm"
       scope="session"
+      input=".authoringContent"
       parameter="method"
       unknown="false"
       validate="true"
@@ -134,18 +135,8 @@
         scope="request"
       />
       <forward
-        name="basic"
-        path=".nb_basic"
-        redirect="false"
-      />
-      <forward
-        name="advanced"
-        path=".nb_advanced"
-        redirect="false"
-      />
-      <forward
-        name="instructions"
-        path=".nb_instructions"
+        name="authoringContent"
+        path=".authoringContent"
         redirect="false"
       />
     </action>
