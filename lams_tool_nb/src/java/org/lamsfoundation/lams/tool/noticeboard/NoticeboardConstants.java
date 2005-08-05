@@ -43,12 +43,14 @@ public class NoticeboardConstants
     // -------------------------------------------
     // Action Forward names
     // -------------------------------------------
+
+    public static final String BASIC = "Basic";
+    public static final String ADVANCED = "Advanced";
+    public static final String INSTRUCTIONS = "Instructions";
     
-  
-    public static final String BASIC_PAGE = "basic";
-    public static final String ADVANCED_PAGE = "advanced";
-    public static final String INSTRUCTIONS_PAGE = "instructions";
+    
    
+    public static final String AUTHOR_PAGE = "authoringContent";
     
     public static final String DISPLAY_MESSAGE = "displayMessage";
     public static final String DISPLAY_LEARNER_CONTENT = "displayLearnerContent";
