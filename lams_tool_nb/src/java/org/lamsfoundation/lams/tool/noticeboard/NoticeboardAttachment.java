@@ -100,7 +100,7 @@ public class NoticeboardAttachment implements Serializable {
     /**
      * 		@hibernate.property
      *      column="filename"
-     *      length="50"
+     *      length="255"
      *      not-null="true"
      * 
      * @return Returns the filename.
