@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 //import org.apache.struts.actions.LookupDispatchAction;
 import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
@@ -144,8 +145,24 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
         //Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
         Long toolContentId = getToolContentId(request);
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+        NbMonitoringForm monitorForm = (NbMonitoringForm)form;
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 		NbWebUtil.copyValuesIntoSession(request, content);
+		
+		
+		Map attachmentMap = monitorForm.getAttachments();
+	        
+	        List attachmentIdList = nbService.getAttachmentIdsFromContent(content);
+			for (int i=0; i<attachmentIdList.size(); i++)
+			{
+			    NoticeboardAttachment file = nbService.retrieveAttachment((Long)attachmentIdList.get(i));
+			    String fileType = file.returnFileType();
+			    String keyName = file.getFilename() + "-" + fileType;
+			    attachmentMap.put(keyName, file);
+			}
+			monitorForm.setAttachments(attachmentMap);
+			NbWebUtil.addUploadsToSession(request, attachmentMap);
+		
 		
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
