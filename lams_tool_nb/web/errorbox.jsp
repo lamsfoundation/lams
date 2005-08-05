@@ -33,7 +33,6 @@ if(cprotocol.startsWith("HTTPS")){
 String pathToShare = cprotocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
 %>
 <div id="datatablecontainer">
-<h2></h2>
 <logic:messagesPresent> 
 <table border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
 <tr>
