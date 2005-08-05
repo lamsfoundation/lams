@@ -1,5 +1,6 @@
 <div id="datatablecontainer">
 <h2><fmt:message key="titleHeading.summary" /> </h2>
+<br>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tr>
 		<td><fmt:message key="basic.title"/></td>
@@ -19,4 +20,5 @@
 	</tr>
 </table>
 </div>
+<br>
 <hr>

@@ -1,4 +1,5 @@
 <h2><fmt:message key="titleHeading.editActivity"/></h2>
+<br>
 <div id="datatablecontainer">
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">
 		<c:choose>
@@ -39,7 +40,7 @@
 			<!--	<html:link forward="forwardToAuthorPage" paramName="NbMonitoringForm" paramProperty="toolContentId" paramId="toolContentId" styleClass="button">
 					<fmt:message key="button.edit" />
 				</html:link> -->
-				<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="button">
+				<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="button" target="_blank">
 					<fmt:message key="button.edit" />
 				</html:link> 
 			</td>	
@@ -47,5 +48,6 @@
 	</c:if>
 </table>
 </div>
+<br>
 <hr>
 

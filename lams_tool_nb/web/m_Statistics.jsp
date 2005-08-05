@@ -1,9 +1,7 @@
 <div id="datatablecontainer">
 <h2><fmt:message key="titleHeading.summary" /> </h2>
+<br>
 <table width="60%" border="0" cellspacing="0" cellpadding="0">
-	<tr>
-		<td>&nbsp;</td>
-	</tr>
 	<c:set var="groupCounter" scope="request" value="0"/>
 	<c:forEach var="group" items="${requestScope.groupStatsMap}">
 		<c:set var="groupCounter" scope="request" value="${groupCounter+1}"/>
@@ -17,7 +15,7 @@
 			<c:out value="${group.value}"/>
 			
 		</td>
-	<!-- 	<td align="left"></td> -->
+	
 	</tr>
 	</c:forEach>
 	<tr>
@@ -30,4 +28,5 @@
 	</tr>
 </table>
 </div>
+<br>
 <hr>
