@@ -73,9 +73,8 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
  *                          type="java.lang.NullPointerException"
  *                          path=".error"
  *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
- * 
- * @struts:action-forward name="basic" path=".nb_basic"
  * @struts:action-forward name="displayMessage" path=".message"
+ * @struts:action-forward name="authoringContent" path=".authoringContent"
  * ----------------XDoclet Tags--------------------
  */
 
@@ -207,8 +206,8 @@ public class NbAuthoringStarterAction extends LamsAction {
 		}
 		NbWebUtil.addUploadsToSession(request, attachmentMap);
 		request.getSession().setAttribute(FORM, nbForm);
-		
-		return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
+	
+		return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
 	}
 	
 	/**

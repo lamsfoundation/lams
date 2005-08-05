@@ -61,7 +61,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts:action path="/authoring" name="NbAuthoringForm" scope="session"
  * 				  type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
- *                parameter="method" validate="false"
+ *                parameter="method" validate="true" input=".authoringContent"
  * 
  * @struts.action-exception key="error.exception.NbApplication" scope="request"
  *                          type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
@@ -71,10 +71,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *                          type="java.lang.NullPointerException"
  *                          path=".error"
  *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
- * 
- * @struts:action-forward name="basic" path=".nb_basic"
- * @struts:action-forward name="advanced" path=".nb_advanced"
- * @struts:action-forward name="instructions" path=".nb_instructions"
+ *
+ * @struts:action-forward name="authoringContent" path=".authoringContent"
  * 
  * ----------------XDoclet Tags--------------------
  */
@@ -119,7 +117,8 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     {
         NbAuthoringForm nbForm = (NbAuthoringForm)form;
         copyAuthoringFormValuesIntoFormBean(request, nbForm);
-	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
+
+        return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
     }
 
 	/**
@@ -129,7 +128,8 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		
 	    NbAuthoringForm nbForm = (NbAuthoringForm)form;
 	    copyAuthoringFormValuesIntoFormBean(request, nbForm);
-	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
+	  //  return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
+	    return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
 	}
 	
 	/**
@@ -137,7 +137,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	 */
 	
 	public ActionForward advanced(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		return mapping.findForward(NoticeboardConstants.ADVANCED_PAGE);
+	    return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
 	}
 	
 	/**
@@ -147,7 +147,8 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	public ActionForward instructions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 	    NbAuthoringForm nbForm = (NbAuthoringForm)form;
 	    copyAuthoringFormValuesIntoFormBean(request, nbForm);
-	    return mapping.findForward(NoticeboardConstants.INSTRUCTIONS_PAGE);
+	 
+	    return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
 	}	
 	
 	/**
@@ -157,7 +158,8 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	public ActionForward done(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 	    NbAuthoringForm nbForm = (NbAuthoringForm)form;
 	    copyAuthoringFormValuesIntoFormBean(request, nbForm);
-	    return mapping.findForward(NoticeboardConstants.BASIC_PAGE);
+	  
+	    return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
 	}
 	
 	/**
@@ -194,7 +196,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		nbContent.setDefineLater(false);
 		nbService.updateNoticeboard(nbContent);
 			
-		return mapping.findForward(NoticeboardConstants.BASIC_PAGE); /** TODO: once the content is saved, should close the window */
+		return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
 	}
 	
 	/**
@@ -306,7 +308,10 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		            throw new NbApplicationException("Unable to upload file, exception was "+e.getMessage());
 		    	}			    	
 			}
-	    	return mapping.findForward(NoticeboardConstants.INSTRUCTIONS_PAGE);
+	  
+			nbForm.setMethod(NoticeboardConstants.INSTRUCTIONS);
+			
+			return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
 	}
 	
 	
@@ -347,9 +352,9 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     	//remove entry from db
     	nbService.removeAttachment(attachment);
     	
-    	
+    	nbForm.setMethod(NoticeboardConstants.INSTRUCTIONS);
 	   
-	    return mapping.findForward(NoticeboardConstants.INSTRUCTIONS_PAGE);
+	   	return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
 	}
 	
 	
