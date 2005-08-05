@@ -24,6 +24,7 @@
  */
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -72,11 +73,9 @@ public class NbMonitoringStarterAction extends LamsAction {
     
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
 
-        //get the list of tool sessionId's and put them in session 
         NbMonitoringForm monitorForm = (NbMonitoringForm)form;
         
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-        monitorForm.reset();
         NbWebUtil.cleanMonitoringSession(request);
         Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
         
@@ -93,10 +92,7 @@ public class NbMonitoringStarterAction extends LamsAction {
         NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
         NbWebUtil.copyValuesIntoSession(request, content);
         
-        
-        
-        //get the list of tool session ids
-        
+     
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
    
