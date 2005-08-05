@@ -28,7 +28,12 @@ package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
+
+import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author mtruong
@@ -56,8 +61,27 @@ public class NbMonitoringForm extends ActionForm {
     
     private Map parametersToAppend;
     
+    private Map attachments = new HashMap();
+    
 
     
+    /**
+     * @return Returns the attachments.
+     */
+    public Map getAttachments() {
+        if (attachments == null)
+        {
+            return new HashMap();
+        }
+        return attachments;
+        
+    }
+    /**
+     * @param attachments The attachments to set.
+     */
+    public void setAttachments(Map attachments) {
+        this.attachments = attachments;
+    }
     /**
      * @return Returns the parametersToAppend.
      */
@@ -95,12 +119,12 @@ public class NbMonitoringForm extends ActionForm {
         this.toolContentId = toolContentId;
     }
     
-    public void reset()
+    public void reset(ActionMapping mapping, HttpServletRequest request)
 	{
 		this.method = null;
-		this.toolContentId = null;
-		this.parametersToAppend = null;
-			
+		this.parametersToAppend = null;		
+		this.attachments = null;
+		
 	}
  
 }
