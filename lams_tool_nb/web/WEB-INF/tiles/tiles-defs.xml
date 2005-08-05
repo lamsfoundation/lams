@@ -29,23 +29,10 @@
 	</definition>
 	
 <!-- ============= Noticeboard Authoring Page Definitions ====================== -->	
-
-	<definition name=".nb_basic" extends=".baseDef" >
+	<definition name=".authoringContent" extends=".baseDef" >
 		<put name="title" value="Noticeboard"/>
 		<put name="pageHeader" value = "Noticeboard"/>
-		<put name="content" value="/a_Basic.jsp" />	
-	</definition>
-	
-	<definition name=".nb_advanced" extends=".baseDef" >
-		<put name="title" value="Noticeboard"/>
-		<put name="pageHeader" value = "Noticeboard"/>
-		<put name="content" value="/a_Advanced.jsp" />	
-	</definition>
-	
-	<definition name=".nb_instructions" extends=".baseDef" >
-		<put name="title" value="Noticeboard"/>
-		<put name="pageHeader" value = "Noticeboard"/>
-		<put name="content" value="/a_Instructions.jsp" />	
+		<put name="content" value="/authorContent.jsp" />	
 	</definition>
 
 <!-- ============= Noticeboard Learner Page Definitions ====================== -->	
