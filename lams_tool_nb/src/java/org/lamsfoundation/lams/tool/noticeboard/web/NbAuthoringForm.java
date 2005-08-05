@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.util.UploadFileUtil;
 
 
 //import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
@@ -220,7 +221,7 @@ public class NbAuthoringForm extends ActionForm {
 		this.toolContentId = toolContentID;
 	}
 
-	public void reset()
+	public void reset(ActionMapping mapping, HttpServletRequest request)
 	{
 	//	this.content = null;
 		//this.title = null;
@@ -263,15 +264,45 @@ public class NbAuthoringForm extends ActionForm {
 	    MessageResources resources =
             (MessageResources) request.getAttribute(Globals.MESSAGES_KEY);
 	    
-	    if (toolContentId == null)
+	    float maxFileSize = UploadFileUtil.getMaxFileSize();
+	   
+	    
+	 /*   if (toolContentId == null)
 	    {
 	        errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(NoticeboardConstants.ERROR_MANDATORY, "Tool COntent id"));
 	    }
 	    if (title==null || title.length()==0)
 	    {
 	        errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(NoticeboardConstants.ERROR_MANDATORY, "Title"));
-	    }
+	    } */
 	    
+	    //check the file sizes so of the file uploads
+	   if (this.offlineFile != null && offlineFile.getFileSize()!= 0) 
+	    {
+	        float sizeOfOfflineUpload = offlineFile.getFileSize() / 1024 / 1024;
+	        //check the file size
+	       if (sizeOfOfflineUpload  > maxFileSize)
+	        {
+	            //show message saying the file is greater than the allowed limit
+	            logger.error("the file uploaded exceeds the maximum file size");
+	            errors.add("filesize", new ActionMessage("error.exceedMaxFileSize"));
+	            this.setMethod("Instructions");
+	        }
+	       
+	    } 
+	   else if ( this.onlineFile != null && onlineFile.getFileSize() != 0)
+	   {
+	       float sizeOfOnlineUpload = onlineFile.getFileSize() / 1024 / 1024; //getFileSize() returns the file size in bytes, but we are comparing the filesize using units MBs
+		   
+	     if (sizeOfOnlineUpload > maxFileSize) 
+	     {
+//	       show message saying the file is greater than the allowed limit
+	            logger.error("the file uploaded exceeds the maximum file size");
+	            errors.add("filesize", new ActionMessage("error.exceedMaxFileSize"));
+	            this.setMethod("Instructions");
+	     }
+	   }
+	   
 	    return errors; 
 	    
 	}
