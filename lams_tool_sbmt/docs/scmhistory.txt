@@ -4,3 +4,4 @@ v2107200501: Learner,monitoring and Authroing works well version. Except Authroi
 STRUTS127: Struts version update to 1.2.7
 v2907200501: Authoring 3 tabs is working in same HTML page. and Upload method update to ToolContentHandler.
 v0308200501: After this version, I extract a new table "learner", so program logic will have big change.
+v0808200501: Unfinished: DHTML tag for authoring;Statistic for monitoring; Learner delete upload file(?)
