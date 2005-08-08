@@ -124,6 +124,21 @@
         redirect="false"
       />
       <forward
+        name="showActivity"
+        path="/monitoring/showactivity.jsp"
+        redirect="false"
+      />
+      <forward
+        name="editActivity"
+        path="/monitoring/editactivity.jsp"
+        redirect="false"
+      />
+      <forward
+        name="success"
+        path="/monitoring/success.jsp"
+        redirect="false"
+      />
+      <forward
         name="status"
         path="/Status.jsp"
         redirect="false"

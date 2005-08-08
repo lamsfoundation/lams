@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.tool.sbmt.web;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -40,7 +39,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
@@ -62,7 +60,12 @@ import org.lamsfoundation.lams.util.WebUtil;
  * @struts.action-forward name="userMarks" path="/monitoring/usermarkslist.jsp"
  * @struts.action-forward name="updateMarks" path="/monitoring/updatemarks.jsp"
  * @struts.action-forward name="allUserMarks" path="/monitoring/viewallmarks.jsp"
+ * 
  * @struts.action-forward name="instructions" path="/monitoring/instructions.jsp"
+ * 
+ * @struts.action-forward name="showActivity" path="/monitoring/showactivity.jsp"
+ * @struts.action-forward name="editActivity" path="/monitoring/editactivity.jsp"
+ * @struts.action-forward name="success" path="/monitoring/success.jsp"
  * 
  * @struts.action-forward name="status" path="/Status.jsp"
  * 				
@@ -288,7 +291,63 @@ public class MonitoringAction extends DispatchAction {
 		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
 		return mapping.findForward("instructions");
 	}
-	//TODO
+	
+	public ActionForward showActivity(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+
+		getAuthoringActivity(form, request);
+		return mapping.findForward("showActivity");
+	}
+
+	public ActionForward editActivity(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+		
+		getAuthoringActivity(form, request);
+		return mapping.findForward("editActivity");
+	}
+	public ActionForward updateActivity(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+		Long contentID = new Long(WebUtil.readLongParam(request,"toolContentID"));
+		String title = WebUtil.readStrParam(request,"title");
+		String instructions = WebUtil.readStrParam(request,"instructions");
+
+		//get back the upload file list and display them on page
+		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
+				.getServlet().getServletContext());
+		SubmitFilesContent content = submitFilesService.getSubmitFilesContent(contentID);
+		content.setTitle(title);
+		content.setInstruction(instructions);
+		submitFilesService.updateSubmitFilesContent(content);
+		
+		return mapping.findForward("success");
+	}
+	/**
+	 * @param form
+	 * @param request
+	 */
+	private void getAuthoringActivity(ActionForm form, HttpServletRequest request) {
+		Long contentID = new Long(WebUtil.readLongParam(request,"toolContentID"));
+		
+		//get back the upload file list and display them on page
+		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
+				.getServlet().getServletContext());
+		
+		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
+		//if this content does not exist, then reset the contentID to current value to keep it on HTML page.
+		if(persistContent == null)
+			persistContent = new SubmitFilesContent();
+		persistContent.setContentID(contentID);
+		AuthoringDTO authorDto = new AuthoringDTO(persistContent);
+		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
+	}
+	
+	//TODO: I don't know what will do following code from Mapreet
 	public ActionForward getStatus(ActionMapping mapping,
 							   ActionForm form,
 							   HttpServletRequest request,
