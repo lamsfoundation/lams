@@ -4,7 +4,7 @@
 	/**
 	 * Launches the popup window for the instruction files
 	 */
-	function launchInstructionsPopup(url, formName, fieldName, type) {
+	function launchInstructionsPopup(url) {
 // add the mac test back in when we have the platform detection working.
 //		if(mac){
 //			window.open(url,'instructions','resizable,width=796,height=570,scrollbars');
