@@ -1,12 +1,9 @@
 
 <%@ page language="java"%>
 
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
-<%@ taglib uri="tags-c" prefix="c" %>
-
+<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jstl/fmt" prefix="fmt"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
@@ -14,6 +11,7 @@
     <title>All Learner Submission Details</title>
     
   	<link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/common.js'/>"></script>
   	
   </head>  
   <body>
@@ -34,11 +32,23 @@
 					    <tr>
 				    </c:if>
 				<tr>
-					<td>
-					File Path: </td>
-					<td><c:out value="${details.filePath}" /> 
-					(<a href="monitoring.do?method=downloadFile&uuID=<c:out value="${details.uuID}" /> &versionID=<c:out value="${details.versionID}" /> ">Download</a>)
-					</td>
+					<td>File Path: </td>
+						<td>
+						File Path: </td><td><c:out value="${details.filePath}" /> 
+						<c:set var="viewURL">
+							<html:rewrite page="/download/?uuid=${details.uuID}&versionID=${details.versionID}&preferDownload=false"/>
+						</c:set>
+						<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+									<fmt:message key="label.view"/>
+						</a>&nbsp;
+						<c:set var="downloadURL">
+							<html:rewrite page="/download/?uuid=${details.uuID}&versionID=${details.versionID}&preferDownload=true"/>
+						</c:set>
+						<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
+									<fmt:message key="label.download"/>
+						</a>
+						</td>					
+					
 				</tr>
 				<tr>
 					<td>File Description: </td><td><c:out value="${details.fileDescription}"  escapeXml="false"/></td>
@@ -78,7 +88,7 @@
 							<input type="hidden" name="detailID" value=<c:out value='${details.submissionID}' /> >
 							<input type="hidden" name="reportID" value=<c:out value='${details.reportID}' /> >
 							<input type="hidden" name="userID" value=<c:out value='${details.userID}' /> >
-							<input type="hidden" name="toolSessionID" value=<c:out value='${sessionScope.toolSessionID}' /> >
+							<input type="hidden" name="toolSessionID" value=<c:out value='${toolSessionID}' /> >
 							<input type="submit" value="Update Marks"/>
 					</form>
 					</td>

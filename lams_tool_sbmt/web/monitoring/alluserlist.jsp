@@ -21,7 +21,7 @@
 
   	<div id="datatablecontainer">
   		<table class="forms">
-  		<c:set var="userlist" scope="request" value="${sessionScope.USERLIST}"/>
+  		<c:set var="userlist" scope="request" value="${userList}"/>
   		<logic:notEmpty name="userlist">
 			<logic:iterate id="element" name="userlist">
 				<tr>
@@ -39,6 +39,7 @@
 			</logic:iterate>
   		</logic:notEmpty>  		
 		</table>
+		<html:errors/>
   		<table class="forms">
 	  		<tr>
 		  			<td class="formcontrol">

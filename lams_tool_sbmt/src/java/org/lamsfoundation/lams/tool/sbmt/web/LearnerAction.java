@@ -117,7 +117,6 @@ public class LearnerAction extends DispatchAction {
 		try{
 			submitFilesService.uploadFileToSession(sessionID,uploadedFile,fileDescription,userID);
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 			SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 			SubmitFilesContent content = session.getContent();
 			Learner learner = submitFilesService.getLearner(sessionID,userID);

@@ -65,12 +65,18 @@
 				<div id="onlinefile">
 				<c:forEach var="file" items="${authoring.onlineFiles}">
 					<li><c:out value="${file.name}"/>
-					<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
+					<c:set var="viewURL">
+						<html:rewrite page="/download/?uuid=${file.uuID}&preferDownload=false"/>
+					</c:set>
+					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
 						<fmt:message key="label.view"/>
-					</html:link>
-					<html:link href="../download/?uuid=${file.uuID}&preferDownload=true">
+					</a>&nbsp;
+					<c:set var="downloadURL">
+							<html:rewrite page="/download/?uuid=${file.uuID}&versionID=${details.versionID}&preferDownload=true"/>
+					</c:set>
+					<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
 						<fmt:message key="label.download"/>
-					</html:link>
+					</a>&nbsp;
 					<c:set var="deleteonline">
 					<html:rewrite page="/deletefile.do?method=deleteOnlineFile&toolContentID=${authoring.contentID}&uuID=${file.uuID}&versionID=${file.versionID}"/>
 					</c:set>

@@ -16,9 +16,9 @@
   	<link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
   </head>  
   <body>
-		  <c:set var="details" value="${sessionScope.fileDetails}"/>
-		  <c:set var="user" value="${sessionScope.user}" />
-		  <c:set var="toolSessionID" value="${sessionScope.toolSessionID}" />		  
+		  <c:set var="details" value="${fileDetails}"/>
+		  <c:set var="user" value="${user}" />
+		  <c:set var="toolSessionID" value="${toolSessionID}" />		  
 		  <b>Please assign a mark and a comment for the report by 
 		  		 <c:out value="${user.login}" /> , <c:out value="${user.firstName}" />  <c:out value="${user.lastName}" /> 	
 		  </b></p>

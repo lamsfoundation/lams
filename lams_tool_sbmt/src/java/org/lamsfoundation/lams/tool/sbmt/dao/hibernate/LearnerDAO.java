@@ -41,7 +41,6 @@ public class LearnerDAO extends BaseDAO implements ILearnerDAO {
 								" where user_id=? AND session_id=?";
 
 	public Learner getLearner(Long sessionID, Long userID) {
-		this.getHibernateTemplate().clear();
 		List list = this.getHibernateTemplate().
 		   find(FIND_BY_USER_ID_SESSION_ID, 
 				   new Object[]{userID, sessionID},
@@ -71,7 +70,6 @@ public class LearnerDAO extends BaseDAO implements ILearnerDAO {
 	}
 
 	public List getSubmissionDetailsForUserBySession(Long userID, Long sessionID) {
-		this.getHibernateTemplate().clear();
 		List learnerList = this.getHibernateTemplate().find(FIND_FOR_USER_BY_SESSION, 
 													 new Object[]{userID, sessionID},
 													 new Type[]{Hibernate.LONG,Hibernate.LONG});

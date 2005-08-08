@@ -22,9 +22,11 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.web;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -90,8 +92,8 @@ public class MonitoringAction extends DispatchAction {
 		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));		
 		submitFilesService = getSubmitFilesService();
 		List userList = submitFilesService.getUsers(sessionID);
-		request.getSession().setAttribute("toolSessionID",sessionID);
-		request.getSession().setAttribute("USERLIST",userList);
+		request.setAttribute("toolSessionID",sessionID);
+		request.setAttribute("userList",userList);
 		return mapping.findForward("userlist");
 	}
 	/**
@@ -111,10 +113,9 @@ public class MonitoringAction extends DispatchAction {
 		submitFilesService = getSubmitFilesService();
 		//return FileDetailsDTO list according to the given userID and sessionID
 		List files = submitFilesService.getFilesUploadedByUser(userID,sessionID);		
-		request.getSession().setAttribute("toolSessionID",sessionID);
-		request.getSession().setAttribute("user",
-										  submitFilesService.getUserDetails(userID));
-		request.getSession().setAttribute("userReport",files);
+		request.setAttribute("toolSessionID",sessionID);
+		request.setAttribute("user",submitFilesService.getUserDetails(userID));
+		request.setAttribute("userReport",files);
 		return mapping.findForward("userMarks");
 	}
 	/**
@@ -135,10 +136,10 @@ public class MonitoringAction extends DispatchAction {
 		
 		submitFilesService = getSubmitFilesService();
 		
-		request.getSession().setAttribute("toolSessionID",sessionID);
-		request.getSession().setAttribute("user",
+		request.setAttribute("toolSessionID",sessionID);
+		request.setAttribute("user",
 							  submitFilesService.getUserDetails(userID));
-		request.getSession().setAttribute("fileDetails",
+		request.setAttribute("fileDetails",
 							  submitFilesService.getFileDetails(detailID));
 		return mapping.findForward("updateMarks");
 	}
@@ -159,10 +160,9 @@ public class MonitoringAction extends DispatchAction {
 		String comments = WebUtil.readStrParam(request,"comments",true);
 		if(!errors.isEmpty()){
 			//to echo back to error page.
-			FileDetailsDTO details = (FileDetailsDTO) request.getSession().getAttribute("fileDetails");
-			if(details != null){
+			FileDetailsDTO details = (FileDetailsDTO) request.getAttribute("fileDetails");
+			if(details != null)
 				details.setComments(comments);
-			}
 			saveErrors(request,errors);
 			return mapping.findForward("updateMarks");
 		}
@@ -181,53 +181,10 @@ public class MonitoringAction extends DispatchAction {
 		
 		submitFilesService.updateMarks(reportID,marks,comments);
 		List report = submitFilesService.getFilesUploadedByUser(userID,sessionID);
-		request.getSession().setAttribute("userReport",report);
-		request.getSession().setAttribute("toolSessionID",sessionID);
-		request.getSession().setAttribute("userID",userID);		
+		request.setAttribute("userReport",report);
+		request.setAttribute("toolSessionID",sessionID);
+		request.setAttribute("userID",userID);		
 		return mapping.findForward("userMarks");
-	}
-	/**
-	 * Download upload file for a special submission detail.  
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	
-	public ActionForward downloadFile(ActionMapping mapping,
-			   ActionForm form,
-			   HttpServletRequest request,
-			   HttpServletResponse response){
-		Long versionID =new Long(WebUtil.readLongParam(request,"versionID"));
-		Long uuID = new Long(WebUtil.readLongParam(request,"uuID"));
-		
-		ISubmitFilesService service = getSubmitFilesService();
-		IVersionedNode node = service.downloadFile(uuID,versionID);
-		int len;
-		ActionMessages errors = new ActionMessages();
-		try {
-			InputStream is = node.getFile();
-			String mineType = node.getProperty("MIMETYPE").getString();
-			response.setContentType(mineType);
-			String header = "attachment; filename=\"" + node.getProperty("FILENAME").getString() + "\";";
-			response.setHeader("Content-Disposition",header);
-			byte[] data = new byte[4 * 1024];
-			while(is != null && (len = is.read(data)) != -1){
-				response.getOutputStream().write(data,0,len);
-			}
-			response.getOutputStream().flush();
-		} catch (Exception e) {
-			log.error(e);
-			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("monitoring.download.error",e.toString()));
-		}
-		//if download throw any exception, then display it in current page.
-		if(!errors.isEmpty()){
-			saveErrors(request,errors);
-			return mapping.findForward("userMarks");
-		}
-			
-		return null;
 	}
 	public ActionForward viewAllMarks(ActionMapping mapping,
 			   ActionForm form,
@@ -238,10 +195,10 @@ public class MonitoringAction extends DispatchAction {
 		submitFilesService = getSubmitFilesService();
 		//return FileDetailsDTO list according to the given sessionID
 		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);		
-		request.getSession().setAttribute("toolSessionID",sessionID);
-//		request.getSession().setAttribute("user",
+		request.setAttribute("toolSessionID",sessionID);
+//		request.setAttribute("user",
 //										  submitFilesService.getUserDetails(userID));
-		request.getSession().setAttribute("report",userFilesMap);
+		request.setAttribute("report",userFilesMap);
 		return mapping.findForward("allUserMarks");
 
 	}
@@ -261,6 +218,54 @@ public class MonitoringAction extends DispatchAction {
 			   ActionForm form,
 			   HttpServletRequest request,
 			   HttpServletResponse response){
+		
+		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
+		submitFilesService = getSubmitFilesService();
+		//return FileDetailsDTO list according to the given sessionID
+		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+		//construct mark HTML format? (other format?)
+		StringBuffer marks = new StringBuffer();
+		Iterator iter = userFilesMap.values().iterator();
+		Iterator dtoIter; 
+		boolean first = true;
+		while(iter.hasNext()){
+			List list = (List) iter.next();
+			dtoIter = list.iterator();
+			first = true;
+			while(dtoIter.hasNext()){
+				FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
+				if(first){
+					marks.append(dto.getUserDTO().getFirstName()).append(" ").append(dto.getUserDTO().getLastName()).append(":<br>");
+					first = false;
+				}
+				marks.append(dto.getMarks()).append("<br>");
+				marks.append(dto.getComments()).append("<br>");
+			}
+		}
+		
+		//construct download file response header
+		String fileName = "marks" + sessionID+".htm";
+		String mineType = "text/html";
+		String header = "attachment; filename=\"" + fileName + "\";";
+		response.setContentType(mineType);
+		response.setHeader("Content-Disposition",header);
+		
+		ActionMessages errors = new ActionMessages();
+		try {
+			byte[] out = marks.toString().getBytes();
+			response.getOutputStream().write(out,0,out.length);
+			response.getOutputStream().flush();
+		} catch (IOException e) {
+			log.error(e);
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("monitoring.download.error",e.toString()));
+		}
+		//if download throw any exception, then display it in current page.
+		if(!errors.isEmpty()){
+			saveErrors(request,errors);
+			request.setAttribute("toolSessionID",sessionID);
+			return mapping.findForward("userlist");
+		}
+			
 		return null;
 	}
 	
@@ -291,8 +296,8 @@ public class MonitoringAction extends DispatchAction {
 		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
 		submitFilesService = getSubmitFilesService();		
 		ArrayList status = submitFilesService.getStatus(sessionID);
-		request.getSession().setAttribute("toolSessionID",sessionID);		
-		request.getSession().setAttribute("status",status);
+		request.setAttribute("toolSessionID",sessionID);		
+		request.setAttribute("status",status);
 		return mapping.findForward("status");
 	}
 	public ActionForward generateReport(ActionMapping mapping, ActionForm form,
@@ -301,8 +306,8 @@ public class MonitoringAction extends DispatchAction {
 				"toolSessionID"));
 		submitFilesService = getSubmitFilesService();
 		Hashtable report = submitFilesService.generateReport(sessionID);
-		request.getSession().setAttribute("toolSessionID", sessionID);
-		request.getSession().setAttribute("report", report);
+		request.setAttribute("toolSessionID", sessionID);
+		request.setAttribute("report", report);
 		return mapping.findForward("allUserMarks");
 	}
 

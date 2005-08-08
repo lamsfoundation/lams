@@ -77,6 +77,7 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 		this.getSession().setFlushMode(FlushMode.AUTO);
 		this.getHibernateTemplate().saveOrUpdate(session);
 		this.getHibernateTemplate().flush();
+		this.getHibernateTemplate().clear();
 		
 	}
 	/* (non-Javadoc)
