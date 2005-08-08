@@ -80,11 +80,12 @@ public class NbWebUtil {
 	 	
 	 	 public static void cleanMonitoringSession(HttpServletRequest request)
 	     {
-	         request.getSession().removeAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
+	         //request.getSession().removeAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
 	         request.getSession().removeAttribute(NoticeboardConstants.TITLE);
 	         request.getSession().removeAttribute(NoticeboardConstants.CONTENT);
 	         request.getSession().removeAttribute(NoticeboardConstants.OFFLINE_INSTRUCTIONS);
 	         request.getSession().removeAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS);
+	         request.getSession().removeAttribute(NoticeboardConstants.ATTACHMENT_LIST);
 	      
 	     }
 	     
@@ -130,4 +131,6 @@ public class NbWebUtil {
 	        List attachmentList = new ArrayList(entries);
 	        request.getSession().setAttribute(NoticeboardConstants.ATTACHMENT_LIST, attachmentList);
 	    }
+	    
+	    
 }
