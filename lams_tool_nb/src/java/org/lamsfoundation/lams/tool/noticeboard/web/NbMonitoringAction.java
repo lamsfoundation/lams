@@ -73,8 +73,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 public class NbMonitoringAction extends LamsLookupDispatchAction {
     
     static Logger logger = Logger.getLogger(NbMonitoringAction.class.getName());
-    public final static String FORM="NbMonitoringForm";
-    
+   
     protected Map getKeyMethodMap()
 	{
 		Map map = new HashMap();
