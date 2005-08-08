@@ -187,7 +187,11 @@ public class LearnerAction extends DispatchAction {
 		dto.setToolSessionID(sessionID);
 		dto.setUserID(userID);
 		if(learner != null){
-			dto.setLocked(learner.isFinished());
+			//only content is lock-on-finished, then check whehter learner choose "finish"
+			if(content.isLockOnFinished())
+				dto.setLocked(learner.isFinished());
+			else
+				dto.setLocked(false);
 			//if Monitoring does not release marks, then screen this mark and comment content.
 			if(filesUploaded != null){
 				Iterator iter = filesUploaded.iterator();

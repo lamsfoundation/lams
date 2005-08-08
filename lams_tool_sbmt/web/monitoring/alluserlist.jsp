@@ -1,10 +1,6 @@
-
-<%@ page language="java"%>
+<%@include file="../sharing/share.jsp" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-html-el" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
-<%@ taglib uri="tags-c" prefix="c" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
@@ -13,7 +9,7 @@
     
     <title><bean:message key="page.title.mark1.userlist"/></title>    
 	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-  	<link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
+    <link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
 
   </head>
   

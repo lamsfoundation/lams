@@ -1,17 +1,11 @@
-
-<%@ page language="java"%>
-
-<%@ taglib uri="tags-html-el" prefix="html" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jstl/fmt" prefix="fmt"%>
-
+<%@include file="../sharing/share.jsp" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
   <head>    
     <title>All Learner Submission Details</title>
-    
-  	<link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/common.js'/>"></script>
+    <html:base/>
+  	<link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/common.js"></script>
   	
   </head>  
   <body>
@@ -84,7 +78,7 @@
 		
 				<tr>
 					<td colspan="2">
-					<form action="monitoring.do?method=markFile" method="post">
+					<form action="<html:rewrite page='/monitoring.do?method=markFile'/>" method="post">
 							<input type="hidden" name="detailID" value=<c:out value='${details.submissionID}' /> >
 							<input type="hidden" name="reportID" value=<c:out value='${details.reportID}' /> >
 							<input type="hidden" name="userID" value=<c:out value='${details.userID}' /> >

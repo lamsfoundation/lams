@@ -1,21 +1,13 @@
-
-<%@ page language="java"%>
-
-<%@ taglib uri="fck-editor" prefix="FCK"%>
-<%@ taglib uri="tags-html-el" prefix="html"%>
-<%@ taglib uri="tags-tiles" prefix="tiles"%>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jstl/fmt" prefix="fmt"%>
+<%@include file="../sharing/share.jsp" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
 <head>
-<html:base />
-<title>Submit Files</title>
-<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-<link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="<html:rewrite page='/includes/javascript/common.js'/>"></script>
-<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
+	<title>Submit Files</title>
+	<html:base />
+	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
+    <link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 </head>
 
 <body>

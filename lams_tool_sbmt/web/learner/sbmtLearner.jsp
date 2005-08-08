@@ -1,9 +1,4 @@
-
-<%@ page language="java"%>
-<%@ taglib uri="tags-html-el" prefix="html" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jstl/fmt" prefix="fmt"%>
-
+<%@include file="../sharing/share.jsp" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
   <head>
@@ -11,7 +6,7 @@
     
     <title>Submission tool for Learner</title>    
 	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-  	<link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
+    <link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
 
 	<script language="javascript">
 	var locked =  <c:out value="${learner.locked}"/>;

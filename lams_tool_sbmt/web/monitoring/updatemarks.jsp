@@ -1,19 +1,12 @@
-
-<%@ page language="java"%>
-
+<%@include file="../sharing/share.jsp" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
-<%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-html" prefix="html" %>
-<%@ taglib uri="tags-logic" prefix="logic" %>
-<%@ taglib uri="tags-tiles" prefix="tiles" %>
-<%@ taglib uri="tags-c" prefix="c" %>
-
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">
   <head>    
     <title>Files Submitted</title>
-  	<link href="<html:rewrite page='/includes/css/aqua.css'/>" rel="stylesheet" type="text/css">
+    <html:base/>
+  	<link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
   </head>  
   <body>
 		  <c:set var="details" value="${fileDetails}"/>
@@ -35,7 +28,7 @@
 		</table>
 		<table class="forms">
 					<tr><td colspan="2"><html:errors/></td></tr>
-					<form name="commentForm" action="monitoring.do?method=updateMarks"  method="post">	
+					<form name="commentForm" action="<html:rewrite page='/monitoring.do?method=updateMarks'/>"  method="post">	
 							 <input type="hidden" name="toolSessionID" value=<c:out value="${toolSessionID}"/> />						
 							 <input type="hidden" name="reportID" value=<c:out value="${details.reportID}"/> />						
  							 <input type="hidden" name="userID" value=<c:out value="${user.userID}"/> />
