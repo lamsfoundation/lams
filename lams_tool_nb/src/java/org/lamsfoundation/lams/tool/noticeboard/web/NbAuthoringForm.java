@@ -265,26 +265,14 @@ public class NbAuthoringForm extends ActionForm {
             (MessageResources) request.getAttribute(Globals.MESSAGES_KEY);
 	    
 	    float maxFileSize = UploadFileUtil.getMaxFileSize();
-	   
-	    
-	 /*   if (toolContentId == null)
-	    {
-	        errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(NoticeboardConstants.ERROR_MANDATORY, "Tool COntent id"));
-	    }
-	    if (title==null || title.length()==0)
-	    {
-	        errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(NoticeboardConstants.ERROR_MANDATORY, "Title"));
-	    } */
-	    
-	    //check the file sizes so of the file uploads
+	  
 	   if (this.offlineFile != null && offlineFile.getFileSize()!= 0) 
 	    {
 	        float sizeOfOfflineUpload = offlineFile.getFileSize() / 1024 / 1024;
 	        //check the file size
 	       if (sizeOfOfflineUpload  > maxFileSize)
 	        {
-	            //show message saying the file is greater than the allowed limit
-	            logger.error("the file uploaded exceeds the maximum file size");
+	            logger.error("file size " + sizeOfOfflineUpload + " Max File Size allowed: " + maxFileSize);
 	            errors.add("filesize", new ActionMessage("error.exceedMaxFileSize"));
 	            this.setMethod("Instructions");
 	        }
@@ -296,8 +284,8 @@ public class NbAuthoringForm extends ActionForm {
 		   
 	     if (sizeOfOnlineUpload > maxFileSize) 
 	     {
-//	       show message saying the file is greater than the allowed limit
-	            logger.error("the file uploaded exceeds the maximum file size");
+
+	         	logger.error("file size " + sizeOfOnlineUpload + " Max File Size allowed: " + maxFileSize);
 	            errors.add("filesize", new ActionMessage("error.exceedMaxFileSize"));
 	            this.setMethod("Instructions");
 	     }
@@ -305,6 +293,10 @@ public class NbAuthoringForm extends ActionForm {
 	   
 	    return errors; 
 	    
+	}
+	
+	private boolean isEmpty(String str) {
+		return str == null || str.trim().length() == 0 ;
 	}
 	
 
