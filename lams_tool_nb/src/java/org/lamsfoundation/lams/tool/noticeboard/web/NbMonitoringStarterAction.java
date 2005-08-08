@@ -69,11 +69,13 @@ import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 public class NbMonitoringStarterAction extends LamsAction {
     
     static Logger logger = Logger.getLogger(NbMonitoringStarterAction.class.getName());
+    
+    public final static String FORM="NbMonitoringForm";
    
     
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
 
-        NbMonitoringForm monitorForm = (NbMonitoringForm)form;
+        NbMonitoringForm monitorForm = new NbMonitoringForm();
         
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         NbWebUtil.cleanMonitoringSession(request);
@@ -87,11 +89,12 @@ public class NbMonitoringStarterAction extends LamsAction {
 		}
         monitorForm.setToolContentId(toolContentId.toString());
         
-        request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE, toolContentId);
+      //  request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE, toolContentId);
         
         NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
         NbWebUtil.copyValuesIntoSession(request, content);
         
+        request.getSession().setAttribute(FORM, monitorForm);
      
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
