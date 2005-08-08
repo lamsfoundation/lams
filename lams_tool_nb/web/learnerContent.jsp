@@ -5,6 +5,7 @@
 
 <html:form action="/learner" target="_self" >
 <hr>
+<BR>
 <div id="datatablecontainer">
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">
 		<tr>
@@ -35,5 +36,6 @@
 </table>
 </c:if>
 </div>
+<BR>
 <hr>
 </html:form>

@@ -55,6 +55,7 @@ public class NbMonitoringForm extends ActionForm {
 
     static Logger logger = Logger.getLogger(NbMonitoringForm.class.getName());
     
+       
     private String toolContentId;
     
     private String method;
