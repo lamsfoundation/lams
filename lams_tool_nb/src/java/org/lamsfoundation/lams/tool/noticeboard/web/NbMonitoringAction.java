@@ -73,6 +73,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 public class NbMonitoringAction extends LamsLookupDispatchAction {
     
     static Logger logger = Logger.getLogger(NbMonitoringAction.class.getName());
+    public final static String FORM="NbMonitoringForm";
     
     protected Map getKeyMethodMap()
 	{
@@ -89,7 +90,7 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
     		ActionMapping mapping,
     		ActionForm form,
     		HttpServletRequest request,
-    		HttpServletResponse response)
+    		HttpServletResponse response) throws NbApplicationException
     {
         return summary(mapping, form, request, response);
     }
@@ -102,10 +103,11 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
      * @return
      */
     public ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        
         NbMonitoringForm monitorForm = (NbMonitoringForm)form;                
-       // Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
-        Long toolContentId = getToolContentId(request);
+      
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentId());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 		NbWebUtil.copyValuesIntoSession(request, content);
 		if (NbWebUtil.isContentEditable(content))
@@ -143,12 +145,15 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
     public ActionForward instructions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
      
         //Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
-        Long toolContentId = getToolContentId(request);
+       // Long toolContentId = getToolContentId(request);
+        
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         NbMonitoringForm monitorForm = (NbMonitoringForm)form;
+        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentId());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 		NbWebUtil.copyValuesIntoSession(request, content);
 		
+		request.setAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS, content.getOnlineInstructions());
 		
 		Map attachmentMap = monitorForm.getAttachments();
 	        
@@ -177,8 +182,10 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
      */
     public ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
        // Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
-        Long toolContentId = getToolContentId(request);
+       // Long toolContentId = getToolContentId(request);
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+        NbMonitoringForm monitorForm = (NbMonitoringForm)form;
+        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentId());
    		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
    		NbWebUtil.copyValuesIntoSession(request, content);
         
@@ -197,7 +204,10 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
         
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         Map map = new HashMap();
-        Long toolContentId = getToolContentId(request);
+       // Long toolContentId = getToolContentId(request);
+        NbMonitoringForm monitorForm = (NbMonitoringForm)form;
+        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentId());
+        
         NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
         
         //Get the total number of learners that have participated in this tool activity
@@ -221,11 +231,6 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
     
-    private Long getToolContentId(HttpServletRequest request)
-    {
-        Long toolContentId = (Long)request.getSession().getAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE);
-        return toolContentId;
-    }
-    
+   
    
 }
