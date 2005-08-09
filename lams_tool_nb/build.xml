@@ -183,6 +183,8 @@ Ant build file.
 				<include name="includes/*"/>
 				<include name="images/*"/>
 				<include name="template/*"/> <!-- used by tiles -->
+				<include name="author_page/**"/>
+				<include name="template2/**"/>
 			</fileset>
 		</war>
 	</target>
