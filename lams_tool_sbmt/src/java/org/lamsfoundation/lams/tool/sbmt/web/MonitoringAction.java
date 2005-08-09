@@ -22,6 +22,7 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.web;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -33,6 +34,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.Region;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -226,43 +232,83 @@ public class MonitoringAction extends DispatchAction {
 		submitFilesService = getSubmitFilesService();
 		//return FileDetailsDTO list according to the given sessionID
 		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
-		//construct mark HTML format? (other format?)
-		StringBuffer marks = new StringBuffer();
-		Iterator iter = userFilesMap.values().iterator();
-		Iterator dtoIter; 
-		boolean first = true;
-		while(iter.hasNext()){
-			List list = (List) iter.next();
-			dtoIter = list.iterator();
-			first = true;
-			while(dtoIter.hasNext()){
-				FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
-				if(first){
-					marks.append(dto.getUserDTO().getFirstName()).append(" ").append(dto.getUserDTO().getLastName()).append(":<br>");
-					first = false;
-				}
-				marks.append(dto.getMarks()).append("<br>");
-				marks.append(dto.getComments()).append("<br>");
-			}
-		}
-		
-		//construct download file response header
-		String fileName = "marks" + sessionID+".htm";
-		String mineType = "text/html";
-		String header = "attachment; filename=\"" + fileName + "\";";
-		response.setContentType(mineType);
-		response.setHeader("Content-Disposition",header);
-		
+		//construct Excel file format and download
 		ActionMessages errors = new ActionMessages();
 		try {
-			byte[] out = marks.toString().getBytes();
-			response.getOutputStream().write(out,0,out.length);
+			//create an empty excel file
+			HSSFWorkbook wb = new HSSFWorkbook();
+			HSSFSheet sheet = wb.createSheet("Marks");
+			sheet.setColumnWidth((short)0,(short)5000);
+			HSSFRow row,row1=null,row2=null,row3=null,row4=null;
+			HSSFCell cell;
+			Iterator iter = userFilesMap.values().iterator();
+			Iterator dtoIter; 
+			boolean first = true;
+			int idx = 0;
+			int fileCount = 0;
+			while(iter.hasNext()){
+				List list = (List) iter.next();
+				dtoIter = list.iterator();
+				first = true;
+				
+				while(dtoIter.hasNext()){
+					FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
+					if(first){
+						row = sheet.createRow(idx++);
+						cell = row.createCell((short) 0);
+						cell.setCellValue(dto.getUserDTO().getFirstName()+" "+dto.getUserDTO().getLastName());
+						sheet.addMergedRegion(new Region(idx-1,(short)0,idx-1, (short)1));
+						first = false;
+						row1 = sheet.createRow(idx+1);
+						cell = row1.createCell((short) 0);
+						cell.setCellValue("File name");
+						row2 = sheet.createRow(idx+2);
+						cell = row2.createCell((short) 0);
+						cell.setCellValue("File description");
+						row3 = sheet.createRow(idx+3);
+						cell = row3.createCell((short) 0);
+						cell.setCellValue("Marks");
+						row4 = sheet.createRow(idx+4);
+						cell = row4.createCell((short) 0);
+						cell.setCellValue("Comments");
+						idx += 6;
+						fileCount = 0;
+					}
+					++fileCount;
+					sheet.setColumnWidth((short)fileCount,(short)8000);
+					cell = row1.createCell((short) fileCount);
+					cell.setCellValue(dto.getFilePath());
+					
+					cell = row2.createCell((short) fileCount);
+					cell.setCellValue(dto.getFileDescription());
+					
+					cell = row3.createCell((short) fileCount);
+					if(dto.getMarks() != null)
+						cell.setCellValue(new Double(dto.getMarks().toString()).doubleValue());
+					else
+						cell.setCellValue("");
+					
+					cell = row4.createCell((short) fileCount);
+					cell.setCellValue(dto.getComments());
+				}
+			}
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			wb.write(bos);
+			//construct download file response header
+			String fileName = "marks" + sessionID+".xls";
+			String mineType = "application/vnd.ms-excel";
+			String header = "attachment; filename=\"" + fileName + "\";";
+			response.setContentType(mineType);
+			response.setHeader("Content-Disposition",header);
+
+			byte[] data = bos.toByteArray();
+			response.getOutputStream().write(data,0,data.length);
 			response.getOutputStream().flush();
 		} catch (IOException e) {
 			log.error(e);
 			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("monitoring.download.error",e.toString()));
 		}
-		//if download throw any exception, then display it in current page.
+
 		if(!errors.isEmpty()){
 			saveErrors(request,errors);
 			request.setAttribute("toolSessionID",sessionID);
