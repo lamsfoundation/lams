@@ -21,10 +21,11 @@
 package org.lamsfoundation.lams.tool.noticeboard;
 
 /**
- * This is a constant utility class that defined all constants need to be 
- * shared around the noticeboard tool.
  * 
- *
+ * <p>This is a constant utility class that defined all constants need to be 
+ * shared around the noticeboard tool.</p>
+ * 
+ * @author mtruong
  */
 public class NoticeboardConstants
 {
@@ -32,6 +33,9 @@ public class NoticeboardConstants
      * Private Construtor to avoid instantiation.
      */
     private NoticeboardConstants(){}
+    
+    public final static String TOOL_SIGNATURE="lanb11";
+    
     
     // ------------------------------------------
     // DEFAULT IDs for testing purposes 
@@ -47,6 +51,7 @@ public class NoticeboardConstants
     public static final String INSTRUCTIONS = "Instructions";
     
     public static final String AUTHOR_PAGE = "authoringContent";
+    public static final String AUTHOR_PAGE2 = "authoringContent2";
     
     public static final String DISPLAY_MESSAGE = "displayMessage";
     public static final String DISPLAY_LEARNER_CONTENT = "displayLearnerContent";
@@ -92,7 +97,7 @@ public class NoticeboardConstants
     public static final String ATTACHMENT_LIST = "attachmentList";
     
     public static final String READ_ONLY_MODE = "readOnlyMode";
-   // public static final String IS_TOOL_COMPLETED = "isToolCompleted";
+   
     
     public static final String USER_ID = "userId";
     public static final String TOOL_SESSION_ID = "toolSessionId";
