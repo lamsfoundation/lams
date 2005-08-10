@@ -24,13 +24,11 @@ package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +71,6 @@ import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
-import org.lamsfoundation.lams.tool.sbmt.dto.LearnerDetailsDTO;
-import org.lamsfoundation.lams.tool.sbmt.dto.StatusReportDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -407,9 +403,11 @@ public class SubmitFilesService implements ToolContentManager,
         {
             SubmitFilesContent submitContent = submitFilesContentDAO.getContentByID(toolContentId);
 
-            SubmitFilesSession submitSession = new SubmitFilesSession (toolSessionId,
-            												SubmitFilesSession.INCOMPLETE);
-                                                            
+            SubmitFilesSession submitSession = new SubmitFilesSession ();
+
+            submitSession.setSessionID(toolSessionId);
+            submitSession.setStatus(new Integer(SubmitFilesSession.INCOMPLETE));
+            submitSession.setContent(submitContent);
             submitFilesSessionDAO.createSession(submitSession);
             log.debug("Survey session created");
         }
@@ -646,91 +644,7 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 		return table;
 	}
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#generateReport(java.lang.Long)
-	 */
-	public Hashtable generateReport(Long sessionID){
-		List users = submissionDetailsDAO.getUsersForSession(sessionID);
-		Iterator iterator = users.iterator();
-		Hashtable table = new Hashtable();
-		while(iterator.hasNext()){
-			Long userID = (Long)iterator.next();			
-			User user = userDAO.getUserById(new Integer(userID.intValue()));
-			List userDetails = learnerDAO.getSubmissionDetailsForUserBySession(userID,sessionID);
-			table.put(user.getUserDTO(),getUserDetails(userDetails.iterator()));
-		}
-		return table;
-	}
-	/**
-	 * Utility function used by <code>generateReport</code> method
-	 * above to assist in generating the report.
-	 * 
-	 * @param iterator
-	 * @return ArrayList
-	 */
-	private ArrayList getUserDetails(Iterator iterator){
-		ArrayList details = new ArrayList();
-		while(iterator.hasNext()){
-			SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();		
-			details.add(getLearnerDetailsDTO(submissionDetails,
-											 submissionDetails.getReport()));
-		}
-		return details;		
-	}
-	/**
-	 * Utility function used by <code>getUserDetails</code> method
-	 * above to assist in generating the report.
-	 * 
-	 * @param details
-	 * @param report
-	 * @return LearnerDetailsDTO
-	 */
-	private LearnerDetailsDTO getLearnerDetailsDTO(SubmissionDetails details, 
-												  SubmitFilesReport report){
-		LearnerDetailsDTO dto = new LearnerDetailsDTO();
-		dto.setComments(report.getComments());
-//		dto.setContentInstruction()
-//		dto.setContentLockOnFinished()
-//		dto.setContentTitle()
-		dto.setDateMarksReleased(report.getDateMarksReleased());
-		dto.setDateOfSubmission(details.getDateOfSubmission());
-		dto.setFileDescription(details.getFileDescription());
-		dto.setMarks(report.getMarks());
-//		dto.setName();
-//		dto.setToolSessionID()
-//		dto.setUserID()
-		return dto;
-	}	
-	
-	public ArrayList getStatus(Long sessionID){		
-		ArrayList details = new ArrayList();
-		List users = submissionDetailsDAO.getUsersForSession(sessionID);
-		Iterator iterator = users.iterator();
-		while(iterator.hasNext()){
-			Long userID = (Long)iterator.next();
-			List allFiles = learnerDAO.getSubmissionDetailsForUserBySession(userID,sessionID);			
-			boolean unmarked = hasUnmarkedContent(allFiles.iterator());
-			details.add(getStatusDetails(userID,unmarked));
-		}
-		return details;		
-	}
-	private boolean hasUnmarkedContent(Iterator details){
-		boolean unmarked = false; 
-		while(details.hasNext()){
-			SubmissionDetails submissionDetails = (SubmissionDetails)details.next();
-			if(submissionDetails.getReport().getMarks()==null)
-				return true;
-		}
-		return unmarked;
-	}	
-	private StatusReportDTO getStatusDetails(Long userID,boolean unmarked){
-		User user = userDAO.getUserById(new Integer(userID.intValue()));
-		return new StatusReportDTO(user.getUserId(),
-								   user.getLogin(),
-								   user.getFullName(),
-								   new Boolean(unmarked));
-	}
+
 	public void updateMarks(Long reportID, Long marks, String comments){
 		SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
 		if(report!=null){

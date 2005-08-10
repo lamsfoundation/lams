@@ -139,8 +139,8 @@
         redirect="false"
       />
       <forward
-        name="status"
-        path="/Status.jsp"
+        name="statistic"
+        path="/monitoring/statistic.jsp"
         redirect="false"
       />
     </action>

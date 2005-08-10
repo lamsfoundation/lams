@@ -6,17 +6,10 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.service;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-
 import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
-import org.lamsfoundation.lams.tool.sbmt.dto.StatusReportDTO;
-import org.springframework.orm.hibernate.HibernateObjectRetrievalFailureException;
 
 /**
  * @author Manpreet Minhas
@@ -86,16 +79,6 @@ public class TestSubmitFilesService extends AbstractLamsTestCase {
 		Hashtable table = submitFilesService.generateReport(new Long(1));
 		assertEquals(table.size(),3);
 	}*/
-	public void testGetStatus(){
-		ArrayList list = submitFilesService.getStatus(new Long(1));
-		Iterator iterator = list.iterator();
-		while(iterator.hasNext()){
-			StatusReportDTO statusReportDTO = (StatusReportDTO)iterator.next();
-			System.out.print(statusReportDTO.getLogin());
-			System.out.print(statusReportDTO.getFullName());
-			System.out.print(statusReportDTO.getUnMarked());
-			System.out.println();
-		}		
-	}
+
 }
  

@@ -24,8 +24,6 @@ package org.lamsfoundation.lams.tool.sbmt.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +46,7 @@ import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
+import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
@@ -73,18 +72,13 @@ import org.lamsfoundation.lams.util.WebUtil;
  * @struts.action-forward name="editActivity" path="/monitoring/editactivity.jsp"
  * @struts.action-forward name="success" path="/monitoring/success.jsp"
  * 
- * @struts.action-forward name="status" path="/Status.jsp"
- * 				
+ * @struts.action-forward name="statistic" path="/monitoring/statistic.jsp"
+ * 
  */
 public class MonitoringAction extends DispatchAction {
 	
 	public ISubmitFilesService submitFilesService;
 	
-	public ISubmitFilesService getSubmitFilesService(){
-		return SubmitFilesServiceProxy
-			   .getSubmitFilesService(this.getServlet()
-			   .getServletContext());
-	}
 	/**
 	 * List all user for monitor staff choose which user need to do report marking.
 	 * It is first step to do report marking.
@@ -317,7 +311,14 @@ public class MonitoringAction extends DispatchAction {
 			
 		return null;
 	}
-	
+	/**
+	 * Display online/offline instruction information from Authoring. This page is read-only.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward instructions(ActionMapping mapping,
 			   ActionForm form,
 			   HttpServletRequest request,
@@ -337,7 +338,15 @@ public class MonitoringAction extends DispatchAction {
 		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
 		return mapping.findForward("instructions");
 	}
-	
+	/**
+	 * Display acitivty from authoring. The information will be same with "Basic" tab in authoring page.
+	 * This page is read-only.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward showActivity(ActionMapping mapping,
 			   ActionForm form,
 			   HttpServletRequest request,
@@ -346,7 +355,14 @@ public class MonitoringAction extends DispatchAction {
 		getAuthoringActivity(form, request);
 		return mapping.findForward("showActivity");
 	}
-
+	/**
+	 * Provide editable page for activity. The information will be same with "Basic" tab in authoring page.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward editActivity(ActionMapping mapping,
 			   ActionForm form,
 			   HttpServletRequest request,
@@ -355,6 +371,14 @@ public class MonitoringAction extends DispatchAction {
 		getAuthoringActivity(form, request);
 		return mapping.findForward("editActivity");
 	}
+	/**
+	 * Update activity to database. The information will be same with "Basic" tab in authoring page.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward updateActivity(ActionMapping mapping,
 			   ActionForm form,
 			   HttpServletRequest request,
@@ -372,6 +396,48 @@ public class MonitoringAction extends DispatchAction {
 		submitFilesService.updateSubmitFilesContent(content);
 		
 		return mapping.findForward("success");
+	}
+	/**
+	 * Provide statistic information. Includes:<br>
+	 * <li>Files not marked</li> 
+	 * <li>Files marked</li> 
+	 * <li>Total Files</li> 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public ActionForward statistic(ActionMapping mapping,
+			   ActionForm form,
+			   HttpServletRequest request,
+			   HttpServletResponse response){
+		
+		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
+		submitFilesService = getSubmitFilesService();
+		//return FileDetailsDTO list according to the given sessionID
+		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+		Iterator iter = userFilesMap.values().iterator();
+		Iterator dtoIter; 
+		int notMarkedCount = 0;
+		int markedCount = 0;
+		while(iter.hasNext()){
+			List list = (List) iter.next();
+			dtoIter = list.iterator();
+			while(dtoIter.hasNext()){
+				FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
+				if(dto.getMarks() == null)
+					notMarkedCount++;
+				else
+					markedCount++;
+			}
+		}
+		StatisticDTO dto = new StatisticDTO();
+		dto.setMarkedCount(markedCount);
+		dto.setNotMarkedCount(notMarkedCount);
+		dto.setTotalUploadedFiles(markedCount+notMarkedCount);
+		request.setAttribute("statistic",dto);
+		return mapping.findForward("statistic");
 	}
 	/**
 	 * @param form
@@ -392,28 +458,11 @@ public class MonitoringAction extends DispatchAction {
 		AuthoringDTO authorDto = new AuthoringDTO(persistContent);
 		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
 	}
+	private ISubmitFilesService getSubmitFilesService(){
+		return SubmitFilesServiceProxy
+			   .getSubmitFilesService(this.getServlet()
+			   .getServletContext());
+	}
 	
-	//TODO: I don't know what will do following code from Mapreet
-	public ActionForward getStatus(ActionMapping mapping,
-							   ActionForm form,
-							   HttpServletRequest request,
-							   HttpServletResponse response){		
-		Long sessionID =new Long(WebUtil.readLongParam(request,"toolSessionID"));
-		submitFilesService = getSubmitFilesService();		
-		ArrayList status = submitFilesService.getStatus(sessionID);
-		request.setAttribute("toolSessionID",sessionID);		
-		request.setAttribute("status",status);
-		return mapping.findForward("status");
-	}
-	public ActionForward generateReport(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		Long sessionID = new Long(WebUtil.readLongParam(request,
-				"toolSessionID"));
-		submitFilesService = getSubmitFilesService();
-		Hashtable report = submitFilesService.generateReport(sessionID);
-		request.setAttribute("toolSessionID", sessionID);
-		request.setAttribute("report", report);
-		return mapping.findForward("allUserMarks");
-	}
-
+	
 }

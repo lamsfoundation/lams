@@ -20,8 +20,6 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.service;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -139,17 +137,6 @@ public interface ISubmitFilesService {
 	 * @return The user information list
 	 */
 	public List getUsers(Long contentID);
-	/**
-	 * This method is required in the monitoring enviornment
-	 * when the teacher wants to view all the learners who have
-	 * uploaded one file or the other for marking purposes.	 * 
-	 *   
-	 * @param contentID The content_id of the tool
-	 * @return Hashtable The required information
-	 */
-	public Hashtable generateReport(Long contentID);
-	
-	public ArrayList getStatus(Long contentID);	
 	
 	public void updateMarks(Long reportID, Long marks, String comments);
 	

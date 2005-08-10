@@ -16,8 +16,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class SubmitFilesServiceProxy {
 	
-	private ISubmitFilesService submitFilesService;
-	
 	public static final ISubmitFilesService getSubmitFilesService(ServletContext servletContext){
 		WebApplicationContext context = WebApplicationContextUtils
 										.getRequiredWebApplicationContext(servletContext);

@@ -26,7 +26,9 @@ package org.lamsfoundation.lams.tool.sbmt.exception;
  * @author Manpreet Minhas
  */
 public class SubmitFilesException extends RuntimeException {
-	
+
+	private static final long serialVersionUID = 8623508856810983309L;
+
 	/**
      * Default Constructor
      */

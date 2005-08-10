@@ -40,5 +40,10 @@
 		<input type ="hidden" name="method" value="showActivity">
 		<input type="submit" name="submit" value="Edit Activity">
 	</form>	
+		<form name="monitoringForm" method="get" action="monitoring.do">
+		<input type ="hidden" name="toolSessionID" value="1">
+		<input type ="hidden" name="method" value="statistic">
+		<input type="submit" name="submit" value="Monitoring Statistic">
+	</form>
 </body>
 </html>

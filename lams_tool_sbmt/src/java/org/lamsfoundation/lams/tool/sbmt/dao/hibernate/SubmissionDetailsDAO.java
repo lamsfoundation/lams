@@ -15,7 +15,6 @@ import net.sf.hibernate.Session;
 import net.sf.hibernate.type.Type;
 
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
-import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;

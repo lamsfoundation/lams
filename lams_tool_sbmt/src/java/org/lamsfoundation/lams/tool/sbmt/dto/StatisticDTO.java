@@ -19,29 +19,34 @@
  *http://www.gnu.org/licenses/gpl.txt
  */
 package org.lamsfoundation.lams.tool.sbmt.dto;
+/**
+ * 
+ * @author Steve.Ni
+ * 
+ * $version$
+ */
+public class StatisticDTO {
 
-public class DTOException extends RuntimeException{
-
-	private static final long serialVersionUID = -6947149246197084147L;
-
-	public DTOException() {
-		super();
-		
+	private int notMarkedCount;
+	private int markedCount;
+	private int totalUploadedFiles;
+	
+	public int getMarkedCount() {
+		return markedCount;
 	}
-
-	public DTOException(String message, Throwable cause) {
-		super(message, cause);
-		
+	public void setMarkedCount(int markedCount) {
+		this.markedCount = markedCount;
 	}
-
-	public DTOException(String message) {
-		super(message);
-		
+	public int getNotMarkedCount() {
+		return notMarkedCount;
 	}
-
-	public DTOException(Throwable cause) {
-		super(cause);
-		
+	public void setNotMarkedCount(int notMarkedCount) {
+		this.notMarkedCount = notMarkedCount;
 	}
-
+	public int getTotalUploadedFiles() {
+		return totalUploadedFiles;
+	}
+	public void setTotalUploadedFiles(int totalUploadedFiles) {
+		this.totalUploadedFiles = totalUploadedFiles;
+	}
 }

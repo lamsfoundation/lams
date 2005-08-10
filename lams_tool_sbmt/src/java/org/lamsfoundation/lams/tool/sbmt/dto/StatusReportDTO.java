@@ -29,6 +29,7 @@ import java.io.Serializable;
  */
 public class StatusReportDTO implements Serializable {
 	
+	private static final long serialVersionUID = 4915274448120747612L;
 	private Long userID; 
 	private String login;
 	private String fullName;
