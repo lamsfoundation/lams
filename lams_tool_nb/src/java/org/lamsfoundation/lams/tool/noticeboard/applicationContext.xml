@@ -14,12 +14,15 @@
 		<property name="jndiName"><value>java:jdbc/tool-ds</value></property>
 	</bean>  -->
 	
-	 <bean id="toolDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+	<!--  <bean id="toolDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
 		<property name="url"><value>jdbc:mysql://localhost/lams?characterEncoding=utf8</value></property>
 		<property name="username"><value>lams</value></property>
 		<property name="password"><value>lamsdemo</value></property>
-	</bean> 
+	</bean> -->
+	<bean id="toolDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName"><value>java:jdbc/tool-ds</value></property>
+	</bean>
 
 	<!-- Hibernate SessionFactory -->
 	  <bean id="nbSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
@@ -61,6 +64,8 @@
 				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
 				<property name="nbUserDAO"><ref bean="nbUserDAO"/></property>
 				<property name="nbAttachmentDAO"><ref bean="nbAttachmentDAO"/></property>
+				<property name="toolService"><ref bean="lamsToolService"/></property>
+				<property name="learnerService"><ref bean="learnerService"/></property>			
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -73,24 +78,12 @@
 				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
 			</props>
 		</property>
 	</bean> 
 
-	<!--
-	  - Lams survey primary business object (default implementation), as an inner bean wrapped
-		- by an outer transactional proxy. The two bean definitions could have been separate,
-		- but this is cleaner as there is no need to ever access the unwrapped object.
-		-->
 
-<!--  	<bean id="nbService" parent="baseTransactionProxy">
-		<property name="target">
-			<bean class="org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServicePOJO">
-				<property name="nbContentDAO"><ref bean="nbContentDAO"/></property>
-				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
-			</bean>
-		</property>
-	</bean>  -->
 
 	<!--  DAO classes -->
 	<bean id="nbContentDAO" class="org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardContentDAO">
