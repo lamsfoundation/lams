@@ -24,6 +24,8 @@ import javax.servlet.ServletContext;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 
 
 /**
@@ -33,6 +35,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * service layer. Therefore we can feel free to switch the business logic
  * implementation.</p>
  *
+ * @author mtruong
  */
 
 public class NoticeboardServiceProxy {
@@ -47,4 +50,28 @@ public class NoticeboardServiceProxy {
 		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
 	    return wac.getBean("nbService");
 	}
+	
+	 /*
+     * Return the survey version of tool session manager implementation. 
+     * It will delegate to the Spring helper method to retrieve the proper 
+     * bean from Spring bean factory.
+     * @param servletContext the servletContext for current application
+     * @return survey service object.*/
+    public static final ToolSessionManager getNbSessionManager(ServletContext servletContext)
+    {
+        return (ToolSessionManager)getNbDomainService(servletContext);
+    }
+     
+    
+    /*
+     * Return the survey version of tool content manager implementation. 
+     * It will delegate to the Spring helper method to retrieve the proper 
+     * bean from Spring bean factory.
+     * @param servletContext the servletContext for current application
+     * @return survey service object. */
+    public static final ToolContentManager getNbContentManager(ServletContext servletContext)
+    {
+        return (ToolContentManager)getNbDomainService(servletContext);
+    }
+   
 }
