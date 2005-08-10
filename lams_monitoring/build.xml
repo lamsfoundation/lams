@@ -65,6 +65,7 @@
 			<fileset dir="${build.classes.java}"/>
 			<fileset dir="${build.classes.test}"/>
 			<fileset dir="${build.lib}"/>
+			<fileset dir="${build.report}"/>
 		</delete>
 	</target>
 
@@ -209,16 +210,19 @@
 	   <!-- =================================================================== -->
 	   <!-- Run junit tests														-->
 	   <!-- =================================================================== -->
-	<target name="test" depends="compile.test">
+	<target name="test" depends="compile.test"> 
 		<mkdir dir="${build.report}" />
-		<junit printsummary="yes" haltonerror="no" haltonfailure="yes"
+		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
 			fork="yes">
+			<jvmarg value="-Xms512M"/>
+			<jvmarg value="-Xmx1024M"/>
 			<formatter type="plain" usefile="false" />
 			<formatter type="xml" />
 			<batchtest todir="${build.report}">
 				<fileset dir="${src.dir.test}">
-					<include name="**/Test*.java" />
-					<exclude name="**/*Action.java" />
+					<include name="**/TestMonitoringService.java" />
+					<include name="**/TestGateAction.java" /> 
+					<!-- does not work <include name="**/TestMonitoringAction.java" /> -->
 				</fileset>
 			</batchtest>
 			<classpath>
@@ -231,7 +235,7 @@
 		</junit>
 	</target>
 
-	<target name="test-report" depends="test">
+	<target name="test-report" depends="test" description="Run the tests - requires the survey tables to exist">
 		<mkdir dir="${build.report}/html" />
 		<junitreport todir="${build.report}">
 			<fileset dir="${build.report}">
