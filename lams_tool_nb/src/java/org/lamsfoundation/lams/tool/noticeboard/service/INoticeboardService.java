@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Defines the contract that the tool service provider must follow
  * 
- *
+ * @author mtruong
  */
 public interface INoticeboardService {
 	
@@ -302,5 +302,12 @@ public interface INoticeboardService {
      * @param uuid The uuid of the file
      */
     public void removeAttachmentByUuid(Long uuid);
+    
+    /**
+     * This method retrieves the default content id.
+     * @param toolSignature The tool signature which is defined in lams_tool table.
+     * @return the default content id
+     */
+    public Long getToolDefaultContentIdBySignature(String toolSignature);
     
 }
