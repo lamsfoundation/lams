@@ -1,4 +1,4 @@
-CREATE TABLE lams.tl_lanb11_content (
+CREATE TABLE tl_lanb11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , nb_content_id BIGINT(20) UNIQUE NOT NULL
      , title TEXT
@@ -14,7 +14,7 @@ CREATE TABLE lams.tl_lanb11_content (
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lanb11_session (
+CREATE TABLE tl_lanb11_session (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , nb_session_id BIGINT(20) UNIQUE NOT NULL
      , nb_content_uid BIGINT(20) NOT NULL
@@ -27,7 +27,7 @@ CREATE TABLE lams.tl_lanb11_session (
                   REFERENCES lams.tl_lanb11_content (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lanb11_user (
+CREATE TABLE tl_lanb11_user (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , user_id BIGINT(20) UNIQUE NOT NULL
      , nb_session_uid BIGINT(20) NOT NULL
@@ -41,7 +41,7 @@ CREATE TABLE lams.tl_lanb11_user (
 )TYPE=InnoDB;
 
 
-CREATE TABLE lams.tl_lanb11_attachment (
+CREATE TABLE tl_lanb11_attachment (
        attachment_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , nb_content_uid BIGINT(20) NOT NULL
      , filename VARCHAR(255) NOT NULL
