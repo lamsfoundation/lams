@@ -1,1 +1,1 @@
-Class-Path: ./lams.jar ./lams-tool-nb.jar 
+Class-Path: ./lams.jar ./lams-tool-lanb11.jar ./lams-contentrepository.jar ./lams-learning.jar
