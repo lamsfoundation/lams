@@ -36,6 +36,8 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 
 /**
  * Copied from Jacky's class in the survey tool.
+ * 
+ * @author mtruong
  */
 public class CustomStrutsExceptionHandler extends ExceptionHandler {
 

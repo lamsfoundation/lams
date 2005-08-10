@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 /**
  * Simple client for accessing the content repository.
  * 
+ * @author mtruong
  */
 public class NbToolContentHandler extends ToolContentHandler {
 
