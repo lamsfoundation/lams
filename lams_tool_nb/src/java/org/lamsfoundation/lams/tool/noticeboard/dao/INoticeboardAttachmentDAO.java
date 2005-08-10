@@ -34,23 +34,80 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 /**
  * @author mtruong
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * <p>Handles database access for uploading, updates and removal of files.</p>
  */
 public interface INoticeboardAttachmentDAO {
 
+    /**
+     * Return the persistent instance of NoticeboardAttachment with the given
+     * identifier <code>attachmentId</code>
+     * 
+     * @param attachmentId The unique identifier for attachment. If null, a null object will be returned.
+     * @return an instance of NoticeboardAttachment
+     */
     public NoticeboardAttachment retrieveAttachment(Long attachmentId);
     
+    /**
+     * Return the persistent instance of NoticeboardAttachment with the given
+     * unique identifier <code>uuid</code>. 
+     * 
+     * @param uuid The uuid of the file, which is also the uuid of the file which is stored in the content repository.
+     * @return an instance of NoticeboardAttachment
+     */
     public NoticeboardAttachment retrieveAttachmentByUuid(Long uuid);
     
+    /**
+     * Return the persistent instance of NoticeboardAttachment with the given
+     * <code>filename</code>. If there is more than one file with the same filename
+     * then only the first file in the list will be returned.
+     * 
+     * @param filename The name of the file
+     * @return an instance of NoticeboardAttachment
+     */
     public NoticeboardAttachment retrieveAttachmentByFilename(String filename);
     
+    /**
+     * Returns a list of attachment ids which are associated with this
+     * instance of NoticeboardContent. 
+     * <p>For example, if the given instance <code>nbContent</code> has a tool content id
+     * of 3, and consider an extract of the tl_lanb11_attachment table:</p>
+     * <pre> 
+     * 		 ----------------------------
+     * 		 attachmentId | toolContentId
+     * 		 ----------------------------
+     * 			1		  | 	1
+     * 			2		  | 	3
+     * 			3		  | 	3
+     * 			4 		  | 	1
+     * 		 ----------------------------
+     * </pre>
+     * Then a call to <code>getAttachmentIdsFromContent</code> will return a list containing the values
+     * 2 and 3. 
+     * @param nbContent
+     * @return
+     */
     public List getAttachmentIdsFromContent(NoticeboardContent nbContent);
     
+    /**
+	 * <p>Persist the given persistent instance of NoticeboardAttachment.</p>
+	 * 
+	 * @param attachment The instance of NoticeboardAttachment to persist.
+	 */
     public void saveAttachment(NoticeboardAttachment attachment);
     
+    /**
+	 * <p>Delete the given persistent instance of NoticeboardAttachment.</p>
+	 * 
+	 * @param attachment The instance of NoticeboardAttachment to delete.
+	 */
     public void removeAttachment(NoticeboardAttachment attachment);
     
+    /**
+     * <p>Delete the given instance of NoticeboardAttachment with the
+     * given <code>uuid</code>
+     * 
+     * @param uuid The unique id of the file/attachment.
+     */
     public void removeAttachment(Long uuid);
     
 }

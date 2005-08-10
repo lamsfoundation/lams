@@ -27,8 +27,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * <p>The NoticeboardSession class represents a tool session for a noticeboard activity.
+ * Each tool session may represent a group of users, if grouping is used, or may 
+ * represent one learner if there is no grouping for this particular activity.
+ * </p>
+ * <br>
+ * <p>The session status has three possible status':
+ * <ul><li>NOT_ATTEMPTED: which means that the tool session has been established, but no learners have reached this activity yet 
+ * <li>INCOMPLETE: which means that a learner has reached this activity 
+ * <li>COMPLETED: The session status will never be set to complete as you don't know when this tool is going to end.
+ * </ul></p>
  * @author mtruong
- *
  */
 
 public class NoticeboardSession implements Serializable {

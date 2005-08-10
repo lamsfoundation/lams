@@ -21,9 +21,6 @@
 
 /*
  * Created on Jul 28, 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.lamsfoundation.lams.tool.noticeboard;
 
@@ -32,20 +29,36 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 
 
 /**
+ * <p>This class represents a file that is uploaded to the noticeboard tool.
+ * It is used in the authoring environment, when an author
+ * uploads an online/offline instructions file. The file is actually stored
+ * in the content repository, however, the file details will be stored in the
+ * tl_lanb11_attachment table. The file uploaded, will be of two types: online or offline.
+ * </p>
+ * 
  * @author mtruong
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class NoticeboardAttachment implements Serializable {
     
+    /** identifier field */
     private Long attachmentId;
+    
+    /** persistent field. Cannot be null */
     private NoticeboardContent nbContent;
+    
+    /** persistent field. Cannot be null */
     private String filename;
+    
+    /** unique persistent field. Cannot be null */
     private Long uuid;
+    
+    /** nullable persistent field */
     private Long versionId;
+    
+    /** persistent field. Cannot be null. It can either take values "ONLINE" or "OFFLINE" */
     private boolean onlineFile;
     
+    /** The two different types of files/attachment that can be uploaded */
     public final static String TYPE_ONLINE = "ONLINE";
     public final static String TYPE_OFFLINE = "OFFLINE";
 
@@ -79,11 +92,6 @@ public class NoticeboardAttachment implements Serializable {
     
     
     /**
-     *		@hibernate.id
-     *      generator-class="native"
-     *      type="java.lang.Long"
-     *      column="attachment_id"
-     * 
      * @return Returns the attachmentId.
      */
     public Long getAttachmentId() {
@@ -98,11 +106,6 @@ public class NoticeboardAttachment implements Serializable {
     }
     
     /**
-     * 		@hibernate.property
-     *      column="filename"
-     *      length="255"
-     *      not-null="true"
-     * 
      * @return Returns the filename.
      */
     public String getFilename() {
@@ -116,11 +119,6 @@ public class NoticeboardAttachment implements Serializable {
     }
    
     /**
-     * 		@hibernate.property
-     *       column="online_file"
-     *       length="1"
-     *       not-null="true"
-     * 
      * @return Returns the isOnline.
      */
     public boolean isOnlineFile() {
@@ -134,10 +132,6 @@ public class NoticeboardAttachment implements Serializable {
     }
    
     /**
-     * 		@hibernate.many-to-one
-     *       not-null="true"
-     *      @hibernate.column name="nb_content_uid" 
-     * 
      * @return Returns the nbContent.
      */
     public NoticeboardContent getNbContent() {
@@ -151,11 +145,6 @@ public class NoticeboardAttachment implements Serializable {
     }
    
     /**
-     * 		@hibernate.property
-     *       column="uuid"
-     *       length="20"
-     * 		 not-null="true"
-     * 
      * @return Returns the uuid.
      */
     public Long getUuid() {
@@ -169,13 +158,9 @@ public class NoticeboardAttachment implements Serializable {
     }
    
     /**
-     * 		@hibernate.property
-     *       column="version_id"
-     *       length="20"
-     * 
      * @return Returns the versionId.
      */
-    public Long getVersionId() {
+    public Long getVersionId() { //nullable
         return versionId;
     }
     /**

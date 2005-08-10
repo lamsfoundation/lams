@@ -26,12 +26,11 @@ import java.util.Set;
 import java.util.HashSet;
 
 
-import org.apache.commons.lang.builder.EqualsBuilder;
 /**
- * Persistent noticeboard object/bean that defines the content for the noticeboard tool.
- * Provides accessors and mutators to get/set noticeboard attributes
+ * <p>Persistent noticeboard object/bean that defines the content for the noticeboard tool.
+ * Provides accessors and mutators to get/set noticeboard attributes</p>
+ * 
  * @author mtruong
- *
  */
 public class NoticeboardContent implements Serializable {
 	

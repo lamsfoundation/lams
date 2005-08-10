@@ -34,7 +34,7 @@ import net.sf.hibernate.Session;
 
 /**
  * @author mtruong
- * Hibernate implementation for database access to Noticeboard sessions for the noticeboard tool.
+ * <p>Hibernate implementation for database access to Noticeboard sessions for the noticeboard tool.</p>
  */
 
 public class NoticeboardSessionDAO extends HibernateDaoSupport implements INoticeboardSessionDAO {
@@ -44,32 +44,15 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
     
     private static final String GET_SESSIONS_FROM_CONTENT = "select ns.nbSessionId from NoticeboardSession ns where ns.nbContent= :nbContent";
     
-    
-
-    
-    /**
-	 * <p>Return the persistent instance of a NoticeboardSession  
-	 * with the given identifier <code>uid</code>, returns null if not found. </p>
-	 * 
-	 * @param uid an identifier for the NoticeboardSession object.
-	 * @return the persistent instance of a NoticeboardSession or null if not found
-	 */
-	public NoticeboardSession getNbSessionByUID(Long uid)
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#getNbSessionByUID(java.lang.Long) */
+    public NoticeboardSession getNbSessionByUID(Long uid)
 	{
 		 return (NoticeboardSession) this.getHibernateTemplate()
          .get(NoticeboardSession.class, uid);
 	}
 	
-	
-	/**
-	 * <p> Return the persistent instance of a NoticeboardSession
-	 * with the given tool session id <code>nbSessionId</code>,
-	 * returns null if not found.</p>
-	 * 
-	 * @param nbSessionId The tool session id
-	 * @return the persistent instance of a NoticeboardSession or null if not found.
-	 */
-	public NoticeboardSession findNbSessionById(Long nbSessionId)
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#findNbSessionById(java.lang.Long) */
+    public NoticeboardSession findNbSessionById(Long nbSessionId)
 	{
 	    String query = "from NoticeboardSession nbS where nbS.nbSessionId=?";
 	    List session = getHibernateTemplate().find(query,nbSessionId);
@@ -84,45 +67,28 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
 		}
 	}
 	
-	
-	/**
-	 * <p>Persist the given persistent instance of NoticeboardSession.</p>
-	 * 
-	 * @param nbSession The instance of NoticeboardSession to persist.
-	 */
-	public void saveNbSession(NoticeboardSession nbSession)
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#saveNbSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
+    public void saveNbSession(NoticeboardSession nbSession)
     {
     	this.getHibernateTemplate().save(nbSession);
     }
     
-	/**
-     * <p>Update the given persistent instance of NoticeboardSession.</p>
-     * 
-     * @param nbContent The instance of NoticeboardSession to persist.
-     */
+	
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#updateNbSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
     public void updateNbSession(NoticeboardSession nbSession)
     {
     	this.getHibernateTemplate().update(nbSession);
     }
 
-    /**
-     * <p>Delete the given instance of NoticeboardSession with the
-     * given identifier <code>uid</code>
-     * 
-     * @param uid an identifier for the NoticeboardSession instance. 
-     */
+   
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbSessionByUID(java.lang.Long) */
     public void removeNbSessionByUID(Long uid)
     {
         NoticeboardSession nb = (NoticeboardSession)getHibernateTemplate().get(NoticeboardSession.class, uid);
     	this.getHibernateTemplate().delete(nb);
     }
     
-    /**
-     * <p>Delete the given instance of NoticeboardSession with the
-     * given tool session id <code>nbSessionid</code>
-     * 
-     * @param nbSessionId The tool session Id. 
-     */
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbSession(java.lang.Long) */
     public void removeNbSession(Long nbSessionId)
     {
         String query = "from NoticeboardSession as nbS where nbS.nbSessionId =";
@@ -134,25 +100,15 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
         this.getHibernateTemplate().delete(queryString);
       
     }
-    /**
-     * <p>Delete the given instance of NoticeboardSession</p>
-     * 
-     * @param nbSession The instance of NoticeboardSession to delete. 
-     */
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbSession(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
     public void removeNbSession(NoticeboardSession nbSession)
     {
         this.getHibernateTemplate().delete(nbSession);
     }
 
-    /**
-     * <p> Returns the persistent instance of NoticeboardSession
-     * associated with the given noticeboard user, with user id <code>userId</code>, 
-     * returns null if not found.
-     * 
-     * @param userId The noticeboard user id
-     * @return a persistent instance of NoticeboardSessions or null if not found.
-     */	
-	public NoticeboardSession getNbSessionByUser(final Long userId)
+    
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#getNbSessionByUser(java.lang.Long) */
+    public NoticeboardSession getNbSessionByUser(final Long userId)
 	{
 		 return (NoticeboardSession) getHibernateTemplate().execute(new HibernateCallback()
                 {
@@ -167,25 +123,16 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
                 });
 	}
 	
-	 /**
-     * <p>Deletes all instances of NoticeboardUser that are associated
-     * with the given instance of NoticeboardSession</p>
-     * 
-     * @param nbSession The instance of NoticeboardSession in which corresponding instances of NoticeboardUser should be deleted.
-     */
-	public void removeNbUsers(NoticeboardSession nbSession)
+	 
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#removeNbUsers(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
+    public void removeNbUsers(NoticeboardSession nbSession)
     {
     	this.getHibernateTemplate().deleteAll(nbSession.getNbUsers());
     }
 	
-	 /**
-     * <p>Creates and persists an instance of NoticeboardUser which is associated
-     * with the NoticeboardSession with tool session id <code>nbSessionId</code> </p>
-     * 
-     * @param nbSessionId The tool session id
-     * @param user The instance of NoticeboardUser
-     */
-	public void addNbUsers(Long nbSessionId, NoticeboardUser user)
+    
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#addNbUsers(java.lang.Long, org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
+    public void addNbUsers(Long nbSessionId, NoticeboardUser user)
 	{
 	    NoticeboardSession session = findNbSessionById(nbSessionId);
 	    user.setNbSession(session);
@@ -194,6 +141,7 @@ public class NoticeboardSessionDAO extends HibernateDaoSupport implements INotic
 	    this.getHibernateTemplate().saveOrUpdateCopy(session);	    
 	}
 	
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO#getSessionsFromContent(org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
 	public List getSessionsFromContent(NoticeboardContent nbContent)
 	{
 	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT,

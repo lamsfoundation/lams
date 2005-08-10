@@ -33,33 +33,21 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 
 /**
  * @author mtruong
+ * <p>Hibernate implementation for database access to Noticeboard users (learners) for the noticeboard tool.</p>
  */
 public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticeboardUserDAO {
     
     private static final String COUNT_USERS_IN_SESSION = "select nu.userId from NoticeboardUser nu where nu.nbSession= :nbSession";
   
     
-    /**
-	 * <p>Return the persistent instance of a NoticeboardUser 
-	 * with the given identifier <code>uid</code>, returns null if not found. </p>
-	 * 
-	 * @param uid an identifier for the NoticeboardUser.
-	 * @return the persistent instance of a NoticeboardUser or null if not found
-	 */
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserByUID(java.lang.Long) */
 	public NoticeboardUser getNbUserByUID(Long uid)
 	{
 		 return (NoticeboardUser) this.getHibernateTemplate()
          .get(NoticeboardUser.class, uid);
 	}
 	
-	/**
-	 * <p> Return the persistent instance of a NoticeboardUser
-	 * with the given user id <code>userId</code>,
-	 * returns null if not found.</p>
-	 * 
-	 * @param userId The id of a NoticeboardUser
-	 * @return the persistent instance of a NoticeboardUser or null if not found.
-	 */
+	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserByID(java.lang.Long) */
 	public NoticeboardUser getNbUserByID(Long userId)
 	{
 	    String query = "from NoticeboardUser user where user.userId=?";
@@ -75,32 +63,19 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
 		}
 	}
 
-	/**
-	 * <p>Persist the given persistent instance of NoticeboardUser.</p>
-	 * 
-	 * @param nbUser The instance of NoticeboardUser to persist.
-	 */
+	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#saveNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
 	public void saveNbUser(NoticeboardUser nbUser)
     {
     	this.getHibernateTemplate().save(nbUser);
     }
 	
-	/**
-     * <p>Update the given persistent instance of NoticeboardUser.</p>
-     * 
-     * @param nbUser The instance of NoticeboardUser to persist.
-     */
+	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#updateNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
     public void updateNbUser(NoticeboardUser nbUser)
     {
     	this.getHibernateTemplate().update(nbUser);
     }
     
-    /**
-     * <p>Delete the given instance of NoticeboardUser with the
-     * given user id <code>userId</code>
-     * 
-     * @param userId The noticeboard user id.
-     */
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#removeNbUser(java.lang.Long) */
     public void removeNbUser(Long userId)
     {
         String query = "from NoticeboardUser as user where user.userId =";
@@ -112,23 +87,14 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
         this.getHibernateTemplate().delete(queryString);
       
     }
-    /**
-     * <p>Delete the given instance of NoticeboardUser</p>
-     * 
-     * @param nbUser The instance of NoticeboardUser to delete. 
-     */
+    
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#removeNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
     public void removeNbUser(NoticeboardUser nbUser)
     {
         this.getHibernateTemplate().delete(nbUser);
     }
     
-    /**
-     * Returns the number of users that are in this particular
-     * session.
-     * 
-     * @param nbSession
-     * @return the number of users that are in this session
-     */
+    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNumberOfUsers((org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
     public int getNumberOfUsers(NoticeboardSession nbSession)
     {
         return (getHibernateTemplate().findByNamedParam(COUNT_USERS_IN_SESSION,

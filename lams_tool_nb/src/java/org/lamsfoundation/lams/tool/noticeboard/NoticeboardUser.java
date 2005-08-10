@@ -28,8 +28,16 @@ import java.io.Serializable;
 /**
  * @author mtruong
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * <p>The NoticeboardUser class represents the learners that will participate
+ * the noticeboard activity. Each learner will have a tool session id which represents
+ * which group they belong to, or there is no grouping, then each learner will have their own
+ * tool session id.</p>
+ * <p>The userStatus can be of two values
+ * <ul>
+ * <li>INCOMPLETE: Which means that the user has not yet finished this activity.</li>
+ * <li>COMPLETED: Which means the user has completed this activity (when the user clicks on finish) </li>
+ * <ul>
+ * </p>
  */
 public class NoticeboardUser implements Serializable {
     

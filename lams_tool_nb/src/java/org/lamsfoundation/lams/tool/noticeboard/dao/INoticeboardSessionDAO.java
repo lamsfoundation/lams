@@ -28,31 +28,116 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 
 
 /**
- * Interface for the NoticeboardSession DAO, defines methods needed to access/modify
- * noticeboard session
+ * <p>Interface for the NoticeboardSession DAO, defines methods needed to access/modify
+ * noticeboard session</p>
  * @author mtruong
  */
 public interface INoticeboardSessionDAO {
 	
-	public NoticeboardSession findNbSessionById(Long nbSessionId);
+   
+    /**
+	 * <p> Return the persistent instance of a NoticeboardSession
+	 * with the given tool session id <code>nbSessionId</code>,
+	 * returns null if not found.</p>
+	 * 
+	 * @param nbSessionId The tool session id
+	 * @return the persistent instance of a NoticeboardSession or null if not found.
+	 */
+    public NoticeboardSession findNbSessionById(Long nbSessionId);
 	
-	public NoticeboardSession getNbSessionByUID(Long nbSessionId);
+    /**
+	 * <p>Return the persistent instance of a NoticeboardSession  
+	 * with the given identifier <code>uid</code>, returns null if not found. </p>
+	 * 
+	 * @param uid an identifier for the NoticeboardSession object.
+	 * @return the persistent instance of a NoticeboardSession or null if not found
+	 */
+    public NoticeboardSession getNbSessionByUID(Long uid);
 	
-	public void saveNbSession(NoticeboardSession nbSession);
+	
+    /**
+	 * <p>Persist the given persistent instance of NoticeboardSession.</p>
+	 * 
+	 * @param nbSession The instance of NoticeboardSession to persist.
+	 */
+    public void saveNbSession(NoticeboardSession nbSession);
     
+    /**
+     * <p>Update the given persistent instance of NoticeboardSession.</p>
+     * 
+     * @param nbContent The instance of NoticeboardSession to persist.
+     */
     public void updateNbSession(NoticeboardSession nbSession);
 
+    /**
+     * <p>Delete the given instance of NoticeboardSession with the
+     * given identifier <code>uid</code>
+     * 
+     * @param uid an identifier for the NoticeboardSession instance. 
+     */
     public void removeNbSessionByUID(Long uid);
     
+    /**
+     * <p>Delete the given instance of NoticeboardSession</p>
+     * 
+     * @param nbSession The instance of NoticeboardSession to delete. 
+     */
     public void removeNbSession(NoticeboardSession nbSession);
     
+    /**
+     * <p>Delete the given instance of NoticeboardSession with the
+     * given tool session id <code>nbSessionid</code>
+     * 
+     * @param nbSessionId The tool session Id. 
+     */
     public void removeNbSession(Long nbSessionId);
     
-    public NoticeboardSession getNbSessionByUser(Long userId); /** TODO: write testcase and def for getNbSessionByUser */
+    /**
+     * <p> Returns the persistent instance of NoticeboardSession
+     * associated with the given noticeboard user, with user id <code>userId</code>, 
+     * returns null if not found.
+     * 
+     * @param userId The noticeboard user id
+     * @return a persistent instance of NoticeboardSessions or null if not found.
+     */	
+    public NoticeboardSession getNbSessionByUser(Long userId); 
     
-    public void removeNbUsers(NoticeboardSession nbSession); /** TODO: write testcase and def for removeNbUsers */
+    /**
+     * <p>Deletes all instances of NoticeboardUser that are associated
+     * with the given instance of NoticeboardSession</p>
+     * 
+     * @param nbSession The instance of NoticeboardSession in which corresponding instances of NoticeboardUser should be deleted.
+     */
+    public void removeNbUsers(NoticeboardSession nbSession); 
 
+    /**
+     * <p>Creates and persists an instance of NoticeboardUser which is associated
+     * with the NoticeboardSession with tool session id <code>nbSessionId</code> </p>
+     * 
+     * @param nbSessionId The tool session id
+     * @param user The instance of NoticeboardUser
+     */
     public void addNbUsers(Long nbSessionId, NoticeboardUser user);
     
+    /**
+     * Returns a list of tool session ids which are associated with this
+     * instance of NoticeboardContent. 
+     * <p>For example, if the given instance <code>nbContent</code> has a tool content id
+     * of 3, and consider an extract of the tl_lanb11_session table:</p>
+     * <pre> 
+     * 		 ----------------------------
+     * 		 attachmentId | toolSessionId
+     * 		 ----------------------------
+     * 			1		  | 	3
+     * 			2		  | 	3
+     * 			3		  | 	3
+     * 			4 		  | 	1
+     * 		 ----------------------------
+     * </pre>
+     * Then a call to <code>getSessionsFromContent</code> will return a list containing the values
+     * 1, 2 and 3. 
+     * @param nbContent The instance of NoticeboardContent in which you want the list of toolSessionIds
+     * @return a list of tool session Ids
+     */
     public List getSessionsFromContent(NoticeboardContent nbContent);
 }
