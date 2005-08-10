@@ -84,6 +84,7 @@ public class NbAuthoringStarterAction extends LamsAction {
 	
 	public final static String FORM="NbAuthoringForm";
 	
+	
 	/**
 	 * This struts actionservlet gets called when the author double clicks
 	 * on the tool icon. If the toolContentId already exists in the tool content 
@@ -134,9 +135,18 @@ public class NbAuthoringStarterAction extends LamsAction {
 		if (!contentExists(nbService, contentId))
 		{
 			//	Pre-fill the form with the default content
-			NoticeboardContent nb =	nbService.retrieveNoticeboard(NoticeboardConstants.DEFAULT_CONTENT_ID);
+			//NoticeboardContent nb =	nbService.retrieveNoticeboard(NoticeboardConstants.DEFAULT_CONTENT_ID);
+		    Long defaultToolContentId = nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE);
+		  //  logger.debug("Default tool content id is " + defaultToolContentId);
+		    NoticeboardContent nb = nbService.retrieveNoticeboard(defaultToolContentId);
 			
 			/** TODO: add a check to see if object is null */
+		    if (nb==null)
+		    {
+		        String error= "There is data missing in the database";
+		        logger.error(error);
+		        throw new NbApplicationException(error);
+		    }
 			
 			//create a new noticeboard object and prefill with default content, save to database
 			NoticeboardContent nbContentNew = new NoticeboardContent(contentId,
