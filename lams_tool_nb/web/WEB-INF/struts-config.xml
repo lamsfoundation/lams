@@ -78,6 +78,41 @@
       />
     </action>
     <action
+      path="/authoringv2"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringV2Action"
+      name="NbAuthoringForm"
+      scope="session"
+      input="/author_page.jsp"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+      <exception
+        key="error.exception.NbApplication"
+        type="org.lamsfoundation.lams.tool.noticeboard.NbApplicationException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
+      <exception
+        key="error.exception.NbApplication"
+        type="java.lang.NullPointerException"
+        handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
+        path=".error"
+        scope="request"
+      />
+      <forward
+        name="authoringContent2"
+        path="/author_page.jsp"
+        redirect="false"
+      />
+      <forward
+        name="displayMessage"
+        path=".message"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/starter/authoring"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringStarterAction"
       name="NbAuthoringForm"
