@@ -113,7 +113,7 @@ Ant build file.
 	<!-- =================================================================== -->
 	<!-- Database Tasks                                             -->
 	<!-- =================================================================== -->
-		<target name="clean-db"	description="clean noticeboard tool database.">
+		<target name="clean-db"	description="Deletes the Noticeboard Tool Tables">
 			<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
 					password="${database.password}">
 				<classpath>
@@ -123,25 +123,24 @@ Ant build file.
 			</sql>
 		</target>
 		
-		<target name="init-db"	description="drop and create noticeboard tool database.">
+		<target name="build-db" depends="clean-db" description="Creates the Noticeboard Tool tables and inserts default content">
 			<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
 								password="${database.password}">
 							<classpath>
 								<pathelement location="${database.driver.file}"/>
 							</classpath>
-				<transaction src="${sql}/init_lams_tool_nb.sql"/>
-			
+					<transaction src="${sql}/create_lams_tool_nb.sql"/>
 			</sql>
-		</target>
-		
-		<target name="build-db" depends="init-db" description="build noticeboard tool database.">
-			<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
-								password="${database.password}">
-							<classpath>
-								<pathelement location="${database.driver.file}"/>
-							</classpath>
-					<transaction src="${sql}/insert_lams_tool_nb_data.sql"/>
-			</sql>
+		</target>	
+	
+		<target name="insert-test-data" depends="" description="Inserts test data for noticeboard tool in order for test cases to run">
+				<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
+									password="${database.password}">
+								<classpath>
+									<pathelement location="${database.driver.file}"/>
+								</classpath>
+						<transaction src="${sql}/insert_lams_tool_nb_data.sql"/>
+				</sql>
 		</target>	
 	
 	
@@ -255,10 +254,12 @@ Ant build file.
 		<!-- =================================================================== -->
 		<!-- Run JUnit Tests                                                     -->
 		<!-- =================================================================== -->
-		<target name="test" depends="compile-test,build-db"> 
+		<target name="test" depends="compile-test"> 
 			<mkdir dir="${build.report}"/>
 			<junit printsummary="yes" haltonerror="no" haltonfailure="no"
 				   fork="yes">
+				<jvmarg value="-Xms512M"/>
+				<jvmarg value="-Xmx1024M"/>
 				<formatter type="plain" usefile="false"/>
 				<formatter type="xml"/>
 				<batchtest todir="${build.report}">
@@ -309,29 +310,89 @@ Ant build file.
 	      </webdoclet>
 		</target>
 	
-	<!-- =================================================================== -->
-		<!-- Generate hibernate xml files                             -->
 		<!-- =================================================================== -->
-		<target name="generate-hbm-files" 
-				description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)"
-				depends="">
-			
-			<taskdef name="hibernatedoclet"
-				classname="xdoclet.modules.hibernate.HibernateDocletTask"
-				classpathref="all-libs"/>
-			
-			<echo message="Building hbm.xml files using XDoclet"/>
+		<!-- Generate the deploy package                                         -->
+		<!-- =================================================================== -->
+		<target name="create-deploy-package" depends="build-war" 
+				description="Generate the deployment package.">
 
-			<hibernatedoclet
-				destdir="${hibernate.mappings}"
-				excludedtags="@version,@author,@todo"
-				force="true">
-					<fileset dir="${src.java}">
-						<include name="**/*.java"/>
+				<path id="deploy.lib.classpath">
+					<fileset dir="${deploy.tool.dir}">
+						<include name="lib/*.jar"/>
 					</fileset>
-				<hibernate version="2.0"/>
-			</hibernatedoclet>
-		</target>
+				</path> 
+					  
+				<mkdir dir="${build.deploy}"/>
+				<mkdir dir="${build.deploy}/lib"/> 
+				<mkdir dir="${build.deploy}/sql"/> 
+				 
+				<copy overwrite="yes" todir="${build.deploy}/sql">
+					<fileset dir="${sql}/">
+						<include name="drop_lams_tool_nb.sql"/>
+						<include name="create_lams_tool_nb.sql"/>
+						<include name="activity_insert.sql"/>
+						<include name="library_insert.sql"/>
+						<include name="tool_insert.sql"/>
+					</fileset>
+				</copy>
+
+				<copy overwrite="yes" todir="${build.deploy}/">
+					<fileset dir="${deploy.tool.dir}">
+						<include name="*.*"/>
+					</fileset>
+				</copy>
+
+				<copy overwrite="yes" todir="${build.deploy}/lib">
+					<fileset dir="${deploy.tool.dir}/lib">
+						<include name="*.jar"/>
+					</fileset>
+				</copy>
+
+				<taskdef name="generateDeployProperties" 
+					classname="org.lamsfoundation.lams.tool.deploy.CreatePackageTask">
+				    <classpath refid="deploy.lib.classpath"/>
+				</taskdef>
+
+				<generateDeployProperties depends="compile" 
+					mode="development" 
+					outputPath="${build.deploy}"
+					dbPassword="${database.password}"
+					dbUsername="${database.userid}"
+					dbDriverUrl="${database.url}"
+					dbDriverClass="com.mysql.jdbc.Driver"
+					deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar"
+					toolSignature="${signature}"
+					toolTablesScriptPath="${sql}/create_lams_tool_nb.sql"
+					toolTablesDeleteScriptPath="${sql}/drop_lams_tool_nb.sql"
+					toolActivityInsertScriptPath="${sql}/activity_insert.sql"
+					toolLibraryInsertScriptPath="${sql}/library_insert.sql"
+					toolInsertScriptPath="${sql}/tool_insert.sql"
+					lamsEarPath="${jboss.deploy}"
+					toolContext="${toolContext}"
+					toolWebUri="${product}.war"
+					/>
+			</target>
+		
+			<target name="deploy-tool" depends="create-deploy-package" 
+				description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
+
+				<path id="deploy.classpath">
+					<fileset dir="${build.deploy}">
+						<include name="lib/*.jar"/>
+					</fileset>
+				</path> 
+
+				<echo>Deploying the Noticeboard Tool</echo>
+		
+				<java
+					classname="org.lamsfoundation.lams.tool.deploy.Deploy"
+					classpathref="deploy.classpath"
+					fork="true">
+						<arg file="${build.deploy}/deploy.properties"/>
+						<arg value="True"/> 
+				</java>
+							
+			</target>
 
 	
 </project>
