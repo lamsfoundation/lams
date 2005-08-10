@@ -23,8 +23,6 @@
 /*
  * Created on Jul 20, 2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.lamsfoundation.lams.tool.noticeboard.util;
 
@@ -39,25 +37,20 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 
 /**
+ * This Web Utility class contains helper methods used in the Action Servlets
+ * 
  * @author mtruong
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class NbWebUtil {
 
     private NbWebUtil() {}
     
-    /**
-	  * Converts the request parameter <code>toolContentId</code>, from a string to a Long
-	  * @author mtruong
-	  */
-
-	 	public static Long convertToLong(String toolContentId)
+     	public static Long convertToLong(String id)
 	 	{
 	 	    try
 	 	    {
-	 	        return new Long(toolContentId);
+	 	        return new Long(id);
 	 	    }
 	 	    catch (NumberFormatException e)
 	 	    {
@@ -91,7 +84,7 @@ public class NbWebUtil {
 	     
 	     /**
 	      * <p> This method checks the two tool content flags, defineLater and contentInUse
-	      * to determine whether the tool content is modifiable or not. Returns true is content is
+	      * to determine whether the tool content is modifiable or not. Returns true if the content is
 	      * modifiable and false otherwise 
 	      * <br>Tool content is modifiable if:
 	      * <li>defineLater is set to true</li>
@@ -116,7 +109,14 @@ public class NbWebUtil {
 	         else //  (content.isContentInUse()==true && content.isDefineLater() == false)
 	             return false;
 	     }
-	     
+	    
+	    /**
+	     * Used in the monitoring environment. 
+	     * Copies the values of the pojo/bean properties title, content, onlineInstructions and offlineInstructions
+	     * into the session scope variables title, content, onlineInstructions and offlineInstructions respectively.
+	     * @param request the HttpServletRequest which is used to obtain the HttpSession, in which is used to store the session variables for the 4 properties.
+	     * @param content the bean in which to copy the 4 properties from
+	     */ 
 	    public static void copyValuesIntoSession(HttpServletRequest request, NoticeboardContent content)
 	    {
 	         request.getSession().setAttribute(NoticeboardConstants.TITLE, content.getTitle());
@@ -125,6 +125,19 @@ public class NbWebUtil {
 	         request.getSession().setAttribute(NoticeboardConstants.OFFLINE_INSTRUCTIONS, content.getOfflineInstructions());
 	    }
 	    
+	    /**
+	     * <p>This method takes in a Map as a parameter and converts it
+	     * into a Collections view of the values of this map. A new 
+	     * ArrayList is formed from this Collection of values and stored in
+	     * the session scope variable <code>attachmentList</code> (represented by NoticeboardConstants.ATTACHMENT_LIST) </p>
+	     * 
+	     * <p>This method is used in authoring and monitoring to display the list of files that have been uploaded.
+	     * They key for this map is the filename-fileType where fileType is either "online" or "offline"
+	     * and the value that maps to this key, is an NoticeboardAttachment object.</p>
+	     * 
+	     * @param request the HttpServletRequest which is used to obtain the HttpSession
+	     * @param map
+	     */
 	    public static void addUploadsToSession(HttpServletRequest request, Map map)
 	    {
 	        Collection entries = map.values();
