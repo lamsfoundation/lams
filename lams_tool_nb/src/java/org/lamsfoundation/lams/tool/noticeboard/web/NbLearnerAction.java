@@ -41,6 +41,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
@@ -51,6 +53,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 
 
 /**
@@ -87,7 +90,7 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
      * @param response
      * @return
      */
-    public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
+    public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException, ToolException, DataMissingException {
 		
 	  NbLearnerForm learnerForm = (NbLearnerForm)form;
 	  Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionId());
@@ -100,25 +103,33 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 	      throw new NbApplicationException(error);
 	  }
 	  INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-	 /** TODO: learnerServiceProxy causes an exception, fix this up later */
-	  // ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-	  
+	  ToolSessionManager sessionMgrService = NoticeboardServiceProxy.getNbSessionManager(getServlet().getServletContext());
+		  
+	 	  
 	  if (learnerForm.getMode().equals(NoticeboardConstants.TOOL_ACCESS_MODE_LEARNER))
 	  {
 		  NoticeboardSession nbSession = nbService.retrieveNoticeboardSession(toolSessionID);
 		  NoticeboardUser nbUser = nbService.retrieveNoticeboardUser(userID);
-		  //do not set session status to complete, as it might be a grouping activity and so you dont know when all the users are finished or not
-		  //nbSession.setSessionStatus(NoticeboardSession.COMPLETED);
-		  //nbSession.setSessionEndDate(new Date(System.currentTimeMillis()));
+		  
 		  nbUser.setUserStatus(NoticeboardUser.COMPLETED);
 		  nbService.updateNoticeboardSession(nbSession);
 		  nbService.updateNoticeboardUser(nbUser);
 		  
 		  //Notify the progress engine of the user's completion
+		  /**
+		   * TODO: Find out how to construct the User object that is passed to the method leaveToolSession() 
+		   * currently only the userId is set. There is no username or any other information
+		   */
 		  User user = new User();
 		  user.setUserId(new Integer(learnerForm.getUserId().toString()));
-		  /** TODO: cannot use this yet as learnerservice causes an exception, fix this up later */
-		 // learnerService.completeToolSession(learnerForm.getToolSessionID(), user);
+		 
+		 /**
+		  * TODO: when this method is called, it throws a NullPointerException.
+		  * This is an error due to the learner service method completeToolSession(). 
+		  * It is not tested yet, however it is left in the code, to indicate that a learner has completed an activity.
+		  */
+		  sessionMgrService.leaveToolSession(NbWebUtil.convertToLong(learnerForm.getToolSessionId()), user);
+		  
 		  
 	  }
 	  request.getSession().setAttribute(NoticeboardConstants.READ_ONLY_MODE, "true");
