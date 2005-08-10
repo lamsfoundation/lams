@@ -54,3 +54,23 @@ CREATE TABLE lams.tl_lanb11_attachment (
                   REFERENCES lams.tl_lanb11_content (uid)
 )TYPE=InnoDB;
 
+-- Default Content For Noticeboard Tool
+
+INSERT INTO tl_lanb11_content ( nb_content_id,
+								title,
+								content,
+								online_instructions,
+								offline_instructions,
+								define_later,
+								force_offline,
+								content_in_use,
+								date_created) 
+VALUES (${default_content_id},
+		'Welcome',
+		'Welcome to these activities',
+		'Enter the online instructions here',
+		'Enter the offline instructions here',
+		0,
+		0,
+		0,
+		now());

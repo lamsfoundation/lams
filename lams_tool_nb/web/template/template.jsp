@@ -45,7 +45,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
       <script src="<%=pathToShare%>/common.js"></script>
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
-	   <link href="<%=pathToShare%>/css/aqua.css" rel="stylesheet" type="text/css"> 
+	   <link href="<%=pathToShare%>/css/aqua.css" rel="stylesheet" type="text/css">
 	
 	 
     </head>
