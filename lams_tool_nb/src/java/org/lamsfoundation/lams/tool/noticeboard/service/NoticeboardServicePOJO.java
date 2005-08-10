@@ -51,11 +51,14 @@ import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.usermanagement.User;
 
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 
 
 
 /**
  * An implementation of the NoticeboardService interface.
+ * 
+ * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  * @author mtruong
  *
  */
@@ -66,13 +69,16 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	
 	private NoticeboardSession nbSession;
 	private INoticeboardSessionDAO nbSessionDAO = null;
+	
 	private ILearnerService learnerService;
+	private ILamsToolService toolService;
 	
 	private NoticeboardUser nbUser;
 	private INoticeboardUserDAO nbUserDAO=null;
 	
 	private NoticeboardAttachment nbAttachment;
 	private INoticeboardAttachmentDAO nbAttachmentDAO = null;
+	
 	
 	private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
 
@@ -765,7 +771,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		if (fromContentId == null)
 		{
 		    //use the default content Id
-		    fromContentId = NoticeboardConstants.DEFAULT_CONTENT_ID;
+		    //fromContentId = NoticeboardConstants.DEFAULT_CONTENT_ID;
+		    fromContentId = getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE);
 		}
 		
 		//fromContentId might not have any content, in this case use default content
@@ -775,7 +782,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		if ((originalNb = retrieveNoticeboard(fromContentId))== null) //the id given does not have content, use default content
 		{
 		    //use default content id to grab contents
-		    NoticeboardContent defaultContent = retrieveNoticeboard(NoticeboardConstants.DEFAULT_CONTENT_ID);
+		    NoticeboardContent defaultContent = retrieveNoticeboard(getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
 		    
 		    if (defaultContent != null)
 		    {
@@ -876,7 +883,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    if ((nbContent = retrieveNoticeboard(toolContentId)) == null)
 	    {
 	        //use default content
-		    NoticeboardContent defaultContent = retrieveNoticeboard(NoticeboardConstants.DEFAULT_CONTENT_ID);
+		    NoticeboardContent defaultContent = retrieveNoticeboard(getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
 		   
 		    if (defaultContent != null)
 		    {
@@ -909,11 +916,12 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long, org.lamsfoundation.lams.usermanagement.User)*/
 	public String leaveToolSession(Long toolSessionId, User learner) throws DataMissingException, ToolException
 	{
-	   getAndCheckIDandObject(toolSessionId);
+	    getAndCheckSessionIDandObject(toolSessionId);
 	    
 	   return learnerService.completeToolSession(toolSessionId, learner);
 	}
-    /** @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.lang.Long)*/ 
+   
+	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.lang.Long)*/ 
 	 public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws ToolException, DataMissingException
 	{
 	     getAndCheckSessionIDandObject(toolSessionId);
@@ -943,63 +951,74 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	
 
     //=========================================================================================
-       
     
-    
-    
-    
-/*	 public boolean isToolContentIdMissing(Long id) throws ToolException
-	{
-	    boolean isMissing = true;
-	    if(id == null)
-	    {
-	        throw new ToolException("Tool content id is missing. Unable to continue");
-	    }
-	    else
-	    {
-	        isMissing = false;
-	    }
-	    return isMissing;
-	}  */
-	
+    public Long getToolDefaultContentIdBySignature(String toolSignature)
+    {
+        Long contentId = null;
+    	contentId=new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));    
+    	if (contentId == null)
+    	{
+    	    String error="Could not retrieve default content id for this tool";
+    	    log.error(error);
+    	    throw new NbApplicationException(error);
+    	}
+	    return contentId;
+    }
+  
 	/* getter setter methods to obtain the service bean */
-	public INoticeboardContentDAO getNbContentDAO()
+	/*public INoticeboardContentDAO getNbContentDAO()
 	{
 		return nbContentDAO;
 	}
-	
+	*/
 	public void setNbContentDAO(INoticeboardContentDAO nbContentDAO)
 	{
 		this.nbContentDAO = nbContentDAO;
 	}
 	
-	public INoticeboardSessionDAO getNbSessionDAO()
+	/*public INoticeboardSessionDAO getNbSessionDAO()
 	{
 	    return nbSessionDAO;
 	}
-	
+	*/
 	public void setNbSessionDAO(INoticeboardSessionDAO nbSessionDAO)
 	{
 	    this.nbSessionDAO = nbSessionDAO;
 	}
 	
-	public INoticeboardUserDAO getNbUserDAO()
+	/*public INoticeboardUserDAO getNbUserDAO()
 	{
 	    return nbUserDAO;
 	}
-	
+	*/
 	public void setNbUserDAO(INoticeboardUserDAO nbUserDAO)
 	{
 	    this.nbUserDAO = nbUserDAO;
 	}
 	
-	
-    
-    public INoticeboardAttachmentDAO getNbAttachmentDAO() {
+    /**
+     * @return Returns the learnerService.
+     */
+  /*  public ILearnerService getLearnerService() {
+        return learnerService;
+    } */
+    /**
+     * @param learnerService The learnerService to set.
+     */
+	 public void setLearnerService(ILearnerService learnerService) {
+	        this.learnerService = learnerService;
+	    } 
+ /*   public INoticeboardAttachmentDAO getNbAttachmentDAO() {
         return nbAttachmentDAO;
-    }
+    } */
    
     public void setNbAttachmentDAO(INoticeboardAttachmentDAO nbAttachmentDAO) {
         this.nbAttachmentDAO = nbAttachmentDAO;
+    }
+    /**
+     * @param toolService The toolService to set.
+     */
+    public void setToolService(ILamsToolService toolService) {
+        this.toolService = toolService;
     }
 }
