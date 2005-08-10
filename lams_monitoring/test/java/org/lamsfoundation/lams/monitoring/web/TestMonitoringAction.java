@@ -26,6 +26,9 @@ import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
 
 /**
  * 
+ * Doesn't work - throws a duplicate key error. Probably due to the 
+ * test lesson already being started!
+ * 
  * @author Jacky Fang
  * @since  2005-4-15
  * @version
@@ -55,13 +58,13 @@ public class TestMonitoringAction extends AbstractLamsStrutsTestCase
      */
     protected String getContextConfigLocation()
     {
-        return 	"/WEB-INF/spring/applicationContext.xml "
-		   		+"/WEB-INF/spring/monitoringApplicationContext.xml "
-		   		+"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
-		   		+"/WEB-INF/authoringApplicationContext.xml "
-		   		+"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
-		   		+"/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml "
-  				+"/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml";
+        return 	"/org/lamsfoundation/lams/applicationContext.xml "+
+		"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "+
+		"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "+
+  		"/org/lamsfoundation/lams/learning/learningApplicationContext.xml "+        					  
+  		"/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml "+
+  		"/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml "+
+		"/org/lamsfoundation/lams/tool/survey/applicationContext.xml ";  
     }
     /*
      * @see AbstractLamsStrutsTestCase#setUp()
