@@ -54,6 +54,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -72,7 +73,9 @@ import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesReportDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -96,9 +99,12 @@ public class SubmitFilesService implements ToolContentManager,
 
 	private ILearnerDAO learnerDAO;
 	
+	
 	private SbmtToolContentHandler toolContentHandler;
 	private IUserDAO userDAO;
-
+	
+	private ILamsToolService toolService;
+	private ILearnerService learnerService;
 	private IRepositoryService repositoryService;
 
 	/***************************************************************************
@@ -176,7 +182,26 @@ public class SubmitFilesService implements ToolContentManager,
 		this.learnerDAO = learnerDAO;
 	}
 
+	public Learner getLearner(Long sessionID, Long userID) {
+		return learnerDAO.getLearner(sessionID,userID);
+	}
 
+	public ILearnerService getLearnerService() {
+		return learnerService;
+	}
+
+	public void setLearnerService(ILearnerService learnerService) {
+		this.learnerService = learnerService;
+	}
+
+	public ILamsToolService getToolService() {
+		return toolService;
+	}
+
+	public void setToolService(ILamsToolService toolService) {
+		this.toolService = toolService;
+	}
+	
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -184,7 +209,6 @@ public class SubmitFilesService implements ToolContentManager,
 	 *      java.lang.Long)
 	 */
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-	    // TODO fix this to use the default content id - shouldn't throw the exception
 		if (fromContentId == null || toContentId == null)
 			throw new ToolException(
 					"Failed to create the SubmitFiles tool seession");
@@ -228,8 +252,11 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @return
 	 */
 	private SubmitFilesContent duplicateDefaultToolContent(Long toolContentId) {
-		//TODO
-		return null;
+		long contentId=0;
+		contentId =toolService.getToolDefaultContentIdBySignature(SbmtConstants.TOOLSIGNNATURE);
+		SubmitFilesContent content = new SubmitFilesContent();
+		content.setContentID(new Long(contentId));
+		return content;
 	}
 
 	/**
@@ -281,7 +308,6 @@ public class SubmitFilesService implements ToolContentManager,
 				submitFilesContentDAO.delete(submitFilesContent);
 			}			
 		}
-		//TODO check for related session data and delete as appropriate
 	}
 
 	/**
@@ -426,9 +452,28 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long,
 	 *      org.lamsfoundation.lams.usermanagement.User)
 	 */
-	public String leaveToolSession(Long toolSessionId, User learner) {
-		// TODO Auto-generated method stub
-		return null;
+	public String leaveToolSession(Long toolSessionId, User learner)
+		   throws DataMissingException, ToolException{
+			if(toolSessionId == null){
+				log.error("Fail to leave tool Session based on null tool session id.");
+				throw new ToolException("Fail to remove tool Session based on null tool session id.");
+			}
+			if(learner == null){
+				log.error("Fail to leave tool Session based on null learner.");
+				throw new ToolException("Fail to remove tool Session based on null learner.");
+			}
+			
+			SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(toolSessionId);
+			if(session != null){
+				session.setStatus(new Integer(SubmitFilesSession.COMPLETED));
+				submitFilesSessionDAO.update(session);
+			}else{
+				log.error("Fail to leave tool Session.Could not find submit file " +
+						"session by given session id: "+toolSessionId);
+				throw new DataMissingException("Fail to leave tool Session." +
+						"Could not find submit file session by given session id: "+toolSessionId);
+			}
+			return learnerService.completeToolSession(toolSessionId,learner);
 	}
 
 	/**
@@ -458,8 +503,19 @@ public class SubmitFilesService implements ToolContentManager,
 	 */
 	public void removeToolSession(Long toolSessionId)
 	   throws DataMissingException, ToolException{
-			// TODO Auto-generated method stub
-			return;
+		if(toolSessionId == null){
+			log.error("Fail to remove tool Session based on null tool session id.");
+			throw new ToolException("Fail to remove tool Session based on null tool session id.");
+		}
+			
+		SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(toolSessionId);
+		if(session != null)
+			submitFilesSessionDAO.delete(session);
+		else{
+			log.error("Could not find submit file session by given session id: "+toolSessionId);
+			throw new DataMissingException("Could not find submit file session by given session id: "+toolSessionId);
+		}
+		return;
 	}
 	/**
 	 * (non-Javadoc)
@@ -704,8 +760,4 @@ public class SubmitFilesService implements ToolContentManager,
 	}
 
 
-
-	public Learner getLearner(Long sessionID, Long userID) {
-		return learnerDAO.getLearner(sessionID,userID);
-	}
 }

@@ -23,5 +23,6 @@ package org.lamsfoundation.lams.tool.sbmt.util;
 public class SbmtConstants {
 
 	public static final String AUTHORING_DTO = "authoring";
+	public static final String TOOLSIGNNATURE = "lasbmt11";
 
 }

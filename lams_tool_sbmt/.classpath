@@ -9,5 +9,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry kind="lib" path="D:/projects/Lams/lams_build/lib/lams/lams-contentrepository.jar"/>
+	<classpathentry kind="lib" path="D:/projects/Lams/lams_build/lib/lams/lams-learning.jar"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>

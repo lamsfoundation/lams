@@ -75,6 +75,8 @@
 		<property name="learnerDAO"><ref bean="learnerDAO"/></property>
 		<property name="toolContentHandler"><ref bean="toolContentHandler"/></property>
 		<property name="userDAO"><ref bean="userDAO"/></property>
+		<property name="learnerService"><ref bean="learnerService"/></property>
+		<property name="toolService"><ref bean="toolService"/></property>
 	</bean>
 	
 	<bean id="submitFilesService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
