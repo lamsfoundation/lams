@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -28,6 +29,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * @author Manpreet Minhas
+ * @author Steve Ni
  * 
  * @struts.action path="/authoring" 
  * 				  name="SbmtAuthoringForm" 
@@ -66,7 +68,12 @@ public class AuthoringAction extends LookupDispatchAction {
 		try {
 			SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(content.getContentID());
 			if(content.getContentID().equals(persistContent.getContentID())){
-				copyContentSimpleProperty(persistContent,content);
+				//keep Set type attribute for persist content becuase this update only 
+				//include updating simple properties from web page(i.e. text value, list value, etc)
+				content.setInstructionFiles(persistContent.getInstructionFiles());
+				content.setToolSession(persistContent.getToolSession());
+				//copy web page value into persist content, as above, the "Set" type value kept.
+				PropertyUtils.copyProperties(persistContent,content);
 				submitFilesService.updateSubmitFilesContent(persistContent);
 			}else
 				submitFilesService.addSubmitFilesContent(content);
@@ -75,20 +82,6 @@ public class AuthoringAction extends LookupDispatchAction {
 		}
 		return mapping.findForward("success");
 	}
-
-	private void copyContentSimpleProperty(SubmitFilesContent target, SubmitFilesContent src) {
-		target.setContentID(src.getContentID());
-		target.setContentInUse(src.isContentInUse());
-		target.setDefineLater(src.isDefineLater());
-		target.setRunOffline(src.isRunOffline());
-		target.setInstruction(src.getInstruction());
-		target.setOfflineInstruction(src.getOfflineInstruction());
-		target.setOnlineInstruction(src.getOnlineInstruction());
-		target.setRunOfflineInstruction(src.getRunOfflineInstruction());
-		target.setTitle(src.getTitle());
-		target.setLockOnFinished(src.isLockOnFinished());
-	}
-
 	/**
 	 * Handle upload online instruction files request.
 	 * @param mapping
