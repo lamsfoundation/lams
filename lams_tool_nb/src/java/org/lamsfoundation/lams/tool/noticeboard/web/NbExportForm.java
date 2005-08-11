@@ -12,7 +12,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 
 /**
  * @author mtruong
- *
+ * 
  * ----------------XDoclet Tags--------------------
  * 
  * @struts:form name="NbExportForm" type="org.lamsfoundation.lams.tool.noticeboard.web.NbExportForm"

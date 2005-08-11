@@ -57,6 +57,42 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Creation Date: 20-05-05
  * Modified Date: 03-06-05
+ * 
+ * <p>This Action class process any actions that are made by the user.</p>
+ * <br>
+ * <p>When the following buttons are pressed:<br>
+ * NoticeboardConstants.BUTTON_BASIC, NoticeboardConstants.BUTTON_ADVANCED, 
+ * NoticeboardConstants.BUTTON_INSTRUCTIONS or NoticeboardConstants.BUTTON_DONE, <br>
+ * they switch between the tabs, but before doing so, they copy the values
+ * in the form (only if they are not null) and place them in the
+ * equivalent formbean properties (session scope). This is done so because the form
+ * is spread across two pages (basic and instructions, in Noticeboard tool, there is 
+ * no Advanced page). It might be strange that all buttons forward to the same path,
+ * but the formbean property "method" keeps a track of what button was pressed.
+ * So when control returns to the jsp, it will determine the value of method and 
+ * show the appropriate page. </p> <br>
+ * 
+ * <p> The button NoticeboardConstants.BUTTON_UPLOAD triggers an upload and will 
+ * upload either a file of type "ONLINE" or "OFFLINE", to the content repository
+ * and will save the file details (filename, toolcontent id, uuid, and filetype).
+ * It will also conduct checks
+ * to see whether the same file (and same type) has been uploaded or not. 
+ * If the same file has been uploaded (to the same noticeboard instance, ie. same
+ * tool content id) then, it will delete the file from the content respository
+ * and delete that particular entry in the table, and then it the new version
+ * will be uploaded to the content repository and a new entry will be saved into 
+ * the database. It then updates the attachment map that was initially setup 
+ * by NbAuthoringStarterAction. </p> <br>
+ * 
+ * <p> The button NoticeboardConstants.LINK_DELETE will trigger the deleteAttachment
+ * action which will delete a file from the content repository, and the entry from
+ * the attachment table. </p>
+ * 
+ * <p> The save method persist the values of the formbean properties 
+ * title, instructions, onlineInstructions and offlineInstructions to 
+ * the database </p>
+ * 
+ * 
  * ----------------XDoclet Tags--------------------
  * 
  * @struts:action path="/authoring" name="NbAuthoringForm" scope="session"

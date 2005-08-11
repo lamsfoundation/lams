@@ -1,8 +1,5 @@
 /*
  * Created on Jul 25, 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
@@ -28,8 +25,11 @@ import java.util.Set;
 /**
  * @author mtruong
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * Export Portfolio functionality.
+ * 
+ * With this noticeboard tool,
+ * both the learner and teacher will export the contents of the noticeboard.
+ * 
  */
 
 /**

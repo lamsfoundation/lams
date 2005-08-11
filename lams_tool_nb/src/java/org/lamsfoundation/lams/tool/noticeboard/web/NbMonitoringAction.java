@@ -49,6 +49,10 @@ import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 
 /**
  * @author mtruong
+ * 
+ * The buttons are a switch between tabs and will forward to a jsp and display
+ * the appropriate page.
+ * 
  *
  */
 
@@ -84,7 +88,10 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
 		return map;
 	}
 
-    
+    /**
+     * If no method parameter, or an unknown key, it will default to displaying
+     * the summary page.
+     */
     public ActionForward unspecified(
     		ActionMapping mapping,
     		ActionForm form,
@@ -93,8 +100,14 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
     {
         return summary(mapping, form, request, response);
     }
-   /**
-     * 
+  
+    /**
+     * Will forward to the jsp
+	 * and will display the edit activity page, which shows the content of the noticeboard
+	 * and will show an edit button which allows an author to modify the noticeboard content.
+	 * When this edit button is clicked, it appends defineLater=true to the authoring URL.
+	 * However, if the contents is not editable (ie. the contents are in use which means a learner 
+	 * already reached the activity) it will display a message saying so.
      * @param mapping
      * @param form
      * @param request
@@ -134,7 +147,12 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
     }
     
     /**
-     * 
+     * Will forward to the jsp
+	 * and will display the instructions page, which will just show the online and 
+	 * offline instructions and also the files that have been uploaded (view only mode).
+	 * The attachment map is setup again in case there were changes made from the 
+	 * first time the monitoring url was called.
+	 * 
      * @param mapping
      * @param form
      * @param request
@@ -172,7 +190,10 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
     }
     
     /**
-     * 
+	 * Will forward to the jsp
+	 * and will display the summary page, which will show the contents of 
+	 * noticeboard.
+	 * 
      * @param mapping
      * @param form
      * @param request
@@ -192,8 +213,11 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
     }
     
     /**
-     * 
-     * @param mapping
+     * Will forward to the jsp
+	 * and will display the statistics page which shows the number of users that
+	 * have viewed this noticeboard. If grouping is applied, then the number of learners
+	 * will also be sorted into groups.
+	 * @param mapping
      * @param form
      * @param request
      * @param response

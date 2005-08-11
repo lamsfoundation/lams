@@ -60,6 +60,30 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 
 /**
  * Creation Date: 19-05-05
+ * 
+ * <p>This Action servlet, sets up the authoring environment, so that on entry
+ * when passed in the request parameter, toolContentId, it will look up whether 
+ * there is an existing entry in the table with this tool content id.
+ *
+ * <p>If no entry is found, then it will assign this toolContentId with the values
+ * for its title, content, onlineInstructions and offlineInstructions fields with 
+ * values the same as that of the default tool content.  Otherwise, if this
+ * tool content id already exists in the table, then it will load up the existing
+ * values for its title, content, onlineInstructions and offlineInstructions.
+ * These values are placed in their respestive formbean properties in the session.</p>
+ * 
+ * <p>Also, it will initialise the attachment map, which is a map containing the 
+ * online or offline files that have been uploaded along with this tool content id.
+ * It is then stored in the session.</p>
+ * 
+ * <p>If the request parameter "defineLater" exists, and set to true, then it denotes
+ * that this is the defineLater mode and which will only show the basic tab in
+ * the authoring environment. If the defineLater is set to true, then the respestive
+ * formbean property defineLater is also set.</p>
+ * 
+ * <p>This action is only called when first entering the authoring environment.
+ * For more information on how authoring works, 
+ * see org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction. <p>
  *  
  * ----------------XDoclet Tags--------------------
  * 
@@ -77,7 +101,6 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
  * @struts:action-forward name="authoringContent" path=".authoringContent"
  * ----------------XDoclet Tags--------------------
  */
-
 public class NbAuthoringStarterAction extends LamsAction {
 	
 	static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());

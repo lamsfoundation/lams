@@ -59,6 +59,14 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 /**
  * Creation Date: 29-06-05
  *  
+ * This class has been created so that when a learner finishes an activity,
+ * leaveToolSession() will be called to inform the progress engine
+ * that the user has completed this activity.
+ * 
+ * A note: at the time of writing (11-08-05) a null pointer exception
+ * occurs when making a call to leaveToolSession(). Will have to wait until
+ * the learner side of things is tested first.
+ * 
  * ----------------XDoclet Tags--------------------
  * 
  * @struts:action path="/learner" name="NbLearnerForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerAction"

@@ -61,7 +61,21 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionMessage;
 /**
  * Creation Date: 27-06-05
+ * 
+ * The learner url can be of three modes learner, teacher or author. Depending on 
+ * what mode was set, it will trigger the corresponding action. If the mode parameter
+ * is missing or a key is not found in the keymap, it will call the unspecified method
+ * which defaults to the learner action. 
  *  
+ * <p>The learner action, checks the defineLater and runOffline flags, and if required
+ * it will show the learner the message screen indicating a reason why they cant see
+ * the contents of the noticeboard.
+ * If none of the flags are set, then the learner is able to see the noticeboard. 
+ * </p>
+ * <p>The difference between author mode (which is basically the preview)
+ * is that if the defineLater flag is set, it will not be able to see the noticeboard screen
+ * </p>
+ * 
  * ----------------XDoclet Tags--------------------
  * 
  * @struts:action path="/starter/learner" name="NbLearnerForm" scope="session" type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"

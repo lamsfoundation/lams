@@ -54,8 +54,16 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
 //import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 
 /**
- * ActionForm which holds the state of the noticeboard form content in the Authoring 
- * environment. Stores all values in the session scope.
+ * <p>ActionForm which holds the state of the noticeboard form content in the Authoring 
+ * environment. Stores all values in the session scope.</p>
+ * 
+ * <p>The validate method does not check whether any of the input from
+ * title, content, onlineInstructions, offlineInstructions are empty or not.
+ * This is because I have encountered a situation where even though the field is
+ * empty, the FCKEditor places a <br/> tag and so the validate method doesnt work.
+ * However, the validate method checks the length of the file that has been uploaded,
+ * the maximum filesize that can be uploaded is a property that is in the UploadFileUtil. </p>
+ * 
  */
 
 /**
