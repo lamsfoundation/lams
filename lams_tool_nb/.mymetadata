@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-module
    type="WEB"
-   name="lams_tool_noticeboard"
+   name="lams_tool_nb"
    id="myeclipse.1115343672296"
    context-root="/lams_tool_noticeboard"
    j2ee-spec="1.4"
-   archive="lams_tool_noticeboard.war">
+   archive="lams_tool_nb.war">
    <attributes>
       <attribute name="webrootdir" value="web" />
    </attributes>
