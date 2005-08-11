@@ -105,6 +105,7 @@ Ant build file.
 			<fileset dir="${web}">
 				<include name="*"/>
 				<include name="css/*"/>
+				<include name="includes/**"/>
 				<include name="images/*"/>
 				<include name="admin/*"/>
 				<include name="doc/*"/>
