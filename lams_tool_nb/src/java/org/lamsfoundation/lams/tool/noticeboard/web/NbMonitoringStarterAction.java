@@ -45,6 +45,9 @@ import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 
 /**
  * @author mtruong
+ * 
+ * Setups the monitoring environment, and places values in the
+ * formbean in session scope.
  */
 
 /**
@@ -92,6 +95,12 @@ public class NbMonitoringStarterAction extends LamsAction {
       //  request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE, toolContentId);
         
         NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
+        if (content == null)
+        {
+            String error = "Unable to continue. Data is missing from the database. Tool content id " + toolContentId + " does not exist";
+		    logger.error(error);
+			throw new NbApplicationException(error);
+        }
         NbWebUtil.copyValuesIntoSession(request, content);
         
         request.getSession().setAttribute(FORM, monitorForm);
