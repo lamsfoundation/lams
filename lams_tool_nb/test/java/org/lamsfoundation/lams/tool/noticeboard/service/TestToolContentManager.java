@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 /**
  * @author mtruong
  *
+ *TODO: the default content id is now not hard coded and taken from the database, ensure the test cases stillw ork
  */
 public class TestToolContentManager extends NbDataAccessTestCase {
 	
@@ -53,7 +54,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	{
 		super(name);
 	}
-
+	
 	protected void setUp() throws Exception
 	{
 		super.setUp();
@@ -168,7 +169,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	   // cleanCopyContent = true;
 	    
 	    //remove the default content so it will trigger the exception
-	    nbService.removeNoticeboard(NoticeboardConstants.DEFAULT_CONTENT_ID);
+	    nbService.removeNoticeboard(nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
 	    
 	    try
 	    {

@@ -69,18 +69,7 @@ public class TestNoticeboardContentDAO extends NbDataAccessTestCase
         	super.cleanNbContentData(TEST_NB_ID);
         }
     }
-    
    
-    public void testgetNbContentByUID()
-    {
-       nbContent = noticeboardDAO.getNbContentByUID(new Long(1));
-       
-       assertEquals(nbContent.getUid(), new Long(1));
-       assertEquals(nbContent.getNbContentId(), DEFAULT_CONTENT_ID);
-       assertContentEqualsDefaultData(nbContent);
-	  
-    } 
-
    public void testfindNbContentByID()
     {
         nbContent = noticeboardDAO.findNbContentById(TEST_NB_ID);

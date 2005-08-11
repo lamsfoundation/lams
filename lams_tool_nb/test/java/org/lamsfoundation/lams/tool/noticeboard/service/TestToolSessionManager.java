@@ -23,8 +23,6 @@
 /*
  * Created on Jul 8, 2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.lamsfoundation.lams.tool.noticeboard.service;
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
@@ -39,6 +37,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 /**
  * @author mtruong
  *
+ * *TODO: the default content id is now not hard coded and taken from the database, ensure the test cases stillw ork
  */
 public class TestToolSessionManager extends NbDataAccessTestCase {
     
@@ -51,8 +50,8 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 	{
 		super(name);
 	}
-
-	protected void setUp() throws Exception
+    
+   protected void setUp() throws Exception
 	{
 		super.setUp();
 		//setup some data
@@ -145,7 +144,7 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 	        nbSession = nbService.retrieveNoticeboardSession(NEW_SESSION_ID);
 		    
 		    assertEquals("validating session id:", nbSession.getNbSessionId(), NEW_SESSION_ID);
-		    assertEquals("Validating content Id:", nbSession.getNbContent().getNbContentId(), DEFAULT_CONTENT_ID);
+		    assertEquals("Validating content Id:", nbSession.getNbContent().getNbContentId(), nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
 		    assertContentEqualsDefaultData(nbSession.getNbContent());
 	    }
 	    catch (ToolException e)
@@ -160,7 +159,7 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 	
 	public void testCreateToolSessionDefaultContentMissing() throws ToolException
 	{
-	    nbService.removeNoticeboard(DEFAULT_CONTENT_ID);
+	    nbService.removeNoticeboard(nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
 	    
 	    try
 	    {

@@ -33,6 +33,7 @@ import java.util.Iterator;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
@@ -520,6 +521,24 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    
 	    assertNull(attachment);
 	    
+	}
+	
+	public void testRemoveAttachmentByUuid()
+	{
+	    initNbAttachmentData();
+	    	    
+	    nbService.removeAttachmentByUuid(TEST_UUID);
+	   
+	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
+	    
+	    assertNull(attachment);
+	    
+	}
+	
+	public void testGetToolDefaultContentIdBySignature()
+	{
+	    Long defaultToolContentId = nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE);
+	    assertNotNull(defaultToolContentId);
 	}
 }
 	

@@ -139,7 +139,11 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	 /** Define the context files. Overrides method in AbstractLamsTestCase */
     protected String[] getContextConfigLocation() {
     	return new String[] {
-    	       "org/lamsfoundation/lams/tool/noticeboard/testApplicationContext.xml"};
+    	        //"org/lamsfoundation/lams/applicationContext.xml",
+    			//"org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+    			//"org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+    			//"org/lamsfoundation/lams/learning/learningApplicationContext.xml",
+    			"org/lamsfoundation/lams/tool/noticeboard/testApplicationContext.xml"};
     }
     
     /** Define the sessionFactory bean name located in testApplication.xml. */
@@ -293,8 +297,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     		assertEquals(content.getOfflineInstructions(), DEFAULT_OFFLINE_INSTRUCTIONS);
     		assertEquals(content.isDefineLater(), DEFAULT_DEFINE_LATER);
     		assertEquals(content.isForceOffline(), DEFAULT_FORCE_OFFLINE);
-    		assertEquals(content.getCreatorUserId(), DEFAULT_CREATOR_USER_ID);
-     } 
+    		     } 
     
     protected void assertEqualsForSessionContent(NoticeboardSession ns)
     {

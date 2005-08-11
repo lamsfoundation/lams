@@ -53,6 +53,8 @@ public class TestNoticeboardAttachmentDAO extends NbDataAccessTestCase {
 	     super.cleanNbContentData(TEST_NB_ID);
 	 }
 	 
+	 
+	
 	 public void testRetrieveAttachment()
 	 {
 	     //test retrieveAttachmentByUuid
@@ -96,6 +98,20 @@ public class TestNoticeboardAttachmentDAO extends NbDataAccessTestCase {
 	     assertNull(nbAttachment);
 	     
 	 } 
+	 
+	 public void testRemoveAttachmentByUuid()
+	 {
+	     nbAttachment = attachmentDao.retrieveAttachmentByUuid(TEST_UUID);
+	     assertNotNull(nbAttachment);
+	     
+	     attachmentDao.removeAttachment(TEST_UUID);
+	     
+	     nbAttachment = attachmentDao.retrieveAttachmentByUuid(TEST_UUID);
+	     assertNull(nbAttachment);
+	     
+	 }
+	 
+	
 	
 	 
 	 
