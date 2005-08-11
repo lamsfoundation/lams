@@ -25,7 +25,7 @@ String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()
 <script type="text/javascript" src="<%=root%>author_page/js/tabcontroller.js"></script>
 <script src="<%=pathToLams%>/common.js"></script>
 <!-- this is the custom CSS for hte tool -->
-<!-- <link href="css/tool_custom.css" rel="stylesheet" type="text/css"> -->
+<link href="<%=root%>author_page/css/tool_custom.css" rel="stylesheet" type="text/css">
 <!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
 <link href="<%=root%>author_page/css/aqua.css" rel="stylesheet" type="text/css">
 <script language="JavaScript" type="text/JavaScript">
@@ -42,8 +42,8 @@ MM_reloadPage(true);
 <body onLoad="initTabs()">
 <html:form action="/authoringv2" target="_self" enctype="multipart/form-data">
 <h1>Noticeboard</h1>
-
-<!-- start tabs -->
+    
+    <!-- start tabs -->
 <!-- tab holder table -->
 <table border="0" cellspacing="0" cellpadding="0">
   <tr>
@@ -52,7 +52,7 @@ MM_reloadPage(true);
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
 		<td><a href="#"  onClick="showTab('b');return false;" ><img src="author_page/images/aqua_tab_s_left.gif" name="tab_left_b" width="8" height="25" border="0" id="tab_left_b"/></a></td>
-		<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_b"  onClick="showTab('b');return false;" ><a href="#" onClick="showTab('b');return false;" id="b" >Basic</a></td>
+		<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_b"  onClick="showTab('b');return false;" ><label for="b" accesskey="b"><a href="#" onClick="showTab('b');return false;" id="b" >Basic</a></label></td>
 		<td><a href="#" onClick="showTab('b');return false;"><img src="author_page/images/aqua_tab_s_right.gif"  name="tab_right_b" width="8" height="25" border="0" id="tab_right_b"/></a></td>
 	  </tr>
 	</table>
@@ -63,7 +63,7 @@ MM_reloadPage(true);
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
 		<td><a href="#" onClick="showTab('a');return false;"><img src="author_page/images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
-		<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');return false;"><a href="#" onClick="showTab('a');return false;" id="a" >Advanced</a></td>
+		<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');return false;"><label for="a" accesskey="a"><a href="#" onClick="showTab('a');return false;" id="a" >Advanced</a></label></td>
 		<td><a href="#" onClick="showTab('a');return false;"><img src="author_page/images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
 	  </tr>
 	</table>
@@ -74,7 +74,7 @@ MM_reloadPage(true);
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
 		<td ><a href="#" onClick="showTab('i');return false;"><img border="0" src="author_page/images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
-		<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');return false;" ><a href="#" onClick="showTab('i');return false;" id="i" >Instructions</a></td>
+		<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');return false;" ><label for="i" accesskey="i"><a href="#" onClick="showTab('i');return false;" id="i" >Instructions</a></label></td>
 		<td ><a href="#" onClick="showTab('i');return false;"><img src="author_page/images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
 	  </tr>
 	</table>
@@ -83,6 +83,10 @@ MM_reloadPage(true);
   </tr>
 </table>
     <!-- end tab buttons -->
+    
+    
+    
+    
 
     <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
@@ -120,6 +124,8 @@ MM_reloadPage(true);
 </div>
 
 <hr>
+<a href="javascript:;" class="button">Cancel</a>
+<html:submit property="method" styleClass="button"><fmt:message key="button.ok" /></html:submit>
 <!-- end of content_b -->
 </div>
 
@@ -127,7 +133,13 @@ MM_reloadPage(true);
 
 <!-- tab content 2 Advanced-->
 <div id='content_a'  class="tabbody content_a">
-
+<h2>Advanced tab content</h2>
+<div id="formtablecontainer">
+<table class="forms">
+	<tr><td><fmt:message key="message.noAdvancedSection" /></td>
+	</tr>
+</table>
+</div>
 
 <!-- end of content_b -->
 </div>
@@ -249,10 +261,12 @@ MM_reloadPage(true);
 			</tr>
 		</table>
 	</div>
-	<hr>
+	
  </logic:notEqual>
  </logic:present>
-
+	<hr>
+<a href="javascript:;" class="button">Cancel</a>
+<html:submit property="method" styleClass="button"><fmt:message key="button.ok" /></html:submit>
 
 
 <!-- end of content_a -->
@@ -263,10 +277,10 @@ MM_reloadPage(true);
 <html:hidden property="onlineInstructions" />
 <html:hidden property="offlineInstructions" />
 
-
+<!--
 <div id="formtablecontainer">
 <html:submit property="method" styleClass="button"><fmt:message key="button.ok" /></html:submit>
-<div>
+<div> -->
 
 
 <p></p>
