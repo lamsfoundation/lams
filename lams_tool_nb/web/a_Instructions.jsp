@@ -6,7 +6,7 @@
 				<tr>
 					<td class="formlabel"><fmt:message key="instructions.onlineInstructions" /></td>
 					<td class="formcontrol">
-							<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/"
+							<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckeditor/"
 								height="200"
 								width="85%">
 								<c:out value="${NbAuthoringForm.onlineInstructions}" escapeXml="false" />
@@ -26,7 +26,7 @@
 				<tr>
 					<td class="formlabel"><fmt:message key="instructions.offlineInstructions" /></td>
 					<td class="formcontrol">
-						<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckEditor/"
+						<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckeditor/"
 								width="85%"
 								height="200">
 							<c:out value="${NbAuthoringForm.offlineInstructions}" escapeXml="false" />

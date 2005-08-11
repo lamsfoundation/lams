@@ -100,7 +100,7 @@ MM_reloadPage(true);
 				<tr>
 					<td class="formlabel"><fmt:message key="basic.title" /></td>
 					<td class="formcontrol">
-							<FCK:editor id="richTextTitle" basePath="/lams/fckEditor/"
+							<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/"
 								height="150"
 								width="85%">
 								<c:out value="${NbAuthoringForm.title}" escapeXml="false" />
@@ -110,7 +110,7 @@ MM_reloadPage(true);
 				<tr>
 					<td class="formlabel"><fmt:message key="basic.content" /></td>
 					<td class="formcontrol">
-						<FCK:editor id="richTextContent" basePath="/lams/fckEditor/"
+						<FCK:editor id="richTextContent" basePath="/lams/fckeditor/"
 								width="85%"
 								height="400">
 							<c:out value="${NbAuthoringForm.content}" escapeXml="false" />
@@ -155,7 +155,7 @@ MM_reloadPage(true);
 				<tr>
 					<td class="formlabel"><fmt:message key="instructions.onlineInstructions" /></td>
 					<td class="formcontrol">
-							<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/"
+							<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckeditor/"
 								height="200"
 								width="85%">
 								<c:out value="${NbAuthoringForm.onlineInstructions}" escapeXml="false" />
@@ -175,7 +175,7 @@ MM_reloadPage(true);
 				<tr>
 					<td class="formlabel"><fmt:message key="instructions.offlineInstructions" /></td>
 					<td class="formcontrol">
-						<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckEditor/"
+						<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckeditor/"
 								width="85%"
 								height="200">
 							<c:out value="${NbAuthoringForm.offlineInstructions}" escapeXml="false" />

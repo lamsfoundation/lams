@@ -6,7 +6,7 @@
 				<tr>
 					<td class="formlabel"><fmt:message key="basic.title" /></td>
 					<td class="formcontrol">
-							<FCK:editor id="richTextTitle" basePath="/lams/fckEditor/"
+							<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/"
 								height="150"
 								width="85%">
 								<c:out value="${NbAuthoringForm.title}" escapeXml="false" />
@@ -16,7 +16,7 @@
 				<tr>
 					<td class="formlabel"><fmt:message key="basic.content" /></td>
 					<td class="formcontrol">
-						<FCK:editor id="richTextContent" basePath="/lams/fckEditor/"
+						<FCK:editor id="richTextContent" basePath="/lams/fckeditor/"
 								width="85%"
 								height="400">
 							<c:out value="${NbAuthoringForm.content}" escapeXml="false" />
