@@ -73,6 +73,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author mtruong
+ * 
+ * <p>This class is a simple combination of NbAuthoringStarterAction and NbAuthoringAction.
+ * It has been created for the purpose of supporting the new authoring page which is done using 
+ * DHTML.</p>
+ * 
+ * <p>The unspecified method, is the same as the execute method for NbAuthoringStarterAction.
+ * It will get called when the method parameter is not specified (that is on first entry
+ * into the authoring environment).</p>
+ * 
+ * <p> The save, upload and delete method is the same as that of NbAuthoringAction, to see its explanation,
+ * please see org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction </p>
  *
  * ----------------XDoclet Tags--------------------
  * 
@@ -94,6 +105,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * ----------------XDoclet Tags--------------------
  */
+
 public class NbAuthoringV2Action extends LamsLookupDispatchAction {
     static Logger logger = Logger.getLogger(NbAuthoringV2Action.class.getName());
     public final static String FORM="NbAuthoringForm";
@@ -122,116 +134,125 @@ public class NbAuthoringV2Action extends LamsLookupDispatchAction {
     
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
         
-    	    MessageResources resources = getResources(request);
-    	    
-    	    //to ensure that we are working with a new form, not one from previous session
-    		NbAuthoringForm nbForm = new NbAuthoringForm();		
-    		NbWebUtil.cleanAuthoringSession(request); 
-    		
-    		Long contentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
-    		
-    		if(contentId == null)
-    		{		    
-    			//String error = "Tool content id missing. Unable to continue.";
-    		    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "Tool Content Id");
-    		    logger.error(error);
-    			throw new NbApplicationException(error);
-    		}
-    		nbForm.setToolContentId(contentId.toString());
-    		
-    		/* if there is a defineLater request parameter, set the form value
-    		 * If a defineLater request parameter is not present, then it is just set to null.
-    		 * This is used in the basic screen, if defineLater is set, then in the basic page,
-    		 * the three tabs {Basic, Advanced, Instructions} are not visible.
-    		 */
-    		nbForm.setDefineLater((String)request.getParameter(NoticeboardConstants.DEFINE_LATER));
+        MessageResources resources = getResources(request);
+	    
+	    //to ensure that we are working with a new form, not one from previous session
+		NbAuthoringForm nbForm = new NbAuthoringForm();		
+		NbWebUtil.cleanAuthoringSession(request); 
+		
+		Long contentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
+		
+		if(contentId == null)
+		{		    
+			//String error = "Tool content id missing. Unable to continue.";
+		    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "Tool Content Id");
+		    logger.error(error);
+			throw new NbApplicationException(error);
+		}
+		nbForm.setToolContentId(contentId.toString());
+		
+		/* if there is a defineLater request parameter, set the form value
+		 * If a defineLater request parameter is not present, then it is just set to null.
+		 * This is used in the basic screen, if defineLater is set, then in the basic page,
+		 * the three tabs {Basic, Advanced, Instructions} are not visible.
+		 */
+		nbForm.setDefineLater((String)request.getParameter(NoticeboardConstants.DEFINE_LATER));
 
-    		request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, contentId);
-    							
-    		/*
-    		 * Retrieve the Service
-    		 */
-    		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-    		Map attachmentMap = nbForm.getAttachments();
-    		
-    		if (!contentExists(nbService, contentId))
-    		{
-    			//	Pre-fill the form with the default content
-    			NoticeboardContent nb =	nbService.retrieveNoticeboard(NoticeboardConstants.DEFAULT_CONTENT_ID);
-    			
-    			/** TODO: add a check to see if object is null */
-    			
-    			//create a new noticeboard object and prefill with default content, save to database
-    			NoticeboardContent nbContentNew = new NoticeboardContent(contentId,
-    			        												nb.getTitle(),
-    			        												nb.getContent(),
-    			        												nb.getOnlineInstructions(),
-    			        												nb.getOfflineInstructions(),
-    			        												new Date(System.currentTimeMillis()));
-    			
-    			nbContentNew = setTrueIfDefineLaterIsSet(nbForm, nbContentNew);
-    			
-    			//save new tool content into db
-    			nbService.saveNoticeboard(nbContentNew);
-    			
-    			//initialise the values in the form, so the values will be shown in the jsp
-    			nbForm.populateFormWithNbContentValues(nbContentNew);
-    			
-    			
-    							
-    		
-    		}
-    		else //content already exists on the database
-    		{
-    			//get the values from the database
-    			NoticeboardContent nb = nbService.retrieveNoticeboard(contentId);
-    			
-    			/* If retrieving existing content, check whether the contentInUse flag is set, if set, the
-    			 * author is not allowed to edit content 
-    			 */
-    			
-    			if (NbWebUtil.isContentEditable(nb))
-    			{
-    			    /* Define later set to true when the edit activity tab is brought up 
-    			     * So that users cannot start using the content while the staff member is editing the content */
-    			    nbForm.populateFormWithNbContentValues(nb);
-    			    nb = setTrueIfDefineLaterIsSet(nbForm, nb);
-    			    nbService.updateNoticeboard(nb);
-    			    
-    			
-    			 
-    			}
-    			else
-    			{
-    			    //The contentInUse flag is set and a user has already reached this activity.
-    			    saveMessages(request, null); //ensure there are no existing messages
-    			    ActionMessages message = new ActionMessages();
-    			    message.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.contentInUseSet"));
-    			    saveMessages(request, message);
-    			    return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
-    			    
-    			}
-    			
-    			//Setup the map containing the files that have been uploaded for this particular tool content id
-    						
-    			List attachmentIdList = nbService.getAttachmentIdsFromContent(nb);
-    			for (int i=0; i<attachmentIdList.size(); i++)
-    			{
-    			    NoticeboardAttachment file = nbService.retrieveAttachment((Long)attachmentIdList.get(i));
-    			    String fileType = file.returnFileType();
-    			    String keyName = file.getFilename() + "-" + fileType;
-    			    attachmentMap.put(keyName, file);
-    			}
-    			nbForm.setAttachments(attachmentMap);
-    			
-    			
-    		
-    		}
-    		NbWebUtil.addUploadsToSession(request, attachmentMap);
-    		request.getSession().setAttribute(FORM, nbForm);
-    	
+		request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, contentId);
+							
+		/*
+		 * Retrieve the Service
+		 */
+		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+		Map attachmentMap = nbForm.getAttachments();
+		
+		if (!contentExists(nbService, contentId))
+		{
+			//	Pre-fill the form with the default content
+			//NoticeboardContent nb =	nbService.retrieveNoticeboard(NoticeboardConstants.DEFAULT_CONTENT_ID);
+		    Long defaultToolContentId = nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE);
+		  //  logger.debug("Default tool content id is " + defaultToolContentId);
+		    NoticeboardContent nb = nbService.retrieveNoticeboard(defaultToolContentId);
+			
+			/** TODO: add a check to see if object is null */
+		    if (nb==null)
+		    {
+		        String error= "There is data missing in the database";
+		        logger.error(error);
+		        throw new NbApplicationException(error);
+		    }
+			
+			//create a new noticeboard object and prefill with default content, save to database
+			NoticeboardContent nbContentNew = new NoticeboardContent(contentId,
+			        												nb.getTitle(),
+			        												nb.getContent(),
+			        												nb.getOnlineInstructions(),
+			        												nb.getOfflineInstructions(),
+			        												new Date(System.currentTimeMillis()));
+			
+			nbContentNew = setTrueIfDefineLaterIsSet(nbForm, nbContentNew);
+			
+			//save new tool content into db
+			nbService.saveNoticeboard(nbContentNew);
+			
+			//initialise the values in the form, so the values will be shown in the jsp
+			nbForm.populateFormWithNbContentValues(nbContentNew);
+			
+			
+							
+		
+		}
+		else //content already exists on the database
+		{
+			//get the values from the database
+			NoticeboardContent nb = nbService.retrieveNoticeboard(contentId);
+			
+			/* If retrieving existing content, check whether the contentInUse flag is set, if set, the
+			 * author is not allowed to edit content 
+			 */
+			
+			if (NbWebUtil.isContentEditable(nb))
+			{
+			    /* Define later set to true when the edit activity tab is brought up 
+			     * So that users cannot start using the content while the staff member is editing the content */
+			    nbForm.populateFormWithNbContentValues(nb);
+			    nb = setTrueIfDefineLaterIsSet(nbForm, nb);
+			    nbService.updateNoticeboard(nb);
+			    
+			    /** TODO: setup values in the instructions map */
+			 
+			}
+			else
+			{
+			    //The contentInUse flag is set and a user has already reached this activity.
+			    saveMessages(request, null); //ensure there are no existing messages
+			    ActionMessages message = new ActionMessages();
+			    message.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.contentInUseSet"));
+			    saveMessages(request, message);
+			    return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
+			    
+			}
+			
+			//Setup the map containing the files that have been uploaded for this particular tool content id
+						
+			List attachmentIdList = nbService.getAttachmentIdsFromContent(nb);
+			for (int i=0; i<attachmentIdList.size(); i++)
+			{
+			    NoticeboardAttachment file = nbService.retrieveAttachment((Long)attachmentIdList.get(i));
+			    String fileType = file.returnFileType();
+			    String keyName = file.getFilename() + "-" + fileType;
+			    attachmentMap.put(keyName, file);
+			}
+			nbForm.setAttachments(attachmentMap);
+			
+			
+		
+		}
+		NbWebUtil.addUploadsToSession(request, attachmentMap);
+		request.getSession().setAttribute(FORM, nbForm);
+	
     		return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE2);
-    	}
+    }
     	
     	/**
     	 * Checks the session to see if the title and content session variables exist or not.
@@ -411,7 +432,7 @@ public class NbAuthoringV2Action extends LamsLookupDispatchAction {
     		    Long uuid = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.UUID));
     		    
     		    NbAuthoringForm nbForm = (NbAuthoringForm)form;
-    		   // copyAuthoringFormValuesIntoFormBean(request, nbForm);
+    		 //  copyAuthoringFormValuesIntoFormBean(request, nbForm);
     		    
     	    	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
     		    
@@ -422,6 +443,13 @@ public class NbAuthoringV2Action extends LamsLookupDispatchAction {
     				throw new NbApplicationException(error);
     	    	}
     	    	NoticeboardAttachment attachment = nbService.retrieveAttachmentByUuid(uuid);
+    	    	if (attachment == null)
+    	    	{
+    	    	    String error = "Unable to continue. The file does not exist";
+					logger.error(error);
+					throw new NbApplicationException(error);
+	    	    	    
+    	    	}
     	       	String keyName = attachment.returnKeyName();
     	    	
     	    	//remove entry from map
@@ -469,8 +497,6 @@ public class NbAuthoringV2Action extends LamsLookupDispatchAction {
     		 * This method copies the values of the request parameters <code>richTextOnlineInstructions</code>
     		 * <code>richTextOfflineInstructions</code> <code>richTextContent</code> into the form properties
     		 * onlineInstructions, offlineInstructions and content respectively.
-    		 * If a null value is returned for the request parameter, the form value is not modified.
-    		 * The request parameters are set as optional because the form spans amongst two pages. 
     		 * 
     		 * @param request HttpServlet request
     		 * @param form The ActionForm class containing data submitted by the forms.
@@ -482,16 +508,30 @@ public class NbAuthoringV2Action extends LamsLookupDispatchAction {
     		  	String content = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_CONTENT, true);
     		  	String title = WebUtil.readStrParam(request, NoticeboardConstants.RICH_TEXT_TITLE, true);
 
-    		  	if(title != null)
+    		  	
     		  	    form.setTitle(title);
-    		  	if(content != null)
+    		  	
     		  	    form.setContent(content);
-    		  	if(onlineInstruction != null)
+    		  	
     		        form.setOnlineInstructions(onlineInstruction);
-    		  	if(offlineInstruction != null)
+    		  	
     		  	    form.setOfflineInstructions(offlineInstruction);
     		  
-    		}
+    		} 
+    		
+    	/*	private void copyFormValuesIntoNbContent(HttpServletRequest request, NoticeboardContent nbContent)
+    		{
+    		    nbContent.setTitle((String)request.getParameter(NoticeboardConstants.RICH_TEXT_TITLE));
+    		    nbContent.setContent((String)request.getParameter(NoticeboardConstants.RICH_TEXT_CONTENT));
+    		    nbContent.setOnlineInstructions((String)request.getParameter(NoticeboardConstants.RICH_TEXT_ONLINE_INSTRN));
+    		    nbContent.setOfflineInstructions((String)request.getParameter(NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN));
+    		    
+    		} */
+    		
+    		
+    		
+    		
+    		
     		/**
     		 * This method checks whether a file
     		 * already exists in the database. If this file already exists, then the 
