@@ -81,7 +81,7 @@
 		<tr>
 			<td class="formlabel"><fmt:message key="label.authoring.basic.instruction" />:</td>
 			<td class="formcontrol"><FCK:editor id="instructions"
-				basePath="/lams/fckEditor/" height="150" width="85%">
+				basePath="/lams/fckeditor/" height="150" width="85%">
 				<c:out value="${authoring.instruction}" escapeXml="false"/>
 			</FCK:editor></td>
 		</tr>
@@ -114,7 +114,7 @@
 			<td class="formlabel"><fmt:message
 				key="label.authoring.online.instruction" />:</td>
 			<td class="formcontrol"><FCK:editor id="onlineInstruction"
-				basePath="/lams/fckEditor/" height="150" width="85%">
+				basePath="/lams/fckeditor/" height="150" width="85%">
 				<c:out value="${authoring.onlineInstruction}" escapeXml="false"/>
 			</FCK:editor></td>
 		</tr>
@@ -165,7 +165,7 @@
 			<td class="formlabel"><fmt:message
 				key="label.authoring.offline.instruction" />:</td>
 			<td class="formcontrol"><FCK:editor id="offlineInstruction"
-				basePath="/lams/fckEditor/" height="150" width="85%">
+				basePath="/lams/fckeditor/" height="150" width="85%">
 				<c:out value="${authoring.offlineInstruction}" escapeXml="false"/>
 			</FCK:editor></td>
 		</tr>

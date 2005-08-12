@@ -42,7 +42,7 @@
  				    		<td class="formlabel">Comments:</td>
 					        <td class="formcontrol">
 					            <FCK:editor id="comments" 
-					    			basePath="/lams/fckEditor/"
+					    			basePath="/lams/fckeditor/"
 					    			height="150"    
 					    			width="85%">
 	    									<c:out value="${details.comments}" escapeXml="false"/>
