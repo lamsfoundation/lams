@@ -35,7 +35,7 @@
 				<td class="formlabel"><fmt:message key="label.authoring.basic.instruction" />:</td>
 				<td class="formcontrol">
 					<FCK:editor id="instructions"
-						basePath="/lams/fckEditor/" height="150" width="85%">
+						basePath="/lams/fckeditor/" height="150" width="85%">
 						<c:out value="${authoring.instruction}" escapeXml="false"/>
 					</FCK:editor>
 				</td>
