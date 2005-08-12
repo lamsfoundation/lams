@@ -24,5 +24,6 @@ public class SbmtConstants {
 
 	public static final String AUTHORING_DTO = "authoring";
 	public static final String TOOLSIGNNATURE = "lasbmt11";
+	public static final String DEFAULT_TITLE = "Submit Files Title";
 
 }

@@ -30,6 +30,9 @@
 				   type="org.apache.struts.upload.FormFile"/>
 	<form-property name="offlineFile"
 				   type="org.apache.struts.upload.FormFile"/>
+
+	<form-property name="currentTab"
+				   type="java.lang.String"/>
 </form-bean>
 
 <form-bean name="SbmtLearnerForm" type="org.apache.struts.validator.DynaValidatorForm">

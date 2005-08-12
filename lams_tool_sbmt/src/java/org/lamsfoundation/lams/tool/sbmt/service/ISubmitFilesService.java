@@ -56,7 +56,9 @@ public interface ISubmitFilesService {
 
 	/**
 	 * Returns the <code>SubmitFilesContent</code> object corresponding to the
-	 * given <code>contentID</code>
+	 * given <code>contentID</code>. If could not find out corresponding 
+	 * <code>SubmitFilesContent</code> by given <code>contentID</code>, return a not-null
+	 * but emtpy <code>SubmitFilesContent</code> instance.
 	 * 
 	 * @param contentID
 	 *            The <code>content_id</code> of the object to be looked up

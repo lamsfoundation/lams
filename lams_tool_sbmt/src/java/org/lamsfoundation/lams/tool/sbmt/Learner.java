@@ -100,7 +100,7 @@ public class Learner implements Serializable,Cloneable{
 		try {
 			obj = super.clone();
 		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + SubmitFilesReport.class + " failed");
+			log.error("When clone " + Learner.class + " failed");
 		}
 		return obj;
 	}

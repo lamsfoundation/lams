@@ -233,8 +233,8 @@ public class SubmitFilesService implements ToolContentManager,
                     + " based on null toolContentId");
         try
         {
-            SubmitFilesContent content = submitFilesContentDAO.getContentByID(toolContentId);
-            if ( content == null ) {
+            SubmitFilesContent content = getSubmitFilesContent(toolContentId);
+            if ( content == null || !toolContentId.equals(content.getContentID())) {
                 content = duplicateDefaultToolContent(toolContentId);
             }
             content.setRunOffline(true);
@@ -248,6 +248,9 @@ public class SubmitFilesService implements ToolContentManager,
     }
     
 	/**
+	 * If the toolContentID does not exist, then get default tool content id from tool core and 
+	 * initialize a emtpy <code>SubmitFilesContent</code> return.
+	 * 
 	 * @param toolContentId
 	 * @return
 	 */
@@ -269,8 +272,8 @@ public class SubmitFilesService implements ToolContentManager,
                     + " based on null toolContentId");
         try
         {
-        	SubmitFilesContent content = submitFilesContentDAO.getContentByID(toolContentId);
-            if ( content == null ) {
+            SubmitFilesContent content = getSubmitFilesContent(toolContentId);
+            if ( content == null || !toolContentId.equals(content.getContentID())) {
                 content = duplicateDefaultToolContent(toolContentId);
             }
             content.setDefineLater(true);
@@ -427,8 +430,11 @@ public class SubmitFilesService implements ToolContentManager,
                 + toolContentId.longValue() + "]");
         try
         {
-            SubmitFilesContent submitContent = submitFilesContentDAO.getContentByID(toolContentId);
-
+            SubmitFilesContent submitContent = getSubmitFilesContent(toolContentId);
+            if ( submitContent == null || !toolContentId.equals(submitContent.getContentID())) {
+            	submitContent = new SubmitFilesContent();
+            	submitContent.setContentID(toolContentId);
+            }
             SubmitFilesSession submitSession = new SubmitFilesSession ();
 
             submitSession.setSessionID(toolSessionId);
@@ -527,17 +533,21 @@ public class SubmitFilesService implements ToolContentManager,
 		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
 			throw new SubmitFilesException("Could not find upload file: " + uploadFile);
 		
-		SubmitFilesContent content = submitFilesContentDAO.getContentByID(contentID);
-		if (content == null)
-			throw new SubmitFilesException(
-					"No such content with a contentID of: " + contentID
-							+ " found.");
-		
+        SubmitFilesContent content = getSubmitFilesContent(contentID);
+        if ( content == null || !contentID.equals(content.getContentID())) {
+        	content  = new SubmitFilesContent();
+        	content.setContentID(contentID);
+        	//user firstly upload file without any other input, even the not-null 
+        	//field "title". Set title as default title.
+        	content.setTitle(SbmtConstants.DEFAULT_TITLE);
+        }
 		NodeKey nodeKey = processFile(uploadFile,fileType);
 		
 		Set fileSet = content.getInstructionFiles();
-		if(fileSet == null)
+		if(fileSet == null){
 			fileSet = new HashSet();
+			content.setInstructionFiles(fileSet);
+		}
 		InstructionFiles file = new InstructionFiles();
 		file.setType(fileType);
 		file.setUuID(nodeKey.getUuid());
