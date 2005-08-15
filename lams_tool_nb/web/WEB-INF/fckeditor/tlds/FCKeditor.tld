@@ -2,7 +2,7 @@
 <!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
 
 <taglib>
-	<tlibversion>2.2</tlibversion>
+	<tlibversion>2.3</tlibversion>
 	<jspversion>1.1</jspversion>
 	<shortname>FCKeditor</shortname>
 	<uri>http://fckeditor.net/tags-fckeditor</uri>
@@ -189,6 +189,26 @@
 			<name>imageBrowserURL</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-  		</attribute> 		
+  		</attribute>
+		<attribute>
+			<name>flashBrowserURL</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+  		</attribute> 	
+		<attribute>
+			<name>linkUploadURL</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+  		</attribute> 	
+		<attribute>
+			<name>imageUploadURL</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+  		</attribute> 	
+		<attribute>
+			<name>flashUploadURL</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+  		</attribute> 	
 	</tag>
 </taglib>
