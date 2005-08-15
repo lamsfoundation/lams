@@ -108,7 +108,7 @@
 					<include name="cglib/*.jar" />
 					<include name="dom4j/*.jar" />
 					<include name="ehcache/*.jar" />
-					<include name="fckEditor/*.jar" />
+					<include name="fckeditor/*.jar" />
 					<include name="hibernate/*.jar" />
 					<include name="j2ee/*.jar" />
 					<include name="jakarta-commons/*.jar" />
@@ -185,10 +185,17 @@
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>
 		</ant>
+
+		<ant antfile="../${tool_lanb_dir}/build.xml" target="deploy-tool"
+				inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>
+		</ant>
+
 		<ant antfile="../${tool_sbmt_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>
 		</ant>
+
 	</target>
 	
 	<!-- ============================================================================== -->
