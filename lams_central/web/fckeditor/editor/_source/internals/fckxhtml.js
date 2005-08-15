@@ -43,9 +43,16 @@ FCKXHtml.GetXHTML = function( node, includeNode, format )
 
 	// Strip the "XHTML" root node.
 	sXHTML = sXHTML.substr( 7, sXHTML.length - 15 ).trim() ;
+	
+	// Remove the trailing <br> added by Gecko.
+	if ( FCKBrowserInfo.IsGecko )
+		sXHTML = sXHTML.replace( /<br\/>$/, '' ) ;
+
+	// Add a space in the tags with no closing tags, like <br/> -> <br />
+	sXHTML = sXHTML.replace( FCKRegexLib.SpaceNoClose, ' />');
 
 	if ( FCKConfig.ForceSimpleAmpersand )
-		sXHTML = sXHTML.replace( /___FCKAmp___/g, '&' ) ;
+		sXHTML = sXHTML.replace( FCKRegexLib.ForceSimpleAmpersand, '&' ) ;
 
 	if ( format )
 		sXHTML = FCKCodeFormatter.Format( sXHTML ) ;
@@ -80,15 +87,21 @@ FCKXHtml._AppendAttribute = function( xmlNode, attributeName, attributeValue )
 
 FCKXHtml._AppendChildNodes = function( xmlNode, htmlNode, isBlockElement )
 {
+	var iCount = 0 ;
+	
 	if ( htmlNode.hasChildNodes() )
 	{
 		// Get all children nodes.
 		var oChildren = htmlNode.childNodes ;
 
 		for ( var i = 0 ; i < oChildren.length ; i++ )
-			this._AppendNode( xmlNode, oChildren[i] ) ;
+		{
+			if ( this._AppendNode( xmlNode, oChildren[i] ) )
+				iCount++ ;
+		}
 	}
-	else
+	
+	if ( iCount == 0 )
 	{
 		if ( isBlockElement && FCKConfig.FillEmptyBlocks )
 		{
@@ -98,7 +111,7 @@ FCKXHtml._AppendChildNodes = function( xmlNode, htmlNode, isBlockElement )
 
 		// We can't use short representation of empty elements that are not marked
 		// as empty in th XHTML DTD.
-		if ( ! FCKRegexLib.EmptyElements.test( htmlNode.nodeName ) )
+		if ( !FCKRegexLib.EmptyElements.test( htmlNode.nodeName ) )
 			xmlNode.appendChild( this.XML.createTextNode('') ) ;
 	}
 }
@@ -109,26 +122,32 @@ FCKXHtml._AppendNode = function( xmlNode, htmlNode )
 	{
 		// Element Node.
 		case 1 :
+			if ( htmlNode.getAttribute('_fckfakelement') )
+				return FCKXHtml._AppendNode( xmlNode, FCK.GetRealElement( htmlNode ) ) ;
+		
 			// Mozilla insert custom nodes in the DOM.
 			if ( FCKBrowserInfo.IsGecko && htmlNode.hasAttribute('_moz_editor_bogus_node') )
-				return ;
+				return false ;
+			
+			if ( htmlNode.getAttribute('_fckdelete') )
+				return false ;
 
 			// Create the Element.
 			var sNodeName = htmlNode.nodeName ;
 
 			// Check if the node name is valid, otherwise ignore this tag.
 			if ( !FCKRegexLib.ElementName.test( sNodeName ) )
-				return ;
+				return false ;
 
 			sNodeName = sNodeName.toLowerCase() ;
 
 			if ( FCKBrowserInfo.IsGecko && sNodeName == 'br' && htmlNode.hasAttribute('type') && htmlNode.getAttribute( 'type', 2 ) == '_moz' )
-				return ;
+				return false ;
 
 			// The already processed nodes must be marked to avoid then to be duplicated (bad formatted HTML).
 			// So here, the "mark" is checked... if the element is Ok, then mark it.
 			if ( htmlNode._fckxhtmljob == FCKXHtml.CurrentJobNum )
-				return ;
+				return false ;
 			else
 				htmlNode._fckxhtmljob = FCKXHtml.CurrentJobNum ;
 
@@ -172,6 +191,7 @@ FCKXHtml._AppendNode = function( xmlNode, htmlNode )
 			xmlNode.appendChild( this.XML.createComment( "Element not supported - Type: " + htmlNode.nodeType + " Name: " + htmlNode.nodeName ) ) ;
 			break ;
 	}
+	return true ;
 }
 
 // Append an item to the SpecialBlocks array and returns the tag to be used.

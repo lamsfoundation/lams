@@ -20,8 +20,8 @@ var FCKLang =
 // Language direction : "ltr" (left to right) or "rtl" (right to left).
 Dir					: "ltr",
 
-ToolbarCollapse		: "Collapse Toolbar",	//MISSING
-ToolbarExpand		: "Expand Toolbar",	//MISSING
+ToolbarCollapse		: "Смањи линију са алаткама",
+ToolbarExpand		: "Прошири линију са алаткама",
 
 // Toolbar Items and Context Menu
 Save				: "Сачувај",
@@ -38,9 +38,11 @@ RemoveFormat		: "Уклони форматирање",
 InsertLinkLbl		: "Линк",
 InsertLink			: "Унеси/измени линк",
 RemoveLink			: "Уклони линк",
-Anchor				: "Insert/Edit Anchor",	//MISSING
+Anchor				: "Унеси/измени сидро",
 InsertImageLbl		: "Слика",
 InsertImage			: "Унеси/измени слику",
+InsertFlashLbl		: "Флеш елемент",
+InsertFlash			: "Унеси/измени флеш",
 InsertTableLbl		: "Табела",
 InsertTable			: "Унеси/измени табелу",
 InsertLineLbl		: "Линија",
@@ -79,18 +81,18 @@ BGColor				: "Боја позадине",
 Source				: "K&ocirc;д",
 Find				: "Претрага",
 Replace				: "Замена",
-SpellCheck			: "Check Spell",	//MISSING
-UniversalKeyboard	: "Universal Keyboard",	//MISSING
+SpellCheck			: "Провери спеловање",
+UniversalKeyboard	: "Универзална тастатура",
 
-Form			: "Form",	//MISSING
-Checkbox		: "Checkbox",	//MISSING
-RadioButton		: "Radio Button",	//MISSING
-TextField		: "Text Field",	//MISSING
-Textarea		: "Textarea",	//MISSING
-HiddenField		: "Hidden Field",	//MISSING
-Button			: "Button",	//MISSING
-SelectionField	: "Selection Field",	//MISSING
-ImageButton		: "Image Button",	//MISSING
+Form			: "Форма",
+Checkbox		: "Поље за потврду",
+RadioButton		: "Радио-дугме",
+TextField		: "Текстуално поље",
+Textarea		: "Зона текста",
+HiddenField		: "Скривено поље",
+Button			: "Дугме",
+SelectionField	: "Изборно поље",
+ImageButton		: "Дугме са сликом",
 
 // Context Menu
 EditLink			: "Промени линк",
@@ -105,17 +107,18 @@ SplitCell			: "Раздвоји ћелије",
 CellProperties		: "Особине ћелије",
 TableProperties		: "Особине табеле",
 ImageProperties		: "Особине слике",
+FlashProperties		: "Особине Флеша",
 
-AnchorProp			: "Anchor Properties",	//MISSING
-ButtonProp			: "Button Properties",	//MISSING
-CheckboxProp		: "Checkbox Properties",	//MISSING
-HiddenFieldProp		: "Hidden Field Properties",	//MISSING
-RadioButtonProp		: "Radio Button Properties",	//MISSING
-ImageButtonProp		: "Image Button Properties",	//MISSING
-TextFieldProp		: "Text Field Properties",	//MISSING
-SelectionFieldProp	: "Selection Field Properties",	//MISSING
-TextareaProp		: "Textarea Properties",	//MISSING
-FormProp			: "Form Properties",	//MISSING
+AnchorProp			: "Особине сидра",
+ButtonProp			: "Особине дугмета",
+CheckboxProp		: "Особине поља за потврду",
+HiddenFieldProp		: "Особине скривеног поља",
+RadioButtonProp		: "Особине радио-дугмета",
+ImageButtonProp		: "Особине дугмета са сликом",
+TextFieldProp		: "Особине текстуалног поља",
+SelectionFieldProp	: "Особине изборног поља",
+TextareaProp		: "Особине зоне текста",
+FormProp			: "Особине форме",
 
 FontFormats			: "Normal;Formatirano;Adresa;Heading 1;Heading 2;Heading 3;Heading 4;Heading 5;Heading 6",
 
@@ -133,9 +136,11 @@ UnknownToolbarSet	: "Toolbar \"%1\" не постоји",
 DlgBtnOK			: "OK",
 DlgBtnCancel		: "Oткажи",
 DlgBtnClose			: "Затвори",
-DlgBtnBrowseServer	: "Browse Server",	//MISSING
+DlgBtnBrowseServer	: "Претражи сервер",
 DlgAdvancedTag		: "Напредни тагови",
-DlgOpOther			: "&lt;Other&gt;",	//MISSING
+DlgOpOther			: "&lt;Остали&gt;",
+DlgInfoTab			: "Инфо",
+DlgAlertUrl			: "Молимо Вас, унесите УРЛ",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;није постављено&gt;",
@@ -180,7 +185,17 @@ DlgImgAlignTextTop	: "Врх текста",
 DlgImgAlignTop		: "Врх",
 DlgImgPreview		: "Изглед",
 DlgImgAlertUrl		: "Унесите УРЛ слике",
-DlgImgLinkTab		: "Link",	//MISSING
+DlgImgLinkTab		: "Линк",
+
+// Flash Dialog
+DlgFlashTitle		: "Особине флеша",
+DlgFlashChkPlay		: "Аутоматски старт",
+DlgFlashChkLoop		: "Понављај",
+DlgFlashChkMenu		: "Укључи флеш мени",
+DlgFlashScale		: "Скалирај",
+DlgFlashScaleAll	: "Прикажи све",
+DlgFlashScaleNoBorder	: "Без ивице",
+DlgFlashScaleFit	: "Попуни површину",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Линк",
@@ -189,7 +204,7 @@ DlgLnkTargetTab		: "Мета",
 
 DlgLnkType			: "Врста линка",
 DlgLnkTypeURL		: "URL",
-DlgLnkTypeAnchor	: "Сидро на овој странициц",
+DlgLnkTypeAnchor	: "Сидро на овој страници",
 DlgLnkTypeEMail		: "Eлектронска пошта",
 DlgLnkProto			: "Протокол",
 DlgLnkProtoOther	: "&lt;друго&gt;",
@@ -211,7 +226,7 @@ DlgLnkTargetBlank	: "Нови прозор (_blank)",
 DlgLnkTargetParent	: "Родитељски прозор (_parent)",
 DlgLnkTargetSelf	: "Исти прозор (_self)",
 DlgLnkTargetTop		: "Прозор на врху (_top)",
-DlgLnkTargetFrameName	: "Target Frame Name",	//MISSING
+DlgLnkTargetFrameName	: "Назив одредишног фрејма",
 DlgLnkPopWinName	: "Назив искачућег прозора",
 DlgLnkPopWinFeat	: "Могућности искачућег прозора",
 DlgLnkPopResize		: "Променљива величина",
@@ -227,9 +242,9 @@ DlgLnkPopHeight		: "Висина",
 DlgLnkPopLeft		: "Од леве ивице екрана (пиксела)",
 DlgLnkPopTop		: "Од врха екрана (пиксела)",
 
-DlnLnkMsgNoUrl		: "Please type the link URL",	//MISSING
-DlnLnkMsgNoEMail	: "Please type the e-mail address",	//MISSING
-DlnLnkMsgNoAnchor	: "Please select an anchor",	//MISSING
+DlnLnkMsgNoUrl		: "Унесите УРЛ линка",
+DlnLnkMsgNoEMail	: "Откуцајте адресу електронске поште",
+DlnLnkMsgNoAnchor	: "Одаберите сидро",
 
 // Color Dialog
 DlgColorTitle		: "Одаберите боју",
@@ -310,143 +325,147 @@ PasteErrorCopy	: "Сигурносна подешавања Вашег прет�
 PasteAsText		: "Залепи као чист текст",
 PasteFromWord	: "Залепи из Worda",
 
-DlgPasteMsg		: "Едитор није могао да изврши аутоматско лепљење због <STRONG>сигурносних поставки</STRONG> Вашег претраживача.<BR>Молимо да залепите садржај унутар следеће површине користећи тастатурну пречицу (<STRONG>Ctrl+V</STRONG>), a затим кликните на <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Молимо Вас да залепите унутар доње површине користећи тастатурну пречицу (<STRONG>Ctrl+V</STRONG>) и да притиснете <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Игнориши Font Face дефиниције",
+DlgPasteRemoveStyles	: "Уклони дефиниције стилова",
+DlgPasteCleanBox		: "Обриши све",
+
 
 // Color Picker
 ColorAutomatic	: "Аутоматски",
 ColorMoreColors	: "Више боја...",
 
 // Document Properties
-DocProps		: "Document Properties",	//MISSING
+DocProps		: "Особине документа",
 
 // Anchor Dialog
-DlgAnchorTitle		: "Anchor Properties",	//MISSING
-DlgAnchorName		: "Anchor Name",	//MISSING
-DlgAnchorErrorName	: "Please type the anchor name",	//MISSING
+DlgAnchorTitle		: "Особине сидра",
+DlgAnchorName		: "Име сидра",
+DlgAnchorErrorName	: "Молимо Вас да унесете име сидра",
 
 // Speller Pages Dialog
-DlgSpellNotInDic		: "Not in dictionary",	//MISSING
-DlgSpellChangeTo		: "Change to",	//MISSING
-DlgSpellBtnIgnore		: "Ignore",	//MISSING
-DlgSpellBtnIgnoreAll	: "Ignore All",	//MISSING
-DlgSpellBtnReplace		: "Replace",	//MISSING
-DlgSpellBtnReplaceAll	: "Replace All",	//MISSING
-DlgSpellBtnUndo			: "Undo",	//MISSING
-DlgSpellNoSuggestions	: "- No suggestions -",	//MISSING
-DlgSpellProgress		: "Spell check in progress...",	//MISSING
-DlgSpellNoMispell		: "Spell check complete: No misspellings found",	//MISSING
-DlgSpellNoChanges		: "Spell check complete: No words changed",	//MISSING
-DlgSpellOneChange		: "Spell check complete: One word changed",	//MISSING
-DlgSpellManyChanges		: "Spell check complete: %1 words changed",	//MISSING
+DlgSpellNotInDic		: "Није у речнику",
+DlgSpellChangeTo		: "Измени",
+DlgSpellBtnIgnore		: "Игнориши",
+DlgSpellBtnIgnoreAll	: "Игнориши све",
+DlgSpellBtnReplace		: "Замени",
+DlgSpellBtnReplaceAll	: "Замени све",
+DlgSpellBtnUndo			: "Врати акцију",
+DlgSpellNoSuggestions	: "- Без сугестија -",
+DlgSpellProgress		: "Провера спеловања у току...",
+DlgSpellNoMispell		: "Провера спеловања завршена: грешке нису пронађене",
+DlgSpellNoChanges		: "Провера спеловања завршена: Није измењена ниједна реч",
+DlgSpellOneChange		: "Провера спеловања завршена: Измењена је једна реч",
+DlgSpellManyChanges		: "Провера спеловања завршена:  %1 реч(и) је измењено",
 
-IeSpellDownload			: "Spell checker not installed. Do you want to download it now?",	//MISSING
+IeSpellDownload			: "Провера спеловања није инсталирана. Да ли желите да је скинете са Интернета?",
 
 // Button Dialog
-DlgButtonText	: "Text (Value)",	//MISSING
-DlgButtonType	: "Type",	//MISSING
+DlgButtonText	: "Текст (вредност)",
+DlgButtonType	: "Tип",
 
 // Checkbox and Radio Button Dialogs
-DlgCheckboxName		: "Name",	//MISSING
-DlgCheckboxValue	: "Value",	//MISSING
-DlgCheckboxSelected	: "Selected",	//MISSING
+DlgCheckboxName		: "Назив",
+DlgCheckboxValue	: "Вредност",
+DlgCheckboxSelected	: "Означено",
 
 // Form Dialog
-DlgFormName		: "Name",	//MISSING
-DlgFormAction	: "Action",	//MISSING
-DlgFormMethod	: "Method",	//MISSING
+DlgFormName		: "Назив",
+DlgFormAction	: "Aкција",
+DlgFormMethod	: "Mетода",
 
 // Select Field Dialog
-DlgSelectName		: "Name",	//MISSING
-DlgSelectValue		: "Value",	//MISSING
-DlgSelectSize		: "Size",	//MISSING
-DlgSelectLines		: "lines",	//MISSING
-DlgSelectChkMulti	: "Allow multiple selections",	//MISSING
-DlgSelectOpAvail	: "Available Options",	//MISSING
-DlgSelectOpText		: "Text",	//MISSING
-DlgSelectOpValue	: "Value",	//MISSING
-DlgSelectBtnAdd		: "Add",	//MISSING
-DlgSelectBtnModify	: "Modify",	//MISSING
-DlgSelectBtnUp		: "Up",	//MISSING
-DlgSelectBtnDown	: "Down",	//MISSING
-DlgSelectBtnSetValue : "Set as selected value",	//MISSING
-DlgSelectBtnDelete	: "Delete",	//MISSING
+DlgSelectName		: "Назив",
+DlgSelectValue		: "Вредност",
+DlgSelectSize		: "Величина",
+DlgSelectLines		: "линија",
+DlgSelectChkMulti	: "Дозволи вишеструку селекцију",
+DlgSelectOpAvail	: "Доступне опције",
+DlgSelectOpText		: "Текст",
+DlgSelectOpValue	: "Вредност",
+DlgSelectBtnAdd		: "Додај",
+DlgSelectBtnModify	: "Измени",
+DlgSelectBtnUp		: "Горе",
+DlgSelectBtnDown	: "Доле",
+DlgSelectBtnSetValue : "Подеси као означену вредност",
+DlgSelectBtnDelete	: "Обриши",
 
 // Textarea Dialog
-DlgTextareaName	: "Name",	//MISSING
-DlgTextareaCols	: "Columns",	//MISSING
-DlgTextareaRows	: "Rows",	//MISSING
+DlgTextareaName	: "Назив",
+DlgTextareaCols	: "Број колона",
+DlgTextareaRows	: "Број редова",
 
 // Text Field Dialog
-DlgTextName			: "Name",	//MISSING
-DlgTextValue		: "Value",	//MISSING
-DlgTextCharWidth	: "Character Width",	//MISSING
-DlgTextMaxChars		: "Maximum Characters",	//MISSING
-DlgTextType			: "Type",	//MISSING
-DlgTextTypeText		: "Text",	//MISSING
-DlgTextTypePass		: "Password",	//MISSING
+DlgTextName			: "Назив",
+DlgTextValue		: "Вредност",
+DlgTextCharWidth	: "Ширина (карактера)",
+DlgTextMaxChars		: "Максимално карактера",
+DlgTextType			: "Тип",
+DlgTextTypeText		: "Текст",
+DlgTextTypePass		: "Лозинка",
 
 // Hidden Field Dialog
-DlgHiddenName	: "Name",	//MISSING
-DlgHiddenValue	: "Value",	//MISSING
+DlgHiddenName	: "Назив",
+DlgHiddenValue	: "Вредност",
 
 // Bulleted List Dialog
-BulletedListProp	: "Bulleted List Properties",	//MISSING
-NumberedListProp	: "Numbered List Properties",	//MISSING
-DlgLstType			: "Type",	//MISSING
-DlgLstTypeCircle	: "Circle",	//MISSING
-DlgLstTypeDisk		: "Disk",	//MISSING
-DlgLstTypeSquare	: "Square",	//MISSING
-DlgLstTypeNumbers	: "Numbers (1, 2, 3)",	//MISSING
-DlgLstTypeLCase		: "Lowercase Letters (a, b, c)",	//MISSING
-DlgLstTypeUCase		: "Uppercase Letters (A, B, C)",	//MISSING
-DlgLstTypeSRoman	: "Small Roman Numerals (i, ii, iii)",	//MISSING
-DlgLstTypeLRoman	: "Large Roman Numerals (I, II, III)",	//MISSING
+BulletedListProp	: "Особине Bulleted листе",
+NumberedListProp	: "Особине набројиве листе",
+DlgLstType			: "Тип",
+DlgLstTypeCircle	: "Круг",
+DlgLstTypeDisk		: "Диск",
+DlgLstTypeSquare	: "Квадрат",
+DlgLstTypeNumbers	: "Бројеви (1, 2, 3)",
+DlgLstTypeLCase		: "мала слова (a, b, c)",
+DlgLstTypeUCase		: "ВЕЛИКА СЛОВА (A, B, C)",
+DlgLstTypeSRoman	: "Мале римске цифре (i, ii, iii)",
+DlgLstTypeLRoman	: "Велике римске цифре (I, II, III)",
 
 // Document Properties Dialog
-DlgDocGeneralTab	: "General",	//MISSING
-DlgDocBackTab		: "Background",	//MISSING
-DlgDocColorsTab		: "Colors and Margins",	//MISSING
-DlgDocMetaTab		: "Meta Data",	//MISSING
+DlgDocGeneralTab	: "Опште особине",
+DlgDocBackTab		: "Позадина",
+DlgDocColorsTab		: "Боје и маргине",
+DlgDocMetaTab		: "Метаподаци",
 
-DlgDocPageTitle		: "Page Title",	//MISSING
-DlgDocLangDir		: "Language Direction",	//MISSING
-DlgDocLangDirLTR	: "Left to Right (LTR)",	//MISSING
-DlgDocLangDirRTL	: "Right to Left (RTL)",	//MISSING
-DlgDocLangCode		: "Language Code",	//MISSING
-DlgDocCharSet		: "Character Set Encoding",	//MISSING
-DlgDocCharSetOther	: "Other Character Set Encoding",	//MISSING
+DlgDocPageTitle		: "Наслов странице",
+DlgDocLangDir		: "Смер језика",
+DlgDocLangDirLTR	: "Слева надесно (LTR)",
+DlgDocLangDirRTL	: "Здесна налево (RTL)",
+DlgDocLangCode		: "Шифра језика",
+DlgDocCharSet		: "Кодирање скупа карактера",
+DlgDocCharSetOther	: "Остала кодирања скупа карактера",
 
-DlgDocDocType		: "Document Type Heading",	//MISSING
-DlgDocDocTypeOther	: "Other Document Type Heading",	//MISSING
-DlgDocIncXHTML		: "Include XHTML Declarations",	//MISSING
-DlgDocBgColor		: "Background Color",	//MISSING
-DlgDocBgImage		: "Background Image URL",	//MISSING
-DlgDocBgNoScroll	: "Nonscrolling Background",	//MISSING
-DlgDocCText			: "Text",	//MISSING
-DlgDocCLink			: "Link",	//MISSING
-DlgDocCVisited		: "Visited Link",	//MISSING
-DlgDocCActive		: "Active Link",	//MISSING
-DlgDocMargins		: "Page Margins",	//MISSING
-DlgDocMaTop			: "Top",	//MISSING
-DlgDocMaLeft		: "Left",	//MISSING
-DlgDocMaRight		: "Right",	//MISSING
-DlgDocMaBottom		: "Bottom",	//MISSING
-DlgDocMeIndex		: "Document Indexing Keywords (comma separated)",	//MISSING
-DlgDocMeDescr		: "Document Description",	//MISSING
-DlgDocMeAuthor		: "Author",	//MISSING
-DlgDocMeCopy		: "Copyright",	//MISSING
-DlgDocPreview		: "Preview",	//MISSING
+DlgDocDocType		: "Заглавље типа документа",
+DlgDocDocTypeOther	: "Остала заглавља типа документа",
+DlgDocIncXHTML		: "Улључи XHTML декларације",
+DlgDocBgColor		: "Боја позадине",
+DlgDocBgImage		: "УРЛ позадинске слике",
+DlgDocBgNoScroll	: "Фиксирана позадина",
+DlgDocCText			: "Текст",
+DlgDocCLink			: "Линк",
+DlgDocCVisited		: "Посећени линк",
+DlgDocCActive		: "Активни линк",
+DlgDocMargins		: "Маргине странице",
+DlgDocMaTop			: "Горња",
+DlgDocMaLeft		: "Лева",
+DlgDocMaRight		: "Десна",
+DlgDocMaBottom		: "Доња",
+DlgDocMeIndex		: "Кључне речи за индексирање документа (раздвојене зарезом)",
+DlgDocMeDescr		: "Опис документа",
+DlgDocMeAuthor		: "Аутор",
+DlgDocMeCopy		: "Ауторска права",
+DlgDocPreview		: "Изглед странице",
 
 // Templates Dialog
-Templates			: "Templates",	//MISSING
-DlgTemplatesTitle	: "Content Templates",	//MISSING
-DlgTemplatesSelMsg	: "Please select the template to open in the editor<br>(the actual contents will be lost):",	//MISSING
-DlgTemplatesLoading	: "Loading templates list. Please wait...",	//MISSING
-DlgTemplatesNoTpl	: "(No templates defined)",	//MISSING
+Templates			: "Обрасци",
+DlgTemplatesTitle	: "Обрасци за садржај",
+DlgTemplatesSelMsg	: "Молимо Вас да одаберете образац који ће бити примењен на страницу (тренутни садржај ће бити обрисан):",
+DlgTemplatesLoading	: "Учитавам листу образаца. Мало стрпљења...",
+DlgTemplatesNoTpl	: "(Нема дефинисаних образаца)",
 
 // About Dialog
-DlgAboutAboutTab	: "About",	//MISSING
-DlgAboutBrowserInfoTab	: "Browser Info",	//MISSING
+DlgAboutAboutTab	: "О едитору",
+DlgAboutBrowserInfoTab	: "Информације о претраживачу",
 DlgAboutVersion		: "верзија",
 DlgAboutLicense		: "Лиценцирано под условима GNU Lesser General Public License",
 DlgAboutInfo		: "За више информација посетите"

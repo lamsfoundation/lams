@@ -42,6 +42,8 @@ RemoveLink			: "ลบ ลิงค์",
 Anchor				: "แทรก/แก้ไข Anchor",
 InsertImageLbl		: "รูปภาพ",
 InsertImage			: "แทรก/แก้ไข รูปภาพ",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "ตาราง",
 InsertTable			: "แทรก/แก้ไข ตาราง",
 InsertLineLbl		: "เส้นคั่นบรรทัด",
@@ -106,6 +108,7 @@ SplitCell			: "แยกช่อง",
 CellProperties		: "คุณสมบัติของช่อง",
 TableProperties		: "คุณสมบัติของตาราง",
 ImageProperties		: "คุณสมบัติของรูปภาพ",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "รายละเอียด Anchor",
 ButtonProp			: "รายละเอียดของ ปุ่ม",
@@ -137,6 +140,8 @@ DlgBtnClose			: "ปิด",
 DlgBtnBrowseServer	: "เปิดหน้าต่างจัดการไฟล์อัพโหลด",
 DlgAdvancedTag		: "ขั้นสูง",
 DlgOpOther			: "&lt;อื่นๆ&gt;",
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;ไม่ระบุ&gt;",
@@ -182,6 +187,16 @@ DlgImgAlignTop		: "บนสุด",
 DlgImgPreview		: "หน้าเอกสารตัวอย่าง",
 DlgImgAlertUrl		: "กรุณาระบุที่อยู่อ้างอิงออนไลน์ของไฟล์รูปภาพ (URL)",
 DlgImgLinkTab		: "Link",	//MISSING
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "ลิงค์เชื่อมโยงเว็บ อีเมล์ รูปภาพ หรือไฟล์อื่นๆ",
@@ -311,7 +326,11 @@ PasteErrorCopy	: "ไม่สามารถสำเนาข้อควา�
 PasteAsText		: "วางแบบตัวอักษรธรรมดา",
 PasteFromWord	: "วางแบบตัวอักษรจากโปรแกรมเวิร์ด",
 
-DlgPasteMsg		: "ไม่สามารถวางข้อความที่สำเนามาได้เนื่องจาก <STRONG>การกำหนดค่าระดับความปลอดภัย</STRONG> ในโปรแกรมท่องเว็บที่ท่านกำลังใช้อยู่.<BR>กรุณาใช้ปุ่มลัดเพื่อวางข้อความแทน (<STRONG>กดปุ่ม Ctrl และตัว V พร้อมกัน</STRONG>) และกดปุ่ม <STRONG>ตกลง</STRONG>.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "สีอัตโนมัติ",

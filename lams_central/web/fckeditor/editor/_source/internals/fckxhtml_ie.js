@@ -37,6 +37,7 @@ FCKXHtml._AppendAttributes = function( xmlNode, htmlNode, node, nodeName )
 		if ( oAttribute.specified )
 		{
 			var sAttName = oAttribute.nodeName.toLowerCase() ;
+			var sAttValue ;
 
 			// The "_fckxhtmljob" attribute is used to mark the already processed elements.
 			if ( sAttName == '_fckxhtmljob' )
@@ -44,20 +45,20 @@ FCKXHtml._AppendAttributes = function( xmlNode, htmlNode, node, nodeName )
 			// The following must be done because of a bug on IE regarding the style
 			// attribute. It returns "null" for the nodeValue.
 			else if ( sAttName == 'style' )
-				var sAttValue = htmlNode.style.cssText ;
+				sAttValue = htmlNode.style.cssText ;
 			// There are two cases when the oAttribute.nodeValue must be used:
 			//		- for the "class" attribute
 			//		- for events attributes (on IE only).
 			else if ( sAttName == 'class' || sAttName.indexOf('on') == 0 )
-				var sAttValue = oAttribute.nodeValue ;
+				sAttValue = oAttribute.nodeValue ;
 			else if ( nodeName == 'body' && sAttName == 'contenteditable' )
 				continue ;
 			// XHTML doens't support attribute minimization like "CHECKED". It must be trasformed to cheched="checked".
 			else if ( oAttribute.nodeValue === true )
 				sAttValue = sAttName ;
 			// We must use getAttribute to get it exactly as it is defined.
-			else
-				var sAttValue = htmlNode.getAttribute( sAttName, 2 ) ;	
+			else if ( ! (sAttValue = htmlNode.getAttribute( sAttName, 2 ) ) )
+				sAttValue = oAttribute.nodeValue ;
 
 			if ( FCKConfig.ForceSimpleAmpersand && sAttValue.replace )
 				sAttValue = sAttValue.replace( /&/g, '___FCKAmp___' ) ;
@@ -174,7 +175,21 @@ FCKXHtml.TagProcessors['form'] = function( node, htmlNode )
 	if ( htmlNode.acceptCharset.length > 0 && htmlNode.acceptCharset != 'UNKNOWN' )
 		FCKXHtml._AppendAttribute( node, 'accept-charset', htmlNode.acceptCharset ) ;
 
+	if ( htmlNode.name ) 
+		FCKXHtml._AppendAttribute( node, 'name', htmlNode.name ) ; 
+
 	FCKXHtml._AppendChildNodes( node, htmlNode ) ;
 
 	return node ;
 }
+
+// IE doens't hold the name attribute as an attribute for the <TEXTAREA> and <SELECT> tags.
+FCKXHtml.TagProcessors['textarea'] = FCKXHtml.TagProcessors['select'] = function( node, htmlNode )
+{ 
+	if ( htmlNode.name ) 
+		FCKXHtml._AppendAttribute( node, 'name', htmlNode.name ) ; 
+
+	FCKXHtml._AppendChildNodes( node, htmlNode ) ; 
+ 
+	return node ; 
+} 

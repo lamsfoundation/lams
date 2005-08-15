@@ -42,6 +42,8 @@ RemoveLink			: "Kendu Esteka",
 Anchor				: "Aingura",
 InsertImageLbl		: "Irudia",
 InsertImage			: "Txertatu/Editatu Irudia",
+InsertFlashLbl		: "Flasha",
+InsertFlash			: "Txertatu/Editatu Flasha",
 InsertTableLbl		: "Taula",
 InsertTable			: "Txertatu/Editatu Taula",
 InsertLineLbl		: "Lerroa",
@@ -106,6 +108,7 @@ SplitCell			: "Zatitu Gelaxka",
 CellProperties		: "Gelaxkaren Ezaugarriak",
 TableProperties		: "Taularen Ezaugarriak",
 ImageProperties		: "Irudiaren Ezaugarriak",
+FlashProperties		: "Flasharen Ezaugarriak",
 
 AnchorProp			: "Ainguraren Ezaugarriak",
 ButtonProp			: "Botoiaren Ezaugarriak",
@@ -137,6 +140,8 @@ DlgBtnClose			: "Itxi",
 DlgBtnBrowseServer	: "Zerbitzaria arakatu",
 DlgAdvancedTag		: "Aurreratua",
 DlgOpOther			: "&lt;Bestelakoak&gt;",
+DlgInfoTab			: "Informazioa",
+DlgAlertUrl			: "Mesedez URLa idatzi ezazu",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;Ezarri gabe&gt;",
@@ -182,6 +187,16 @@ DlgImgAlignTop		: "Goian",
 DlgImgPreview		: "Aurrebista",
 DlgImgAlertUrl		: "Mesedez Irudiaren URLa idatzi",
 DlgImgLinkTab		: "Esteka",
+
+// Flash Dialog
+DlgFlashTitle		: "Flasharen Ezaugarriak",
+DlgFlashChkPlay		: "Automatikoki Erreproduzitu",
+DlgFlashChkLoop		: "Begizta",
+DlgFlashChkMenu		: "Flasharen Menua Gaitu",
+DlgFlashScale		: "Eskalatu",
+DlgFlashScaleAll	: "Dena erakutsi",
+DlgFlashScaleNoBorder	: "Ertzarik gabe",
+DlgFlashScaleFit	: "Doitu",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Esteka",
@@ -311,7 +326,11 @@ PasteErrorCopy	: "Zure web nabigatzailearen segurtasun ezarpenak testuak automat
 PasteAsText		: "Testu Arrunta bezala Itsatsi",
 PasteFromWord	: "Word-etik itsatsi",
 
-DlgPasteMsg		: "Editoreak ezin du atomatikoki testua itsatsi zure nabigatzailearen <STRONG>segurtasun neurriengatik</STRONG>.<BR>Mesedez, itsatsi ezazu ondorengo kutxan teklatuaren bidez (<STRONG>Ctrl+V</STRONG>) eta <STRONG>Ados</STRONG> botoian klik egin.",
+DlgPasteMsg2	: "Mesedez teklatua erabilita (<STRONG>Ctrl+V</STRONG>) ondorego eremuan testua itsatsi eta <STRONG>OK</STRONG> sakatu.",
+DlgPasteIgnoreFont		: "Letra Motaren definizioa ezikusi",
+DlgPasteRemoveStyles	: "Estilo definizioak kendu",
+DlgPasteCleanBox		: "Testu-eremua Garbitu",
+
 
 // Color Picker
 ColorAutomatic	: "Automatikoa",

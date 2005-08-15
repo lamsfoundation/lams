@@ -21,6 +21,13 @@ FCK.Description = "FCKeditor for Gecko Browsers" ;
 
 FCK.InitializeBehaviors = function()
 {
+	// Enable table borders visibility.
+	if ( FCKConfig.ShowBorders ) 
+	{
+		var oStyle = FCKTools.AppendStyleSheet( this.EditorDocument, FCKConfig.FullBasePath + 'css/fck_showtableborders_gecko.css' ) ;
+		oStyle.setAttribute( '_fcktemp', 'true' ) ;
+	}
+
 	// Disable Right-Click
 	var oOnContextMenu = function( e )
 	{
@@ -29,13 +36,7 @@ FCK.InitializeBehaviors = function()
 	}
 	this.EditorDocument.addEventListener( 'contextmenu', oOnContextMenu, true ) ;
 
-	/*
-	TODO: 
-	This is not working... on Gecko there is no "OnPaste" event that
-	can prevent the user to paste.
-	I've tried with the OnKeyDown event for the "CTRL-V" key "down", but the
-	paste still occours (preventDefault does nothing in this case).
-	
+	// Handle pasting operations.
 	var oOnKeyDown = function( e )
 	{
 		if ( e.ctrlKey && !e.shiftKey && !e.altKey )
@@ -43,18 +44,15 @@ FCK.InitializeBehaviors = function()
 			// Char 86/118 = V/v
 			if ( e.which == 86 || e.which == 118 )
 			{
-				if ( FCK.Status == FCK_STATUS_COMPLETE )
+				if ( FCK.Status != FCK_STATUS_COMPLETE || !FCK.Events.FireEvent( "OnPaste" ) )
 				{
-					if ( !FCK.Events.FireEvent( "OnPaste" ) )
-						e.preventDefault() ;
-				}
-				else
 					e.preventDefault() ;
+					e.stopPropagation() ;
+				}
 			}
 		}
 	}
-	this.EditorDocument.addEventListener( 'keydown', oOnKeyDown, true ) ;
-	*/
+	this.EditorDocument.addEventListener( 'keypress', oOnKeyDown, true ) ;
 
 	this.ExecOnSelectionChange = function()
 	{
@@ -161,7 +159,7 @@ FCK.SetHTML = function( html, forceWYSIWYG )
 
 				this._Initialized = true ;
 			}
-			
+
 			this.EditorDocument.open() ;
 			this.EditorDocument.write( sHtml ) ;
 			this.EditorDocument.close() ;
@@ -187,38 +185,43 @@ FCK.SetHTML = function( html, forceWYSIWYG )
 
 			sHtml += '</head><body>&nbsp;</body></html>' ;
 			*/
-			
+
 			if ( !this._Initialized )
 			{
 				this.EditorDocument.dir = FCKConfig.ContentLangDirection ;
-				
+
 				var sHtml =
 					'<title></title>' +
 					'<link href="' + FCKConfig.EditorAreaCSS + '" rel="stylesheet" type="text/css" />' +
 					'<link href="' + FCKConfig.BasePath + 'css/fck_internal.css' + '" rel="stylesheet" type="text/css" _fcktemp="true" />' ;
-					
+
 				sHtml += FCK.TempBaseTag ;
 
 				this.EditorDocument.getElementsByTagName("HEAD")[0].innerHTML = sHtml ;
-				
+
 				this.InitializeBehaviors() ;
 
 				this._Initialized = true ;
-			}			
+			}
 
 			// On Gecko we must disable editing before setting the BODY innerHTML.
-			FCK.EditorDocument.designMode = 'off' ;
+//			FCK.EditorDocument.designMode = 'off' ;
 
-			FCK.EditorDocument.body.innerHTML = html ;
-			
+			if ( html.length == 0 )
+				FCK.EditorDocument.body.innerHTML = '<br _moz_editor_bogus_node="TRUE">' ;
+			else if ( FCKRegexLib.EmptyParagraph.test( html ) )
+				FCK.EditorDocument.body.innerHTML = html.replace( FCKRegexLib.TagBody, '><br _moz_editor_bogus_node="TRUE"><' ) ;
+			else
+				FCK.EditorDocument.body.innerHTML = html ;
+
 			// On Gecko we must set the desingMode on again after setting the BODY innerHTML.
-			FCK.EditorDocument.designMode = 'on' ;
+//			FCK.EditorDocument.designMode = 'on' ;
 
 			// Tell Gecko to use or not the <SPAN> tag for the bold, italic and underline.
 			FCK.EditorDocument.execCommand( 'useCSS', false, !FCKConfig.GeckoUseSPAN ) ;
 		}
 
-		this.Events.FireEvent( 'OnAfterSetHTML' ) ;
+		FCK.OnAfterSetHTML() ;
 	}
 	else
 		document.getElementById('eSourceField').value = html ;

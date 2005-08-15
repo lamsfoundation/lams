@@ -15,6 +15,19 @@
  * 		Frederico Caldeira Knabben (fredck@fckeditor.net)
 -->
 <%
+
+Sub SetXmlHeaders()
+	' Cleans the response buffer.
+	Response.Clear()
+
+	' Prevent the browser from caching the result.
+	Response.CacheControl = "no-cache"
+
+	' Set the response format.
+	Response.CharSet		= "UTF-8"
+	Response.ContentType	= "text/xml"
+End Sub
+
 Sub CreateXmlHeader( command, resourceType, currentFolder )
 	' Create the XML document header.
 	Response.Write "<?xml version=""1.0"" encoding=""utf-8"" ?>"
@@ -28,5 +41,16 @@ End Sub
 
 Sub CreateXmlFooter()
 	Response.Write "</Connector>"
+End Sub
+
+Sub SendError( number, text )
+	SetXmlHeaders
+	
+	' Create the XML document header.
+	Response.Write "<?xml version=""1.0"" encoding=""utf-8"" ?>"
+	
+	Response.Write "<Connector><Error number=""" & number & """ text=""" & Server.HTMLEncode( text ) & """ /></Connector>"
+	
+	Response.End
 End Sub
 %>

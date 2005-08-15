@@ -23,6 +23,8 @@ var FCKTableCommand = function( command )
 
 FCKTableCommand.prototype.Execute = function()
 {
+	FCKUndo.SaveUndoStep() ;
+	
 	switch ( this.Name )
 	{
 		case 'TableInsertRow' :

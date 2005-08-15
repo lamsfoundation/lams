@@ -41,6 +41,8 @@ RemoveLink			: "Remover Hiperlink",
 Anchor				: "Inserir/Editar Âncora",
 InsertImageLbl		: "Figura",
 InsertImage			: "Inserir/Editar Figura",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "Tabela",
 InsertTable			: "Inserir/Editar Tabela",
 InsertLineLbl		: "Linha",
@@ -105,6 +107,7 @@ SplitCell			: "Dividir Célular",
 CellProperties		: "Formatar Célula",
 TableProperties		: "Formatar Tabela",
 ImageProperties		: "Formatar Figura",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "Formatar Âncora",
 ButtonProp			: "Formatar Botão",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Fechar",
 DlgBtnBrowseServer	: "Localizar no Servidor",
 DlgAdvancedTag		: "Avançado",
 DlgOpOther			: "&lt;Outros&gt;",
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;não ajustado&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Superior",
 DlgImgPreview		: "Visualização",
 DlgImgAlertUrl		: "Por favor, digite o URL da figura.",
 DlgImgLinkTab		: "Hiperlink",
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "Hiperlink",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "As configurações de segurança do seu navegador não permite
 PasteAsText		: "Colar como Texto sem Formatação",
 PasteFromWord	: "Colar do Word",
 
-DlgPasteMsg		: "Não foi possível execurar o comando colar automaticamente devido às <STRONG>configurações de segurança</STRONG> seu navegador.<BR>Cole o conteúdo desejado dentro da seguinte caixa texto utilizando a tecla de atalho (<STRONG>Ctrl+V</STRONG>) e clique em <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "Automático",

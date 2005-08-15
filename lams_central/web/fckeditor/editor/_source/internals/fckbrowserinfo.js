@@ -23,7 +23,8 @@ if ( !( FCKBrowserInfo = NS.FCKBrowserInfo ) )
 
 	var sAgent = navigator.userAgent.toLowerCase() ;
 
-	FCKBrowserInfo.IsIE			= sAgent.indexOf("msie") != -1 ;
+	FCKBrowserInfo.IsIE			= ( sAgent.indexOf("msie") != -1 ) ;
 	FCKBrowserInfo.IsGecko		= !FCKBrowserInfo.IsIE ;
-	FCKBrowserInfo.IsNetscape	= sAgent.indexOf("netscape") != -1 ;
+	FCKBrowserInfo.IsSafari		= ( sAgent.indexOf("safari") != -1 ) ;
+	FCKBrowserInfo.IsNetscape	= ( sAgent.indexOf("netscape") != -1 ) ;
 }

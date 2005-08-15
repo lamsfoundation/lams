@@ -42,6 +42,8 @@ RemoveLink			: "Odstranit odkaz",
 Anchor				: "Vložít/změnit záložku",
 InsertImageLbl		: "Obrázek",
 InsertImage			: "Vložit/změnit obrázek",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "Tabulka",
 InsertTable			: "Vložit/změnit tabulku",
 InsertLineLbl		: "Linka",
@@ -106,6 +108,7 @@ SplitCell			: "Rozdělit buňku",
 CellProperties		: "Vlastnosti buňky",
 TableProperties		: "Vlastnosti tabulky",
 ImageProperties		: "Vlastnosti obrázku",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "Vlastnosti záložky",
 ButtonProp			: "Vlastnosti tlačítka",
@@ -137,6 +140,8 @@ DlgBtnClose			: "Zavřít",
 DlgBtnBrowseServer	: "Vybrat na serveru",
 DlgAdvancedTag		: "Rozšířené",
 DlgOpOther			: "&lt;Ostatní&gt;",
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;nenastaveno&gt;",
@@ -182,6 +187,16 @@ DlgImgAlignTop		: "Nahoru",
 DlgImgPreview		: "Náhled",
 DlgImgAlertUrl		: "Zadejte prosím URL obrázku",
 DlgImgLinkTab		: "Link",	//MISSING
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "Odkaz",
@@ -311,7 +326,11 @@ PasteErrorCopy	: "Bezpečnostní nastavení Vašeho prohlížeče nedovolují ed
 PasteAsText		: "Vložit jako čistý text",
 PasteFromWord	: "Vložit text z Wordu",
 
-DlgPasteMsg		: "<STRONG>Bezpečnostní nastavení</STRONG> Vašeho prohlížeče nedovolují editoru spustit funkci pro vložení textu ze schránky.<BR>Text ze schránky prosím vložte pomocí klávesnice do tohoto pole (<STRONG>Ctrl+V</STRONG>) a pak stiskněte tlačítko <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "Automaticky",

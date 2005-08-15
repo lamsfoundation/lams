@@ -41,6 +41,8 @@ RemoveLink			: "إزالة رابط",
 Anchor				: "إدراج/تحرير إشارة مرجعية",
 InsertImageLbl		: "صورة",
 InsertImage			: "إدراج/تحرير صورة",
+InsertFlashLbl		: "فلاش",
+InsertFlash			: "إدراج/تحرير فيلم فلاش",
 InsertTableLbl		: "جدول",
 InsertTable			: "إدراج/تحرير جدول",
 InsertLineLbl		: "خط فاصل",
@@ -105,6 +107,7 @@ SplitCell			: "تقسيم خلية",
 CellProperties		: "خصائص الخلية",
 TableProperties		: "خصائص الجدول",
 ImageProperties		: "خصائص الصورة",
+FlashProperties		: "خصائص فيلم الفلاش",
 
 AnchorProp			: "خصائص الإشارة المرجعية",
 ButtonProp			: "خصائص زر الضغط",
@@ -136,6 +139,8 @@ DlgBtnClose			: "إغلاق",
 DlgBtnBrowseServer	: "تصفح الخادم",
 DlgAdvancedTag		: "متقدم",
 DlgOpOther			: "&lt;أخرى&gt;",
+DlgInfoTab			: "معلومات",
+DlgAlertUrl			: "الرجاء كتابة عنوان الإنترنت",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;بدون تحديد&gt;",
@@ -180,7 +185,17 @@ DlgImgAlignTextTop	: "أعلى النص",
 DlgImgAlignTop		: "أعلى",
 DlgImgPreview		: "معاينة",
 DlgImgAlertUrl		: "فضلاً اكتب الموقع الذي توجد عليه هذه الصورة.",
-DlgImgLinkTab		: "Link",	//MISSING
+DlgImgLinkTab		: "الرابط",
+
+// Flash Dialog
+DlgFlashTitle		: "خصائص فيلم الفلاش",
+DlgFlashChkPlay		: "تشغيل تلقائي",
+DlgFlashChkLoop		: "تكرار",
+DlgFlashChkMenu		: "تمكين قائمة فيلم الفلاش",
+DlgFlashScale		: "الحجم",
+DlgFlashScaleAll	: "إظهار الكل",
+DlgFlashScaleNoBorder	: "بلا حدود",
+DlgFlashScaleFit	: "ضبط تام",
 
 // Link Dialog
 DlgLnkWindowTitle	: "ارتباط تشعبي",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "الإعدادات الأمنية للمتصفح الذي تس
 PasteAsText		: "لصق كنص بسيط",
 PasteFromWord	: "لصق من وورد",
 
-DlgPasteMsg		: "لم يتمكن المحرر من القيام باللصق تلقائياً، نظراً <STRONG>لإعدادت متصفحك الأمنية</STRONG>.<BR>فضلاً إلصق داخل المربع التالي باستخدام لوحة المفاتيح (<STRONG>Ctrl+V</STRONG>) ثم اضغط <STRONG>موافق</STRONG>.",
+DlgPasteMsg2	: "الصق داخل الصندوق باستخدام زرّي (<STRONG>Ctrl+V</STRONG>) في لوحة المفاتيح، ثم اضغط زر  <STRONG>موافق</STRONG>.",
+DlgPasteIgnoreFont		: "تجاهل تعريفات أسماء الخطوط",
+DlgPasteRemoveStyles	: "إزالة تعريفات الأنماط",
+DlgPasteCleanBox		: "نظّف محتوى الصندوق",
+
 
 // Color Picker
 ColorAutomatic	: "تلقائي",
@@ -438,11 +457,11 @@ DlgDocMeCopy		: "المالك",
 DlgDocPreview		: "معاينة",
 
 // Templates Dialog
-Templates			: "Templates",	//MISSING
-DlgTemplatesTitle	: "Content Templates",	//MISSING
-DlgTemplatesSelMsg	: "Please select the template to open in the editor<br>(the actual contents will be lost):",	//MISSING
-DlgTemplatesLoading	: "Loading templates list. Please wait...",	//MISSING
-DlgTemplatesNoTpl	: "(No templates defined)",	//MISSING
+Templates			: "القوالب",
+DlgTemplatesTitle	: "قوالب المحتوى",
+DlgTemplatesSelMsg	: "اختر القالب الذي تود وضعه في المحرر <br>(سيتم فقدان المحتوى الحالي):",
+DlgTemplatesLoading	: "جاري تحميل قائمة القوالب، الرجاء الانتظار...",
+DlgTemplatesNoTpl	: "(لم يتم تعريف أي قالب)",
 
 // About Dialog
 DlgAboutAboutTab	: "نبذة",

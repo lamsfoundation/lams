@@ -24,7 +24,7 @@ FCKRegexLib.AposEntity		= /&apos;/gi ;
 FCKRegexLib.ObjectElements	= /^(?:IMG|TABLE|TR|TD|INPUT|SELECT|TEXTAREA|HR|OBJECT)$/i ;
 
 // Block Elements.
-FCKRegexLib.BlockElements	= /^(?:P|DIV|H1|H2|H3|H4|H5|H6|ADDRESS|PRE|OL|UL|LI)$/i ;
+FCKRegexLib.BlockElements	= /^(?:P|DIV|H1|H2|H3|H4|H5|H6|ADDRESS|PRE|OL|UL|LI|TD)$/i ;
 
 // Elements marked as empty "Empty" in the XHTML DTD.
 FCKRegexLib.EmptyElements	= /^(?:BASE|META|LINK|HR|BR|PARAM|IMG|AREA|INPUT)$/i ;
@@ -46,4 +46,15 @@ FCKRegexLib.HeadCloser		= /<\/head\s*>/i ;
 
 FCKRegexLib.TableBorderClass = /\s*FCK__ShowTableBorders\s*/ ;
 
+// Validate element names.
 FCKRegexLib.ElementName = /^[A-Za-z_:][\w.-:]*$/ ;
+
+// Used in conjuction with the FCKConfig.ForceSimpleAmpersand configuration option.
+FCKRegexLib.ForceSimpleAmpersand = /___FCKAmp___/g ;
+
+// Get the closing parts of the tags with no closing tags, like <br/>... gets the "/>" part.
+FCKRegexLib.SpaceNoClose = /\/>/g ;
+
+FCKRegexLib.EmptyParagraph = /^<(p|div)>\s*<\/\1>$/i ;
+
+FCKRegexLib.TagBody = /></ ;

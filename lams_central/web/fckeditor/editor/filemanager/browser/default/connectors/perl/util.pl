@@ -39,4 +39,16 @@ sub ConvertToXmlAttribute
 
 }
 
+sub specialchar_cnv
+{
+	local($ch) = @_;
+
+	$ch =~ s/&/&amp;/g;		# &
+	$ch =~ s/\"/&quot;/g;	#"
+	$ch =~ s/\'/&#39;/g;	# '
+	$ch =~ s/</&lt;/g;		# <
+	$ch =~ s/>/&gt;/g;		# >
+	return($ch);
+}
+
 1;

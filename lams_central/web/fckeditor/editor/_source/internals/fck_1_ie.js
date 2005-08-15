@@ -23,10 +23,24 @@ FCK.Description = "FCKeditor for Internet Explorer 5.5+" ;
 // errors when using a differente BaseHref.
 FCK._BehaviorsStyle =
 	'<style type="text/css" _fcktemp="true"> \
-		TABLE	{ behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/showtableborders.htc) ; } \
-		A		{ behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/anchors.htc) ; } \
-		INPUT	{ behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/hiddenfield.htc) ; } \
-	</style>' ;
+		INPUT		{ behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/hiddenfield.htc) ; } \
+		INPUT		{ behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/disablehandles.htc) ; } \
+		TEXTAREA	{ behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/disablehandles.htc) ; } \
+		SELECT		{ behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/disablehandles.htc) ; }' ;
+
+if ( FCKConfig.ShowBorders )
+	FCK._BehaviorsStyle += 'TABLE { behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/showtableborders.htc) ; }' ;
+
+if ( FCKConfig.DisableImageHandles )
+	FCK._BehaviorsStyle += 'IMG { behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/disablehandles.htc) ; }' ;
+
+if ( FCKConfig.DisableTableHandles )
+	FCK._BehaviorsStyle += 'TABLE { behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/disablehandles.htc) ; }' ;
+
+// Disable anchors handles
+FCK._BehaviorsStyle += '.FCK__Anchor { behavior: url(' + FCKConfig.FullBasePath + 'css/behaviors/disablehandles.htc) ; }' ;
+
+FCK._BehaviorsStyle += '</style>' ;
 
 function Doc_OnMouseDown()
 {
@@ -47,6 +61,7 @@ function Doc_OnPaste()
 function Doc_OnContextMenu()
 {
 	var e = FCK.EditorWindow.event ;
+	
 	FCK.ShowContextMenu( e.screenX, e.screenY ) ;
 	return false ;
 }
@@ -82,8 +97,26 @@ function Doc_OnKeyDown()
 		FCK.InsertHtml( window.FCKTabHTML ) ;
 		return false ;
 	}
-
+	
 	return true ;
+}
+
+function Doc_OnKeyDownUndo()
+{
+	if ( !FCKUndo.Typing )
+	{
+		FCKUndo.SaveUndoStep() ;
+		FCKUndo.Typing = true ;
+		FCK.Events.FireEvent( "OnSelectionChange" ) ;
+	}
+	
+	FCKUndo.TypesCount++ ;
+
+	if ( FCKUndo.TypesCount > FCKUndo.MaxTypes )
+	{
+		FCKUndo.TypesCount = 0 ;
+		FCKUndo.SaveUndoStep() ;
+	}
 }
 
 function Doc_OnDblClick()
@@ -123,6 +156,8 @@ FCK.InitializeBehaviors = function( dontReturn )
 
 		this.EditorDocument.attachEvent("onkeydown", Doc_OnKeyDown ) ;
 	}
+
+	this.EditorDocument.attachEvent("onkeydown", Doc_OnKeyDownUndo ) ;
 
 	this.EditorDocument.attachEvent("ondblclick", Doc_OnDblClick ) ;
 
@@ -172,8 +207,13 @@ FCK.SetHTML = function( html, forceWYSIWYG )
 		{
 			sHtml =
 				FCKConfig.DocType +
-				'<html dir="' + FCKConfig.ContentLangDirection + '">' +
-				'<head><title></title>' +
+				'<html dir="' + FCKConfig.ContentLangDirection + '"' ;
+			
+			if ( FCKConfig.IEForceVScroll )
+				sHtml += ' style="overflow-y: scroll"' ;
+			
+			sHtml +=
+				'><head><title></title>' +
 				'<link href="' + FCKConfig.EditorAreaCSS + '" rel="stylesheet" type="text/css" />' +
 				'<link href="' + FCKConfig.FullBasePath + 'css/fck_internal.css' + '" rel="stylesheet" type="text/css" _fcktemp="true" />' ;
 
@@ -189,7 +229,7 @@ FCK.SetHTML = function( html, forceWYSIWYG )
 		this.InitializeBehaviors() ;
 		this.EditorDocument.body.contentEditable = true ;
 
-		this.Events.FireEvent( 'OnAfterSetHTML' ) ;
+		FCK.OnAfterSetHTML() ;
 
 		// TODO: Wait stable version and remove the following commented lines.
 //		this.EditorDocument.body.innerHTML = '' ;
@@ -201,31 +241,6 @@ FCK.SetHTML = function( html, forceWYSIWYG )
 	else
 		document.getElementById('eSourceField').value = html ;
 }
-
-// TODO: Wait stable version and remove the following commented lines.
-/*
-FCK.CheckRelativeLinks = function()
-{
-	// IE automatically change relative URLs to absolute, so we use a trick
-	// to solve this problem (the document base points to "fckeditor:".
-
-	for ( var i = 0 ; i < this.EditorDocument.links.length ; i++ )
-	{
-		var e = this.EditorDocument.links[i] ;
-
-		if ( e.href.startsWith( FCK.BaseUrl ) )
-			e.href = e.href.remove( 0, FCK.BaseUrl.length ) ;
-	}
-
-	for ( var i = 0 ; i < this.EditorDocument.images.length ; i++ )
-	{
-		var e = this.EditorDocument.images[i] ;
-
-		if ( e.src.startsWith( FCK.BaseUrl ) )
-			e.src = e.src.remove( 0, FCK.BaseUrl.length ) ;
-	}
-}
-*/
 
 FCK.InsertHtml = function( html )
 {

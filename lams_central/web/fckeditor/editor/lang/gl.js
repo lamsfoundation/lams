@@ -41,6 +41,8 @@ RemoveLink			: "Eliminar Ligazón",
 Anchor				: "Inserir/Editar Referencia",
 InsertImageLbl		: "Imaxe",
 InsertImage			: "Inserir/Editar Imaxe",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "Inserir/Editar Flash",
 InsertTableLbl		: "Tabla",
 InsertTable			: "Inserir/Editar Tabla",
 InsertLineLbl		: "Liña",
@@ -105,6 +107,7 @@ SplitCell			: "Partir Celas",
 CellProperties		: "Propriedades da Cela",
 TableProperties		: "Propriedades da Taboa",
 ImageProperties		: "Propriedades Imaxe",
+FlashProperties		: "Propriedades Flash",
 
 AnchorProp			: "Propriedades da Referencia",
 ButtonProp			: "Propriedades do Botón",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Pechar",
 DlgBtnBrowseServer	: "Navegar no Servidor",
 DlgAdvancedTag		: "Advanzado",
 DlgOpOther			: "&lt;Outro&gt;",
+DlgInfoTab			: "Info",
+DlgAlertUrl			: "Por favor, insira a URL",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;non definido&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Tope",
 DlgImgPreview		: "Vista Previa",
 DlgImgAlertUrl		: "Por favor, escriba a URL da imaxe",
 DlgImgLinkTab		: "Ligazón",
+
+// Flash Dialog
+DlgFlashTitle		: "Propriedades Flash",
+DlgFlashChkPlay		: "Auto Execución",
+DlgFlashChkLoop		: "Bucle",
+DlgFlashChkMenu		: "Activar Menú Flash",
+DlgFlashScale		: "Escalar",
+DlgFlashScaleAll	: "Amosar Todo",
+DlgFlashScaleNoBorder	: "Sen Borde",
+DlgFlashScaleFit	: "Encaixar axustando",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Ligazón",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "Os axustes de seguridade do seu navegador non permiten que o e
 PasteAsText		: "Pegar como texto plano",
 PasteFromWord	: "Pegar dende Word",
 
-DlgPasteMsg		: "O editor non pode executar automáticamente o pegado debido ós <STRONG>axustes de seguridade</STRONG> do seu navegador.<BR>Por favor, pegue dentro do seguinte cadro usando o atallo de teclado (<STRONG>Ctrl+V</STRONG>) e pulse <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Por favor, pegue dentro do seguinte cadro usando o teclado (<STRONG>Ctrl+V</STRONG>) e pulse <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Ignorar as definicións de Tipografía",
+DlgPasteRemoveStyles	: "Eliminar as definicións de Estilos",
+DlgPasteCleanBox		: "Limpar o Cadro",
+
 
 // Color Picker
 ColorAutomatic	: "Automático",

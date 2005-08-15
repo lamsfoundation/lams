@@ -41,14 +41,16 @@ RemoveLink			: "取消超链接",
 Anchor				: "插入/编辑锚点链接",
 InsertImageLbl		: "图象",
 InsertImage			: "插入/编辑图象",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "插入/编辑 Flash",
 InsertTableLbl		: "表格",
 InsertTable			: "插入/编辑表格",
 InsertLineLbl		: "水平线",
 InsertLine			: "插入水平线",
 InsertSpecialCharLbl: "特殊符号",
 InsertSpecialChar	: "插入特殊符号",
-InsertSmileyLbl		: "图释",
-InsertSmiley		: "插入图释",
+InsertSmileyLbl		: "表情符",
+InsertSmiley		: "插入表情图标",
 About				: "关于 FCKeditor",
 Bold				: "加粗",
 Italic				: "倾斜",
@@ -76,7 +78,7 @@ Font				: "字体",
 FontSize			: "大小",
 TextColor			: "文本颜色",
 BGColor				: "背景颜色",
-Source				: "代码",
+Source				: "源代码",
 Find				: "查找",
 Replace				: "替换",
 SpellCheck			: "拼写检查",
@@ -105,6 +107,7 @@ SplitCell			: "拆分单元格",
 CellProperties		: "单元格属性",
 TableProperties		: "表格属性",
 ImageProperties		: "图象属性",
+FlashProperties		: "Flash 属性",
 
 AnchorProp			: "锚点链接属性",
 ButtonProp			: "按钮属性",
@@ -136,6 +139,8 @@ DlgBtnClose			: "关闭",
 DlgBtnBrowseServer	: "浏览服务器",
 DlgAdvancedTag		: "高级",
 DlgOpOther			: "&lt;其它&gt;",
+DlgInfoTab			: "信息",
+DlgAlertUrl			: "请插入 URL",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;没有设置&gt;",
@@ -148,11 +153,11 @@ DlgGenAccessKey		: "访问键",
 DlgGenName			: "名称",
 DlgGenTabIndex		: "Tab 键次序",
 DlgGenLongDescr		: "详细说明地址",
-DlgGenClass			: "样式类",
+DlgGenClass			: "样式类名称",
 DlgGenTitle			: "标题",
-DlgGenContType		: "类型",
-DlgGenLinkCharset	: "编码",
-DlgGenStyle			: "样式",
+DlgGenContType		: "内容类型",
+DlgGenLinkCharset	: "字符编码",
+DlgGenStyle			: "行内样式",
 
 // Image Dialog
 DlgImgTitle			: "图象属性",
@@ -180,7 +185,17 @@ DlgImgAlignTextTop	: "文本上方",
 DlgImgAlignTop		: "顶端",
 DlgImgPreview		: "预览",
 DlgImgAlertUrl		: "请输入图象地址",
-DlgImgLinkTab		: "Link",	//MISSING
+DlgImgLinkTab		: "链接",
+
+// Flash Dialog
+DlgFlashTitle		: "Flash 属性",
+DlgFlashChkPlay		: "自动播放",
+DlgFlashChkLoop		: "循环",
+DlgFlashChkMenu		: "启用 Flash 菜单",
+DlgFlashScale		: "缩放",
+DlgFlashScaleAll	: "全部显示",
+DlgFlashScaleNoBorder	: "无边框",
+DlgFlashScaleFit	: "严格匹配",
 
 // Link Dialog
 DlgLnkWindowTitle	: "超链接",
@@ -188,7 +203,7 @@ DlgLnkInfoTab		: "超链接信息",
 DlgLnkTargetTab		: "目标",
 
 DlgLnkType			: "超链接类型",
-DlgLnkTypeURL		: "网址",
+DlgLnkTypeURL		: "超链接",
 DlgLnkTypeAnchor	: "页内锚点链接",
 DlgLnkTypeEMail		: "电子邮件",
 DlgLnkProto			: "协议",
@@ -238,7 +253,7 @@ DlgColorHighlight	: "预览",
 DlgColorSelected	: "选择",
 
 // Smiley Dialog
-DlgSmileyTitle		: "插入一个图释",
+DlgSmileyTitle		: "插入表情图标",
 
 // Special Character Dialog
 DlgSpecialCharTitle	: "选择特殊符号",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "您的浏览器安全设置不允许编辑器自动执行复�
 PasteAsText		: "粘贴为无格式文本",
 PasteFromWord	: "从 MS Word 粘贴",
 
-DlgPasteMsg		: "因为您的浏览器编辑器 <STRONG>安全设置</STRONG> 原因，不能自动执行粘贴。<BR>请使用键盘快捷键(<STRONG>Ctrl+V</STRONG>)粘贴到下面并按 <STRONG>确定</STRONG>。",
+DlgPasteMsg2	: "请使用键盘快捷键(<STRONG>Ctrl+V</STRONG>)把内容粘贴到下面的方框里，再按 <STRONG>确定</STRONG>。",
+DlgPasteIgnoreFont		: "忽略 Font 标签",
+DlgPasteRemoveStyles	: "清理 CSS 样式",
+DlgPasteCleanBox		: "清空上面内容",
+
 
 // Color Picker
 ColorAutomatic	: "自动",
@@ -378,7 +397,7 @@ DlgTextareaRows	: "行数",
 
 // Text Field Dialog
 DlgTextName			: "名称",
-DlgTextValue		: "值",
+DlgTextValue		: "初始值",
 DlgTextCharWidth	: "字符宽度",
 DlgTextMaxChars		: "最多字符数",
 DlgTextType			: "类型",
@@ -387,7 +406,7 @@ DlgTextTypePass		: "密码",
 
 // Hidden Field Dialog
 DlgHiddenName	: "名称",
-DlgHiddenValue	: "值",
+DlgHiddenValue	: "初始值",
 
 // Bulleted List Dialog
 BulletedListProp	: "项目列表属性",
@@ -438,11 +457,11 @@ DlgDocMeCopy		: "版权",
 DlgDocPreview		: "预览",
 
 // Templates Dialog
-Templates			: "Templates",	//MISSING
-DlgTemplatesTitle	: "Content Templates",	//MISSING
-DlgTemplatesSelMsg	: "Please select the template to open in the editor<br>(the actual contents will be lost):",	//MISSING
-DlgTemplatesLoading	: "Loading templates list. Please wait...",	//MISSING
-DlgTemplatesNoTpl	: "(No templates defined)",	//MISSING
+Templates			: "模板",
+DlgTemplatesTitle	: "内容模板",
+DlgTemplatesSelMsg	: "请选择编辑器内容模板<br>(当前内容将会被清除替换):",
+DlgTemplatesLoading	: "正在加载模板列表，请稍等...",
+DlgTemplatesNoTpl	: "(没有模板)",
 
 // About Dialog
 DlgAboutAboutTab	: "关于",

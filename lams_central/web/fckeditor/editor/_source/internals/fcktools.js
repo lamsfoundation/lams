@@ -65,10 +65,10 @@ FCKTools.AttachToLinkedFieldFormSubmit = function( functionPointer )
 	
 	// Creates a Array in the form object that will hold all Attached function call
 	// (in the case there are more than one editor in the same page)
-	if (! oForm.updateFCKEditor) oForm.updateFCKEditor = new Array() ;
+	if (! oForm.updateFCKeditor) oForm.updateFCKeditor = new Array() ;
 	
 	// Adds the function pointer to the array of functions to call when "submit" is called
-	oForm.updateFCKEditor[oForm.updateFCKEditor.length] = functionPointer ;
+	oForm.updateFCKeditor[oForm.updateFCKeditor.length] = functionPointer ;
 
 	// Switches the original submit method with a new one that first call all functions
 	// on the above array and the call the original submit
@@ -86,11 +86,11 @@ FCKTools.AttachToLinkedFieldFormSubmit = function( functionPointer )
 
 function FCKTools_SubmitReplacer()
 {
-	if (this.updateFCKEditor)
+	if (this.updateFCKeditor)
 	{
 		// Calls all functions in the functions array
-		for (var i = 0 ; i < this.updateFCKEditor.length ; i++)
-			this.updateFCKEditor[i]() ;
+		for (var i = 0 ; i < this.updateFCKeditor.length ; i++)
+			this.updateFCKeditor[i]() ;
 	}
 	// Calls the original "submit"
 	this.originalSubmit() ;
@@ -136,6 +136,9 @@ FCKTools.SelectNoCase = function( selectElement, value, defaultValue )
 
 FCKTools.HTMLEncode = function( text )
 {
+	if ( !text )
+		return '' ;
+
 	text = text.replace( /&/g, "&amp;" ) ;
 	text = text.replace( /"/g, "&quot;" ) ;
 	text = text.replace( /</g, "&lt;" ) ;
@@ -203,4 +206,14 @@ FCKTools.Pause = function( miliseconds )
 		if ( miliseconds < oNow - oStart ) 
 			return ;
 	}
+}
+
+FCKTools.ConvertStyleSizeToHtml = function( size )
+{
+	return size.endsWith( '%' ) ? size : parseInt( size ) ;
+}
+
+FCKTools.ConvertHtmlSizeToStyle = function( size )
+{
+	return size.endsWith( '%' ) ? size : ( size + 'px' ) ;
 }

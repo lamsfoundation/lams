@@ -23,6 +23,7 @@ FCKTools.AppendStyleSheet = function( documentElement, cssFileUrl )
 	e.type	= 'text/css' ;
 	e.href	= cssFileUrl ;
 	documentElement.getElementsByTagName("HEAD")[0].appendChild( e ) ;
+	return e ;
 }
 
 // Removes all attributes and values from the element.

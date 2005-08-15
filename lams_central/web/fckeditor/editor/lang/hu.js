@@ -41,6 +41,8 @@ RemoveLink			: "Hivatkozás törlése",
 Anchor				: "Horgony beillesztése/szerkesztése",
 InsertImageLbl		: "Kép",
 InsertImage			: "Kép beillesztése/módosítása",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "Táblázat",
 InsertTable			: "Táblázat beillesztése/módosítása",
 InsertLineLbl		: "Vonal",
@@ -105,6 +107,7 @@ SplitCell			: "Cellák szétválasztása",
 CellProperties		: "Cellák tulajdonsága",
 TableProperties		: "Táblázat tulajdonsága",
 ImageProperties		: "Kép tulajdonsága",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "Horgony(ok) tulajdonsága(i)",
 ButtonProp			: "Gomb(ok) tulajdonsága(i) ",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Bezárás",
 DlgBtnBrowseServer	: "Szerver tallózása",
 DlgAdvancedTag		: "Haladó",
 DlgOpOther			: "Egyéb",
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;nincs beállítva&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Tetejére",
 DlgImgPreview		: "Elõnézet",
 DlgImgAlertUrl		: "Töltse ki a kép URL-ét",
 DlgImgLinkTab		: "Link",	//MISSING
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "Hivatkozás",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "A böngészõ biztonsági beállításai nem engedélyezik a s
 PasteAsText		: "Beillesztés formázatlan szövegként",
 PasteFromWord	: "Beillesztés Wordbõl",
 
-DlgPasteMsg		: "A szerkesztõ nem képes végrehajtani a beillesztési mûveletet a bõngészõ <STRONG>biztonsági beállításai</STRONG> miatt.<BR>Másolja be az alábbi mezõbe a (<STRONG>Ctrl+V</STRONG>) billentyûzetkombinációval és kattintson <STRONG>OK</STRONG> gombra.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "Automatikus",

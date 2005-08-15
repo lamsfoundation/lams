@@ -108,6 +108,9 @@ FCKContextMenu._GetGroup = function( groupName )
 		case 'Image' :
 			return new FCKContextMenuGroup( true, this, 'Image', FCKLang.ImageProperties, true ) ;
 
+		case 'Flash' :
+			return new FCKContextMenuGroup( true, this, 'Flash', FCKLang.FlashProperties, true ) ;
+
 		case 'Form' :
 			return new FCKContextMenuGroup( true, this, 'Form', FCKLang.FormProp, true ) ;
 
@@ -161,14 +164,16 @@ FCKContextMenu.RefreshState = function()
 
 	// Set items visibility.
 
-	var bIsAnchor = ( sTagName == 'A' && oTag.name.length > 0 && oTag.href.length == 0 ) ;
+//	var bIsAnchor = ( sTagName == 'A' && oTag.name.length > 0 && oTag.href.length == 0 ) ;
 
-	if ( this.Groups['Anchor'] )		this.Groups['Anchor'].SetVisible( bIsAnchor ) ;
-	if ( this.Groups['Link'] )			this.Groups['Link'].SetVisible( !bIsAnchor && FCK.GetNamedCommandState( 'Unlink' ) != FCK_TRISTATE_DISABLED ) ;
+	if ( this.Groups['Link'] )			this.Groups['Link'].SetVisible( /*!bIsAnchor &&*/ FCK.GetNamedCommandState( 'Unlink' ) != FCK_TRISTATE_DISABLED ) ;
 
 	if ( this.Groups['TableCell'] )		this.Groups['TableCell'].SetVisible( sTagName != 'TABLE' && FCKSelection.HasAncestorNode('TABLE') ) ;
 	if ( this.Groups['Table'] )			this.Groups['Table'].SetVisible( sTagName == 'TABLE' ) ;
-	if ( this.Groups['Image'] )			this.Groups['Image'].SetVisible( sTagName == 'IMG' ) ;
+	
+	if ( this.Groups['Image'] )			this.Groups['Image'].SetVisible( sTagName == 'IMG' && !oTag.getAttribute('_fckflash') && !oTag.getAttribute('_fckanchor') ) ;
+	if ( this.Groups['Flash'] )			this.Groups['Flash'].SetVisible( sTagName == 'IMG' && oTag.getAttribute('_fckflash') ) ;
+	if ( this.Groups['Anchor'] )		this.Groups['Anchor'].SetVisible( sTagName == 'IMG' && oTag.getAttribute('_fckanchor') ) ;
 
 	if ( this.Groups['BulletedList'] )	this.Groups['BulletedList'].SetVisible( FCKSelection.HasAncestorNode('UL') ) ;
 	if ( this.Groups['NumberedList'] )	this.Groups['NumberedList'].SetVisible( FCKSelection.HasAncestorNode('OL') ) ;

@@ -149,6 +149,13 @@ FCKSaveCommand.prototype.Execute = function()
 	// Get the linked field form.
 	var oForm = FCK.LinkedField.form ;
 
+	if ( typeof( oForm.onsubmit ) == 'function' )
+	{
+		var bRet = oForm.onsubmit() ;
+		if ( bRet != null && bRet === false )
+			return ;
+	}
+
 	// Submit the form.
 	oForm.submit() ;
 }
@@ -167,7 +174,9 @@ var FCKNewPageCommand = function()
 FCKNewPageCommand.prototype.Execute = function()
 {
 	FCKUndo.SaveUndoStep() ;
-	FCK.SetHTML( FCKBrowserInfo.IsGecko ? '&nbsp;' : '' ) ;
+	FCK.SetHTML( '' ) ;
+//	FCK.SetHTML( FCKBrowserInfo.IsGecko ? '&nbsp;' : '' ) ;
+//	FCK.SetHTML( FCKBrowserInfo.IsGecko ? '<br _moz_editor_bogus_node="TRUE">' : '' ) ;
 }
 
 FCKNewPageCommand.prototype.GetState = function()
@@ -183,7 +192,14 @@ var FCKSourceCommand = function()
 
 FCKSourceCommand.prototype.Execute = function()
 {
-     FCK.SwitchEditMode() ;
+	if ( FCKBrowserInfo.IsGecko )
+	{
+		var iWidth	= screen.width * 0.65 ;
+		var iHeight	= screen.height * 0.65 ;
+		FCKDialog.OpenDialog( 'FCKDialog_Source', FCKLang.Source, 'dialog/fck_source.html', iWidth, iHeight, null, null, true ) ;
+	}
+	else
+	    FCK.SwitchEditMode() ;
 }
 
 FCKSourceCommand.prototype.GetState = function()
@@ -208,7 +224,7 @@ FCKUndoCommand.prototype.Execute = function()
 FCKUndoCommand.prototype.GetState = function()
 {
 	if ( FCKBrowserInfo.IsIE )
-		return ( FCKUndo.CurrentIndex > 0 ? FCK_TRISTATE_OFF : FCK_TRISTATE_DISABLED ) ;
+		return ( FCKUndo.Typing || FCKUndo.CurrentIndex > 0 ? FCK_TRISTATE_OFF : FCK_TRISTATE_DISABLED ) ;
 	else
 		return FCK.GetNamedCommandState( 'Undo' ) ;
 }
@@ -230,7 +246,7 @@ FCKRedoCommand.prototype.Execute = function()
 FCKRedoCommand.prototype.GetState = function()
 {
 	if ( FCKBrowserInfo.IsIE )
-		return ( FCKUndo.CurrentIndex < ( FCKUndo.SavedData.length - 1 ) ? FCK_TRISTATE_OFF : FCK_TRISTATE_DISABLED ) ;
+		return ( !FCKUndo.Typing && FCKUndo.CurrentIndex < ( FCKUndo.SavedData.length - 1 ) ? FCK_TRISTATE_OFF : FCK_TRISTATE_DISABLED ) ;
 	else
 		return FCK.GetNamedCommandState( 'Redo' ) ;
 }

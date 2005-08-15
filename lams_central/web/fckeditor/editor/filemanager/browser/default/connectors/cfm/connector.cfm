@@ -1,33 +1,24 @@
 <cfsetting enablecfoutputonly="true" showdebugoutput="false">
-<!---
- * FCKeditor - The text editor for internet
- * Copyright (C) 2003-2005 Frederico Caldeira Knabben
- * 
- * Licensed under the terms of the GNU Lesser General Public License:
- * 		http://www.opensource.org/licenses/lgpl-license.php
- * 
- * For further information visit:
- * 		http://www.fckeditor.net/
- * 
- * File Name: connector.cfm
- * 	This is the File Browser Connector for ColdFusion.
- * 	
- * 	Notice: 
- * 	FCKEditor needs an UTF-8 encoded XML packet. 
- * 	Only CFMX can encode in UTF-8. If this browser doesn't work in CF 4.0/4.5/5,
- * 	please send me a notice. We then can use an more object oriented approach (CFC)
- * 	to clean up this code :)
- * 	
- * 	Please declare the base path (e.g. /UserFiles/) as an Application or Server variable
- * 	Directory structure (with optional subdirectories built by the user). 
- * 	The "Type" subdirectory is automatically submitted by FCKEditor:
- * 	/UserFiles/Image/
- * 	/UserFiles/Flash/
- * 	/UserFiles/File/
- * 	/UserFiles/Media/
- * 
- * File Authors:
- * 		Hendrik Kramer (hk@lwd.de)
+<!--- @Packager.Header
+<FileDescription>
+	This is the File Browser Connector for ColdFusion.
+	
+	Notice: 
+	FCKeditor needs an UTF-8 encoded XML packet. 
+	Only CFMX can encode in UTF-8. If this browser doesn't work in CF 4.0/4.5/5,
+	please send me a notice. We then can use an more object oriented approach (CFC)
+	to clean up this code :)
+	
+	Please declare the base path (e.g. /UserFiles/) as an Application or Server variable
+	Directory structure (with optional subdirectories built by the user). 
+	The "Type" subdirectory is automatically submitted by FCKeditor:
+	/UserFiles/Image/
+	/UserFiles/Flash/
+	/UserFiles/File/
+	/UserFiles/Media/
+
+</FileDescription>
+<Author name="Hendrik Kramer" email="hk@lwd.de" />
 --->
 <cfparam name="URL.Command" type="string">
 <cfparam name="URL.Type" type="string">

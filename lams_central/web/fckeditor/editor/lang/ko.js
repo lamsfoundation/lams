@@ -41,6 +41,8 @@ RemoveLink			: "링크 삭제",
 Anchor				: "책갈피 삽입/변경",
 InsertImageLbl		: "이미지",
 InsertImage			: "이미지 삽입/변경",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "표",
 InsertTable			: "표 삽입/변경",
 InsertLineLbl		: "수평선",
@@ -105,6 +107,7 @@ SplitCell			: "셀 나누기",
 CellProperties		: "셀 속성",
 TableProperties		: "표 속성",
 ImageProperties		: "이미지 속성",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "책갈피 속성",
 ButtonProp			: "버튼 속성",
@@ -136,6 +139,8 @@ DlgBtnClose			: "닫기",
 DlgBtnBrowseServer	: "서버 보기",
 DlgAdvancedTag		: "자세히",
 DlgOpOther			: "&lt;기타&gt;",
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;설정되지 않음&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "위",
 DlgImgPreview		: "미리보기",
 DlgImgAlertUrl		: "이미지 URL을 입력하십시요",
 DlgImgLinkTab		: "링크",
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "링크",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "브라우저의 보안설정때문에 복사하기 기능을 �
 PasteAsText		: "텍스트로 붙여넣기",
 PasteFromWord	: "MS Word 형식에서 붙여넣기",
 
-DlgPasteMsg		: "브라우저의 <STRONG>보안설정/STRONG> 때문에 붙여넣기 할 수 없습니다. <BR>키보드 명령(<STRONG>Ctrl+V</STRONG>)을 이용하여 붙여넣은 다음 <STRONG>예</STRONG>버튼을 클릭하십시요.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "기본색상",

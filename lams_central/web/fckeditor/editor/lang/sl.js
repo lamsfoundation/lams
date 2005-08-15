@@ -41,6 +41,8 @@ RemoveLink			: "Odstrani povezavo",
 Anchor				: "Vstavi/uredi zaznamek",
 InsertImageLbl		: "Slika",
 InsertImage			: "Vstavi/uredi sliko",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "Vstavi/Uredi Flash",
 InsertTableLbl		: "Tabela",
 InsertTable			: "Vstavi/uredi tabelo",
 InsertLineLbl		: "Črta",
@@ -105,6 +107,7 @@ SplitCell			: "Razdeli celico",
 CellProperties		: "Lastnosti celice",
 TableProperties		: "Lastnosti tabele",
 ImageProperties		: "Lastnosti slike",
+FlashProperties		: "Lastnosti Flash",
 
 AnchorProp			: "Lastnosti zaznamka",
 ButtonProp			: "Lastnosti gumba",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Zapri",
 DlgBtnBrowseServer	: "Prebrskaj na strežniku",
 DlgAdvancedTag		: "Napredno",
 DlgOpOther			: "&lt;Ostalo&gt;",
+DlgInfoTab			: "Podatki",
+DlgAlertUrl			: "Prosim vpiši spletni naslov",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;ni postavljen&gt;",
@@ -180,7 +185,17 @@ DlgImgAlignTextTop	: "Besedilo na vrh",
 DlgImgAlignTop		: "Na vrh",
 DlgImgPreview		: "Predogled",
 DlgImgAlertUrl		: "Vnesite URL slike",
-DlgImgLinkTab		: "Link",	//MISSING
+DlgImgLinkTab		: "Povezava",
+
+// Flash Dialog
+DlgFlashTitle		: "Lastnosti Flash",
+DlgFlashChkPlay		: "Samodejno predvajaj",
+DlgFlashChkLoop		: "Ponavljanje",
+DlgFlashChkMenu		: "Omogoči Flash Meni",
+DlgFlashScale		: "Povečava",
+DlgFlashScaleAll	: "Pokaži vse",
+DlgFlashScaleNoBorder	: "Brez obrobe",
+DlgFlashScaleFit	: "Natančno prileganje",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Povezava",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "Varnostne nastavitve brskalnika ne dopuščajo samodejnega kop
 PasteAsText		: "Prilepi kot golo besedilo",
 PasteFromWord	: "Prilepi iz Worda",
 
-DlgPasteMsg		: "Ni bilo mogoče izvesti lepljenja zaradi <STRONG>varnostnih nastavitev</STRONG> vašega brskalnika.<BR>Prilepite v sledeče okno s kombinacijo tipk na tipkovnici (<STRONG>Ctrl+V</STRONG>) in pritisnite <STRONG>V redu</STRONG>.",
+DlgPasteMsg2	: "Prosim prilepite v sleči okvir s pomočjo tipkovnice (<STRONG>Ctrl+V</STRONG>) in pritisnite <STRONG>V redu</STRONG>.",
+DlgPasteIgnoreFont		: "Prezri obliko pisave",
+DlgPasteRemoveStyles	: "Odstrani nastavitve stila",
+DlgPasteCleanBox		: "Počisti okvir",
+
 
 // Color Picker
 ColorAutomatic	: "Samodejno",
@@ -438,11 +457,11 @@ DlgDocMeCopy		: "Avtorske pravice",
 DlgDocPreview		: "Predogled",
 
 // Templates Dialog
-Templates			: "Templates",	//MISSING
-DlgTemplatesTitle	: "Content Templates",	//MISSING
-DlgTemplatesSelMsg	: "Please select the template to open in the editor<br>(the actual contents will be lost):",	//MISSING
-DlgTemplatesLoading	: "Loading templates list. Please wait...",	//MISSING
-DlgTemplatesNoTpl	: "(No templates defined)",	//MISSING
+Templates			: "Predloge",
+DlgTemplatesTitle	: "Vsebinske predloge",
+DlgTemplatesSelMsg	: "Izberite predlogo, ki jo želite odpreti v urejevalniku<br>(trenutna vsebina bo izgubljena):",
+DlgTemplatesLoading	: "Nalagam seznam predlog. Prosim počakajte...",
+DlgTemplatesNoTpl	: "(Ni pripravljenih predlog)",
 
 // About Dialog
 DlgAboutAboutTab	: "Vizitka",

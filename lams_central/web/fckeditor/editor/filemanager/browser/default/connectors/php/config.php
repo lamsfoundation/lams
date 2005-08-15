@@ -1,4 +1,5 @@
-<?php /*
+<?php 
+/*
  * FCKeditor - The text editor for internet
  * Copyright (C) 2003-2005 Frederico Caldeira Knabben
  * 
@@ -17,12 +18,14 @@
 
 global $Config ;
 
+// SECURITY: You must explicitelly enable this "connector". (Set it to "true").
+$Config['Enabled'] = false ;
+
 // Path to user files relative to the document root.
-// SECURITY TIP: Uncomment the following line to set a fixed path.
-//$Config['UserFilesPath'] = '/UserFiles/' ;
+$Config['UserFilesPath'] = '/UserFiles/' ;
 
 $Config['AllowedExtensions']['File']	= array() ;
-$Config['DeniedExtensions']['File']		= array('php','asp','aspx','ascx','jsp','cfm','cfc','pl','bat','exe','dll','reg') ;
+$Config['DeniedExtensions']['File']		= array('php','php3','php5','phtml','asp','aspx','ascx','jsp','cfm','cfc','pl','bat','exe','dll','reg','cgi') ;
 
 $Config['AllowedExtensions']['Image']	= array('jpg','gif','jpeg','png') ;
 $Config['DeniedExtensions']['Image']	= array() ;

@@ -2,6 +2,8 @@
 
 FCKUndo.SavedData = new Array() ;
 FCKUndo.CurrentIndex = -1 ;
+FCKUndo.TypesCount = FCKUndo.MaxTypes = 25 ;
+FCKUndo.Typing = false ;
 
 FCKUndo.SaveUndoStep = function()
 {
@@ -35,7 +37,7 @@ FCKUndo.SaveUndoStep = function()
 
 FCKUndo.Undo = function()
 {
-	if ( FCKUndo.CurrentIndex > 0 )
+	if ( FCKUndo.CurrentIndex >= 0 )
 	{
 		// If it is the first step.
 		if ( FCKUndo.CurrentIndex == ( FCKUndo.SavedData.length - 1 ) )
@@ -75,4 +77,7 @@ FCKUndo._ApplyUndoLevel = function(level)
 		oRange.moveToBookmark( oData[1] ) ;
 		oRange.select() ;
 	}
+	
+	FCKUndo.TypesCount = 0 ; 
+	FCKUndo.Typing = false ;
 }

@@ -1,4 +1,5 @@
-<?php /*
+<?php 
+/*
  * FCKeditor - The text editor for internet
  * Copyright (C) 2003-2005 Frederico Caldeira Knabben
  * 
@@ -29,7 +30,7 @@ $fckphp_config['prot'].="://";
 /* The physical path to the document root, Set manually if not using apache	*/
 /*------------------------------------------------------------------------------*/
 //$fckphp_config['basedir']=$_SERVER['DOCUMENT_ROOT'];
-$fckphp_config['basedir'] = 'D:\Work\FCKEditor\www\FCKeditor.V2\editor\filemanager\browser\mcpuk' ;
+$fckphp_config['basedir'] = 'D:\Work\FCKeditor\www\FCKeditor.V2\editor\filemanager\browser\mcpuk' ;
 /*==============================================================================*/
 
 

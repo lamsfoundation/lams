@@ -41,6 +41,8 @@ RemoveLink			: "برداشتن لينک",
 Anchor				: "درج/ويرايش لنگر",
 InsertImageLbl		: "تصوير",
 InsertImage			: "درج/ويرايش تصوير",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "جدول",
 InsertTable			: "درج/ويرايش جدول",
 InsertLineLbl		: "خط",
@@ -105,6 +107,7 @@ SplitCell			: "تفکيک سلول",
 CellProperties		: "ويژگيهای سلول",
 TableProperties		: "ويژگيهای جدول",
 ImageProperties		: "ويژگيهای تصوير",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "ويژگيهای لنگر",
 ButtonProp			: "ويژگيهای دکمه",
@@ -136,6 +139,8 @@ DlgBtnClose			: "بستن",
 DlgBtnBrowseServer	: "فهرست نمايی سرور",
 DlgAdvancedTag		: "پيشرفته",
 DlgOpOther			: "&lt;غيره&gt;",
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;تعين نشده&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "بالا",
 DlgImgPreview		: "پيش نمايش",
 DlgImgAlertUrl		: "لطفا URL تصوير را انتخاب کنيد",
 DlgImgLinkTab		: "لينک",
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "لينک",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "تنظيمات امنيتی مرورگر شما اجازه ن�
 PasteAsText		: "چسباندن به عنوان متن ساده",
 PasteFromWord	: "چسباندن از Word",
 
-DlgPasteMsg		: "به خاطر <STRONG>تنظيمات امنيتی</STRONG> مرورگر شما، ويرايشگر نتوانست به طور خودکار عملکرد چسباندن را به انجام برساند.<BR>لطفا به کمک کليد  (<STRONG>Ctrl+V</STRONG>) متن را درون جهبه زير بچسبانيد و دکمه <STRONG>تائيد</STRONG> را فشار دهيد.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "خودکار",

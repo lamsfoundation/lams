@@ -84,7 +84,7 @@ FCK.Paste = function()
 		{
 			if ( confirm( FCKLang["PasteWordConfirm"] ) )
 			{
-				FCK.CleanAndPaste( sHTML ) ;
+				FCK.PasteFromWord() ;
 				return false ;
 			}
 		}
@@ -161,7 +161,7 @@ FCK.PasteAsPlainText = function()
 	this.InsertHtml( sText ) ;	
 */
 }
-
+/*
 FCK.PasteFromWord = function()
 {
 	// TODO: Implement the "Paste as Plain Text" code.
@@ -170,7 +170,7 @@ FCK.PasteFromWord = function()
 
 //	FCK.CleanAndPaste( FCK.GetClipboardHTML() ) ;
 }
-
+*/
 FCK.GetClipboardHTML = function()
 {
 	return '' ;

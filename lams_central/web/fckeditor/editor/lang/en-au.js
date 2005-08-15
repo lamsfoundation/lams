@@ -39,9 +39,11 @@ RemoveFormat		: "Remove Format",
 InsertLinkLbl		: "Link",
 InsertLink			: "Insert/Edit Link",
 RemoveLink			: "Remove Link",
-Anchor				: "Insert/Edit Anchor",	//MISSING
+Anchor				: "Insert/Edit Anchor",
 InsertImageLbl		: "Image",
 InsertImage			: "Insert/Edit Image",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "Insert/Edit Flash",
 InsertTableLbl		: "Table",
 InsertTable			: "Insert/Edit Table",
 InsertLineLbl		: "Line",
@@ -75,23 +77,23 @@ Style				: "Style",
 FontFormat			: "Format",
 Font				: "Font",
 FontSize			: "Size",
-TextColor			: "Text Color",	//MISSING
-BGColor				: "Background Color",	//MISSING
+TextColor			: "Text Color",
+BGColor				: "Background Color",
 Source				: "Source",
 Find				: "Find",
 Replace				: "Replace",
-SpellCheck			: "Check Spell",	//MISSING
-UniversalKeyboard	: "Universal Keyboard",	//MISSING
+SpellCheck			: "Check Spell",
+UniversalKeyboard	: "Universal Keyboard",
 
-Form			: "Form",	//MISSING
-Checkbox		: "Checkbox",	//MISSING
-RadioButton		: "Radio Button",	//MISSING
-TextField		: "Text Field",	//MISSING
-Textarea		: "Textarea",	//MISSING
-HiddenField		: "Hidden Field",	//MISSING
-Button			: "Button",	//MISSING
-SelectionField	: "Selection Field",	//MISSING
-ImageButton		: "Image Button",	//MISSING
+Form			: "Form",
+Checkbox		: "Checkbox",
+RadioButton		: "Radio Button",
+TextField		: "Text Field",
+Textarea		: "Textarea",
+HiddenField		: "Hidden Field",
+Button			: "Button",
+SelectionField	: "Selection Field",
+ImageButton		: "Image Button",
 
 // Context Menu
 EditLink			: "Edit Link",
@@ -106,17 +108,18 @@ SplitCell			: "Split Cell",
 CellProperties		: "Cell Properties",
 TableProperties		: "Table Properties",
 ImageProperties		: "Image Properties",
+FlashProperties		: "Flash Properties",
 
-AnchorProp			: "Anchor Properties",	//MISSING
-ButtonProp			: "Button Properties",	//MISSING
-CheckboxProp		: "Checkbox Properties",	//MISSING
-HiddenFieldProp		: "Hidden Field Properties",	//MISSING
-RadioButtonProp		: "Radio Button Properties",	//MISSING
-ImageButtonProp		: "Image Button Properties",	//MISSING
-TextFieldProp		: "Text Field Properties",	//MISSING
-SelectionFieldProp	: "Selection Field Properties",	//MISSING
-TextareaProp		: "Textarea Properties",	//MISSING
-FormProp			: "Form Properties",	//MISSING
+AnchorProp			: "Anchor Properties",
+ButtonProp			: "Button Properties",
+CheckboxProp		: "Checkbox Properties",
+HiddenFieldProp		: "Hidden Field Properties",
+RadioButtonProp		: "Radio Button Properties",
+ImageButtonProp		: "Image Button Properties",
+TextFieldProp		: "Text Field Properties",
+SelectionFieldProp	: "Selection Field Properties",
+TextareaProp		: "Textarea Properties",
+FormProp			: "Form Properties",
 
 FontFormats			: "Normal;Formatted;Address;Heading 1;Heading 2;Heading 3;Heading 4;Heading 5;Heading 6;Paragraph (DIV)",
 
@@ -134,9 +137,11 @@ UnknownToolbarSet	: "Toolbar set \"%1\" doesn't exist",
 DlgBtnOK			: "OK",
 DlgBtnCancel		: "Cancel",
 DlgBtnClose			: "Close",
-DlgBtnBrowseServer	: "Browse Server",	//MISSING
+DlgBtnBrowseServer	: "Browse Server",
 DlgAdvancedTag		: "Advanced",
-DlgOpOther			: "&lt;Other&gt;",	//MISSING
+DlgOpOther			: "&lt;Other&gt;",
+DlgInfoTab			: "Info",
+DlgAlertUrl			: "Please insert the URL",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;not set&gt;",
@@ -181,7 +186,17 @@ DlgImgAlignTextTop	: "Text Top",
 DlgImgAlignTop		: "Top",
 DlgImgPreview		: "Preview",
 DlgImgAlertUrl		: "Please type the image URL",
-DlgImgLinkTab		: "Link",	//MISSING
+DlgImgLinkTab		: "Link",
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",
+DlgFlashChkPlay		: "Auto Play",
+DlgFlashChkLoop		: "Loop",
+DlgFlashChkMenu		: "Enable Flash Menu",
+DlgFlashScale		: "Scale",
+DlgFlashScaleAll	: "Show all",
+DlgFlashScaleNoBorder	: "No Border",
+DlgFlashScaleFit	: "Exact Fit",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Link",
@@ -212,7 +227,7 @@ DlgLnkTargetBlank	: "New Window (_blank)",
 DlgLnkTargetParent	: "Parent Window (_parent)",
 DlgLnkTargetSelf	: "Same Window (_self)",
 DlgLnkTargetTop		: "Topmost Window (_top)",
-DlgLnkTargetFrameName	: "Target Frame Name",	//MISSING
+DlgLnkTargetFrameName	: "Target Frame Name",
 DlgLnkPopWinName	: "Popup Window Name",
 DlgLnkPopWinFeat	: "Popup Window Features",
 DlgLnkPopResize		: "Resizable",
@@ -233,10 +248,10 @@ DlnLnkMsgNoEMail	: "Please type the e-mail address",
 DlnLnkMsgNoAnchor	: "Please select an anchor",
 
 // Color Dialog
-DlgColorTitle		: "Select Color",	//MISSING
-DlgColorBtnClear	: "Clear",	//MISSING
-DlgColorHighlight	: "Highlight",	//MISSING
-DlgColorSelected	: "Selected",	//MISSING
+DlgColorTitle		: "Select Color",
+DlgColorBtnClear	: "Clear",
+DlgColorHighlight	: "Highlight",
+DlgColorSelected	: "Selected",
 
 // Smiley Dialog
 DlgSmileyTitle		: "Insert a Smiley",
@@ -285,8 +300,8 @@ DlgCellVerAlignBottom	: "Bottom",
 DlgCellVerAlignBaseline	: "Baseline",
 DlgCellRowSpan		: "Rows Span",
 DlgCellCollSpan		: "Columns Span",
-DlgCellBackColor	: "Background Color",	//MISSING
-DlgCellBorderColor	: "Border Color",	//MISSING
+DlgCellBackColor	: "Background Color",
+DlgCellBorderColor	: "Border Color",
 DlgCellBtnSelect	: "Select...",
 
 // Find Dialog
@@ -311,143 +326,147 @@ PasteErrorCopy	: "Your browser security settings don't permit the editor to auto
 PasteAsText		: "Paste as Plain Text",
 PasteFromWord	: "Paste from Word",
 
-DlgPasteMsg		: "The editor was not able to automaticaly execute pasting because of the <STRONG>security settings</STRONG> of your browser.<BR>Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",
+DlgPasteRemoveStyles	: "Remove Styles definitions",
+DlgPasteCleanBox		: "Clean Up Box",
+
 
 // Color Picker
-ColorAutomatic	: "Automatic",	//MISSING
-ColorMoreColors	: "More Colors...",	//MISSING
+ColorAutomatic	: "Automatic",
+ColorMoreColors	: "More Colors...",
 
 // Document Properties
-DocProps		: "Document Properties",	//MISSING
+DocProps		: "Document Properties",
 
 // Anchor Dialog
-DlgAnchorTitle		: "Anchor Properties",	//MISSING
-DlgAnchorName		: "Anchor Name",	//MISSING
-DlgAnchorErrorName	: "Please type the anchor name",	//MISSING
+DlgAnchorTitle		: "Anchor Properties",
+DlgAnchorName		: "Anchor Name",
+DlgAnchorErrorName	: "Please type the anchor name",
 
 // Speller Pages Dialog
-DlgSpellNotInDic		: "Not in dictionary",	//MISSING
-DlgSpellChangeTo		: "Change to",	//MISSING
-DlgSpellBtnIgnore		: "Ignore",	//MISSING
-DlgSpellBtnIgnoreAll	: "Ignore All",	//MISSING
-DlgSpellBtnReplace		: "Replace",	//MISSING
-DlgSpellBtnReplaceAll	: "Replace All",	//MISSING
-DlgSpellBtnUndo			: "Undo",	//MISSING
-DlgSpellNoSuggestions	: "- No suggestions -",	//MISSING
-DlgSpellProgress		: "Spell check in progress...",	//MISSING
-DlgSpellNoMispell		: "Spell check complete: No misspellings found",	//MISSING
-DlgSpellNoChanges		: "Spell check complete: No words changed",	//MISSING
-DlgSpellOneChange		: "Spell check complete: One word changed",	//MISSING
-DlgSpellManyChanges		: "Spell check complete: %1 words changed",	//MISSING
+DlgSpellNotInDic		: "Not in dictionary",
+DlgSpellChangeTo		: "Change to",
+DlgSpellBtnIgnore		: "Ignore",
+DlgSpellBtnIgnoreAll	: "Ignore All",
+DlgSpellBtnReplace		: "Replace",
+DlgSpellBtnReplaceAll	: "Replace All",
+DlgSpellBtnUndo			: "Undo",
+DlgSpellNoSuggestions	: "- No suggestions -",
+DlgSpellProgress		: "Spell check in progress...",
+DlgSpellNoMispell		: "Spell check complete: No misspellings found",
+DlgSpellNoChanges		: "Spell check complete: No words changed",
+DlgSpellOneChange		: "Spell check complete: One word changed",
+DlgSpellManyChanges		: "Spell check complete: %1 words changed",
 
-IeSpellDownload			: "Spell checker not installed. Do you want to download it now?",	//MISSING
+IeSpellDownload			: "Spell checker not installed. Do you want to download it now?",
 
 // Button Dialog
-DlgButtonText	: "Text (Value)",	//MISSING
-DlgButtonType	: "Type",	//MISSING
+DlgButtonText	: "Text (Value)",
+DlgButtonType	: "Type",
 
 // Checkbox and Radio Button Dialogs
-DlgCheckboxName		: "Name",	//MISSING
-DlgCheckboxValue	: "Value",	//MISSING
-DlgCheckboxSelected	: "Selected",	//MISSING
+DlgCheckboxName		: "Name",
+DlgCheckboxValue	: "Value",
+DlgCheckboxSelected	: "Selected",
 
 // Form Dialog
-DlgFormName		: "Name",	//MISSING
-DlgFormAction	: "Action",	//MISSING
-DlgFormMethod	: "Method",	//MISSING
+DlgFormName		: "Name",
+DlgFormAction	: "Action",
+DlgFormMethod	: "Method",
 
 // Select Field Dialog
-DlgSelectName		: "Name",	//MISSING
-DlgSelectValue		: "Value",	//MISSING
-DlgSelectSize		: "Size",	//MISSING
-DlgSelectLines		: "lines",	//MISSING
-DlgSelectChkMulti	: "Allow multiple selections",	//MISSING
-DlgSelectOpAvail	: "Available Options",	//MISSING
-DlgSelectOpText		: "Text",	//MISSING
-DlgSelectOpValue	: "Value",	//MISSING
-DlgSelectBtnAdd		: "Add",	//MISSING
-DlgSelectBtnModify	: "Modify",	//MISSING
-DlgSelectBtnUp		: "Up",	//MISSING
-DlgSelectBtnDown	: "Down",	//MISSING
-DlgSelectBtnSetValue : "Set as selected value",	//MISSING
-DlgSelectBtnDelete	: "Delete",	//MISSING
+DlgSelectName		: "Name",
+DlgSelectValue		: "Value",
+DlgSelectSize		: "Size",
+DlgSelectLines		: "lines",
+DlgSelectChkMulti	: "Allow multiple selections",
+DlgSelectOpAvail	: "Available Options",
+DlgSelectOpText		: "Text",
+DlgSelectOpValue	: "Value",
+DlgSelectBtnAdd		: "Add",
+DlgSelectBtnModify	: "Modify",
+DlgSelectBtnUp		: "Up",
+DlgSelectBtnDown	: "Down",
+DlgSelectBtnSetValue : "Set as selected value",
+DlgSelectBtnDelete	: "Delete",
 
 // Textarea Dialog
-DlgTextareaName	: "Name",	//MISSING
-DlgTextareaCols	: "Columns",	//MISSING
-DlgTextareaRows	: "Rows",	//MISSING
+DlgTextareaName	: "Name",
+DlgTextareaCols	: "Columns",
+DlgTextareaRows	: "Rows",
 
 // Text Field Dialog
-DlgTextName			: "Name",	//MISSING
-DlgTextValue		: "Value",	//MISSING
-DlgTextCharWidth	: "Character Width",	//MISSING
-DlgTextMaxChars		: "Maximum Characters",	//MISSING
-DlgTextType			: "Type",	//MISSING
-DlgTextTypeText		: "Text",	//MISSING
-DlgTextTypePass		: "Password",	//MISSING
+DlgTextName			: "Name",
+DlgTextValue		: "Value",
+DlgTextCharWidth	: "Character Width",
+DlgTextMaxChars		: "Maximum Characters",
+DlgTextType			: "Type",
+DlgTextTypeText		: "Text",
+DlgTextTypePass		: "Password",
 
 // Hidden Field Dialog
-DlgHiddenName	: "Name",	//MISSING
-DlgHiddenValue	: "Value",	//MISSING
+DlgHiddenName	: "Name",
+DlgHiddenValue	: "Value",
 
 // Bulleted List Dialog
-BulletedListProp	: "Bulleted List Properties",	//MISSING
-NumberedListProp	: "Numbered List Properties",	//MISSING
-DlgLstType			: "Type",	//MISSING
-DlgLstTypeCircle	: "Circle",	//MISSING
-DlgLstTypeDisk		: "Disk",	//MISSING
-DlgLstTypeSquare	: "Square",	//MISSING
-DlgLstTypeNumbers	: "Numbers (1, 2, 3)",	//MISSING
-DlgLstTypeLCase		: "Lowercase Letters (a, b, c)",	//MISSING
-DlgLstTypeUCase		: "Uppercase Letters (A, B, C)",	//MISSING
-DlgLstTypeSRoman	: "Small Roman Numerals (i, ii, iii)",	//MISSING
-DlgLstTypeLRoman	: "Large Roman Numerals (I, II, III)",	//MISSING
+BulletedListProp	: "Bulleted List Properties",
+NumberedListProp	: "Numbered List Properties",
+DlgLstType			: "Type",
+DlgLstTypeCircle	: "Circle",
+DlgLstTypeDisk		: "Disk",
+DlgLstTypeSquare	: "Square",
+DlgLstTypeNumbers	: "Numbers (1, 2, 3)",
+DlgLstTypeLCase		: "Lowercase Letters (a, b, c)",
+DlgLstTypeUCase		: "Uppercase Letters (A, B, C)",
+DlgLstTypeSRoman	: "Small Roman Numerals (i, ii, iii)",
+DlgLstTypeLRoman	: "Large Roman Numerals (I, II, III)",
 
 // Document Properties Dialog
-DlgDocGeneralTab	: "General",	//MISSING
-DlgDocBackTab		: "Background",	//MISSING
-DlgDocColorsTab		: "Colors and Margins",	//MISSING
-DlgDocMetaTab		: "Meta Data",	//MISSING
+DlgDocGeneralTab	: "General",
+DlgDocBackTab		: "Background",
+DlgDocColorsTab		: "Colors and Margins",
+DlgDocMetaTab		: "Meta Data",
 
-DlgDocPageTitle		: "Page Title",	//MISSING
-DlgDocLangDir		: "Language Direction",	//MISSING
-DlgDocLangDirLTR	: "Left to Right (LTR)",	//MISSING
-DlgDocLangDirRTL	: "Right to Left (RTL)",	//MISSING
-DlgDocLangCode		: "Language Code",	//MISSING
-DlgDocCharSet		: "Character Set Encoding",	//MISSING
-DlgDocCharSetOther	: "Other Character Set Encoding",	//MISSING
+DlgDocPageTitle		: "Page Title",
+DlgDocLangDir		: "Language Direction",
+DlgDocLangDirLTR	: "Left to Right (LTR)",
+DlgDocLangDirRTL	: "Right to Left (RTL)",
+DlgDocLangCode		: "Language Code",
+DlgDocCharSet		: "Character Set Encoding",
+DlgDocCharSetOther	: "Other Character Set Encoding",
 
-DlgDocDocType		: "Document Type Heading",	//MISSING
-DlgDocDocTypeOther	: "Other Document Type Heading",	//MISSING
-DlgDocIncXHTML		: "Include XHTML Declarations",	//MISSING
-DlgDocBgColor		: "Background Color",	//MISSING
-DlgDocBgImage		: "Background Image URL",	//MISSING
-DlgDocBgNoScroll	: "Nonscrolling Background",	//MISSING
-DlgDocCText			: "Text",	//MISSING
-DlgDocCLink			: "Link",	//MISSING
-DlgDocCVisited		: "Visited Link",	//MISSING
-DlgDocCActive		: "Active Link",	//MISSING
-DlgDocMargins		: "Page Margins",	//MISSING
-DlgDocMaTop			: "Top",	//MISSING
-DlgDocMaLeft		: "Left",	//MISSING
-DlgDocMaRight		: "Right",	//MISSING
-DlgDocMaBottom		: "Bottom",	//MISSING
-DlgDocMeIndex		: "Document Indexing Keywords (comma separated)",	//MISSING
-DlgDocMeDescr		: "Document Description",	//MISSING
-DlgDocMeAuthor		: "Author",	//MISSING
-DlgDocMeCopy		: "Copyright",	//MISSING
-DlgDocPreview		: "Preview",	//MISSING
+DlgDocDocType		: "Document Type Heading",
+DlgDocDocTypeOther	: "Other Document Type Heading",
+DlgDocIncXHTML		: "Include XHTML Declarations",
+DlgDocBgColor		: "Background Color",
+DlgDocBgImage		: "Background Image URL",
+DlgDocBgNoScroll	: "Nonscrolling Background",
+DlgDocCText			: "Text",
+DlgDocCLink			: "Link",
+DlgDocCVisited		: "Visited Link",
+DlgDocCActive		: "Active Link",
+DlgDocMargins		: "Page Margins",
+DlgDocMaTop			: "Top",
+DlgDocMaLeft		: "Left",
+DlgDocMaRight		: "Right",
+DlgDocMaBottom		: "Bottom",
+DlgDocMeIndex		: "Document Indexing Keywords (comma separated)",
+DlgDocMeDescr		: "Document Description",
+DlgDocMeAuthor		: "Author",
+DlgDocMeCopy		: "Copyright",
+DlgDocPreview		: "Preview",
 
 // Templates Dialog
-Templates			: "Templates",	//MISSING
-DlgTemplatesTitle	: "Content Templates",	//MISSING
-DlgTemplatesSelMsg	: "Please select the template to open in the editor<br>(the actual contents will be lost):",	//MISSING
-DlgTemplatesLoading	: "Loading templates list. Please wait...",	//MISSING
-DlgTemplatesNoTpl	: "(No templates defined)",	//MISSING
+Templates			: "Templates",
+DlgTemplatesTitle	: "Content Templates",
+DlgTemplatesSelMsg	: "Please select the template to open in the editor<br>(the actual contents will be lost):",
+DlgTemplatesLoading	: "Loading templates list. Please wait...",
+DlgTemplatesNoTpl	: "(No templates defined)",
 
 // About Dialog
-DlgAboutAboutTab	: "About",	//MISSING
-DlgAboutBrowserInfoTab	: "Browser Info",	//MISSING
+DlgAboutAboutTab	: "About",
+DlgAboutBrowserInfoTab	: "Browser Info",
 DlgAboutVersion		: "version",
 DlgAboutLicense		: "Licensed under the terms of the GNU Lesser General Public License",
 DlgAboutInfo		: "For further information go to"

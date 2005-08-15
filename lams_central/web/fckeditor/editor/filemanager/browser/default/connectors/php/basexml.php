@@ -1,4 +1,5 @@
-<?php /*
+<?php 
+/*
  * FCKeditor - The text editor for internet
  * Copyright (C) 2003-2005 Frederico Caldeira Knabben
  * 
@@ -15,8 +16,27 @@
  * 		Frederico Caldeira Knabben (fredck@fckeditor.net)
  */
 
+function SetXmlHeaders()
+{
+	// Prevent the browser from caching the result.
+	// Date in the past
+	header('Expires: Mon, 26 Jul 1997 05:00:00 GMT') ;
+	// always modified
+	header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT') ;
+	// HTTP/1.1
+	header('Cache-Control: no-store, no-cache, must-revalidate') ;
+	header('Cache-Control: post-check=0, pre-check=0', false) ;
+	// HTTP/1.0
+	header('Pragma: no-cache') ;
+
+	// Set the response format.
+	header( 'Content-Type:text/xml; charset=utf-8' ) ;
+}
+
 function CreateXmlHeader( $command, $resourceType, $currentFolder )
 {
+	SetXmlHeaders() ;
+	
 	// Create the XML document header.
 	echo '<?xml version="1.0" encoding="utf-8" ?>' ;
 
@@ -30,5 +50,17 @@ function CreateXmlHeader( $command, $resourceType, $currentFolder )
 function CreateXmlFooter()
 {
 	echo '</Connector>' ;
+}
+
+function SendError( $number, $text )
+{
+	SetXmlHeaders() ;
+	
+	// Create the XML document header
+	echo '<?xml version="1.0" encoding="utf-8" ?>' ;
+	
+	echo '<Connector><Error number="' . $number . '" text="' . htmlspecialchars( $text ) . '" /></Connector>' ;
+	
+	exit ;
 }
 ?>

@@ -41,6 +41,8 @@ RemoveLink			: "Eliminar Vínculo",
 Anchor				: "Referencia",
 InsertImageLbl		: "Imagen",
 InsertImage			: "Insertar/Editar Imagen",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "Insertar/Editar Flash",
 InsertTableLbl		: "Tabla",
 InsertTable			: "Insertar/Editar Tabla",
 InsertLineLbl		: "Línea",
@@ -105,6 +107,7 @@ SplitCell			: "Dividir Celda",
 CellProperties		: "Propiedades de Celda",
 TableProperties		: "Propiedades de Tabla",
 ImageProperties		: "Propiedades de Imagen",
+FlashProperties		: "Propiedades de Flash",
 
 AnchorProp			: "Propiedades de Referencia",
 ButtonProp			: "Propiedades de Botón",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Cerrar",
 DlgBtnBrowseServer	: "Ver Servidor",
 DlgAdvancedTag		: "Avanzado",
 DlgOpOther			: "&lt;Otro&gt;",
+DlgInfoTab			: "Información",
+DlgAlertUrl			: "Inserte el URL",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;No definido&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Tope",
 DlgImgPreview		: "Vista Previa",
 DlgImgAlertUrl		: "Por favor tipee el URL de la imagen",
 DlgImgLinkTab		: "Vínculo",
+
+// Flash Dialog
+DlgFlashTitle		: "Propiedades de Flash",
+DlgFlashChkPlay		: "Autoejecución",
+DlgFlashChkLoop		: "Repetir",
+DlgFlashChkMenu		: "Activar Menú Flash",
+DlgFlashScale		: "Escala",
+DlgFlashScaleAll	: "Mostrar todo",
+DlgFlashScaleNoBorder	: "Sin Borde",
+DlgFlashScaleFit	: "Ajustado",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Vínculo",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "La configuración de seguridad de este navegador no permite la
 PasteAsText		: "Pegar como Texto Plano",
 PasteFromWord	: "Pegar desde Word",
 
-DlgPasteMsg		: "El editor no pudo ejecutar automáticamente el pegado debido a la <STRONG>configuración de seguridad</STRONG> de su navegador.<BR>Por favor pegue dentro del sigueinte recuadro usando el teclado (<STRONG>Ctrl+V</STRONG>) y presione <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Por favor pegue dentro del cuadro utilizando el teclado (<STRONG>Ctrl+V</STRONG>); luego presione <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Ignorar definiciones de fuentes",
+DlgPasteRemoveStyles	: "Remover definiciones de estilo",
+DlgPasteCleanBox		: "Clean Up Box",
+
 
 // Color Picker
 ColorAutomatic	: "Automático",

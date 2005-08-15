@@ -56,7 +56,7 @@ FCK.Paste = function()
 		{
 			if ( confirm( FCKLang["PasteWordConfirm"] ) )
 			{
-				FCK.CleanAndPaste( sHTML ) ;
+				FCK.PasteFromWord() ;
 				return false ;
 			}
 		}
@@ -76,12 +76,12 @@ FCK.PasteAsPlainText = function()
 	// Insert the resulting data in the editor.
 	this.InsertHtml( sText ) ;	
 }
-
+/*
 FCK.PasteFromWord = function()
 {
 	FCK.CleanAndPaste( FCK.GetClipboardHTML() ) ;
 }
-
+*/
 FCK.InsertElement = function( element )
 {
 	FCK.InsertHtml( element.outerHTML ) ;

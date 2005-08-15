@@ -21,6 +21,11 @@ function Window_OnContextMenu( e )
 {
 	if ( e )
 		e.preventDefault() ;	// The Gecko way.
+	else
+	{
+		if ( event.srcElement == document.getElementById('eSourceField') )
+			return true ;
+	}
 
 	return false ;				// The IE way.
 }
@@ -51,15 +56,15 @@ if ( FCKBrowserInfo.IsIE )
 	// On IE, some circular references must be cleared to avoid memory leak.
 	function Window_OnBeforeUnload()
 	{
-		FCKToolbarSet.Collapse() ;
+//		if ( typeof( FCKToolbarSet ) != 'undefined' )
+//			FCKToolbarSet.Collapse() ;
 
-		var e ;
+		var d, e ;
 
-		for ( var j = 0 ; j < aCleanupDocs.length ; j++ )
+		var j = 0 ;
+		while ( d = aCleanupDocs[j++] )
 		{
-			var d = aCleanupDocs[j] ;
 			var i = 0 ;
-
 			while ( e = d.getElementsByTagName("DIV").item(i++) )
 			{
 				if ( e.FCKToolbarButton )
@@ -80,10 +85,12 @@ if ( FCKBrowserInfo.IsIE )
 			}
 
 			aCleanupDocs[j] = null ;
-			d = null ;
 		}
+		
+		if ( typeof( FCKTempBin ) != 'undefined' )
+			FCKTempBin.Reset() ;
 	}
-	window.attachEvent( "onbeforeunload", Window_OnBeforeUnload ) ;
+	window.attachEvent( "onunload", Window_OnBeforeUnload ) ;
 }
 
 // The editor startup follows these steps:
@@ -151,6 +158,8 @@ function LoadPageConfig()
 
 function LoadStyles()
 {
+	if( window.console ) window.console.log( 'LoadStyles()' ) ;	// @Packager.Compactor.RemoveLine
+
 	FCKScriptLoader.OnEmpty = LoadScripts ;
 
 	// Load the active skin CSS.
@@ -160,6 +169,8 @@ function LoadStyles()
 
 function LoadScripts()
 {
+	if( window.console ) window.console.log( 'LoadScripts()' ) ;	// @Packager.Compactor.RemoveLine
+
 	FCKScriptLoader.OnEmpty = null ;
 
 	// @Packager.Compactor.Remove.Start
@@ -193,13 +204,19 @@ function LoadScripts()
 
 function LoadLanguageFile()
 {
+	if( window.console ) window.console.log( 'LoadLanguageFile()' ) ;	// @Packager.Compactor.RemoveLine
+
 	FCKScriptLoader.OnEmpty = LoadEditor ;
+
+	if( window.console ) window.console.log( 'Active Language: ' + FCKLanguageManager.ActiveLanguage.Code ) ;	// @Packager.Compactor.RemoveLine
 
 	FCKScriptLoader.AddScript( 'lang/' + FCKLanguageManager.ActiveLanguage.Code + '.js' ) ;
 }
 
 function LoadEditor()
 {
+	if( window.console ) window.console.log( 'LoadEditor()' ) ;	// @Packager.Compactor.RemoveLine
+
 	// Removes the OnEmpty listener.
 	FCKScriptLoader.OnEmpty = null ;
 

@@ -42,6 +42,8 @@ RemoveLink			: "Slet Link",
 Anchor				: "Insert/Rediger Anker",
 InsertImageLbl		: "Indsæt Billed",
 InsertImage			: "Indsæt/Rediger Billed",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "Indsæt/rediger Flash",
 InsertTableLbl		: "Table",
 InsertTable			: "Indsæt/Rediger Tabel",
 InsertLineLbl		: "Linie",
@@ -106,6 +108,7 @@ SplitCell			: "Opdel celler",
 CellProperties		: "Celle egenskaber",
 TableProperties		: "Tabel egenskaber",
 ImageProperties		: "Billed egenskaber",
+FlashProperties		: "Flash egenskaber",
 
 AnchorProp			: "Anker egenskaber",
 ButtonProp			: "Knap egenskaber",
@@ -137,6 +140,8 @@ DlgBtnClose			: "Luk",
 DlgBtnBrowseServer	: "Gennemse Server",
 DlgAdvancedTag		: "Avanceret",
 DlgOpOther			: "&lt;Andet&gt;",
+DlgInfoTab			: "Info",
+DlgAlertUrl			: "Indtast URL",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;ikke sat&gt;",
@@ -182,6 +187,16 @@ DlgImgAlignTop		: "Top",
 DlgImgPreview		: "Vis eksempel",
 DlgImgAlertUrl		: "Indtast stien til billedet",
 DlgImgLinkTab		: "Link",
+
+// Flash Dialog
+DlgFlashTitle		: "Flash egenskaber",
+DlgFlashChkPlay		: "Automatisk afspilning",
+DlgFlashChkLoop		: "Gentagelse",
+DlgFlashChkMenu		: "Vis Flash menu",
+DlgFlashScale		: "Skalér",
+DlgFlashScaleAll	: "Vis alt",
+DlgFlashScaleNoBorder	: "Ingen ramme",
+DlgFlashScaleFit	: "Tilpas størrelse",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Link",
@@ -311,7 +326,11 @@ PasteErrorCopy	: "Din browsers sikkerhedsindstillinger tillader ikke editoren at
 PasteAsText		: "Indsæt som ren tekst",
 PasteFromWord	: "Indsæt fra Word",
 
-DlgPasteMsg		: "Editoren kunne ikke indsætte teksten automatisk på grund af din browsers <STRONG>sikkerhedsindstillinger</STRONG>.<BR>Indsæt i stedet teksten i den følgende boks ved hjælp af tastaturet (<STRONG>Ctrl+V</STRONG>) og klik <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Indsæt i boksen herunder (<STRONG>Ctrl+V</STRONG>) og klik <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Ignorer font definitioner",
+DlgPasteRemoveStyles	: "Fjern typografi definitioner",
+DlgPasteCleanBox		: "Slet indhold",
+
 
 // Color Picker
 ColorAutomatic	: "Automatisk",

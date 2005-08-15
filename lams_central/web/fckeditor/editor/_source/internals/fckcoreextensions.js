@@ -39,15 +39,21 @@ String.prototype.startsWith = function( value )
 }
 
 // Extends the String object, creating a "endsWith" method on it.
-String.prototype.endsWith = function( value )
+String.prototype.endsWith = function( value, ignoreCase )
 {
 	var L1 = this.length ;
 	var L2 = value.length ;
 	
 	if ( L2 > L1 )
 		return false ;
-		
-	return ( L2 == 0 || this.substr( L1 - L2, L2 ) == value ) ;
+
+	if ( ignoreCase )
+	{
+		var oRegex = new RegExp( value + '$' , 'i' ) ;
+		return oRegex.test( this ) ;
+	}
+	else
+		return ( L2 == 0 || this.substr( L1 - L2, L2 ) == value ) ;
 }
 
 String.prototype.remove = function( start, length )

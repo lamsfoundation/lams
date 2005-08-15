@@ -42,6 +42,8 @@ RemoveLink			: "Înlătură link (legătură web)",
 Anchor				: "Inserează/Editează ancoră",
 InsertImageLbl		: "Imagine",
 InsertImage			: "Inserează/Editează imagine",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "Inserează/Editează flash",
 InsertTableLbl		: "Tabel",
 InsertTable			: "Inserează/Editează tabel",
 InsertLineLbl		: "Linie",
@@ -106,6 +108,7 @@ SplitCell			: "Împarte celulă",
 CellProperties		: "Proprietăţile celulei",
 TableProperties		: "Proprietăţile tabelului",
 ImageProperties		: "Proprietăţile imaginii",
+FlashProperties		: "Proprietăţile flash-ului",
 
 AnchorProp			: "Proprietăţi ancoră",
 ButtonProp			: "Proprietăţi buton",
@@ -137,6 +140,8 @@ DlgBtnClose			: "Închidere",
 DlgBtnBrowseServer	: "Răsfoieşte server",
 DlgAdvancedTag		: "Avansat",
 DlgOpOther			: "&lt;Altul&gt;",
+DlgInfoTab			: "Informaţii",
+DlgAlertUrl			: "Vă rugăm să scrieţi URL-ul",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;nesetat&gt;",
@@ -182,6 +187,16 @@ DlgImgAlignTop		: "Sus",
 DlgImgPreview		: "Previzualizare",
 DlgImgAlertUrl		: "Vă rugăm să scrieţi URL-ul imaginii",
 DlgImgLinkTab		: "Link (Legătură web)",
+
+// Flash Dialog
+DlgFlashTitle		: "Proprietăţile flash-ului",
+DlgFlashChkPlay		: "Rulează automat",
+DlgFlashChkLoop		: "Repetă (Loop)",
+DlgFlashChkMenu		: "Activează meniul flash",
+DlgFlashScale		: "Scală",
+DlgFlashScaleAll	: "Arată tot",
+DlgFlashScaleNoBorder	: "Fără margini (No border)",
+DlgFlashScaleFit	: "Potriveşte",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Link (Legătură web)",
@@ -311,7 +326,11 @@ PasteErrorCopy	: "Setările de securitate ale navigatorului (browser) pe care î
 PasteAsText		: "Adaugă ca text simplu (Plain Text)",
 PasteFromWord	: "Adaugă din Word",
 
-DlgPasteMsg		: "Editor nu a putut executa automat adăugarea din cauza <STRONG>setărilor de securitate</STRONG> ale navigatorului (browser) dvs.<BR>Vă rugăm adăugaţi inăuntrul casuţei folosind tastatura (<STRONG>Ctrl+V</STRONG>) şi apăsaţi <STRONG>Bine</STRONG>.",
+DlgPasteMsg2	: "Vă rugăm adăugaţi în căsuţa următoare folosind tastatura (<STRONG>Ctrl+V</STRONG>) şi apăsaţi <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Ignoră definiţiile Font Face",
+DlgPasteRemoveStyles	: "Şterge definiţiile stilurilor",
+DlgPasteCleanBox		: "Şterge căsuţa",
+
 
 // Color Picker
 ColorAutomatic	: "Automatic",
@@ -340,7 +359,7 @@ DlgSpellNoChanges		: "Verificarea textului terminată: Nici un cuvânt modificat
 DlgSpellOneChange		: "Verificarea textului terminată: Un cuvânt modificat",
 DlgSpellManyChanges		: "Verificarea textului terminată: 1% cuvinte modificate",
 
-IeSpellDownload			: "Spell checker not installed. Do you want to download it now?",
+IeSpellDownload			: "Unealta pentru verificat textul (Spell checker) neinstalată. Doriţi să o descărcaţi acum?",
 
 // Button Dialog
 DlgButtonText	: "Text (Valoare)",

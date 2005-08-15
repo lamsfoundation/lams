@@ -41,6 +41,8 @@ RemoveLink			: "Verwijderen link",
 Anchor				: "Interne link",
 InsertImageLbl		: "Afbeelding",
 InsertImage			: "Invoegen/Wijzigen afbeelding",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "Invoegen/Wijzigen Flash",
 InsertTableLbl		: "Tabel",
 InsertTable			: "Invoegen/Wijzigen tabel",
 InsertLineLbl		: "Lijn",
@@ -105,6 +107,7 @@ SplitCell			: "Cellen splitsen",
 CellProperties		: "Eigenschappen cel",
 TableProperties		: "Eigenschappen tabel",
 ImageProperties		: "Eigenschappen afbeelding",
+FlashProperties		: "Eigenschappen Flash",
 
 AnchorProp			: "Eigenschappen interne link",
 ButtonProp			: "Eigenschappen knop",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Afsluiten",
 DlgBtnBrowseServer	: "Bladeren op server",
 DlgAdvancedTag		: "Geavanceerd",
 DlgOpOther			: "&lt;Anders&gt;",
+DlgInfoTab			: "Informatie",
+DlgAlertUrl			: "Geef URL op",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;niet ingevuld&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Boven",
 DlgImgPreview		: "Voorbeeld",
 DlgImgAlertUrl		: "Geeft de URL van de afbeelding",
 DlgImgLinkTab		: "Link",
+
+// Flash Dialog
+DlgFlashTitle		: "Eigenschappen Flash",
+DlgFlashChkPlay		: "Automatisch afspelen",
+DlgFlashChkLoop		: "Herhalen",
+DlgFlashChkMenu		: "Flaschmenu\'s inschakelen",
+DlgFlashScale		: "Verschalen",
+DlgFlashScaleAll	: "Alles tonen",
+DlgFlashScaleNoBorder	: "Geen rand",
+DlgFlashScaleFit	: "Precies passen",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Link",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "De beveiligingsinstelling van de browser verhinderen het autom
 PasteAsText		: "Plakken als platte tekst",
 PasteFromWord	: "Plakken van Word-gegevens",
 
-DlgPasteMsg		: "De <STRONG>beveiligingsinstelling</STRONG> van de browser verhinderen het automatisch plakken. <BR>Plak de data in de volgende pagina door gebruik te maken van toetsenbord(<STRONG>Ctrl+V</STRONG>).  Klik hierna op <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Plak de tekst in de volgende box gebruikmakend van je toetstenbord (<STRONG>Ctrl+V</STRONG>) en kies <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Negeer Font Face definities",
+DlgPasteRemoveStyles	: "Verwijder Styles definities",
+DlgPasteCleanBox		: "Box opschonen",
+
 
 // Color Picker
 ColorAutomatic	: "Automatisch",

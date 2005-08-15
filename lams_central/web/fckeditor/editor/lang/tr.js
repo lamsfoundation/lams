@@ -41,6 +41,8 @@ RemoveLink			: "Köprü Kaldir",
 Anchor				: "Insert/Edit Anchor",	//MISSING
 InsertImageLbl		: "Resim",
 InsertImage			: "Resim Ekle/Düzenle",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "Tablo",
 InsertTable			: "Tablo Ekle/Düzenle",
 InsertLineLbl		: "Satir",
@@ -105,6 +107,7 @@ SplitCell			: "Hücre Böl",
 CellProperties		: "Hücre Özellikleri",
 TableProperties		: "Tablo Özellikleri",
 ImageProperties		: "Resim Özellikleri",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "Çapa Özellikleri",
 ButtonProp			: "Dügme Özellikleri",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Kapat",
 DlgBtnBrowseServer	: "Sunucuyu Gez",
 DlgAdvancedTag		: "Gelismis",
 DlgOpOther			: "&lt;Diger&gt;",
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;tanimlanmamis&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Tepe",
 DlgImgPreview		: "Ön Izleme",
 DlgImgAlertUrl		: "Lütfen resimin URL'sini yaziniz",
 DlgImgLinkTab		: "Link",	//MISSING
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "Köprü",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "Gezgin yaziliminizin güvenlik ayarlari editörün otomatik ko
 PasteAsText		: "Düz Metin Olarak Yapistir",
 PasteFromWord	: "Word'den yapistir",
 
-DlgPasteMsg		: "Gezgin yaziliminizin <STRONG>güvenlik ayarlari</STRONG> editörün otomatik yapistirma islemine izin vermiyor.<BR>Lütfen yandaki kutuya klavyenin (<STRONG>Ctrl+V</STRONG>) tuslarini kullanarak yapistirin ve <STRONG>Tamam</STRONG>'a basin.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "Otomatik",

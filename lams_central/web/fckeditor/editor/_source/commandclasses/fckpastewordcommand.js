@@ -27,5 +27,8 @@ FCKPasteWordCommand.prototype.Execute = function()
 
 FCKPasteWordCommand.prototype.GetState = function()
 {
-	return FCK.GetNamedCommandState( 'Paste' ) ;
+	if ( FCKConfig.ForcePasteAsPlainText )
+		return FCK_TRISTATE_DISABLED ;
+	else
+		return FCK.GetNamedCommandState( 'Paste' ) ;
 }

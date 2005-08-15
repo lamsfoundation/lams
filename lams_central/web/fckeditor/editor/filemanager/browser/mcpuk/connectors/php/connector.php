@@ -1,4 +1,5 @@
-<?php /*
+<?php 
+/*
  * FCKeditor - The text editor for internet
  * Copyright (C) 2003-2005 Frederico Caldeira Knabben
  * 
@@ -40,7 +41,7 @@ function errorHandler ($errno, $errstr, $errfile, $errline, $errcontext) {
 				if ($fckphp_config['Debug_SERVER']) fwrite($fh,"\n\$_SERVER::\n".print_r($_SERVER,true)."\n");
 				if ($fckphp_config['Debug_SESSIONS']) fwrite($fh,"\n\$_SESSIONS::\n".print_r($_SESSION,true)."\n");
 				fwrite($fh,"\n-------------------------------------------------------\n\n\n");
-				fwrite($oldData); $oldData="";
+				fwrite($fh,$oldData); $oldData="";
 				fclose($fh);
 				$reported=true;
 			} 

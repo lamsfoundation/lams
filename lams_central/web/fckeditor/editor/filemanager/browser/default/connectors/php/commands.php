@@ -1,4 +1,5 @@
-<?php /*
+<?php 
+/*
  * FCKeditor - The text editor for internet
  * Copyright (C) 2003-2005 Frederico Caldeira Knabben
  * 
@@ -9,7 +10,7 @@
  * 		http://www.fckeditor.net/
  * 
  * File Name: commands.php
- * 	This is the File Manager Connector for ASP.
+ * 	This is the File Manager Connector for PHP.
  * 
  * File Authors:
  * 		Frederico Caldeira Knabben (fredck@fckeditor.net)

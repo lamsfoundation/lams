@@ -51,13 +51,63 @@ FCKScriptLoader.CheckQueue = function()
 			oTempArray[ i - 1 ] = this.Queue[ i ] ;
 		this.Queue = oTempArray ;
 		
-//		window.status = ( 'Loading ' + sScriptPath + '...' ) ;
+		this.LoadFile( sScriptPath ) ;
+	}
+	else
+	{
+		this.IsLoading = false ;
+		
+		// Call the "OnEmpty" event.
+		if ( this.OnEmpty ) 
+			this.OnEmpty() ;
+	}
+}
+
+if ( FCKBrowserInfo.IsSafari )
+{
+	FCKScriptLoader.LoadFile = function( filePath ) 
+	{
+		if ( filePath.lastIndexOf( '.css' ) > 0 )
+		{
+			this.CheckQueue() ;
+			return ;
+		}
+		
+		var oXmlRequest = new XMLHttpRequest() ;
+		
+		// Load the script synchronously.
+		oXmlRequest.open( "GET", filePath, false ) ;
+		oXmlRequest.send( null ) ;
+		
+		// Evaluate the script.
+		if ( oXmlRequest.status == 200 )
+		{
+			try
+			{
+				eval( oXmlRequest.responseText ) ;
+			}
+			catch ( e )
+			{
+				alert( 'Error parsing ' + filePath + ': ' + e.message ) ;
+			}
+		}
+		else
+			alert( 'Error loading ' + filePath ) ;
+			
+		this.CheckQueue() ;
+	}
+}
+else
+{
+	FCKScriptLoader.LoadFile = function( filePath ) 
+	{
+		//window.status = ( 'Loading ' + filePath + '...' ) ;
 
 		// Dynamically load the file (it can be a CSS or a JS)
 		var e ;
 		
 		// If is a CSS
-		if ( sScriptPath.lastIndexOf( '.css' ) > 0 )
+		if ( filePath.lastIndexOf( '.css' ) > 0 )
 		{
 			e = document.createElement( 'LINK' ) ;
 			e.rel	= 'stylesheet' ;
@@ -67,7 +117,7 @@ FCKScriptLoader.CheckQueue = function()
 		else
 		{
 			e = document.createElement( "script" ) ;
-			e.type	= "text/javascript" ;
+				e.type	= "text/javascript" ;
 		}
 		
 		// Add the new object to the HEAD.
@@ -84,29 +134,21 @@ FCKScriptLoader.CheckQueue = function()
 			else
 				FCKScriptLoader.CheckQueue() ;
 				
-			e.href = sScriptPath ;
+			e.href = filePath ;
 		}
 		else
 		{
 			// Gecko fires the "onload" event and IE fires "onreadystatechange"
 			e.onload = e.onreadystatechange = FCKScriptLoader_OnLoad ;
-			e.src = sScriptPath ;
+			e.src = filePath ;
 		}
 	}
-	else
-	{
-		this.IsLoading = false ;
-		
-		// Call the "OnEmpty" event.
-		if ( this.OnEmpty ) 
-			this.OnEmpty() ;
-	}
-}
 
-function FCKScriptLoader_OnLoad()
-{
-	// Gecko doesn't have a "readyState" property
-	if ( this.tagName == 'LINK' || !this.readyState || this.readyState == 'loaded' )
-		// Load the next script available in the queue
-		FCKScriptLoader.CheckQueue() ;
+	function FCKScriptLoader_OnLoad()
+	{
+		// Gecko doesn't have a "readyState" property
+		if ( this.tagName == 'LINK' || !this.readyState || this.readyState == 'loaded' )
+			// Load the next script available in the queue
+			FCKScriptLoader.CheckQueue() ;
+	}
 }

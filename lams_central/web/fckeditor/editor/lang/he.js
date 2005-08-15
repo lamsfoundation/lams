@@ -41,6 +41,8 @@ RemoveLink			: "הסרת הקישור",
 Anchor				: "Insert/Edit Anchor",	//MISSING
 InsertImageLbl		: "תמונה",
 InsertImage			: "הוספת/עריכת תמונה",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "טבלה",
 InsertTable			: "הוספת/עריכת טבלה",
 InsertLineLbl		: "קו",
@@ -105,6 +107,7 @@ SplitCell			: "פיצול תאים",
 CellProperties		: "תכונות התא",
 TableProperties		: "תכונות הטבלה",
 ImageProperties		: "תכונות התמונה",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "Anchor Properties",	//MISSING
 ButtonProp			: "Button Properties",	//MISSING
@@ -136,6 +139,8 @@ DlgBtnClose			: "סגירה",
 DlgBtnBrowseServer	: "Browse Server",	//MISSING
 DlgAdvancedTag		: "אפשרויות מתקדמות",
 DlgOpOther			: "&lt;Other&gt;",	//MISSING
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;לא נקבע&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "למעלה",
 DlgImgPreview		: "תצוגה מקדימה",
 DlgImgAlertUrl		: "נא להקליד את כתובת התמונה",
 DlgImgLinkTab		: "Link",	//MISSING
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "קישור",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "הגדרות האבטחה בדפדפן שלך לא מאפשר�
 PasteAsText		: "הדבקה כטקסט פשוט",
 PasteFromWord	: "הדבקה מ-Word",
 
-DlgPasteMsg		: "העורך לא הצליח לבצע הדבקה אוטומטית בגלל<STRONG>הגדרות האבטחה</STRONG> של הדפדפן שלך.<BR>נא להדביק לתוך התיבה הבאה באמצעות המקלדת (<STRONG>Ctrl+V</STRONG>) וללחוץ על <STRONG>אישור</STRONG>.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "אוטומטי",

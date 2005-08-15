@@ -41,6 +41,8 @@ RemoveLink			: "Supprimer Lien",
 Anchor				: "Insérer/Modifier Ancre",
 InsertImageLbl		: "Image",
 InsertImage			: "Insérer/Modifier Image",
+InsertFlashLbl		: "Animation Flash",
+InsertFlash			: "Insérer/Modifier Animation Flash",
 InsertTableLbl		: "Tableau",
 InsertTable			: "Insérer/Modifier Tableau",
 InsertLineLbl		: "Séparateur",
@@ -105,6 +107,7 @@ SplitCell			: "Scinder les Cellules",
 CellProperties		: "Propriétés de Cellule",
 TableProperties		: "Propriétés de Tableau",
 ImageProperties		: "Propriétés d'Image",
+FlashProperties		: "Propriétés d'Animation Flash",
 
 AnchorProp			: "Propriétés d'Ancre",
 ButtonProp			: "Propriétés de Bouton",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Fermer",
 DlgBtnBrowseServer	: "Parcourir le Serveur",
 DlgAdvancedTag		: "Avancé",
 DlgOpOther			: "&lt;Autre&gt;",
+DlgInfoTab			: "Info",
+DlgAlertUrl			: "Veuillez saisir l'URL",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;Par Défaut&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Haut",
 DlgImgPreview		: "Prévisualisation",
 DlgImgAlertUrl		: "Veuillez saisir l'URL de l'image",
 DlgImgLinkTab		: "Lien",
+
+// Flash Dialog
+DlgFlashTitle		: "Propriétés d'animation Flash",
+DlgFlashChkPlay		: "Lecture automatique",
+DlgFlashChkLoop		: "Boucle",
+DlgFlashChkMenu		: "Activer menu Flash",
+DlgFlashScale		: "Affichage",
+DlgFlashScaleAll	: "Par défault (tout montrer)",
+DlgFlashScaleNoBorder	: "Sans Bordure",
+DlgFlashScaleFit	: "Ajuster aux Dimensions",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Propriétés de Lien",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "Les paramètres de sécurité de votre navigateur empêchent l
 PasteAsText		: "Coller comme texte",
 PasteFromWord	: "Coller à partir de Word",
 
-DlgPasteMsg		: "L'éditeur n'a pu coller automatiquement vos données à cause des <STRONG>paramètres de sécurité</STRONG> de votre navigateur.<BR>Veuillez coller dans la zone suivante en utilisant le clavier (<STRONG>Ctrl+V</STRONG>) et cliquez sur <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Veuillez coller dans la zone ci-dessous en utilisant le clavier (<STRONG>Ctrl+V</STRONG>) et cliquez sur <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Ignorer les Polices de Caractères",
+DlgPasteRemoveStyles	: "Supprimer les Styles",
+DlgPasteCleanBox		: "Effacer le contenu",
+
 
 // Color Picker
 ColorAutomatic	: "Automatique",

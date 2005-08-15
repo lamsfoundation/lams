@@ -15,12 +15,13 @@
  * 		Frederico Caldeira Knabben (fredck@fckeditor.net)
  */
 
-FCKDialog.Show = function( dialogInfo, dialogName, pageUrl, dialogWidth, dialogHeight, parentWindow )
+FCKDialog.Show = function( dialogInfo, dialogName, pageUrl, dialogWidth, dialogHeight, parentWindow, resizable )
 {
 	var iTop  = (screen.height - dialogHeight) / 2 ;
 	var iLeft = (screen.width  - dialogWidth)  / 2 ;
 
-	var sOption  = "location=no,menubar=no,resizable=no,toolbar=no,dependent=yes,dialog=yes,minimizable=no,modal=yes,alwaysRaised=yes" +
+	var sOption  = "location=no,menubar=no,toolbar=no,dependent=yes,dialog=yes,minimizable=no,modal=yes,alwaysRaised=yes" +
+		",resizable="  + ( resizable ? 'yes' : 'no' ) +
 		",width="  + dialogWidth +
 		",height=" + dialogHeight +
 		",top="  + iTop +
@@ -29,7 +30,7 @@ FCKDialog.Show = function( dialogInfo, dialogName, pageUrl, dialogWidth, dialogH
 	if ( !parentWindow )
 		parentWindow = window ;
 	
-	var oWindow = parentWindow.open( '', 'FCKEditorDialog_' + dialogName, sOption, true ) ;
+	var oWindow = parentWindow.open( '', 'FCKeditorDialog_' + dialogName, sOption, true ) ;
 	oWindow.moveTo( iLeft, iTop ) ;
 	oWindow.resizeTo( dialogWidth, dialogHeight ) ;
 	oWindow.focus() ;

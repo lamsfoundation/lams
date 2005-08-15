@@ -1,4 +1,5 @@
-<?php /*
+<?php 
+/*
  * FCKeditor - The text editor for internet
  * Copyright (C) 2003-2005 Frederico Caldeira Knabben
  * 
@@ -31,14 +32,12 @@ function RemoveExtension( $fileName )
 function ServerMapFolder( $resourceType, $folderPath )
 {
 	// Get the resource type directory.
-//	$sResourceTypePath = $GLOBALS["UserFilesDirectory"] . $resourceType . '\\' ;
 	$sResourceTypePath = $GLOBALS["UserFilesDirectory"] . $resourceType . '/' ;
 
 	// Ensure that the directory exists.
 	CreateServerFolder( $sResourceTypePath ) ;
 
 	// Return the resource type directory combined with the required path.
-//	return $sResourceTypePath . str_replace( '/', '\\', RemoveFromStart( $folderPath, '/' ) ) ;
 	return $sResourceTypePath . RemoveFromStart( $folderPath, '/' ) ;
 }
 
@@ -88,9 +87,7 @@ function GetRootPath()
 {
 	$sRealPath = realpath( './' ) ;
 
-//	$sSelfPath = str_replace( '/', '\\', $_SERVER['PHP_SELF'] ) ;
 	$sSelfPath = $_SERVER['PHP_SELF'] ;
-//	$sSelfPath = substr( $sSelfPath, 0, strrpos( $sSelfPath, '\\' ) ) ;
 	$sSelfPath = substr( $sSelfPath, 0, strrpos( $sSelfPath, '/' ) ) ;
 
 	return substr( $sRealPath, 0, strlen( $sRealPath ) - strlen( $sSelfPath ) ) ;

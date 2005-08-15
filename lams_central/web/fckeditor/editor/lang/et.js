@@ -41,6 +41,8 @@ RemoveLink			: "Eemalda link",
 Anchor				: "Insert/Edit Anchor",	//MISSING
 InsertImageLbl		: "Pilt",
 InsertImage			: "Sisesta/Muuda pilt",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "Tabel",
 InsertTable			: "Sisesta/Muuda tabel",
 InsertLineLbl		: "Joon",
@@ -105,6 +107,7 @@ SplitCell			: "Lahuta lahtrid",
 CellProperties		: "Lahtri atribuudid",
 TableProperties		: "Tabeli atribuudid",
 ImageProperties		: "Pildi  atribuudid",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "Anchor Properties",	//MISSING
 ButtonProp			: "Button Properties",	//MISSING
@@ -136,6 +139,8 @@ DlgBtnClose			: "Sule",
 DlgBtnBrowseServer	: "Browse Server",	//MISSING
 DlgAdvancedTag		: "Täpsemalt",
 DlgOpOther			: "&lt;Other&gt;",	//MISSING
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;määramata&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Üles",
 DlgImgPreview		: "Eelvaade",
 DlgImgAlertUrl		: "Palun kirjuta pildi URL",
 DlgImgLinkTab		: "Link",	//MISSING
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "Link",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "Sinu brauseri turvaseaded ei luba redaktoril automaatselt kope
 PasteAsText		: "Kleebi tavalise tekstina",
 PasteFromWord	: "Kleebi Wordist",
 
-DlgPasteMsg		: "Redaktor ei saanud sinu brauseri <STRONG>turvaseadete</STRONG> pärast automatselt kleepida.<BR>Palun kleebi järgmisse kasti kasutades klaviatuuri(<STRONG>Ctrl+V</STRONG>) ja vajuta <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "Automaatne",

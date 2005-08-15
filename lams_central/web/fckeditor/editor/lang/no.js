@@ -41,6 +41,8 @@ RemoveLink			: "Fjern lenke",
 Anchor				: "Sett inn/Rediger anker",
 InsertImageLbl		: "Bilde",
 InsertImage			: "Sett inn/Rediger bilde",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "Sett inn/Rediger Flash",
 InsertTableLbl		: "Tabell",
 InsertTable			: "Sett inn/Rediger tabell",
 InsertLineLbl		: "Linje",
@@ -105,6 +107,7 @@ SplitCell			: "Splitt celler",
 CellProperties		: "Celleegenskaper",
 TableProperties		: "Tabellegenskaper",
 ImageProperties		: "Bildeegenskaper",
+FlashProperties		: "Flash Egenskaper",
 
 AnchorProp			: "Ankeregenskaper",
 ButtonProp			: "Knappegenskaper",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Lukk",
 DlgBtnBrowseServer	: "Bla igjennom server",
 DlgAdvancedTag		: "Avansert",
 DlgOpOther			: "&lt;Annet&gt;",
+DlgInfoTab			: "Info",
+DlgAlertUrl			: "Vennligst skriv inn URL'en",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;ikke satt&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Topp",
 DlgImgPreview		: "Forhåndsvis",
 DlgImgAlertUrl		: "Vennligst skriv bildeurlen",
 DlgImgLinkTab		: "Lenke",
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Egenskaper",
+DlgFlashChkPlay		: "Auto Spill",
+DlgFlashChkLoop		: "Loop",
+DlgFlashChkMenu		: "Slå på Flash meny",
+DlgFlashScale		: "Skaler",
+DlgFlashScaleAll	: "Vis alt",
+DlgFlashScaleNoBorder	: "Ingen ramme",
+DlgFlashScaleFit	: "Skaler til å passeExact Fit",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Lenke",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "Din nettlesers sikkerhetsinstillinger tillater ikke automatisk
 PasteAsText		: "Lim inn som ren tekst",
 PasteFromWord	: "Lim inn fra word",
 
-DlgPasteMsg		: "Programmet kan ikke lime inn tekst på grunn av din nettlesers <STRONG>sikkerhetsinstillinger</STRONG>.<BR>Vennligst lim inn teksten i boksen nedenfor med tastatursnareveien. (<STRONG>Ctrl+V</STRONG>) og trykk <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Vennligst lim inn i den følgende boksen med tastaturet (<STRONG>Ctrl+V</STRONG>) og trykk <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Ignorer fonter",
+DlgPasteRemoveStyles	: "Fjern stildefinisjoner",
+DlgPasteCleanBox		: "Tøm boksen",
+
 
 // Color Picker
 ColorAutomatic	: "Automatisk",

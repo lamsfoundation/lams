@@ -42,6 +42,8 @@ RemoveLink			: "Link entfernen",
 Anchor				: "Anker einfügen/editieren",
 InsertImageLbl		: "Bild",
 InsertImage			: "Bild einfügen/editieren",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "Flash einfügen/editieren",
 InsertTableLbl		: "Tabelle",
 InsertTable			: "Tabelle einfügen/editieren",
 InsertLineLbl		: "Linie",
@@ -106,11 +108,12 @@ SplitCell			: "Zelle teilen",
 CellProperties		: "Zellen Eigenschaften",
 TableProperties		: "Tabellen Eigenschaften",
 ImageProperties		: "Bild Eigenschaften",
+FlashProperties		: "Flash Eigenschaften",
 
 AnchorProp			: "Anker Eigenschaften",
 ButtonProp			: "Button Eigenschaften",
 CheckboxProp		: "Checkbox Eigenschaften",
-HiddenFieldProp		: "verstecktes Feld Eigenschaften",
+HiddenFieldProp		: "Verstecktes Feld Eigenschaften",
 RadioButtonProp		: "Radiobutton Eigenschaften",
 ImageButtonProp		: "Bildbutton Eigenschaften",
 TextFieldProp		: "Textfeld einzeilig Eigenschaften",
@@ -137,6 +140,8 @@ DlgBtnClose			: "Schließen",
 DlgBtnBrowseServer	: "Server durchsuchen",
 DlgAdvancedTag		: "Erweitert",
 DlgOpOther			: "&lt;andere&gt;",
+DlgInfoTab			: "Info",
+DlgAlertUrl			: "Bitte tragen Sie die URL ein",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt; nichts &gt;",
@@ -182,6 +187,16 @@ DlgImgAlignTop		: "Oben",
 DlgImgPreview		: "Vorschau",
 DlgImgAlertUrl		: "Bitte geben Sie die Bild-URL an",
 DlgImgLinkTab		: "Link",
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Eigenschaften",
+DlgFlashChkPlay		: "autom. Abspielen",
+DlgFlashChkLoop		: "Endlosschleife",
+DlgFlashChkMenu		: "Aktiviere Flash Menü",
+DlgFlashScale		: "Skalierung",
+DlgFlashScaleAll	: "Alles anzeigen",
+DlgFlashScaleNoBorder	: "ohne Rand",
+DlgFlashScaleFit	: "Passgenau",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Link",
@@ -311,7 +326,11 @@ PasteErrorCopy	: "Die Sicherheitseinstellungen Ihres Browsers lassen es nicht zu
 PasteAsText		: "Als Text einfügen",
 PasteFromWord	: "Aus Word einfügen",
 
-DlgPasteMsg		: "Der Text konnte nicht automatisch eingefügt werden, da die Sicherheitseinstellungen Ihres Browsers dies nicht zulassen.<BR>Bitte nutzen Sie in der folgenden Box die System-Zwischenablage ueber STRG-C (kopieren) und STRG-V (einfügen).",
+DlgPasteMsg2	: "Bitte fügen Sie den Text in der folgenden Box über die Tastatur (mit <STRONG>Ctrl+V</STRONG>) ein und bestätigen Sie mit <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Ignoriere Schriftart-Definitionen",
+DlgPasteRemoveStyles	: "Entferne Style-Definitionen",
+DlgPasteCleanBox		: "Inhalt aufräumen",
+
 
 // Color Picker
 ColorAutomatic	: "Automatisch",

@@ -31,8 +31,8 @@ FCK.StartEditor = function()
 	// The Base Path of the editor is saved to rebuild relative URL (IE issue).
 //	this.BaseUrl = this.EditorDocument.location.protocol + '//' + this.EditorDocument.location.host ;
 
-//	if ( FCKBrowserInfo.IsGecko )
-//		this.MakeEditable() ;
+	if ( FCKBrowserInfo.IsGecko )
+		this.MakeEditable() ;
 
 	// Set the editor's startup contents
 	this.SetHTML( FCKTools.GetLinkedFieldValue() ) ;
@@ -163,7 +163,12 @@ FCK.GetXHTML = function( format )
 	if ( FCKConfig.FullPage )
 		var sXHTML = FCKXHtml.GetXHTML( this.EditorDocument.getElementsByTagName( 'html' )[0], true, format ) ;
 	else
-		var sXHTML = FCKXHtml.GetXHTML( this.EditorDocument.body, false, format ) ;
+	{
+		if ( FCKConfig.IgnoreEmptyParagraphValue && this.EditorDocument.body.innerHTML == '<P>&nbsp;</P>' )
+			var sXHTML = '' ;
+		else
+			var sXHTML = FCKXHtml.GetXHTML( this.EditorDocument.body, false, format ) ;
+	}
 
 	if ( bSource )
 		this.SwitchEditMode() ;
@@ -210,4 +215,110 @@ FCK.OnDoubleClick = function( element )
 FCK.RegisterDoubleClickHandler = function( handlerFunction, tag )
 {
 	FCK.RegisteredDoubleClickHandlers[ tag.toUpperCase() ] = handlerFunction ;
+}
+
+FCK.OnAfterSetHTML = function()
+{
+	var oProcessor, i = 0 ;
+	while( oProcessor = FCKDocumentProcessors[i++] )
+		oProcessor.ProcessDocument( FCK.EditorDocument ) ;
+
+	this.Events.FireEvent( 'OnAfterSetHTML' ) ;
+}
+
+// Advanced document processors.
+
+var FCKDocumentProcessors = new Array() ;
+
+var FCKDocumentProcessors_CreateFakeImage = function( fakeClass, realElement )
+{
+	var oImg = FCK.EditorDocument.createElement( 'IMG' ) ;
+	oImg.className = fakeClass ;
+	oImg.src = FCKConfig.FullBasePath + 'images/spacer.gif' ;
+	oImg.setAttribute( '_fckfakelement', 'true', 0 ) ;
+	oImg.setAttribute( '_fckrealelement', FCKTempBin.AddElement( realElement ), 0 ) ;
+	return oImg ;
+}
+
+// Link Anchors
+var FCKAnchorsProcessor = new Object() ;
+FCKAnchorsProcessor.ProcessDocument = function( document )
+{
+	var aLinks = document.getElementsByTagName( 'A' ) ;
+
+	var oLink ;
+	var i = aLinks.length - 1 ;
+	while ( i >= 0 && ( oLink = aLinks[i--] ) )
+	{
+		// If it is anchor.
+		if ( oLink.name.length > 0 && ( !oLink.getAttribute('href') || oLink.getAttribute('href').length == 0 ) )
+		{
+			var oImg = FCKDocumentProcessors_CreateFakeImage( 'FCK__Anchor', oLink.cloneNode(true) ) ;
+			oImg.setAttribute( '_fckanchor', 'true', 0 ) ;
+			
+			oLink.parentNode.insertBefore( oImg, oLink ) ;
+			oLink.parentNode.removeChild( oLink ) ;
+		}
+	}
+}
+
+FCKDocumentProcessors.addItem( FCKAnchorsProcessor ) ;
+
+// Flash Embeds.
+var FCKFlashProcessor = new Object() ;
+FCKFlashProcessor.ProcessDocument = function( document )
+{
+	/*
+	Sample code:
+	This is some <embed src="/UserFiles/Flash/Yellow_Runners.swf"></embed><strong>sample text</strong>. You are&nbsp;<a name="fred"></a> using <a href="http://www.fckeditor.net/">FCKeditor</a>.
+	*/
+
+	var aEmbeds = document.getElementsByTagName( 'EMBED' ) ;
+
+	var oEmbed ;
+	var i = aEmbeds.length - 1 ;
+	while ( i >= 0 && ( oEmbed = aEmbeds[i--] ) )
+	{
+		if ( oEmbed.src.endsWith( '.swf', true ) )
+		{
+			var oImg = FCKDocumentProcessors_CreateFakeImage( 'FCK__Flash', oEmbed.cloneNode(true) ) ;
+			oImg.setAttribute( '_fckflash', 'true', 0 ) ;
+			
+			FCKFlashProcessor.RefreshView( oImg, oEmbed ) ;
+
+			oEmbed.parentNode.insertBefore( oImg, oEmbed ) ;
+			oEmbed.parentNode.removeChild( oEmbed ) ;
+
+//			oEmbed.setAttribute( '_fckdelete', 'true', 0) ;
+//			oEmbed.style.display = 'none' ;
+//			oEmbed.hidden = true ;
+		}
+	}
+}
+
+FCKFlashProcessor.RefreshView = function( placholderImage, originalEmbed )
+{
+	if ( originalEmbed.width > 0 )
+		placholderImage.style.width = FCKTools.ConvertHtmlSizeToStyle( originalEmbed.width ) ;
+		
+	if ( originalEmbed.height > 0 )
+		placholderImage.style.height = FCKTools.ConvertHtmlSizeToStyle( originalEmbed.height ) ;
+}
+
+FCKDocumentProcessors.addItem( FCKFlashProcessor ) ;
+
+FCK.GetRealElement = function( fakeElement )
+{
+	var e = FCKTempBin.Elements[ fakeElement.getAttribute('_fckrealelement') ] ;
+
+	if ( fakeElement.getAttribute('_fckflash') )
+	{
+		if ( fakeElement.style.width.length > 0 )
+				e.width = FCKTools.ConvertStyleSizeToHtml( fakeElement.style.width ) ;
+		
+		if ( fakeElement.style.height.length > 0 )
+				e.height = FCKTools.ConvertStyleSizeToHtml( fakeElement.style.height ) ;
+	}
+	
+	return e ;
 }

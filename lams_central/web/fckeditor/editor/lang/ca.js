@@ -41,6 +41,8 @@ RemoveLink			: "Eliminar Enllaç",
 Anchor				: "Afegir/Editar Àncora",
 InsertImageLbl		: "Imatge",
 InsertImage			: "Afegir/Editar Imatge",
+InsertFlashLbl		: "Flash",
+InsertFlash			: "Afegir/Editar Flash",
 InsertTableLbl		: "Taula",
 InsertTable			: "Afegir/Editar Taula",
 InsertLineLbl		: "Línia",
@@ -105,6 +107,7 @@ SplitCell			: "Separar Cel·les",
 CellProperties		: "Proprietats de Cel·la",
 TableProperties		: "Proprietats de Taula",
 ImageProperties		: "Proprietats d'Image",
+FlashProperties		: "Proprietats Flash",
 
 AnchorProp			: "Proprietats d'àncora",
 ButtonProp			: "Proprietats de botó",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Tancar",
 DlgBtnBrowseServer	: "Veure servidor",
 DlgAdvancedTag		: "Avançat",
 DlgOpOther			: "Altres",
+DlgInfoTab			: "Info",
+DlgAlertUrl			: "Si us plau, afegiu la URL",
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;no definit&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Top",
 DlgImgPreview		: "Vista Prèvia",
 DlgImgAlertUrl		: "Si us plau, escriviu la URL de la imatge",
 DlgImgLinkTab		: "Enllaç",
+
+// Flash Dialog
+DlgFlashTitle		: "Propietats Flash",
+DlgFlashChkPlay		: "Reprodució Automàtica",
+DlgFlashChkLoop		: "Bucle",
+DlgFlashChkMenu		: "Habilitar Menu Flash",
+DlgFlashScale		: "Escala",
+DlgFlashScaleAll	: "Mostrar tot",
+DlgFlashScaleNoBorder	: "Sense Costats",
+DlgFlashScaleFit	: "Mida exacta",
 
 // Link Dialog
 DlgLnkWindowTitle	: "Enllaç",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "La seguretat del vostre navigador no permet executar automàti
 PasteAsText		: "Enganxar com Text Planer",
 PasteFromWord	: "Enganxar com Word",
 
-DlgPasteMsg		: "L'editor no ha pogut executar automàticament l'operació d'enganxar a causa de la <STRONG>configuració de seguretat</STRONG> del seu navigador.<BR>Si us plau, enganxi en el següent cuadre de text utilitzant el teclat (<STRONG>Ctrl+V</STRONG>) i premeu <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Si us plau, enganxeu dins del següent camp utilitzant el teclat (<STRONG>Ctrl+V</STRONG>) i premeu <STRONG>OK</STRONG>.",
+DlgPasteIgnoreFont		: "Ignorar definicions de font",
+DlgPasteRemoveStyles	: "Eliminar definicions d'estil",
+DlgPasteCleanBox		: "Netejar camp",
+
 
 // Color Picker
 ColorAutomatic	: "Automàtic",

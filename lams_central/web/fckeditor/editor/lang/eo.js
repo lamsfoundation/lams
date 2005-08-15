@@ -41,6 +41,8 @@ RemoveLink			: "Forigi Ligilon",
 Anchor				: "Enmeti/Ŝanĝi Ankron",
 InsertImageLbl		: "Bildo",
 InsertImage			: "Enmeti/Ŝanĝi Bildon",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "Tabelo",
 InsertTable			: "Enmeti/Ŝanĝi Tabelon",
 InsertLineLbl		: "Horizonta Linio",
@@ -105,6 +107,7 @@ SplitCell			: "Dividi Ĉelojn",
 CellProperties		: "Atributoj de Ĉelo",
 TableProperties		: "Atributoj de Tabelo",
 ImageProperties		: "Atributoj de Bildo",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "Ankraj Atributoj",
 ButtonProp			: "Butonaj Atributoj",
@@ -136,6 +139,8 @@ DlgBtnClose			: "Fermi",
 DlgBtnBrowseServer	: "Foliumi en la Servilo",
 DlgAdvancedTag		: "Speciala",
 DlgOpOther			: "&lt;Alia&gt;",
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;Defaŭlta&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Supre",
 DlgImgPreview		: "Vidigi Aspekton",
 DlgImgAlertUrl		: "Bonvolu tajpi la URL de la bildo",
 DlgImgLinkTab		: "Link",	//MISSING
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "Ligilo",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "La sekurecagordo de via TTT-legilo ne permesas, ke la redaktil
 PasteAsText		: "Interglui kiel Tekston",
 PasteFromWord	: "Interglui el Word",
 
-DlgPasteMsg		: "La redaktilo ne povis aŭtomate interglui pro la <STRONG>sekurecagordo</STRONG> de via TTT-legilo.<BR>Bonvolu interglui viajn datumojn en la ĉi suban tekstozonon per la klavaro (<STRONG>Ctrl-V</STRONG>) kaj musklaku la butonon <STRONG>Akceptita</STRONG>.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "Aŭtomata",

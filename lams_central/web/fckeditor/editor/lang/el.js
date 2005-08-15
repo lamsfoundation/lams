@@ -41,6 +41,8 @@ RemoveLink			: "Αφαίρεση Συνδέσμου (Link)",
 Anchor				: "Insert/Edit Anchor",	//MISSING
 InsertImageLbl		: "Εικόνα",
 InsertImage			: "Εισαγωγή/Μεταβολή Εικόνας",
+InsertFlashLbl		: "Flash",	//MISSING
+InsertFlash			: "Insert/Edit Flash",	//MISSING
 InsertTableLbl		: "Πίνακας",
 InsertTable			: "Εισαγωγή/Μεταβολή Πίνακα",
 InsertLineLbl		: "Γραμμή",
@@ -105,6 +107,7 @@ SplitCell			: "Διαχωρισμός Κελιού",
 CellProperties		: "Ιδιότητες Κελιού",
 TableProperties		: "Ιδιότητες Πίνακα",
 ImageProperties		: "Ιδιότητες Εικόνας",
+FlashProperties		: "Flash Properties",	//MISSING
 
 AnchorProp			: "Anchor Properties",	//MISSING
 ButtonProp			: "Button Properties",	//MISSING
@@ -136,6 +139,8 @@ DlgBtnClose			: "Κλείσιμο",
 DlgBtnBrowseServer	: "Browse Server",	//MISSING
 DlgAdvancedTag		: "Για προχωρημένους",
 DlgOpOther			: "&lt;Other&gt;",	//MISSING
+DlgInfoTab			: "Info",	//MISSING
+DlgAlertUrl			: "Please insert the URL",	//MISSING
 
 // General Dialogs Labels
 DlgGenNotSet		: "&lt;χωρίς&gt;",
@@ -181,6 +186,16 @@ DlgImgAlignTop		: "Πάνω (Top)",
 DlgImgPreview		: "Προεπισκόπιση",
 DlgImgAlertUrl		: "Εισάγετε την τοποθεσία (URL) της εικόνας",
 DlgImgLinkTab		: "Link",	//MISSING
+
+// Flash Dialog
+DlgFlashTitle		: "Flash Properties",	//MISSING
+DlgFlashChkPlay		: "Auto Play",	//MISSING
+DlgFlashChkLoop		: "Loop",	//MISSING
+DlgFlashChkMenu		: "Enable Flash Menu",	//MISSING
+DlgFlashScale		: "Scale",	//MISSING
+DlgFlashScaleAll	: "Show all",	//MISSING
+DlgFlashScaleNoBorder	: "No Border",	//MISSING
+DlgFlashScaleFit	: "Exact Fit",	//MISSING
 
 // Link Dialog
 DlgLnkWindowTitle	: "Υπερσύνδεσμος (Link)",
@@ -310,7 +325,11 @@ PasteErrorCopy	: "Οι ρυθμίσεις ασφαλείας του φυλλομ
 PasteAsText		: "Επικόλληση ως Απλό Κείμενο",
 PasteFromWord	: "Επικόλληση από το Word",
 
-DlgPasteMsg		: "Ο επεξεργαστής κειμένου δεν μπορεί να εκτελέσει αυτόματα την επικόλληση λόγω των <STRONG>τυθμίσεων ασφαλείας</STRONG> του φυλλομετρητή σας.<BR>Εισάγετε το κείμενο στο πιο κάτω περιθώριο χρησιμοποιώντας το πληκτρολόγιο (<STRONG>Ctrl+V</STRONG>) και πιέστε <STRONG>OK</STRONG>.",
+DlgPasteMsg2	: "Please paste inside the following box using the keyboard (<STRONG>Ctrl+V</STRONG>) and hit <STRONG>OK</STRONG>.",	//MISSING
+DlgPasteIgnoreFont		: "Ignore Font Face definitions",	//MISSING
+DlgPasteRemoveStyles	: "Remove Styles definitions",	//MISSING
+DlgPasteCleanBox		: "Clean Up Box",	//MISSING
+
 
 // Color Picker
 ColorAutomatic	: "Αυτόματο",

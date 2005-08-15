@@ -1,4 +1,5 @@
-<?php /*
+<?php 
+/*
  * FCKeditor - The text editor for internet
  * Copyright (C) 2003-2005 Frederico Caldeira Knabben
  * 
@@ -20,6 +21,9 @@ include('util.php') ;
 include('io.php') ;
 include('basexml.php') ;
 include('commands.php') ;
+
+if ( !$Config['Enabled'] )
+	SendError( 1, 'This connector is disabled. Please check the "editor/filemanager/browser/default/connectors/php/config.php" file' ) ;
 
 // Get the "UserFiles" path.
 $GLOBALS["UserFilesPath"] = '' ;
@@ -57,6 +61,10 @@ function DoResponse()
 	// Check the current folder syntax (must begin and start with a slash).
 	if ( ! ereg( '/$', $sCurrentFolder ) ) $sCurrentFolder .= '/' ;
 	if ( strpos( $sCurrentFolder, '/' ) !== 0 ) $sCurrentFolder = '/' . $sCurrentFolder ;
+	
+	// Check for invalid folder paths (..)
+	if ( strpos( $sCurrentFolder, '..' ) )
+		SendError( 102, "" ) ;
 
 	// File Upload doesn't have to Return XML, so it must be intercepted before anything.
 	if ( $sCommand == 'FileUpload' )
@@ -64,20 +72,6 @@ function DoResponse()
 		FileUpload( $sResourceType, $sCurrentFolder ) ;
 		return ;
 	}
-
-	// Prevent the browser from caching the result.
-	// Date in the past
-	header('Expires: Mon, 26 Jul 1997 05:00:00 GMT') ;
-	// always modified
-	header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT') ;
-	// HTTP/1.1
-	header('Cache-Control: no-store, no-cache, must-revalidate') ;
-	header('Cache-Control: post-check=0, pre-check=0', false) ;
-	// HTTP/1.0
-	header('Pragma: no-cache') ;
-
-	// Set the response format.
-	header( 'Content-Type:text/xml; charset=utf-8' ) ;
 
 	CreateXmlHeader( $sCommand, $sResourceType, $sCurrentFolder ) ;
 

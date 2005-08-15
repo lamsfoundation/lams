@@ -49,6 +49,10 @@ function CreateFolder()
 
 function CreateFolderCallBack( fckXml )
 {
+	if ( oConnector.CheckError( fckXml ) == 0 )
+		window.parent.frames['frmResourcesList'].Refresh() ;
+	
+	/*
 	// Get the current folder path.
 	var oNode = fckXml.SelectSingleNode( 'Connector/Error' ) ;
 	var iErrorNumber = parseInt( oNode.attributes.getNamedItem('number').value ) ;
@@ -74,6 +78,7 @@ function CreateFolderCallBack( fckXml )
 			alert( 'Error creating folder. Error number: ' + iErrorNumber ) ;
 			break ;
 	}
+	*/
 }
 
 window.onload = function()
