@@ -13,7 +13,7 @@
 						<tr> 
 					 		<td> <bean:message key="label.authoring.title"/>: </td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-							<FCK:editor id="richTextTitle" basePath="/lams/fckEditor/"
+							<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/"
 							      height="200"
 								  width="100%">
 								  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
@@ -23,7 +23,7 @@
 					  	<tr> 
 					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-							<FCK:editor id="richTextInstructions" basePath="/lams/fckEditor/"
+							<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/"
 							      height="200"
 								  width="100%">
 								  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  

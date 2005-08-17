@@ -13,7 +13,7 @@
           				<fmt:message key="label.offlineInstructions" />:
           			</td>
 					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckEditor/"
+					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckeditor/"
 					      height="200"
 						  width="100%">
 						  <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />						  
@@ -49,7 +49,7 @@
           				<fmt:message key="label.onlineInstructions" />
           			</td>
 					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckEditor/"
+					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckeditor/"
 					      height="200"
 						  width="100%">
   						  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
