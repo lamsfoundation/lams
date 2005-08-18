@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.sbmt.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
@@ -34,13 +35,9 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * @author Manpreet Minhas
  */
 public class FileDetailsDTO implements Serializable{
-	
-	/**
-	 * For Serializable
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	
+
+	private Logger log = Logger.getLogger(FileDetailsDTO.class);
+	private static final long serialVersionUID = 2964711101016972263L;
 	private Long userID;
 	private Long submissionID;
 	private Long reportID;
@@ -58,7 +55,11 @@ public class FileDetailsDTO implements Serializable{
 	
 
 	public FileDetailsDTO(SubmissionDetails details, SubmitFilesReport report){
-
+		if(details == null){
+			log.warn("SubmissionDetails is null, failed to initial FileDetailDTO");
+			return;
+		}
+		
 		Learner learner = details.getLearner();
 		if(learner != null){
 			this.userID = learner.getUserID();
@@ -83,6 +84,11 @@ public class FileDetailsDTO implements Serializable{
 		this.userDTO = userDTO;
 	}
 	public FileDetailsDTO(SubmissionDetails details){
+		
+		if(details == null){
+			log.warn("SubmissionDetails is null, failed to initial FileDetailDTO");
+			return;
+		}
 		
 		this.submissionID = details.getSubmissionID();
 		this.filePath = details.getFilePath();

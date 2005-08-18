@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 /**
  * 
@@ -71,7 +72,7 @@ public class DeleteFileAction extends DispatchAction {
 	 * @return
 	 */
 	private ActionForward deleteFile(HttpServletRequest request, HttpServletResponse response, String type) {
-		Long contentID = new Long(WebUtil.readLongParam(request,"toolContentID"));
+		Long contentID = new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_CONTENT_ID));
 		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
 		Long uuID = new Long(WebUtil.readLongParam(request,"uuID"));
 		

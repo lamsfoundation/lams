@@ -643,19 +643,18 @@ public class SubmitFilesService implements ToolContentManager,
 	 */
 	public List getFilesUploadedByUser(Long userID, Long sessionID){
 		List list =  learnerDAO.getSubmissionDetailsForUserBySession(userID,sessionID);
-		if(list!=null){
-			Iterator iterator = list.iterator();
-			ArrayList details = new ArrayList();
-			while(iterator.hasNext()){
-				SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
-				SubmitFilesReport report = submissionDetails.getReport();
-				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report);
-				details.add(detailDto);
-			}
+		ArrayList details = new ArrayList();
+		if(list ==null)
 			return details;
-
-		}else
-			return null;
+		
+		Iterator iterator = list.iterator();
+		while(iterator.hasNext()){
+			SubmissionDetails submissionDetails = (SubmissionDetails)iterator.next();
+			SubmitFilesReport report = submissionDetails.getReport();
+			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails,report);
+			details.add(detailDto);
+		}
+		return details;
 	}
 	/**
 	 * This method save SubmissionDetails list into a map container: key is user id,
@@ -701,8 +700,12 @@ public class SubmitFilesService implements ToolContentManager,
 	 */
 	public List getUsers(Long sessionID){
 		List users = submissionDetailsDAO.getUsersForSession(sessionID);
-		Iterator iterator = users.iterator();
 		List table = new ArrayList();
+		
+		if(users == null)
+			return table; 
+		
+		Iterator iterator = users.iterator();
 		while(iterator.hasNext()){
 			Long userID = (Long)iterator.next();			
 			User user = userDAO.getUserById(new Integer(userID.intValue()));
@@ -721,6 +724,9 @@ public class SubmitFilesService implements ToolContentManager,
 	}
 	public UserDTO getUserDetails(Long userID){
 		User user = userDAO.getUserById(new Integer(userID.intValue()));
+		if(user == null)
+			return null;
+		
 		return user.getUserDTO();
 	}
 	public IVersionedNode downloadFile(Long uuid, Long versionID)throws SubmitFilesException{

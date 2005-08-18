@@ -22,8 +22,11 @@ package org.lamsfoundation.lams.tool.sbmt.util;
 
 public class SbmtConstants {
 
-	public static final String AUTHORING_DTO = "authoring";
 	public static final String TOOLSIGNNATURE = "lasbmt11";
 	public static final String DEFAULT_TITLE = "Submit Files Title";
 
+	public static final String AUTHORING_DTO = "authoring";
+
+	public static final String TOOL_SESSION_ID = "toolSessionID";
+	public static final String TOOL_CONTENT_ID = "toolContentID";
 }

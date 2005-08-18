@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.tool.sbmt.dto.LearnerDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 
 /**
  * @author Manpreet Minhas
@@ -58,7 +59,7 @@ public class LearnerAction extends DispatchAction {
 		
 
 		DynaActionForm authForm= (DynaActionForm)form;
-		Long sessionID =(Long) authForm.get("toolSessionID");
+		Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
 		Long userID = (Long)authForm.get("userID");
 		
 		//get submission information from content table.E.g., title, instruction
@@ -93,7 +94,7 @@ public class LearnerAction extends DispatchAction {
 		
 		DynaActionForm authForm= (DynaActionForm)form;
 		if(!isTokenValid(request,true)){
-			Long sessionID =(Long) authForm.get("toolSessionID");
+			Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
 			Long userID = (Long)authForm.get("userID");
 			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
@@ -106,7 +107,7 @@ public class LearnerAction extends DispatchAction {
 			return returnErrors(mapping,request,"submit.upload.twice","upload");
 		}
 		
-		Long sessionID =(Long) authForm.get("toolSessionID");
+		Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
 		Long userID = (Long)authForm.get("userID");
 		FormFile uploadedFile= (FormFile) authForm.get("filePath");
 		String fileDescription = (String) authForm.get("fileDescription");
@@ -142,7 +143,7 @@ public class LearnerAction extends DispatchAction {
 			HttpServletRequest request,
 			HttpServletResponse response){
 		DynaActionForm authForm= (DynaActionForm)form;
-		Long sessionID =(Long) authForm.get("toolSessionID");
+		Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
 		Long userID = (Long)authForm.get("userID");
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 		submitFilesService.finishSubmission(sessionID,userID);
@@ -180,7 +181,9 @@ public class LearnerAction extends DispatchAction {
 	 * @param content
 	 * @param filesUploaded 
 	 */
-	private void setLearnerDTO(HttpServletRequest request,Long sessionID,Long userID, Learner learner, SubmitFilesContent content, List filesUploaded) {
+	private void setLearnerDTO(HttpServletRequest request, Long sessionID,
+			Long userID, Learner learner, SubmitFilesContent content,
+			List filesUploaded) {
 		
 		LearnerDetailsDTO dto = new LearnerDetailsDTO();
 		//don't use learner data, becuase these 2 values come from web page. Learner maybe empty.
