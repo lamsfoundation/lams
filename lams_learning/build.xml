@@ -270,7 +270,7 @@ http://www.gnu.org/licenses/gpl.txt
 	<!-- =================================================================== -->
 	<target name="test" depends="compile.test">
 		<mkdir dir="${build.report}" />
-		<junit printsummary="yes" haltonerror="no" haltonfailure="yes"
+		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
 			fork="yes">
 			<formatter type="plain" usefile="false" />
 			<formatter type="xml" />
@@ -278,6 +278,7 @@ http://www.gnu.org/licenses/gpl.txt
 				<fileset dir="${src.dir.test}">
 					<include name="**/Test*.java" />
 					<exclude name="**/*Action.java" />
+					<exclude name="**/*Form.java" />
 				</fileset>
 			</batchtest>
 			<classpath>
