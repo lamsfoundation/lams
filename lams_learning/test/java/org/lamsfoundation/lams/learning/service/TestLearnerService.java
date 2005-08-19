@@ -43,12 +43,14 @@ import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
-import org.lamsfoundation.lams.tool.service.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 
 /**
+ * You must run the lams_monitoring tests before running these tests,
+ * as the lams_monitoring tests set up the necessary test data.
  * 
  * @author Jacky Fang 2005-2-22
  * 
