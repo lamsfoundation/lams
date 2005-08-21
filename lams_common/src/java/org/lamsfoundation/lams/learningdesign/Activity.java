@@ -126,12 +126,6 @@ public abstract class Activity implements Serializable,Nullable {
 	/** Date this activity was created */
 	private Date createDateTime;
 
-	/** Offline Instruction for this activity*/
-	private String offlineInstructions;
-	
-	 /** Online Instructions for this activity*/
-    private String onlineInstructions;
-	
 	/** The image that represents the icon of this 
 	 * activity in the UI*/
 	private String libraryActivityUiImage;
@@ -196,7 +190,6 @@ public abstract class Activity implements Serializable,Nullable {
 			Integer orderId,
 			Boolean defineLater,
 			Date createDateTime,
-			String offlineInstructions,
 			LearningLibrary learningLibrary,
 			Activity parentActivity,
 			Activity libraryActivity,
@@ -215,7 +208,6 @@ public abstract class Activity implements Serializable,Nullable {
 		this.orderId = orderId;
 		this.defineLater = defineLater;
 		this.createDateTime = createDateTime;
-		this.offlineInstructions = offlineInstructions;
 		this.learningLibrary = learningLibrary;
 		this.parentActivity = parentActivity;
 		this.parentUIID = parentUIID;
@@ -378,17 +370,6 @@ public abstract class Activity implements Serializable,Nullable {
 
 	public void setCreateDateTime(Date createDateTime) {
 		this.createDateTime = createDateTime;
-	}
-
-	/**
-	 * @hibernate.property column="offline_instructions" length="65535"
-	 */
-	public String getOfflineInstructions() {
-		return this.offlineInstructions;
-	}
-
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
 	}
 
 	/**
@@ -591,19 +572,6 @@ public abstract class Activity implements Serializable,Nullable {
 		this.runOffline = runOffline;
 	}
 	
-	/**
-	 * @return Returns the onlineInstructions.
-	 */
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
-	/**
-	 * @param onlineInstructions The onlineInstructions to set.
-	 */
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-
 	public Integer getActivityCategoryID() 
 	{
 		return activityCategoryID;

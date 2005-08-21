@@ -66,6 +66,8 @@ public class LearningDesignDTO extends BaseDTO{
 	private String lessonName;
 	private Date lessonStartDateTime;
 	private Date lastModifiedDateTime;
+	private String offlineInstructions;
+	private String onlineInstructions;
 	
 	private ArrayList activities;
 	private ArrayList transitions;
@@ -97,7 +99,9 @@ public class LearningDesignDTO extends BaseDTO{
 							 Long lessonID,
 							 String lessonName, 
 							 Date lessonStartDateTime,
-							 Date lastModifiedDateTime) {
+							 Date lastModifiedDateTime,
+							 String offlineInstructions, 
+							 String onlineInstructions) {
 		super();
 		this.learningDesignID = learningDesignId;
 		this.learningDesignUIID = learningDesignUIID;
@@ -109,6 +113,8 @@ public class LearningDesignDTO extends BaseDTO{
 		this.validDesign = validDesign;
 		this.readOnly = readOnly;
 		this.dateReadOnly = dateReadOnly;
+		this.offlineInstructions = offlineInstructions;
+		this.onlineInstructions = onlineInstructions;
 		this.userID = userID;
 		this.helpText = helpText;
 		this.copyTypeID = copyTypeID;
@@ -143,6 +149,9 @@ public class LearningDesignDTO extends BaseDTO{
 		this.validDesign = learningDesign.getValidDesign();
 		this.readOnly = learningDesign.getReadOnly();
 		this.dateReadOnly = learningDesign.getDateReadOnly();
+		
+		this.offlineInstructions = learningDesign.getOfflineInstructions();	
+		this.onlineInstructions = learningDesign.getOnlineInstructions();
 		
 		this.userID = learningDesign.getUser()!=null?
 					  learningDesign.getUser().getUserId():
@@ -188,6 +197,8 @@ public class LearningDesignDTO extends BaseDTO{
 		this.validDesign = (Boolean)table.get("validDesign");
 		this.readOnly = (Boolean)table.get("readOnly");;
 		this.dateReadOnly = (Date)table.get("dateReadOnly");
+		this.offlineInstructions= (String) table.get("offlineInstructions");
+		this.onlineInstructions =(String) table.get("onlineInstructions");
 		this.userID = convertToInteger(table.get("userID"));
 		this.helpText = (String)table.get("helpText");
 		this.copyTypeID = convertToInteger(table.get("copyTypeID"));
@@ -601,6 +612,33 @@ public class LearningDesignDTO extends BaseDTO{
 		if(!firstActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
 			this.firstActivityUIID = firstActivityUIID;
 	}	
+	/**
+	 * @return Returns the onlineInstructions.
+	 */
+	public String getOnlineInstructions() {
+		return onlineInstructions!=null?onlineInstructions:WDDXTAGS.STRING_NULL_VALUE;
+	}
+	/**
+	 * @param onlineInstructions The onlineInstructions to set.
+	 */
+	public void setOnlineInstructions(String onlineInstructions) {
+		if(!onlineInstructions.equals(WDDXTAGS.STRING_NULL_VALUE))
+			this.onlineInstructions = onlineInstructions;
+	}
+	/**
+	 * @param offlineInstructions The offlineInstructions to set.
+	 */
+	public void setOfflineInstructions(String offlineInstructions) {
+		if(!offlineInstructions.equals(WDDXTAGS.STRING_NULL_VALUE))
+			this.offlineInstructions = offlineInstructions;
+	}
+	/**
+	 * @return Returns the offlineInstructions.
+	 */
+	public String getOfflineInstructions() {
+		return offlineInstructions!=null?offlineInstructions:WDDXTAGS.STRING_NULL_VALUE;
+	}
+
 	public static LearningDesign extractLearningDesign(LearningDesignDTO learningDesignDTO){
 		LearningDesign learningDesign = new LearningDesign();
 		if(!learningDesignDTO.getLearningDesignUIID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
@@ -619,6 +657,10 @@ public class LearningDesignDTO extends BaseDTO{
 			learningDesign.setCopyTypeID(learningDesignDTO.getCopyTypeID());		
 		if(!learningDesignDTO.getHelpText().equals(WDDXTAGS.STRING_NULL_VALUE))
 			learningDesign.setHelpText(learningDesignDTO.getHelpText());
+		if(!learningDesignDTO.getOfflineInstructions().equals(WDDXTAGS.STRING_NULL_VALUE))
+			learningDesign.setHelpText(learningDesignDTO.getOfflineInstructions());
+		if(!learningDesignDTO.getOnlineInstructions().equals(WDDXTAGS.STRING_NULL_VALUE))
+			learningDesign.setHelpText(learningDesignDTO.getOnlineInstructions());
 		if(!learningDesignDTO.getVersion().equals(WDDXTAGS.STRING_NULL_VALUE))
 			learningDesign.setVersion(learningDesignDTO.getVersion());
 		if(!learningDesignDTO.getLicenseText().equals(WDDXTAGS.STRING_NULL_VALUE))

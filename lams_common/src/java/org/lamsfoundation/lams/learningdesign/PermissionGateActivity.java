@@ -47,7 +47,6 @@ public class PermissionGateActivity extends GateActivity implements Serializable
             Integer orderId,
             Boolean defineLater,
             java.util.Date createDateTime,
-            String offlineInstructions,
             LearningLibrary learningLibrary,
             Activity parentActivity,
             Activity libraryActivity,
@@ -69,7 +68,6 @@ public class PermissionGateActivity extends GateActivity implements Serializable
                 orderId,
                 defineLater,
                 createDateTime,
-                offlineInstructions,
                 learningLibrary,
                 parentActivity,
 				libraryActivity,
@@ -148,10 +146,6 @@ public class PermissionGateActivity extends GateActivity implements Serializable
     	newPermissionGateActivity.setDefineLater(originalActivity.getDefineLater());
     	newPermissionGateActivity.setCreateDateTime(new Date());
     	newPermissionGateActivity.setRunOffline(originalActivity.getRunOffline());
-    	
-    	newPermissionGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newPermissionGateActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
-    	
     	newPermissionGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
     	newPermissionGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
     	return newPermissionGateActivity;

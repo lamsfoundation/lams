@@ -46,7 +46,6 @@ public class SynchGateActivity extends GateActivity implements Serializable {
             Integer orderId, 
             Boolean defineLater,
             java.util.Date createDateTime, 
-            String offlineInstructions,  
             LearningLibrary learningLibrary, 
             Activity parentActivity,  
             Activity libraryActivity,
@@ -67,7 +66,6 @@ public class SynchGateActivity extends GateActivity implements Serializable {
                 orderId, 
                 defineLater, 
                 createDateTime, 
-                offlineInstructions, 
                 learningLibrary,  
                 parentActivity,
 				libraryActivity,
@@ -146,10 +144,6 @@ public class SynchGateActivity extends GateActivity implements Serializable {
     	newSynchGateActivity.setDefineLater(originalActivity.getDefineLater());
     	newSynchGateActivity.setCreateDateTime(new Date());
     	newSynchGateActivity.setRunOffline(originalActivity.getRunOffline());
-    	
-    	newSynchGateActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newSynchGateActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
-    	
     	newSynchGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
     	newSynchGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
     	

@@ -63,6 +63,8 @@ public class TestToolDAO extends ToolDataAccessTestCase
         assertEquals("verify display name",TEST_TOOL_DISPLAY_NAME,testTool.getToolDisplayName());
         assertEquals("verify default content id",TEST_TOOL_DEFAULT_CONTENT_ID,testTool.getDefaultToolContentId());
         assertTrue("verify support define later",testTool.getSupportsDefineLater());
+        assertEquals("verify identifier",TEST_TOOL_IDENTIFIER,testTool.getToolIdentifier());
+        assertEquals("verify version",TEST_TOOL_VERSION,testTool.getToolVersion());
     }
 
     public void testGetAllTools(){

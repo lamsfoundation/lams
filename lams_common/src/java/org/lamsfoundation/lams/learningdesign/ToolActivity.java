@@ -63,7 +63,6 @@ public class ToolActivity extends SimpleActivity implements Serializable
             Integer orderId,
             Boolean defineLater,
             java.util.Date createDateTime,
-            String offlineInstructions,
             LearningLibrary learningLibrary,
             Activity parentActivity,
             Activity libraryActivity,
@@ -85,7 +84,6 @@ public class ToolActivity extends SimpleActivity implements Serializable
                 orderId,
                 defineLater,
                 createDateTime,
-                offlineInstructions,
                 learningLibrary,
                 parentActivity,
 				libraryActivity,
@@ -163,10 +161,6 @@ public class ToolActivity extends SimpleActivity implements Serializable
     	newToolActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newToolActivity.setCreateDateTime(new Date());
     	newToolActivity.setRunOffline(originalActivity.getRunOffline());
-    	
-    	newToolActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newToolActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
-    	
     	newToolActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
     	newToolActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
     	newToolActivity.setLibraryActivity(originalActivity.getLibraryActivity());

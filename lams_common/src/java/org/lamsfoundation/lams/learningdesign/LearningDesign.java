@@ -150,6 +150,13 @@ public class LearningDesign implements Serializable {
 	/** persistent field*/
 	private Date lastModifiedDateTime;
 	
+	/** Offline Instruction for this activity*/
+	private String offlineInstructions;
+	
+	 /** Online Instructions for this activity*/
+    private String onlineInstructions;
+	
+
 	/** full constructor */
 	public LearningDesign(
 			Long learningDesignId,
@@ -171,7 +178,9 @@ public class LearningDesign implements Serializable {
 			Set activities,
 			Long duration,
 			String licenseText,
-			License license) {
+			License license,
+			String offlineInstructions,
+			String onlineInstructions) {
 		this.learningDesignId = learningDesignId;
 		this.learningDesignUIID = ui_id;
 		this.description = description;
@@ -194,6 +203,8 @@ public class LearningDesign implements Serializable {
 		this.duration = duration;
 		this.licenseText = licenseText;
 		this.license = license;
+		this.offlineInstructions = offlineInstructions;
+		this.onlineInstructions = onlineInstructions;
 	}
 
 	/** default constructor */
@@ -492,6 +503,21 @@ public class LearningDesign implements Serializable {
 	public void setLastModifiedDateTime(Date lastModifiedDateTime) {
 		this.lastModifiedDateTime = lastModifiedDateTime;
 	}
+	
+	public String getOfflineInstructions() {
+		return this.offlineInstructions;
+	}
+	public void setOfflineInstructions(String offlineInstructions) {
+		this.offlineInstructions = offlineInstructions;
+	}
+	public String getOnlineInstructions() {
+		return onlineInstructions;
+	}
+	public void setOnlineInstructions(String onlineInstructions) {
+		this.onlineInstructions = onlineInstructions;
+	}
+
+
 	public LearningDesignDTO getLearningDesignDTO(){
 		return new LearningDesignDTO(this);
 	}

@@ -44,7 +44,6 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
             Integer orderId, 
             Boolean defineLater, 
             java.util.Date createDateTime, 
-            String offlineInstructions, 
             LearningLibrary learningLibrary, 
             Activity parentActivity,
             Activity libraryActivity,
@@ -64,7 +63,6 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
                 orderId, 
                 defineLater, 
                 createDateTime, 
-                offlineInstructions, 
                 learningLibrary, 
                 parentActivity, 
 				libraryActivity,
@@ -137,9 +135,6 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
     	newParallelActivity.setDefineLater(originalActivity.getDefineLater());
     	newParallelActivity.setCreateDateTime(new Date());
     	newParallelActivity.setRunOffline(originalActivity.getRunOffline());
-    	
-    	newParallelActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newParallelActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
     	
     	newParallelActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
     	newParallelActivity.setLibraryActivity(originalActivity.getLibraryActivity());		

@@ -53,7 +53,6 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
             Integer orderId, 
             Boolean defineLater, 
             java.util.Date createDateTime, 
-            String offlineInstructions, 
             LearningLibrary learningLibrary, 
             Activity parentActivity, 
             Activity libraryActivity,
@@ -76,7 +75,6 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
                 orderId, 
                 defineLater, 
                 createDateTime, 
-                offlineInstructions, 
                 learningLibrary, 
                 parentActivity, 
 				libraryActivity,
@@ -150,10 +148,6 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
     	newOptionsActivity.setLearningLibrary(originalActivity.getLearningLibrary());
     	newOptionsActivity.setCreateDateTime(new Date());
     	newOptionsActivity.setRunOffline(originalActivity.getRunOffline());
-    	
-    	newOptionsActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());    	
-    	newOptionsActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
-    	
     	newOptionsActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
     	newOptionsActivity.setLibraryActivity(originalActivity.getLibraryActivity());
     	return newOptionsActivity;

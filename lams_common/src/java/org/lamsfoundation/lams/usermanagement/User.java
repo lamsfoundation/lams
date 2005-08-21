@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /** 
@@ -90,6 +91,9 @@ public class User implements Serializable {
     private Organisation baseOrganisation;
     
     /** persistent field */
+    private CSSThemeVisualElement theme;
+
+    /** persistent field */
     private Set learnerProgresses;
     
     /** persistent field */
@@ -106,7 +110,7 @@ public class User implements Serializable {
     
     private String fullName;
     /** full constructor */
-    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, Set userOrganisations, Organisation baseOrganisation, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
+    public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement theme, Set userOrganisations, Organisation baseOrganisation, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
         this.login = login;
         this.password = password;
         this.title = title;
@@ -127,6 +131,7 @@ public class User implements Serializable {
         this.createDate = createDate;
         this.workspace = workspace;
         this.authenticationMethod = authenticationMethod;
+        this.theme = theme;
         this.userOrganisations = userOrganisations;
         this.baseOrganisation = baseOrganisation;
         this.learnerProgresses = learnerProgresses;
@@ -461,6 +466,20 @@ public class User implements Serializable {
         this.authenticationMethod = authenticationMethod;
     }
 
+    /** 
+     *            @hibernate.many-to-one
+     *             not-null="false"
+     *            @hibernate.column name="theme_id"         
+     *         
+     */
+    public CSSThemeVisualElement getTheme() {
+        return this.theme;
+    }
+
+    public void setTheme(CSSThemeVisualElement theme) {
+        this.theme = theme;
+    }
+    
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"

@@ -45,7 +45,6 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
             Integer orderId, 
             Boolean defineLater, 
             java.util.Date createDateTime, 
-            String offlineInstructions, 
             LearningLibrary learningLibrary, 
             Activity parentActivity, 
             Activity libraryActivity,
@@ -65,7 +64,6 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
                 orderId, 
                 defineLater, 
                 createDateTime, 
-                offlineInstructions, 
                 learningLibrary, 
                 parentActivity, 
 				libraryActivity,
@@ -138,9 +136,6 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     	newSequenceActivity.setDefineLater(originalActivity.getDefineLater());
     	newSequenceActivity.setCreateDateTime(new Date());
     	newSequenceActivity.setRunOffline(originalActivity.getRunOffline());
-    	
-    	newSequenceActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	newSequenceActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
     	
     	newSequenceActivity.setLibraryActivity(originalActivity.getLibraryActivity());
 		newSequenceActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	

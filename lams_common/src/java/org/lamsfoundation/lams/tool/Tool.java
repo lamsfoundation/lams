@@ -103,6 +103,12 @@ public class Tool implements Serializable {
     /** persistent field */
     private Integer groupingSupportTypeId;
     
+    /** persistent field */
+    private String toolIdentifier;
+
+    /** persistent field */
+    private String toolVersion;
+
     /** full constructor */
     public Tool(Long toolId, 
                 String learnerUrl, 
@@ -124,7 +130,9 @@ public class Tool implements Serializable {
                 Date createDateTime,
                 String monitorUrl,
                 String contributeUrl,
-                String moderationUrl) 
+                String moderationUrl,
+                String toolIdentifier,
+                String toolVersion) 
     {
         this.toolId = toolId;
         this.learnerUrl = learnerUrl;
@@ -147,6 +155,8 @@ public class Tool implements Serializable {
         this.monitorUrl = monitorUrl;
         this.contributeUrl = contributeUrl;
         this.moderationUrl = moderationUrl;
+        this.toolIdentifier = toolIdentifier;
+        this.toolVersion = toolVersion;
     }
 
     /** default constructor */
@@ -169,7 +179,9 @@ public class Tool implements Serializable {
                 Set activities,
                 Integer groupingSupportTypeId,
                 Date createDateTime,
-                String monitorUrl) 
+                String monitorUrl,
+                String toolIdentifier,
+                String toolVersion) 
     {
         this.toolId = toolId;
         this.learnerUrl = learnerUrl;
@@ -187,6 +199,8 @@ public class Tool implements Serializable {
         this.groupingSupportTypeId = groupingSupportTypeId;
         this.createDateTime = createDateTime;
         this.monitorUrl = monitorUrl;
+        this.toolIdentifier = toolIdentifier;
+        this.toolVersion = toolVersion;
     }
 
     /** 
@@ -479,6 +493,30 @@ public class Tool implements Serializable {
     {
         this.monitorUrl = monitorUrl;
     }
+ 
+    
+    /** 
+     * @hibernate.property column="tool_identifier" length="64"       
+     */
+    public String getToolIdentifier() {
+        return this.toolIdentifier;
+    }
+
+    public void setToolIdentifier(String toolIdentifier) {
+        this.toolIdentifier = toolIdentifier;
+    }
+
+    /** 
+     * @hibernate.property column="tool_version" length="10"       
+     */
+    public String getToolVersion() {
+        return this.toolVersion;
+    }
+
+    public void setToolVersion(String toolVersion) {
+        this.toolVersion = toolVersion;
+    }
+
     public String toString() {
         return new ToStringBuilder(this)
             .append("toolId", getToolId())

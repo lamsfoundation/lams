@@ -52,7 +52,6 @@ public class GroupingActivity extends SimpleActivity implements Serializable
             Integer orderId, 
             Boolean defineLater, 
             java.util.Date createDateTime, 
-            String offlineInstructions, 
 			LearningLibrary learningLibrary, 
             Activity parentActivity, 
             Activity libraryActivity,
@@ -75,7 +74,6 @@ public class GroupingActivity extends SimpleActivity implements Serializable
                 orderId, 
                 defineLater, 
                 createDateTime, 
-                offlineInstructions,  
                 learningLibrary, 
                 parentActivity, 
 				libraryActivity,
@@ -146,9 +144,6 @@ public class GroupingActivity extends SimpleActivity implements Serializable
     	groupingActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
     	groupingActivity.setApplyGrouping(originalActivity.getApplyGrouping());
     	groupingActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
-    	
-    	groupingActivity.setOfflineInstructions(originalActivity.getOfflineInstructions());
-    	groupingActivity.setOnlineInstructions(originalActivity.getOnlineInstructions());
     	
     	groupingActivity.setDefineLater(originalActivity.getDefineLater());    	
     	groupingActivity.setCreateDateTime(new Date()); 

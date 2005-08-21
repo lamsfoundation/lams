@@ -47,7 +47,7 @@ Ant build file.
 	</target>
 
 	<target name="init">
-		<available property="xdoclet-jars-installed" file="lib/xdoclet/xdoclet-${xdoclet.version}.jar"/>
+		<available property="xdoclet-jars-installed" file="${lib}/xdoclet/xdoclet-${xdoclet.version}.jar"/>
 	</target>
 
 	<!-- =================================================================== -->
@@ -203,6 +203,7 @@ Ant build file.
 			<fileset dir="${src.test.java}">
 				<include name="**/*.xml"/>
 				<include name="**/*.zip"/>
+				<include name="**/*.properties"/>
 			</fileset>
 		</copy>
 	</target>
@@ -330,7 +331,7 @@ Ant build file.
 			<formatter type="xml"/>
 			<batchtest todir="${build.report}">
 				<fileset dir="${src.test.java}">
-					<include name="**/Test*.java"/>
+					<include name="**/Test*"/>
 					<exclude name="**/Test*All.java"/>
 					<exclude name="**/TestInitLesson.java"/>
 				</fileset>

@@ -72,6 +72,10 @@
 				<!-- Workspace related mapping files -->
 				<value>org/lamsfoundation/lams/workspace/WorkspaceFolderContent.hbm.xml</value>
 				
+				<!-- Theme related mapping files -->
+				<value>org/lamsfoundation/lams/themes/CSSProperty.hbm.xml</value>
+				<value>org/lamsfoundation/lams/themes/CSSStyle.hbm.xml</value>
+				<value>org/lamsfoundation/lams/themes/CSSThemeVisualElement.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -198,4 +202,10 @@
 	<bean id="workspaceFolderContentDAO" class="org.lamsfoundation.lams.workspace.dao.hibernate.WorkspaceFolderContentDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
+	
+	<!--  Theme beans -->
+	<bean id="themeDAO" class="org.lamsfoundation.lams.themes.dao.hibernate.CSSThemeDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
 </beans>

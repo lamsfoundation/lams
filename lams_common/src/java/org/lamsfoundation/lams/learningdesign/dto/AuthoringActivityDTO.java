@@ -111,12 +111,6 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/** Indicates whether this activity is available offline*/
 	private Boolean runOffline;
 
-	/** Offline Instruction for this activity*/
-	private String offlineInstructions;
-	
-	/** Online Instruction for this activity*/
-	private String onlineInstructions;
-	
 	/** Maximum number of activities to be attempted */
 	private Integer maxOptions;
 	
@@ -179,7 +173,6 @@ public class AuthoringActivityDTO extends BaseDTO{
 			Integer activityTypeId, Long groupingID, Integer groupingUIID,
 			Integer orderID, Boolean defineLater, Long learningDesignID,
 			Long learningLibraryID, Date createDateTime, Boolean runOffline,
-			String offlineInstructions, String onlineInstructions,
 			Integer maxOptions, Integer minOptions,
 			String optionsInstructions, Long toolID, Long toolContentID,
 			Integer activityCategoryID, Integer gateActivityLevelID,
@@ -208,8 +201,6 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.learningLibraryID = learningLibraryID;
 		this.createDateTime = createDateTime;
 		this.runOffline = runOffline;
-		this.offlineInstructions = offlineInstructions;
-		this.onlineInstructions = onlineInstructions;
 		this.maxOptions = maxOptions;
 		this.minOptions = minOptions;
 		this.optionsInstructions = optionsInstructions;
@@ -262,8 +253,6 @@ public class AuthoringActivityDTO extends BaseDTO{
 								 WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
 		this.createDateTime = activity.getCreateDateTime();
 		this.runOffline = activity.getRunOffline();
-		this.offlineInstructions = activity.getOfflineInstructions();	
-		this.onlineInstructions = activity.getOnlineInstructions();
 		this.activityCategoryID = activity.getActivityCategoryID();		
 		this.libraryActivityUiImage = activity.getLibraryActivityUiImage();		
 		this.libraryActivityID = activity.getLibraryActivity()!=null?
@@ -310,10 +299,6 @@ public class AuthoringActivityDTO extends BaseDTO{
 			this.createDateTime = (Date)activityDetails.get("createDateTime");
 		if(activityDetails.containsKey("runOffline"))
 			this.runOffline = (Boolean) activityDetails.get("runOffline");
-		if(activityDetails.containsKey("offlineInstructions"))
-			this.offlineInstructions= (String) activityDetails.get("offlineInstructions");
-		if(activityDetails.containsKey("onlineInstructions"))
-			this.onlineInstructions =(String) activityDetails.get("onlineInstructions");
 		if(activityDetails.containsKey("maxOptions"))
 			this.maxOptions = convertToInteger(activityDetails.get("maxOptions"));
 		if(activityDetails.containsKey("minOptions"))
@@ -572,12 +557,6 @@ public class AuthoringActivityDTO extends BaseDTO{
 		return minOptions!=null?minOptions:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}
 	/**
-	 * @return Returns the offlineInstructions.
-	 */
-	public String getOfflineInstructions() {
-		return offlineInstructions!=null?offlineInstructions:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	/**
 	 * @return Returns the optionsInstructions.
 	 */
 	public String getOptionsInstructions() {
@@ -807,13 +786,6 @@ public class AuthoringActivityDTO extends BaseDTO{
 			this.minOptions = minOptions;
 	}
 	/**
-	 * @param offlineInstructions The offlineInstructions to set.
-	 */
-	public void setOfflineInstructions(String offlineInstructions) {
-		if(!offlineInstructions.equals(WDDXTAGS.STRING_NULL_VALUE))
-			this.offlineInstructions = offlineInstructions;
-	}
-	/**
 	 * @param optionsInstructions The optionsInstructions to set.
 	 */
 	public void setOptionsInstructions(String optionsInstructions) {
@@ -882,19 +854,6 @@ public class AuthoringActivityDTO extends BaseDTO{
 		if(!xcoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
 			this.ycoord = ycoord;
 	}	
-	/**
-	 * @return Returns the onlineInstructions.
-	 */
-	public String getOnlineInstructions() {
-		return onlineInstructions!=null?onlineInstructions:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	/**
-	 * @param onlineInstructions The onlineInstructions to set.
-	 */
-	public void setOnlineInstructions(String onlineInstructions) {
-		if(!onlineInstructions.equals(WDDXTAGS.STRING_NULL_VALUE))
-			this.onlineInstructions = onlineInstructions;
-	}
 	/**
 	 * @return Returns the applyGrouping.
 	 */

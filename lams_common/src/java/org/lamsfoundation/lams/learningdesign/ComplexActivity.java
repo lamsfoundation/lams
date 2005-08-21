@@ -53,7 +53,6 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 			Integer orderId,
 			Boolean defineLater,
 			Date createDateTime,
-			String offlineInstructions,
 			LearningLibrary learningLibrary,
 			Activity parentActivity,
 			Activity libraryActivity,
@@ -65,7 +64,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 			Transition transitionFrom,
 			Set activities) {
 		super(activityId, id, description, title, xcoord, ycoord, orderId,
-				defineLater, createDateTime, offlineInstructions,
+				defineLater, createDateTime, 
 				learningLibrary, parentActivity, libraryActivity,parentUIID,learningDesign, grouping,
 				activityTypeId, transitionTo,transitionFrom);
 		this.activities = activities;

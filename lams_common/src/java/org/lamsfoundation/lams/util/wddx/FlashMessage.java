@@ -144,4 +144,9 @@ public class FlashMessage implements Serializable {
     			"No such WorkspaceFolderContent with a folder_content_id of " + folderContentID +" exists",
 				FlashMessage.ERROR);
     }
+    public static FlashMessage getNoSuchTheme(String methodName, Long themeID){
+    	return new FlashMessage(methodName,
+    			"No such theme with a theme id of " + themeID +" exists",
+				FlashMessage.ERROR);
+    }
 }

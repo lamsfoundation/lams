@@ -54,12 +54,13 @@ public class BaseDTO {
 	 * @return Integer The required value
 	 */
 	public Integer convertToInteger(Object ob){
-		Double doub = (Double)ob;
-		Integer integer = new Integer(doub.intValue());
-		if(!integer.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			return integer;
-		else
-			return null;
+	    if ( ob != null ) {
+			Double doub = (Double)ob;
+			Integer integer = new Integer(doub.intValue());
+			if(!integer.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
+				return integer;
+	    }
+	    return null;
 	}
 	/**
 	 * This method converts the passed
@@ -69,11 +70,12 @@ public class BaseDTO {
 	 * @return Long The required value
 	 */
 	public Long convertToLong(Object ob){
-		Double doub = (Double)ob;
-		Long longValue = new Long(doub.longValue());
-		if(!longValue.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			return longValue;
-		else
-			return null;
+	    if ( ob != null ) {
+			Double doub = (Double)ob;
+			Long longValue = new Long(doub.longValue());
+			if(!longValue.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+				return longValue;
+	    }
+		return null;
 	}
 }
