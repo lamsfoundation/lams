@@ -38,6 +38,36 @@
     </id>
 
     <property
+        name="toolIdentifier"
+        type="java.lang.String"
+        column="tool_identifier"
+        not-null="true"
+        length="64"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="tool_identifier"
+            length="64"
+            not-null="true"
+        </meta>    
+    </property>
+    
+    <property
+        name="toolVersion"
+        type="java.lang.String"
+        column="tool_version"
+        not-null="true"
+        length="10"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="tool_version"
+            length="10"
+            not-null="true"
+        </meta>    
+    </property>
+    
+    <property
         name="learnerUrl"
         type="java.lang.String"
         column="learner_url"

@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.themes.CSSThemeVisualElement" 
+    table="lams_css_theme_ve"
+>
+
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_css_theme_ve"
+    </meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="theme_ve_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Long"
+            column="theme_ve_id"
+
+
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="native" />
+    </id>
+
+    <property
+        name="name"
+        type="java.lang.String"
+        column="name"
+        not-null="true"
+        length="100"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="name"
+            length="100"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="description"
+        type="java.lang.String"
+        column="description"
+        length="100"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="description"
+            length="100"
+        </meta>    
+    </property>
+    <property
+        name="theme"
+        type="boolean"
+        column="theme_flag"
+        not-null="true"
+        length="1"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="theme_flag"
+            length="1"
+            not-null="true"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to LamsUser -->
+    <set
+        name="users"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+               @hibernate.set
+                 lazy="true"
+                 inverse="true"
+                 cascade="none"
+                @hibernate.collection-key
+                 column="theme_id"
+                @hibernate.collection-one-to-many
+                 class="org.lamsfoundation.lams.usermanagement.User"
+        </meta>
+        <key>
+            <column name="theme_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.usermanagement.User"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to Style. Is really 1-1 but we want to -->
+    <!--  to use the cascade delete orphan, so using a set is easier. If stylesheets ever -->
+    <!--  change to have more than one style per element, we'll be ready <grin> -->
+    <set
+        name="styles"
+        lazy="true"
+        inverse="true"
+		cascade="all-delete-orphan"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+
+           @hibernate.collection-key
+            column="theme_ve_id"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.themes.CSSStyle"
+        </meta>
+        <key>
+            <column name="theme_ve_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.themes.CSSStyle"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to child visual elements (maybe child themes in the future) -->
+    <set
+        name="elements"
+        lazy="true"
+        inverse="true"
+		cascade="all-delete-orphan"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+
+           @hibernate.collection-key
+            column="parent_id"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
+        </meta>
+        <key>
+            <column name="parent_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
+        />
+    </set>
+    <!-- bi-directional many-to-one association to the parent theme record -->
+    <many-to-one
+        name="parentTheme"
+        class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+   		    cascade="none"
+            update="true"
+            insert="true"
+           @hibernate.column name="parent_id"         
+        </meta>
+        <column name="parent_id" />
+    </many-to-one>
+    
+</class>
+</hibernate-mapping>

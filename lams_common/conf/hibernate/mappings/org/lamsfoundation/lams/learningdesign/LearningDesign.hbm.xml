@@ -154,6 +154,15 @@
     	<meta attribute="field-description">@hibernate.property column ="last_modified_date_time"</meta>
     </property>
 
+    <property name="offlineInstructions" type="java.lang.String" column="offline_instructions" length="65535">
+        <meta attribute="field-description">@hibernate.property column="offline_instructions" length="65535"</meta>    
+    </property>
+    
+    <property name="onlineInstructions" type="java.lang.String" column="online_instructions" length="65535">
+		<meta attribute="field-description">@hibernate.property column="online_instructions" length="65535"</meta>    
+	</property>
+
+
     <!-- Associations -->
     
     <!-- bi-directional many-to-one association to License-->  

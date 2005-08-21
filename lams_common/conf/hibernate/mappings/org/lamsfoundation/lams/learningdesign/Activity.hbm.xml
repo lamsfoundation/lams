@@ -59,15 +59,6 @@
         <meta attribute="field-description">@hibernate.property column="create_date_time" length="19" not-null="true"</meta>    
     </property>
 
-    <property name="offlineInstructions" type="java.lang.String" column="offline_instructions" length="65535">
-        <meta attribute="field-description">@hibernate.property column="offline_instructions" length="65535"</meta>    
-    </property>
-    
-    <property name="onlineInstructions" type="java.lang.String" column="online_instructions" length="65535">
-		<meta attribute="field-description">@hibernate.property column="online_instructions" length="65535"</meta>    
-	</property>
-    
-    
     <property name="runOffline" type="java.lang.Boolean" column="run_offline_flag" not-null="true" length="4">
         <meta attribute="field-description">@hibernate.property column="run_offline_flag" length="4" not-null="true"</meta>    
     </property>

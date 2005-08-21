@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.themes.CSSProperty" 
+    table="lams_css_property"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_css_property"
+    </meta>
+
+    <id
+        name="propertyId"
+        type="java.lang.Long"
+        column="property_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Long"
+            column="property_id"
+
+
+        </meta>
+        <generator class="native" />
+    </id>
+
+    <property
+        name="name"
+        type="java.lang.String"
+        column="name"
+        not-null="true"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="name"
+            length="255"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="value"
+        type="java.lang.String"
+        column="value"
+        not-null="true"
+        length="100"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="value"
+            length="100"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="type"
+        type="byte"
+        column="type"
+        not-null="true"
+        length="4"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="type"
+            length="4"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="styleSubset"
+        type="java.lang.String"
+        column="style_subset"
+        not-null="false"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="style_subset"
+            length="20"
+            not-null="true"
+        </meta>    
+    </property>
+ 
+    <!-- Associations -->
+
+</class>
+</hibernate-mapping>

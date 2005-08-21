@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.themes.CSSStyle" 
+    table="lams_css_style"
+>
+
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_css_style"
+    </meta>
+
+    <id
+        name="styleId"
+        type="java.lang.Long"
+        column="style_id"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Long"
+            column="style_id"
+
+
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="native" />
+    </id>
+
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to CSSProperty -->
+    <set
+        name="properties"
+        lazy="false"
+        inverse="true"
+     	cascade="all-delete-orphan"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="false"
+            inverse="true"
+            cascade="all-delete-orphan"
+
+           @hibernate.collection-key
+            column="style_id"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.themes.CSSProperty"
+        </meta>
+        <key>
+            <column name="style_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.themes.CSSProperty"
+        />
+    </set>
+
+    <!-- bi-directional many-to-one association to CSSThemeVisualElement. To which -->
+    <!--  theme or element does this style belong? -->
+    <many-to-one
+        name="themeElement"
+        class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+   		    cascade="none"
+            update="true"
+            insert="true"
+           @hibernate.column name="theme_ve_id"         
+        </meta>
+        <column name="theme_ve_id" />
+    </many-to-one>
+
+   <!-- Associations -->
+  
+ 
+</class>
+</hibernate-mapping>

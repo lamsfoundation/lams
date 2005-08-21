@@ -330,6 +330,20 @@
         </meta>
         <column name="base_organisation_id" />
     </many-to-one>
+    <!-- bi-directional many-to-one association to CSSTheme -->
+    <many-to-one
+        name="theme"
+        class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="theme_id"         
+        </meta>
+        <column name="theme_id" />
+    </many-to-one>
+    
 	<!-- bi-directional one-to-many association to LearnerProgress -->
     <set
         name="learnerProgresses"
