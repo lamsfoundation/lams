@@ -207,8 +207,8 @@
 				<fileset dir="${build.classes.test}"/>
 				<fileset dir="${conf.hibernate.mapping.dir}"/>
 				<fileset dir="${build.web}"/>
-				<fileset dir="${build.web.includes}"/>
-				<fileset dir="${build.web.template}"/>
+				<!--<fileset dir="${build.web.includes}"/>-->
+				<!--<fileset dir="${build.web.template}"/>-->
 			</jar>
 		</target>
 	

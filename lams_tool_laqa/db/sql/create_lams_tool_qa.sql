@@ -1,4 +1,4 @@
-CREATE TABLE lams.tl_laqa11_content (
+CREATE TABLE tl_laqa11_content (
        qa_content_id BIGINT(20) NOT NULL
      , title VARCHAR(250) NOT NULL DEFAULT 'Questions and Answers'
      , instructions VARCHAR(250) NOT NULL DEFAULT 'Please, take a minute to answer the following questions.'
@@ -19,7 +19,7 @@ CREATE TABLE lams.tl_laqa11_content (
      , PRIMARY KEY (qa_content_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_laqa11_session (
+CREATE TABLE tl_laqa11_session (
        qa_session_id BIGINT(20) NOT NULL
      , session_start_date DATETIME
      , session_end_date DATETIME
@@ -31,7 +31,7 @@ CREATE TABLE lams.tl_laqa11_session (
                   REFERENCES lams.tl_laqa11_content (qa_content_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_laqa11_que_usr (
+CREATE TABLE tl_laqa11_que_usr (
        que_usr_id BIGINT(20) NOT NULL
      , username VARCHAR(100)
      , qa_session_id BIGINT(20) NOT NULL
@@ -42,7 +42,7 @@ CREATE TABLE lams.tl_laqa11_que_usr (
                   REFERENCES lams.tl_laqa11_session (qa_session_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_laqa11_que_content (
+CREATE TABLE tl_laqa11_que_content (
        qa_que_content_id BIGINT(20) NOT NULL
      , question VARCHAR(255)
      , display_order INT(5)
@@ -53,7 +53,7 @@ CREATE TABLE lams.tl_laqa11_que_content (
                   REFERENCES lams.tl_laqa11_content (qa_content_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_laqa11_usr_resp (
+CREATE TABLE tl_laqa11_usr_resp (
        response_id BIGINT(20) NOT NULL
      , hidden TINYINT(1) DEFAULT 0
      , answer VARCHAR(255)
@@ -70,7 +70,7 @@ CREATE TABLE lams.tl_laqa11_usr_resp (
                   REFERENCES lams.tl_laqa11_que_usr (que_usr_id)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_laqa11_uploadedFile (
+CREATE TABLE tl_laqa11_uploadedFile (
        submissionId BIGINT(20) NOT NULL AUTO_INCREMENT
      , uuid VARCHAR(255) NOT NULL
      , isOnline_File TINYINT(1) NOT NULL
