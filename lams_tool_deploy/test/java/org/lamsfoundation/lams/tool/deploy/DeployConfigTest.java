@@ -64,19 +64,19 @@ public class DeployConfigTest extends TestCase
     
     public void testGetDbUsername()
     {
-        assertEquals(config.getDbUsername(), "root");
+        assertEquals(config.getDbUsername(), "lams");
         assertEquals(config2.getDbUsername(), "root2");
     }
     
     public void testGetDbPassword()
     {
-        assertEquals(config.getDbPassword(), "dag.Quiz");
+        assertEquals(config.getDbPassword(), "lamsdemo");
         assertEquals(config2.getDbPassword(), "dag.Quiz2");
     }
     
     public void testGetDbDriverUrl()
     {
-        assertEquals(config.getDbDriverUrl(), "jdbc:mysql://localhost:3306/scratch");
+        assertEquals(config.getDbDriverUrl(), "jdbc:mysql://localhost/lams?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull");
         assertEquals(config2.getDbDriverUrl(), "jdbc:mysql://localhost:3306/scratch2");
     }
     

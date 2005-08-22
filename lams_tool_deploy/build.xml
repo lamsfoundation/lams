@@ -26,6 +26,7 @@
         <property name="classes.dir" value="build/classes"/>
         <property name="test.classes.dir" value="build/test"/>
         <property name="build.dir" value="build/lib"/>
+    	<property name="build.report.dir" value="build/report"/>
         <property name="lib.dir" value="lib"/>
         <property name="src.dir" value="src/java"/>
         <property name="test.src.dir" value="test/java"/>
@@ -93,20 +94,31 @@
         
         <target name="junit" depends="compile" description="Build and test the project">
         <!-- NOTE: needs fork and dir so it can find test files! -->
-            <junit printsummary="withOutAndErr" haltonfailure="true" showoutput="on" fork="on" dir="${basedir}">
+    		<mkdir dir="${build.report.dir}" />
+            <junit printsummary="withOutAndErr" haltonerror="no" haltonfailure="no" showoutput="on" fork="on" dir="${basedir}">
                 <classpath>
                     <path refid="junit.class.path"/>
                 </classpath>
-                <formatter type="plain"/>
-                <test name="org.lamsfoundation.lams.tool.deploy.FileTokenReplacerTest" todir="${basedir}/test/results" outfile="FileTokenReplacer"/>
-                <test name="org.lamsfoundation.lams.tool.deploy.DeployConfigTest" todir="${basedir}/test/results" outfile="DeployConfig"/>
-                <test name="org.lamsfoundation.lams.tool.deploy.DeployFilesTaskTest" todir="${basedir}/test/results" outfile="DeployFilesTask"/>
-                <test name="org.lamsfoundation.lams.tool.deploy.ScriptRunnerTest" todir="${basedir}/test/results" outfile="ScriptRunner"/>
-                <test name="org.lamsfoundation.lams.tool.deploy.ToolDBDeployTaskTest" todir="${basedir}/test/results" outfile="ToolDBDeployTaskTest"/>
-                <test name="org.lamsfoundation.lams.tool.deploy.ToolDBActivateTaskTest" todir="${basedir}/test/results" outfile="ToolDBActivateTaskTest"/>
-                <test name="org.lamsfoundation.lams.tool.deploy.DeployTest" todir="${basedir}/test/results" outfile="DeployTest"/>
+        		<formatter type="plain" usefile="false" />
+        		<formatter type="xml" />
+        		<batchtest todir="${build.report.dir}">
+        			<fileset dir="${test.src.dir}">
+                        <include name="**/*Test.java"/>
+        				<!-- base class for test cases -->
+                        <exclude name="**/ToolDBTest.java"/> 
+        				<exclude name="**/ToolDBTest.java"/>
+        			</fileset>
+        		</batchtest>
             </junit>
         </target>
 	
-
+		<target name="test-report" depends="junit" description="Run the tests">
+			<mkdir dir="${build.report.dir}/html" />
+			<junitreport>
+				<fileset dir="${build.report.dir}">
+					<include name="TEST-*.xml" />
+				</fileset>
+				<report todir="${build.report.dir}/html" />
+			</junitreport>
+		</target>
 </project>
