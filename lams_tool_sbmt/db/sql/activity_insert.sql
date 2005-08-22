@@ -23,8 +23,6 @@ activity_ui_id
 , learning_library_id
 , create_date_time
 , run_offline_flag
-, offline_instructions
-, online_instructions
 , max_number_of_options
 , min_number_of_options
 , options_instructions
@@ -63,8 +61,6 @@ NULL
 , 2
 , NOW()
 , 0
-, 'Do it yourself'
-, 'Do it in LAMS'
 , NULL
 , NULL
 , NULL
