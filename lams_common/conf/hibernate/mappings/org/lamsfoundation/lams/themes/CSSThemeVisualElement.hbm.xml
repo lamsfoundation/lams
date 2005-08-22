@@ -113,13 +113,13 @@
     <!--  change to have more than one style per element, we'll be ready <grin> -->
     <set
         name="styles"
-        lazy="true"
+        lazy="false"
         inverse="true"
 		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
-            lazy="true"
+            lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
 
@@ -139,13 +139,13 @@
     <!-- bi-directional one-to-many association to child visual elements (maybe child themes in the future) -->
     <set
         name="elements"
-        lazy="true"
+        lazy="false"
         inverse="true"
 		cascade="all-delete-orphan"
     >
         <meta attribute="field-description">
            @hibernate.set
-            lazy="true"
+            lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
 

@@ -168,7 +168,7 @@ public class CSSThemeVisualElement implements Serializable {
      * But its easier with Hibernate to make it a uni-directional many to one.
      * 
      * 	  @hibernate.set
-     *       lazy="true"
+     *       lazy="false"
      *       inverse="true"
      *       cascade="all-delete-orphan"
      *
@@ -231,7 +231,7 @@ public class CSSThemeVisualElement implements Serializable {
      * The visual elements (or in the future sub-themes) that make up this theme
      *  
      *            @hibernate.set
-     *             lazy="true"
+     *             lazy="false"
      *             inverse="true"
      *             cascade="all-delete-orphan"
      *            @hibernate.collection-key
