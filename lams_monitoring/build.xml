@@ -65,7 +65,6 @@
 			<fileset dir="${build.classes.java}"/>
 			<fileset dir="${build.classes.test}"/>
 			<fileset dir="${build.lib}"/>
-			<fileset dir="${build.report}"/>
 		</delete>
 	</target>
 
@@ -211,6 +210,9 @@
 	   <!-- Run junit tests														-->
 	   <!-- =================================================================== -->
 	<target name="test" depends="compile.test"> 
+		<delete>
+			<fileset dir="${build.report}" failonerror="false"/>
+		</delete>
 		<mkdir dir="${build.report}" />
 		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
 			fork="yes">
