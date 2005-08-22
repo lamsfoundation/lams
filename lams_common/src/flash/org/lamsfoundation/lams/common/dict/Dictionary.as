@@ -72,9 +72,16 @@ dynamic class Dictionary {
     /**
     * @returns a string holding the text requested
     */
-    public static function getValue(id:Number):String{
+    public static function getValue(key:String):String{
         //Debugger.log('returning item-' +id + '-' + items.get(id).value,Debugger.GEN,'getItemById','org.lamsfoundation.lams.dict.Dictionary');
-        return _instance.items.get(id).value;
+        var v:String = _instance.items.get(key).value;
+		if(v!=null){
+			return v;
+		}else{
+			Debugger.log('Entry not found in '+_currentLanguage+' dictionary, key='+key,Debugger.CRITICAL,'createFromData','Dictionary');
+		}
+		
+		
     }
     
     /**
@@ -91,7 +98,7 @@ dynamic class Dictionary {
         //Go through hash of dictionary items and get data objects for each
         for(var i=0;i<hashKeys.length;i++){
             obj.dictionaryItems[i] = hashValues[i].toData();
-            obj.dictionaryItems[i].hashKey = hashKeys[i];
+            obj.dictionaryItems[i].key = hashKeys[i];
         }
         return obj;
     }
@@ -109,8 +116,8 @@ dynamic class Dictionary {
         //Go through data object and copy values to items hash
         for(var i=0;i<dataObj.dictionaryItems.length;i++){
             //Create hashKey object and then prune hashkey from dataObject before adding dictionary item to hashtable 
-            var hashKey = dataObj.dictionaryItems[i].hashKey;
-            delete dataObj.dictionaryItems[i].hashKey;
+            var hashKey = dataObj.dictionaryItems[i].key;
+            delete dataObj.dictionaryItems[i].key;
             //Create the dictionary item from the data object
             var dictItem:DictionaryItem = DictionaryItem.createFromData(dataObj.dictionaryItems[i]);
             items.put(hashKey,dictItem);
@@ -145,7 +152,7 @@ dynamic class Dictionary {
         //Create the dictionary from the data obj
         createFromData(dictionaryDataObj);
 		
-        //Now that theme has been loaded by server, cache it 
+        //Now that dict has been loaded by server, cache it 
         saveToDisk();		
     }
 
@@ -163,7 +170,8 @@ dynamic class Dictionary {
     * REMOVE WHEN NO LONGER REQUIRED
     */
     public function createDictionaryFromCode(lang:String) {
-        //_global.breakpoint();
+        Debugger.log('SHOULD NOT BE CALLED _ NO LONGER USED!!',Debugger.CRITICAL,'createDictionaryFromCode','Dictionary');
+		//_global.breakpoint();
         //Clear the dictionary + set language
         items.clear();
         _currentLanguage = lang;

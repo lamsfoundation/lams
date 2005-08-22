@@ -6,14 +6,14 @@
 */
 class DictionaryItem {
     
-	private var _id:Number;
-	private var _name:String;
+	private var _key:String;
+	private var _description:String;
 	private var _value:String;
 
-	public function DictionaryItem(id:Number,name:String,value:String) {
+	public function DictionaryItem(key:String, value:String,description:String) {
 		//constructor 
-        _id = id;
-        _name = name;
+        _key = key;
+        _description = description;
         _value = value;
 	}
     
@@ -22,8 +22,8 @@ class DictionaryItem {
     */
     public function toData():Object{
         var obj:Object = {};
-        obj.id = _id;
-        obj.name = _name;
+        obj.key = _key;
+        obj.description = _description;
         obj.value = _value;
         return obj;
     }
@@ -32,7 +32,7 @@ class DictionaryItem {
     * Create Dictionary item from dataObject
     */
     public static function createFromData(dataobj:Object):DictionaryItem{
-        var dictionaryItem:DictionaryItem =  new DictionaryItem(dataobj.id,dataobj.name,dataobj.value)
+        var dictionaryItem:DictionaryItem =  new DictionaryItem(dataobj.key,dataobj.description,dataobj.value)
         return dictionaryItem;
     }
     
