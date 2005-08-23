@@ -12,6 +12,7 @@ Ant build file.
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
+	<property file="../lams_build/common.properties"/>
 
 	<path id="all-libs">
 	<!-- 	<fileset dir="${lib}">
@@ -75,20 +76,20 @@ Ant build file.
 	<!-- ================================================================ -->
 	
 	<target name="compile-java" depends="clean-build" description="compile java sources">
-		<javac srcdir="${src.java}" compiler="modern"
+		<javac srcdir="${src.java.dir}" compiler="modern"
 	         	 	destdir="${build.classes.java}" deprecation="on" debug="on">
 			<classpath>
 				<path refid="project.classpath"/>
 			</classpath>
 		</javac>
 		<copy overwrite="yes" todir="${build.classes.java}/${package}">
-			<fileset dir="${src.java}/${package}">
+			<fileset dir="${src.java.dir}/${package}">
 					<include name="*.xml"/>
 					<include name="*.properties"/>
 			</fileset>
 		</copy>
 		<copy overwrite="yes" todir="${build.classes.java}/${package}/web">
-			<fileset dir="${src.java}/${package}/web">
+			<fileset dir="${src.java.dir}/${package}/web">
 					<include name="*.properties"/>
 			</fileset>
 		</copy>
@@ -96,14 +97,14 @@ Ant build file.
 
 	<target name="compile-test" depends="compile-java">
 		<javac destdir="${build.classes.test}" compiler="modern">
-			<src path="${src.test}"/>
+			<src path="${src.test.dir}"/>
 			<classpath>
 				<pathelement location="${build.classes.java}"/>
 				<path refid="project.classpath"/>
 			</classpath>
 		</javac>
 		<copy overwrite="yes" todir="${build.classes.test}">
-			<fileset dir="${src.test}">
+			<fileset dir="${src.test.dir}">
 				<include name="**/*.xml"/>
 				<include name="**/*.zip"/>
 			</fileset>
@@ -114,32 +115,32 @@ Ant build file.
 	<!-- Database Tasks                                             -->
 	<!-- =================================================================== -->
 		<target name="clean-db"	description="Deletes the Noticeboard Tool Tables">
-			<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
-					password="${database.password}">
+			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+					password="${db.password}">
 				<classpath>
-					<pathelement location="${database.driver.file}"/>
+					<pathelement location="${db.driver.file}"/>
 				</classpath>
-				<transaction src="${sql}/drop_lams_tool_nb.sql"/>
+				<transaction src="${db.scripts}/drop_lams_tool_nb.sql"/>
 			</sql>
 		</target>
 		
 		<target name="build-db" depends="clean-db" description="Creates the Noticeboard Tool tables and inserts default content">
-			<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
-								password="${database.password}">
+			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+								password="${db.password}">
 							<classpath>
-								<pathelement location="${database.driver.file}"/>
+								<pathelement location="${db.driver.jar}"/>
 							</classpath>
-					<transaction src="${sql}/create_lams_tool_nb.sql"/>
+					<transaction src="${db.scripts}/create_lams_tool_nb.sql"/>
 			</sql>
 		</target>	
 	
 		<target name="insert-test-data" depends="" description="Inserts test data for noticeboard tool in order for test cases to run">
-				<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
-									password="${database.password}">
+				<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+									password="${db.password}">
 								<classpath>
-									<pathelement location="${database.driver.file}"/>
+									<pathelement location="${db.driver.jar}"/>
 								</classpath>
-						<transaction src="${sql}/insert_lams_tool_nb_data.sql"/>
+						<transaction src="${db.scripts}/insert_lams_tool_nb_data.sql"/>
 				</sql>
 		</target>	
 	
@@ -149,10 +150,10 @@ Ant build file.
 	<!-- ================================================================ -->
 	<target name="build-jar" depends="compile-java" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
-		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf}/jar/META-INF/MANIFEST.MF">
+		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 			<fileset dir="${build.classes.java}">
 			</fileset>
-			<fileset dir="${hibernate.mappings}">
+			<fileset dir="${conf.hibernate.mapping.dir}">
 			</fileset>
 		</jar>
 	</target>
@@ -163,8 +164,8 @@ Ant build file.
 	<target name="build-war" depends="build-jar, webdoclet" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
 		<war warfile="${build.lib}/${product}.war" 
-  				webxml="${webinf}/web.xml" manifest="${conf}/war/META-INF/MANIFEST.MF">
-			<webinf dir="${webinf}">
+  				webxml="${conf.webinf.dir}/web.xml" manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
+			<webinf dir="${conf.webinf.dir}">
 				<include name="*.tld"/>
 				<include name="*.xml"/>
 				<include name="*.properties"/>
@@ -177,7 +178,7 @@ Ant build file.
 			</webinf>
 			<lib dir="${build.lib}">
 				<include name="${product}.jar"/> </lib>
-			<fileset dir="${web}">
+			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="includes/*"/>
 				<include name="images/*"/>
@@ -223,20 +224,20 @@ Ant build file.
 	         appname="${name}"
 	         prefsdir="${middlegen}"
 	         gui="${middlegen.gui}"
-	         databaseurl="${database.url}"
+	         databaseurl="${db.url}"
 	         initialContextFactory="${java.naming.factory.initial}"
 	         providerURL="${java.naming.provider.url}"
 	         datasourceJNDIName="${datasource.jndi.name}"
-	         driver="${database.driver}"
-	         username="${database.userid}"
-	         password="${database.password}"
-	         schema="${database.schema}"
+	         driver="${db.driver}"
+	         username="${db.username}"
+	         password="${db.password}"
+	         schema="${db.schema}"
 	         catalog="lams"
 	         includeViews="false"
 	      >
 
 	         <hibernate 
-	            destination="${conf}/hibernate/mapping"
+	            destination="${conf.dir}/hibernate/mapping"
 	            package="${package.name}"
 	            genXDocletTags="true"
 	            javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
@@ -263,7 +264,7 @@ Ant build file.
 				<formatter type="plain" usefile="false"/>
 				<formatter type="xml"/>
 				<batchtest todir="${build.report}">
-					<fileset dir="${src.test}">
+					<fileset dir="${src.test.dir}">
 						<include name="**/Test*.java"/>
 						
 					</fileset>
@@ -271,8 +272,8 @@ Ant build file.
 				<classpath>
 					<pathelement location="${build.classes.java}"/>
 					<pathelement location="${build.classes.test}"/>
-					<pathelement location="${hibernate.mappings}"/>
-					<pathelement location="${conf}"/>
+					<pathelement location="${conf.hibernate.mapping.dir}"/>
+					<pathelement location="${conf.dir}"/>
 					<path refid="project.classpath"/>
 				</classpath>
 			</junit>
@@ -298,15 +299,15 @@ Ant build file.
 
 			<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
 				
-	         <fileset dir="${src.java}">
+	         <fileset dir="${src.java.dir}">
 	            <include name="**/*Action.java" />
 	            <include name="**/*Form.java" />
 	         </fileset>
 
-	         <deploymentdescriptor servletspec="2.3" destdir="${webinf}"
-				mergedir="${xdoclet}" sessiontimeout="${sessiontimeout}"/>
+	         <deploymentdescriptor servletspec="2.3" destdir="${conf.webinf.dir}"
+				mergedir="${conf.xdoclet.dir}" sessiontimeout="${sessiontimeout}"/>
 				
-	         <strutsconfigxml destdir="${webinf}" mergedir="${xdoclet}" version="1.2"/>
+	         <strutsconfigxml destdir="${conf.webinf.dir}" mergedir="${conf.xdoclet.dir}" version="1.2"/>
 	      </webdoclet>
 		</target>
 	
@@ -327,7 +328,7 @@ Ant build file.
 				<mkdir dir="${build.deploy}/sql"/> 
 				 
 				<copy overwrite="yes" todir="${build.deploy}/sql">
-					<fileset dir="${sql}/">
+					<fileset dir="${db.scripts}/">
 						<include name="drop_lams_tool_nb.sql"/>
 						<include name="create_lams_tool_nb.sql"/>
 						<include name="activity_insert.sql"/>
@@ -356,17 +357,17 @@ Ant build file.
 				<generateDeployProperties depends="compile" 
 					mode="development" 
 					outputPath="${build.deploy}"
-					dbPassword="${database.password}"
-					dbUsername="${database.userid}"
-					dbDriverUrl="${database.url}"
+					dbPassword="${db.password}"
+					dbUsername="${db.username}"
+					dbDriverUrl="${db.url}"
 					dbDriverClass="com.mysql.jdbc.Driver"
 					deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar"
 					toolSignature="${signature}"
-					toolTablesScriptPath="${sql}/create_lams_tool_nb.sql"
-					toolTablesDeleteScriptPath="${sql}/drop_lams_tool_nb.sql"
-					toolActivityInsertScriptPath="${sql}/activity_insert.sql"
-					toolLibraryInsertScriptPath="${sql}/library_insert.sql"
-					toolInsertScriptPath="${sql}/tool_insert.sql"
+					toolTablesScriptPath="${db.scripts}/create_lams_tool_nb.sql"
+					toolTablesDeleteScriptPath="${db.scripts}/drop_lams_tool_nb.sql"
+					toolActivityInsertScriptPath="${db.scripts}/activity_insert.sql"
+					toolLibraryInsertScriptPath="${db.scripts}/library_insert.sql"
+					toolInsertScriptPath="${db.scripts}/tool_insert.sql"
 					lamsEarPath="${jboss.deploy}"
 					toolContext="${toolContext}"
 					toolWebUri="${product}.war"
