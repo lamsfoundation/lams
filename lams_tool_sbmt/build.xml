@@ -24,7 +24,7 @@
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
-	
+	<property file="../lams_build/common.properties"/>
 	<path id="all-libs">
 			<fileset dir="${sharedlib}">
 				<include name="**/*.jar"/>
@@ -93,7 +93,7 @@
 			
 			<middlegen appname="lams_tool_sbmt" 
 					   prefsdir="${conf.middlegen.dir}"
-					   gui="${gui}"
+					   gui="${middlegen.gui}"
 					   databaseurl="${db.url}"
 					   driver="${db.driver}"
 					   username="${db.username}"
@@ -333,7 +333,7 @@
 		<mkdir dir="${build.deploy}/sql"/> 
 		 
 		<copy overwrite="yes" todir="${build.deploy}/sql">
-			<fileset dir="${sql}/">
+			<fileset dir="${db.scripts}/">
 				<include name="drop_lams_tool_sbmt.sql"/>
 				<include name="create_lams_tool_sbmt.sql"/>
 				<include name="activity_insert.sql"/>
@@ -368,11 +368,11 @@
 			dbDriverClass="${db.driver}"
 			deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar"
 			toolSignature="${signature}"
-			toolTablesDeleteScriptPath="${sql}/drop_lams_tool_sbmt.sql"
-			toolTablesScriptPath="${sql}/create_lams_tool_sbmt.sql"
-			toolActivityInsertScriptPath="${sql}/activity_insert.sql"
-			toolLibraryInsertScriptPath="${sql}/library_insert.sql"
-			toolInsertScriptPath="${sql}/tool_insert.sql"
+			toolTablesDeleteScriptPath="${db.scripts}/drop_lams_tool_sbmt.sql"
+			toolTablesScriptPath="${db.scripts}/create_lams_tool_sbmt.sql"
+			toolActivityInsertScriptPath="${db.scripts}/activity_insert.sql"
+			toolLibraryInsertScriptPath="${db.scripts}/library_insert.sql"
+			toolInsertScriptPath="${db.scripts}/tool_insert.sql"
 			lamsEarPath="${jboss.deploy}"
 			toolContext="${toolContext}"
 			toolWebUri="${product}.war"

@@ -60,7 +60,7 @@ public class LearnerAction extends DispatchAction {
 
 		DynaActionForm authForm= (DynaActionForm)form;
 		Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
-		Long userID = (Long)authForm.get("userID");
+		Long userID = (Long)authForm.get(SbmtConstants.USER_ID);
 		
 		//get submission information from content table.E.g., title, instruction
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
@@ -95,7 +95,7 @@ public class LearnerAction extends DispatchAction {
 		DynaActionForm authForm= (DynaActionForm)form;
 		if(!isTokenValid(request,true)){
 			Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
-			Long userID = (Long)authForm.get("userID");
+			Long userID = (Long)authForm.get(SbmtConstants.USER_ID);
 			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 			List filesUploaded = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 
@@ -108,7 +108,7 @@ public class LearnerAction extends DispatchAction {
 		}
 		
 		Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
-		Long userID = (Long)authForm.get("userID");
+		Long userID = (Long)authForm.get(SbmtConstants.USER_ID);
 		FormFile uploadedFile= (FormFile) authForm.get("filePath");
 		String fileDescription = (String) authForm.get("fileDescription");
 
@@ -144,7 +144,7 @@ public class LearnerAction extends DispatchAction {
 			HttpServletResponse response){
 		DynaActionForm authForm= (DynaActionForm)form;
 		Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
-		Long userID = (Long)authForm.get("userID");
+		Long userID = (Long)authForm.get(SbmtConstants.USER_ID);
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 		submitFilesService.finishSubmission(sessionID,userID);
 

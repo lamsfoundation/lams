@@ -54,6 +54,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>JBOSS4</name>
+			<type>2</type>
+			<location>D:/jboss-4.0.2/server/default/deploy/lams.ear/lams-tool-lasbmt11.war/WEB-INF/classes</location>
+		</link>
+		<link>
 			<name>JBOSS_DEPLOY</name>
 			<type>2</type>
 			<location>D:/jboss-3.2.6/server/default/deploy/lams.ear/lams-tool-lasbmt11.war/WEB-INF/classes</location>

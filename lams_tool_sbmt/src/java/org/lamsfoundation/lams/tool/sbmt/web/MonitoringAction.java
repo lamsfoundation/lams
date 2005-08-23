@@ -201,8 +201,7 @@ public class MonitoringAction extends DispatchAction {
 		//return FileDetailsDTO list according to the given sessionID
 		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);		
 		request.setAttribute(SbmtConstants.TOOL_SESSION_ID,sessionID);
-//		request.setAttribute("user",
-//										  submitFilesService.getUserDetails(userID));
+//		request.setAttribute("user",submitFilesService.getUserDetails(userID));
 		request.setAttribute("report",userFilesMap);
 		return mapping.findForward("allUserMarks");
 
