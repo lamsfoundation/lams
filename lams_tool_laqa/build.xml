@@ -24,7 +24,8 @@
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
-	
+	<property file="../lams_build/common.properties"/>
+		
 	<path id="all-libs">
 			<fileset dir="${sharedlib}">
 				<include name="**/*.jar"/>
@@ -76,9 +77,9 @@
 		<target name="panic-if-driver-not-present" unless="driver.present">
 			<fail>
 		      The JDBC driver you have specified by including one of the files in ${basedir}/config/database
-		      doesn't exist. You have to download this driver separately and put it in ${database.driver.file}
+		      doesn't exist. You have to download this driver separately and put it in ${db.driver.jar}
 		      Please make sure you're using a version that is equal or superior to the one we looked for.
-		      If you name the driver jar file differently, please update the database.driver.file property
+		      If you name the driver jar file differently, please update the db.driver.jar property
 		      in the ${basedir}/config/database/xxx.xml file accordingly.
 		     </fail>
 	   </target>
@@ -90,7 +91,7 @@
 			
 			<middlegen appname="lams_tool_laqa11" 
 					   prefsdir="${conf.middlegen.dir}"
-					   gui="${gui}"
+					   gui="${middlegen.gui}"
 					   databaseurl="${db.url}"
 					   driver="${db.driver}"
 					   username="${db.username}"
@@ -121,7 +122,7 @@
 	         classpathref="all-libs"
 	      />
 		
-		  <hbm2java output="${src.dir.java}">
+		  <hbm2java output="${src.java.dir}">
 				<fileset dir="${conf.hibernate.mapping.dir}/${laqa11.path}">
 					<include name="*.hbm.xml"/>
 				</fileset>
@@ -150,14 +151,14 @@
 		</target>
 
 		<target name="compile" depends="clean" description="compile java sources">
-			<javac srcdir="${src.dir.java}" compiler="modern"
+			<javac srcdir="${src.java.dir}" compiler="modern"
 		         	 	destdir="${build.classes.java}" deprecation="on" debug="on">
 				<classpath>					
 					<path refid="project.classpath"/>
 				</classpath>
 				</javac>
 				<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/tool/qa/">
-								<fileset dir="${src.dir.java}/org/lamsfoundation/lams/tool/qa/">
+								<fileset dir="${src.java.dir}/org/lamsfoundation/lams/tool/qa/">
 										<include name="*.xml"/>
 										<include name="*.properties"/>
 					   				    <exclude name="web.xml"/>
@@ -166,7 +167,7 @@
 		</target>
 
 		<target name="compile.test" depends="compile">
-			<javac srcdir="${src.dir.test}" destdir="${build.classes.test}" compiler="modern">
+			<javac srcdir="${src.test.dir}" destdir="${build.classes.test}" compiler="modern">
 				<classpath>
 					<pathelement location="${build.classes.java}"/>
 					<path refid="project.classpath"/>
@@ -222,7 +223,7 @@
 		<target name="webdoclet" depends="preparedirs">
 			<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
 
-	         <fileset dir="${src.dir.java}">
+	         <fileset dir="${src.java.dir}">
 	            <include name="**/*Action.java" />
 	            <include name="**/*Form.java" />
 	         </fileset>
@@ -330,7 +331,7 @@
 			<mkdir dir="${build.deploy}/sql"/> 
 			 
 			<copy overwrite="yes" todir="${build.deploy}/sql">
-				<fileset dir="${sql}/">
+				<fileset dir="${db.scripts}/">
 					<include name="drop_lams_tool_qa.sql"/>
 					<include name="create_lams_tool_qa.sql"/>
 					<include name="activity_insert.sql"/>
@@ -359,17 +360,17 @@
 			<generateDeployProperties depends="compile" 
 				mode="development" 
 				outputPath="${build.deploy}"
-				dbPassword="${database.password}"
-				dbUsername="${database.userid}"
-				dbDriverUrl="${database.url}"
+				dbPassword="${db.password}"
+				dbUsername="${db.username}"
+				dbDriverUrl="${db.url}"
 				dbDriverClass="com.mysql.jdbc.Driver"
 				deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar"
 				toolSignature="${signature}"
-				toolTablesScriptPath="${sql}/create_lams_tool_qa.sql"
-				toolTablesDeleteScriptPath="${sql}/drop_lams_tool_qa.sql"
-				toolActivityInsertScriptPath="${sql}/activity_insert.sql"
-				toolLibraryInsertScriptPath="${sql}/library_insert.sql"
-				toolInsertScriptPath="${sql}/tool_insert.sql"
+				toolTablesScriptPath="${db.scripts}/create_lams_tool_qa.sql"
+				toolTablesDeleteScriptPath="${db.scripts}/drop_lams_tool_qa.sql"
+				toolActivityInsertScriptPath="${db.scripts}/activity_insert.sql"
+				toolLibraryInsertScriptPath="${db.scripts}/library_insert.sql"
+				toolInsertScriptPath="${db.scripts}/tool_insert.sql"
 				lamsEarPath="${jboss.deploy}"
 				toolContext="${toolContext}"
 				toolWebUri="${product}.war"
@@ -399,11 +400,11 @@
 	
 			<target name="test-QaContent" depends="compile.test"> 
 				<mkdir dir="${build.report}"/>
-				<copy file="${webinf}/web.xml" todir="${testwebinf}" overwrite="true"/>		
-				<copy file="${webinf}/struts/struts-config.xml" todir="${testwebinf}" overwrite="true"/>			
-				<copy file="${webinf}/tiles/tiles-defs.xml" todir="${testwebinf}/tiles" overwrite="true"/>			
+				<copy file="${conf.webinf.dir}/web.xml" todir="${testwebinf}" overwrite="true"/>		
+				<copy file="${conf.webinf.dir}/struts/struts-config.xml" todir="${testwebinf}" overwrite="true"/>			
+				<copy file="${conf.webinf.dir}/tiles/tiles-defs.xml" todir="${testwebinf}/tiles" overwrite="true"/>			
 				<copy overwrite="yes" todir="${build.classes.test}/org/lamsfoundation/lams/tool/qa/">
-								<fileset dir="${src.dir.test}/org/lamsfoundation/lams/tool/qa/">
+								<fileset dir="${src.test.dir}/org/lamsfoundation/lams/tool/qa/">
 										<include name="*.xml"/>
 										<include name="*.properties"/>
 					   				    <exclude name="web.xml"/>
@@ -414,7 +415,7 @@
 					<formatter type="plain" usefile="false"/>
 					<formatter type="xml"/>
 					<batchtest todir="${build.report}">
-						<fileset dir="${src.test.java}">
+						<fileset dir="${src.test.dir}">
 							<include name="**/TestQaContent.java"/>
 
 						</fileset>
