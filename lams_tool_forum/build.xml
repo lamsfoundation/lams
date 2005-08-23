@@ -1,38 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="JAR MODULE BUILD" default="_build">
+<project name="LAMS Forum" basedir="." default="_build">
 	<!-- begin properties *******************************************************************************************-->
-	<property name="project.dir" value="${basedir}"/>
-	<property file="${project.dir}/build.properties"/>
-	<property name="project" value="${project}"/>
+	<!-- import properties from the specified file -->
+	<property file="build.properties"/>
+	<property file="../lams_build/common.properties"/>
+	
 	<property name="project.displayname" value="${project} - ${project.displayname}"/>
 	<property name="project.description" value="${project} - ${project.description}"/>
 
-	<property file="build.properties"/>
-
 	<!-- fixed filesystem property structure /-->
-	<property name="sql.dir" value="${project.dir}/db/sql"/>
-	
-	<property name="src.dir" value="${project.dir}/src/java"/>
-	<property name="lib.dir" value="${project.dir}/lib"/>
-	<property name="build.dir" value="${project.dir}/build"/>
-	<property name="build.lib.dir" value="${build.dir}/lib"/>
-	<property name="build.report.dir" value="${build.dir}/report"/>
-	<property name="build.deploy.dir" value="${build.dir}/deploy"/>
-	<property name="classes.dir" value="${build.dir}/classes"/>
-  	<property name="deploy.dir" value="${project.dir}/deploy"/>
+	<property name="lib.dir" value="${basedir}/lib"/>
+	<property name="classes.dir" value="${build}/classes"/>
 
-    <property name="test.src.dir" value="${project.dir}/test/java"/>
-    <property name="test.lib.dir" value="${project.dir}/test/lib"/>
-    <property name="test.classes.dir" value="${project.dir}/test/classes"/>
-    <property name="test.result" value="${project.dir}/test/testresult"/>
-
-    <property name="web.dir" value="${project.dir}/web"/>
-	<property name="webinf.dir" value="${project.dir}/web/WEB-INF"/>
-	 
-	<property name="conf.dir" value="${project.dir}/conf"/>
-	<property name="xdoclet.dir" value="${conf.dir}/xdoclet"/>
-
-	<property name="hibernate.mappings.dir" value="${conf.dir}/hibernate/mappings"/>
+    <property name="test.lib.dir" value="${basedir}/test/lib"/>
+    <property name="test.classes.dir" value="${basedir}/test/classes"/>
+    <property name="test.result" value="${basedir}/test/testresult"/>
 
 	<!-- end properties *********************************************************************************************-->
 
@@ -83,13 +65,12 @@
 		<!-- build filesystem structure /-->
 		<mkdir dir="${classes.dir}"/>
 		<mkdir dir="${lib.dir}"/>
-        <mkdir dir="${build.dir}"/>
-        <mkdir dir="${build.report.dir}"/>
-        <mkdir dir="${build.lib.dir}"/>
-        <mkdir dir="${build.deploy.dir}"/>
+        <mkdir dir="${build}"/>
+        <mkdir dir="${build.report}"/>
+        <mkdir dir="${build.lib}"/>
+        <mkdir dir="${build.deploy}"/>
         <mkdir dir="${test.classes.dir}"/>
         <mkdir dir="${test.result}"/>
-         <mkdir dir="${deploy.dir}"/>
 	</target>
 
 
@@ -99,13 +80,12 @@
 		<echo>+------------------------------------------+</echo>
 
 		<delete dir="${classes.dir}"/>
-		<delete dir="${build.dir}"/>
-		<delete dir="${build.report.dir}"/>
-		<delete dir="${build.lib.dir}"/>
-		<delete dir="${build.deploy.dir}"/>
+		<delete dir="${build}"/>
+		<delete dir="${build.report}"/>
+		<delete dir="${build.lib}"/>
+		<delete dir="${build.deploy}"/>
         <delete dir="${test.classes.dir}"/>
         <delete dir="${test.result}"/>
-        <delete dir="${deploy.dir}"/>
 
 	</target>
 			
@@ -131,10 +111,10 @@
 			classname="xdoclet.modules.hibernate.HibernateDocletTask"
 			classpathref="all-libs"/>
 
-		<echo>Building hbm.xml files using XDoclet to ${hibernate.mappings.dir} from ${src.dir}</echo>
+		<echo>Building hbm.xml files using XDoclet to ${conf.hibernate.mapping.dir} from ${src.dir}</echo>
 
 		<hibernatedoclet
-			destdir="${hibernate.mappings.dir}"
+			destdir="${conf.hibernate.mapping.dir}"
 			excludedtags="@version,@author,@todo"
 			force="true">
 				<fileset dir="${src.dir}">
@@ -163,7 +143,7 @@
             </fileset>
           </copy>
 
-        <javac srcdir="${test.src.dir}"
+        <javac srcdir="${src.test.dir}"
             source="1.4"
             debug="on"
             compiler="modern"
@@ -176,34 +156,34 @@
 	<!-- Forum Database tasks                                               -->
 	<!-- =================================================================== -->
 	<target name="clean-db"	description="clean forum database.">
-		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
-				password="${database.password}">
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+				password="${db.password}">
 			<classpath>
-				<pathelement location="${database.driver.file}"/>
+				<pathelement location="${db.driver.jar}"/>
 			</classpath>
-			<transaction src="${sql.dir}/cleanup_lams_tool_forum.sql"/>
+			<transaction src="${db.scripts}/cleanup_lams_tool_forum.sql"/>
 		</sql>
 	</target>
 	
 	<target name="init-db"	description="drop and create forum database.">
-		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
-				password="${database.password}">
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+				password="${db.password}">
 			<classpath>
-				<pathelement location="${database.driver.file}"/>
+				<pathelement location="${db.driver.jar}"/>
 			</classpath>
-			<transaction src="${sql.dir}/drop_lams_tool_forum.sql"/>
-			<transaction src="${sql.dir}/create_lams_tool_forum.sql"/>
+			<transaction src="${db.scripts}/drop_lams_tool_forum.sql"/>
+			<transaction src="${db.scripts}/create_lams_tool_forum.sql"/>
 		</sql>
 	</target>
 	
 	<target name="build-db"	depends="init-db" 
 							description="build qa tool database.">
-		<sql driver="${database.driver}" url="${database.url}" userid="${database.userid}"
-				password="${database.password}">
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+				password="${db.password}">
 			<classpath>
-				<pathelement location="${database.driver.file}"/>
+				<pathelement location="${db.driver.name}"/>
 			</classpath>
-			<transaction src="${sql.dir}/insert_lams_tool_forum_data.sql"/>
+			<transaction src="${db.scripts}/insert_lams_tool_forum_data.sql"/>
 		</sql>
 	</target>
 
@@ -213,7 +193,7 @@
         <echo>+-------------------------------------------+</echo>
         <mkdir dir="${test.result}"/>
 
-        <junit dir="${project.dir}"
+        <junit dir="${basedir}"
              printsummary="yes"
              errorProperty="test.failed"
              failureProperty="test.failed">
@@ -233,7 +213,7 @@
 
 
          <batchtest fork="yes" todir="${test.result}">
-             <fileset dir="${test.src.dir}">
+             <fileset dir="${src.test.dir}">
                  <include name="org/lamsfoundation/lams/tool/forum/**/*.*"/>
                  <exclude name="org/lamsfoundation/lams/tool/forum/core/BaseTestCase.java"/>
                  <exclude name="org/lamsfoundation/lams/tool/forum/core/SpringAwareTestCase.java"/>
@@ -260,11 +240,11 @@
 		<echo>+------------------------------------------+</echo>
 		<echo>| create jar file                          |</echo>
 		<echo>+------------------------------------------+</echo>
-		<delete file="${build.lib.dir}/${product}.jar"/>
-		<jar destfile="${build.lib.dir}/${product}.jar">
+		<delete file="${build.lib}/${product}.jar"/>
+		<jar destfile="${build.lib}/${product}.jar">
 			<fileset dir="${classes.dir}">
 			</fileset>
-			<fileset dir="${hibernate.mappings.dir}">
+			<fileset dir="${conf.hibernate.mapping.dir}">
 			</fileset>
 		</jar> 
 	</target>
@@ -275,8 +255,8 @@
 	        classname="xdoclet.modules.web.WebDocletTask"
 	        classpathref="project.classpath"
 	    />
-		<webdoclet destDir="${webinf.dir}" force="${xdoclet.force}" 
-			mergedir="${xdoclet.dir}" >
+		<webdoclet destDir="${conf.webinf.dir}" force="${xdoclet.force}" 
+			mergedir="${conf.xdoclet.dir}" >
 			
          <fileset dir="${src.dir}">
             <include name="**/*Action.java" />
@@ -294,16 +274,16 @@
 		<echo>+------------------------------------------+</echo>
 		<echo>| build jar file                           |</echo>
 		<echo>+------------------------------------------+</echo>
-		<delete file="${build.lib.dir}/${product}.war"/>
-		<war warfile="${build.lib.dir}/${product}.war" 
-  				webxml="${webinf.dir}/web.xml" manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
-			<webinf dir="${webinf.dir}">
+		<delete file="${build.lib}/${product}.war"/>
+		<war warfile="${build.lib}/${product}.war" 
+  				webxml="${conf.webinf.dir}/web.xml" manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
+			<webinf dir="${conf.webinf.dir}">
 				<include name="*.tld"/>
 				<include name="*.xml"/>
 				<include name="struts/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
-			<fileset dir="${web.dir}">
+			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="includes/**"/>
 				<include name="jsps/**"/> 
@@ -315,9 +295,9 @@
 	<!-- Deploy the jar and war                               				 -->
 	<!-- =================================================================== -->
 	<target name="deploy-war" depends="build-war" description="Deploy the IMS Content Package tool war file and jar file">
-		<copy file="${build.lib.dir}/${product}.jar"
+		<copy file="${build.lib}/${product}.jar"
 				todir="${jboss.deploy}"/> 
-		<copy file="${build.lib.dir}/${product}.war"
+		<copy file="${build.lib}/${product}.war"
 				todir="${jboss.deploy}"/> 
 	</target>
 
@@ -336,12 +316,12 @@
 			</fileset>
 		</path> 
 			  
-		<mkdir dir="${build.deploy.dir}"/>
-		<mkdir dir="${build.deploy.dir}/lib"/> 
-		<mkdir dir="${build.deploy.dir}/sql"/> 
+		<mkdir dir="${build.deploy}"/>
+		<mkdir dir="${build.deploy}/lib"/> 
+		<mkdir dir="${build.deploy}/sql"/> 
 		 
-		<copy overwrite="yes" todir="${build.deploy.dir}/sql">
-			<fileset dir="${sql.dir}/">
+		<copy overwrite="yes" todir="${build.deploy}/sql">
+			<fileset dir="${db.scripts}/">
 				<include name="create_lams_tool_forum.sql"/>
 				<include name="drop_lams_tool_forum.sql"/>
 				<include name="activity_insert.sql"/>
@@ -350,13 +330,13 @@
 			</fileset>
 		</copy>
 
-		<copy overwrite="yes" todir="${build.deploy.dir}/">
+		<copy overwrite="yes" todir="${build.deploy}/">
 			<fileset dir="${deploy.tool.dir}">
 				<include name="*.*"/>
 			</fileset>
 		</copy>
 
-		<copy overwrite="yes" todir="${build.deploy.dir}/lib">
+		<copy overwrite="yes" todir="${build.deploy}/lib">
 			<fileset dir="${deploy.tool.dir}/lib">
 				<include name="*.jar"/>
 			</fileset>
@@ -369,18 +349,18 @@
 
 		<generateDeployProperties depends="compile" 
 			mode="development" 
-			outputPath="${build.deploy.dir}"
-			dbPassword="${database.password}"
-			dbUsername="${database.userid}"
-			dbDriverUrl="${database.url}"
+			outputPath="${build.deploy}"
+			dbPassword="${db.password}"
+			dbUsername="${db.username}"
+			dbDriverUrl="${db.url}"
 			dbDriverClass="com.mysql.jdbc.Driver"
-			deployFiles="${build.lib.dir}/${product}.war,${build.lib.dir}/${product}.jar"
+			deployFiles="${build.lib}/${product}.war,${build.lib}/${product}.jar"
 			toolSignature="${signature}"
-			toolTablesScriptPath="${sql.dir}/create_lams_tool_forum.sql"
-			toolTablesDeleteScriptPath="${sql.dir}/drop_lams_tool_forum.sql"
-			toolActivityInsertScriptPath="${sql.dir}/activity_insert.sql"
-			toolLibraryInsertScriptPath="${sql.dir}/library_insert.sql"
-			toolInsertScriptPath="${sql.dir}/tool_insert.sql"
+			toolTablesScriptPath="${db.scripts}/create_lams_tool_forum.sql"
+			toolTablesDeleteScriptPath="${db.scripts}/drop_lams_tool_forum.sql"
+			toolActivityInsertScriptPath="${db.scripts}/activity_insert.sql"
+			toolLibraryInsertScriptPath="${db.scripts}/library_insert.sql"
+			toolInsertScriptPath="${db.scripts}/tool_insert.sql"
 			lamsEarPath="${jboss.deploy}"
 			toolContext="${toolContext}"
 			toolWebUri="${product}.war"
@@ -391,7 +371,7 @@
 		description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
 
 		<path id="deploy.classpath">
-			<fileset dir="${build.deploy.dir}">
+			<fileset dir="${build.deploy}">
 				<include name="lib/*.jar"/>
 			</fileset>
 		</path> 
@@ -402,7 +382,7 @@
 			classname="org.lamsfoundation.lams.tool.deploy.Deploy"
 			classpathref="deploy.classpath"
 			fork="true">
-				<arg file="${build.deploy.dir}/deploy.properties"/>
+				<arg file="${build.deploy}/deploy.properties"/>
 				<arg value="True"/> <!-- forcedb -->
 		</java>
 					
