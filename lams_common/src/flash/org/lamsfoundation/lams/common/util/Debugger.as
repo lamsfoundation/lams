@@ -9,7 +9,7 @@ import mx.events.*/**
 * 
 * 
 */  
-class Debugger {  
+class org.lamsfoundation.lams.common.util.Debugger {  
 	
     //Declarations  
     public static var CRITICAL:Number = 1;      //level constants
@@ -108,6 +108,18 @@ class Debugger {
                 _instance.dispatchEvent({type:'update',target:_instance});
 			}
 		}
+	}
+	
+	public static function error(e:Object):Void{
+		if(e instanceof LFError){
+			var lfe = LFError(e);
+			trace("/////////////////////// ERROR ///////////////////");
+			log(lfe.message,Debugger.CRITICAL,lfe.fname,"LFError");
+			trace("/////////////////////////////////////////////////");
+		}else{
+			log("Recieved unsupported error type",Debugger.CRITICAL,"error","Debugger");
+		}
+		
 	}
 	/**
 	* Legacy Method to print a message to the output - trace or window...

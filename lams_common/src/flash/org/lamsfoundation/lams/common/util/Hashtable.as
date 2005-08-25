@@ -3,7 +3,7 @@
 /**
 * HashTable
 */
-class Hashtable {
+class org.lamsfoundation.lams.common.util.Hashtable {
 
     //Declarations
     private var elements:Array;
@@ -124,7 +124,7 @@ class Hashtable {
         return r;
     }
     
-    public function containsKey(o) {
+    public function containsKey(o:Number) {
 		setBusy();
 		var r = this._getIndex(o) != this.elements.length;
 		clearBusy();

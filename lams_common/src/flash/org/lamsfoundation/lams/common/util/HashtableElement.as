@@ -3,7 +3,7 @@
 /**
 * HashtableElement
 */
-class HashtableElement {
+class org.lamsfoundation.lams.common.util.HashtableElement {
     //Declarations	private var key;
 	private var val;
 	

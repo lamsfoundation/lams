@@ -5,7 +5,7 @@
 * 
 * 
 */  
-class ObjectUtils{
+class org.lamsfoundation.lams.common.util.ObjectUtils{
 	
 	
 	/**
