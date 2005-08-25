@@ -32,16 +32,20 @@ class DictionaryItem {
     * Create Dictionary item from dataObject
     */
     public static function createFromData(dataobj:Object):DictionaryItem{
-        var dictionaryItem:DictionaryItem =  new DictionaryItem(dataobj.key,dataobj.description,dataobj.value)
+        var dictionaryItem:DictionaryItem =  new DictionaryItem(dataobj.key,dataobj.value,dataobj.description);
         return dictionaryItem;
     }
     
-    function get name():String{
-        return _name;
+    function get key():String{
+        return _key;
     }
     
     function get value():String{
         return _value;
+    }
+	
+	function get description():String{
+        return _description;
     }
 
 }

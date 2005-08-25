@@ -73,12 +73,12 @@ dynamic class Dictionary {
     * @returns a string holding the text requested
     */
     public static function getValue(key:String):String{
-        //Debugger.log('returning item-' +id + '-' + items.get(id).value,Debugger.GEN,'getItemById','org.lamsfoundation.lams.dict.Dictionary');
+        Debugger.log('requesting :' + key + ' > ' + getInstance().items.get(key).value,Debugger.GEN,'getValue','org.lamsfoundation.lams.dict.Dictionary');
         var v:String = _instance.items.get(key).value;
 		if(v!=null){
 			return v;
 		}else{
-			Debugger.log('Entry not found in '+_currentLanguage+' dictionary, key='+key,Debugger.CRITICAL,'createFromData','Dictionary');
+			Debugger.log('Entry not found in '+getInstance()._currentLanguage+' dictionary, key='+key,Debugger.CRITICAL,'createFromData','Dictionary');
 		}
 		
 		
@@ -112,14 +112,14 @@ dynamic class Dictionary {
 
         //First empty hash 
         items.clear();
-        
+        _global.breakpoint();
         //Go through data object and copy values to items hash
-        for(var i=0;i<dataObj.dictionaryItems.length;i++){
+        for(var i=0;i<dataObj.length;i++){
             //Create hashKey object and then prune hashkey from dataObject before adding dictionary item to hashtable 
-            var hashKey = dataObj.dictionaryItems[i].key;
-            delete dataObj.dictionaryItems[i].key;
+            var hashKey = dataObj[i].key;
+            delete dataObj[i].key;
             //Create the dictionary item from the data object
-            var dictItem:DictionaryItem = DictionaryItem.createFromData(dataObj.dictionaryItems[i]);
+            var dictItem:DictionaryItem = DictionaryItem.createFromData(dataObj[i])
             items.put(hashKey,dictItem);
         }
         //Dispatch load event 
@@ -149,7 +149,7 @@ dynamic class Dictionary {
     */
     public function onDictionaryLoadedFromServer(dictionaryDataObj:Object){
 		Debugger.log('onDictionaryLoadedFromServer',Debugger.CRITICAL,'onDictionaryLoadedFromServer','Dictionary');		
-        //Create the dictionary from the data obj
+	   //Create the dictionary from the data obj
         createFromData(dictionaryDataObj);
 		
         //Now that dict has been loaded by server, cache it 
@@ -162,7 +162,8 @@ dynamic class Dictionary {
     public function openFromServer() {
 		Debugger.log('URL : '+ 'http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',Debugger.CRITICAL,'openFromServer','Dictionary');
 		var callBack = Proxy.create(this,onDictionaryLoadedFromServer);
-        comms.loadXML('http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',callBack,true,true);
+        //comms.loadXML('http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',callBack,true,true);
+        comms.getRequest('http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',callBack,true);
     }
     
     /**
@@ -173,7 +174,8 @@ dynamic class Dictionary {
         Debugger.log('SHOULD NOT BE CALLED _ NO LONGER USED!!',Debugger.CRITICAL,'createDictionaryFromCode','Dictionary');
 		//_global.breakpoint();
         //Clear the dictionary + set language
-        items.clear();
+        /*
+		items.clear();
         _currentLanguage = lang;
         switch (lang) {
             case 'en' : 
@@ -233,6 +235,7 @@ dynamic class Dictionary {
         }
         //Dispatch load event 
         dispatchEvent({type:'load',target:this});
+		*/
    }
     
     /**

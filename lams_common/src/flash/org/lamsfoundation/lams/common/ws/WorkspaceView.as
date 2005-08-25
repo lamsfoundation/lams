@@ -46,9 +46,9 @@ class org.lamsfoundation.lams.common.ws.WorkspaceView extends AbstractView
         var dialog:MovieClip;
         //Check to see whether this should be a centered or positioned dialog
         if(typeof(pos)=='string'){
-            dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog'});
+            dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'workspaceDialog'});
         } else {
-            dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue(0),closeButton:true,scrollContentPath:'workspaceDialog',_x:pos.x,_y:pos.y});
+            dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('ws_dlg_title'),closeButton:true,scrollContentPath:'workspaceDialog',_x:pos.x,_y:pos.y});
         }
         //Assign dialog load handler
         dialog.addEventListener('contentLoaded',Delegate.create(this,dialogLoaded));

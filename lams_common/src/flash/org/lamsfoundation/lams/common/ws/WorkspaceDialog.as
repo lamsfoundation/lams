@@ -79,8 +79,8 @@ class WorkspaceDialog extends MovieClip{
         myLabel_lbl.text = 'text label';
         
         //Set the text for buttons
-        ok_btn.label = Dictionary.getValue(1);
-        cancel_btn.label = Dictionary.getValue(2);
+        ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
+        cancel_btn.label = Dictionary.getValue('ws_dlg_cancel_button');
         
         //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();
