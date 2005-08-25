@@ -11,7 +11,7 @@ import mx.styles.StyleManager
 *
 */
  [Event ("change")]
-class Panel extends UIComponent 
+class org.lamsfoundation.lams.common.ui.Panel extends UIComponent 
 {
 	// Components must declare these to be proper
 	// components in the components framework.
