@@ -14,8 +14,9 @@ class Config {
 	//Declarations
 
     //static constants
-	//MS of delacy between clicks to make a double click
-	public static var DOUBLE_CLICK_DELAY:Number = 500;
+	//MS of delay between clicks to make a double click
+	//TODO - set this to 500 ms when not in IDE
+	public static var DOUBLE_CLICK_DELAY:Number = 2000;
 	//message type codes
 	public static var MESSAGE_TYPE_ERROR:Number = 1;
 	public static var MESSAGE_TYPE_CRITICAL:Number = 2;
@@ -141,28 +142,36 @@ class Config {
     * local where applicable.
     */
     private function serverDefaultsLoaded(serverConfigData:Object) {
-        //Go through server defaults and create config items
+        
+		//store data from server in local private variable
+        _configData = serverConfigData;
+		
+		
+		//Go through server defaults and create config items
         //Loop through server defaults and overwrite if a local version exists
-        for (var prop in serverConfigData) {
+        
+		
+		for (var prop in serverConfigData) {
             if (CookieMonster.cookieExists(CONFIG_PREFIX+String(prop))){
                 Debugger.log('overwriting :' + prop,Debugger.GEN,'serverDefaultsLoaded','Config');
-                serverConfigData[prop] = CookieMonster.open(CONFIG_PREFIX+String(prop),true);
+                _configData[prop] = CookieMonster.open(CONFIG_PREFIX+String(prop),true);
             } else {
                 //If language config not in cookie, check browser locale before using server
                 if(prop=='language'){
-                    serverConfigData[prop] = getLanguage();
+                    _configData[prop] = getLanguage();
                 } else if(prop=='theme') {
                     //Default to 'default' if theme can't be found locally
-                    serverConfigData[prop] = 'default';
+                    _configData[prop] = 'default';
                 }
                 //...else if(prop=='...'){
             }
         }
         
-        //TODO 31/05/05 Deal with alternative sources other than cookie or server. i.e. Browser + _root (query string)
         
-        //Store final configuration in local private variable
-        _configData = serverConfigData;
+		
+		//TODO 31/05/05 Deal with alternative sources other than cookie or server. i.e. Browser + _root (query string)
+        _serverUrl = _root.serverUrl;
+		
         
         //Dispatch load event
         dispatchEvent({type:'load',target:this});
