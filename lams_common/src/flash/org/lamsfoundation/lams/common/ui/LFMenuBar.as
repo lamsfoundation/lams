@@ -67,34 +67,34 @@ class LFMenuBar extends MovieClip {
         /*=================
             FILE MENU
         =================*/
-        file_menu = _mb.addMenu(Dictionary.getValue(17));
+        file_menu = _mb.addMenu(Dictionary.getValue('mnu_file'));
         
         // "new" is the linkage id of the movie clip to be used as the icon for the "New" menu item.
         //file_menu.addMenuItem({label:"New", instanceName:"newInstance", icon:"new"});
         //_global.breakpoint();
-        file_menu.addMenuItem({label:Dictionary.getValue(9), instanceName:"newItem"});
-        file_menu.addMenuItem({label:Dictionary.getValue(10), instanceName:"openItem"});
-        file_menu.addMenuItem({label:Dictionary.getValue(11), instanceName:"revertItem", enabled:false});
-        file_menu.addMenuItem({label:Dictionary.getValue(12), instanceName:"closeItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_new'), instanceName:"newItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_open'), instanceName:"openItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_revert'), instanceName:"revertItem", enabled:false});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_new'), instanceName:"closeItem"});
         file_menu.addMenuItem({type:"separator"});
-        file_menu.addMenuItem({label:Dictionary.getValue(13), instanceName:"saveItem"});
+        file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_save'), instanceName:"saveItem"});
 
 
         /*=================
             TOOLS MENU
         =================*/
-        tools_menu = _mb.addMenu(Dictionary.getValue(18));
-        tools_menu.addMenuItem({label:Dictionary.getValue(14), instanceName:"drawTransitionalItem"});
-        tools_menu.addMenuItem({label:Dictionary.getValue(15), instanceName:"drawOptionalItem"});
+        tools_menu = _mb.addMenu(Dictionary.getValue('mnu_tools'));
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_trans'), instanceName:"drawTransitionalItem"});
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_opt'), instanceName:"drawOptionalItem"});
         tools_menu.addMenuItem({type:"separator"});
-        tools_menu.addMenuItem({label:Dictionary.getValue(21), instanceName:"prefsItem"});
+        tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_prefs'), instanceName:"prefsItem"});
 
 
         /*=================
             HELP MENU
         =================*/
-        help_menu = _mb.addMenu(Dictionary.getValue(19));
-        help_menu.addMenuItem({label:Dictionary.getValue(20), instanceName:"aboutItem"});
+        help_menu = _mb.addMenu(Dictionary.getValue('mnu_help'));
+        help_menu.addMenuItem({label:Dictionary.getValue('mnu_help_abt'), instanceName:"aboutItem"});
         
         //set up listeners
         // register the listeners with the separate menus
@@ -103,6 +103,7 @@ class LFMenuBar extends MovieClip {
 		
 		//Now that menu items have been set up make the menu bar visible
 		this._visible = true;
+		Debugger.log('Finished setting up set visible to:'+this._visible,Debugger.GEN,'setupMenuItems','LFMenuBar');
 
 	}
     
