@@ -22,7 +22,7 @@ class DebugDialog extends MovieClip implements Dialog{
     
     private var ok_btn:Button;         //OK+Cancel buttons
     private var cancel_btn:Button;
-    private var test_btn:Button;
+    private var load_btn:Button;
     private var assign_btn:Button;     //Assign property
     private var serialize_btn:Button;  //Serialize an object and trace
     private var showProps_btn:Button;  //Serialize an object and trace
@@ -112,6 +112,7 @@ class DebugDialog extends MovieClip implements Dialog{
         serialize_btn.addEventListener('click',Delegate.create(this, serialize));
         showProps_btn.addEventListener('click',Delegate.create(this, showProperties));
         clear_btn.addEventListener('click',Delegate.create(this, clearText));
+        load_btn.addEventListener('click',Delegate.create(this, loadHandler));
     }
     
     /**
@@ -271,6 +272,24 @@ class DebugDialog extends MovieClip implements Dialog{
         //close popup
         _container.deletePopUp();
     }
+	
+	private function loadHandler(){
+		//load some wddx and 
+		var url_str:String = input_ti.text;
+		var comms = Application.getInstance().getComms();
+		comms.getRequest(url_str,testLoadXMLLoaded,true);
+		
+	}
+
+	/**
+    * XML onLoad handler for data
+    */
+    private function testLoadXMLLoaded (dto:Object){
+        _global.breakpoint();
+		var test=dto;
+		ObjectUtils.printObject(dto);
+		
+    }
 
     /**
     * Clean up on unload
@@ -306,7 +325,7 @@ class DebugDialog extends MovieClip implements Dialog{
             messages_ta.setSize(w-40,h-133);
     
             //align buttons        
-            clear_btn._y = showProps_btn._y = serialize_btn._y = assign_btn._y = test_btn._y = h - 75;
+            clear_btn._y = showProps_btn._y = serialize_btn._y = assign_btn._y = load_btn._y = h - 75;
             
             input_ti.setSize(w-40,input_ti.height);
             input_ti._y = h - 104;
