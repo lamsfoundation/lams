@@ -68,6 +68,19 @@ class Cursor {
 		return _current;
 	}
 	
+	/**
+	 * Returns current cursor, if cursor is the mouse, then null is returned
+	 * @usage   
+	 * @return  Reference of current cursor
+	 */
+	public static function getCurrentCursorRef():MovieClip{
+		if(_current == "default"){
+			return null;
+		}else{
+			return _cursors[_current];
+		}
+	}
+	
 	
 	
 	
