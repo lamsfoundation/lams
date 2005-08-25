@@ -1,4 +1,5 @@
 ﻿import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.ui.*
 /**  
 * MovieclipUtils  
 */  
@@ -17,6 +18,14 @@ class MovieClipUtils {
 	public static function LFHitTest(a_mc:MovieClip,b_mc:MovieClip):Boolean{
 		trace("Method not implemented");
 		return false;
+	}
+
+	public static function getCenterOfMC(mc:MovieClip):Point{
+		var x:Number = mc._x + (mc._width / 2);
+		var y:Number = mc._y + (mc._height / 2);
+		var p:Point = new Point(x,y);
+		return p;
+	
 	}
 
     /**
