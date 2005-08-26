@@ -535,10 +535,54 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    
 	}
 	
-	public void testGetToolDefaultContentIdBySignature()
+	/*public void testGetToolDefaultContentIdBySignature()
 	{
 	    Long defaultToolContentId = nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE);
 	    assertNotNull(defaultToolContentId);
+	} */
+	
+	public void testRetrieveNbUserBySession()
+	{
+		 Long newSessionId1 = new Long(3457);
+		 NoticeboardSession newSession1 = new NoticeboardSession(newSessionId1);
+	     nbService.addSession(TEST_NB_ID, newSession1);
+	     
+	     NoticeboardUser oldUserInSession1 = new NoticeboardUser(TEST_USER_ID, newSession1);
+	     nbService.saveNoticeboardUser(oldUserInSession1);
+	     
+	     //associate the same test user to another new session
+	     Long newSessionId2 = new Long(3458);
+		 NoticeboardSession newSession2 = new NoticeboardSession(newSessionId2);
+	     nbService.addSession(TEST_NB_ID, newSession2);
+	     
+	     NoticeboardUser oldUserInSession2 = new NoticeboardUser(TEST_USER_ID, newSession2);
+	     nbService.saveNoticeboardUser(oldUserInSession2);
+	     
+	     //create another user in one of the existing sessions
+	     Long newUserId = new Long(3459);
+	     NoticeboardUser user2 = new NoticeboardUser(newUserId, newSession1);
+	     nbService.saveNoticeboardUser(user2);
+	     
+	     //try to get the test user using newSessionId1
+	     nbUser = nbService.retrieveNbUserBySession(TEST_USER_ID, newSessionId1);
+	     assertEquals(nbUser.getUserId(), TEST_USER_ID);
+	     assertEquals(nbUser.getNbSession().getNbSessionId(), newSessionId1);
+	     
+	     //try to get the test user using newSessionId2
+	     nbUser = nbService.retrieveNbUserBySession(TEST_USER_ID, newSessionId2);
+	     assertEquals(nbUser.getUserId(), TEST_USER_ID);
+	     assertEquals(nbUser.getNbSession().getNbSessionId(), newSessionId2);
+	     
+	     //try to get the new user that was created
+	     nbUser = nbService.retrieveNbUserBySession(newUserId, newSessionId1);
+	     assertEquals(nbUser.getUserId(), newUserId);
+	     assertEquals(nbUser.getNbSession().getNbSessionId(), newSessionId1);
+	     
+	     //try to get data that does not exist, should return null
+	     nbUser = nbService.retrieveNbUserBySession(newUserId, newSessionId2);
+	     assertNull(nbUser);
+	     
+	
 	}
 }
 	
