@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 
 /**
  * @author mtruong
@@ -38,6 +39,9 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
     
     private NoticeboardUser nbUser;
     private NoticeboardSession nbSession;
+    
+    private NoticeboardContent content;
+    private NoticeboardContentDAO nbContentDao;
     
     private boolean cleanContentData = true;
     
@@ -53,6 +57,7 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	 	super.setUp();
         nbSessionDAO = (NoticeboardSessionDAO) this.context.getBean("nbSessionDAO");
         nbUserDAO = (NoticeboardUserDAO) this.context.getBean("nbUserDAO");
+        nbContentDao = (NoticeboardContentDAO) this.context.getBean("nbContentDAO");
         super.initAllData();
      
     }
@@ -67,7 +72,7 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	 }
 	 
 	
-	 
+
 	 public void testGetNbUserByID()
 	 {
 	     nbUser = nbUserDAO.getNbUserByID(TEST_USER_ID);
@@ -98,7 +103,9 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	     
 	     assertEquals(nbUser.getUserId(), newUserId);
 	     assertEquals(nbUser.getNbSession().getNbSessionId(),TEST_SESSION_ID);
-	 }
+	 } 
+	 
+	
 	 
 	 public void testUpdateNbUser()
 	 {
@@ -141,6 +148,43 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	     int numberOfUsers = nbUserDAO.getNumberOfUsers(nbSession);
 	     System.out.println(numberOfUsers);
 	     assertEquals(numberOfUsers, 1);
-	 }
+	 } 
+	 
+	 public void testGetNbUserBySession()
+	 {
+	 	Long newSessionId = new Long(3456);
+	 	
+	 	NoticeboardContent content = nbContentDao.findNbContentById(TEST_NB_ID);
+	 	
+	 	NoticeboardSession newSession = new NoticeboardSession(newSessionId, content);
+	 	content.getNbSessions().add(newSession);
+	 	nbContentDao.updateNbContent(content);
+	 	nbSessionDAO.saveNbSession(newSession);
+	 	
+	 	//add the test user to a new session
+	 	NoticeboardUser existingUserNewSession = new NoticeboardUser(TEST_USER_ID, newSession);
+	 	newSession.getNbUsers().add(existingUserNewSession);
+	 	nbSessionDAO.updateNbSession(newSession);
+	 	
+	 	nbUserDAO.saveNbUser(existingUserNewSession);
+	 	
+	 	//add a different user to the session
+	 	Long newUserId= new Long(3458);
+	 	NoticeboardUser newUser = new NoticeboardUser(newUserId, newSession);
+	 	newSession.getNbUsers().add(newUser);
+	 	nbSessionDAO.updateNbSession(newSession);
+	 	nbUserDAO.saveNbUser(newUser);
+	 	
+	 	//retrieve test user by session	id	
+	 	NoticeboardUser retrievedUser = nbUserDAO.getNbUserBySession(TEST_USER_ID, newSessionId);
+	 	assertEquals(retrievedUser.getUserId(), TEST_USER_ID);
+	 	assertEquals(retrievedUser.getNbSession().getNbSessionId(), newSessionId);
+	 	
+	 	NoticeboardUser retrievedUser2 = nbUserDAO.getNbUserBySession(newUserId, newSessionId);
+	 	assertEquals(retrievedUser2.getUserId(), newUserId);
+	 	assertEquals(retrievedUser.getNbSession().getNbSessionId(), newSessionId);
+	 	
+	 } 
+
 
 }
