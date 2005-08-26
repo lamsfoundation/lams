@@ -56,6 +56,18 @@ public interface INoticeboardUserDAO {
     public NoticeboardUser getNbUserByID(Long userId);
     
     /**
+	 * <p> Return the persistent instance of a NoticeboardUser
+	 * who has the user id <code>userId</code> and tool session id
+	 * <code>sessionId</code>
+	 * returns null if not found.</p>
+	 * 
+	 * @param userId. The id of the learner
+	 * @param sessionId. The tool session id to which this user belongs to.
+	 * @return the persistent instance of a NoticeboardUser or null if not found.
+	 */
+    public NoticeboardUser getNbUserBySession(Long userId, Long sessionId);
+    
+    /**
 	 * <p>Persist the given persistent instance of NoticeboardUser.</p>
 	 * 
 	 * @param nbUser The instance of NoticeboardUser to persist.

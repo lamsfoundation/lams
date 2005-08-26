@@ -38,7 +38,8 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticeboardUserDAO {
     
     private static final String COUNT_USERS_IN_SESSION = "select nu.userId from NoticeboardUser nu where nu.nbSession= :nbSession";
-  
+   
+    
     
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserByUID(java.lang.Long) */
 	public NoticeboardUser getNbUserByUID(Long uid)
@@ -61,6 +62,26 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
 		{
 			return (NoticeboardUser)users.get(0);
 		}
+	}
+	
+	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserBySession(java.lang.Long, java.lang.Long)*/
+	public NoticeboardUser getNbUserBySession(Long userId, Long sessionId)
+	{
+		String query = "select nu from NoticeboardUser nu where nu.userId=? and nu.nbSession.nbSessionId=?";
+		Long[] bindingValues = new Long[2];
+		bindingValues[0] = userId;
+		bindingValues[1] = sessionId;
+		List usersReturned = getHibernateTemplate().find(query, bindingValues); //although only one or no users should be returned
+		
+		if (usersReturned!= null && usersReturned.size() == 0)
+		{
+			return null;
+		}
+		else
+		{
+			return (NoticeboardUser)usersReturned.get(0);
+		}
+
 	}
 
 	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#saveNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
