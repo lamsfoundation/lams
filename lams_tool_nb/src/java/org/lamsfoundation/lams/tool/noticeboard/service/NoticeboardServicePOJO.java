@@ -472,6 +472,22 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		}
 	}
 	
+	/** org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#retrieveNbUserBySession(java.lang.Long, java.lang.Long) */
+	public NoticeboardUser retrieveNbUserBySession(Long userId, Long sessionId)
+	{
+		try
+		{
+		  nbUser = nbUserDAO.getNbUserBySession(userId, sessionId);
+		}
+		catch (DataAccessException e)
+		{
+			throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to retrive the noticeboard user object: "
+					+ e.getMessage(), e);
+		}
+		
+		return nbUser;
+	}
+	
 	/**
 	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#updateNoticeboardUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser)
 	 */

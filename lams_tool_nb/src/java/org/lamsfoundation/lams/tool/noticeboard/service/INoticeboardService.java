@@ -174,6 +174,17 @@ public interface INoticeboardService {
 	 */
 	public NoticeboardUser retrieveNoticeboardUser(Long nbUserId);
 	
+	/**
+	 * <p> Return the persistent instance of a NoticeboardUser
+	 * who has the user id <code>userId</code> and tool session id
+	 * <code>sessionId</code>
+	 * returns null if not found.</p>
+	 * 
+	 * @param userId. The id of the learner
+	 * @param sessionId. The tool session id to which this user belongs to.
+	 * @return the persistent instance of a NoticeboardUser or null if not found.
+	 */
+	public NoticeboardUser retrieveNbUserBySession(Long userId, Long sessionId);
 	
 	/**
 	 * Persists the new NoticeboardUser object into the database.
