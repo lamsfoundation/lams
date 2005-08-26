@@ -27,17 +27,14 @@
  */
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-//import org.apache.struts.actions.LookupDispatchAction;
 import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
 import org.apache.log4j.Logger;
-
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -49,8 +46,6 @@ import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
