@@ -45,15 +45,16 @@ Ant build file.
 		<echo message="compile-java --> Compile the java source files"/>
 		<echo message="compile-test --> Compile the java test source files"/>
 		<echo message="clean-db     --> Drop the noticeboard tables"/>
-		<echo message="build-db     --> Create the noticeboard tables and insert data"/>
+		<echo message="build-db     --> Drop and Create the noticeboard tables"/>
+		<echo message="insert-test-data     --> Builds the Db and inserts test data"/>
 		<echo message="create-deploy-package --> Generates the deployment package"/>
 		<echo message="deploy-tool  --> Creates the database and default content and then deploys the jar and war file to lams.ear "/>
 		<echo message="test-report  --> Runs the junit testcases and generates the report "/>
 		<echo message=""/>
 		<echo message="------------------------------------------------------"/>
 		<echo message="Notes on running NB junit tests:"/>
-		<echo message="Run deploy-tool and then run insert-test-data"/>
-		<echo message="This sets up the test data needed for the test cases to run. Then you can run test-report"/>		
+		<echo message="Run insert-test-data"/>
+		<echo message="This will create the NB tables and sets up the test data needed for the test cases to run. Then you can run test-report"/>		
 	</target>
 
 	<target name="print-classpath">
