@@ -39,13 +39,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMessage;
 
-import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.MessageResources;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
+
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.util.UploadFileUtil;
