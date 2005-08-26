@@ -6,9 +6,9 @@ String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
 String authorUrl = "/starter/authoring?toolContentId="+355;
-String learnerUrl = "/starter/learner?userId="+555+"&toolSessionId="+455+"&toolContentId="+355+"&mode=learner";
-String learnerUrlTeacher = "/starter/learner?userId="+555+"&toolSessionId="+455+"&toolContentId="+355+"&mode=teacher";
-String learnerUrlAuthor = "/starter/learner?userId="+555+"&toolSessionId="+455+"&toolContentId="+355+"&mode=author";
+String learnerUrl = "/starter/learner?userId="+555+"&toolSessionId="+455+"&mode=learner";
+String learnerUrlTeacher = "/starter/learner?userId="+555+"&toolSessionId="+455+"&mode=teacher";
+String learnerUrlAuthor = "/starter/learner?userId="+555+"&toolSessionId="+455+"&mode=author";
 String monitoringUrl = "/starter/monitor?toolContentId="+355;
 String exportPortfolioTeacher ="/exportPortfolio.do?mode=teacher&toolContentId=355";
 String exportPortfolioStudent = "/exportPortfolio.do?mode=learner&toolSessionId=455&userId=555";
