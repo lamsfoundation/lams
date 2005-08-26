@@ -40,9 +40,20 @@ Ant build file.
 		<echo message=""/>
 		<echo message="The available targets are:"/>
 		<echo message=""/>
-		<echo message="preparedirs --> Create the build directories"/>
-		<echo message="clean-build --> Remove all the class files"/>
+		<echo message="preparedirs  --> Create the build directories"/>
+		<echo message="clean-build  --> Remove all the class files"/>
+		<echo message="compile-java --> Compile the java source files"/>
+		<echo message="compile-test --> Compile the java test source files"/>
+		<echo message="clean-db     --> Drop the noticeboard tables"/>
+		<echo message="build-db     --> Create the noticeboard tables and insert data"/>
+		<echo message="create-deploy-package --> Generates the deployment package"/>
+		<echo message="deploy-tool  --> Creates the database and default content and then deploys the jar and war file to lams.ear "/>
+		<echo message="test-report  --> Runs the junit testcases and generates the report "/>
 		<echo message=""/>
+		<echo message="------------------------------------------------------"/>
+		<echo message="Notes on running NB junit tests:"/>
+		<echo message="Run deploy-tool and then run insert-test-data"/>
+		<echo message="This sets up the test data needed for the test cases to run. Then you can run test-report"/>		
 	</target>
 
 	<target name="print-classpath">
@@ -118,23 +129,23 @@ Ant build file.
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 					password="${db.password}">
 				<classpath>
-					<pathelement location="${db.driver.file}"/>
+					<pathelement location="${db.driver.jar}"/>
 				</classpath>
 				<transaction src="${db.scripts}/drop_lams_tool_nb.sql"/>
 			</sql>
 		</target>
 		
-		<target name="build-db" depends="clean-db" description="Creates the Noticeboard Tool tables and inserts default content">
+		<target name="build-db" depends="" description="Deletes and Creates the Noticeboard Tool tables and inserts default content">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 								password="${db.password}">
 							<classpath>
 								<pathelement location="${db.driver.jar}"/>
 							</classpath>
-					<transaction src="${db.scripts}/create_lams_tool_nb.sql"/>
+					<transaction src="${db.scripts}/init_lams_tool_nb.sql"/>
 			</sql>
 		</target>	
 	
-		<target name="insert-test-data" depends="" description="Inserts test data for noticeboard tool in order for test cases to run">
+		<target name="insert-test-data" depends="build-db" description="Inserts test data for noticeboard tool in order for test cases to run">
 				<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 									password="${db.password}">
 								<classpath>
