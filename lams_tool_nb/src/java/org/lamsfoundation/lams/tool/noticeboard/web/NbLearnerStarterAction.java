@@ -30,11 +30,6 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,7 +43,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
+
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
@@ -106,7 +101,6 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
     public ActionForward learner(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
 
         NoticeboardContent nbContent = null;
-        NoticeboardSession nbSession = null;
         NoticeboardUser nbUser = null;
         NbWebUtil.cleanLearnerSession(request);
         saveMessages(request, null);
@@ -118,27 +112,29 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         
         Long userId = NbWebUtil.convertToLong(learnerForm.getUserId());
         Long toolSessionId = NbWebUtil.convertToLong(learnerForm.getToolSessionId());
-        Long toolContentId = NbWebUtil.convertToLong(learnerForm.getToolContentId());
+       // Long toolContentId = NbWebUtil.convertToLong(learnerForm.getToolContentId());
         
-        if(userId == null || toolSessionId ==null || toolContentId==null)
+        if(userId == null || toolSessionId ==null)
 		{
 			String error = "Unable to continue. The user ID, tool session ID or tool contentID is missing.";
 			logger.error(error);
 			throw new NbApplicationException(error);
 		}
 
-	        nbContent = nbService.retrieveNoticeboard(toolContentId);
-	        nbSession = nbService.retrieveNoticeboardSession(toolSessionId);
-	        nbUser = nbService.retrieveNoticeboardUser(userId);
-	        
+        nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionId);
+	       // nbSession = nbService.retrieveNoticeboardSession(toolSessionId);
+	   
+	    
 	    if(nbContent == null)
 		{
-			String error = "Unable to continue as the data is missing from the database";
+			String error = "An Internal error has occurred. Please exit and retry this sequence";
 			logger.error(error);				
 			throw new NbApplicationException(error);
 		}   
-	        
-        /*
+
+	    nbUser = nbService.retrieveNbUserBySession(userId, toolSessionId);
+	    
+	    /*
          * Checks to see if the defineLater or runOffline flag is set.
          * If the particular flag is set, control is forwarded to jsp page
          * displaying to the user the message according to what flag is set.
@@ -154,34 +150,21 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
             nbContent.setContentInUse(true);
           //  nbContent.setDefineLater(false); /* defineLater should be false anyway */
             nbService.updateNoticeboard(nbContent);
+                     
+            if (nbUser != null)
+	        {
+            	if (nbUser.getUserStatus().equals(NoticeboardUser.COMPLETED))
+	                   request.getSession().setAttribute(NoticeboardConstants.READ_ONLY_MODE, "true");	           
+	        }
+            else
+            {
+            	//create a new user with this session id
+            	NoticeboardUser newUser = new NoticeboardUser(userId);
+            	nbService.addUser(toolSessionId, newUser);
+            }
             
-	       if (nbSession != null)
-	       {
-	           if (nbUser != null)
-	           {
-	               //check user status, if completed, set session attribue readOnlyMode to true
-	               //copy values into content, then thats it
-	               if (nbUser.getUserStatus().equals(NoticeboardUser.COMPLETED))
-	                   request.getSession().setAttribute(NoticeboardConstants.READ_ONLY_MODE, "true");
-	               
-	           }
-	           else //user is new
-	           {
-	               NoticeboardUser newUser = new NoticeboardUser(userId);
-	               nbService.addUser(toolSessionId, newUser);
-	           }
-	         
-	           
-	       }
-	       else
-	       {
-	          NoticeboardSession newSession = new NoticeboardSession(toolSessionId);
-	          nbService.addSession(toolContentId, newSession);
-	          NoticeboardUser newUser = new NoticeboardUser(userId);
-	          nbService.addUser(toolSessionId, newUser);
-	          
-	       }
-        }
+            
+        } 
         learnerForm.copyValuesIntoForm(nbContent);
         return mapping.findForward(NoticeboardConstants.DISPLAY_LEARNER_CONTENT);
     
@@ -189,42 +172,49 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
     
     public ActionForward teacher(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
         return learner(mapping, form, request, response);
-      //return mapping.findForward(NoticeboardConstants.DISPLAY_LEARNER_CONTENT);
     }
     
     public ActionForward author(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
         
         /* will show a different screen if defineLater flag is set and running in preview mode */
-        NbLearnerForm nbForm = (NbLearnerForm)form;
+    	NoticeboardContent nbContent = null;
+        NoticeboardUser nbUser = null;
         NbWebUtil.cleanLearnerSession(request);
-        Long toolContentId = NbWebUtil.convertToLong(nbForm.getToolContentId());
-        if (toolContentId == null)
-        {
-            String error = "Unable to continue. The user ID, tool session ID or tool contentID is missing.";
-			logger.error(error);
-			throw new NbApplicationException(error);
-        }
         saveMessages(request, null);
         
+        NbLearnerForm learnerForm = (NbLearnerForm)form;
+      
         ActionMessages message = new ActionMessages();
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-        NoticeboardContent nbContent = nbService.retrieveNoticeboard(toolContentId);
         
-        if (nbContent == null)
-        {
-            String error = "Unable to continue as there is data missing from the database";
+        Long userId = NbWebUtil.convertToLong(learnerForm.getUserId());
+        Long toolSessionId = NbWebUtil.convertToLong(learnerForm.getToolSessionId());
+        
+        if(userId == null || toolSessionId ==null)
+		{
+			String error = "Unable to continue. The user ID, tool session ID or tool contentID is missing.";
 			logger.error(error);
 			throw new NbApplicationException(error);
-        }
-        
+		}
+
+        nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionId);
+	      
+	    if(nbContent == null)
+		{
+			String error = "An Internal error has occurred. Please exit and retry this sequence";
+			logger.error(error);				
+			throw new NbApplicationException(error);
+		}   
+	    
+	    nbUser = nbService.retrieveNbUserBySession(userId, toolSessionId);	    
+       
         if (displayMessageToAuthor(nbContent, message))
         {
             saveMessages(request, message);
             return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
         }
-        
-        
-        nbForm.copyValuesIntoForm(nbContent);       
+                
+        learnerForm.copyValuesIntoForm(nbContent);       
         return mapping.findForward(NoticeboardConstants.DISPLAY_LEARNER_CONTENT);
     }
     
