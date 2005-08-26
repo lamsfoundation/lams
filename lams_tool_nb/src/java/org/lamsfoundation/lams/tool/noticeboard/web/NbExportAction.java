@@ -16,12 +16,10 @@ import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.web.NbExportForm;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
-import java.util.HashSet;
-import java.util.Set;
+
 /**
  * @author mtruong
  *
@@ -72,28 +70,24 @@ public class NbExportAction extends LamsDispatchAction {
             throw new NbApplicationException(error);
         }
         
-        NoticeboardSession session = nbService.retrieveNbSessionByUserID(userId);
+        NoticeboardUser userInThisSession = nbService.retrieveNbUserBySession(userId, toolSessionId);
         
-        Set userList = session.getNbUsers();
-      /** TODO: check whether user belongs to session or not */
-    /*   if (session.getNbSessionId().toString().equals(toolSessionId.toString()))
+        if (userInThisSession == null)
         {
-            String error="User does not belong to this session. ";
-            logger.error(error);
-            throw new NbApplicationException(error);
-        } */
-        
-        NoticeboardContent content = session.getNbContent();
-        
-        if (content == null)
-        {
-            String error="Data is missing from the database. Unable to Continue";
+            String error="The user with user id " + userId + " does not exist in this session or session may not exist.";
             logger.error(error);
             throw new NbApplicationException(error);
         }
-        //check if user belong to that session too.
         
-        //check if the given user exists on the db or not, if they are not, do not export content.
+       NoticeboardContent content = nbService.retrieveNoticeboardBySessionID(toolSessionId);
+        
+        if (content == null)
+        {
+            String error="The content for this activity has not been defined yet.";
+            logger.error(error);
+            throw new NbApplicationException(error);
+        }
+               
         exportForm.populateForm(content);
         return mapping.findForward(NoticeboardConstants.EXPORT_PORTFOLIO);
     }
