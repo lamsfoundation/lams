@@ -24,6 +24,7 @@ public class GenericObjectFactoryImpl implements GenericObjectFactory {
     public static GenericObjectFactory getInstance() {
         if (genericObjectFactory == null) {
             genericObjectFactory = new GenericObjectFactoryImpl();
+            addContext("/org/lamsfoundation/lams/applicationContext.xml");
             addContext("/org/lamsfoundation/lams/contentrepository/applicationContext.xml");
             addContext("/forumApplicationContext.xml");
         }
