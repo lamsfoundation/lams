@@ -210,8 +210,8 @@
 	   <!-- Run junit tests														-->
 	   <!-- =================================================================== -->
 	<target name="test" depends="compile.test"> 
-		<delete>
-			<fileset dir="${build.report}" failonerror="false"/>
+		<delete failonerror="false">
+			<fileset dir="${build.report}"/>
 		</delete>
 		<mkdir dir="${build.report}" />
 		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
