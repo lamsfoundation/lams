@@ -14,10 +14,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.TestCase;
-
 import net.sf.hibernate.HibernateException;
 
-import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -29,6 +27,7 @@ import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonClassDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
+import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
@@ -45,7 +44,7 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
  * @author Jacky Fang 2/02/2005
  * 
  */
-public class LessonDataAccessTestCase extends AbstractLamsTestCase
+public class LessonDataAccessTestCase extends AbstractCommonTestCase
 {
 
     //---------------------------------------------------------------------
@@ -119,7 +118,7 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
 
     }
     protected String[] getContextConfigLocation() {
-		return new String[] {"org/lamsfoundation/lams/applicationContext.xml",
+		return new String[] {"org/lamsfoundation/lams/localApplicationContext.xml",
 							 "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml"};
 	}
 
@@ -281,11 +280,4 @@ public class LessonDataAccessTestCase extends AbstractLamsTestCase
         
     }
 
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-     */
-    protected String getHibernateSessionFactoryName()
-    {
-        return "coreSessionFactory";
-    }
 }

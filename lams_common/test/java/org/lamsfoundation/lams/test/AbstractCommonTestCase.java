@@ -18,32 +18,37 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt 
 */
-package org.lamsfoundation.lams.usermanagement.dao.hibernate;
+package org.lamsfoundation.lams.test;
 
-import java.util.List;
 
-import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 
 /**
- * @author Manpreet Minhas
+ * Contains all the information shared across the lams_common junit tests.
+ * In particular, it sets up the context file and hibernate session name.
+ *  
+ * @author Fiona Malikoff
+ * 
  */
-public class TestUserOrganisationDAO extends AbstractCommonTestCase {
-	
-	protected UserOrganisationDAO userOrganisationDAO;
-	protected UserDAO userDAO;
-	
-	public TestUserOrganisationDAO(String name){
-		super(name);
-	}
-	protected void setUp()throws Exception{
-		super.setUp();
-		userOrganisationDAO = (UserOrganisationDAO)context.getBean("userOrganisationDAO");
-		userDAO =(UserDAO)context.getBean("userDAO");
+abstract public class AbstractCommonTestCase extends AbstractLamsTestCase
+{
+    /**
+     * Constructor for AbstractCommonTestCase.
+     * @param arg0
+     */
+    public AbstractCommonTestCase(String arg0) {
+        super(arg0);
+    }
+
+    protected String[] getContextConfigLocation() {
+		return new String[] {"org/lamsfoundation/lams/localApplicationContext.xml"};
 	}
 
-	public void testGetUserOrganisationsByUser(){
-		List memberships = userOrganisationDAO.getUserOrganisationsByUser(userDAO.getUserById(new Integer(4)));
-		assertEquals(memberships.size(),4);
-	}
+    /**
+     * @see org.lamsfoundation.lams.test.AbstractLamsTestCase#getHibernateSessionFactoryName()
+     */
+    protected String getHibernateSessionFactoryName()
+    {
+        return "coreSessionFactory";
+    }
 
 }

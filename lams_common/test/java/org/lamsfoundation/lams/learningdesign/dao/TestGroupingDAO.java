@@ -22,9 +22,9 @@
 
 package org.lamsfoundation.lams.learningdesign.dao;
 
-import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
+import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
  * @version
  * 
  */
-public class TestGroupingDAO extends AbstractLamsTestCase
+public class TestGroupingDAO extends AbstractCommonTestCase
 {
 	protected IGroupingDAO groupingDAO;
 	protected IUserDAO userDAO = null;
@@ -74,13 +74,6 @@ public class TestGroupingDAO extends AbstractLamsTestCase
     {
         super(testName);
     }
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
-     */
-    protected String[] getContextConfigLocation()
-    {
-    	return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
-    }
 
     public void testGetGrouping()
     {
@@ -102,14 +95,5 @@ public class TestGroupingDAO extends AbstractLamsTestCase
         assertTrue("tet learner should exist now",testGrouping.doesLearnerExist(testUser));
         
     }
-
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-     */
-    protected String getHibernateSessionFactoryName()
-    {
-        return "coreSessionFactory";
-    }
-
 
 }

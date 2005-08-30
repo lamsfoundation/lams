@@ -214,21 +214,6 @@
         redirect="false"
       />
     </action>
-    <action
-      path="/workspace"
-      type="org.lamsfoundation.lams.workspace.web.WorkspaceAction"
-      name="WorkspaceAction"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="/index.jsp"
-        redirect="false"
-      />
-    </action>
 
     <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
   </action-mappings>

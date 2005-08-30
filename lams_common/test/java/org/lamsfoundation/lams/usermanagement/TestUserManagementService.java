@@ -24,7 +24,8 @@ package org.lamsfoundation.lams.usermanagement;
 
 import java.io.IOException;
 import java.util.Date;
-import org.lamsfoundation.lams.AbstractLamsTestCase;
+
+import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.AuthenticationMethodDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationTypeDAO;
@@ -36,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 /**
  * @author Manpreet Minhas
  */
-public class TestUserManagementService extends AbstractLamsTestCase {
+public class TestUserManagementService extends AbstractCommonTestCase {
 	
 	protected UserDAO userDAO;
 	protected RoleDAO roleDAO;
@@ -60,13 +61,6 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 		userOrganisationRoleDAO = (UserOrganisationRoleDAO)context.getBean("userOrganisationRoleDAO");
 	}
 
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
-	 */
-	protected String[] getContextConfigLocation() {
-		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
-	}
 	public void testSaveOrganisation(){
 		Organisation organisation = new Organisation("Test Organisation",
 													 "Test Organisation Description",													
@@ -93,12 +87,5 @@ public class TestUserManagementService extends AbstractLamsTestCase {
 	public void testGetUsersFromOrganisationByRole() throws IOException{
 		String packet = userManagementService.getUsersFromOrganisationByRole(new Integer(4),"AUTHOR");
 		System.out.println(packet);
-	}
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-	 */
-	protected String getHibernateSessionFactoryName() {		
-		return "coreSessionFactory";
 	}
 }

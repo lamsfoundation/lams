@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.lamsfoundation.lams.AbstractLamsTestCase;
+import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.themes.CSSProperty;
 import org.lamsfoundation.lams.themes.CSSStyle;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.themes.dto.CSSThemeDTO;
 /**
  * @author Fiona Malikoff
  */
-public class TestCSSThemeDAO extends AbstractLamsTestCase {
+public class TestCSSThemeDAO extends AbstractCommonTestCase {
 
     private CSSThemeDAO themeDAO = null;
     private final static Long RUBY_THEME_ID = new Long(1);
@@ -47,13 +47,6 @@ public class TestCSSThemeDAO extends AbstractLamsTestCase {
         super.setUp();
 		themeDAO =(CSSThemeDAO) context.getBean("themeDAO");
     }
-
-	protected String getHibernateSessionFactoryName() {
-		return "coreSessionFactory";		
-	}
-	protected String[] getContextConfigLocation() {
-		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
-	}
 
     /*
      * @see TestCase#tearDown()

@@ -1,17 +1,27 @@
-/* ********************************************************************************
- *  Copyright Notice
- *  =================
- * This file contains propriety information of LAMS Foundation. 
- * Copying or reproduction with prior written permission is prohibited.
- * Copyright (c) 2005 
- * Created on 8/02/2005
- ******************************************************************************** */
+/* 
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt 
+*/
 package org.lamsfoundation.lams.tool;
 
 import java.util.Date;
 
-import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
@@ -21,15 +31,13 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
-
-
+import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
-
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
@@ -40,7 +48,7 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
  * @author Jacky Fang 8/02/2005
  * 
  */
-public class ToolDataAccessTestCase extends AbstractLamsTestCase
+public class ToolDataAccessTestCase extends AbstractCommonTestCase
 {
 
     protected IToolContentDAO toolContentDao;
@@ -116,14 +124,11 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
     {
         super(arg0);
     }
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
-     */
     protected String[] getContextConfigLocation()
     {
         return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
                 			  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
-                			  "org/lamsfoundation/lams/applicationContext.xml"};
+                			  "org/lamsfoundation/lams/localApplicationContext.xml"};
     }
     
     public void initTestToolSession()
@@ -151,12 +156,4 @@ public class ToolDataAccessTestCase extends AbstractLamsTestCase
                                       testLesson);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-     */
-    protected String getHibernateSessionFactoryName()
-    {
-        return "coreSessionFactory";
-    }
-   
-}
+ }

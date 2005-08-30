@@ -1,12 +1,28 @@
-/*
- * Created on Nov 22, 2004
- *
- * Last modified on Nov 22, 2004
- */
+/* 
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt 
+*/
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.Date;
-import org.lamsfoundation.lams.AbstractLamsTestCase;
+
+import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -15,15 +31,13 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 
 
 /**
- * TODO Add description here
- *
  * <p>
  * <a href="UserDAOTest.java.html"><i>View Source</i></a>
  * </p>
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class UserDAOTest extends AbstractLamsTestCase{
+public class UserDAOTest extends AbstractCommonTestCase {
 	private User user = null;
 	private UserDAO userDAO = null;
 	protected RoleDAO roleDAO;
@@ -60,9 +74,6 @@ public class UserDAOTest extends AbstractLamsTestCase{
 		boolean member = user.isMember(organisation);
 		assertTrue(member);
 	}
-	protected String[] getContextConfigLocation() {
-		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
-	}	
 	public void testSaveUser(){
 		User user = new User();
 		user.setLogin("MiniMinhas");
@@ -90,7 +101,4 @@ public class UserDAOTest extends AbstractLamsTestCase{
 		userOrganisationRoleDAO.saveUserOrganisationRole(userOrganisationRole);
 		return userOrganisationRole;
 	}	
-	protected String getHibernateSessionFactoryName() {
-		return "coreSessionFactory";
-	}
 }

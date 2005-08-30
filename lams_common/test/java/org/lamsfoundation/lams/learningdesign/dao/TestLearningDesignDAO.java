@@ -1,33 +1,43 @@
-/*
- * Created on Dec 6, 2004
- */
-package org.lamsfoundation.lams.learningdesign.dao;
+/* 
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt 
+*/
+package org.lamsfoundation.lams.learningdesign.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Activity;
-
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
-
+import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 
-
 /**
  * @author MMINHAS
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
-public class TestLearningDesignDAO extends AbstractLamsTestCase {
+public class TestLearningDesignDAO extends AbstractCommonTestCase {
 	
 	protected ActivityDAO activityDAO;
 	private LearningDesignDAO learningDesignDAO;
@@ -54,9 +64,6 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		long x = 20;
 		assertEquals(activity.getActivityId().longValue(),x);
 	}
-	protected String[] getContextConfigLocation() {
-		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
-	}
 	public void testGetAllValidLearningDesignsInFolder(){
 		List list = learningDesignDAO.getAllValidLearningDesignsInFolder(new Integer(1));
 		System.out.println("SIZE:"+list.size());
@@ -66,8 +73,5 @@ public class TestLearningDesignDAO extends AbstractLamsTestCase {
 		LearningDesignDTO learningDesignDTO = learningDesign.getLearningDesignDTO();		
 		String str = WDDXProcessor.serialize(learningDesignDTO);
 		System.out.println(str);		
-	}	
-	protected String getHibernateSessionFactoryName() {
-		return "coreSessionFactory";
 	}	
 }

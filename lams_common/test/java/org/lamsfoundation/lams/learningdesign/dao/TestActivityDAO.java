@@ -1,28 +1,43 @@
 package org.lamsfoundation.lams.learningdesign.dao;
+/* 
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt 
+*/
 import java.util.List;
 
-import org.lamsfoundation.lams.AbstractLamsTestCase;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
-import org.lamsfoundation.lams.learningdesign.*;
-
-/*
- * Created on Dec 3, 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 
 /**
  * @author MMINHAS
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
-public class TestActivityDAO extends AbstractLamsTestCase {
+public class TestActivityDAO extends AbstractCommonTestCase {
 	
 	protected ActivityDAO activityDAO;
 	protected Activity activity;
@@ -62,12 +77,6 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 		Activity activity = activityDAO.getActivityByUIID(new Integer(3),learningDesignDAO.getLearningDesignById(new Long(1)));
 		assertNotNull(activity.getTitle());
 		System.out.println("ActivityID: " + activity.getActivityId());
-	}
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
-	 */
-	protected String[] getContextConfigLocation() {
-		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
 	}
 	public void testgetActivityByLibraryID(){
 		List activities = activityDAO.getActivitiesByLibraryID(new Long(1));
@@ -122,8 +131,5 @@ public class TestActivityDAO extends AbstractLamsTestCase {
 		}
 		assertNotNull(parallelActivity.getActivityId());
 	}
-	protected String getHibernateSessionFactoryName() {
-		return "coreSessionFactory";
-	}	
 }
 

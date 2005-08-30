@@ -1,26 +1,39 @@
-/*
- * Created on Nov 26, 2004
- *
- * Last modified on Nov 26, 2004
- */
+/* 
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt 
+*/
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
-import org.springframework.context.ApplicationContext;
-import org.lamsfoundation.lams.AbstractLamsTestCase;
+import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.springframework.context.ApplicationContext;
 
 
 
 /**
- * TODO Add description here
- *
  * <p>
  * <a href="OrganisationTypeTypeDAOTest.java.html"><i>View Source</i></a>
  * </p>
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class OrganisationTypeDAOTest extends AbstractLamsTestCase{
+public class OrganisationTypeDAOTest extends AbstractCommonTestCase{
 	private OrganisationType organisationType = null;
 	private String errorMessage = "";
 	private OrganisationTypeDAO organisationTypeDAO = null;
@@ -43,13 +56,7 @@ public class OrganisationTypeDAOTest extends AbstractLamsTestCase{
 		organisationTypeDAO.saveOrganisationType(organisationType);
 		assertNotNull(organisationTypeDAO.getOrganisationTypeByName("TEST"));
 	}
-	/**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
-     */
-    protected String[] getContextConfigLocation()
-    {
-    	return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
-    }
+
 	public void testGetOrganisationTypeById(){
 		errorMessage = "The name of the organisationType gotten by Id 1 is not ROOT ORGANISATION";
 		organisationType = organisationTypeDAO.getOrganisationTypeById(new Integer(1));
@@ -68,12 +75,5 @@ public class OrganisationTypeDAOTest extends AbstractLamsTestCase{
 		organisationTypeDAO.deleteOrganisationType(organisationType);
 		assertNull(organisationTypeDAO.getOrganisationTypeByName("TEST"));
 	}
-	/**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-     */
-    protected String getHibernateSessionFactoryName()
-    {
-        return "coreSessionFactory";
-    }
 
 }

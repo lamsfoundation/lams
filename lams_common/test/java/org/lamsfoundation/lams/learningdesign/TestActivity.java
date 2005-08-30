@@ -1,18 +1,29 @@
-/* ********************************************************************************
- *  Copyright Notice
- *  =================
- * This file contains propriety information of LAMS Foundation. 
- * Copying or reproduction with prior written permission is prohibited.
- * Copyright (c) 2005 
- * Created on 2005-2-18
- ******************************************************************************** */
+/* 
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+
+http://www.gnu.org/licenses/gpl.txt 
+*/
 package org.lamsfoundation.lams.learningdesign;
 
 import java.util.Set;
 
-import org.lamsfoundation.lams.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.test.AbstractCommonTestCase;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
@@ -23,7 +34,7 @@ import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
  * @author Jacky Fang 2005-2-18
  * 
  */
-public class TestActivity extends AbstractLamsTestCase
+public class TestActivity extends AbstractCommonTestCase
 {
 	protected ActivityDAO activityDAO;
 	protected IUserDAO userDAO; 
@@ -36,9 +47,6 @@ public class TestActivity extends AbstractLamsTestCase
 	private static final Integer TEST_USER_ID = new Integer(2);
 	private static final long TEST_CHILD_QNA_ACTIVITY_ID = 22;
 	
-    /*
-     * @see AbstractLamsTestCase#setUp()
-     */
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -48,9 +56,6 @@ public class TestActivity extends AbstractLamsTestCase
 		
     }
 
-    /*
-     * @see AbstractLamsTestCase#tearDown()
-     */
     protected void tearDown() throws Exception
     {
         super.tearDown();
@@ -105,15 +110,4 @@ public class TestActivity extends AbstractLamsTestCase
         assertNotNull(child);
         assertEquals("verify id",TEST_CHILD_QNA_ACTIVITY_ID,child.getActivityId().longValue());
     }
-    protected String[] getContextConfigLocation() {
-		return new String[] {"org/lamsfoundation/lams/applicationContext.xml"};
-	}
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-     */
-    protected String getHibernateSessionFactoryName()
-    {
-        return "coreSessionFactory";
-    }
-
 }

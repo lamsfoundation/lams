@@ -54,9 +54,6 @@ public class TestGateActivityStrategy extends TestCase
     private static final int NUM_OF_TEST_USERS = 5;
     private static final int TEST_USER_ID = 1;
     
-    /*
-     * @see AbstractLamsTestCase#setUp()
-     */
     protected void setUp() throws Exception
     {
 
@@ -64,9 +61,6 @@ public class TestGateActivityStrategy extends TestCase
         for(int i =0; i<NUM_OF_TEST_USERS;i++)
             testLessonUsers.add(createUser(new Integer(i+1),"tester"+i));
     }
-    /*
-     * @see AbstractLamsTestCase#tearDown()
-     */
     protected void tearDown() throws Exception
     {
         super.tearDown();
