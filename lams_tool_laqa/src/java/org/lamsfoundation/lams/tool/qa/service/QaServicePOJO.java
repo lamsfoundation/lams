@@ -1405,7 +1405,7 @@ public class QaServicePOJO implements
 	 * @throws SubmitFilesException
 	 */
 	public ITicket getRepositoryLoginTicket() throws QaApplicationException {
-		repositoryService = RepositoryProxy.getLocalRepositoryService();
+		repositoryService = RepositoryProxy.getRepositoryService();
     	logger.debug("retrieved repositoryService : " + repositoryService);
 		
 		ICredentials credentials = new SimpleCredentials(
