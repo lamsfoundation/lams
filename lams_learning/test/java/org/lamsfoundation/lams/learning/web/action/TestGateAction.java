@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
@@ -40,7 +39,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @version 1.1
  * 
  */
-public class TestGateAction extends AbstractLamsStrutsTestCase
+public class TestGateAction extends AbstractTestAction
 {
     //---------------------------------------------------------------------
     // Instance variables
@@ -61,24 +60,6 @@ public class TestGateAction extends AbstractLamsStrutsTestCase
     public TestGateAction(String testName)
     {
         super(testName);
-    }
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getContextConfigLocation()
-     */
-    protected String getContextConfigLocation()
-    {
-        return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
-  			   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
-  			   +"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml "
-  			   +"/WEB-INF/spring/applicationContext.xml "
-  			   +"/WEB-INF/spring/learningApplicationContext.xml";
-    }
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getHibernateSessionFactoryBeanName()
-     */
-    protected String getHibernateSessionFactoryBeanName()
-    {
-        return "coreSessionFactory";
     }
     /*
      * @see AbstractLamsStrutsTestCase#setUp()

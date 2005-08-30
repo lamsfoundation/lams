@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -36,7 +35,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  * @version
  * 
  */
-public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
+public class TestDisplayActivityAction extends AbstractTestAction
 {
     //---------------------------------------------------------------------
     // Instance variables
@@ -57,25 +56,7 @@ public class TestDisplayActivityAction extends AbstractLamsStrutsTestCase
         super(arg0);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getContextConfigLocation()
-     */
-    protected String getContextConfigLocation()
-    {
-        return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
-		   	   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
-		   	   +"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml "
-		   	   +"applicationContext.xml "
-		   	   +"/WEB-INF/spring/learningApplicationContext.xml";
-    }
-    
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getHibernateSessionFactoryBeanName()
-     */
-    protected String getHibernateSessionFactoryBeanName()
-    {
-        return "coreSessionFactory";
-    }    
+
     /*
      * @see AbstractLamsStrutsTestCase#setUp()
      */

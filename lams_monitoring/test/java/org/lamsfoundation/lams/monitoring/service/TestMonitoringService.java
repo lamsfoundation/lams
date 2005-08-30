@@ -25,7 +25,7 @@ import java.util.LinkedList;
 
 import javax.sql.DataSource;
 
-import org.lamsfoundation.lams.AbstractLamsTestCase;
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -123,7 +123,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
     protected String[] getContextConfigLocation()
     {
         return new String[] { 
-        		"/org/lamsfoundation/lams/applicationContext.xml",
+        		"/org/lamsfoundation/lams/localApplicationContext.xml",
         		"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
         		"/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
           		"/org/lamsfoundation/lams/learning/learningApplicationContext.xml",        					  

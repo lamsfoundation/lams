@@ -22,7 +22,7 @@
 
 package org.lamsfoundation.lams.monitoring.web;
 
-import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
+import org.lamsfoundation.lams.test.AbstractLamsStrutsTestCase;
 
 
 /**
@@ -72,7 +72,7 @@ public class TestGateAction extends AbstractLamsStrutsTestCase
      */
     protected String getContextConfigLocation()
     {
-        return 	"/org/lamsfoundation/lams/applicationContext.xml "+
+        return 	"/org/lamsfoundation/lams/localApplicationContext.xml "+
 		"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "+
 		"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "+
   		"/org/lamsfoundation/lams/learning/learningApplicationContext.xml "+        					  

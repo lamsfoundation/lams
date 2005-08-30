@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
@@ -35,7 +34,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  * @version
  * 
  */
-public class TestLearnerAction extends AbstractLamsStrutsTestCase
+public class TestLearnerAction extends AbstractTestAction
 {
     //---------------------------------------------------------------------
     // Instance variables
@@ -67,18 +66,7 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
         super.tearDown();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getContextConfigLocation()
-     */
-    protected String getContextConfigLocation()
-    {
-        return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
-  			   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
-  			   +"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml "
-  			   +"applicationContext.xml "
-  			   +"/WEB-INF/spring/learningApplicationContext.xml";
-    }
-    
+
     /**
      * Constructor for TestLearnerAction.
      * @param testName
@@ -153,11 +141,4 @@ public class TestLearnerAction extends AbstractLamsStrutsTestCase
         verifyNoActionErrors();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getHibernateSessionFactoryBeanName()
-     */
-    protected String getHibernateSessionFactoryBeanName()
-    {
-        return "coreSessionFactory";
-    }
-}
+ }

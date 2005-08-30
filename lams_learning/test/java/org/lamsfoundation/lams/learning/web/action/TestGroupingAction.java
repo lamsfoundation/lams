@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.AbstractLamsStrutsTestCase;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learning.web.util.LessonLearnerDataManager;
@@ -42,7 +41,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @version
  * 
  */
-public class TestGroupingAction extends AbstractLamsStrutsTestCase
+public class TestGroupingAction extends AbstractTestAction
 {
 
     private static final String TEST_LERNER_PROGRESS_ID = "1";
@@ -60,25 +59,6 @@ public class TestGroupingAction extends AbstractLamsStrutsTestCase
         super(testName);
     }
 
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getContextConfigLocation()
-     */
-    protected String getContextConfigLocation()
-    {
-        return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
-  			   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
-  			   +"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml "
-  			   +"/WEB-INF/spring/applicationContext.xml "
-  			   +"/WEB-INF/spring/learningApplicationContext.xml";
-    }
-    
-    /**
-     * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getHibernateSessionFactoryBeanName()
-     */
-    protected String getHibernateSessionFactoryBeanName()
-    {
-        return "coreSessionFactory";
-    }
     /*
      * @see AbstractLamsStrutsTestCase#setUp()
      */

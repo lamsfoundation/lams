@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.AbstractLamsTestCase;
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -140,11 +140,11 @@ public class TestLearnerService extends AbstractLamsTestCase
     }
     protected String[] getContextConfigLocation()
     {
-        return new String[] { "classpath:/org/lamsfoundation/lams/applicationContext.xml",
+        return new String[] { "classpath:/org/lamsfoundation/lams/localApplicationContext.xml",
                 "classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
                 "classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
                 "classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml",
-                "classpath:*/applicationContext.xml"};
+                "classpath:/org/lamsfoundation/lams/tool/survey/applicationContext.xml"};
 
 /*        return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
   			  				  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
