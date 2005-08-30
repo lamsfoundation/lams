@@ -256,16 +256,16 @@
 	        classpathref="project.classpath"
 	    />
 		<webdoclet destDir="${conf.webinf.dir}" force="${xdoclet.force}" 
-			mergedir="${conf.xdoclet.dir}" >
+			mergedir="${conf.xdoclet.dir}" verbose="true">
 			
-         <fileset dir="${src.dir}">
+         <fileset dir="${src.java.dir}">
             <include name="**/*Action.java" />
             <include name="**/*Form.java" />
          </fileset>
 
          <deploymentdescriptor servletspec="2.3" sessiontimeout="${sessiontimeout}"/>
 			
-         <strutsconfigxml validatexml="true" version="1.2"/>
+         <strutsconfigxml validatexml="true" version="1.2" mergedir="${conf.xdoclet.dir}"/>
       </webdoclet>
 
 	</target>
