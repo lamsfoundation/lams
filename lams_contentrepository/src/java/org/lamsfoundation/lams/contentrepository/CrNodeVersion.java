@@ -274,15 +274,13 @@ public class CrNodeVersion implements Serializable {
             .toString();
     }
 
+    /** Two CrNodeVersions are equal if their NvId field is the same */
     public boolean equals(Object other) {
         if ( (this == other ) ) return true;
         if ( !(other instanceof CrNodeVersion) ) return false;
         CrNodeVersion castOther = (CrNodeVersion) other;
         return new EqualsBuilder()
             .append(this.getNvId(), castOther.getNvId())
-            .append(this.getVersionId(), castOther.getVersionId())
-            .append(this.getCreatedDateTime(), castOther.getCreatedDateTime())
-            .append(this.getNode(), castOther.getNode())
             .isEquals();
     }
 

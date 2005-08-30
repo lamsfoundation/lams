@@ -509,11 +509,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		// start the next version id at 1, which is used straight away by incrementNextVersionId()
 		node = new CrNode(relPath, nodeTypeName, createdDate, new Long(1), workspace, parentNode, null);
 		nodeVersion = createCrNodeVersion(nodeTypeName, createdDate, node.incrementNextVersionId());  
-		
-		HashSet versions = new HashSet();
-		versions.add(nodeVersion);
-		node.setCrNodeVersions(versions);
-
+		node.addCrNodeVersion(nodeVersion);
 	}
 
 	/** Create a version part of a node. 
@@ -899,7 +895,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
     	if ( failedList.size() > 0 ) {
     		String filenames =  null;
     		Iterator failedIter = failedList.iterator();
-    		while ( iter.hasNext() ) {
+    		while ( failedIter.hasNext() ) {
     			String path = (String) failedIter.next();
     			filenames = filenames != null ? filenames + "," + path : path; 
     		}
@@ -929,19 +925,15 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 			}
     	}
 
-    	NodeKey nk = getNodeKey();   	
-
-    	// remove the node version by removing it from the set - the
-    	// cascade delete on the hibernate classes will take care of it.
-    	Set versions = node.getCrNodeVersions();
-    	if ( versions != null )
-    		versions.remove(nodeVersion);
-    	else 
-    		nodeDAO.delete(nodeVersion);
+    	NodeKey nk = getNodeKey();
+    	if ( node.getCrNodeVersions() != null ) {
+    		node.getCrNodeVersions().remove(nodeVersion);
+    	}
 
     	// if this was the last version for the node, delete the node
-    	if ( versions == null || versions.size() == 0 )
+    	if ( node.getCrNodeVersions() == null || node.getCrNodeVersions().size() == 0 ) { 
     		nodeDAO.delete(node);
+    	}
     	
     	nodeKeysDeleted.add(nk);
     }

@@ -49,13 +49,17 @@ public interface IRepositoryService {
 
 	/** String used to define service in Spring context */
 	public static final String REPOSITORY_SERVICE_ID = "repositoryService";
-	/** String used to define the path to the context file */
+	/** String used to define the path to the content repository context file. */
 	public static final String REPOSITORY_CONTEXT_PATH = 
 		"/org/lamsfoundation/lams/contentrepository/applicationContext.xml";
-	/** String used to define the path to the context file used for
-	 * JUNIT testing. This file uses local datasources */
-	public static final String LOCAL_CONTEXT_PATH = 
-		"/org/lamsfoundation/lams/contentrepository/localApplicationContext.xml";
+	/** String used to define the path to the local datasource version of the 
+	 * lams.jar context file*/
+	public static final String CORE_CONTEXT_PATH = 
+		"/org/lamsfoundation/lams/applicationContext.xml";
+	/** String used to define the path to the local datasource version of the 
+	 * lams.jar context file*/
+	public static final String CORE_LOCAL_CONTEXT_PATH = 
+		"/org/lamsfoundation/lams/localApplicationContext.xml";
 	
     /**
      * Login, creating a new ticket for the given credentials and specified

@@ -42,8 +42,8 @@ public class TestSimpleTicket extends BaseTestCase {
 	 * @throws AccessDeniedException
 	 * @throws LoginException
 	 */
-	public TestSimpleTicket() throws LoginException, AccessDeniedException, WorkspaceNotFoundException {
-		super();
+	public TestSimpleTicket(String name) throws LoginException, AccessDeniedException, WorkspaceNotFoundException {
+		super(name);
 	}
 
 	/*

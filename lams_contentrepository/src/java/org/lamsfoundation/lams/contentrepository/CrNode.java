@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.contentrepository;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
@@ -32,6 +33,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.themes.CSSProperty;
 
 
 /** 
@@ -226,8 +228,20 @@ public class CrNode implements Serializable {
         return this.crNodeVersions;
     }
 
-    public void setCrNodeVersions(Set crNodeVersions) {
+    private void setCrNodeVersions(Set crNodeVersions) {
         this.crNodeVersions = crNodeVersions;
+    }
+
+    /** Add a version to this node */
+    public void addCrNodeVersion(CrNodeVersion version) {
+        if ( getCrNodeVersions() == null ) {
+            Set set = new HashSet();
+            set.add(version);
+            setCrNodeVersions(set);
+        } else {
+        	getCrNodeVersions().add(version);
+        }
+        version.setNode(this);
     }
 
     public String toString() {

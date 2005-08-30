@@ -26,12 +26,10 @@ import junit.framework.TestCase;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 
 
-public class BaseTestCase extends TestCase {
-	protected static ApplicationContext context = null;
+public class BaseTestCase extends AbstractLamsTestCase {
 	
 	protected static IRepositoryAdmin repository = null;
 	protected static ITicket ticket = null;
@@ -48,20 +46,18 @@ public class BaseTestCase extends TestCase {
 	protected static final Long TEST_DATA_NODE_ID = new Long(1); // A datanode that should already be in db
 	protected static final Long TEST_FILE_NODE_ID = new Long(2); // A filenode that should already be in db	
 
-	public BaseTestCase(){
-		super();
+	public BaseTestCase(String name){
+		super(name);
 		// Uncomment the following line to get debuggging.
 		// BasicConfigurator.configure();
 		
-		// this is run for each test so once we have it, we don't
-		// want to get it again!
-		if ( context == null ) {
-			context = new ClassPathXmlApplicationContext(new String[] {
-			        IRepositoryService.LOCAL_CONTEXT_PATH,
-			        "/org/lamsfoundation/lams/contentrepository/testApplicationContext.xml"
-			        });
-		}
-		
+	}
+	
+    /**
+     * @see TestCase#setUp()
+     */
+    protected void setUp() throws Exception {
+    	super.setUp();
 		if ( repository == null ) {
 			// get repository object from bean factory
 			repository =(IRepositoryAdmin)context.getBean(IRepositoryService.REPOSITORY_SERVICE_ID);
@@ -73,7 +69,21 @@ public class BaseTestCase extends TestCase {
 			}
 		}
 	}
+
+	protected String[] getContextConfigLocation() {
+		return new String[] {
+				IRepositoryService.CORE_LOCAL_CONTEXT_PATH,
+		        IRepositoryService.REPOSITORY_CONTEXT_PATH,
+		        "/org/lamsfoundation/lams/contentrepository/testApplicationContext.xml"
+		        };
+	}
+
 	
+    protected String getHibernateSessionFactoryName() {
+    	return "crSessionFactory";
+    }
+
+
 	protected void failUnexpectedException(Exception e) {
 		System.out.println("Unexpected exception: ");
 		e.printStackTrace();

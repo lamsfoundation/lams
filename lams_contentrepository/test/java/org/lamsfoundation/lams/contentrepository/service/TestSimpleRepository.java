@@ -81,8 +81,8 @@ public class TestSimpleRepository extends BaseTestCase {
 	 * Constructor for SimpleRepositoryTest.
 	 * @param arg0
 	 */
-	public TestSimpleRepository() {
-		super();
+	public TestSimpleRepository(String name) {
+		super(name);
 	}
 
 	public void testLoginPass() {

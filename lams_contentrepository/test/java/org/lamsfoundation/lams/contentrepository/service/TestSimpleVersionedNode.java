@@ -77,8 +77,8 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 	 * @throws NoSuchNodeTypeException
 	 * @throws ItemExistsException
 	 */
-	public TestSimpleVersionedNode() throws ItemExistsException, NoSuchNodeTypeException, RepositoryCheckedException {
-		super();
+	public TestSimpleVersionedNode(String name) throws ItemExistsException, NoSuchNodeTypeException, RepositoryCheckedException {
+		super(name);
 	}
 
 	/*

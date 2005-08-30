@@ -48,7 +48,10 @@ public class RepositoryProxy {
 	
 	public static IRepositoryService getRepositoryService()  {
     	
-		ApplicationContext context = new ClassPathXmlApplicationContext(IRepositoryService.REPOSITORY_CONTEXT_PATH);
+		String[] contextPaths = new String[] {IRepositoryService.CORE_CONTEXT_PATH,
+			IRepositoryService.REPOSITORY_CONTEXT_PATH};
+		
+		ApplicationContext context = new ClassPathXmlApplicationContext(contextPaths);
 		if ( context == null ) 
 			throw new RepositoryRuntimeException("Unable to access application context. Cannot create repository object.");
 		
@@ -64,7 +67,10 @@ public class RepositoryProxy {
 	 */
 	public static IRepositoryService getLocalRepositoryService()  {
     	
-		ApplicationContext context = new ClassPathXmlApplicationContext(IRepositoryService.LOCAL_CONTEXT_PATH);
+		String[] contextPaths = new String[] {IRepositoryService.CORE_LOCAL_CONTEXT_PATH,
+				IRepositoryService.REPOSITORY_CONTEXT_PATH};
+
+		ApplicationContext context = new ClassPathXmlApplicationContext(contextPaths);
 		if ( context == null ) 
 			throw new RepositoryRuntimeException("Unable to access application context. Cannot create repository object.");
 		

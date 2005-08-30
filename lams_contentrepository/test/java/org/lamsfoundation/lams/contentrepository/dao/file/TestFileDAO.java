@@ -40,7 +40,12 @@ public class TestFileDAO extends BaseTestCase {
 	Long v101 = null;
 	static FileDAO fileDAO = null;
 
-	public void setUp() {
+	public TestFileDAO(String name) {
+		super(name);
+	}
+
+	public void setUp() throws Exception {
+		super.setUp();
 		if ( fileDAO == null ) {
 			fileDAO = (FileDAO)context.getBean("fileDAO", FileDAO.class);
 		}
