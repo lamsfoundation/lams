@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
-package org.lamsfoundation.lams;
+package org.lamsfoundation.lams.test;
 
 import javax.servlet.http.HttpSession;
 
