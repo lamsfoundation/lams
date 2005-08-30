@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
 <%@ page import="java.util.Map"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.web.UsersAddActionForm"%>
