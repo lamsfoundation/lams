@@ -18,10 +18,14 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-<context-param>
-	<param-name>contextConfigLocation</param-name>
-	<param-value>/WEB-INF/spring/applicationContext.xml		  
-	/WEB-INF/spring/learningDesignApplicationContext.xml		  
-	/WEB-INF/spring/workspaceApplicationContext.xml 
-	</param-value>
-</context-param>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:/org/lamsfoundation/lams/applicationContext.xml
+		</param-value>
+	</context-param>
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>	

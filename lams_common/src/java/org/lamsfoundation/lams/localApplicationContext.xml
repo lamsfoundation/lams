@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+ - Application context definition for LAMS. Do not use in production.
+ - This uses a local datasource and Hibernate transaction manager and
+ - is designed for junit testing.
+-->
+
+<beans>
+
+	<import resource="commonContext.xml"/>
+	
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
+		<property name="url"><value>jdbc:mysql://localhost/lams?zeroDateTimeBehavior=convertToNull&amp;characterEncoding=utf8&amp;autoReconnect=true</value></property>
+		<property name="username"><value>lams</value></property>
+		<property name="password"><value>lamsdemo</value></property>
+	</bean>
+
+	<bean id="toolDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
+		<property name="url"><value>jdbc:mysql://localhost/lams?zeroDateTimeBehavior=convertToNull&amp;characterEncoding=utf8&amp;autoReconnect=true</value></property>
+		<property name="username"><value>lams</value></property>
+		<property name="password"><value>lamsdemo</value></property>
+	</bean>
+
+	<!--  Note - as this is only a Hibernate based transaction manager (and not JTA) some transactions may 
+	 - go awry when working across jars.
+	-->
+ 	<bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+
+
+</beans>
+
