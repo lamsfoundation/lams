@@ -184,9 +184,9 @@ Ant build file.
 		</javac>
 		<!-- Spring files -->
 		<copy overwrite="yes" todir="${build.classes}/org/lamsfoundation/lams/">
-				<fileset dir="${src.java}/org/lamsfoundation/lams">
-						<include name="*.xml"/>
-						<include name="*.properties"/>
+				<fileset dir="${src.java}/org/lamsfoundation/lams/">
+						<include name="**/*.xml"/>
+						<include name="**/*.properties"/>
 				</fileset>
 		</copy>
 	</target>
@@ -230,7 +230,6 @@ Ant build file.
 		<delete file="${build.lib}/${product}.jar"/>
 		<jar jarfile="${build.lib}/${product}.jar">
 			<fileset dir="${build.classes}"/>
-			<fileset dir="${build.test}"/>
 			<fileset dir="${hbm}"/>
 			<fileset dir="${build.web}"/>
 		</jar>
@@ -331,7 +330,7 @@ Ant build file.
 			<formatter type="xml"/>
 			<batchtest todir="${build.report}">
 				<fileset dir="${src.test.java}">
-					<include name="**/Test*"/>
+					<include name="**/Test*.java"/>
 					<exclude name="**/Test*All.java"/>
 					<exclude name="**/TestInitLesson.java"/>
 				</fileset>
@@ -341,7 +340,6 @@ Ant build file.
 				<pathelement location="${build.test}"/>
 				<pathelement location="${hbm}"/>
 				<pathelement location="${web}"/>
-				<pathelement location="${webinf.spring}"/>
 				<pathelement location="${testweb}"/>
 				<path refid="project.classpath"/>
 			</classpath>
