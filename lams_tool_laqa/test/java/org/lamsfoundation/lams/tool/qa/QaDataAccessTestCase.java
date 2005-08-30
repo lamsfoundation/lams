@@ -3,7 +3,7 @@ package org.lamsfoundation.lams.tool.qa;
 import java.util.Date;
 import java.util.TreeSet;
 
-import org.lamsfoundation.lams.AbstractLamsTestCase;
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.qa.dao.hibernate.QaContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueUsrDAO;
