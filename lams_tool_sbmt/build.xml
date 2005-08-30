@@ -133,14 +133,14 @@
 			        excludedtags="@version,@author,@todo"
 			        force="true"
 			        verbose="true">
-			        <fileset dir="${src.dir.java}">
+			        <fileset dir="${src.java.dir}">
 			            <include name="**/*/*.java"/>
 			        </fileset>
 			        <!-- hibernate 1 and hibernate 2 mapping files are not fully compatible-->
 			        <hibernate version="2.0"/>
 			    </hibernatedoclet>
 				<!-- copy hbm.xml to src folder. This makes hbm.xml can be synchronized with classes folder in eclipse -->
-				<copy overwrite="yes" todir="${src.dir.java}">
+				<copy overwrite="yes" todir="${src.java.dir}">
 					<fileset dir="${conf.hibernate.mapping.dir}">
 						<include name="**/*.hbm.xml"/>
 					</fileset>
@@ -192,14 +192,14 @@
 		</target>
 
 		<target name="compile" depends="clean" description="compile java sources">
-			<javac srcdir="${src.dir.java}" compiler="modern"
+			<javac srcdir="${src.java.dir}" compiler="modern"
 		         	 	destdir="${build.classes.java}" deprecation="on" debug="on">
 				<classpath>					
 					<path refid="project.classpath"/>
 				</classpath>
 				</javac>
 				<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/tool/sbmt/">
-								<fileset dir="${src.dir.java}/org/lamsfoundation/lams/tool/sbmt/">
+								<fileset dir="${src.java.dir}/org/lamsfoundation/lams/tool/sbmt/">
 										<include name="*.xml"/>
 										<include name="*.properties"/>
 								</fileset>
@@ -207,7 +207,7 @@
 		</target>
 
 		<target name="compile.test" depends="compile">
-			<javac srcdir="${src.dir.test}" destdir="${build.classes.test}" compiler="modern">
+			<javac srcdir="${src.test.dir}" destdir="${build.classes.test}" compiler="modern">
 				<classpath>
 					<pathelement location="${build.classes.java}"/>
 					<path refid="project.classpath"/>
@@ -247,7 +247,7 @@
 		<target name="webdoclet" depends="preparedirs">
 			<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
 
-	         <fileset dir="${src.dir.java}">
+	         <fileset dir="${src.java.dir}">
 	            <include name="**/*Action.java" />
 	            <include name="**/*Form.java" />
 	         </fileset>
