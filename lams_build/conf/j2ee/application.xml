@@ -13,18 +13,6 @@
     </module>
     <module>
         <web>
-            <web-uri>lams-workspace.war</web-uri>
-            <context-root>/lams/workspace</context-root>
-	</web>
-    </module>
-    <module>
-        <web>
-            <web-uri>lams-authoring.war</web-uri>
-            <context-root>/lams/authoring</context-root>
-	</web>
-    </module>
-    <module>
-        <web>
             <web-uri>lams-monitoring.war</web-uri>
             <context-root>/lams/monitoring</context-root>
 	</web>

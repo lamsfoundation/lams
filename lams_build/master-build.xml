@@ -50,10 +50,6 @@
 			target="build-jar" inheritAll="false" />
 		<ant antfile="../${lams_central}/build.xml" target="build-war"
 			inheritAll="false" />
-		<ant antfile="../${lams_workspace}/build.xml" target="build-war"
-			inheritAll="false" />
-		<ant antfile="../${lams_authoring}/build.xml"  target="build-war"
-			inheritAll="false"/>
 		<ant antfile="../${lams_learning}/build.xml" target="build-war" inheritAll="false"/>
 		<ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/>
 		<!--
@@ -129,10 +125,7 @@
 				<include name="${lams.jar}" />
 				<include name="${lams-contentrepository.jar}" />
 				<include name="${lams-central.war}" />
-				<include name="${lams-workspace.jar}"/>
-				<include name="${lams-workspace.war}"/>
-				<include name="${lams-authoring.jar}"/>
-				<include name="${lams-authoring.war}"/>
+				<include name="${lams-central.jar}" />
 				<include name="${lams-monitoring.jar}"/>
 				<include name="${lams-monitoring.war}"/>
 				<include name="${lams-learning.jar}"/>

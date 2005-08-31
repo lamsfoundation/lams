@@ -20,22 +20,13 @@
 
   http://www.gnu.org/licenses/gpl.txt 
 -->
-
-<!-- 
-The DOCTYPE declaration declares the location of database-specific parts of the
-Ant build file. 
--->
-<!DOCTYPE project [
-	<!ENTITY properties SYSTEM "file:./properties.xml">
-]>
-
-<project name="LAMS" basedir="." default="usage">
+<project name="LAMS Central" basedir="." default="usage">
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
 
 	<path id="all-libs">
-		<fileset dir="${lib}">
+		<fileset dir="${sharedlib}">
 			<include name="**/*.jar"/>
 		</fileset>
 		<fileset dir="${sharedlib}">
@@ -61,6 +52,7 @@ Ant build file.
 		<echo message="Among the available targets are:"/>
 		<echo message=""/>
 		<echo message="build-war  --> Make war archive for deployment"/>
+		<echo message="build-jar  --> Make jar archive for deployment"/>
 		<echo message="clean-build  --> Make war archive for deployment"/>
 		<echo message=""/>
 	</target>
@@ -72,25 +64,73 @@ Ant build file.
 		<echo message="java.class.path = ${java.class.path}"/>
 	</target>
 
+	
 	<!-- ================================================================ -->
 	<!-- Preparations									                  -->
 	<!-- ================================================================ -->
 	<target name="preparedirs">
 		<mkdir dir="${build}"/>
 		<mkdir dir="${build.lib}"/>
+		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.test}"/>
+		<mkdir dir="${build.web}"/>				
 	</target>
 
 
-	<target name="clean-build" depends="preparedirs" description="removes all class files">
+	<target name="clean" depends="preparedirs" description="removes all class files">
+		<delete>
+			<fileset dir="${build.classes}"/>
+		</delete>
+		<mkdir dir="${build.classes}"/>	
 		<delete dir="${build.lib}"/>
 		<mkdir dir="${build.lib}"/>
 	</target>
 
+	
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+	<target name="compile" depends="clean" description="compile java sources">
+ 	   <!--<property name="cp" refid="project.classpath"/>
+	   <echo message="Classpath is ${cp}"/> -->
+		<javac srcdir="${src.java}" compiler="modern"
+	         	 	destdir="${build.classes}" deprecation="on" debug="on">
+			<classpath>
+				<!--pathelement location="${build.classes.java}"/-->
+				<path refid="project.classpath"/>
+			</classpath>
+		</javac>
+		<!-- Spring files -->
+		<copy overwrite="yes" todir="${build.classes}/org/lamsfoundation/lams/authoring/">
+				<fileset dir="${src.java}/org/lamsfoundation/lams/authoring/">
+						<include name="*.xml"/>
+						<include name="*.properties"/>
+				</fileset>
+		</copy>
+	</target>
 
+	<target name="compile.test" depends="compile">
+		<javac destdir="${build.test}" compiler="modern">
+			<src path="${src.test.java}"/>
+			<classpath>
+				<path refid="project.classpath"/>
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="copyContext">
+		<copy overwrite="yes" todir="${build.web}">
+			<fileset dir="${web}">
+				<include name="**/*.xml"/>
+				<include name="**/*.tld"/>
+			</fileset>
+		</copy>
+	</target>
+	
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<!-- Make the war archive  for deployment             -->
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
-	<target name="build-war" depends="clean-build" description="creates war file">
+	<target name="build-war" depends="webdoclet,build-jar" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
 		<copy overwrite="yes" file="${web}/css/aqua.css" tofile="${web}/css/default.css"/>
 		<war warfile="${build.lib}/${product}.war" 
@@ -99,9 +139,11 @@ Ant build file.
 				<include name="*.xml"/>
 				<include name="*.properties"/>
 				<include name="struts/*"/>
+				<include name="spring/*"/>					
 				<include name="jstl/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
+			<classes dir="${build.classes}"/>				
 			<fileset dir="${web}">
 				<include name="*"/>
 				<include name="css/*"/>
@@ -114,5 +156,75 @@ Ant build file.
 		</war>
 	</target>
 
+	<!-- ================================================================ -->
+	<!-- Make jar archive for deployment        		    	          -->
+	<!-- ================================================================ -->
+	<target name="build-jar" depends="compile,copyContext" description="creates jar file">
+		<delete file="${build.lib}/${product}.jar"/>
+		<jar jarfile="${build.lib}/${product}.jar"  manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
+			<fileset dir="${build.classes}"/>
+			<fileset dir="${build.test}"/>
+			<fileset dir="${build.web}"/>
+		</jar>
+	</target>
+	<!-- =================================================================== -->
+	<!-- Run JUnit Tests                                                     -->
+	<!-- =================================================================== -->
+	<target name="test" depends="compile.test"> 
+			<mkdir dir="${build.report}"/>
+			<junit printsummary="yes" haltonerror="no" haltonfailure="no" fork="yes">
+				<formatter type="plain" usefile="false"/>
+				<formatter type="xml"/>
+				<batchtest todir="${build.report}">
+					<fileset dir="${src.test.java}">
+						<include name="**/Test*.java"/>
+					</fileset>
+				</batchtest>			
+				<classpath>
+					<pathelement location="${build.classes}"/>
+					<pathelement location="${build.test}"/>
+					<pathelement location="${build.web}"/>
+					<path refid="project.classpath"/>
+				</classpath>			
+			</junit>
+	</target>
+		
+	<target name="test-report" depends="test">
+		<mkdir dir="${build.report}/html"/> 
+		<junitreport todir="${build.report}"> 
+			<fileset dir="${build.report}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report todir="${build.report}/html"/> 
+		</junitreport>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Run xdoclet for hibernate                                           -->
+	<!-- =================================================================== -->
+	<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask">
+	    <classpath refid="all-libs"/>
+	</taskdef>
+
+	<target name="webdoclet" depends="preparedirs">
+		<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
+	         <fileset dir="${src.java}">
+	            <include name="**/*Action.java" />
+	         </fileset>
+
+	         <deploymentdescriptor 
+	         				servletspec="2.3" 
+	         				destdir="${webinf}"
+				         	mergedir="${conf.xdoclet}"
+	         				sessiontimeout="${sessiontimeout}"/>
+			
+	         <strutsconfigxml 
+	         				destdir="${webinf.struts}"
+	         				version="1.2" 
+	         				mergedir="${conf.xdoclet}"/>
+	     </webdoclet>
+	</target>
+		
+	
 </project>
 
