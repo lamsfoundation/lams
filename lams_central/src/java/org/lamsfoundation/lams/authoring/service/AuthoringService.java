@@ -1,0 +1,624 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+package org.lamsfoundation.lams.authoring.service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.authoring.ObjectExtractor;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningLibrary;
+import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
+import org.lamsfoundation.lams.learningdesign.RandomGrouping;
+import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
+import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
+import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
+import org.lamsfoundation.lams.themes.dto.CSSThemeDTO;
+import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
+import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
+import org.lamsfoundation.lams.usermanagement.exception.UserException;
+import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+
+
+/**
+ * @author Manpreet Minhas 
+ */
+public class AuthoringService implements IAuthoringService {
+	
+	protected Logger log = Logger.getLogger(AuthoringService.class);	
+
+	/** Required DAO's */
+	protected LearningDesignDAO learningDesignDAO;
+	protected LearningLibraryDAO learningLibraryDAO;
+	protected ActivityDAO activityDAO;
+	protected UserDAO userDAO;
+	protected WorkspaceFolderDAO workspaceFolderDAO;
+	protected TransitionDAO transitionDAO;
+	protected ToolDAO toolDAO;
+	protected LicenseDAO licenseDAO;
+	protected GroupingDAO groupingDAO;
+	protected GroupDAO groupDAO;
+	protected ICSSThemeDAO themeDAO;
+	
+	public AuthoringService(){
+		
+	}
+	
+	/**********************************************
+	 * Setter Methods
+	 * *******************************************/
+	
+	/**
+	 * @param groupDAO The groupDAO to set.
+	 */
+	public void setGroupDAO(GroupDAO groupDAO) {
+		this.groupDAO = groupDAO;
+	}
+	public void setGroupingDAO(GroupingDAO groupingDAO) {
+		this.groupingDAO = groupingDAO;
+	}
+	/** for sending acknowledgment/error messages back to flash */
+	private FlashMessage flashMessage;
+	
+	/**
+	 * @param transitionDAO The transitionDAO  to set
+	 */
+	public void setTransitionDAO(TransitionDAO transitionDAO) {
+		this.transitionDAO = transitionDAO;
+	}
+	/**
+	 * @param learningDesignDAO The learningDesignDAO to set.
+	 */
+	public void setLearningDesignDAO(LearningDesignDAO learningDesignDAO) {
+		this.learningDesignDAO = learningDesignDAO;
+	}	
+	/**
+	 * @param learningLibraryDAO The learningLibraryDAO to set.
+	 */
+	public void setLearningLibraryDAO(LearningLibraryDAO learningLibraryDAO) {
+		this.learningLibraryDAO = learningLibraryDAO;
+	}
+	/**
+	 * @param userDAO The userDAO to set.
+	 */
+	public void setUserDAO(UserDAO userDAO) {
+		this.userDAO = userDAO;
+	}
+	/**
+	 * @param activityDAO The activityDAO to set.
+	 */
+	public void setActivityDAO(ActivityDAO activityDAO) {
+		this.activityDAO = activityDAO;
+	}	
+	/**
+	 * @param workspaceFolderDAO The workspaceFolderDAO to set.
+	 */
+	public void setWorkspaceFolderDAO(WorkspaceFolderDAO workspaceFolderDAO) {
+		this.workspaceFolderDAO = workspaceFolderDAO;
+	}
+	/**
+	 * @param toolDAO The toolDAO to set 
+	 */
+	public void setToolDAO(ToolDAO toolDAO) {
+		this.toolDAO = toolDAO;
+	}
+	/**
+	 * @param licenseDAO The licenseDAO to set
+	 */
+	public void setLicenseDAO(LicenseDAO licenseDAO) {
+		this.licenseDAO = licenseDAO;
+	}	
+	
+    /**
+     * @return Returns the themeDAO.
+     */
+    public ICSSThemeDAO getThemeDAO() {
+        return themeDAO;
+    }
+    /**
+     * @param themeDAO The ICSSThemeDAO to set.
+     */
+    public void setThemeDAO(ICSSThemeDAO themeDAO) {
+        this.themeDAO = themeDAO;
+    }
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesign(java.lang.Long)
+	 */
+	public LearningDesign getLearningDesign(Long learningDesignID){
+		return learningDesignDAO.getLearningDesignById(learningDesignID);
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#saveLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign)
+	 */
+	public void saveLearningDesign(LearningDesign learningDesign){
+		learningDesignDAO.insert(learningDesign);
+	}
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningDesigns()
+	 */
+	public List getAllLearningDesigns(){
+		return learningDesignDAO.getAllLearningDesigns();		
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#updateLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign)
+	 */
+	public void updateLearningDesign(LearningDesign learningDesign) {		
+		learningDesignDAO.update(learningDesign);
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraries()
+	 */
+	public List getAllLearningLibraries(){
+		return learningLibraryDAO.getAllLearningLibraries();		
+	}
+	
+	/**********************************************
+	 * Utility/Service Methods
+	 * *******************************************/
+	
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignDetails(java.lang.Long)
+	 */
+	public String getLearningDesignDetails(Long learningDesignID)throws IOException{
+		String wddxPacket = null;
+		LearningDesign design = learningDesignDAO.getLearningDesignById(learningDesignID);
+		if(design==null)
+			flashMessage = FlashMessage.getNoSuchLearningDesignExists("getLearningDesignDetails",learningDesignID);
+		else{
+			LearningDesignDTO learningDesignDTO = design.getLearningDesignDTO();
+			flashMessage = new FlashMessage("getLearningDesignDetails",learningDesignDTO);
+		}
+		return flashMessage.serializeMessage();
+	}	
+	/**
+	 * Checks whether the WDDX packet contains any invalid
+	 * "<null/>". It returns true if there exists any such null
+	 */
+	private boolean containsNulls(String packet)
+	{
+		if (packet.indexOf("<null />") != -1)
+			return true;
+		else
+			return false;
+	}
+	public String copyLearningDesign(Long originalDesignID,Integer copyType,
+									Integer userID, Integer workspaceFolderID)throws UserException, LearningDesignException, 
+											 							      WorkspaceFolderException, IOException{
+		
+		LearningDesign originalDesign = learningDesignDAO.getLearningDesignById(originalDesignID);
+		if(originalDesign==null)
+			throw new LearningDesignException("No Learning Design with learning_design_id of:" + originalDesignID +" exists");
+		
+		User user = userDAO.getUserById(userID);
+		if(user==null)
+			throw new UserException("No such User with a user_id of:" + userID + " exists");
+		
+		WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
+		if(workspaceFolder==null)
+			throw new WorkspaceFolderException("No such WorkspaceFolder with workspace_folder_id of:" + workspaceFolderID + " exists");
+		
+		LearningDesign designCopy = copyLearningDesign(originalDesign,copyType,user,workspaceFolder);
+		flashMessage = new FlashMessage("copyLearningDesign", designCopy.getLearningDesignId());
+		return flashMessage.serializeMessage();
+	}
+	
+	/**
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User)
+	 */
+	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user){
+		WorkspaceFolder runSequencesFolder = workspaceFolderDAO.getRunSequencesFolderForUser(user.getUserId());
+		return copyLearningDesign(originalLearningDesign,copyType,user, runSequencesFolder);
+	}
+	
+    /**
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.usermanagement.WorkspaceFolder)
+     */
+    public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user, WorkspaceFolder workspaceFolder)
+    {
+    	LearningDesign newLearningDesign  = LearningDesign.createLearningDesignCopy(originalLearningDesign,copyType);
+    	newLearningDesign.setUser(user);    	
+    	newLearningDesign.setWorkspaceFolder(workspaceFolder);    	
+    	learningDesignDAO.insert(newLearningDesign);
+    	updateDesignActivities(originalLearningDesign,newLearningDesign); 
+    	calculateFirstActivity(originalLearningDesign,newLearningDesign);
+    	updateDesignTransitions(originalLearningDesign,newLearningDesign);
+        return newLearningDesign;
+    }
+    /**
+     * Calculates the First activity of the LearningDesign.
+     * <p> 
+     * The <em>activity_ui_id</em> is unique per LearningDesign. So when a LearningDesign is deep-copied
+     * all the activities in the newDesign would have the same <em>activity_ui_id</em> as the oldDesign.  
+     * This mean that the firstActivity of the newDesign would have the same <em>activity_ui_id</em>
+     * as the oldDesign.So in order to determine the firstActivity of the newDesign we look for an 
+     * activity which has an <em>activity_ui_id</em> same as that of the oldDesign and 
+     * <em>learning_design_id</em> as the newDesign
+     * </p>
+     *   
+     * @param oldDesign The LearningDesign to be copied
+     * @param newDesign The copy of the originalLearningDesign
+     */
+    private void calculateFirstActivity(LearningDesign oldDesign,LearningDesign newDesign){
+    	Integer oldUIID  = oldDesign.getFirstActivity().getActivityUIID();
+    	Activity firstActivity = activityDAO.getActivityByUIID(oldUIID,newDesign);
+    	newDesign.setFirstActivity(firstActivity);
+    	Integer learning_design_ui_id = new Integer(newDesign.getLearningDesignId().intValue());
+    	newDesign.setLearningDesignUIID(learning_design_ui_id);
+    }
+    
+    /**
+     * Updates the Activity information in the newLearningDesign based 
+     * on the originalLearningDesign
+     * 
+     * @param originalLearningDesign The LearningDesign to be copied
+     * @param newLearningDesign The copy of the originalLearningDesign
+     */
+    private void updateDesignActivities(LearningDesign originalLearningDesign, LearningDesign newLearningDesign){
+    	HashSet newActivities = new HashSet();    	
+    	TreeSet oldParentActivities = new TreeSet(new ActivityOrderComparator());
+    	oldParentActivities.addAll(originalLearningDesign.getParentActivities());    	    	
+    	Iterator iterator = oldParentActivities.iterator();    	
+    	while(iterator.hasNext()){
+    		Object parentActivity = iterator.next();
+    		Activity newParentActivity = getActivityCopy(parentActivity);
+    		newParentActivity.setLearningDesign(newLearningDesign);
+    		activityDAO.insert(newParentActivity);
+    		newActivities.add(newParentActivity);
+    		
+    		TreeSet oldChildActivities = new TreeSet(new ActivityOrderComparator());
+    		oldChildActivities.addAll(getChildActivities((Activity)parentActivity));    		
+    		Iterator childIterator = oldChildActivities.iterator();
+    		
+    		while(childIterator.hasNext()){
+    			Activity childActivity = (Activity)childIterator.next();
+    			Activity newChildActivity = getActivityCopy(childActivity);
+    			newChildActivity.setParentActivity(newParentActivity);
+    			newChildActivity.setParentUIID(newParentActivity.getActivityUIID());
+    			newChildActivity.setLearningDesign(newLearningDesign);
+    			activityDAO.insert(newChildActivity);
+    			newActivities.add(newChildActivity);
+    		}
+    	}
+    	newLearningDesign.setActivities(newActivities);
+    }
+    
+    /**
+     * Updates the Transition information in the newLearningDesign based 
+     * on the originalLearningDesign
+     * 
+     * @param originalLearningDesign The LearningDesign to be copied 
+     * @param newLearningDesign The copy of the originalLearningDesign
+     */
+    public void updateDesignTransitions(LearningDesign originalLearningDesign, LearningDesign newLearningDesign){
+    	HashSet newTransitions = new HashSet();
+    	Set oldTransitions = originalLearningDesign.getTransitions();
+    	Iterator iterator = oldTransitions.iterator();
+    	while(iterator.hasNext()){
+    		Transition transition = (Transition)iterator.next();
+    		Transition newTransition = Transition.createCopy(transition);    		
+    		Activity toActivity = null;
+        	Activity fromActivity=null;
+    		if(newTransition.getToUIID()!=null)
+    			toActivity = activityDAO.getActivityByUIID(newTransition.getToUIID(),newLearningDesign);
+    		if(newTransition.getFromUIID()!=null)
+    			fromActivity = activityDAO.getActivityByUIID(newTransition.getFromUIID(),newLearningDesign);
+    		newTransition.setToActivity(toActivity);
+    		newTransition.setFromActivity(fromActivity);
+    		newTransition.setLearningDesign(newLearningDesign);
+    		transitionDAO.insert(newTransition);
+    		newTransitions.add(newTransition);
+    	}
+    	newLearningDesign.setTransitions(newTransitions);
+    }
+    /**
+     * Determines the type of activity and returns a deep-copy of the same
+     * 
+     * @param activity The object to be deep-copied
+     * @return Activity The new deep-copied Activity object
+     */
+    private Activity getActivityCopy(Object activity){
+    	if(activity instanceof GroupingActivity){    		
+    		GroupingActivity newGroupingActivity = GroupingActivity.createCopy((GroupingActivity)activity);
+    		createGroupingForGroupingActivity(newGroupingActivity,(GroupingActivity)activity);
+    		return newGroupingActivity;
+    	}
+    	else if(activity instanceof ComplexActivity)
+    		return createComplexActivityCopy(activity);
+    	else if(activity instanceof GateActivity)
+    		return createGateActivityCopy(activity);
+    	else 
+    		return ToolActivity.createCopy((ToolActivity)activity);    	
+    } 
+    /**
+     * This function creates a new Grouping for the new GroupingActivity
+     * based on the grouping type of the old GroupingActivity from
+     * which it has been deep-copied.
+     * 
+     * @param groupingActivity The new GroupingActivity
+     * @param oldActivity The old GroupingActivity
+     */
+    private void createGroupingForGroupingActivity(GroupingActivity groupingActivity, GroupingActivity oldActivity){
+    	Grouping grouping = oldActivity.getCreateGrouping();
+    	
+    	if(grouping.getGroupingTypeId()==Grouping.CHOSEN_GROUPING_TYPE){
+    		ChosenGrouping chosenGrouping = ChosenGrouping.createCopy((ChosenGrouping)grouping);    		
+    		groupingDAO.insert(chosenGrouping);
+    		groupingActivity.setCreateGrouping(chosenGrouping);
+    	}
+    	else{
+    		RandomGrouping randomGrouping = RandomGrouping.createCopy((RandomGrouping)grouping);
+    		groupingDAO.insert(randomGrouping);
+    		groupingActivity.setCreateGrouping(randomGrouping);
+    	}    	
+    }
+    /**
+     * This function creates a deep copy of ComplexActivity object
+     * 
+     * @param activity The object to be deep copied
+     * @return Activity The deep-copied object
+     */
+    private Activity createComplexActivityCopy(Object activity){    	    	
+    	if(activity instanceof OptionsActivity)
+    		return OptionsActivity.createCopy((OptionsActivity)activity);
+    	else if (activity instanceof ParallelActivity)
+    		return ParallelActivity.createCopy((ParallelActivity)activity);
+    	else
+    		return SequenceActivity.createCopy((SequenceActivity)activity);
+    	
+    }
+    /**
+     * This function creates a deep copy of the GateActivity object
+     *  
+     * @param activity The object to be deep copied
+     * @return Activity The deep-copied object
+     */
+    private Activity createGateActivityCopy(Object activity){
+    	if(activity instanceof ScheduleGateActivity)
+    		return ScheduleGateActivity.createCopy((ScheduleGateActivity)activity);
+    	else if (activity instanceof PermissionGateActivity)
+    		return PermissionGateActivity.createCopy((PermissionGateActivity)activity);
+    	else
+    		return SynchGateActivity.createCopy((SynchGateActivity)activity);
+    }
+    /**
+     * Returns a set of child activities for the given parent activitity
+     * 
+     * @param parentActivity The parent activity 
+     * @return HashSet Set of the activities that belong to the parentActivity 
+     */
+    private HashSet getChildActivities(Activity parentActivity){
+    	HashSet childActivities = new HashSet();
+    	List list = activityDAO.getActivitiesByParentActivityId(parentActivity.getActivityId());
+    	if(list!=null)
+    		childActivities.addAll(list);
+    	return childActivities;
+    }		
+	/**
+	 * This method saves a new Learning Design to the database.
+	 * It received a WDDX packet from flash, deserializes it
+	 * and then finally persists it to the database.
+	 * 
+	 * @param wddxPacket The WDDX packet received from Flash
+	 * @return String The acknowledgement in WDDX format that the design has been
+	 * 				  successfully saved.
+	 * @throws Exception
+	 */
+	public String storeLearningDesignDetails(String wddxPacket) throws Exception{
+		LearningDesignDTO learningDesignDTO = null;
+		
+		if(containsNulls(wddxPacket)){
+			flashMessage = new FlashMessage("storeLearningDesignDetails",
+											"WDDXPacket contains null",
+											FlashMessage.ERROR);
+			return flashMessage.serializeMessage();
+		}		
+		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
+		ObjectExtractor extractor = new ObjectExtractor(userDAO,learningDesignDAO,
+														activityDAO,workspaceFolderDAO,
+														learningLibraryDAO,licenseDAO,
+														groupingDAO,toolDAO,groupDAO,transitionDAO);		
+		learningDesignDTO = new LearningDesignDTO(table);		
+		if(learningDesignDTO!=null){
+			LearningDesign design = extractor.extractLearningDesignObject(learningDesignDTO);	
+			learningDesignDAO.insert(design);
+			flashMessage = new FlashMessage("storeLearningDesignDetails",design.getLearningDesignId());
+		}
+		else
+			flashMessage = new FlashMessage("storeLearningDesignDetails",
+											"Invalid Object in WDDX packet",
+											FlashMessage.ERROR);
+		
+		return flashMessage.serializeMessage(); 		
+	}
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningDesignDetails()
+	 */
+	public String getAllLearningDesignDetails()throws IOException{
+		Iterator iterator= getAllLearningDesigns().iterator();
+		ArrayList arrayList = createDesignDetailsPacket(iterator);
+		flashMessage = new FlashMessage("getAllLearningDesignDetails",arrayList);		
+		return flashMessage.serializeMessage();
+	}
+	/**
+	 * This is a utility method used by the method 
+	 * <code>getAllLearningDesignDetails</code> to pack the 
+	 * required information in a data transfer object.
+	 * 	  
+	 * @param iterator 
+	 * @return Hashtable The required information in a Hashtable
+	 */
+	private ArrayList createDesignDetailsPacket(Iterator iterator){
+	    ArrayList arrayList = new ArrayList();
+		while(iterator.hasNext()){
+			LearningDesign learningDesign = (LearningDesign)iterator.next();
+			DesignDetailDTO designDetailDTO = learningDesign.getDesignDetailDTO();
+			arrayList.add(designDetailDTO);
+		}
+		return arrayList;
+	}
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesignsForUser(java.lang.Long)
+	 */
+	public String getLearningDesignsForUser(Long userID) throws IOException{
+		List list = learningDesignDAO.getLearningDesignByUserId(userID);
+		ArrayList arrayList = createDesignDetailsPacket(list.iterator());
+		flashMessage = new FlashMessage("getLearningDesignsForUser",arrayList);
+		return flashMessage.serializeMessage();
+	}	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraryDetails()
+	 */
+	public String getAllLearningLibraryDetails()throws IOException{
+		Iterator iterator= getAllLearningLibraries().iterator();
+		ArrayList libraries = new ArrayList();
+		while(iterator.hasNext()){
+			LearningLibrary learningLibrary = (LearningLibrary)iterator.next();			
+			libraries.add(learningLibrary.getLearningLibraryDTO());
+		}
+		flashMessage = new FlashMessage("getAllLearningLibraryDetails",libraries);
+		return flashMessage.serializeMessage();
+	}
+	
+	
+	/**
+	 * Store a theme created on a client.
+	 * @param wddxPacket The WDDX packet received from Flash
+	 * @return String The acknowledgement in WDDX format that the theme has been
+	 * 				  successfully saved.
+	 * @throws Exception
+	 */
+	public String storeTheme(String wddxPacket) throws Exception{
+		
+		if(containsNulls(wddxPacket)){
+			flashMessage = new FlashMessage("storeTheme",
+											"WDDXPacket contains null",
+											FlashMessage.ERROR);
+			return flashMessage.serializeMessage();
+		}		
+		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
+		
+		CSSThemeDTO themeDTO = new CSSThemeDTO(table);
+		if ( log.isDebugEnabled() ) {
+		    log.debug("Converted Theme packet. Packet was \n"+wddxPacket+
+		            "\nDTO is\n"+themeDTO);
+		}
+
+		CSSThemeVisualElement dbTheme = null;
+		CSSThemeVisualElement storedTheme = null;
+		if ( themeDTO.getId() != null )  {
+		    // Flash has supplied an id, get the record from the database for update
+		    dbTheme = themeDAO.getThemeById(themeDTO.getId());
+		}
+		
+		if ( dbTheme == null ) {
+		    storedTheme = themeDTO.createCSSThemeVisualElement();
+		} else {
+		    storedTheme = themeDTO.updateCSSTheme(dbTheme);
+		}
+		
+		themeDAO.saveOrUpdateTheme(storedTheme);
+		flashMessage = new FlashMessage("storeTheme",storedTheme.getId());
+		return flashMessage.serializeMessage(); 		
+	}
+
+	/**
+	 * Returns a string representing the requested theme in WDDX format
+	 * 
+	 * @param learningDesignID The learning_design_id of the design whose WDDX packet is requested 
+	 * @return String The requested LearningDesign in WDDX format
+	 * @throws Exception
+	 */
+	public String getTheme(Long themeId)throws IOException {
+	    CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
+		if(theme==null)
+			flashMessage = FlashMessage.getNoSuchTheme("wddxPacket",themeId);
+		else{
+			CSSThemeDTO dto = new CSSThemeDTO(theme);
+			flashMessage = new FlashMessage("getTheme",dto);
+		}
+		return flashMessage.serializeMessage();
+	}
+
+
+	/**
+	 * This method returns a list of all available themes in
+	 * WDDX format. We need to work out if this should be restricted
+	 * by user.
+	 * 
+	 * @return String The required information in WDDX format
+	 * @throws IOException
+	 */
+	public String getThemes() throws IOException {
+	    List themes = themeDAO.getAllThemes();
+		ArrayList themeList = new ArrayList();
+		Iterator iterator = themes.iterator();
+		while(iterator.hasNext()){
+		    CSSThemeBriefDTO dto = new CSSThemeBriefDTO((CSSThemeVisualElement)iterator.next());
+		    themeList.add(dto);
+		}
+		flashMessage = new FlashMessage("getThemes",themeList);		
+		return flashMessage.serializeMessage();
+	}
+}
