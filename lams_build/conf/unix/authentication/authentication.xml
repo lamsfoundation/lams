@@ -19,7 +19,7 @@
 
 
 <Method Name="LAMS-Database" Enabled="true">
-	<Param Name="dsJndiName">java:/MySqlDS</Param>
+	<Param Name="dsJndiName">java:/jdbc/lams-ds</Param>
 	<Param Name="principalsQuery">select password from lams_user where login=?</Param>
 	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
 </Method>
