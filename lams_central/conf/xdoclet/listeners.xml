@@ -1,0 +1,8 @@
+<listener>
+	<listener-class>
+		org.springframework.web.context.ContextLoaderListener
+	</listener-class>
+	<listener-class>
+ 		org.lamsfoundation.lams.web.SessionListener
+ 	</listener-class>
+</listener>	

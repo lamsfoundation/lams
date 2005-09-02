@@ -6,6 +6,6 @@
   <!-- This setting is only used when the war file is deployed directly -->
   <!-- within JBOSS. Usually it will be deployed as /lams, set in the ear's -->
   <!-- application.xml file. -->
-  <context-root>java:/jaas/LAMS</context-root>
+   <security-domain>java:/jaas/LAMS</security-domain>
 
 </jboss-web>

@@ -28,8 +28,3 @@ http://www.gnu.org/licenses/gpl.txt
 				classpath:/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml
 	</param-value>
 </context-param>
-<listener>
-	<listener-class>
-		org.springframework.web.context.ContextLoaderListener
-	</listener-class>
-</listener>	
