@@ -101,10 +101,10 @@
 			</classpath>
 		</javac>
 		<!-- Spring files -->
-		<copy overwrite="yes" todir="${build.classes}/org/lamsfoundation/lams/authoring/">
-				<fileset dir="${src.java}/org/lamsfoundation/lams/authoring/">
-						<include name="*.xml"/>
-						<include name="*.properties"/>
+		<copy overwrite="yes" todir="${build.classes}/org/lamsfoundation/lams/">
+				<fileset dir="${src.java}/org/lamsfoundation/lams/">
+						<include name="**/*.xml"/>
+						<include name="**/*.properties"/>
 				</fileset>
 		</copy>
 	</target>
