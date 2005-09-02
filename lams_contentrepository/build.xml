@@ -33,6 +33,7 @@ Ant build file.
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
+	<property file="../lams_build/common.properties"/>
 
 	<path id="all-libs">
 		<fileset dir="${lib}">
@@ -105,14 +106,14 @@ Ant build file.
 	</target>
 
 	<target name="check-driver-present">
-		<available file="${database.driver.file}" type="file" property="driver.present"/>
+		<available file="${db.driver}" type="file" property="driver.present"/>
 	</target>
 	<target name="panic-if-driver-not-present" unless="driver.present">
 		<fail>
 	      The JDBC driver you have specified by including one of the files in ${basedir}/config/database
-	      doesn't exist. You have to download this driver separately and put it in ${database.driver.file}
+	      doesn't exist. You have to download this driver separately and put it in ${db.driver}
 	      Please make sure you're using a version that is equal or superior to the one we looked for.
-	      If you name the driver jar file differently, please update the database.driver.file property
+	      If you name the driver jar file differently, please update the db.driver property
 	      in the ${basedir}/config/database/xxx.xml file accordingly.
 	     </fail>
 	</target>
@@ -138,13 +139,13 @@ Ant build file.
 		<middlegen-cr
          appname="learningdesign"
          prefsdir="${middlegen}"
-         gui="${gui}"
-         databaseurl="${database.url}"
-         driver="${database.driver}"
-         username="${database.userid}"
-         password="${database.password}"
-         schema="${database.schema}"
-         catalog="${database.catalog}"
+         gui="${middlegen.gui}"
+         databaseurl="${db.url}"
+         driver="${db.driver}"
+         username="${db.username}"
+         password="${db.password}"
+         schema="${db.schema}"
+         catalog="${db.catalog}"
          includeViews="false"
         >
 
@@ -176,7 +177,7 @@ Ant build file.
          classname="net.sf.hibernate.tool.hbm2java.Hbm2JavaTask"
          classpathref="all-libs"
       />
-		<hbm2java-cr output="${src.java}">
+		<hbm2java-cr output="${src.java.dir}">
 			<fileset dir="${hbm}/${package.contentrepository}">
 				<include name="*.hbm.xml"/>
 			</fileset>
@@ -192,34 +193,35 @@ Ant build file.
 	<!-- ================================================================ -->
 	<target name="preparedirs">
 		<mkdir dir="${build}"/>
-		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.classes.java}"/>
 		<mkdir dir="${build.lib}"/>
 	</target>
 
 
 	<target name="clean-build" depends="preparedirs" description="removes all class files">
-		<delete dir="${build.classes}"/>
+		<delete dir="${build.classes.java}"/>
 		<delete dir="${build.lib}"/>
-		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.classes.java}"/>
+		<mkdir dir="${build.classes.test}"/>
 		<mkdir dir="${build.lib}"/>
 	</target>
 
 	<target name="compile" depends="clean-build" description="compile java sources">
-		<javac srcdir="${src.java}" compiler="modern"
-	         	 	destdir="${build.classes}" deprecation="on" debug="on">
+		<javac srcdir="${src.java.dir}" compiler="modern"
+	         	 	destdir="${build.classes.java}" deprecation="on" debug="on">
 			<classpath>
 				<path refid="project.classpath"/>
 			</classpath>
 		</javac>
 		<!-- JBOSS cache file -->
-		<copy overwrite="yes" todir="${build.classes}">
-			<fileset dir="${src.java}">
+		<copy overwrite="yes" todir="${build.classes.java}">
+			<fileset dir="${src.java.dir}">
 					<include name="*.xml"/>
 			</fileset>
 		</copy>
 		<!-- Spring files -->
-		<copy overwrite="yes" todir="${build.classes}/org/lamsfoundation/lams/contentrepository/">
-			<fileset dir="${src.java}/org/lamsfoundation/lams/contentrepository">
+		<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/contentrepository/">
+			<fileset dir="${src.java.dir}/org/lamsfoundation/lams/contentrepository">
 					<include name="*.xml"/>
 					<include name="*.properties"/>
 			</fileset>
@@ -227,22 +229,22 @@ Ant build file.
 	</target>
 
 	<target name="compile.test" depends="compile">
-		<mkdir dir="${build.test}"/>
-		<javac destdir="${build.test}" compiler="modern">
-			<src path="${test.java}"/>
+		<mkdir dir="${build.classes.test}"/>
+		<javac destdir="${build.classes.test}" compiler="modern">
+			<src path="${src.test.dir}"/>
 			<classpath>
-				<pathelement location="${build.classes}"/>
+				<pathelement location="${build.classes.test}"/>
 				<path refid="project.classpath"/>
 			</classpath>
 		</javac>
-		<copy overwrite="yes" todir="${build.test}">
-			<fileset dir="${test.java}">
+		<copy overwrite="yes" todir="${build.classes.test}">
+			<fileset dir="${src.test.dir}">
 				<include name="**/*.xml"/>
 			</fileset>
-			<fileset dir="${test.java}">
+			<fileset dir="${src.test.dir}">
 				<include name="**/*.txt"/>
 			</fileset>
-			<fileset dir="${test.java}">
+			<fileset dir="${src.test.dir}">
 				<include name="**/*.zip"/>
 			</fileset>
 		</copy>
@@ -253,8 +255,8 @@ Ant build file.
 	<!-- ================================================================ -->
 	<target name="build-jar" depends="compile" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
-		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf}/META-INF/MANIFEST.MF">
-			<fileset dir="${build.classes}">
+		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/META-INF/MANIFEST.MF">
+			<fileset dir="${build.classes.java}">
 			</fileset>
 			<fileset dir="${hbm}">
 			</fileset>
@@ -267,8 +269,8 @@ Ant build file.
 	<target name="build-war" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
 		<war warfile="${build.lib}/${product}.war" 
-  				webxml="${webinf}/web.xml">
-			<webinf dir="${webinf}">
+  				webxml="${conf.webinf.dir}/web.xml">
+			<webinf dir="${conf.webinf.dir}">
 				<include name="*.xml"/>
 				<include name="*.properties"/>
 				<include name="struts/*"/>
@@ -279,7 +281,7 @@ Ant build file.
 			<!-- <lib dir="${build.lib}"> -->
 			<!-- 	<include name="${product}.jar"/> -->
 			<!-- </lib> -->
-			<fileset dir="${web}">
+			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="admin/*"/>
 				<include name="images/*"/>
@@ -345,7 +347,7 @@ Ant build file.
 			destdir="${hbm}"
 			excludedtags="@version,@author,@todo"
 			force="true">
-				<fileset dir="${src.java}">
+				<fileset dir="${src.java.dir}">
 					<include name="**/Cr*.java"/>
 				</fileset>
 			<hibernate version="2.0"/>
@@ -374,14 +376,14 @@ Ant build file.
 			<formatter type="plain" usefile="false"/>
 			<formatter type="xml"/>
 			<batchtest todir="${build.report}">
-				<fileset dir="${test.java}">
+				<fileset dir="${src.test.dir}">
 					<include name="**/Test*.java"/>
 					<exclude name="**/AllTests.java"/>
 				</fileset>
 			</batchtest> 
 			<classpath>
-				<pathelement location="${build.classes}"/>
-				<pathelement location="${build.test}"/>
+				<pathelement location="${build.classes.java}"/>
+				<pathelement location="${build.classes.test}"/>
 				<pathelement location="${hbm}"/>
 				<path refid="project.classpath"/>
 			</classpath>
