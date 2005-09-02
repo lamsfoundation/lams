@@ -3,6 +3,7 @@
 <project name="LAMS" default="usage" basedir=".">
 
 	<!-- import properties from the shared and o/s specific files -->
+	<property file="common.properties" />
 	<property file="shared.properties" />
 	<property file="windows.properties" />
 
@@ -152,7 +153,7 @@
 
 	<target name="deploy-ear" 
 		description="Deploys previously assembled ear to jboss">
-		<copy todir="${jboss.deploy}" overwrite="true"
+		<copy todir="${jboss.ear.deploy}" overwrite="true"
 			failonerror="true" verbose="true">
 			<fileset dir="${assembly}">
 				<include name="${lams.ear}/**/*.*" />
@@ -168,25 +169,25 @@
 	<target name="deploy-tools">
 		<ant antfile="../${tool_forum_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
 		<ant antfile="../${tool_imscp_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
 		<ant antfile="../${tool_laqa_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
 
 		<ant antfile="../${tool_lanb_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
 
 		<ant antfile="../${tool_sbmt_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}/lams.ear"/>
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant>
 
 	</target>
@@ -218,7 +219,7 @@
 				<include name="*.dtd" />
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${jboss.deploy}">
+		<copy overwrite="yes" todir="${jboss.ear.deploy}">
 			<fileset dir="${conf.jboss}/service">
 				<include name="mysql*.xml" />
 			</fileset>
