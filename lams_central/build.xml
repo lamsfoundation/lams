@@ -138,9 +138,8 @@
 			<webinf dir="${webinf}">
 				<include name="*.xml"/>
 				<include name="*.properties"/>
-				<include name="struts/*"/>
-				<include name="spring/*"/>					
-				<include name="jstl/*"/>
+				<include name="struts/**"/>
+				<include name="jstl/**"/>
 				<exclude name="web.xml"/>
 			</webinf>
 			<classes dir="${build.classes}"/>				
