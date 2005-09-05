@@ -2,7 +2,7 @@
 	<display-name>SecurityConstraint</display-name>
 	<web-resource-collection>
 		<web-resource-name>STK</web-resource-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>*.jsp</url-pattern>
 		<http-method>DELETE</http-method>
 		<http-method>GET</http-method>
 		<http-method>POST</http-method>

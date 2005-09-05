@@ -7,8 +7,8 @@
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 <html>
 <head>
-	<script language="JavaScript" type="text/javascript" src="getSysInfo.js"></script>
-	<script language="JavaScript" type="text/javascript" src="openUrls.js"></script>
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 </head>
 <form name="form" method="post">
 <table width="98%" height="100%" border="0" align="center" cellpadding="2" cellspacing="0">

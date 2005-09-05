@@ -1,7 +1,7 @@
 <html>
 	
 <head>
-	<link rel="stylesheet" type="text/css" href="style.css"/> 
+	<link rel="stylesheet" type="text/css" href="css/aqua.css"/> 
 </head>
 
 <table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
