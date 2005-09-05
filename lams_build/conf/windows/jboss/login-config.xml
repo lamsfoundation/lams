@@ -51,6 +51,18 @@ $Revision$
        </authentication>
     </application-policy>
 
+    <!-- Security domain for JBossMQ when using file-state-service.xml
+    <application-policy name = "jbossmq">
+       <authentication>
+          <login-module code = "org.jboss.mq.sm.file.DynamicLoginModule"
+             flag = "required">
+             <module-option name = "unauthenticatedIdentity">guest</module-option>
+             <module-option name = "sm.objectname">jboss.mq:service=StateManager</module-option>
+          </login-module>
+       </authentication>
+    </application-policy>
+    -->
+
     <!-- Security domains for testing new jca framework -->
     <application-policy name = "HsqlDbRealm">
        <authentication>
@@ -60,18 +72,6 @@ $Revision$
              <module-option name = "userName">sa</module-option>
              <module-option name = "password"></module-option>
              <module-option name = "managedConnectionFactoryName">jboss.jca:service=LocalTxCM,name=DefaultDS</module-option>
-          </login-module>
-       </authentication>
-    </application-policy>
-
-    <application-policy name = "FirebirdDBRealm">
-       <authentication>
-          <login-module code = "org.jboss.resource.security.ConfiguredIdentityLoginModule"
-             flag = "required">
-             <module-option name = "principal">sysdba</module-option>
-             <module-option name = "userName">sysdba</module-option>
-             <module-option name = "password">masterkey</module-option>
-             <module-option name = "managedConnectionFactoryName">jboss.jca:service=XaTxCM,name=FirebirdDS</module-option>
           </login-module>
        </authentication>
     </application-policy>
@@ -96,8 +96,8 @@ $Revision$
        <authentication>
           <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule"
              flag = "required">
-             <module-option name="usersProperties">jmx-console-users.properties</module-option>
-             <module-option name="rolesProperties">jmx-console-roles.properties</module-option>
+           <module-option name="usersProperties">props/jmx-console-users.properties</module-option>
+           <module-option name="rolesProperties">props/jmx-console-roles.properties</module-option>
           </login-module>
        </authentication>
     </application-policy>
@@ -114,6 +114,19 @@ $Revision$
              <module-option name="rolesProperties">web-console-roles.properties</module-option>
           </login-module>
        </authentication>
+    </application-policy>
+
+    <!-- A template configuration for the JBossWS web application (and transport layer!).
+      This defaults to the UsersRolesLoginModule the same as other and should be
+      changed to a stronger authentication mechanism as required.
+    -->
+    <application-policy name="JBossWS">
+      <authentication>
+        <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule"
+          flag="required">
+          <module-option name="unauthenticatedIdentity">anonymous</module-option>
+        </login-module>
+      </authentication>
     </application-policy>
 
     <!-- The default login configuration used by any security domain that
@@ -137,7 +150,6 @@ $Revision$
        </authentication>
     </application-policy>
 
-
 	<application-policy name = "lams-DB">
        <authentication>
           <login-module code = "org.jboss.security.auth.spi.DatabaseServerLoginModule" flag = "required">
@@ -158,4 +170,3 @@ $Revision$
 
 
 </policy>
-
