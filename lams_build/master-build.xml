@@ -204,9 +204,10 @@
 
 	<target name="copyfiles" depends="makeconfdir"
 		description="copy lib and config files">
-		<copy overwrite="yes" todir="${jboss.server}/conf/">
+		<copy overwrite="yes" todir="${jboss.server.instance}/conf/">
 			<fileset dir="${conf.jboss}/">
 				<include name="login-config.xml" />
+				<include name="log4j.xml" />
 			</fileset>
 		</copy>
 		<copy overwrite="yes" todir="${lamsconf}">
@@ -222,6 +223,11 @@
 		<copy overwrite="yes" todir="${jboss.ear.deploy}">
 			<fileset dir="${conf.jboss}/service">
 				<include name="mysql*.xml" />
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${jboss.ear.deploy}/jbossweb-tomcat55.sar/META-INF">
+			<fileset dir="${conf.jboss}/tomcat">
+				<include name="jboss-service.xml" />
 			</fileset>
 		</copy>
 	</target>
