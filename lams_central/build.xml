@@ -140,6 +140,7 @@
 				<include name="*.properties"/>
 				<include name="struts/**"/>
 				<include name="jstl/**"/>
+				<include name="tiles/**"/>
 				<exclude name="web.xml"/>
 			</webinf>
 			<classes dir="${build.classes}"/>				
