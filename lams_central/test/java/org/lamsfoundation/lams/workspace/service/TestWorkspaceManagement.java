@@ -204,7 +204,10 @@ public class TestWorkspaceManagement extends BaseWorkspaceTest {
 	 * @return
 	 */
 	private WorkspaceFolderContent getMatchingContent(NodeKey nk, Long folderId) {
+		assertNotNull(nk);
+		assertNotNull(folderId);
 		List contentList = workspaceFolderContentDAO.getContentByWorkspaceFolder(folderId);
+		assertNotNull(contentList);
 		Iterator iter = contentList.iterator();
 		while (iter.hasNext()) {
 			WorkspaceFolderContent element = (WorkspaceFolderContent) iter.next();
