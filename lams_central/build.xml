@@ -173,6 +173,8 @@
 	<target name="test" depends="compile.test"> 
 			<mkdir dir="${build.report}"/>
 			<junit printsummary="yes" haltonerror="no" haltonfailure="no" fork="yes">
+				<jvmarg value="-Xms512M"/>
+				<jvmarg value="-Xmx1024M"/>
 				<formatter type="plain" usefile="false"/>
 				<formatter type="xml"/>
 				<batchtest todir="${build.report}">
