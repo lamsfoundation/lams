@@ -4,6 +4,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.web.util.HttpSessionManager;
 
 
 /**

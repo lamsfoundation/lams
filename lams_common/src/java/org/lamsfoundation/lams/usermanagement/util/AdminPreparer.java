@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
-import org.lamsfoundation.lams.web.AttributeNames;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * <p>

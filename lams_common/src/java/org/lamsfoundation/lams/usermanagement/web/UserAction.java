@@ -28,7 +28,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.AdminPreparer;
-import org.lamsfoundation.lams.web.HttpSessionManager;
+import org.lamsfoundation.lams.web.util.HttpSessionManager;
 
 
 /**

@@ -26,7 +26,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.web.HttpSessionManager;
+import org.lamsfoundation.lams.web.util.HttpSessionManager;
 
 /**
  * @author Fei Yang

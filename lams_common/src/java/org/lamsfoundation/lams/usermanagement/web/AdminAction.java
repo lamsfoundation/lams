@@ -29,8 +29,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.util.ExcelUserImportFileParser;
 import org.lamsfoundation.lams.usermanagement.util.AdminPreparer;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
-import org.lamsfoundation.lams.web.HttpSessionManager;
-import org.lamsfoundation.lams.web.AttributeNames;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.lamsfoundation.lams.util.UploadFileUtil;
 import org.lamsfoundation.lams.usermanagement.web.UserActionForm;
 
