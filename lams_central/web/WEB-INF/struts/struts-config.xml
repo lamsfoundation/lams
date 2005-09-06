@@ -13,6 +13,11 @@
   <!-- ========== Form Bean Definitions =================================== -->
   <form-beans>
 
+    <form-bean
+      name="PasswordChangeActionForm"
+      type="org.lamsfoundation.lams.web.PasswordChangeActionForm"
+    />
+
     <!--
          If you have non XDoclet forms, define them in a file called struts-forms.xml and
          place it in your merge directory.
@@ -125,7 +130,7 @@
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-   <!-- Define your Struts message-resources in a file called struts-message-resources.xml and place it in your merge directory. -->
+    <message-resources    parameter="org.lamsfoundation.lams.applicationResources"/>
 
   <plug-in className="org.apache.struts.tiles.TilesPlugin">
 	<set-property property="definitions-config"
