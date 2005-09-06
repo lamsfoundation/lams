@@ -54,26 +54,6 @@
       />
     </action>
     <action
-      path="/passwordChanged"
-      type="org.lamsfoundation.lams.web.PasswordChangeAction"
-      name="PasswordChangeActionForm"
-      scope="request"
-      input=".passwordChange"
-      unknown="false"
-      validate="true"
-    >
-      <forward
-        name="okay"
-        path=".passwordChangeOk"
-        redirect="false"
-      />
-      <forward
-        name="cancelled"
-        path="/index.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/admin"
       type="org.lamsfoundation.lams.usermanagement.web.AdminAction"
       parameter="method"
@@ -173,59 +153,6 @@
       <forward
         name="error"
         path=".admin.error"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/home"
-      type="org.lamsfoundation.lams.web.HomeAction"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="admin"
-        path=".admin"
-        redirect="false"
-      />
-      <forward
-        name="learner"
-        path="/learner.jsp"
-        redirect="false"
-      />
-      <forward
-        name="author"
-        path="/author.jsp"
-        redirect="false"
-      />
-      <forward
-        name="staff"
-        path="/staff.jsp"
-        redirect="false"
-      />
-      <forward
-        name="error"
-        path=".error"
-        redirect="false"
-      />
-      <forward
-        name="passwordChange"
-        path=".passwordChange"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/workspace"
-      type="org.lamsfoundation.lams.workspace.web.WorkspaceAction"
-      name="WorkspaceAction"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="/index.jsp"
         redirect="false"
       />
     </action>
