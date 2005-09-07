@@ -22,7 +22,6 @@ http://www.gnu.org/licenses/gpl.txt
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
 				classpath:/org/lamsfoundation/lams/applicationContext.xml
-				classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
 				classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml

@@ -1,2 +1,1 @@
-Class-Path: ./lams.jar 
-
+Class-Path: ./lams.jar ./lams-contentrepository.jar
