@@ -21,11 +21,11 @@ public class AttachmentTest extends TestCase {
 
     public void testCreateAndDeleteForum() throws FactoryException {
         //Populate an Attachment entity for test purposes
-        AttachmentDao attachmentDao = (AttachmentDao) GenericObjectFactoryImpl.getInstance().lookup(AttachmentDao.class);
+        AttachmentDao attachmentDao = (AttachmentDao) GenericObjectFactoryImpl.getTestInstance().lookup(AttachmentDao.class);
         Attachment instructions = new Attachment();
         attachmentDao.saveOrUpdate(instructions);
 
-        AttachmentDao dao = (AttachmentDao) GenericObjectFactoryImpl.getInstance().lookup(AttachmentDao.class);
+        AttachmentDao dao = (AttachmentDao) GenericObjectFactoryImpl.getTestInstance().lookup(AttachmentDao.class);
         dao.saveOrUpdate(instructions);
         assertNotNull(instructions.getId());
 

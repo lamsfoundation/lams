@@ -1,12 +1,8 @@
 package org.lamsfoundation.lams.tool.forum.core;
 
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.apache.log4j.Priority;
-import org.apache.log4j.Logger;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 
 /**
@@ -25,6 +21,20 @@ public class GenericObjectFactoryImpl implements GenericObjectFactory {
         if (genericObjectFactory == null) {
             genericObjectFactory = new GenericObjectFactoryImpl();
             addContext("/org/lamsfoundation/lams/applicationContext.xml");
+            addContext("/org/lamsfoundation/lams/contentrepository/applicationContext.xml");
+            addContext("/forumApplicationContext.xml");
+        }
+        return genericObjectFactory;
+    }
+
+    /** Get the Spring context with a local datasource and transaction, suitable
+     * for testing. Does not use JTA so the transactions across projects could be
+     * out. Do NOT use in production code - only for junit testing.
+     */
+    public static GenericObjectFactory getTestInstance() {
+        if (genericObjectFactory == null) {
+            genericObjectFactory = new GenericObjectFactoryImpl();
+            addContext("/org/lamsfoundation/lams/localApplicationContext.xml");
             addContext("/org/lamsfoundation/lams/contentrepository/applicationContext.xml");
             addContext("/forumApplicationContext.xml");
         }

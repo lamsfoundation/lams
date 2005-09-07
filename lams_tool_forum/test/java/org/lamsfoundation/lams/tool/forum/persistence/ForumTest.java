@@ -33,7 +33,7 @@ public class ForumTest extends TestCase {
 
         Set attachments = new HashSet();
 
-        AttachmentDao attachmentDao = (AttachmentDao) GenericObjectFactoryImpl.getInstance().lookup(AttachmentDao.class);
+        AttachmentDao attachmentDao = (AttachmentDao) GenericObjectFactoryImpl.getTestInstance().lookup(AttachmentDao.class);
         Attachment instructions = new Attachment();
         //instructions.setType(true);
         attachments.add(instructions);
@@ -42,7 +42,7 @@ public class ForumTest extends TestCase {
         entity.setAttachments(attachments);
 
         //save
-        ForumDao dao = (ForumDao) GenericObjectFactoryImpl.getInstance().lookup(ForumDao.class);
+        ForumDao dao = (ForumDao) GenericObjectFactoryImpl.getTestInstance().lookup(ForumDao.class);
         dao.saveOrUpdate(entity);
         assertNotNull(entity.getId());
         assertNotNull("date created is null", entity.getCreated());

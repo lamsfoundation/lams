@@ -26,7 +26,7 @@ public class GenericEntityTest extends TestCase {
         entity.setModifiedBy(new Long("1004"));
 
         //save
-        GenericEntityDao dao = (GenericEntityDao) GenericObjectFactoryImpl.getInstance().lookup(GenericEntityDao.class);
+        GenericEntityDao dao = (GenericEntityDao) GenericObjectFactoryImpl.getTestInstance().lookup(GenericEntityDao.class);
         dao.saveOrUpdate(entity);
         assertNotNull(entity.getId());
         assertNotNull("date created is null", entity.getCreated());

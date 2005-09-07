@@ -27,7 +27,7 @@ public class MessageTest extends TestCase {
         Forum forum = new Forum();
 
         //save
-        ForumDao dao = (ForumDao) GenericObjectFactoryImpl.getInstance().lookup(ForumDao.class);
+        ForumDao dao = (ForumDao) GenericObjectFactoryImpl.getTestInstance().lookup(ForumDao.class);
         dao.saveOrUpdate(forum);
 
         Message message = new Message();
@@ -39,7 +39,7 @@ public class MessageTest extends TestCase {
         message.setCreatedBy(new Long(1000));
         message.setModifiedBy(new Long(1002));
 
-        MessageDao messageDao = (MessageDao) GenericObjectFactoryImpl.getInstance().lookup(MessageDao.class);
+        MessageDao messageDao = (MessageDao) GenericObjectFactoryImpl.getTestInstance().lookup(MessageDao.class);
         messageDao.saveOrUpdate(message);
 
         assertNotNull(message.getId());

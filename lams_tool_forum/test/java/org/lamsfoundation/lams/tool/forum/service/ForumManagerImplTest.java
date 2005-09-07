@@ -22,7 +22,7 @@ public class ForumManagerImplTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        forumManager = (ForumManager) GenericObjectFactoryImpl.getInstance().lookup("forumManager");
+        forumManager = (ForumManager) GenericObjectFactoryImpl.getTestInstance().lookup("forumManager");
     }
 
     public void testCreateAndDeleteForum() throws PersistenceException {

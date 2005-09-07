@@ -8,21 +8,10 @@
 	<property name="project.displayname" value="${project} - ${project.displayname}"/>
 	<property name="project.description" value="${project} - ${project.description}"/>
 
-	<!-- fixed filesystem property structure /-->
-	<property name="lib.dir" value="${basedir}/lib"/>
-	<property name="classes.dir" value="${build}/classes"/>
-
-    <property name="test.lib.dir" value="${basedir}/test/lib"/>
-    <property name="test.classes.dir" value="${basedir}/test/classes"/>
-    <property name="test.result" value="${basedir}/test/testresult"/>
-
 	<!-- end properties *********************************************************************************************-->
 
 	<!-- begin path *************************************************************************************************-->
 	<path id="all-libs">
-		<fileset dir="${lib}">
-			<include name="**/*.jar"/>
-		</fileset>
 		<fileset dir="${sharedlib}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -38,39 +27,22 @@
 		<pathelement location="${java.class.path}" />
 	</path>
 
-	<path id="build.class.path">
-		<fileset dir="${lib.dir}/build">
-			<include name="**/*.jar"/>
-		</fileset>
-    </path>
-
 	<!-- end path ***************************************************************************************************-->
 
 	<!-- begin tasks ***********************************************************************************************/-->
 	<target name="init">
 		<echo>+------------------------------------------+</echo>
-		<echo>| build initializing                       |</echo>
-		<echo>+------------------------------------------+</echo>
-
-		<antcall target="mkdirs"/>
-
-		<echoproperties/>
-	</target>
-
-	<target name="mkdirs">
-		<echo>+------------------------------------------+</echo>
 		<echo>| creating directory structure             |</echo>
 		<echo>+------------------------------------------+</echo>
 
 		<!-- build filesystem structure /-->
-		<mkdir dir="${classes.dir}"/>
-		<mkdir dir="${lib.dir}"/>
         <mkdir dir="${build}"/>
+		<mkdir dir="${build.classes.java}"/>
         <mkdir dir="${build.report}"/>
         <mkdir dir="${build.lib}"/>
         <mkdir dir="${build.deploy}"/>
-        <mkdir dir="${test.classes.dir}"/>
-        <mkdir dir="${test.result}"/>
+        <mkdir dir="${build.classes.test}"/>
+        <mkdir dir="${build.report}"/>
 	</target>
 
 
@@ -79,30 +51,30 @@
 		<echo>| clean                                    |</echo>
 		<echo>+------------------------------------------+</echo>
 
-		<delete dir="${classes.dir}"/>
-		<delete dir="${build}"/>
-		<delete dir="${build.report}"/>
-		<delete dir="${build.lib}"/>
-		<delete dir="${build.deploy}"/>
-        <delete dir="${test.classes.dir}"/>
-        <delete dir="${test.result}"/>
+		<delete dir="${build.classes.java}" quiet="false"/>
+        <delete dir="${build.classes.test}" quiet="false"/>
+		<delete dir="${build.lib}" quiet="false"/>
+		<delete dir="${build.deploy}" quiet="false"/>
 
 	</target>
 			
-	<target name="compile" description="Compiles the Task" depends="init">
-		<echo>+------------------------------------------+</echo>
-		<echo>| compile                                  |</echo>
-		<echo>+------------------------------------------+</echo>
-
-		<javac srcdir="${src.dir}"
+	<target name="compile-java" description="Compiles the Task" depends="init">
+		<javac srcdir="${src.java.dir}"
             source="1.4"
             debug="on"
             compiler="modern"
             classpathref="project.classpath"
-            destdir="${classes.dir}"/>
+            destdir="${build.classes.java}"/>
+	 	<copy overwrite="yes" todir="${build.classes.java}" verbose="true">
+			<fileset dir="${src.java.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.hbm.xml"/>
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
 	</target>
 
-	<target name="hibernate" depends="compile">
+	<target name="hibernate" depends="compile-java">
 		<echo>+------------------------------------------+</echo>
 		<echo>| generating hibernate metadata            |</echo>
 		<echo>+------------------------------------------+</echo>
@@ -111,13 +83,13 @@
 			classname="xdoclet.modules.hibernate.HibernateDocletTask"
 			classpathref="all-libs"/>
 
-		<echo>Building hbm.xml files using XDoclet to ${conf.hibernate.mapping.dir} from ${src.dir}</echo>
+		<echo>Building hbm.xml files using XDoclet to ${conf.hibernate.mapping.dir} from ${src.java.dir}</echo>
 
 		<hibernatedoclet
 			destdir="${conf.hibernate.mapping.dir}"
 			excludedtags="@version,@author,@todo"
 			force="true">
-				<fileset dir="${src.dir}">
+				<fileset dir="${src.java.dir}">
 					<include name="**/*.java"/>
 				</fileset>
 			<hibernate version="2.0"/>
@@ -125,32 +97,20 @@
 
     </target>
 
-    <target name="compiletest" description="Compiles the test classes" depends="clean, compile, hibernate">
-        <echo>+------------------------------------------+</echo>
-        <echo>| compile                                  |</echo>
-        <echo>+------------------------------------------+</echo>
-         <mkdir dir="${test.classes.dir}"/>
-
-	      <copy todir="${test.classes.dir}">
-            <fileset dir="${src.dir}">
-			    <include name="**/*.xml"/>
-            </fileset>
-          </copy>
-          <copy todir="${test.classes.dir}">
-			<fileset dir="${classes.dir}">
-                <include name="**/*.class"/>
-                <include name="**/*.hbm.xml"/>
-            </fileset>
-          </copy>
-
-        <javac srcdir="${src.test.dir}"
-            source="1.4"
-            debug="on"
-            compiler="modern"
-            classpathref="project.classpath"
-            destdir="${test.classes.dir}"/>
-    </target>
-	
+	<target name="compile-test" depends="compile-java">
+		<javac srcdir="${src.test.dir}" compiler="modern"
+	         	 	destdir="${build.classes.test}" deprecation="on" debug="on">
+			<classpath>
+				<pathelement location="${build.classes.java}"/>
+				<path refid="project.classpath"/>
+			</classpath>
+		</javac>
+		<copy overwrite="yes" todir="${build.classes.test}">
+			<fileset dir="${src.test.dir}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
 	
 	<!-- =================================================================== -->
 	<!-- Forum Database tasks                                               -->
@@ -187,62 +147,46 @@
 		</sql>
 	</target>
 
-    <target name="junit" depends="compiletest, init-db">
-        <echo>+-------------------------------------------+</echo>
-        <echo>| run junit tests and save results in /test |</echo>
-        <echo>+-------------------------------------------+</echo>
-        <mkdir dir="${test.result}"/>
+	<target name="test-report" depends="compile-test, init-db">
 
-        <junit dir="${basedir}"
-             printsummary="yes"
-             errorProperty="test.failed"
-             failureProperty="test.failed">
-         <jvmarg value="-Xmx512m"/>
-         <!--
-         <jvmarg value="-ea"/>
-         <jvmarg value="-esa"/>
-         -->
-         <jvmarg value="-Djava.endorsed.dirs=${lib.dir}/endorsed"/>
+		<mkdir dir="${build.report}"/>
+		<mkdir dir="${build.report}/html"/> 
+		
+		<junit printsummary="yes" errorProperty="test.failed" failureProperty="test.failed"
+			   fork="yes">
+			<formatter type="plain" usefile="false"/>
+			<formatter type="xml"/>
+			<batchtest todir="${build.report}">
+				<fileset dir="${src.test.dir}">
+	                 <include name="org/lamsfoundation/lams/tool/forum/**/*.*"/>
+				</fileset>
+			</batchtest>
+			<classpath>
+				<pathelement location="${build.classes.java}"/>
+				<pathelement location="${build.classes.test}"/>
+				<pathelement location="${conf.hibernate.mapping.dir}"/>
+				<pathelement location="${conf.web.dir}"/>
+				<path refid="project.classpath"/>
+			</classpath>
+		</junit>
 
-         <classpath id="junit.class.path">
-             <path location="${test.classes.dir}"/>
-             <path refid="project.classpath"/>
-         </classpath>
-
-         <formatter type="xml"/>
-
-
-         <batchtest fork="yes" todir="${test.result}">
-             <fileset dir="${src.test.dir}">
-                 <include name="org/lamsfoundation/lams/tool/forum/**/*.*"/>
-                 <exclude name="org/lamsfoundation/lams/tool/forum/core/BaseTestCase.java"/>
-                 <exclude name="org/lamsfoundation/lams/tool/forum/core/SpringAwareTestCase.java"/>
-             </fileset>
-         </batchtest>
-     </junit>
-    <fail message="Tests failed. Check log and/or reports." if="test.failed"/>
-    </target>
-
-    <target name="merge" description="merges dependencies for the jar file">
-		<echo>+------------------------------------------+</echo>
-		<echo>| merge stuff into jar file                |</echo>
-		<echo>+------------------------------------------+</echo>
-
-	 	<copy overwrite="yes" todir="${classes.dir}">
-			<fileset dir="${src.dir}">
-				<include name="**/*.xml"/>
-				<include name="**/*.properties"/>
+		<junitreport todir="${build.report}"> 
+			<fileset dir="${build.report}">
+				<include name="TEST-*.xml"/>
 			</fileset>
-		</copy>
+			<report todir="${build.report}/html"/> 
+		</junitreport>
+		
+		<fail message="Tests failed. Check log and/or reports" if="test.failed"/>
 	</target>
 
-	<target name="jar" description="JARs the Task" depends="hibernate, compile, merge">
+	<target name="jar" description="JARs the Task" depends="hibernate, compile-java">
 		<echo>+------------------------------------------+</echo>
 		<echo>| create jar file                          |</echo>
 		<echo>+------------------------------------------+</echo>
 		<delete file="${build.lib}/${product}.jar"/>
 		<jar destfile="${build.lib}/${product}.jar">
-			<fileset dir="${classes.dir}">
+			<fileset dir="${build.classes.java}">
 			</fileset>
 			<fileset dir="${conf.hibernate.mapping.dir}">
 			</fileset>
@@ -391,7 +335,7 @@
 	<!-- begin navigation tasks *************************************************************************************-->
 	<target
         name="_build"
-        depends="init, clean, mkdirs, compile, merge, jar, web">
+        depends="init, clean, compile-java, jar, web">
 		<echo>+------------------------------------------+</echo>
 		<echo>| built war file                           |</echo>
 		<echo>+------------------------------------------+</echo>
