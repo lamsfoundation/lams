@@ -77,16 +77,16 @@ Used to get the appropriate property from a node. e.g. IValue value = node.getPr
 
 <p>Note:  All interfaces with Admin in their name are only to be used within the repository and must not be used by tools. </p>
 
-<h2>Spring Context File</h2>
+<h2>Spring Context</h2>
 
 <p>The context file for Spring is available as /org/lamsfoundation/lams/contentrepository/applicationContext.xml.</p>
 
 <p>The only bean that should be accessed directly is the repository service. The
 bean reference is "repositoryService".</p>
 
-<p>There is a local context file available as /org/lamsfoundation/lams/contentrepository/localApplicationContext.xml.
-This should only be used in junit testing. This uses a local database (rather than the JNDI datasource) and
-does not use a cache.</p>
+<p>The content repository uses the core datasource and the shared transaction manager
+defined in /org/lamsfoundation/lams/applicationContext.xml. When using the content repository
+for junit testing, make sure you include /org/lamsfoundation/lams/localApplicationContext.xml.
 
 <h2>Typical Usage</h2>
 
@@ -240,12 +240,13 @@ Calling code can catch either the detailed exceptions or just
 RepositoryCheckedException.</P>
 
 <p>All the calls on IRepository should be transactional, defined
-in the Spring context file. If any are not defined in the context file, then
-this is a bug and should be corrected!!!!!!!!!. All 
-of the transactions should roll back on both the RepositoryCheckedException
-(as it is defined in the context file) and RepositoryRuntimeException
-as the Spring trasactions will roll back on any RuntimeException.
-However, all we can roll back are database changes. We cannot roll back
+in the Spring context file.  Runtime exceptions will trigger the transaction 
+to be marked for rollback. Checked exceptions will NOT trigger the transaction 
+to be marked for rollback so it is up to the calling code to trigger a 
+rollback if needed. This allows the calling code to handle the exception and 
+continue the transaction.</p>
+
+<p>However, all we can roll back are database changes. We cannot roll back
 file system changes. For this reason, we try to do the database changes
 first. But it isn't perfect. </p>
 
@@ -254,7 +255,7 @@ first. But it isn't perfect. </p>
 <UL>
 <LI><STRONG>Repository location</STRONG> Edit 
 org.lamsfoundation.lams.contentrepository.contentRepositoryApplicationContext.xml 
-(in the src hierarchy). Defaults to D:\repository. This can reside anywhere it 
+(in the src hierarchy). Defaults to /tmp/repository. This can reside anywhere it 
 can be accessed as a directory - it does not need to be under the JBOSS hierarchy.
 <EM>This needs to be changed to pick up the value from the database!</EM></LI>
 <LI><STRONG>Database user and password</STRONG> Edit build.properties (in the root of the project)

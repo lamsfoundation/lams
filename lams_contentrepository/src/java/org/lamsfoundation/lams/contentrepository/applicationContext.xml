@@ -61,8 +61,9 @@
 	<!--  repository (as repositoryAdminService) and ticket are the two main interfaces -->
 	<!--  into the repository and as such have transaction definitions on their interfaces -->
 
-	<!--  don't actually have to specify to roll back on RepositoryRuntimeException (as Runtime exceptions roll back -->
-	<!--  automatically, but put then in here as documentation	-->
+	<!--  Only rollback on runtime exceptions - the checked exceptions may be handled by -->
+	<!--  the calling code, so we don't want to mark the transaction as rollback.        -->
+	<!--  Exceptions that we don't want people to catch shouldn't be a checked exception -->
 	<bean id="repositoryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager">
 			<ref bean ="transactionManager"/>
@@ -72,23 +73,23 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="login">PROPAGATION_SUPPORTS,readOnly,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="addWorkspace">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="createCredentials">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="assignCredentials">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="updateCredentials">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="addFileItem">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="addPackageItem">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="updateFileItem">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="updatePackageItem">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="deleteVersion">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="deleteNode">PROPAGATION_REQUIRED,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="logout">PROPAGATION_SUPPORTS,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="setProperty">PROPAGATION_SUPPORTS,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="login">PROPAGATION_SUPPORTS,readOnly</prop>
+				<prop key="addWorkspace">PROPAGATION_REQUIRED</prop>
+				<prop key="createCredentials">PROPAGATION_REQUIRED</prop>
+				<prop key="assignCredentials">PROPAGATION_REQUIRED</prop>
+				<prop key="updateCredentials">PROPAGATION_REQUIRED</prop>
+				<prop key="addFileItem">PROPAGATION_REQUIRED</prop>
+				<prop key="addPackageItem">PROPAGATION_REQUIRED</prop>
+				<prop key="updateFileItem">PROPAGATION_REQUIRED</prop>
+				<prop key="updatePackageItem">PROPAGATION_REQUIRED</prop>
+				<prop key="deleteVersion">PROPAGATION_REQUIRED</prop>
+				<prop key="deleteNode">PROPAGATION_REQUIRED</prop>
+				<prop key="logout">PROPAGATION_SUPPORTS</prop>
+				<prop key="setProperty">PROPAGATION_SUPPORTS</prop>
 				<!--  Read only methods -->
-				<prop key="getFileItem">PROPAGATION_REQUIRED,readOnly,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="getVersionHistory">PROPAGATION_REQUIRED,readOnly,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
-				<prop key="getNodeList">PROPAGATION_REQUIRED,readOnly,-RepositoryCheckedException,-RepositoryRuntimeException</prop>
+				<prop key="getFileItem">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="getVersionHistory">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="getNodeList">PROPAGATION_REQUIRED,readOnly</prop>
 			</props>
 		</property>
 		<property name="preInterceptors">

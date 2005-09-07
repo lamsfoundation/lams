@@ -43,7 +43,13 @@ import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 
 /**
- * Tool access to the repository
+ * Tool access to the repository.
+ * <p> 
+ * Runtime exceptions will trigger the transaction to be marked for rollback.
+ * Checked exceptions will NOT trigger the transaction to be marked for 
+ * rollback so it is up to the calling code to trigger a rollback if needed.
+ * This allows the calling code to handle the exception and continue the
+ * transaction.
  */
 public interface IRepositoryService {
 
@@ -85,7 +91,6 @@ public interface IRepositoryService {
 	 * It does not clear the password in the credentials
 	 * @param credentials this user/password must already exist in the repository. Password will be checked.
 	 * @param workspaceName 
-	 * @param credentials   The credentials of the user/tool
 	 * @throws LoginException if credentials are not authorised to add/access the new workspace.
 	 * @throws ItemExistsException if the workspace already exists.
 	 * @throws RepositoryCheckedException if parameters are missing.	 
@@ -212,8 +217,8 @@ public interface IRepositoryService {
      * Sets the property to a value, based on the specified type.  Removes the property if the value is null.
      *
      * @param ticket Mandatory
-     * @pararm uuid Mandatory
-     * @pararm versionId Mandatory
+     * @param uuid Mandatory
+     * @param versionId Mandatory
      * @param name  The name of a property of this node
      * @param value The value to be assigned
      * @param type  The type of the property. See org.lamsfoundation.lams.contentrepository.PropertyType
