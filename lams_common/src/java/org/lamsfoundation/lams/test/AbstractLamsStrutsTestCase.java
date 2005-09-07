@@ -125,7 +125,7 @@ public abstract class AbstractLamsStrutsTestCase extends MockStrutsTestCase
 	    	Session s = holder.getSession(); 
 		    s.flush();
 		    TransactionSynchronizationManager.unbindResource(sessionFactory);
-		    SessionFactoryUtils.closeSessionIfNecessary(s, sessionFactory);
+		    SessionFactoryUtils.releaseSession(s, sessionFactory);
 	    }
     }
     

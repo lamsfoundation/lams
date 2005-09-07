@@ -26,16 +26,13 @@
 
     <!--  Third Party JAR Files -->
 	<module>
-		<java>aopalliance.jar</java>
-	</module>
-	<module>
-		<java>cglib-full-2.0.2.jar</java>
+		<java>cglib-nodep-2.1_2.jar</java>
 	</module>
 	<module>
 		<java>dom4j-1.5.2.jar</java>
 	</module>
 	<module>
-		<java>ehcache-1.0.jar</java>
+		<java>ehcache-1.1.jar</java>
 	</module>
 	<module>
 		<java>hibernate2.jar</java>
@@ -104,9 +101,6 @@
 		<java>odmg-3.0.jar</java>
 	</module>
 	<module>
-		<java>spring.jar</java>
-	</module>
-	<module>
 		<java>antlr.jar</java>
 	</module>
 	<module>
@@ -120,6 +114,48 @@
 	</module>
 	<module>
 		<java>wddx-1.0a-lfl-0.2.jar</java>
+	</module>
+	<module>
+		<java>quartz.jar</java>
+	</module>
+	<module>
+		<java>spring-aop.jar</java>
+	</module>
+	<module>
+		<java>spring-beans.jar</java>
+	</module>
+	<module>
+		<java>spring-context.jar</java>
+	</module>
+	<module>
+		<java>spring-core.jar</java>
+	</module>
+	<module>
+		<java>spring-dao.jar</java>
+	</module>
+	<module>
+		<java>spring-hibernate.jar</java>
+	</module>
+	<module>
+		<java>spring-jdbc.jar</java>
+	</module>
+	<module>
+		<java>spring-mock.jar</java>
+	</module>
+	<module>
+		<java>spring-orm.jar</java>
+	</module>
+	<module>
+		<java>spring-remoting.jar</java>
+	</module>
+	<module>
+		<java>spring-support.jar</java>
+	</module>
+	<module>
+		<java>spring-web.jar</java>
+	</module>
+	<module>
+		<java>spring-webmvc.jar</java>
 	</module>
     <!--  End Third Party JAR Files -->
     

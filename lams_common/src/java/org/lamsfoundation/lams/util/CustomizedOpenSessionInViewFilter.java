@@ -74,6 +74,6 @@ public class CustomizedOpenSessionInViewFilter extends OpenSessionInViewFilter
 	 * @param sessionFactory the SessionFactory that this filter uses
 	 */
 	protected void closeSession(Session session, SessionFactory sessionFactory) {
-		SessionFactoryUtils.closeSessionIfNecessary(session, sessionFactory);
+		SessionFactoryUtils.releaseSession(session, sessionFactory);
 	}
 }
