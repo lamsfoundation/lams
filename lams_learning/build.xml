@@ -44,6 +44,12 @@ http://www.gnu.org/licenses/gpl.txt
 		<pathelement location="${java.class.path}" />
 	</path>
 
+	<path id="surveytool.classpath">
+		<fileset dir="../lams_tool_survey/build/lib/">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
 	<target name="usage">
 		<echo message="" />
 		<echo message="${name} build file" />
@@ -287,6 +293,7 @@ http://www.gnu.org/licenses/gpl.txt
 				<pathelement location="${conf.hibernate.mapping.dir}" />
 				<pathelement location="${conf.web.dir}" />
 				<path refid="project.classpath" />
+				<path refid="surveytool.classpath" />
 			</classpath>
 		</junit>
 	</target>
