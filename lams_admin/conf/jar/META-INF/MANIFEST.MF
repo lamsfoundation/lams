@@ -1,0 +1,3 @@
+Implementation-Title: LAMS Admin
+Implementation-Version: 1.1
+Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
