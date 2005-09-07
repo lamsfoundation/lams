@@ -3,7 +3,7 @@
 <!-- -->
 <!DOCTYPE project [
 ]>
-<project name="lams_admin" default="usage" basedir=".">
+<project name="Lams_Admin" default="usage" basedir=".">
 
 	<property file="build.properties"/>
 	<property file="../lams_build/common.properties"/>
@@ -123,7 +123,7 @@
 			<delete file="${build.lib}/${product}.jar"/>
 			<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 				<fileset dir="${build.classes.java}"/>
-				<fileset dir="${conf.hibernate.mapping.dir}"/>
+				<!--<fileset dir="${conf.hibernate.mapping.dir}"/>-->
 				<fileset dir="${build.web}"/>
 			</jar>
 		</target>
@@ -176,6 +176,21 @@
 	   	   </war>
 	   	
 	   </target>
+	
+	<!-- =================================================================== -->
+	<!-- Deploy the jar and war                               -->
+	<!-- =================================================================== -->
+	<target name="deploy-war" depends="build-war" description="Deploy the SubmitFiles tool war file and jar file">
+		<delete quiet="true">
+			<fileset dir="${jboss.deploy}/tmp"/>
+			<fileset dir="${jboss.deploy}/work"/>
+		</delete>
+		<copy file="${build.lib}/${product}.jar"
+				todir="${jboss.deploy}"/> 
+		<copy file="${build.lib}/${product}.war"
+				todir="${jboss.deploy}"/> 
+	</target>
+
 	<!-- =================================================================== -->
 	<!-- Run JUnit Tests                                                     -->
 	<!-- =================================================================== -->
@@ -196,7 +211,7 @@
 			<classpath>
 				<pathelement location="${build.classes.java}" />
 				<pathelement location="${build.classes.test}" />
-				<pathelement location="${conf.hibernate.mapping.dir}" />
+				<!--<pathelement location="${conf.hibernate.mapping.dir}" />-->
 				<pathelement location="${conf.web.dir}" />
 				<path refid="project.classpath" />
 			</classpath>

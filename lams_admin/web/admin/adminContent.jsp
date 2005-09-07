@@ -10,7 +10,7 @@
 <%@ page import="org.lamsfoundation.lams.usermanagement.Organisation" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.User" %>
-<%@ page import="org.lamsfoundation.lams.admin.web.AttributeNames" %>
+<%@ page import="org.lamsfoundation.lams.web.util.AttributeNames" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
