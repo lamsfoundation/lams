@@ -68,7 +68,7 @@ public class NodeDAO extends HibernateDaoSupport implements INodeDAO  {
 	 * more efficient. But as the repository doesn't keep the session
 	 * open, the lazy loading can't occur! So load manually.
 	 * 
-	 * @param workspaceId
+	 * @param parentNodeVersion
 	 * @return Set of CrNodes that are child nodes of this node/version 
 	 */
 	public List findChildNodes(CrNodeVersion parentNodeVersion) {
@@ -96,7 +96,9 @@ public class NodeDAO extends HibernateDaoSupport implements INodeDAO  {
 	 * more efficient. But as the repository doesn't keep the session
 	 * open, the lazy loading can't occur! So load manually.
 	 * 
-	 * @param workspaceId
+	 * @param parentNodeVersion
+	 * @param relPath relative path of the file, based on the main page 
+	 * from the parent node.
 	 * @return Set of CrNodes that are child nodes of this node/version 
 	 */
 	public CrNode findChildNode(CrNodeVersion parentNodeVersion, String relPath) {

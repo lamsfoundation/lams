@@ -160,7 +160,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
      * Get the ticket to access the repository. If the workspace/credential
      * hasn't been set up, then it will be set up automatically.
      * 
-     * @forceLogin set to true if tried to do something and got access denied. This may happen
+     * @param forceLogin set to true if tried to do something and got access denied. This may happen
      * if the repository loses the ticket.
      * @return the repository ticket 
      */

@@ -36,8 +36,9 @@ public interface IRepositoryAdmin extends IRepositoryService {
 		throws RepositoryCheckedException, WorkspaceNotFoundException;
     
     /** Is this ticket acceptable to the repository? 
+     * <p>
      * Only the interceptor for an IRepositoryAdmin should call this!!!!!!
-     * 
+     * <p>
      * Do NOT declare this method as a transaction otherwise we will
      * end up with an endless loop of forever trying to check if 
      * the ticket is okay as this method would end up getting

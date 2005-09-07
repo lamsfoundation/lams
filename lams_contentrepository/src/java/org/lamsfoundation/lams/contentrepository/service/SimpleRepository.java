@@ -350,7 +350,6 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 	/* ********** Node related methods, requiring ticket for access ****/
 
 	/** Is this ticket okay? 
-	 * @see org.lamsfoundation.lams.contentrepository.IRepository#addFileItem(org.lamsfoundation.lams.contentrepository.ITicket, java.io.InputStream, java.lang.String, java.lang.String, java.lang.String)
 	 */
     public boolean isTicketOkay(ITicket ticket) {
 		return ( ticket != null &&  ticketIdSet.contains(ticket.getTicketId()) );

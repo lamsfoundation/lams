@@ -180,7 +180,7 @@ public class FileDAO implements IFileDAO {
 
 	/** Delete a file from the repository. If this makes the directory
 	 * empty, then the directory should be deleted. 
-	 * @returns 1 if deleted okay, 0 if file not found, -1 if file found but a delete error occured.
+	 * @return 1 if deleted okay, 0 if file not found, -1 if file found but a delete error occured.
 	 */ 
 	public int delete(Long uuid, Long versionId)
 						throws FileException {
@@ -222,7 +222,9 @@ public class FileDAO implements IFileDAO {
 	}
 
 	/**
-	 * Is there a file on disk? Used to validate file nodes
+	 * Is there a file on disk? 
+	 * <p>
+	 * Used to validate file nodes
 	 */
 	public boolean fileExists(Long uuid, Long versionId )
 						throws FileException {
