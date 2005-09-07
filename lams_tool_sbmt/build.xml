@@ -198,12 +198,7 @@
 					<path refid="project.classpath"/>
 				</classpath>
 				</javac>
-				<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/tool/sbmt/">
-								<fileset dir="${src.java.dir}/org/lamsfoundation/lams/tool/sbmt/">
-										<include name="*.xml"/>
-										<include name="*.properties"/>
-								</fileset>
-				</copy>						
+				
 		</target>
 
 		<target name="compile.test" depends="compile">
@@ -222,12 +217,18 @@
 					<include name="**/*.tld"/>
 				</fileset>
 			</copy>
+			<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/">
+							<fileset dir="${src.java.dir}/org/lamsfoundation/lams/">
+									<include name="**/*.xml"/>
+									<include name="**/*.properties"/>
+							</fileset>
+			</copy>		
 		</target>
 	
 		<!-- ================================================================ -->
 		<!-- Make jar archive for deployment        		    	          -->
 		<!-- ================================================================ -->
-		<target name="lams-sbmt-jar" depends="compile,compile.test,copyContext" description="creates jar file">
+		<target name="build-jar" depends="compile,compile.test,copyContext" description="creates jar file">
 			<delete file="${build.lib}/${product}.jar"/>
 			<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 				<fileset dir="${build.classes.java}"/>
@@ -264,7 +265,7 @@
 	   <!-- Make the WAR archive for deployment				 -->
 	   <!-- ================================================ -->	
 		
-	   <target name="lams-sbmt-war" depends="webdoclet,lams-sbmt-jar" description="creates war file">
+	   <target name="build-war" depends="webdoclet,build-jar" description="creates war file">
 	   		<delete file="${build.lib}/${product}.war"/>	
 	   		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF"
 	   			 webxml="${conf.webinf.dir}/web.xml">
@@ -289,7 +290,7 @@
 		<!-- =================================================================== -->
 		<!-- Deploy the jar and war                               -->
 		<!-- =================================================================== -->
-		<target name="deploy-war" depends="lams-sbmt-war" description="Deploy the SubmitFiles tool war file and jar file">
+		<target name="deploy-war" depends="build-war" description="Deploy the SubmitFiles tool war file and jar file">
 			<delete quiet="true">
 				<fileset dir="${jboss.deploy}/tmp"/>
 				<fileset dir="${jboss.deploy}/work"/>
@@ -319,7 +320,7 @@
 	<!-- =================================================================== -->
 	<!-- Generate the deploy package                                         -->
 	<!-- =================================================================== -->
-	<target name="create-deploy-package" depends="lams-sbmt-war" 
+	<target name="create-deploy-package" depends="build-war" 
 		description="Generate the deployment package.">
 
 		<path id="deploy.lib.classpath">
