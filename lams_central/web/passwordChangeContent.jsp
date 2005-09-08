@@ -1,6 +1,6 @@
 <%@page import="org.lamsfoundation.lams.web.PasswordChangeActionForm" %>
 <%@ taglib uri="tags-html-el" prefix="html" %>
-<%@ taglib uri="tags-bean-el" prefix="bean" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
 
 <html:form action="/passwordChanged" method="post">
 <table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
