@@ -6,30 +6,6 @@
 
 <tiles-definitions>
 
-	<definition name=".passwordChange" path="/template.jsp">
-		<put name="title" value="LAMS :: Change Password"/>
-		<put name="pageHeader" value="Change Password"/>
-		<put name="header" value="header.jsp"/>
-		<put name="content" value="passwordChangeContent.jsp"/>	
-		<put name="footer" value="footer.jsp"/>	
-	</definition>
-	
-	<definition name=".passwordChangeOk" path="/template.jsp">
-		<put name="title" value="LAMS :: Password Changed"/>
-		<put name="pageHeader" value="Password Changed"/>
-		<put name="header" value="header.jsp"/>
-		<put name="content" value="passwordChangeOkContent.jsp" />	
-		<put name="footer" value="footer.jsp"/>	
-	</definition>
-
-	<definition name=".error" path="/template.jsp">
-		<put name="title" value="LAMS :: Error"/>
-		<put name="pageHeader" value="Error"/>
-		<put name="header" value="header.jsp"/>
-		<put name="content" value="errorContent.jsp" />	
-		<put name="footer" value="footer.jsp"/>	
-	</definition>
-
 	<definition name=".admin.error" path="/template.jsp">
 		<put name="title" value="LAMS ::Admin Error"/>
 		<put name="pageHeader" value="Admin Error"/>

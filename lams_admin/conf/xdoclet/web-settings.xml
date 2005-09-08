@@ -1,0 +1,9 @@
+<display-name>LAMS</display-name>
+
+<description>Learning Activity Management System</description>
+<context-param>
+	<param-name>contextConfigLocation</param-name>
+	<param-value>
+		classpath:/org/lamsfoundation/lams/applicationContext.xml
+	</param-value>
+</context-param>

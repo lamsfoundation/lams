@@ -3,7 +3,15 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app >
-   <distributable/>
+ <display-name>LAMS</display-name>
+
+<description>Learning Activity Management System</description>
+<context-param>
+	<param-name>contextConfigLocation</param-name>
+	<param-value>
+		classpath:/org/lamsfoundation/lams/applicationContext.xml
+	</param-value>
+</context-param>
 
     <!--
     To use non XDoclet filters, create a filters.xml file that
@@ -19,19 +27,47 @@
     project's merge dir.
     -->
 
-    <!--
-    To use non XDoclet listeners, create a listeners.xml file that
-    contains the additional listeners and place it in your
-    project's merge dir.
-    -->
+  <listener>
+	<listener-class>
+		org.springframework.web.context.ContextLoaderListener
+	</listener-class>
+	<listener-class>
+ 		org.lamsfoundation.lams.web.SessionListener
+ 	</listener-class>
+</listener>	
 
-  <!--
-  To use non XDoclet servlets, create a servlets.xml file that
-  contains the additional servlets (eg Struts) and place it in your
-  project's merge dir.  Don't include servlet-mappings in this file,
-  include them in a file called servlet-mappings.xml and put that in
-  the same directory.
-  -->
+ <servlet>
+	<servlet-name>context</servlet-name>
+	<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
+	<load-on-startup>1</load-on-startup>
+</servlet>
+
+<servlet>
+    <servlet-name>action</servlet-name>
+    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <init-param>
+      <param-name>config</param-name>
+      <param-value>/WEB-INF/struts/struts-config.xml</param-value>
+    </init-param>
+    <init-param>
+      <param-name>debug</param-name>
+      <param-value>999</param-value>
+    </init-param>
+    <init-param>
+      <param-name>detail</param-name>
+      <param-value>2</param-value>
+    </init-param>
+    <init-param>
+      <param-name>validate</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+</servlet>
+
+  <servlet-mapping>
+	<servlet-name>action</servlet-name>
+    <url-pattern>*.do</url-pattern>
+</servlet-mapping>
 
    <session-config>
       <session-timeout>120</session-timeout>
@@ -51,10 +87,82 @@
    <!ELEMENT error-page ((error-code | exception-type), location)>
    -->
 
-  <!--
-  To add taglibs by xml, create a file called taglibs.xml and place it
-  in your merge dir.
-  -->
+<!--  ======================================================== -->	
+<!-- Struts Tag Library Descriptors -->
+<!--  ======================================================== -->	
+<taglib>
+    <taglib-uri>tags-bean</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-bean.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-html</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-html.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-logic</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-logic.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-tiles</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-tiles.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-bean-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-bean-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-html-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-html-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-logic-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-logic-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-tiles-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-tiles-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-c</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/c.tld</taglib-location>
+</taglib>
+<!--  ======================================================== -->	
+<!--  JSTL Tag Library -->
+<!--  ======================================================== -->	
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/fmt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/tlds/fmt.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/fmt-rt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/tlds/fmt-rt.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/tlds/c.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/core-rt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/tlds/c-rt.tld</taglib-location>
+  </taglib>
+<!--  ======================================================== -->	
+<!--   Customized Tag Library -->
+<!--  ======================================================== -->	
+<taglib>
+    <taglib-uri>fck-editor</taglib-uri>
+    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
+</taglib>
 
    <!--
    To set up security settings for your web app, create a file named web-security.xml, put it in your project's mergedir.
