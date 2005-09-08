@@ -149,7 +149,6 @@
 				<include name="css/*"/>
 				<include name="includes/**"/>
 				<include name="images/**"/>
-				<include name="admin/**"/>
 				<include name="fckeditor/**"/>
 				<exclude name="lams_example_tool"/>
 			</fileset>
