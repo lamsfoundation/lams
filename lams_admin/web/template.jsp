@@ -1,4 +1,4 @@
-
+<%@include file="sharing/share.jsp" %>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 
@@ -10,8 +10,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/css/aqua.css'/>" >
-	<script language="JavaScript" type="text/JavaScript" src="<html:rewrite page='/includes/javascript/changeStyle.js'/>"></script>
+	<link rel="stylesheet" type="text/css" href="<%=LAMS_WEB_ROOT%>/css/aqua.css" >
+	<script language="JavaScript" type="text/JavaScript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/changeStyle.js"></script>
 </head>
     
 <body bgcolor="#9DC5EC" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">

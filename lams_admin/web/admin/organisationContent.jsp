@@ -1,9 +1,9 @@
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
 <%@ page import="org.lamsfoundation.lams.admin.web.OrganisationActionForm" %>
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
-<%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="tags-html" prefix="html" %>
 
-<html:form action="/organisation" method="post">
+<html:form action="/admin/organisation" method="post">
 	<table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
 		<tr> 
 			<td valign="top">

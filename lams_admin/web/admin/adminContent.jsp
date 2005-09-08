@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
+
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.io.IOException" %>
@@ -12,7 +13,7 @@
 <%@ page import="org.lamsfoundation.lams.usermanagement.User" %>
 <%@ page import="org.lamsfoundation.lams.web.util.AttributeNames" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
-<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-html-el" prefix="html" %>
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
@@ -32,7 +33,7 @@
 		}
 		if(error == ""){
 			if(document.forms[1].checkbox.checked){
-				document.forms[1].action = "admin.do?method=importUsersFromFile&orgId=<c:out value="${organisation.organisationId}"/>&existingUsersOnly=true" ;
+				document.forms[1].action = "<html:rewrite page="/admin.do?method=importUsersFromFile&orgId=${organisation.organisationId}"/>&existingUsersOnly=true" ;
 			}
 			document.forms[1].submit();
 		}else{
@@ -104,7 +105,7 @@
 							Parent Organisation:
 							<c:choose>
 								<c:when test="${not empty parentAccess}">
-									<a href="admin.do?method=getAdmin&orgId=<c:out value="${organisation.parentOrganisation.organisationId}"/>">
+									<a href="<html:rewrite page="/admin.do?method=getAdmin&orgId=${organisation.parentOrganisation.organisationId}"/>">
 										<c:out value="${organisation.parentOrganisation.name}"/>
 									</a>
 								</c:when>
@@ -118,7 +119,7 @@
 				<tr>	
 					<td class="body" align="left" width="50%"><strong>Creation Date: </strong> <c:out value="${organisation.createDate}"/></td>
 					<td class="body" align="right" width="50%">
-						<form action="admin.do" name="form0" id="form0">
+						<form action="<html:rewrite page="/admin.do"/>" name="form0" id="form0">
 							<c:if test="${organisation.childOrganisations!=null}">
 								<table width="100%" border="0" >
 									<tr>
@@ -161,13 +162,13 @@
 	
 			<p>
 				<input name="update" type="button" class="extendingButton" id="update" 
-					onClick="javascript:document.location='admin.do?method=getOrganisationEdit&orgId=<c:out value="${organisation.organisationId}"/>';" 		
+					onClick="javascript:document.location='<html:rewrite page="/admin.do?method=getOrganisationEdit&orgId=${organisation.organisationId}"/>';" 		
 					onMouseOver="changeStyle(this,'extendingButtonover')"
 					onMouseOut="changeStyle(this,'extendingButton')" 
 					value="Update this Organisation" /> 
 				&nbsp;			
 				<input name="createOrg" type="button" class="extendingButton" id="createOrg" 
-					onClick="javascript:document.location='admin.do?method=getOrganisationEdit&orgId=-1&parentOrgId=<c:out value="${organisation.organisationId}"/>';" 		
+					onClick="javascript:document.location='<html:rewrite page="/admin.do?method=getOrganisationEdit&orgId=-1&parentOrgId=${organisation.organisationId}"/>';" 		
 					onMouseOver="changeStyle(this,'extendingButtonover')"
 					onMouseOut="changeStyle(this,'extendingButton')" 
 					value="Create child organisation" />
@@ -180,7 +181,7 @@
 			</span>
 			<br><br>
 		
-			<form action="admin.do?method=importUsersFromFile&orgId=<c:out value="${organisation.organisationId}"/>" onsubmit="return validateForm()" method="post" ENCTYPE='multipart/form-data' name="form1" id="form1">										
+			<form action="<html:rewrite page="/admin.do?method=importUsersFromFile&orgId=${organisation.organisationId}"/>" onsubmit="return validateForm()" method="post" ENCTYPE='multipart/form-data' name="form1" id="form1">										
 				<c:if test="${!empty errormsg}">
 					<p align="center"  class="error"><%=(String)request.getAttribute(AttributeNames.ADMIN_ERR_MSG)%></p>
 				</c:if>	
@@ -215,19 +216,19 @@
 	
 			<p>
 				<input name="createUser" type="button" class="extendingButton" id="createUser" 
-					onClick="javascript:document.location='admin.do?method=getUserEdit&orgId=<c:out value="${organisation.organisationId}"/>';" 		
+					onClick="javascript:document.location='<html:rewrite page="/admin.do?method=getUserEdit&orgId=${organisation.organisationId}"/>';" 		
 					onMouseOver="changeStyle(this,'extendingButtonover')"
 					onMouseOut="changeStyle(this,'extendingButton')" 
 					value="Create new user" /></input>
 				&nbsp;			
 				<input name="addUsers" type="button" class="extendingButton" id="addUsers" 
-					onClick="javascript:document.location='admin.do?method=getUsersAdd&orgId=<c:out value="${organisation.organisationId}"/>';" 		
+					onClick="javascript:document.location='<html:rewrite page="/admin.do?method=getUsersAdd&orgId=${organisation.organisationId}"/>';" 		
 					onMouseOver="changeStyle(this,'extendingButtonover')"
 					onMouseOut="changeStyle(this,'extendingButton')" 
 					value="Add existing user" />
 				&nbsp;			
 				<input name="removeUsers" type="button" class="extendingButton" id="removeUsers" 
-					onClick="javascript:document.location='admin.do?method=getUsersRemove&orgId=<c:out value="${organisation.organisationId}"/>';" 		
+					onClick="javascript:document.location='<html:rewrite page="/admin.do?method=getUsersRemove&orgId=${organisation.organisationId}"/>';" 		
 					onMouseOver="changeStyle(this,'extendingButtonover')"
 					onMouseOut="changeStyle(this,'extendingButton')" 
 					value="Remove Users" />

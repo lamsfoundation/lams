@@ -10,10 +10,10 @@
 <%@ page import="org.lamsfoundation.lams.usermanagement.User" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.Organisation" %>
 <%@ page import="org.lamsfoundation.lams.admin.web.UsersRemoveActionForm" %>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
 <%!
 	/* Display ther user map, for a particular right */
