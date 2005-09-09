@@ -294,7 +294,6 @@
 				<transaction src="${db.scripts}/drop_lams_tool_qa.sql"/>
 				<transaction src="${db.scripts}/create_lams_tool_qa.sql"/>
 			</sql>
-			<delete quiet="true" dir ="${contentrepository.location}"/>
 		</target>
 
 		<!-- =================================================================== -->
@@ -309,7 +308,6 @@
 				</classpath>
 				<transaction src="${db.scripts}/drop_lams_tool_qa.sql"/>
 			</sql>
-			<delete quiet="true" dir ="${contentrepository.location}"/>
 		</target>
 
 	

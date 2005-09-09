@@ -314,7 +314,6 @@
 				<transaction src="${db.scripts}/drop_lams_tool_sbmt.sql"/>
 				<transaction src="${db.scripts}/create_lams_tool_sbmt.sql"/>
 			</sql>
-			<delete quiet="true" dir ="${contentrepository.location}"/>
 		</target>
 
 	<!-- =================================================================== -->
