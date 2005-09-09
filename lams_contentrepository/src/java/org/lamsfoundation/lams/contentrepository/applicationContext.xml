@@ -42,18 +42,7 @@
 				<value>org/lamsfoundation/lams/contentrepository/CrWorkspaceCredential.hbm.xml</value>
 			</list>
 		</property>
-		<property name="hibernateProperties">
-			<props>
-				<prop key="hibernate.dialect">net.sf.hibernate.dialect.MySQLDialect</prop>
-				<prop key="hibernate.show_sql">false</prop>
-				<prop key="hibernate.c3p0.minPoolSize">5</prop>
-				<prop key="hibernate.c3p0.maxPoolSize">20</prop>
-				<prop key="hibernate.c3p0.timeout">1800</prop>
-				<prop key="hibernate.c3p0.max_statement">50</prop>
-				<!-- will need to be revisited for JBOSS 4.0 -->
-				<!--  <prop key="hibernate.cache.provider_class">net.sf.hibernate.cache.TreeCacheProvider</prop> -->
-			</props>
-		</property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 	</bean>
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
