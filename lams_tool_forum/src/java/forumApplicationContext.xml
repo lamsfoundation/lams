@@ -5,22 +5,13 @@
     <!-- Hibernate SessionFactory -->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="toolDataSource"/></property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 
         <!-- Must references all OR mapping files. -->
         <property name="mappingResources">
             <list>
                <value>org/lamsfoundation/lams/tool/forum/persistence/GenericEntity.hbm.xml</value>
             </list>
-        </property>
-
-        <!-- Set the type of database; changing this one property will port this to Oracle, etc. -->
-        <property name="hibernateProperties">
-            <props>
-                <!-- test only /-->
-                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-             <!--   <prop key="hibernate.dialect">net.sf.hibernate.dialect.HSQLDialect</prop>-->
-                <prop key="hibernate.dialect">net.sf.hibernate.dialect.MySQLDialect</prop>
-            </props>
         </property>
     </bean>
 
