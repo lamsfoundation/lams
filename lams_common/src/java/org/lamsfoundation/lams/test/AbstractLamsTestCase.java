@@ -11,6 +11,8 @@ package org.lamsfoundation.lams.test;
 
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
 import net.sf.hibernate.Session;
@@ -19,6 +21,7 @@ import net.sf.hibernate.SessionFactory;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate.SessionFactoryUtils;
 import org.springframework.orm.hibernate.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -161,5 +164,16 @@ public abstract class AbstractLamsTestCase extends TestCase
 		}
 		return null;
     }	
+
+    /** Get the largest id in a table. This will normally be the last
+     * id inserted. Why not use LAST_INSERT_ID() - that works per connection and there is 
+     * no guarantee that this test case is running using the same connection as the 
+     * service. 
+     */
+    protected long getMaxId(String tablename, String idname, DataSource dataSource)
+    {
+        JdbcTemplate jt = new JdbcTemplate(dataSource);
+        return jt.queryForLong("SELECT max("+idname+") FROM "+tablename);
+    }
 
 }
