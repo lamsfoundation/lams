@@ -397,7 +397,7 @@
 						
 		</target>
 	
-			<target name="test-QaContent" depends="compile.test"> 
+			<target name="test-report" depends="compile.test"> 
 				<mkdir dir="${build.report}"/>
 				<copy file="${conf.webinf.dir}/web.xml" todir="${testwebinf}" overwrite="true"/>		
 				<copy file="${conf.webinf.dir}/struts/struts-config.xml" todir="${testwebinf}" overwrite="true"/>			
@@ -409,7 +409,7 @@
 					   				    <exclude name="web.xml"/>
 								</fileset>
 				</copy>						
-								<junit printsummary="yes" haltonerror="no" haltonfailure="no"
+				<junit printsummary="yes" haltonerror="no" haltonfailure="no"
 					   fork="yes">
 					<formatter type="plain" usefile="false"/>
 					<formatter type="xml"/>
@@ -429,6 +429,14 @@
 						<path refid="project.classpath"/>
 					</classpath>
 				</junit>
+				
+				<junitreport todir="${build.report}"> 
+					<fileset dir="${build.report}">
+						<include name="TEST-*.xml"/>
+					</fileset>
+					<report todir="${build.report}/html"/> 
+				</junitreport>
+
 			</target>
 	
 </project>
