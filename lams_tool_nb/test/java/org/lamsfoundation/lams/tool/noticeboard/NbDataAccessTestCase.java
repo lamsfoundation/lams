@@ -27,7 +27,7 @@
 
 package org.lamsfoundation.lams.tool.noticeboard;
 
-import org.lamsfoundation.lams.AbstractLamsTestCase;
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.hibernate.NoticeboardUserDAO;
@@ -139,7 +139,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	 /** Define the context files. Overrides method in AbstractLamsTestCase */
     protected String[] getContextConfigLocation() {
     	return new String[] {
-    	        //"org/lamsfoundation/lams/applicationContext.xml",
+    	        "org/lamsfoundation/lams/localApplicationContext.xml",
     			//"org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
     			//"org/lamsfoundation/lams/tool/toolApplicationContext.xml",
     			//"org/lamsfoundation/lams/learning/learningApplicationContext.xml",

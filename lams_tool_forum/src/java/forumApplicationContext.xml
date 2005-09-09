@@ -4,9 +4,7 @@
 
     <!-- Hibernate SessionFactory -->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
-        <property name="dataSource">
-            <ref local="dataSource"/>
-        </property>
+		<property name="dataSource"><ref bean="toolDataSource"/></property>
 
         <!-- Must references all OR mapping files. -->
         <property name="mappingResources">
@@ -26,48 +24,8 @@
         </property>
     </bean>
 
-    <!-- Data Source -->
-   <!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" destroy-method="close">
-        <property name="driverClassName">
-            <value>org.hsqldb.jdbcDriver</value>
-        </property>
-        <property name="url">
-            <value>jdbc:hsqldb:.</value>
-        </property>
-        <property name="username">
-            <value>sa</value>
-        </property>
-        <property name="password">
-            <value></value>
-        </property>
-    </bean>
-    -->
-
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" destroy-method="close">
-        <property name="driverClassName">
-            <value>com.mysql.jdbc.Driver</value>
-        </property>
-        <property name="url">
-            <value>jdbc:mysql://localhost/lams</value>
-        </property>
-        <property name="username">
-            <value>lams</value>
-        </property>
-        <property name="password">
-            <value>lamsdemo</value>
-        </property>
-    </bean>
-
-
-    <!-- Spring Hibernate Transaction Manager -->
-    <bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-
     <!-- core beans -->
-<bean id="persistenceDelegate" class="org.lamsfoundation.lams.tool.forum.core.PersistenceDelegateImpl"/>
+	<bean id="persistenceDelegate" class="org.lamsfoundation.lams.tool.forum.core.PersistenceDelegateImpl"/>
 
     <bean id="genericEntityDao" class="org.lamsfoundation.lams.tool.forum.persistence.GenericEntityDao">
         <property name="sessionFactory">
@@ -99,9 +57,6 @@
     <bean id="permissionManager" class="org.lamsfoundation.lams.tool.forum.permissions.PermissionManagerImpl">
     </bean>
 
-    <!-- Spring Hibernate Transaction Manager -->
-
-
     <bean id="forumManagerTarget" class="org.lamsfoundation.lams.tool.forum.service.ForumManagerImpl">
         <property name="persistenceDelegate">
             <ref local="persistenceDelegate"/>
@@ -109,9 +64,7 @@
     </bean>
 
     <bean id="forumManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref local="transactionManager"/>
-        </property>
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
             <ref local="forumManagerTarget"/>
         </property>

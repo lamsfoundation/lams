@@ -267,7 +267,7 @@ Ant build file.
 		<!-- =================================================================== -->
 		<!-- Run JUnit Tests                                                     -->
 		<!-- =================================================================== -->
-		<target name="test" depends="compile-test"> 
+		<target name="test" depends="compile-test, insert-test-data"> 
 			<mkdir dir="${build.report}"/>
 			<junit printsummary="yes" haltonerror="no" haltonfailure="no"
 				   fork="yes">
