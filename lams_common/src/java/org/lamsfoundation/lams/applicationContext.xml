@@ -27,8 +27,9 @@
 	<!--  to be consistent with the rest of the system (and what data doesn't.... ), then you 		 -->
 	<!--  must use this transaction manager. If you do not, then the core code data changes will be  -->
 	<!--  committed independent of your changes. 			 										 -->
-	<bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
-	</bean>
+	<!--  "autodetectTransactionManager" defaults to true so we don't need to include it.  		 	 -->
+	<!--  But remember all application servers do not have the same JNDI name for their transaction manager! -->
+	<bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"/>
 
 </beans>
 
