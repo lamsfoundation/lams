@@ -28,9 +28,13 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 import servletunit.struts.MockStrutsTestCase;
 
 /**
+ * This test is invalid. The url and parameter names are wrong,
+ * the matching content doesn't exist in the database. 
+ * FM Sept 05
+ *
  * @author Manpreet Minhas
  */
-public class TestAuthoringAction extends MockStrutsTestCase {
+public class TestAuthoringAction extends SbmtBaseTestAction {
 	
 	public TestAuthoringAction(String name){
 		super(name);

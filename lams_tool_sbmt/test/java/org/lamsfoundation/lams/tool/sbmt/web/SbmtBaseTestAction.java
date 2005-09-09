@@ -22,35 +22,28 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.web;
 
-import java.io.File;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
-/**
- * This test is invalid. You can't assign a string to the 
- * filePath parameter - its of type org.apache.struts.upload.FormFile!
- * FM Sept 05
- * 
- * @author Manpreet Minhas
- */
-public class TestLearnerAction extends SbmtBaseTestAction {
-	
-	public TestLearnerAction(String name){
+import servletunit.struts.MockStrutsTestCase;
+
+public class SbmtBaseTestAction extends MockStrutsTestCase {
+
+	public SbmtBaseTestAction(String name){
 		super(name);
 	}
-	
-	public void testUploadFile(){		
-		setConfigFile("/WEB-INF/struts/struts-config.xml");
-		setRequestPathInfo("/learner");
-		addRequestParameter("method","uploadFile");
-		
-		addRequestParameter("contentID","1");		
-		String filePath = "c:" + File.separator + "mminhas.txt";
-		addRequestParameter("filePath",filePath);		
-		addRequestParameter("fileDescription","Mock file description ");
-		addRequestParameter("userID","1");
-		
-		actionPerform();
-		verifyForward("upload");
-		verifyNoActionErrors();
+	public void setUp()throws Exception{
+		super.setUp();
+		ContextLoader ctxLoader = new ContextLoader();
+        context.setInitParameter(ContextLoader.CONTEXT_CLASS_PARAM,
+                                 XmlWebApplicationContext.class.getName());
+        context.setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM,
+        		"org/lamsfoundation/lams/localApplicationContext.xml,"+
+				 "org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml,"+
+				 "org/lamsfoundation/lams/contentrepository/applicationContext.xml,"+
+				 "org/lamsfoundation/lams/lesson/lessonApplicationContext.xml,"+
+				 "org/lamsfoundation/lams/learning/learningApplicationContext.xml,"+	
+				 "org/lamsfoundation/lams/tool/toolApplicationContext.xml,");
+        ctxLoader.initWebApplicationContext(context);
 	}
-
 }

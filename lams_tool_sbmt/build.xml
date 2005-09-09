@@ -318,6 +318,20 @@
 		</target>
 
 	<!-- =================================================================== -->
+	<!-- Insert the test data in the database.                               -->
+	<!-- =================================================================== -->
+	<target name="insert-test-data" depends="rebuild-db"
+		description="Insert some dummy test data. Removes any data that was in the tables first.">
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+				password="${db.password}">
+			<classpath>
+				<pathelement location="${db.driver.jar}"/>
+			</classpath>
+			<transaction src="${db.scripts}/insert_test_data.sql"/>
+		</sql>
+	</target>
+
+	<!-- =================================================================== -->
 	<!-- Generate the deploy package                                         -->
 	<!-- =================================================================== -->
 	<target name="create-deploy-package" depends="build-war" 
@@ -442,4 +456,40 @@
         </copy>
     </target>
 
+	<!-- =================================================================== -->
+	<!-- Run JUnit Tests                                                     -->
+	<!-- =================================================================== -->
+	<target name="test-report" depends="compile,compile.test,copyContext,insert-test-data">
+
+		<mkdir dir="${build.report}"/>
+		<mkdir dir="${build.report}/html"/> 
+		
+		<junit printsummary="yes" errorProperty="test.failed" failureProperty="test.failed"
+			   fork="yes">
+			<formatter type="plain" usefile="false"/>
+			<formatter type="xml"/>
+			<batchtest todir="${build.report}">
+				<fileset dir="${src.test.dir}">
+					<include name="**/Test*.java"/>
+					<exclude name="**/Test*Action.java"/>
+				</fileset>
+			</batchtest>
+			<classpath>
+				<pathelement location="${build.classes.java}"/>
+				<pathelement location="${build.classes.test}"/>
+				<pathelement location="${conf.hibernate.mapping.dir}"/>
+				<pathelement location="${conf.web.dir}"/>
+				<path refid="project.classpath"/>
+			</classpath>
+		</junit>
+
+		<junitreport todir="${build.report}"> 
+			<fileset dir="${build.report}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report todir="${build.report}/html"/> 
+		</junitreport>
+		
+		<fail message="Tests failed. Check log and/or reports" if="test.failed"/>
+	</target>
 </project>

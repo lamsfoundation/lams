@@ -22,30 +22,19 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.web;
 
-import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.support.XmlWebApplicationContext;
-
 import servletunit.struts.MockStrutsTestCase;
 
 /**
+ * None of these tests are valid - the getStatus method 
+ * doesn't exist and markFiles should be markFile and take 
+ * different parameters. FM Sept 05
+ * 
  * @author Manpreet Minhas
  */
 public class TestMonitoringAction extends MockStrutsTestCase {
 	
 	public TestMonitoringAction(String name){
 		super(name);
-	}
-	public void setUp()throws Exception{
-		super.setUp();
-		ContextLoader ctxLoader = new ContextLoader();
-        context.setInitParameter(ContextLoader.CONTEXT_CLASS_PARAM,
-                                 XmlWebApplicationContext.class.getName());
-        context.setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM,
-        		"org/lamsfoundation/lams/applicationContext.xml," +
-        		" org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml," +
-        		" org/lamsfoundation/lams/authoring/authoringApplicationContext.xml," +
-        		" org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml");
-        ctxLoader.initWebApplicationContext(context);
 	}
 	public void testGetStatus(){
 		setConfigFile("/WEB-INF/struts/struts-config.xml");

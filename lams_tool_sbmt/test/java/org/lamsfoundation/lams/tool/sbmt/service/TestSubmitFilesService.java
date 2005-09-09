@@ -1,23 +1,51 @@
 /*
- * Created on May 20, 2005
+ *Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ *This program is free software; you can redistribute it and/or modify
+ *it under the terms of the GNU General Public License as published by
+ *the Free Software Foundation; either version 2 of the License, or
+ *(at your option) any later version.
+ *
+ *This program is distributed in the hope that it will be useful,
+ *but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *GNU General Public License for more details.
+ *
+ *You should have received a copy of the GNU General Public License
+ *along with this program; if not, write to the Free Software
+ *Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ *USA
+ *
+ *http://www.gnu.org/licenses/gpl.txt
  */
 package org.lamsfoundation.lams.tool.sbmt.service;
 
-import org.lamsfoundation.lams.test.AbstractLamsTestCase;
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.sbmt.SbmtBaseTestCase;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
+import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
+import org.springframework.orm.hibernate.HibernateObjectRetrievalFailureException;
 
 /**
- * @author Manpreet Minhas
+ * Note: this test sets up tool content ids and tool session ids that 
+ * are invalid with respect to the core tables.
+ * 
+ * @author Manpreet Minhas, Fiona Malikoff
  */
-public class TestSubmitFilesService extends AbstractLamsTestCase {
+public class TestSubmitFilesService extends SbmtBaseTestCase {
 	
 	protected ISubmitFilesService submitFilesService;
-	protected ISubmitFilesContentDAO submitFilesContentDAO;
+	protected ToolContentManager submitFilesToolContentManager;
+	protected ToolSessionManager submitFilesToolSessionManager;
+	
+	protected ISubmitFilesSessionDAO submitFilesSessionDAO  = null;
+	protected ISubmitFilesContentDAO submitFilesContentDAO  = null;
 	protected ISubmissionDetailsDAO submissionDetailsDAO;
 	
 	protected SubmitFilesContent submitFilesContent;
@@ -26,32 +54,15 @@ public class TestSubmitFilesService extends AbstractLamsTestCase {
 		super(name);
 	}
 
-	/**
-	 *(non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getContextConfigLocation()
-	 */
-	protected String[] getContextConfigLocation() {
-		return new String[] {"org/lamsfoundation/lams/applicationContext.xml",
-							 "org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml",
-							 "org/lamsfoundation/lams/authoring/authoringApplicationContext.xml",
-							 "org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml"};
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.AbstractLamsTestCase#getHibernateSessionFactoryName()
-	 */
-	protected String getHibernateSessionFactoryName() {
-		return "sbmtSessionFactory";
-	}
-	
 	public void setUp()throws Exception{
 		super.setUp();
 		submitFilesService = (ISubmitFilesService)context.getBean("submitFilesService");
+		submitFilesToolContentManager = (ToolContentManager) submitFilesService;
+		submitFilesToolSessionManager = (ToolSessionManager) submitFilesService;
+
+		submitFilesSessionDAO = (ISubmitFilesSessionDAO)context.getBean("submitFilesSessionDAO");
 		submitFilesContentDAO = (ISubmitFilesContentDAO)context.getBean("submitFilesContentDAO");
-		submissionDetailsDAO = (ISubmissionDetailsDAO)context.getBean("submissionDetailsDAO");
 	}
-	
 	/*public void testAddSubmitFilesContent(){
 		submitFilesService.addSubmitFilesContent(new Long(1),"Trial Title Submit Files", "Trial Instructions Submit Files");
 		assertNotNull(submitFilesContentDAO.getContentByID(new Long(1)));
@@ -65,17 +76,130 @@ public class TestSubmitFilesService extends AbstractLamsTestCase {
 		submitFilesService.uploadFile(new Long(1),filePath,"Trial Content File Description", new Long(1));
 		submitFilesService.uploadFile(new Long(1),filePath,"Trial Content File Description", new Long(2));
 		assertNotNull(submissionDetailsDAO.getSubmissionDetailsByID(new Long(1)));
+	}*/
+	
+	public void testCopyContent(){
+		Long id = copyTestContent();
 	}
-	public void testRemoveToolContent(){
-		submitFilesService.removeToolContent(new Long(1));
-		try{
-			submitFilesContentDAO.getContentByID(new Long(1));
-			fail("Exception should be raised because this object has already been deleted");
-		}catch(HibernateObjectRetrievalFailureException he){
-			assertTrue(true);
+	
+	private Long copyTestContent() {
+		
+		Long newContentId = new Long(getMaxContentId() + 1);
+		try {
+			submitFilesToolContentManager.copyToolContent(TEST_CONTENT_ID, newContentId);
+		} catch (ToolException e) {
+			e.printStackTrace();
+			fail("Tool exception thrown copying the content");
 		}
+		return newContentId;
 	}
-	public void testGenerateReport(){
+
+	public void testCreateSession() {
+		createSession(copyTestContent());
+	}
+	
+	private SubmitFilesSession createSession(Long toolContentId) {
+		Long toolSessionId = new Long(getMaxSessionId()+1);
+
+		try {
+			submitFilesToolSessionManager.createToolSession(toolSessionId,toolContentId);
+		} catch (ToolException e) {
+			e.printStackTrace();
+			fail("Tool exception thrown while creating session");
+		}
+		SubmitFilesSession submitFilesSession = submitFilesSessionDAO.getSessionByID(toolSessionId);
+		assertNotNull("submitFilesSession", submitFilesSession);
+		assertEquals(toolSessionId, submitFilesSession.getSessionID());
+		return submitFilesSession;
+	}
+	
+	/** Tests removing content where session data exists */ 
+	public void testRemoveToolContentSessionDataExists(){
+		
+		Long toolContentId = copyTestContent();
+		SubmitFilesSession submitFilesSession = createSession(toolContentId);
+		Long sessionContentId = submitFilesSession.getSessionID();
+
+		// Remove without removing the session data - should fail. 
+		try {
+			submitFilesToolContentManager.removeToolContent(toolContentId, false);
+			fail("Expected SessionDataExistsException to be thrown, toolSessionId = "
+					+sessionContentId);
+		} catch (SessionDataExistsException e) {
+			assertTrue("SessionDataExistsException thrown as expected", true);
+		} catch (ToolException e) {
+			e.printStackTrace();
+			fail("Tool exception thrown deleting the content toolContentId="+toolContentId);
+		}
+
+		// Records should still exist
+		try{
+			SubmitFilesContent content = submitFilesContentDAO.getContentByID(toolContentId);
+			assertNotNull("Tool content data", content);
+		}catch(HibernateObjectRetrievalFailureException he){
+			fail("Tool content has been marked as deleted - should not have been deleted");
+		}
+
+		try{
+			SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(sessionContentId);
+			assertNotNull("Tool session data", session);
+		}catch(HibernateObjectRetrievalFailureException he){
+			fail("Tool session has been marked as deleted - should not have been deleted");
+		}
+
+		// This time remove the session data too! 
+		try {
+			submitFilesToolContentManager.removeToolContent(toolContentId, true);
+		} catch (SessionDataExistsException e) {
+			e.printStackTrace();
+			fail("SessionDataExistsException thrown deleting the content toolContentId="+toolContentId);
+		} catch (ToolException e) {
+			e.printStackTrace();
+			fail("Tool exception thrown deleting the content toolContentId="+toolContentId);
+		}
+
+		try{
+			submitFilesContentDAO.getContentByID(toolContentId);
+			fail("Exception should be raised because content object has already been deleted");
+		}catch(HibernateObjectRetrievalFailureException he){
+			assertTrue("Tool Content has been deleted as expected", true);
+		}
+
+		try{
+			submitFilesSessionDAO.getSessionByID(sessionContentId);
+			fail("Exception should be raised because session object has already been deleted");
+		}catch(HibernateObjectRetrievalFailureException he){
+			assertTrue("Tool session has been deleted as expected", true);
+		}
+		
+	}
+
+	/** Tests removing content where session data does not exist */ 
+	public void testRemoveToolContentNoSessionData(){
+		
+		Long toolContentId = copyTestContent();
+
+		// Remove without removing the session data - should work. 
+		try {
+			submitFilesToolContentManager.removeToolContent(toolContentId, true);
+		} catch (SessionDataExistsException e) {
+			e.printStackTrace();
+			fail("SessionDataExistsException thrown deleting the content toolContentId="+toolContentId);
+		} catch (ToolException e) {
+			e.printStackTrace();
+			fail("Tool exception thrown deleting the content toolContentId="+toolContentId);
+		}
+
+		try{
+			submitFilesContentDAO.getContentByID(toolContentId);
+			fail("Exception should be raised because content object has already been deleted");
+		}catch(HibernateObjectRetrievalFailureException he){
+			assertTrue("Tool Content has been deleted as expected", true);
+		}
+
+	}
+
+	/*	public void testGenerateReport(){
 		Hashtable table = submitFilesService.generateReport(new Long(1));
 		assertEquals(table.size(),3);
 	}*/
