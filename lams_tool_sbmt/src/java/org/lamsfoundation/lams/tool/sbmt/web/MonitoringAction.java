@@ -52,6 +52,10 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.SharedSession;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import sun.misc.SharedSecrets;
 
 
 /**
@@ -113,7 +117,11 @@ public class MonitoringAction extends DispatchAction {
 							   HttpServletRequest request,
 							   HttpServletResponse response){
 		Long sessionID =new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_SESSION_ID));
-		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
+//		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
+		SharedSession ss = SharedSession.getInstance(getServlet().getServletContext());
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		Long userID = new Long(user.getUserID().longValue());
+		
 		submitFilesService = getSubmitFilesService();
 		//return FileDetailsDTO list according to the given userID and sessionID
 		List files = submitFilesService.getFilesUploadedByUser(userID,sessionID);
