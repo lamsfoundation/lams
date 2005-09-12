@@ -175,6 +175,28 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		return success;
 	}
 	
+	public function toData():Object{
+		var design = {};
+		design.objectType = _objectType;
+		design.learningDesignID = _learningDesignID;
+		design.uiID = _uiID;
+		design.title = _title;
+		design.description = _description;
+		design.helpText = _helpText;
+		design.version = _version;
+		design.userID = _userID;
+		design.workspaceFolderID = objectType;
+		design.createDateTime = _createDateTime;
+		design.readOnlyFlag = _readOnlyFlag;
+		design.validDesignFlag = _validDesignFlag;
+		design.maxID = _maxID;
+		design.firstID = _firstID;
+		design.activities = _activities.values();
+		design.transitions = _transitions.values();
+		design.groupings = _groupings.values();
+		return design;
+	}
+	
 	/**
 	 * Creates a new UI ID which is unique for this design.
 	 * @usage   
