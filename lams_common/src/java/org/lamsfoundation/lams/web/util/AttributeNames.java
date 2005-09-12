@@ -36,4 +36,6 @@ public class AttributeNames {
 	public static final String ADMIN_USER = "user";
 	public static final String ADMIN_ERR_MSG = "errormsg";
 
+	public static final String USER= "user";
+	
 }

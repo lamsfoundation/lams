@@ -24,8 +24,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.*;
 
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
@@ -34,6 +32,8 @@ import org.apache.log4j.Logger;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.web.SharedSession;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.lamsfoundation.lams.usermanagement.*;
 
@@ -146,6 +146,11 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				} else {
 					log.debug("Unexpected authentication type!");
 					return false;
+				}
+				//if login is valid, register userDTO into session.
+				if(isValid){
+					SharedSession sharedSess = SharedSession.getInstance(HttpSessionManager.getInstance().getServletContext());
+					sharedSess.setAttribute(AttributeNames.USER,user.getUserDTO());					
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
