@@ -22,6 +22,9 @@ class org.lamsfoundation.lams.common.comms.Communication {
     
     private var queue:Array;
     private var queueID:Number;
+	
+	//so compiler can see application when not in LAMS
+	private var Application;
     
    
     /**
@@ -39,9 +42,14 @@ class org.lamsfoundation.lams.common.comms.Communication {
 		//_global.breakpoint();
 		if(_serverURL == null){
 			//_serverURL = Config.getInstance().serverUrl;
-            
+			if(_root.serverURL==null){
+				Debugger.log("! serverURL is not set, unable to connect to server !!",Debugger.CRITICAL,'Consturcutor','Communication');
+			}else{
+				_serverURL = _root.serverURL;
+			}
+			
 		}
-        _serverURL = _root.serverURL;
+        
         		//Debugger.log('_serverURL:'+_serverURL,4,'Consturcutor','Communication');
         wddx = new Wddx();
     }
@@ -62,8 +70,10 @@ class org.lamsfoundation.lams.common.comms.Communication {
     * @returns Void
     */
     public function getRequest(requestURL:String,handler:Function,isFullURL:Boolean):Void{
-		Cursor.showCursor(Application.C_HOURGLASS);
-        //Create XML response object 
+		if(Application != null){
+			Cursor.showCursor(Application.C_HOURGLASS);
+		}
+		//Create XML response object 
         var responseXML = new XML();
         //Assign onLoad handler
         responseXML.onLoad = Proxy.create(this,onServerResponse,queueID);
@@ -94,23 +104,36 @@ class org.lamsfoundation.lams.common.comms.Communication {
         if(success){
             var responseObj:Object = wddx.deserialize(wrappedPacketXML);
 
-            //Now delete the XML 
-            delete wrappedPacketXML;
             
+			
+			if(responseObj.messageType == null){
+				Debugger.log('Message type was:'+responseObj.messageType+' , cannot continue',Debugger.CRITICAL,'getRequest','Communication');			
+				Debugger.log('xml recieved is:'+wrappedPacketXML.toString(),Debugger.CRITICAL,'getRequest','Communication');			
+				return -1;
+			}
+			
             //Check for errors in message type that's returned from server
-            if(responseObj.messageType == FRIENDLY_ERROR_CODE){
+			if(responseObj.messageType == FRIENDLY_ERROR_CODE){
                 //user friendly error
                 //showAlert("Oops", responseObj.body, "sad");
             }else if(responseObj.messageType == SYSTEM_ERROR_CODE){
                 //showAlert("System error", "<p>Sorry there has been a system error, please try the operation again. If the problem persistes please contact support</p><p>Additional information:"+responseObj.body+"</p>", "sad");
             }else{
                 //Everything is fine so lookup callback handler on queue 
-                dispatchToHandlerByID(queueID,responseObj.messageValue);
+                if(responseObj.messageValue != null){
+					dispatchToHandlerByID(queueID,responseObj.messageValue);
+				}else{
+					Debugger.log('Message value was null, cannot continue',Debugger.CRITICAL,'getRequest','Communication');			
+				}
             }
+			
+			//Now delete the XML 
+            delete wrappedPacketXML;
         }else {
             //TODO DI 12/04/05 Handle onLoad error
             //showAlert("System error", "<p>Communication Error</p>", "sad");
-        }
+			Debugger.log("XML Load failed",Debugger.CRITICAL,'onServerResponse','Communication');			
+			}
     }
     
   
@@ -128,9 +151,15 @@ class org.lamsfoundation.lams.common.comms.Communication {
     public function sendAndReceive(dto:Object, requestURL:String,handler:Function,isFullURL){
         //Serialise the Data Transfer Object
         var xmlToSend:XML = serializeObj(dto);
+		//xmlToSend.contentType="dave";
         
+		//Create XML response object 
+        var responseXML = new XML();
+		 //Assign onLoad handler
+        responseXML.onLoad = Proxy.create(this,onServerResponse,queueID);
+
         //Assign onLoad handler
-        responseXML.onLoad = Proxy.create(this,onSendACK,queueID);
+       // responseXML.onLoad = Proxy.create(this,onSendACK,queueID);
         //Add handler to queue
         addToQueue(handler);        
         //Assign onData function        
@@ -138,10 +167,12 @@ class org.lamsfoundation.lams.common.comms.Communication {
         
         //TODO DI 11/04/05 Stub here for now until we have server implmenting new WDDX structure
         if(isFullURL){
-            Debugger.log('Requesting:'+requestURL,Debugger.GEN,'sendAndReceive','Communication');			
+            Debugger.log('Posting to:'+requestURL,Debugger.GEN,'sendAndReceive','Communication');			
+			Debugger.log('Sending XML:'+xmlToSend.toString(),Debugger.GEN,'sendAndReceive','Communication');			
             xmlToSend.sendAndLoad(requestURL,responseXML);
         }else{
-            Debugger.log('Requesting:'+_serverURL+requestURL,Debugger.GEN,'sendAndReceive','Communication');			
+            Debugger.log('Posting to:'+_serverURL+requestURL,Debugger.GEN,'sendAndReceive','Communication');
+			Debugger.log('Sending XML:'+xmlToSend.toString(),Debugger.GEN,'sendAndReceive','Communication');			
             xmlToSend.sendAndLoad(_serverURL+requestURL,responseXML);
         }
     }
@@ -211,8 +242,11 @@ class org.lamsfoundation.lams.common.comms.Communication {
     private function setOnData(xmlObject:XML){
         //Set ondata handler to validate data returned in XML object
         xmlObject.onData = function(src){
-			Cursor.showCursor(Application.C_DEFAULT);
-            if (src != undefined) {
+			Debugger.log('src:'+src,Debugger.GEN,' xmlObject.onData ','Communication');		
+			if(Application != null){
+				Cursor.showCursor(Application.C_DEFAULT);
+            }
+			if (src != undefined) {
                 //Check for login page
                 if(src.indexOf("j_security_login_page") != -1){
                     //TODO DI 12/04/05 deal with error from session timeout/server error
