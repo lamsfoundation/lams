@@ -637,7 +637,9 @@ public class User implements Serializable {
     	return new UserDTO(this.userId,
     						this.firstName,
 							this.lastName,
-							this.login);
+							this.login,
+							this.email,
+							this.theme);
     }
 	
 	/**This method checks whether user is a member of the 

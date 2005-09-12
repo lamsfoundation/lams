@@ -22,6 +22,7 @@
  */
 package org.lamsfoundation.lams.usermanagement.dto;
 
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -33,14 +34,18 @@ public class UserDTO {
 	private String firstName;
 	private String lastName;
 	private String login;
+    private String email;
+    private CSSThemeVisualElement theme;
 	
 
 	public UserDTO(Integer userID, String firstName, String lastName,
-			String login) {		
+			String login, String email, CSSThemeVisualElement theme) {		
 		this.userID = userID;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.login = login;
+		this.email = email;
+		this.theme = theme;
 	}
 	/**
 	 * @return Returns the firstName.
