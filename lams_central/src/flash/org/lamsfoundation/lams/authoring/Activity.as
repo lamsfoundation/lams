@@ -1,4 +1,5 @@
 ﻿import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.dict.*
 /*
 *
 * @author      DC
@@ -126,6 +127,21 @@ class org.lamsfoundation.lams.authoring.Activity {
 		
 		
     }
+	
+	//static class level methods
+	/**
+	 * Created an array of activity types to be can be used as a dataprovider
+	 * @usage   
+	 * @return  
+	 */
+	public static function getGateActivityTypes():Array{
+		var types:Array = [];
+		types.addItem({label: Dictionary.getValue('synch_act_lbl'), data: SYNCH_GATE_ACTIVITY_TYPE});
+		types.addItem({label: Dictionary.getValue('sched_act_lbl'), data: SCHEDULE_GATE_ACTIVITY_TYPE});
+		types.addItem({label: Dictionary.getValue('perm_act_lbl'), data: PERMISSION_GATE_ACTIVITY_TYPE});
+		return types;
+	}
+	
 	
 	//helper methods
 	
