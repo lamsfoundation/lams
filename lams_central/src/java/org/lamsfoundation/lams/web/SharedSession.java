@@ -75,6 +75,7 @@ public class SharedSession   {
 	 * @return
 	 */
 	public static SharedSession getInstance(ServletContext context){
+		//TODO: hardcode for lams root context
 		SharedSession ss = new SharedSession(context.getContext("/lams"));
 		if(ss.context == null){
 			log.error("Failed in retrieving lams core context.");
