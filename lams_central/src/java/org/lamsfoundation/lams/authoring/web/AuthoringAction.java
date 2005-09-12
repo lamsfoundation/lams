@@ -36,10 +36,12 @@ import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
-import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import java.io.BufferedReader;
 
 /**
  * @author Manpreet Minhas
@@ -140,7 +142,8 @@ public class AuthoringAction extends DispatchAction{
 											ActionForm form,
 											HttpServletRequest request,
 											HttpServletResponse response)throws ServletException, Exception{
-		String designDetails = WebUtil.readStrParam(request,"designDetails");
+	//	String designDetails = WebUtil.readStrParam(request,"designDetails");
+		String designDetails = getBody(request);
 		IAuthoringService authoringService = getAuthoringService();
 		String message = authoringService.storeLearningDesignDetails(designDetails);
 		request.getSession().setAttribute("message",message);
@@ -210,5 +213,22 @@ public class AuthoringAction extends DispatchAction{
 	    String message = authoringService.getThemes();
 	    request.getSession().setAttribute("message",message);
 	    return outputPacket(mapping, request, response, message, "message");
+	}
+	
+	/* Get the post body */
+	private String getBody(HttpServletRequest req)
+		throws IOException
+	{
+		BufferedReader  tempReader  = req.getReader();
+		int tempContentLength = req.getContentLength();
+		StringBuffer tempStrBuf = new StringBuffer( tempContentLength>0 ? tempContentLength : 200 );
+		String tempStr;
+		tempStr = tempReader.readLine(); 
+		while ( tempStr != null )
+		{
+			tempStrBuf.append(tempStr);
+			tempStr = tempReader.readLine();
+		}
+		return(tempStrBuf.toString());
 	}
 }
