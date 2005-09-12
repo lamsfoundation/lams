@@ -46,8 +46,11 @@ class org.lamsfoundation.lams.authoring.Application {
     private static var MENU_DEPTH:Number = 25;   //depth of the menu
     
     private static var UI_LOAD_CHECK_INTERVAL:Number = 50;
-    
+	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
+
     private static var QUESTION_MARK_KEY:Number = 191;
+
+	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
 	
 	private var _ddm:DesignDataModel;
     private var _toolbar:Toolbar;
@@ -196,6 +199,7 @@ class org.lamsfoundation.lams.authoring.Application {
         if(!_UILoadCheckIntervalID) {
             _UILoadCheckIntervalID = setInterval(Proxy.create(this,checkUILoaded),UI_LOAD_CHECK_INTERVAL);
         } else {
+			_uiLoadCheckCount++;
             //If all events dispatched clear interval and call start()
             if(_dictionaryEventDispatched && _themeEventDispatched){
 				Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
@@ -204,7 +208,7 @@ class org.lamsfoundation.lams.authoring.Application {
             }else {
                 //If UI loaded check which events can be broadcast
                 if(_UILoaded){
-					Debugger.log('ALL UI LOADED',Debugger.GEN,'checkUILoaded','Application');
+					Debugger.log('ALL UI LOADED, waiting for all true to dispatch init events: _dictionaryLoaded:'+_dictionaryLoaded+'_themeLoaded:'+_themeLoaded ,Debugger.GEN,'checkUILoaded','Application');
 
                     //If dictionary is loaded and event hasn't been dispatched - dispatch it
                     if(_dictionaryLoaded && !_dictionaryEventDispatched){
@@ -216,6 +220,13 @@ class org.lamsfoundation.lams.authoring.Application {
 						_themeEventDispatched = true;
                         _themeManager.broadcastThemeChanged();
                     }
+					
+					if(_uiLoadCheckCount >= UI_LOAD_CHECK_TIMEOUT_COUNT){
+						//if we havent loaded the dict or theme by the timeout count then give up
+						Debugger.log('raeached time out waiting to load dict and themes, giving up.',Debugger.CRITICAL,'checkUILoaded','Application');
+						//todo:  give the user a message
+						clearInterval(_UILoadCheckIntervalID);
+					}
                 }
             }
         }
