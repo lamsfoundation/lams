@@ -1,4 +1,5 @@
-﻿import org.lamsfoundation.lams.common.dict.*
+﻿import org.lamsfoundation.lams.common.*
+import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.comms.*
 import org.lamsfoundation.lams.authoring.*;
@@ -55,7 +56,9 @@ dynamic class Dictionary {
         //Set Language
         this._currentLanguage = language;
         //Cookie or server?
-        if(CookieMonster.cookieExists('dictionary.'+language)) {
+		Debugger.log('Config.DOUBLE_CLICK_DELAY:'+Config.DOUBLE_CLICK_DELAY,Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
+		Debugger.log('Config.USE_CACHE:'+Config.USE_CACHE,Debugger.GEN,'load','org.lamsfoundation.lams.dict.Dictionary');
+        if(CookieMonster.cookieExists('dictionary.'+language) && Config.USE_CACHE) {
             openFromDisk();
         }else {
             openFromServer();
@@ -93,12 +96,12 @@ dynamic class Dictionary {
         var hashKeys:Array = items.keys();
         var hashValues:Array = items.values();
         
-        obj.dictionaryItems = [];
+        obj = [];
         
         //Go through hash of dictionary items and get data objects for each
         for(var i=0;i<hashKeys.length;i++){
-            obj.dictionaryItems[i] = hashValues[i].toData();
-            obj.dictionaryItems[i].key = hashKeys[i];
+            obj[i] = hashValues[i].toData();
+            obj[i].key = hashKeys[i];
         }
         return obj;
     }
