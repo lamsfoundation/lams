@@ -20,6 +20,7 @@ http://www.gnu.org/licenses/gpl.txt
 */
 package org.lamsfoundation.lams.util.zipfile;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,10 +30,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.zip.ZipOutputStream;
 
 import junit.framework.TestCase;
 
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileUtilException;
 
 /**
  * Test that the zip file util will expand a zip file, delete the
@@ -226,4 +229,83 @@ public class TestZipFileUtil extends TestCase {
             throw e;
         }
     }
+   
+    private boolean createTestDirectoryAndFiles(String testDirName) throws FileUtilException, IOException
+    {
+       String testSubDirName = testDirName + "/subDirectory";       	
+    
+       	boolean created = FileUtil.createDirectory(testSubDirName);
+       	boolean filesCreated = false;
+       	if (created)
+       	{
+       		//add some files
+       		File file1 = new File(testDirName, "testFile1.txt");
+       		File file2 = new File(testDirName, "testFile2.txt");
+       		File file3 = new File(testDirName, "testFile3.txt");
+       		File file4 = new File(testSubDirName, "testFile4.txt");
+       		File file5 = new File(testSubDirName, "testFile5.txt");
+       		
+       		filesCreated = file1.createNewFile() && file2.createNewFile() && file3.createNewFile()
+								&& file4.createNewFile() && file5.createNewFile();
+       	}
+       	
+       	if (created && filesCreated)
+       		return true;
+       	else
+       		return false;
+       	
+         	
+    } 
+    
+    public void testCreateZipFile() throws FileUtilException, IOException, ZipFileUtilException
+    {
+    	String directoryName = "testDirectory";
+    	boolean created = createTestDirectoryAndFiles(directoryName);
+    	if (created)
+    	{
+	    	String zipFileName = "test.zip";
+	    	
+	    	ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFileName)));
+	    	File directory = new File(directoryName);
+	        assertTrue(directory.exists());
+	    	File[] files = directory.listFiles();
+	  
+	    	ZipFileUtil.zipFiles(out, files);  
+	    	
+	    	out.close(); 
+	    	
+	    	FileUtil.deleteDirectory(directoryName);
+    	}
+    	else
+    	{
+    		assertFalse("Failed to run test", true);
+    	}
+    	
+    } 
+    
+   public void testCreateZipFile2() throws FileUtilException, IOException, ZipFileUtilException
+    {
+    	  	
+	    	String directoryName = "/MaiTestDirectory";
+	    	boolean created = createTestDirectoryAndFiles(directoryName);
+	    	
+	    	if (created)
+	    	{
+	    	   	
+		    	String zipFileName= "maitest.zip";
+		    	
+		    	ZipFileUtil.createZipFile(zipFileName, directoryName);
+		    	
+		
+		    	
+		    	FileUtil.deleteDirectory(directoryName);
+	    	}
+	    	else
+	    	{
+	    		assertFalse("Failed to run test", true);
+	    	} 
+	
+    } 
+    
+ 
 }
