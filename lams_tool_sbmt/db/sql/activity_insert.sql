@@ -58,7 +58,7 @@ NULL
 , NULL
 , 0
 , NULL
-, 2
+, ${learning_library_id}
 , NOW()
 , 0
 , NULL
@@ -73,7 +73,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, '/lams/tool/sbmt/images/icon_questionanswer.swf'
+, '/lams/images/icon_reportsubmission.swf'
 , NULL
 , NULL
 , NULL
