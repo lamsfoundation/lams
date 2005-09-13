@@ -16,7 +16,7 @@
 	    }
     </script>
 	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/common.js"></script>
+	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/common.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 </head>
 <c:if test="${empty currentTab}"><c:set var="currentTab" value="b"/></c:if>

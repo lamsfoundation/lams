@@ -8,7 +8,7 @@
 <title>Submit Files</title>
 	<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
     <link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/common.js"></script>
+	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/common.js"></script>
 
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
 </head>

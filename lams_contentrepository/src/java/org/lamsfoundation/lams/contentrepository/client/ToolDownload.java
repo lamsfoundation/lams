@@ -71,7 +71,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *  &lt;/tr&gt;
  * </pre>
  * <p>
- * The launchInstructionsPopup() method is defined in common.js, available as http://.../lams/common.js.
+ * The launchInstructionsPopup() method is defined in common.js, available as http://.../lams/includes/javascript/common.js.
  * <p>
  * For an example of this servlet being used, have a look at the lams_tool_imscp project. 
  * The jsps/authoring/forum/instructions.jsp calls the servlet and includes/header.jsp 

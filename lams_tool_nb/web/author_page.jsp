@@ -23,7 +23,7 @@ String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title>Noticeboard tool</title>
 <script type="text/javascript" src="<%=root%>author_page/js/tabcontroller.js"></script>
-<script src="<%=pathToLams%>/common.js"></script>
+<script src="<%=pathToLams%>/includes/javascript/common.js"></script>
 <!-- this is the custom CSS for hte tool -->
 <link href="<%=root%>author_page/css/tool_custom.css" rel="stylesheet" type="text/css">
 <!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->

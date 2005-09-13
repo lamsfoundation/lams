@@ -5,7 +5,7 @@
     <title>All Learner Submission Details</title>
     <html:base/>
   	<link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/common.js"></script>
+	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/common.js"></script>
   	
   </head>  
   <body>
