@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.util;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.FileUtilException;
 
 /**
  * General File Utilities
@@ -66,5 +67,105 @@ public class FileUtil {
 		    return false;
 		}
 	}
-
+	
+	public static boolean deleteDirectory(String directoryName) throws FileUtilException {
+		boolean isDeleted = false;
+		if (directoryName == null || directoryName.length() == 0)
+			throw new FileUtilException("A directory name must be specified");
+	
+		File dir = new File(directoryName);
+		isDeleted = deleteDirectory(dir);
+		
+		return isDeleted;
+		
+	
+	}
+	
+	/**
+	 * This method creates a directory with the name <code>directoryName</code>.
+	 * Also creates any necessary parent directories that may not yet exist.
+	 * 
+	 * If the directoryname is null or an empty string, a FileUtilException is thrown
+	 * @param directoryName the name of the directory to create
+	 * @return boolean. Returns true if the directory is created and false otherwise
+	 * @throws FileUtilException if the directory name is null or an empty string
+	 */
+	public static boolean createDirectory(String directoryName) throws FileUtilException
+	{
+		boolean isCreated = false;
+		//check directoryName to see if its empty or null
+		if (directoryName == null || directoryName.length() == 0)
+			throw new FileUtilException("A directory name must be specified");
+	
+		File dir = new File(directoryName);
+		isCreated = dir.exists() ? false : dir.mkdirs();
+		
+		return isCreated;
+	}
+	
+	/**
+     * Creates a subdirectory under the parent directory <code>parentDirName</code>
+     * If the parent or child directory is null, FileUtilException is thrown.
+     * 
+     * If the parent directory has not been created yet, it will be created.
+     * 
+     * 
+	 * @param parentDirName The name of the parent directory in which the subdirectory should be created in
+	 * @param subDirName The name of the subdirectory to create
+	 * @return boolean. Returns true if the subdirectory was created and false otherwise
+	 * @throws FileUtilException if the parent/child directory name is null or empty.
+	 */
+	public static boolean createDirectory(String parentDirName, String subDirName) throws FileUtilException
+	{
+		boolean isSubDirCreated = false;
+		boolean isParentDirCreated;
+	
+		if (parentDirName == null || parentDirName.length()==0 || subDirName == null || subDirName.length() == 0)
+			throw new FileUtilException("A parent or subdirectory name must be specified");
+	
+		File parentDir = new File(parentDirName);
+		if (!parentDir.exists())
+			isParentDirCreated = createDirectory(parentDirName);
+		else
+			isParentDirCreated = true; //parent directory already exists
+		
+		if (trailingForwardSlashPresent(parentDirName)) /* for eg. "parentDirectoryName/" <-- slash at end of name */
+			parentDirName = removeTrailingForwardSlash(parentDirName);
+		
+		//concatenate the two together
+		String combinedDirName = parentDirName + File.separator + subDirName;
+		
+		isSubDirCreated = createDirectory(combinedDirName);
+				
+		return isSubDirCreated && isParentDirCreated;
+	}
+	
+	/**
+	 * If the directory name specified has a slash at the end of it
+	 * such as "directoryName/", then the slash will be removed
+	 * and "directoryName" will be returned. The createDirectory(parentdir, childdir)
+	 * method requires that there is no slash at the end of the directory name.
+	 * @param stringToModify
+	 * @return
+	 */
+	protected static String removeTrailingForwardSlash(String stringToModify)
+	{
+		String stringWithoutSlashAtEnd = stringToModify.substring(0, stringToModify.length()-1);
+		return stringWithoutSlashAtEnd;
+	}
+	
+	/**
+	 * Checks to see if there is a slash at the end of the string.
+	 * 
+	 * @param stringToCheck the directoryName to check
+	 * @return boolean. Returns true if there is a slash at the end and false if not.
+	 */
+	protected static boolean trailingForwardSlashPresent(String stringToCheck)
+	{
+		int indexOfSlash = stringToCheck.lastIndexOf("/");
+		if (indexOfSlash == (stringToCheck.length()-1))
+			return true;
+		else
+			return false;
+	}
 }
