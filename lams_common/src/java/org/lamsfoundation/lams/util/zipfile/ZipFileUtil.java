@@ -31,6 +31,10 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.FileUtil;
+import java.util.zip.ZipOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.BufferedInputStream;
 
 /**
  * Handles zip files - expands them to a temporary directory, and 
@@ -251,6 +255,88 @@ public class ZipFileUtil {
         else
             return newMessage;
     }
+    
+    public static String createZipFile(String zipFileName, String directoryToZip) throws ZipFileUtilException //public static String createZipFile(String ZipFileName, String[] filesToZip)
+    {
+    	//check if a zip file already exists with that name "filename.zip" or "filename" is accepted as well
+    	//if so delete that existing file.
+    	//return the name of the zipfile
+    	int dotIndex = zipFileName.indexOf(".");
+		//String shortZipName = dotIndex > -1 ? zipFileName.substring(0,dotIndex) : zipFileName;
+		String fileNameOfZipToCreate = dotIndex > -1 ? zipFileName : zipFileName+".zip"; //append ".zip" extension if the filename doesnt contain .zip extension
+        
+		//check the name of the directory given
+		
+		try
+		{
+        	ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileNameOfZipToCreate)));
+        	File directory = new File(directoryToZip);
+        	if(!directory.exists())
+        	{
+        		throw new ZipFileUtilException("The specified directory " + directoryToZip + " does not exit");
+        	}
+        	File[] files = directory.listFiles();
+        	
+        	zipFiles(out, files);
+        	out.close();       	
+		}
+		catch (IOException e1)
+		{
+			throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: ", e1);
+		}
+        
+    	return fileNameOfZipToCreate;
+    }
+    
+    protected static void zipFiles(ZipOutputStream zop, File[] files) throws ZipFileUtilException
+    {
+    	File file = null;
+    	ZipEntry entry = null;
+		BufferedInputStream source = null;
+		byte[] data = new byte[ BUFFER_SIZE ]; //byte[] buffer = new byte[ 1024 ]; //what size should we use? 1024?
+		
+		try
+		{
+	    	for (int i=0; i< files.length; i++)
+	    	{
+	    		file = files[i];
+	    		//if file is a directory, recursively call this method
+	    		if (file.isDirectory())
+	    		{
+	    			File[] filesInsideDir = file.listFiles();
+	    			zipFiles(zop, filesInsideDir);
+	    		}
+	    		else
+	    		{
+	    			source = new BufferedInputStream(new FileInputStream(file));
+	    			entry = new ZipEntry(file.getPath());
+	    			
+		    		zop.putNextEntry(entry);
+		    		
+		    		//transfer bytes from file to ZIP file
+		    		int length;
+		    		while((length = source.read(data)) > 0)
+		    		{
+		    			zop.write(data, 0, length);
+		    		}
+		    		
+		    		zop.closeEntry();
+		    		source.close(); 
+		    		
+		    		source=null;
+		    		
+	    		}
+	    		
+	    		
+	    	}
+		}
+		catch(IOException e)
+		{
+			throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: ", e);
+		}
+    }
+    
+  
     
 }
 
