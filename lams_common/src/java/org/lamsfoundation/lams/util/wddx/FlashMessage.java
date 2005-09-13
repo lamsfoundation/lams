@@ -30,6 +30,7 @@ import java.io.Serializable;
  * This class represents the message sent by the server to the 
  * Flash client.
  * 
+ * TODO Flash messages require internationalisation.
  */
 public class FlashMessage implements Serializable {
 	
