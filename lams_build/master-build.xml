@@ -233,4 +233,26 @@
 		</copy>
 	</target>
 
+	<target name="test-report" description="Run all the test cases across the system. Takes a long time.">
+		<!-- Core projects first -->
+<!-- 		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
+ 		<ant antfile="../${lams_common}/build.xml" target="test-report" inheritAll="false"/>
+ 		<ant antfile="../${lams_contentrepository}/build.xml" target="test-report" inheritAll="false"/>
+ 	xx	<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
+		<ant antfile="../${lams_central}/build.xml" target="test-report" inheritAll="false"/>
+		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
+		<ant antfile="../${tool_survey_dir}/build.xml" target="build-db" inheritAll="false"/>
+		<ant antfile="../${tool_survey_dir}/build.xml" target="build-jar" inheritAll="false"/>
+	xx	<ant antfile="../${lams_monitoring}/build.xml" target="test-report" inheritAll="false"/>
+		<ant antfile="../${lams_learning}/build.xml" target="test-report" inheritAll="false"/>
+-->
+		<!--  Now the tools -->
+ 		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
+		<ant antfile="../${tool_forum_dir}/build.xml" target="test-report" inheritAll="false"/>
+		<ant antfile="../${tool_imscp_dir}/build.xml" target="test-report" inheritAll="false"/>
+		<ant antfile="../${tool_laqa_dir}/build.xml" target="test-report" inheritAll="false"/>
+		<ant antfile="../${tool_lanb_dir}/build.xml" target="test-report" inheritAll="false"/>
+		<ant antfile="../${tool_sbmt_dir}/build.xml" target="test-report" inheritAll="false"/>
+		<ant antfile="../${tool_survey_dir}/build.xml" target="test-report" inheritAll="false"/>
+	</target>
 </project>
