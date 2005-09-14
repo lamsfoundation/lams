@@ -150,4 +150,14 @@ public class FlashMessage implements Serializable {
     			"No such theme with a theme id of " + themeID +" exists",
 				FlashMessage.ERROR);
     }
+    public static FlashMessage getWDDXPacketGetReceived(String urlCall){
+    	return new FlashMessage(urlCall,
+    			"Invalid call. Expected WDDX packet in POST but received a GET",
+				FlashMessage.ERROR);
+    }
+    public static FlashMessage getExceptionOccured(String methodName, String message){
+    	return new FlashMessage(methodName,
+    			"Unable to store due to an internal error. Contact support for help. Exception message was "+message,
+				FlashMessage.ERROR);
+    }
 }
