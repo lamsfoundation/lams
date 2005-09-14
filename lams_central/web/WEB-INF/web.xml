@@ -56,6 +56,17 @@ http://www.gnu.org/licenses/gpl.txt
  	</listener-class>
 </listener>	
 
+   <servlet>
+      <servlet-name>storeLD</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>storeTheme</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreThemeServlet</servlet-class>
+
+   </servlet>
+
  <!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
@@ -149,6 +160,15 @@ http://www.gnu.org/licenses/gpl.txt
     <servlet-name>Connector</servlet-name>
     <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>storeLD</servlet-name>
+      <url-pattern>/authoring/storeLearningDesignDetails</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>storeTheme</servlet-name>
+      <url-pattern>/authoring/storeTheme</url-pattern>
+   </servlet-mapping>
 
    <session-config>
       <session-timeout>120</session-timeout>

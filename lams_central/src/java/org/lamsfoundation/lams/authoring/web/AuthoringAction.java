@@ -29,6 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -36,18 +37,16 @@ import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import java.io.BufferedReader;
 
 /**
  * @author Manpreet Minhas
  * 
  * @struts.action name = "AuthoringAction"
- * 				  path = "/author"
+ * 				  path = "/authoring/author"
  * 				  parameter = "method"
  * 				  validate = "false"
  * @struts.action-forward name = "success" path = "/index.jsp"
@@ -55,20 +54,20 @@ import java.io.BufferedReader;
  */
 public class AuthoringAction extends DispatchAction{
 	
-    /** If you want the output given as a jsp, set the request parameter "jspoutput" to 
+	private static Logger log = Logger.getLogger(AuthoringAction.class);
+
+	/** If you want the output given as a jsp, set the request parameter "jspoutput" to 
      * some value other than an empty string (e.g. 1, true, 0, false, blah). 
      * If you want it returned as a stream (ie for Flash), do not define this parameter
      */  
 	public static String USE_JSP_OUTPUT = "jspoutput";
 	
-	/** Complete Theme to be stored in the db */
-	public static final String THEME_PARAMETER = "theme";
 	/** Id of theme to be retrieved from the db */
-	public static final String THEME_ID_PARAMETER = "themeid";
-	
+	public static final String THEME_ID_PARAMETER = "themeID";
+		
 	public IAuthoringService getAuthoringService(){
 		WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServlet().getServletContext());
-		return (IAuthoringService) webContext.getBean("authoringService");		
+		return (IAuthoringService) webContext.getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);		
 	}
 	
 	/** Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT
@@ -138,17 +137,7 @@ public class AuthoringAction extends DispatchAction{
 		String wddxPacket = authoringService.getAllLearningDesignDetails();
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
-	public ActionForward storeLearningDesignDetails(ActionMapping mapping,
-											ActionForm form,
-											HttpServletRequest request,
-											HttpServletResponse response)throws ServletException, Exception{
-	//	String designDetails = WebUtil.readStrParam(request,"designDetails");
-		String designDetails = getBody(request);
-		IAuthoringService authoringService = getAuthoringService();
-		String message = authoringService.storeLearningDesignDetails(designDetails);
-		request.getSession().setAttribute("message",message);
-		return outputPacket(mapping, request, response, message, "message");
-	}
+
 	public ActionForward getAllLearningLibraryDetails(ActionMapping mapping,
 													  ActionForm form,
 													  HttpServletRequest request,
@@ -158,23 +147,7 @@ public class AuthoringAction extends DispatchAction{
 		return outputPacket(mapping, request, response, wddxPacket, "details");
 	}
 	
-	/**
-	 * Store a theme created on a client.
-	 * @return String The acknowledgement in WDDX format that the theme has been
-	 * 				  successfully saved.
-	 * @throws Exception
-	 */
-	public ActionForward storeTheme(ActionMapping mapping,
-			ActionForm form,
-			HttpServletRequest request,
-			HttpServletResponse response)throws ServletException, Exception{
 
-	    String theme = WebUtil.readStrParam(request,THEME_PARAMETER);
-		IAuthoringService authoringService = getAuthoringService();
-		String message = authoringService.storeTheme(theme);
-		request.getSession().setAttribute("message",message);
-		return outputPacket(mapping, request, response, message, "message");
-	}
 	
 	/**
 	 * Returns a string representing the requested theme in WDDX format
@@ -215,20 +188,5 @@ public class AuthoringAction extends DispatchAction{
 	    return outputPacket(mapping, request, response, message, "message");
 	}
 	
-	/* Get the post body */
-	private String getBody(HttpServletRequest req)
-		throws IOException
-	{
-		BufferedReader  tempReader  = req.getReader();
-		int tempContentLength = req.getContentLength();
-		StringBuffer tempStrBuf = new StringBuffer( tempContentLength>0 ? tempContentLength : 200 );
-		String tempStr;
-		tempStr = tempReader.readLine(); 
-		while ( tempStr != null )
-		{
-			tempStrBuf.append(tempStr);
-			tempStr = tempReader.readLine();
-		}
-		return(tempStrBuf.toString());
-	}
+
 }

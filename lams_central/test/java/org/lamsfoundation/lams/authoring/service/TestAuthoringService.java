@@ -85,13 +85,15 @@ public class TestAuthoringService extends AbstractLamsTestCase {
 		String packet = authService.getAllLearningLibraryDetails();
 		System.out.println("Library Details: "+ packet);
 	}
-	public void testStoreLearningDesignDetails() throws Exception{		
-		String str = authService.storeLearningDesignDetails(LEARNING_DESIGN_PART_A+"-111111"+LEARNING_DESIGN_PART_B);
+	public void testStoreLearningDesignDetails() throws Exception{	
+		String design = LEARNING_DESIGN_PART_A+"-111111"+LEARNING_DESIGN_PART_B;
+		String str = authService.storeLearningDesignDetails(design);
 		assertTrue("storeLearningDesignDetails returned WDDX packet", str!=null && str.startsWith("<wddxPacket"));
 		System.out.println(str);		
 		Long id = extractIdFromWDDXPacket(str);
 
-		str = authService.storeLearningDesignDetails(LEARNING_DESIGN_PART_A+id.toString()+LEARNING_DESIGN_PART_B);
+		design = LEARNING_DESIGN_PART_A+id.toString()+LEARNING_DESIGN_PART_B;
+		str = authService.storeLearningDesignDetails(design);
 		assertTrue("storeLearningDesignDetails(2) returned WDDX packet", str!=null && str.startsWith("<wddxPacket"));
 		System.out.println(str);
 		Long id2 = extractIdFromWDDXPacket(str);

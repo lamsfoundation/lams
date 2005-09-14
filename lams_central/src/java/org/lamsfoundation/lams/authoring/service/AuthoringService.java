@@ -75,6 +75,8 @@ import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 
+import com.allaire.wddx.WddxDeserializationException;
+
 
 /**
  * @author Manpreet Minhas 
@@ -480,10 +482,10 @@ public class AuthoringService implements IAuthoringService {
 		if(learningDesignDTO!=null){
 			LearningDesign design = extractor.extractLearningDesignObject(learningDesignDTO);	
 			learningDesignDAO.insert(design);
-			flashMessage = new FlashMessage("storeLearningDesignDetails",design.getLearningDesignId());
+			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
 		}
 		else
-			flashMessage = new FlashMessage("storeLearningDesignDetails",
+			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,
 											"Invalid Object in WDDX packet",
 											FlashMessage.ERROR);
 		
@@ -547,9 +549,11 @@ public class AuthoringService implements IAuthoringService {
 	 * @param wddxPacket The WDDX packet received from Flash
 	 * @return String The acknowledgement in WDDX format that the theme has been
 	 * 				  successfully saved.
+	 * @throws IOException
+	 * @throws WddxDeserializationException
 	 * @throws Exception
 	 */
-	public String storeTheme(String wddxPacket) throws Exception{
+	public String storeTheme(String wddxPacket) throws Exception {
 		
 		if(containsNulls(wddxPacket)){
 			flashMessage = new FlashMessage("storeTheme",
@@ -579,7 +583,7 @@ public class AuthoringService implements IAuthoringService {
 		}
 		
 		themeDAO.saveOrUpdateTheme(storedTheme);
-		flashMessage = new FlashMessage("storeTheme",storedTheme.getId());
+		flashMessage = new FlashMessage(IAuthoringService.STORE_THEME_MESSAGE_KEY,storedTheme.getId());
 		return flashMessage.serializeMessage(); 		
 	}
 

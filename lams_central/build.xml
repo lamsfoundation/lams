@@ -150,6 +150,7 @@
 				<include name="includes/**"/>
 				<include name="images/**"/>
 				<include name="fckeditor/**"/>
+				<include name="development/**"/>
 				<exclude name="lams_example_tool"/>
 			</fileset>
 		</war>
@@ -210,6 +211,7 @@
 	<target name="webdoclet" depends="preparedirs">
 		<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
 	         <fileset dir="${src.java}">
+	            <include name="**/*Servlet.java" />
 	            <include name="**/*Action.java" />
 	            <include name="**/*ActionForm.java" />
 	         </fileset>

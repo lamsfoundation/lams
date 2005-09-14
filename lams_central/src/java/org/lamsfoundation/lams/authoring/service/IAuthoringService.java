@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
 import java.util.List;
+
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -36,7 +37,12 @@ import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException
  */
 public interface IAuthoringService {
 	
+	/** Message key returned by the storeTheme() method */
+	public static final String STORE_THEME_MESSAGE_KEY = "storeTheme";
 	
+	/** Message key returned by the storeLearningDesignDetails() method */
+	public static final String STORE_LD_MESSAGE_KEY = "storeLearningDesignDetails";
+
 	/**
 	 * Returns a populated LearningDesign object corresponding to the given learningDesignID
 	 * 

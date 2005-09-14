@@ -14,6 +14,10 @@
   <form-beans>
 
     <form-bean
+      name="WDDXPostActionForm"
+      type="org.lamsfoundation.lams.web.development.WDDXPostActionForm"
+    />
+    <form-bean
       name="PasswordChangeActionForm"
       type="org.lamsfoundation.lams.web.PasswordChangeActionForm"
     />
@@ -110,7 +114,7 @@
       />
     </action>
     <action
-      path="/author"
+      path="/authoring/author"
       type="org.lamsfoundation.lams.authoring.web.AuthoringAction"
       name="AuthoringAction"
       scope="request"
@@ -123,6 +127,16 @@
         path="/index.jsp"
         redirect="false"
       />
+    </action>
+    <action
+      path="/WDDXPost"
+      type="org.lamsfoundation.lams.web.development.WDDXPostAction"
+      name="WDDXPostActionForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
     </action>
 
     <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->

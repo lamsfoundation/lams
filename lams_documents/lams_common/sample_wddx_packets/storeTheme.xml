@@ -1,0 +1,42 @@
+<wddxPacket version='1.0'><header /><data>
+<struct>
+<var name='baseStyleObject'>
+<struct>
+	<var name='borderStyle'><string>outset</string></var>
+	<var name='rollOverColor'><number>16711680</number></var>
+	<var name='selectionColor'><number>16711680</number></var>
+	<var name='themeColor'><number>16711680</number></var>
+	<var name='_tf'>
+	<struct>
+		<var name='font'><string>_sans</string></var>
+		<var name='size'><number>10</number></var>
+		<var name='color'><number>12452097</number></var>
+		<var name='display'><string>block</string></var>
+	</struct>
+	</var>
+</struct>
+</var> 
+<var name='name'><string>AuthoringTestTheme</string></var>
+<var name='description'><string>theme used for TestAuthoringService</string></var>
+<var name='visualElements'>
+	<array length='1'>
+	<struct>
+		<var name='name'><string>button</string></var>
+		<var name='styleObject'>
+		<struct>
+		<var name='borderStyle'><string>outset</string></var>
+		<var name='rollOverColor'><number>16711680</number></var>
+		<var name='selectionColor'><number>16711680</number></var>
+		<var name='themeColor'><number>16711680</number></var>
+		<var name='_tf'>
+			<struct>
+				<var name='color'><number>7174353</number></var>
+				<var name='display'><string>block</string></var>
+			</struct>
+			</var>
+		</struct>
+		</var>
+	</struct>
+	</array>
+</var> 
+</struct></data></wddxPacket>
