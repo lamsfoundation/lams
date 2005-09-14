@@ -52,11 +52,11 @@ public class NoticeboardServiceProxy {
 	}
 	
 	 /*
-     * Return the survey version of tool session manager implementation. 
+     * Return the noticeboard version of tool session manager implementation. 
      * It will delegate to the Spring helper method to retrieve the proper 
      * bean from Spring bean factory.
      * @param servletContext the servletContext for current application
-     * @return survey service object.*/
+     * @return noticeboard service object.*/
     public static final ToolSessionManager getNbSessionManager(ServletContext servletContext)
     {
         return (ToolSessionManager)getNbDomainService(servletContext);
@@ -64,11 +64,11 @@ public class NoticeboardServiceProxy {
      
     
     /*
-     * Return the survey version of tool content manager implementation. 
+     * Return the noticeboard version of tool content manager implementation. 
      * It will delegate to the Spring helper method to retrieve the proper 
      * bean from Spring bean factory.
      * @param servletContext the servletContext for current application
-     * @return survey service object. */
+     * @return noticeboard service object. */
     public static final ToolContentManager getNbContentManager(ServletContext servletContext)
     {
         return (ToolContentManager)getNbDomainService(servletContext);
