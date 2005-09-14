@@ -41,6 +41,12 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="body" value=""/>
 	</definition>
 	
+	<definition name=".systemError" extends=".activityLayout" >
+		<put name="title" value="System Error Page"/>
+		<put name="body" value="/error.jsp" />	
+	</definition>
+	
+	
 	<!--  Activity definitions -->
 	
 	<definition name=".loadToolActivity" extends=".layout">
