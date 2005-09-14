@@ -34,7 +34,7 @@ http://www.gnu.org/licenses/gpl.txt
 		<title>Learner :: LAMS</title>
 		<script language="JavaScript" type="text/JavaScript"><!--
 			// TODO: replace with proper URL
-			var serverURL = "http://127.0.0.1:8080/lams_learning/";
+			var serverURL = "http://127.0.0.1:8080/lams/learning/";
 			//-->
 		</script>
 	</head>
