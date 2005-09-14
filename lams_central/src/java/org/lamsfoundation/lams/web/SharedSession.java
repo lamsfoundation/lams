@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 
 import org.apache.log4j.Logger;
 /**
@@ -32,11 +34,30 @@ import org.apache.log4j.Logger;
  * 
  * $version$
  */
-public class SharedSession   {
+/* Should come out in web.xml in LAMS root web applicaton as:
+ * <!-- Listeners -->
+ *	<listener>
+ *		<listener-class>
+ *		  org.lamsfoundation.lams.web.SharedSession
+ *		</listener-class>
+ *	</listener>
+ */
+public class SharedSession  implements HttpSessionListener{
 
 	private static Logger log = Logger.getLogger(SharedSession.class);
+//	TODO: hardcode for lams root context
+	private static String ROOT_CONTEXT = "/lams"; 
+	
 	private ServletContext context;
-	private static final String SHARE_SESSION_NAME = "name";
+	private static final String SHARE_SESSION_NAME = "LAMS_SHARED_SESSION";
+	/**
+	 * This construct method is just for HttpSessionListener. To get an instance of
+	 * this class,  use <code>getInstance(ServletContext)</code> method.
+	 *
+	 */
+	public SharedSession(){
+		
+	}
 	private SharedSession(ServletContext context){
 		this.context = context;
 	}
@@ -75,12 +96,27 @@ public class SharedSession   {
 	 * @return
 	 */
 	public static SharedSession getInstance(ServletContext context){
-		//TODO: hardcode for lams root context
-		SharedSession ss = new SharedSession(context.getContext("/lams"));
+		
+		SharedSession ss = new SharedSession(context.getContext(ROOT_CONTEXT));
 		if(ss.context == null){
 			log.error("Failed in retrieving lams core context.");
 			return null;
 		}
 		return ss;
+	}
+	public void sessionCreated(HttpSessionEvent event) {
+	}
+	
+	/**
+	 * To ensure destroy shared session simultaneously with true HttpSession variables. 
+	 */
+	public void sessionDestroyed(HttpSessionEvent event) {
+		if(event == null)
+			return;
+		
+		ServletContext context = event.getSession().getServletContext();
+		//to ensure this context is root context
+		context = context.getContext(ROOT_CONTEXT);
+		context.setAttribute(SHARE_SESSION_NAME,null);
 	}
 }
