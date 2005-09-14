@@ -31,6 +31,8 @@ package org.lamsfoundation.lams.tool.noticeboard.web;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletException;
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
@@ -93,7 +95,7 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
      * @param response
      * @return
      */
-    public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException, ToolException, DataMissingException {
+    public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException, ToolException, DataMissingException, ServletException, IOException {
 		
 	  NbLearnerForm learnerForm = (NbLearnerForm)form;
 	  Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionId());
@@ -130,8 +132,30 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 		  * TODO: when this method is called, it throws a NullPointerException.
 		  * This is an error due to the learner service method completeToolSession(). 
 		  * It is not tested yet, however it is left in the code, to indicate that a learner has completed an activity.
+		  * 
+		  * get the url that is returned from leavetoolsession and redirect to this url
 		  */
-		  sessionMgrService.leaveToolSession(NbWebUtil.convertToLong(learnerForm.getToolSessionId()), user);
+		  
+		  
+		  String nextActivityUrl;
+			try
+			{
+				nextActivityUrl = sessionMgrService.leaveToolSession(NbWebUtil.convertToLong(learnerForm.getToolSessionId()), user);
+			}
+			catch (DataMissingException e)
+			{
+				// TODO Auto-generated catch block
+				throw new ServletException(e);
+			}
+			catch (ToolException e)
+			{
+				// TODO Auto-generated catch block
+				throw new ServletException(e);
+			}
+	        
+			response.sendRedirect(nextActivityUrl);
+			
+	        return null;
 		  
 		  
 	  }
