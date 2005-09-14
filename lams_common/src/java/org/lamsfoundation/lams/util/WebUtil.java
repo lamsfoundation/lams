@@ -21,7 +21,10 @@ public class WebUtil
     //---------------------------------------------------------------------
     public static final String PARAM_MODE = "mode";
     public static final String PARAM_SESSION_STATUS = "sessionStatus";
-    public static final String PARAM_TOOL_SESSION_ID = "sessionId";
+    public static final String PARAM_TOOL_SESSION_ID = "sessionId"; //works with survey but doesnt work with qa and nb which expects toolSessionId
+    //public static final String PARAM_TOOL_SESSION_ID = "toolSessionId";
+    public static final String PARAM_USER_ID_NEW = "userId";
+    
     public static final String PARAM_CONTENT_ID = "content_id";
     public static final String PARAM_USER_ID = "user_id";
     public static final String PARAM_LESSON_ID = "lesson_id";
