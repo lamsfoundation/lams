@@ -66,7 +66,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * @struts.action-exception key="error.system.learner" scope="request"
  *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
  *                          path=".systemError"
- * 							handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+ * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="viewGrouping" path="/grouping.do?method=viewGrouping"
  * @struts:action-forward name="showGroup" path=".grouping"
  * ----------------XDoclet Tags--------------------

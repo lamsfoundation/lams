@@ -77,7 +77,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * @struts.action-exception key="error.system.learner" scope="request"
  *                          type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
  *                          path=".systemError"
- * 							handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+ * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
  * @struts:action-forward name="welcome" path=".welcome"
  * 
