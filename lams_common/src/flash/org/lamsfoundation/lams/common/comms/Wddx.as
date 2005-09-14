@@ -82,10 +82,10 @@ class org.lamsfoundation.lams.common.comms.Wddx {
 	var atRev:Object = new Object();
 	var timezoneString:String;
 	var preserveVarCase:Boolean = true;
-	var useTimezoneInfo:Boolean = true;
+	var useTimeZoneInfo:Boolean = true;
 	var packet:XML;
 	var wddxPacket:XMLNode;
-	var useTimeZoneInfo:String;
+	//var useTimeZoneInfo:String;
 	var tzOffset:Number;
 	function Wddx() {
 		for (var i = 0; i<256; ++i) {
