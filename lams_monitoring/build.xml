@@ -131,7 +131,6 @@
 				<exclude name="web.xml"/>
 			</webinf>
 			<classes dir="${build.classes.java}"/>
-			<lib dir="${conf.webinf.dir}/lib"/>
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 			</fileset>
