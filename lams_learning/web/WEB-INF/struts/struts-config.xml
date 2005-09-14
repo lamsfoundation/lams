@@ -110,7 +110,7 @@ http://www.gnu.org/licenses/gpl.txt
       <exception
         key="error.system.learner"
         type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
         path=".systemError"
         scope="request"
       />
@@ -132,7 +132,7 @@ http://www.gnu.org/licenses/gpl.txt
       <exception
         key="error.system.learner"
         type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
         path=".systemError"
         scope="request"
       />
@@ -171,7 +171,7 @@ http://www.gnu.org/licenses/gpl.txt
       <exception
         key="error.system.learner"
         type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
         path=".systemError"
         scope="request"
       />
@@ -263,6 +263,27 @@ http://www.gnu.org/licenses/gpl.txt
       <forward
         name="displayParallel"
         path=".parallelActivity"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/exportPortfolio"
+      type="org.lamsfoundation.lams.learning.export.web.action.ExportPortfolioAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <exception
+        key="error.system.exportPortfolio"
+        type="org.lamsfoundation.lams.learning.export.ExportPortfolioException"
+        handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
+        path=".systemError"
+        scope="request"
+      />
+      <forward
+        name="displayPortfolio"
+        path="/exportPortfolio.jsp"
         redirect="false"
       />
     </action>
