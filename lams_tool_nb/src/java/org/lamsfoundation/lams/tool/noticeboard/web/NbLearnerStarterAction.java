@@ -116,7 +116,7 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         
         if(userId == null || toolSessionId ==null)
 		{
-			String error = "Unable to continue. The user ID, tool session ID or tool contentID is missing.";
+			String error = "Unable to continue. The user ID or tool session ID";
 			logger.error(error);
 			throw new NbApplicationException(error);
 		}
