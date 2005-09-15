@@ -536,8 +536,15 @@ public class AuthoringService implements IAuthoringService {
 		Iterator iterator= getAllLearningLibraries().iterator();
 		ArrayList libraries = new ArrayList();
 		while(iterator.hasNext()){
-			LearningLibrary learningLibrary = (LearningLibrary)iterator.next();			
-			libraries.add(learningLibrary.getLearningLibraryDTO());
+			LearningLibrary learningLibrary = (LearningLibrary)iterator.next();		
+			List templateActivities = activityDAO.getActivitiesByLibraryID(learningLibrary.getLearningLibraryId());
+			
+			if (templateActivities!=null & templateActivities.size()==0)
+			{
+				log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId() + " does not have a template activity");
+			}
+			libraries.add(learningLibrary.getLearningLibraryDTO(templateActivities));
+			//libraries.add(learningLibrary.getLearningLibraryDTO());
 		}
 		flashMessage = new FlashMessage("getAllLearningLibraryDetails",libraries);
 		return flashMessage.serializeMessage();
@@ -625,4 +632,6 @@ public class AuthoringService implements IAuthoringService {
 		flashMessage = new FlashMessage("getThemes",themeList);		
 		return flashMessage.serializeMessage();
 	}
+	
+	
 }
