@@ -70,13 +70,25 @@ public interface IActivityDAO extends IBaseDAO{
 	 * It only returns the template activities and not all activities 
 	 * with learning_library_id =libraryID. Template activity is one which
 	 * is not a part of any learning Design but is used as a blue-print/
-	 * template for creating new activities. Single LearningLibrary can 
-	 * have one or more activities associated with it. 
+	 * template for creating new activities. Single LearningLibrary 
+	 * in a normal case has one template activity.
 	 * 
 	 * @param libraryID The learning_library_id of the LearningLibrary 
 	 * @return List List of activities that belong to 
 	 * 		   the given LearningLibrary 
 	 */
 	public List getActivitiesByLibraryID(Long libraryID);
+	
+	/**
+	 * Returns the template activity that belongs to the LearningLibrary.
+	 * A template activity is one where learning_library_id=libraryID AND
+	 * learning_design_id IS NULL. This is what distinguishes between a normal
+	 * activity and a template activity.
+	 * If a template doesnt exist for that particular LearningLibrary then
+	 * and error messaged is logged (an exception is not thrown).
+	 * @param libraryID The learning_library_id of the LearningLibrary
+	 * @return Activity the template activity for the learning library.
+	 */
+	public Activity getTemplateActivityByLibraryID(Long libraryID);
 	
 }
