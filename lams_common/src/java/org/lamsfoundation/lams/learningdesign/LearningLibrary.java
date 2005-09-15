@@ -25,10 +25,12 @@ package org.lamsfoundation.lams.learningdesign;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import java.util.List;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
+
 
 
 /** 
@@ -189,4 +191,10 @@ public class LearningLibrary implements Serializable {
 	public LearningLibraryDTO getLearningLibraryDTO(){
 		return new LearningLibraryDTO(this);
 	}
+	
+	public LearningLibraryDTO getLearningLibraryDTO(List templateActivities) {
+		return new LearningLibraryDTO(this, templateActivities);
+	}
+	
+	
 }
