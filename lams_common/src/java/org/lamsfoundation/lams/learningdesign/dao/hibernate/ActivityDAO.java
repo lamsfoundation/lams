@@ -124,4 +124,11 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 		List list = this.getHibernateTemplate().find(FIND_BY_LIBRARY_ID,libraryID);
 		return list;
 	}
+	
+	/** @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getTemplateActivityByLibraryID(java.lang.Long) */
+	public Activity getTemplateActivityByLibraryID(Long libraryID)
+	{
+		List list = this.getHibernateTemplate().find(FIND_BY_LIBRARY_ID,libraryID);
+		return (list!= null && list.size()!=0) ? (Activity)list.get(0): null;
+	}
 }
