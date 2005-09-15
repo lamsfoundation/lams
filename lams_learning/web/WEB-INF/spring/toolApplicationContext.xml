@@ -27,7 +27,7 @@
 		<property name="target"><ref local="toolContentIDGeneratorTarget"/></property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="getNextToolContentIDFor">PROPAGATION_REQUIRES_NEW,ISOLATION_READ_COMMITTED</prop>
+				<prop key="getNextToolContentIDFor">PROPAGATION_REQUIRES_NEW</prop>
 			</props>
 		</property>
 	</bean>
@@ -44,9 +44,9 @@
 		<property name="target"><ref local="lamsCoreToolServiceTarget"/></property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="createToolSession">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
-				<prop key="notifyToolsToCreateSession">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
-			    <prop key="update*">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="createToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="notifyToolsToCreateSession">PROPAGATION_REQUIRED</prop>
+			    <prop key="update*">PROPAGATION_REQUIRED</prop>
 			    <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
 			</props>
 		</property>

@@ -29,13 +29,13 @@
 		<property name="target"><ref local="learnerServiceTarget"/></property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="joinLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
-				<prop key="calculateProgress">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
-				<prop key="completeToolSession">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
-				<prop key="completelActivity">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
-				<prop key="exitLesson">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
-				<prop key="performGrouping">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
-				<prop key="knockGate">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="joinLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="calculateProgress">PROPAGATION_REQUIRED</prop>
+				<prop key="completeToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="completelActivity">PROPAGATION_REQUIRED</prop>
+				<prop key="exitLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="performGrouping">PROPAGATION_REQUIRED</prop>
+				<prop key="knockGate">PROPAGATION_REQUIRED</prop>
    			</props>
 		</property>
 	</bean> 
@@ -51,7 +51,7 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="export*">PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED</prop>
+				<prop key="export*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean> 
