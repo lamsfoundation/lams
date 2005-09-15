@@ -273,7 +273,7 @@ public class ZipFileUtil {
         	File directory = new File(directoryToZip);
         	if(!directory.exists())
         	{
-        		throw new ZipFileUtilException("The specified directory " + directoryToZip + " does not exit");
+        		throw new ZipFileUtilException("The specified directory " + directoryToZip + " does not exist");
         	}
         	File[] files = directory.listFiles();
         	
@@ -308,9 +308,10 @@ public class ZipFileUtil {
 	    		}
 	    		else
 	    		{
+	    			
 	    			source = new BufferedInputStream(new FileInputStream(file));
 	    			entry = new ZipEntry(file.getPath());
-	    			
+	    				    			
 		    		zop.putNextEntry(entry);
 		    		
 		    		//transfer bytes from file to ZIP file
@@ -336,7 +337,8 @@ public class ZipFileUtil {
 		}
     }
     
-  
+   
+   
     
 }
 
