@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
@@ -45,6 +46,7 @@ public class LearningLibraryDTO extends BaseDTO {
 	private Boolean validFlag;
 	private Vector templateActivities;
 	
+	
 	public LearningLibraryDTO(){
 		
 	}
@@ -56,14 +58,27 @@ public class LearningLibraryDTO extends BaseDTO {
 		this.title = title;
 		this.validFlag = validFlag;		
 		this.templateActivities = templateActivities;
-	}
+	} 
+	
+	
 	public LearningLibraryDTO(LearningLibrary learningLibrary){
 		this.learningLibraryID = learningLibrary.getLearningLibraryId();
 		this.description = learningLibrary.getDescription();
 		this.title = learningLibrary.getTitle();
 		this.validFlag = learningLibrary.getValidLibrary();		
 		this.templateActivities = populateActivities(learningLibrary.getActivities().iterator());
-	}	
+	}
+	
+	public LearningLibraryDTO(LearningLibrary learningLibrary, List templateActivity)
+	{
+		this.learningLibraryID = learningLibrary.getLearningLibraryId();
+		this.description = learningLibrary.getDescription();
+		this.title = learningLibrary.getTitle();
+		this.validFlag = learningLibrary.getValidLibrary();	
+		this.templateActivities = populateActivities(templateActivity.iterator());
+	}
+	
+	
 	/**
 	 * @return Returns the description.
 	 */
@@ -94,7 +109,8 @@ public class LearningLibraryDTO extends BaseDTO {
 	 */
 	public Vector getTemplateActivities() {
 		return templateActivities;
-	}
+	} 
+	
 	public Vector populateActivities(Iterator iterator){		
 		Vector activities = new Vector();
 		while(iterator.hasNext()){
@@ -103,4 +119,6 @@ public class LearningLibraryDTO extends BaseDTO {
 		}		
 		return activities;		
 	}
+	
+	
 }
