@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.util;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -78,4 +79,60 @@ public class DateUtil
 
         return new Date(UTCDate.getTime()+offset);
     }
+    
+    /**
+     * Convert from String formatted date to a Date. Tries the following
+     * date formats:
+     *  (WDDX) YYYY-MM-ddTHH:mm:ss
+     * 
+     * @param dateString the date as a string
+     * @return converted Date
+     * TODO junit tests to test this code.
+     * @throws ParseException
+     */
+    public static Date convertFromString(String dateString) throws ParseException
+    {  
+    	if ( dateString == null )
+    		return null;
+    	
+    	// Replace this implementation with commons.lang.time.DateUtils.parseDate()
+    	// if/when we upgrade to commons 2.1
+        SimpleDateFormat parser = null;
+        String[] parseFormats = new String[] {"yyyy-MM-dd'T'HH:mm:ss"};
+        for (int i = 0; i < parseFormats.length; i++) {
+            if (i == 0) {
+                parser = new SimpleDateFormat(parseFormats[0]);
+            } else {
+                parser.applyPattern(parseFormats[i]);
+            }
+            try {
+            	Date date = parser.parse(dateString);
+            	if ( date != null ) {
+            		return date;
+            	}
+            } catch ( ParseException p )  {
+				// okay no good, try the next one...
+            }
+        }
+        throw new ParseException("Unable to parse date "+dateString,0);
+    }
+
+    /**
+     * Convert from String formatted date to a Date given the supplied
+     * SimpleDateFormat pattern
+     * 
+     * @param dateString the date as a string
+     * @param dateFormat SimpleDateFormat pattern
+     * @return converted Date
+     * @throws ParseException
+     */
+    public static Date convertFromString(String dateString, String dateFormat) throws ParseException
+    {
+    	if ( dateString == null )
+    		return null;
+    	
+        SimpleDateFormat parser = new SimpleDateFormat(dateFormat);
+        return parser.parse(dateString);
+    }
+
 }
