@@ -34,6 +34,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.web.context.WebApplicationContext;
@@ -248,8 +249,8 @@ public class WorkspaceAction extends DispatchAction {
 		Integer contentTypeID = new Integer(WebUtil.readIntParam(request,"contentType"));
 		String name = WebUtil.readStrParam(request,"name");
 		String description = WebUtil.readStrParam(request,"description");
-		Date createDateTime = new Date(WebUtil.readStrParam(request,"createDateTime"));
-		Date lastModifiedDate = new Date(WebUtil.readStrParam(request,"lastModifiedDateTime"));
+		Date createDateTime = DateUtil.convertFromString(WebUtil.readStrParam(request,"createDateTime"));
+		Date lastModifiedDate = DateUtil.convertFromString(WebUtil.readStrParam(request,"lastModifiedDateTime"));
 		Integer workspaceFolderID =  new Integer(WebUtil.readIntParam(request,"workspaceFolderID"));
 		String mimeType = WebUtil.readStrParam(request,"mimeType");
 		String path = WebUtil.readStrParam(request,"path");
