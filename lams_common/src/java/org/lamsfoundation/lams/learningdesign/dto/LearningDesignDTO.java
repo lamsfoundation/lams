@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -187,29 +188,29 @@ public class LearningDesignDTO extends BaseDTO{
 		this.activities = populateActivities(learningDesign);
 		this.transitions = populateTransitions(learningDesign);
 	}
-	public LearningDesignDTO(Hashtable table){
+	public LearningDesignDTO(Hashtable table) throws WDDXProcessorConversionException{
 		
-		this.learningDesignUIID = convertToInteger(table.get("learningDesignUIID"));
-		this.description = (String)table.get("description");
-		this.title = (String)table.get("title");
-		this.firstActivityUIID = convertToInteger(table.get("firstActivityUIID"));
-		this.maxID = convertToInteger(table.get("maxID"));
-		this.validDesign = (Boolean)table.get("validDesign");
-		this.readOnly = (Boolean)table.get("readOnly");;
-		this.dateReadOnly = (Date)table.get("dateReadOnly");
-		this.offlineInstructions= (String) table.get("offlineInstructions");
-		this.onlineInstructions =(String) table.get("onlineInstructions");
-		this.userID = convertToInteger(table.get("userID"));
-		this.helpText = (String)table.get("helpText");
-		this.copyTypeID = convertToInteger(table.get("copyTypeID"));
-		this.createDateTime = (Date)table.get("createDateTime");
-		this.version = (String)table.get("version");
-		this.parentLearningDesignID = convertToLong(table.get("parentLearningDesignID"));
-		this.workspaceFolderID =convertToInteger(table.get("workspaceFolderID"));
-		this.duration = convertToLong(table.get("duration"));
-		this.licenseID =convertToLong(table.get("licenseID"));
-		this.licenseText = (String)table.get("licenseText");				
-		this.lastModifiedDateTime =(Date)table.get("lastModifiedDateTime");
+		this.learningDesignUIID = convertToInteger(table,"learningDesignUIID");
+		this.description = convertToString(table,"description");
+		this.title = convertToString(table,"title");
+		this.firstActivityUIID = convertToInteger(table,"firstActivityUIID");
+		this.maxID = convertToInteger(table,"maxID");
+		this.validDesign = convertToBoolean(table,"validDesign");
+		this.readOnly = convertToBoolean(table,"readOnly");;
+		this.dateReadOnly = convertToDate(table,"dateReadOnly");
+		this.offlineInstructions= convertToString(table,"offlineInstructions");
+		this.onlineInstructions =convertToString(table,"onlineInstructions");
+		this.userID = convertToInteger(table,"userID");
+		this.helpText = convertToString(table,"helpText");
+		this.copyTypeID = convertToInteger(table,"copyTypeID");
+		this.createDateTime = convertToDate(table,"createDateTime");
+		this.version = convertToString(table,"version");
+		this.parentLearningDesignID = convertToLong(table,"parentLearningDesignID");
+		this.workspaceFolderID = convertToInteger(table,"workspaceFolderID");
+		this.duration = convertToLong(table,"duration");
+		this.licenseID =convertToLong(table,"licenseID");
+		this.licenseText = convertToString(table,"licenseText");				
+		this.lastModifiedDateTime =convertToDate(table,"lastModifiedDateTime");
 		
 		Vector activityDetails = (Vector)table.get("activities");
 		this.activities = new ArrayList();

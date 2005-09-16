@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.Hashtable;
 
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 
@@ -76,27 +77,17 @@ public class TransitionDTO extends BaseDTO{
 		this.fromActivityID = transition.getFromActivity().getActivityId();							  
 		this.learningDesignID = transition.getLearningDesign().getLearningDesignId();
 	}
-	public TransitionDTO(Hashtable transitionDetails){
-		if(transitionDetails.containsKey("transitionID"))
-			transitionID= convertToLong(transitionDetails.get("transitionID"));
-		if(transitionDetails.containsKey("transitionUIID"))
-			transitionUIID=convertToInteger(transitionDetails.get("transitionUIID"));
-		if(transitionDetails.containsKey("toUIID"))
-			toUIID=convertToInteger(transitionDetails.get("toUIID"));
-		if(transitionDetails.containsKey("fromUIID"))
-			fromUIID=convertToInteger(transitionDetails.get("fromUIID"));
-		if(transitionDetails.containsKey("description"))
-			description=(String)transitionDetails.get("description");
-		if(transitionDetails.containsKey("title"))
-			title=(String)transitionDetails.get("title");
-		if(transitionDetails.containsKey("createDateTime"))
-			createDateTime=(Date)transitionDetails.get("createDateTime");
-		if(transitionDetails.containsKey("toActivityID"))
-			toActivityID=convertToLong(transitionDetails.get("toActivityID"));
-		if(transitionDetails.containsKey("fromActivityID"))
-			fromActivityID=convertToLong(transitionDetails.get("fromActivityID"));
-		if(transitionDetails.containsKey("learningDesignID"))
-			learningDesignID=convertToLong(transitionDetails.get("learningDesignID"));
+	public TransitionDTO(Hashtable transitionDetails) throws WDDXProcessorConversionException{
+		transitionID= convertToLong(transitionDetails,"transitionID");
+		transitionUIID=convertToInteger(transitionDetails,"transitionUIID");
+		toUIID=convertToInteger(transitionDetails,"toUIID");
+		fromUIID=convertToInteger(transitionDetails,"fromUIID");
+		description=convertToString(transitionDetails,"description");
+		title=convertToString(transitionDetails,"title");
+		createDateTime=convertToDate(transitionDetails,"createDateTime");
+		toActivityID=convertToLong(transitionDetails,"toActivityID");
+		fromActivityID=convertToLong(transitionDetails,"fromActivityID");
+		learningDesignID=convertToLong(transitionDetails,"learningDesignID");
 	}
 	/**
 	 * @return Returns the createDateTime.

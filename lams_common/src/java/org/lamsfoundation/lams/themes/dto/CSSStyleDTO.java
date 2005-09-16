@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.themes.CSSProperty;
 import org.lamsfoundation.lams.themes.CSSStyle;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 
 /**
  * Models the Theme structure that is used to communicate with Flash.
@@ -50,7 +51,15 @@ public class CSSStyleDTO extends Hashtable {
      * @param styleHashtable
      */
     public CSSStyleDTO(Hashtable styleHashtable) {
-        super(styleHashtable);   
+        // copy all the entries from the input table to the new table.
+    	// don't copy any null entries.
+        Iterator iter = styleHashtable.entrySet().iterator();
+        while ( iter.hasNext() ) {
+        	Map.Entry entry = (Map.Entry) iter.next();
+        	if ( ! WDDXProcessor.isNull(entry.getValue())) {
+        		this.put(entry.getKey(), entry.getValue());
+        	}
+        }
     }
     
     /**

@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.lesson.LessonClass;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -65,22 +66,14 @@ public class GroupingDTO extends BaseDTO{
 		Object object = Grouping.getGroupingInstance(groupingType);
 		processGroupingActivity(object);
 	}
-	public GroupingDTO(Hashtable groupingDetails){
-		if(groupingDetails.containsKey("groupingID"))
-			this.groupingID =convertToLong(groupingDetails.get("groupingID"));
-		if(groupingDetails.containsKey("groupingUIID"))
-			this.groupingUIID =convertToInteger(groupingDetails.get("groupingUIID"));
-		if(groupingDetails.containsKey("maxNumberOfGroups"))
-			this.maxNumberOfGroups =convertToInteger(groupingDetails.get("maxNumberOfGroups"));
-		if(groupingDetails.containsKey("groupingType"))
-			this.groupingType =convertToInteger(groupingDetails.get("groupingType"));		
-		if(groupingDetails.containsKey("staffGroupID"))
-				this.staffGroupID =convertToLong(groupingDetails.get("staffGroupID"));
-		if(groupingDetails.containsKey("numberOfGroups"))
-				this.numberOfGroups =convertToInteger(groupingDetails.get("numberOfGroups"));
-		if(groupingDetails.containsKey("learnersPerGroup"))
-				this.learnersPerGroup =convertToInteger(groupingDetails.get("learnersPerGroup"));
-		
+	public GroupingDTO(Hashtable groupingDetails) throws WDDXProcessorConversionException{
+		this.groupingID =convertToLong(groupingDetails,"groupingID");
+		this.groupingUIID =convertToInteger(groupingDetails,"groupingUIID");
+		this.maxNumberOfGroups =convertToInteger(groupingDetails,"maxNumberOfGroups");
+		this.groupingType =convertToInteger(groupingDetails,"groupingType");		
+		this.staffGroupID =convertToLong(groupingDetails,"staffGroupID");
+		this.numberOfGroups =convertToInteger(groupingDetails,"numberOfGroups");
+		this.learnersPerGroup =convertToInteger(groupingDetails,"learnersPerGroup");
 	}
 	public void processGroupingActivity(Object object){
 		if(object instanceof RandomGrouping)

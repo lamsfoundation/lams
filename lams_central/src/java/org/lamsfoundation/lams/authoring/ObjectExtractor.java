@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -131,7 +132,7 @@ public class ObjectExtractor {
 		calculateFirstActivity(learningDesignDTO.getFirstActivityUIID(),learningDesign);				
 		return learningDesign;	
 	}
-	private void parseActivities(LearningDesignDTO learningDesignDTO, LearningDesign learningDesign){
+	private void parseActivities(LearningDesignDTO learningDesignDTO, LearningDesign learningDesign) throws WDDXProcessorConversionException{
 		HashSet set = new HashSet();
 		if(learningDesignDTO.getActivities()!=null){
 			ArrayList table = learningDesignDTO.getActivities();
@@ -147,7 +148,7 @@ public class ObjectExtractor {
 		learningDesign.setActivities(set);
 		learningDesignDAO.update(learningDesign);
 	}
-	private void parseTransitions(LearningDesignDTO learningDesignDTO, LearningDesign learningDesign){
+	private void parseTransitions(LearningDesignDTO learningDesignDTO, LearningDesign learningDesign) throws WDDXProcessorConversionException{
 		HashSet set = new HashSet();
 		if(learningDesignDTO.getTransitions()!=null){
 			ArrayList table = learningDesignDTO.getTransitions();
@@ -319,12 +320,12 @@ public class ObjectExtractor {
 		Transition transition = new Transition();
 		transition.setTransitionUIID(transitionDTO.getTransitionUIID());
 		if(transitionDTO.getToUIID()!=null){
-			Activity toActivity = activityDAO.getActivityByUIID(transitionDTO.getToUIID(),learningDesign);
+			Activity toActivity = activityDAO.getActivityByUIID(transitionDTO.getToUIID(), learningDesign);
 			transition.setToActivity(toActivity);
 			transition.setToUIID(transitionDTO.getToUIID());
 		}
 		if(transitionDTO.getFromUIID()!=null){
-			Activity fromActivity = activityDAO.getActivityByUIID(transitionDTO.getFromUIID(),learningDesign);
+			Activity fromActivity = activityDAO.getActivityByUIID(transitionDTO.getFromUIID(), learningDesign);
 			transition.setFromActivity(fromActivity);
 			transition.setFromUIID(transitionDTO.getFromUIID());
 		}		

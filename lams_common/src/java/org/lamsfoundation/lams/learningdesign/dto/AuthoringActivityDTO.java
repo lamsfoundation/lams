@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 /**
  * @author Manpreet Minhas
@@ -261,88 +262,54 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.applyGrouping = activity.getApplyGrouping();
 		this.groupingSupportType = activity.getGroupingSupportType();
 	}
-	public AuthoringActivityDTO(Hashtable activityDetails){
-		if(activityDetails.containsKey("activityUIID"))
-			this.activityUIID =convertToInteger(activityDetails.get("activityUIID"));
-		if(activityDetails.containsKey("description"))
-			this.description =(String)activityDetails.get("description");
-		if(activityDetails.containsKey("title"))
-			this.title = (String)activityDetails.get("title");			
-		if(activityDetails.containsKey("helpText"))
-			this.helpText =(String)activityDetails.get("helpText");
-		if(activityDetails.containsKey("xcoord"))
-			this.xcoord = convertToInteger(activityDetails.get("xcoord"));
-		if(activityDetails.containsKey("ycoord"))
-			this.ycoord = convertToInteger(activityDetails.get("ycoord"));
+	
+	
+	public AuthoringActivityDTO(Hashtable activityDetails) throws WDDXProcessorConversionException{
+		this.activityUIID = convertToInteger(activityDetails,"activityUIID");
+		this.description = convertToString(activityDetails,"description");
+		this.title = convertToString(activityDetails,"title");			
+		this.helpText = convertToString(activityDetails,"helpText");
+		this.xcoord = convertToInteger(activityDetails, "xcoord");
+		this.ycoord = convertToInteger(activityDetails, "ycoord");
+
+		this.parentActivityID = convertToLong(activityDetails, "parentActivityID");
+		this.parentUIID = convertToInteger(activityDetails, "parentUIID");
+
+		this.activityTypeID = convertToInteger(activityDetails, "activityTypeID");
+		this.groupingID = convertToLong(activityDetails,"groupingID");
+		this.groupingUIID = convertToInteger(activityDetails,"groupingUIID");
+		this.orderID = convertToInteger(activityDetails,"orderID");
+		this.defineLater = convertToBoolean(activityDetails,"defineLater");
+		this.learningDesignID = convertToLong(activityDetails,"learningDesignID");
+		this.learningLibraryID = convertToLong(activityDetails,"learningLibraryID");
+		this.createDateTime = convertToDate(activityDetails,"createDateTime");
+		this.runOffline = convertToBoolean(activityDetails,"runOffline");
+		this.maxOptions = convertToInteger(activityDetails,"maxOptions");
+		this.minOptions = convertToInteger(activityDetails,"minOptions");
+		this.optionsInstructions = convertToString(activityDetails,"optionsInstructions");
+		this.toolID = convertToLong(activityDetails,"toolID");
+		this.toolContentID = convertToLong(activityDetails,"toolContentID");
+		this. activityCategoryID = convertToInteger(activityDetails,"activityCategoryID");
+
+		this.gateActivityLevelID = convertToInteger(activityDetails,"gateActivityLevelID");
+		this.gateOpen = convertToBoolean(activityDetails,"gateOpen");
+		this.gateEndTimeOffset = convertToLong(activityDetails,"gateEndTimeOffset");
+		this.gateStartTimeOffset = convertToLong(activityDetails,"gateStartTimeOffset");
+		this.gateEndDateTime = convertToDate(activityDetails,"gateEndDateTime");
+		this.gateStartDateTime = convertToDate(activityDetails,"gateStartDateTime");
 		
-		if(activityDetails.containsKey("parentActivityID"))
-			this.parentActivityID = convertToLong(activityDetails.get("parentActivityID"));
-		
-		if(activityDetails.containsKey("parentUIID"))
-			this.parentUIID =convertToInteger(activityDetails.get("parentUIID"));
-		
-		if(activityDetails.containsKey("activityTypeID"))
-			this.activityTypeID = convertToInteger(activityDetails.get("activityTypeID"));
-		if(activityDetails.containsKey("groupingID"))
-			this.groupingID = convertToLong(activityDetails.get("groupingID"));
-		if(activityDetails.containsKey("groupingUIID"))
-			this.groupingUIID = convertToInteger(activityDetails.get("groupingUIID"));
-		if(activityDetails.containsKey("orderID"))
-			this.orderID = convertToInteger(activityDetails.get("orderID"));
-		if(activityDetails.containsKey("defineLater"))
-			this.defineLater = (Boolean) activityDetails.get("defineLater");
-		if(activityDetails.containsKey("learningDesignID"))
-			this.learningDesignID = convertToLong(activityDetails.get("learningDesignID"));
-		if(activityDetails.containsKey("learningLibraryID"))
-			this.learningLibraryID = convertToLong(activityDetails.get("learningLibraryID"));
-		if(activityDetails.containsKey("createDateTime"))
-			this.createDateTime = (Date)activityDetails.get("createDateTime");
-		if(activityDetails.containsKey("runOffline"))
-			this.runOffline = (Boolean) activityDetails.get("runOffline");
-		if(activityDetails.containsKey("maxOptions"))
-			this.maxOptions = convertToInteger(activityDetails.get("maxOptions"));
-		if(activityDetails.containsKey("minOptions"))
-			this.minOptions = convertToInteger(activityDetails.get("minOptions"));
-		if(activityDetails.containsKey("optionsInstructions"))
-			this.optionsInstructions =(String)activityDetails.get("optionsInstructions");
-		if(activityDetails.containsKey("toolID"))
-			this.toolID =convertToLong(activityDetails.get("toolID"));
-		if(activityDetails.containsKey("toolContentID"))
-			this.toolContentID = convertToLong(activityDetails.get("toolContentID"));
-		if(activityDetails.containsKey("activityCategoryID"))
-			this. activityCategoryID = convertToInteger(activityDetails.get("activityCategoryID"));
-		
-		if(activityDetails.containsKey("gateActivityLevelID"))
-			this.gateActivityLevelID = convertToInteger(activityDetails.get("gateActivityLevelID"));
-		if(activityDetails.containsKey("gateOpen"))
-			this.gateOpen = (Boolean)activityDetails.get("gateOpen");
-		if(activityDetails.containsKey("gateEndTimeOffset"))
-			this.gateEndTimeOffset = convertToLong(activityDetails.get("gateEndTimeOffset"));
-		if(activityDetails.containsKey("gateStartTimeOffset"))
-			this.gateStartTimeOffset = convertToLong(activityDetails.get("gateStartTimeOffset"));
-		if(activityDetails.containsKey("gateEndDateTime"))
-			this.gateEndDateTime = (Date)activityDetails.get("gateEndDateTime");
-		if(activityDetails.containsKey("gateStartDateTime"))
-			this.gateStartDateTime = (Date)activityDetails.get("gateStartDateTime");
-		
-		if(activityDetails.containsKey("libraryActivityUiImage"))
-			this.libraryActivityUiImage=(String)activityDetails.get("libraryActivityUiImage");
-		if(activityDetails.containsKey("createGroupingID"))
-			this.createGroupingID= convertToLong(activityDetails.get("createGroupingID"));
-		if(activityDetails.containsKey("createGroupingUIID"))
-			this.createGroupingUIID=convertToInteger(activityDetails.get("createGroupingUIID"));
-		if(activityDetails.containsKey("libraryActivityID"))
-			this.libraryActivityID=convertToLong(activityDetails.get("libraryActivityID"));
-		if(activityDetails.containsKey("applyGrouping"))
-			this.applyGrouping=(Boolean)activityDetails.get("applyGrouping");
-		if(activityDetails.containsKey("groupingSupportType"))
-			this.groupingSupportType=convertToInteger(activityDetails.get("groupingSupportType"));
-		if(activityDetails.containsKey("groupingType"))
-			this.groupingType=convertToInteger(activityDetails.get("groupingType"));
+		this.libraryActivityUiImage=convertToString(activityDetails,"libraryActivityUiImage");
+		this.createGroupingID= convertToLong(activityDetails,"createGroupingID");
+		this.createGroupingUIID=convertToInteger(activityDetails,"createGroupingUIID");
+		this.libraryActivityID=convertToLong(activityDetails,"libraryActivityID");
+		this.applyGrouping=convertToBoolean(activityDetails,"applyGrouping");
+		this.groupingSupportType=convertToInteger(activityDetails,"groupingSupportType");
+		this.groupingType=convertToInteger(activityDetails,"groupingType");
 		if(activityDetails.containsKey("groupingDTO")){
 			Hashtable groupingDetails = (Hashtable) activityDetails.get("groupingDTO");			
 			this.groupingDTO = new GroupingDTO(groupingDetails);
 		}
+
 	}
 	private  void processActivityType(Object activity){
 		if(activity instanceof GroupingActivity)

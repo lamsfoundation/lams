@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.BaseDTO;
 import org.lamsfoundation.lams.themes.CSSStyle;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 /**
  * Models the Theme structure that is used to communicate with Flash.
@@ -52,10 +53,11 @@ public class CSSVisualElementDTO extends BaseDTO {
     
     /**
      * Create the DTO using the data from Flash
+     * @throws WDDXProcessorConversionException
      */
-    public CSSVisualElementDTO(Hashtable wddxData) {
+    public CSSVisualElementDTO(Hashtable wddxData) throws WDDXProcessorConversionException {
         if ( wddxData != null ) {
-            this.name = (String) wddxData.get(CSSThemeDTO.NAME_TAG);
+            this.name = convertToString(wddxData,CSSThemeDTO.NAME_TAG);
             Hashtable so = (Hashtable) wddxData.get(CSSThemeDTO.STYLE_OBJECT_TAG);
     		if ( so != null ) {
     		    styleObject = new CSSStyleDTO(so);

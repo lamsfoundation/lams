@@ -22,60 +22,114 @@
  */
 package org.lamsfoundation.lams.learningdesign.dto;
 
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
+import java.util.Date;
+import java.util.Hashtable;
+
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+
 
 /**
- * @author Manpreet Minhas
+ * @author Manpreet Minhas, Fiona Malikoff
  * 
  * This class acts as base class for all authoring DTO's.
- * 
- * FLASH returns Long and Integer values as Double.
- * 
- * For example, a value of 10 would returned as 10.0   
- * 
- * This class contains utility methods for converting this 
- * Double value into the required data types.
- * 
- * All Integer and Long null values are represented as
- * -111111.0 in flash, which are indicated by 	
- * 		WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER and
- * 		WDDXTAGS.NUMERIC_NULL_VALUE_LONG 
- * attributes defined in the WDDXTAGS interface.
- * So if the object being converted is equivalent to this
- * value it returns null rather than returning -111111. 
+ * It will contain any helper methods for DTOs. 
  * 
  */
 public class BaseDTO {	
-	/**
-	 * This method converts the passed
-	 * Object into an Integer
-	 * 
-	 * @param ob The object to be converted
-	 * @return Integer The required value
-	 */
-	public Integer convertToInteger(Object ob){
-	    if ( ob != null ) {
-			Double doub = (Double)ob;
-			Integer integer = new Integer(doub.intValue());
-			if(!integer.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-				return integer;
-	    }
-	    return null;
-	}
-	/**
-	 * This method converts the passed
-	 * Object into Long
-	 * 
-	 * @param ob The object to be converted
-	 * @return Long The required value
-	 */
-	public Long convertToLong(Object ob){
-	    if ( ob != null ) {
-			Double doub = (Double)ob;
-			Long longValue = new Long(doub.longValue());
-			if(!longValue.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-				return longValue;
-	    }
+
+	/** Get an Integer from a hashtable, based on the given key.
+	 * If the key doesn't exist, return null.
+	 * Uses WDDXProcessor.getInteger(), which handles string inputs
+	 * and Flash null values.
+	 * @param table Hashtable containing values from Flash. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @param key Key of entry in table. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @return Integer value of entry in table, or null.
+	 * @throws WDDXProcessorConversionException if the value cannot be converted.
+	 * @author Fiona Malikoff
+	 */ 
+	protected Integer convertToInteger(Hashtable table, String key) 
+		throws WDDXProcessorConversionException {
+		if(table.containsKey(key)) {
+			return WDDXProcessor.convertToInteger(key, table.get(key));
+		}
 		return null;
 	}
+
+	/** Get an Long from a hashtable, based on the given key.
+	 * If the key doesn't exist, return null.
+	 * Uses WDDXProcessor.getLong(), which handles string inputs
+	 * and Flash null values.
+	 * @param table Hashtable containing values from Flash. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @param key Key of entry in table. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @return Integer value of entry in table, or null.
+	 * @throws WDDXProcessorConversionException if the value cannot be converted.
+	 * @author Fiona Malikoff
+	 */ 
+	protected Long convertToLong(Hashtable table, String key) 
+		throws WDDXProcessorConversionException {
+		if(table.containsKey(key)) {
+			return WDDXProcessor.convertToLong(key, table.get(key));
+		}
+		return null;
+	}
+	
+	/** Get an String from a hashtable, based on the given key.
+	 * If the key doesn't exist, return null.
+	 * @param table Hashtable containing values from Flash. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @param key Key of entry in table. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @return Integer value of entry in table, or null.
+	 * @throws WDDXProcessorConversionException if the value cannot be converted.
+	 * @author Fiona Malikoff
+	 */ 
+	protected String convertToString(Hashtable table, String key) 
+		throws WDDXProcessorConversionException {
+		if(table.containsKey(key)) {
+			return WDDXProcessor.convertToString(key, table.get(key));
+		}
+		return null;
+	}
+
+	/** Get an Boolean from a hashtable, based on the given key.
+	 * If the key doesn't exist, return null.
+	 * @param table Hashtable containing values from Flash. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @param key Key of entry in table. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @return Integer value of entry in table, or null.
+	 * @throws WDDXProcessorConversionException if the value cannot be converted.
+	 * @author Fiona Malikoff
+	 */ 
+	protected Boolean convertToBoolean(Hashtable table, String key) 
+		throws WDDXProcessorConversionException {
+		if(table.containsKey(key)) {
+			return WDDXProcessor.convertToBoolean(key, table.get(key));
+		}
+		return null;
+	}
+	
+	/** Get an Date from a hashtable, based on the given key.
+	 * If the key doesn't exist, return null.
+	 * @param table Hashtable containing values from Flash. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @param key Key of entry in table. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @return Integer value of entry in table, or null.
+	 * @throws WDDXProcessorConversionException if the value cannot be converted.
+	 * @author Fiona Malikoff
+	 */ 
+	protected Date convertToDate(Hashtable table, String key) 
+		throws WDDXProcessorConversionException {
+		if(table.containsKey(key)) {
+			return WDDXProcessor.convertToDate(key, table.get(key));
+		}
+		return null;
+	}
+
 }
