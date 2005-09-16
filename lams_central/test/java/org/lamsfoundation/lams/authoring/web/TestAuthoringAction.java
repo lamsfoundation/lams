@@ -47,7 +47,7 @@ public class TestAuthoringAction extends MockStrutsTestCase {
 	}
 	public void testGetLearningDesign(){
 		setConfigFile("/WEB-INF/struts/struts-config.xml");
-		setRequestPathInfo("/author");
+		setRequestPathInfo("/authoring/author");
 		addRequestParameter("method","getLearningDesignDetails");
 		addRequestParameter("learningDesignID","1");
 		addRequestParameter("jspoutput","true");
