@@ -50,12 +50,25 @@ public interface WDDXTAGS {
 	public static final String LIB_PACKAGE = "libraries";
 	public static final String DESIGN_PACKAGE ="designs";
 	
-	
-	public static final Long NUMERIC_NULL_VALUE_LONG = new Long(-111111);
+	/** The string value in a WDDX packet that indicates that this value is really null */
 	public static final String STRING_NULL_VALUE = "string_null_value";
+	/** The Boolean value in a WDDX packet that indicates that this value is really null.
+	 * Implemented as a String as Boolean is too restrictive. */
+	public static final String BOOLEAN_NULL_VALUE_AS_STRING = "boolean_null_value";
+	/** Don't know what to do Java -> Flash yet. 
+	 * TODO remove.
+	 */
+	public static final Boolean BOOLEAN_NULL_VALUE = new Boolean(false);
+	/** The Long value in a WDDX packet that indicates that this value is really null.*/
+	public static final Long NUMERIC_NULL_VALUE_LONG = new Long(-111111);
+	/** The Integer value in a WDDX packet that indicates that this value is really null.*/
 	public static final Integer NUMERIC_NULL_VALUE_INTEGER = new Integer(-111111);
+	/** The Double value in a WDDX packet that indicates that this value is really null.
+	 * This is used to check a value coming in from WDDX - as it tends to return Doubles,
+	 * not Long or Integers. */
+	public static final Double NUMERIC_NULL_VALUE_DOUBLE = new Double(-111111);
+	/** The Date value in a WDDX packet that indicates that this value is really null.*/
 	public static final Date DATE_NULL_VALUE = new Date(0);
-	public static final Boolean BOOLEAN_NULL_VALUE = new Boolean("false");
 	
 	/*Activity specific tags*/
 	public static final String ACTIVITY_ID ="activity_id";

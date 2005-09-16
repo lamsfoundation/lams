@@ -25,9 +25,11 @@ package org.lamsfoundation.lams.util.wddx;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.xml.sax.InputSource;
 
 import com.allaire.wddx.WddxDeserializationException;
@@ -36,7 +38,7 @@ import com.allaire.wddx.WddxSerializer;
 
 
 /**
- * @author Manpreet Minhas 
+ * @author Manpreet Minhas
  */
 public class WDDXProcessor {
 	private static Logger logger = Logger.getLogger(WDDXProcessor.class.getName());
@@ -120,18 +122,25 @@ public class WDDXProcessor {
         return tempsw.toString();
     }
     
-    /** Convert a string to an int, based on how WDDX usually passes numbers.
+    /** 
+     * Convert a string to an int, based on how WDDX usually passes numbers. 
+     * If it gets any of the NULL value objects (see WDDXTAGS) then it will 
+     * consider this the same as a null.
+     * <p>
+     * Throws an exception with one of two messages: "(identifier) is null, cannot 
+     * convert to an int" or "Unable to convert value (identifier): (value) to an int"
 	 * @param identifier - name of value being converted - using in the exception thrown
 	 *   if the number cannot be converted.
 	 * @param value - the value to be converted
 	 * @return int value
-	 * @throws Exception - will contain a message "Unable to convert value (identifier): (value) to an int"
+	 * @throws WDDXProcessorConversionException 
+	 * 
 	 */
 	public static int convertToInt( String identifier, Object value)
 		throws WDDXProcessorConversionException 
 	{
 		int result=-255;		
-		if ( value == null )
+		if ( value == null || isNull(value) )
 		{
 			throw new WDDXProcessorConversionException(identifier+" is null, cannot convert to an int");
 		}
@@ -158,7 +167,9 @@ public class WDDXProcessor {
 	/**
 	 * Some conversion doesn't allow null value. Doing so will result in hidden
 	 * nullpointer exception. We do need this helper function.
-	 * 
+	 * <p>
+     * If it gets any of the NULL value objects (see WDDXTAGS) then it will
+     * consider this the same as a null.
 	 * @param identifier
 	 * @param value
 	 * @return converted integer.
@@ -167,13 +178,15 @@ public class WDDXProcessor {
 	 */
 	public static Integer nullSafeCovertToInteger(String identifier,Object value) throws WDDXProcessorConversionException
 	{
-	    if(value == null)
+	    if(value == null || isNull(value) )
             throw new IllegalArgumentException("["+identifier+"] is null. We can't convert null value to integer");
 	    //delegate to convertToInteger
 	    return convertToInteger(identifier,value);
 	}
-   	/** Convert a string to an integer, based on how WDDX usually passes numbers.
+   	/** Convert a number/string to an integer, based on how WDDX usually passes numbers.
    	 * As it is an integer, if the field is blank (or not there), then return null
+     * If it gets any of the NULL value objects (see WDDXTAGS) then it will return null
+     * 
 	 * @param identifier - name of value being converted - using in the exception thrown
 	 *   if the number cannot be converted.
 	 * @param value - the value to be converted
@@ -184,13 +197,12 @@ public class WDDXProcessor {
 		throws WDDXProcessorConversionException 
 	{
 		Integer result = null;		
-		if ( value == null )
+		if ( value == null || isNull(value) )
 		    return null;
 		
 		try {
 			// WDDX should give us a double 
-			result = new Integer (((Number)value).intValue() );
-			return(result);
+			return new Integer (((Number)value).intValue() );
 		} catch (Exception e) {}
 		
 		try {
@@ -210,8 +222,9 @@ public class WDDXProcessor {
 		return(result);
 	}
 
-	/** Convert a String to an Long, based on how WDDX usually passes numbers.
+	/** Convert a Number/String to an Long, based on how WDDX usually passes numbers.
    	 * As it is a Long, if the field is blank (or not there), then return null
+     * If it gets any of the NULL value objects (see WDDXTAGS) then it will return null
 	 * @param identifier - name of value being converted - using in the exception thrown
 	 *   if the number cannot be converted.
 	 * @param value - the value to be converted
@@ -222,15 +235,14 @@ public class WDDXProcessor {
 		throws WDDXProcessorConversionException 
 	{
 		Long result = null;		
-		if ( value == null )
+		if ( value == null || isNull(value) )
 		{
 			return null;
 		}
 		
 		try {
 			// WDDX should give us a double 
-			result = new Long(((Number)value).intValue() );
-			return(result);
+			return new Long(((Number)value).intValue() );
 		} catch (Exception e) {}
 		
 		try {
@@ -250,7 +262,10 @@ public class WDDXProcessor {
 		return(result);
 	}
 
-	/** Convert a String/Boolean to an Boolean
+	/** 
+	 * Convert a String/Boolean to an Boolean
+     * If it gets any of the NULL value objects (see WDDXTAGS) then it will return null
+     * 
 	 * @param identifier - name of value being converted - using in the exception thrown
 	 *   if the value cannot be converted.
 	 * @param value - the value to be converted
@@ -261,15 +276,13 @@ public class WDDXProcessor {
 		throws WDDXProcessorConversionException 
 	{
 		Boolean result = null;		
-		if ( value == null )
+		if ( value == null || isNull(value) )
 		{
 			return null;
 		}
 		
 		try {
-			result = (Boolean) value;
-			logger.debug("identifier "+identifier+" was Boolean value "+value+" becomes "+result);
-			return(result);
+			return (Boolean) value;
 		} catch (Exception e) {}
 		
 		try {
@@ -284,4 +297,77 @@ public class WDDXProcessor {
 			throw new WDDXProcessorConversionException("Unable to convert value "+identifier+":"+value+" to a Boolean");
 		}
 	}
+	
+   	/** Convert a string to an string. 
+     * If it gets any of the NULL value objects (see WDDXTAGS) then it will return null
+     * 
+	 * @param identifier - name of value being converted - using in the exception thrown
+	 *   if the number cannot be converted.
+	 * @param value - the value to be converted
+	 * @return integer value or null
+	 * @throws Exception - will contain a message "Unable to convert value (identifier): (value) to an int"
+	 */
+	public static String convertToString( String identifier, Object value)
+		throws WDDXProcessorConversionException 
+	{
+		if ( value == null || isNull(value) ) {
+		    return null;
+		}
+		
+		try {
+			return (String) value;
+		} catch ( Exception e2) {
+			throw new WDDXProcessorConversionException("Unable to convert value "+identifier+":"+value+" to an String");
+		}
+	}
+	
+	/** 
+	 * Convert a String/Date to an Date
+     * If it gets any of the NULL value objects (see WDDXTAGS) then it will return null
+     * 
+	 * @param identifier - name of value being converted - using in the exception thrown
+	 *   if the value cannot be converted.
+	 * @param value - the value to be converted
+	 * @return Boolean value or null
+	 * @throws Exception - will contain a message "Unable to convert value (identifier): (value) to an int"
+	 */
+	public static Date convertToDate( String identifier, Object value)
+		throws WDDXProcessorConversionException 
+	{
+		Date result = null;		
+		if ( value == null || isNull(value) )
+		{
+			return null;
+		}
+		
+		try {
+			return (Date) value;
+		} catch (Exception e) {}
+		
+		try {
+			String textValue = (String) value;
+			if ( textValue.length() == 0 )
+				return null;
+
+			result = DateUtil.convertFromString(textValue);
+			logger.debug("identifier "+identifier+" was String value "+value+" becomes date "+result);
+			return(result);
+			
+		} catch ( Exception e2) {
+			throw new WDDXProcessorConversionException("Unable to convert value "+identifier+":"+value+" to a Date");
+		}
+	}
+	
+	/** Does the given object match any of the known "null" values? */
+	public static boolean isNull(Object obj) {
+		if ( obj == null ) return true;
+		if ( obj.equals(WDDXTAGS.STRING_NULL_VALUE) ) return true;
+		if ( obj.equals(WDDXTAGS.BOOLEAN_NULL_VALUE_AS_STRING) ) return true;
+		if ( obj.equals(WDDXTAGS.NUMERIC_NULL_VALUE_DOUBLE) ) return true;
+		if ( obj.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG) ) return true;
+		if ( obj.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER) ) return true;
+		if ( obj.equals(WDDXTAGS.DATE_NULL_VALUE) ) return true;
+		return false;
+	}
+
 }
