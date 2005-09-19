@@ -1,4 +1,5 @@
 ﻿import org.lamsfoundation.lams.authoring.*;
+import org.lamsfoundation.lams.common.*;
 import org.lamsfoundation.lams.common.util.*;/**
 * Transition data class. Transitions are used in the design to join up activities. Stored in the DDM
 *
@@ -42,7 +43,21 @@ class org.lamsfoundation.lams.authoring.Transition {
 	}
 	
 	
-	
+	public function toData():Object{
+		var dto:Object = new Object();
+		dto.transitionID = (_transitionID) ?  _transitionID : Config.NUMERIC_NULL_VALUE;
+		dto.uiID= (_uiID) ?  _uiID : Config.NUMERIC_NULL_VALUE;
+		dto.fromActivityID = (_fromActivityID) ?  _fromActivityID : Config.NUMERIC_NULL_VALUE;
+		dto.fromUIID = (_fromUIID) ?  _fromUIID : Config.NUMERIC_NULL_VALUE;
+		dto.toActivityID = (_toActivityID) ?  _toActivityID : Config.NUMERIC_NULL_VALUE;
+		dto.toUIID = (_toUIID) ?  _toUIID : Config.NUMERIC_NULL_VALUE;
+		dto.title = (_title) ?  _title : Config.STRING_NULL_VALUE;
+		dto.description = (_description) ?  _description : Config.STRING_NULL_VALUE;
+		 Debugger.log('Config.DATE_NULL_VALUE:' + Config.DATE_NULL_VALUE,Debugger.GEN,'toData','Canvas');
+		dto.createDateTime = (_createDateTime) ?  _createDateTime : Config.DATE_NULL_VALUE;
+		dto.learningDesignID = (_learningDesignID) ?  _learningDesignID : Config.NUMERIC_NULL_VALUE;
+		return dto;
+	}
 
 	public function set transitionID(a:Number):Void{
 		_transitionID = a;

@@ -1,5 +1,6 @@
 ﻿import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*;
+import org.lamsfoundation.lams.common.*;
 /*
 *
 * @author      DC
@@ -176,24 +177,52 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	}
 	
 	public function toData():Object{
-		var design = {};
-		design.objectType = _objectType;
-		design.learningDesignID = _learningDesignID;
-		design.uiID = _uiID;
-		design.title = _title;
-		design.description = _description;
-		design.helpText = _helpText;
-		design.version = _version;
-		design.userID = _userID;
-		design.workspaceFolderID = objectType;
-		design.createDateTime = _createDateTime;
-		design.readOnlyFlag = _readOnlyFlag;
-		design.validDesignFlag = _validDesignFlag;
-		design.maxID = _maxID;
-		design.firstID = _firstID;
-		design.activities = _activities.values();
-		design.transitions = _transitions.values();
-		design.groupings = _groupings.values();
+		var design:Object = new Object();
+		
+		
+		design.objectType = (_objectType) ? _objectType : Config.STRING_NULL_VALUE;
+		design.learningDesignID = (_learningDesignID) ? _learningDesignID : Config.NUMERIC_NULL_VALUE;
+		design.uiID = (_uiID) ? _uiID: Config.NUMERIC_NULL_VALUE;
+		design.title = _title ? _title : Config.STRING_NULL_VALUE;
+		design.description = (_description) ? _description : Config.STRING_NULL_VALUE;
+		design.helpText = (_helpText) ? _helpText : Config.STRING_NULL_VALUE;
+		design.version = (_version) ? _version : Config.NUMERIC_NULL_VALUE;
+		design.userID = (_userID) ? _userID : Config.NUMERIC_NULL_VALUE;
+		design.workspaceFolderID = (_workspaceFolderID) ? _workspaceFolderID : Config.NUMERIC_NULL_VALUE;
+		design.createDateTime = (_createDateTime) ? _createDateTime : Config.DATE_NULL_VALUE;
+		design.readOnlyFlag = (_readOnlyFlag) ? _readOnlyFlag : Config.BOOLEAN_NULL_VALUE;
+		design.validDesignFlag = _validDesignFlag ? _validDesignFlag : Config.BOOLEAN_NULL_VALUE;
+		design.maxID = (_maxID) ? _maxID : Config.NUMERIC_NULL_VALUE;
+		design.firstID = (_firstID) ? _firstID : Config.NUMERIC_NULL_VALUE;
+		
+		
+		
+		var classActs:Array = _activities.values();
+		if(classActs.length > 0){
+			design.activities = new Array();
+			for(var i=0; i<classActs.length; i++){
+				design.activities[i] = classActs[i].toData();
+			}
+		}
+		
+		var classTrans:Array = _transitions.values();
+		if(classTrans.length > 0){
+			design.transitions = new Array();
+			for(var i=0; i<classTrans.length; i++){
+				design.transitions[i] = classTrans[i].toData();
+			}
+		}
+		
+		var classGroups:Array = _groupings.values();
+		if(classGroups.length > 0){
+			design.groupings = new Array();
+			for(var i=0; i<classGroups.length; i++){
+				//TODO: Add a toData to the gorup class (after we make the group class :)
+				design[i] = classGroups[i].toData();
+			}
+		}
+
+		
 		return design;
 	}
 	

@@ -1,5 +1,7 @@
 ﻿import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.dict.*
+import org.lamsfoundation.lams.common.*
+import org.lamsfoundation.lams.common.util.*
 /*
 *
 * @author      DC
@@ -166,6 +168,36 @@ class org.lamsfoundation.lams.authoring.Activity {
 		}else{
 			return false;
 		}
+	}
+	
+	public function toData(){
+		var dto:Object = new Object();
+		dto.objectType = (_objectType) ?  _objectType : Config.STRING_NULL_VALUE;
+		dto.activityTypeID = (_activityTypeID) ?  _activityTypeID : Config.NUMERIC_NULL_VALUE;
+		dto.activityID = (_activityID) ?  _activityID : Config.NUMERIC_NULL_VALUE;
+		dto.activityCategoryID = (_activityCategoryID) ?  _activityCategoryID : Config.NUMERIC_NULL_VALUE;
+		dto.activityUIID = (_activityUIID) ?  _activityUIID : Config.NUMERIC_NULL_VALUE;
+		dto.learningLibraryID = (_learningLibraryID) ?  _learningLibraryID : Config.NUMERIC_NULL_VALUE;
+		dto.learningDesignID = (_learningDesignID) ?  _learningDesignID : Config.NUMERIC_NULL_VALUE;
+		dto.libraryActivityID = (_libraryActivityID) ?  _libraryActivityID : Config.NUMERIC_NULL_VALUE;
+		dto.parentActivityID = (_parentActivityID) ?  _parentActivityID : Config.NUMERIC_NULL_VALUE;
+		dto.parentUIID = (_parentUIID) ?  _parentUIID : Config.NUMERIC_NULL_VALUE;
+		dto.orderID = (_orderID) ?  _orderID : Config.NUMERIC_NULL_VALUE;
+		dto.groupingID = (_groupingID) ?  _groupingID : Config.NUMERIC_NULL_VALUE;
+		dto.groupingUIID = (_groupingUIID) ?  _groupingUIID : Config.NUMERIC_NULL_VALUE;
+		dto.title = (_title) ?  _title : Config.STRING_NULL_VALUE;
+		dto.description = (_description) ?  _description : Config.STRING_NULL_VALUE;
+		dto.helpText = (_helpText) ?  _helpText : Config.STRING_NULL_VALUE;
+		dto.yCoord = (_yCoord) ?  _yCoord : Config.NUMERIC_NULL_VALUE;
+		dto.xCoord = (_xCoord) ?  _xCoord : Config.NUMERIC_NULL_VALUE;
+		dto.libraryActivityUIImage = (_libraryActivityUIImage) ?  _libraryActivityUIImage : Config.STRING_NULL_VALUE;
+		dto.applyGrouping= (_applyGrouping) ?  _applyGrouping : Config.BOOLEAN_NULL_VALUE;
+		dto.runOffline= (_runOffline) ?  _runOffline : Config.BOOLEAN_NULL_VALUE;
+		dto.offlineInstructions = (_offlineInstructions) ?  _offlineInstructions : Config.STRING_NULL_VALUE;
+		dto.defineLater= (_defineLater) ?  _defineLater : Config.BOOLEAN_NULL_VALUE;
+		dto.createDateTime= (_createDateTime) ?  _createDateTime : Config.DATE_NULL_VALUE;
+		dto.groupingSupportType = (_groupingSupportType) ?  _groupingSupportType : Config.NUMERIC_NULL_VALUE;
+		return dto;
 	}
 	
 	
