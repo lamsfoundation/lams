@@ -51,7 +51,7 @@
     >
     </property>    
     <property
-        name="maxId"
+        name="maxID"
         type="java.lang.Integer"
         column="max_id"
         length="11"
