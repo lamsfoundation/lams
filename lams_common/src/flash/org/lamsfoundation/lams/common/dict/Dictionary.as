@@ -115,7 +115,7 @@ dynamic class Dictionary {
 
         //First empty hash 
         items.clear();
-        _global.breakpoint();
+        //_global.breakpoint();
         //Go through data object and copy values to items hash
         for(var i=0;i<dataObj.length;i++){
             //Create hashKey object and then prune hashkey from dataObject before adding dictionary item to hashtable 
@@ -163,10 +163,10 @@ dynamic class Dictionary {
     * Opens Dictionary from server
     */
     public function openFromServer() {
-		Debugger.log('URL : '+ 'http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',Debugger.CRITICAL,'openFromServer','Dictionary');
+		Debugger.log('URL : '+ 'flashxml/' + _currentLanguage + '_dictionary.xml',Debugger.CRITICAL,'openFromServer','Dictionary');
 		var callBack = Proxy.create(this,onDictionaryLoadedFromServer);
         //comms.loadXML('http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',callBack,true,true);
-        comms.getRequest('http://dolly.uklams.net/lams/lams_authoring/' + _currentLanguage + '_dictionary.xml',callBack,true);
+        comms.getRequest('flashxml/' + _currentLanguage + '_dictionary.xml',callBack,false);
     }
     
     /**
