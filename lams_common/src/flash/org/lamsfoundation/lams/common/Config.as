@@ -21,11 +21,20 @@ class Config {
 	public static var MESSAGE_TYPE_ERROR:Number = 1;
 	public static var MESSAGE_TYPE_CRITICAL:Number = 2;
 	public static var MESSAGE_TYPE_OK:Number = 3;
+	public static var USE_CACHE:Boolean = false;			//FLAG TO TELL DICT AND (todo:add to themes) Theme if thay can use the cached data.
+	
+	//nulls
+	public static var STRING_NULL_VALUE:String = "string_null_value";
+	public static var NUMERIC_NULL_VALUE:Number = -111111;
+	public static var DATE_NULL_VALUE:Date = new Date(0);
+	public static var BOOLEAN_NULL_VALUE:String = "boolean_null_value";
 	
 	//Config instance is stored as a static in the class
     private static var _instance:Config = null;   
     private static var CONFIG_PREFIX:String = 'config.';    //All config items stored in a cookie with prefix 'config.' 
-    
+  
+	
+	
     private var _configData:Object      //Object that stores configuration data
     
     private var _cm:CookieMonster;
@@ -46,7 +55,7 @@ class Config {
 	private function Config() {
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
-
+		
         //Get a ref to the cookie monster 
         _cm = CookieMonster.getInstance();
         _comms = Application.getInstance().getComms();
@@ -57,6 +66,7 @@ class Config {
     * Initialises the Config class, loading config from the server and overwriting with local values
     */
     public function init() {
+		
         //Get defaults from server
 		loadServerDefaults();
     }
@@ -80,7 +90,7 @@ class Config {
         var callBack = Proxy.create(this,serverDefaultsLoaded);
         
         //TODO DI 09/06/05 - When server is ready change to getRequest()
-        _comms.loadXML('http://dolly.uklams.net/lams/lams_authoring/configData.xml',callBack,true,true)
+        _comms.getRequest('flashxml/configData.xml',callBack)
         //_comms.loadXML('lams_authoring/configData.xml',callBack,true,true);
     }
     
@@ -153,7 +163,7 @@ class Config {
 		
 		for (var prop in serverConfigData) {
             if (CookieMonster.cookieExists(CONFIG_PREFIX+String(prop))){
-                Debugger.log('overwriting :' + prop,Debugger.GEN,'serverDefaultsLoaded','Config');
+                Debugger.log('overwriting with local data :' + prop,Debugger.GEN,'serverDefaultsLoaded','Config');
                 _configData[prop] = CookieMonster.open(CONFIG_PREFIX+String(prop),true);
             } else {
                 //If language config not in cookie, check browser locale before using server
@@ -169,9 +179,9 @@ class Config {
         
         
 		
+        _serverUrl = _root.serverURL;
 		//TODO 31/05/05 Deal with alternative sources other than cookie or server. i.e. Browser + _root (query string)
-        _serverUrl = _root.serverUrl;
-		
+		Debugger.log('Confirming ServerURL passed in - _serverUrl:' + _serverUrl,Debugger.GEN,'serverDefaultsLoaded','Config');
         
         //Dispatch load event
         dispatchEvent({type:'load',target:this});
