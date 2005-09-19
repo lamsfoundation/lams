@@ -10,10 +10,16 @@ import org.lamsfoundation.lams.authoring.*;
 */
 class org.lamsfoundation.lams.common.comms.Communication {
     
-    private static var FRIENDLY_ERROR_CODE:Number = 1;  //Server error codes
+    
+
+
+
+	private static var FRIENDLY_ERROR_CODE:Number = 1;  //Server error codes
     private static var SYSTEM_ERROR_CODE:Number = 2;
     
     private static var MAX_REQUESTS:Number = 20;       //Maximum no of simultaneous requests
+	
+	
     
     private var _serverURL:String;
     private var ignoreWhite:Boolean;  
@@ -53,6 +59,10 @@ class org.lamsfoundation.lams.common.comms.Communication {
         		//Debugger.log('_serverURL:'+_serverURL,4,'Consturcutor','Communication');
         wddx = new Wddx();
     }
+	
+	
+	
+	
     
     /**
     * Make a request to the server.  Each request handlers is added to a queue whilst waiting for the (asynchronous) response 
@@ -92,49 +102,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
 		}
     }
     
-    /**
-    * XML load handler for getRequest()
-    * @param success            XML load status
-    * @param wrappedPacketXML   The wrapped XML response object 
-    * @param queueID:Number     ID of request handler on queue 
-    */
-    private function onServerResponse(success:Boolean,wrappedPacketXML:XML,queueID:Number){
-        trace('XML loaded success:'+ success);
-        //Load ok?
-        if(success){
-            var responseObj:Object = wddx.deserialize(wrappedPacketXML);
-
-            
-			
-			if(responseObj.messageType == null){
-				Debugger.log('Message type was:'+responseObj.messageType+' , cannot continue',Debugger.CRITICAL,'getRequest','Communication');			
-				Debugger.log('xml recieved is:'+wrappedPacketXML.toString(),Debugger.CRITICAL,'getRequest','Communication');			
-				return -1;
-			}
-			
-            //Check for errors in message type that's returned from server
-			if(responseObj.messageType == FRIENDLY_ERROR_CODE){
-                //user friendly error
-                //showAlert("Oops", responseObj.body, "sad");
-            }else if(responseObj.messageType == SYSTEM_ERROR_CODE){
-                //showAlert("System error", "<p>Sorry there has been a system error, please try the operation again. If the problem persistes please contact support</p><p>Additional information:"+responseObj.body+"</p>", "sad");
-            }else{
-                //Everything is fine so lookup callback handler on queue 
-                if(responseObj.messageValue != null){
-					dispatchToHandlerByID(queueID,responseObj.messageValue);
-				}else{
-					Debugger.log('Message value was null, cannot continue',Debugger.CRITICAL,'getRequest','Communication');			
-				}
-            }
-			
-			//Now delete the XML 
-            delete wrappedPacketXML;
-        }else {
-            //TODO DI 12/04/05 Handle onLoad error
-            //showAlert("System error", "<p>Communication Error</p>", "sad");
-			Debugger.log("XML Load failed",Debugger.CRITICAL,'onServerResponse','Communication');			
-			}
-    }
+    
     
   
     /**
@@ -148,9 +116,14 @@ class org.lamsfoundation.lams.common.comms.Communication {
 	* @usage: 
 	* 
     */
-    public function sendAndReceive(dto:Object, requestURL:String,handler:Function,isFullURL){
-        //Serialise the Data Transfer Object
-        var xmlToSend:XML = serializeObj(dto);
+    public function sendAndReceive(rawDto:Object, requestURL:String,handler:Function,isFullURL){
+        //denull the object first, stops the wddx processor on java side form barfing
+		
+		
+		//var dto:Object = ObjectUtils.deNull(rawDto);
+		
+		//Serialise the Data Transfer Object
+        var xmlToSend:XML = serializeObj(rawDto);
 		//xmlToSend.contentType="dave";
         
 		//Create XML response object 
@@ -175,6 +148,52 @@ class org.lamsfoundation.lams.common.comms.Communication {
 			Debugger.log('Sending XML:'+xmlToSend.toString(),Debugger.GEN,'sendAndReceive','Communication');			
             xmlToSend.sendAndLoad(_serverURL+requestURL,responseXML);
         }
+    }
+	
+	/**
+    * XML load handler for getRequest()
+    * @param success            XML load status
+    * @param wrappedPacketXML   The wrapped XML response object 
+    * @param queueID:Number     ID of request handler on queue 
+    */
+    private function onServerResponse(success:Boolean,wrappedPacketXML:XML,queueID:Number){
+        trace('XML loaded success:'+ success);
+        //Load ok?
+        if(success){
+            var responseObj:Object = wddx.deserialize(wrappedPacketXML);
+
+            
+			
+			if(responseObj.messageType == null){
+				Debugger.log('Message type was:'+responseObj.messageType+' , cannot continue',Debugger.CRITICAL,'getRequest','Communication');			
+				Debugger.log('xml recieved is:'+wrappedPacketXML.toString(),Debugger.CRITICAL,'getRequest','Communication');			
+				return -1;
+			}
+			
+            //Check for errors in message type that's returned from server
+			if(responseObj.messageType == FRIENDLY_ERROR_CODE){
+                //user friendly error
+				var e = new LFError(responseObj.messageValue,"onServerResponse",this);
+				dispatchToHandlerByID(queueID,e);
+                //showAlert("Oops", responseObj.body, "sad");
+            }else if(responseObj.messageType == SYSTEM_ERROR_CODE){
+                //showAlert("System error", "<p>Sorry there has been a system error, please try the operation again. If the problem persistes please contact support</p><p>Additional information:"+responseObj.body+"</p>", "sad");
+            }else{
+                //Everything is fine so lookup callback handler on queue 
+                if(responseObj.messageValue != null){
+					dispatchToHandlerByID(queueID,responseObj.messageValue);
+				}else{
+					Debugger.log('Message value was null, cannot continue',Debugger.CRITICAL,'getRequest','Communication');			
+				}
+            }
+			
+			//Now delete the XML 
+            delete wrappedPacketXML;
+        }else {
+            //TODO DI 12/04/05 Handle onLoad error
+            //showAlert("System error", "<p>Communication Error</p>", "sad");
+			Debugger.log("XML Load failed",Debugger.CRITICAL,'onServerResponse','Communication');			
+			}
     }
     
     /**
@@ -285,7 +304,9 @@ class org.lamsfoundation.lams.common.comms.Communication {
 	public function deserializeObj(xmlObj:XML):Object{
         var dto:Object = wddx.deserialize(xmlObj);
 		return dto;
-	}  
+	}
+	
+	
     
     /**
     * Finds handler in queue, dispatches object to it and deletes item from queue
