@@ -43,10 +43,19 @@ INSERT INTO lams_user_organisation_role VALUES (12, 5, 4);
 INSERT INTO lams_user_organisation_role VALUES (13, 5, 5);
 INSERT INTO lams_user_organisation_role VALUES (14, 6, 3);
 
+-- mmm user: author, learner, stagg
 INSERT INTO lams_user_organisation_role VALUES (15, 7, 3);
 INSERT INTO lams_user_organisation_role VALUES (16, 8, 3);
 INSERT INTO lams_user_organisation_role VALUES (17, 9, 3);
 INSERT INTO lams_user_organisation_role VALUES (18, 10,3);
+INSERT INTO lams_user_organisation_role VALUES (19, 7, 4);
+INSERT INTO lams_user_organisation_role VALUES (20, 8, 4);
+INSERT INTO lams_user_organisation_role VALUES (21, 9, 4);
+INSERT INTO lams_user_organisation_role VALUES (22, 10,4);
+INSERT INTO lams_user_organisation_role VALUES (23, 7, 5);
+INSERT INTO lams_user_organisation_role VALUES (24, 8, 5);
+INSERT INTO lams_user_organisation_role VALUES (25, 9, 5);
+INSERT INTO lams_user_organisation_role VALUES (26, 10,5);
 
 -- themes and styles 
 INSERT INTO lams_css_style (style_id, theme_ve_id) VALUES (1,1);
@@ -63,7 +72,7 @@ INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_
 
 -- users
 INSERT INTO lams_user VALUES(1, 'sysadmin','sysadmin','Mr','Fei','Yang',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'fyang@melcoe.mq.edu.au',0,NOW(),1,null,1,'en','au',1);
-INSERT INTO lams_user VALUES(2, 'test','test','Mr','Kevin','Han',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'khan@melcoe.mq.edu.au',0,NOW(),3,null,2,'mi','nz',1);
+INSERT INTO lams_user VALUES(2, 'test','test','Dr','Testing','LDAP',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'test@xx.xx.xx',0,NOW(),3,null,2,'mi','nz',1);
 INSERT INTO lams_user VALUES(3, 'lamskh01','dummy','Mr','Jacky','Fang',null,null,null,'Sydney','NSW','Australia',null,null,null,null,'jfang@melcoe.mq.edu.au',0,NOW(),2,null,3,'en','nz',1);
 
 insert into lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
@@ -72,7 +81,7 @@ fax,email,
 disabled_flag,create_date,authentication_method_id,workspace_id,
 base_organisation_id)
 values
-(4,'mmmmmmm','mmmmmmm','Ms','Mary','Morgan','99','First Ave',null,
+(4,'mmm','mmm','Ms','Mary','Morgan','99','First Ave',null,
 'Parramatta','NSW','Australia','0295099999','0298939999','0499999999',
 '0299999999','mmmmmmm@xx.os',
 0,'20041223',1,6,4);
