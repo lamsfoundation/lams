@@ -86,8 +86,8 @@ class PreferencesDialog extends MovieClip implements Dialog{
         cancel_btn.label = Dictionary.getValue('prefs_dlg_cancel');
         
         //Set the labels
-        lang_lbl.text = Dictionary.getValue('prefs_dlg_theme_lbl');
-        theme_lbl.text = Dictionary.getValue('prefs_dlg_lng_lbl');
+        lang_lbl.text = Dictionary.getValue('prefs_dlg_lng_lbl');
+        theme_lbl.text = Dictionary.getValue('prefs_dlg_theme_lbl');
         
         //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();

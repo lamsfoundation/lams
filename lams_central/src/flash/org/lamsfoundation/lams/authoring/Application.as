@@ -26,7 +26,7 @@ class org.lamsfoundation.lams.authoring.Application {
 	public static var C_DEFAULT = "default";
 	
     private static var TOOLBAR_X:Number = 10;
-    private static var TOOLBAR_Y:Number = 17;    private static var TOOLKIT_X:Number = 0;
+    private static var TOOLBAR_Y:Number = 35;    private static var TOOLKIT_X:Number = 0;
     private static var TOOLKIT_Y:Number = 74;
     
     private static var CANVAS_X:Number = 180;
