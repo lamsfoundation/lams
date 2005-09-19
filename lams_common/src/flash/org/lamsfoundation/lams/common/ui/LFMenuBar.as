@@ -83,7 +83,9 @@ class LFMenuBar extends MovieClip {
         /*=================
             TOOLS MENU
         =================*/
+		//_global.breakpoint();
         tools_menu = _mb.addMenu(Dictionary.getValue('mnu_tools'));
+		
         tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_trans'), instanceName:"drawTransitionalItem"});
         tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_opt'), instanceName:"drawOptionalItem"});
         tools_menu.addMenuItem({type:"separator"});
@@ -128,6 +130,12 @@ class LFMenuBar extends MovieClip {
             case eventObj.menu.openItem :
                 app.getWorkspace().userSelectItem();
                 break;
+			case eventObj.menu.saveItem:
+			//TODO: go through workspace to save design in location
+				Debugger.log('Clicked Flie > Save',Debugger.GEN,'fileMenuClicked','LFMenuBar');
+                app.getCanvas().saveDesignToServer();
+                break;
+		
         }        
     }
     
