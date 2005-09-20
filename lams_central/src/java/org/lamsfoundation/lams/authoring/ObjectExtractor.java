@@ -22,10 +22,11 @@
  */
 package org.lamsfoundation.lams.authoring;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
@@ -52,10 +53,6 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
-import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
-import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
-import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
-import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
@@ -63,8 +60,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
  * @author Manpreet Minhas
@@ -102,45 +99,84 @@ public class ObjectExtractor {
 		this.groupDAO = groupDAO;
 		this.transitionDAO = transitionDAO;
 	}
-	public LearningDesign extractLearningDesignObject(LearningDesignDTO learningDesignDTO)throws Exception{
-		LearningDesign learningDesign = LearningDesignDTO.extractLearningDesign(learningDesignDTO);
+	public LearningDesign extractLearningDesign(Hashtable table) throws WDDXProcessorConversionException, ObjectExtractorException {
+
+		// get the core learning design stuff
+		LearningDesign learningDesign = new LearningDesign();
+
+		learningDesign.setLearningDesignUIID(WDDXProcessor.convertToInteger(table,"learningDesignUIID"));
+		learningDesign.setDescription(WDDXProcessor.convertToString(table,"description"));
+		learningDesign.setTitle(WDDXProcessor.convertToString(table,"title"));
+		learningDesign.setMaxID(WDDXProcessor.convertToInteger(table,"maxID"));
+		learningDesign.setValidDesign(WDDXProcessor.convertToBoolean(table,"validDesign"));
+		learningDesign.setReadOnly(WDDXProcessor.convertToBoolean(table,"readOnly"));
+		learningDesign.setDateReadOnly(WDDXProcessor.convertToDate(table,"dateReadOnly"));
+		learningDesign.setOfflineInstructions(WDDXProcessor.convertToString(table,"offlineInstructions"));
+		learningDesign.setOnlineInstructions(WDDXProcessor.convertToString(table,"onlineInstructions"));
+		learningDesign.setHelpText(WDDXProcessor.convertToString(table,"helpText"));
+		learningDesign.setCopyTypeID(WDDXProcessor.convertToInteger(table,"copyTypeID"));
+		learningDesign.setCreateDateTime(WDDXProcessor.convertToDate(table,"createDateTime"));
+		learningDesign.setVersion(WDDXProcessor.convertToString(table,"version"));
+		learningDesign.setDuration(WDDXProcessor.convertToLong(table,"duration"));
+		learningDesign.setLastModifiedDateTime(WDDXProcessor.convertToDate(table,"lastModifiedDateTime"));
 		
-		if(learningDesignDTO.getUserID()!=null &&
-				!learningDesignDTO.getUserID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)){
-			User user = userDAO.getUserById(learningDesignDTO.getUserID());
-			if(user!=null)
+		// not required at authoring time.
+		learningDesign.setLessonOrgName(WDDXProcessor.convertToString(table,"lessonOrgName"));
+		learningDesign.setLessonName(WDDXProcessor.convertToString(table,"lessonName"));					
+		learningDesign.setLessonStartDateTime(WDDXProcessor.convertToDate(table,"lessonStartDateTime"));
+		learningDesign.setLessonID(WDDXProcessor.convertToLong(table,"lessionID"));
+		learningDesign.setLessonOrgID(WDDXProcessor.convertToLong(table,"lessionOrgID"));
+		learningDesign.setDuration(WDDXProcessor.convertToLong(table,"duration"));
+		
+		Integer userId = WDDXProcessor.convertToInteger(table,"userID");
+		if( userId != null ) {
+			User user = userDAO.getUserById(userId);
+			if(user!=null) {
 				learningDesign.setUser(user);
+			} else {
+				throw new ObjectExtractorException("userID missing");
+			}
 		}
-		if(!learningDesignDTO.getLicenseID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)){
-			License license = licenseDAO.getLicenseByID(learningDesignDTO.getLicenseID());
-			if(license!=null)
-				learningDesign.setLicense(license);			
+		
+		Long licenseID = WDDXProcessor.convertToLong(table,"licenseID");
+		if( licenseID!=null ){
+			License license = licenseDAO.getLicenseByID(licenseID);
+			learningDesign.setLicense(license);			
+		} else {
+			learningDesign.setLicense(null);
 		}
-		if(!learningDesignDTO.getWorkspaceFolderID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)){
-			WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(learningDesignDTO.getWorkspaceFolderID());
-			if(workspaceFolder!=null)
-				learningDesign.setWorkspaceFolder(workspaceFolder);			
+		learningDesign.setLicenseText(WDDXProcessor.convertToString(table,"licenseText"));				
+
+		Integer workspaceFolderID = WDDXProcessor.convertToInteger(table,"workspaceFolderID");
+		if( workspaceFolderID!=null ){
+			WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(workspaceFolderID);
+			learningDesign.setWorkspaceFolder(workspaceFolder);			
 		}
-		if(!learningDesignDTO.getParentLearningDesignID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)){
-			LearningDesign parent = learningDesignDAO.getLearningDesignById(learningDesignDTO.getParentLearningDesignID());
-			if(parent!=null)
-				learningDesign.setParentLearningDesign(parent);
+
+		Long parentLearningDesignID = WDDXProcessor.convertToLong(table,"parentLearningDesignID");
+		if( parentLearningDesignID != null ){
+			LearningDesign parent = learningDesignDAO.getLearningDesignById(parentLearningDesignID);
+			learningDesign.setParentLearningDesign(parent);
 		}
+		
 		learningDesignDAO.insert(learningDesign);
-		parseActivities(learningDesignDTO,learningDesign);
-		parseTransitions(learningDesignDTO,learningDesign);
-		calculateFirstActivity(learningDesignDTO.getFirstActivityUIID(),learningDesign);				
+
+		// now process the "parts" of the learning design
+		parseActivities((Vector)table.get("activities"),learningDesign);
+		parseTransitions((Vector)table.get("transitions"),learningDesign);
+		calculateFirstActivity(WDDXProcessor.convertToInteger(table,"firstActivityUIID"),learningDesign);				
+
 		return learningDesign;	
-	}
-	private void parseActivities(LearningDesignDTO learningDesignDTO, LearningDesign learningDesign) throws WDDXProcessorConversionException{
+		}
+	
+	private void parseActivities(List activitiesList, LearningDesign learningDesign) 
+			throws WDDXProcessorConversionException, ObjectExtractorException {
 		HashSet set = new HashSet();
-		if(learningDesignDTO.getActivities()!=null){
-			ArrayList table = learningDesignDTO.getActivities();
-			Iterator iterator = table.iterator();
+		if(activitiesList!=null){
+			Iterator iterator = activitiesList.iterator();
 			while(iterator.hasNext()){
 				Hashtable activityDetails = (Hashtable)iterator.next();
-				AuthoringActivityDTO authoringActivityDTO = new AuthoringActivityDTO(activityDetails);
-				Activity activity = extractActivityObject(authoringActivityDTO,learningDesign);	
+				Activity activity = extractActivityObject(activityDetails,learningDesign);	
 				activityDAO.insert(activity);
 				set.add(activity);
 			}
@@ -148,15 +184,13 @@ public class ObjectExtractor {
 		learningDesign.setActivities(set);
 		learningDesignDAO.update(learningDesign);
 	}
-	private void parseTransitions(LearningDesignDTO learningDesignDTO, LearningDesign learningDesign) throws WDDXProcessorConversionException{
+	private void parseTransitions(List transitionsList, LearningDesign learningDesign) throws WDDXProcessorConversionException{
 		HashSet set = new HashSet();
-		if(learningDesignDTO.getTransitions()!=null){
-			ArrayList table = learningDesignDTO.getTransitions();
-			Iterator iterator= table.iterator();
+		if(transitionsList!=null){
+			Iterator iterator= transitionsList.iterator();
 			while(iterator.hasNext()){
 				Hashtable transitionDetails = (Hashtable)iterator.next();
-				TransitionDTO transitionDTO = new TransitionDTO(transitionDetails);				
-				Transition transition = extractTransitionObject(transitionDTO,learningDesign);
+				Transition transition = extractTransitionObject(transitionDetails,learningDesign);
 				transitionDAO.insert(transition);
 				set.add(transition);
 			}
@@ -165,176 +199,225 @@ public class ObjectExtractor {
 		learningDesignDAO.update(learningDesign);
 	}
 	/**TODO This function has to be tested with real data*/
-	public void calculateFirstActivity(Integer firstID, LearningDesign design)throws Exception{		
+	public void calculateFirstActivity(Integer firstID, LearningDesign design){		
 		Activity flashFirstActivity = activityDAO.getActivityByUIID(firstID,design);
 		design.setFirstActivity(flashFirstActivity);
 		learningDesignDAO.update(design);
 	}	
-	public Activity extractActivityObject(AuthoringActivityDTO authoringActivityDTO, LearningDesign design){		
-		Object activityObject = Activity.getActivityInstance(authoringActivityDTO.getActivityTypeID().intValue());
-		processActivityType(activityObject,authoringActivityDTO);
+	public Activity extractActivityObject(Hashtable activityDetails, LearningDesign design) throws WDDXProcessorConversionException, ObjectExtractorException {
+		
+		Integer activityTypeID = WDDXProcessor.convertToInteger(activityDetails, "activityTypeID");
+		if ( activityTypeID == null ) {
+			throw new ObjectExtractorException("activityTypeID missing");
+		}
+		
+		Object activityObject = Activity.getActivityInstance(activityTypeID.intValue());
+		processActivityType(activityObject,activityDetails);
 		Activity activity =(Activity)activityObject;
-		activity.setActivityUIID(authoringActivityDTO.getActivityUIID());
-		activity.setDescription(authoringActivityDTO.getDescription());
-		activity.setTitle(authoringActivityDTO.getTitle());
-		activity.setHelpText(authoringActivityDTO.getHelpText());
-		activity.setXcoord(authoringActivityDTO.getXcoord());
-		activity.setYcoord(authoringActivityDTO.getYcoord());
-		
-		if(authoringActivityDTO.getParentUIID()!=null &&
-				!authoringActivityDTO.getParentUIID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)){
-			Activity parentActivity = activityDAO.getActivityByUIID(authoringActivityDTO.getParentUIID(),design);
-			if(parentActivity!=null)
-				activity.setParentActivity(parentActivity);
-			activity.setParentUIID(authoringActivityDTO.getParentUIID());
+		activity.setActivityTypeId(activityTypeID);
+		activity.setActivityUIID(WDDXProcessor.convertToInteger(activityDetails,"activityUIID"));
+		activity.setDescription(WDDXProcessor.convertToString(activityDetails,"description"));
+		activity.setTitle(WDDXProcessor.convertToString(activityDetails,"title"));
+		activity.setHelpText(WDDXProcessor.convertToString(activityDetails,"helpText"));
+		activity.setXcoord(WDDXProcessor.convertToInteger(activityDetails, "xcoord"));
+		activity.setYcoord(WDDXProcessor.convertToInteger(activityDetails, "ycoord"));
+
+		Integer parentUIID = WDDXProcessor.convertToInteger(activityDetails, "parentUIID");
+		if( parentUIID!=null ) {
+			Activity parentActivity = activityDAO.getActivityByUIID(parentUIID,design);
+			activity.setParentActivity(parentActivity);
+			activity.setParentUIID(parentUIID);
+		} else {
+			activity.setParentActivity(null);
+			activity.setParentUIID(null);
 		}
 		
-		activity.setActivityTypeId(authoringActivityDTO.getActivityTypeID());
-		
-		if(authoringActivityDTO.getGroupingID()!=null && 
-				!authoringActivityDTO.getGroupingID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)){
-			Grouping grouping = groupingDAO.getGroupingById(authoringActivityDTO.getGroupingID());
-			if(grouping!=null)
-				activity.setGrouping(grouping);
-			activity.setGroupingUIID(authoringActivityDTO.getGroupingUIID());
+		Long groupingID = WDDXProcessor.convertToLong(activityDetails,"groupingID");
+		Integer groupingUIID = WDDXProcessor.convertToInteger(activityDetails,"groupingUIID");
+		if( groupingID!=null ){
+			Grouping grouping = groupingDAO.getGroupingById(groupingID);
+			activity.setGrouping(grouping);
+			activity.setGroupingUIID(groupingUIID);
+		} else {
+			activity.setGrouping(null);
+			activity.setGroupingUIID(null);
 		}
 		
-		activity.setOrderId(authoringActivityDTO.getOrderID());
-		activity.setDefineLater(authoringActivityDTO.getDefineLater());
+		activity.setOrderId(WDDXProcessor.convertToInteger(activityDetails,"orderID"));
+		activity.setDefineLater(WDDXProcessor.convertToBoolean(activityDetails,"defineLater"));
 		activity.setLearningDesign(design);
 		
-		if(authoringActivityDTO.getLearningLibraryID()!=null &&
-				!authoringActivityDTO.getLearningLibraryID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)){
-			LearningLibrary library = learningLibraryDAO.getLearningLibraryById(authoringActivityDTO.getLearningLibraryID());
-			if(library!=null)
-				activity.setLearningLibrary(library);
+		Long learningLibraryID = WDDXProcessor.convertToLong(activityDetails,"learningLibraryID");
+		if( learningLibraryID!=null ){
+			LearningLibrary library = learningLibraryDAO.getLearningLibraryById(learningLibraryID);
+			activity.setLearningLibrary(library);
+		} else {
+			activity.setLearningLibrary(null);
 		}
 		
-		activity.setCreateDateTime(authoringActivityDTO.getCreateDateTime());
-		activity.setRunOffline(authoringActivityDTO.getRunOffline());
-		activity.setActivityCategoryID(authoringActivityDTO.getActivityCategoryID());
-		activity.setLibraryActivityUiImage(authoringActivityDTO.getLibraryActivityUiImage());
+		activity.setCreateDateTime(WDDXProcessor.convertToDate(activityDetails,"createDateTime"));
+		activity.setRunOffline(WDDXProcessor.convertToBoolean(activityDetails,"runOffline"));
+		activity.setActivityCategoryID(WDDXProcessor.convertToInteger(activityDetails,"activityCategoryID"));
+		activity.setLibraryActivityUiImage(WDDXProcessor.convertToString(activityDetails,"libraryActivityUiImage"));
 		
-		if(authoringActivityDTO.getLibraryActivityID()!=null &&
-				!authoringActivityDTO.getLibraryActivityID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)){
-			Activity libraryActivity = activityDAO.getActivityByActivityId(authoringActivityDTO.getLibraryActivityID());
-			if(libraryActivity!=null)
-				activity.setLibraryActivity(libraryActivity);
+		Long libraryActivityID = WDDXProcessor.convertToLong(activityDetails,"libraryActivityID");
+		if( libraryActivityID != null ){
+			Activity libraryActivity = activityDAO.getActivityByActivityId(libraryActivityID);
+			activity.setLibraryActivity(libraryActivity);
+		} else {
+			activity.setLibraryActivity(null);
 		}
 		
-		activity.setApplyGrouping(authoringActivityDTO.getApplyGrouping());
-		activity.setGroupingSupportType(authoringActivityDTO.getGroupingSupportType());
+		activity.setApplyGrouping(WDDXProcessor.convertToBoolean(activityDetails,"applyGrouping"));
+		activity.setGroupingSupportType(WDDXProcessor.convertToInteger(activityDetails,"groupingSupportType"));
 		return activity;
 	}	 
-	private  void processActivityType(Object activity, AuthoringActivityDTO authoringActivityDTO){
+	private  void processActivityType(Object activity, Hashtable activityDetails) 
+			throws WDDXProcessorConversionException, ObjectExtractorException {
 		if(activity instanceof GroupingActivity)
-			 buildGroupingActivity((GroupingActivity)activity,authoringActivityDTO);
+			 buildGroupingActivity((GroupingActivity)activity,activityDetails);
 		else if(activity instanceof ToolActivity)
-			 buildToolActivity((ToolActivity)activity,authoringActivityDTO);
+			 buildToolActivity((ToolActivity)activity,activityDetails);
 		else if(activity instanceof GateActivity)
-			 buildGateActivity(activity,authoringActivityDTO);
+			 buildGateActivity(activity,activityDetails);
 		else 			
-			 buildComplexActivity(activity,authoringActivityDTO);		
+			 buildComplexActivity(activity,activityDetails);		
 	}
-	private void buildComplexActivity(Object activity,AuthoringActivityDTO authoringActivityDTO){		
+	private void buildComplexActivity(Object activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
 		if(activity instanceof OptionsActivity)
-			buildOptionsActivity((OptionsActivity)activity,authoringActivityDTO);
+			buildOptionsActivity((OptionsActivity)activity,activityDetails);
 		else if (activity instanceof ParallelActivity)
-			buildParallelActivity((ParallelActivity)activity,authoringActivityDTO);
+			buildParallelActivity((ParallelActivity)activity,activityDetails);
 		else
-			buildSequenceActivity((SequenceActivity)activity,authoringActivityDTO);
+			buildSequenceActivity((SequenceActivity)activity,activityDetails);
 		
 	}
-	private void buildGroupingActivity(GroupingActivity groupingActivity,AuthoringActivityDTO authoringActivityDTO){
-		Integer groupingType = authoringActivityDTO.getGroupingType();
-		Grouping grouping = extractGroupingObject(authoringActivityDTO.getGroupingDTO());		
-		groupingActivity.setCreateGrouping(grouping);
-		groupingActivity.setCreateGroupingUIID(grouping.getGroupingUIID());		
+	private void buildGroupingActivity(GroupingActivity groupingActivity,Hashtable activityDetails) 
+		throws WDDXProcessorConversionException, ObjectExtractorException {
+		Hashtable groupingDetails = (Hashtable) activityDetails.get("groupingDTO"); 
+		if( groupingDetails != null ){
+			Grouping grouping = extractGroupingObject(groupingDetails);		
+			groupingActivity.setCreateGrouping(grouping);
+			groupingActivity.setCreateGroupingUIID(grouping.getGroupingUIID());
+		} else {
+			groupingActivity.setCreateGrouping(null);
+			groupingActivity.setCreateGroupingUIID(null);
+		}
 	}	
-	private void buildOptionsActivity(OptionsActivity optionsActivity,AuthoringActivityDTO authoringActivityDTO){
-		optionsActivity.setMaxNumberOfOptions(authoringActivityDTO.getMaxOptions());
-		optionsActivity.setMinNumberOfOptions(authoringActivityDTO.getMinOptions());
-		optionsActivity.setOptionsInstructions(authoringActivityDTO.getOptionsInstructions());		
+
+	private void buildOptionsActivity(OptionsActivity optionsActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
+		optionsActivity.setMaxNumberOfOptions(WDDXProcessor.convertToInteger(activityDetails,"maxOptions"));
+		optionsActivity.setMinNumberOfOptions(WDDXProcessor.convertToInteger(activityDetails,"minOptions"));
+		optionsActivity.setOptionsInstructions(WDDXProcessor.convertToString(activityDetails,"optionsInstructions"));		
 	}
-	private void buildParallelActivity(ParallelActivity activity,AuthoringActivityDTO authoringActivityDTO){		
+	private void buildParallelActivity(ParallelActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
 	}
-	private void buildSequenceActivity(SequenceActivity activity,AuthoringActivityDTO authoringActivityDTO){
+	private void buildSequenceActivity(SequenceActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
 		
 	}
-	private void buildToolActivity(ToolActivity toolActivity,AuthoringActivityDTO authoringActivityDTO){
-		toolActivity.setToolContentId(authoringActivityDTO.getToolContentID());
-		Tool tool =toolDAO.getToolByID(authoringActivityDTO.getToolID());
+	private void buildToolActivity(ToolActivity toolActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
+		toolActivity.setToolContentId(WDDXProcessor.convertToLong(activityDetails,"toolContentID"));
+		Tool tool =toolDAO.getToolByID(WDDXProcessor.convertToLong(activityDetails,"toolID"));
 		toolActivity.setTool(tool);											 
 	}
-	private void buildGateActivity(Object activity,AuthoringActivityDTO authoringActivityDTO){
+	private void buildGateActivity(Object activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
 		if(activity instanceof SynchGateActivity)
-			buildSynchGateActivity((SynchGateActivity)activity,authoringActivityDTO);
+			buildSynchGateActivity((SynchGateActivity)activity,activityDetails);
 		else if (activity instanceof PermissionGateActivity)
-			buildPermissionGateActivity((PermissionGateActivity)activity,authoringActivityDTO);
+			buildPermissionGateActivity((PermissionGateActivity)activity,activityDetails);
 		else
-			buildScheduleGateActivity((ScheduleGateActivity)activity,authoringActivityDTO);
+			buildScheduleGateActivity((ScheduleGateActivity)activity,activityDetails);
 		GateActivity gateActivity = (GateActivity)activity ;
-		gateActivity.setGateActivityLevelId(authoringActivityDTO.getGateActivityLevelID());
-		gateActivity.setGateOpen(authoringActivityDTO.getGateOpen());
+		gateActivity.setGateActivityLevelId(WDDXProcessor.convertToInteger(activityDetails,"gateActivityLevelID"));
+		gateActivity.setGateOpen(WDDXProcessor.convertToBoolean(activityDetails,"gateOpen"));
 				
 	}
-	private void buildSynchGateActivity(SynchGateActivity activity,AuthoringActivityDTO authoringActivityDTO){	
+	private void buildSynchGateActivity(SynchGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{	
 	}
-	private void buildPermissionGateActivity(PermissionGateActivity activity,AuthoringActivityDTO authoringActivityDTO){		
+	private void buildPermissionGateActivity(PermissionGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{		
 	}
-	private static void buildScheduleGateActivity(ScheduleGateActivity activity,AuthoringActivityDTO authoringActivityDTO){
-		activity.setGateStartDateTime(authoringActivityDTO.getGateStartDateTime());
-		activity.setGateEndDateTime(authoringActivityDTO.getGateEndDateTime());
-		activity.setGateStartTimeOffset(authoringActivityDTO.getGateStartTimeOffset());
-		activity.setGateEndTimeOffset(authoringActivityDTO.getGateEndTimeOffset());		
+	private static void buildScheduleGateActivity(ScheduleGateActivity activity,Hashtable activityDetails) throws WDDXProcessorConversionException{
+		activity.setGateStartDateTime(WDDXProcessor.convertToDate(activityDetails,"gateStartDateTime"));
+		activity.setGateEndDateTime(WDDXProcessor.convertToDate(activityDetails,"gateEndDateTime"));
+		activity.setGateStartTimeOffset(WDDXProcessor.convertToLong(activityDetails,"gateStartTimeOffset"));
+		activity.setGateEndTimeOffset(WDDXProcessor.convertToLong(activityDetails,"gateEndTimeOffset"));		
 	}
-	public Grouping extractGroupingObject(GroupingDTO groupingDTO){		
-		Object object = Grouping.getGroupingInstance(groupingDTO.getGroupingType());
+	
+
+	public Grouping extractGroupingObject(Hashtable groupingDetails) throws WDDXProcessorConversionException, ObjectExtractorException{
+		Integer groupingType=WDDXProcessor.convertToInteger(groupingDetails,"groupingType");
+		if ( groupingType == null ) { 
+			throw new ObjectExtractorException("groupingType missing");
+		}
+		
+		Object object = Grouping.getGroupingInstance(groupingType);
 		
 		if(object instanceof RandomGrouping)
-			createRandomGrouping((RandomGrouping)object,groupingDTO);
+			createRandomGrouping((RandomGrouping)object,groupingDetails);
 		else if(object instanceof ChosenGrouping)
-			createChosenGrouping((ChosenGrouping)object,groupingDTO);
+			createChosenGrouping((ChosenGrouping)object,groupingDetails);
 		else
-			createLessonClass((LessonClass)object, groupingDTO);
+			createLessonClass((LessonClass)object, groupingDetails);
 		
 		Grouping grouping = (Grouping)object;
-		grouping.setGroupingUIID(groupingDTO.getGroupingUIID());
-		grouping.setMaxNumberOfGroups(groupingDTO.getMaxNumberOfGroups());
+		grouping.setGroupingId(WDDXProcessor.convertToLong(groupingDetails,"groupingID"));
+		grouping.setGroupingUIID(WDDXProcessor.convertToInteger(groupingDetails,"groupingUIID"));
+		grouping.setMaxNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,"maxNumberOfGroups"));
 		groupingDAO.insert(grouping);
 		return grouping;
 	}
-	private void createRandomGrouping(RandomGrouping randomGrouping,GroupingDTO groupingDTO){
-		randomGrouping.setLearnersPerGroup(groupingDTO.getLearnersPerGroup());
-		randomGrouping.setNumberOfGroups(groupingDTO.getNumberOfGroups());
+	private void createRandomGrouping(RandomGrouping randomGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
+		randomGrouping.setLearnersPerGroup(WDDXProcessor.convertToInteger(groupingDetails,"learnersPerGroup"));
+		randomGrouping.setNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,"numberOfGroups"));
 	}
-	private void createChosenGrouping(ChosenGrouping chosenGrouping,GroupingDTO groupingDTO){
+	private void createChosenGrouping(ChosenGrouping chosenGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
 		
 	}
-	private void createLessonClass(LessonClass lessonClass, GroupingDTO groupingDTO){
-		Group group = groupDAO.getGroupById(groupingDTO.getStaffGroupID());
+	private void createLessonClass(LessonClass lessonClass, Hashtable groupingDetails) throws WDDXProcessorConversionException{
+		Group group = groupDAO.getGroupById(WDDXProcessor.convertToLong(groupingDetails,"staffGroupID"));
 		if(group!=null)
 			lessonClass.setStaffGroup(group);
 	}
-	private Transition extractTransitionObject(TransitionDTO transitionDTO,LearningDesign learningDesign){
+
+	/** Create the transition from a WDDX based hashtable. It is easier to go 
+	 * straight to the data object rather than going via the DTO, as the DTO
+	 * returns the special null values from the getter methods. This makes it
+	 * hard to set up the transaction object from the transitionDTO.
+	 * 
+	 * @param transitionDetails
+	 * @throws WDDXProcessorConversionException
+	 */
+	private Transition extractTransitionObject(Hashtable transitionDetails, LearningDesign learningDesign) throws WDDXProcessorConversionException{
+		
 		Transition transition = new Transition();
-		transition.setTransitionUIID(transitionDTO.getTransitionUIID());
-		if(transitionDTO.getToUIID()!=null){
-			Activity toActivity = activityDAO.getActivityByUIID(transitionDTO.getToUIID(), learningDesign);
+		
+		Long transitionID= WDDXProcessor.convertToLong(transitionDetails,"transitionID");
+		if ( transitionID != null )
+			transition.setTransitionId(transitionID);
+			
+		transition.setTransitionUIID(WDDXProcessor.convertToInteger(transitionDetails,"transitionUIID"));
+		
+		Integer toUIID=WDDXProcessor.convertToInteger(transitionDetails,"toUIID"); 
+		if(toUIID!=null){
+			Activity toActivity = activityDAO.getActivityByUIID(toUIID, learningDesign);
 			transition.setToActivity(toActivity);
-			transition.setToUIID(transitionDTO.getToUIID());
+			transition.setToUIID(toUIID);
 		}
-		if(transitionDTO.getFromUIID()!=null){
-			Activity fromActivity = activityDAO.getActivityByUIID(transitionDTO.getFromUIID(), learningDesign);
+
+		Integer fromUIID=WDDXProcessor.convertToInteger(transitionDetails,"fromUIID");
+		if(fromUIID!=null){
+			Activity fromActivity = activityDAO.getActivityByUIID(fromUIID, learningDesign);
 			transition.setFromActivity(fromActivity);
-			transition.setFromUIID(transitionDTO.getFromUIID());
+			transition.setFromUIID(fromUIID);
 		}		
-		transition.setDescription(transitionDTO.getDescription());
-		transition.setTitle(transitionDTO.getTitle());
-		transition.setCreateDateTime(transitionDTO.getCreateDateTime());			
+		transition.setDescription(WDDXProcessor.convertToString(transitionDetails,"description"));
+		transition.setTitle(WDDXProcessor.convertToString(transitionDetails,"title"));
+		transition.setCreateDateTime(WDDXProcessor.convertToDate(transitionDetails,"createDateTime"));			
 		transition.setLearningDesign(learningDesign);		
 		return transition;
 	}		
+	
+
 }
 	
 

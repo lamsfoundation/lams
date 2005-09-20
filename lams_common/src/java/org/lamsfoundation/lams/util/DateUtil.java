@@ -42,6 +42,7 @@ import java.util.TimeZone;
 public class DateUtil
 {
 
+	public static final String FLASH_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
     /**
      * Convert your local time to Universal Time Coordinator.
      * TODO conversion is not working properly. The returned Date object still 
@@ -98,7 +99,7 @@ public class DateUtil
     	// Replace this implementation with commons.lang.time.DateUtils.parseDate()
     	// if/when we upgrade to commons 2.1
         SimpleDateFormat parser = null;
-        String[] parseFormats = new String[] {"yyyy-MM-dd'T'HH:mm:ss"};
+        String[] parseFormats = new String[] {FLASH_FORMAT};
         for (int i = 0; i < parseFormats.length; i++) {
             if (i == 0) {
                 parser = new SimpleDateFormat(parseFormats[0]);

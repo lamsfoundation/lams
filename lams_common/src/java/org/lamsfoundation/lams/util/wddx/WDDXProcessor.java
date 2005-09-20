@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.Hashtable;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -122,7 +123,103 @@ public class WDDXProcessor {
         return tempsw.toString();
     }
     
-    /** 
+	/** Get an Integer from a hashtable, based on the given key.
+	 * If the key doesn't exist, return null. Simplifies interface 
+	 * to getInteger(), which handles string inputs
+	 * and Flash null values.
+	 * @param table Hashtable containing values from Flash. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @param key Key of entry in table. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @return Integer value of entry in table, or null.
+	 * @throws WDDXProcessorConversionException if the value cannot be converted.
+	 * @author Fiona Malikoff
+	 */ 
+    public static Integer convertToInteger(Hashtable table, String key) 
+		throws WDDXProcessorConversionException {
+		if(table.containsKey(key)) {
+			return WDDXProcessor.convertToInteger(key, table.get(key));
+		}
+		return null;
+	}
+
+	/** Get an Long from a hashtable, based on the given key.
+	 * If the key doesn't exist, return null. Simplifies interface 
+	 * to getLong(), which handles string inputs and Flash null values.
+	 * @param table Hashtable containing values from Flash. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @param key Key of entry in table. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @return Integer value of entry in table, or null.
+	 * @throws WDDXProcessorConversionException if the value cannot be converted.
+	 * @author Fiona Malikoff
+	 */ 
+	public static Long convertToLong(Hashtable table, String key) 
+		throws WDDXProcessorConversionException {
+		if(table.containsKey(key)) {
+			return WDDXProcessor.convertToLong(key, table.get(key));
+		}
+		return null;
+	}
+	
+	/** Get an String from a hashtable, based on the given key.
+	 * Simplifies interface to getString().
+	 * If the key doesn't exist, return null. 
+	 * @param table Hashtable containing values from Flash. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @param key Key of entry in table. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @return Integer value of entry in table, or null.
+	 * @throws WDDXProcessorConversionException if the value cannot be converted.
+	 * @author Fiona Malikoff
+	 */ 
+	public static String convertToString(Hashtable table, String key) 
+		throws WDDXProcessorConversionException {
+		if(table.containsKey(key)) {
+			return WDDXProcessor.convertToString(key, table.get(key));
+		}
+		return null;
+	}
+
+	/** Get an Boolean from a hashtable, based on the given key.
+	 * If the key doesn't exist, return null. Simplifies interface 
+	 * to getBoolean().
+	 * @param table Hashtable containing values from Flash. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @param key Key of entry in table. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @return Integer value of entry in table, or null.
+	 * @throws WDDXProcessorConversionException if the value cannot be converted.
+	 * @author Fiona Malikoff
+	 */ 
+	public static Boolean convertToBoolean(Hashtable table, String key) 
+		throws WDDXProcessorConversionException {
+		if(table.containsKey(key)) {
+			return WDDXProcessor.convertToBoolean(key, table.get(key));
+		}
+		return null;
+	}
+	
+	/** Get an Date from a hashtable, based on the given key.
+	 * If the key doesn't exist, return null. Simplifies interface
+	 * to getDate().
+	 * @param table Hashtable containing values from Flash. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @param key Key of entry in table. Must not be null
+	 * or NullPointerException will be thrown.
+	 * @return Integer value of entry in table, or null.
+	 * @throws WDDXProcessorConversionException if the value cannot be converted.
+	 * @author Fiona Malikoff
+	 */ 
+	public static Date convertToDate(Hashtable table, String key) 
+		throws WDDXProcessorConversionException {
+		if(table.containsKey(key)) {
+			return WDDXProcessor.convertToDate(key, table.get(key));
+		}
+		return null;
+	}
+	
+   /** 
      * Convert a string to an int, based on how WDDX usually passes numbers. 
      * If it gets any of the NULL value objects (see WDDXTAGS) then it will 
      * consider this the same as a null.

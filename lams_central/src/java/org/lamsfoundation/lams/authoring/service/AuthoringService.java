@@ -33,6 +33,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.ObjectExtractor;
+import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
@@ -477,18 +478,17 @@ public class AuthoringService implements IAuthoringService {
 		ObjectExtractor extractor = new ObjectExtractor(userDAO,learningDesignDAO,
 														activityDAO,workspaceFolderDAO,
 														learningLibraryDAO,licenseDAO,
-														groupingDAO,toolDAO,groupDAO,transitionDAO);		
-		learningDesignDTO = new LearningDesignDTO(table);		
-		if(learningDesignDTO!=null){
-			LearningDesign design = extractor.extractLearningDesignObject(learningDesignDTO);	
+														groupingDAO,toolDAO,groupDAO,transitionDAO);
+		try { 
+			LearningDesign design = extractor.extractLearningDesign(table);	
 			learningDesignDAO.insert(design);
 			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,design.getLearningDesignId());
-		}
-		else
+		} catch ( ObjectExtractorException e ) {
 			flashMessage = new FlashMessage(IAuthoringService.STORE_LD_MESSAGE_KEY,
-											"Invalid Object in WDDX packet",
+											"Invalid Object in WDDX packet. Error was "+e.getMessage(),
 											FlashMessage.ERROR);
-		
+		}
+	
 		return flashMessage.serializeMessage(); 		
 	}
 	/**

@@ -30,6 +30,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.BaseDTO;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 /**
@@ -68,9 +69,9 @@ public class CSSThemeDTO extends BaseDTO {
      */
     public CSSThemeDTO(Hashtable wddxData) throws WDDXProcessorConversionException {
         if ( wddxData != null ) {
-    		this.id = convertToLong(wddxData,ID_TAG);
-    		this.name = convertToString(wddxData,NAME_TAG);
-    		this.description = convertToString(wddxData,DESCRIPTION_TAG);
+    		this.id = WDDXProcessor.convertToLong(wddxData,ID_TAG);
+    		this.name = WDDXProcessor.convertToString(wddxData,NAME_TAG);
+    		this.description = WDDXProcessor.convertToString(wddxData,DESCRIPTION_TAG);
     		Hashtable so = (Hashtable) wddxData.get(BASE_STYLE_OBJECT_TAG);
     		if ( so != null ) {
     		    baseStyleObject = new CSSStyleDTO(so);

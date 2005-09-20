@@ -1,4 +1,4 @@
-/****************************************************************
+/***************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * 
@@ -18,20 +18,43 @@
  * USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
- * ****************************************************************
- */
-package org.lamsfoundation.lams.learningdesign.dto;
+ * ***********************************************************************/
 
-
+package org.lamsfoundation.lams.authoring;
 
 /**
- * @author Manpreet Minhas
- * 
- * This class acts as base class for all authoring DTO's.
- * It will contain any helper methods for DTOs. 
+ * @author Fiona Malikoff
  * 
  */
-public class BaseDTO {	
+public class ObjectExtractorException extends Exception {
 
+	/**
+	 * 
+	 */
+	public ObjectExtractorException() {
+		super();
+	}
+
+	/**
+	 * @param arg0
+	 */
+	public ObjectExtractorException(String arg0) {
+		super(arg0);
+	}
+
+	/**
+	 * @param arg0
+	 */
+	public ObjectExtractorException(Throwable arg0) {
+		super(arg0);
+	}
+
+	/**
+	 * @param arg0
+	 * @param arg1
+	 */
+	public ObjectExtractorException(String arg0, Throwable arg1) {
+		super(arg0, arg1);
+	}
 
 }

@@ -25,15 +25,12 @@ package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Vector;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.Transition;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -146,7 +143,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.firstActivityUIID = learningDesign.getFirstActivity()!=null?
 								 learningDesign.getFirstActivity().getActivityUIID():
 								 WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
-		this.maxID = learningDesign.getMaxId();
+		this.maxID = learningDesign.getMaxID();
 		this.validDesign = learningDesign.getValidDesign();
 		this.readOnly = learningDesign.getReadOnly();
 		this.dateReadOnly = learningDesign.getDateReadOnly();
@@ -188,39 +185,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.activities = populateActivities(learningDesign);
 		this.transitions = populateTransitions(learningDesign);
 	}
-	public LearningDesignDTO(Hashtable table) throws WDDXProcessorConversionException{
-		
-		this.learningDesignUIID = convertToInteger(table,"learningDesignUIID");
-		this.description = convertToString(table,"description");
-		this.title = convertToString(table,"title");
-		this.firstActivityUIID = convertToInteger(table,"firstActivityUIID");
-		this.maxID = convertToInteger(table,"maxID");
-		this.validDesign = convertToBoolean(table,"validDesign");
-		this.readOnly = convertToBoolean(table,"readOnly");;
-		this.dateReadOnly = convertToDate(table,"dateReadOnly");
-		this.offlineInstructions= convertToString(table,"offlineInstructions");
-		this.onlineInstructions =convertToString(table,"onlineInstructions");
-		this.userID = convertToInteger(table,"userID");
-		this.helpText = convertToString(table,"helpText");
-		this.copyTypeID = convertToInteger(table,"copyTypeID");
-		this.createDateTime = convertToDate(table,"createDateTime");
-		this.version = convertToString(table,"version");
-		this.parentLearningDesignID = convertToLong(table,"parentLearningDesignID");
-		this.workspaceFolderID = convertToInteger(table,"workspaceFolderID");
-		this.duration = convertToLong(table,"duration");
-		this.licenseID =convertToLong(table,"licenseID");
-		this.licenseText = convertToString(table,"licenseText");				
-		this.lastModifiedDateTime =convertToDate(table,"lastModifiedDateTime");
-		
-		Vector activityDetails = (Vector)table.get("activities");
-		this.activities = new ArrayList();
-		activities.addAll(activityDetails);		
-		
-		Vector transitionDetails = (Vector)table.get("transitions");		
-		this.transitions = new ArrayList();
-		transitions.addAll(transitionDetails);
-		
-	}	
+
 	/**
 	 * @return Returns the copyTypeID.
 	 */
@@ -640,51 +605,5 @@ public class LearningDesignDTO extends BaseDTO{
 		return offlineInstructions!=null?offlineInstructions:WDDXTAGS.STRING_NULL_VALUE;
 	}
 
-	public static LearningDesign extractLearningDesign(LearningDesignDTO learningDesignDTO){
-		LearningDesign learningDesign = new LearningDesign();
-		if(!learningDesignDTO.getLearningDesignUIID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			learningDesign.setLearningDesignUIID(learningDesignDTO.getLearningDesignUIID());
-		if(!learningDesignDTO.getDescription().equals(WDDXTAGS.STRING_NULL_VALUE))
-			learningDesign.setDescription(learningDesignDTO.getDescription());
-		if(!learningDesignDTO.getTitle().equals(WDDXTAGS.STRING_NULL_VALUE))
-			learningDesign.setTitle(learningDesignDTO.getTitle());
-		if(!learningDesignDTO.getMaxID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			learningDesign.setMaxId(learningDesignDTO.getMaxID());
-		
-		learningDesign.setValidDesign(learningDesignDTO.getValidDesign());
-		learningDesign.setReadOnly(learningDesignDTO.getReadOnly());
-			
-		if(!learningDesignDTO.getCopyTypeID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			learningDesign.setCopyTypeID(learningDesignDTO.getCopyTypeID());		
-		if(!learningDesignDTO.getHelpText().equals(WDDXTAGS.STRING_NULL_VALUE))
-			learningDesign.setHelpText(learningDesignDTO.getHelpText());
-		if(!learningDesignDTO.getOfflineInstructions().equals(WDDXTAGS.STRING_NULL_VALUE))
-			learningDesign.setHelpText(learningDesignDTO.getOfflineInstructions());
-		if(!learningDesignDTO.getOnlineInstructions().equals(WDDXTAGS.STRING_NULL_VALUE))
-			learningDesign.setHelpText(learningDesignDTO.getOnlineInstructions());
-		if(!learningDesignDTO.getVersion().equals(WDDXTAGS.STRING_NULL_VALUE))
-			learningDesign.setVersion(learningDesignDTO.getVersion());
-		if(!learningDesignDTO.getLicenseText().equals(WDDXTAGS.STRING_NULL_VALUE))
-			learningDesign.setLicenseText(learningDesignDTO.getLicenseText());
-		if(!learningDesignDTO.getLessonOrgName().equals(WDDXTAGS.STRING_NULL_VALUE))
-			learningDesign.setLessonOrgName(learningDesignDTO.getLessonOrgName());
-		if(!learningDesignDTO.getLessonName().equals(WDDXTAGS.STRING_NULL_VALUE))
-			learningDesign.setLessonName(learningDesignDTO.getLessonName());					
-		if(!learningDesignDTO.getDateReadOnly().equals(WDDXTAGS.DATE_NULL_VALUE))
-			learningDesign.setDateReadOnly(learningDesignDTO.getDateReadOnly());
-		if(!learningDesignDTO.getCreateDateTime().equals(WDDXTAGS.DATE_NULL_VALUE))
-			learningDesign.setCreateDateTime(learningDesignDTO.getCreateDateTime());
-		if(!learningDesignDTO.getLessonStartDateTime().equals(WDDXTAGS.DATE_NULL_VALUE))
-			learningDesign.setLessonStartDateTime(learningDesignDTO.getLessonStartDateTime());
-		if(!learningDesignDTO.getLastModifiedDateTime().equals(WDDXTAGS.DATE_NULL_VALUE))
-			learningDesign.setLastModifiedDateTime(learningDesignDTO.getLastModifiedDateTime());
-		if(!learningDesignDTO.getLessonID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			learningDesign.setLessonID(learningDesignDTO.getLessonID());
-		if(!learningDesignDTO.getLessonOrgID().equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			learningDesign.setLessonOrgID(learningDesignDTO.getLessonOrgID());
-		if(!learningDesignDTO.getDuration().equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			learningDesign.setDuration(learningDesignDTO.getDuration());
-		
-		return learningDesign;
-	}
+
 }

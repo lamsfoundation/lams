@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.util.Date;
-import java.util.Hashtable;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -36,7 +35,6 @@ import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 /**
  * @author Manpreet Minhas
@@ -264,53 +262,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	
 	
-	public AuthoringActivityDTO(Hashtable activityDetails) throws WDDXProcessorConversionException{
-		this.activityUIID = convertToInteger(activityDetails,"activityUIID");
-		this.description = convertToString(activityDetails,"description");
-		this.title = convertToString(activityDetails,"title");			
-		this.helpText = convertToString(activityDetails,"helpText");
-		this.xcoord = convertToInteger(activityDetails, "xcoord");
-		this.ycoord = convertToInteger(activityDetails, "ycoord");
 
-		this.parentActivityID = convertToLong(activityDetails, "parentActivityID");
-		this.parentUIID = convertToInteger(activityDetails, "parentUIID");
-
-		this.activityTypeID = convertToInteger(activityDetails, "activityTypeID");
-		this.groupingID = convertToLong(activityDetails,"groupingID");
-		this.groupingUIID = convertToInteger(activityDetails,"groupingUIID");
-		this.orderID = convertToInteger(activityDetails,"orderID");
-		this.defineLater = convertToBoolean(activityDetails,"defineLater");
-		this.learningDesignID = convertToLong(activityDetails,"learningDesignID");
-		this.learningLibraryID = convertToLong(activityDetails,"learningLibraryID");
-		this.createDateTime = convertToDate(activityDetails,"createDateTime");
-		this.runOffline = convertToBoolean(activityDetails,"runOffline");
-		this.maxOptions = convertToInteger(activityDetails,"maxOptions");
-		this.minOptions = convertToInteger(activityDetails,"minOptions");
-		this.optionsInstructions = convertToString(activityDetails,"optionsInstructions");
-		this.toolID = convertToLong(activityDetails,"toolID");
-		this.toolContentID = convertToLong(activityDetails,"toolContentID");
-		this. activityCategoryID = convertToInteger(activityDetails,"activityCategoryID");
-
-		this.gateActivityLevelID = convertToInteger(activityDetails,"gateActivityLevelID");
-		this.gateOpen = convertToBoolean(activityDetails,"gateOpen");
-		this.gateEndTimeOffset = convertToLong(activityDetails,"gateEndTimeOffset");
-		this.gateStartTimeOffset = convertToLong(activityDetails,"gateStartTimeOffset");
-		this.gateEndDateTime = convertToDate(activityDetails,"gateEndDateTime");
-		this.gateStartDateTime = convertToDate(activityDetails,"gateStartDateTime");
-		
-		this.libraryActivityUiImage=convertToString(activityDetails,"libraryActivityUiImage");
-		this.createGroupingID= convertToLong(activityDetails,"createGroupingID");
-		this.createGroupingUIID=convertToInteger(activityDetails,"createGroupingUIID");
-		this.libraryActivityID=convertToLong(activityDetails,"libraryActivityID");
-		this.applyGrouping=convertToBoolean(activityDetails,"applyGrouping");
-		this.groupingSupportType=convertToInteger(activityDetails,"groupingSupportType");
-		this.groupingType=convertToInteger(activityDetails,"groupingType");
-		if(activityDetails.containsKey("groupingDTO")){
-			Hashtable groupingDetails = (Hashtable) activityDetails.get("groupingDTO");			
-			this.groupingDTO = new GroupingDTO(groupingDetails);
-		}
-
-	}
 	private  void processActivityType(Object activity){
 		if(activity instanceof GroupingActivity)
 			 addGroupingActivityAttributes((GroupingActivity)activity);

@@ -22,13 +22,10 @@
  */
 package org.lamsfoundation.lams.learningdesign.dto;
 
-import java.util.Hashtable;
-
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.lesson.LessonClass;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -65,15 +62,6 @@ public class GroupingDTO extends BaseDTO{
 		this.groupingType = grouping.getGroupingTypeId();
 		Object object = Grouping.getGroupingInstance(groupingType);
 		processGroupingActivity(object);
-	}
-	public GroupingDTO(Hashtable groupingDetails) throws WDDXProcessorConversionException{
-		this.groupingID =convertToLong(groupingDetails,"groupingID");
-		this.groupingUIID =convertToInteger(groupingDetails,"groupingUIID");
-		this.maxNumberOfGroups =convertToInteger(groupingDetails,"maxNumberOfGroups");
-		this.groupingType =convertToInteger(groupingDetails,"groupingType");		
-		this.staffGroupID =convertToLong(groupingDetails,"staffGroupID");
-		this.numberOfGroups =convertToInteger(groupingDetails,"numberOfGroups");
-		this.learnersPerGroup =convertToInteger(groupingDetails,"learnersPerGroup");
 	}
 	public void processGroupingActivity(Object object){
 		if(object instanceof RandomGrouping)

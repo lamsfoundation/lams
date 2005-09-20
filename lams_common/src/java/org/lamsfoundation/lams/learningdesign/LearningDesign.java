@@ -79,7 +79,7 @@ public class LearningDesign implements Serializable {
 	private Activity firstActivity;
 
 	/** nullable persistent field */
-	private Integer maxId;
+	private Integer maxID;
 
 	/** persistent field */
 	private Boolean validDesign;
@@ -164,7 +164,7 @@ public class LearningDesign implements Serializable {
 			String description,
 			String title,
 			Activity firstActivity,
-			Integer maxId,
+			Integer maxID,
 			Boolean validDesign,
 			Boolean readOnly,
 			Date dateReadOnly,
@@ -186,7 +186,7 @@ public class LearningDesign implements Serializable {
 		this.description = description;
 		this.title = title;
 		this.firstActivity = firstActivity;
-		this.maxId = maxId;
+		this.maxID = maxID;
 		this.validDesign = validDesign;
 		this.readOnly = readOnly;
 		this.dateReadOnly = dateReadOnly;
@@ -251,7 +251,7 @@ public class LearningDesign implements Serializable {
 		LearningDesign newDesign = new LearningDesign();		
 		newDesign.setDescription(design.getDescription());
 		newDesign.setTitle(design.getTitle());		
-		newDesign.setMaxId(design.getMaxId());
+		newDesign.setMaxID(design.getMaxID());
 		newDesign.setValidDesign(design.getValidDesign());		
 		newDesign.setDateReadOnly(design.getDateReadOnly());
 		newDesign.setHelpText(design.getHelpText());
@@ -295,11 +295,11 @@ public class LearningDesign implements Serializable {
 	public void setFirstActivity(Activity firstActivity) {
 		this.firstActivity = firstActivity;
 	}
-	public Integer getMaxId() {
-		return maxId;
+	public Integer getMaxID() {
+		return maxID;
 	}
-	public void setMaxId(Integer maxId) {
-		this.maxId = maxId;
+	public void setMaxID(Integer maxID) {
+		this.maxID = maxID;
 	}
 	public Boolean getValidDesign() {
 		return validDesign;

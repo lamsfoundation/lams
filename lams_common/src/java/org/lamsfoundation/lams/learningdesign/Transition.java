@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -107,7 +108,7 @@ public class Transition implements Serializable {
 		this.fromActivity = fromActivity;
 		this.learningDesign = learningDesign;
 	}
-	
+
 	/**
 	 * Makes a copy of the Transition for authoring, preview and monitoring enviornment
 	 * 
