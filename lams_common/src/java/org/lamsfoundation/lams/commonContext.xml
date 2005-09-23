@@ -189,4 +189,13 @@
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
+	<!--  System Session bean -->
+	<bean id="SystemSession"
+	    class="org.lamsfoundation.lams.web.session.SessionManager"
+	    init-method="init"
+	    destroy-method="destroy"
+		singleton="true">
+		<property name="monitorPeriod"><value>60</value></property>
+	</bean>
+	
 </beans>
