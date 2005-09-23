@@ -2,10 +2,10 @@
 	<listener-class>
 		org.springframework.web.context.ContextLoaderListener
 	</listener-class>
+</listener>	
+<listener>
 	<listener-class>
  		org.lamsfoundation.lams.web.SessionListener
  	</listener-class>
-	<listener-class>
-	  org.lamsfoundation.lams.web.SharedSession
-	</listener-class>
-</listener>	
+</listener>
+ 	
