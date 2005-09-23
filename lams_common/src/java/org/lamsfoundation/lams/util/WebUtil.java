@@ -29,6 +29,8 @@ public class WebUtil
     public static final String PARAM_USER_ID = "user_id";
     public static final String PARAM_LESSON_ID = "lesson_id";
     public static final String PARAM_TOOL_CONTENT_ID = "contentId";
+    public static final String PARAM_DIRECTORY_NAME = "directoryName";
+    public static final String PARAM_FILENAME = "filename";
     
     public static final String ATTR_MODE = "mode";
     public static final String ATTR_USERNAME = "username";
