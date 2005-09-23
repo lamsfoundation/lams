@@ -19,6 +19,8 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.web.NbExportForm;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
+import org.lamsfoundation.lams.util.WebUtil;
+
 
 /**
  * @author mtruong
@@ -61,6 +63,8 @@ public class NbExportAction extends LamsDispatchAction {
         NbExportForm exportForm = (NbExportForm)form;
         Long toolSessionId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_SESSION_ID));
         Long userId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.USER_ID));
+      
+        
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         
         if (userId == null || toolSessionId == null)
@@ -89,6 +93,7 @@ public class NbExportAction extends LamsDispatchAction {
         }
                
         exportForm.populateForm(content);
+       
         return mapping.findForward(NoticeboardConstants.EXPORT_PORTFOLIO);
     }
     
@@ -99,6 +104,7 @@ public class NbExportAction extends LamsDispatchAction {
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         
         Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
+       
         //check if toolContentId exists in db or not
         if (toolContentId==null)
         {
@@ -117,7 +123,7 @@ public class NbExportAction extends LamsDispatchAction {
         }
         
         exportForm.populateForm(content);
-        
+  
    		return mapping.findForward(NoticeboardConstants.EXPORT_PORTFOLIO);
     }
     
