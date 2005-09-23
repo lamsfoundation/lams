@@ -148,7 +148,7 @@ public class FileUtil {
 	 * @param stringToModify
 	 * @return
 	 */
-	protected static String removeTrailingForwardSlash(String stringToModify)
+	public static String removeTrailingForwardSlash(String stringToModify)
 	{
 		String stringWithoutSlashAtEnd = stringToModify.substring(0, stringToModify.length()-1);
 		return stringWithoutSlashAtEnd;
@@ -160,12 +160,18 @@ public class FileUtil {
 	 * @param stringToCheck the directoryName to check
 	 * @return boolean. Returns true if there is a slash at the end and false if not.
 	 */
-	protected static boolean trailingForwardSlashPresent(String stringToCheck)
+	public static boolean trailingForwardSlashPresent(String stringToCheck)
 	{
 		int indexOfSlash = stringToCheck.lastIndexOf("/");
 		if (indexOfSlash == (stringToCheck.length()-1))
 			return true;
 		else
 			return false;
+	}
+	
+	public static boolean directoryExist(String directoryToCheck)
+	{
+		File dir = new File(directoryToCheck);
+		return dir.exists();
 	}
 }
