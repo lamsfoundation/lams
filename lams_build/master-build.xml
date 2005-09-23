@@ -121,6 +121,7 @@
 					<include name="spring/*.jar" />
 					<include name="struts/*.jar" />
 					<include name="wddx/*.jar" />
+					<include name="concurrent/*.jar" />					
 				</patternset>
 			</fileset>
 			<fileset dir="..">

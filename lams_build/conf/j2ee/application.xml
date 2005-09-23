@@ -157,6 +157,9 @@
 	<module>
 		<java>spring-webmvc.jar</java>
 	</module>
+	<module>
+		<java>concurrent-1.3.4.jar</java>
+	</module>	
     <!--  End Third Party JAR Files -->
     
     <!--  Tools -->
