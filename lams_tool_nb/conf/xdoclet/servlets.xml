@@ -41,12 +41,22 @@
  
 <!--  The download servlet, reused from the content repository jar -->
 	<servlet>
-		<description>Instructions Download</description>
-		<display-name>Instructions Download</display-name>
 		<servlet-name>download</servlet-name>
+		<display-name>Instructions Download</display-name>
+		<description>Instructions Download</description>		
 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
 	    <load-on-startup>3</load-on-startup>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>exportPortfolio</servlet-name>
+		<display-name>Export Portfolio</display-name>
+		<description>Export Portfolio</description>		
+		<servlet-class>org.lamsfoundation.lams.tool.noticeboard.web.NbExportServlet</servlet-class>
+	</servlet>
+	
+	
+	
 
 
 
