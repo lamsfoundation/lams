@@ -7,3 +7,8 @@
 		<servlet-name>download</servlet-name>
 		<url-pattern>/download/*</url-pattern>
   	</servlet-mapping>
+  	
+  	<servlet-mapping>
+		<servlet-name>exportPortfolio</servlet-name>
+		<url-pattern>/portfolioExport</url-pattern>
+  	</servlet-mapping>
