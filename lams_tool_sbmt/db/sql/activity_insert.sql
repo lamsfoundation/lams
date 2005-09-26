@@ -73,7 +73,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, '/lams/images/icon_reportsubmission.swf'
+, '/images/icon_reportsubmission.swf'
 , NULL
 , NULL
 , NULL

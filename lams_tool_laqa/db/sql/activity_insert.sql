@@ -73,7 +73,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, '/lams/tool/laqa11/images/icon_questionanswer.swf'
+, '/tool/laqa11/images/icon_questionanswer.swf'
 , NULL
 , NULL
 , NULL

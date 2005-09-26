@@ -311,7 +311,7 @@ values
 1,null,0,0,
 null,1,'20050101',0,
 null,null,1,1,
-null,null,null,'/lams/images/icon_journal.swf',
+null,null,null,'/images/icon_journal.swf',
 1,0,1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -325,7 +325,7 @@ values
 1,null,0,0,
 null,2,'20050101',0,
 null,null,2,2,
-null,null,null,'/lams/images/icon_noticeboard.swf',
+null,null,null,'/images/icon_noticeboard.swf',
 1,0,1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -367,7 +367,7 @@ values
 1,null,0,0,
 null,5,'20050101',0,
 null,null,5,5,
-null,null,null,'/lams/images/icon_messageboard.swf',
+null,null,null,'/images/icon_messageboard.swf',
 1,0,1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -381,7 +381,7 @@ values
 1,null,0,0,
 null,6,'20050101',0,
 null,null,6,6,
-null,null,null,'/lams/images/icon_survey.swf',
+null,null,null,'/images/icon_survey.swf',
 1,0,1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -395,7 +395,7 @@ values
 1,null,0,0,
 null,7,'20050101',0,
 null,null,7,7,
-null,null,null,'/lams/images/icon_chat.swf',
+null,null,null,'/images/icon_chat.swf',
 1,0,1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -409,7 +409,7 @@ values
 1,null,0,0,
 null,8,'20050101',0,
 null,null,8,8,
-null,null,null,'/lams/images/icon_singleresource.swf',
+null,null,null,'/images/icon_singleresource.swf',
 1,0,1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -423,7 +423,7 @@ values
 1,null,0,0,
 null,9,'20050101',0,
 null,null,9,9,
-null,null,null,'/lams/images/icon_ranking.swf',
+null,null,null,'/images/icon_ranking.swf',
 1,0,1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -437,7 +437,7 @@ values
 1,null,0,0,
 null,10,'20050101',0,
 null,null,10,10,
-null,null,null,'/lams/images/icon_reportsubmission.swf',
+null,null,null,'/images/icon_reportsubmission.swf',
 1,0,1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -511,7 +511,7 @@ values
 1,null,1,0,
 1,1,'20050101',0,
 null,null,1,12,
-null,null,null,'/lams/images/icon_journal.swf',
+null,null,null,'/images/icon_journal.swf',
 1,0,1);
 
 insert into lams_learning_activity
@@ -526,7 +526,7 @@ values
 1,null,0,0,
 1,2,'20050101',0,
 null,null,2,13,
-null,null,null,'/lams/images/icon_noticeboard.swf',
+null,null,null,'/images/icon_noticeboard.swf',
 1,0,1);
 
 insert into lams_learning_activity
@@ -571,7 +571,7 @@ values
 1,100,1,0,
 1,5,'20050101',0,
 null,null,5,16,
-null,null,null,'/lams/images/icon_messageboard.swf',
+null,null,null,'/images/icon_messageboard.swf',
 1,0,1);
 
 insert into lams_learning_activity
@@ -586,7 +586,7 @@ values
 1,null,0,1,
 1,6,'20050101',0,
 null,null,6,17,
-null,null,null,'/lams/images/icon_survey.swf',
+null,null,null,'/images/icon_survey.swf',
 1,0,1);
 
 insert into lams_learning_activity
@@ -619,7 +619,7 @@ null,null,null,
 null,null,
 null,null,
 null,null,
-'/lams/images/icon_chat.swf',
+'/images/icon_chat.swf',
 null,null,
 7,
 2,1,1);
@@ -636,7 +636,7 @@ values
 1,null,0,0,
 1,8,'20050101',0,
 null,null,8,19,
-null,null,null,'/lams/images/icon_singleresource.swf',
+null,null,null,'/images/icon_singleresource.swf',
 1,0,1);
 
 -- Sample GroupingActivity with RandomGrouping 
