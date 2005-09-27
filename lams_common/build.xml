@@ -221,11 +221,28 @@ Ant build file.
 	<!-- ================================================================ -->
 	<target name="lams-jar" depends="compile,compile.test,copyContext" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
+		<delete file="${build.lib}/lams-session.jar"/>
 		<jar jarfile="${build.lib}/${product}.jar">
 			<fileset dir="${build.classes.java}"/>
 			<fileset dir="${conf.hibernate.mapping.dir}"/>
 			<fileset dir="${build.web}"/>
 		</jar>
+		<jar jarfile="${build.lib}/lams-session.jar">
+			<fileset dir="${build.classes.java}">
+				<include name="org/lamsfoundation/lams/web/session/*"/>
+			</fileset>
+		</jar>
+	</target>
+	<!-- ================================================================ -->
+	<!-- copy jar archive of org.lamsfoundation.lams.web.session.* for   -->
+ 	<!-- our own FormAuthenticator. Shared Session Necessary package  	  -->
+	<!-- ================================================================ -->
+	<target name="copy-shared-session-jar" depends="lams-jar" description="creates jar file">
+		<copy overwrite="yes" todir="${jboss.server.instance}/lib/">
+			<fileset dir="${build.lib}/">
+				<include name="lams-session.jar" />
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
