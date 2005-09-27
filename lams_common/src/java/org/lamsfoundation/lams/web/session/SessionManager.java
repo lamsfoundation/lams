@@ -26,10 +26,17 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 import javax.servlet.http.HttpSessionContext;
+
+import net.sf.hibernate.id.UUIDHexGenerator;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.Configuration;
@@ -146,6 +153,97 @@ public class SessionManager{
 	}
 	public void setMonitorPeriod(short monitorPeriod) {
 		this.monitorPeriod = monitorPeriod;
+	}
+
+	/**
+	 * Start a session for current ServletRequest and SerlvetResponse. 
+	 * If session does not exist, then create a new session. If it exists, just using current session.
+	 * 
+	 * @param req
+	 * @param res
+	 */
+	public static void startSession(ServletRequest req, ServletResponse res) {
+		Cookie cookie = findCookie((HttpServletRequest) req,SystemSessionFilter.SYS_SESSION_COOKIE);
+		String currentSessionId = null;
+		if(cookie != null){
+			currentSessionId = cookie.getValue();
+			Object obj = getSession(currentSessionId);
+			//if cookie exist, but session does not. This usually menas seesion expired. 
+			//then delete the cookie first and set it null in order to create a new one
+			if(obj == null){
+				removeCookie((HttpServletResponse) res,SystemSessionFilter.SYS_SESSION_COOKIE);
+				cookie = null;
+			}
+		}
+		//can not be in else!
+		if(cookie == null){
+			//create new session and set it into cookie
+			currentSessionId = (String) new UUIDHexGenerator().generate(null,null);
+			createSession(currentSessionId);
+			cookie = createCookie((HttpServletResponse) res,SystemSessionFilter.SYS_SESSION_COOKIE,currentSessionId);
+		}
+		
+		setCurrentSessionId(currentSessionId);
+		//reset session last access time
+		SessionVisitor sessionVisitor = getSessionVisitor();
+		sessionVisitor.accessed();
+	}
+	/**
+	 * This method will reset current session id, so programs can not use <code>getSession()</code> to get current
+	 * session after this method is called.  
+	 */
+	public static void endSession() {
+		setCurrentSessionId(null);
+	}
+
+	/**
+	 * Find a cookie by given cookie name from request.
+	 * 
+	 * @param req
+	 * @param name The cookie name
+	 * @return The cookie of this name in the request, or null if not found.
+	 */
+	private static Cookie findCookie(HttpServletRequest req, String name)
+	{
+		Cookie[] cookies = req.getCookies();
+		if (cookies != null) {
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies[i].getName().equals(name)) {
+					return cookies[i];
+				}
+			}
+		}
+	
+		return null;
+	}
+	/**
+	 * Remove cookie by given name from request
+	 * @param res
+	 * @param name
+	 * @return the removed cookies
+	 */
+	private  static Cookie removeCookie(HttpServletResponse res, String name){
+		Cookie cookie = new Cookie(name, "");
+		cookie.setPath("/");
+		cookie.setMaxAge(0);
+		res.addCookie(cookie);
+		
+		return cookie;
+	}
+	/**
+	 * Create a new cookie for request.
+	 * @param res
+	 * @param name cookie name
+	 * @param value cookie value
+	 * @return the created cookie.
+	 */
+	private static Cookie createCookie(HttpServletResponse res, String name, String value){
+		Cookie cookie = new Cookie(name, value);
+		cookie.setPath("/");
+		cookie.setMaxAge(-1);
+		res.addCookie(cookie);
+		
+		return cookie;
 	}
 
 	//************************************************************************

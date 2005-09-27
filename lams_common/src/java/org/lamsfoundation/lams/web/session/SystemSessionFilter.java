@@ -28,11 +28,9 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.hibernate.id.UUIDHexGenerator;
 
 /**
  * 
@@ -57,89 +55,16 @@ public class SystemSessionFilter implements Filter {
 			return;
 		}
 		
-		Cookie cookie = findCookie((HttpServletRequest) req,SYS_SESSION_COOKIE);
-		String currentSessionId = null;
-		if(cookie != null){
-			currentSessionId = cookie.getValue();
-			Object obj = SessionManager.getSession(currentSessionId);
-			//if cookie exist, but session does not. This usually menas seesion expired. 
-			//then delete the cookie first and set it null in order to create a new one
-			if(obj == null){
-				removeCookie((HttpServletResponse) res,SYS_SESSION_COOKIE);
-				cookie = null;
-			}
-		}
-		//can not be in else!
-		if(cookie == null){
-			//create new session and set it into cookie
-			currentSessionId = (String) new UUIDHexGenerator().generate(null,null);
-			SessionManager.createSession(currentSessionId);
-			cookie = createCookie((HttpServletResponse) res,SYS_SESSION_COOKIE,currentSessionId);
-		}
-		
-		SessionManager.setCurrentSessionId(currentSessionId);
-		//reset session last access time
-		SessionVisitor sessionVisitor = SessionManager.getSessionVisitor();
-		sessionVisitor.accessed();
+		SessionManager.startSession(req, res);
 		
 		//do following part of chain
 		chain.doFilter(req,res);
 		
-		SessionManager.setCurrentSessionId(null);
+		SessionManager.endSession();
 		
 	}
 
 	public void destroy() {
 		//do nothing
-	}
-
-	/**
-	 * Find a cookie by given cookie name from request.
-	 * 
-	 * @param req
-	 * @param name The cookie name
-	 * @return The cookie of this name in the request, or null if not found.
-	 */
-	private Cookie findCookie(HttpServletRequest req, String name)
-	{
-		Cookie[] cookies = req.getCookies();
-		if (cookies != null) {
-			for (int i = 0; i < cookies.length; i++) {
-				if (cookies[i].getName().equals(name)) {
-					return cookies[i];
-				}
-			}
-		}
-
-		return null;
-	}
-	/**
-	 * Remove cookie by given name from request
-	 * @param res
-	 * @param name
-	 * @return the removed cookies
-	 */
-	private Cookie removeCookie(HttpServletResponse res, String name){
-		Cookie cookie = new Cookie(name, "");
-		cookie.setPath("/");
-		cookie.setMaxAge(0);
-		res.addCookie(cookie);
-		
-		return cookie;
-	}
-	/**
-	 * Create a new cookie for request.
-	 * @param res
-	 * @param name cookie name
-	 * @param value cookie value
-	 * @return the created cookie.
-	 */
-	private Cookie createCookie(HttpServletResponse res, String name, String value){
-		Cookie cookie = new Cookie(name, value);
-		cookie.setPath("/");
-		cookie.setMaxAge(-1);
-		res.addCookie(cookie);
-		
-		return cookie;
 	}
 }

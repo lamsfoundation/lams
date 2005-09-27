@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -52,10 +53,8 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.SharedSession;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-
-import sun.misc.SharedSecrets;
 
 
 /**
@@ -118,7 +117,14 @@ public class MonitoringAction extends DispatchAction {
 							   HttpServletResponse response){
 		Long sessionID =new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_SESSION_ID));
 //		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
-		SharedSession ss = SharedSession.getInstance(getServlet().getServletContext());
+//		Session session = SessionManager.getCurrentSession();
+		System.out.println(request.getRemoteUser());
+		System.out.println(request.getUserPrincipal());
+//		ToolSession toolSession = SessionManager.getCurrentToolSession();
+//		session.setAttribute("TS","from sesson");
+//		toolSession.setAttribute("TTS","from tool session");
+		
+		HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		Long userID = new Long(user.getUserID().longValue());
 		

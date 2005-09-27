@@ -8,3 +8,11 @@
       <param-value>sbmtSessionFactory</param-value>
     </init-param>
    </filter>
+   <!-- System session filter -->
+   <filter>
+       <filter-name>SystemSessionFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.session.SystemSessionFilter
+         </filter-class>
+     </filter>
+   
