@@ -26,7 +26,16 @@ import org.apache.catalina.authenticator.FormAuthenticator;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
-
+/**
+ * This class is special for JBOSS/Tomcat.
+ * 
+ * The resson is JBOSS ignores any Filter if j_security_checks submit. It becomes impossilble to preset the current
+ * session ID to UniversialLoginModule. This class will replace default <code>SystemSessionFilter</code> setting.
+ * 
+ * @author Steve.Ni
+ * 
+ * $version$
+ */
 public class LoginFormAuthenticator extends FormAuthenticator{
 
 	public boolean authenticate(Request request, Response response, LoginConfig config) throws IOException {
