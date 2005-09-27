@@ -210,6 +210,7 @@
 			<fileset dir="${conf.jboss}/">
 				<include name="login-config.xml" />
 				<include name="log4j.xml" />
+				<include name="jboss-service.xml" />
 			</fileset>
 		</copy>
 		<copy overwrite="yes" todir="${lamsconf}">
@@ -232,6 +233,14 @@
 				<include name="jboss-service.xml" />
 			</fileset>
 		</copy>
+		<copy overwrite="yes" todir="${jboss.ear.deploy}/jbossweb-tomcat55.sar/">
+			<fileset dir="${conf.jboss}/tomcat">
+				<include name="server.xml" />
+				<include name="context.xml" />
+			</fileset>
+		</copy>
+		<ant antfile="../${lams_common}/build.xml" target="copy-shared-session-jar" inheritAll="false"/>
+		
 	</target>
 
 	<target name="test-report" description="Run all the test cases across the system. Takes a long time.">
