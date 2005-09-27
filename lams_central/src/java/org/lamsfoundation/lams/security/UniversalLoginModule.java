@@ -9,33 +9,35 @@ package org.lamsfoundation.lams.security;
  *  
  */
 
-import java.security.acl.Group;
 import java.security.Principal;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.login.FailedLoginException;
-
-import javax.naming.NamingException;
-import javax.security.auth.login.LoginException;
-import javax.naming.InitialContext;
-
+import java.security.acl.Group;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.sql.DataSource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.FailedLoginException;
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.context.WebApplicationContext;
+import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.AuthenticationMethodParameter;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
-import org.lamsfoundation.lams.web.SharedSession;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
-import org.lamsfoundation.lams.usermanagement.*;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class UniversalLoginModule extends UsernamePasswordLoginModule {
 	private static Logger log = Logger.getLogger(UniversalLoginModule.class);
@@ -149,8 +151,8 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 				}
 				//if login is valid, register userDTO into session.
 				if(isValid){
-					SharedSession sharedSess = SharedSession.getInstance(HttpSessionManager.getInstance().getServletContext());
-					sharedSess.setAttribute(AttributeNames.USER,user.getUserDTO());					
+					HttpSession sharedsession = SessionManager.getSession(); 
+					sharedsession.setAttribute(AttributeNames.USER,user.getUserDTO());					
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
