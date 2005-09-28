@@ -155,8 +155,7 @@ class org.lamsfoundation.lams.authoring.Application {
         _dictionary.addEventListener('load',Delegate.create(this,onDictionaryLoad));
         _dictionary.load(language);
         
-		//Design Data Model.
-		_ddm = new DesignDataModel();
+		
 		
         //Set reference to StyleManager and load Themes and setup load handler.
         var theme:String = String(_config.getItem('theme'));
@@ -364,10 +363,11 @@ class org.lamsfoundation.lams.authoring.Application {
     }
     
 	/**
+	* get the ddm form the canvas.. this method is here as the ddm used to be stored inthe application.
     * returns the the Design Data Model
     */
     public function getDesignDataModel():DesignDataModel{
-        return _ddm;
+        return  _canvas.ddm;
     }
 	
     /**
