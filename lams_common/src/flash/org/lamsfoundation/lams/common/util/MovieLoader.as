@@ -44,6 +44,22 @@ class MovieLoader {
 		  
 		  
 	  }
+	  
+	 public function onLoadError(loaded_mc:MovieClip,errorCode:String):Void{
+		switch(errorCode){
+			
+			case 'URLNotFound' :
+				Debugger.log('TemplateActivity icon failed to load - URL is not found:'+loaded_mc._url,Debugger.CRITICAL,'onLoadInit','TemplateActivity');	
+				break;
+			case 'LoadNeverCompleted' :
+				Debugger.log('TemplateActivity icon failed to load - Load never completed:'+loaded_mc,Debugger.CRITICAL,'onLoadInit','TemplateActivity');	
+				break;
+		}
+		
+		
+		var myFn = Proxy.create(_scope,_fn,loaded_mc);
+		myFn.call();
+	}
 	
 		
 	
