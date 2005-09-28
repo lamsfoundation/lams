@@ -10,24 +10,8 @@ import org.lamsfoundation.lams.common.util.*
 */
 class org.lamsfoundation.lams.authoring.Activity {
 	
-
-	/**
-	* static final variables indicating the the category of activities
-    *******************************************************************
-	public static final int CATEGORY_SYSTEM = 1;
-	public static final int CATEGORY_COLLABORATION = 2;
-	public static final int CATEGORY_ASSESSMENT = 3;
-	public static final int CATEGORY_CONTENT = 4;
-	public static final int CATEGORY_SPLIT = 5;
-	/******************************************************************/
 	
-	/**
-	 * static final variables indicating the grouping_support of activities
-	 *******************************************************************
-	 public static final int GROUPING_SUPPORT_NONE = 1;
-	 public static final int GROUPING_SUPPORT_OPTIONAL = 2;
-	 public static final int GROUPING_SUPPORT_REQUIRED = 3;
-	/******************************************************************/
+	
 	/*
 	//---------------------------------------------------------------------
     // Class Level Constants
@@ -45,8 +29,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
 	public static var OPTIONS_ACTIVITY_TYPE:Number = 7;
 	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
-	/******************************************************************/
-	
+	/******************************************************************/	
 	/**
 	* static final variables indicating the the category of activities
     *******************************************************************/
@@ -57,9 +40,18 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var CATEGORY_SPLIT:Number = 5;
 	/******************************************************************/
 	
+	
+	/**
+	 * static final variables indicating the grouping_support of activities
+	 *******************************************************************/
+	 public static var GROUPING_SUPPORT_NONE:Number = 1;
+	 public static var GROUPING_SUPPORT_OPTIONAL:Number = 2;
+	 public static var GROUPING_SUPPORT_REQUIRED:Number = 3;
+	/******************************************************************/
+	
 	//Activity Properties:
-	// * indicates required field for constructor
-	    //---------------------------------------------------------------------
+	// * indicates required field
+	//---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
 	
@@ -90,10 +82,10 @@ class org.lamsfoundation.lams.authoring.Activity {
 	
 	private var _title:String;						
 	private var _description:String;				
-	private var _helpText:String;					//*
+	private var _helpText:String;					
 	private var _xCoord:Number;
 	private var _yCoord:Number;
-	private var _libraryActivityUIImage:String;	//*
+	private var _libraryActivityUIImage:String;	
 	private var _applyGrouping:Boolean;
 
 
@@ -102,7 +94,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	private var _defineLater:Boolean;
 	private var _createDateTime:Date;
 
-	private var _groupingSupportType:Number;
+	private var _groupingSupportType:Number; //*
 	
 	
      
@@ -117,18 +109,18 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 * @param   helpText               
 	 * @param   libraryActivityUIImage  
 	 */
-    function Activity(activityUIID:Number, activityTypeID:Number, activityCategoryID:Number, learningLibraryID:Number,libraryActivityUIImage:String){
+    function Activity(activityUIID:Number){
         //assign the values:
-		_objectType = "Activity"; //should be "Activity"
+		
 		_activityUIID = activityUIID;
-		_activityTypeID = activityTypeID;
-		_activityCategoryID = activityCategoryID;
-		_learningLibraryID = learningLibraryID;
-		_libraryActivityUIImage = libraryActivityUIImage;
+		//set default calues
+		_objectType = "Activity"; //should be "Activity"
+		_applyGrouping = false;
+		_runOffline = false;
+		_defineLater = false;
+		_createDateTime = new Date();
 		
-		
-		
-    }
+	}
 	
 	//static class level methods
 	/**
@@ -191,10 +183,10 @@ class org.lamsfoundation.lams.authoring.Activity {
 		dto.yCoord = (_yCoord) ?  _yCoord : Config.NUMERIC_NULL_VALUE;
 		dto.xCoord = (_xCoord) ?  _xCoord : Config.NUMERIC_NULL_VALUE;
 		dto.libraryActivityUIImage = (_libraryActivityUIImage) ?  _libraryActivityUIImage : Config.STRING_NULL_VALUE;
-		dto.applyGrouping= (_applyGrouping) ?  _applyGrouping : Config.BOOLEAN_NULL_VALUE;
-		dto.runOffline= (_runOffline) ?  _runOffline : Config.BOOLEAN_NULL_VALUE;
+		dto.applyGrouping= (_applyGrouping!=null) ?  _applyGrouping : Config.BOOLEAN_NULL_VALUE;
+		dto.runOffline= (_runOffline!=null) ?  _runOffline : Config.BOOLEAN_NULL_VALUE;
 		dto.offlineInstructions = (_offlineInstructions) ?  _offlineInstructions : Config.STRING_NULL_VALUE;
-		dto.defineLater= (_defineLater) ?  _defineLater : Config.BOOLEAN_NULL_VALUE;
+		dto.defineLater= (_defineLater!=null) ?  _defineLater : Config.BOOLEAN_NULL_VALUE;
 		dto.createDateTime= (_createDateTime) ?  _createDateTime : Config.DATE_NULL_VALUE;
 		dto.groupingSupportType = (_groupingSupportType) ?  _groupingSupportType : Config.NUMERIC_NULL_VALUE;
 		return dto;
