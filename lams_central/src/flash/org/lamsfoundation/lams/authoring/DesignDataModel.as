@@ -9,23 +9,28 @@ import org.lamsfoundation.lams.common.*;
 */
 
 class org.lamsfoundation.lams.authoring.DesignDataModel {
-		//State / internal properties
-	private var _currentMaxID:Number;	
+	
+	public static var COPY_TYPE_ID_AUTHORING:Number = 1;
+	public static var COPY_TYPE_ID_RUN:Number = 2;
+	public static var COPY_TYPE_ID_PREVIEW:Number = 3;	
 	//LearningDesign Properties:
 	
 	private var _objectType:String;
+	private var _copyTypeID:Number;
+	
+
 	private var _learningDesignID:Number;
 	private var _uiID:Number;
 	private var _title:String;
 	private var _description:String;
 	private var _helpText:String;
-	private var _version:Number;
+	private var _version:String;
 	
 	private var _userID:Number;
 	private var _workspaceFolderID:Number;
 	private var _createDateTime:Date;
-	private var _readOnlyFlag:Boolean;
-	private var _validDesignFlag:Boolean;
+	private var _readOnly:Boolean;
+	private var _validDesign:Boolean;
 	
 	private var _maxID:Number;
 	private var _firstID:Number;
@@ -43,6 +48,13 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_activities = new Hashtable("_activities");
 		_transitions = new Hashtable("_transitions");
 		
+		//set the defualts:
+		
+		_objectType = "LearningDesign";
+		_copyTypeID = COPY_TYPE_ID_AUTHORING;
+		_version = "1.1_beta";
+		_readOnly = false;
+		_validDesign = false;
 		
     }
 	
@@ -117,8 +129,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_userID = null;
 		_workspaceFolderID = null;
 		_createDateTime = null;
-		_readOnlyFlag = null;
-		_validDesignFlag = null;
+		_readOnly = null;
+		_validDesign = null;
 		
 		_maxID = null;
 		_firstID = null;
@@ -153,8 +165,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_userID = design.user_id;
 		_workspaceFolderID = design.workspace_folder_id;
 		_createDateTime = design.create_date_time;
-		_readOnlyFlag = design.read_only_flag;
-		_validDesignFlag = design.valid_design_flag;
+		_readOnly = design.read_only_flag;
+		_validDesign = design.valid_design_flag;
 		
 		_maxID = design.max_id;
 		_firstID = design.first_id;
@@ -176,25 +188,68 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		return success;
 	}
 	
+	private function prepareDesignForSaving():Void{
+		
+		//set create date time to now
+		_createDateTime = new Date();
+		//validate and set field
+		_validDesign = validate();
+		if(_validDesign){
+			//set first ID
+			
+		}
+		
+		
+		
+	}
+	
+	public function getDesignForSaving():Object{
+		prepareDesignForSaving();
+		return toData();
+	}
+	
 	public function toData():Object{
 		var design:Object = new Object();
 		
+		//if null, use default
 		
+		//TODO: get this sorted - query string
+		Debugger.log('1 UserID:'+_userID,Debugger.GEN,'toData','DesignDataModel');
+		//design.userID = (_userID) ? _userID : 123;
+		if(_userID == undefined){
+			_userID = 4;
+		}
+		
+		if(_copyTypeID == undefined){
+			_copyTypeID = COPY_TYPE_ID_AUTHORING;
+		}
+		
+		
+		
+		Debugger.log('2 UserID:'+_userID,Debugger.GEN,'toData','DesignDataModel');
+		//denull
+		Debugger.log('1 _objectType:'+_objectType,Debugger.GEN,'toData','DesignDataModel');
 		design.objectType = (_objectType) ? _objectType : Config.STRING_NULL_VALUE;
+		design.copyTypeID = (_copyTypeID) ? _copyTypeID : Config.NUMERIC_NULL_VALUE;
 		design.learningDesignID = (_learningDesignID) ? _learningDesignID : Config.NUMERIC_NULL_VALUE;
 		design.uiID = (_uiID) ? _uiID: Config.NUMERIC_NULL_VALUE;
 		design.title = _title ? _title : Config.STRING_NULL_VALUE;
 		design.description = (_description) ? _description : Config.STRING_NULL_VALUE;
 		design.helpText = (_helpText) ? _helpText : Config.STRING_NULL_VALUE;
-		design.version = (_version) ? _version : Config.NUMERIC_NULL_VALUE;
+		design.version = (_version) ? _version : Config.STRING_NULL_VALUE;
+		
 		design.userID = (_userID) ? _userID : Config.NUMERIC_NULL_VALUE;
 		design.workspaceFolderID = (_workspaceFolderID) ? _workspaceFolderID : Config.NUMERIC_NULL_VALUE;
 		design.createDateTime = (_createDateTime) ? _createDateTime : Config.DATE_NULL_VALUE;
-		design.readOnlyFlag = (_readOnlyFlag) ? _readOnlyFlag : Config.BOOLEAN_NULL_VALUE;
-		design.validDesignFlag = _validDesignFlag ? _validDesignFlag : Config.BOOLEAN_NULL_VALUE;
+		design.readOnly = (_readOnly!=null) ? _readOnly : Config.BOOLEAN_NULL_VALUE;
+		design.validDesign = (_validDesign!=null) ? _validDesign : Config.BOOLEAN_NULL_VALUE;
 		design.maxID = (_maxID) ? _maxID : Config.NUMERIC_NULL_VALUE;
 		design.firstID = (_firstID) ? _firstID : Config.NUMERIC_NULL_VALUE;
 		
+		
+		Debugger.log('3 design.userID:'+design.userID,Debugger.GEN,'toData','DesignDataModel');
+		Debugger.log('1 design.objectType:'+design.objectType,Debugger.GEN,'toData','DesignDataModel');
+		Debugger.log('1 design.copyTypeID:'+design.copyTypeID,Debugger.GEN,'toData','DesignDataModel');
 		
 		
 		var classActs:Array = _activities.values();
@@ -233,12 +288,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function newUIID():Number{
 		//if this is the first time then initialise to 1
-		if(_currentMaxID == null){
-			_currentMaxID = 0;
+		if(_maxID == null){
+			_maxID = 0;
 		}
 		//add one for a new ID
-		_currentMaxID++;
-		return _currentMaxID;
+		_maxID++;
+		return _maxID;
 	}
 	
 	
@@ -290,11 +345,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function set helpText(a:String):Void{
 		_helpText = a;
-	}	public function get version():Number{
+	}	public function get version():String{
 		return _version;
 	}
 	
-	public function set version(a:Number):Void{
+	public function set version(a:String):Void{
 		_version = a;
 	}
 	
@@ -322,20 +377,20 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_createDateTime = a;
 	}
 	
-	public function get readOnlyFlag():Boolean{
-		return _readOnlyFlag;
+	public function get readOnly():Boolean{
+		return _readOnly;
 	}
 	
-	public function set readOnlyFlag(a:Boolean):Void{
-		_readOnlyFlag = a;
+	public function set readOnly(a:Boolean):Void{
+		_readOnly = a;
 	}
 	
-	public function get validDesignFlag():Boolean{
-		return _validDesignFlag;
+	public function get validDesign():Boolean{
+		return _validDesign;
 	}
 	
-	public function set validDesignFlag(a:Boolean):Void{
-		_validDesignFlag = a;
+	public function set validDesign(a:Boolean):Void{
+		_validDesign = a;
 	}
 	
 	public function get maxID():Number{
@@ -365,7 +420,24 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function set transitions(a:Hashtable):Void{
 		_transitions = a;
 	}
-
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newcopyTypeID 
+	 * @return  
+	 */
+	public function set copyTypeID (newcopyTypeID:Number):Void {
+		_copyTypeID = newcopyTypeID;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get copyTypeID ():Number {
+		return _copyTypeID;
+	}
 	
 	
 	
