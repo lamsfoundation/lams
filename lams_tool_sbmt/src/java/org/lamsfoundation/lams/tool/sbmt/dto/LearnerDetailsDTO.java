@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+
 /**
  * @author Manpreet Minhas
  * @serial 5900249986365640342L
@@ -18,9 +20,11 @@ public class LearnerDetailsDTO implements Serializable{
 	
 	private static final long serialVersionUID = 5900249986365640342L;
 	private Long toolSessionID;
-
-	private Long userID;
-	private String userName;
+	
+	//learner personal info dto
+	private UserDTO userDto;
+	
+	//learner uploaded file info
 	private String fileName;
 	private String fileDescription;
 	private String comments;	
@@ -156,18 +160,7 @@ public class LearnerDetailsDTO implements Serializable{
 	public void setToolSessionID(Long toolSessionID) {
 		this.toolSessionID = toolSessionID;
 	}
-	/**
-	 * @return Returns the userID.
-	 */
-	public Long getUserID() {
-		return userID;
-	}
-	/**
-	 * @param userID The userID to set.
-	 */
-	public void setUserID(Long userID) {
-		this.userID = userID;
-	}
+
 	/**
 	 * @return Returns the filesUploaded.
 	 */
@@ -192,16 +185,11 @@ public class LearnerDetailsDTO implements Serializable{
 	public void setLocked(boolean locked) {
 		this.locked = locked;
 	}
-	/**
-	 * @return Returns the userName.
-	 */
-	public String getUserName() {
-		return userName;
+
+	public UserDTO getUserDto() {
+		return userDto;
 	}
-	/**
-	 * @param userName The userName to set.
-	 */
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUserDto(UserDTO userDto) {
+		this.userDto = userDto;
 	}
 }

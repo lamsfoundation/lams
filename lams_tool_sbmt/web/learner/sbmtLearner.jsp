@@ -13,7 +13,7 @@
 	function finish(){
 		var lockOnFinished = <c:out value="${learner.contentLockOnFinished}"/>;
 		var uploadFileNum = <c:choose><c:when test="${empty learner.filesUploaded}">0</c:when><c:otherwise>1</c:otherwise></c:choose>;
-		var finishUrl= "<html:rewrite page='/learner.do?method=finish&toolSessionID=${learner.toolSessionID}&userID=${learner.userID}'/>";
+		var finishUrl= "<html:rewrite page='/learner.do?method=finish&toolSessionID=${learner.toolSessionID}'/>";
 		if(lockOnFinished && uploadFileNum==0){
 			if(confirm("<fmt:message key='learner.finish.without.upload'/>"))
 				location.href= finishUrl;
@@ -102,7 +102,6 @@
       <table class="forms">
       	<!-- Hidden fields -->
       	<html:hidden property="toolSessionID" value="${learner.toolSessionID}"/>
-      	<html:hidden property="userID" value ="${learner.userID}"/>
       	
       	<!--File path row -->
         <tr>
