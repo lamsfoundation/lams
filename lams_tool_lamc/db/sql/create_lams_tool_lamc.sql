@@ -1,99 +1,94 @@
-CREATE TABLE tl_laqa11_content (
-       qa_content_id BIGINT(20) NOT NULL
-     , title VARCHAR(250) NOT NULL DEFAULT 'Questions and Answers'
-     , instructions VARCHAR(250) NOT NULL DEFAULT 'Please, take a minute to answer the following questions.'
+CREATE TABLE lams.tl_lamc11_content (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , qa_content_id BIGINT(20) NOT NULL
+     , title VARCHAR(250) NOT NULL DEFAULT 'Multiple Choice'
+     , instructions VARCHAR(250) NOT NULL DEFAULT 'Please answer the questions until you reach the passmark.'
      , creation_date VARCHAR(100)
      , update_date DATETIME
-     , questions_sequenced TINYINT(1) NOT NULL
+     , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
      , username_visible TINYINT(1) NOT NULL DEFAULT 0
-     , monitoring_report_title VARCHAR(100) DEFAULT 'Combined Learner Results'
-     , report_title VARCHAR(100) DEFAULT 'Report'
      , created_by BIGINT(20) NOT NULL DEFAULT 0
-     , run_offline TINYINT(1) DEFAULT 0
+     , monitoring_report_title VARCHAR(100) NOT NULL DEFAULT 'Combined Learner Results'
+     , report_title VARCHAR(100) NOT NULL DEFAULT 'Multiple Choice'
+     , run_offline TINYINT(1) NOT NULL DEFAULT 0
      , define_later TINYINT(1) NOT NULL DEFAULT 0
      , synch_in_monitor TINYINT(1) NOT NULL DEFAULT 0
-     , offline_instructions VARCHAR(250) DEFAULT 'offline instructions'
-     , online_instructions VARCHAR(250) DEFAULT 'online instructions'
-     , end_learning_message VARCHAR(150) DEFAULT 'Thank you!'
-     , content_locked TINYINT(1) DEFAULT 0
-     , PRIMARY KEY (qa_content_id)
+     , offline_instructions VARCHAR(250) NOT NULL DEFAULT 'offline instructions'
+     , online_instructions VARCHAR(250) NOT NULL DEFAULT 'online instructions'
+     , end_learning_message VARCHAR(150) NOT NULL DEFAULT 'Thank you!'
+     , content_in_use TINYINT(1) NOT NULL DEFAULT 0
+     , pass_mark INTEGER
+     , show_feedback TINYINT(1) NOT NULL DEFAULT 0
+     , show_top_users TINYINT(1) NOT NULL DEFAULT 0
+     , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE tl_laqa11_session (
-       qa_session_id BIGINT(20) NOT NULL
+CREATE TABLE lams.tl_lamc11_session (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , qa_session_id BIGINT(20) NOT NULL
      , session_start_date DATETIME
      , session_end_date DATETIME
      , session_status VARCHAR(100)
      , qa_content_id BIGINT(20) NOT NULL
-     , PRIMARY KEY (qa_session_id)
+     , PRIMARY KEY (uid)
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_session_1 FOREIGN KEY (qa_content_id)
-                  REFERENCES lams.tl_laqa11_content (qa_content_id)
+                  REFERENCES lams.tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE tl_laqa11_que_usr (
-       que_usr_id BIGINT(20) NOT NULL
+CREATE TABLE lams.tl_lamc11_que_usr (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , que_usr_id BIGINT(20) NOT NULL
      , username VARCHAR(100)
      , qa_session_id BIGINT(20) NOT NULL
      , fullname VARCHAR(100)
-     , PRIMARY KEY (que_usr_id)
+     , PRIMARY KEY (uid)
      , INDEX (qa_session_id)
-     , CONSTRAINT FK_tl_laqa11_que_usr_2 FOREIGN KEY (qa_session_id)
-                  REFERENCES lams.tl_laqa11_session (qa_session_id)
+     , CONSTRAINT FK_tl_laqa11_que_usr_1 FOREIGN KEY (qa_session_id)
+                  REFERENCES lams.tl_lamc11_session (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE tl_laqa11_que_content (
-       qa_que_content_id BIGINT(20) NOT NULL
+CREATE TABLE lams.tl_lamc11_que_content (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , qa_que_content_id BIGINT(20) NOT NULL
      , question VARCHAR(255)
      , display_order INT(5)
      , qa_content_id BIGINT(20) NOT NULL
-     , PRIMARY KEY (qa_que_content_id)
+     , PRIMARY KEY (uid)
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_que_content_1 FOREIGN KEY (qa_content_id)
-                  REFERENCES lams.tl_laqa11_content (qa_content_id)
+                  REFERENCES lams.tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE tl_laqa11_usr_resp (
-       response_id BIGINT(20) NOT NULL
-     , hidden TINYINT(1) DEFAULT 0
-     , answer VARCHAR(255)
-     , time_zone VARCHAR(255)
-     , attempt_time DATETIME
+CREATE TABLE lams.tl_lamc11_options_content (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , qa_que_option_id BIGINT(20) NOT NULL
+     , correct_option TINYINT(1) NOT NULL DEFAULT 0
+     , qa_que_content_id BIGINT(20) NOT NULL
+     , qa_que_option_text VARCHAR(250)
+     , PRIMARY KEY (uid)
+     , INDEX (qa_que_content_id)
+     , CONSTRAINT FK_tl_laqa11_options_content_1 FOREIGN KEY (qa_que_content_id)
+                  REFERENCES lams.tl_lamc11_que_content (uid)
+)TYPE=InnoDB;
+
+CREATE TABLE lams.tl_lamc11_usr_attempt (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , attempt_id BIGINT(20) NOT NULL
      , que_usr_id BIGINT(20) NOT NULL
      , qa_que_content_id BIGINT(20) NOT NULL
-     , PRIMARY KEY (response_id)
-     , INDEX (qa_que_content_id)
-     , CONSTRAINT FK_tl_laqa11_usr_resp_2 FOREIGN KEY (qa_que_content_id)
-                  REFERENCES lams.tl_laqa11_que_content (qa_que_content_id)
+     , qa_que_option_id BIGINT(20) NOT NULL
+     , attempt_time DATETIME
+     , time_zone VARCHAR(255)
+     , PRIMARY KEY (uid)
      , INDEX (que_usr_id)
-     , CONSTRAINT FK_tl_laqa11_usr_resp_3 FOREIGN KEY (que_usr_id)
-                  REFERENCES lams.tl_laqa11_que_usr (que_usr_id)
+     , CONSTRAINT FK_tl_lamc11_usr_attempt_3 FOREIGN KEY (que_usr_id)
+                  REFERENCES lams.tl_lamc11_que_usr (uid)
+     , INDEX (qa_que_content_id)
+     , CONSTRAINT FK_tl_lamc11_usr_attempt_2 FOREIGN KEY (qa_que_content_id)
+                  REFERENCES lams.tl_lamc11_que_content (uid)
+     , INDEX (qa_que_option_id)
+     , CONSTRAINT FK_tl_lamc11_usr_attempt_4 FOREIGN KEY (qa_que_option_id)
+                  REFERENCES lams.tl_lamc11_options_content (uid)
 )TYPE=InnoDB;
-
-CREATE TABLE tl_laqa11_uploadedFile (
-       submissionId BIGINT(20) NOT NULL AUTO_INCREMENT
-     , uuid VARCHAR(255) NOT NULL
-     , isOnline_File TINYINT(1) NOT NULL
-     , filename VARCHAR(255) NOT NULL
-     , qa_content_id BIGINT(20) NOT NULL
-     , PRIMARY KEY (submissionId)
-     , INDEX (qa_content_id)
-     , CONSTRAINT FK_tl_laqa11_que_content_1_1 FOREIGN KEY (qa_content_id)
-                  REFERENCES lams.tl_laqa11_content (qa_content_id)
-)TYPE=InnoDB;
-
-
-
--- data for content table
-INSERT INTO tl_laqa11_content (qa_content_id, 
-								creation_date
-								) 
-VALUES (${default_content_id},
-		NOW());
-
-
--- data for content questions table
-INSERT INTO tl_laqa11_que_content (question, 
-									display_order, 
-									qa_content_id) VALUES ('What is the capital of Russia?',1,${default_content_id});
 

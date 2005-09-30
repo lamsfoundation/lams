@@ -1,7 +1,14 @@
 
-DROP TABLE IF EXISTS tl_laqa11_usr_resp;
-DROP TABLE IF EXISTS tl_laqa11_que_usr;
-DROP TABLE IF EXISTS tl_laqa11_que_content;
-DROP TABLE IF EXISTS tl_laqa11_session;
-DROP TABLE IF EXISTS tl_laqa11_uploadedFile;
-DROP TABLE IF EXISTS tl_laqa11_content;
+DROP TABLE lams.tl_lamc11_usr_attempt;
+DROP TABLE lams.tl_lamc11_options_content;
+DROP TABLE lams.tl_lamc11_que_content;
+DROP TABLE lams.tl_lamc11_que_usr;
+DROP TABLE lams.tl_lamc11_session;
+DROP TABLE lams.tl_lamc11_content;
+
+
+
+
+
+
+
