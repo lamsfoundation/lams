@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -27,6 +28,9 @@ import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
@@ -155,9 +159,11 @@ public class LearningUtil implements QaAppConstants{
     	IQaService qaService =QaUtils.getToolService(request);
         logger.debug("createUsers-retrieving qaService: " + qaService);
         
-        User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
+	    HttpSession ss = SessionManager.getSession();
+	    //get back login user DTO
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
     	logger.debug("retrieving toolUser: " + toolUser);
-    	logger.debug("retrieving toolUser userId: " + toolUser.getUserId());
+    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
     	logger.debug("retrieving toolUser username: " + toolUser.getLogin());
     	/**
     	 * !!double check this!!
@@ -166,7 +172,7 @@ public class LearningUtil implements QaAppConstants{
     	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
     	logger.debug("retrieving toolUser fullname: " + fullName);
     	
-    	Long userId=new Long(toolUser.getUserId().longValue());
+    	Long userId=new Long(toolUser.getUserID().longValue());
     	
         /**
          * retrive contentId from the http session
@@ -448,7 +454,9 @@ public class LearningUtil implements QaAppConstants{
     		/**
         	 * find out whos is the current user. Important to know for reporting responses in learning mode 
         	 */
-        	User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
+    	    HttpSession ss = SessionManager.getSession();
+    	    //get back login user DTO
+    	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
         	logger.debug("retrieving toolUser: " + toolUser + " userName: " + toolUser.getLogin());
         	/**
         	 * !!double check if String userName=toolUser.getLogin(); 

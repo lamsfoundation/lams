@@ -99,7 +99,6 @@ public interface QaAppConstants {
     public static final String IS_USERNAME_VISIBLE_MONITORING			="isUsernameVisibleMonitoring";
     public static final String IS_SYNCH_INMONITOR_MONITORING			="isSynchInMonitorMonitoring";
     public static final String IS_QUESTIONS_SEQUENCED_MONITORING		="isQuestionsSequencedMonitoring";
-    public static final String USER_ID									="userId";
     public static final String RICHTEXT_OFFLINEINSTRUCTIONS				="richTextOfflineInstructions";
     public static final String RICHTEXT_ONLINEINSTRUCTIONS				="richTextOnlineInstructions";
     public static final String RICHTEXT_TITLE							="richTextTitle";
@@ -265,17 +264,7 @@ public interface QaAppConstants {
     public static final String FEEDBACK_TYPE_SEQUENTIAL					="You will be presented a total of : ";
     public static final String FEEDBACK_TYPE_COMBINED					="You are being presented a total of : ";
     public static final String QUESTIONS								=" questions.";
-    /**
-     * refers to current tool user whether an author or a learner
-     */
-    public static final String TOOL_USER 								="toolUser";
-    /**
-     * these indicate current user's reporting data
-     */
-    public static final String CURRENT_TOOL_USER_FULLNAME 				="currentToolUserFullname";
-    public static final String CURRENT_TOOL_USER_ATTEMPTTIME 			="currentToolUserAttemptTime";
-    public static final String CURRENT_TOOL_USER_ANSWER 				="currentToolUserAnswer";
-    
+
     /**
      * constants redundant for the moment
      */

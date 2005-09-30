@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -51,6 +52,9 @@ import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class QaExportPortfolioStarterAction extends Action implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaExportPortfolioStarterAction.class.getName());
@@ -81,32 +85,17 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 	     * obtain and setup the current user's data 
 	     */
 
-	    String userId="";
-		userId=request.getParameter(USER_ID);
-		logger.debug("userId: " + userId);
-	    try
-		{
-	    	User user=QaUtils.createSimpleUser(new Integer(userId));
-	    	request.getSession().setAttribute(TOOL_USER, user);
-		}
-	    catch(NumberFormatException e)
-		{
-	    	persistError(request,"error.userId.notNumeric");
-			request.setAttribute(USER_EXCEPTION_USERID_NOTNUMERIC, new Boolean(true));
-			logger.debug("forwarding to: " + PORTFOLIO_REPORT);
-			return (mapping.findForward(PORTFOLIO_REPORT));
-		}
-		
-	    
-	    if ((userId == null) || (userId.length()==0))
-		{
+	    //get session from shared session.
+	    HttpSession ss = SessionManager.getSession();
+	    //get back login user DTO
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if ((user == null) || (user.getUserID() == null))
+	    {
 	    	logger.debug("error: The tool expects userId");
-	    	persistError(request,"error.userId.required");
+	    	persistError(request,"error.authoringUser.notAvailable");
 	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-			logger.debug("forwarding to: " + PORTFOLIO_REPORT);
-			return (mapping.findForward(PORTFOLIO_REPORT));
-		}
-		logger.debug("TOOL_USER is:" + request.getSession().getAttribute(TOOL_USER));
+	    	return (mapping.findForward(LOAD_QUESTIONS));
+	    }
 		
 		String mode="";
 		mode=request.getParameter(MODE);
@@ -216,7 +205,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		}
 	
 		/**
-			at this point we have session attributes TOOL_CONTENT_ID, TOOL_SESSION_ID and TOOL_USER AND MODE ready to use  
+			at this point we have session attributes TOOL_CONTENT_ID, TOOL_SESSION_ID AND MODE ready to use  
 		*/
 	
 		mode=(String)request.getSession().getAttribute(MODE);
@@ -241,11 +230,10 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		    logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
 		    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(qaContent.isUsernameVisible()));
 		    
-		    logger.debug("TOOL_USER is:" + request.getSession().getAttribute(TOOL_USER));
-		    User toolUser= (User)request.getSession().getAttribute(TOOL_USER);
-		    logger.debug("TOOL_USER id:" + toolUser.getUserId());
+		    logger.debug("TOOL USER is:" + user);
+		    logger.debug("TOOL USER id:" + user.getUserID());
 		    
-		    QaQueUsr qaQueUsr=qaService.loadQaQueUsr(new Long(toolUser.getUserId().longValue()));
+		    QaQueUsr qaQueUsr=qaService.loadQaQueUsr(new Long(user.getUserID().longValue()));
 		    logger.debug("qaQueUsr:" + qaQueUsr);
 		    
 		    if (qaQueUsr != null)

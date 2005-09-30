@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -42,6 +43,9 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -562,7 +566,9 @@ public class QAction extends DispatchAction implements QaAppConstants
             	 */
             	
                 Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
-                User user=(User)request.getSession().getAttribute(TOOL_USER);
+        	    HttpSession ss = SessionManager.getSession();
+        	    //get back login user DTO
+        	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
                 logger.debug("simulating container behaviour by calling  " +
 							 "leaveToolSession() with toolSessionId: " +  toolSessionId + " and user: " + user);
                 

@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -49,6 +50,9 @@ import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class QaMonitoringStarterAction extends Action implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaMonitoringStarterAction.class.getName());
@@ -84,37 +88,21 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    /**
 	     * obtain and setup the current user's data 
 	     */
-
-	    String userId="";
-	    User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
-	    if (toolUser != null)
-	    	userId=toolUser.getUserId().toString();
-		else
-		{
-			userId=request.getParameter(USER_ID);
-		    try
-			{
-		    	User user=QaUtils.createSimpleUser(new Integer(userId));
-		    	request.getSession().setAttribute(TOOL_USER, user);
-			}
-		    catch(NumberFormatException e)
-			{
-		    	persistError(request,"error.userId.notNumeric");
-				request.setAttribute(USER_EXCEPTION_USERID_NOTNUMERIC, new Boolean(true));
-				logger.debug("forwarding to: " + MONITORING_REPORT);
-				return (mapping.findForward(MONITORING_REPORT));
-			}
-		}
-	    
-	    if ((userId == null) || (userId.length()==0))
-		{
+	    String userId = "";
+	    //get session from shared session.
+	    HttpSession ss = SessionManager.getSession();
+	    //get back login user DTO
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if ((user == null) || (user.getUserID() == null))
+	    {
 	    	logger.debug("error: The tool expects userId");
 	    	persistError(request,"error.authoringUser.notAvailable");
 	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-			logger.debug("forwarding to: " + MONITORING_REPORT);
-			return (mapping.findForward(MONITORING_REPORT));
-		}
-		logger.debug("TOOL_USER is:" + request.getSession().getAttribute(TOOL_USER));
+	    	return (mapping.findForward(LOAD_QUESTIONS));
+	    }else
+	    	userId = user.getUserID().toString();
+		
+		logger.debug("TOOL_USER is:" + user);
 		
 		String toolContentId=request.getParameter(TOOL_CONTENT_ID);
 	    logger.debug("TOOL_CONTENT_ID: " + toolContentId);

@@ -21,6 +21,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
@@ -28,12 +29,14 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
  * 
- * The session attributes ATTR_USERDATA and TOOL_USER refer to the same User object.
- * TOOL_USER is the one we consistently use across the application to obtain current user data.
+ * The session attributes ATTR_USERDATA refer to the same User object.
  * 
  * Verify the assumption:
  * We make the assumption that the obtained User object will habe a userId property ready in it. 
@@ -143,13 +146,9 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(CHECK_ALL_SESSIONS_COMPLETED);
 		request.getSession().removeAttribute(TOOL_CONTENT_ID);
 		request.getSession().removeAttribute(ATTR_USERDATA);
-		request.getSession().removeAttribute(TOOL_USER);
 		request.getSession().removeAttribute(TOOL_SERVICE);
 		request.getSession().removeAttribute(TARGET_MODE);
-		
-		request.getSession().removeAttribute(CURRENT_TOOL_USER_FULLNAME);
-		request.getSession().removeAttribute(CURRENT_TOOL_USER_ATTEMPTTIME);
-		request.getSession().removeAttribute(CURRENT_TOOL_USER_ANSWER);
+
     }
 
     public static void setDefaultSessionAttributes(HttpServletRequest request, QaContent defaultQaContent, QaAuthoringForm qaAuthoringForm)
@@ -222,9 +221,11 @@ public abstract class QaUtils implements QaAppConstants {
 
 	public static int getCurrentUserId(HttpServletRequest request) throws QaApplicationException
     {
-		User user=(User) request.getSession().getAttribute(TOOL_USER);
-		logger.debug(logger + " " + "QaUtils" +  " Current user is: " + user + " with id: " + user.getUserId());
-		return user.getUserId().intValue();
+	    HttpSession ss = SessionManager.getSession();
+	    //get back login user DTO
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		logger.debug(logger + " " + "QaUtils" +  " Current user is: " + user + " with id: " + user.getUserID());
+		return user.getUserID().intValue();
     }
 	
 	

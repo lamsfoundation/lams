@@ -15,6 +15,7 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -27,6 +28,9 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
@@ -351,12 +355,14 @@ public class AuthoringUtil implements QaAppConstants {
     	
     		
     	/**obtain user object from the session*/
-    	User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
+	    HttpSession ss = SessionManager.getSession();
+	    //get back login user DTO
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
     	logger.debug("retrieving toolUser: " + toolUser);
-    	logger.debug("retrieving toolUser userId: " + toolUser.getUserId());
+    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
     	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
     	logger.debug("retrieving toolUser fullname: " + fullName);
-    	long userId=toolUser.getUserId().longValue();
+    	long userId=toolUser.getUserID().longValue();
     	
     	/** create a new qa content and leave the default content intact*/
     	QaContent qa = new QaContent();

@@ -80,7 +80,6 @@ public class MonitoringUtil implements QaAppConstants{
 		request.getSession().removeAttribute(CHECK_ALL_SESSIONS_COMPLETED);
 		request.getSession().removeAttribute(TOOL_CONTENT_ID);
 		request.getSession().removeAttribute(ATTR_USERDATA);
-		request.getSession().removeAttribute(TOOL_USER);
 		request.getSession().removeAttribute(TOOL_SERVICE);
 		request.getSession().removeAttribute(TARGET_MODE);
 	}

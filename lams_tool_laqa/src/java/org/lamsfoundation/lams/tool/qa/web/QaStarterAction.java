@@ -76,6 +76,7 @@ import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -94,6 +95,9 @@ import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 public class QaStarterAction extends Action implements QaAppConstants {
@@ -145,35 +149,17 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    /**
 	     * obtain and setup the current user's data 
 	     */
-	    String userId="";
-	    User toolUser=(User)request.getSession().getAttribute(TOOL_USER);
-	    if (toolUser != null)
-	    	userId=toolUser.getUserId().toString();
-		else
-		{
-			userId=request.getParameter(USER_ID);
-			if ((userId == null) || (userId.length()==0))
-			{
-		    	logger.debug("error: The tool expects userId");
-		    	persistError(request,"error.authoringUser.notAvailable");
-		    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
-			
-		    try
-			{
-		    	/* Check QaUtils.createAuthoringUser again User Management Service is ready */
-		    	User user=QaUtils.createSimpleUser(new Integer(userId)); 
-		    	request.getSession().setAttribute(TOOL_USER, user);
-			}
-		    catch(NumberFormatException e)
-			{
-		    	persistError(request,"error.userId.notNumeric");
-				request.setAttribute(USER_EXCEPTION_USERID_NOTNUMERIC, new Boolean(true));
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
-		}
-		
+	    //get session from shared session.
+	    HttpSession ss = SessionManager.getSession();
+	    //get back login user DTO
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if ((user == null) || (user.getUserID() == null))
+	    {
+	    	logger.debug("error: The tool expects userId");
+	    	persistError(request,"error.authoringUser.notAvailable");
+	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
+	    	return (mapping.findForward(LOAD_QUESTIONS));
+	    }
 		
 		/**
 		 * retrieve the default content id based on tool signature
