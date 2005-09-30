@@ -23,7 +23,7 @@ package org.lamsfoundation.lams.web.session;
  * Provide some internal method to access session private values.
  *  
  * @author Steve.Ni
- * $version$
+ * @version $Revision$
  */
 interface SessionVisitor {
 	/**

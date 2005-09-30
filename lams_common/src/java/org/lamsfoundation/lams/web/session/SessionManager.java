@@ -47,7 +47,7 @@ import EDU.oswego.cs.dl.util.concurrent.ConcurrentReaderHashMap;
  * 
  * @author Steve.Ni
  * 
- * $version$
+ * @version $Revision$
  */
 public class SessionManager{
 

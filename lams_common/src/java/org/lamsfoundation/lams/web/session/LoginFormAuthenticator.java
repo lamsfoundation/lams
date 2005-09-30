@@ -34,14 +34,22 @@ import org.apache.catalina.deploy.LoginConfig;
  * 
  * @author Steve.Ni
  * 
- * $version$
+ * @version $Revision$
  */
 public class LoginFormAuthenticator extends FormAuthenticator{
 
 	public boolean authenticate(Request request, Response response, LoginConfig config) throws IOException {
-		SessionManager.startSession(request,response);
-		boolean result = super.authenticate(request, response, config);
-		SessionManager.endSession();
+		String uri = request.getRequestURI();
+		boolean result;
+		//only when URI is j_security_check, execute the shared session initialize. 
+		//Otherwise, the shared session initializtion will run in Filter.
+		if(uri.endsWith("j_security_check")){
+			SessionManager.startSession(request,response);
+			result = super.authenticate(request, response, config);
+			SessionManager.endSession();
+		}else
+			result = super.authenticate(request, response, config);
+			
 		return result;
 	}
 

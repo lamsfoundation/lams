@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Steve.Ni
  * 
- * $version$
+ * @version $Revision$
  */
 public class SystemSessionFilter implements Filter {
 	
