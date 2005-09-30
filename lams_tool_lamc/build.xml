@@ -84,9 +84,9 @@
 		     </fail>
 	   </target>
 	<!-- =================================================================== -->
-	<!-- Run Middlegen For LearningDesign                                                       -->
+	<!-- Run Middlegen For mc                                                       -->
 	<!-- =================================================================== -->
-		<target name="middlegen" description="Run Middlegen For Submit Fiiles Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
+		<target name="middlegen" description="Run Middlegen For mc Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
 			<taskdef name="middlegen" classname="middlegen.MiddlegenTask" classpathref="all-libs" />
 			
 			<middlegen appname="lams_tool_lamc11" 
@@ -105,10 +105,12 @@
 						   javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
 				/>
 				
-				<table name="tl_lasbmt11_content"/>
-				<table name="tl_lasbmt11_report"/>
-				<table name="tl_lasbmt11_session"/>
-				<table name="tl_lasbmt11_submission_details"/>
+				<table name="tl_lamc11_content"/>
+				<table name="tl_lamc11_session"/>
+				<table name="tl_lamc11_que_usr"/>
+				<table name="tl_lamc11_que_content"/>
+				<table name="tl_lamc11_options_content"/>
+				<table name="tl_lamc11_usr_attempt"/>				
 			</middlegen>
 
 		</target>
