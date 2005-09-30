@@ -151,6 +151,7 @@
 				<include name="images/**"/>
 				<include name="fckeditor/**"/>
 				<include name="development/**"/>
+				<include name="flashxml/**"/>
 				<exclude name="lams_example_tool"/>
 			</fileset>
 		</war>
