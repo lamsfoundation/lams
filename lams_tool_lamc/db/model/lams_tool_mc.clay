@@ -88,7 +88,7 @@
 </table>
 <table name="tl_laqa11_content" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="96" y="408" width="209" height="364"/>
+<table-figure-bounds x="96" y="391" width="203" height="304"/>
 <column-list>
 <column name="uid" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="true">
 <column-description/>
@@ -475,7 +475,7 @@
 <table-description/>
 <table-figure-bounds x="930" y="73" width="206" height="125"/>
 <column-list>
-<column name="uid" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="false">
+<column name="uid" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="true">
 <column-description/>
 <data-type name="BIGINT" jdbc-type="-5" selected-variant-pattern="BIGINT(%n)">
 <variant type-name-pattern="BIGINT"/>
