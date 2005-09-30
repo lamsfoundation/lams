@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<class 
+    name="org.lamsfoundation.lams.tool.qa.QaSession" 
+    table="tl_laqa11_session"
+	dynamic-update="false"
+    dynamic-insert="false"
+    select-before-update="false"
+    optimistic-lock="version"
+>
+    <id
+        name="qaSessionId"
+        type="java.lang.Long"
+        column="qa_session_id"
+    >
+		    <generator class="assigned"/>
+    </id>
+
+    <property
+        name="session_start_date"
+        type="java.util.Date"
+        update="true"
+        insert="true"
+        access="property"
+        column="session_start_date"
+        length="10"
+    />
+    
+    <property
+        name="session_end_date"
+        type="java.util.Date"
+        update="true"
+        insert="true"
+        access="property"
+        column="session_end_date"
+        length="10"
+    />
+    
+    <property
+        name="session_status"
+        type="java.lang.String"
+        update="true"
+        insert="true"
+        access="property"
+        column="session_status"
+        length="100"
+    />
+    
+    <property
+        name="qaContentId"
+        type="java.lang.Long"
+        update="false"
+        insert="false"
+        access="property"
+        column="qa_content_id"
+        length="20"
+    />
+
+    
+   <many-to-one
+        name="qaContent"
+        class="org.lamsfoundation.lams.tool.qa.QaContent"
+        cascade="none"
+        outer-join="auto"
+        update="true"
+        insert="true"
+        access="property"
+    >
+        <column
+            name="qa_content_id" 
+        />
+    </many-to-one>
+    
+    <set
+        name="qaQueUsers"
+        lazy="false"
+        inverse="true"
+        cascade="all-delete-orphan"
+        sort="unsorted"
+    >
+        <key>
+        	<column name="qa_session_id" />
+   		</key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.qa.QaQueUsr"
+        />
+    </set>
+    
+
+</class>
+</hibernate-mapping>

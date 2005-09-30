@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+
+<hibernate-mapping>
+    <class
+        name="org.lamsfoundation.lams.tool.qa.QaQueContent"
+        table="tl_laqa11_que_content"
+        dynamic-update="false"
+        dynamic-insert="false"
+        select-before-update="false"
+        optimistic-lock="version"
+    >
+
+        <id
+            name="qaQueContentId"
+            column="qa_que_content_id"
+            type="java.lang.Long"
+        >
+		    <generator class="increment"/>
+        </id>
+
+        <property
+            name="question"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            access="property"
+            column="question"
+            length="65535"
+        />
+
+        <property
+            name="displayOrder"
+            type="int"
+            update="true"
+            insert="true"
+            access="property"
+            column="display_order"
+            length="11"
+        />
+
+
+        <property
+            name="qaContentId"
+            type="java.lang.Long"
+            update="false"
+            insert="false"
+            access="property"
+            column="qa_content_id"
+            length="65535"
+        />
+
+
+        <many-to-one
+            name="qaContent"
+            class="org.lamsfoundation.lams.tool.qa.QaContent"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            access="property"
+        >
+            <column
+                name="qa_content_id" 
+            />
+        </many-to-one>
+
+
+ 		<set
+            name="qaUsrResps"
+            lazy="false"
+            inverse="true"
+            cascade="none"
+            sort="natural"
+        >
+              <key
+                  column="qa_que_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.qa.QaUsrResp"
+              />
+
+        </set>
+
+
+    </class>
+
+</hibernate-mapping>
