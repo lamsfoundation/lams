@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.tool.mc.TlLamc11QueContent" 
+    table="tl_lamc11_que_content"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="tl_lamc11_que_content"
+    </meta>
+
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="assigned"
+            type="java.lang.Long"
+            column="uid"
+
+
+        </meta>
+        <generator class="assigned" />
+    </id>
+
+    <property
+        name="qaQueContentId"
+        type="long"
+        column="qa_que_content_id"
+        not-null="true"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="qa_que_content_id"
+            length="20"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="question"
+        type="java.lang.String"
+        column="question"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="question"
+            length="255"
+        </meta>    
+    </property>
+    <property
+        name="displayOrder"
+        type="java.lang.Integer"
+        column="display_order"
+        length="5"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="display_order"
+            length="5"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to TlLamc11Content -->
+    <many-to-one
+        name="tlLamc11Content"
+        class="org.lamsfoundation.lams.tool.mc.TlLamc11Content"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="qa_content_id"         
+        </meta>
+        <column name="qa_content_id" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to TlLamc11UsrAttempt -->
+    <set
+        name="tlLamc11UsrAttempts"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="qa_que_content_id"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.tool.mc.TlLamc11UsrAttempt"
+        </meta>
+        <key>
+            <column name="qa_que_content_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.mc.TlLamc11UsrAttempt"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to TlLamc11OptionsContent -->
+    <set
+        name="tlLamc11OptionsContents"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <meta attribute="field-description">
+           @hibernate.set
+            lazy="true"
+            inverse="true"
+            cascade="none"
+
+           @hibernate.collection-key
+            column="qa_que_content_id"
+
+           @hibernate.collection-one-to-many
+            class="org.lamsfoundation.lams.tool.mc.TlLamc11OptionsContent"
+        </meta>
+        <key>
+            <column name="qa_que_content_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.mc.TlLamc11OptionsContent"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>
