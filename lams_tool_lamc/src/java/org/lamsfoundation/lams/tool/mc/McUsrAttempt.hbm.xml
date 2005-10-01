@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.tool.mc.TlLamc11UsrAttempt" 
+    table="tl_lamc11_usr_attempt"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="tl_lamc11_usr_attempt"
+    </meta>
+
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="assigned"
+            type="java.lang.Long"
+            column="uid"
+
+
+        </meta>
+        <generator class="assigned" />
+    </id>
+
+    <property
+        name="attemptId"
+        type="long"
+        column="attempt_id"
+        not-null="true"
+        length="20"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="attempt_id"
+            length="20"
+            not-null="true"
+        </meta>    
+    </property>
+    <property
+        name="attemptTime"
+        type="java.sql.Timestamp"
+        column="attempt_time"
+        length="19"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="attempt_time"
+            length="19"
+        </meta>    
+    </property>
+    <property
+        name="timeZone"
+        type="java.lang.String"
+        column="time_zone"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="time_zone"
+            length="255"
+        </meta>    
+    </property>
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to TlLamc11QueContent -->
+    <many-to-one
+        name="tlLamc11QueContent"
+        class="org.lamsfoundation.lams.tool.mc.TlLamc11QueContent"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="qa_que_content_id"         
+        </meta>
+        <column name="qa_que_content_id" />
+    </many-to-one>
+    <!-- bi-directional many-to-one association to TlLamc11QueUsr -->
+    <many-to-one
+        name="tlLamc11QueUsr"
+        class="org.lamsfoundation.lams.tool.mc.TlLamc11QueUsr"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="que_usr_id"         
+        </meta>
+        <column name="que_usr_id" />
+    </many-to-one>
+    <!-- bi-directional many-to-one association to TlLamc11OptionsContent -->
+    <many-to-one
+        name="tlLamc11OptionsContent"
+        class="org.lamsfoundation.lams.tool.mc.TlLamc11OptionsContent"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="qa_que_option_id"         
+        </meta>
+        <column name="qa_que_option_id" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

@@ -3,7 +3,6 @@ package org.lamsfoundation.lams.tool.mc;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
-import org.lamsfoundation.lams.tool.mc.McContent;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -29,13 +28,13 @@ public class McSession implements Serializable {
     private Long mcContentId;
 
     /** nullable persistent field */
-    private McContent mcContent;
+    private org.lamsfoundation.lams.tool.mc.McContent mcContent;
 
     /** persistent field */
     private Set mcQueUsers;
 
     /** full constructor */
-    public McSession(Long mcSessionId, Date session_start_date, Date session_end_date, String session_status, Long mcContentId, McContent mcContent, Set mcQueUsers) {
+    public McSession(Long mcSessionId, Date session_start_date, Date session_end_date, String session_status, Long mcContentId, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcQueUsers) {
         this.mcSessionId = mcSessionId;
         this.session_start_date = session_start_date;
         this.session_end_date = session_end_date;
@@ -103,11 +102,11 @@ public class McSession implements Serializable {
         this.mcContentId = mcContentId;
     }
 
-    public McContent getMcContent() {
+    public org.lamsfoundation.lams.tool.mc.McContent getMcContent() {
         return this.mcContent;
     }
 
-    public void setMcContent(McContent mcContent) {
+    public void setMcContent(org.lamsfoundation.lams.tool.mc.McContent mcContent) {
         this.mcContent = mcContent;
     }
 

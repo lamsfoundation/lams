@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.tool.mc;
+package org.lamsfoundation.lams.tool.qa;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -8,13 +8,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /** @author Hibernate CodeGenerator */
-public class McContent implements Serializable {
+public class QaContent implements Serializable {
 
     /** identifier field */
-    private Long uid;
-
-    /** persistent field */
-    private Long mcContentId;
+    private Long qaContentId;
 
     /** nullable persistent field */
     private String title;
@@ -65,14 +62,17 @@ public class McContent implements Serializable {
     private String endLearningMessage;
 
     /** persistent field */
-    private SortedSet mcQueContents;
+    private SortedSet qaQueContents;
 
     /** persistent field */
-    private Set mcSessions;
+    private Set qaSessions;
+
+    /** persistent field */
+    private Set qaUploadedFiles;
 
     /** full constructor */
-    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentLocked, String offlineInstructions, String onlineInstructions, String endLearningMessage, SortedSet mcQueContents, Set mcSessions) {
-        this.mcContentId = mcContentId;
+    public QaContent(Long qaContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentLocked, String offlineInstructions, String onlineInstructions, String endLearningMessage, SortedSet qaQueContents, Set qaSessions, Set qaUploadedFiles) {
+        this.qaContentId = qaContentId;
         this.title = title;
         this.instructions = instructions;
         this.defineLater = defineLater;
@@ -89,35 +89,29 @@ public class McContent implements Serializable {
         this.offlineInstructions = offlineInstructions;
         this.onlineInstructions = onlineInstructions;
         this.endLearningMessage = endLearningMessage;
-        this.mcQueContents = mcQueContents;
-        this.mcSessions = mcSessions;
+        this.qaQueContents = qaQueContents;
+        this.qaSessions = qaSessions;
+        this.qaUploadedFiles = qaUploadedFiles;
     }
 
     /** default constructor */
-    public McContent() {
+    public QaContent() {
     }
 
     /** minimal constructor */
-    public McContent(Long mcContentId, SortedSet mcQueContents, Set mcSessions) {
-        this.mcContentId = mcContentId;
-        this.mcQueContents = mcQueContents;
-        this.mcSessions = mcSessions;
+    public QaContent(Long qaContentId, SortedSet qaQueContents, Set qaSessions, Set qaUploadedFiles) {
+        this.qaContentId = qaContentId;
+        this.qaQueContents = qaQueContents;
+        this.qaSessions = qaSessions;
+        this.qaUploadedFiles = qaUploadedFiles;
     }
 
-    public Long getUid() {
-        return this.uid;
+    public Long getQaContentId() {
+        return this.qaContentId;
     }
 
-    public void setUid(Long uid) {
-        this.uid = uid;
-    }
-
-    public Long getMcContentId() {
-        return this.mcContentId;
-    }
-
-    public void setMcContentId(Long mcContentId) {
-        this.mcContentId = mcContentId;
+    public void setQaContentId(Long qaContentId) {
+        this.qaContentId = qaContentId;
     }
 
     public String getTitle() {
@@ -248,25 +242,33 @@ public class McContent implements Serializable {
         this.endLearningMessage = endLearningMessage;
     }
 
-    public SortedSet getMcQueContents() {
-        return this.mcQueContents;
+    public SortedSet getQaQueContents() {
+        return this.qaQueContents;
     }
 
-    public void setMcQueContents(SortedSet mcQueContents) {
-        this.mcQueContents = mcQueContents;
+    public void setQaQueContents(SortedSet qaQueContents) {
+        this.qaQueContents = qaQueContents;
     }
 
-    public Set getMcSessions() {
-        return this.mcSessions;
+    public Set getQaSessions() {
+        return this.qaSessions;
     }
 
-    public void setMcSessions(Set mcSessions) {
-        this.mcSessions = mcSessions;
+    public void setQaSessions(Set qaSessions) {
+        this.qaSessions = qaSessions;
+    }
+
+    public Set getQaUploadedFiles() {
+        return this.qaUploadedFiles;
+    }
+
+    public void setQaUploadedFiles(Set qaUploadedFiles) {
+        this.qaUploadedFiles = qaUploadedFiles;
     }
 
     public String toString() {
         return new ToStringBuilder(this)
-            .append("uid", getUid())
+            .append("qaContentId", getQaContentId())
             .toString();
     }
 
