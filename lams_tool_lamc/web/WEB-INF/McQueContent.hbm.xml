@@ -4,12 +4,6 @@
     "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
     
 <hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
-
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
 
 <class 
     name="org.lamsfoundation.lams.tool.mc.McQueContent" 
@@ -48,9 +42,6 @@
     >
     </property>
 
-    <!-- Associations -->
-  
-    <!-- bi-directional many-to-one association to McContent -->
     <many-to-one
         name="mcContent"
         class="org.lamsfoundation.lams.tool.mc.McContent"
@@ -59,10 +50,10 @@
         <column name="mc_content_id" />
     </many-to-one>
     
-    <!-- bi-directional one-to-many association to McUsrAttempt -->
-    <!-- 
+
+
     <set
-        name="tlLamc11UsrAttempts"
+        name="mcUsrAttempts"
         lazy="true"
         inverse="true"
 		cascade="none"
@@ -72,38 +63,24 @@
             <column name="mc_que_content_id" />
         </key>
         <one-to-many 
-            class="org.lamsfoundation.lams.tool.mc.TlLamc11UsrAttempt"
+            class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
         />
     </set>
-    -->
-    <!-- bi-directional one-to-many association to TlLamc11OptionsContent -->
-	
-	<!-- 
+
+
     <set
-        name="tlLamc11OptionsContents"
+        name="mcOptionsContents"
         lazy="true"
         inverse="true"
 		cascade="none"
     >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="qa_que_content_id"
-
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.tool.mc.TlLamc11OptionsContent"
-        </meta>
         <key>
-            <column name="qa_que_content_id" />
+            <column name="mc_que_content_id" />
         </key>
         <one-to-many 
-            class="org.lamsfoundation.lams.tool.mc.TlLamc11OptionsContent"
+            class="org.lamsfoundation.lams.tool.mc.McOptionsContent"
         />
     </set>
-	-->
+
 </class>
 </hibernate-mapping>

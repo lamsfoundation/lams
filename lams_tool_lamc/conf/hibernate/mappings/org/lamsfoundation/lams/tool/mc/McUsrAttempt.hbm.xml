@@ -4,117 +4,66 @@
     "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
     
 <hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
-
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
 
 <class 
-    name="org.lamsfoundation.lams.tool.mc.TlLamc11UsrAttempt" 
+    name="org.lamsfoundation.lams.tool.mc.McUsrAttempt" 
     table="tl_lamc11_usr_attempt"
 >
-    <meta attribute="class-description" inherit="false">
-       @hibernate.class
-        table="tl_lamc11_usr_attempt"
-    </meta>
-
     <id
         name="uid"
         type="java.lang.Long"
         column="uid"
     >
-        <meta attribute="field-description">
-           @hibernate.id
-            generator-class="assigned"
-            type="java.lang.Long"
-            column="uid"
-
-
-        </meta>
-        <generator class="assigned" />
+        <generator class="native" />
     </id>
 
     <property
         name="attemptId"
-        type="long"
+        type="java.lang.Long"
         column="attempt_id"
         not-null="true"
         length="20"
     >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="attempt_id"
-            length="20"
-            not-null="true"
-        </meta>    
     </property>
+    
     <property
         name="attemptTime"
-        type="java.sql.Timestamp"
+        type="java.util.Date"
         column="attempt_time"
-        length="19"
+        length="10"
     >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="attempt_time"
-            length="19"
-        </meta>    
     </property>
+    
     <property
         name="timeZone"
         type="java.lang.String"
         column="time_zone"
         length="255"
     >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="time_zone"
-            length="255"
-        </meta>    
     </property>
 
-    <!-- Associations -->
-  
-    <!-- bi-directional many-to-one association to TlLamc11QueContent -->
     <many-to-one
-        name="tlLamc11QueContent"
-        class="org.lamsfoundation.lams.tool.mc.TlLamc11QueContent"
+        name="mcQueContent"
+        class="org.lamsfoundation.lams.tool.mc.McQueContent"
         not-null="true"
     >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="qa_que_content_id"         
-        </meta>
-        <column name="qa_que_content_id" />
+        <column name="mc_que_content_id" />
     </many-to-one>
-    <!-- bi-directional many-to-one association to TlLamc11QueUsr -->
+    
     <many-to-one
-        name="tlLamc11QueUsr"
-        class="org.lamsfoundation.lams.tool.mc.TlLamc11QueUsr"
+        name="mcQueUsr"
+        class="org.lamsfoundation.lams.tool.mc.McQueUsr"
         not-null="true"
     >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="que_usr_id"         
-        </meta>
         <column name="que_usr_id" />
     </many-to-one>
-    <!-- bi-directional many-to-one association to TlLamc11OptionsContent -->
+    
     <many-to-one
-        name="tlLamc11OptionsContent"
-        class="org.lamsfoundation.lams.tool.mc.TlLamc11OptionsContent"
+        name="mcOptionsContent"
+        class="org.lamsfoundation.lams.tool.mc.McOptionsContent"
         not-null="true"
     >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="qa_que_option_id"         
-        </meta>
-        <column name="qa_que_option_id" />
+        <column name="mc_que_option_id" />
     </many-to-one>
 
 </class>

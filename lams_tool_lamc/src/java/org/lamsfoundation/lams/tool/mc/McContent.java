@@ -53,7 +53,7 @@ public class McContent implements Serializable {
     private boolean synchInMonitor;
 
     /** nullable persistent field */
-    private boolean contentLocked;
+    private boolean contentInUse;
 
     /** nullable persistent field */
     private String offlineInstructions;
@@ -64,6 +64,15 @@ public class McContent implements Serializable {
     /** nullable persistent field */
     private String endLearningMessage;
 
+    /** nullable persistent field */
+    private Integer passMark;
+
+    /** nullable persistent field */
+    private boolean showFeedback;
+
+    /** nullable persistent field */
+    private boolean showTopUsers;
+
     /** persistent field */
     private SortedSet mcQueContents;
 
@@ -71,7 +80,7 @@ public class McContent implements Serializable {
     private Set mcSessions;
 
     /** full constructor */
-    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentLocked, String offlineInstructions, String onlineInstructions, String endLearningMessage, SortedSet mcQueContents, Set mcSessions) {
+    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, String endLearningMessage, Integer passMark, boolean showFeedback, boolean showTopUsers, SortedSet mcQueContents, Set mcSessions) {
         this.mcContentId = mcContentId;
         this.title = title;
         this.instructions = instructions;
@@ -85,10 +94,13 @@ public class McContent implements Serializable {
         this.monitoringReportTitle = monitoringReportTitle;
         this.createdBy = createdBy;
         this.synchInMonitor = synchInMonitor;
-        this.contentLocked = contentLocked;
+        this.contentInUse = contentInUse;
         this.offlineInstructions = offlineInstructions;
         this.onlineInstructions = onlineInstructions;
         this.endLearningMessage = endLearningMessage;
+        this.passMark = passMark;
+        this.showFeedback = showFeedback;
+        this.showTopUsers = showTopUsers;
         this.mcQueContents = mcQueContents;
         this.mcSessions = mcSessions;
     }
@@ -216,12 +228,12 @@ public class McContent implements Serializable {
         this.synchInMonitor = synchInMonitor;
     }
 
-    public boolean isContentLocked() {
-        return this.contentLocked;
+    public boolean isContentInUse() {
+        return this.contentInUse;
     }
 
-    public void setContentLocked(boolean contentLocked) {
-        this.contentLocked = contentLocked;
+    public void setContentInUse(boolean contentInUse) {
+        this.contentInUse = contentInUse;
     }
 
     public String getOfflineInstructions() {
@@ -246,6 +258,30 @@ public class McContent implements Serializable {
 
     public void setEndLearningMessage(String endLearningMessage) {
         this.endLearningMessage = endLearningMessage;
+    }
+
+    public Integer getPassMark() {
+        return this.passMark;
+    }
+
+    public void setPassMark(Integer passMark) {
+        this.passMark = passMark;
+    }
+
+    public boolean isShowFeedback() {
+        return this.showFeedback;
+    }
+
+    public void setShowFeedback(boolean showFeedback) {
+        this.showFeedback = showFeedback;
+    }
+
+    public boolean isShowTopUsers() {
+        return this.showTopUsers;
+    }
+
+    public void setShowTopUsers(boolean showTopUsers) {
+        this.showTopUsers = showTopUsers;
     }
 
     public SortedSet getMcQueContents() {

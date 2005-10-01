@@ -21,6 +21,8 @@
 				<value>/WEB-INF/McSession.hbm.xml</value>
 				<value>/WEB-INF/McQueContent.hbm.xml</value>
 				<value>/WEB-INF/McQueUsr.hbm.xml</value>
+				<value>/WEB-INF/McUsrAttempt.hbm.xml</value>
+				<value>/WEB-INF/McOptionsContent.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>

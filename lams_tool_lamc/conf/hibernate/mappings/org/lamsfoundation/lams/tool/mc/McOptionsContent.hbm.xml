@@ -4,118 +4,68 @@
     "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
     
 <hibernate-mapping>
-<!-- 
-    Created by the Middlegen Hibernate plugin 2.1
-
-    http://boss.bekk.no/boss/middlegen/
-    http://www.hibernate.org/
--->
 
 <class 
-    name="org.lamsfoundation.lams.tool.mc.TlLamc11OptionsContent" 
+    name="org.lamsfoundation.lams.tool.mc.McOptionsContent" 
     table="tl_lamc11_options_content"
 >
-    <meta attribute="class-description" inherit="false">
-       @hibernate.class
-        table="tl_lamc11_options_content"
-    </meta>
-
     <id
         name="uid"
         type="java.lang.Long"
         column="uid"
     >
-        <meta attribute="field-description">
-           @hibernate.id
-            generator-class="assigned"
-            type="java.lang.Long"
-            column="uid"
-
-
-        </meta>
-        <generator class="assigned" />
+        <generator class="native" />
     </id>
 
     <property
-        name="qaQueOptionId"
-        type="long"
-        column="qa_que_option_id"
+        name="mcQueOptionId"
+        type="java.lang.Long"
+        column="mc_que_option_id"
         not-null="true"
         length="20"
     >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="qa_que_option_id"
-            length="20"
-            not-null="true"
-        </meta>    
     </property>
-    <property
-        name="correctOption"
-        type="byte"
-        column="correct_option"
-        not-null="true"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
+    
+   <property
+            name="correctOption"
+            type="boolean"
+            update="true"
+            insert="true"
+            access="property"
             column="correct_option"
-            length="1"
-            not-null="true"
-        </meta>    
-    </property>
+   />
+    
     <property
-        name="qaQueOptionText"
+        name="mcQueOptionText"
         type="java.lang.String"
-        column="qa_que_option_text"
+        column="mc_que_option_text"
         length="250"
     >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="qa_que_option_text"
-            length="250"
-        </meta>    
     </property>
 
     <!-- Associations -->
   
-    <!-- bi-directional many-to-one association to TlLamc11QueContent -->
+    <!-- bi-directional many-to-one association to McQueContent -->
     <many-to-one
-        name="tlLamc11QueContent"
-        class="org.lamsfoundation.lams.tool.mc.TlLamc11QueContent"
+        name="mcQueContent"
+        class="org.lamsfoundation.lams.tool.mc.McQueContent"
         not-null="true"
     >
-        <meta attribute="field-description">
-           @hibernate.many-to-one
-            not-null="true"
-           @hibernate.column name="qa_que_content_id"         
-        </meta>
-        <column name="qa_que_content_id" />
+        <column name="mc_que_content_id" />
     </many-to-one>
-    <!-- bi-directional one-to-many association to TlLamc11UsrAttempt -->
+    
+    <!-- bi-directional one-to-many association to McUsrAttempt -->
     <set
-        name="tlLamc11UsrAttempts"
+        name="mcUsrAttempts"
         lazy="true"
         inverse="true"
 		cascade="none"
     >
-        <meta attribute="field-description">
-           @hibernate.set
-            lazy="true"
-            inverse="true"
-            cascade="none"
-
-           @hibernate.collection-key
-            column="qa_que_option_id"
-
-           @hibernate.collection-one-to-many
-            class="org.lamsfoundation.lams.tool.mc.TlLamc11UsrAttempt"
-        </meta>
         <key>
-            <column name="qa_que_option_id" />
+            <column name="mc_que_option_id" />
         </key>
         <one-to-many 
-            class="org.lamsfoundation.lams.tool.mc.TlLamc11UsrAttempt"
+            class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
         />
     </set>
 

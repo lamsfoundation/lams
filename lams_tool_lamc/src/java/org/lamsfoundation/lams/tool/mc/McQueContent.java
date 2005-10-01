@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
+import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -22,12 +23,20 @@ public class McQueContent implements Serializable {
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.McContent mcContent;
 
+    /** persistent field */
+    private Set mcUsrAttempts;
+
+    /** persistent field */
+    private Set mcOptionsContents;
+
     /** full constructor */
-    public McQueContent(Long qaQueContentId, String question, Integer displayOrder, org.lamsfoundation.lams.tool.mc.McContent mcContent) {
+    public McQueContent(Long qaQueContentId, String question, Integer displayOrder, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
         this.qaQueContentId = qaQueContentId;
         this.question = question;
         this.displayOrder = displayOrder;
         this.mcContent = mcContent;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
     }
 
     /** default constructor */
@@ -35,9 +44,11 @@ public class McQueContent implements Serializable {
     }
 
     /** minimal constructor */
-    public McQueContent(Long qaQueContentId, org.lamsfoundation.lams.tool.mc.McContent mcContent) {
+    public McQueContent(Long qaQueContentId, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
         this.qaQueContentId = qaQueContentId;
         this.mcContent = mcContent;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
     }
 
     public Long getUid() {
@@ -78,6 +89,22 @@ public class McQueContent implements Serializable {
 
     public void setMcContent(org.lamsfoundation.lams.tool.mc.McContent mcContent) {
         this.mcContent = mcContent;
+    }
+
+    public Set getMcUsrAttempts() {
+        return this.mcUsrAttempts;
+    }
+
+    public void setMcUsrAttempts(Set mcUsrAttempts) {
+        this.mcUsrAttempts = mcUsrAttempts;
+    }
+
+    public Set getMcOptionsContents() {
+        return this.mcOptionsContents;
+    }
+
+    public void setMcOptionsContents(Set mcOptionsContents) {
+        this.mcOptionsContents = mcOptionsContents;
     }
 
     public String toString() {
