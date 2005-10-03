@@ -33,7 +33,7 @@ import org.springframework.orm.hibernate.HibernateCallback;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 /**
- * @author mtruong
+ * @author ozgur
  * <p>Hibernate implementation for database access to Mc content for the mc tool.</p>
  */
 
