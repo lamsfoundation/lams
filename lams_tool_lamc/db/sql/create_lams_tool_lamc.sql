@@ -17,6 +17,7 @@ CREATE TABLE lams.tl_lamc11_content (
      , online_instructions VARCHAR(250) NOT NULL DEFAULT 'online instructions'
      , end_learning_message VARCHAR(150) NOT NULL DEFAULT 'Thank you!'
      , content_in_use TINYINT(1) NOT NULL DEFAULT 0
+     , retries TINYINT(1) NOT NULL DEFAULT 0
      , pass_mark INTEGER
      , show_feedback TINYINT(1) NOT NULL DEFAULT 0
      , show_top_users TINYINT(1) NOT NULL DEFAULT 0
