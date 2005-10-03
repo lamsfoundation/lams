@@ -296,6 +296,7 @@
 				</classpath>
 				<transaction src="${db.scripts}/drop_lams_tool_lamc.sql"/>
 				<transaction src="${db.scripts}/create_lams_tool_lamc.sql"/>
+				<transaction src="${db.scripts}/insert_lams_tool_lamc.sql"/> 
 			</sql>
 		</target>
 

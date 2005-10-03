@@ -6,16 +6,26 @@
 <hibernate-mapping>
 
 <class 
-    name="org.lamsfoundation.lams.tool.qa.QaQueUsr" 
-    table="tl_laqa11_que_usr"
+    name="org.lamsfoundation.lams.tool.mc.McQueUsr" 
+    table="tl_lamc11_que_usr"
 >
     <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+		    <generator class="native"/>
+    </id>
+
+	<property
         name="queUsrId"
         type="java.lang.Long"
         column="que_usr_id"
+        not-null="true"
+        length="20"
     >
-		    <generator class="assigned"/>
-    </id>
+    </property>
+
 
     <property
         name="username"
@@ -33,43 +43,43 @@
     </property>
 
     <property
-        name="qaSessionId"
+        name="mcSessionId"
         type="java.lang.Long"
-        column="qa_session_id"
+        column="mc_session_id"
         update="false"
         insert="false"
     >
     </property>
     
     <many-to-one
-        name="qaSession"
-        class="org.lamsfoundation.lams.tool.qa.QaSession"
+        name="mcSession"
+        class="org.lamsfoundation.lams.tool.mc.McSession"
         cascade="none"
         outer-join="auto"
         update="true"
         insert="true"
         access="property"
     >
-        <column name="qa_session_id" />
+        <column name="mc_session_id" />
     </many-to-one>
-    
-    <set
-            name="qaUsrResps"
+
+
+   	 <set
+            name="mcUsrAttempts"
             lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
-            sort="unsorted"
+            sort="natural"
         >
-
               <key
-                  column="que_usr_id" 
+                  column="que_usr_id"
               >
               </key>
 
               <one-to-many
-                  class="org.lamsfoundation.lams.tool.qa.QaUsrResp"
+                  class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
               />
-   </set>
+    </set>
 
 </class>
 </hibernate-mapping>

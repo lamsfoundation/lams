@@ -6,23 +6,26 @@
 <hibernate-mapping>
 
 <class 
-    name="org.lamsfoundation.lams.tool.qa.QaContent" 
-    table="tl_laqa11_content"
-    dynamic-update="false"
-    dynamic-insert="false"
-    select-before-update="false"
-    optimistic-lock="version"
+    name="org.lamsfoundation.lams.tool.mc.McContent" 
+    table="tl_lamc11_content"
 >
-
     <id
-        name="qaContentId"
+        name="uid"
         type="java.lang.Long"
-        column="qa_content_id"
+        column="uid"
     >
-	    <generator class="assigned"/>
+        <generator class="native" />
     </id>
 
-
+	<property
+        name="mcContentId"
+        type="java.lang.Long"
+        column="mc_content_id"
+        not-null="true"
+        length="20"
+    >
+    </property>
+    
     <property
         name="title"
         type="java.lang.String"
@@ -149,17 +152,15 @@
     />
     
     <property
-        name="contentLocked"
+        name="contentInUse"
         type="boolean"
         update="true"
         insert="true"
         access="property"        
-        column="content_locked"
+        column="content_in_use"
         length="1"
     />
-    
-    
-    
+
     <property
         name="offlineInstructions"
         type="java.lang.String"
@@ -190,61 +191,71 @@
         length="65535"
     />
     
+    <property
+        name="passMark"
+        type="java.lang.Integer"
+        update="true"
+        insert="true"
+        access="property"        
+        column="pass_mark"
+    />
+
+    <property
+        name="showFeedback"
+        type="boolean"
+        update="true"
+        insert="true"
+        access="property"        
+        column="show_feedback"
+        length="1"
+    />
+    
+
+    <property
+        name="showTopUsers"
+        type="boolean"
+        update="true"
+        insert="true"
+        access="property"        
+        column="show_top_users"
+        length="1"
+    />
+    
 
    	 <set
-            name="qaQueContents"
+            name="mcQueContents"
             lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
             sort="natural"
         >
               <key
-                  column="qa_content_id"
+                  column="mc_content_id"
               >
               </key>
 
               <one-to-many
-                  class="org.lamsfoundation.lams.tool.qa.QaQueContent"
+                  class="org.lamsfoundation.lams.tool.mc.McQueContent"
               />
     </set>
 
 	<set
-            name="qaSessions"
+            name="mcSessions"
             lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
             sort="unsorted"
         >
               <key
-                  column="qa_content_id"
+                  column="mc_content_id"
               >
               </key>
 
               <one-to-many
-                  class="org.lamsfoundation.lams.tool.qa.QaSession"
+                  class="org.lamsfoundation.lams.tool.mc.McSession"
               />
 
     </set>
-    
-   	<set
-            name="qaUploadedFiles"
-            lazy="false"
-            inverse="true"
-            cascade="all-delete-orphan"
-            sort="unsorted"
-        >
-              <key
-                  column="qa_content_id"
-              >
-              </key>
-
-              <one-to-many
-                  class="org.lamsfoundation.lams.tool.qa.QaUploadedFile"
-              />
-
-    </set> 
-    
-    
 
 </class>
 </hibernate-mapping>

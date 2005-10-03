@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.mc;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -22,9 +22,9 @@ public class AllTests {
 	}
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("QaTestSuite");
+		TestSuite suite = new TestSuite("McTestSuite");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(org.lamsfoundation.lams.tool.qa.TestQaContent.class);
+		suite.addTestSuite(org.lamsfoundation.lams.tool.mc.TestMcContent.class);
 		
 		//$JUnit-END$
 		return suite;
