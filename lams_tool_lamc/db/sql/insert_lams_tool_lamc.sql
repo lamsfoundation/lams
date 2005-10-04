@@ -60,14 +60,14 @@ INSERT INTO tl_lamc11_usr_attempt (attempt_id,
 									que_usr_id, 
 									mc_que_content_id, 
 									mc_que_option_id)
-									 VALUES (200, 1, 1, 2);
+									 VALUES (201, 1, 1, 2);
 
 
 INSERT INTO tl_lamc11_usr_attempt (attempt_id, 
 									que_usr_id, 
 									mc_que_content_id, 
 									mc_que_option_id)
-									 VALUES (200, 1, 1, 3);
+									 VALUES (202, 1, 1, 3);
 
 
 
