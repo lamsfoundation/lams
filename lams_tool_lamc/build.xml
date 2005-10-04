@@ -417,7 +417,7 @@
 					<formatter type="xml"/>
 					<batchtest todir="${build.report}">
 						<fileset dir="${src.test.dir}">
-							<include name="**/TestQaContent.java"/>
+							<include name="**/TestMcContent.java"/>
 
 						</fileset>
 					</batchtest>
