@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.List;
 import java.lang.Long;
 
+import net.sf.hibernate.Hibernate;
 import net.sf.hibernate.HibernateException;
 import net.sf.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.McContent;
@@ -33,14 +34,14 @@ import org.springframework.orm.hibernate.HibernateCallback;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 /**
- * @author ozgur
+ * @author ozgurd
  * <p>Hibernate implementation for database access to Mc content for the mc tool.</p>
  */
 
 public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	
 	
-	private static final String LOAD_NB_BY_SESSION = "select mc from McContent mc left join fetch "
+	private static final String LOAD_MC_BY_SESSION = "select mc from McContent mc left join fetch "
         + "mc.mcSessions session where session.mcSessionId=:sessionId";
 
 	
@@ -77,7 +78,7 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 
                     public Object doInHibernate(Session session) throws HibernateException
                     {
-                        return session.createQuery(LOAD_NB_BY_SESSION)
+                        return session.createQuery(LOAD_MC_BY_SESSION)
                                       .setLong("sessionId",
                                       		mcSessionId.longValue())
                                       .uniqueResult();
@@ -110,6 +111,15 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
           
        this.getHibernateTemplate().delete(queryString);
     }
+	
+	 public void removeMcById(Long mcContentId)
+	    {
+	        String query = "from mc in class org.lamsfoundation.lams.tool.mc.McContent"
+	        + " where qa.mcContentId = ?";
+	        this.getHibernateTemplate().delete(query,mcContentId,Hibernate.LONG);
+	    }
+	
+	
     
 	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#removeMc(org.lamsfoundation.lams.tool.mc.McContent)*/
     public void removeMc(McContent mcContent)
@@ -133,5 +143,11 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
         this.getHibernateTemplate().saveOrUpdate(content);
         
     }
+    
+    public void flush()
+    {
+        this.getHibernateTemplate().flush();
+    }
+    
   
 }
