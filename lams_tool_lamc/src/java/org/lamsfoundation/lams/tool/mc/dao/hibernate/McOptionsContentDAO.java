@@ -8,6 +8,8 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
+import net.sf.hibernate.Hibernate;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.McOptionsContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
@@ -32,7 +34,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 		
 		public McOptionsContent findMcOptionsContentById(Long mcQueOptionId)
 		{
-		    String query = "from McOptionsContent as mco where mco.mcContentId = ?";
+		    String query = "from McOptionsContent as mco where mco.mcQueOptionId = ?";
 			List content = getHibernateTemplate().find(query,mcQueOptionId);
 				
 			if(content!=null && content.size() == 0)
@@ -46,19 +48,46 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 		
 		}
 		
-	 	public McOptionsContent getMcOptionById(long mcQueOptionId)
-	 	{
-	 		return (McOptionsContent) this.getHibernateTemplate().load(McOptionsContent.class, new Long(mcQueOptionId));
-	 	}
-	 	
-		public void createOptionsContent(McOptionsContent mcOptionsContent) 
+		
+		public void saveMcOptionsContent(McOptionsContent mcOptionsContent)
 	    {
 	    	this.getHibernateTemplate().save(mcOptionsContent);
 	    }
-		
-		public void removeOptionsContent(long mcQueOptionId) 
+	    
+		public void updateMcOptionsContent(McOptionsContent mcOptionsContent)
 	    {
-			McOptionsContent mcQueContent= (McOptionsContent) this.getHibernateTemplate().load(McOptionsContent.class, new Long(mcQueOptionId));
-	    	this.getHibernateTemplate().delete(mcQueContent);
+	    	this.getHibernateTemplate().update(mcOptionsContent);
 	    }
+		
+		
+		public void removeMcOptionsContentByUID(Long uid)
+	    {
+			McOptionsContent mco = (McOptionsContent)getHibernateTemplate().get(McOptionsContent.class, uid);
+	    	this.getHibernateTemplate().delete(mco);
+	    }
+		
+		
+		public void removeMcOptionsContent(Long mcQueOptionId)
+	    {
+	       String query = "from McOptionsContent as mco where mco.mcQueOptionId=";
+	       StringBuffer sb = new StringBuffer(query);
+	       sb.append(mcQueOptionId.longValue());
+	       String queryString = sb.toString();
+	          
+	       this.getHibernateTemplate().delete(queryString);
+	    }
+	
+		public void removeMcOptionsContentById(Long mcQueOptionId)
+	    {
+	        String query = "from mco in class org.lamsfoundation.lams.tool.mc.McOptionsContent"
+	        + " where mcq.mcQueOptionId = ?";
+	        this.getHibernateTemplate().delete(query,mcQueOptionId,Hibernate.LONG);
+	    }
+		
+		
+		public void removeMcOptionsContent(McOptionsContent mcOptionsContent)
+	    {
+	        this.getHibernateTemplate().delete(mcOptionsContent);
+	    }
+		
 } 

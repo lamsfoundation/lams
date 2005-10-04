@@ -35,11 +35,17 @@ public interface IMcOptionsContentDAO
 	
 	public McOptionsContent findMcOptionsContentById(Long mcQueOptionId);
 	
- 	public McOptionsContent getMcOptionById(long mcQueOptionId);
-
-	public void createOptionsContent(McOptionsContent mcOptionsContent); 
+	public void saveMcOptionsContent(McOptionsContent mcOptionsContent);
     
-	public void removeOptionsContent(long mcQueOptionId);
+	public void updateMcOptionsContent(McOptionsContent mcOptionsContent);
+
+	public void removeMcOptionsContentByUID(Long uid);
+	
+	public void removeMcOptionsContent(Long mcQueOptionId);
+
+	public void removeMcOptionsContentById(Long mcQueOptionId);
+	
+	public void removeMcOptionsContent(McOptionsContent mcOptionsContent);
         
 }
 

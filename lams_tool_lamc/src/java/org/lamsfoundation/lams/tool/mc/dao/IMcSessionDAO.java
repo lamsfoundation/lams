@@ -28,31 +28,32 @@ import org.lamsfoundation.lams.tool.mc.McQueUsr;
 
 
 /**
- * <p>Interface for the NoticeboardSession DAO, defines methods needed to access/modify
+ * <p>Interface for the McSession DAO, defines methods needed to access/modify
  * mc session</p>
  * @author ozgurd
  */
 public interface IMcSessionDAO {
 	
-   
-    /**
-	 * <p> Return the persistent instance of a NoticeboardSession
-	 * with the given tool session id <code>mcSessionId</code>,
-	 * returns null if not found.</p>
-	 * 
-	 * @param mcSessionId The tool session id
-	 * @return the persistent instance of a NoticeboardSession or null if not found.
-	 */
-    public McSession findMcSessionById(Long mcSessionId);
-	
-    /**
+	/**
 	 * <p>Return the persistent instance of a McSession  
 	 * with the given identifier <code>uid</code>, returns null if not found. </p>
 	 * 
 	 * @param uid an identifier for the McSession object.
 	 * @return the persistent instance of a McSession or null if not found
 	 */
+	
     public McSession getMcSessionByUID(Long uid);
+    
+    /**
+	 * <p> Return the persistent instance of a McSession
+	 * with the given tool session id <code>mcSessionId</code>,
+	 * returns null if not found.</p>
+	 * 
+	 * @param mcSessionId The tool session id
+	 * @return the persistent instance of a McSession or null if not found.
+	 */
+    public McSession findMcSessionById(Long mcSessionId);
+	
 	
 	
     /**
