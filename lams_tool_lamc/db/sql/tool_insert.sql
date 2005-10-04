@@ -29,11 +29,11 @@ create_date_time
 )
 VALUES
 (
-'laqa11',
-'qaService',
-'Question and Answer',
-'Question and Answer Tool Description',
-'qa',
+'lamc11',
+'mcService',
+'Multiple Choice',
+'Multiple Choice Tool Description',
+'mc',
 '1.1',
 NULL,
 NULL,

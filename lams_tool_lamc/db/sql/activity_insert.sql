@@ -43,9 +43,9 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'Question and Answer Description'
-, 'Question and Answer'
-, 'Put some help text here.'
+, 'Multiple Choice Description'
+, 'Multiple Choice'
+, 'Help text for Multiple Choice.'
 , NULL
 , NULL
 , NULL
