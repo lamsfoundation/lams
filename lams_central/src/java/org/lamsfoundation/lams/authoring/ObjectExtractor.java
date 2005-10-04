@@ -101,9 +101,15 @@ public class ObjectExtractor {
 	}
 	public LearningDesign extractLearningDesign(Hashtable table) throws WDDXProcessorConversionException, ObjectExtractorException {
 
-		// get the core learning design stuff
-		LearningDesign learningDesign = new LearningDesign();
-
+		LearningDesign learningDesign = null;
+	
+		Long learningDesignId = WDDXProcessor.convertToLong(table, "learningDesignID");
+		//if the learningDesignID is not null, load the existing LearningDesign object from the database, otherwise create a new one.
+		learningDesign = learningDesignId!= null ? learningDesignDAO.getLearningDesignById(learningDesignId) : new LearningDesign();
+		
+		//get the core learning design stuff
+		//LearningDesign learningDesign = new LearningDesign();
+		
 		learningDesign.setLearningDesignUIID(WDDXProcessor.convertToInteger(table,"learningDesignUIID"));
 		learningDesign.setDescription(WDDXProcessor.convertToString(table,"description"));
 		learningDesign.setTitle(WDDXProcessor.convertToString(table,"title"));
