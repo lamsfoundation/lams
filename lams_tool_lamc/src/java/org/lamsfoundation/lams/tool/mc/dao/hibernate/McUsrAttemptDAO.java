@@ -8,6 +8,8 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
+import net.sf.hibernate.Hibernate;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
@@ -48,20 +50,45 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 		
 		}
 		
-	 		 	
-	 	public McUsrAttempt getMcUsrAttemptById(long attemptId)
-	 	{
-	 		return (McUsrAttempt) this.getHibernateTemplate().load(McUsrAttempt.class, new Long(attemptId));
-	 	}
-	 	
-		public void createUsrAttempt(McUsrAttempt mcUsrAttempt) 
+		
+		public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt)
 	    {
 	    	this.getHibernateTemplate().save(mcUsrAttempt);
 	    }
-		
-		public void removeUsrAttempt(long attemptId) 
+	    
+		public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt)
 	    {
-			McUsrAttempt mcUsrAttempt= (McUsrAttempt) this.getHibernateTemplate().load(McUsrAttempt.class, new Long(attemptId));
-	    	this.getHibernateTemplate().delete(mcUsrAttempt);
+	    	this.getHibernateTemplate().update(mcUsrAttempt);
 	    }
+		
+		public void removeMcUsrAttemptByUID(Long uid)
+	    {
+			McUsrAttempt mca = (McUsrAttempt)getHibernateTemplate().get(McUsrAttempt.class, uid);
+	    	this.getHibernateTemplate().delete(mca);
+	    }
+		
+		
+		public void removeMcUsrAttempt(Long attemptId)
+	    {
+	       String query = "from McUsrAttempt as mca where mca.attemptId=";
+	       StringBuffer sb = new StringBuffer(query);
+	       sb.append(attemptId.longValue());
+	       String queryString = sb.toString();
+	          
+	       this.getHibernateTemplate().delete(queryString);
+	    }
+		
+		
+		public void removeMcUsrAttemptById(Long attemptId)
+	    {
+	        String query = "from mca in class org.lamsfoundation.lams.tool.mc.McUsrAttempt"
+	        + " where mca.attemptId = ?";
+	        this.getHibernateTemplate().delete(query,attemptId,Hibernate.LONG);
+	    }
+		
+		public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt)
+	    {
+	        this.getHibernateTemplate().delete(mcUsrAttempt);
+	    }
+	 	
 } 

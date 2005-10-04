@@ -33,12 +33,18 @@ public interface IMcUsrAttemptDAO
 	public McUsrAttempt getMcUserAttemptByUID(Long uid);
 	
 	public McUsrAttempt findMcUsrAttemptById(Long attemptId);
-		 	
- 	public McUsrAttempt getMcUsrAttemptById(long attemptId);
- 	 	
-	public void createUsrAttempt(McUsrAttempt mcUsrAttempt);
+	
+	public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt);
     
-	public void removeUsrAttempt(long attemptId);
+	public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt);
+	
+	public void removeMcUsrAttemptByUID(Long uid);
+	
+	public void removeMcUsrAttempt(Long attemptId);
+	
+	public void removeMcUsrAttemptById(Long attemptId);
+	
+	public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt);
         
 }
 
