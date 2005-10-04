@@ -20,12 +20,15 @@
  */
 package org.lamsfoundation.lams.tool.mc.dao;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 
 
 /**
  * 
- * @author Ozgur Demirtas
+ * @author ozgurd
  *
  */
 public interface IMcQueContentDAO
@@ -34,12 +37,20 @@ public interface IMcQueContentDAO
 	
 	public McQueContent findMcQueContentById(Long mcQueContentId);
 	
-    public McQueContent getMcQueById(long mcQueContentId);
+ 	public McQueContent getToolDefaultQuestionContent(final long mcContentId);
+ 	
+ 	public List getQuestionIndsForContent(McContent mc);
+ 	
+ 	public void saveMcQueContent(McQueContent mcQueContent);
     
-    public McQueContent getToolDefaultQuestionContent(final long mcContentId);
-    
-    public void createQueContent(McQueContent queContent);
-    
-    public void removeQueContent(long mcQueContentId);
+	public void updateMcQueContent(McQueContent mcQueContent);
+	
+	public void removeMcQueContentByUID(Long uid);
+	
+	public void removeMcQueContent(Long mcQueContentId);
+	
+	public void removeMcQueContentById(Long mcQueContentId);
+	
+	public void removeMcQueContent(McQueContent mcQueContent);
     
 }

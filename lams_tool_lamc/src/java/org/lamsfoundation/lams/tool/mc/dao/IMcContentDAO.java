@@ -80,6 +80,10 @@ public interface IMcContentDAO {
      */
     public void removeMc(McContent mcContent);
     
+    
+    public void removeMcById(Long mcContentId);
+    
+    
     /**
      * <p>Delete the given instance of McContent with the
      * given tool content id <code>mcContentId</code>
@@ -95,6 +99,8 @@ public interface IMcContentDAO {
      * 
      * @param mcContent The instance of McContent in which corresponding instances of McSession should be deleted.
      */
+    
+    
     public void removeMcSessions(McContent mcContent);
     
     /**
@@ -106,5 +112,7 @@ public interface IMcContentDAO {
      * @param mcSession The instance of McSession to add
      */
     public void addMcSession(Long mcContentId, McSession mcSession);
+    
+    public void flush();
     
   }

@@ -56,6 +56,10 @@ public interface IMcUserDAO {
 	 * 
 	 * @param nbUser The instance of McQueUsr to persist.
 	 */
+    
+    public McQueUsr getMcUserBySession(Long userId, Long sessionId);
+    
+    
     public void saveMcUser(McQueUsr mcUser);
     
     /**

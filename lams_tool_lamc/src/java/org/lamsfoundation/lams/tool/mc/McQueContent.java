@@ -12,7 +12,7 @@ public class McQueContent implements Serializable {
     private Long uid;
 
     /** persistent field */
-    private Long qaQueContentId;
+    private Long mcQueContentId;
 
     /** nullable persistent field */
     private String question;
@@ -22,7 +22,9 @@ public class McQueContent implements Serializable {
 
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.McContent mcContent;
-
+    
+    private Long mcContentId;
+    
     /** persistent field */
     private Set mcUsrAttempts;
 
@@ -30,8 +32,8 @@ public class McQueContent implements Serializable {
     private Set mcOptionsContents;
 
     /** full constructor */
-    public McQueContent(Long qaQueContentId, String question, Integer displayOrder, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.qaQueContentId = qaQueContentId;
+    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+        this.mcQueContentId = mcQueContentId;
         this.question = question;
         this.displayOrder = displayOrder;
         this.mcContent = mcContent;
@@ -44,8 +46,8 @@ public class McQueContent implements Serializable {
     }
 
     /** minimal constructor */
-    public McQueContent(Long qaQueContentId, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.qaQueContentId = qaQueContentId;
+    public McQueContent(Long mcQueContentId, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+        this.mcQueContentId = mcQueContentId;
         this.mcContent = mcContent;
         this.mcUsrAttempts = mcUsrAttempts;
         this.mcOptionsContents = mcOptionsContents;
@@ -60,11 +62,11 @@ public class McQueContent implements Serializable {
     }
 
     public Long getQaQueContentId() {
-        return this.qaQueContentId;
+        return this.mcQueContentId;
     }
 
-    public void setQaQueContentId(Long qaQueContentId) {
-        this.qaQueContentId = qaQueContentId;
+    public void setQaQueContentId(Long mcQueContentId) {
+        this.mcQueContentId = mcQueContentId;
     }
 
     public String getQuestion() {

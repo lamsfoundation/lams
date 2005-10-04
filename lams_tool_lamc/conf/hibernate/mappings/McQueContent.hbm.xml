@@ -18,9 +18,9 @@
     </id>
 
     <property
-        name="qaQueContentId"
+        name="mcQueContentId"
         type="java.lang.Long"
-        column="qa_que_content_id"
+        column="mc_que_content_id"
         not-null="true"
         length="20"
     >
@@ -41,6 +41,18 @@
         length="5"
     >
     </property>
+    
+    <property
+	    name="mcContentId"
+	    type="java.lang.Long"
+	    update="false"
+	    insert="false"
+	    access="property"
+	    column="mc_content_id"
+	    length="65535"
+	/>
+    
+   
 
     <many-to-one
         name="mcContent"

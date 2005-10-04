@@ -67,7 +67,8 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 			return (McSession)session.get(0);
 		}
 	}
-	
+    
+    
     /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#saveMcSession(org.lamsfoundation.lams.tool.mc.McSession) */
     public void saveMcSession(McSession mcSession)
     {

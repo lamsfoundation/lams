@@ -26,10 +26,10 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.McQueUsr;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 import org.lamsfoundation.lams.tool.mc.McSession;
+import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
+import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 /**
  * @author ozgurd
@@ -63,6 +63,28 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 			return (McQueUsr)users.get(0);
 		}
 	}
+	
+	
+	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#getMcUserBySession(java.lang.Long, java.lang.Long)*/
+	public McQueUsr getMcUserBySession(Long userId, Long sessionId)
+	{
+		String query = "select mu from McQueUsr mu where mu.queUsrId=? and mu.mcSession.mcSessionId=?";
+		Long[] bindingValues = new Long[2];
+		bindingValues[0] = userId;
+		bindingValues[1] = sessionId;
+		List usersReturned = getHibernateTemplate().find(query, bindingValues); 
+		
+		if (usersReturned!= null && usersReturned.size() == 0)
+		{
+			return null;
+		}
+		else
+		{
+			return (McQueUsr)usersReturned.get(0);
+		}
+
+	}
+
 	
 		/** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#saveMcUser(org.lamsfoundation.lams.tool.mc.McUser) */
 	public void saveMcUser(McQueUsr mcUser)
