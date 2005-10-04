@@ -1,16 +1,11 @@
 package org.lamsfoundation.lams.tool.mc;
 
-import java.util.Date;
-import java.util.TreeSet;
-
 import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McQueContentDAO;
-import org.lamsfoundation.lams.tool.mc.dao.hibernate.McQueUsrDAO;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McSessionDAO;
-import org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrRespDAO;
-
-
+import org.lamsfoundation.lams.tool.mc.dao.hibernate.McUserDAO;
+import org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrAttemptDAO;
 
 /**
  * @author ozgurd
@@ -40,9 +35,9 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
 	
 	protected McContentDAO mcContentDAO;
 	protected McSessionDAO mcSessionDAO;
-	protected McQueUsrDAO  mcQueUsrDAO;
+	protected McUserDAO    mcUserDAO;
 	protected McQueContentDAO mcQueContentDAO;
-	protected McUsrRespDAO  mcUsrRespDAO;
+	protected McUsrAttemptDAO  mcUsrAttemptDAO;
 	
 	
 	protected McSession mcSession;
@@ -59,10 +54,9 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
         super.setUp();
         mcContentDAO = (McContentDAO) this.context.getBean("mcContentDAO");
         mcSessionDAO = (McSessionDAO) this.context.getBean("mcSessionDAO");
-        mcQueUsrDAO = (McQueUsrDAO) this.context.getBean("mcQueUsrDAO");
+        mcUserDAO = (McUserDAO) this.context.getBean("mcUserDAO");
         mcQueContentDAO = (McQueContentDAO) this.context.getBean("mcQueContentDAO");
-        mcUsrRespDAO = (McUsrRespDAO) this.context.getBean("mcUsrRespDAO");
-        
+        mcUsrAttemptDAO = (McUsrAttemptDAO) this.context.getBean("mcUsrAttemptDAO");
     }
 
     protected String[] getContextConfigLocation()
@@ -80,5 +74,6 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
     {
     	super.tearDown();
     }
+    
 
 }

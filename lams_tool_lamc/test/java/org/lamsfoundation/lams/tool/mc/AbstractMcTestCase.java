@@ -1,10 +1,10 @@
 
 package org.lamsfoundation.lams.tool.mc;
 
+import junit.framework.TestCase;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import junit.framework.TestCase;
 
 
 /**
@@ -29,7 +29,9 @@ public abstract class AbstractMcTestCase extends TestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+        System.out.println("AbstractMcTestCase: done with abstract super setup");
         context = new ClassPathXmlApplicationContext(getContextConfigLocation());
+        System.out.println("AbstractMcTestCase: context" + context);
     }
 
 	protected abstract String[] getContextConfigLocation();

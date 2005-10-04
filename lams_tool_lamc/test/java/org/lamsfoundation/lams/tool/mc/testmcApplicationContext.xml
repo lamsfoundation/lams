@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for lams survey business layer.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+	<!-- (in this case, hibernate-related settings for the session factory definition below) -->
+	
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location"><value>/org/lamsfoundation/lams/tool/mc/dbConnection.properties</value></property>
+	</bean>
+	
+
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	
+		<!-- Local DataSource that works in any environment -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"><value>${jdbc.driverClassName}</value></property>
+		<property name="url"><value>${jdbc.url}</value></property>
+		<property name="username"><value>${jdbc.username}</value></property>
+		<property name="password"><value>${jdbc.password}</value></property>
+	</bean>
+	
+	<!-- Hibernate SessionFactory -->
+	<bean id="mcSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+		<property name="dataSource"><ref local="dataSource"/></property>
+		<property name="mappingResources">
+			<list>	
+				<value>/org/lamsfoundation/lams/tool/mc/McContent.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/mc/McSession.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/mc/McQueUsr.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/mc/McQueContent.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/mc/McOptionsContent.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/mc/McUsrAttempt.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.c3p0.minPoolSize">${hibernate.c3p0.minPoolSize}</prop>
+				<prop key="hibernate.c3p0.maxPoolSize">${hibernate.c3p0.maxPoolSize}</prop>
+				<prop key="hibernate.c3p0.timeout">${hibernate.c3p0.timeout}</prop>
+				<prop key="hibernate.c3p0.max_statement">${hibernate.c3p0.max_statement}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- If we really use multiple SessionFactory, we have to change to JTA Transaction Manager -->
+	<!-- bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"/-->
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
+		<property name="mcSessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>
+
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+
+	<!-- tool beans -->
+
+	<bean id="mcContentDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McContentDAO">
+		<property name="mcsessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>  
+
+	<bean id="mcSessionDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McSessionDAO">
+		<property name="mcsessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>
+
+	<bean id="mcUserDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUserDAO">
+		<property name="mcsessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>
+	
+	<bean id="mcQueContentDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McQueContentDAO">
+		<property name="mcsessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>
+	
+	<bean id="mcOptionsContentDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McOptionsContentDAO">
+		<property name="mcsessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>
+	
+	
+	<bean id="mcUsrAttemptDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrAttemptDAO">
+		<property name="mcsessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>
+	
+
+<!-- 	
+	<bean id="mcUploadedFileDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUploadedFileDAO">
+		<property name="mcsessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>
+-->
+	
+	<!-- end of tool beans -->
+
+
+</beans>
+

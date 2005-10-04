@@ -13,7 +13,7 @@
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 	
 	<!-- Hibernate SessionFactory -->
-	<bean id="qaSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+	<bean id="mcSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="toolDataSource"/></property>
 		<property name="mappingResources">
 			<list>	
@@ -31,45 +31,51 @@
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 
 	<!-- tool beans -->
-<!-- 
-	<bean id="qaContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaContentDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+
+	<bean id="mcContentDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McContentDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>  
 
-	<bean id="qaSessionDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaSessionDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	<bean id="mcSessionDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McSessionDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
 
-	<bean id="qaQueUsrDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueUsrDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	<bean id="mcUserDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUserDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
 	
-	<bean id="qaQueContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueContentDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	<bean id="mcQueContentDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McQueContentDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
 	
-	<bean id="qaUsrRespDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaUsrRespDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	<bean id="mcUsrAttemptDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrAttemptDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
 	
-	<bean id="qaUploadedFileDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaUploadedFileDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	<bean id="mcUsrRespDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrRespDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>
+
+<!-- 	
+	<bean id="mcUploadedFileDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUploadedFileDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
 -->
+
 	
 	<!-- end of tool beans -->
 	
 <!-- 
-	<bean id="qaService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	<bean id="mcService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 			<property name="target">
-				<bean class="org.lamsfoundation.lams.tool.qa.service.QaServicePOJO">
-					<property name="qaDAO"><ref bean="qaContentDAO"/></property>
-					<property name="qaSessionDAO"><ref bean="qaSessionDAO"/></property>
-					<property name="qaQueUsrDAO"><ref bean="qaQueUsrDAO"/></property>
-					<property name="qaQueContentDAO"><ref bean="qaQueContentDAO"/></property>
-					<property name="qaUsrRespDAO"><ref bean="qaUsrRespDAO"/></property>								
-					<property name="qaUploadedFileDAO"><ref bean="qaUploadedFileDAO"/></property>								
+				<bean class="org.lamsfoundation.lams.tool.mc.service.QaServicePOJO">
+					<property name="mcDAO"><ref bean="mcContentDAO"/></property>
+					<property name="mcSessionDAO"><ref bean="mcSessionDAO"/></property>
+					<property name="mcQueUsrDAO"><ref bean="mcQueUsrDAO"/></property>
+					<property name="mcQueContentDAO"><ref bean="mcQueContentDAO"/></property>
+					<property name="mcUsrRespDAO"><ref bean="mcUsrRespDAO"/></property>								
+					<property name="mcUploadedFileDAO"><ref bean="mcUploadedFileDAO"/></property>								
 					<property name="toolService"><ref bean="lamsToolService"/></property>
 					<property name="repositoryService"><ref bean="repositoryService"/></property>
 				</bean>
