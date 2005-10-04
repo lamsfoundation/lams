@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for lams survey business layer.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+	<!-- (in this case, hibernate-related settings for the session factory definition below) -->
+	
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location"><value>/org/lamsfoundation/lams/tool/qa/dbConnection.properties</value></property>
+	</bean>
+	
+
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	
+		<!-- Local DataSource that works in any environment -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"><value>${jdbc.driverClassName}</value></property>
+		<property name="url"><value>${jdbc.url}</value></property>
+		<property name="username"><value>${jdbc.username}</value></property>
+		<property name="password"><value>${jdbc.password}</value></property>
+	</bean>
+	
+	
+	<!-- Hibernate SessionFactory -->
+	<bean id="qaSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+		<property name="dataSource"><ref local="dataSource"/></property>
+		<property name="mappingResources">
+			<list>	
+				<value>/org/lamsfoundation/lams/tool/qa/QaContent.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaSession.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaQueContent.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaQueUsr.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaUsrResp.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaUploadedFile.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.c3p0.minPoolSize">${hibernate.c3p0.minPoolSize}</prop>
+				<prop key="hibernate.c3p0.maxPoolSize">${hibernate.c3p0.maxPoolSize}</prop>
+				<prop key="hibernate.c3p0.timeout">${hibernate.c3p0.timeout}</prop>
+				<prop key="hibernate.c3p0.max_statement">${hibernate.c3p0.max_statement}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- If we really use multiple SessionFactory, we have to change to JTA Transaction Manager -->
+	<!-- bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"/-->
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
+		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	</bean>
+
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+
+	<!-- tool beans -->
+	<bean id="qaContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaContentDAO">
+		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	</bean>  
+
+	<bean id="qaSessionDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaSessionDAO">
+		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	</bean>
+
+	<bean id="qaQueUsrDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueUsrDAO">
+		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	</bean>
+	
+	<bean id="qaQueContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueContentDAO">
+		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	</bean>
+	
+	<bean id="qaUsrRespDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaUsrRespDAO">
+		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	</bean>
+	
+	<bean id="qaUploadedFileDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaUploadedFileDAO">
+		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	</bean>
+	
+	
+	<!-- end of tool beans -->
+	
+
+	<bean id="qaService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+			<property name="target">
+				<bean class="org.lamsfoundation.lams.tool.qa.service.QaServicePOJO">
+					<property name="qaDAO"><ref bean="qaContentDAO"/></property>
+					<property name="qaSessionDAO"><ref bean="qaSessionDAO"/></property>
+					<property name="qaQueUsrDAO"><ref bean="qaQueUsrDAO"/></property>
+					<property name="qaQueContentDAO"><ref bean="qaQueContentDAO"/></property>
+					<property name="qaUsrRespDAO"><ref bean="qaUsrRespDAO"/></property>								
+					<property name="qaUploadedFileDAO"><ref bean="qaUploadedFileDAO"/></property>								
+					<!--  <property name="toolService"><ref bean="lamsToolService"/></property> -->
+					<!--  <property name="repositoryService"><ref bean="repositoryService"/></property> -->
+				</bean>
+			</property>
+			<property name="transactionAttributes">
+				<props>
+					<prop key="create*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="copy*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="save*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
+					<prop key="update*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="get*">PROPAGATION_REQUIRED,readOnly,-QacpApplicationException</prop>
+					<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<!--  <prop key="configureContentRepository">PROPAGATION_REQUIRED,-QaApplicationException</prop> -->
+				</props>
+			</property>
+	</bean>  
+
+</beans>
