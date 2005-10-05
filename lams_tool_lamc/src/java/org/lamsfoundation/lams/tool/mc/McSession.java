@@ -2,7 +2,9 @@ package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -34,16 +36,16 @@ public class McSession implements Serializable {
     private Set mcQueUsers;
 
     /** full constructor */
-    public McSession(Long mcSessionId, Date session_start_date, Date session_end_date, String session_status, Long mcContentId, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcQueUsers) {
+    public McSession(Long mcSessionId, Date session_start_date, Date session_end_date, String session_status, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcQueUsers) {
         this.mcSessionId = mcSessionId;
         this.session_start_date = session_start_date;
         this.session_end_date = session_end_date;
         this.session_status = session_status;
-        this.mcContentId = mcContentId;
         this.mcContent = mcContent;
         this.mcQueUsers = mcQueUsers;
     }
-
+    
+    
     /** default constructor */
     public McSession() {
     }
@@ -111,6 +113,8 @@ public class McSession implements Serializable {
     }
 
     public Set getMcQueUsers() {
+        if (this.mcQueUsers == null)
+            setMcQueUsers(new HashSet());
         return this.mcQueUsers;
     }
 

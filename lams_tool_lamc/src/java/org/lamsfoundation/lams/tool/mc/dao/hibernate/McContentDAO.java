@@ -115,7 +115,7 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	 public void removeMcById(Long mcContentId)
 	    {
 	        String query = "from mc in class org.lamsfoundation.lams.tool.mc.McContent"
-	        + " where qa.mcContentId = ?";
+	        + " where mc.mcContentId = ?";
 	        this.getHibernateTemplate().delete(query,mcContentId,Hibernate.LONG);
 	    }
 	

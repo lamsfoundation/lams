@@ -417,8 +417,8 @@
 					<formatter type="xml"/>
 					<batchtest todir="${build.report}">
 						<fileset dir="${src.test.dir}">
-							<include name="**/TestMcContent.java"/>
-
+						<!-- <include name="**/TestMcContent.java"/> -->
+							<include name="**/TestMcSession.java"/> 
 						</fileset>
 					</batchtest>
 					<classpath>

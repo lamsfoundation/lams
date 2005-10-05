@@ -13,19 +13,13 @@ import org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrAttemptDAO;
 public class McDataAccessTestCase extends AbstractLamsTestCase
 {
 	//These both refer to the same entry in the db.
-	protected final long TEST_EXISTING_CONTENT_ID = 10;
-	protected final long DEFAULT_CONTENT_ID = 10;
-	 
-	protected final long TEST_NEW_CONTENT_ID = 11;
+	protected final Long DEFAULT_CONTENT_ID = new Long(10);
+	protected final Long TEST_CONTENT_ID = new Long(2);
+	protected final Long TEST_CONTENT_ID_OTHER = new Long(3);
 	
-	protected final long TEST_EXISTING_SESSION_ID = 101;
-	protected final long TEST_NEW_SESSION_ID = 102;
+	protected final Long TEST_SESSION_ID = new Long(20);
+	protected final Long TEST_SESSION_ID_OTHER = new Long(21);
 	
-	protected final long TEST_NEW_USER_ID = 700;
-	protected final long TEST_EXISTING_QUE_CONTENT_ID = 20;
-	protected final long TEST_NEW_QUE_CONTENT_ID = 23;
-	
-	protected final long TEST_NONEXISTING_CONTENT_ID=2475733396382404l;
 	
     protected final long ONE_DAY = 60 * 60 * 1000 * 24;
     
@@ -75,5 +69,9 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
     	super.tearDown();
     }
     
+    public void testDummy()
+    {    
+    	System.out.println("dummy McDataAccessTestCase");
+    }
 
 }

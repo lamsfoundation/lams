@@ -49,7 +49,7 @@ public class TestMcContent extends McDataAccessTestCase
     {
     	//create new mc content
     	McContent mc = new McContent();
-		mc.setMcContentId(new Long(4));
+		mc.setMcContentId(TEST_CONTENT_ID);
 		mc.setTitle("New - Put Title Here");
 		mc.setInstructions("New - Put instructions here.");
 		mc.setQuestionsSequenced(false);
@@ -72,6 +72,66 @@ public class TestMcContent extends McDataAccessTestCase
 	    mc.setMcSessions(new TreeSet());
 	    
 	    mcContentDAO.saveMcContent(mc);
+	    assertNotNull(mc);
    }
     
+   /* 
+    public void testCreateNewMcContentOther()
+    {
+    	//create new mc content
+    	McContent mc = new McContent();
+		mc.setMcContentId(TEST_CONTENT_ID_OTHER);
+		mc.setTitle("Other - Put Title Here");
+		mc.setInstructions("Other - Put instructions here.");
+		mc.setQuestionsSequenced(false);
+		mc.setUsernameVisible(false);
+		mc.setCreatedBy(0);
+		mc.setMonitoringReportTitle("Other-Monitoring Report title");
+		mc.setReportTitle("Other-Report title");
+		mc.setRunOffline(false);
+	    mc.setDefineLater(false);
+	    mc.setSynchInMonitor(false);
+	    mc.setOnlineInstructions("Other- online instructions");
+	    mc.setOfflineInstructions("Other- offline instructions");
+	    mc.setEndLearningMessage("Other- endLearningMessage");
+	    mc.setContentInUse(false);
+	    mc.setRetries(false);
+	    mc.setShowFeedback(false);
+	    mc.setShowTopUsers(false);
+		
+	    mc.setMcQueContents(new TreeSet());
+	    mc.setMcSessions(new TreeSet());
+	    
+	    mcContentDAO.saveMcContent(mc);
+	    assertNotNull(mc);
+   } 
+    
+    
+    public void testRetrieveMcContent()
+    {
+    	McContent mcContent = mcContentDAO.findMcContentById(TEST_CONTENT_ID);
+    	assertNotNull(mcContent);
+    	assertEquals(mcContent.getMcContentId(), new Long(2));
+    }
+ 
+    public void testRemoveMcContent()
+    {
+    	McContent mcContent = mcContentDAO.findMcContentById(TEST_CONTENT_ID);
+    	mcContentDAO.removeMc(mcContent);
+    	assertNull(mcContent);
+    }
+    
+
+    public void testRemoveMcContentById()
+    {
+    	mcContentDAO.removeMc(TEST_CONTENT_ID_OTHER);
+    }
+
+    
+    public void testRemoveMcContentByIdExplicit()
+    {
+    	mcContentDAO.removeMcById(TEST_CONTENT_ID);
+    }
+    
+    */
 }
