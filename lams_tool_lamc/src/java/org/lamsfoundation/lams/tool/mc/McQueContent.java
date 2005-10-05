@@ -61,11 +61,11 @@ public class McQueContent implements Serializable {
         this.uid = uid;
     }
 
-    public Long getQaQueContentId() {
+    public Long getMcQueContentId() {
         return this.mcQueContentId;
     }
 
-    public void setQaQueContentId(Long mcQueContentId) {
+    public void setMcQueContentId(Long mcQueContentId) {
         this.mcQueContentId = mcQueContentId;
     }
 
@@ -115,4 +115,16 @@ public class McQueContent implements Serializable {
             .toString();
     }
 
+	/**
+	 * @return Returns the mcContentId.
+	 */
+	public Long getMcContentId() {
+		return mcContentId;
+	}
+	/**
+	 * @param mcContentId The mcContentId to set.
+	 */
+	public void setMcContentId(Long mcContentId) {
+		this.mcContentId = mcContentId;
+	}
 }

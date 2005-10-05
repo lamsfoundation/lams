@@ -192,6 +192,16 @@
     />
     
     <property
+        name="retries"
+        type="boolean"
+        update="true"
+        insert="true"
+        access="property"        
+        column="retries"
+        length="1"
+    />
+    
+    <property
         name="passMark"
         type="java.lang.Integer"
         update="true"

@@ -65,6 +65,21 @@ public class McContent implements Serializable {
     private String endLearningMessage;
 
     /** nullable persistent field */
+    private boolean retries;
+    
+	/**
+	 * @return Returns the retries.
+	 */
+	public boolean isRetries() {
+		return retries;
+	}
+	/**
+	 * @param retries The retries to set.
+	 */
+	public void setRetries(boolean retries) {
+		this.retries = retries;
+	}
+    /** nullable persistent field */
     private Integer passMark;
 
     /** nullable persistent field */
@@ -80,7 +95,7 @@ public class McContent implements Serializable {
     private Set mcSessions;
 
     /** full constructor */
-    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, String endLearningMessage, Integer passMark, boolean showFeedback, boolean showTopUsers, SortedSet mcQueContents, Set mcSessions) {
+    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, String endLearningMessage, Integer passMark, boolean showFeedback, boolean retries, boolean showTopUsers, SortedSet mcQueContents, Set mcSessions) {
         this.mcContentId = mcContentId;
         this.title = title;
         this.instructions = instructions;
@@ -99,6 +114,7 @@ public class McContent implements Serializable {
         this.onlineInstructions = onlineInstructions;
         this.endLearningMessage = endLearningMessage;
         this.passMark = passMark;
+        this.retries=retries;
         this.showFeedback = showFeedback;
         this.showTopUsers = showTopUsers;
         this.mcQueContents = mcQueContents;
