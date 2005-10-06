@@ -180,7 +180,7 @@
     <appender-ref ref="LAMSCONSOLE"/>
   </category>
   
-  <category name="net.sf.hibernate" additivity="false">
+  <category name="org.hibernate" additivity="false">
     <priority value="INFO"/>
     <appender-ref ref="HIBERNATEFILE"/>
   </category>

@@ -4,8 +4,7 @@
 <archive path="/lams_build/lib/cglib/cglib-nodep-2.1_2.jar"/>
 <archive path="/lams_build/lib/dom4j/dom4j-1.5.2.jar"/>
 <archive path="/lams_build/lib/ehcache/ehcache-1.1.jar"/>
-<archive path="/lams_build/lib/hibernate/hibernate-tools.jar"/>
-<archive path="/lams_build/lib/hibernate/hibernate2.jar" source="/lams_build/lib/hibernate/src/hibernate-src.zip"/>
+<archive path="/lams_build/lib/hibernate/hibernate3.jar" source="/lams_build/lib/hibernate/src/hibernate-src.zip"/>
 <archive path="/lams_build/lib/httpunit/httpunit.jar"/>
 <archive path="/lams_build/lib/httpunit/js.jar"/>
 <archive path="/lams_build/lib/httpunit/nekohtml.jar"/>
