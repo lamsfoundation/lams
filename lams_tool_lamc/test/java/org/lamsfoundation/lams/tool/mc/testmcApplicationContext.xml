@@ -35,14 +35,12 @@
 		<property name="dataSource"><ref local="dataSource"/></property>
 		<property name="mappingResources">
 			<list>	
-			  <!-- 	
-				<value>/org/lamsfoundation/lams/tool/mc/McUsrAttempt.hbm.xml</value>
-			  -->
   			  	<value>/org/lamsfoundation/lams/tool/mc/McContent.hbm.xml</value> 
 				<value>/org/lamsfoundation/lams/tool/mc/McQueContent.hbm.xml</value>
 				<value>/org/lamsfoundation/lams/tool/mc/McOptsContent.hbm.xml</value>
 			  	<value>/org/lamsfoundation/lams/tool/mc/McSession.hbm.xml</value>
 				<value>/org/lamsfoundation/lams/tool/mc/McQueUsr.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/mc/McUsrAttempt.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

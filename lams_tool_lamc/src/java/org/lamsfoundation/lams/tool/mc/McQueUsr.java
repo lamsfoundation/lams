@@ -22,9 +22,7 @@ public class McQueUsr implements Serializable {
     /** nullable persistent field */
     private String fullname;
 
-    /** nullable persistent field */
-    private Long mcSessionId;
-
+    
     /** nullable persistent field */
     private org.lamsfoundation.lams.tool.mc.McSession mcSession;
 
@@ -82,14 +80,7 @@ public class McQueUsr implements Serializable {
         this.fullname = fullname;
     }
 
-    public Long getMcSessionId() {
-        return this.mcSessionId;
-    }
-
-    public void setMcSessionId(Long mcSessionId) {
-        this.mcSessionId = mcSessionId;
-    }
-
+    
     public org.lamsfoundation.lams.tool.mc.McSession getMcSession() {
         return this.mcSession;
     }

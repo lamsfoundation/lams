@@ -42,15 +42,6 @@
     >
     </property>
 
-    <property
-        name="mcSessionId"
-        type="java.lang.Long"
-        column="mc_session_id"
-        update="false"
-        insert="false"
-    >
-    </property>
-    
     <many-to-one
         name="mcSession"
         class="org.lamsfoundation.lams.tool.mc.McSession"
@@ -63,8 +54,6 @@
         <column name="mc_session_id" />
     </many-to-one>
 
-
-<!-- 
    	 <set
             name="mcUsrAttempts"
             lazy="false"
@@ -81,7 +70,6 @@
                   class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
               />
     </set>
-  -->
 
 </class>
 </hibernate-mapping>

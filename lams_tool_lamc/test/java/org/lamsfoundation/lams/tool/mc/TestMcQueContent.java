@@ -50,6 +50,7 @@ public class TestMcQueContent extends McDataAccessTestCase
     												);
     	mcQueContentDAO.saveMcQueContent(mcQueContent);
     	
+    
     	
     	McContent mcContent2 = mcContentDAO.findMcContentById(new Long(3));
     	
@@ -62,15 +63,16 @@ public class TestMcQueContent extends McDataAccessTestCase
     												);
     	mcQueContentDAO.saveMcQueContent(mcQueContent2);
     	
+    	
     }
-    
+   /* 
     public void testRetrieveMcQueContent()
     {
     	McQueContent mcQueContent= mcQueContentDAO.findMcQueContentById(new Long(20));
     	mcQueContent.setDisplayOrder(new Integer(88));
     	mcQueContentDAO.saveMcQueContent(mcQueContent);
     }
-
+    */
     
     
 }
