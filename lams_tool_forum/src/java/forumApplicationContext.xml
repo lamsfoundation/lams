@@ -3,7 +3,7 @@
 <beans>
 
     <!-- Hibernate SessionFactory -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="toolDataSource"/></property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 

@@ -56,41 +56,41 @@ public class TestToolContentHandlerImpl extends BaseTestCase {
         handler = null;
     }
 
-    public void testGetRepositoryWorkspaceName() {
-        assertEquals(handler.repositoryWorkspace,handler.getRepositoryWorkspaceName());
-    }
-
-    public void testGetRepositoryUser() {
-        assertEquals(handler.repositoryUser,handler.getRepositoryUser());
-    }
-
-    public void testGetRepositoryId() {
-        assertEquals(handler.repositoryId,handler.getRepositoryId());
-   }
-
-    public void testGetRepositoryService() {
-        try {
-            assertNotNull(handler.getRepositoryService());
-        } catch ( Exception e ) {
-            e.printStackTrace();
-            fail("getRepService() threw exception "+e.getMessage());
-        }
-   }
-
-    public void testGetTicket() {
-        try {
-            ITicket ticket1 = handler.getTicket(false);
-            // repeat call using false should get same ticket;
-            ITicket ticket2 = handler.getTicket(false);
-            assertSame(ticket1, ticket2);
-            // repeat call using true should get new ticket;
-            ITicket ticket3 = handler.getTicket(true);
-            assertNotSame(ticket1, ticket3);
-        } catch ( Exception e ) {
-            e.printStackTrace();
-            fail("getRepositoryId() threw exception "+e.getMessage());
-        }
-    }
+//    public void testGetRepositoryWorkspaceName() {
+//        assertEquals(handler.repositoryWorkspace,handler.getRepositoryWorkspaceName());
+//    }
+//
+//    public void testGetRepositoryUser() {
+//        assertEquals(handler.repositoryUser,handler.getRepositoryUser());
+//    }
+//
+//    public void testGetRepositoryId() {
+//        assertEquals(handler.repositoryId,handler.getRepositoryId());
+//   }
+//
+//    public void testGetRepositoryService() {
+//        try {
+//            assertNotNull(handler.getRepositoryService());
+//        } catch ( Exception e ) {
+//            e.printStackTrace();
+//            fail("getRepService() threw exception "+e.getMessage());
+//        }
+//   }
+//
+//    public void testGetTicket() {
+//        try {
+//            ITicket ticket1 = handler.getTicket(false);
+//            // repeat call using false should get same ticket;
+//            ITicket ticket2 = handler.getTicket(false);
+//            assertSame(ticket1, ticket2);
+//            // repeat call using true should get new ticket;
+//            ITicket ticket3 = handler.getTicket(true);
+//            assertNotSame(ticket1, ticket3);
+//        } catch ( Exception e ) {
+//            e.printStackTrace();
+//            fail("getRepositoryId() threw exception "+e.getMessage());
+//        }
+//    }
 
     /* Creates an offline and online file, checks that the properties are correct and then deletes them. */
     public void testUploadFile() {
@@ -109,7 +109,7 @@ public class TestToolContentHandlerImpl extends BaseTestCase {
             handler.deleteFile(uuid);
             try {
                 node = handler.getFileNode(uuid);
-  //              fail("Expected ItemNotFoundException to be thrown when trying to access deleted offline file.");
+                fail("Expected ItemNotFoundException to be thrown when trying to access deleted offline file.");
             } catch (ItemNotFoundException ie) {
                 assertTrue("Offline node cannot be retrieved after deletion",true);
             }

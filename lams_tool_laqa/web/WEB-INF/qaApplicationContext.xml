@@ -30,7 +30,7 @@
 	
 	
 	<!-- Hibernate SessionFactory -->
-	<bean id="qaSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+	<bean id="qaSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource"><ref local="dataSource"/></property>
 		<property name="mappingResources">
 			<list>	

@@ -168,22 +168,6 @@ Ant build file.
 	</target>
 	-->
 	
-	<!-- =================================================================== -->
-	<!-- Run hbm2java for Content Repository                                 -->
-	<!-- =================================================================== -->
-	<target name="hbm2java-cr" description="Generate .java from .hbm files.">
-		<taskdef
-         name="hbm2java-cr"
-         classname="net.sf.hibernate.tool.hbm2java.Hbm2JavaTask"
-         classpathref="all-libs"
-      />
-		<hbm2java-cr output="${src.java.dir}">
-			<fileset dir="${hbm}/${package.contentrepository}">
-				<include name="*.hbm.xml"/>
-			</fileset>
-		</hbm2java-cr>
-	</target>
-
 	<target name="print-classpath">
 		<echo message="java.class.path = ${java.class.path}"/>
 	</target>
@@ -213,12 +197,6 @@ Ant build file.
 				<path refid="project.classpath"/>
 			</classpath>
 		</javac>
-		<!-- JBOSS cache file -->
-		<copy overwrite="yes" todir="${build.classes.java}">
-			<fileset dir="${src.java.dir}">
-					<include name="*.xml"/>
-			</fileset>
-		</copy>
 		<!-- Spring files -->
 		<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/contentrepository/">
 			<fileset dir="${src.java.dir}/org/lamsfoundation/lams/contentrepository">
@@ -350,7 +328,7 @@ Ant build file.
 				<fileset dir="${src.java.dir}">
 					<include name="**/Cr*.java"/>
 				</fileset>
-			<hibernate version="2.0"/>
+			<hibernate version="3.0"/>
 		</hibernatedoclet>
 	</target>
 

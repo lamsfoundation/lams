@@ -33,7 +33,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.themes.CSSProperty;
 
 
 /** 
@@ -70,12 +69,6 @@ public class CrNode implements Serializable {
     /** versions of this node. persistent field */
     private Set crNodeVersions;
     
-    /** transitory field. 
-	 * don't create the versionHistory till requested, but
-	 * keep it just in case the caller asks for it again.
-	 */
-	private SortedSet versionHistory = null;
-
     /** full constructor */
     public CrNode(String path, String type, Date createdDateTime, Long nextVersionId, org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace, org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set crNodeVersions) {
         this.path = path;
@@ -244,6 +237,23 @@ public class CrNode implements Serializable {
         version.setNode(this);
     }
 
+    /** Remove a version to this node. Returns true if the version was found and deleted.
+     * For some reason, this seems to be more reliable than getCrNodeVersions().remove(version)
+     * in junit tests. */
+    public boolean removeCrNodeVersion(CrNodeVersion version) {
+        if ( getCrNodeVersions() != null ) {
+        	Iterator iter = getCrNodeVersions().iterator();
+        	while (iter.hasNext()) {
+				CrNodeVersion element = (CrNodeVersion) iter.next();
+				if ( element == version) {
+					iter.remove();
+					return true;
+				}
+			}
+        }
+        return false;
+    }
+
     public String toString() {
         return new ToStringBuilder(this)
             .append("nodeId", getNodeId())
@@ -291,33 +301,28 @@ public class CrNode implements Serializable {
     }
     
 	/** 
-	 * Get the history for this node. Quite intensive operation the
-	 * first time it is run on a node as it has to build all the 
-	 * data structures.
+	 * Get the history for this node. Quite intensive operation 
+	 * as it has to build all the data structures. Can't cache
+	 * it as can't tell easily when the versions are changed.
 	 * @return SortedSet of IVersionDetail objects, ordered by version
 	 */
 	public SortedSet getVersionHistory() {
 		
-		if ( versionHistory == null ) {
-			
-			SortedSet history = new TreeSet();
-			
-			Set versions = getCrNodeVersions();
-			if ( versions != null ) {
-				Iterator iter = versions.iterator();
-				while (iter.hasNext()) {
-					CrNodeVersion element = (CrNodeVersion) iter.next();
-					String desc = element.getVersionDescription();
-					history.add(	new SimpleVersionDetail(
-										element.getVersionId(),
-										element.getCreatedDateTime(), 
-										desc ));
-				}
-			}
-			versionHistory = history;
-		}
+		SortedSet history = new TreeSet();
 		
-		return versionHistory;
+		Set versions = getCrNodeVersions();
+		if ( versions != null ) {
+			Iterator iter = versions.iterator();
+			while (iter.hasNext()) {
+				CrNodeVersion element = (CrNodeVersion) iter.next();
+				String desc = element.getVersionDescription();
+				history.add(	new SimpleVersionDetail(
+									element.getVersionId(),
+									element.getCreatedDateTime(), 
+									desc ));
+			}
+		}
+		return history;
 	}
 
     /**

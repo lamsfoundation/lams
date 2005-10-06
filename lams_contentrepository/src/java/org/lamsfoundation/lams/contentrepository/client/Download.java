@@ -32,19 +32,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IValue;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**

@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping
 >
     <class
         name="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
         table="lams_cr_node_version"
-        dynamic-update="false"
-        dynamic-insert="false"
-        select-before-update="false"
-        optimistic-lock="version"
     >
         <cache usage="transactional" />
 
@@ -36,7 +32,6 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            access="property"
             column="version_id"
             length="20"
             not-null="true"
@@ -47,7 +42,6 @@
             type="java.sql.Timestamp"
             update="true"
             insert="true"
-            access="property"
             column="created_date_time"
             length="14"
         />
@@ -59,7 +53,6 @@
             outer-join="auto"
             update="true"
             insert="true"
-            access="property"
         >
             <column
                 name="node_id" 
@@ -75,16 +68,16 @@
         >
             <cache 
                 usage="transactional" 
-             />
+            />
 
-              <key
-                  column="nv_id"
-              >
-              </key>
+            <key
+                column="nv_id"
+            >
+            </key>
 
-              <one-to-many
+            <one-to-many
                   class="org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty"
-              />
+            />
 
         </set>
 

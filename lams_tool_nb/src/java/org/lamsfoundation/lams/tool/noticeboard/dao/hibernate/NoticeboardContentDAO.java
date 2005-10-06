@@ -24,13 +24,13 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 import java.util.List;
 import java.lang.Long;
 
-import net.sf.hibernate.HibernateException;
-import net.sf.hibernate.Session;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
-import org.springframework.orm.hibernate.HibernateCallback;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author mtruong

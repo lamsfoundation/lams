@@ -88,7 +88,10 @@ public interface IMonitoringService
     
     /**
      * Set the gate to open to let all the learners through. This learning service
-     * is triggerred by the system scheduler.
+     * is triggerred by the system scheduler. Will return true GateActivity (or subclass)
+     * object, rather than a hibernate proxy. This is needed so that the class can 
+     * be returned to the web layer for proper handling.
+     * 
      * @param gate the id of the gate we need to open.
      */
     public GateActivity openGate(Long gateId);

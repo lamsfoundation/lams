@@ -30,7 +30,6 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
-import org.springframework.orm.hibernate.HibernateObjectRetrievalFailureException;
 
 /**
  * Note: this test sets up tool content ids and tool session ids that 
@@ -133,19 +132,11 @@ public class TestSubmitFilesService extends SbmtBaseTestCase {
 		}
 
 		// Records should still exist
-		try{
-			SubmitFilesContent content = submitFilesContentDAO.getContentByID(toolContentId);
-			assertNotNull("Tool content data", content);
-		}catch(HibernateObjectRetrievalFailureException he){
-			fail("Tool content has been marked as deleted - should not have been deleted");
-		}
+		SubmitFilesContent content = submitFilesContentDAO.getContentByID(toolContentId);
+		assertNotNull("Tool content data", content);
 
-		try{
-			SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(sessionContentId);
-			assertNotNull("Tool session data", session);
-		}catch(HibernateObjectRetrievalFailureException he){
-			fail("Tool session has been marked as deleted - should not have been deleted");
-		}
+		SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(sessionContentId);
+		assertNotNull("Tool session data", session);
 
 		// This time remove the session data too! 
 		try {
@@ -158,19 +149,11 @@ public class TestSubmitFilesService extends SbmtBaseTestCase {
 			fail("Tool exception thrown deleting the content toolContentId="+toolContentId);
 		}
 
-		try{
-			submitFilesContentDAO.getContentByID(toolContentId);
-			fail("Exception should be raised because content object has already been deleted");
-		}catch(HibernateObjectRetrievalFailureException he){
-			assertTrue("Tool Content has been deleted as expected", true);
-		}
+		SubmitFilesContent content2 = submitFilesContentDAO.getContentByID(toolContentId);
+		assertNull("Tool Content has been deleted as expected", content2);
 
-		try{
-			submitFilesSessionDAO.getSessionByID(sessionContentId);
-			fail("Exception should be raised because session object has already been deleted");
-		}catch(HibernateObjectRetrievalFailureException he){
-			assertTrue("Tool session has been deleted as expected", true);
-		}
+		SubmitFilesSession session2 = submitFilesSessionDAO.getSessionByID(sessionContentId);
+		assertNull("Tool session has been deleted as expected", session2);
 		
 	}
 
@@ -190,12 +173,8 @@ public class TestSubmitFilesService extends SbmtBaseTestCase {
 			fail("Tool exception thrown deleting the content toolContentId="+toolContentId);
 		}
 
-		try{
-			submitFilesContentDAO.getContentByID(toolContentId);
-			fail("Exception should be raised because content object has already been deleted");
-		}catch(HibernateObjectRetrievalFailureException he){
-			assertTrue("Tool Content has been deleted as expected", true);
-		}
+		SubmitFilesContent content2 = submitFilesContentDAO.getContentByID(toolContentId);
+		assertNull("Tool Content has been deleted as expected", content2);
 
 	}
 

@@ -213,8 +213,10 @@ public class SubmitFilesService implements ToolContentManager,
 			throw new ToolException(
 					"Failed to create the SubmitFiles tool seession");
 
-		SubmitFilesContent fromContent = submitFilesContentDAO
-				.getContentByID(fromContentId);
+		SubmitFilesContent fromContent = submitFilesContentDAO.getContentByID(fromContentId);
+		if ( fromContent == null ) {
+			// TODO need to get default content here!!!
+		}
 		SubmitFilesContent toContent = (SubmitFilesContent) fromContent.clone();
 		//reset some new attributes for toContent
 		toContent.setContentID(toContentId);
@@ -293,8 +295,7 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long)
 	 */
 	public void removeToolContent(Long toolContentId, boolean removeSessionData)throws DataMissingException {
-		SubmitFilesContent submitFilesContent = submitFilesContentDAO
-				.getContentByID(toolContentId);
+		SubmitFilesContent submitFilesContent = submitFilesContentDAO.getContentByID(toolContentId);
 		if (submitFilesContent == null)
 			throw new DataMissingException(
 					"No such content with a contentID of : " + toolContentId
@@ -342,8 +343,11 @@ public class SubmitFilesService implements ToolContentManager,
 		try {
 			content = submitFilesContentDAO.getContentByID(contentID);
 		} catch (Exception e) {
-			log.error("Could not find the content by givn ID:"+contentID+". Excpetion is " + e);
+			log.error("Could not find the content by given ID:"+contentID+". Excpetion is " + e);
 		}
+		if ( content == null )
+			log.error("Could not find the content by given ID:"+contentID);
+		
 		return content;
 	}
 

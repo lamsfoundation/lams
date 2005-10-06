@@ -20,29 +20,20 @@
 */
 package org.lamsfoundation.lams.contentrepository.dao;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.CrNode;
 import org.lamsfoundation.lams.contentrepository.CrNodeVersion;
+import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
 
 /**
  * Data access routines for Nodes, versions and properties
  * 
  * @author Fiona Malikoff
  */
-public interface INodeDAO {
-
-	public Object find(Class objClass, Serializable id);
+public interface INodeDAO extends IBaseDAO {
 
 	public void saveOrUpdate(Object object);		
-
-	public void update(Object object);
-
-	public void delete(Object object);
-
-	public List findAll(Class objClass);
-	
 	public List findChildNodes(CrNodeVersion parentNodeVersion);
 	public CrNode findChildNode(CrNodeVersion parentNodeVersion, String relPath);
 

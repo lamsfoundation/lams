@@ -27,16 +27,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import net.sf.hibernate.HibernateException;
-import net.sf.hibernate.Session;
-
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.contentrepository.CrCredential;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.IWorkspace;
 import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
 
 
 /**
@@ -46,7 +45,7 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
  * @author Fiona Malikoff
  *
  */
-public class CredentialDAO extends HibernateDaoSupport implements ICredentialDAO {
+public class CredentialDAO extends BaseDAO implements ICredentialDAO {
   
 	protected Logger log = Logger.getLogger(CredentialDAO.class);	
 
@@ -155,18 +154,6 @@ public class CredentialDAO extends HibernateDaoSupport implements ICredentialDAO
 		return credentialMatched;
 	}
 
-	public void insert(Object object) {
-		this.getHibernateTemplate().save(object);		
-	}
-
-	public void update(Object object) {
-		this.getHibernateTemplate().update(object);
-	}
-
-	public void delete(Object object) {
-		this.getHibernateTemplate().delete(object);
-	}
-
 	public CrCredential findByName(String name)  {
 
 		log.debug("Getting credential for name "+name);
@@ -181,9 +168,4 @@ public class CredentialDAO extends HibernateDaoSupport implements ICredentialDAO
 			return (CrCredential)credentials.get(0);
 		}
 	}
-	public List findAll(Class objClass) {
-		String query="from obj in class " + objClass.getName(); 
-		return this.getHibernateTemplate().find(query);
-	}
-	
 }

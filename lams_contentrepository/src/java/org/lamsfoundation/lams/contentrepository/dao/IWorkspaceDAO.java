@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
+import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
 
 
 /**
@@ -32,7 +33,7 @@ import org.lamsfoundation.lams.contentrepository.CrWorkspace;
  * 
  * @author Fiona Malikoff
  */
-public interface IWorkspaceDAO {
+public interface IWorkspaceDAO extends IBaseDAO {
 
 	/** Get a workspace. 
 	 * 
@@ -61,12 +62,5 @@ public interface IWorkspaceDAO {
 	 */
 	public Object find(Class objClass, Serializable id);
 
-	public void insert(Object object);		
-
-	public void update(Object object);
-
-	public void delete(Object object);
-
-	public List findAll(Class objClass);
 	
 }

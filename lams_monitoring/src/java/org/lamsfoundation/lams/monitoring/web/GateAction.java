@@ -77,7 +77,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * @struts.action-exception key="error.system.monitor" scope="request"
  *                          type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
  *                          path=".systemError"
- * 							handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+ * 							handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="viewSynchGate" path=".viewSynchGate"
  * @struts:action-forward name="viewPermissionGate" path=".viewPermissionGate"
  * @struts:action-forward name="viewScheduleGate" path=".viewScheduleGate"
@@ -144,11 +144,13 @@ public class GateAction extends LamsDispatchAction
     {
         DynaActionForm gateForm = (DynaActionForm)form;
         
+        long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
+
+        Long gateIdLong = (Long)gateForm.get("activityId");
+        long gateId = WebUtil.checkLong("activityId", gateIdLong);
+        
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
         this.learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
-        
-        long gateId = ((Long)gateForm.get("activityId")).longValue();
-        long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
         
         Activity gate = monitoringService.getActivityById(gateId);
         

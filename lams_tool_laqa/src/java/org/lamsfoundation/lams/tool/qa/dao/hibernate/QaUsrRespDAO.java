@@ -20,12 +20,12 @@
  */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
-import net.sf.hibernate.Hibernate;
+import org.hibernate.Hibernate;
 
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
 /**
@@ -78,9 +78,16 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
     
     public void removeUserResponseByQaQueId(Long qaQueId)
     {
-    	String query = "from resp in class org.lamsfoundation.lams.tool.qa.QaUsrResp"
-            + " where resp.qaQueContentId = ?";
-            this.getHibernateTemplate().delete(query,qaQueId,Hibernate.LONG);
+    	if ( qaQueId != null ) {
+    		String query = "from resp in class org.lamsfoundation.lams.tool.qa.QaUsrResp"
+    			+ " where resp.qaQueContentId = ?";
+            Object obj = getSession().createQuery(query)
+				.setLong(0,qaQueId.longValue())
+				.uniqueResult();
+            if ( obj != null ) {
+            	getHibernateTemplate().delete(obj);
+            }
+    	}
 	}
 
 }

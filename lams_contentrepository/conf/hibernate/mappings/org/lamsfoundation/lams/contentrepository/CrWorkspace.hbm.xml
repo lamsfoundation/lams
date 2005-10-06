@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping
 >
     <class
         name="org.lamsfoundation.lams.contentrepository.CrWorkspace"
         table="lams_cr_workspace"
-        dynamic-update="false"
-        dynamic-insert="false"
-        select-before-update="false"
-        optimistic-lock="version"
     >
         <cache usage="transactional" />
 
@@ -36,7 +32,6 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="name"
             length="255"
             not-null="true"
@@ -50,14 +45,14 @@
             sort="unsorted"
         >
 
-              <key
-                  column="workspace_id"
-              >
-              </key>
+            <key
+                column="workspace_id"
+            >
+            </key>
 
-              <one-to-many
+            <one-to-many
                   class="org.lamsfoundation.lams.contentrepository.CrWorkspaceCredential"
-              />
+            />
 
         </set>
 
@@ -69,14 +64,14 @@
             sort="unsorted"
         >
 
-              <key
-                  column="workspace_id"
-              >
-              </key>
+            <key
+                column="workspace_id"
+            >
+            </key>
 
-              <one-to-many
+            <one-to-many
                   class="org.lamsfoundation.lams.contentrepository.CrNode"
-              />
+            />
 
         </set>
 

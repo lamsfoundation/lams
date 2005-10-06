@@ -1,12 +1,11 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import org.springframework.orm.hibernate.HibernateCallback;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
-import net.sf.hibernate.HibernateException;
-import net.sf.hibernate.Session;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 
 import java.util.List;
-import java.util.Date;
 
 /**
  * @author conradb

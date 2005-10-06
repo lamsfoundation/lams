@@ -8,17 +8,17 @@ package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
 import java.util.List;
 
-import net.sf.hibernate.FlushMode;
-import net.sf.hibernate.Hibernate;
-import net.sf.hibernate.HibernateException;
-import net.sf.hibernate.Session;
-import net.sf.hibernate.type.Type;
+import org.hibernate.FlushMode;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.type.Type;
 
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO;
-import org.springframework.orm.hibernate.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateCallback;
 
 /**
  * @author Manpreet Minhas
@@ -83,9 +83,11 @@ public class SubmissionDetailsDAO extends BaseDAO implements
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmissionDetailsDAO#getSubmissionDetailsBySession(java.lang.Long)
 	 */
 	public List getSubmissionDetailsBySession(Long sessionID) {
-		List list = this.getHibernateTemplate().find(FIND_BY_SESSION, 
-				 new Object[]{sessionID},
-				 new Type[]{Hibernate.LONG});
-		return list;
+		if ( sessionID != null ) {
+			return this.getSession().createQuery(FIND_BY_SESSION)
+				.setLong(0, sessionID.longValue())
+				.list();
+		}
+		return null;
 	}
 }

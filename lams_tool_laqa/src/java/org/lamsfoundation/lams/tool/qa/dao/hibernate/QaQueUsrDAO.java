@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
 

@@ -25,8 +25,9 @@ import org.lamsfoundation.lams.contentrepository.CrCredential;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.IWorkspace;
 import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
+import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
 
-public interface ICredentialDAO {
+public interface ICredentialDAO extends IBaseDAO {
 
 	/** Check the supplied credential to the workspace.
 	 * By doing the check at this level, the password does 
@@ -43,12 +44,6 @@ public interface ICredentialDAO {
 	 * @throws repository exception if an internal (db) error occurs
 	 */
 	public abstract boolean checkCredential(ICredentials credential) throws RepositoryRuntimeException; 
-
-	public abstract void insert(Object object);		
-
-	public abstract void update(Object object);
-
-	public abstract void delete(Object object);
 
 	public abstract CrCredential findByName(String name);
 

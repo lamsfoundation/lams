@@ -10,7 +10,7 @@
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 	<!-- Hibernate SessionFactory -->
-	  <bean id="nbSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+	  <bean id="nbSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="toolDataSource"/></property>
 		<property name="mappingResources">
 			<list>	

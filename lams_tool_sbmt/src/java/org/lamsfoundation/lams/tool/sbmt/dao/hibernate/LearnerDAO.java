@@ -23,9 +23,9 @@ package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.hibernate.FlushMode;
-import net.sf.hibernate.Hibernate;
-import net.sf.hibernate.type.Type;
+import org.hibernate.FlushMode;
+import org.hibernate.Hibernate;
+import org.hibernate.type.Type;
 
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.Learner;
@@ -41,14 +41,13 @@ public class LearnerDAO extends BaseDAO implements ILearnerDAO {
 								" where user_id=? AND session_id=?";
 
 	public Learner getLearner(Long sessionID, Long userID) {
-		List list = this.getHibernateTemplate().
-		   find(FIND_BY_USER_ID_SESSION_ID, 
-				   new Object[]{userID, sessionID},
-				   new Type[]{Hibernate.LONG,Hibernate.LONG});
-		if(list != null && list.size() > 0)
-			return (Learner)list.get(0) ;
-		else
-			return null;
+		if ( sessionID != null && userID != null ) {
+			return (Learner) this.getSession().createQuery(FIND_BY_USER_ID_SESSION_ID)
+				.setLong(0, userID.longValue())
+				.setLong(1, sessionID.longValue())
+				.uniqueResult();
+		}
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -70,16 +69,16 @@ public class LearnerDAO extends BaseDAO implements ILearnerDAO {
 	}
 
 	public List getSubmissionDetailsForUserBySession(Long userID, Long sessionID) {
-		List learnerList = this.getHibernateTemplate().find(FIND_FOR_USER_BY_SESSION, 
-													 new Object[]{userID, sessionID},
-													 new Type[]{Hibernate.LONG,Hibernate.LONG});
-		List list = null;
-		if(learnerList != null && learnerList.size() > 0){
-			Learner learner = (Learner) learnerList.get(0);
-			if(learner != null && learner.getSubmissionDetails() != null)
-				list = new ArrayList(learner.getSubmissionDetails());
+		if ( userID != null && sessionID != null ) {
+			Learner learner = (Learner) this.getSession().createQuery(FIND_FOR_USER_BY_SESSION)
+										.setLong(0, userID.longValue())
+										.setLong(1, sessionID.longValue())
+										.uniqueResult();
+			if(learner != null && learner.getSubmissionDetails() != null) {
+				return new ArrayList(learner.getSubmissionDetails());
+			}
 		}
-		return list;
+		return null;
 	}
 
 }

@@ -58,7 +58,6 @@ import org.lamsfoundation.lams.contentrepository.dao.INodeDAO;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.orm.hibernate.HibernateObjectRetrievalFailureException;
 
 
 /**
@@ -187,12 +186,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		node = null;
 		nodeVersion = null;
 
-		try {
-			node = (CrNode) nodeDAO.find(CrNode.class, uuid);
-			
-		} catch (HibernateObjectRetrievalFailureException e ) {
-		}
-
+		node = (CrNode) nodeDAO.find(CrNode.class, uuid);
 		if ( node == null ) {
 			
 			throw new ItemNotFoundException("Node "+uuid+" not found.");
@@ -365,9 +359,9 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		return node.isNodeType(nodeTypeName);
 	}
 
-	/** Get the history for this node. Quite intensive operation the
-	 * first time it is run on a node as it has to build all the 
-	 * data structures.
+	/** Get the history for this node. Quite intensive operation 
+	 * as it has to build all the data structures. Can't be easily
+	 * cached.
 	 * @return SortedSet of IVersionDetail objects, ordered by version
 	 */
 	public SortedSet getVersionHistory() {
@@ -691,13 +685,23 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		return node.getNodeId();
 	}
 
-	/** Just save the db changes to the current node. 
+
+	/** Validate the node and save the db changes to the current node. 
+	 * Do not use if there are files that have been updated - the validation may fail and we
+	 * would end up in an odd state.
+	 * <p>
 	 * If files have been added, please call Long save(String versionDescription, List childNodes).
-	 * This method will validate the node and save the database changes 
-	 * @param versionDescription optional. If supplied will set the version description 
+	 * @param versionDescription optional. If supplied will set the version description
 	 */
-	protected void saveDB(String versionDescription) throws ValidationException {
+	protected void validateSaveDB(String versionDescription) throws ValidationException {
 		validateNode();
+		saveDB(versionDescription);
+	}
+
+	/** Just save the db changes to the current node. See validateSaveDB()
+	 * @param versionDescription optional. If supplied will set the version description
+	 */
+	protected void saveDB(String versionDescription) {
 
 		// nodeDAO to take care of insert or update (uses saveOrUpdate)
 		// the nodeVersion and nodeVersionProperty collections cascade
@@ -927,7 +931,10 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 
     	NodeKey nk = getNodeKey();
     	if ( node.getCrNodeVersions() != null ) {
-    		node.getCrNodeVersions().remove(nodeVersion);
+    		boolean removed = node.removeCrNodeVersion(nodeVersion);
+    		if ( removed ) {
+    	    	nodeKeysDeleted.add(nk);
+    		}
     	}
 
     	// if this was the last version for the node, delete the node
@@ -935,7 +942,6 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
     		nodeDAO.delete(node);
     	}
     	
-    	nodeKeysDeleted.add(nk);
     }
     
     /* **********************************************************

@@ -237,8 +237,8 @@ public class TestSimpleRepository extends BaseTestCase {
 			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
 			
 			deleteVersion(keys.getUuid(), two);
-			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
 			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 1);
+			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
 					
 			deleteVersion(keys.getUuid(), one);
 			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);

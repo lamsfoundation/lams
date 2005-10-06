@@ -30,8 +30,8 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
-import org.springframework.orm.hibernate.HibernateObjectRetrievalFailureException;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
+import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
 
 
 
@@ -40,7 +40,7 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
  * 
  * @author Fiona Malikoff
  */
-public class WorkspaceDAO extends HibernateDaoSupport implements IWorkspaceDAO  {
+public class WorkspaceDAO extends BaseDAO implements IWorkspaceDAO  {
 
 	protected Logger log = Logger.getLogger(WorkspaceDAO.class);	
 
@@ -87,29 +87,13 @@ public class WorkspaceDAO extends HibernateDaoSupport implements IWorkspaceDAO  
 	
 	public Object find(Class objClass, Serializable id) {
 		try {
-			return this.getHibernateTemplate().load(objClass,id);		
+			return super.find(objClass,id);
 		} catch (HibernateObjectRetrievalFailureException e ) {
 			return null;
 		}
 	}
 
-	public void insert(Object object) {
-		this.getHibernateTemplate().save(object);		
-	}
 
-	public void update(Object object) {
-		this.getHibernateTemplate().update(object);
-	}
-
-	public void delete(Object object) {
-		this.getHibernateTemplate().delete(object);
-	}
-
-	public List findAll(Class objClass) {
-		String query="from obj in class " + objClass.getName(); 
-		return this.getHibernateTemplate().find(query);
-	}
-	
 	public void flushSession() throws RepositoryCheckedException {
 		try {
 			getSession().flush();

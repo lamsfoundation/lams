@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 
 /**

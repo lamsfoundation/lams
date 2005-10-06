@@ -137,7 +137,7 @@
 			            <include name="**/*/*.java"/>
 			        </fileset>
 			        <!-- hibernate 1 and hibernate 2 mapping files are not fully compatible-->
-			        <hibernate version="2.0"/>
+			        <hibernate version="3.0"/>
 			    </hibernatedoclet>
 				<!-- copy hbm.xml to src folder. This makes hbm.xml can be synchronized with classes folder in eclipse -->
 				<copy overwrite="yes" todir="${src.java.dir}">

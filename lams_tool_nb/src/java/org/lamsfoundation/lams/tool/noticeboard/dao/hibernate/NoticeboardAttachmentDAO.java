@@ -9,7 +9,7 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * @author mtruong
  *

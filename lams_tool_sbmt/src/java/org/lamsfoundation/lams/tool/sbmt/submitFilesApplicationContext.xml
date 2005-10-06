@@ -7,7 +7,7 @@
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
   	<!-- Hibernate SessionFactory -->
-	<bean id="sbmtSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+	<bean id="sbmtSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="toolDataSource"/></property>
 		<property name="mappingResources">
 			<list>

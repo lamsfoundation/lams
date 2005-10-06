@@ -127,12 +127,14 @@
 				<include name="*.xml"/>
 				<include name="struts/*"/>
 				<include name="jstl/*"/>
-				<include name="spring/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
-			<classes dir="${build.classes.java}"/>
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
+				<include name="css/*"/>
+				<include name="gate/*"/>
+				<include name="images/*"/>
+				<include name="template/*"/>
 			</fileset>
 		</war>
 	</target>

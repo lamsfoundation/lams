@@ -57,7 +57,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * @struts.action-exception key="error.system.monitor" scope="request"
  *                          type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
  *                          path=".systemError"
- * 							handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+ * 							handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
  * @struts:action-forward name="scheduler" path="/TestScheduler.jsp"
  * @struts.action-forward name = "success" path = "/index.jsp"
  * 

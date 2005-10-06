@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping
 >
     <class
         name="org.lamsfoundation.lams.contentrepository.CrNode"
         table="lams_cr_node"
-        dynamic-update="false"
-        dynamic-insert="false"
-        select-before-update="false"
-        optimistic-lock="version"
     >
         <cache usage="transactional" />
 
@@ -36,7 +32,6 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="path"
             length="255"
         />
@@ -46,7 +41,6 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            access="property"
             column="type"
             length="255"
             not-null="true"
@@ -57,9 +51,7 @@
             type="java.sql.Timestamp"
             update="true"
             insert="true"
-            access="property"
             column="created_date_time"
-            length="14"
         />
 
         <property
@@ -67,7 +59,6 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            access="property"
             column="next_version_id"
         />
 
@@ -78,7 +69,6 @@
             outer-join="auto"
             update="true"
             insert="true"
-            access="property"
         >
             <column
                 name="workspace_id" 
@@ -92,7 +82,6 @@
             outer-join="auto"
             update="true"
             insert="true"
-            access="property"
         >
             <column
                 name="parent_nv_id" 
@@ -108,16 +97,16 @@
         >
             <cache 
                 usage="transactional" 
-             />
+            />
 
-              <key
-                  column="node_id"
-              >
-              </key>
+            <key
+                column="node_id"
+            >
+            </key>
 
-              <one-to-many
+            <one-to-many
                   class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
-              />
+            />
 
         </set>
 
