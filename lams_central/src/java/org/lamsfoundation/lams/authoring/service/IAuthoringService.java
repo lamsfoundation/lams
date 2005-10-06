@@ -185,4 +185,19 @@ public interface IAuthoringService {
 	 * @throws IOException
 	 */
 	public String getThemes() throws IOException;
+	
+	/**
+	 * Returns a string representing the new tool content id in 
+	 * WDDX format.
+	 * 
+	 * Typically, when a user clicks on an activity to edit the tool contnet,
+	 * it must have a tool content id passed to it. This method uses the 
+	 * ToolContentIDGenerator to generate the new tool content id and passes
+	 * this value back to flash in WDDX format. 
+	 * 
+	 * @param toolID The toolID in which to generate the new tool content id for
+	 * @return String The new tool content id in WDDX Format
+	 */
+	public String getToolContentID(Long toolID) throws IOException;
+	
 }
