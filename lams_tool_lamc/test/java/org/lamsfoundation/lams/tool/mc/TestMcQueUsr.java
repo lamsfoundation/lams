@@ -55,10 +55,15 @@ public class TestMcQueUsr extends McDataAccessTestCase
 										"John Baker",
 										mcSession, 
 										new HashSet());
-
         mcUserDAO.saveMcUser(mcQueUsr);
         
+        McQueUsr mcQueUsr2= new McQueUsr(new Long(77),
+				"ozgur",
+				"Ozgur Demirtas",
+				mcSession, 
+				new HashSet());
+
+        mcUserDAO.saveMcUser(mcQueUsr2);
     }
-	
     
 }

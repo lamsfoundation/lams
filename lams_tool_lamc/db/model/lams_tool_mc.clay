@@ -411,7 +411,7 @@
 </foreign-key-list>
 <index-list/>
 </table>
-<table name="tl_lamc11_tool_usr" alias="" remarks="">
+<table name="tl_lamc11_que_usr" alias="" remarks="">
 <table-description/>
 <table-figure-bounds x="582" y="87" width="-1" height="-1"/>
 <column-list>
@@ -469,7 +469,7 @@
 </data-type>
 </column>
 </column-list>
-<primary-key name="PK_TL_LAMC11_TOOL_USR" alias="" remarks="">
+<primary-key name="PK_TL_LAMC11_QUE_USR" alias="" remarks="">
 <primary-key-description/>
 <primary-key-column name="uid"/>
 </primary-key>

@@ -61,7 +61,7 @@ CREATE TABLE lams.tl_lamc11_options_content (
                   REFERENCES lams.tl_lamc11_que_content (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lamc11_tool_usr (
+CREATE TABLE lams.tl_lamc11_que_usr (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , que_usr_id BIGINT(20) NOT NULL
      , mc_session_id BIGINT(20) NOT NULL

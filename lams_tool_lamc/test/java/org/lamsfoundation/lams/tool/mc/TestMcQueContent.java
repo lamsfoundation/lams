@@ -10,7 +10,6 @@
 package org.lamsfoundation.lams.tool.mc;
 
 import java.util.HashSet;
-import java.util.Set;
 
 
 /*
@@ -42,37 +41,36 @@ public class TestMcQueContent extends McDataAccessTestCase
     public void testCreateMcQueContent()
     {
     	McContent mcContent = mcContentDAO.findMcContentById(new Long(2));
-    	System.out.println(this.getClass().getName() + "retrieved mcContent: " + mcContent);
-    	
     	McQueContent mcQueContent=  new McQueContent(TEST_QUE_ID1,
-													 "How many elephants do you see in the picture?",
-													 new Integer(20),
+													 "What planet are you from?",
+													 new Integer(99),
 													 mcContent,
 													 new HashSet(),
 													 new HashSet()
     												);
-    	
-    	System.out.println(this.getClass().getName() + "retrieving mcQueContent: " + mcQueContent);
     	mcQueContentDAO.saveMcQueContent(mcQueContent);
     	
-/*    	
-    	mcQueContent.setMcContent(mcContent);
-    	mcContent.getMcQueContents().add(mcQueContent);
-    	mcQueContentDAO.saveMcQueContent(mcQueContent);
-  */
-    
-    
+    	
+    	McContent mcContent2 = mcContentDAO.findMcContentById(new Long(3));
+    	
+    	McQueContent mcQueContent2=  new McQueContent(TEST_QUE_ID1,
+													 "What is a good question?",
+													 new Integer(55),
+													 mcContent2,
+													 new HashSet(),
+													 new HashSet()
+    												);
+    	mcQueContentDAO.saveMcQueContent(mcQueContent2);
+    	
     }
     
-       
-   /*
     public void testRetrieveMcQueContent()
     {
     	McQueContent mcQueContent= mcQueContentDAO.findMcQueContentById(new Long(20));
     	mcQueContent.setDisplayOrder(new Integer(88));
     	mcQueContentDAO.saveMcQueContent(mcQueContent);
     }
-    */
+
     
     
 }
