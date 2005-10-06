@@ -5,6 +5,41 @@
     <description>
     Learning Activty Management System
     </description>
+    <!-- ======================================================== -->
+	<!--  Security Roles -->
+    <!-- ======================================================== -->
+	<security-role>
+		<description>Student</description>
+		<role-name>LEARNER</role-name>
+	</security-role>
+	<security-role>
+		<description>Student</description>
+		<role-name>TEACHER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can create/modify a learning design</description>
+		<role-name>AUTHOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can running and monitoring a learning session</description>
+		<role-name>STAFF</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can add/remove users to the system, set up classes of users for sessions</description>
+		<role-name>ADMIN</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can add/remove users to the system, set up classes of users for sessions</description>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
+	    
+    <!-- ======================================================== -->
+	<!--  Modules 						-->
+    <!-- ======================================================== -->
     <module>
         <web>
             <web-uri>lams-central.war</web-uri>
