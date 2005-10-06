@@ -149,6 +149,11 @@
       <session-timeout>120</session-timeout>
    </session-config>
    
+     <error-page>
+	<error-code>403</error-code>
+	<location>/403.html</location>
+</error-page>
+   
    <taglib>
     <taglib-uri>fck-editor</taglib-uri>
     <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
@@ -192,5 +197,69 @@
    <!ELEMENT form-login-page (#PCDATA)>
    <!ELEMENT form-error-page (#PCDATA)>
    -->
+   
+   <!--  Security Constraint -->
+	<security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>LEARNER</role-name>
+    		<role-name>TEACHER</role-name>
+    		<role-name>STAFF</role-name>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Authoring Update</web-resource-name>
+		    <url-pattern>/authoringStarter.do</url-pattern>
+		   <url-pattern>/authoring.do</url-pattern>
+		 </web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    
+    
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
+		    <url-pattern>/monitoringStarter.do</url-pattern>
+		    <url-pattern>/monitoring.do</url-pattern>		   
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>STAFF</role-name>
+    	</auth-constraint>
+    </security-constraint>
+
+    
+	<!--  some combine role security setting -->
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Download Files</web-resource-name>
+		    <url-pattern>/download/</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>STAFF</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+
+	<!--  Login Configuration -->
+  	<login-config>
+   		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+   		<form-login-config>
+    		<form-login-page>/login.jsp</form-login-page>
+   		</form-login-config>
+   	</login-config>
+   
 
 </web-app>
