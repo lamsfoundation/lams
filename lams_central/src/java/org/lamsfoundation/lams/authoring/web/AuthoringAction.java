@@ -188,5 +188,17 @@ public class AuthoringAction extends DispatchAction{
 	    return outputPacket(mapping, request, response, message, "message");
 	}
 	
+	public ActionForward getToolContentID(ActionMapping mapping,
+			ActionForm form,
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
+	 
+	    Long toolID = new Long(WebUtil.readLongParam(request,"toolID"));
+	    IAuthoringService authoringService = getAuthoringService();
+	    String message = authoringService.getToolContentID(toolID);
+	    return outputPacket(mapping, request, response, message, "details");   
+	    
+	}
+	
 
 }

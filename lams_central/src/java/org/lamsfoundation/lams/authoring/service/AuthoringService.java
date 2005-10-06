@@ -67,6 +67,8 @@ import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.themes.dto.CSSThemeDTO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
@@ -98,6 +100,8 @@ public class AuthoringService implements IAuthoringService {
 	protected GroupingDAO groupingDAO;
 	protected GroupDAO groupDAO;
 	protected ICSSThemeDAO themeDAO;
+	
+	protected ToolContentIDGenerator contentIDGenerator;
 	
 	public AuthoringService(){
 		
@@ -180,6 +184,15 @@ public class AuthoringService implements IAuthoringService {
     public void setThemeDAO(ICSSThemeDAO themeDAO) {
         this.themeDAO = themeDAO;
     }
+    
+    /**
+     * @param contentIDGenerator The contentIDGenerator to set.
+     */
+    public void setContentIDGenerator(ToolContentIDGenerator contentIDGenerator)
+    {
+        this.contentIDGenerator = contentIDGenerator;
+    }
+    
 	/**
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getLearningDesign(java.lang.Long)
 	 */
@@ -631,6 +644,24 @@ public class AuthoringService implements IAuthoringService {
 		}
 		flashMessage = new FlashMessage("getThemes",themeList);		
 		return flashMessage.serializeMessage();
+	}
+	
+	
+	/** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolContentID(java.lang.Long) */
+
+	public String getToolContentID(Long toolID) throws IOException
+	{
+	   Tool tool = toolDAO.getToolByID(toolID);
+	   if (tool == null)
+	   {
+	       log.error("The toolID "+ toolID + " is not valid. A Tool with tool id " + toolID + " does not exist on the database.");
+	       return FlashMessage.getNoSuchTool("getToolContentID", toolID).serializeMessage();
+	   }
+	   
+	   Long newContentID = contentIDGenerator.getNextToolContentIDFor(tool);
+	   flashMessage = new FlashMessage("getToolContentID", newContentID);
+	   
+	   return flashMessage.serializeMessage();
 	}
 	
 	
