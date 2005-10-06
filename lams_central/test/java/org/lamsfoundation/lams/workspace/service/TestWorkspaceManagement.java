@@ -7,10 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
-import org.springframework.orm.hibernate.HibernateObjectRetrievalFailureException;
+import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
 
 /**
  * @author Manpreet Minhas

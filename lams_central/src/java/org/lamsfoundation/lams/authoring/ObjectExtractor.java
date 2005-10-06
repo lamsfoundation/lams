@@ -187,6 +187,7 @@ public class ObjectExtractor {
 				set.add(activity);
 			}
 		}
+		// TODO: Need to double check that the toolID/toolContentID combinations match entries in lams_tool_content table, or put FK on table.
 		learningDesign.setActivities(set);
 		learningDesignDAO.update(learningDesign);
 	}
