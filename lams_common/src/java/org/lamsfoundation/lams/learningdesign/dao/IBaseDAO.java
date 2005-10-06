@@ -44,10 +44,13 @@ public interface IBaseDAO {
 	public void delete(Object object);
 	
 	/**
+	 * Find an object. If the object is not found 
+	 * then it will return null
 	 * @param objClass
 	 * @param id
 	 */
 	public Object find(Class objClass, Serializable id);
+	
 	/**
 	 * @param objClass
 	 */

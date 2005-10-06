@@ -34,16 +34,22 @@ import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
  * @author Jacky Fang 2005-2-24
  * @version 1.1
  */
-public class ParallelActivityStrategy extends ComplextActivityStrategy
+public class ParallelActivityStrategy extends ComplexActivityStrategy
 {
+	private ParallelActivity parallelActivity = null;
+	
+	public ParallelActivityStrategy(ParallelActivity parallelActivity) {
+		this.parallelActivity = parallelActivity;
+	}
+
     /**
      * Regarding incomplete parallel activity, the next activity will always
      * be a waiting activity, which will finally translated into waiting
      * message.
      * 
-     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#getNextActivityByParent(Activity, Activity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
-    public Activity getNextActivityByParent(Activity activity, Activity currentChild)
+    public Activity getNextActivityByParent(ComplexActivity activity, Activity currentChild)
     {
         return new ParallelWaitActivity();
     }
@@ -53,12 +59,21 @@ public class ParallelActivityStrategy extends ComplextActivityStrategy
      * activity. A parallel activity is marked as complete if all children
      * activities are completed.
      * 
-     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#isComplete(int)
      */
-    protected boolean isComplete(int numOfCompletedActivities, ComplexActivity complexActivity)
+    protected boolean isComplete(int numOfCompletedActivities)
     {
-        ParallelActivity parallelActivity = (ParallelActivity)complexActivity;
-        return numOfCompletedActivities==parallelActivity.getActivities().size()?true:false;
+    	if ( parallelActivity != null ) {
+    		return numOfCompletedActivities==parallelActivity.getActivities().size()?true:false;
+    	} else {
+    		return true;
+    	}
     }
 
+    /** 
+     * Get the strategy's activity as a Complex Activity.  
+     */
+    protected ComplexActivity getComplexActivity() {
+    	return parallelActivity;
+    }
 }

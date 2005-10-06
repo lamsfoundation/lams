@@ -79,13 +79,13 @@ public class PermissionGateActivity extends GateActivity implements Serializable
 				transitionFrom,
                 gateActivityLevelId,
                 waitingLearners);
-        super.simpleActivityStrategy = new PermissionGateActivityStrategy();
+        super.simpleActivityStrategy = new PermissionGateActivityStrategy(this);
     }
     
     /** default constructor */
     public PermissionGateActivity()
     {
-    	super.simpleActivityStrategy = new PermissionGateActivityStrategy();
+    	super.simpleActivityStrategy = new PermissionGateActivityStrategy(this);
     }
     
     /** minimal constructor */
@@ -114,7 +114,7 @@ public class PermissionGateActivity extends GateActivity implements Serializable
 				transitionFrom,
                 gateActivityLevelId,
                 waitingLearners);
-        super.simpleActivityStrategy = new PermissionGateActivityStrategy();
+        super.simpleActivityStrategy = new PermissionGateActivityStrategy(this);
     }
     /**
      * Makes a copy of the PermissionGateActivity for authoring, preview and monitoring enviornment 

@@ -130,7 +130,7 @@ public class TestComplexActivityStrategy extends TestLearnerProgressDAO
         testSubSeuquencActivitySR = activityDAO.getActivityByActivityId(TEST_SR_ACTIVITY_ID);
         testSubSeuqenceActivityQNA = activityDAO.getActivityByActivityId(TEST_QNA_ACTIVITY_ID);
         
-        Activity nextActivity = ((ComplexActivity)testSequenceActivity).getNextActivityByParent(testSubSeuquencActivitySR);
+        Activity nextActivity = testSequenceActivity.getNextActivityByParent(testSubSeuquencActivitySR);
         
         assertNotNull("we should have a next activity",nextActivity);
         assertEquals("it should be qna",this.testSubSeuqenceActivityQNA.getActivityId().longValue(),nextActivity.getActivityId().longValue());

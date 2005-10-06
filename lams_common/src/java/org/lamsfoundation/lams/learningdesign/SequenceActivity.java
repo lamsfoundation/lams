@@ -74,13 +74,13 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
                 transitionTo,
 				transitionFrom,
                 activities);
-        super.activityStrategy = new SequenceActivityStrategy();
+        super.activityStrategy = new SequenceActivityStrategy(this);
     }
 
 
     /** default constructor */
     public SequenceActivity() {
-        super.activityStrategy = new SequenceActivityStrategy();
+        super.activityStrategy = new SequenceActivityStrategy(this);
     }
 
      /** minimal constructor */
@@ -106,7 +106,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
               transitionTo,
 			  transitionFrom,
               activities);
-      super.activityStrategy = new SequenceActivityStrategy();
+      super.activityStrategy = new SequenceActivityStrategy(this);
     }
     
     /**

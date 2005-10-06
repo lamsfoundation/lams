@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
     
 <hibernate-mapping>
 <!-- 
@@ -147,7 +147,7 @@
 			    </set>
                  
                  <!-- bi-directional many-to-one association to Tool-->
-                 <many-to-one name="tool" class="org.lamsfoundation.lams.tool.Tool" >
+                 <many-to-one name="tool" class="org.lamsfoundation.lams.tool.Tool" lazy="false" >
                  	<column name="tool_id" not-null="false"/>
                  </many-to-one>                 
 			</subclass>

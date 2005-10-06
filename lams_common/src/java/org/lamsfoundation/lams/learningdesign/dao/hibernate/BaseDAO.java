@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 import java.io.Serializable;
 import java.util.List;
 
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
 
@@ -55,11 +55,14 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 		this.getHibernateTemplate().delete(object);
 	}
 
-	/** 
-	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IBaseDAO#find(java.lang.Class, java.lang.Long)
+	/**
+	 * Find an object. If the object is not found, 
+	 * then it will return null
+	 * @param objClass
+	 * @param id
 	 */
 	public Object find(Class objClass, Serializable id) {
-		return this.getHibernateTemplate().load(objClass,id);		
+		return this.getHibernateTemplate().get(objClass,id);		
 	}
 
 	/** 

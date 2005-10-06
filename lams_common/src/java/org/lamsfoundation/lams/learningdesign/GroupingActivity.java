@@ -85,13 +85,13 @@ public class GroupingActivity extends SimpleActivity implements Serializable
 				transitionFrom);
         this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
-        super.simpleActivityStrategy = new GroupingActivityStrategy();
+        super.simpleActivityStrategy = new GroupingActivityStrategy(this);
     }
     
     /** default constructor */
     public GroupingActivity()
     {
-    	super.simpleActivityStrategy = new GroupingActivityStrategy();
+    	super.simpleActivityStrategy = new GroupingActivityStrategy(this);
     }
     
     /** minimal constructor */
@@ -121,7 +121,7 @@ public class GroupingActivity extends SimpleActivity implements Serializable
 				transitionFrom);
         this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
-        super.simpleActivityStrategy = new GroupingActivityStrategy();
+        super.simpleActivityStrategy = new GroupingActivityStrategy(this);
     }
     /**
      * This function creates a deep copy of the GroupingActivity passed

@@ -19,6 +19,7 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt 
 */
+
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -96,39 +97,29 @@ public class TestActivityDAO extends AbstractCommonTestCase {
 		
 	}*/
 	public void testCreateToolActivityCopy(){
-		activity = activityDAO.getActivityByActivityId(new Long(20));		
-		ToolActivity newToolActivity =null;
-		if(activity.isToolActivity()){			
-			newToolActivity = ToolActivity.createCopy((ToolActivity)activity);						
-			activityDAO.insert(newToolActivity);
-		}
+		ToolActivity ta = (ToolActivity) activityDAO.getActivityByActivityId(new Long(20));
+		ToolActivity newToolActivity = ToolActivity.createCopy(ta);						
+		activityDAO.insert(newToolActivity);
 		assertNotNull(newToolActivity.getActivityId());
 	}
 	public void testCreateGroupingActivityCopy(){
-		activity = activityDAO.getActivityByActivityId(new Long(23));		
+		GroupingActivity ga = (GroupingActivity) activityDAO.getActivityByActivityId(new Long(23));
 		GroupingActivity newGroupingActivity = null;
-		if(activity.isGroupingActivity()){			
-			newGroupingActivity = GroupingActivity.createCopy((GroupingActivity)activity);			
-			activityDAO.insert(newGroupingActivity);
-		}
+		newGroupingActivity = GroupingActivity.createCopy(ga);			
+		activityDAO.insert(newGroupingActivity);
 		assertNotNull(newGroupingActivity.getActivityId());
 	}
 	public void testCreateOptionsActivityCopy(){
-		activity = activityDAO.getActivityByActivityId(new Long(12));
+		OptionsActivity oa = (OptionsActivity) activityDAO.getActivityByActivityId(new Long(12));
 		OptionsActivity optionsActivity =null;
-		if(activity.getActivityTypeId().intValue()== Activity.OPTIONS_ACTIVITY_TYPE){
-			optionsActivity = OptionsActivity.createCopy((OptionsActivity)activity);
-			activityDAO.insert(optionsActivity);
-		}
+		optionsActivity = OptionsActivity.createCopy(oa);
+		activityDAO.insert(optionsActivity);
 		assertNotNull(optionsActivity.getActivityId());		
 	}
 	public void testCreateParallelActivityCopy(){
-		activity = activityDAO.getActivityByActivityId(new Long(13));
-		ParallelActivity parallelActivity = null;
-		if(activity.getActivityTypeId().intValue()==Activity.PARALLEL_ACTIVITY_TYPE){
-			parallelActivity = ParallelActivity.createCopy((ParallelActivity)activity);
-			activityDAO.insert(parallelActivity);
-		}
+		ParallelActivity pa = (ParallelActivity) activityDAO.getActivityByActivityId(new Long(13));
+		ParallelActivity parallelActivity = ParallelActivity.createCopy(pa);
+		activityDAO.insert(parallelActivity);
 		assertNotNull(parallelActivity.getActivityId());
 	}
 }

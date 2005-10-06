@@ -102,8 +102,8 @@ public class ToolDataAccessTestCase extends AbstractCommonTestCase
         
         //retrieve test domain data
         testUser = userDao.getUserById(TEST_USER_ID);
-        testNonGroupedActivity = (ToolActivity)activityDAO.getActivityByActivityId(TEST_NON_GROUP_ACTIVITY_ID);
-        testGroupedActivity = (ToolActivity)activityDAO.getActivityByActivityId(TEST_GROUPED_ACTIVITY_ID);
+        testNonGroupedActivity = (ToolActivity) activityDAO.getActivityByActivityId(TEST_NON_GROUP_ACTIVITY_ID);
+        testGroupedActivity = (ToolActivity) activityDAO.getActivityByActivityId(TEST_GROUPED_ACTIVITY_ID);
         testGroup = (Group)groupDao.getGroupById(TEST_GROUP_ID);
         testLesson = lessonDao.getLesson(TEST_LESSON_ID);
     }

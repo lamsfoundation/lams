@@ -11,7 +11,7 @@ package org.lamsfoundation.lams.tool.dao.hibernate;
 
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
 /**

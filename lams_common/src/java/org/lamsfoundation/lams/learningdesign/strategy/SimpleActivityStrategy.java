@@ -34,7 +34,14 @@ import org.lamsfoundation.lams.learningdesign.Activity;
  * code as possible. Abstract methods sit at this level is designed to be 
  * overidden by sub simple activities to polymorphically achieve the behavior
  * specific to particular conrete activity. 
- * 
+ * <p>
+ * When a particular strategy is created, the activity should be 
+ * stored in the strategy. This allows the strategy to have the
+ * correct activity type and (hopefully) stops the need for casting,
+ * which is difficult with Hibernates proxied objects. Each strategy
+ * needs to define a method getActivity() so that shared methods
+ * (such as getContributionType()) can access the activity.
+ * <p>
  * @author Jacky Fang
  * @author Minhas
  * @version 1.1
@@ -61,12 +68,14 @@ public abstract class SimpleActivityStrategy implements Serializable
      * @param activity the activity that has contribute type.
      * @return an array of contribute types.
      */
-    public Integer[] getContributionType(Activity activity)
+    public Integer[] getContributionType()
     {
+    	Activity activity = getActivity();
+    	
 		ArrayList contributionTypes = new ArrayList();
 		
 		//abstract method to polymorphically setup contribute type.
-		setUpContributionType(activity,contributionTypes);
+		setUpContributionType(contributionTypes);
 		
 		return (Integer[])contributionTypes.toArray(new Integer[contributionTypes.size()]);
     }
@@ -80,5 +89,11 @@ public abstract class SimpleActivityStrategy implements Serializable
      * 				   for.
      * @param contributionTypes the list that holds contribution types.
      */
-    protected abstract void setUpContributionType(Activity activity,ArrayList contributionTypes);
+    protected abstract void setUpContributionType(ArrayList contributionTypes);
+    
+    /**
+     * Get the activity for this strategy. The activity should be set
+     * when the strategy is created.
+     */
+    protected abstract Activity getActivity();
 }

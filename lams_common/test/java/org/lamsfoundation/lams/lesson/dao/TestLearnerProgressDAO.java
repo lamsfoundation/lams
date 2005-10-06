@@ -9,9 +9,12 @@
 
 package org.lamsfoundation.lams.lesson.dao;
 
-import net.sf.hibernate.HibernateException;
-
+import org.hibernate.HibernateException;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -26,10 +29,10 @@ import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;
 public class TestLearnerProgressDAO extends LessonDataAccessTestCase
 {
     protected IActivityDAO activityDAO;
-    protected Activity testToolActivity;
-    protected Activity testParallelActivity;
-    protected Activity testOptionsActivity;
-    protected Activity testSequenceActivity;
+    protected ToolActivity testToolActivity;
+    protected ParallelActivity testParallelActivity;
+    protected OptionsActivity testOptionsActivity;
+    protected SequenceActivity testSequenceActivity;
     
     //this is survey id we inserted in test data sql script
     protected static final Long TEST_TOOL_ACTIVITY_ID = new Long(15);
@@ -46,10 +49,10 @@ public class TestLearnerProgressDAO extends LessonDataAccessTestCase
         super.initLearnerProgressData();
         
 		activityDAO =(ActivityDAO) context.getBean("activityDAO");
-		testToolActivity = activityDAO.getActivityByActivityId(TEST_TOOL_ACTIVITY_ID);
-		testParallelActivity = activityDAO.getActivityByActivityId(TEST_PARALLEL_ACTIVITY_ID);
-		testOptionsActivity = activityDAO.getActivityByActivityId(TEST_OPTIONS_ACTIVITY_ID);
-		testSequenceActivity = activityDAO.getActivityByActivityId(TEST_SEQUENCE_ACTIVITY_ID);
+		testToolActivity = (ToolActivity) activityDAO.getActivityByActivityId(TEST_TOOL_ACTIVITY_ID);
+		testParallelActivity = (ParallelActivity) activityDAO.getActivityByActivityId(TEST_PARALLEL_ACTIVITY_ID);
+		testOptionsActivity = (OptionsActivity) activityDAO.getActivityByActivityId(TEST_OPTIONS_ACTIVITY_ID);
+		testSequenceActivity = (SequenceActivity) activityDAO.getActivityByActivityId(TEST_SEQUENCE_ACTIVITY_ID);
     }
 
     /*

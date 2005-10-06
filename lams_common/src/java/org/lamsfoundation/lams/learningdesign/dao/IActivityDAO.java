@@ -34,8 +34,15 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 public interface IActivityDAO extends IBaseDAO{
 	
 	/**
+	 * Returns an object that may be assigned to Activity.
+	 * This must return a true Activity object, rather than 
+	 * the Hibernate CGLIB proxy, or other code gets too difficult.
+	 * <p>
+	 * If a new type of activity is added, then this method must be 
+	 * updated.
 	 * @param activityId The activityId of the activity
 	 * @return Activity populated Activity object
+	 * @throws DataRetrievalFailureException if it can't work out the correct Activity class.
 	 */
 	public Activity getActivityByActivityId(Long activityId);
 	

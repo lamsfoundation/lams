@@ -22,13 +22,12 @@
 
 package org.lamsfoundation.lams.util;
 
-import net.sf.hibernate.FlushMode;
-import net.sf.hibernate.Session;
-import net.sf.hibernate.SessionFactory;
-
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.orm.hibernate.SessionFactoryUtils;
-import org.springframework.orm.hibernate.support.OpenSessionInViewFilter;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate3.support.OpenSessionInViewFilter;
 
 
 /**
@@ -51,8 +50,8 @@ public class CustomizedOpenSessionInViewFilter extends OpenSessionInViewFilter
 	 * @param sessionFactory the SessionFactory that this filter uses
 	 * @return the Session to use
 	 * @throws DataAccessResourceFailureException if the Session could not be created
-	 * @see org.springframework.orm.hibernate.SessionFactoryUtils#getSession(SessionFactory, boolean)
-	 * @see net.sf.hibernate.FlushMode#NEVER
+	 * @see org.springframework.orm.hibernate3.SessionFactoryUtils#getSession(SessionFactory, boolean)
+	 * @see org.hibernate.FlushMode#NEVER
 	 */
 	protected Session getSession(SessionFactory sessionFactory)
 			throws DataAccessResourceFailureException {

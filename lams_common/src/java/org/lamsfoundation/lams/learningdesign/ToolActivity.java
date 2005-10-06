@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learningdesign;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.strategy.ToolActivityStrategy;
@@ -95,12 +96,12 @@ public class ToolActivity extends SimpleActivity implements Serializable
 				transitionFrom);
         this.tool = tool;
         this.toolContentId = toolContentId;
-        super.simpleActivityStrategy = new ToolActivityStrategy();
+        super.simpleActivityStrategy = new ToolActivityStrategy(this);
     }
     
     /** default constructor */
     public ToolActivity(){
-    	super.simpleActivityStrategy = new ToolActivityStrategy();
+    	super.simpleActivityStrategy = new ToolActivityStrategy(this);
     }
     
     /** minimal constructor */
@@ -129,7 +130,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
 				transitionFrom);
         this.tool = tool;
         this.toolContentId = toolContentId;
-        super.simpleActivityStrategy = new ToolActivityStrategy();
+        super.simpleActivityStrategy = new ToolActivityStrategy(this);
     }
     
     /**
@@ -256,4 +257,13 @@ public class ToolActivity extends SimpleActivity implements Serializable
     {
         return false;
     }    
+    
+
+	/** 
+	 * Get all the tool activities in this activity. Called by Activity.getAllToolActivities()
+	 * As we are a tool activity, just add ourself.
+	 */
+	protected void getToolActivitiesInActivity(SortedSet toolActivities) {
+        toolActivities.add(this);
+	}
 }

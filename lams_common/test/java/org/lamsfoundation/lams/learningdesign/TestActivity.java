@@ -74,7 +74,7 @@ public class TestActivity extends AbstractCommonTestCase
     {
         Activity complexActivity = activityDAO.getActivityByActivityId(TEST_SEQUENCE_ACTIVITY);
         
-        Set toolActivities = complexActivity.getAllToolActivitiesFrom(complexActivity);
+        Set toolActivities = complexActivity.getAllToolActivities();
         
         assertEquals("verify the number tool activity we should get",2,toolActivities.size());
     }
@@ -83,7 +83,7 @@ public class TestActivity extends AbstractCommonTestCase
     {
         Activity simpleActivity = activityDAO.getActivityByActivityId(TEST_SURVEY_ACTIVITY);
         
-        Set toolActivities = simpleActivity.getAllToolActivitiesFrom(simpleActivity);
+        Set toolActivities = simpleActivity.getAllToolActivities();
         
         assertEquals("verify the number tool activity we should get",1,toolActivities.size());
 
@@ -104,9 +104,9 @@ public class TestActivity extends AbstractCommonTestCase
     
     public void testGetChildActivityById()
     {
-        Activity complexActivity = activityDAO.getActivityByActivityId(TEST_SEQUENCE_ACTIVITY);
+        ComplexActivity complexActivity = (ComplexActivity) activityDAO.getActivityByActivityId(TEST_SEQUENCE_ACTIVITY);
         
-        Activity child = ((ComplexActivity)complexActivity).getChildActivityById(TEST_CHILD_QNA_ACTIVITY_ID);
+        Activity child = complexActivity.getChildActivityById(TEST_CHILD_QNA_ACTIVITY_ID);
         assertNotNull(child);
         assertEquals("verify id",TEST_CHILD_QNA_ACTIVITY_ID,child.getActivityId().longValue());
     }

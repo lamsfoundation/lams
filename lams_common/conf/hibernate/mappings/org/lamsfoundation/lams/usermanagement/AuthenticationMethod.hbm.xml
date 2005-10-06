@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
     
 <hibernate-mapping>
 <!-- 
@@ -62,9 +62,11 @@
         name="authenticationMethodType"
         class="org.lamsfoundation.lams.usermanagement.AuthenticationMethodType"
         not-null="true"
+        lazy="false"
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
+	        lazy="false"
             not-null="true"
            @hibernate.column name="authentication_method_type_id"         
         </meta>

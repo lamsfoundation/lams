@@ -41,6 +41,13 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public abstract class GateActivityStrategy extends SimpleActivityStrategy
 {
+	protected GateActivity gateActivity = null;
+	
+	public GateActivityStrategy(GateActivity gateActivity) {
+		this.gateActivity = gateActivity;
+	}
+
+
     //---------------------------------------------------------------------
     // Template methods
     //---------------------------------------------------------------------
@@ -56,23 +63,24 @@ public abstract class GateActivityStrategy extends SimpleActivityStrategy
      * @param lessonLearners all learners who are currently in the lesson.
      * @return whether we should open it or not.
      */
-    public boolean shouldOpenGateFor(User learner,List lessonLearners,GateActivity activity)
+    public boolean shouldOpenGateFor(User learner,List lessonLearners)
     {
-        activity.addWaitingLeaner(learner);
+    	gateActivity.addWaitingLeaner(learner);
         
-        if(!activity.getGateOpen().booleanValue())
+        if(!gateActivity.getGateOpen().booleanValue())
         {
-            if( isOpenConditionMet(activity, lessonLearners))
+            if( isOpenConditionMet(lessonLearners))
             {
-            	activity.setGateOpen(new Boolean(true));
-            	activity.getWaitingLearners().clear();
+            	gateActivity.setGateOpen(new Boolean(true));
+            	gateActivity.getWaitingLearners().clear();
             }
 
         }
         //always clear waiting list if the gate is already opened.
-        else
-            activity.getWaitingLearners().clear();
-        return activity.getGateOpen().booleanValue();
+        else {
+        	gateActivity.getWaitingLearners().clear();
+        }
+        return gateActivity.getGateOpen().booleanValue();
     }
     
     //---------------------------------------------------------------------
@@ -82,14 +90,23 @@ public abstract class GateActivityStrategy extends SimpleActivityStrategy
      * Check up the open condition according the gate type.
      * @return return true if the condition is met.
      */
-    protected abstract boolean isOpenConditionMet(GateActivity activity,
-                                                  List lessonLearners);
+    protected abstract boolean isOpenConditionMet(List lessonLearners);
     //---------------------------------------------------------------------
     // Overidden methods
     //---------------------------------------------------------------------
     /**
      * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
      */
-    protected abstract void setUpContributionType(Activity activity, ArrayList contributionTypes);
+    protected abstract void setUpContributionType(ArrayList contributionTypes);
+
+    /**
+     * Get the activity for this strategy. The activity should be set
+     * when the strategy is created.
+     */
+    protected Activity getActivity() {
+    	return gateActivity;
+    }
+
+
 
 }

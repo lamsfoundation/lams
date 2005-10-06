@@ -28,7 +28,7 @@
 	<!--  Note - as this is only a Hibernate based transaction manager (and not JTA) some transactions may 
 	 - go awry when working across jars.
 	-->
- 	<bean id="transactionManager" class="org.springframework.orm.hibernate.HibernateTransactionManager">
+ 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 

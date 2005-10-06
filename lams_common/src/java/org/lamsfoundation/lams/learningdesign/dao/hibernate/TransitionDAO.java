@@ -24,9 +24,7 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
 import java.util.List;
 
-import net.sf.hibernate.Hibernate;
-import net.sf.hibernate.type.Type;
-
+import org.hibernate.Query;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
@@ -55,8 +53,12 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO#getTransitionByToActivityID(java.lang.Long)
 	 */
 	public Transition getTransitionByToActivityID(Long toActivityID) {		
-		List list = this.getHibernateTemplate().find(FIND_BY_TO_ACTIVITY,new Object[]{toActivityID}, new Type[]{Hibernate.LONG});
-		return (Transition)list.get(0);
+		if ( toActivityID != null ) {
+			Query query = this.getSession().createQuery(FIND_BY_TO_ACTIVITY);
+			query.setLong(0,toActivityID.longValue());
+			return (Transition) query.uniqueResult();
+		}
+		return null;
 	}
 
 	/**
@@ -64,16 +66,21 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO#getTransitionByfromActivityID(java.lang.Long)
 	 */
 	public Transition getTransitionByfromActivityID(Long fromActivityID) {
-		List list = this.getHibernateTemplate().find(FIND_BY_FROM_ACTIVITY,new Object[]{fromActivityID}, new Type[]{Hibernate.LONG});
-		if(list.size()!=0)
-			return (Transition)list.get(0);
-		else
-			return null;
+		if ( fromActivityID != null ) {
+			return (Transition) this.getSession().createQuery(FIND_BY_FROM_ACTIVITY)
+			.setLong(0,fromActivityID.longValue())
+			.uniqueResult();
+		}
+		return null;
 	}
 	
 	public List getTransitionsByLearningDesignID(Long learningDesignID){
-		List list = this.getHibernateTemplate().find(FIND_BY_LEARNING_DESIGN_ID, new Object[]{learningDesignID}, new Type[]{Hibernate.LONG});
-		return list;
+		if ( learningDesignID != null ) {
+			return this.getSession().createQuery(FIND_BY_LEARNING_DESIGN_ID)
+				.setLong(0, learningDesignID.longValue())
+				.list();
+		} 
+		return null;
 	}
 	public Activity getNextActivity(Long fromActivityID){
 		Transition transition = getTransitionByfromActivityID(fromActivityID);

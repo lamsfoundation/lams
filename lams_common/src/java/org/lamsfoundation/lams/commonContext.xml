@@ -20,7 +20,7 @@
   	<bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 	  	<property name="properties">
 		<props>
-			<prop key="hibernate.dialect">net.sf.hibernate.dialect.MySQLDialect</prop>
+			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
 			<prop key="hibernate.show_sql">false</prop>
 			<prop key="hibernate.c3p0.minPoolSize">5</prop>
 			<prop key="hibernate.c3p0.maxPoolSize">20</prop>
@@ -33,7 +33,7 @@
   	</bean>
   	
 	<!-- Hibernate SessionFactory -->
-	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="dataSource"/></property>
 		<property name="mappingResources">
 			<list>

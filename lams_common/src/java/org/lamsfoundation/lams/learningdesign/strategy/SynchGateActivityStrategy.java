@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -43,6 +42,10 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class SynchGateActivityStrategy extends GateActivityStrategy
 {
+	public SynchGateActivityStrategy(GateActivity gateActivity) {
+		super(gateActivity);
+	}
+
     //---------------------------------------------------------------------
     // Overriden methods
     //---------------------------------------------------------------------
@@ -59,27 +62,26 @@ public class SynchGateActivityStrategy extends GateActivityStrategy
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#isOpenConditionMet()
      */
-    protected boolean isOpenConditionMet(GateActivity activity,
-                                         List lessonLearners)
+    protected boolean isOpenConditionMet(List lessonLearners)
     {
-        for(Iterator i = lessonLearners.iterator();i.hasNext();)
-        {
-            User learner = (User)i.next();
-            if (!activity.getWaitingLearners().contains(learner))
-                return false;
-        }
+    	if ( gateActivity != null ) {
+	        for(Iterator i = lessonLearners.iterator();i.hasNext();)
+	        {
+	            User learner = (User)i.next();
+	            if (!gateActivity.getWaitingLearners().contains(learner))
+	                return false;
+	        }
+    	}
         return true;
     }
     
     /**
      * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
      */
-    protected void setUpContributionType(Activity activity,
-                                         ArrayList contributionTypes)
+    protected void setUpContributionType(ArrayList contributionTypes)
     {
         contributionTypes.add(SYNC_GATE);   
     }
-
 
 
 }

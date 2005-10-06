@@ -117,10 +117,14 @@ public class WebUtil
 	 * @exception IllegalArgumentException -
 	 *                if not set
 	 */
-	public static void checkString(String paramName, String paramValue) throws IllegalArgumentException
+	public static void checkObject(String paramName, Object paramValue) throws IllegalArgumentException
 	{
-		if ((paramValue == null) || (paramValue.length() < 1))
-		{
+		boolean isNull = ( paramValue == null );
+		if ( ! isNull && String.class.isInstance(paramValue) ) {
+			String str = (String) paramValue;
+			isNull = ( str.trim().length() == 0 );
+		}
+		if ( isNull ) {
 			throw new IllegalArgumentException(paramName + " is required '"
 					+ paramValue + "'");
 		}
@@ -135,7 +139,7 @@ public class WebUtil
 	{
 		try
 		{
-			checkString(paramName, paramValue);
+			checkObject(paramName, paramValue);
 			return Integer.parseInt(paramValue.trim());
 
 		}
@@ -155,7 +159,7 @@ public class WebUtil
 	{
 		try
 		{
-			checkString(paramName, paramValue);
+			checkObject(paramName, paramValue);
 			return Long.parseLong(paramValue.trim());
 
 		}
@@ -167,6 +171,19 @@ public class WebUtil
 	}
 
 	/**
+	 * Get a long version of paramValue, throwing an IllegalArgumentException
+	 * if the parameter is null
+	 * @return long value of paramValue
+	 * @exception IllegalArgumentException -
+	 *                if not set or not long
+	 */
+	public static long checkLong(String paramName, Long paramValue) throws IllegalArgumentException
+	{
+		checkObject(paramName, paramValue);
+		return paramValue.longValue();
+	}
+
+	/**
 	 * @return boolean value of paramValue
 	 * @exception IllegalArgumentException -
 	 *                if not set or not boolean
@@ -174,7 +191,7 @@ public class WebUtil
 	public static boolean checkBoolean(String paramName, String paramValue) throws IllegalArgumentException
 	{
 
-		checkString(paramName, paramValue);
+		checkObject(paramName, paramValue);
 		return Boolean.valueOf(paramValue.trim()).booleanValue();
 	}
 
@@ -238,7 +255,7 @@ public class WebUtil
 	public static String readStrParam(HttpServletRequest req, String paramName, boolean isOptional)
 	{
 		if (!isOptional)
-			checkString(paramName, req.getParameter(paramName));
+			checkObject(paramName, req.getParameter(paramName));
 		return req.getParameter(paramName);
 	}
 

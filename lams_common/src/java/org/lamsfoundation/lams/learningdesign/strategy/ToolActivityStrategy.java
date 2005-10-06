@@ -38,22 +38,37 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
  */
 public class ToolActivityStrategy extends SimpleActivityStrategy {
 
+	protected ToolActivity toolActivity = null;
+	
+	public ToolActivityStrategy(ToolActivity toolActivity) {
+		this.toolActivity = toolActivity;
+	}
+
     //---------------------------------------------------------------------
     // Overriden methods
     //---------------------------------------------------------------------
     /**
      * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity)
      */
-    protected void setUpContributionType(Activity activity,
-                                         ArrayList contributionTypes)
+    protected void setUpContributionType(ArrayList contributionTypes)
     {
-		ToolActivity toolActivity = (ToolActivity)activity;
-		if(toolActivity.getTool().getSupportsModeration())
-		    contributionTypes.add(MODERATION);
-		if(toolActivity.getTool().getSupportsContribute())
-		    contributionTypes.add(CONTRIBUTION);
-		if(toolActivity.getDefineLater().booleanValue())
-		    contributionTypes.add(DEFINE_LATER);
+    	if ( toolActivity != null ) {
+			if(toolActivity.getTool().getSupportsModeration())
+			    contributionTypes.add(MODERATION);
+			if(toolActivity.getTool().getSupportsContribute())
+			    contributionTypes.add(CONTRIBUTION);
+			if(toolActivity.getDefineLater().booleanValue())
+			    contributionTypes.add(DEFINE_LATER);
+    	}
     }
+    
+    /**
+     * Get the activity for this strategy. The activity should be set
+     * when the strategy is created.
+     */
+    protected Activity getActivity() {
+    	return toolActivity;
+    }
+
 
 }

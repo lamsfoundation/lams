@@ -38,29 +38,34 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
  * @author Jacky Fang 2005-2-24
  * @version 1.1
  */
-public class SequenceActivityStrategy extends ComplextActivityStrategy
+public class SequenceActivityStrategy extends ComplexActivityStrategy
 {
-    
+	protected SequenceActivity sequenceActivity = null;
+	
+	public SequenceActivityStrategy(SequenceActivity sequenceActivity) {
+		this.sequenceActivity = sequenceActivity;
+	}
+
     /**
-     * <p>Return the next activity for a incomplete options activity. For a 
-     * sequence activity, the activity should be the next activity in the
+     * <p>Return the next activity for a incomplete options activity. 
+     * 
+     * <p>For a sequence activity, the activity should be the next activity in the
      * children activity set ordered by activity id.</p>
      * 
      * Pre-condition: the parent must have some incomplete children
      * 
-     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#getNextActivityByParent(Activity, Activity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
-    public Activity getNextActivityByParent(Activity parent, Activity currentChild)
+    public Activity getNextActivityByParent(ComplexActivity parent, Activity currentChild)
     {
         Set children = new TreeSet(new ActivityOrderComparator());
-        
-        children.addAll(((ComplexActivity)parent).getActivities());
+        children.addAll(parent.getActivities());
         
         for(Iterator i=children.iterator();i.hasNext();)
         {
             Activity curChild = (Activity)i.next();
             //if no current child, we should return the first one.
-            if(currentChild.isNull())
+            if(currentChild==null || currentChild.isNull())
                 return curChild;
             
             if(curChild.getActivityId().longValue()==currentChild.getActivityId().longValue())
@@ -74,12 +79,20 @@ public class SequenceActivityStrategy extends ComplextActivityStrategy
      * of this sequence activity appear in the completed activities set from
      * current learner progress.
      * 
-     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
      */
-    protected boolean isComplete(int numOfCompletedActivities, ComplexActivity complexActivity)
+    protected boolean isComplete(int numOfCompletedActivities)
     {
-        SequenceActivity sequenceActivity = (SequenceActivity)complexActivity;
-        return numOfCompletedActivities==sequenceActivity.getActivities().size()?true:false;
+    	if ( sequenceActivity != null ) {
+    		return numOfCompletedActivities==sequenceActivity.getActivities().size()?true:false;
+    	} 
+    	return true;
     }
 
+    /** 
+     * Get the strategy's activity as a Complex Activity.  
+     */
+    protected ComplexActivity getComplexActivity() {
+    	return sequenceActivity;
+    }
 }

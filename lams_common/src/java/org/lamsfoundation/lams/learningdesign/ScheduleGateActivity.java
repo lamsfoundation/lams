@@ -132,12 +132,12 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
         
         this.gateStartTimeOffset = gateStartTimeOffset;
         this.gateEndTimeOffset = gateEndTimeOffset;
-        this.simpleActivityStrategy = new ScheduleGateActivityStrategy();
+        this.simpleActivityStrategy = new ScheduleGateActivityStrategy(this);
     }
 
     /** default constructor */
     public ScheduleGateActivity() {
-        this.simpleActivityStrategy = new ScheduleGateActivityStrategy();
+        this.simpleActivityStrategy = new ScheduleGateActivityStrategy(this);
     }
 
     /** minimal constructor */
@@ -172,7 +172,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
           		" than start time offset");
       this.gateStartTimeOffset = gateStartTimeOffset;
       this.gateEndTimeOffset = gateEndTimeOffset;
-      this.simpleActivityStrategy = new ScheduleGateActivityStrategy();
+      this.simpleActivityStrategy = new ScheduleGateActivityStrategy(this);
     }
     /**
      * Makes a copy of the ScheduleGateActivity for authoring, preview and monitoring enviornment 

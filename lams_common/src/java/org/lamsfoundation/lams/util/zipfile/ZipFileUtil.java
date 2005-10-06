@@ -20,21 +20,20 @@ http://www.gnu.org/licenses/gpl.txt
 */
 package org.lamsfoundation.lams.util.zipfile;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.FileUtil;
-import java.util.zip.ZipOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.BufferedInputStream;
 
 /**
  * Handles zip files - expands them to a temporary directory, and 

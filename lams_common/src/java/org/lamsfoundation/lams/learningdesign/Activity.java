@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -40,6 +41,10 @@ import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
 /**
+ * Base class for all activities. If you add another subclass, 
+ * you must update ActivityDAO.getActivityByActivityId() and add a  
+ * ACTIVITY_TYPE constant.
+ * 
  * @hibernate.class table="lams_learning_activity"
  */
 public abstract class Activity implements Serializable,Nullable {
@@ -47,11 +52,13 @@ public abstract class Activity implements Serializable,Nullable {
     //---------------------------------------------------------------------
     // Class Level Constants
     //---------------------------------------------------------------------
-	/**
+	/*
 	 * static final variables indicating the type of activities
-	 * available for a LearningDesign 
-	 * */
-	/******************************************************************/
+	 * available for a LearningDesign. As new types of activities 
+	 * are added, these constants must be updated, as well as 
+	 * ActivityDAO.getActivityByActivityId()
+	 */
+	/* *****************************************************************/
 	public static final int TOOL_ACTIVITY_TYPE = 1;
 	public static final int GROUPING_ACTIVITY_TYPE = 2;
 	public static final int SYNCH_GATE_ACTIVITY_TYPE = 3;
@@ -582,39 +589,31 @@ public abstract class Activity implements Serializable,Nullable {
 	}
     //---------------------------------------------------------------------
     // Service Methods 
-    //---------------------------------------------------------------------	
+    //---------------------------------------------------------------------
+	
 	/**
-	 * This method that get all tool activities belong to a particular activity. 
+	 * This method that get all tool activities belong to the current activity. 
 	 * 
 	 * As the activity object structure might be infinite, we recursively loop
 	 * through the entire structure and added all tool activities into the set 
-	 * that we want to return.
+	 * that we want to return. This method calls a method getToolActivitiesInActivity()
+	 * which must be defined in subclasses for tool or a complex activities.
+	 * This handles the polymorphic aspect of this function. (Note: we can't
+	 * use instanceOf as we are dealing with Hibernate proxies.)
 	 * 
-	 * @param activity the requested activity.
 	 * @return the set of all tool activities.
 	 */
-	public Set getAllToolActivitiesFrom(Activity activity)
+	public Set getAllToolActivities()
 	{
-	    Set toolActivities = new TreeSet(new ActivityOrderComparator());
-	    //tool activity is usually leaf node activity, we return it right away
-	    if(activity.getActivityTypeId().intValue()==Activity.TOOL_ACTIVITY_TYPE)
-	    {
-	        toolActivities.add(activity);
-	        return toolActivities;
-	    }
-	    //recursively get tool activity from its children if it is complex activity.
-	    else if(activity instanceof ComplexActivity)
-	    {
-	        ComplexActivity cActivity = (ComplexActivity)activity;
-	        for(Iterator i = cActivity.getActivities().iterator();i.hasNext();)
-	        {
-	            Activity child = (Activity)i.next();
-	            toolActivities.addAll(getAllToolActivitiesFrom(child));
-	        }
-	    }
-
+	    SortedSet toolActivities = new TreeSet(new ActivityOrderComparator());
+	    getToolActivitiesInActivity(toolActivities);
 	    return toolActivities;
-	    
+	}
+	
+	protected void getToolActivitiesInActivity(SortedSet toolActivities) {
+		
+		// a simple activity doesn't have any tool activities
+	
 	}
 	
 	/**

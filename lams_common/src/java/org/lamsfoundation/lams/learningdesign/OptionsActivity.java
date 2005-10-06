@@ -88,12 +88,12 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
         this.maxNumberOfOptions = maxNumberOfOptions;
         this.minNumberOfOptions = minNumberOfOptions;
         this.optionsInstructions = options_instructions;
-        super.activityStrategy = new OptionsActivityStrategy();
+        super.activityStrategy = new OptionsActivityStrategy(this);
     }
 
     /** default constructor */
     public OptionsActivity() {
-        super.activityStrategy = new OptionsActivityStrategy();
+        super.activityStrategy = new OptionsActivityStrategy(this);
     }
 
     /** minimal constructor */
@@ -119,7 +119,7 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
               transitionTo,
               transitionFrom,
               activities);
-      super.activityStrategy = new OptionsActivityStrategy();
+      super.activityStrategy = new OptionsActivityStrategy(this);
     }
     public static OptionsActivity createCopy(OptionsActivity originalActivity){
     	OptionsActivity newOptionsActivity = new OptionsActivity();

@@ -77,6 +77,7 @@ public class AuthenticationMethod implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
+     *             lazy="false"
      *            @hibernate.column name="authentication_method_type_id"         
      *         
      */

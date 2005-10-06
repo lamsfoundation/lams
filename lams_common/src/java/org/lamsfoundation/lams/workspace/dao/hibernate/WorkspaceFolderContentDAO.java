@@ -22,10 +22,8 @@
  */
 package org.lamsfoundation.lams.workspace.dao.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
-
-import net.sf.hibernate.Hibernate;
-import net.sf.hibernate.type.Type;
 
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
@@ -71,22 +69,35 @@ public class WorkspaceFolderContentDAO extends BaseDAO implements IWorkspaceFold
 	 * @see org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO#getContentByTypeFromWorkspaceFolder(java.lang.Long, java.lang.String)
 	 */
 	public List getContentByTypeFromWorkspaceFolder(Long workspaceFolderID,String mimeType) {
-		List list = this.getHibernateTemplate().find(FIND_BY_TYPE_IN_FOLDER,
-													 new Object[]{workspaceFolderID,mimeType},
-													 new Type[]{Hibernate.LONG,Hibernate.STRING}); 
-		if(list==null||list.size()==0)
-			return null;
-		else
-			return list;
+		if ( workspaceFolderID !=null ) {
+			return this.getSession().createQuery(FIND_BY_TYPE_IN_FOLDER)
+				.setLong(0,workspaceFolderID.longValue())
+				.setString(1,mimeType)
+				.list();
+		}
+		return null;
 	}
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.workspace.dao.IWorkspaceFolderContentDAO#deleteContentWithVersion(java.lang.Long, java.lang.Long, java.lang.Long)
 	 */
 	public int deleteContentWithVersion(Long uuid, Long versionID, Long folderContentID){
-		return this.getHibernateTemplate().delete(DELETE_BY_VERSION,
-										   new Object[]{folderContentID,uuid,versionID},
-										   new Type[]{Hibernate.LONG,Hibernate.LONG,Hibernate.LONG});		
-		
+		int numDeleted = 0;
+		if ( uuid != null && versionID != null && folderContentID != null ) {
+			List list = this.getSession().createQuery(DELETE_BY_VERSION)
+				.setLong(0, folderContentID.longValue())
+				.setLong(1, uuid.longValue())
+				.setLong(2,versionID.longValue())
+				.list();
+			if ( list != null && list.size() > 0 ) {
+				Iterator iter = list.iterator();
+				while (iter.hasNext()) {
+					Object element = (Object) iter.next();
+					this.getSession().delete(element);
+					numDeleted++;
+				}
+			}
+		}
+		return numDeleted;
 	}
 }

@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.learningdesign.strategy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 
 
@@ -41,6 +40,11 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
  */
 public class ScheduleGateActivityStrategy extends GateActivityStrategy
 {
+	public ScheduleGateActivityStrategy(GateActivity gateActivity) {
+		super(gateActivity);
+	}
+
+
     //---------------------------------------------------------------------
     // Overriden methods
     //---------------------------------------------------------------------
@@ -48,8 +52,7 @@ public class ScheduleGateActivityStrategy extends GateActivityStrategy
     /**
      * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
      */
-    protected void setUpContributionType(Activity activity, 
-                                         ArrayList contributionTypes)
+    protected void setUpContributionType(ArrayList contributionTypes)
     {
         contributionTypes.add(SCHEDULE_GATE);        
     }
@@ -62,9 +65,11 @@ public class ScheduleGateActivityStrategy extends GateActivityStrategy
      * 
      * @see org.lamsfoundation.lams.learningdesign.strategy.GateActivityStrategy#isOpenConditionMet()
      */
-    protected boolean isOpenConditionMet(GateActivity activity,
-                                         List lessonLearners)
+    protected boolean isOpenConditionMet(List lessonLearners)
     {
-        return activity.getGateOpen().booleanValue();
+    	if ( gateActivity != null ) {
+    		return gateActivity.getGateOpen().booleanValue();
+    	}
+    	return true;
     }
 }

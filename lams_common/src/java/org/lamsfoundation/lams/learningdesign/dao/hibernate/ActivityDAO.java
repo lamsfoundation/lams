@@ -24,13 +24,19 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
 import java.util.List;
 
-import net.sf.hibernate.Hibernate;
-import net.sf.hibernate.type.Type;
-
+import org.hibernate.Query;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
+import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.springframework.dao.DataRetrievalFailureException;
 
 /**
  * @author Manpreet Minhas 
@@ -56,7 +62,36 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#getActivityById(java.lang.Long)
 	 */
 	public Activity getActivityByActivityId(Long activityId) {
-		return (Activity) super.find(Activity.class,activityId);		
+		Activity act = (Activity) super.find(Activity.class,activityId);
+		
+		// we must return the real activity, not a Hibernate proxy. So relook
+		// it up. This should be quick as it should be in the cache.
+		if ( act != null ) {
+			Integer activityType = act.getActivityTypeId();
+			if ( activityType != null ) {
+				switch ( activityType.intValue() ) {
+					case Activity.TOOL_ACTIVITY_TYPE: 
+							return (ToolActivity) super.find(ToolActivity.class,activityId);
+					case Activity.GROUPING_ACTIVITY_TYPE: 
+							return (GroupingActivity) super.find(GroupingActivity.class,activityId);
+					case Activity.SYNCH_GATE_ACTIVITY_TYPE: 
+							return (SynchGateActivity) super.find(SynchGateActivity.class,activityId);
+					case Activity.SCHEDULE_GATE_ACTIVITY_TYPE: 
+							return (ScheduleGateActivity) super.find(ScheduleGateActivity.class,activityId);
+					case Activity.PERMISSION_GATE_ACTIVITY_TYPE: 
+							return (PermissionGateActivity) super.find(PermissionGateActivity.class,activityId);
+					case Activity.PARALLEL_ACTIVITY_TYPE: 
+							return (ParallelActivity) super.find(ParallelActivity.class,activityId);
+					case Activity.OPTIONS_ACTIVITY_TYPE: 
+							return (OptionsActivity) super.find(OptionsActivity.class,activityId);
+					case Activity.SEQUENCE_ACTIVITY_TYPE: 
+							return (SequenceActivity) super.find(SequenceActivity.class,activityId);
+					default: break; 
+				}
+			}
+			throw new DataRetrievalFailureException("Unable to get activity as the activity type is unknown or missing. Activity type is "+activityType);
+		}
+		return null;		
 	}
 
 	/* 
@@ -110,12 +145,14 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	 * @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getActivityByID(java.lang.Integer)
 	 */
 	public Activity getActivityByUIID(Integer id, LearningDesign design) {
-		Long designID = design.getLearningDesignId();
-		List list = this.getHibernateTemplate().find(FIND_BY_UI_ID,new Object[]{id,designID},new Type[]{Hibernate.INTEGER,Hibernate.LONG});
-		if(list!=null && list.size()!=0)
-			return (Activity) list.get(0);
-		else
-			return null;
+		if ( id != null && design != null ) {
+			Long designID = design.getLearningDesignId();
+			Query query = this.getSession().createQuery(FIND_BY_UI_ID);
+			query.setInteger(0,id.intValue());
+			query.setLong(1,designID.longValue());
+			return (Activity) query.uniqueResult();
+		}
+		return null;
 	}
 	/**
 	 * @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getActivitiesByLibraryID(java.lang.Long)

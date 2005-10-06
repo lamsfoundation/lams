@@ -24,10 +24,8 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
 import java.util.List;
 
-import net.sf.hibernate.Hibernate;
-import net.sf.hibernate.HibernateException;
-import net.sf.hibernate.type.Type;
-
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 
@@ -70,11 +68,15 @@ public class LearningDesignDAO extends BaseDAO implements ILearningDesignDAO {
 	}
 	
 	public List getLearningDesignByUserId(Long userID){		
-		try{
-			return this.getSession().find(FIND_BY_USERID,new Object[]{userID}, new Type[]{Hibernate.LONG});
-		}catch(HibernateException he){
-			return null;			
-		}		
+		if ( userID != null ) {
+			try{
+				Query query = this.getSession().createQuery(FIND_BY_USERID);
+				query.setLong(0,userID.longValue());
+				return query.list();
+			}catch(HibernateException he){
+			}		
+		}
+		return null;			
 	}
 
 	/**

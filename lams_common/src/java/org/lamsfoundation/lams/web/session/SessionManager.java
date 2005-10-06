@@ -36,7 +36,7 @@ import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 import javax.servlet.http.HttpSessionContext;
 
-import net.sf.hibernate.id.UUIDHexGenerator;
+import org.hibernate.id.UUIDHexGenerator;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.Configuration;

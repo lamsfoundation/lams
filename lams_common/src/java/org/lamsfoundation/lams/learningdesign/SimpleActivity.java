@@ -110,6 +110,6 @@ public abstract class SimpleActivity extends Activity implements Serializable
 
     
 	public Integer[] getContributionType(){
-		return simpleActivityStrategy.getContributionType(this);
+		return simpleActivityStrategy.getContributionType();
 	}
 }

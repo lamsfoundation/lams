@@ -8,20 +8,17 @@ package org.lamsfoundation.lams.lesson.dao.hibernate;
 
 import java.util.List;
 
-
-import net.sf.hibernate.FetchMode;
-import net.sf.hibernate.HibernateException;
-import net.sf.hibernate.Query;
-import net.sf.hibernate.Session;
-import net.sf.hibernate.expression.Expression;
-
-import org.springframework.orm.hibernate.HibernateCallback;
-import org.springframework.orm.hibernate.HibernateTemplate;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
-
-import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.hibernate.FetchMode;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.criterion.Expression;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * Hibernate implementation of ILessonDAO
  * @author chris
@@ -43,7 +40,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
     }
     
     
-    public Lesson getLessonWithEagerlyFetchedProgress(final Long lessonId)
+    public Lesson getLessonWithJoinFetchedProgress(final Long lessonId)
     {
         HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
@@ -54,7 +51,7 @@ public class LessonDAO extends HibernateDaoSupport implements ILessonDAO
                  {
                      return session.createCriteria(Lesson.class)
                      			   .add(Expression.like("lessonId",lessonId))
-                     			   .setFetchMode("learnerProgresses",FetchMode.EAGER)
+                     			   .setFetchMode("learnerProgresses",FetchMode.JOIN)
                      			   .uniqueResult();
                  }
              }

@@ -204,7 +204,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
         if(getGateOpen()==null)
             this.setGateOpen(new Boolean(false));
         
-	    return ((GateActivityStrategy)simpleActivityStrategy).shouldOpenGateFor(learner,lessonLearners,this);
+	    return ((GateActivityStrategy)simpleActivityStrategy).shouldOpenGateFor(learner,lessonLearners);
 	}
 
     //---------------------------------------------------------------------

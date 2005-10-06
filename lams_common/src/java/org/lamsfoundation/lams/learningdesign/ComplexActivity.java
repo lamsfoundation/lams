@@ -26,10 +26,11 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy;
+import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
@@ -38,7 +39,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 public abstract class ComplexActivity extends Activity implements Serializable {
 
 
-    protected ComplextActivityStrategy activityStrategy;
+    protected ComplexActivityStrategy activityStrategy;
 	/** persistent field */
 	private Set activities;
 
@@ -149,7 +150,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	 */
 	public boolean areChildrenCompleted(LearnerProgress learnerProgress)
 	{
-	    return activityStrategy.areChildrenCompleted(this,learnerProgress);
+	    return activityStrategy.areChildrenCompleted(learnerProgress);
 	}
 	
 	/**
@@ -160,11 +161,23 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	 * 				enigne specific now. Please see the <code>ActivityStrategy</code>
 	 * 				for details explaination of what is next.
 	 * 
-	 * @param currentChild the current child activity in a complex activity.
 	 * @return the next activity within a parent activity
 	 */
 	public Activity getNextActivityByParent(Activity currentChild)
 	{
-	    return activityStrategy.getNextActivityByParent(this,currentChild);
+	    return activityStrategy.getNextActivityByParent(this, currentChild);
 	}	
+	
+	/** 
+	 * Get all the tool activities in this activity. Called by Activity.getAllToolActivities().
+	 * Recursively get tool activity from its children.
+	 */
+	protected void getToolActivitiesInActivity(SortedSet toolActivities) {
+		
+        for(Iterator i = this.getActivities().iterator();i.hasNext();) {
+            Activity child = (Activity)i.next();
+            child.getToolActivitiesInActivity(toolActivities);
+        }
+	    
+	}
 }

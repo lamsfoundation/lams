@@ -39,17 +39,34 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
  */
 public class GroupingActivityStrategy extends SimpleActivityStrategy {
 
+	private GroupingActivity groupingActivity = null;
+	
+	public GroupingActivityStrategy(GroupingActivity groupingActivity) {
+		this.groupingActivity = groupingActivity;
+	}
+
     //---------------------------------------------------------------------
     // Overriden methods
     //---------------------------------------------------------------------
     /**
      * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
      */
-    protected void setUpContributionType(Activity activity, ArrayList contributionTypes)
+    protected void setUpContributionType(ArrayList contributionTypes)
     {
-		GroupingActivity groupingActivity =(GroupingActivity)activity;
-		if(groupingActivity.getCreateGrouping().getGroupingTypeId()== Grouping.CHOSEN_GROUPING_TYPE)
-		    contributionTypes.add(CHOSEN_GROUPING);	
+		if ( groupingActivity != null ) {
+			if(groupingActivity.getCreateGrouping().getGroupingTypeId()== Grouping.CHOSEN_GROUPING_TYPE)
+			    contributionTypes.add(CHOSEN_GROUPING);
+		}
     }
+    
+    /**
+     * Get the activity for this strategy. The activity should be set
+     * when the strategy is created.
+     */
+    protected Activity getActivity() {
+    	return groupingActivity;
+    }
+
+
 
 }

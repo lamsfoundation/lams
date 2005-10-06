@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
  * @author Jacky Fang 2005-2-23
  * @version 1.1
  */
-public abstract class ComplextActivityStrategy implements Serializable
+public abstract class ComplexActivityStrategy implements Serializable
 {
     /**
      * <p>Check up all children completion status for a complex activity. </p>
@@ -49,19 +49,22 @@ public abstract class ComplextActivityStrategy implements Serializable
      * 						  completed
      * @return true if all children are completed.
      */
-    public boolean areChildrenCompleted(Activity activity, LearnerProgress learnerProgress)
+    public boolean areChildrenCompleted(LearnerProgress learnerProgress)
     {
-        ComplexActivity complexActivity = (ComplexActivity)activity;
-        
+        ComplexActivity complexActivity = getComplexActivity();
+
         int numOfCompletedActivities=0;
-        for(Iterator i = complexActivity.getActivities().iterator();i.hasNext();)
-        {
-            Activity currentActivity = (Activity)i.next();
-            if(learnerProgress.getCompletedActivities().contains(currentActivity))
-                numOfCompletedActivities++;
+        
+        if ( complexActivity != null ) {
+	        for(Iterator i = complexActivity.getActivities().iterator();i.hasNext();)
+	        {
+	            Activity currentActivity = (Activity)i.next();
+	            if(learnerProgress.getCompletedActivities().contains(currentActivity))
+	                numOfCompletedActivities++;
+	        }
         }
         
-        return isComplete(numOfCompletedActivities,complexActivity);
+        return isComplete(numOfCompletedActivities);
 
     }
 
@@ -72,17 +75,32 @@ public abstract class ComplextActivityStrategy implements Serializable
      * 								   progress data
      * @return true if the completion condition is met.
      */
-    protected abstract boolean isComplete(int numOfCompletedActivities,ComplexActivity complexActivity);
+    protected abstract boolean isComplete(int numOfCompletedActivities);
 
 
     /**
      * This method get next activity that should be progressed against the
-     * requested incomplete parent activity.
+     * requested incomplete parent activity. 
+     * 
+     * Changes made to remove casting (by Fiona Malikoff) made the assumption
+     * that the parent is always a ComplexActivity. If this is not correct
+     * we may have a problem.
      * @param parent The requested incomplete parent activity.
      * @param currentChild the current children we have just completed.
      * 
      * @return the activity we should progress to.
      */
-    public abstract Activity getNextActivityByParent(Activity parent, Activity currentChild);
+    public abstract Activity getNextActivityByParent(ComplexActivity parent, Activity currentChild);
     
+    /** 
+     * Get the strategy's activity as a Complex Activity. Needed for areChildrenCompleted() 
+     */
+    protected abstract ComplexActivity getComplexActivity();
+    
+    /** Set the getActivity() to return the result of getComplexActivity() - no need for
+     * subclasses to create two methods that do much the same thing.
+     */
+    protected Activity getActivity() {
+    	return getComplexActivity();
+    }
 }

@@ -8,7 +8,7 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 import java.util.List;
 import java.util.Iterator;
 
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;

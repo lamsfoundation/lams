@@ -9,8 +9,7 @@
 
 package org.lamsfoundation.lams.lesson.dao;
 
-import net.sf.hibernate.HibernateException;
-
+import org.hibernate.HibernateException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.lesson.LessonDataAccessTestCase;

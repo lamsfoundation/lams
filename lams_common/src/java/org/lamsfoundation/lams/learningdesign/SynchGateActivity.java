@@ -77,12 +77,12 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 				transitionFrom,
                 gateActivityLevelId,
                 waitingLearners);
-        super.simpleActivityStrategy = new SynchGateActivityStrategy();
+        super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
     }
 
     /** default constructor */
     public SynchGateActivity() {
-        super.simpleActivityStrategy = new SynchGateActivityStrategy();
+        super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
     }
 
     /** minimal constructor */
@@ -111,7 +111,7 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 			  transitionFrom,
               gateActivityLevelId,
               waitingLearners);
-      super.simpleActivityStrategy = new SynchGateActivityStrategy();
+      super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
     }
     
     /**

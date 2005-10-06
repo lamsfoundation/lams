@@ -33,8 +33,13 @@ import org.lamsfoundation.lams.learningdesign.OptionsActivity;
  * @author Jacky Fang 2005-2-24
  * @version 1.1
  */
-public class OptionsActivityStrategy extends ComplextActivityStrategy
+public class OptionsActivityStrategy extends ComplexActivityStrategy
 {
+	private OptionsActivity optionsActivity = null;
+	
+	public OptionsActivityStrategy(OptionsActivity optionsActivity) {
+		this.optionsActivity = optionsActivity;
+	}
 
     /**
      * Return the next activity for a incomplete options activity. In terms of 
@@ -42,9 +47,9 @@ public class OptionsActivityStrategy extends ComplextActivityStrategy
      * activity itself so as to display the options page again when the user
      * finish one option.
      *  
-     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#getNextActivityByParent(Activity, Activity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#getNextActivityByParent(Activity, Activity)
      */
-    public Activity getNextActivityByParent(Activity parent, Activity currentChild)
+    public Activity getNextActivityByParent(ComplexActivity parent, Activity currentChild)
     {
         return parent;
     }
@@ -54,12 +59,20 @@ public class OptionsActivityStrategy extends ComplextActivityStrategy
      * activity. A option activity is marked as complete if the maximum
      * number of options requirement is met.
      * 
-     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplextActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
+     * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#isComplete(int, org.lamsfoundation.lams.learningdesign.ComplexActivity)
      */
-    protected boolean isComplete(int numOfCompletedActivities, ComplexActivity complexActivity)
+    protected boolean isComplete(int numOfCompletedActivities)
     {
-        OptionsActivity optionsActivity = (OptionsActivity)complexActivity;
-        return numOfCompletedActivities>=optionsActivity.getMaxNumberOfOptions().intValue()?true:false;
+    	if ( optionsActivity != null ) {
+    		return numOfCompletedActivities>=optionsActivity.getMaxNumberOfOptions().intValue()?true:false;
+    	}
+    	return true;
     }
 
+    /** 
+     * Get the strategy's activity as a Complex Activity.  
+     */
+    protected ComplexActivity getComplexActivity() {
+    	return optionsActivity;
+    }
 }

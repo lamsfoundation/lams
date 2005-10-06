@@ -27,7 +27,7 @@ public interface ILessonDAO
     
     public List getAllLessons();
     
-    public Lesson getLessonWithEagerlyFetchedProgress(Long lessonId);
+    public Lesson getLessonWithJoinFetchedProgress(Long lessonId);
     /**
      * Gets all lessons that are active for a learner.
      * @param learner a User that identifies the learner.

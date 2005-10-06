@@ -73,12 +73,12 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
                 transitionTo,
 				transitionFrom,
                 activities);
-        super.activityStrategy = new ParallelActivityStrategy();
+        super.activityStrategy = new ParallelActivityStrategy(this);
     }
 
     /** default constructor */
     public ParallelActivity() {
-        super.activityStrategy = new ParallelActivityStrategy();
+        super.activityStrategy = new ParallelActivityStrategy(this);
     }
 
     /** minimal constructor */
@@ -104,7 +104,7 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
               transitionTo,
 			  transitionFrom,
               activities);
-      super.activityStrategy = new ParallelActivityStrategy();
+      super.activityStrategy = new ParallelActivityStrategy(this);
     }
     /**
      * Makes a copy of the ParallelActivity for authoring, preview and monitoring enviornment 
