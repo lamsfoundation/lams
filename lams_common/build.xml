@@ -244,36 +244,6 @@ Ant build file.
 			</fileset>
 		</copy>
 	</target>
-
-	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
-	<!-- Make the war archive  for deployment             -->
-	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
-	<target name="lams-war" depends="lams-jar" description="creates war file">
-		<delete file="${build.lib}/${product}.war"/>
-		<war warfile="${build.lib}/${product}.war" 
-  				webxml="${webinf}/web.xml">
-			<webinf dir="${webinf}">
-				<include name="*.xml"/>
-				<!--include name="*.properties"/-->
-				<include name="struts/*"/>
-				<include name="jstl/*"/>
-				<include name="tiles/*"/>
-				<exclude name="web.xml"/>
-			</webinf>
-			<lib dir="${build.lib}">
-				<include name="${product}.jar"/>
-			</lib>
-			<fileset dir="${web}">
-				<include name="*"/>
-				<include name="doc/*"/>
-				<include name="admin/*"/>
-				<include name="images/*"/>
-				<include name="admin/file/*"/>
-			</fileset>
-		</war>
-	</target>
-
-
 	<!-- =================================================================== -->
 	<!-- Deploy the project on windows                                       -->
 	<!-- =================================================================== -->
@@ -283,8 +253,6 @@ Ant build file.
 			<fileset dir="${jboss.deploy}/work"/>
 		</delete>
 		<copy file="${build.lib}/${product}.jar"
-				todir="${jboss.deploy}"/>
-		<copy file="${build.lib}/${product}.war"
 				todir="${jboss.deploy}"/>
 	</target>
 
