@@ -21,7 +21,13 @@
 <Method Name="LAMS-Database" Enabled="true">
 	<Param Name="dsJndiName">java:/jdbc/lams-ds</Param>
 	<Param Name="principalsQuery">select password from lams_user where login=?</Param>
-	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
+	<Param Name="rolesQuery">
+	            SELECT DISTINCT  r.name,'Roles' FROM
+             	lams_user u LEFT OUTER JOIN lams_user_organisation uo USING(user_id)
+             	LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id)
+             	LEFT OUTER JOIN lams_role r USING (role_id)
+             	WHERE u.login=?
+	</Param>
 </Method>
 
 <Method Name="Oxford-WebAuth" Enabled="true">
@@ -29,7 +35,13 @@
 	<Param Name="WebAuthTriggerPage">https://array00.melcoe.mq.edu.au/webauth.html</Param>
 	<Param Name="DummyPasswordForWebAuthUser">dummy</Param>
 	<Param Name="dsJndiName">java:/MySqlDS</Param>
-	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
+	<Param Name="rolesQuery">
+	            SELECT DISTINCT  r.name,'Roles' FROM
+             	lams_user u LEFT OUTER JOIN lams_user_organisation uo USING(user_id)
+             	LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id)
+             	LEFT OUTER JOIN lams_role r USING (role_id)
+             	WHERE u.login=?
+	</Param>
 </Method>
 
 <!-- NOT in USE -->
@@ -47,7 +59,13 @@
 	<Param Name="com.lams.naming.import.ldap.factory.initial">com.sun.jndi.ldap.LdapCtxFactory</Param>
 	<Param Name="dsJndiName">java:/MySqlDS</Param>
 	<Param Name="principalsQuery">select password from lams_user where login=?</Param>
-	<Param Name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</Param>
+	<Param Name="rolesQuery">
+	           	SELECT DISTINCT  r.name,'Roles' FROM
+             	lams_user u LEFT OUTER JOIN lams_user_organisation uo USING(user_id)
+             	LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id)
+             	LEFT OUTER JOIN lams_role r USING (role_id)
+             	WHERE u.login=?
+	</Param>
 </Method>
 
 </Authentication>

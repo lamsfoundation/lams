@@ -155,7 +155,13 @@ $Revision$
           <login-module code = "org.jboss.security.auth.spi.DatabaseServerLoginModule" flag = "required">
              <module-option name="dsJndiName">java:/MySqlDS</module-option>
              <module-option name="principalsQuery">select password from lams_user where login=?</module-option>
-             <module-option name="rolesQuery">select name,'Roles' from lams_role, lams_user where login=?</module-option>
+             <module-option name="rolesQuery">
+             	SELECT DISTINCT  r.name,'Roles' FROM
+             	lams_user u LEFT OUTER JOIN lams_user_organisation uo USING(user_id)
+             	LEFT OUTER JOIN lams_user_organisation_role urr USING(user_organisation_id)
+             	LEFT OUTER JOIN lams_role r USING (role_id)
+             	WHERE u.login=?
+             </module-option>
           </login-module>
        </authentication>
     </application-policy>
