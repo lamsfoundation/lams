@@ -391,7 +391,7 @@ public class LearnerService implements ILearnerService
         Activity nextActivity = learnerProgress.getNextActivity();
         try
         {
-            for(Iterator i = nextActivity.getAllToolActivitiesFrom(nextActivity).iterator();i.hasNext();)
+            for(Iterator i = nextActivity.getAllToolActivities().iterator();i.hasNext();)
             {
                 ToolActivity toolActivity = (ToolActivity)i.next();
                 if(shouldCreateToolSession(learnerProgress,toolActivity))

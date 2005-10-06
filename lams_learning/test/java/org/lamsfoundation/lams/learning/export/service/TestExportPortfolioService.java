@@ -6,39 +6,25 @@
  */
 package org.lamsfoundation.lams.learning.export.service;
 
+import java.util.Iterator;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.AbstractLamsTestCase;
-import org.lamsfoundation.lams.learning.export.Portfolio;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
-
-import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Vector;
-import java.util.SortedSet;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
-import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
-import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
-import org.lamsfoundation.lams.learningdesign.SimpleActivity;
-import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 
 
 /**

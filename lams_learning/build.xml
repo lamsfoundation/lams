@@ -206,7 +206,7 @@ http://www.gnu.org/licenses/gpl.txt
 			<fileset dir="${src.dir.java}">
 				<include name="${survey.path}/*.java" />
 			</fileset>
-			<hibernate version="2.0" />
+			<hibernate version="3.0" />
 
 		</hibernatedoclet>
 	</target-->
