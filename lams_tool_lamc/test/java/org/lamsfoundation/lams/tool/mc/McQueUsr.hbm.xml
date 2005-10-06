@@ -64,12 +64,13 @@
     </many-to-one>
 
 
+<!-- 
    	 <set
             name="mcUsrAttempts"
             lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
-            sort="natural"
+            sort="unsorted"
         >
               <key
                   column="que_usr_id"
@@ -80,6 +81,7 @@
                   class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
               />
     </set>
+  -->
 
 </class>
 </hibernate-mapping>

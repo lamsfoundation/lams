@@ -27,10 +27,10 @@ public class McUsrAttempt implements Serializable {
     private org.lamsfoundation.lams.tool.mc.McQueUsr mcQueUsr;
 
     /** persistent field */
-    private org.lamsfoundation.lams.tool.mc.McOptionsContent mcOptionsContent;
+    private org.lamsfoundation.lams.tool.mc.McOptsContent mcOptionsContent;
 
     /** full constructor */
-    public McUsrAttempt(Long attemptId, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, org.lamsfoundation.lams.tool.mc.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.McOptionsContent mcOptionsContent) {
+    public McUsrAttempt(Long attemptId, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, org.lamsfoundation.lams.tool.mc.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.McOptsContent mcOptionsContent) {
         this.attemptId = attemptId;
         this.attemptTime = attemptTime;
         this.timeZone = timeZone;
@@ -44,7 +44,7 @@ public class McUsrAttempt implements Serializable {
     }
 
     /** minimal constructor */
-    public McUsrAttempt(Long attemptId, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, org.lamsfoundation.lams.tool.mc.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.McOptionsContent mcOptionsContent) {
+    public McUsrAttempt(Long attemptId, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, org.lamsfoundation.lams.tool.mc.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.McOptsContent mcOptionsContent) {
         this.attemptId = attemptId;
         this.mcQueContent = mcQueContent;
         this.mcQueUsr = mcQueUsr;
@@ -99,11 +99,11 @@ public class McUsrAttempt implements Serializable {
         this.mcQueUsr = mcQueUsr;
     }
 
-    public org.lamsfoundation.lams.tool.mc.McOptionsContent getMcOptionsContent() {
+    public org.lamsfoundation.lams.tool.mc.McOptsContent getMcOptionsContent() {
         return this.mcOptionsContent;
     }
 
-    public void setMcOptionsContent(org.lamsfoundation.lams.tool.mc.McOptionsContent mcOptionsContent) {
+    public void setMcOptionsContent(org.lamsfoundation.lams.tool.mc.McOptsContent mcOptionsContent) {
         this.mcOptionsContent = mcOptionsContent;
     }
 

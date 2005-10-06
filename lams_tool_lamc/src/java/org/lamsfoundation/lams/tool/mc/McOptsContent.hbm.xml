@@ -4,9 +4,15 @@
     "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
     
 <hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
 
 <class 
-    name="org.lamsfoundation.lams.tool.mc.McOptionsContent" 
+    name="org.lamsfoundation.lams.tool.mc.McOptsContent" 
     table="tl_lamc11_options_content"
 >
     <id
@@ -16,8 +22,8 @@
     >
         <generator class="native" />
     </id>
-
-    <property
+    
+     <property
         name="mcQueOptionId"
         type="java.lang.Long"
         column="mc_que_option_id"
@@ -25,15 +31,14 @@
         length="20"
     >
     </property>
-    
-   <property
-            name="correctOption"
-            type="boolean"
-            update="true"
-            insert="true"
-            access="property"
-            column="correct_option"
-   />
+
+    <property
+        name="correctOption"
+        type="boolean"
+        column="correct_option"
+        not-null="true"
+    >
+    </property>
     
     <property
         name="mcQueOptionText"
@@ -45,29 +50,18 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional many-to-one association to McQueContent -->
+    <!-- bi-directional many-to-one association to TlLamc11QueContent -->
     <many-to-one
         name="mcQueContent"
         class="org.lamsfoundation.lams.tool.mc.McQueContent"
-        not-null="true"
+        cascade="none"
+        outer-join="auto"
+        update="true"
+        insert="true"
+        access="property"
     >
         <column name="mc_que_content_id" />
     </many-to-one>
-    
-    <!-- bi-directional one-to-many association to McUsrAttempt -->
-    <set
-        name="mcUsrAttempts"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-        <key>
-            <column name="mc_que_option_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
-        />
-    </set>
-
+   
 </class>
 </hibernate-mapping>

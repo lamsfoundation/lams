@@ -4,6 +4,12 @@
     "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
     
 <hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
 
 <class 
     name="org.lamsfoundation.lams.tool.mc.McQueContent" 
@@ -42,44 +48,21 @@
     >
     </property>
     
-    <property
-	    name="mcContentId"
-	    type="java.lang.Long"
-	    update="false"
-	    insert="false"
-	    access="property"
-	    column="mc_content_id"
-	    length="65535"
-	/>
-    
-   
-
     <many-to-one
         name="mcContent"
         class="org.lamsfoundation.lams.tool.mc.McContent"
+	    cascade="none"
+	    outer-join="auto"
+	    update="true"
+	    insert="true"
+	    access="property"
         not-null="true"
     >
         <column name="mc_content_id" />
     </many-to-one>
     
-
-
-    <set
-        name="mcUsrAttempts"
-        lazy="true"
-        inverse="true"
-		cascade="none"
-    >
-
-        <key>
-            <column name="mc_que_content_id" />
-        </key>
-        <one-to-many 
-            class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
-        />
-    </set>
-
-
+    
+    <!-- bi-directional one-to-many association to TlLamc11OptionsContent -->
     <set
         name="mcOptionsContents"
         lazy="true"
@@ -90,9 +73,8 @@
             <column name="mc_que_content_id" />
         </key>
         <one-to-many 
-            class="org.lamsfoundation.lams.tool.mc.McOptionsContent"
+            class="org.lamsfoundation.lams.tool.mc.McOptsContent"
         />
     </set>
-
 </class>
 </hibernate-mapping>

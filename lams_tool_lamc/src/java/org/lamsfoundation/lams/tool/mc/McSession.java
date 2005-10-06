@@ -18,13 +18,13 @@ public class McSession implements Serializable {
     private Long mcSessionId;
 
     /** nullable persistent field */
-    private Date session_start_date;
+    private Date sessionStartDate;
 
     /** nullable persistent field */
-    private Date session_end_date;
+    private Date sessionEndDate;
 
     /** nullable persistent field */
-    private String session_status;
+    private String sessionStatus;
 
     /** nullable persistent field */
     private Long mcContentId;
@@ -36,11 +36,11 @@ public class McSession implements Serializable {
     private Set mcQueUsers;
 
     /** full constructor */
-    public McSession(Long mcSessionId, Date session_start_date, Date session_end_date, String session_status, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcQueUsers) {
+    public McSession(Long mcSessionId, Date sessionStartDate, Date sessionEndDate, String sessionStatus, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcQueUsers) {
         this.mcSessionId = mcSessionId;
-        this.session_start_date = session_start_date;
-        this.session_end_date = session_end_date;
-        this.session_status = session_status;
+        this.sessionStartDate = sessionStartDate;
+        this.sessionEndDate = sessionEndDate;
+        this.sessionStatus = sessionStatus;
         this.mcContent = mcContent;
         this.mcQueUsers = mcQueUsers;
     }
@@ -72,30 +72,7 @@ public class McSession implements Serializable {
         this.mcSessionId = mcSessionId;
     }
 
-    public Date getSession_start_date() {
-        return this.session_start_date;
-    }
-
-    public void setSession_start_date(Date session_start_date) {
-        this.session_start_date = session_start_date;
-    }
-
-    public Date getSession_end_date() {
-        return this.session_end_date;
-    }
-
-    public void setSession_end_date(Date session_end_date) {
-        this.session_end_date = session_end_date;
-    }
-
-    public String getSession_status() {
-        return this.session_status;
-    }
-
-    public void setSession_status(String session_status) {
-        this.session_status = session_status;
-    }
-
+    
     public Long getMcContentId() {
         return this.mcContentId;
     }
@@ -112,20 +89,61 @@ public class McSession implements Serializable {
         this.mcContent = mcContent;
     }
 
-    public Set getMcQueUsers() {
-        if (this.mcQueUsers == null)
-            setMcQueUsers(new HashSet());
-        return this.mcQueUsers;
-    }
-
-    public void setMcQueUsers(Set mcQueUsers) {
-        this.mcQueUsers = mcQueUsers;
-    }
-
     public String toString() {
         return new ToStringBuilder(this)
             .append("uid", getUid())
             .toString();
     }
 
+	/**
+	 * @return Returns the sessionEndDate.
+	 */
+	public Date getSessionEndDate() {
+		return sessionEndDate;
+	}
+	/**
+	 * @param sessionEndDate The sessionEndDate to set.
+	 */
+	public void setSessionEndDate(Date sessionEndDate) {
+		this.sessionEndDate = sessionEndDate;
+	}
+	/**
+	 * @return Returns the sessionStartDate.
+	 */
+	public Date getSessionStartDate() {
+		return sessionStartDate;
+	}
+	/**
+	 * @param sessionStartDate The sessionStartDate to set.
+	 */
+	public void setSessionStartDate(Date sessionStartDate) {
+		this.sessionStartDate = sessionStartDate;
+	}
+	/**
+	 * @return Returns the sessionStatus.
+	 */
+	public String getSessionStatus() {
+		return sessionStatus;
+	}
+	/**
+	 * @param sessionStatus The sessionStatus to set.
+	 */
+	public void setSessionStatus(String sessionStatus) {
+		this.sessionStatus = sessionStatus;
+	}
+	/**
+	 * @return Returns the mcQueUsers.
+	 */
+	
+	public Set getMcQueUsers() {
+		if (this.mcQueUsers == null)
+			setMcQueUsers(new HashSet());
+	    return this.mcQueUsers;
+	}
+	/**
+	 * @param mcQueUsers The mcQueUsers to set.
+	 */
+	public void setMcQueUsers(Set mcQueUsers) {
+		this.mcQueUsers = mcQueUsers;
+	}
 }

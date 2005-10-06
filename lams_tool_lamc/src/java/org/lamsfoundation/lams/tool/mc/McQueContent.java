@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -23,8 +24,7 @@ public class McQueContent implements Serializable {
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.McContent mcContent;
     
-    private Long mcContentId;
-    
+        
     /** persistent field */
     private Set mcUsrAttempts;
 
@@ -32,14 +32,24 @@ public class McQueContent implements Serializable {
     private Set mcOptionsContents;
 
     /** full constructor */
-    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+    public McQueContent(Long mcQueContentId, String question, Integer displayOrder,  McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
         this.mcQueContentId = mcQueContentId;
         this.question = question;
         this.displayOrder = displayOrder;
-        this.mcContent = mcContent;
+        this.mcContent=mcContent;
         this.mcUsrAttempts = mcUsrAttempts;
         this.mcOptionsContents = mcOptionsContents;
     }
+    
+    public McQueContent(Long mcQueContentId, String question, Integer displayOrder,  Set mcUsrAttempts, Set mcOptionsContents) {
+        this.mcQueContentId = mcQueContentId;
+        this.question = question;
+        this.displayOrder = displayOrder;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
+    }
+    
+    
 
     /** default constructor */
     public McQueContent() {
@@ -94,14 +104,20 @@ public class McQueContent implements Serializable {
     }
 
     public Set getMcUsrAttempts() {
+    	if (this.mcUsrAttempts == null)
+        	setMcUsrAttempts(new HashSet());
         return this.mcUsrAttempts;
     }
 
+    
     public void setMcUsrAttempts(Set mcUsrAttempts) {
         this.mcUsrAttempts = mcUsrAttempts;
     }
 
+    
     public Set getMcOptionsContents() {
+    	if (this.mcOptionsContents == null)
+        	setMcOptionsContents(new HashSet());
         return this.mcOptionsContents;
     }
 
@@ -114,17 +130,5 @@ public class McQueContent implements Serializable {
             .append("uid", getUid())
             .toString();
     }
-
-	/**
-	 * @return Returns the mcContentId.
-	 */
-	public Long getMcContentId() {
-		return mcContentId;
-	}
-	/**
-	 * @param mcContentId The mcContentId to set.
-	 */
-	public void setMcContentId(Long mcContentId) {
-		this.mcContentId = mcContentId;
-	}
+	
 }

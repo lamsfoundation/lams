@@ -124,4 +124,9 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	        this.getHibernateTemplate().delete(mcQueContent);
 	    }
 		
+		 public void flush()
+	    {
+	        this.getHibernateTemplate().flush();
+	    }
+		
 } 

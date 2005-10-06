@@ -237,7 +237,7 @@
             lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
-            sort="natural"
+            sort="unsorted"
         >
               <key
                   column="mc_content_id"
@@ -248,6 +248,7 @@
                   class="org.lamsfoundation.lams.tool.mc.McQueContent"
               />
     </set>
+
 
 	<set
             name="mcSessions"
@@ -266,6 +267,7 @@
               />
 
     </set>
+
 
 </class>
 </hibernate-mapping>

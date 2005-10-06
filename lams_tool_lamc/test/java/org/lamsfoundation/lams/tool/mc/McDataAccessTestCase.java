@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.tool.mc;
 
 import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McContentDAO;
+import org.lamsfoundation.lams.tool.mc.dao.hibernate.McOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McQueContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McSessionDAO;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McUserDAO;
@@ -20,7 +21,13 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
 	protected final Long TEST_SESSION_ID = new Long(20);
 	protected final Long TEST_SESSION_ID_OTHER = new Long(21);
 	
+	protected final Long TEST_QUE_ID1 = new Long(1);
+	protected final Long TEST_QUE_OPTION_ID1 = new Long(1);
+	protected final Long TEST_QUE_OPTION_ID2 = new Long(2);
+	protected final Long TEST_QUE_OPTION_ID3 = new Long(3);
 	
+	protected final Long TEST_NEW_USER_ID = new Long(100);
+		
     protected final long ONE_DAY = 60 * 60 * 1000 * 24;
     
     public final String NOT_ATTEMPTED = "NOT_ATTEMPTED";
@@ -31,6 +38,7 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
 	protected McSessionDAO mcSessionDAO;
 	protected McUserDAO    mcUserDAO;
 	protected McQueContentDAO mcQueContentDAO;
+	protected McOptionsContentDAO mcOptionsContentDAO;
 	protected McUsrAttemptDAO  mcUsrAttemptDAO;
 	
 	
@@ -50,6 +58,7 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
         mcSessionDAO = (McSessionDAO) this.context.getBean("mcSessionDAO");
         mcUserDAO = (McUserDAO) this.context.getBean("mcUserDAO");
         mcQueContentDAO = (McQueContentDAO) this.context.getBean("mcQueContentDAO");
+        mcOptionsContentDAO =(McOptionsContentDAO) this.context.getBean("mcOptionsContentDAO");
         mcUsrAttemptDAO = (McUsrAttemptDAO) this.context.getBean("mcUsrAttemptDAO");
     }
 

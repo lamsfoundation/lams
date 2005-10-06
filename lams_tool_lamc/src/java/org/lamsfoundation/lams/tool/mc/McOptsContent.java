@@ -1,19 +1,20 @@
 package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /** @author Hibernate CodeGenerator */
-public class McOptionsContent implements Serializable {
-
+public class McOptsContent implements Serializable {
+	
     /** identifier field */
     private Long uid;
-
-    /** persistent field */
+    
     private Long mcQueOptionId;
-
+    
     /** nullable persistent field */
     private boolean correctOption;
 
@@ -22,28 +23,30 @@ public class McOptionsContent implements Serializable {
 
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent;
-
+    
     /** persistent field */
     private Set mcUsrAttempts;
 
+    
     /** full constructor */
-    public McOptionsContent(Long mcQueOptionId, boolean correctOption, String mcQueOptionText, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, Set mcUsrAttempts) {
-        this.mcQueOptionId = mcQueOptionId;
+    public McOptsContent(Long mcQueOptionId, boolean correctOption, String mcQueOptionText, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent) {
+    	this.mcQueOptionId=mcQueOptionId;
         this.correctOption = correctOption;
         this.mcQueOptionText = mcQueOptionText;
         this.mcQueContent = mcQueContent;
-        this.mcUsrAttempts = mcUsrAttempts;
     }
-
-    /** default constructor */
-    public McOptionsContent() {
-    }
-
-    /** minimal constructor */
-    public McOptionsContent(Long mcQueOptionId, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, Set mcUsrAttempts) {
-        this.mcQueOptionId = mcQueOptionId;
+    
+    public McOptsContent(Long mcQueOptionId, boolean correctOption, String mcQueOptionText, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, Set mcUsrAttempts) {
+    	this.mcQueOptionId=mcQueOptionId;
+        this.correctOption = correctOption;
+        this.mcQueOptionText = mcQueOptionText;
         this.mcQueContent = mcQueContent;
-        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcUsrAttempts=mcUsrAttempts;
+    }
+    
+    
+    /** default constructor */
+    public McOptsContent() {
     }
 
     public Long getUid() {
@@ -54,14 +57,7 @@ public class McOptionsContent implements Serializable {
         this.uid = uid;
     }
 
-    public Long getMcQueOptionId() {
-        return this.mcQueOptionId;
-    }
-
-    public void setMcQueOptionId(Long mcQueOptionId) {
-        this.mcQueOptionId = mcQueOptionId;
-    }
-
+    
     public boolean isCorrectOption() {
         return this.correctOption;
     }
@@ -86,18 +82,39 @@ public class McOptionsContent implements Serializable {
         this.mcQueContent = mcQueContent;
     }
 
-    public Set getMcUsrAttempts() {
-        return this.mcUsrAttempts;
-    }
-
-    public void setMcUsrAttempts(Set mcUsrAttempts) {
-        this.mcUsrAttempts = mcUsrAttempts;
-    }
-
+    
     public String toString() {
         return new ToStringBuilder(this)
             .append("uid", getUid())
             .toString();
     }
 
+	/**
+	 * @return Returns the mcQueOptionId.
+	 */
+	public Long getMcQueOptionId() {
+		return mcQueOptionId;
+	}
+	/**
+	 * @param mcQueOptionId The mcQueOptionId to set.
+	 */
+	public void setMcQueOptionId(Long mcQueOptionId) {
+		this.mcQueOptionId = mcQueOptionId;
+	}
+	/**
+	 * @return Returns the mcUsrAttempts.
+	 */
+	
+	
+	public Set getMcUsrAttempts() {
+		if (this.mcUsrAttempts == null)
+			setMcUsrAttempts(new HashSet());
+	    return this.mcUsrAttempts;
+	}
+	/**
+	 * @param mcUsrAttempts The mcUsrAttempts to set.
+	 */
+	public void setMcUsrAttempts(Set mcUsrAttempts) {
+		this.mcUsrAttempts = mcUsrAttempts;
+	}
 }

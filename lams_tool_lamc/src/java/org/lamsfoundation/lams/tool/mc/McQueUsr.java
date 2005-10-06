@@ -1,7 +1,9 @@
 package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
-import java.util.SortedSet;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -27,14 +29,13 @@ public class McQueUsr implements Serializable {
     private org.lamsfoundation.lams.tool.mc.McSession mcSession;
 
     /** persistent field */
-    private SortedSet mcUsrAttempts;
+    private Set mcUsrAttempts;
 
     /** full constructor */
-    public McQueUsr(Long queUsrId, String username, String fullname, Long mcSessionId, org.lamsfoundation.lams.tool.mc.McSession mcSession, SortedSet mcUsrAttempts) {
+    public McQueUsr(Long queUsrId, String username, String fullname,  org.lamsfoundation.lams.tool.mc.McSession mcSession, Set mcUsrAttempts) {
         this.queUsrId = queUsrId;
         this.username = username;
         this.fullname = fullname;
-        this.mcSessionId = mcSessionId;
         this.mcSession = mcSession;
         this.mcUsrAttempts = mcUsrAttempts;
     }
@@ -44,7 +45,7 @@ public class McQueUsr implements Serializable {
     }
 
     /** minimal constructor */
-    public McQueUsr(Long queUsrId, SortedSet mcUsrAttempts) {
+    public McQueUsr(Long queUsrId, Set mcUsrAttempts) {
         this.queUsrId = queUsrId;
         this.mcUsrAttempts = mcUsrAttempts;
     }
@@ -97,11 +98,14 @@ public class McQueUsr implements Serializable {
         this.mcSession = mcSession;
     }
 
-    public SortedSet getMcUsrAttempts() {
+    public Set getMcUsrAttempts() {
+    	if (this.mcUsrAttempts == null)
+        	setMcUsrAttempts(new HashSet());
         return this.mcUsrAttempts;
     }
-
-    public void setMcUsrAttempts(SortedSet mcUsrAttempts) {
+    
+    
+    public void setMcUsrAttempts(Set mcUsrAttempts) {
         this.mcUsrAttempts = mcUsrAttempts;
     }
 

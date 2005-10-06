@@ -20,8 +20,7 @@
  */
 package org.lamsfoundation.lams.tool.mc.dao;
 
-import org.lamsfoundation.lams.tool.mc.McOptionsContent;
-import org.lamsfoundation.lams.tool.mc.dao.hibernate.McOptionsContentDAO;
+import org.lamsfoundation.lams.tool.mc.McOptsContent;
 
 
 /**
@@ -31,13 +30,13 @@ import org.lamsfoundation.lams.tool.mc.dao.hibernate.McOptionsContentDAO;
  */
 public interface IMcOptionsContentDAO
 {
-	public McOptionsContentDAO getMcOptionsContentByUID(Long uid);
+	public McOptsContent getMcOptionsContentByUID(Long uid);
 	
-	public McOptionsContent findMcOptionsContentById(Long mcQueOptionId);
+	public McOptsContent findMcOptionsContentById(Long mcQueOptionId);
 	
-	public void saveMcOptionsContent(McOptionsContent mcOptionsContent);
+	public void saveMcOptionsContent(McOptsContent mcOptionsContent);
     
-	public void updateMcOptionsContent(McOptionsContent mcOptionsContent);
+	public void updateMcOptionsContent(McOptsContent mcOptionsContent);
 
 	public void removeMcOptionsContentByUID(Long uid);
 	
@@ -45,7 +44,7 @@ public interface IMcOptionsContentDAO
 
 	public void removeMcOptionsContentById(Long mcQueOptionId);
 	
-	public void removeMcOptionsContent(McOptionsContent mcOptionsContent);
+	public void removeMcOptionsContent(McOptsContent mcOptionsContent);
         
 }
 

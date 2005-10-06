@@ -296,7 +296,7 @@
 				</classpath>
 				<transaction src="${db.scripts}/drop_lams_tool_lamc.sql"/>
 				<transaction src="${db.scripts}/create_lams_tool_lamc.sql"/>
-				<transaction src="${db.scripts}/insert_lams_tool_lamc.sql"/> 
+		<!--		<transaction src="${db.scripts}/insert_lams_tool_lamc.sql"/> -->
 			</sql>
 		</target>
 
@@ -417,8 +417,13 @@
 					<formatter type="xml"/>
 					<batchtest todir="${build.report}">
 						<fileset dir="${src.test.dir}">
-						<!-- <include name="**/TestMcContent.java"/> -->
-							<include name="**/TestMcSession.java"/> 
+						<!-- <include name="**/TestMcContent.java"/>  -->
+						<!-- <include name="**/TestMcQueContent.java"/> -->
+							 <include name="**/TestMcOptionsContent.java"/>  
+						<!-- <include name="**/TestMcSession.java"/> -->
+						<!-- <include name="**/TestMcQueUsr.java"/>  -->
+
+							
 						</fileset>
 					</batchtest>
 					<classpath>

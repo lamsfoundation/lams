@@ -192,6 +192,16 @@
     />
     
     <property
+        name="retries"
+        type="boolean"
+        update="true"
+        insert="true"
+        access="property"        
+        column="retries"
+        length="1"
+    />
+    
+    <property
         name="passMark"
         type="java.lang.Integer"
         update="true"
@@ -227,7 +237,7 @@
             lazy="false"
             inverse="true"
             cascade="all-delete-orphan"
-            sort="natural"
+            sort="unsorted"
         >
               <key
                   column="mc_content_id"
@@ -238,6 +248,7 @@
                   class="org.lamsfoundation.lams.tool.mc.McQueContent"
               />
     </set>
+
 
 	<set
             name="mcSessions"
@@ -256,6 +267,7 @@
               />
 
     </set>
+
 
 </class>
 </hibernate-mapping>

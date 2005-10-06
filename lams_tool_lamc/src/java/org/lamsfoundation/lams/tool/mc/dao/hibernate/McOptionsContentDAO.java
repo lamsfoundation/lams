@@ -11,7 +11,7 @@ import java.util.List;
 import net.sf.hibernate.Hibernate;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.mc.McOptionsContent;
+import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
@@ -26,15 +26,15 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptionsContentDAO {
 	 	static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
 	 	
-	 	public McOptionsContentDAO getMcOptionsContentByUID(Long uid)
+	 	public McOptsContent getMcOptionsContentByUID(Long uid)
 		{
-			 return (McOptionsContentDAO) this.getHibernateTemplate()
-	         .get(McOptionsContentDAO.class, uid);
+			 return (McOptsContent) this.getHibernateTemplate()
+	         .get(McOptsContent.class, uid);
 		}
 		
-		public McOptionsContent findMcOptionsContentById(Long mcQueOptionId)
+		public McOptsContent findMcOptionsContentById(Long mcQueOptionId)
 		{
-		    String query = "from McOptionsContent as mco where mco.mcQueOptionId = ?";
+		    String query = "from McOptsContent as mco where mco.mcQueOptionId = ?";
 			List content = getHibernateTemplate().find(query,mcQueOptionId);
 				
 			if(content!=null && content.size() == 0)
@@ -43,33 +43,33 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 			}
 			else
 			{
-				return (McOptionsContent)content.get(0);
+				return (McOptsContent)content.get(0);
 			}
 		
 		}
 		
 		
-		public void saveMcOptionsContent(McOptionsContent mcOptionsContent)
+		public void saveMcOptionsContent(McOptsContent mcOptsContent)
 	    {
-	    	this.getHibernateTemplate().save(mcOptionsContent);
+	    	this.getHibernateTemplate().save(mcOptsContent);
 	    }
 	    
-		public void updateMcOptionsContent(McOptionsContent mcOptionsContent)
+		public void updateMcOptionsContent(McOptsContent mcOptsContent)
 	    {
-	    	this.getHibernateTemplate().update(mcOptionsContent);
+	    	this.getHibernateTemplate().update(mcOptsContent);
 	    }
 		
 		
 		public void removeMcOptionsContentByUID(Long uid)
 	    {
-			McOptionsContent mco = (McOptionsContent)getHibernateTemplate().get(McOptionsContent.class, uid);
+			McOptsContent mco = (McOptsContent)getHibernateTemplate().get(McOptsContent.class, uid);
 	    	this.getHibernateTemplate().delete(mco);
 	    }
 		
 		
 		public void removeMcOptionsContent(Long mcQueOptionId)
 	    {
-	       String query = "from McOptionsContent as mco where mco.mcQueOptionId=";
+	       String query = "from McOptsContent as mco where mco.mcQueOptionId=";
 	       StringBuffer sb = new StringBuffer(query);
 	       sb.append(mcQueOptionId.longValue());
 	       String queryString = sb.toString();
@@ -79,15 +79,19 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	
 		public void removeMcOptionsContentById(Long mcQueOptionId)
 	    {
-	        String query = "from mco in class org.lamsfoundation.lams.tool.mc.McOptionsContent"
+	        String query = "from mco in class org.lamsfoundation.lams.tool.mc.McOptsContent"
 	        + " where mcq.mcQueOptionId = ?";
 	        this.getHibernateTemplate().delete(query,mcQueOptionId,Hibernate.LONG);
 	    }
 		
 		
-		public void removeMcOptionsContent(McOptionsContent mcOptionsContent)
+		public void removeMcOptionsContent(McOptsContent mcOptsContent)
 	    {
-	        this.getHibernateTemplate().delete(mcOptionsContent);
+	        this.getHibernateTemplate().delete(mcOptsContent);
 	    }
 		
+		 public void flush()
+	    {
+	        this.getHibernateTemplate().flush();
+	    }
 } 

@@ -2,8 +2,9 @@ package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.SortedSet;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -67,18 +68,7 @@ public class McContent implements Serializable {
     /** nullable persistent field */
     private boolean retries;
     
-	/**
-	 * @return Returns the retries.
-	 */
-	public boolean isRetries() {
-		return retries;
-	}
-	/**
-	 * @param retries The retries to set.
-	 */
-	public void setRetries(boolean retries) {
-		this.retries = retries;
-	}
+	
     /** nullable persistent field */
     private Integer passMark;
 
@@ -89,13 +79,13 @@ public class McContent implements Serializable {
     private boolean showTopUsers;
 
     /** persistent field */
-    private SortedSet mcQueContents;
+    private Set mcQueContents;
 
     /** persistent field */
     private Set mcSessions;
 
     /** full constructor */
-    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, String endLearningMessage, Integer passMark, boolean showFeedback, boolean retries, boolean showTopUsers, SortedSet mcQueContents, Set mcSessions) {
+    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, String endLearningMessage, Integer passMark, boolean showFeedback, boolean retries, boolean showTopUsers, Set mcQueContents, Set mcSessions) {
         this.mcContentId = mcContentId;
         this.title = title;
         this.instructions = instructions;
@@ -126,7 +116,7 @@ public class McContent implements Serializable {
     }
 
     /** minimal constructor */
-    public McContent(Long mcContentId, SortedSet mcQueContents, Set mcSessions) {
+    public McContent(Long mcContentId, Set mcQueContents, Set mcSessions) {
         this.mcContentId = mcContentId;
         this.mcQueContents = mcQueContents;
         this.mcSessions = mcSessions;
@@ -300,15 +290,21 @@ public class McContent implements Serializable {
         this.showTopUsers = showTopUsers;
     }
 
-    public SortedSet getMcQueContents() {
+    
+    public Set getMcQueContents() {
+    	if (this.mcQueContents == null)
+        	setMcQueContents(new HashSet());
         return this.mcQueContents;
     }
 
-    public void setMcQueContents(SortedSet mcQueContents) {
+    
+    public void setMcQueContents(Set mcQueContents) {
         this.mcQueContents = mcQueContents;
     }
 
     public Set getMcSessions() {
+    	if (this.mcSessions == null)
+        	setMcSessions(new HashSet());
         return this.mcSessions;
     }
 
@@ -321,5 +317,18 @@ public class McContent implements Serializable {
             .append("uid", getUid())
             .toString();
     }
+    
+    /**
+	 * @return Returns the retries.
+	 */
+	public boolean isRetries() {
+		return retries;
+	}
+	/**
+	 * @param retries The retries to set.
+	 */
+	public void setRetries(boolean retries) {
+		this.retries = retries;
+	}
 
 }

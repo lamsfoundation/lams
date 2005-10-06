@@ -24,31 +24,6 @@ CREATE TABLE lams.tl_lamc11_content (
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lamc11_session (
-       uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , mc_session_id BIGINT(20) NOT NULL
-     , session_start_date DATETIME
-     , session_end_date DATETIME
-     , session_status VARCHAR(100)
-     , mc_content_id BIGINT(20) NOT NULL
-     , PRIMARY KEY (uid)
-     , INDEX (mc_content_id)
-     , CONSTRAINT FK_tl_laqa11_session_1 FOREIGN KEY (mc_content_id)
-                  REFERENCES lams.tl_lamc11_content (uid)
-)TYPE=InnoDB;
-
-CREATE TABLE lams.tl_lamc11_que_usr (
-       uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , que_usr_id BIGINT(20) NOT NULL
-     , username VARCHAR(100)
-     , mc_session_id BIGINT(20) NOT NULL
-     , fullname VARCHAR(100)
-     , PRIMARY KEY (uid)
-     , INDEX (mc_session_id)
-     , CONSTRAINT FK_tl_laqa11_que_usr_1 FOREIGN KEY (mc_session_id)
-                  REFERENCES lams.tl_lamc11_session (uid)
-)TYPE=InnoDB;
-
 CREATE TABLE lams.tl_lamc11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , mc_que_content_id BIGINT(20) NOT NULL
@@ -58,6 +33,19 @@ CREATE TABLE lams.tl_lamc11_que_content (
      , PRIMARY KEY (uid)
      , INDEX (mc_content_id)
      , CONSTRAINT FK_tl_lamc11_que_content_1 FOREIGN KEY (mc_content_id)
+                  REFERENCES lams.tl_lamc11_content (uid)
+)TYPE=InnoDB;
+
+CREATE TABLE lams.tl_lamc11_session (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , mc_session_id BIGINT(20) NOT NULL
+     , session_start_date DATETIME
+     , session_end_date DATETIME
+     , session_status VARCHAR(100)
+     , mc_content_id BIGINT(20) NOT NULL
+     , PRIMARY KEY (uid)
+     , INDEX (mc_content_id)
+     , CONSTRAINT FK_tl_lamc_session_2 FOREIGN KEY (mc_content_id)
                   REFERENCES lams.tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
@@ -73,23 +61,15 @@ CREATE TABLE lams.tl_lamc11_options_content (
                   REFERENCES lams.tl_lamc11_que_content (uid)
 )TYPE=InnoDB;
 
-CREATE TABLE lams.tl_lamc11_usr_attempt (
+CREATE TABLE lams.tl_lamc11_tool_usr (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , attempt_id BIGINT(20) NOT NULL
      , que_usr_id BIGINT(20) NOT NULL
-     , mc_que_content_id BIGINT(20) NOT NULL
-     , mc_que_option_id BIGINT(20) NOT NULL
-     , attempt_time DATETIME
-     , time_zone VARCHAR(255)
+     , mc_session_id BIGINT(20) NOT NULL
+     , username VARCHAR(100)
+     , fullname VARCHAR(100)
      , PRIMARY KEY (uid)
-     , INDEX (que_usr_id)
-     , CONSTRAINT FK_tl_lamc11_usr_attempt_3 FOREIGN KEY (que_usr_id)
-                  REFERENCES lams.tl_lamc11_que_usr (uid)
-     , INDEX (mc_que_content_id)
-     , CONSTRAINT FK_tl_lamc11_usr_attempt_5 FOREIGN KEY (mc_que_content_id)
-                  REFERENCES lams.tl_lamc11_que_content (uid)
-     , INDEX (mc_que_option_id)
-     , CONSTRAINT FK_tl_lamc11_usr_attempt_4 FOREIGN KEY (mc_que_option_id)
-                  REFERENCES lams.tl_lamc11_options_content (uid)
+     , INDEX (mc_session_id)
+     , CONSTRAINT FK_tl_lamc_tool_usr_1 FOREIGN KEY (mc_session_id)
+                  REFERENCES lams.tl_lamc11_session (uid)
 )TYPE=InnoDB;
 
