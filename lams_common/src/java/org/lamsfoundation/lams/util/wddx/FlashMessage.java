@@ -160,4 +160,10 @@ public class FlashMessage implements Serializable {
     			"Unable to store due to an internal error. Contact support for help. Exception message was "+message,
 				FlashMessage.ERROR);
     }
+    
+    public static FlashMessage getNoSuchTool(String methodName, Long toolID)
+    {
+        return new FlashMessage(methodName, "No such Tool with tool id of " + toolID + " exists",
+                FlashMessage.ERROR);
+    }
 }
