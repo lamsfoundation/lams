@@ -72,7 +72,7 @@
 		</property>
 		<property name="hibernateProperties">
 			<props>
-				<prop key="hibernate.dialect">net.sf.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
 				<prop key="hibernate.show_sql">false</prop>
 				<prop key="hibernate.c3p0.minPoolSize">5</prop>
 				<prop key="hibernate.c3p0.maxPoolSize">20</prop>
