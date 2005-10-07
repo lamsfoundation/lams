@@ -82,7 +82,7 @@ public interface IMcUserDAO {
      * 
      * @param userId The mc user id.
      */
-    public void removeMcUser(Long userId);
+    public void removeMcUserById(Long userId);
     
     /**
      * Returns the number of users that are in this particular

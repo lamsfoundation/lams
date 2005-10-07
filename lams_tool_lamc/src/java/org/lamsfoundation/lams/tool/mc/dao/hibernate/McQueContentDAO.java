@@ -8,16 +8,16 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
-import net.sf.hibernate.Hibernate;
-import net.sf.hibernate.HibernateException;
-import net.sf.hibernate.Session;
-
 import org.apache.log4j.Logger;
+import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
-import org.springframework.orm.hibernate.HibernateCallback;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
 
@@ -31,6 +31,8 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 
 public class McQueContentDAO extends HibernateDaoSupport implements IMcQueContentDAO {
 	 	static Logger logger = Logger.getLogger(McQueContentDAO.class.getName());
+	 	
+	 	private static final String FIND_MC_QUE_CONTENT = "from " + McQueContent.class.getName() + " as mcq where mc_que_content_id=?";
 
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
 	 	private static final String GET_QUESTION_IDS_FOR_CONTENT = "select mcQueContent.mcQueContentId from McQueContent mcQueContent where mcQueContent.mcContentId = :mc";
@@ -44,18 +46,12 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 		
 		public McQueContent findMcQueContentById(Long mcQueContentId)
 		{
-		    String query = "from McQueContent as mcq where mcq.mcQueContentId = ?";
-			List content = getHibernateTemplate().find(query,mcQueContentId);
-				
-			if(content!=null && content.size() == 0)
-			{			
-				return null;
-			}
-			else
-			{
-				return (McQueContent)content.get(0);
-			}
-		
+			String query = "from McQueContent as mcq where mcq.mcQueContentId = ?";
+			
+			return (McQueContent) getSession().createQuery(query)
+			.setLong(0,mcQueContentId.longValue())
+			.uniqueResult();
+			
 		}
 		
 	 	public McQueContent getToolDefaultQuestionContent(final long mcContentId)
@@ -93,6 +89,11 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	    	this.getHibernateTemplate().update(mcQueContent);
 	    }
 		
+		public void saveOrUpdateMcQueContent(McQueContent mcQueContent)
+	    {
+	    	this.getHibernateTemplate().saveOrUpdate(mcQueContent);
+	    }
+		
 		public void removeMcQueContentByUID(Long uid)
 	    {
 			McQueContent mcq = (McQueContent)getHibernateTemplate().get(McQueContent.class, uid);
@@ -100,22 +101,21 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	    }
 		
 		
-		public void removeMcQueContent(Long mcQueContentId)
-	    {
-	       String query = "from McQueContent as mcq where mcq.mcQueContentId=";
-	       StringBuffer sb = new StringBuffer(query);
-	       sb.append(mcQueContentId.longValue());
-	       String queryString = sb.toString();
-	          
-	       this.getHibernateTemplate().delete(queryString);
-	    }
-		
-		
 		public void removeMcQueContentById(Long mcQueContentId)
 	    {
-	        String query = "from mcq in class org.lamsfoundation.lams.tool.mc.McQueContent"
-	        + " where mcq.mcQueContentId = ?";
-	        this.getHibernateTemplate().delete(query,mcQueContentId,Hibernate.LONG);
+			HibernateTemplate templ = this.getHibernateTemplate();
+			if ( mcQueContentId != null) {
+				List list = getSession().createQuery(FIND_MC_QUE_CONTENT)
+					.setLong(0,mcQueContentId.longValue())
+					.list();
+				
+				if(list != null && list.size() > 0){
+					McQueContent mcq = (McQueContent) list.get(0);
+					this.getSession().setFlushMode(FlushMode.AUTO);
+					templ.delete(mcq);
+					templ.flush();
+				}
+			}
 	    }
 		
 		

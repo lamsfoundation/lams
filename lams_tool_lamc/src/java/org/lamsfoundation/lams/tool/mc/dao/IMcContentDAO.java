@@ -20,6 +20,8 @@
  */
 package org.lamsfoundation.lams.tool.mc.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McSession;
 
@@ -81,16 +83,13 @@ public interface IMcContentDAO {
     public void removeMc(McContent mcContent);
     
     
-    public void removeMcById(Long mcContentId);
-    
-    
     /**
      * <p>Delete the given instance of McContent with the
      * given tool content id <code>mcContentId</code>
      * 
      * @param mcContentId The tool content Id. 
      */
-    public void removeMc(Long mcContentId);
+    public void removeMcById(Long mcContentId);
    
     
     /**
@@ -113,6 +112,8 @@ public interface IMcContentDAO {
      */
     public void addMcSession(Long mcContentId, McSession mcSession);
     
+    public List findAll(Class objClass);
+   
     public void flush();
     
   }

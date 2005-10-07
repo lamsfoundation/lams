@@ -23,8 +23,8 @@ package org.lamsfoundation.lams.tool.mc.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.mc.McContent;
-import org.lamsfoundation.lams.tool.mc.McSession;
 import org.lamsfoundation.lams.tool.mc.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.McSession;
 
 
 /**
@@ -78,20 +78,10 @@ public interface IMcSessionDAO {
      */
     public void removeMcSessionByUID(Long uid);
     
-    /**
-     * <p>Delete the given instance of McSession</p>
-     * 
-     * @param mcSession The instance of McSession to delete. 
-     */
+    public void removeMcSessionById(Long mcSessionId);
+
     public void removeMcSession(McSession mcSession);
     
-    /**
-     * <p>Delete the given instance of McSession with the
-     * given tool session id <code>mcSessionid</code>
-     * 
-     * @param mcSessionId The tool session Id. 
-     */
-    public void removeMcSession(Long mcSessionId);
     
     /**
      * <p> Returns the persistent instance of McSession
@@ -101,15 +91,9 @@ public interface IMcSessionDAO {
      * @param userId The mc user id
      * @return a persistent instance of McSessions or null if not found.
      */	
-    public McSession getMcSessionByUser(Long userId); 
+    public McSession getMcSessionByUser(Long userId);
     
-    /**
-     * <p>Deletes all instances of McQueUsr that are associated
-     * with the given instance of McSession</p>
-     * 
-     * @param mcSession The instance of McSession in which corresponding instances of McQueUsr should be deleted.
-     */
-    public void removeMcUsers(McSession mcSession); 
+   
 
     /**
      * <p>Creates and persists an instance of McQueUsr which is associated

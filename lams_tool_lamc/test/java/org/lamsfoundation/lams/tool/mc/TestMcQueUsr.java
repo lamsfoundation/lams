@@ -45,7 +45,7 @@ public class TestMcQueUsr extends McDataAccessTestCase
         super(name);
     }
     
-    
+    /*
     public void testCreateNewUser()
     {
     	McSession mcSession = mcSessionDAO.findMcSessionById(TEST_SESSION_ID_OTHER);
@@ -65,5 +65,14 @@ public class TestMcQueUsr extends McDataAccessTestCase
 
         mcUserDAO.saveMcUser(mcQueUsr2);
     }
+    
+    */
+    public void testRemoveMcUserById()
+    {
+    	mcUserDAO.removeMcUserById(TEST_NEW_USER_ID);
+    }
+    
+    
+    
     
 }

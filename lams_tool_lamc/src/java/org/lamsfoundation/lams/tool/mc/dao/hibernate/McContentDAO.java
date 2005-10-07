@@ -22,16 +22,16 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
-import java.lang.Long;
 
-import net.sf.hibernate.Hibernate;
-import net.sf.hibernate.HibernateException;
-import net.sf.hibernate.Session;
+import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McSession;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
-import org.springframework.orm.hibernate.HibernateCallback;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author ozgurd
@@ -39,7 +39,7 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
  */
 
 public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
-	
+	private static final String FIND_MC_CONTENT = "from " + McContent.class.getName() + " as mc where mc_content_id=?";
 	
 	private static final String LOAD_MC_BY_SESSION = "select mc from McContent mc left join fetch "
         + "mc.mcSessions session where session.mcSessionId=:sessionId";
@@ -49,25 +49,21 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#getMcContentByUID(java.lang.Long) */
 	public McContent getMcContentByUID(Long uid)
 	{
-		 return (McContent) this.getHibernateTemplate()
-         .get(McContent.class, uid);
+		return (McContent) this.getHibernateTemplate().get(McContent.class, uid);
 	}
 	
+	
+	/** Finds a package via the tool content id. Returns
+	 * null if not found
+	 */
 	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#findMcContentById(java.lang.Long) */
 	public McContent findMcContentById(Long mcContentId)
 	{
-	    String query = "from McContent as mc where mc.mcContentId = ?";
-		List content = getHibernateTemplate().find(query,mcContentId);
-			
-		if(content!=null && content.size() == 0)
-		{			
-			return null;
-		}
-		else
-		{
-			return (McContent)content.get(0);
-		}
-	
+		String query = "from McContent as mc where mc.mcContentId = ?";
+		
+		return (McContent) getSession().createQuery(query)
+		.setLong(0,mcContentId.longValue())
+		.uniqueResult();
 	}
     	
 	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#getMcContentBySession(java.lang.Long) */
@@ -101,23 +97,22 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 
    
 	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#removeMc(java.lang.Long)*/
-	public void removeMc(Long mcContentId)
+	public void removeMcById(Long mcContentId)
     {
-       
-       String query = "from McContent as mc where mc.mcContentId=";
-       StringBuffer sb = new StringBuffer(query);
-       sb.append(mcContentId.longValue());
-       String queryString = sb.toString();
-          
-       this.getHibernateTemplate().delete(queryString);
+		HibernateTemplate templ = this.getHibernateTemplate();
+		if ( mcContentId != null) {
+			List list = getSession().createQuery(FIND_MC_CONTENT)
+				.setLong(0,mcContentId.longValue())
+				.list();
+			
+			if(list != null && list.size() > 0){
+				McContent mc = (McContent) list.get(0);
+				this.getSession().setFlushMode(FlushMode.AUTO);
+				templ.delete(mc);
+				templ.flush();
+			}
+		}
     }
-	
-	 public void removeMcById(Long mcContentId)
-	    {
-	        String query = "from mc in class org.lamsfoundation.lams.tool.mc.McContent"
-	        + " where mc.mcContentId = ?";
-	        this.getHibernateTemplate().delete(query,mcContentId,Hibernate.LONG);
-	    }
 	
 	
     
@@ -141,8 +136,12 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
         content.getMcSessions().add(mcSession);
         this.getHibernateTemplate().saveOrUpdate(mcSession);
         this.getHibernateTemplate().saveOrUpdate(content);
-        
     }
+    
+    public List findAll(Class objClass) {
+		String query="from obj in class " + objClass.getName(); 
+		return this.getHibernateTemplate().find(query);
+	}
     
     public void flush()
     {

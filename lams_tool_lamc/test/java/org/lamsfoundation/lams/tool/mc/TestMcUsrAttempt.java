@@ -51,7 +51,7 @@ public class TestMcUsrAttempt extends McDataAccessTestCase
     	
     	McOptsContent mcOptionsContent=mcOptionsContentDAO.findMcOptionsContentById(new Long(888));
     	
-    	McQueUsr mcQueUsr=mcUserDAO.findMcUserById(TEST_NEW_USER_ID); 
+    	McQueUsr mcQueUsr=mcUserDAO.findMcUserById(TEST_MY_USER_ID); 
 	    
 	    McUsrAttempt mcUsrAttempt= new McUsrAttempt(new Long(33),
 	    											new Date(System.currentTimeMillis()),
@@ -69,7 +69,15 @@ public class TestMcUsrAttempt extends McDataAccessTestCase
 				mcOptionsContent					
 				);
 	    
+	    mcUsrAttemptDAO.saveMcUsrAttempt(mcUsrAttempt);
 	    mcUsrAttemptDAO.saveMcUsrAttempt(mcUsrAttempt2);
     }
+  
+    
+    public void testRemoveMcUsrAttemptById()
+    {
+    	mcUsrAttemptDAO.removeMcUsrAttemptById(new Long(34));	
+     } 
+    
     
 }

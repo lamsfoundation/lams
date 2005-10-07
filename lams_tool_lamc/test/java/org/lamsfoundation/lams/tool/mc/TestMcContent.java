@@ -9,7 +9,8 @@
 
 package org.lamsfoundation.lams.tool.mc;
 
-import java.util.TreeSet;
+
+import java.util.HashSet;
 
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 
@@ -68,14 +69,14 @@ public class TestMcContent extends McDataAccessTestCase
 	    mc.setShowFeedback(false);
 	    mc.setShowTopUsers(false);
 		
-	    mc.setMcQueContents(new TreeSet());
-	    mc.setMcSessions(new TreeSet());
+	    mc.setMcQueContents(new HashSet());
+	    mc.setMcSessions(new HashSet());
 	    
 	    mcContentDAO.saveMcContent(mc);
 	    assertNotNull(mc);
    }
   
-    
+/*    
     
     public void testCreateNewMcContentOther()
     {
@@ -100,14 +101,14 @@ public class TestMcContent extends McDataAccessTestCase
 	    mc.setShowFeedback(false);
 	    mc.setShowTopUsers(false);
 		
-	    mc.setMcQueContents(new TreeSet());
-	    mc.setMcSessions(new TreeSet());
+	    mc.setMcQueContents(new HashSet());
+	    mc.setMcSessions(new HashSet());
 	    
 	    mcContentDAO.saveMcContent(mc);
 	    assertNotNull(mc);
-   } 
+   }
+   
     
-    /*
     public void testRetrieveMcContent()
     {
     	McContent mcContent = mcContentDAO.findMcContentById(TEST_CONTENT_ID);
@@ -122,17 +123,11 @@ public class TestMcContent extends McDataAccessTestCase
     	assertNull(mcContent);
     }
     
-
-    public void testRemoveMcContentById()
-    {
-    	mcContentDAO.removeMc(TEST_CONTENT_ID_OTHER);
-    }
-
     
-    public void testRemoveMcContentByIdExplicit()
+    public void testRemoveMcById()
     {
-    	mcContentDAO.removeMcById(TEST_CONTENT_ID);
+    	mcContentDAO.removeMcById(TEST_CONTENT_ID_OTHER);
     }
-    
-    */
+  */  
+
 }

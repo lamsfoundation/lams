@@ -11,6 +11,7 @@ package org.lamsfoundation.lams.tool.mc;
 
 import java.util.HashSet;
 
+
 /*
  * 
  * @author ozgurd
@@ -49,9 +50,15 @@ public class TestMcOptionsContent extends McDataAccessTestCase
     	
     	McOptsContent mcOptionsContent3= new McOptsContent(new Long(999), false, "yellow", mcQueContent, new HashSet());
     	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent3);
-    } 
+    }
+    
+    public void testRemoveMcOptionsContentById()
+    {
+    	mcOptionsContentDAO.removeMcOptionsContentById(new Long(999));
+    }
     
     	    
+    
 }
 
 

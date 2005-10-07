@@ -41,38 +41,60 @@ public class TestMcQueContent extends McDataAccessTestCase
     public void testCreateMcQueContent()
     {
     	McContent mcContent = mcContentDAO.findMcContentById(new Long(2));
-    	McQueContent mcQueContent=  new McQueContent(TEST_QUE_ID1,
+    	assertEquals("Check ids:", mcContent.getMcContentId() , new Long(2));
+    	
+    	
+    	 McQueContent mcQueContent=  new McQueContent(TEST_QUE_ID1,
 													 "What planet are you from?",
-													 new Integer(99),
+													 new Integer(444),
 													 mcContent,
 													 new HashSet(),
 													 new HashSet()
     												);
-    	mcQueContentDAO.saveMcQueContent(mcQueContent);
     	
+    	 mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
+    	 
+    	 McQueContent mcQueContent2=  new McQueContent(TEST_QUE_ID1,
+				 "What is a good question?",
+				 new Integer(555),
+				 mcContent,
+				 new HashSet(),
+				 new HashSet()
+				);
+
+    	 mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent2);
+    	 mcQueContentDAO.flush();
+    }
+
     
-    	
-    	McContent mcContent2 = mcContentDAO.findMcContentById(new Long(3));
+    public void testSaveOrUpdateMcQueContent()
+    {
+    	McContent mcContent2 = mcContentDAO.findMcContentById(new Long(2));
     	
     	McQueContent mcQueContent2=  new McQueContent(TEST_QUE_ID1,
-													 "What is a good question?",
-													 new Integer(55),
-													 mcContent2,
-													 new HashSet(),
-													 new HashSet()
+    												 "Where is the sky?",
+    												 new Integer(777),
+    												 mcContent2,
+    												 new HashSet(),
+    												 new HashSet()
     												);
-    	mcQueContentDAO.saveMcQueContent(mcQueContent2);
     	
-    	
+    	mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent2);
+        	
     }
-   /* 
+    
+    
+	
     public void testRetrieveMcQueContent()
     {
     	McQueContent mcQueContent= mcQueContentDAO.findMcQueContentById(new Long(20));
     	mcQueContent.setDisplayOrder(new Integer(88));
     	mcQueContentDAO.saveMcQueContent(mcQueContent);
     }
-    */
     
+    public void testRemoveMcQueContentById()
+    {
+    	mcQueContentDAO.removeMcQueContentById(TEST_QUE_ID1);
+    }
     
 }

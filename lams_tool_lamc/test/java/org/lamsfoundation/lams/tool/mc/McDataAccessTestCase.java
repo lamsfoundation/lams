@@ -27,6 +27,7 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
 	protected final Long TEST_QUE_OPTION_ID3 = new Long(3);
 	
 	protected final Long TEST_NEW_USER_ID = new Long(100);
+	protected final Long TEST_MY_USER_ID = new Long(77);
 		
     protected final long ONE_DAY = 60 * 60 * 1000 * 24;
     
@@ -64,8 +65,7 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
 
     protected String[] getContextConfigLocation()
     {
-    	System.out.println("McDataAccessTestCase will be configured");
-        return new String[] {"/org/lamsfoundation/lams/tool/mc/testmcApplicationContext.xml" };
+    	return new String[] {"/org/lamsfoundation/lams/tool/mc/testmcApplicationContext.xml" };
     }
     
     protected String getHibernateSessionFactoryName()

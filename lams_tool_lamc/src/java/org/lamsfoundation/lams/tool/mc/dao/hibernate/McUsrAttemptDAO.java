@@ -8,12 +8,12 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
-import net.sf.hibernate.Hibernate;
-
 import org.apache.log4j.Logger;
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
 
@@ -28,6 +28,8 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
 	 	static Logger logger = Logger.getLogger(McUsrAttemptDAO.class.getName());
 	 	
+	 	private static final String FIND_USR_ATTEMPT = "from " + McUsrAttempt.class.getName() + " as mca where attempt_id=?";
+	 	
 	 	public McUsrAttempt getMcUserAttemptByUID(Long uid)
 		{
 			 return (McUsrAttempt) this.getHibernateTemplate()
@@ -37,16 +39,10 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 		public McUsrAttempt findMcUsrAttemptById(Long attemptId)
 		{
 		    String query = "from McUsrAttempt as mca where mca.attemptId = ?";
-			List content = getHibernateTemplate().find(query,attemptId);
-				
-			if(content!=null && content.size() == 0)
-			{			
-				return null;
-			}
-			else
-			{
-				return (McUsrAttempt)content.get(0);
-			}
+
+		    return (McUsrAttempt) getSession().createQuery(query)
+			.setLong(0,attemptId.longValue())
+			.uniqueResult();
 		
 		}
 		
@@ -68,22 +64,21 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	    }
 		
 		
-		public void removeMcUsrAttempt(Long attemptId)
-	    {
-	       String query = "from McUsrAttempt as mca where mca.attemptId=";
-	       StringBuffer sb = new StringBuffer(query);
-	       sb.append(attemptId.longValue());
-	       String queryString = sb.toString();
-	          
-	       this.getHibernateTemplate().delete(queryString);
-	    }
-		
-		
 		public void removeMcUsrAttemptById(Long attemptId)
 	    {
-	        String query = "from mca in class org.lamsfoundation.lams.tool.mc.McUsrAttempt"
-	        + " where mca.attemptId = ?";
-	        this.getHibernateTemplate().delete(query,attemptId,Hibernate.LONG);
+			HibernateTemplate templ = this.getHibernateTemplate();
+			if ( attemptId != null) {
+				List list = getSession().createQuery(FIND_USR_ATTEMPT)
+					.setLong(0,attemptId.longValue())
+					.list();
+				
+				if(list != null && list.size() > 0){
+					McUsrAttempt mcu = (McUsrAttempt) list.get(0);
+					this.getSession().setFlushMode(FlushMode.AUTO);
+					templ.delete(mcu);
+					templ.flush();
+				}
+			}
 	    }
 		
 		public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt)

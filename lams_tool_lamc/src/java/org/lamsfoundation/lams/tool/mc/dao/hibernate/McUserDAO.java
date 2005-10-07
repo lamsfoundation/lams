@@ -26,10 +26,12 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.McSession;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
-import org.springframework.orm.hibernate.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author ozgurd
@@ -37,9 +39,10 @@ import org.springframework.orm.hibernate.support.HibernateDaoSupport;
  */
 public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     
-    private static final String COUNT_USERS_IN_SESSION = "select mu.queUsrId from McQueUsr mu where mu.mcSession= :mcSession";
+	private static final String FIND_MC_USR_CONTENT = "from " + McQueUsr.class.getName() + " as mcu where que_usr_id=?";
+	
+	private static final String COUNT_USERS_IN_SESSION = "select mu.queUsrId from McQueUsr mu where mu.mcSession= :mcSession";
    
-    
     
     /** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#getMcUserByUID(java.lang.Long) */
 	public McQueUsr getMcUserByUID(Long uid)
@@ -53,23 +56,18 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#getMcUserByID(java.lang.Long) */
 	public McQueUsr findMcUserById(Long userId)
 	{
-	    String query = "from McQueUsr user where user.queUsrId=?";
-	    List users = getHibernateTemplate().find(query,userId);
+		String query = "from McQueUsr user where user.queUsrId=?";
 		
-		if(users!=null && users.size() == 0)
-		{			
-			return null;
-		}
-		else
-		{
-			return (McQueUsr)users.get(0);
-		}
+		return (McQueUsr) getSession().createQuery(query)
+		.setLong(0,userId.longValue())
+		.uniqueResult();
 	}
 	
 	
 	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#getMcUserBySession(java.lang.Long, java.lang.Long)*/
 	public McQueUsr getMcUserBySession(Long userId, Long sessionId)
 	{
+		/*
 		String query = "select mu from McQueUsr mu where mu.queUsrId=? and mu.mcSession.mcSessionId=?";
 		Long[] bindingValues = new Long[2];
 		bindingValues[0] = userId;
@@ -84,7 +82,8 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 		{
 			return (McQueUsr)usersReturned.get(0);
 		}
-
+		*/
+		return null;
 	}
 
 	
@@ -101,15 +100,21 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     }
     
     /** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#removeMcUser(java.lang.Long) */
-    public void removeMcUser(Long userId)
+    public void removeMcUserById(Long userId)
     {
-        String query = "from McQueUsr as user where user.queUsrId =";
-        StringBuffer sb = new StringBuffer(query);
-        sb.append(userId.longValue());
-        
-        String queryString = sb.toString();
-           
-        this.getHibernateTemplate().delete(queryString);
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		if ( userId != null) {
+			List list = getSession().createQuery(FIND_MC_USR_CONTENT)
+				.setLong(0,userId.longValue())
+				.list();
+			
+			if(list != null && list.size() > 0){
+				McQueUsr mcu = (McQueUsr) list.get(0);
+				this.getSession().setFlushMode(FlushMode.AUTO);
+				templ.delete(mcu);
+				templ.flush();
+			}
+		}
       
     }
     

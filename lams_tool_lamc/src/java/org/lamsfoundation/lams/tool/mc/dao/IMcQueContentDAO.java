@@ -45,12 +45,11 @@ public interface IMcQueContentDAO
     
 	public void updateMcQueContent(McQueContent mcQueContent);
 	
+	public void saveOrUpdateMcQueContent(McQueContent mcQueContent);
+	
 	public void removeMcQueContentByUID(Long uid);
 	
-	public void removeMcQueContent(Long mcQueContentId);
-	
 	public void removeMcQueContentById(Long mcQueContentId);
-	
-	public void removeMcQueContent(McQueContent mcQueContent);
     
+	public void removeMcQueContent(McQueContent mcQueContent);
 }

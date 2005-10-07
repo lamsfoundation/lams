@@ -40,8 +40,6 @@ public interface IMcUsrAttemptDAO
 	
 	public void removeMcUsrAttemptByUID(Long uid);
 	
-	public void removeMcUsrAttempt(Long attemptId);
-	
 	public void removeMcUsrAttemptById(Long attemptId);
 	
 	public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt);
