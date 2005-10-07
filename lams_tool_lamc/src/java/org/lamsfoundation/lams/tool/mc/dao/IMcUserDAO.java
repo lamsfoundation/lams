@@ -49,7 +49,7 @@ public interface IMcUserDAO {
 	 * @param userId The id of a McQueUsr
 	 * @return the persistent instance of a McQueUsr or null if not found.
 	 */
-    public McQueUsr getMcUserByID(Long userId);
+    public McQueUsr findMcUserById(Long userId);
     
     /**
 	 * <p>Persist the given persistent instance of McQueUsr.</p>

@@ -48,8 +48,10 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
          .get(McQueUsr.class, uid);
 	}
 	
+	
+	
 	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#getMcUserByID(java.lang.Long) */
-	public McQueUsr getMcUserByID(Long userId)
+	public McQueUsr findMcUserById(Long userId)
 	{
 	    String query = "from McQueUsr user where user.queUsrId=?";
 	    List users = getHibernateTemplate().find(query,userId);

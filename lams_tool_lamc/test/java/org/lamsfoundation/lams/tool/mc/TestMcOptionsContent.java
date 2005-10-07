@@ -9,6 +9,8 @@
 
 package org.lamsfoundation.lams.tool.mc;
 
+import java.util.HashSet;
+
 /*
  * 
  * @author ozgurd
@@ -34,17 +36,18 @@ public class TestMcOptionsContent extends McDataAccessTestCase
         super(name);
     }
     
+    	
     
     public void testCreateMcOptionsContent()
     {
     	McQueContent mcQueContent = mcQueContentDAO.findMcQueContentById(TEST_QUE_ID1);
-    	McOptsContent mcOptionsContent= new McOptsContent(new Long(777), true, "red", mcQueContent);
+    	McOptsContent mcOptionsContent= new McOptsContent(new Long(777), true, "red", mcQueContent, new HashSet());
     	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent);
     	
-    	McOptsContent mcOptionsContent2= new McOptsContent(new Long(888), false, "blue", mcQueContent);
+    	McOptsContent mcOptionsContent2= new McOptsContent(new Long(888), false, "blue", mcQueContent, new HashSet());
     	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent2);
     	
-    	McOptsContent mcOptionsContent3= new McOptsContent(new Long(999), false, "yellow", mcQueContent);
+    	McOptsContent mcOptionsContent3= new McOptsContent(new Long(999), false, "yellow", mcQueContent, new HashSet());
     	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent3);
     } 
     

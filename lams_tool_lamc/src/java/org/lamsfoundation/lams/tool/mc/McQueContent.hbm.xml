@@ -76,5 +76,24 @@
             class="org.lamsfoundation.lams.tool.mc.McOptsContent"
         />
     </set>
+    
+    
+    <set
+        name="mcUsrAttempts"
+        lazy="false"
+        inverse="true"
+		cascade="none"
+	>
+
+        <key>
+            <column name="mc_que_content_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
+        />
+    </set>
+    
+    
+    
 </class>
 </hibernate-mapping>

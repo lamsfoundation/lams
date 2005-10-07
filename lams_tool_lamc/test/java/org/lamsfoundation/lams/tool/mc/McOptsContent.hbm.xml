@@ -62,6 +62,23 @@
     >
         <column name="mc_que_content_id" />
     </many-to-one>
+
+    
+    <set
+        name="mcUsrAttempts"
+        lazy="false"
+        inverse="true"
+		cascade="all-delete-orphan"
+    >
+        <key>
+            <column name="mc_que_option_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
+        />
+    </set>
+    
+    
    
 </class>
 </hibernate-mapping>
