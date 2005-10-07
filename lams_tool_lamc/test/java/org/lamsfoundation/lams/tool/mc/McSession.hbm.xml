@@ -32,7 +32,7 @@
         insert="true"
         access="property"
         column="session_start_date"
-        length="10"
+        length="20"
     />
     
     <property
@@ -42,7 +42,7 @@
         insert="true"
         access="property"
         column="session_end_date"
-        length="10"
+        length="20"
     />
     
     <property

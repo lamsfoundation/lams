@@ -29,19 +29,19 @@
     <property
         name="attemptTime"
         type="java.util.Date"
-        update="false"
-        insert="false"
+        update="true"
+        insert="true"
         access="property"
         column="attempt_time"
-        length="10"
+        length="20"
     >
     </property>
     
     <property
         name="timeZone"
         type="java.lang.String"
-        update="false"
-        insert="false"
+        update="true"
+        insert="true"
         access="property"
         column="time_zone"
         length="255"

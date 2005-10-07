@@ -85,7 +85,7 @@
         insert="true"
         access="property"        
         column="update_date"
-        length="10"
+        length="20"
     />
 
 
