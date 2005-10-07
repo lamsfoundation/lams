@@ -76,7 +76,7 @@ public class TestMcContent extends McDataAccessTestCase
 	    assertNotNull(mc);
    }
   
-/*    
+    
     
     public void testCreateNewMcContentOther()
     {
@@ -128,6 +128,6 @@ public class TestMcContent extends McDataAccessTestCase
     {
     	mcContentDAO.removeMcById(TEST_CONTENT_ID_OTHER);
     }
-  */  
+  
 
 }

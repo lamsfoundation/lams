@@ -57,8 +57,6 @@ public class TestMcOptionsContent extends McDataAccessTestCase
     	mcOptionsContentDAO.removeMcOptionsContentById(new Long(999));
     }
     
-    	    
-    
 }
 
 

@@ -58,7 +58,7 @@ public class TestMcSession extends McDataAccessTestCase
                                    new HashSet());
     
 	    mcSessionDAO.saveMcSession(mcSession);
-	    //assertEquals(mcSession.getMcSessionId(),new Long(21));
+	    assertEquals(mcSession.getMcSessionId(),new Long(21));
 	    
 	    
 	    McSession mcSession2 = new McSession(TEST_SESSION_ID,
@@ -69,7 +69,7 @@ public class TestMcSession extends McDataAccessTestCase
                 new HashSet());
 
 		mcSessionDAO.saveMcSession(mcSession);
-		//assertEquals(mcSession.getMcSessionId(),new Long(20));
+		assertEquals(mcSession.getMcSessionId(),new Long(20));
 	    
 		McSession mcSession3 = new McSession(new Long(55),
                                    new Date(System.currentTimeMillis()),
@@ -79,8 +79,6 @@ public class TestMcSession extends McDataAccessTestCase
                                    new HashSet());
     
 	    mcSessionDAO.saveMcSession(mcSession3);
-	    
-	    
     }
     
 }

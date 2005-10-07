@@ -77,7 +77,7 @@ public class TestMcUsrAttempt extends McDataAccessTestCase
     public void testRemoveMcUsrAttemptById()
     {
     	mcUsrAttemptDAO.removeMcUsrAttemptById(new Long(34));	
-     } 
+    } 
     
     
 }
