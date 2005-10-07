@@ -738,7 +738,7 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
         // check that the previous version was a file node - error otherwise
         SimpleVersionedNode node = getNode(ticket.getWorkspaceId(),uuid,versionId);
         node.setProperty(name, value, type);
-        node.validateSaveDB(null);
+        node.saveDB(null);
     }
 
     /* (non-Javadoc)
@@ -757,7 +757,6 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 	   				+"Please delete the parent. Node UUID "+uuid);
 	   	}
 	   	List problemPaths = latestNodeVersion.deleteNode(); 
-	   	latestNodeVersion.saveDB(null);
 	   	return problemPaths != null ? 
 	   			(String[]) problemPaths.toArray(new String[problemPaths.size()]) : 
 	   			new String[0];
@@ -776,7 +775,6 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 		// get the first version of the node and delete from there.
 	   	SimpleVersionedNode nodeVersion = getNode(ticket.getWorkspaceId(),uuid,version);
 	   	List problemPaths = nodeVersion.deleteVersion();
-	   	nodeVersion.saveDB(null);
 	   	return problemPaths != null ? 
 	   			(String[]) problemPaths.toArray(new String[problemPaths.size()]) : 
 	   			new String[0];

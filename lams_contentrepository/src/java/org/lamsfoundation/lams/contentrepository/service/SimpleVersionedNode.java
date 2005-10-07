@@ -686,22 +686,12 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 	}
 
 
-	/** Validate the node and save the db changes to the current node. 
-	 * Do not use if there are files that have been updated - the validation may fail and we
-	 * would end up in an odd state.
-	 * <p>
-	 * If files have been added, please call Long save(String versionDescription, List childNodes).
+	/** Validate the node and save the db changes to the current node.
 	 * @param versionDescription optional. If supplied will set the version description
 	 */
-	protected void validateSaveDB(String versionDescription) throws ValidationException {
-		validateNode();
-		saveDB(versionDescription);
-	}
+	protected void saveDB(String versionDescription) throws ValidationException {
 
-	/** Just save the db changes to the current node. See validateSaveDB()
-	 * @param versionDescription optional. If supplied will set the version description
-	 */
-	protected void saveDB(String versionDescription) {
+		validateNode();
 
 		// nodeDAO to take care of insert or update (uses saveOrUpdate)
 		// the nodeVersion and nodeVersionProperty collections cascade
