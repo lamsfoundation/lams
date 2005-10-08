@@ -9,9 +9,8 @@
 
 package org.lamsfoundation.lams.tool.qa;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Date;
+import java.util.TreeSet;
 
 
 /*
@@ -61,7 +60,7 @@ public class TestQaSession extends QaDataAccessTestCase
     /*
     public void testCreateNewSession()
     {
-    	QaContent qa = qaContentDAO.getQaById(getTestQaContentID());
+    	QaContent qa = qaContentDAO.getQaById(TEST_NEW_CONTENT_ID);
 
         qaSession = new QaSession(new Long(TEST_NEW_SESSION_ID),
                                    new Date(System.currentTimeMillis()),
@@ -74,11 +73,12 @@ public class TestQaSession extends QaDataAccessTestCase
         qaSessionDAO.CreateQaSession(qaSession);
         System.out.println(this.getClass().getName() + " New session created: " + qaSession);
      
-        qaSessionDAO.deleteQaSession(qaSession);
-        System.out.println(this.getClass().getName() + " New session deleted: ");
+    //    qaSessionDAO.deleteQaSession(qaSession);
+    //    System.out.println(this.getClass().getName() + " New session deleted: ");
     }
     */
     
+    /*
     public void testDevToolSession()
     {
     	QaSession qaSession=qaSessionDAO.getQaSessionById(this.DEVELOPMENT_TOOL_SESSION_ID);
@@ -109,14 +109,7 @@ public class TestQaSession extends QaDataAccessTestCase
 	        System.out.println(this.getClass().getName() + "\n pairs.key: " + pairs.getKey());
 	    }
     	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
     }
-    
+    */
 
 }

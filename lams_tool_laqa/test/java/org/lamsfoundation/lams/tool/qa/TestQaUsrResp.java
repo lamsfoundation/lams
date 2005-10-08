@@ -45,13 +45,15 @@ public class TestQaUsrResp extends QaDataAccessTestCase
     
     public void testCreateNewResponse()
     {
-    	QaQueContent qaQueContent = qaQueContentDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);
+    	QaQueContent qaQueContent = qaQueContentDAO.getQaQueById(new Long(1).longValue());
     	
-		QaUsrResp qaUsrResp= new QaUsrResp("I am from Mars",false,
+    	QaQueUsr qaQueUsr=qaQueUsrDAO.getQaQueUsrById(new Long(700).longValue()); 
+    	
+		QaUsrResp qaUsrResp= new QaUsrResp("I am from Sydney.",false,
 											new Date(System.currentTimeMillis()),
 											"",
 											qaQueContent,
-											getExistingUser("randomstriker","Michael Random"));
+											qaQueUsr);
 		qaUsrRespDAO.createUserResponse(qaUsrResp);
     }
     

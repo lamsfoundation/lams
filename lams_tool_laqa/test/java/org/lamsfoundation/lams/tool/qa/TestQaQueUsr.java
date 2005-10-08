@@ -45,8 +45,8 @@ public class TestQaQueUsr extends QaDataAccessTestCase
     
     public void testCreateNewUser()
     {
-    	QaQueContent qaQueContent = qaQueContentDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);
-		QaSession qaSession = qaSessionDAO.getQaSessionById(TEST_EXISTING_SESSION_ID);
+    	QaQueContent qaQueContent = qaQueContentDAO.getQaQueById(new Long(1).longValue() );
+		QaSession qaSession = qaSessionDAO.getQaSessionById(new Long(102).longValue());
     	
         QaQueUsr qaQueUsr= new QaQueUsr(new Long(TEST_NEW_USER_ID),
     									"john",

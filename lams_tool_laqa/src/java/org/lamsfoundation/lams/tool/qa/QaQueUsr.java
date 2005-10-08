@@ -71,7 +71,7 @@ public class QaQueUsr implements Serializable, Comparable, Nullable
     private QaQueContent qaQueContent;
     
     /** persistent field */
-    private Set qaUsrResps;  //surveyUsrResps 
+    private Set qaUsrResps;  
     
     public QaQueUsr()
 	{

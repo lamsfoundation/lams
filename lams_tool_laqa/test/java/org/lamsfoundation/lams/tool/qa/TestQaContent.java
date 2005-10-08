@@ -50,6 +50,7 @@ public class TestQaContent extends QaDataAccessTestCase
         super(name);
     }
     
+    
     public void testSimpleCreateNewQaContent()
     {
     	//create new qa content
