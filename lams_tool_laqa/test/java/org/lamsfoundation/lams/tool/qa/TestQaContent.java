@@ -12,6 +12,7 @@ package org.lamsfoundation.lams.tool.qa;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 
@@ -48,6 +49,39 @@ public class TestQaContent extends QaDataAccessTestCase
     {
         super(name);
     }
+    
+    public void testSimpleCreateNewQaContent()
+    {
+    	//create new qa content
+    	QaContent qa = new QaContent();
+		qa.setQaContentId(new Long(TEST_NEW_CONTENT_ID));
+		qa.setTitle("New - Put Title Here");
+		qa.setInstructions("New - Put instructions here.");
+		qa.setCreationDate(new Date(System.currentTimeMillis()).toString() );
+		qa.setCreatedBy(0);
+	    qa.setUsernameVisible(false);
+	    qa.setDefineLater(false);
+	    qa.setSynchInMonitor(false);
+	    qa.setOnlineInstructions("New- online instructions");
+	    qa.setOfflineInstructions("New- offline instructions");
+	    qa.setReportTitle("New-Report title");
+	    qa.setQaQueContents(new TreeSet());
+	    qa.setQaSessions(new TreeSet());
+	    
+	    //create new qa que content
+	    QaQueContent qaQueContent = new QaQueContent("What planet are you from",
+	    											4, 
+													qa, 
+													new TreeSet(), 
+													new TreeSet());
+	    
+	    qa.getQaQueContents().add(qaQueContent);
+	    
+	    //create the new content
+	    qaContentDAO.createQa(qa);
+    }
+    
+    
     
    /* 
     public void testCreateNewQaContent()

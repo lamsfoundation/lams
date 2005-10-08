@@ -8,9 +8,6 @@
  ******************************************************************************** */
 
 package org.lamsfoundation.lams.tool.qa;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 /*
  * 
  * @author ozgurd

@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 
 <hibernate-mapping>
     <class
         name="org.lamsfoundation.lams.tool.qa.QaQueContent"
         table="tl_laqa11_que_content"
-        dynamic-update="false"
-        dynamic-insert="false"
-        select-before-update="false"
-        optimistic-lock="version"
     >
 
         <id
@@ -52,7 +48,6 @@
             length="65535"
         />
 
-
         <many-to-one
             name="qaContent"
             class="org.lamsfoundation.lams.tool.qa.QaContent"
@@ -66,7 +61,6 @@
                 name="qa_content_id" 
             />
         </many-to-one>
-
 
  		<set
             name="qaUsrResps"
@@ -85,8 +79,5 @@
               />
 
         </set>
-
-
     </class>
-
 </hibernate-mapping>

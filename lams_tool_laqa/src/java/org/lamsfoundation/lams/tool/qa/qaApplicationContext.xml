@@ -17,12 +17,12 @@
 		<property name="dataSource"><ref bean="toolDataSource"/></property>
 		<property name="mappingResources">
 			<list>	
-				<value>/WEB-INF/QaContent.hbm.xml</value>
-				<value>/WEB-INF/QaSession.hbm.xml</value>
-				<value>/WEB-INF/QaQueContent.hbm.xml</value>
-				<value>/WEB-INF/QaQueUsr.hbm.xml</value>
-				<value>/WEB-INF/QaUsrResp.hbm.xml</value>
-				<value>/WEB-INF/QaUploadedFile.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaContent.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaSession.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaQueContent.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaQueUsr.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaUsrResp.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/qa/QaUploadedFile.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>

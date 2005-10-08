@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.qa.QaContent;
