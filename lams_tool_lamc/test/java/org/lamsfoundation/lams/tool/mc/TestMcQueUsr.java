@@ -49,7 +49,6 @@ public class TestMcQueUsr extends McDataAccessTestCase
     public void testCreateNewUser()
     {
     	McSession mcSession = mcSessionDAO.findMcSessionById(TEST_SESSION_ID_OTHER);
-    	
         McQueUsr mcQueUsr= new McQueUsr(TEST_NEW_USER_ID,
     									"john",
 										"John Baker",
