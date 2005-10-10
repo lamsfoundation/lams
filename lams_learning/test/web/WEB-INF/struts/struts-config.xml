@@ -18,10 +18,6 @@
       type="org.lamsfoundation.lams.learning.web.form.ActivityForm"
     />
     <form-bean
-      name="dummyToolForm"
-      type="org.lamsfoundation.lams.learning.web.form.DummyToolForm"
-    />
-    <form-bean
       name="testDblSubmitForm"
       type="org.lamsfoundation.lams.learning.web.form.TestDblSubmitForm"
     />
@@ -114,7 +110,7 @@ http://www.gnu.org/licenses/gpl.txt
       <exception
         key="error.system.learner"
         type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
         path=".systemError"
         scope="request"
       />
@@ -136,7 +132,7 @@ http://www.gnu.org/licenses/gpl.txt
       <exception
         key="error.system.learner"
         type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
         path=".systemError"
         scope="request"
       />
@@ -175,7 +171,7 @@ http://www.gnu.org/licenses/gpl.txt
       <exception
         key="error.system.learner"
         type="org.lamsfoundation.lams.learning.service.LearnerServiceException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
         path=".systemError"
         scope="request"
       />
@@ -187,26 +183,6 @@ http://www.gnu.org/licenses/gpl.txt
       <forward
         name="welcome"
         path=".welcome"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/test/DummyTool"
-      type="org.lamsfoundation.lams.learning.web.action.DummyToolAction"
-      name="dummyToolForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="display"
-        path="/test/dummyTool.jsp"
-        redirect="false"
-      />
-      <forward
-        name="next"
-        path=".requestDisplay"
         redirect="false"
       />
     </action>
@@ -291,6 +267,25 @@ http://www.gnu.org/licenses/gpl.txt
       />
     </action>
     <action
+      path="/exportPortfolio"
+      type="org.lamsfoundation.lams.learning.export.web.action.ExportPortfolioAction"
+      unknown="false"
+      validate="false"
+    >
+      <exception
+        key="error.system.exportPortfolio"
+        type="org.lamsfoundation.lams.learning.export.ExportPortfolioException"
+        handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
+        path=".systemError"
+        scope="request"
+      />
+      <forward
+        name="displayPortfolio"
+        path="/exportPortfolio.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/ChooseActivity"
       type="org.lamsfoundation.lams.learning.web.action.ChooseActivityAction"
       name="activityForm"
@@ -298,20 +293,6 @@ http://www.gnu.org/licenses/gpl.txt
       unknown="false"
       validate="false"
     >
-    </action>
-    <action
-      path="/test/DummyLesson"
-      type="org.lamsfoundation.lams.learning.web.action.DummyLessonAction"
-      name="activityForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="displayLesson"
-        path="/DisplayActivity.do"
-        redirect="true"
-      />
     </action>
 
    <!--
