@@ -37,4 +37,12 @@ public class NullActivity extends Activity {
         return true;
     }
 
+	/** Create a deep copy of the this activity. It should return the same
+	 * subclass as the activity being copied 
+	 * @return deep copy of this object
+	 */
+   public Activity createCopy() {
+   		return new NullActivity();
+   }
+
 }

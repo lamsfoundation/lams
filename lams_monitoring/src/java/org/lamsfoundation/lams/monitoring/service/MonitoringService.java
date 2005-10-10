@@ -34,12 +34,10 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
-import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
@@ -236,16 +234,18 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
                                                                                   new Integer(LearningDesign.COPY_TYPE_LESSON),
                                                                                   user,
                                                                                   originalLearningDesign.getWorkspaceFolder());
-        //copy the tool content
+        // copy the tool content
+        // unfortuanately, we have to reaccess the activities to make sure we get the
+        // subclass, not a hibernate proxy.
         for (Iterator i = copiedLearningDesign.getActivities().iterator(); i.hasNext();)
         {
             Activity currentActivity = (Activity) i.next();
             if (currentActivity.isToolActivity())
             {
                 try {
-                    Long newContentId = newContentId = lamsCoreToolService.notifyToolToCopyContent((ToolActivity) currentActivity);
-                    ((ToolActivity) currentActivity).setToolContentId(newContentId);
-
+                	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(currentActivity.getActivityId());
+                    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity);
+                    toolActivity.setToolContentId(newContentId);
                 } catch (DataMissingException e) {
                     String error = "Unable to initialise the lesson. Data is missing for activity "+currentActivity.getActivityUIID()
                             +" in learning design "+learningDesignId
@@ -310,22 +310,27 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
         Date lessonStartTime = new Date();
         //initialize tool sessions if necessary
-        for (Iterator i = requestedLesson.getLearningDesign()
-                                         .getActivities()
-                                         .iterator(); i.hasNext();)
+        Set activities = requestedLesson.getLearningDesign().getActivities();
+        for (Iterator i = activities.iterator(); i.hasNext();)
         {
             Activity activity = (Activity) i.next();
+            System.out.println(activity);
             //TODO this is for testing purpose as survey is the only tool available
             //so far.
-            if (shouldInitToolSessionFor(activity)&&this.isSurvey((ToolActivity)activity))
-                initToolSessionFor((ToolActivity) activity,
+            if ( activity.getActivityTypeId().intValue() == Activity.TOOL_ACTIVITY_TYPE ) {
+            	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId()); 
+				if (shouldInitToolSessionFor(toolActivity)&&this.isSurvey(toolActivity))
+					initToolSessionFor((ToolActivity) activity,
                                    requestedLesson.getAllLearners(),
                                    requestedLesson);
+            }
             //if it is schedule gate, we need to initialize the sheduler for it.
-            if(activity.getActivityTypeId().intValue()==Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
-                runGateScheduler((ScheduleGateActivity)activity,lessonStartTime);
-        }
+            if(activity.getActivityTypeId().intValue() == Activity.SCHEDULE_GATE_ACTIVITY_TYPE) {
+            	ScheduleGateActivity gateActivity = (ScheduleGateActivity) activityDAO.getActivityByActivityId(activity.getActivityId());
+                runGateScheduler(gateActivity,lessonStartTime); 
+            }
         //update lesson status
+        }
         requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
         requestedLesson.setStartDateTime(lessonStartTime);
         lessonDAO.updateLesson(requestedLesson);
@@ -340,8 +345,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public GateActivity openGate(Long gateId)
     {
         GateActivity gate = (GateActivity)activityDAO.getActivityByActivityId(gateId);
-        gate.setGateOpen(new Boolean(true));
-        activityDAO.update(gate);
+        if ( gate != null ) {
+        	gate.setGateOpen(new Boolean(true));
+        	activityDAO.update(gate);
+        }
         return gate;
     }
 
@@ -744,13 +751,12 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * can be initialized if the activity is tool activity and it doesn't 
      * involve any grouping.
      * 
-     * @param activity the activity that needs to be inspected.
+     * @param tool activity the activity that needs to be inspected.
      * @return the result.
      */
-    private boolean shouldInitToolSessionFor(Activity activity)
+    private boolean shouldInitToolSessionFor(ToolActivity activity)
     {
-        return activity.isToolActivity()
-                && !((ToolActivity) activity).getApplyGrouping().booleanValue();
+        return activity.getApplyGrouping().booleanValue();
     }
 
     /**
@@ -781,49 +787,44 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	private Vector getOrderedActivityTree(LearningDesign learningDesign){
 		int order = 0;		
 		HashMap activityTree = learningDesign.getActivityTree();		
-		Vector activitySet = new Vector();		
+		Vector activityVector = new Vector();		
 		
-		Activity firstActivity = learningDesign.getFirstActivity();
-		firstActivity.setOrderId(new Integer(order));
-		order++;
-		
-		if(firstActivity.isComplexActivity()){			
-			ComplexActivity complexActivity = (ComplexActivity)firstActivity;			
-			Iterator childIterator = complexActivity.getActivities().iterator();
-			while(childIterator.hasNext()){
-				SimpleActivity simpleActivity= (SimpleActivity)childIterator.next();
-				activitySet.addAll(simpleActivity.getMonitoringActivityDTO(simpleActivity.getContributionType()));				
-			}		
-		}else{
-			SimpleActivity simpleActivity = (SimpleActivity)firstActivity;
-			if(simpleActivity.getContributionType().length!=0)
-				activitySet.addAll(simpleActivity.getMonitoringActivityDTO(simpleActivity.getContributionType()));
-		}
-		
-		
-		Activity nextActivity = transitionDAO.getNextActivity(firstActivity.getActivityId());
+		Activity nextActivity = learningDesign.getFirstActivity();
 		while(nextActivity!=null){
-			nextActivity.setOrderId(new Integer(order));
-			order++;			
-			Set childActiivities = (Set) activityTree.get(nextActivity.getActivityId());			
-			if(childActiivities.size()!=0){
-				Iterator iterator = childActiivities.iterator();
-				while(iterator.hasNext()){					
-					SimpleActivity simpleActivity= (SimpleActivity)iterator.next();
-					activitySet.addAll(simpleActivity.getMonitoringActivityDTO(simpleActivity.getContributionType()));
-				}
-			}else{
-				SimpleActivity simpleActivity = (SimpleActivity)nextActivity;
-				if(simpleActivity.getContributionType().length!=0)
-					activitySet.addAll(simpleActivity.getMonitoringActivityDTO(simpleActivity.getContributionType()));
-			}
-			
+			order = addActivityToVector(order, activityTree, activityVector, nextActivity);
 			nextActivity = transitionDAO.getNextActivity(nextActivity.getActivityId());	
 		}				
-		return activitySet;
+		return activityVector;
 	}	
 
-    //---------------------------------------------------------------------
+    /**
+     * Used by getOrderedActivityTree(LearningDesign learningDesign)
+     * 
+	 * @param order
+	 * @param activityTree
+	 * @param activityVector
+	 * @param nextActivity
+	 * @return
+	 */
+	private int addActivityToVector(int order, HashMap activityTree, Vector activityVector, Activity nextActivity) {
+		nextActivity.setOrderId(new Integer(order));
+		Set childActivities = (Set) activityTree.get(nextActivity.getActivityId());			
+		if(childActivities.size()!=0){
+			Iterator iterator = childActivities.iterator();
+			while(iterator.hasNext()){					
+				Activity simpleActivity= (Activity)iterator.next();
+				activityVector.add(simpleActivity.getMonitoringActivityDTO());
+			}
+		}else{
+			// we are assuming that this is a simple activity.
+			// the original code for this branch only added it if it had a valid contribution 
+			// type, but the code for the if branch above didn't. Can add it in 
+			// again later if it causes Flash problems.
+			activityVector.add(nextActivity.getMonitoringActivityDTO());
+		}
+		return order + 1;
+	}
+	//---------------------------------------------------------------------
     // Helper Methods - scheduling
     //---------------------------------------------------------------------
     /**

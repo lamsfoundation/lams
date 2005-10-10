@@ -14,9 +14,12 @@
   <form-beans>
 
    <form-bean name="GateForm"  type="org.apache.struts.action.DynaActionForm">
+	<form-property name="gate" type="org.lamsfoundation.lams.learningdesign.GateActivity" />
 	<form-property name="activityId" type="java.lang.Long" />
-	<form-property name="waitingLearners" type="java.lang.Integer" />
+	<form-property name="waitingLearners" type="java.lang.Integer"/>
 	<form-property name="totalLearners" type="java.lang.Integer" />
+	<form-property name="startingTime" type="java.util.Date" />
+	<form-property name="endingTime" type="java.util.Date" />
 </form-bean>
 
   </form-beans>
@@ -64,7 +67,7 @@ http://www.gnu.org/licenses/gpl.txt
       <exception
         key="error.system.monitor"
         type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
         path=".systemError"
         scope="request"
       />
@@ -73,12 +76,17 @@ http://www.gnu.org/licenses/gpl.txt
         path="/TestScheduler.jsp"
         redirect="false"
       />
+      <forward
+        name="success"
+        path="/index.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/gate"
       type="org.lamsfoundation.lams.monitoring.web.GateAction"
       name="GateForm"
-      scope="request"
+      scope="session"
       parameter="method"
       unknown="false"
       validate="false"
@@ -86,7 +94,7 @@ http://www.gnu.org/licenses/gpl.txt
       <exception
         key="error.system.monitor"
         type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
         path=".systemError"
         scope="request"
       />
@@ -103,11 +111,6 @@ http://www.gnu.org/licenses/gpl.txt
       <forward
         name="viewScheduleGate"
         path=".viewScheduleGate"
-        redirect="false"
-      />
-      <forward
-        name="openGate"
-        path=".openGate"
         redirect="false"
       />
     </action>

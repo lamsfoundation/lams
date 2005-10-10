@@ -176,41 +176,39 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     }
     /**
      * Makes a copy of the ScheduleGateActivity for authoring, preview and monitoring enviornment 
-     * 
-     * @param originalActivity The activity that needs to be deep-copied
      * @return ScheduleGateActivity Returns a deep-copy of the originalActivity
      */
-    public static ScheduleGateActivity createCopy(ScheduleGateActivity originalActivity){
+    public Activity createCopy(){
     	ScheduleGateActivity newScheduleGateActivity = new ScheduleGateActivity();
     	
-    	newScheduleGateActivity.setGateActivityLevelId(originalActivity.getGateActivityLevelId());
+    	newScheduleGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
     	newScheduleGateActivity.setGateOpen(new Boolean(false));
     	
-    	newScheduleGateActivity.setGateEndTimeOffset(originalActivity.getGateEndTimeOffset());
-    	newScheduleGateActivity.setGateStartTimeOffset(originalActivity.getGateStartTimeOffset());
-    	newScheduleGateActivity.setGateEndDateTime(originalActivity.getGateEndDateTime());
-		newScheduleGateActivity.setGateStartDateTime(originalActivity.getGateStartDateTime());
+    	newScheduleGateActivity.setGateEndTimeOffset(this.getGateEndTimeOffset());
+    	newScheduleGateActivity.setGateStartTimeOffset(this.getGateStartTimeOffset());
+    	newScheduleGateActivity.setGateEndDateTime(this.getGateEndDateTime());
+		newScheduleGateActivity.setGateStartDateTime(this.getGateStartDateTime());
 		
-    	newScheduleGateActivity.setActivityUIID(originalActivity.getActivityUIID());
-    	newScheduleGateActivity.setDescription(originalActivity.getDescription());
-    	newScheduleGateActivity.setTitle(originalActivity.getTitle());
-    	newScheduleGateActivity.setHelpText(originalActivity.getHelpText());
-    	newScheduleGateActivity.setXcoord(originalActivity.getXcoord());
-    	newScheduleGateActivity.setYcoord(originalActivity.getYcoord());
-    	newScheduleGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newScheduleGateActivity.setActivityUIID(this.getActivityUIID());
+    	newScheduleGateActivity.setDescription(this.getDescription());
+    	newScheduleGateActivity.setTitle(this.getTitle());
+    	newScheduleGateActivity.setHelpText(this.getHelpText());
+    	newScheduleGateActivity.setXcoord(this.getXcoord());
+    	newScheduleGateActivity.setYcoord(this.getYcoord());
+    	newScheduleGateActivity.setActivityTypeId(this.getActivityTypeId());
     	
-    	newScheduleGateActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
-    	newScheduleGateActivity.setApplyGrouping(originalActivity.getApplyGrouping());
-    	newScheduleGateActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	newScheduleGateActivity.setGroupingSupportType(this.getGroupingSupportType());
+    	newScheduleGateActivity.setApplyGrouping(this.getApplyGrouping());
+    	newScheduleGateActivity.setActivityCategoryID(this.getActivityCategoryID());
     	
-    	newScheduleGateActivity.setGrouping(originalActivity.getGrouping());
-    	newScheduleGateActivity.setGroupingUIID(originalActivity.getGroupingUIID());
-    	newScheduleGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());    	
-    	newScheduleGateActivity.setDefineLater(originalActivity.getDefineLater());
+    	newScheduleGateActivity.setGrouping(this.getGrouping());
+    	newScheduleGateActivity.setGroupingUIID(this.getGroupingUIID());
+    	newScheduleGateActivity.setLearningLibrary(this.getLearningLibrary());    	
+    	newScheduleGateActivity.setDefineLater(this.getDefineLater());
     	newScheduleGateActivity.setCreateDateTime(new Date());
-    	newScheduleGateActivity.setRunOffline(originalActivity.getRunOffline());
-    	newScheduleGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
-    	newScheduleGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
+    	newScheduleGateActivity.setRunOffline(this.getRunOffline());
+    	newScheduleGateActivity.setLibraryActivity(this.getLibraryActivity());
+    	newScheduleGateActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
     	
     	return newScheduleGateActivity;
     }

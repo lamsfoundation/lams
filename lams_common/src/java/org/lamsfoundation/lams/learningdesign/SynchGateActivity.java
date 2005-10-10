@@ -116,36 +116,34 @@ public class SynchGateActivity extends GateActivity implements Serializable {
     
     /**
      * Makes a copy of the SynchGateActivity for authoring, preview and monitoring enviornment 
-     * 
-     * @param originalActivity The activity that needs to be deep-copied
      * @return SynchGateActivity Returns a deep-copy of the originalActivity
      */    
-    public static SynchGateActivity createCopy(SynchGateActivity originalActivity){
+    public Activity createCopy() {
     	SynchGateActivity newSynchGateActivity = new SynchGateActivity();
     	
-    	newSynchGateActivity.setGateActivityLevelId(originalActivity.getGateActivityLevelId());
+    	newSynchGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
     	newSynchGateActivity.setGateOpen(new Boolean(false));
     	
-    	newSynchGateActivity.setActivityUIID(originalActivity.getActivityUIID());
-    	newSynchGateActivity.setDescription(originalActivity.getDescription());
-    	newSynchGateActivity.setTitle(originalActivity.getTitle());
-    	newSynchGateActivity.setHelpText(originalActivity.getHelpText());    	
-    	newSynchGateActivity.setXcoord(originalActivity.getXcoord());
-    	newSynchGateActivity.setYcoord(originalActivity.getYcoord());
-    	newSynchGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newSynchGateActivity.setActivityUIID(this.getActivityUIID());
+    	newSynchGateActivity.setDescription(this.getDescription());
+    	newSynchGateActivity.setTitle(this.getTitle());
+    	newSynchGateActivity.setHelpText(this.getHelpText());    	
+    	newSynchGateActivity.setXcoord(this.getXcoord());
+    	newSynchGateActivity.setYcoord(this.getYcoord());
+    	newSynchGateActivity.setActivityTypeId(this.getActivityTypeId());
     	
-    	newSynchGateActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
-    	newSynchGateActivity.setApplyGrouping(originalActivity.getApplyGrouping());
-    	newSynchGateActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	newSynchGateActivity.setGroupingSupportType(this.getGroupingSupportType());
+    	newSynchGateActivity.setApplyGrouping(this.getApplyGrouping());
+    	newSynchGateActivity.setActivityCategoryID(this.getActivityCategoryID());
     	
-    	newSynchGateActivity.setGrouping(originalActivity.getGrouping());
-    	newSynchGateActivity.setGroupingUIID(originalActivity.getGroupingUIID());
-    	newSynchGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());
-    	newSynchGateActivity.setDefineLater(originalActivity.getDefineLater());
+    	newSynchGateActivity.setGrouping(this.getGrouping());
+    	newSynchGateActivity.setGroupingUIID(this.getGroupingUIID());
+    	newSynchGateActivity.setLearningLibrary(this.getLearningLibrary());
+    	newSynchGateActivity.setDefineLater(this.getDefineLater());
     	newSynchGateActivity.setCreateDateTime(new Date());
-    	newSynchGateActivity.setRunOffline(originalActivity.getRunOffline());
-    	newSynchGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
-    	newSynchGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
+    	newSynchGateActivity.setRunOffline(this.getRunOffline());
+    	newSynchGateActivity.setLibraryActivity(this.getLibraryActivity());
+    	newSynchGateActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
     	
     	return newSynchGateActivity;    	
     }

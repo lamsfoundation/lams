@@ -118,36 +118,34 @@ public class PermissionGateActivity extends GateActivity implements Serializable
     }
     /**
      * Makes a copy of the PermissionGateActivity for authoring, preview and monitoring enviornment 
-     * 
-     * @param originalActivity The activity that needs to be deep-copied
      * @return PermissionGateActivity Returns a deep-copy of the originalActivity
      */
-    public static PermissionGateActivity createCopy(PermissionGateActivity originalActivity){
+    public Activity createCopy(){
     	PermissionGateActivity newPermissionGateActivity = new PermissionGateActivity();
     	
     	newPermissionGateActivity.setGateOpen(new Boolean(false));
-    	newPermissionGateActivity.setGateActivityLevelId(originalActivity.getGateActivityLevelId());
+    	newPermissionGateActivity.setGateActivityLevelId(this.getGateActivityLevelId());
     	
-    	newPermissionGateActivity.setActivityUIID(originalActivity.getActivityUIID());
-    	newPermissionGateActivity.setDescription(originalActivity.getDescription());
-    	newPermissionGateActivity.setTitle(originalActivity.getTitle());
-    	newPermissionGateActivity.setHelpText(originalActivity.getHelpText());
-    	newPermissionGateActivity.setXcoord(originalActivity.getXcoord());
-    	newPermissionGateActivity.setYcoord(originalActivity.getYcoord());
-    	newPermissionGateActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newPermissionGateActivity.setActivityUIID(this.getActivityUIID());
+    	newPermissionGateActivity.setDescription(this.getDescription());
+    	newPermissionGateActivity.setTitle(this.getTitle());
+    	newPermissionGateActivity.setHelpText(this.getHelpText());
+    	newPermissionGateActivity.setXcoord(this.getXcoord());
+    	newPermissionGateActivity.setYcoord(this.getYcoord());
+    	newPermissionGateActivity.setActivityTypeId(this.getActivityTypeId());
     	
-    	newPermissionGateActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
-    	newPermissionGateActivity.setApplyGrouping(originalActivity.getApplyGrouping());
-    	newPermissionGateActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	newPermissionGateActivity.setGroupingSupportType(this.getGroupingSupportType());
+    	newPermissionGateActivity.setApplyGrouping(this.getApplyGrouping());
+    	newPermissionGateActivity.setActivityCategoryID(this.getActivityCategoryID());
     	
-    	newPermissionGateActivity.setGrouping(originalActivity.getGrouping());
-    	newPermissionGateActivity.setGroupingUIID(originalActivity.getGroupingUIID());
-    	newPermissionGateActivity.setLearningLibrary(originalActivity.getLearningLibrary());    	
-    	newPermissionGateActivity.setDefineLater(originalActivity.getDefineLater());
+    	newPermissionGateActivity.setGrouping(this.getGrouping());
+    	newPermissionGateActivity.setGroupingUIID(this.getGroupingUIID());
+    	newPermissionGateActivity.setLearningLibrary(this.getLearningLibrary());    	
+    	newPermissionGateActivity.setDefineLater(this.getDefineLater());
     	newPermissionGateActivity.setCreateDateTime(new Date());
-    	newPermissionGateActivity.setRunOffline(originalActivity.getRunOffline());
-    	newPermissionGateActivity.setLibraryActivity(originalActivity.getLibraryActivity());
-    	newPermissionGateActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
+    	newPermissionGateActivity.setRunOffline(this.getRunOffline());
+    	newPermissionGateActivity.setLibraryActivity(this.getLibraryActivity());
+    	newPermissionGateActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());    	
     	return newPermissionGateActivity;
     	
     }

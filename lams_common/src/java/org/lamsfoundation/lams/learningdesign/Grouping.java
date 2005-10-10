@@ -109,6 +109,12 @@ public abstract class Grouping implements Serializable
         this.groupingId = groupingId;
     }
     
+	/** Create a deep copy of the this grouping. It should return the same
+	 * subclass as the grouping being copied 
+	 * @return deep copy of this object
+	 */
+    public abstract Grouping createCopy();
+
     /**
      *            
      *

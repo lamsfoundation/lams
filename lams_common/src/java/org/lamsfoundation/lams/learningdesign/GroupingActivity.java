@@ -124,33 +124,45 @@ public class GroupingActivity extends SimpleActivity implements Serializable
         super.simpleActivityStrategy = new GroupingActivityStrategy(this);
     }
     /**
-     * This function creates a deep copy of the GroupingActivity passed
-     * as an argument. However each time a GroupingActivity is deep copied
-     * it would result in creation of new Groups as well.
-     * @param originalActivity
-     * @return
+     * This function creates a deep copy of the GroupingActivity of the current
+     * object. However each time a GroupingActivity is deep copied
+     * it would result in creation of new Groups as well. 
+     * <p>
+     * Note: the grouping
+     * object will be created here but the calling class will need to insert
+     * it into the database otherwise it won't be persisted (can't easily set
+     * it up to cascade). Call getCreateGrouping() to get the grouping object
+     * to be stored via the session.
+     * 
+     * @return GroupActivity, which is copy of this activity. 
      */
-    public static GroupingActivity createCopy(GroupingActivity originalActivity){
+    public Activity createCopy(){
     	GroupingActivity groupingActivity = new GroupingActivity();
     	
-    	groupingActivity.setActivityUIID(originalActivity.getActivityUIID());
-    	groupingActivity.setDescription(originalActivity.getDescription());
-    	groupingActivity.setTitle(originalActivity.getTitle());
-    	groupingActivity.setHelpText(originalActivity.getHelpText());
-    	groupingActivity.setXcoord(originalActivity.getXcoord());
-    	groupingActivity.setYcoord(originalActivity.getYcoord());    	    
-    	groupingActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	groupingActivity.setActivityUIID(this.getActivityUIID());
+    	groupingActivity.setDescription(this.getDescription());
+    	groupingActivity.setTitle(this.getTitle());
+    	groupingActivity.setHelpText(this.getHelpText());
+    	groupingActivity.setXcoord(this.getXcoord());
+    	groupingActivity.setYcoord(this.getYcoord());    	    
+    	groupingActivity.setActivityTypeId(this.getActivityTypeId());
     	
-    	groupingActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
-    	groupingActivity.setApplyGrouping(originalActivity.getApplyGrouping());
-    	groupingActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	groupingActivity.setGroupingSupportType(this.getGroupingSupportType());
+    	groupingActivity.setApplyGrouping(this.getApplyGrouping());
+    	groupingActivity.setActivityCategoryID(this.getActivityCategoryID());
     	
-    	groupingActivity.setDefineLater(originalActivity.getDefineLater());    	
+    	groupingActivity.setDefineLater(this.getDefineLater());    	
     	groupingActivity.setCreateDateTime(new Date()); 
-    	groupingActivity.setRunOffline(originalActivity.getRunOffline());
-    	groupingActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
+    	groupingActivity.setRunOffline(this.getRunOffline());
+    	groupingActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());    	
+
+    	Grouping currentGrouping = this.getCreateGrouping();
+    	Grouping newGrouping = currentGrouping.createCopy();
+    	groupingActivity.setCreateGrouping(newGrouping);
+
     	return groupingActivity;    	
     }
+    
     public String toString()
     {
         return new ToStringBuilder(this)

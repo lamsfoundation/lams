@@ -43,17 +43,14 @@ public class ChosenGrouping extends Grouping
     }
     
     /**
-     * This method creates a deep copy of the Grouping passed
-     * as an argument.
-     * 
-     * @param originalGrouping The Grouping object to be deep copied
+     * This method creates a deep copy of the Grouping 
      * @return ChosenGrouping The deep copied Grouping object
      */
-    public static ChosenGrouping createCopy(ChosenGrouping originalGrouping)
+    public Grouping createCopy()
     {
     	ChosenGrouping chosenGrouping = new ChosenGrouping();
-    	chosenGrouping.setMaxNumberOfGroups(originalGrouping.getMaxNumberOfGroups());
-    	chosenGrouping.setGroupingUIID(originalGrouping.getGroupingUIID());
+    	chosenGrouping.setMaxNumberOfGroups(this.getMaxNumberOfGroups());
+    	chosenGrouping.setGroupingUIID(this.getGroupingUIID());
     	return chosenGrouping;
     }
 

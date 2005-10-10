@@ -31,10 +31,13 @@ http://www.gnu.org/licenses/gpl.txt
 <context-param>
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
-		/WEB-INF/spring/applicationContext.xml /WEB-INF/spring/toolApplicationContext.xml
-		/WEB-INF/spring/monitoringApplicationContext.xml /WEB-INF/spring/lessonApplicationContext.xml
-		/WEB-INF/spring/authoringApplicationContext.xml	
-		/WEB-INF/spring/dataAccessContext.xml  /WEB-INF/spring/surveyApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/applicationContext.xml
+		classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
+		classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
+  		classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml        					  
+  		classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
+  		classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml
+		classpath*:applicationContext.xml
 	</param-value>
 </context-param>
 
@@ -61,7 +64,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 <filter>
 	<filter-name>HibernateFilter</filter-name>
-	<filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
+	<filter-class>org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter</filter-class>
 	<init-param>
 		<param-name>sessionFactoryBeanName</param-name>
 		<param-value>coreSessionFactory</param-value>
@@ -101,11 +104,11 @@ http://www.gnu.org/licenses/gpl.txt
 	<url-pattern>*.jsp</url-pattern>
 </filter-mapping>
 
-    <!--
-    To use non XDoclet listeners, create a listeners.xml file that
-    contains the additional listeners and place it in your
-    project's merge dir.
-    -->
+  <listener>
+	<listener-class>
+		org.springframework.web.context.ContextLoaderListener
+	</listener-class>
+</listener>	
 
  <!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
@@ -127,12 +130,6 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-
-<servlet>
-	<servlet-name>context</servlet-name>
-	<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
-	<load-on-startup>1</load-on-startup>
-</servlet>
 <servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>

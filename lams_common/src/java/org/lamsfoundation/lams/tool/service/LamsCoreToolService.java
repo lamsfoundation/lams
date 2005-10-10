@@ -20,6 +20,7 @@
 */
 package org.lamsfoundation.lams.tool.service;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -49,7 +50,9 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class LamsCoreToolService implements ILamsCoreToolService,ApplicationContextAware
 {
-    //---------------------------------------------------------------------
+	private static final Logger log = Logger.getLogger(LamsCoreToolService.class);
+
+	//---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
     private ApplicationContext context;
@@ -225,6 +228,15 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
                                               String toolURL) throws LamsToolServiceException
     {
         ToolSession toolSession = this.getToolSessionByActivity(learner,activity);
+        
+        if ( toolSession == null ) {
+        	String error = "Unable to set up url as session does not exist. Activity "
+        		+(activity!=null?activity.getActivityId()+":"+activity.getTitle():"null")
+				+" learner "
+				+(learner!=null?learner.getUserId()+":"+learner.getLogin():"null");
+        	log.error(error);
+			throw new LamsToolServiceException(error);
+        }
         
         return WebUtil.appendParameterToURL(toolURL,
                                             WebUtil.PARAM_TOOL_SESSION_ID,

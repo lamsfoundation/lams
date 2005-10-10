@@ -254,7 +254,7 @@ public abstract class Activity implements Serializable,Nullable {
 		this.transitionFrom = transitionFrom;
 	}
 	
-	public static Object getActivityInstance(int activityType)
+	public static Activity getActivityInstance(int activityType)
 	{
 		switch(activityType){
 			case TOOL_ACTIVITY_TYPE:
@@ -658,6 +658,16 @@ public abstract class Activity implements Serializable,Nullable {
 	    return getActivityTypeId().intValue()==SEQUENCE_ACTIVITY_TYPE;
 	}
 	
+	public boolean isParallelActivity()
+	{
+		return getActivityTypeId().intValue()== PARALLEL_ACTIVITY_TYPE;
+	}
+
+	public boolean isOptionsActivity()
+	{
+		return getActivityTypeId().intValue()== OPTIONS_ACTIVITY_TYPE;
+	}
+
 	public boolean isComplexActivity()
 	{
 		return getActivityTypeId().intValue()== SEQUENCE_ACTIVITY_TYPE || 
@@ -716,15 +726,16 @@ public abstract class Activity implements Serializable,Nullable {
 	    return new ProgressActivityDTO(this.activityId);
 	}
 	
-	
-	public Set getMonitoringActivityDTO(Integer[] contributionType)
+
+	/** Get the monitoring DTO for this activity. Overridden by SimpleActivity
+	 * to include the contribution types */ 
+	public Set getMonitoringActivityDTO()
 	{
 		HashSet dtoSet = new HashSet();
-		for(int i=0;i<contributionType.length;i++){
-			dtoSet.add(new MonitoringActivityDTO(this,contributionType[i]));
-		}
+		dtoSet.add(new MonitoringActivityDTO(this,null));
 		return dtoSet;
 	}
+
 	
 	public AuthoringActivityDTO getAuthoringActivityDTO()
 	{
@@ -733,4 +744,11 @@ public abstract class Activity implements Serializable,Nullable {
 	public LibraryActivityDTO getLibraryActivityDTO(){
 		return new LibraryActivityDTO((ToolActivity)this);
 	}
+	
+	/** Create a deep copy of the this activity. It should return the same
+	 * subclass as the activity being copied 
+	 * @return deep copy of this object
+	 */
+   public abstract Activity createCopy();
+
 }

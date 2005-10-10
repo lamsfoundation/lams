@@ -402,14 +402,13 @@ public class LearningDesign implements Serializable {
 		HashMap parentActivities = new HashMap();
 		Iterator iterator = this.getActivities().iterator();
 		while(iterator.hasNext()){
-			Object object = iterator.next();
-			if(object instanceof ComplexActivity){
-				ComplexActivity complexActivity =(ComplexActivity)object;
+			Activity act = (Activity) iterator.next();
+			if(act.isComplexActivity()){
+				ComplexActivity complexActivity =(ComplexActivity)act;
 				parentActivities.put(complexActivity.getActivityId(),complexActivity.getActivities());
 			}else{
-				Activity activity = (Activity)object;
-				if(activity.getParentActivity()==null)
-					parentActivities.put(activity.getActivityId(),new HashSet());
+				if(act.getParentActivity()==null)
+					parentActivities.put(act.getActivityId(),new HashSet());
 			}
 		}
 		return parentActivities;

@@ -108,36 +108,34 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
     }
     /**
      * Makes a copy of the ParallelActivity for authoring, preview and monitoring enviornment 
-     * 
-     * @param originalActivity The activity that needs to be deep-copied
      * @return ParallelActivity Returns a deep-copy of the originalActivity
      */
-    public static ParallelActivity createCopy(ParallelActivity originalActivity){
+    public Activity createCopy(){
     	
     	ParallelActivity newParallelActivity = new ParallelActivity();
     	
-    	newParallelActivity.setActivityUIID(originalActivity.getActivityUIID());
-    	newParallelActivity.setDescription(originalActivity.getDescription());
-    	newParallelActivity.setTitle(originalActivity.getTitle());
-    	newParallelActivity.setHelpText(originalActivity.getHelpText());
-    	newParallelActivity.setXcoord(originalActivity.getXcoord());
-    	newParallelActivity.setYcoord(originalActivity.getYcoord());
-    	newParallelActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newParallelActivity.setActivityUIID(this.getActivityUIID());
+    	newParallelActivity.setDescription(this.getDescription());
+    	newParallelActivity.setTitle(this.getTitle());
+    	newParallelActivity.setHelpText(this.getHelpText());
+    	newParallelActivity.setXcoord(this.getXcoord());
+    	newParallelActivity.setYcoord(this.getYcoord());
+    	newParallelActivity.setActivityTypeId(this.getActivityTypeId());
     	
-    	newParallelActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
-    	newParallelActivity.setApplyGrouping(originalActivity.getApplyGrouping());
-    	newParallelActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	newParallelActivity.setGroupingSupportType(this.getGroupingSupportType());
+    	newParallelActivity.setApplyGrouping(this.getApplyGrouping());
+    	newParallelActivity.setActivityCategoryID(this.getActivityCategoryID());
     	
-    	newParallelActivity.setGrouping(originalActivity.getGrouping());
-    	newParallelActivity.setLearningLibrary(originalActivity.getLearningLibrary());
-    	newParallelActivity.setGroupingUIID(originalActivity.getGroupingUIID());
+    	newParallelActivity.setGrouping(this.getGrouping());
+    	newParallelActivity.setLearningLibrary(this.getLearningLibrary());
+    	newParallelActivity.setGroupingUIID(this.getGroupingUIID());
     	
-    	newParallelActivity.setDefineLater(originalActivity.getDefineLater());
+    	newParallelActivity.setDefineLater(this.getDefineLater());
     	newParallelActivity.setCreateDateTime(new Date());
-    	newParallelActivity.setRunOffline(originalActivity.getRunOffline());
+    	newParallelActivity.setRunOffline(this.getRunOffline());
     	
-    	newParallelActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
-    	newParallelActivity.setLibraryActivity(originalActivity.getLibraryActivity());		
+    	newParallelActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());    	
+    	newParallelActivity.setLibraryActivity(this.getLibraryActivity());		
     	
     	return newParallelActivity;
     }

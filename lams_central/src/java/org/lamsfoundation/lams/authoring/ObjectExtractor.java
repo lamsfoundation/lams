@@ -218,7 +218,7 @@ public class ObjectExtractor {
 			throw new ObjectExtractorException("activityTypeID missing");
 		}
 		
-		Object activityObject = Activity.getActivityInstance(activityTypeID.intValue());
+		Activity activityObject = Activity.getActivityInstance(activityTypeID.intValue());
 		processActivityType(activityObject,activityDetails);
 		Activity activity =(Activity)activityObject;
 		activity.setActivityTypeId(activityTypeID);
@@ -279,13 +279,13 @@ public class ObjectExtractor {
 		activity.setGroupingSupportType(WDDXProcessor.convertToInteger(activityDetails,"groupingSupportType"));
 		return activity;
 	}	 
-	private  void processActivityType(Object activity, Hashtable activityDetails) 
+	private  void processActivityType(Activity activity, Hashtable activityDetails) 
 			throws WDDXProcessorConversionException, ObjectExtractorException {
-		if(activity instanceof GroupingActivity)
+		if(activity.isGroupingActivity())
 			 buildGroupingActivity((GroupingActivity)activity,activityDetails);
-		else if(activity instanceof ToolActivity)
+		else if(activity.isToolActivity())
 			 buildToolActivity((ToolActivity)activity,activityDetails);
-		else if(activity instanceof GateActivity)
+		else if(activity.isGateActivity())
 			 buildGateActivity(activity,activityDetails);
 		else 			
 			 buildComplexActivity(activity,activityDetails);		

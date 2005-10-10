@@ -47,6 +47,15 @@ public interface IActivityDAO extends IBaseDAO{
 	public Activity getActivityByActivityId(Long activityId);
 	
 	/**
+	 * Returns an object that may be assigned to the Class clasz.
+	 * Returns a true Activity object, rather than the Hibernate CGLIB proxy.
+	 * @param activityId The activityId of the activity
+	 * @param clasz The expected class - must be a subclass of Activity
+	 * @return Activity populated object
+	 */
+	public Activity getActivityByActivityId(Long activityId, Class clasz);
+
+	/**
 	 * @param uiID The internal id (flash generated) of the activity 
 	 * 		  being looked for 
 	 * @param design The learning_design_id of the design 

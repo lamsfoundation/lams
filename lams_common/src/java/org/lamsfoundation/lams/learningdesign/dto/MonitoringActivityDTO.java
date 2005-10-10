@@ -52,7 +52,7 @@ public class MonitoringActivityDTO {
 		this.isRequired = new Boolean(calculateIsRequired(contributionType));
 	}
 	private boolean calculateIsRequired(Integer contributionType){
-		if(contributionType.equals(SimpleActivityStrategy.DEFINE_LATER) ||
+		if(contributionType!=null && contributionType.equals(SimpleActivityStrategy.DEFINE_LATER) ||
 				contributionType.equals(SimpleActivityStrategy.PERMISSION_GATE)||
 				contributionType.equals(SimpleActivityStrategy.CHOSEN_GROUPING))
 			return true;

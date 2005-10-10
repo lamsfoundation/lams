@@ -221,9 +221,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.groupingType = groupingType;
 		this.groupingDTO = groupingDTO;
 	}
-	public AuthoringActivityDTO(Object object){
-		processActivityType(object);
-		Activity activity = (Activity)object;
+	public AuthoringActivityDTO(Activity activity){
+		processActivityType(activity);
 		this.activityID = activity.getActivityId();
 		this.activityUIID = activity.getActivityUIID();
 		this.description = activity.getDescription();
@@ -263,20 +262,20 @@ public class AuthoringActivityDTO extends BaseDTO{
 	
 	
 
-	private  void processActivityType(Object activity){
-		if(activity instanceof GroupingActivity)
+	private  void processActivityType(Activity activity){
+		if(activity.isGroupingActivity())
 			 addGroupingActivityAttributes((GroupingActivity)activity);
-		else if(activity instanceof ToolActivity)
+		else if(activity.isToolActivity())
 			 addToolActivityAttributes((ToolActivity)activity);
-		else if(activity instanceof GateActivity)
+		else if(activity.isGateActivity())
 			 addGateActivityAttributes(activity);
 		else 			
 			 addComplexActivityAttributes(activity);		
 	}
-	private void addComplexActivityAttributes(Object activity){		
-		if(activity instanceof OptionsActivity)
+	private void addComplexActivityAttributes(Activity activity){		
+		if(activity.isOptionsActivity())
 			addOptionsActivityAttributes((OptionsActivity)activity);
-		else if (activity instanceof ParallelActivity)
+		else if (activity.isParallelActivity())
 			addParallelActivityAttributes((ParallelActivity)activity);
 		else
 			addSequenceActivityAttributes((SequenceActivity)activity);

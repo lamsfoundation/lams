@@ -348,9 +348,9 @@ public class LearningDesignDTO extends BaseDTO{
 		ArrayList childActivities = null;
 		Iterator parentIterator = design.getParentActivities().iterator();
 		while(parentIterator.hasNext()){
-			Object object = parentIterator.next();
+			Activity object = (Activity) parentIterator.next();
 			
-			if(object instanceof ComplexActivity){
+			if(object.isComplexActivity()){
 				ComplexActivity complexActivity = (ComplexActivity)object;
 				Iterator childIterator = complexActivity.getActivities().iterator();
 				childActivities = new ArrayList();
@@ -358,11 +358,10 @@ public class LearningDesignDTO extends BaseDTO{
 					Activity activity =(Activity)childIterator.next();
 					childActivities.add(activity.getAuthoringActivityDTO());					
 				}				
-				activities.add(((Activity)complexActivity).getAuthoringActivityDTO());
+				activities.add(complexActivity.getAuthoringActivityDTO());
 				activities.addAll(childActivities);
 			}else{
-				Activity activity = (Activity)object;
-				activities.add(activity.getAuthoringActivityDTO());
+				activities.add(object.getAuthoringActivityDTO());
 			}			
 		}
 		return activities;

@@ -121,35 +121,35 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
               activities);
       super.activityStrategy = new OptionsActivityStrategy(this);
     }
-    public static OptionsActivity createCopy(OptionsActivity originalActivity){
+    public Activity createCopy(){
     	OptionsActivity newOptionsActivity = new OptionsActivity();
     	
     	/** OptionsActivity Specific Attributes */
-    	newOptionsActivity.setMaxNumberOfOptions(originalActivity.getMaxNumberOfOptions());
-    	newOptionsActivity.setMinNumberOfOptions(originalActivity.getMinNumberOfOptions());
-    	newOptionsActivity.setOptionsInstructions(originalActivity.getOptionsInstructions());
+    	newOptionsActivity.setMaxNumberOfOptions(this.getMaxNumberOfOptions());
+    	newOptionsActivity.setMinNumberOfOptions(this.getMinNumberOfOptions());
+    	newOptionsActivity.setOptionsInstructions(this.getOptionsInstructions());
     	
     	/** Generic Activity Attributes */
-    	newOptionsActivity.setActivityUIID(originalActivity.getActivityUIID());
-    	newOptionsActivity.setDescription(originalActivity.getDescription());
-    	newOptionsActivity.setTitle(originalActivity.getTitle());
-    	newOptionsActivity.setHelpText(originalActivity.getHelpText());
-    	newOptionsActivity.setXcoord(originalActivity.getXcoord());
-    	newOptionsActivity.setYcoord(originalActivity.getYcoord());
-    	newOptionsActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newOptionsActivity.setActivityUIID(this.getActivityUIID());
+    	newOptionsActivity.setDescription(this.getDescription());
+    	newOptionsActivity.setTitle(this.getTitle());
+    	newOptionsActivity.setHelpText(this.getHelpText());
+    	newOptionsActivity.setXcoord(this.getXcoord());
+    	newOptionsActivity.setYcoord(this.getYcoord());
+    	newOptionsActivity.setActivityTypeId(this.getActivityTypeId());
     	
-    	newOptionsActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
-    	newOptionsActivity.setApplyGrouping(originalActivity.getApplyGrouping());
-    	newOptionsActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());    	
+    	newOptionsActivity.setGroupingSupportType(this.getGroupingSupportType());
+    	newOptionsActivity.setApplyGrouping(this.getApplyGrouping());
+    	newOptionsActivity.setActivityCategoryID(this.getActivityCategoryID());    	
     	
-    	newOptionsActivity.setGrouping(originalActivity.getGrouping());
-    	newOptionsActivity.setGroupingUIID(originalActivity.getGroupingUIID());
-    	newOptionsActivity.setDefineLater(originalActivity.getDefineLater());
-    	newOptionsActivity.setLearningLibrary(originalActivity.getLearningLibrary());
+    	newOptionsActivity.setGrouping(this.getGrouping());
+    	newOptionsActivity.setGroupingUIID(this.getGroupingUIID());
+    	newOptionsActivity.setDefineLater(this.getDefineLater());
+    	newOptionsActivity.setLearningLibrary(this.getLearningLibrary());
     	newOptionsActivity.setCreateDateTime(new Date());
-    	newOptionsActivity.setRunOffline(originalActivity.getRunOffline());
-    	newOptionsActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
-    	newOptionsActivity.setLibraryActivity(originalActivity.getLibraryActivity());
+    	newOptionsActivity.setRunOffline(this.getRunOffline());
+    	newOptionsActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
+    	newOptionsActivity.setLibraryActivity(this.getLibraryActivity());
     	return newOptionsActivity;
     }
 

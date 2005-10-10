@@ -7,8 +7,9 @@
 package org.lamsfoundation.lams.lesson;
 
 import java.util.Set;
-import org.lamsfoundation.lams.learningdesign.Grouping;
+
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 
 /**
  * A type of Grouping that represents all the Learners in a Lesson. The
@@ -60,6 +61,18 @@ public class LessonClass extends Grouping {
             		" is learner group without group id.");
         
         return staffGroup.getGroupId()!=group.getGroupId();
+    }
+
+    /**
+     * This method creates a deep copy of the LessonClass 
+     * @return LessonClass The deep copied LessonClass object
+     */
+    public Grouping createCopy()
+    {
+    	LessonClass lessonClass = new LessonClass();
+    	lessonClass.staffGroup = this.staffGroup;
+    	lessonClass.lesson = this.lesson;
+    	return lessonClass;
     }
 
 }

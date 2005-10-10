@@ -111,34 +111,32 @@ public class SequenceActivity extends ComplexActivity implements Serializable {
     
     /**
      * Makes a copy of the SequenceActivity for authoring, preview and monitoring enviornment
-     * 
-     * @param originalActivity The activity that needs to be deep-copied
      * @return SequenceActivity Returns a deep-copy of the originalActivity
      */
-    public static SequenceActivity createCopy(SequenceActivity originalActivity){
+    public Activity createCopy(){
     	SequenceActivity newSequenceActivity = new SequenceActivity();
     	
-    	newSequenceActivity.setActivityUIID(originalActivity.getActivityUIID());
-    	newSequenceActivity.setDescription(originalActivity.getDescription());
-    	newSequenceActivity.setTitle(originalActivity.getTitle());
-    	newSequenceActivity.setHelpText(originalActivity.getHelpText());
-    	newSequenceActivity.setXcoord(originalActivity.getXcoord());
-    	newSequenceActivity.setYcoord(originalActivity.getYcoord());
-    	newSequenceActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+    	newSequenceActivity.setActivityUIID(this.getActivityUIID());
+    	newSequenceActivity.setDescription(this.getDescription());
+    	newSequenceActivity.setTitle(this.getTitle());
+    	newSequenceActivity.setHelpText(this.getHelpText());
+    	newSequenceActivity.setXcoord(this.getXcoord());
+    	newSequenceActivity.setYcoord(this.getYcoord());
+    	newSequenceActivity.setActivityTypeId(this.getActivityTypeId());
     	
-    	newSequenceActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
-    	newSequenceActivity.setApplyGrouping(originalActivity.getApplyGrouping());
-    	newSequenceActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
+    	newSequenceActivity.setGroupingSupportType(this.getGroupingSupportType());
+    	newSequenceActivity.setApplyGrouping(this.getApplyGrouping());
+    	newSequenceActivity.setActivityCategoryID(this.getActivityCategoryID());
     	
-    	newSequenceActivity.setGrouping(originalActivity.getGrouping());
-    	newSequenceActivity.setGroupingUIID(originalActivity.getGroupingUIID());
-    	newSequenceActivity.setLearningLibrary(originalActivity.getLearningLibrary());
-    	newSequenceActivity.setDefineLater(originalActivity.getDefineLater());
+    	newSequenceActivity.setGrouping(this.getGrouping());
+    	newSequenceActivity.setGroupingUIID(this.getGroupingUIID());
+    	newSequenceActivity.setLearningLibrary(this.getLearningLibrary());
+    	newSequenceActivity.setDefineLater(this.getDefineLater());
     	newSequenceActivity.setCreateDateTime(new Date());
-    	newSequenceActivity.setRunOffline(originalActivity.getRunOffline());
+    	newSequenceActivity.setRunOffline(this.getRunOffline());
     	
-    	newSequenceActivity.setLibraryActivity(originalActivity.getLibraryActivity());
-		newSequenceActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());    	
+    	newSequenceActivity.setLibraryActivity(this.getLibraryActivity());
+		newSequenceActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());    	
     	
 		return newSequenceActivity;
     }

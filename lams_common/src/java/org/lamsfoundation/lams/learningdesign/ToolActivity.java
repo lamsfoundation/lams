@@ -136,35 +136,34 @@ public class ToolActivity extends SimpleActivity implements Serializable
     /**
      * Makes a copy of the ToolActivity for authoring, preview and monitoring enviornment 
      * 
-     * @param originalActivity The activity that needs to be deep-copied
      * @return ToolActivity Returns a deep-copy of the originalActivity
      */
-    public static ToolActivity createCopy(ToolActivity originalActivity){    	
+    public Activity createCopy(){    	
     	ToolActivity newToolActivity = new ToolActivity();
     	 
-		newToolActivity.setTool(originalActivity.getTool());
-		newToolActivity.setToolContentId(originalActivity.getToolContentId());    	
-		newToolActivity.setActivityUIID(originalActivity.getActivityUIID());
-    	newToolActivity.setDescription(originalActivity.getDescription());
-    	newToolActivity.setTitle(originalActivity.getTitle());
-    	newToolActivity.setHelpText(originalActivity.getHelpText());
-    	newToolActivity.setXcoord(originalActivity.getXcoord());
-    	newToolActivity.setYcoord(originalActivity.getYcoord());
-    	newToolActivity.setActivityTypeId(originalActivity.getActivityTypeId());
+		newToolActivity.setTool(this.getTool());
+		newToolActivity.setToolContentId(this.getToolContentId());    	
+		newToolActivity.setActivityUIID(this.getActivityUIID());
+    	newToolActivity.setDescription(this.getDescription());
+    	newToolActivity.setTitle(this.getTitle());
+    	newToolActivity.setHelpText(this.getHelpText());
+    	newToolActivity.setXcoord(this.getXcoord());
+    	newToolActivity.setYcoord(this.getYcoord());
+    	newToolActivity.setActivityTypeId(this.getActivityTypeId());
     	
-    	newToolActivity.setGroupingSupportType(originalActivity.getGroupingSupportType());
-    	newToolActivity.setApplyGrouping(originalActivity.getApplyGrouping());
-    	newToolActivity.setGrouping(originalActivity.getGrouping());
+    	newToolActivity.setGroupingSupportType(this.getGroupingSupportType());
+    	newToolActivity.setApplyGrouping(this.getApplyGrouping());
+    	newToolActivity.setGrouping(this.getGrouping());
     	
-    	newToolActivity.setGroupingUIID(originalActivity.getGroupingUIID());
-    	newToolActivity.setOrderId(originalActivity.getOrderId());
-    	newToolActivity.setDefineLater(originalActivity.getDefineLater());
-    	newToolActivity.setLearningLibrary(originalActivity.getLearningLibrary());
+    	newToolActivity.setGroupingUIID(this.getGroupingUIID());
+    	newToolActivity.setOrderId(this.getOrderId());
+    	newToolActivity.setDefineLater(this.getDefineLater());
+    	newToolActivity.setLearningLibrary(this.getLearningLibrary());
     	newToolActivity.setCreateDateTime(new Date());
-    	newToolActivity.setRunOffline(originalActivity.getRunOffline());
-    	newToolActivity.setActivityCategoryID(originalActivity.getActivityCategoryID());
-    	newToolActivity.setLibraryActivityUiImage(originalActivity.getLibraryActivityUiImage());
-    	newToolActivity.setLibraryActivity(originalActivity.getLibraryActivity());
+    	newToolActivity.setRunOffline(this.getRunOffline());
+    	newToolActivity.setActivityCategoryID(this.getActivityCategoryID());
+    	newToolActivity.setLibraryActivityUiImage(this.getLibraryActivityUiImage());
+    	newToolActivity.setLibraryActivity(this.getLibraryActivity());
     	return newToolActivity;
     }    
     

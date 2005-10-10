@@ -71,27 +71,34 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 			if ( activityType != null ) {
 				switch ( activityType.intValue() ) {
 					case Activity.TOOL_ACTIVITY_TYPE: 
-							return (ToolActivity) super.find(ToolActivity.class,activityId);
+							return getActivityByActivityId(activityId,ToolActivity.class);
 					case Activity.GROUPING_ACTIVITY_TYPE: 
-							return (GroupingActivity) super.find(GroupingActivity.class,activityId);
+							return getActivityByActivityId(activityId,GroupingActivity.class);
 					case Activity.SYNCH_GATE_ACTIVITY_TYPE: 
-							return (SynchGateActivity) super.find(SynchGateActivity.class,activityId);
+							return getActivityByActivityId(activityId,SynchGateActivity.class);
 					case Activity.SCHEDULE_GATE_ACTIVITY_TYPE: 
-							return (ScheduleGateActivity) super.find(ScheduleGateActivity.class,activityId);
+							return getActivityByActivityId(activityId,ScheduleGateActivity.class);
 					case Activity.PERMISSION_GATE_ACTIVITY_TYPE: 
-							return (PermissionGateActivity) super.find(PermissionGateActivity.class,activityId);
+							return getActivityByActivityId(activityId,PermissionGateActivity.class);
 					case Activity.PARALLEL_ACTIVITY_TYPE: 
-							return (ParallelActivity) super.find(ParallelActivity.class,activityId);
+							return getActivityByActivityId(activityId,ParallelActivity.class);
 					case Activity.OPTIONS_ACTIVITY_TYPE: 
-							return (OptionsActivity) super.find(OptionsActivity.class,activityId);
+							return getActivityByActivityId(activityId,OptionsActivity.class);
 					case Activity.SEQUENCE_ACTIVITY_TYPE: 
-							return (SequenceActivity) super.find(SequenceActivity.class,activityId);
+							return getActivityByActivityId(activityId,SequenceActivity.class);
 					default: break; 
 				}
 			}
 			throw new DataRetrievalFailureException("Unable to get activity as the activity type is unknown or missing. Activity type is "+activityType);
 		}
 		return null;		
+	}
+
+	/* 
+	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#getActivityById(java.lang.Long)
+	 */
+	public Activity getActivityByActivityId(Long activityId, Class clasz) {
+		return (Activity) super.find(clasz,activityId);
 	}
 
 	/* 

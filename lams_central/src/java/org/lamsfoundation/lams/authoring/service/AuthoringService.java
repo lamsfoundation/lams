@@ -36,21 +36,10 @@ import org.lamsfoundation.lams.authoring.ObjectExtractor;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
-import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
-import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
-import org.lamsfoundation.lams.learningdesign.OptionsActivity;
-import org.lamsfoundation.lams.learningdesign.ParallelActivity;
-import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
-import org.lamsfoundation.lams.learningdesign.RandomGrouping;
-import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
-import org.lamsfoundation.lams.learningdesign.SequenceActivity;
-import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
@@ -66,9 +55,9 @@ import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.themes.dto.CSSThemeDTO;
-import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
-import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
+import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
@@ -281,7 +270,8 @@ public class AuthoringService implements IAuthoringService {
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer, org.lamsfoundation.lams.usermanagement.User)
 	 */
 	public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign,Integer copyType,User user){
-		WorkspaceFolder runSequencesFolder = workspaceFolderDAO.getRunSequencesFolderForUser(user.getUserId());
+		Integer userId = user.getUserId();
+		WorkspaceFolder runSequencesFolder = workspaceFolderDAO.getRunSequencesFolderForUser(userId);
 		return copyLearningDesign(originalLearningDesign,copyType,user, runSequencesFolder);
 	}
 	
@@ -334,7 +324,7 @@ public class AuthoringService implements IAuthoringService {
     	oldParentActivities.addAll(originalLearningDesign.getParentActivities());    	    	
     	Iterator iterator = oldParentActivities.iterator();    	
     	while(iterator.hasNext()){
-    		Object parentActivity = iterator.next();
+    		Activity parentActivity = (Activity)iterator.next();
     		Activity newParentActivity = getActivityCopy(parentActivity);
     		newParentActivity.setLearningDesign(newLearningDesign);
     		activityDAO.insert(newParentActivity);
@@ -391,70 +381,19 @@ public class AuthoringService implements IAuthoringService {
      * @param activity The object to be deep-copied
      * @return Activity The new deep-copied Activity object
      */
-    private Activity getActivityCopy(Object activity){
-    	if(activity instanceof GroupingActivity){    		
-    		GroupingActivity newGroupingActivity = GroupingActivity.createCopy((GroupingActivity)activity);
-    		createGroupingForGroupingActivity(newGroupingActivity,(GroupingActivity)activity);
+    private Activity getActivityCopy(Activity activity){
+    	if ( Activity.GROUPING_ACTIVITY_TYPE == activity.getActivityTypeId().intValue() ) {
+    		GroupingActivity newGroupingActivity = (GroupingActivity) activity.createCopy();
+    		// now we need to manually add the grouping to the session, as we can't easily
+    		// set up a cascade
+    		Grouping grouping = newGroupingActivity.getCreateGrouping();
+    		if ( grouping != null )
+    			groupingDAO.insert(grouping);
     		return newGroupingActivity;
     	}
-    	else if(activity instanceof ComplexActivity)
-    		return createComplexActivityCopy(activity);
-    	else if(activity instanceof GateActivity)
-    		return createGateActivityCopy(activity);
     	else 
-    		return ToolActivity.createCopy((ToolActivity)activity);    	
+    		return activity.createCopy();    	
     } 
-    /**
-     * This function creates a new Grouping for the new GroupingActivity
-     * based on the grouping type of the old GroupingActivity from
-     * which it has been deep-copied.
-     * 
-     * @param groupingActivity The new GroupingActivity
-     * @param oldActivity The old GroupingActivity
-     */
-    private void createGroupingForGroupingActivity(GroupingActivity groupingActivity, GroupingActivity oldActivity){
-    	Grouping grouping = oldActivity.getCreateGrouping();
-    	
-    	if(grouping.getGroupingTypeId()==Grouping.CHOSEN_GROUPING_TYPE){
-    		ChosenGrouping chosenGrouping = ChosenGrouping.createCopy((ChosenGrouping)grouping);    		
-    		groupingDAO.insert(chosenGrouping);
-    		groupingActivity.setCreateGrouping(chosenGrouping);
-    	}
-    	else{
-    		RandomGrouping randomGrouping = RandomGrouping.createCopy((RandomGrouping)grouping);
-    		groupingDAO.insert(randomGrouping);
-    		groupingActivity.setCreateGrouping(randomGrouping);
-    	}    	
-    }
-    /**
-     * This function creates a deep copy of ComplexActivity object
-     * 
-     * @param activity The object to be deep copied
-     * @return Activity The deep-copied object
-     */
-    private Activity createComplexActivityCopy(Object activity){    	    	
-    	if(activity instanceof OptionsActivity)
-    		return OptionsActivity.createCopy((OptionsActivity)activity);
-    	else if (activity instanceof ParallelActivity)
-    		return ParallelActivity.createCopy((ParallelActivity)activity);
-    	else
-    		return SequenceActivity.createCopy((SequenceActivity)activity);
-    	
-    }
-    /**
-     * This function creates a deep copy of the GateActivity object
-     *  
-     * @param activity The object to be deep copied
-     * @return Activity The deep-copied object
-     */
-    private Activity createGateActivityCopy(Object activity){
-    	if(activity instanceof ScheduleGateActivity)
-    		return ScheduleGateActivity.createCopy((ScheduleGateActivity)activity);
-    	else if (activity instanceof PermissionGateActivity)
-    		return PermissionGateActivity.createCopy((PermissionGateActivity)activity);
-    	else
-    		return SynchGateActivity.createCopy((SynchGateActivity)activity);
-    }
     /**
      * Returns a set of child activities for the given parent activitity
      * 
