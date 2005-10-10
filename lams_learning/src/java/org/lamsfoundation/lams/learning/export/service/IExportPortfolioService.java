@@ -30,18 +30,15 @@
 package org.lamsfoundation.lams.learning.export.service;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.Vector;
 
-import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.learning.export.Portfolio;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.learning.export.Portfolio;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
 /**
  * @author mtruong
  *
@@ -69,9 +66,9 @@ public interface IExportPortfolioService {
 	
 	public Portfolio[] exportPortfolioForTeacher(Lesson lesson);
 	
-	public Portfolio[] exportPortfolioForStudent(LearnerProgress learnerProgress, User user, boolean anonymity);
+	//public Portfolio[] exportPortfolioForStudent(LearnerProgress learnerProgress, User user, boolean anonymity);
 	
-	public Portfolio[] exportPortfolioForStudent(Lesson lesson, User user, boolean anonymity);
+	//public Portfolio[] exportPortfolioForStudent(Lesson lesson, User user, boolean anonymity);
 	
 	public Portfolio[] exportPortfolioForStudent(Long learnerProgressId, User user, boolean anonymity);
 	
@@ -83,7 +80,7 @@ public interface IExportPortfolioService {
 
 	public Vector getOrderedActivityList(LearningDesign learningDesign);
 	
-	public Vector getOrderedActivityList(LearnerProgress learnerProgress);
+	//public Vector getOrderedActivityList(LearnerProgress learnerProgress);
 	
 	/** 
 	 * Returns the ordered activity list containing the list of activities 

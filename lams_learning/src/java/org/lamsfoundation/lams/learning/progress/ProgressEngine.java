@@ -167,14 +167,17 @@ public class ProgressEngine
         
         if (parent != null)
         {
-            if(!(parent instanceof ComplexActivity))
+            if(!(parent.isComplexActivity()))
                 throw new ProgressException("Parent activity is always expected" +
                 		" to the complex activity. But activity type"+
                 		parent.getActivityTypeId()+" has been found");
             //move to next activity within parent if not all children are completed.
-            if (!((ComplexActivity)parent).areChildrenCompleted(learnerProgress))
+            
+            // TODO make sure we really have a complex activity, not a CGLIB proxy of activity.
+            ComplexActivity complexParent = (ComplexActivity)parent;
+            if (!complexParent.areChildrenCompleted(learnerProgress))
             {
-                Activity nextActivity = ((ComplexActivity)parent).getNextActivityByParent(completedActivity);
+                Activity nextActivity = complexParent.getNextActivityByParent(completedActivity);
                 
                 
                 if (!isNextActivityValid(nextActivity))

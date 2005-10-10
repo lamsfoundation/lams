@@ -24,8 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.test.AbstractLamsTestCase;
-
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -34,12 +32,14 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
@@ -66,6 +66,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     private IUserManagementService usermanageService;
     private ILessonDAO lessonDao; 
     private ILearnerProgressDAO learnerProgressDao;
+    private IActivityDAO activityDao;
     private IToolSessionDAO toolSessionDao;
     //---------------------------------------------------------------------
     // Testing Data - Constants
@@ -101,7 +102,7 @@ public class TestLearnerService extends AbstractLamsTestCase
     private static final long TEST_SQNA_ACTIVITY_UIID = 25;
     private static final long TEST_SCHEDULE_GATE_ACTIVITY_UIID = 27;
     private static final long TEST_PERMISSION_GATE_ACTIVITY_UIID = 28;
-    private static final String HOST="http://localhost:8080/lams_learning";
+    private static final String HOST="http://localhost:8080/lams/learning";
     private static final String LOAD_TOOL_URL="/LoadToolActivity.do";
     private static final String GATE_URL="/gate.do";
     private static final String PARAM_ACTIVITY_ID="?activityId=";
@@ -117,6 +118,7 @@ public class TestLearnerService extends AbstractLamsTestCase
         lessonDao = (LessonDAO)this.context.getBean("lessonDAO");
         learnerProgressDao = (LearnerProgressDAO)this.context.getBean("learnerProgressDAO");
         toolSessionDao = (ToolSessionDAO)this.context.getBean("toolSessionDAO");
+        activityDao = (IActivityDAO)this.context.getBean("activityDAO");
         
         testUser = usermanageService.getUserById(TEST_USER_ID);
         testLesson = lessonDao.getLesson(Test_Lesson_ID);
@@ -140,19 +142,12 @@ public class TestLearnerService extends AbstractLamsTestCase
     }
     protected String[] getContextConfigLocation()
     {
-        return new String[] { "classpath:/org/lamsfoundation/lams/localApplicationContext.xml",
-                "classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-                "classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
-                "classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml",
-                "classpath:/org/lamsfoundation/lams/tool/survey/applicationContext.xml"};
-
-/*        return new String[] { "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-  			  				  "/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
-  			  				"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml",
-                              "/org/lamsfoundation/lams/tool/survey/dataAccessContext.xml",
-                              "/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml",          					  
-        					  "applicationContext.xml",
-    			  			  "/WEB-INF/spring/learningApplicationContext.xml"}; */
+        return new String[] { 
+        		"/org/lamsfoundation/lams/localApplicationContext.xml",
+        		"/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+        		"/org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+        		"/org/lamsfoundation/lams/tool/survey/applicationContext.xml",            
+    			"/org/lamsfoundation/lams/learning/learningApplicationContext.xml"};
     }
     
     public void testJoinLesson() throws ProgressException,LamsToolServiceException
@@ -160,18 +155,23 @@ public class TestLearnerService extends AbstractLamsTestCase
         learnerService.joinLesson(testUser,testLesson);
         
         testProgress=learnerProgressDao.getLearnerProgressByLearner(testUser,testLesson);
-        
         assertNotNull(testProgress);
-        assertNotNull("verify next activity",testProgress.getNextActivity());
-        assertEquals("verify id of next activity-survey",6,testProgress.getNextActivity().getActivityUIID().intValue());
-        assertNotNull("verify current activity",testProgress.getCurrentActivity());
-        assertEquals("verify id of current activity-survey",6,testProgress.getCurrentActivity().getActivityUIID().intValue());
+
+        // get the next activity, and get it by its proper class so we can analyse it!
+        Activity nextActivity = testProgress.getNextActivity();
+        Activity currentActivity = testProgress.getCurrentActivity();
+        assertNotNull("verify next activity",nextActivity);
+        assertEquals("verify id of next activity-survey",6,nextActivity.getActivityUIID().intValue());
+        assertNotNull("verify current activity",currentActivity);
+        assertEquals("verify id of current activity-survey",6,currentActivity.getActivityUIID().intValue());
         assertEquals("verify attempted activity",1,testProgress.getAttemptedActivities().size());
         assertEquals("verify completed activity",0,testProgress.getCompletedActivities().size());
+        
+        ToolActivity nextToolActivity = (ToolActivity) activityDao.getActivityByActivityId(nextActivity.getActivityId());
         assertNotNull("verify correspondent tool session for next activity",
-                      ((ToolActivity)testProgress.getNextActivity()).getToolSessions());
+                      nextToolActivity.getToolSessions());
         assertEquals("verify number of tool sessions created",1,
-                     ((ToolActivity)testProgress.getNextActivity()).getToolSessions().size());
+        				nextToolActivity.getToolSessions().size());
     }
 
 
@@ -184,6 +184,8 @@ public class TestLearnerService extends AbstractLamsTestCase
         assertNotNull("verify the existance of tool session",toolSession);
         assertEquals("verify tool session state",ToolSession.ENDED_STATE,toolSession.getToolSessionStateId());
         
+        System.out.println("HOST+GATE_URL+PARAM_ACTIVITY_ID+TEST_SYNCHGATE_ACTIVITY_ID+&progressId=1:  "+HOST+GATE_URL+PARAM_ACTIVITY_ID+TEST_SYNCHGATE_ACTIVITY_ID+"&progressId=1");
+        System.out.println("urlForNextActivity:  "+urlForNextActivity);
         assertEquals("verify the returned url",HOST+GATE_URL+PARAM_ACTIVITY_ID+TEST_SYNCHGATE_ACTIVITY_ID+"&progressId=1",urlForNextActivity);
         
     }

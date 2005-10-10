@@ -33,7 +33,6 @@ import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.action.ActivityAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -82,7 +81,7 @@ public class ActivityMapping implements Serializable
         //String strutsAction = getActivityAction(activity, progress);
         String strutsAction = this.activityMappingStrategy.getActivityAction(activity,
                                                                              progress);
-        if (activity instanceof ToolActivity)
+        if (activity.isToolActivity())
         {
             // always use redirect false for a ToolActivity as ToolDisplayActivity
             // does it's own redirect
@@ -216,7 +215,7 @@ public class ActivityMapping implements Serializable
                 // display next activity
                 activityURL = this.getActivityURL(progress.getNextActivity(),
                                                   progress);
-                if (progress.getPreviousActivity() instanceof ParallelActivity)
+                if (progress.getPreviousActivity().isParallelActivity())
                 {
                     // if previous activity was a parallel activity then we need to
                     // clear frames.
@@ -327,11 +326,11 @@ public class ActivityMapping implements Serializable
                                                       Activity activity)
     {
 
-        if (activity instanceof ToolActivity)
+        if (activity.isToolActivity())
         {
             return getLearnerToolURL(((ToolActivity) activity), learner);
         }
-        else if (activity instanceof GroupingActivity)
+        else if (activity.isGroupingActivity())
             //TODO need to be changed when group action servlet is done
             return getActivityURL(activity, null);
 

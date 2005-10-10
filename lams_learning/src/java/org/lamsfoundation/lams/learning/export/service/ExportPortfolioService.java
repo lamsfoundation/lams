@@ -27,43 +27,34 @@
  */
 package org.lamsfoundation.lams.learning.export.service;
 
-import java.util.Set;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
-
+import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
+import org.lamsfoundation.lams.learning.export.Portfolio;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.SimpleActivity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
-
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.Tool;
-import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
-
-import org.lamsfoundation.lams.util.WebUtil;
-
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
-
-import org.lamsfoundation.lams.learning.export.Portfolio;
-import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
-
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
@@ -129,7 +120,9 @@ public class ExportPortfolioService implements IExportPortfolioService {
     	return portfolios;
 	}
 	
-	/** returns a Portfolio array , change from void to Portfolio[]*/
+	/* returns a Portfolio array , change from void to Portfolio[]
+	 *  Not used currently - was having problems with lazy initialisation. Delete once export
+	 * portfolio is working.
 	public Portfolio[] exportPortfolioForStudent(LearnerProgress learnerProgress, User user, boolean anonymity)
 	{
 		if (learnerProgress == null || user == null)
@@ -153,7 +146,9 @@ public class ExportPortfolioService implements IExportPortfolioService {
     	
 		
 	}
-	
+	*/
+	/*  Not used currently - was having problems with lazy initialisation. Delete once export
+	 * portfolio is working.
 	public Portfolio[] exportPortfolioForStudent(Lesson lesson, User user, boolean anonymity)
 	{
 		if (lesson == null || user == null)
@@ -178,7 +173,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
     	
 		
 	}
-	
+	*/
 	public Portfolio[] exportPortfolioForStudent(Long learnerProgressId, User user, boolean anonymity)
 	{
 		if (learnerProgressId == null || user == null)
@@ -305,45 +300,36 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		}
 		HashMap activityTree = learningDesign.getActivityTree();				
 		Vector v = new Vector();
-		Activity firstActivity = learningDesign.getFirstActivity();
-		if(firstActivity.isComplexActivity()){			
-			ComplexActivity complexActivity = (ComplexActivity)firstActivity;			
-			Iterator childIterator = complexActivity.getActivities().iterator();
-			while(childIterator.hasNext()){
-				//SimpleActivity simpleActivity= (SimpleActivity)childIterator.next();
-				//v.add(simpleActivity);	
-				
-				Activity simpleActivity= (Activity)childIterator.next();
-				v.add(simpleActivity);
-			}		
-		}else{
-			SimpleActivity simpleActivity = (SimpleActivity)firstActivity;
-			v.add(simpleActivity);
-		}
+		Activity nextActivity = learningDesign.getFirstActivity();
 		
-		Activity nextActivity = transitionDAO.getNextActivity(firstActivity.getActivityId());
 		while(nextActivity!=null){
-			Set childActivities = (Set) activityTree.get(nextActivity.getActivityId());			
-			if(childActivities.size()!=0){
-				Iterator iterator = childActivities.iterator();
-				while(iterator.hasNext()){					
-					/*SimpleActivity simpleActivity= (SimpleActivity)iterator.next();
-					v.add(simpleActivity);*/
-					Activity simpleActivity= (Activity)iterator.next();
-					v.add(simpleActivity);
-				}
-			}else{
-				/*SimpleActivity simpleActivity = (SimpleActivity)nextActivity;
-				v.add(simpleActivity);*/
-			
-				v.add(nextActivity);
-			}
-			
+			addActivityToVector(activityTree, v, nextActivity);
 			nextActivity = transitionDAO.getNextActivity(nextActivity.getActivityId());	
 		}				
 		return v;
 	}
+	
+	/**
+	 * Used by getOrderedActivityList(LearningDesign)
+	 * 
+	 * @param activityTree
+	 * @param v
+	 * @param nextActivity
+	 */
+	private void addActivityToVector(HashMap activityTree, Vector v, Activity activity) {
+		Set childActivities = (Set) activityTree.get(activity.getActivityId());			
+		if(childActivities.size()!=0){
+			// must have been a complex activity
+			v.addAll(childActivities);
+		}else{
+			// must be a simple activity
+			v.add(activity);
+		}
+	}
 
+
+	/* Not used currently - was having problems with lazy initialisation. Delete once export
+	 * portfolio is working.
 	public Vector getOrderedActivityList(LearnerProgress learnerProgress)
 	{
 		if (learnerProgress == null)
@@ -352,11 +338,11 @@ public class ExportPortfolioService implements IExportPortfolioService {
 			throw new ExportPortfolioException(error);
 		}
 		Set activitySet = learnerProgress.getCompletedActivities();
-	/*	if (activitySet.size() == 0)
-		{
-			String error="Cannot export your portfolio. You have not completed any activities yet.";
-			throw new ExportPortfolioException(error);
-		} */
+		//if (activitySet.size() == 0)
+		//{
+		//	String error="Cannot export your portfolio. You have not completed any activities yet.";
+		//	throw new ExportPortfolioException(error);
+		//}
 		TreeSet sortedActivities = new TreeSet(new ActivityOrderComparator());
     	sortedActivities.addAll(activitySet);
     	
@@ -377,7 +363,9 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	
 		return v;
 	}
+	*/
 	
+
 	public Vector getOrderedActivityList(Long learnerProgressId)
 	{
 		if (learnerProgressId == null)

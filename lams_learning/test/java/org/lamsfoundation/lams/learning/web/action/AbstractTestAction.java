@@ -44,9 +44,7 @@ public class AbstractTestAction extends AbstractLamsStrutsTestCase {
     {
         return "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml "
   			   +"/org/lamsfoundation/lams/tool/toolApplicationContext.xml "
-  			   +"/org/lamsfoundation/lams/learningdesign/learningDesignApplicationContext.xml "
-  			   +"/org/lamsfoundation/lams/localapplicationContext.xml "
-  			   +"/WEB-INF/spring/learningApplicationContext.xml";
+  			   +"/org/lamsfoundation/lams/localApplicationContext.xml ";
     }
     /**
      * @see org.lamsfoundation.lams.AbstractLamsStrutsTestCase#getHibernateSessionFactoryBeanName()

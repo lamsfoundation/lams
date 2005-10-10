@@ -24,13 +24,6 @@ package org.lamsfoundation.lams.learning.web.util;
 import java.io.Serializable;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
-import org.lamsfoundation.lams.learningdesign.GateActivity;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
-import org.lamsfoundation.lams.learningdesign.OptionsActivity;
-import org.lamsfoundation.lams.learningdesign.ParallelActivity;
-import org.lamsfoundation.lams.learningdesign.SimpleActivity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
@@ -48,28 +41,29 @@ public class ActivityMappingStrategy implements Serializable {
 	protected String getActivityAction(Activity activity, LearnerProgress progress) {
 		String strutsAction = null;
 		
-		if (activity instanceof ComplexActivity) 
-		{
-		    if (activity instanceof ParallelActivity) 
+		if ( activity.isComplexActivity() ) {
+			if ( activity.isParallelActivity() )
 		        strutsAction = "/DisplayParallelActivity.do";
-		    else if (activity instanceof OptionsActivity) 
+		    else if (activity.isOptionsActivity()) 
 		        strutsAction = "/DisplayOptionsActivity.do";
 		}
-		else if (activity instanceof SimpleActivity) 
+		else // should be a simple activity 
 		{
-			if (activity instanceof GroupingActivity) 
+			if ( activity.isGroupingActivity()) {
 			    strutsAction = "/grouping.do?";
-			if (activity instanceof GateActivity) {
+			} 
+			else if (activity.isGateActivity()) {
 			    strutsAction = "/gate.do";
 				// not completed so return wait URL
 			}
-			if (activity instanceof ToolActivity) 
+			else if (activity.isToolActivity()) { 
 			    strutsAction = "/LoadToolActivity.do";
 				//strutsAction = "/DisplayToolActivity.do";
+			}
 		}
 		return strutsAction;
 	}
-	
+
 	/**
 	 * Returns the struts action for displaying the parallel wait.
 	 */

@@ -53,8 +53,7 @@ http://www.gnu.org/licenses/gpl.txt
 	<target name="usage">
 		<echo message="" />
 		<echo message="${name} build file" />
-		<echo
-			message="------------------------------------------------------" />
+		<echo message="------------------------------------------------------" />
 		<echo message="" />
 		<echo message="Among the available targets are:" />
 		<echo message="" />
@@ -292,8 +291,8 @@ http://www.gnu.org/licenses/gpl.txt
 				<pathelement location="${build.classes.test}" />
 				<pathelement location="${conf.hibernate.mapping.dir}" />
 				<pathelement location="${conf.web.dir}" />
-				<path refid="project.classpath" />
 				<path refid="surveytool.classpath" />
+				<path refid="project.classpath" />
 			</classpath>
 		</junit>
 	</target>
