@@ -154,7 +154,7 @@
 			    <echo message="Run the schema export for all hbm.xml files in ${conf.hibernate.mapping.dir}/hbm"/>
 				<taskdef
 					name="schemaexport"
-					classname="net.sf.hibernate.tool.hbm2ddl.SchemaExportTask"
+					classname="org.hibernate.tool.hbm2ddl.SchemaExportTask"
 					classpathref="schemaexport.classpath"
 					>
 				</taskdef>

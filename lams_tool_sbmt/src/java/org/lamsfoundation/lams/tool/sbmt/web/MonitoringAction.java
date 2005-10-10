@@ -189,7 +189,8 @@ public class MonitoringAction extends DispatchAction {
 		List report = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		request.setAttribute("userReport",report);
 		request.setAttribute(SbmtConstants.TOOL_SESSION_ID,sessionID);
-		request.setAttribute("userID",userID);		
+		UserDTO userDto = submitFilesService.getUserDetails(userID);
+		request.setAttribute("user",userDto);
 		return mapping.findForward("userMarks");
 	}
 	public ActionForward viewAllMarks(ActionMapping mapping,

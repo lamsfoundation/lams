@@ -3,10 +3,14 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app >
- <context-param>
+ <display-name>LAMS</display-name>
+
+<description>Learning Activity Management System</description>
+<context-param>
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
 		classpath:/org/lamsfoundation/lams/applicationContext.xml
+		classpath:/org/lamsfoundation/lams/commonContext.xml
 		classpath:/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
 		classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml	
@@ -22,17 +26,28 @@
     <filter>
     <filter-name>hibernateFilter</filter-name>
     <filter-class>
-      org.springframework.orm.hibernate.support.OpenSessionInViewFilter
+      org.springframework.orm.hibernate3.support.OpenSessionInViewFilter
     </filter-class>
     <init-param>
       <param-name>sessionFactoryBeanName</param-name>
       <param-value>sbmtSessionFactory</param-value>
     </init-param>
    </filter>
+   <!-- System session filter -->
+   <filter>
+       <filter-name>SystemSessionFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.session.SystemSessionFilter
+         </filter-class>
+     </filter>
 
     <filter-mapping>
     <filter-name>hibernateFilter</filter-name>
      <url-pattern>*.do</url-pattern>
+  </filter-mapping>
+    <filter-mapping>
+    <filter-name>SystemSessionFilter</filter-name>
+     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
     <!--
@@ -118,12 +133,10 @@
    <!ELEMENT mime-mapping (extension, mime-type)>
    -->
 
-   <!--
-   To specify error pages, create a file named error-pages.xml, put it in your project's mergedir.
-   Organize error-pages.xml following this DTD slice:
-
-   <!ELEMENT error-page ((error-code | exception-type), location)>
-   -->
+  <error-page>
+	<error-code>403</error-code>
+	<location>/403.html</location>
+</error-page>
 
 <!--  ======================================================== -->	
 <!-- Struts Tag Library Descriptors -->
@@ -202,24 +215,80 @@
     <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
 </taglib>
 
-   <!--
-   To set up security settings for your web app, create a file named web-security.xml, put it in your project's mergedir.
-   Organize web-security.xml following this DTD slice:
+  	<!--  Security Constraint -->
+	<security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>LEARNER</role-name>
+    		<role-name>TEACHER</role-name>
+    		<role-name>STAFF</role-name>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-   <!ELEMENT security-constraint (display-name?, web-resource-collection+, auth-constraint?, user-data-constraint?)>
-   <!ELEMENT web-resource-collection (web-resource-name, description?, url-pattern*, http-method*)>
-   <!ELEMENT web-resource-name (#PCDATA)>
-   <!ELEMENT url-pattern (#PCDATA)>
-   <!ELEMENT http-method (#PCDATA)>
-   <!ELEMENT user-data-constraint (description?, transport-guarantee)>
-   <!ELEMENT transport-guarantee (#PCDATA)>
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Authoring Update</web-resource-name>
+		    <url-pattern>/authoring.do</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
+		    <url-pattern>/monitoring.do</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>STAFF</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-   <!ELEMENT login-config (auth-method?, realm-name?, form-login-config?)>
-   <!ELEMENT auth-method (#PCDATA)>
-   <!ELEMENT realm-name (#PCDATA)>
-   <!ELEMENT form-login-config (form-login-page, form-error-page)>
-   <!ELEMENT form-login-page (#PCDATA)>
-   <!ELEMENT form-error-page (#PCDATA)>
-   -->
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Adminstrator Content</web-resource-name>
+		    <url-pattern>/admin.do</url-pattern> 
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>ADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>LAMS System Adminstrator Content</web-resource-name>
+		    <url-pattern>/sysadmin.do</url-pattern> 
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+	<!--  some combine role security setting -->
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Download Files</web-resource-name>
+		    <url-pattern>/download/</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>STAFF</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
+
+	<!--  Login Configuration -->
+  	<login-config>
+   		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+   		<form-login-config>
+    		<form-login-page>/login.jsp</form-login-page>
+   		</form-login-config>
+   	</login-config>
 
 </web-app>
