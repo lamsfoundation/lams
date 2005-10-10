@@ -55,9 +55,6 @@ public class SystemSessionFilter implements Filter {
 			return;
 		}
 		
-		System.out.println(req.getServerName());
-		System.out.println(((HttpServletRequest)req).getRequestURI());
-		
 		SessionManager.startSession(req, res);
 		
 		//do following part of chain

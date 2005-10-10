@@ -55,9 +55,6 @@ public class SessionManager{
 	
 	//signlton 
 	private static SessionManager sessionMgr;
-	
-	public static final String SYS_SESSION_NAME = "sys_session";
-	
 	//KEY: sessionId, each session will have an identified id. VALUE: SessionImpl instance, which contains 
 	//true session key/value pairs. 
 	private Map sessionContainer = new ConcurrentReaderHashMap();
@@ -171,8 +168,10 @@ public class SessionManager{
 			//if cookie exist, but session does not. This usually menas seesion expired. 
 			//then delete the cookie first and set it null in order to create a new one
 			if(obj == null){
-				removeCookie((HttpServletResponse) res,SystemSessionFilter.SYS_SESSION_COOKIE);
-				cookie = null;
+				createSession(currentSessionId);
+				//After changing cookie name to JSESSIONID, left cookie lifecycle management to Server
+//				removeCookie((HttpServletResponse) res,SystemSessionFilter.SYS_SESSION_COOKIE);
+//				cookie = null;
 			}
 		}
 		//can not be in else!
