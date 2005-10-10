@@ -39,7 +39,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 
 public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
-	private static final String FIND_MC_CONTENT = "from " + McContent.class.getName() + " as mc where mc_content_id=?";
+	private static final String FIND_MC_CONTENT = "from " + McContent.class.getName() + " as mc where content_id=?";
 	
 	private static final String LOAD_MC_BY_SESSION = "select mc from McContent mc left join fetch "
         + "mc.mcSessions session where session.mcSessionId=:sessionId";

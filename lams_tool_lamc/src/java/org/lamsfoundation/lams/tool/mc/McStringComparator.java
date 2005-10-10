@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
  *  The TreeMap in the web layer makes use of it.
  * 
  */
-public class QaStringComparator implements Comparator, Serializable {
-	static Logger logger = Logger.getLogger(QaStringComparator.class.getName());
+public class McStringComparator implements Comparator, Serializable {
+	static Logger logger = Logger.getLogger(McStringComparator.class.getName());
 	
 	 public int compare(Object o1, Object o2) {
 	   String s1 = (String)o1;

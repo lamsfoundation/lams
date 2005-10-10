@@ -41,8 +41,23 @@ public class McQueContent implements Serializable {
         this.mcOptionsContents = mcOptionsContents;
     }
     
+    public McQueContent(String question, Integer displayOrder,  McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+        this.question = question;
+        this.displayOrder = displayOrder;
+        this.mcContent=mcContent;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
+    }
+    
     public McQueContent(Long mcQueContentId, String question, Integer displayOrder,  Set mcUsrAttempts, Set mcOptionsContents) {
         this.mcQueContentId = mcQueContentId;
+        this.question = question;
+        this.displayOrder = displayOrder;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
+    }
+    
+    public McQueContent(String question, Integer displayOrder,  Set mcUsrAttempts, Set mcOptionsContents) {
         this.question = question;
         this.displayOrder = displayOrder;
         this.mcUsrAttempts = mcUsrAttempts;

@@ -41,7 +41,7 @@ public class TestMcOptionsContent extends McDataAccessTestCase
     
     public void testCreateMcOptionsContent()
     {
-    	McQueContent mcQueContent = mcQueContentDAO.findMcQueContentById(TEST_QUE_ID1);
+    	McQueContent mcQueContent = mcQueContentDAO.getMcQueContentByUID(new Long(1));
     	McOptsContent mcOptionsContent= new McOptsContent(new Long(777), true, "red", mcQueContent, new HashSet());
     	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent);
     	
@@ -50,11 +50,6 @@ public class TestMcOptionsContent extends McDataAccessTestCase
     	
     	McOptsContent mcOptionsContent3= new McOptsContent(new Long(999), false, "yellow", mcQueContent, new HashSet());
     	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent3);
-    }
-    
-    public void testRemoveMcOptionsContentById()
-    {
-    	mcOptionsContentDAO.removeMcOptionsContentById(new Long(999));
     }
     
 }

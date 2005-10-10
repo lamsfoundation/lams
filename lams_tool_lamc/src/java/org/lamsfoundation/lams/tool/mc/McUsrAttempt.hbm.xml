@@ -18,15 +18,6 @@
     </id>
 
     <property
-        name="attemptId"
-        type="java.lang.Long"
-        column="attempt_id"
-        not-null="true"
-        length="20"
-    >
-    </property>
-    
-    <property
         name="attemptTime"
         type="java.util.Date"
         update="true"

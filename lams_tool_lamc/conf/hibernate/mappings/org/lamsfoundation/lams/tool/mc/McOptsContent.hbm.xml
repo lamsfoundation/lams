@@ -23,15 +23,6 @@
         <generator class="native" />
     </id>
     
-     <property
-        name="mcQueOptionId"
-        type="java.lang.Long"
-        column="mc_que_option_id"
-        not-null="true"
-        length="20"
-    >
-    </property>
-
     <property
         name="correctOption"
         type="boolean"

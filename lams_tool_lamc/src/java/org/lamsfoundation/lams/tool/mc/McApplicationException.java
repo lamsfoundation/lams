@@ -18,7 +18,7 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.mc;
 
 
 /**
@@ -29,12 +29,12 @@ package org.lamsfoundation.lams.tool.qa;
 * @author Ozgur Demirtas
  * 
  */
-public class QaApplicationException extends RuntimeException
+public class McApplicationException extends RuntimeException
 {
     /**
      * Default Constructor
      */
-    public QaApplicationException()
+    public McApplicationException()
     {
         super();
     }
@@ -43,7 +43,7 @@ public class QaApplicationException extends RuntimeException
      * Constructor for customized error message
      * @param message
      */
-    public QaApplicationException(String message)
+    public McApplicationException(String message)
     {
         super(message);
     }
@@ -52,7 +52,7 @@ public class QaApplicationException extends RuntimeException
      * Constructor for wrapping the throwable object
      * @param cause
      */
-    public QaApplicationException(Throwable cause)
+    public McApplicationException(Throwable cause)
     {
         super(cause);
     }
@@ -63,7 +63,7 @@ public class QaApplicationException extends RuntimeException
      * @param message
      * @param cause
      */
-    public QaApplicationException(String message, Throwable cause)
+    public McApplicationException(String message, Throwable cause)
     {
         super(message, cause);
     }

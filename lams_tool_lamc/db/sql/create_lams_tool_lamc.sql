@@ -1,6 +1,6 @@
 CREATE TABLE lams.tl_lamc11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , mc_content_id BIGINT(20) NOT NULL
+     , content_id BIGINT(20) NOT NULL
      , title VARCHAR(250) NOT NULL DEFAULT 'Multiple Choice'
      , instructions VARCHAR(250) NOT NULL DEFAULT 'Please answer the questions until you reach the passmark.'
      , creation_date VARCHAR(100)
@@ -26,7 +26,6 @@ CREATE TABLE lams.tl_lamc11_content (
 
 CREATE TABLE lams.tl_lamc11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , mc_que_content_id BIGINT(20) NOT NULL
      , question VARCHAR(255)
      , display_order INT(5)
      , mc_content_id BIGINT(20) NOT NULL
@@ -38,7 +37,6 @@ CREATE TABLE lams.tl_lamc11_que_content (
 
 CREATE TABLE lams.tl_lamc11_options_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , mc_que_option_id BIGINT(20) NOT NULL
      , correct_option TINYINT(1) NOT NULL DEFAULT 0
      , mc_que_content_id BIGINT(20) NOT NULL
      , mc_que_option_text VARCHAR(250)
@@ -75,7 +73,6 @@ CREATE TABLE lams.tl_lamc11_que_usr (
 
 CREATE TABLE lams.tl_lamc11_usr_attempt (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , attempt_id BIGINT(20) NOT NULL
      , que_usr_id BIGINT(20) NOT NULL
      , mc_que_content_id BIGINT(20) NOT NULL
      , mc_que_option_id BIGINT(20) NOT NULL

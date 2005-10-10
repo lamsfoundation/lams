@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.mc;
 
 /**
  * @author Ozgur Demirtas
@@ -13,13 +13,13 @@ package org.lamsfoundation.lams.tool.qa;
  * Holds constants used throughout the application
  * 
  */
-public interface QaAppConstants {
+public interface McAppConstants {
 	/**
 	 * Currently we are hardcoding the default content id.
      * This will be replaced when the deploy logic automatically assigns a default content id in the deploy script.
      */
 	
-	public static final String MY_SIGNATURE 							="laqa11";
+	public static final String MY_SIGNATURE 							="lamc11";
 	public static final long DEFAULT_CONTENT_ID 						=0;
     public static final long DEFAULT_QUE_CONTENT_ID 					=1;
 

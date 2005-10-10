@@ -40,6 +40,16 @@ public class McUsrAttempt implements Serializable {
         this.mcOptionsContent = mcOptionsContent;
     }
 
+    public McUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, 
+    		org.lamsfoundation.lams.tool.mc.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.McOptsContent mcOptionsContent) {
+        this.attemptTime = attemptTime;
+        this.timeZone = timeZone;
+        this.mcQueContent = mcQueContent;
+        this.mcQueUsr = mcQueUsr;
+        this.mcOptionsContent = mcOptionsContent;
+    }
+    
+    
     /** default constructor */
     public McUsrAttempt() {
     }

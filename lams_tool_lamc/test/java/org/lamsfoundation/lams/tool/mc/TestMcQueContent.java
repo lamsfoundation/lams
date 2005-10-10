@@ -44,8 +44,7 @@ public class TestMcQueContent extends McDataAccessTestCase
     	assertEquals("Check ids:", mcContent.getMcContentId() , new Long(2));
     	
     	
-    	 McQueContent mcQueContent=  new McQueContent(TEST_QUE_ID1,
-													 "What planet are you from?",
+    	 McQueContent mcQueContent=  new McQueContent("What planet are you from?",
 													 new Integer(444),
 													 mcContent,
 													 new HashSet(),
@@ -54,8 +53,7 @@ public class TestMcQueContent extends McDataAccessTestCase
     	
     	 mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
     	 
-    	 McQueContent mcQueContent2=  new McQueContent(TEST_QUE_ID1,
-				 "What is a good question?",
+    	 McQueContent mcQueContent2=  new McQueContent("What is a good question?",
 				 new Integer(555),
 				 mcContent,
 				 new HashSet(),
@@ -66,12 +64,12 @@ public class TestMcQueContent extends McDataAccessTestCase
     	 mcQueContentDAO.flush();
     }
 
-    
+
     public void testSaveOrUpdateMcQueContent()
     {
     	McContent mcContent2 = mcContentDAO.findMcContentById(new Long(2));
     	
-    	McQueContent mcQueContent2=  new McQueContent(TEST_QUE_ID1,
+    	McQueContent mcQueContent2=  new McQueContent(
     												 "Where is the sky?",
     												 new Integer(777),
     												 mcContent2,
@@ -87,14 +85,9 @@ public class TestMcQueContent extends McDataAccessTestCase
 	
     public void testRetrieveMcQueContent()
     {
-    	McQueContent mcQueContent= mcQueContentDAO.findMcQueContentById(new Long(20));
+    	McQueContent mcQueContent= mcQueContentDAO.getMcQueContentByUID(new Long(1));
     	mcQueContent.setDisplayOrder(new Integer(88));
     	mcQueContentDAO.saveMcQueContent(mcQueContent);
-    }
-    
-    public void testRemoveMcQueContentById()
-    {
-    	mcQueContentDAO.removeMcQueContentById(TEST_QUE_ID1);
     }
     
 }

@@ -20,7 +20,7 @@
 	<property
         name="mcContentId"
         type="java.lang.Long"
-        column="mc_content_id"
+        column="content_id"
         not-null="true"
         length="20"
     >

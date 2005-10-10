@@ -47,12 +47,13 @@ public class TestMcUsrAttempt extends McDataAccessTestCase
   
     public void testCreateNewMcUsrAttempt()
     {    
-    	McQueContent mcQueContent = mcQueContentDAO.findMcQueContentById(TEST_QUE_ID1);
+    	McQueContent mcQueContent = mcQueContentDAO.getMcQueContentByUID(new Long(1));
     	
-    	McOptsContent mcOptionsContent=mcOptionsContentDAO.findMcOptionsContentById(new Long(888));
+    	McOptsContent mcOptionsContent=mcOptionsContentDAO.getMcOptionsContentByUID(new Long(1));
     	
     	McQueUsr mcQueUsr=mcUserDAO.findMcUserById(TEST_MY_USER_ID); 
 	    
+    	
 	    McUsrAttempt mcUsrAttempt= new McUsrAttempt(new Long(33),
 	    											new Date(System.currentTimeMillis()),
 													"Sydney",
@@ -72,12 +73,5 @@ public class TestMcUsrAttempt extends McDataAccessTestCase
 	    mcUsrAttemptDAO.saveMcUsrAttempt(mcUsrAttempt);
 	    mcUsrAttemptDAO.saveMcUsrAttempt(mcUsrAttempt2);
     }
-  
-    
-    public void testRemoveMcUsrAttemptById()
-    {
-    	mcUsrAttemptDAO.removeMcUsrAttemptById(new Long(34));	
-    } 
-    
     
 }

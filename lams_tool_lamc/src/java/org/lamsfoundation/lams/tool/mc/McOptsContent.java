@@ -37,6 +37,14 @@ public class McOptsContent implements Serializable {
     }
     
     
+    public McOptsContent(boolean correctOption, String mcQueOptionText, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, Set mcUsrAttempts) {
+    	this.correctOption = correctOption;
+        this.mcQueOptionText = mcQueOptionText;
+        this.mcQueContent = mcQueContent;
+        this.mcUsrAttempts=mcUsrAttempts;
+    }
+    
+    
     /** default constructor */
     public McOptsContent() {
     }

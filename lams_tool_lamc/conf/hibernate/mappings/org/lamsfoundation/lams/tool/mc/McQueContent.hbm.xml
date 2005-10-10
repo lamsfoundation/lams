@@ -22,15 +22,6 @@
     >
         <generator class="native" />
     </id>
-
-    <property
-        name="mcQueContentId"
-        type="java.lang.Long"
-        column="mc_que_content_id"
-        not-null="true"
-        length="20"
-    >
-    </property>
     
     <property
         name="question"
