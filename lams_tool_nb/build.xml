@@ -249,7 +249,7 @@ Ant build file.
 	      >
 
 	         <hibernate 
-	            destination="${conf.dir}/hibernate/mapping"
+	            destination="${conf.dir}/hibernate/mappings"
 	            package="${package.name}"
 	            genXDocletTags="true"
 	            javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
