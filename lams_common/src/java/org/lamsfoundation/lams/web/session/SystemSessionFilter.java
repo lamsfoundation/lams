@@ -40,8 +40,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class SystemSessionFilter implements Filter {
 	
-	/** The name of the cookie we use to keep sakai session. */
-	public static final String SYS_SESSION_COOKIE = "SYSSESSIONID";
+	//The session name to trace shared session
+	public static final String SYS_SESSION_COOKIE = "JSESSIONID";
 
 	public void init(FilterConfig config) throws ServletException {
 	}
@@ -54,6 +54,9 @@ public class SystemSessionFilter implements Filter {
 			chain.doFilter(req, res);
 			return;
 		}
+		
+		System.out.println(req.getServerName());
+		System.out.println(((HttpServletRequest)req).getRequestURI());
 		
 		SessionManager.startSession(req, res);
 		
