@@ -256,24 +256,37 @@ public abstract class Activity implements Serializable,Nullable {
 	
 	public static Activity getActivityInstance(int activityType)
 	{
+		// the default constructors don't set up the activity type
+		// so we need to do that manually
+		Activity activity = null;
 		switch(activityType){
 			case TOOL_ACTIVITY_TYPE:
-				return new ToolActivity();
+				activity = new ToolActivity();
+				break;
 			case OPTIONS_ACTIVITY_TYPE:
-				return new OptionsActivity();
+				activity = new OptionsActivity();
+				break;
 			case PARALLEL_ACTIVITY_TYPE:
-				return new ParallelActivity();
+				activity = new ParallelActivity();
+				break;
 			case SEQUENCE_ACTIVITY_TYPE:
-				return new SequenceActivity();
+				activity = new SequenceActivity();
+				break;
 			case SYNCH_GATE_ACTIVITY_TYPE:
-				return new SynchGateActivity();
+				activity = new SynchGateActivity();
+				break;
 			case SCHEDULE_GATE_ACTIVITY_TYPE:
-				return new ScheduleGateActivity();
+				activity = new ScheduleGateActivity();
+				break;
 			case PERMISSION_GATE_ACTIVITY_TYPE:
-				return new PermissionGateActivity();
+				activity = new PermissionGateActivity();
+				break;
 			default:
-				return new GroupingActivity();
+				activity = new GroupingActivity();
+				break;
 		}
+		activity.setActivityTypeId(new Integer(activityType));
+		return activity;
 	}
 	
     //---------------------------------------------------------------------
