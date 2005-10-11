@@ -1,18 +1,30 @@
-/*
- * Created on 15/03/2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
+
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -28,22 +40,10 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
 	 	static Logger logger = Logger.getLogger(McUsrAttemptDAO.class.getName());
 	 	
-	 	private static final String FIND_USR_ATTEMPT = "from " + McUsrAttempt.class.getName() + " as mca where attempt_id=?";
-	 	
 	 	public McUsrAttempt getMcUserAttemptByUID(Long uid)
 		{
 			 return (McUsrAttempt) this.getHibernateTemplate()
 	         .get(McUsrAttempt.class, uid);
-		}
-		
-		public McUsrAttempt findMcUsrAttemptById(Long attemptId)
-		{
-		    String query = "from McUsrAttempt as mca where mca.attemptId = ?";
-
-		    return (McUsrAttempt) getSession().createQuery(query)
-			.setLong(0,attemptId.longValue())
-			.uniqueResult();
-		
 		}
 		
 		
@@ -63,23 +63,6 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	    	this.getHibernateTemplate().delete(mca);
 	    }
 		
-		
-		public void removeMcUsrAttemptById(Long attemptId)
-	    {
-			HibernateTemplate templ = this.getHibernateTemplate();
-			if ( attemptId != null) {
-				List list = getSession().createQuery(FIND_USR_ATTEMPT)
-					.setLong(0,attemptId.longValue())
-					.list();
-				
-				if(list != null && list.size() > 0){
-					McUsrAttempt mcu = (McUsrAttempt) list.get(0);
-					this.getSession().setFlushMode(FlushMode.AUTO);
-					templ.delete(mcu);
-					templ.flush();
-				}
-			}
-	    }
 		
 		public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt)
 	    {

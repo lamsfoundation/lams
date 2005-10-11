@@ -68,7 +68,6 @@ public class TestMcContent extends McDataAccessTestCase
 	    mc.setContentInUse(false);
 	    mc.setRetries(false);
 	    mc.setShowFeedback(false);
-	    mc.setShowTopUsers(false);
 		
 	    mc.setMcQueContents(new HashSet());
 	    mc.setMcSessions(new HashSet());
@@ -100,7 +99,6 @@ public class TestMcContent extends McDataAccessTestCase
 	    mc.setContentInUse(false);
 	    mc.setRetries(false);
 	    mc.setShowFeedback(false);
-	    mc.setShowTopUsers(false);
 		
 	    mc.setMcQueContents(new HashSet());
 	    mc.setMcSessions(new HashSet());

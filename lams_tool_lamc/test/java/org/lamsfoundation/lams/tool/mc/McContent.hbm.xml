@@ -220,18 +220,6 @@
         length="1"
     />
     
-
-    <property
-        name="showTopUsers"
-        type="boolean"
-        update="true"
-        insert="true"
-        access="property"        
-        column="show_top_users"
-        length="1"
-    />
-    
-
    	 <set
             name="mcQueContents"
             lazy="false"

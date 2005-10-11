@@ -1,12 +1,35 @@
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
+
 package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-
 
 /** @author Hibernate CodeGenerator */
 public class McContent implements Serializable {
@@ -75,9 +98,7 @@ public class McContent implements Serializable {
     /** nullable persistent field */
     private boolean showFeedback;
 
-    /** nullable persistent field */
-    private boolean showTopUsers;
-
+    
     /** persistent field */
     private Set mcQueContents;
 
@@ -85,7 +106,7 @@ public class McContent implements Serializable {
     private Set mcSessions;
 
     /** full constructor */
-    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, String endLearningMessage, Integer passMark, boolean showFeedback, boolean retries, boolean showTopUsers, Set mcQueContents, Set mcSessions) {
+    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, String endLearningMessage, Integer passMark, boolean showFeedback, boolean retries, Set mcQueContents, Set mcSessions) {
         this.mcContentId = mcContentId;
         this.title = title;
         this.instructions = instructions;
@@ -106,7 +127,6 @@ public class McContent implements Serializable {
         this.passMark = passMark;
         this.retries=retries;
         this.showFeedback = showFeedback;
-        this.showTopUsers = showTopUsers;
         this.mcQueContents = mcQueContents;
         this.mcSessions = mcSessions;
     }
@@ -120,6 +140,66 @@ public class McContent implements Serializable {
         this.mcContentId = mcContentId;
         this.mcQueContents = mcQueContents;
         this.mcSessions = mcSessions;
+    }
+    
+    
+    /**
+     *  gets called as part of the copyToolContent
+     *  
+     * Copy Construtor to create a new mc content instance. Note that we
+     * don't copy the mc session data here because the mc session 
+     * will be created after we copied tool content.
+     * @param mc the original mc content.
+     * @param newContentId the new mc content id.
+     * @return the new mc content object.
+     */
+    public static McContent newInstance(McContent mc,
+            Long newContentId)
+    {
+    	McContent newContent = new McContent(
+    				newContentId,
+                     mc.getTitle(),
+                     mc.getInstructions(),
+                     mc.isDefineLater(),
+					 mc.isRunOffline(),
+					 mc.getCreationDate(),
+			         mc.getUpdateDate(),
+					 mc.isQuestionsSequenced(),
+                     mc.isUsernameVisible(),
+                     mc.getReportTitle(),
+					 mc.getMonitoringReportTitle(),
+					 mc.getCreatedBy(),				 
+					 mc.isSynchInMonitor(),
+					 mc.isContentInUse(),
+					 mc.getOfflineInstructions(),
+					 mc.getOnlineInstructions(),
+					 mc.getEndLearningMessage(),
+					 mc.getPassMark(),
+					 mc.isRetries(),
+					 mc.isShowFeedback(),
+         			 new TreeSet(),
+                     new TreeSet());
+    	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
+    	return newContent;
+	}
+    
+    /**
+     * gets called as part of the copyToolContent
+     * 
+     * @param newQaContent
+     * @return
+     */
+    public Set deepCopyMcQueContent(McContent newQaContent)
+    {
+    	Set newMcQueContent = new TreeSet();
+        for (Iterator i = this.getMcQueContents().iterator(); i.hasNext();)
+        {
+            McQueContent queContent = (McQueContent) i.next();
+            newMcQueContent.add(McQueContent.newInstance(queContent,
+            											newQaContent,
+														null));
+        }
+        return newMcQueContent;
     }
 
     public Long getUid() {
@@ -282,15 +362,7 @@ public class McContent implements Serializable {
         this.showFeedback = showFeedback;
     }
 
-    public boolean isShowTopUsers() {
-        return this.showTopUsers;
-    }
-
-    public void setShowTopUsers(boolean showTopUsers) {
-        this.showTopUsers = showTopUsers;
-    }
-
-    
+        
     public Set getMcQueContents() {
     	if (this.mcQueContents == null)
         	setMcQueContents(new HashSet());

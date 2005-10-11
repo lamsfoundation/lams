@@ -45,7 +45,7 @@ public class TestMcSession extends McDataAccessTestCase
         super(name);
     }
     
-  
+/*  
     public void testCreateNewMcSession()
     {    
 	    McContent mcContent = mcContentDAO.findMcContentById(TEST_CONTENT_ID);
@@ -79,6 +79,14 @@ public class TestMcSession extends McDataAccessTestCase
                                    new HashSet());
     
 	    mcSessionDAO.saveMcSession(mcSession3);
+    }
+    
+    */
+    
+    public void testFindMcSession()
+    {
+    	McSession mcSession=mcSessionDAO.findMcSessionById(new Long(555));
+    	System.out.println("Is null session?: " + mcSession); 
     }
     
 }

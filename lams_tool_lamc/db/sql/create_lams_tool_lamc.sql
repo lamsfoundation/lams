@@ -20,7 +20,6 @@ CREATE TABLE lams.tl_lamc11_content (
      , retries TINYINT(1) NOT NULL DEFAULT 0
      , pass_mark INTEGER
      , show_feedback TINYINT(1) NOT NULL DEFAULT 0
-     , show_top_users TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 

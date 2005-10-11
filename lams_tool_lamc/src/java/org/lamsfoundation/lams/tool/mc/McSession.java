@@ -1,3 +1,25 @@
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
+
 package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
@@ -11,6 +33,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /** @author Hibernate CodeGenerator */
 public class McSession implements Serializable {
 
+	public final static String INCOMPLETE = "INCOMPLETE";
+    
+    public static final String COMPLETED = "COMPLETED";
+    
     /** identifier field */
     private Long uid;
 
@@ -40,6 +66,14 @@ public class McSession implements Serializable {
         this.mcSessionId = mcSessionId;
         this.sessionStartDate = sessionStartDate;
         this.sessionEndDate = sessionEndDate;
+        this.sessionStatus = sessionStatus;
+        this.mcContent = mcContent;
+        this.mcQueUsers = mcQueUsers;
+    }
+    
+    public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus, org.lamsfoundation.lams.tool.mc.McContent mcContent, Set mcQueUsers) {
+        this.mcSessionId = mcSessionId;
+        this.sessionStartDate = sessionStartDate;
         this.sessionStatus = sessionStatus;
         this.mcContent = mcContent;
         this.mcQueUsers = mcQueUsers;

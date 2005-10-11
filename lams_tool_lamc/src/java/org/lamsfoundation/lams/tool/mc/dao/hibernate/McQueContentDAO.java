@@ -1,22 +1,32 @@
-/*
- * Created on 15/03/2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -32,11 +42,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class McQueContentDAO extends HibernateDaoSupport implements IMcQueContentDAO {
 	 	static Logger logger = Logger.getLogger(McQueContentDAO.class.getName());
 	 	
-	 	private static final String FIND_MC_QUE_CONTENT = "from " + McQueContent.class.getName() + " as mcq where mc_que_content_id=?";
-
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
-	 	private static final String GET_QUESTION_IDS_FOR_CONTENT = "select mcQueContent.mcQueContentId from McQueContent mcQueContent where mcQueContent.mcContentId = :mc";
-	 	
+	 		 	
 	 	
 	 	public McQueContent getMcQueContentByUID(Long uid)
 		{
@@ -44,15 +51,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	         .get(McQueContent.class, uid);
 		}
 		
-		public McQueContent findMcQueContentById(Long mcQueContentId)
-		{
-			String query = "from McQueContent as mcq where mcq.mcQueContentId = ?";
-			
-			return (McQueContent) getSession().createQuery(query)
-			.setLong(0,mcQueContentId.longValue())
-			.uniqueResult();
-			
-		}
 		
 	 	public McQueContent getToolDefaultQuestionContent(final long mcContentId)
 	    {
@@ -67,16 +65,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	         });
 	    }
 
-	 	
-	 	public List getQuestionIndsForContent(McContent mc)
-	    {
-	    	   
-			  List listDefaultQuestionIds=(getHibernateTemplate().findByNamedParam(GET_QUESTION_IDS_FOR_CONTENT,
-	                "mc",
-	                mc));
-			  
-			  return listDefaultQuestionIds;
-	    }
 	 	
 	 	
 	 	public void saveMcQueContent(McQueContent mcQueContent)
@@ -98,24 +86,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	    {
 			McQueContent mcq = (McQueContent)getHibernateTemplate().get(McQueContent.class, uid);
 	    	this.getHibernateTemplate().delete(mcq);
-	    }
-		
-		
-		public void removeMcQueContentById(Long mcQueContentId)
-	    {
-			HibernateTemplate templ = this.getHibernateTemplate();
-			if ( mcQueContentId != null) {
-				List list = getSession().createQuery(FIND_MC_QUE_CONTENT)
-					.setLong(0,mcQueContentId.longValue())
-					.list();
-				
-				if(list != null && list.size() > 0){
-					McQueContent mcq = (McQueContent) list.get(0);
-					this.getSession().setFlushMode(FlushMode.AUTO);
-					templ.delete(mcq);
-					templ.flush();
-				}
-			}
 	    }
 		
 		

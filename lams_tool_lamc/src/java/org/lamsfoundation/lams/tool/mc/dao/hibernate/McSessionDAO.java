@@ -1,23 +1,24 @@
-/* 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt 
-*/
+/***************************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ***********************************************************************/
 
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
@@ -142,13 +143,12 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#addMcUsers(java.lang.Long, org.lamsfoundation.lams.tool.mc.McSession) */
     public void addMcUsers(Long mcSessionId, McQueUsr user)
 	{
-    	/*
-	    McSession session = findMcSessionById(mcSessionId);
+    	McSession session = findMcSessionById(mcSessionId);
 	    user.setMcSession(session);
 	    session.getMcQueUsers().add(user);
 	    this.getHibernateTemplate().saveOrUpdate(user);
-	    this.getHibernateTemplate().saveOrUpdateCopy(session);
-	    */	    
+	    this.getHibernateTemplate().saveOrUpdate(session);
+	    	    
 	}
 	
     /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#getSessionsFromContent(org.lamsfoundation.lams.tool.mc.McSession) */
