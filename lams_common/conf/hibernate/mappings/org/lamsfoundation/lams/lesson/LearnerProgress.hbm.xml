@@ -63,18 +63,18 @@
 		</many-to-one>
 
 		<!-- bi-directional many-to-one association to current activites -->
-		<many-to-one name="currentActivity"
+		<many-to-one name="currentActivity" lazy="false"
 			class="org.lamsfoundation.lams.learningdesign.Activity">
 			<column name="current_activity_id" />
 		</many-to-one>
 
 		<!-- bi-directional many-to-one association to current activites -->
-		<many-to-one name="nextActivity"
+		<many-to-one name="nextActivity" lazy="false"
 			class="org.lamsfoundation.lams.learningdesign.Activity">
 			<column name="next_activity_id" />
 		</many-to-one>
 
-		<many-to-one name="previousActivity"
+		<many-to-one name="previousActivity" lazy="false"
 			class="org.lamsfoundation.lams.learningdesign.Activity">
 			<column name="previous_activity_id" />
 		</many-to-one>
