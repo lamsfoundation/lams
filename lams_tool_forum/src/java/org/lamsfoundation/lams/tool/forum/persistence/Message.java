@@ -1,26 +1,131 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import java.util.Set;
 import java.util.Date;
+import java.util.Set;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * @author conradb
  *
- * @hibernate.joined-subclass table="tl_lafrum11_message"
- * @hibernate.joined-subclass-key column="id"
+ * @hibernate.class table="tl_lafrum11_message"
  *
  * @hibernate.query name="allMessages" query="from Message message"
  * @hibernate.query name="allAuthoredMessagesOfForum" query="from Message message where message.forum.id = ? AND message.isAuthored = true"
  * @hibernate.query name="allMessagesByForum" query="from Message message where message.forum = ?"
  */
-public class Message extends GenericEntity {
-	protected String subject;
-	protected String body;
-    protected boolean isAuthored;
-	protected boolean isAnnonymous;
-    protected Message parent;
-    protected Set replies;
-    protected Forum forum;
+public class Message {
+	private Long uuid;
+	private String subject;
+	private String body;
+	private boolean isAuthored;
+	private boolean isAnnonymous;
+	private Message parent;
+	private Set replies;
+	private Forum forum;
+	
+	protected Date created;
+	protected Date updated;
+  	protected Long createdBy;
+    protected Long modifiedBy;
+    
+	/**
+	 * Returns the object's creation date
+	 *
+	 * @return date
+	 * @hibernate.property column="CREATED"
+	 */
+	public Date getCreated() {
+      return created;
+	}
+
+	/**
+	 * Sets the object's creation date
+	 *
+	 * @param created
+	 */
+	public void setCreated(Date created) {
+	    this.created = created;
+	}
+
+	/**
+	 * Returns the object's date of last update
+	 *
+	 * @return date updated
+	 * @hibernate.property column="UPDATED"
+	 */
+	public Date getUpdated() {
+        return updated;
+	}
+
+	/**
+	 * Sets the object's date of last update
+	 *
+	 * @param updated
+	 */
+	public void setUpdated(Date updated) {
+        this.updated = updated;
+	}
+
+    /**
+     * @return Returns the userid of the user who created the Forum.
+     *
+     * @hibernate.property
+     * 		column="CREATEDBY"
+     *
+     */
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    /**
+     * @param createdBy The userid of the user who created this Forum.
+     */
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+	/**
+	 * Updates the modification data for this entity.
+	 */
+	public void updateModificationData() {
+		long now = System.currentTimeMillis();
+		if (created == null) {
+			this.setCreated(new Date(now));
+		}
+		this.setUpdated(new Date(now));
+	}
+
+    /**
+     * @return Returns the userid of the user who modified the posting.
+     *
+     *
+     * @hibernate.property
+     * 		column="MODIFIEDBY"
+     *
+     */
+    public Long getModifiedBy() {
+        return modifiedBy;
+    }
+
+    /**
+     * @param modifiedBy The userid of the user who modified the posting.
+     */
+    public void setModifiedBy(Long modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    /**
+     * @hibernate.id column="UUID" generator-class="native"
+     */
+	public Long getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(Long uuid) {
+		this.uuid = uuid;
+	}
 
     /**
      * @return Returns the subject of the Message.
@@ -104,8 +209,8 @@ public class Message extends GenericEntity {
      * @hibernate.set table="MESSAGE"
      * inverse="false"
      * lazy="false"
-     * cascade="all"
-     * @hibernate.collection-key column="PARENT"
+     * cascade="all-delete-orphan"
+     * @hibernate.collection-key column="parent"
      * @hibernate.collection-one-to-many 
      * 			class="org.lamsfoundation.lams.tool.forum.persistence.Message"
      *
@@ -151,5 +256,31 @@ public class Message extends GenericEntity {
     public Message getParent() {
         return parent;
     }
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Message))
+			return false;
+		
+		final Message genericEntity = (Message) o;
 
+      	return new EqualsBuilder()
+      	.append(this.uuid,genericEntity.uuid)
+      	.append(this.subject,genericEntity.subject)
+      	.append(this.body,genericEntity.body)
+      	.append(this.created,genericEntity.created)
+      	.append(this.updated,genericEntity.updated)
+      	.append(this.createdBy,genericEntity.createdBy)
+      	.append(this.modifiedBy,genericEntity.modifiedBy)
+      	.isEquals();
+	}
+
+	public int hashCode() {
+		return new HashCodeBuilder().append(uuid)
+		.append(subject).append(body)
+		.append(created)
+		.append(updated).append(createdBy)
+		.append(modifiedBy)
+		.toHashCode();
+	}
 }

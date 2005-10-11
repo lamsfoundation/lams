@@ -26,6 +26,10 @@
 		<!-- This property is supposed to be set in eclipse  -->
 		<pathelement location="${java.class.path}" />
 	</path>
+	<path id="schemaexport.classpath">
+		<path refid="project.classpath"/>
+		<pathelement location="${build.classes.java}"/>
+	</path>
 
 	<!-- end path ***************************************************************************************************-->
 
@@ -74,7 +78,7 @@
 		</copy>
 	</target>
 
-	<target name="hibernate" depends="compile-java">
+	<target name="generate-hbm" depends="compile-java">
 		<echo>+------------------------------------------+</echo>
 		<echo>| generating hibernate metadata            |</echo>
 		<echo>+------------------------------------------+</echo>
@@ -94,9 +98,37 @@
 				</fileset>
 			<hibernate version="3.0"/>
 		</hibernatedoclet>
-
+		
+		<copy todir="${src.java.dir}" overwrite="true" verbose="true">
+			<fileset dir="${conf.hibernate.mapping.dir}">
+				<include name="**/*.hbm.xml"/>
+			</fileset>
+		</copy>
     </target>
-
+	
+	<!-- exports all the hbm mappings to the specified database -->
+	<target name="schemaexport" description="Exports all hbm.xml files in {conf.hibernate.mapping.dir}/hbm"
+		depends="generate-hbm">
+	    <echo message="Run the schema export for all hbm.xml files in ${conf.hibernate.mapping.dir}/hbm"/>
+		<taskdef
+			name="schemaexport"
+			classname="org.hibernate.tool.hbm2ddl.SchemaExportTask"
+			classpathref="schemaexport.classpath"
+			>
+		</taskdef>
+		<schemaexport
+			properties="${conf.hibernate.mapping.dir}/hibernate.properties"
+			quiet="no"
+			text="no"
+			drop="no"
+			delimiter=";"
+			output="${db.scripts}/table-schema.sql">
+			<fileset dir="${conf.hibernate.mapping.dir}">
+				<include name="**/*.hbm.xml"/>
+			</fileset>
+		</schemaexport>	
+	</target>	
+	
 	<target name="compile-test" depends="compile-java">
 		<javac srcdir="${src.test.dir}" compiler="modern"
 	         	 	destdir="${build.classes.test}" deprecation="on" debug="on">
@@ -180,7 +212,7 @@
 		<fail message="Tests failed. Check log and/or reports" if="test.failed"/>
 	</target>
 
-	<target name="jar" description="JARs the Task" depends="hibernate, compile-java">
+	<target name="jar" description="JARs the Task" depends="generate-hbm, compile-java">
 		<echo>+------------------------------------------+</echo>
 		<echo>| create jar file                          |</echo>
 		<echo>+------------------------------------------+</echo>

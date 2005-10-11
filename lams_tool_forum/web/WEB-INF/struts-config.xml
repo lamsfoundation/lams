@@ -13,15 +13,6 @@
   <!-- ========== Form Bean Definitions =================================== -->
   <form-beans>
 
-    <form-bean
-      name="forumForm"
-      type="org.lamsfoundation.lams.tool.forum.web.forms.ForumForm"
-    />
-    <form-bean
-      name="messageForm"
-      type="org.lamsfoundation.lams.tool.forum.web.forms.MessageForm"
-    />
-
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->

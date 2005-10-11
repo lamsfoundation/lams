@@ -27,18 +27,18 @@ public class AttachmentTest extends TestCase {
 
         AttachmentDao dao = (AttachmentDao) GenericObjectFactoryImpl.getTestInstance().lookup(AttachmentDao.class);
         dao.saveOrUpdate(instructions);
-        assertNotNull(instructions.getId());
+        assertNotNull(instructions.getUuid());
 
         //load
 
-        Attachment reloaded = (Attachment) dao.getById(instructions.getId());
+        Attachment reloaded = (Attachment) dao.getById(instructions.getUuid());
         //find
         List values = dao.findByNamedQuery("allAttachments");
         assertTrue("find all result not containing object", values.contains(instructions));
 
         //delete
         dao.delete(reloaded);
-        assertNull("object not deleted", dao.getById(instructions.getId()) );
+        assertNull("object not deleted", dao.getById(instructions.getUuid()) );
     }
 
     protected void tearDown() throws Exception {

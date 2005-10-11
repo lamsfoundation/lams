@@ -117,7 +117,7 @@ public class MessageMapTag extends TagSupport {
             buffer.append("<a href=\"" + path + "?topicId=");
             buffer.append(topicId);
             buffer.append("&messageId=");
-            buffer.append(reply.getId() + "\">");
+            buffer.append(reply.getUuid() + "\">");
             buffer.append("<b>Edit</b>");
             buffer.append("</a>\n");
             buffer.append("</td>\n");
@@ -129,7 +129,7 @@ public class MessageMapTag extends TagSupport {
             buffer.append("<a href=\"/forum/learning/message/post.do?topicId=");
             buffer.append(topicId);
             buffer.append("&parentId=");
-            buffer.append(reply.getId() + "\">");
+            buffer.append(reply.getUuid() + "\">");
             buffer.append("<b>Reply</b>");
             buffer.append("</a>\n");
             buffer.append("</td>\n");

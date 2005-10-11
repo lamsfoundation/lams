@@ -89,7 +89,7 @@ public class LearningAction extends Action {
           throws IOException, ServletException, Exception {
       Long forumId = new Long((String) request.getParameter("forumId"));
       Forum forum = forumManager.getForum(forumId);
-      List topicList = this.forumManager.getTopics(forum.getId());
+      List topicList = this.forumManager.getTopics(forum.getUuid());
       ForumForm forumForm = new ForumForm();
       forumForm.setForum(forum);
       request.setAttribute("forum", forumForm);

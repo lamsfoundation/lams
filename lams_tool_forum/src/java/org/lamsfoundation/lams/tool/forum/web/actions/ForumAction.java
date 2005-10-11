@@ -121,7 +121,7 @@ public class ForumAction extends Action {
         forumForm.setForum(forum);
 
         //populate topics with new topics
-        List topicList = getForumManager().getTopics(forum.getId());
+        List topicList = getForumManager().getTopics(forum.getUuid());
         topics = new HashMap();
         Iterator it = topicList.iterator();
         while (it.hasNext()) {
@@ -153,7 +153,7 @@ public class ForumAction extends Action {
           throws IOException, ServletException, Exception {
         Long forumId = new Long((String) request.getParameter("forumId"));
         Forum forum = getForumManager().getForum(forumId);
-        List topicList = getForumManager().getTopics(forum.getId());
+        List topicList = getForumManager().getTopics(forum.getUuid());
         ForumForm forumForm = new ForumForm();
 
         forumForm.setForum(forum);
@@ -289,8 +289,8 @@ public class ForumAction extends Action {
         Map attachments = forumForm.getAttachments();
         Attachment attachment = (Attachment) attachments.remove(fileName + "-" + type);
         getToolContentHandler().deleteFile(attachment.getUuid());
-        if (attachment.getId() != null) {
-            getForumManager().deleteForumAttachment(attachment.getId());
+        if (attachment.getUuid() != null) {
+            getForumManager().deleteForumAttachment(attachment.getUuid());
         }
         List attachmentList = new ArrayList(attachments.values());
         request.getSession().setAttribute("attachmentList", attachmentList);
@@ -301,8 +301,8 @@ public class ForumAction extends Action {
         String topicName = (String) request.getParameter("topicName");
         Map topics = (Map) request.getSession().getAttribute("topics");
         Message topic = (Message) topics.remove(topicName);
-        if (topic.getId() != null) {
-            getForumManager().deleteMessage(topic.getId());
+        if (topic.getUuid() != null) {
+            getForumManager().deleteMessage(topic.getUuid());
         }
         request.getSession().setAttribute("topics", topics);
         request.getSession().setAttribute("topicList", new ArrayList(topics.values()));

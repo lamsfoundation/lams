@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.forum.persistence.Message"
+        table="tl_lafrum11_message"
+    >
+
+        <id
+            name="uuid"
+            column="UUID"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-Message.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="created"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="CREATED"
+        />
+
+        <property
+            name="updated"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="UPDATED"
+        />
+
+        <property
+            name="createdBy"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="CREATEDBY"
+        />
+
+        <property
+            name="modifiedBy"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="MODIFIEDBY"
+        />
+
+        <property
+            name="subject"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="SUBJECT"
+        />
+
+        <property
+            name="body"
+            type="text"
+            update="true"
+            insert="true"
+            column="BODY"
+        />
+
+        <property
+            name="isAuthored"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="ISAUTHORED"
+        />
+
+        <property
+            name="isAnnonymous"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="ISANNONYMOUS"
+        />
+
+        <set
+            name="replies"
+            table="MESSAGE"
+            lazy="false"
+            inverse="false"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="parent"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+            />
+
+        </set>
+
+        <many-to-one
+            name="forum"
+            class="org.lamsfoundation.lams.tool.forum.persistence.Forum"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="FORUM"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-Message.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+        <query name="allMessages"><![CDATA[
+            from Message message
+        ]]></query>
+        <query name="allAuthoredMessagesOfForum"><![CDATA[
+            from Message message where message.forum.id = ? AND message.isAuthored = true
+        ]]></query>
+        <query name="allMessagesByForum"><![CDATA[
+            from Message message where message.forum = ?
+        ]]></query>
+
+</hibernate-mapping>
