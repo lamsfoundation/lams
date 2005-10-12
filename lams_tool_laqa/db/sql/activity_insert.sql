@@ -43,7 +43,7 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'Question and Answer Description'
+, 'Learner completes a series of free text questions.'
 , 'Question and Answer'
 , 'Put some help text here.'
 , NULL

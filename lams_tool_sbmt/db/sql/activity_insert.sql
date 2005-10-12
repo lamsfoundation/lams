@@ -43,7 +43,7 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'Submit File Description'
+, 'Uploading of files by learners, for review by teachers.'
 , 'Submit File'
 , 'Put some help text here.'
 , NULL
@@ -64,7 +64,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 2
+, ${tool_id}
 , NULL
 , 4
 , NULL

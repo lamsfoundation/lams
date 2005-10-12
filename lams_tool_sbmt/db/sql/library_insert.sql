@@ -11,7 +11,7 @@ create_date_time
 )
 VALUES
 (
-'Submit File Description',
+'Uploading of files by learners, for review by teachers.',
 'Submit file',
 0,
 NOW()
