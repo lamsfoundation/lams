@@ -58,13 +58,14 @@ class org.lamsfoundation.lams.authoring.Activity {
 	private var _objectType:String;				
 	private var _activityTypeID:Number;			
 
-
+	
 	private var _activityID:Number;				
 	private var _activityCategoryID:Number;				
 	
 	private var _activityUIID:Number;
 
-	private var _learningLibraryID:Number;			
+	private var _learningLibraryID:Number;		
+	//TODO: This will be removed by mai this week.
 	private var _learningDesignID:Number;			
 	private var _libraryActivityID:Number;		
 
@@ -190,6 +191,37 @@ class org.lamsfoundation.lams.authoring.Activity {
 		dto.createDateTime= (_createDateTime) ?  _createDateTime : Config.DATE_NULL_VALUE;
 		dto.groupingSupportType = (_groupingSupportType) ?  _groupingSupportType : Config.NUMERIC_NULL_VALUE;
 		return dto;
+	}
+	
+	public function clone():Activity{
+		var n = new Activity(null);
+		//objectType is in the constructor
+		n.activityTypeID = _activityTypeID;
+		n.activityID = _activityID;
+		n.activityCategoryID = _activityCategoryID;
+		n.activityUIID = _activityUIID;
+		n.learningLibraryID = _learningLibraryID;
+		n.learningDesignID = _learningDesignID;
+		n.libraryActivityID = _libraryActivityID;
+		n.parentActivityID = _parentActivityID;
+		n.parentUIID = _parentUIID
+		n.orderID = _orderID
+		n.groupingID = _groupingID;
+		n.groupingUIID = _groupingUIID
+		n.title = _title;
+		n.description = _description;
+		n.helpText =  _helpText;
+		n.yCoord = _yCoord;
+		n.xCoord = _xCoord;
+		n.libraryActivityUIImage = _libraryActivityUIImage;
+		n.applyGrouping = _applyGrouping;
+		n.runOffline = _runOffline;
+		n.offlineInstructions = _offlineInstructions;
+		n.defineLater = _defineLater;
+		n.createDateTime = _createDateTime;
+		n.groupingSupportType = _groupingSupportType;
+		
+		return n;
 	}
 	
 	

@@ -39,11 +39,58 @@ class ToolActivity extends Activity{
 		dto.authoringURL = (_authoringURL) ?  _authoringURL : Config.STRING_NULL_VALUE;	
 		dto.toolDisplayName = (_toolDisplayName) ?  _toolDisplayName: Config.STRING_NULL_VALUE;	
 		dto.toolContentID = (_toolContentID) ?  _toolContentID: Config.NUMERIC_NULL_VALUE;	
-		dto.toolContentID = (_toolID) ?  _toolID: Config.NUMERIC_NULL_VALUE;	
+		dto.toolID = (_toolID) ?  _toolID: Config.NUMERIC_NULL_VALUE;	
 		dto.supportsContribute = (_supportsContribute!=null) ?  _supportsContribute: Config.BOOLEAN_NULL_VALUE;	
 		dto.supportsDefineLater = (_supportsDefineLater!=null) ?  _supportsDefineLater: Config.BOOLEAN_NULL_VALUE;	
 		dto.supportsModeration = (_supportsModeration!=null) ?  _supportsModeration: Config.BOOLEAN_NULL_VALUE;	
+		dto._supportsRunOffline = (_supportsRunOffline!=null) ?  _supportsRunOffline: Config.BOOLEAN_NULL_VALUE;	
 		return dto;
+	}
+	
+	public function clone():ToolActivity{
+		//var n:Activity = super.clone();
+		
+		var n:ToolActivity = new ToolActivity(null);
+		
+		//parents properties:
+		n.objectType = _objectType;
+		n.activityTypeID = _activityTypeID;
+		n.activityID = _activityID;
+		n.activityCategoryID = _activityCategoryID;
+		n.activityUIID = _activityUIID;
+		n.learningLibraryID = _learningLibraryID;
+		n.learningDesignID = _learningDesignID;
+		n.libraryActivityID = _libraryActivityID;
+		n.parentActivityID = _parentActivityID;
+		n.parentUIID = _parentUIID
+		n.orderID = _orderID
+		n.groupingID = _groupingID;
+		n.groupingUIID = _groupingUIID
+		n.title = _title;
+		n.description = _description;
+		n.helpText =  _helpText;
+		n.yCoord = _yCoord;
+		n.xCoord = _xCoord;
+		n.libraryActivityUIImage = _libraryActivityUIImage;
+		n.applyGrouping = _applyGrouping;
+		n.runOffline = _runOffline;
+		n.offlineInstructions = _offlineInstructions;
+		n.defineLater = _defineLater;
+		n.createDateTime = _createDateTime;
+		n.groupingSupportType = _groupingSupportType;
+		
+		//class props
+		n.authoringURL = _authoringURL;
+		n.toolDisplayName = _toolDisplayName;
+		n.toolContentID = _toolContentID;
+		n.toolID = _toolID;
+		n.supportsContribute = _supportsContribute;
+		n.supportsDefineLater = _supportsDefineLater;
+		n.supportsModeration = _supportsRunOffline;
+		
+		return n;
+		
+		
 	}
 	
 	//GETTERS + SETTERS
