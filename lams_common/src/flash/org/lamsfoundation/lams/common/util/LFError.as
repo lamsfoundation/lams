@@ -28,9 +28,13 @@ class LFError extends Error{
   public function showErrorAlert(okHandler){
 	var a:Alert;
 	if(okHandler != undefined){
-	   a = Alert.show(message,"__Error__",Alert.OK,null,okHandler,"alertIcon_gen",Alert.OK);
+		
+		//TODO: Fix the problem of size calculation with icons
+	   //a = Alert.show(message,"__Error__",Alert.OK,null,okHandler,"alertIcon_gen",Alert.OK);
+	   a = Alert.show(message,"__Error__",Alert.OK,null,okHandler,null,Alert.OK);
 	}else{
-	   a = Alert.show(message,"__Error__",Alert.OK,null,null,"alertIcon_gen",Alert.OK);
+	   //a = Alert.show(message,"__Error__",Alert.OK,null,null,"alertIcon_gen",Alert.OK);
+	   a = Alert.show(message,"__Error__",Alert.OK,null,null,null,Alert.OK);
 	}
 	
 	a.setSize(500,250);
