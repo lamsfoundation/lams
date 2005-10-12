@@ -40,8 +40,35 @@ public class Portfolio {
 	private String exportUrl;
 	private String exportContent; //the html content of the export
 	private Long toolContentId;
-
+	private String mainFileName;
+	private String directoryName; //includes the parent path
+	private String toolLink;
 	
+	
+	/**
+	 * @return Returns the toolLink.
+	 */
+	public String getToolLink() {
+		return toolLink;
+	}
+	/**
+	 * @param toolLink The toolLink to set.
+	 */
+	public void setToolLink(String toolLink) {
+		this.toolLink = toolLink;
+	}
+	/**
+	 * @return Returns the directoryName.
+	 */
+	public String getDirectoryName() {
+		return directoryName;
+	}
+	/**
+	 * @param directoryName The directoryName to set.
+	 */
+	public void setDirectoryName(String directoryName) {
+		this.directoryName = directoryName;
+	}
 	public Portfolio()
 	{
 		this.activityId = null;
@@ -52,6 +79,7 @@ public class Portfolio {
 		this.exportUrl = null;
 		this.exportContent = null;
 		this.toolContentId = null;
+		this.mainFileName = null;
 	}
 	
 	
@@ -160,4 +188,18 @@ public class Portfolio {
 	public void setToolContentId(Long toolContentId) {
 		this.toolContentId = toolContentId;
 	}
+	/**
+	 * @return Returns the mainFileName.
+	 */
+	public String getMainFileName() {
+		return mainFileName;
+	}
+	/**
+	 * @param mainFileName The mainFileName to set.
+	 */
+	public void setMainFileName(String mainFileName) {
+		this.mainFileName = mainFileName;
+	}
+	
+	
 }
