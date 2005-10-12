@@ -1,5 +1,7 @@
 package org.lamsfoundation.lams.tool.mc;
 
+import java.util.HashSet;
+
 import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.hibernate.McOptionsContentDAO;
@@ -77,5 +79,53 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
     {
     	super.tearDown();
     }
+    
+    
+    public void testInitDB()
+    {
+    	//create new mc content
+    	McContent mc = new McContent();
+		mc.setMcContentId(DEFAULT_CONTENT_ID);
+		mc.setTitle("New - Put Title Here");
+		mc.setInstructions("New - Put instructions here.");
+		mc.setQuestionsSequenced(false);
+		mc.setUsernameVisible(false);
+		mc.setCreatedBy(0);
+		mc.setMonitoringReportTitle("New-Monitoring Report title");
+		mc.setReportTitle("New-Report title");
+		mc.setRunOffline(false);
+	    mc.setDefineLater(false);
+	    mc.setSynchInMonitor(false);
+	    mc.setOnlineInstructions("New- online instructions");
+	    mc.setOfflineInstructions("New- offline instructions");
+	    mc.setEndLearningMessage("New- endLearningMessage");
+	    mc.setContentInUse(false);
+	    mc.setRetries(false);
+	    mc.setShowFeedback(false);
+	    mc.setMcQueContents(new HashSet());
+	    mc.setMcSessions(new HashSet());
+	    mcContentDAO.saveMcContent(mc);
+	    
+	    
+    	McContent mcContent = mcContentDAO.findMcContentById(DEFAULT_CONTENT_ID);
+    	McQueContent mcQueContent=  new McQueContent("What planet are you from?",
+													 new Integer(444),
+													 mcContent,
+													 new HashSet(),
+													 new HashSet()
+    												);
+    	mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
+    	 
+    	 
+    	McQueContent mcQueContent1 = mcQueContentDAO.getMcQueContentByUID(new Long(1));
+     	McOptsContent mcOptionsContent= new McOptsContent(new Long(777), true, "red", mcQueContent1, new HashSet());
+     	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent);
+     	
+     	McOptsContent mcOptionsContent2= new McOptsContent(new Long(888), false, "blue", mcQueContent1, new HashSet());
+     	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent2);
+     	
+     	McOptsContent mcOptionsContent3= new McOptsContent(new Long(999), false, "yellow", mcQueContent1, new HashSet());
+     	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent3);
+   }
     
 }
