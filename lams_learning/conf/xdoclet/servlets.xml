@@ -45,3 +45,10 @@ http://www.gnu.org/licenses/gpl.txt
     </init-param>
     <load-on-startup>2</load-on-startup>
 </servlet>
+
+<servlet>
+		<servlet-name>exportPortfolio</servlet-name>
+		<display-name>Export Portfolio</display-name>
+		<description>Export Portfolio</description>		
+		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.MainExportServlet</servlet-class>
+	</servlet>
