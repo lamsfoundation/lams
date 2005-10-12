@@ -246,7 +246,7 @@
 
 	</target>
 
-	<target name="build-war" depends="web,jar" description="creates war file">
+	<target name="build-war" depends="web" description="creates war file">
 		<echo>+------------------------------------------+</echo>
 		<echo>| build jar file                           |</echo>
 		<echo>+------------------------------------------+</echo>
@@ -259,6 +259,7 @@
 				<include name="struts/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
+			<classes dir="${build.classes.java}"/>	
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="includes/**"/>
@@ -374,5 +375,39 @@
 	</target>
 
  	<!-- end navigation tasks ***************************************************************************************-->
+	
+	<!-- Debug target: Explode tool to ear folder for debug use  -->
+	<target name="delete-exploded-tool-folder" description="delete old tool exploded tool folder">
+		<!-- delete old war folder tree -->
+		<delete quiet="true" includeemptydirs="true">
+			<fileset dir="${jboss.deploy}/${product}.war">
+			    <include name="**"/>
+			</fileset>
+		</delete>
+		<!-- if use explode tool target when jboss is running, explode may be failed and left the the temp folder. Here try to delete the temp folder -->
+		<delete quiet="true" includeemptydirs="true">
+			<fileset dir="${jboss.deploy}/temp-${product}.war">
+			    <include name="**"/>
+			</fileset>
+		</delete>
+	</target>
+	
+	<target name="explode-tool" depends="delete-exploded-tool-folder,deploy-tool" description="explode tool jar and war package to a war folder">
+		<!-- rename war file to avoid name conflict -->
+		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war"/>
+		<!-- explode the ear -->
+		<!-- Don't explode jar file, becuase classes in jar will conflict with those same classes files in war -->
+		<!--<unjar src="${jboss.deploy}/${product}.jar" dest="${jboss.deploy}/${product}.war" />-->
+		<unjar src="${jboss.deploy}/temp-${product}.war" dest="${jboss.deploy}/${product}.war" />
+		<!-- delete war and jar files -->
+		<delete>
+			<fileset dir="${jboss.deploy}">
+			    <include name="temp-${product}.war"/>
+			    <include name="${product}.jar"/>
+			</fileset>
+		</delete>
+	
+	</target>
+	
 	<!-- end tasks **************************************************************************************************-->
 </project>

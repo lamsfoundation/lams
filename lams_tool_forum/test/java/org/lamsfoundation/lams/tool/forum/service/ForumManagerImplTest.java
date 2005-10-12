@@ -8,14 +8,13 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
 import java.util.*;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 /**
- * Created by IntelliJ IDEA.
  * User: conradb
  * Date: 9/06/2005
  * Time: 10:59:06
- * To change this template use File | Settings | File Templates.
  */
 public class ForumManagerImplTest extends TestCase {
     protected ForumManager forumManager;
@@ -47,7 +46,7 @@ public class ForumManagerImplTest extends TestCase {
 
         forumManager.deleteForum(forum.getUuid());
         try {
-            forumManager.getForum(forum.getUuid());
+            Forum forum2 = forumManager.getForum(forum.getUuid());
             fail("getForum should have barfed for non existing forum");
         } catch (Exception e) {
 

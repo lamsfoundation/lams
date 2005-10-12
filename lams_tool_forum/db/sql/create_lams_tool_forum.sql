@@ -1,12 +1,16 @@
 create table tl_lafrum11_attachment (
-   id bigint not null,
-   UUID bigint,
+   UUID bigint not null auto_increment,
    VERSION bigint,
-   FORUM bigint,
-   primary key (id)
+   type varchar(255),
+   NAME varchar(255),
+   forum bigint,
+   primary key (UUID)
 );
 create table tl_lafrum11_forum (
-   id bigint not null,
+   UUID bigint not null auto_increment,
+   CREATED datetime,
+   UPDATED datetime,
+   CREATEDBY bigint,
    TITLE varchar(255),
    ALLOWANNOMITY bit,
    FORCEOFFLINE bit,
@@ -14,29 +18,22 @@ create table tl_lafrum11_forum (
    INSTRUCTIONS varchar(255),
    ONLINEINSTRUCTIONS varchar(255),
    OFFLINEINSTRUCTIONS varchar(255),
-   primary key (id)
+   primary key (UUID)
 );
-create table tl_lafrum11_genericentity (
-   ID bigint not null auto_increment,
+create table tl_lafrum11_message (
+   UUID bigint not null auto_increment,
    CREATED datetime,
    UPDATED datetime,
    CREATEDBY bigint,
    MODIFIEDBY bigint,
-   primary key (ID)
-);
-create table tl_lafrum11_message (
-   id bigint not null,
    SUBJECT varchar(255),
    BODY text,
    ISAUTHORED bit,
    ISANNONYMOUS bit,
    FORUM bigint,
-   PARENT bigint,
-   primary key (id)
+   parent bigint,
+   primary key (UUID)
 );
-alter table tl_lafrum11_attachment add index FK389AD9A23FF9501 (FORUM), add constraint FK389AD9A23FF9501 foreign key (FORUM) references tl_lafrum11_forum (id);
-alter table tl_lafrum11_attachment add index FK389AD9A2D1B (id), add constraint FK389AD9A2D1B foreign key (id) references tl_lafrum11_genericentity (ID);
-alter table tl_lafrum11_forum add index FK87917942D1B (id), add constraint FK87917942D1B foreign key (id) references tl_lafrum11_genericentity (ID);
-alter table tl_lafrum11_message add index FK4A6067E83FF9501 (FORUM), add constraint FK4A6067E83FF9501 foreign key (FORUM) references tl_lafrum11_forum (id);
-alter table tl_lafrum11_message add index FK4A6067E88C3DFCAA (PARENT), add constraint FK4A6067E88C3DFCAA foreign key (PARENT) references tl_lafrum11_message (id);
-alter table tl_lafrum11_message add index FK4A6067E8D1B (id), add constraint FK4A6067E8D1B foreign key (id) references tl_lafrum11_genericentity (ID);
+alter table tl_lafrum11_attachment add index FK389AD9A29EAD680D (forum), add constraint FK389AD9A29EAD680D foreign key (forum) references tl_lafrum11_forum (UUID);
+alter table tl_lafrum11_message add index FK4A6067E8F7440FBC (parent), add constraint FK4A6067E8F7440FBC foreign key (parent) references tl_lafrum11_message (UUID);
+alter table tl_lafrum11_message add index FK4A6067E89EAD680D (FORUM), add constraint FK4A6067E89EAD680D foreign key (FORUM) references tl_lafrum11_forum (UUID);
