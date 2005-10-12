@@ -22,6 +22,7 @@ class org.lamsfoundation.lams.authoring.Transition {
 	private var _description:String;
 	
 	private var _createDateTime:Date;
+	//TODO 05-10-05: This will be removed by mai this week
 	private var _learningDesignID:Number;
 	
 	
