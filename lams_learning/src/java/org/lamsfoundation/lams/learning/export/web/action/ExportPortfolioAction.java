@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.learning.util.CustomStrutsExceptionHandler"
  * 
+ * @struts:action-forward name="displayPrintVersion" path="/exportPortfolioPrintVersion.jsp"
  * @struts:action-forward name="displayPortfolio" path="/exportPortfolio.jsp"
  * -------------------------------------------------
  **/
@@ -94,6 +95,7 @@ public class ExportPortfolioAction extends LamsAction{
 		}
 		
 		request.setAttribute(PARAM_PORTFOLIO_LIST, portfolios);
+		
 		return mapping.findForward("displayPortfolio");
 	}
 }
