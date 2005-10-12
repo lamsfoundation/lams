@@ -25,6 +25,8 @@ class org.lamsfoundation.lams.authoring.Application {
 	public static var C_OPTIONAL = "c_optionalBoxPen";
 	public static var C_DEFAULT = "default";
 	
+	private static var SHOW_DEBUGGER:Boolean = false;
+	
     private static var TOOLBAR_X:Number = 10;
     private static var TOOLBAR_Y:Number = 35;    private static var TOOLKIT_X:Number = 0;
     private static var TOOLKIT_Y:Number = 74;
@@ -317,6 +319,9 @@ class org.lamsfoundation.lams.authoring.Application {
         //Fire off a resize to set up sizes
         onResize();
 		//TODO Remove loading screen
+		if(SHOW_DEBUGGER){
+			showDebugger();
+		}
     }
     
     /**
@@ -355,12 +360,20 @@ class org.lamsfoundation.lams.authoring.Application {
 		//the debug window:
         if (Key.isDown(Key.CONTROL) && Key.isDown(Key.ALT) && Key.isDown(QUESTION_MARK_KEY)) {
             if (!_debugDialog.content){
-                _debugDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:'Debug',closeButton:true,scrollContentPath:'debugDialog'});
+                showDebugger();
             }else {
-               _debugDialog.deletePopUp();
-            }                
+               hideDebugger();
+            }               
         }
     }
+	
+	public function showDebugger():Void{
+		_debugDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:'Debug',closeButton:true,scrollContentPath:'debugDialog'});
+	}
+	
+	public function hideDebugger():Void{
+		_debugDialog.deletePopUp();
+	}
     
 	/**
 	* get the ddm form the canvas.. this method is here as the ddm used to be stored inthe application.
