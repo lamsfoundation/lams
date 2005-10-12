@@ -110,10 +110,12 @@ public class MessageTest extends TestCase {
 
 
         //delete
+        
         messageDao.delete(reloaded);
+        messageDao.deleteForumMessage(forum.getUuid());
         dao.delete(forum);
-//        assertNull("message object not deleted", messageDao.getById(message.getUuid()));
-//        assertNull("reply message object not deleted", messageDao.getById(message2.getUuid()));
+        assertNull("message object not deleted", messageDao.getById(message.getUuid()));
+        assertNull("reply message object not deleted", messageDao.getById(message2.getUuid()));
     }
 
     protected void tearDown() throws Exception {

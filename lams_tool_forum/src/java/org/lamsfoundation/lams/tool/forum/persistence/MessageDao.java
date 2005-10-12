@@ -34,4 +34,14 @@ public class MessageDao extends HibernateDaoSupport {
 		return this.getHibernateTemplate().findByNamedQuery(name, forumId);
 	}
 
+	/**
+	 * Delete all messages in special forum.
+	 * @param forumUuid 
+	 * 		The forum UUID which messages will be deleted in this method.
+	 */
+	public void deleteForumMessage(Long forumUuid) {
+		List list = findByNamedQuery("allMessagesByForum",forumUuid);
+		this.getHibernateTemplate().deleteAll(list);
+	}
+
 }

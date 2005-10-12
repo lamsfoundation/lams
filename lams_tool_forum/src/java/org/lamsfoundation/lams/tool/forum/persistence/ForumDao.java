@@ -20,11 +20,15 @@ public class ForumDao extends HibernateDaoSupport {
 	public Forum getById(Long forumId) {
 		return (Forum) getHibernateTemplate().get(Forum.class,forumId);
 	}
-
+	/**
+	 * NOTE: before call this method, must be sure delete all messages in this forum.
+	 * Example code like this:
+	 * <pre>
+	 * <code>messageDao.deleteForumMessage(forum.getUuid());</code>
+	 * </pre>
+	 * @param forum
+	 */
 	public void delete(Forum forum) {
-		//TODO: delete this forum message
-//		this.getHibernateTemplate().
-//		this.getSession().createQuery()
 		this.getHibernateTemplate().delete(forum);
 	}
 
