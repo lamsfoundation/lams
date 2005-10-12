@@ -45,6 +45,7 @@
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.learning.export.service.ExportPortfolioService">
 				<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
+				<property name="activityDAO"><ref bean="activityDAO"/></property>
 				<property name="transitionDAO"><ref bean="transitionDAO"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>			
 			</bean>
