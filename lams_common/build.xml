@@ -37,7 +37,7 @@ Ant build file.
 		<echo message=""/>
 		<echo message="Among the available targets are:"/>
 		<echo message=""/>
-		<echo message="deploy-lams-windows  --> Deploy lams project on windows"/>
+		<echo message="deploy-lams-jar --> Deploy lams jar to jboss"/>
 		<echo message="rebuild-db   --> Clean and rebuild the database"/>
 		<echo message="insert-test-data --> Insert test data to database"/>
 		<echo message="lams-jar  --> Make jar archive for deployment"/>
@@ -269,6 +269,7 @@ Ant build file.
 			<transaction src="${db.scripts}/drop_lams_11_tables.sql"/>
 			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
 			<transaction src="${db.scripts}/insert_types_data.sql"/>
+			<transaction src="${db.scripts}/insert_users.sql"/>
 		</sql>
 		<delete dir="${contentrepository.location}"/>
 	</target>
