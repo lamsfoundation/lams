@@ -1,6 +1,7 @@
 ﻿import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.common.util.*
+import org.lamsfoundation.lams.common.*
 import mx.utils.*
 
 /**
@@ -27,6 +28,34 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		//Create the authoring view and register with model
 		workspaceView = new WorkspaceView(workspaceModel, undefined);
 		workspaceModel.addObserver(workspaceView);
+		init();
+	}
+	
+	private function init():Void{
+		//find out the users wsp:
+		getUserWorkspace();
+			
+	}
+	
+	/**
+	 * Retrieves the workspace details for the current user from the server.
+	 * @usage   
+	 */
+	public function getUserWorkspace():Void{
+		var callback:Function = Proxy.create(this,setUserWorkspace);
+        var uid:Number = Config.getInstance().userID;
+		Application.getInstance().getComms().getRequest('workspace.do?method=getWorkspace&userID='+uid,callback, false);
+	}
+	
+	/**
+	 * Invoked when getUserWorkspace returns result from server.
+	 * Sets the data in the model
+	 * @usage   
+	 */
+	public function setUserWorkspace(dto):Void{
+		Debugger.log('workspaceID:'+dto.workspaceID+',rootFolderID:'+dto.rootFolderID,Debugger.GEN,'setUserWorkspace','Workspace');			
+		workspaceModel.rootFolderID = dto.rootFolderID;
+		workspaceModel.workspaceID = dto.workspaceID;
 	}
 	
     /**
