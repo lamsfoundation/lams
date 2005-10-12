@@ -20,31 +20,13 @@
 	<tr>
 	
 		<td>*<bean:write name="portfolio" property="activityName"/>:</td>
-		<td><a href="#act<bean:write name="portfolio" property="activityId"/>"><bean:write name="portfolio" property="activityDescription"/></a></td>
+		<td><a href="<bean:write name="portfolio" property="toolLink"/>"><bean:write name="portfolio" property="activityDescription"/></a></td>
 		
 	</tr>
 </logic:iterate>
 </logic:notEqual>
 </table></td></tr>
 
-
-<tr> <td> <table>
-<bean:size id="counter2" name="portfolioList" />
-<logic:notEqual name="counter2" value="0">
-<logic:iterate name="portfolioList" id="portfolio">
-	<tr>
-	<td>
-		<a name="act<bean:write name="portfolio" property="activityId"/>"><bean:write name="portfolio" property="activityName"/>:
-		<bean:write name="portfolio" property="activityDescription"/></a>	
-	</td>	
-	<td>
-		<IFRAME name="frame<bean:write name="portfolio" property="activityId"/>" src="http://localhost:8080/lams/tool/lanb11/exportPortfolio.do?mode=learner&toolSessionId=455&userId=555"
-		frameborder="0"></IFRAME>
-	</td>
-	</tr>
-</logic:iterate>
-</logic:notEqual>
-</table></td></tr>
 
 </logic:present>
 
