@@ -26,56 +26,11 @@
 				  requestScope.userExceptionDefaultContentNotSetup != 'true'  && 				  
   				  requestScope.userExceptionUserIdNotNumeric != 'true'  && 
 				  requestScope.userExceptionDefaultQuestionContentNotAvailable != 'true'}"> 	
-		<!-- Dave to do the styling-->
-		<!-- this form is exists temporarily to represent tool icon, remove this form once the tool is deployed into authoring environment -->
-		<c:if test="${requestScope.startMonitoringSummaryRequest == 'true'}"> 			
-			<html:form  action="/authoring?method=loadMonitoring&validate=false" enctype="multipart/form-data" method="POST" target="_self">
-				<table align=center> <!-- Dave to take off--> 
-				<tr>
-						<td>
-							<html:submit property="summaryMonitoring" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-								<bean:message key="button.summary"/>
-							</html:submit> 
-						</td><td>
-							<html:submit property="instructionsMonitoring" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-								<bean:message key="button.instructions"/>
-							</html:submit> 
-						</td><td>
-							<html:submit property="editActivityMonitoring" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-								<bean:message key="button.editActivity"/>
-							</html:submit> 
-						</td><td>			
-							<html:submit property="statsMonitoring" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-								<bean:message key="button.stats"/>
-							</html:submit> 
-						</td>
-				</tr>
-				</table>
-			</html:form>		
-		</c:if>						
 		
 		<html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
-		<table align=center> <!-- Dave to take off--> 
-			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
-				<tr><td>
-					<fmt:message key="label.authoring.qa"/>
-				</td></tr>
-			</c:if>								
-			
-			<c:if test="${sessionScope.isDefineLater == 'true'}"> 			
-				<c:if test="${requestScope.startMonitoringSummaryRequest != 'true'}"> 			
-					<tr><td class="error">
-						<fmt:message key="error.content.beingModified"/>
-					</td></tr>
-				</c:if>						
-			</c:if>						
+		<table align=center> 
 
 			<c:if test="${sessionScope.isDefineLater != 'true' || sessionScope.isMonitoringDefineLater == 'true' }"> 			
-				<c:if test="${sessionScope.contentLocked == 'true'}"> 			
-					<tr><td class="error">
-						<fmt:message key="error.content.inUse"/>
-					</td></tr>
-				</c:if>						
 				<c:if test="${sessionScope.contentLocked == 'false'}"> 			
 					<tr> <td class="error">
 						<html:errors/>

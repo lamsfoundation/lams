@@ -81,6 +81,7 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
     }
     
     
+    /*
     public void testInitDB()
     {
     	//create new mc content
@@ -127,5 +128,6 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
      	McOptsContent mcOptionsContent3= new McOptsContent(new Long(999), false, "yellow", mcQueContent1, new HashSet());
      	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent3);
    }
+   */
     
 }

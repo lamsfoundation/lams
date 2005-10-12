@@ -1177,7 +1177,6 @@ public class McServicePOJO implements
 
     public McQueContent getToolDefaultQuestionContent(long contentId) throws McApplicationException
     {
-    	logger.debug("before attempting retrieving McQueContent with contentId : " + contentId);
     	McQueContent mcQueContent=mcQueContentDAO.getToolDefaultQuestionContent(contentId);
     	logger.debug("retrieved mcQueContent : " + mcQueContent);
     	return mcQueContent; 

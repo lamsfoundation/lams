@@ -44,7 +44,10 @@ public class McQueContent implements Serializable {
 
     /** nullable persistent field */
     private Integer displayOrder;
-
+    
+    /** non persistent field */
+    private Long mcContentId;
+    
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.McContent mcContent;
     
@@ -189,4 +192,16 @@ public class McQueContent implements Serializable {
             .toString();
     }
 	
+	/**
+	 * @return Returns the mcContentId.
+	 */
+	public Long getMcContentId() {
+		return mcContentId;
+	}
+	/**
+	 * @param mcContentId The mcContentId to set.
+	 */
+	public void setMcContentId(Long mcContentId) {
+		this.mcContentId = mcContentId;
+	}
 }

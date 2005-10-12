@@ -37,7 +37,7 @@ public class TestMcQueContent extends McDataAccessTestCase
         super(name);
     }
     
-    
+    /*
     public void testCreateMcQueContent()
     {
     	McContent mcContent = mcContentDAO.findMcContentById(new Long(2));
@@ -88,6 +88,13 @@ public class TestMcQueContent extends McDataAccessTestCase
     	McQueContent mcQueContent= mcQueContentDAO.getMcQueContentByUID(new Long(1));
     	mcQueContent.setDisplayOrder(new Integer(88));
     	mcQueContentDAO.saveMcQueContent(mcQueContent);
+    }
+    */
+    
+    public void testGetToolDefaultQuestionContent()
+    {
+    	McQueContent mcQueContent = mcQueContentDAO.getToolDefaultQuestionContent(new Long(1).longValue());
+    	System.out.print("mcQueContent:" + mcQueContent);
     }
     
 }

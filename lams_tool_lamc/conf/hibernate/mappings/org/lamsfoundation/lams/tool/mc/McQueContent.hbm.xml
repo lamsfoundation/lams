@@ -39,6 +39,17 @@
     >
     </property>
     
+    <property
+        name="mcContentId"
+        type="java.lang.Long"
+        column="mc_content_id"
+        not-null="true"
+   	    update="false"
+	    insert="false"
+        length="20"
+    >
+    </property>
+    
     <many-to-one
         name="mcContent"
         class="org.lamsfoundation.lams.tool.mc.McContent"

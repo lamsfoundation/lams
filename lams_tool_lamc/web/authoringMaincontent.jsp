@@ -41,7 +41,7 @@ MM_reloadPage(true);
 </head>
 <body onLoad="initTabs()">
 
-<h1>Noticeboard</h1>
+<h1>Multipe Choice</h1>
     
     <!-- start tabs -->
 <!-- tab holder table -->
@@ -83,16 +83,24 @@ MM_reloadPage(true);
   </tr>
 </table>
     <!-- end tab buttons -->
-    
-    
-    
-    
+
+<!-- error holder table -->    
+<table border="0" cellspacing="0" cellpadding="0">
+<tr> 
+	<td class="error">   
+	<html:errors/>
+</td></tr>    
+</table>
 
     <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
 <h2>Basic tab content</h2>
 <div id="formtablecontainer">
-The basic contents should go here
+	  <tr>
+		<td>
+			<c:out value="${sessionScope.defaultQuestionContent}"/>
+		</td>
+	  </tr>		
 </div>
 <hr>
 <a href="javascript:;" class="button">Cancel</a>

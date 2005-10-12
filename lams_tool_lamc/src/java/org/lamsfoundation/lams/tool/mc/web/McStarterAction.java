@@ -1,5 +1,5 @@
 /**
- * @author oxgurd
+ * @author ozgurd
  * 
  * Created on 12/10/2005
  * 
@@ -131,26 +131,55 @@ public class McStarterAction extends Action implements McAppConstants {
 			if (contentId == 0) 
 			{
 				logger.debug("default content id has not been setup");
+				request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
 				persistError(request,"error.defaultContent.notSetup");
-		    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
 				return (mapping.findForward(LOAD_QUESTIONS));	
 			}
 		}
 		catch(Exception e)
 		{
 			logger.debug("error getting the default content id: " + e.getMessage());
+			request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
 			persistError(request,"error.defaultContent.notSetup");
-	    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
 
+		
 		/**
-		 * retrieve the default question content id based on default content id determined above
+		 * retrieve uid of the content based on default content id determined above
+		 */
+		long contentUID=0;
+		try
+		{
+			logger.debug("retrieve uid of the content based on default content id determined above: " + contentId);
+			McContent mcContent=mcService.retrieveMc(new Long(contentId));
+			if (mcContent == null)
+			{
+				logger.debug("Exception occured: No default content");
+	    		request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
+	    		persistError(request,"error.defaultContent.notSetup");
+				return (mapping.findForward(LOAD_QUESTIONS));
+			}
+			logger.debug("using mcContent: " + mcContent);
+			logger.debug("using mcContent uid: " + mcContent.getUid());
+			contentUID=mcContent.getUid().longValue();
+		}
+		catch(Exception e)
+		{
+			logger.debug("Exception occured: No default question content");
+			request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
+    		persistError(request,"error.defaultContent.notSetup");
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
+		
+		
+		/**
+		 * retrieve the default question content id based on default content UID determined above
 		 */
 		try
 		{
-			logger.debug("retrieve the default question content based on default contentId: " + contentId);
-			McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(contentId);
+			logger.debug("retrieve the default question content based on default content UID: " + contentId);
+			McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(contentUID);
 			logger.debug("using mcQueContent: " + mcQueContent);
 			if (mcQueContent == null)
 			{
