@@ -44,7 +44,10 @@ class Config {
     private var _version:String;        //Config properties
     private var _language:String;
     private var _theme:String;
+	
+	//passed in from the query string:
     private var _serverUrl:String;
+    private var _userID:Number;
     
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -180,6 +183,7 @@ class Config {
         
 		
         _serverUrl = _root.serverURL;
+		_userID = _root.userID;
 		//TODO 31/05/05 Deal with alternative sources other than cookie or server. i.e. Browser + _root (query string)
 		Debugger.log('Confirming ServerURL passed in - _serverUrl:' + _serverUrl,Debugger.GEN,'serverDefaultsLoaded','Config');
         
@@ -286,5 +290,9 @@ class Config {
 	
 	function get serverUrl():String{
 		return _serverUrl;
+	}
+	
+	function get userID():Number{
+		return _userID;
 	}
 }
