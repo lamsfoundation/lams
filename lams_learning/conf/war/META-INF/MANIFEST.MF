@@ -1,2 +1,2 @@
-Class-Path: ./lams.jar ./lams_learning.jar
+Class-Path: ./lams.jar ./lams_learning.jar ./lams-tool-lasr10.jar
 
