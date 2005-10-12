@@ -76,7 +76,7 @@ class org.lamsfoundation.lams.common.util.Debugger {
 	* @param fname 			(Optional) Name of the function calling this log message
 	* @param currentClass 	(Optional)Name of the class
 	*/
-	public static function log(msg:String,level:Number,fname:String,currentClass:Object):Void{
+	public static function log(msg:Object,level:Number,fname:String,currentClass:Object):Void{
         //Ensure we have an instance
         getInstance();
         
