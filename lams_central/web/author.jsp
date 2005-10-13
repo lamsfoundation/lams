@@ -1,3 +1,4 @@
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <HTML>
 <HEAD>
@@ -218,19 +219,18 @@ function checkSaved(){
 <!-- URL's used in the movie-->
 <!-- text used in the movie-->
 <!--Library-->
-
 <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
  codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0" name="authoring"
  width="100%" height="100%" align="" id="authoring">
   <param name="allowScriptAccess" value="sameDomain" />
 
-  <param name="movie" value="lams_authoring.swf?serverURL=<%=pathToRoot%>">
+  <param name="movie" value="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>">
   <param name="quality" value="high">
   <param name="scale" value="noscale">
   <param name="bgcolor" value="#B3B7C8">
   <embed 
 	 
-	  src="lams_authoring.swf?serverURL=<%=pathToRoot%>"
+	  src="lams_authoring.swf?userID=<lams:user property="userID"/>&serverURL=<%=pathToRoot%>"
 	  quality="high" 
 	  scale="noscale" 
 	  bgcolor="#B3B7C8"  

@@ -27,37 +27,49 @@ http://www.gnu.org/licenses/gpl.txt
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
 				classpath:/org/lamsfoundation/lams/applicationContext.xml
+				classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
 				classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml
 	</param-value>
 </context-param>
 
-    <!--
-    To use non XDoclet filters, create a filters.xml file that
-    contains the additional filters (eg Sitemesh) and place it in your
-    project's merge dir.  Don't include filter-mappings in this file,
-    include them in a file called filter-mappings.xml and put that in
-    the same directory.
-    -->
+    <filter>
+    <filter-name>SystemSessionFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.session.SystemSessionFilter
+         </filter-class>
+  </filter>
+  <filter>
+    <filter-name>hibernateFilter</filter-name>
+    <filter-class>
+      org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter
+    </filter-class>
+	<init-param>
+		<param-name>sessionFactoryBeanName</param-name>
+		<param-value>coreSessionFactory</param-value>
+	</init-param>
+   </filter>
 
-    <!--
-    To use non XDoclet filter-mappings, create a filter-mappings.xml file that
-    contains the additional filter-mappings and place it in your
-    project's merge dir.
-    -->
+    <filter-mapping>
+    <filter-name>SystemSessionFilter</filter-name>
+     <url-pattern>/*</url-pattern> 
+  </filter-mapping>
+    <filter-mapping>
+    <filter-name>hibernateFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
   <listener>
 	<listener-class>
 		org.springframework.web.context.ContextLoaderListener
 	</listener-class>
+</listener>	
+<listener>
 	<listener-class>
  		org.lamsfoundation.lams.web.SessionListener
  	</listener-class>
-	<listener-class>
-	  org.lamsfoundation.lams.web.SharedSession
-	</listener-class>
-</listener>	
+</listener>
 
    <servlet>
       <servlet-name>storeLD</servlet-name>
@@ -266,6 +278,11 @@ http://www.gnu.org/licenses/gpl.txt
 <taglib>
     <taglib-uri>fck-editor</taglib-uri>
     <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
+</taglib>
+
+ <taglib>
+   <taglib-uri>tags-lams</taglib-uri>
+   <taglib-location>/WEB-INF/lams.tld</taglib-location>
 </taglib>
 
   	<!--  Security Constraint -->

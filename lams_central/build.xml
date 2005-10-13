@@ -137,6 +137,7 @@
   				webxml="${webinf}/web.xml">
 			<webinf dir="${webinf}">
 				<include name="*.xml"/>
+				<include name="*.tld"/>
 				<include name="*.properties"/>
 				<include name="struts/**"/>
 				<include name="jstl/**"/>
@@ -215,6 +216,7 @@
 	            <include name="**/*Servlet.java" />
 	            <include name="**/*Action.java" />
 	            <include name="**/*ActionForm.java" />
+	            <include name="**/*Tag.java" />
 	         </fileset>
 
 	         <deploymentdescriptor 
@@ -227,6 +229,16 @@
 	         				destdir="${webinf.struts}"
 	         				version="1.2" 
 	         				mergedir="${conf.xdoclet}"/>
+			 
+			 <jsptaglib jspversion="1.1"
+						taglibversion="1.0"
+					 	shortname="lams"
+			 			displayname="LAMSTags"
+					 	description="LAMS custom tags"
+			 			filename="lams.tld"
+					 	validatexml="true"
+						destdir="${webinf}"
+        				mergedir="${conf.xdoclet}"/>
 	     </webdoclet>
 	</target>
 		
