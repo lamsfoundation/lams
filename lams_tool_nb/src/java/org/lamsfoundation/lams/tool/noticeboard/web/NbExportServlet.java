@@ -6,17 +6,16 @@
  */
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
-import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.RequestDispatcher;
-import java.io.IOException;
-import javax.servlet.ServletException;
+
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
-import org.lamsfoundation.lams.util.WebUtil;
-import java.io.File;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.servlet.ExportPortfolioServletException;
+
 /**
  * @author mtruong
  *
@@ -27,7 +26,7 @@ public class NbExportServlet extends AbstractExportPortfolioServlet {
 	
 	private final String FILENAME = "nb_main.html";
 	
-	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName) throws NbApplicationException
+	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) throws NbApplicationException
 	{
 		/**
 		 * Implementation 1: using filters. Problem: cant generate more than one file
@@ -76,7 +75,7 @@ public class NbExportServlet extends AbstractExportPortfolioServlet {
 		try
 		{
 			// Can generate other files here by calling writeResponseToFile and supplying different urls 
-			writeResponseToFile(urlWithParameters, directoryName, FILENAME);
+			writeResponseToFile(urlWithParameters, directoryName, FILENAME, cookies);
 		
 		}
 		catch(ExportPortfolioServletException e)
@@ -85,8 +84,6 @@ public class NbExportServlet extends AbstractExportPortfolioServlet {
 		} 
 		return FILENAME;
 	}
-	
-	
 	
 	
 }
