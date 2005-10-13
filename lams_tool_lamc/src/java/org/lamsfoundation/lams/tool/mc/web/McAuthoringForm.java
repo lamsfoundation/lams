@@ -22,6 +22,9 @@ import org.apache.struts.upload.FormFile;
  */
 public class McAuthoringForm extends ActionForm implements McAppConstants {
 	/** form controllers */
+	protected String editDefaultQuestion;
+	
+	
 	protected String addContent;
 	protected String removeContent;
 	protected String removeAllContent;
@@ -30,6 +33,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String submitOfflineFile;
 	protected String submitOnlineFile;
 	
+		
 	/** tab controller, these may go away once the Flash wraps the jsp */
 	protected String choice;
 	protected String choiceBasic;
@@ -47,6 +51,9 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String offlineInstructions;
 	protected FormFile theOfflineFile;
 	protected FormFile theOnlineFile;
+	
+	protected String richTextOfflineInstructions;
+	protected String richTextOnlineInstructions;
 	
 	/** advanced content */
 	protected String synchInMonitor;
@@ -66,6 +73,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	
 	public void resetUserAction()
     {
+		this.editDefaultQuestion=null;
     	this.addContent=null;	
     	this.removeContent=null;
     	this.removeAllContent=null;
@@ -104,6 +112,9 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 
 		this.onlineInstructions=null;
 		this.offlineInstructions=null;
+		
+		this.richTextOfflineInstructions=null;
+		this.richTextOnlineInstructions=null;
 	
 		this.endLearningMessage=null;
 		this.synchInMonitor=null;
@@ -502,5 +513,42 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setSubmitOnlineFile(String submitOnlineFile) {
 		this.submitOnlineFile = submitOnlineFile;
+	}
+	/**
+	 * @return Returns the richTextOfflineInstructions.
+	 */
+	public String getRichTextOfflineInstructions() {
+		return richTextOfflineInstructions;
+	}
+	/**
+	 * @param richTextOfflineInstructions The richTextOfflineInstructions to set.
+	 */
+	public void setRichTextOfflineInstructions(
+			String richTextOfflineInstructions) {
+		this.richTextOfflineInstructions = richTextOfflineInstructions;
+	}
+	/**
+	 * @return Returns the richTextOnlineInstructions.
+	 */
+	public String getRichTextOnlineInstructions() {
+		return richTextOnlineInstructions;
+	}
+	/**
+	 * @param richTextOnlineInstructions The richTextOnlineInstructions to set.
+	 */
+	public void setRichTextOnlineInstructions(String richTextOnlineInstructions) {
+		this.richTextOnlineInstructions = richTextOnlineInstructions;
+	}
+	/**
+	 * @return Returns the editDefaultQuestion.
+	 */
+	public String getEditDefaultQuestion() {
+		return editDefaultQuestion;
+	}
+	/**
+	 * @param editDefaultQuestion The editDefaultQuestion to set.
+	 */
+	public void setEditDefaultQuestion(String editDefaultQuestion) {
+		this.editDefaultQuestion = editDefaultQuestion;
 	}
 }

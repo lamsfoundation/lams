@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.tool.mc.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
 
 
@@ -33,6 +35,8 @@ import org.lamsfoundation.lams.tool.mc.McOptsContent;
 public interface IMcOptionsContentDAO
 {
 	public McOptsContent getMcOptionsContentByUID(Long uid);
+	
+	public List findMcOptionsContentByQueId(Long mcQueContentId);
 	
 	public void saveMcOptionsContent(McOptsContent mcOptionsContent);
     

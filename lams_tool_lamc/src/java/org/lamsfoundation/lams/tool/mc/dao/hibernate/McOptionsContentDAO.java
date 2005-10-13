@@ -21,9 +21,12 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -38,12 +41,28 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptionsContentDAO {
 	 	static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
 	 	
+	 	private static final String FIND_MC_OPTIONS_CONTENT = "from " + McOptsContent.class.getName() + " as mco where mc_que_content_id=?";
+	 	
 	 	public McOptsContent getMcOptionsContentByUID(Long uid)
 		{
 			 return (McOptsContent) this.getHibernateTemplate()
 	         .get(McOptsContent.class, uid);
 		}
 		
+	 	
+	 	public List findMcOptionsContentByQueId(Long mcQueContentId)
+	    {
+			HibernateTemplate templ = this.getHibernateTemplate();
+			if ( mcQueContentId != null) {
+				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+					.setLong(0,mcQueContentId.longValue())
+					.list();
+				return list;
+			}
+			return null;
+	    }
+
+	 	
 		
 		public void saveMcOptionsContent(McOptsContent mcOptsContent)
 	    {

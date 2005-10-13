@@ -67,6 +67,8 @@
 
 package org.lamsfoundation.lams.tool.mc.web;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -86,6 +88,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
+import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
@@ -103,6 +106,7 @@ public class McStarterAction extends Action implements McAppConstants {
   								throws IOException, ServletException, McApplicationException {
 	
 		Map mapQuestionContent= new TreeMap(new McComparator());
+		Map mapOptionsContent= new TreeMap(new McComparator());
 		
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		mcAuthoringForm.resetRadioBoxes();
@@ -174,7 +178,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		
 		/**
-		 * retrieve the default question content id based on default content UID determined above
+		 * retrieve the default question content based on default content UID determined above
 		 */
 		try
 		{
@@ -236,9 +240,81 @@ public class McStarterAction extends Action implements McAppConstants {
 			logger.debug("forwarding to: " + LOAD_QUESTIONS);
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
-	/**
-	 * load questions page
-	 */
+	
+    	/**
+		 * find out if the passed tool content id exists in the db 
+		 * present user either a first timer screen with default content data or fetch the existing content.
+		 * 
+		 * if the toolcontentid does not exist in the db, create the default Map,
+		 * there is no need to check if the content is in use in this case.
+		 * It is always unlocked -> not in use since it is the default content.
+		*/
+		if (!existsContent(toolContentId, request))
+		{
+			logger.debug("getting default content");
+			contentId=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+			McContent mcContent=mcService.retrieveMc(new Long(contentId));
+			logger.debug("mcContent:" + mcContent);
+			
+			if (mcContent == null)
+			{
+				logger.debug("Exception occured: No default content");
+				request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE, new Boolean(true));
+				persistError(request,"error.defaultContent.notAvailable");
+				return (mapping.findForward(LOAD_QUESTIONS));
+			}
+			McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
+			logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
+			logger.debug("getting default content");
+			/**
+			 * this is a new content creation, the content must not be in use.
+			 * relevant attribute: CONTENT_IN_USE  
+			 */
+			request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(false));
+		    logger.debug("CONTENT_IN_USE: " + request.getSession().getAttribute(CONTENT_IN_USE));
+		    
+		    mcAuthoringForm.setUsernameVisible(OFF);
+		    mcAuthoringForm.setQuestionsSequenced(OFF);
+			mcAuthoringForm.setSynchInMonitor(OFF);
+			
+			/** collect options for the default question content into a Map*/
+			McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(mcContent.getUid().longValue());
+			System.out.print("mcQueContent:" + mcQueContent);
+			if (mcQueContent == null)
+			{
+				logger.debug("Exception occured: No default question content");
+				request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
+				persistError(request,"error.defaultQuestionContent.notAvailable");
+				return (mapping.findForward(LOAD_QUESTIONS));
+			}
+			
+			/** hold all he options for this question*/
+			List list=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());
+	    	logger.debug("options list:" + list);
+
+	    	Iterator listIterator=list.iterator();
+	    	Long mapIndex=new Long(1);
+	    	while (listIterator.hasNext())
+	    	{
+	    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+	    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+	    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+	    		mapIndex=new Long(mapIndex.longValue()+1);
+	    	}
+	    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+			logger.debug("starter initialized the Options Map: " + request.getSession().getAttribute("mapOptionsContent") );
+			
+		}
+		else
+		{
+			logger.debug("getting existing content with id:" + toolContentId);
+		}
+    	
+    	
+    	
+    	
+    	
+    	
 	
 	
 	mcAuthoringForm.resetUserAction();
@@ -252,13 +328,13 @@ public class McStarterAction extends Action implements McAppConstants {
 	 * @return boolean
 	 * determine whether a specific toolContentId exists in the db
 	 */
-	protected boolean existsContent(Long toolContentId, HttpServletRequest request)
+	protected boolean existsContent(long toolContentId, HttpServletRequest request)
 	{
 		/**
 		 * retrive the service
 		 */
 		IMcService mcService =McUtils.getToolService(request);
-		McContent mcContent=mcService.retrieveMc(toolContentId);
+		McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
 	    if (mcContent == null) 
 	    	return false;
 	    

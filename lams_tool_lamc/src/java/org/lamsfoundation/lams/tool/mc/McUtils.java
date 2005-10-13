@@ -73,25 +73,6 @@ public abstract class McUtils implements McAppConstants {
 	}
 	
 	
-	
-    public static void setDefaultSessionAttributes(HttpServletRequest request, McContent defaultMcContent, McAuthoringForm mcAuthoringForm)
-	{
-		/**should never be null anyway as default content MUST exist in the db*/
-		if (defaultMcContent != null)
-		{		
-			mcAuthoringForm.setTitle(defaultMcContent.getTitle());
-			mcAuthoringForm.setInstructions(defaultMcContent.getInstructions());
-			mcAuthoringForm.setReportTitle(defaultMcContent.getReportTitle());
-			mcAuthoringForm.setEndLearningMessage(defaultMcContent.getEndLearningMessage());
-			mcAuthoringForm.setOnlineInstructions(defaultMcContent.getOnlineInstructions());
-			mcAuthoringForm.setOfflineInstructions(defaultMcContent.getOfflineInstructions());
-			mcAuthoringForm.setMonitoringReportTitle(defaultMcContent.getMonitoringReportTitle());
-			
-			request.getSession().setAttribute(TITLE,mcAuthoringForm.getTitle());
-			request.getSession().setAttribute(INSTRUCTIONS,mcAuthoringForm.getInstructions());
-		}
-	}
-    
 	public static int getCurrentUserId(HttpServletRequest request) throws McApplicationException
     {
 	    HttpSession ss = SessionManager.getSession();
@@ -187,7 +168,20 @@ public abstract class McUtils implements McAppConstants {
 		return true;	
 	}
 	
-
+	public static void setDefaultSessionAttributes(HttpServletRequest request, McContent defaultMcContent, McAuthoringForm mcAuthoringForm)
+	{
+		/**should never be null anyway as default content MUST exist in the db*/
+		if (defaultMcContent != null)
+		{		
+			mcAuthoringForm.setTitle(defaultMcContent.getTitle());
+			mcAuthoringForm.setInstructions(defaultMcContent.getInstructions());
+			
+			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,defaultMcContent.getOfflineInstructions());
+		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,defaultMcContent.getOnlineInstructions());
+		}
+	}
+	
+	
 	public static String getFormattedDateString(Date date)
 	{
 		logger.debug(logger + " " + " McUtils getFormattedDateString: " +  

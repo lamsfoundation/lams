@@ -101,6 +101,7 @@ public interface McAppConstants {
      * authoring mode constants
      */
     public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
+    public static final String MAP_OPTIONS_CONTENT						="mapOptionsContent";
     public static final String DEFAULT_QUESTION_CONTENT					="defaultQuestionContent";
     public static final String TITLE									="title";
     public static final String INSTRUCTIONS								="instructions";
@@ -110,6 +111,7 @@ public interface McAppConstants {
     public static final String OFFLINE_INSTRUCTIONS						="offlineInstructions";
     public static final String END_LEARNING_MESSSAGE					="endLearningMessage";
     public static final String CONTENT_LOCKED							="contentLocked";
+    public static final String CONTENT_IN_USE							="contentInUse";
     public static final String ON										="ON";
     public static final String OFF										="OFF";
     public static final String IS_USERNAME_VISIBLE_MONITORING			="isUsernameVisibleMonitoring";

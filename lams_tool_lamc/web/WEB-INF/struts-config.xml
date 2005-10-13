@@ -51,6 +51,29 @@
 		    redirect="true"
 	  	/>
 	</action>  
+	
+	<action
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.mc.web.McAction"
+      name="McAuthoringForm"
+      scope="session"
+      input=".questions"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="load"
+        path=".questions"
+        redirect="true"
+      />
+    
+      <forward
+        name="starter"
+        path=".starter"
+        redirect="true"
+      />
+    </action>
  </action-mappings>
 
   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

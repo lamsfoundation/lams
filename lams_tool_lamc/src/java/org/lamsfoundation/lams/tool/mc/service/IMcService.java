@@ -89,6 +89,8 @@ public interface IMcService
 	
     public void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
     
+    public List findMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
+    
     public void saveMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
     
     public void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;

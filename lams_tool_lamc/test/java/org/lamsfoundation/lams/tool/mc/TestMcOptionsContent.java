@@ -9,7 +9,8 @@
 
 package org.lamsfoundation.lams.tool.mc;
 
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 
 /*
@@ -37,8 +38,7 @@ public class TestMcOptionsContent extends McDataAccessTestCase
         super(name);
     }
     
-    	
-
+    /*	
     public void testCreateMcOptionsContent()
     {
     	McQueContent mcQueContent = mcQueContentDAO.getMcQueContentByUID(new Long(1));
@@ -51,8 +51,20 @@ public class TestMcOptionsContent extends McDataAccessTestCase
     	McOptsContent mcOptionsContent3= new McOptsContent(new Long(999), false, "yellow", mcQueContent, new HashSet());
     	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent3);
     }
-
+  */
     
+    public void testRetrieveMcOptionsContent()
+    {
+    	List list=mcOptionsContentDAO.findMcOptionsContentByQueId(new Long(1));
+    	System.out.print("list:" + list);
+    	
+    	Iterator listIterator=list.iterator();
+    	while (listIterator.hasNext())
+    	{
+    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+    		System.out.println("option text:" + mcOptsContent.getMcQueOptionText());
+    	}
+    }
     
 }
 

@@ -419,6 +419,21 @@ public class McServicePOJO implements
     }
     
     
+    public List findMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException
+    {
+    	try
+        {
+            List list=mcOptionsContentDAO.findMcOptionsContentByQueId(mcQueContentId);
+            return list;
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is finding by que id"
+                                                 + " the mc options: "
+                                                 + e.getMessage(),e);
+        }
+    }
+    
     public void saveMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException
 	{
     	try

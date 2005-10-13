@@ -92,15 +92,54 @@ MM_reloadPage(true);
 </td></tr>    
 </table>
 
-    <!-- tab content one (basic)-->
+
+<html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
+ <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
-<h2>Basic tab content</h2>
+<h2>Basic Question Definitions</h2>
 <div id="formtablecontainer">
-	  <tr>
-		<td>
-			<c:out value="${sessionScope.defaultQuestionContent}"/>
-		</td>
-	  </tr>		
+					<table align=center> 	 
+ 						<tr> 
+					 		<td> <bean:message key="label.authoring.title"/>: </td>
+							<td class="formcontrol">
+							<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/">
+								  <c:out value="${McAuthoringForm.title}" escapeXml="false" />						  
+							</FCK:editor>
+							</td> 
+					  	</tr>
+					  	
+					  	<tr> 
+					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
+							<td class="formcontrol">
+							<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/">
+								  <c:out value="${McAuthoringForm.instructions}" escapeXml="false" />						  
+							</FCK:editor>
+							</td>
+						</tr>
+				
+			 		<!--default question content, this entry can not be deleted but can be updated -->
+				 		<tr> 
+						  	<td> 
+						 		<bean:message key="label.question1"/> : 
+						 	</td>
+						  	<td>
+								  	<input type="text" name="questionContent0" size="50" 
+								  	maxlength="255" value="<c:out value="${sessionScope.defaultQuestionContent}"/>"> 
+								  	&nbsp
+									<html:submit property="addContent" styleClass="linkbutton" 
+									onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+										<bean:message key="button.addNewQuestion"/>
+									</html:submit>
+						  	</td>
+						  	<td>						  	
+						  			<html:submit property="editDefaultQuestion" styleClass="linkbutton"  
+			 						onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+										<bean:message key="button.editQuestion"/>
+									</html:submit>
+						  	</td>									
+					  	</tr>
+	 				</table> 	 
+					<html:hidden property="questionIndex"/>
 </div>
 <hr>
 <a href="javascript:;" class="button">Cancel</a>
@@ -112,7 +151,7 @@ MM_reloadPage(true);
 
 <!-- tab content 2 Advanced-->
 <div id='content_a'  class="tabbody content_a">
-<h2>Advanced tab content</h2>
+<h2>Advanced Question Definitions</h2>
 <div id="formtablecontainer">
 The advanced contents should go here
 </div>
@@ -122,7 +161,7 @@ The advanced contents should go here
 
 <!-- tab content 3 instructions -->
 <div id='content_i'  class="tabbody content_i">
-<h2>Instructions tab content </h2>
+<h2>Instructions</h2>
 <div id="formtablecontainer">
 Instructions are here
 </div>
@@ -133,11 +172,27 @@ Instructions are here
 
 <!-- end of content_a -->
 </div>
-
-
-
-
+</html:form>
 <p></p>
+
+<SCRIPT language="JavaScript"> 
+	function editQuestion(questionIndex)
+	{
+		document.forms[0].questionIndex.value=questionIndex;
+		document.forms[0].isEditQuestion.value='1';
+		document.forms[0].submit();
+	}
+ </SCRIPT>
+
+
+
+
 
 </body>
 </html:html>
+
+
+
+
+
+
