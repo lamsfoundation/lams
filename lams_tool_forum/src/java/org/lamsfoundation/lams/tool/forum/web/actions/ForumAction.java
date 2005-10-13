@@ -180,7 +180,7 @@ public class ForumAction extends Action {
             while (propIt.hasNext()) {
                 CrNodeVersionProperty property = (CrNodeVersionProperty) propIt.next();
                 if ("FILENAME".equals(property.getName())) {
-                    attachment.setName(property.getValue());
+                    attachment.setFileName(property.getValue());
                 }
                 if ("TYPE".equals(property.getName())) {
                     attachment.setType(property.getValue());
@@ -270,7 +270,7 @@ public class ForumAction extends Action {
                 NodeKey node = getToolContentHandler().uploadFile(file.getInputStream(), fileName, 
                         file.getContentType(), attachmentType);
                 Attachment attachment = new Attachment();
-                attachment.setName(fileName);
+                attachment.setFileName(fileName);
                 attachment.setStream(file.getInputStream());
                 attachment.setUuid(node.getUuid());
                 attachment.setType(attachmentType);
