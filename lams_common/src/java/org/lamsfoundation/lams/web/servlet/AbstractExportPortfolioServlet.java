@@ -6,26 +6,29 @@
  */
 package org.lamsfoundation.lams.web.servlet;
 
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.apache.log4j.Logger;
-import java.net.HttpURLConnection;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.io.FileNotFoundException;
-import java.io.File;
-
+import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.web.servlet.ExportPortfolioServletException;
-import java.io.PrintWriter;
 
 
 /**
@@ -59,6 +62,7 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	protected final String TOOL_SESSION_ID = "toolSessionId";
 	protected final String TOOL_CONTENT_ID = "toolContentId";
 	protected final String USER_ID = "userId";
+
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException {
@@ -67,9 +71,11 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		String directoryName = null;
 		String mode = null;
 		
-		//get the name of the directory in which to write files to
-		directoryName = WebUtil.readStrParam(request, WebUtil.PARAM_DIRECTORY_NAME);
+		Cookie[] cookies = request.getCookies();
 		
+		
+		directoryName = WebUtil.readStrParam(request, WebUtil.PARAM_DIRECTORY_NAME);
+	
 		if (log.isDebugEnabled()) {
 			log.debug("Directory name to store files is "+directoryName);
 		}
@@ -81,14 +87,13 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		if (!FileUtil.directoryExist(directoryName))
 			throw new IOException("The directory supplied" + directoryName + " does not exist.");
 		
-		//check the format of the directory name
 		mode = WebUtil.readStrParam(request, WebUtil.PARAM_MODE);			
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Export is conducted in mode: " + mode);
 		}
 				
-		mainFileName = doExport(request, response, directoryName);
+		mainFileName = doExport(request, response, directoryName, cookies);
 		
 		if (log.isDebugEnabled()) {
 			log.debug("The name of main html file is "+mainFileName);
@@ -117,7 +122,7 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	 * @param directoryName
 	 * @return
 	 */
-	abstract protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName);
+	abstract protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies);
 	
 	private String checkDirectoryName(String directoryName)
 	{
@@ -137,9 +142,9 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	 * 
 	 * @param filename
 	 */
-	protected void writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename) throws ExportPortfolioServletException
+	protected void writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename, Cookie[] cookies) throws ExportPortfolioServletException
 	{
-		String absoluteFilePath = directoryToStoreFile + File.separator + filename;
+		/* String absoluteFilePath = directoryToStoreFile + File.separator + filename;
 		try
 		{
 			URL url = new URL(urlToConnectTo);
@@ -173,9 +178,26 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		catch(IOException e)
 		{
 			throw new ExportPortfolioServletException("A problem has occurred while writing file. ", e);
+		} */
+	    
+	    try
+	    {
+	        HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, filename, cookies);
+	    }
+	    catch(MalformedURLException e)
+		{
+			throw new ExportPortfolioServletException("The URL given is invalid. ",e);
+		}
+		catch(FileNotFoundException e)
+		{
+			throw new ExportPortfolioServletException("The directory or file may not exist. ",e);
+		}
+		catch(IOException e)
+		{
+			throw new ExportPortfolioServletException("A problem has occurred while writing file. ", e);
 		}
 		
-	}
+	} 
 	
 	/**
 	 * Helper method to generate the export portfolio url in learner mode.
