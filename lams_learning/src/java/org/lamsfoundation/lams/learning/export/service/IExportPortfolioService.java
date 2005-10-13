@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.learning.export.service;
 
 import java.util.Map;
 import java.util.Vector;
+import javax.servlet.http.Cookie;
 
 import org.lamsfoundation.lams.learning.export.Portfolio;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -70,7 +71,7 @@ public interface IExportPortfolioService {
 	 * @param lesson The specific instance of the LearningDesign and Class.
 	 * @return Portfolio[] The array of portfolio objects.
 	 */
-	public Portfolio[] exportPortfolioForTeacher(Lesson lesson);
+	public Portfolio[] exportPortfolioForTeacher(Lesson lesson, Cookie[] cookies);
 
 	/**
 	 * The main method that performs the export for the student.
@@ -82,7 +83,7 @@ public interface IExportPortfolioService {
 	 * @param anonymity The anonymity flag, is true, then anonymity is on, otherwise username would be visible.
 	 * @return Portfolio[] The array of portfolio objects.
 	 */
-	public Portfolio[] exportPortfolioForStudent(Long learnerProgressId, User user, boolean anonymity);
+	public Portfolio[] exportPortfolioForStudent(Long learnerProgressId, User user, boolean anonymity, Cookie[] cookies);
 	
 	/**
 	 * A helper method that sets up the export url for the activity. Will go through all key-value pairs
@@ -174,7 +175,7 @@ public interface IExportPortfolioService {
 	 * @param portfolios
 	 * @return An array of portfolios that can be used to generate the main export page.
 	 */
-	public Portfolio[] doExport(Vector portfolios, String tempDirectoryName);
+	public Portfolio[] doExport(Vector portfolios, String tempDirectoryName, Cookie[] cookies);
 	/**
 	 * This method is responsible for the call to the tool to export their portfolio via the export url.
 	 * It uses a HttpURLConnection to connect to the export url of each tool and returns the filename
@@ -183,7 +184,8 @@ public interface IExportPortfolioService {
 	 * @param tool The portfolio object, which contains the exportUrl in which to connect to.
 	 * @return The main file name of the tool's page.
 	 */
-	public String exportToolPortfolio(Portfolio tool);
+	//commented out to use common code from HttpUrlConnectionUtil
+	public String connectToToolViaExportURL(String exportURL, Cookie[] cookies);
 	
 	/*	public Portfolio[] exportPortfolioForStudent(LearnerProgress learnerProgress, User user, boolean anonymity);
 	
