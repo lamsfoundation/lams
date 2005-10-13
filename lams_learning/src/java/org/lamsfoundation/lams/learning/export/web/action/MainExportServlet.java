@@ -8,27 +8,25 @@ package org.lamsfoundation.lams.learning.export.web.action;
 
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.Cookie;
 
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
+
+
 
 
 /**
@@ -64,6 +62,10 @@ public class MainExportServlet extends HttpServlet {
 		String urlWithParameters = null;
 		String mode = WebUtil.readStrParam(request, WebUtil.PARAM_MODE);
 		
+		/** Get the cookies that were sent along with this request, then pass it onto export service */
+		Cookie[] cookies = request.getCookies();	
+		
+		
 		//create the directory
 		if (createTemporaryDirectory(ExportPortfolioConstants.EXPORT_TMP_DIR))
 		{			
@@ -78,7 +80,25 @@ public class MainExportServlet extends HttpServlet {
 				urlWithParameters = WebUtil.appendParameterToURL(urlWithParameters, "lessonID", WebUtil.readStrParam(request, "lessonID"));
 			}
 			
-			writeResponseToFile(urlWithParameters, ExportPortfolioConstants.EXPORT_TMP_DIR, ExportPortfolioConstants.MAIN_EXPORT_FILENAME);
+			try
+			{
+			    HttpUrlConnectionUtil.writeResponseToFile(urlWithParameters, ExportPortfolioConstants.EXPORT_TMP_DIR, ExportPortfolioConstants.MAIN_EXPORT_FILENAME, cookies);
+			}
+			catch(MalformedURLException e)
+			{
+				throw new ExportPortfolioException("The URL given is invalid. ",e);
+			}
+			catch(FileNotFoundException e)
+			{
+				throw new ExportPortfolioException("The directory or file may not exist. ",e);
+			}
+			catch(IOException e)
+			{
+				throw new ExportPortfolioException("A problem has occurred while writing file. ", e);
+			}
+			
+			
+			//writeResponseToFile(urlWithParameters, ExportPortfolioConstants.EXPORT_TMP_DIR, ExportPortfolioConstants.MAIN_EXPORT_FILENAME, cookies);
 		}
 		//forward somewhere
 		
@@ -95,7 +115,8 @@ public class MainExportServlet extends HttpServlet {
 	 * @param filename The filename of the HTML directory in which contents are to be saved to
 	 * @throws ExportPortfolioException
 	 */
-	private void writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename) throws ExportPortfolioException
+	//comment out to use common code in HttpUrlConnectionUtil
+	/*private void writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename, Cookie[] cookies) throws ExportPortfolioException
 	{
 		String absoluteFilePath = directoryToStoreFile + File.separator + filename;
 		try
@@ -133,7 +154,7 @@ public class MainExportServlet extends HttpServlet {
 			throw new ExportPortfolioException("A problem has occurred while writing file. ", e);
 		}
 		
-	}
+	} */
 	
 	/**
 	 * Creates the temporary export directory. Checks whether the directory already exists,
@@ -181,6 +202,8 @@ public class MainExportServlet extends HttpServlet {
 		
 		
 	}
+	
+	
 	
 
 }
