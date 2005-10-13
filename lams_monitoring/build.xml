@@ -6,6 +6,7 @@
 <project name="lams_monitoring" default="usage" basedir="." >
 	
    <property                                       file="build.properties"/>
+	<property file="../lams_build/common.properties"/>
 
 
    
@@ -125,6 +126,7 @@
   				webxml="${conf.webinf.dir}/web.xml">
 			<webinf dir="${conf.webinf.dir}">
 				<include name="*.xml"/>
+				<include name="*.tld"/>
 				<include name="struts/*"/>
 				<include name="jstl/*"/>
 				<exclude name="web.xml"/>
@@ -248,4 +250,11 @@
 		</junitreport>
 	</target>
 
+	
+	<target name="deploy-war" depends="build-war">
+		<copy file="${build.lib}/${product}.jar"
+				todir="${jboss.deploy}"/>
+		<copy file="${build.lib}/${product}.war"
+				todir="${jboss.deploy}"/>
+	</target>
 </project>

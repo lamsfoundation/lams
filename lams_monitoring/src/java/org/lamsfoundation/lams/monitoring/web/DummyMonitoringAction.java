@@ -23,105 +23,76 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
-import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
- * <p>The action servlet that provide all the monitoring functionalities. It
- * interact with the teacher via flash and JSP monitoring interface.</p>
- * 
- * @author Jacky Fang
- * @since  2005-4-15
- * @version 1.1
+ * <p>An action servlet to support the dummy monitoring page dummy.jsp.</p>
  * 
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/monitoring" 
+ * @struts:action path="/dummy" 
+ * 				  name="DummyForm"
  *                parameter="method" 
  *                validate="false"
  * @struts.action-exception key="error.system.monitor" scope="request"
  *                          type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
- * @struts:action-forward name="scheduler" path="/TestScheduler.jsp"
- * @struts.action-forward name = "success" path = "/index.jsp"
+ * @struts:action-forward name="dummy" path="/dummy.jsp"
  * 
  * ----------------XDoclet Tags--------------------
  */
-public class MonitoringAction extends LamsDispatchAction
+public class DummyMonitoringAction extends LamsDispatchAction
 {
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-	private static Logger log = Logger.getLogger(MonitoringAction.class);
+	private static Logger log = Logger.getLogger(DummyMonitoringAction.class);
 	
 	private IMonitoringService monitoringService;
-    //---------------------------------------------------------------------
-    // Class level constants - Struts forward
-    //---------------------------------------------------------------------
-    private static final String SCHEDULER = "scheduler";
+    private IUserManagementService usermanageService;
 
     //---------------------------------------------------------------------
     // Class level constants - session attributes
     //---------------------------------------------------------------------
-    private static final String PARAM_LESSON_ID = "lessonId";
+	// input parameters
+    // output parameters
+    private static final String DUMMY_FORWARD = "dummy";
+    private static final String LESSONS_PARAMETER = "lessons";
     
-    /** If you want the output given as a jsp, set the request parameter "jspoutput" to 
-     * some value other than an empty string (e.g. 1, true, 0, false, blah). 
-     * If you want it returned as a stream (ie for Flash), do not define this parameter
-     */  
-	public static String USE_JSP_OUTPUT = "jspoutput";
-	
-	/** Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT
-	 * is set, then it sets the session attribute "parameterName" to the wddx packet string.
-	 * If  USE_JSP_OUTPUT is not set, then the packet is written out to the 
-	 * request's PrintWriter.
-	 *   
-	 * @param mapping action mapping (for the forward to the success jsp)
-	 * @param request needed to check the USE_JSP_OUTPUT parameter
-	 * @param response to write out the wddx packet if not using the jsp
-	 * @param wddxPacket wddxPacket or message to be sent/displayed
-	 * @param parameterName session attribute to set if USE_JSP_OUTPUT is set
-	 * @throws IOException
-	 */
-	private ActionForward outputPacket(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
-	        		String wddxPacket, String parameterName) throws IOException {
-	    String useJSP = WebUtil.readStrParam(request, USE_JSP_OUTPUT, true);
-	    if ( useJSP != null && useJSP.length() >= 0 ) {
-		    request.getSession().setAttribute(parameterName,wddxPacket);
-		    return mapping.findForward("success");
-	    } else {
-	        PrintWriter writer = response.getWriter();
-	        writer.println(wddxPacket);
-	        return null;
-	    }
-	}
-	
+    private static final Integer ORGANIZATION_ID = new Integer(1);
+    
+    
     //---------------------------------------------------------------------
     // Struts Dispatch Method
     //---------------------------------------------------------------------
     /**
-     * The Struts dispatch method that starts a lesson that has been created
-     * beforehand. Most likely, the request to start lesson should be triggered
-     * by the flash component. This method will delegate to the Spring service
-     * bean to complete all the steps for starting a lesson. Finally, a wddx
-     * acknowledgement message will be serialized and sent back to the flash
-     * component.
+     * The Struts dispatch method that initialised and start a lesson.
+     * It will start a lesson with the current user as the staff and learner.
      * 
      * @param mapping An ActionMapping class that will be used by the Action class to tell
      * the ActionServlet where to send the end-user.
@@ -135,33 +106,80 @@ public class MonitoringAction extends LamsDispatchAction
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward startLesson(ActionMapping mapping,
-                                     ActionForm form,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response) throws IOException,
-                                                                          ServletException
-    {
-        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-
-        long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
-
-        monitoringService.startlesson(lessonId);
-
-        //TODO add the wddx acknowledgement code.
-        
-        //return mapping.findForward(SCHEDULER);
-        return null;
-    }
     
-    public ActionForward getAllLessons(ActionMapping mapping,
+    public ActionForward startLesson(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException{
+    	
+    	setupServices();
+    	
+    	// set up all the data needed
+    	DummyForm dummyForm = (DummyForm) form;
+    	Long ldId = dummyForm.getLearningDesignId();
+    	if ( ldId == null )
+    		throw new IOException("Learning design id must be set");
+    	
+        String title = dummyForm.getTitle();
+        if ( title == null ) title = "lesson";
+        String desc = dummyForm.getDesc(); 
+        if ( desc == null ) desc = "description";
+
+        User user = getUser();
+        Organisation organisation = usermanageService.getOrganisationById(ORGANIZATION_ID);
+
+        // initialize the lesson
+        Lesson testLesson = monitoringService.initializeLesson(title,desc,ldId.longValue(),user);
+
+        // create the lesson class
+        LinkedList learners = new LinkedList();
+        learners.add(user);
+        LinkedList staffs = new LinkedList();
+        staffs.add(user);
+        testLesson = monitoringService.createLessonClassForLesson(testLesson.getLessonId().longValue(),
+        		organisation,
+				learners,
+                staffs);
+
+        // start the lesson.
+        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        monitoringService.startlesson(testLesson.getLessonId().longValue());
+        
+        // now got back to the dummy screen with an updated list of lessons to the user 
+        return unspecified(mapping, form, request, response);
+
+    }
+
+    /** Default method for this action. Gets a list of all the current lessons for this user and forwards to dummy.jsp */
+    public ActionForward unspecified(ActionMapping mapping,
                                      ActionForm form,
                                      HttpServletRequest request,
                                      HttpServletResponse response)throws IOException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	String wddxPacket = monitoringService.getAllLessonsWDDX();
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
+    	setupServices();
+
+    	User user = getUser();
+    	List lessons = monitoringService.getAllLessons(user.getUserId());
+	    request.getSession().setAttribute(LESSONS_PARAMETER,lessons);
+    	return mapping.findForward(DUMMY_FORWARD);
     }
-    public ActionForward getLessonDetails(ActionMapping mapping,
+
+    private void setupServices() {
+    	
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+    	this.usermanageService= (IUserManagementService) wac.getBean("userManagementService");
+
+    }
+    private User getUser() throws IOException {
+    	HttpSession ss = SessionManager.getSession();
+    	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    	if ( user != null ) {
+    		return usermanageService.getUserById(user.getUserID());
+    	}
+    	throw new IOException("Unable to get user. User in session manager is "+user);
+    }
+/*    public ActionForward getLessonDetails(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
@@ -272,5 +290,5 @@ public class MonitoringAction extends LamsDispatchAction
        // request.setAttribute(USE_JSP_OUTPUT, "1");
         return outputPacket(mapping, request, response, wddxPacket, "details");
     }
-
+*/
 }

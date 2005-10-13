@@ -103,14 +103,36 @@ public interface IMonitoringService
     public GateActivity closeGate(Long gateId);
     
     /**
+     * This method returns a A list of all available Lessons.
+     * If the data is to be sent to Flash, then use  getAllLessonsWDDX()
+     * 
+     * @return List The requested list of Lessons
+     * @throws IOException
+     */
+    public List getAllLessons() throws IOException;
+
+    /**
      * This method returns a string representing a list of all 
      * available Lessons in the WDDX format
      * 
      * @return String The requested list of Lessons in wddx format
      * @throws IOException
      */
-    public String getAllLessons() throws IOException;
+    public String getAllLessonsWDDX() throws IOException;
     
+    /**
+     * This method returns a string representing a list of all 
+     * available Lessons for a given user. If the data is to be 
+     * sent to Flash, then use  getAllLessonsWDDX(Integer userID)
+     * 
+     * @param userID The user_id of the user for whom the lessons 
+     * 				 are being fetched.
+     * @return List The requested list of Lessons
+     * @throws IOException
+     */
+    public List getAllLessons(Integer userID)throws IOException;
+    
+
     /**
      * This method returns a string representing a list of all 
      * available Lessons for a given user in the WDDX format
@@ -120,7 +142,7 @@ public interface IMonitoringService
      * @return String The requested list of Lessons in wddx format
      * @throws IOException
      */
-    public String getAllLessons(Integer userID)throws IOException;
+    public String getAllLessonsWDDX(Integer userID)throws IOException;
     
     /**
      * This method returns the details for the given Lesson in

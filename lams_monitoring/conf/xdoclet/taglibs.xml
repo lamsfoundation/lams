@@ -78,3 +78,9 @@ http://www.gnu.org/licenses/gpl.txt
 	<taglib-uri>http://java.sun.com/jstl/xml_rt</taglib-uri>
 	<taglib-location>/WEB-INF/jstl/x-rt.tld</taglib-location>
 </taglib>
+
+<!-- Custom LAMS tags -->
+ <taglib>
+   <taglib-uri>tags-lams</taglib-uri>
+   <taglib-location>/WEB-INF/lams.tld</taglib-location>
+</taglib>

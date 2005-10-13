@@ -61,7 +61,12 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-
+<filter>
+       <filter-name>SystemSessionFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.session.SystemSessionFilter
+         </filter-class>
+</filter>
 <filter>
 	<filter-name>HibernateFilter</filter-name>
 	<filter-class>org.lamsfoundation.lams.util.CustomizedOpenSessionInViewFilter</filter-class>
@@ -95,6 +100,10 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
+<filter-mapping>
+    <filter-name>SystemSessionFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+</filter-mapping>
 <filter-mapping>
 	<filter-name>HibernateFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
@@ -274,6 +283,12 @@ http://www.gnu.org/licenses/gpl.txt
 <taglib>
 	<taglib-uri>http://java.sun.com/jstl/xml_rt</taglib-uri>
 	<taglib-location>/WEB-INF/jstl/x-rt.tld</taglib-location>
+</taglib>
+
+<!-- Custom LAMS tags -->
+ <taglib>
+   <taglib-uri>tags-lams</taglib-uri>
+   <taglib-location>/WEB-INF/lams.tld</taglib-location>
 </taglib>
 
    <!--

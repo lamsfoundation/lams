@@ -62,11 +62,11 @@ public class TestMonitoringService extends AbstractLamsTestCase
     private final Integer TEST_LEARNER_ID = new Integer(2);
     private final Integer TEST_STAFF_ID = new Integer(3);
     // values when demo'ing the progress engine
-    //private final long TEST_LEARNING_DESIGN_ID = 2;
-    //private final long TEST_COPIED_LEARNING_DESIGN_ID = 3;
+    private final long TEST_LEARNING_DESIGN_ID = 2;
+    private final long TEST_COPIED_LEARNING_DESIGN_ID = 3;
     // values when testing the progress engine
-    private final long TEST_LEARNING_DESIGN_ID = 1;
-    private final long TEST_COPIED_LEARNING_DESIGN_ID = 2;
+    //private final long TEST_LEARNING_DESIGN_ID = 1;
+    //private final long TEST_COPIED_LEARNING_DESIGN_ID = 2;
     private final Integer TEST_ORGANIZATION_ID = new Integer(1);
     private final Long TEST_SCHEDULE_GATE_ID = new Long(27);
     private final Long TEST_LESSION_ID = new Long(1); // "Test_Lesson" from insert_test_data script 
@@ -224,7 +224,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
     }
     
     public void testGetAllLessons()throws IOException{
-    	String packet = monitoringService.getAllLessons();    	
+    	String packet = monitoringService.getAllLessonsWDDX();    	
     	System.out.print(packet);
     }
     public void testGetLessonDetails() throws IOException{

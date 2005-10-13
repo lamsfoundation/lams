@@ -375,18 +375,32 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons()
      */
-    public String getAllLessons() throws IOException{
-    	List lessons = lessonDAO.getAllLessons(); 
-    	return requestLessonList(lessons);    	
+    public List getAllLessons() throws IOException{
+    	return lessonDAO.getAllLessons(); 
+    }
+    
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessonsWDDX()
+     */
+    public String getAllLessonsWDDX() throws IOException{
+    	return requestLessonList(getAllLessons());    	
     }
     
     /**
      * (non-Javadoc)
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessons(java.lang.Integer)
      */
-    public String getAllLessons(Integer userID)throws IOException{
-    	List lessons = lessonDAO.getLessonsForUser(userID);
-    	return requestLessonList(lessons); 
+    public List getAllLessons(Integer userID)throws IOException{
+    	return lessonDAO.getLessonsForUser(userID);
+    }
+
+    /**
+     * (non-Javadoc)
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLessonsWDDX(java.lang.Integer)
+     */
+    public String getAllLessonsWDDX(Integer userID)throws IOException{
+    	return requestLessonList(getAllLessons(userID)); 
     }
     /**
      * (non-Javadoc)
