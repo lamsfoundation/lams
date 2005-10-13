@@ -33,18 +33,12 @@ package org.lamsfoundation.lams.learning.export;
 public class Portfolio {
 	
 	private Long activityId;
-	private Long toolSessionId;
-	private Long userId;
 	private String activityDescription;
 	private String activityName;
 	private String exportUrl;
-	private String exportContent; //the html content of the export
-	private Long toolContentId;
-	private String mainFileName;
-	private String directoryName; //includes the parent path
+	/* The link to the tool page from the main export page */
 	private String toolLink;
-	
-	
+		
 	/**
 	 * @return Returns the toolLink.
 	 */
@@ -57,29 +51,14 @@ public class Portfolio {
 	public void setToolLink(String toolLink) {
 		this.toolLink = toolLink;
 	}
-	/**
-	 * @return Returns the directoryName.
-	 */
-	public String getDirectoryName() {
-		return directoryName;
-	}
-	/**
-	 * @param directoryName The directoryName to set.
-	 */
-	public void setDirectoryName(String directoryName) {
-		this.directoryName = directoryName;
-	}
+
 	public Portfolio()
 	{
-		this.activityId = null;
-		this.toolSessionId = null;
-		this.userId = null;
+		this.activityId = null;	
 		this.activityDescription = null;
 		this.activityName = null;
 		this.exportUrl = null;
-		this.exportContent = null;
-		this.toolContentId = null;
-		this.mainFileName = null;
+		this.toolLink = null;
 	}
 	
 	
@@ -96,18 +75,7 @@ public class Portfolio {
 	public void setActivityName(String activityName) {
 		this.activityName = activityName;
 	}
-	/**
-	 * @return Returns the content.
-	 */
-	public String getExportContent() {
-		return exportContent;
-	}
-	/**
-	 * @param content The content to set.
-	 */
-	public void setContent(String exportContent) {
-		this.exportContent = exportContent;
-	}
+	
 	/**
 	 * @return Returns the exportUrl.
 	 */
@@ -120,20 +88,7 @@ public class Portfolio {
 	public void setExportUrl(String exportUrl) {
 		this.exportUrl = exportUrl;
 	}
-	
-	
-	/**
-	 * @return Returns the toolSessionId.
-	 */
-	public Long getToolSessionId() {
-		return toolSessionId;
-	}
-	/**
-	 * @param toolSessionId The toolSessionId to set.
-	 */
-	public void setToolSessionId(Long toolSessionId) {
-		this.toolSessionId = toolSessionId;
-	}
+		
 	/**
 	 * @return Returns the activityId.
 	 */
@@ -146,24 +101,7 @@ public class Portfolio {
 	public void setActivityId(Long activityId) {
 		this.activityId = activityId;
 	}
-	/**
-	 * @return Returns the userId.
-	 */
-	public Long getUserId() {
-		return userId;
-	}
-	/**
-	 * @param userId The userId to set.
-	 */
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-	/**
-	 * @param exportContent The exportContent to set.
-	 */
-	public void setExportContent(String exportContent) {
-		this.exportContent = exportContent;
-	}
+		
 	/**
 	 * @return Returns the activityDescription.
 	 */
@@ -175,30 +113,6 @@ public class Portfolio {
 	 */
 	public void setActivityDescription(String activityDescription) {
 		this.activityDescription = activityDescription;
-	}
-	/**
-	 * @return Returns the toolContentId.
-	 */
-	public Long getToolContentId() {
-		return toolContentId;
-	}
-	/**
-	 * @param toolContentId The toolContentId to set.
-	 */
-	public void setToolContentId(Long toolContentId) {
-		this.toolContentId = toolContentId;
-	}
-	/**
-	 * @return Returns the mainFileName.
-	 */
-	public String getMainFileName() {
-		return mainFileName;
-	}
-	/**
-	 * @param mainFileName The mainFileName to set.
-	 */
-	public void setMainFileName(String mainFileName) {
-		this.mainFileName = mainFileName;
 	}
 	
 	
