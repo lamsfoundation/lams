@@ -59,8 +59,8 @@ public class ForumManagerImpl implements ForumManager {
         reloaded.setTitle(forum.getTitle());
         reloaded.setCreatedBy(forum.getCreatedBy());
         reloaded.setLockWhenFinished(forum.getLockWhenFinished());
-        reloaded.setForceOffline(forum.getForceOffline());
-        reloaded.setAllowAnnomity(forum.getAllowAnnomity());
+        reloaded.setRunOffline(forum.getRunOffline());
+        reloaded.setAllowAnonym(forum.getAllowAnonym());
         reloaded.setInstructions(forum.getInstructions());
         reloaded.setOnlineInstructions(forum.getOnlineInstructions());
         reloaded.setOfflineInstructions(forum.getOfflineInstructions());
@@ -118,7 +118,7 @@ public class ForumManagerImpl implements ForumManager {
      public Message editMessage(Message message) throws PersistenceException {
         Message reloaded = this.getMessage(message.getUuid());
         reloaded.setModifiedBy(message.getModifiedBy());
-        reloaded.setIsAnnonymous(message.getIsAnnonymous());
+        reloaded.setIsAnnonymous(message.getIsAnonymous());
         reloaded.setIsAuthored(message.getIsAuthored());
         reloaded.setSubject(message.getSubject());
         reloaded.setBody(message.getBody());

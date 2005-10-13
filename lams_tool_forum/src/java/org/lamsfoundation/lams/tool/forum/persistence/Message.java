@@ -20,7 +20,7 @@ public class Message {
 	private String subject;
 	private String body;
 	private boolean isAuthored;
-	private boolean isAnnonymous;
+	private boolean isAnonymous;
 	private Message parent;
 	private Set replies;
 	private Forum forum;
@@ -34,7 +34,7 @@ public class Message {
 	 * Returns the object's creation date
 	 *
 	 * @return date
-	 * @hibernate.property column="CREATED"
+	 * @hibernate.property column="create_date"
 	 */
 	public Date getCreated() {
       return created;
@@ -53,7 +53,7 @@ public class Message {
 	 * Returns the object's date of last update
 	 *
 	 * @return date updated
-	 * @hibernate.property column="UPDATED"
+	 * @hibernate.property column="update_date"
 	 */
 	public Date getUpdated() {
         return updated;
@@ -72,7 +72,7 @@ public class Message {
      * @return Returns the userid of the user who created the Forum.
      *
      * @hibernate.property
-     * 		column="CREATEDBY"
+     * 		column="create_by"
      *
      */
     public Long getCreatedBy() {
@@ -102,7 +102,7 @@ public class Message {
      *
      *
      * @hibernate.property
-     * 		column="MODIFIEDBY"
+     * 		column="modified_by"
      *
      */
     public Long getModifiedBy() {
@@ -117,7 +117,7 @@ public class Message {
     }
 
     /**
-     * @hibernate.id column="UUID" generator-class="native"
+     * @hibernate.id column="uuid" generator-class="native"
      */
 	public Long getUuid() {
 		return uuid;
@@ -131,7 +131,7 @@ public class Message {
      * @return Returns the subject of the Message.
      *
      * @hibernate.property
-     * 		column="SUBJECT"
+     * 		column="subject"
      *
      */
     public String getSubject() {
@@ -149,7 +149,7 @@ public class Message {
 	 * @return Returns the body of the Message.
 	 *
 	 * @hibernate.property 
-	 * 		column="BODY"
+	 * 		column="body"
      *      type="text"
 	 *  	 
 	 */
@@ -168,7 +168,7 @@ public class Message {
 	 * @return Returns true if the Message was an Authored Message.
 	 *
 	 * @hibernate.property
-	 * 		column="ISAUTHORED"
+	 * 		column="is_authored"
 	 *
 	 */
 	public boolean getIsAuthored() {
@@ -188,19 +188,19 @@ public class Message {
 	 * 		Annonymous message.
 	 *
 	 * @hibernate.property 
-	 * 		column="ISANNONYMOUS"
+	 * 		column="is_anonymous"
 	 *  	 
 	 */
-	public boolean getIsAnnonymous() {
-		return isAnnonymous;
+	public boolean getIsAnonymous() {
+		return isAnonymous;
 	}
 	
 	/**
-	 * @param isAnnonymous Indicates that the Message is to be shown
+	 * @param isAnonymous Indicates that the Message is to be shown
 	 * 			as an Annonymous message when set to true.
 	 */
 	public void setIsAnnonymous(boolean isAnnonymous) {
-		this.isAnnonymous = isAnnonymous;
+		this.isAnonymous = isAnnonymous;
 	}
 
 	/**

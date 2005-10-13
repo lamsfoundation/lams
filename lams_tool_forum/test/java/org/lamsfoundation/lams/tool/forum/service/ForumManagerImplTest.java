@@ -35,8 +35,8 @@ public class ForumManagerImplTest extends TestCase {
         assertEquals(reloadedForum.getTitle(), "TEST");
         assertEquals(reloadedForum.getCreatedBy(), new Long("1002"));
         assertEquals(reloadedForum.getLockWhenFinished(), true);
-        assertEquals(reloadedForum.getForceOffline(), true);
-        assertEquals(reloadedForum.getAllowAnnomity(), false);
+        assertEquals(reloadedForum.getRunOffline(), true);
+        assertEquals(reloadedForum.getAllowAnonym(), false);
         assertEquals(reloadedForum.getInstructions(), "TEST INSTRUCTIONS");
         assertEquals(reloadedForum.getOnlineInstructions(), "TEST ONLINEINSTRUCTIONS");
         assertEquals(reloadedForum.getOfflineInstructions(), "TEST OFFLINEINSTRUCTIONS");
@@ -60,8 +60,8 @@ public class ForumManagerImplTest extends TestCase {
         assertEquals(reloadedForum.getTitle(), "TEST");
         assertEquals(reloadedForum.getCreatedBy(), new Long("1002"));
         assertEquals(reloadedForum.getLockWhenFinished(), true);
-        assertEquals(reloadedForum.getForceOffline(), true);
-        assertEquals(reloadedForum.getAllowAnnomity(), false);
+        assertEquals(reloadedForum.getRunOffline(), true);
+        assertEquals(reloadedForum.getAllowAnonym(), false);
         assertEquals(reloadedForum.getInstructions(), "TEST INSTRUCTIONS");
         assertEquals(reloadedForum.getOnlineInstructions(), "TEST ONLINEINSTRUCTIONS");
         assertEquals(reloadedForum.getOfflineInstructions(), "TEST OFFLINEINSTRUCTIONS");
@@ -84,8 +84,8 @@ public class ForumManagerImplTest extends TestCase {
         assertEquals(reloadedForum.getTitle(), "TEST");
         assertEquals(reloadedForum.getCreatedBy(), new Long("1002"));
         assertEquals(reloadedForum.getLockWhenFinished(), false);
-        assertEquals(reloadedForum.getForceOffline(), false);
-        assertEquals(reloadedForum.getAllowAnnomity(), false);
+        assertEquals(reloadedForum.getRunOffline(), false);
+        assertEquals(reloadedForum.getAllowAnonym(), false);
         assertEquals(reloadedForum.getInstructions(), "");
         assertEquals(reloadedForum.getOnlineInstructions(), "");
         assertEquals(reloadedForum.getOfflineInstructions(), "");
@@ -110,7 +110,7 @@ public class ForumManagerImplTest extends TestCase {
 
       assertEquals(reloaded.getForum(), forum);
       assertEquals(reloaded.getCreatedBy(), new Long("1002"));
-      assertEquals(reloaded.getIsAnnonymous(), true);
+      assertEquals(reloaded.getIsAnonymous(), true);
       assertEquals(reloaded.getIsAuthored(), true);
       assertEquals(reloaded.getSubject(), "TEST");
       assertEquals(reloaded.getBody(), "TEST");
@@ -125,7 +125,7 @@ public class ForumManagerImplTest extends TestCase {
       assertEquals(message.getForum(), forum);
       assertEquals(message.getCreatedBy(), new Long("1002"));
       assertEquals(message.getModifiedBy(), new Long("1004"));
-      assertEquals(message.getIsAnnonymous(), false);
+      assertEquals(message.getIsAnonymous(), false);
       assertEquals(message.getSubject(), "MODIFIED SUBJECT");
       assertEquals(message.getBody(), "MODIFIED BODY");
 
@@ -147,7 +147,7 @@ public class ForumManagerImplTest extends TestCase {
       Message reloaded = forumManager.getMessage(message.getUuid());
       assertEquals(reloaded.getForum(), forum);
       assertEquals(reloaded.getCreatedBy(), new Long("1002"));
-      assertEquals(reloaded.getIsAnnonymous(), true);
+      assertEquals(reloaded.getIsAnonymous(), true);
       assertEquals(reloaded.getIsAuthored(), true);
       assertEquals(reloaded.getSubject(), "TEST");
       assertEquals(reloaded.getBody(), "TEST");
@@ -157,7 +157,7 @@ public class ForumManagerImplTest extends TestCase {
       reply = forumManager.getMessage(reply.getUuid());
       assertEquals(message.getForum(), forum);
       assertEquals(reply.getCreatedBy(), new Long("1008"));
-      assertEquals(reply.getIsAnnonymous(), true);
+      assertEquals(reply.getIsAnonymous(), true);
       assertEquals(reply.getIsAuthored(), false);
       assertEquals(reply.getSubject(), "REPLY MESSAGE");
       assertEquals(reply.getBody(), "REPLY MESSAGE");
@@ -201,8 +201,8 @@ public class ForumManagerImplTest extends TestCase {
         forum.setTitle(title);
         forum.setCreatedBy(createdBy);
         forum.setLockWhenFinished(lockWhenFinished);
-        forum.setForceOffline(forceOffLine);
-        forum.setAllowAnnomity(allowAnnomity);
+        forum.setRunOffline(forceOffLine);
+        forum.setAllowAnonym(allowAnnomity);
         forum.setInstructions(instructions);
         forum.setOfflineInstructions(offlineInstructions);
         forum.setOnlineInstructions(onlineInstructions);

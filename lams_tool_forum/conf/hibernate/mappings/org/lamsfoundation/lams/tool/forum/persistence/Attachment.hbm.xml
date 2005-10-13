@@ -13,7 +13,7 @@
 
         <id
             name="uuid"
-            column="UUID"
+            column="uuid"
             type="java.lang.Long"
         >
             <generator class="native">
@@ -26,11 +26,11 @@
         </id>
 
         <property
-            name="version"
+            name="versionId"
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="VERSION"
+            column="version_id"
         />
 
         <property
@@ -42,11 +42,11 @@
         />
 
         <property
-            name="name"
+            name="fileName"
             type="java.lang.String"
             update="true"
             insert="true"
-            column="NAME"
+            column="file_name"
         />
 
         <!--

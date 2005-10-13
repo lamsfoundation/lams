@@ -13,7 +13,7 @@
 
         <id
             name="uuid"
-            column="UUID"
+            column="uuid"
             type="java.lang.Long"
         >
             <generator class="native">
@@ -30,7 +30,7 @@
             type="java.util.Date"
             update="true"
             insert="true"
-            column="CREATED"
+            column="create_date"
         />
 
         <property
@@ -38,7 +38,7 @@
             type="java.util.Date"
             update="true"
             insert="true"
-            column="UPDATED"
+            column="update_date"
         />
 
         <property
@@ -46,7 +46,7 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="CREATEDBY"
+            column="create_by"
         />
 
         <property
@@ -54,7 +54,7 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="MODIFIEDBY"
+            column="modified_by"
         />
 
         <property
@@ -62,7 +62,7 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            column="SUBJECT"
+            column="subject"
         />
 
         <property
@@ -70,7 +70,7 @@
             type="text"
             update="true"
             insert="true"
-            column="BODY"
+            column="body"
         />
 
         <property
@@ -78,15 +78,15 @@
             type="boolean"
             update="true"
             insert="true"
-            column="ISAUTHORED"
+            column="is_authored"
         />
 
         <property
-            name="isAnnonymous"
+            name="isAnonymous"
             type="boolean"
             update="true"
             insert="true"
-            column="ISANNONYMOUS"
+            column="is_anonymous"
         />
 
         <set

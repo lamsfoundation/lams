@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
-        table="tl_lafrum11_attachment"
+        name="org.lamsfoundation.lams.tool.forum.persistence.ToolSession"
+        table="tl_lafrum11_tool_session"
     >
 
         <id
@@ -16,52 +16,61 @@
             column="uuid"
             type="java.lang.Long"
         >
-            <generator class="native">
+            <generator class="identity">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-Attachment.xml 
+                  hibernate-generator-params-ToolSession.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
         <property
-            name="versionId"
+            name="sessionEndDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="sessionEndDate"
+        />
+
+        <property
+            name="sessionStartDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="sessionStartDate"
+        />
+
+        <property
+            name="status"
+            type="int"
+            update="true"
+            insert="true"
+            column="status"
+        />
+
+        <property
+            name="toolContentId"
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="version_id"
+            column="toolContentId"
         />
 
         <property
-            name="type"
-            type="java.lang.String"
+            name="toolSessionId"
+            type="java.lang.Long"
             update="true"
             insert="true"
-            column="type"
-        />
-
-        <property
-            name="fileName"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="file_name"
+            column="toolSessionId"
         />
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-Attachment.xml
+                hibernate-properties-ToolSession.xml
             containing the additional properties and place it in your merge dir.
         -->
 
     </class>
-
-        <query name="allAttachments"><![CDATA[
-            from Attachment attachment
-        ]]></query>
-        <query name="getAttachmentbyType"><![CDATA[
-            from Attachment attachment where attachment.type = ?
-        ]]></query>
 
 </hibernate-mapping>

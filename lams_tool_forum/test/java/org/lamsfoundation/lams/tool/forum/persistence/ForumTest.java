@@ -27,8 +27,8 @@ public class ForumTest extends TestCase {
         Forum entity = new Forum();
         entity.setTitle("Lams Forum");
         entity.setLockWhenFinished(false);
-        entity.setForceOffline(true);
-        entity.setAllowAnnomity(true);
+        entity.setRunOffline(true);
+        entity.setAllowAnonym(true);
         entity.setCreatedBy(new Long("1000"));
 
         Set attachments = new HashSet();
@@ -59,8 +59,8 @@ public class ForumTest extends TestCase {
         assertEquals("date difference in database and memory", entity.getUpdated().getTime()/1000, reloaded.getUpdated().getTime()/1000);
          assertEquals("title should be Lams Forum", "Lams Forum", reloaded.getTitle());
         assertEquals("lockWhenFinished should be false", false, reloaded.getLockWhenFinished());
-        assertEquals("forceOffline should be true", true, reloaded.getForceOffline());
-        assertEquals("allowAnnomity should be true", true, reloaded.getAllowAnnomity());
+        assertEquals("forceOffline should be true", true, reloaded.getRunOffline());
+        assertEquals("allowAnnomity should be true", true, reloaded.getAllowAnonym());
             //validate attachment relations
         assertEquals("should have 1 attachments", 1, reloaded.getAttachments().size());
         Set reloadedSet = reloaded.getAttachments();

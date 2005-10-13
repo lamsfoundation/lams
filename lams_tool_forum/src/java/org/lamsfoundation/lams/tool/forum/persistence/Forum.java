@@ -1,6 +1,5 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
@@ -19,23 +18,25 @@ public class Forum {
 	
 	private Long uuid;
 	private String title;
+	private Long toolContentId;
 	private boolean lockWhenFinished;
-	private boolean forceOffline;
-	private boolean allowAnnomity;
+	private boolean runOffline;
+	private boolean allowAnonym;
 	private String instructions;
 	private String onlineInstructions;
 	private String offlineInstructions;
+	private boolean defineLater;
+	private boolean contentInUse;
 	private Set attachments;
 	protected Date created;
 	protected Date updated;
   	protected Long createdBy;
-    protected Long modifiedBy;
     
 	/**
 	 * Returns the object's creation date
 	 *
 	 * @return date
-	 * @hibernate.property column="CREATED"
+	 * @hibernate.property column="create_date"
 	 */
 	public Date getCreated() {
       return created;
@@ -54,7 +55,7 @@ public class Forum {
 	 * Returns the object's date of last update
 	 *
 	 * @return date updated
-	 * @hibernate.property column="UPDATED"
+	 * @hibernate.property column="update_date"
 	 */
 	public Date getUpdated() {
         return updated;
@@ -73,7 +74,7 @@ public class Forum {
      * @return Returns the userid of the user who created the Forum.
      *
      * @hibernate.property
-     * 		column="CREATEDBY"
+     * 		column="create_by"
      *
      */
     public Long getCreatedBy() {
@@ -88,7 +89,7 @@ public class Forum {
     }
 
     /**
-     * @hibernate.id column="UUID" generator-class="native"
+     * @hibernate.id column="uuid" generator-class="native"
      */
 	public Long getUuid() {
 		return uuid;
@@ -102,7 +103,7 @@ public class Forum {
 	 * @return Returns the title.
 	 *
 	 * @hibernate.property
-	 * 		column="TITLE"
+	 * 		column="title"
 	 *
 	 */
 	public String getTitle() {
@@ -117,49 +118,49 @@ public class Forum {
 	}
 
 	/**
-	 * @return Returns the allowAnnomity.
+	 * @return Returns the allowAnonym.
 	 *
 	 * @hibernate.property 
-	 * 		column="ALLOWANNOMITY"
+	 * 		column="allow_anonym"
 	 *  
 	 */
-	public boolean getAllowAnnomity() {
-		return allowAnnomity;
+	public boolean getAllowAnonym() {
+		return allowAnonym;
 	}
 	
 	/**
-	 * @param allowAnnomity The allowAnnomity to set.
+	 * @param allowAnonym The allowAnonym to set.
 	 *
 	 */
-	public void setAllowAnnomity(boolean allowAnnomity) {
-		this.allowAnnomity = allowAnnomity;
+	public void setAllowAnonym(boolean allowAnnomity) {
+		this.allowAnonym = allowAnnomity;
 	}
 
 	/**
-	 * @return Returns the forceOffline.
+	 * @return Returns the runOffline.
 	 *
 	 * @hibernate.property 
-	 * 		column="FORCEOFFLINE"
+	 * 		column="run_offline"
 	 *
 	 */
-	public boolean getForceOffline() {
-		return forceOffline;
+	public boolean getRunOffline() {
+		return runOffline;
 	}
     
 	/**
-	 * @param forceOffline The forceOffLine to set.
+	 * @param runOffline The forceOffLine to set.
 	 *
 	 *
 	 */
-	public void setForceOffline(boolean forceOffline) {
-		this.forceOffline = forceOffline;
+	public void setRunOffline(boolean forceOffline) {
+		this.runOffline = forceOffline;
 	}
 
     /**
      * @return Returns the lockWhenFinish.
      *
      * @hibernate.property
-     * 		column="LOCKWHENFINISHED"
+     * 		column="lock_on_finished"
      *
      */
     public boolean getLockWhenFinished() {
@@ -177,7 +178,7 @@ public class Forum {
      * @return Returns the instructions set by the teacher.
      *
      * @hibernate.property
-     * 		column="INSTRUCTIONS"
+     * 		column="instructions"
      *      //type="text"
      */
     public String getInstructions() {
@@ -192,7 +193,7 @@ public class Forum {
      * @return Returns the onlineInstructions set by the teacher.
      *
      * @hibernate.property
-     * 		column="ONLINEINSTRUCTIONS"
+     * 		column="online_instructions"
      *      //type="text"
      */
     public String getOnlineInstructions() {
@@ -207,7 +208,7 @@ public class Forum {
      * @return Returns the onlineInstructions set by the teacher.
      *
      * @hibernate.property
-     * 		column="OFFLINEINSTRUCTIONS"
+     * 		column="offline_instructions"
      *      //type="text"
      */
     public String getOfflineInstructions() {
@@ -269,7 +270,6 @@ public class Forum {
       	.append(this.created,genericEntity.created)
       	.append(this.updated,genericEntity.updated)
       	.append(this.createdBy,genericEntity.createdBy)
-      	.append(this.modifiedBy,genericEntity.modifiedBy)
       	.isEquals();
 	}
 
@@ -278,7 +278,40 @@ public class Forum {
 		.append(instructions).append(onlineInstructions)
 		.append(offlineInstructions).append(created)
 		.append(updated).append(createdBy)
-		.append(modifiedBy)
 		.toHashCode();
+	}
+	/**
+	 * @hibernate.property column="content_in_use"
+	 * @return
+	 */
+	public boolean isContentInUse() {
+		return contentInUse;
+	}
+
+	public void setContentInUse(boolean contentInUse) {
+		this.contentInUse = contentInUse;
+	}
+	/**
+	 * @hibernate.property column="define_later"
+	 * @return
+	 */
+	public boolean isDefineLater() {
+		return defineLater;
+	}
+
+	public void setDefineLater(boolean defineLater) {
+		this.defineLater = defineLater;
+	}
+	
+	/**
+	 * @hibernate.property  column="tool_content_id"
+	 * @return
+	 */
+	public Long getToolContentId() {
+		return toolContentId;
+	}
+
+	public void setToolContentId(Long toolContentId) {
+		this.toolContentId = toolContentId;
 	}
 }

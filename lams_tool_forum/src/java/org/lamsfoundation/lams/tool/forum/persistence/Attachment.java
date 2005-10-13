@@ -19,9 +19,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 public class Attachment {
     private Long uuid;
-    private Long version;
+    private Long versionId;
     private String type;
-    private String name;
+    private String fileName;
     private InputStream inputStream;
     private String contentType;
     
@@ -29,7 +29,7 @@ public class Attachment {
     public final static String TYPE_OFFLINE = "OFFLINE";
 
     /**
-     * @hibernate.id column="UUID" generator-class="native"
+     * @hibernate.id column="uuid" generator-class="native"
      */
     public Long getUuid() {
         return uuid;
@@ -40,15 +40,15 @@ public class Attachment {
     }
 
     /**
-     * @hibernate.property column="VERSION"
+     * @hibernate.property column="version_id"
      *
      */
-    public Long getVersion() {
-        return version;
+    public Long getVersionId() {
+        return versionId;
     }
 
-    public void setVersion(Long version) {
-        this.version = version;
+    public void setVersionId(Long version) {
+        this.versionId = version;
     }
 
     /**
@@ -63,14 +63,14 @@ public class Attachment {
     }
 
     /**
-     * @hibernate.property column="NAME"
+     * @hibernate.property column="file_name"
      */
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFileName(String name) {
+        this.fileName = name;
     }
 
     public InputStream getInputStream() {
@@ -100,13 +100,13 @@ public class Attachment {
 
       	return new EqualsBuilder()
       	.append(this.uuid,genericEntity.uuid)
-      	.append(this.version,genericEntity.version)
-      	.append(this.name,genericEntity.name)
+      	.append(this.versionId,genericEntity.versionId)
+      	.append(this.fileName,genericEntity.fileName)
       	.append(this.type,genericEntity.type)
       	.isEquals();
 	}
 
 	public int hashCode() {
-		return new HashCodeBuilder().append(uuid).append(version).append(name).append(type).toHashCode();
+		return new HashCodeBuilder().append(uuid).append(versionId).append(fileName).append(type).toHashCode();
 	}
 }

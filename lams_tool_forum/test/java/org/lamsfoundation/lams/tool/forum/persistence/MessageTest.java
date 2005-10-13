@@ -56,7 +56,7 @@ public class MessageTest extends TestCase {
         assertEquals("reloaded message body should be: Test Message", "Test Message", reloaded.getBody());
         assertEquals("reloaded message Subject should be: Test Message", "Test Message", reloaded.getSubject());
         assertEquals("reloaded message Forum not equal", forum.getUuid(), reloaded.getForum().getUuid());
-        assertEquals("reloaded message isAnnonymous not equal", false, reloaded.getIsAnnonymous());
+        assertEquals("reloaded message isAnnonymous not equal", false, reloaded.getIsAnonymous());
         assertEquals("reloaded message isAuthored not equal", true, reloaded.getIsAuthored());
         assertEquals("reloaded message createdBy not equal", new Long(1000), reloaded.getCreatedBy());
         assertEquals("reloaded message modifiedBy not equal", new Long(1002), reloaded.getModifiedBy());
@@ -80,7 +80,7 @@ public class MessageTest extends TestCase {
         assertEquals("reloaded message body should be: Test Message", "Test Message2", reloaded2.getBody());
         assertEquals("reloaded message Subject should be: Test Message", "Test Message2", reloaded2.getSubject());
         assertEquals("reloaded message Forum not equal", forum.getUuid(), reloaded2.getForum().getUuid());
-        assertEquals("reloaded message isAnnonymous not equal", true, reloaded2.getIsAnnonymous());
+        assertEquals("reloaded message isAnnonymous not equal", true, reloaded2.getIsAnonymous());
         assertEquals("reloaded message isAuthored not equal", true, reloaded2.getIsAuthored());
         assertEquals("reloaded message createdBy not equal", new Long(1005), reloaded2.getCreatedBy());
         assertEquals("reloaded message modifiedBy not equal", new Long(1006), reloaded2.getModifiedBy());

@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
-        table="tl_lafrum11_attachment"
+        name="org.lamsfoundation.lams.tool.forum.persistence.Learner"
+        table="tl_lafrum11_forum_learners"
     >
 
         <id
@@ -16,52 +16,66 @@
             column="uuid"
             type="java.lang.Long"
         >
-            <generator class="native">
+            <generator class="identity">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-Attachment.xml 
+                  hibernate-generator-params-Learner.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
         <property
-            name="versionId"
+            name="userID"
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="version_id"
+            column="user_id"
+            length="20"
         />
 
         <property
-            name="type"
-            type="java.lang.String"
+            name="status"
+            type="boolean"
             update="true"
             insert="true"
-            column="type"
+            column="status"
+            length="1"
         />
 
         <property
-            name="fileName"
+            name="sessionID"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="session_id"
+            length="20"
+        />
+
+        <property
+            name="fullName"
             type="java.lang.String"
             update="true"
             insert="true"
-            column="file_name"
+            column="fullName"
+            length="255"
+        />
+
+        <property
+            name="userName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="userName"
+            length="255"
         />
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-Attachment.xml
+                hibernate-properties-Learner.xml
             containing the additional properties and place it in your merge dir.
         -->
 
     </class>
-
-        <query name="allAttachments"><![CDATA[
-            from Attachment attachment
-        ]]></query>
-        <query name="getAttachmentbyType"><![CDATA[
-            from Attachment attachment where attachment.type = ?
-        ]]></query>
 
 </hibernate-mapping>

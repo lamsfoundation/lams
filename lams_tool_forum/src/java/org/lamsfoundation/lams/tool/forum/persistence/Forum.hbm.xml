@@ -13,7 +13,7 @@
 
         <id
             name="uuid"
-            column="UUID"
+            column="uuid"
             type="java.lang.Long"
         >
             <generator class="native">
@@ -30,7 +30,7 @@
             type="java.util.Date"
             update="true"
             insert="true"
-            column="CREATED"
+            column="create_date"
         />
 
         <property
@@ -38,7 +38,7 @@
             type="java.util.Date"
             update="true"
             insert="true"
-            column="UPDATED"
+            column="update_date"
         />
 
         <property
@@ -46,7 +46,7 @@
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="CREATEDBY"
+            column="create_by"
         />
 
         <property
@@ -54,23 +54,23 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            column="TITLE"
+            column="title"
         />
 
         <property
-            name="allowAnnomity"
+            name="allowAnonym"
             type="boolean"
             update="true"
             insert="true"
-            column="ALLOWANNOMITY"
+            column="allow_anonym"
         />
 
         <property
-            name="forceOffline"
+            name="runOffline"
             type="boolean"
             update="true"
             insert="true"
-            column="FORCEOFFLINE"
+            column="run_offline"
         />
 
         <property
@@ -78,7 +78,7 @@
             type="boolean"
             update="true"
             insert="true"
-            column="LOCKWHENFINISHED"
+            column="lock_on_finished"
         />
 
         <property
@@ -86,7 +86,7 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            column="INSTRUCTIONS"
+            column="instructions"
         />
 
         <property
@@ -94,7 +94,7 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            column="ONLINEINSTRUCTIONS"
+            column="online_instructions"
         />
 
         <property
@@ -102,7 +102,7 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            column="OFFLINEINSTRUCTIONS"
+            column="offline_instructions"
         />
 
         <set
@@ -124,6 +124,30 @@
             />
 
         </set>
+
+        <property
+            name="contentInUse"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="content_in_use"
+        />
+
+        <property
+            name="defineLater"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="define_later"
+        />
+
+        <property
+            name="toolContentId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="tool_content_id"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named
