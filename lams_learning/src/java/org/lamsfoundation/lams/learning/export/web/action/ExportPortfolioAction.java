@@ -29,6 +29,7 @@ package org.lamsfoundation.lams.learning.export.web.action;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Cookie;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
@@ -62,7 +63,8 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
  * -------------------------------------------------
  **/
 
-public class ExportPortfolioAction extends LamsAction{
+public class ExportPortfolioAction extends LamsAction {
+    
 	public final String PARAM_PORTFOLIO_LIST = "portfolioList";
 
 	public ActionForward execute(ActionMapping mapping,
@@ -74,6 +76,9 @@ public class ExportPortfolioAction extends LamsAction{
 		String mode = WebUtil.readStrParam(request, WebUtil.PARAM_MODE);
 		IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(getServlet().getServletContext());
 		
+		//get the cookies that came along with the request and pass it onto export service method
+		Cookie[] cookies = request.getCookies();
+		
 		if (mode.equals(ToolAccessMode.LEARNER.toString()))
 		{
 			//get the learnerprogress id
@@ -81,7 +86,7 @@ public class ExportPortfolioAction extends LamsAction{
 			LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgressByUser(request, getServlet().getServletContext());
 			Long progressId = learnerProgress.getLearnerProgressId();
 			
-			portfolios = exportService.exportPortfolioForStudent(progressId, learner, true);
+			portfolios = exportService.exportPortfolioForStudent(progressId, learner, true, cookies);
 		}
 		else if(mode.equals(ToolAccessMode.TEACHER.toString()))
 		{
@@ -91,7 +96,7 @@ public class ExportPortfolioAction extends LamsAction{
 			ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 			Lesson lesson = learnerService.getLesson(lessonID);
 			
-			portfolios = exportService.exportPortfolioForTeacher(lesson);
+			portfolios = exportService.exportPortfolioForTeacher(lesson, cookies);
 		}
 		
 		request.setAttribute(PARAM_PORTFOLIO_LIST, portfolios);
