@@ -233,12 +233,33 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("updated Questions Map size: " + mapQuestionsContent.size());
 			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
     		logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+    		
+    		mcAuthoringForm.resetUserAction();
 	 		return (mapping.findForward(LOAD_QUESTIONS));
+	 	}
+	 	else if (mcAuthoringForm.getRemoveQuestion() != null)
+	 	{
+	 		userAction="removeQuestion";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		
+	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
+			logger.debug("questionIndex:" + questionIndex);
+			String deletableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
+			logger.debug("deletableQuestionEntry:" + deletableQuestionEntry);
+			mapQuestionsContent.remove(questionIndex);
+			logger.debug("removed entry:" + deletableQuestionEntry + " from the Map");
+			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+			logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+			
+			mcAuthoringForm.resetUserAction();
+			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	else if (mcAuthoringForm.getEditDefaultQuestion() != null)
 	 	{
 	 		userAction="editDefaultQuestion";
 	 		request.setAttribute(USER_ACTION, userAction);
+	 		
+	 		mcAuthoringForm.resetUserAction();
 	 		return (mapping.findForward(EDIT_OPTS_CONTENT));
 	 	}
 	 	
@@ -248,6 +269,8 @@ public class McAction extends DispatchAction implements McAppConstants
 
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	logger.debug("mcService:" + mcService);
+	 	
+	 	mcAuthoringForm.resetUserAction();
    	    return (mapping.findForward(LOAD_QUESTIONS));
     }
     
@@ -298,7 +321,6 @@ public class McAction extends DispatchAction implements McAppConstants
     	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
 		{
 			String candidateQuestionEntry =request.getParameter("questionContent" + i);
-			logger.debug("candidateQuestionEntry:" + candidateQuestionEntry);
 			if (
 				(candidateQuestionEntry != null) && 
 				(candidateQuestionEntry.length() > 0) &&  
@@ -306,9 +328,7 @@ public class McAction extends DispatchAction implements McAppConstants
 				)
 			{
 				mapCounter++;
-				logger.debug("mapCounter:" + mapCounter);
 				mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateQuestionEntry);
-				logger.debug("added new entry: " + candidateQuestionEntry);	
 			}
 		}
     	logger.debug("return repopulated Map: " + mapTempQuestionsContent);

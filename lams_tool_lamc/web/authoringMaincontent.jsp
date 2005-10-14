@@ -150,7 +150,7 @@ MM_reloadPage(true);
 									  		size="50" maxlength="255"> 
 									  	</td>
 										<td>									  										  		
-			 								<html:submit property="removeContent" styleClass="linkbutton"  onclick="removeQuestion(${queIndex});"
+			 								<html:submit property="removeQuestion" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 												<bean:message key="button.removeQuestion"/>
 											</html:submit>
@@ -215,6 +215,7 @@ Instructions are here
 	function removeQuestion(questionIndex)
 	{
 		document.forms[0].questionIndex.value=questionIndex;
+		alert(questionIndex);
 		document.forms[0].submit();
 	}
  </SCRIPT>
