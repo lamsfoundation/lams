@@ -12,7 +12,23 @@
 		parameter="tiles:/blank" />
 
       	<!-- Forum  related actions -->
-
+    <action
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
+      name="forumForm"
+      scope="request"
+      input="/authoring/authoring.jsp"
+      parameter="action"
+      unknown="false"
+      validate="true"
+	>
+      <forward
+        name="success"
+        path="/authoring/success.jsp"
+        redirect="false"
+      />
+    </action>
+    
 	    <action path="/authoring/forum/create"
 		    type="org.apache.struts.actions.ForwardAction" parameter="tiles:/authoring/forum/create" />
 

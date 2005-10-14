@@ -15,10 +15,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @hibernate.query name="allForums" query="from Forum forum"
  */
 public class Forum {
-	
+	//tool contentID
 	private Long uuid;
 	private String title;
-	private Long toolContentId;
 	private boolean lockWhenFinished;
 	private boolean runOffline;
 	private boolean allowAnonym;
@@ -302,16 +301,5 @@ public class Forum {
 	public void setDefineLater(boolean defineLater) {
 		this.defineLater = defineLater;
 	}
-	
-	/**
-	 * @hibernate.property  column="tool_content_id"
-	 * @return
-	 */
-	public Long getToolContentId() {
-		return toolContentId;
-	}
 
-	public void setToolContentId(Long toolContentId) {
-		this.toolContentId = toolContentId;
-	}
 }

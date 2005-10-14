@@ -30,8 +30,7 @@ import java.util.Date;
  */
 public class ToolSession {
 	private Long uuid;
-	private Long toolSessionId;
-	private Long toolContentId;
+	private Forum forum;
 	private Date sessionStartDate;
 	private Date sessionEndDate;
 	private int status;
@@ -77,25 +76,17 @@ public class ToolSession {
 	public void setStatus(int status) {
 		this.status = status;
 	}
+
 	/**
-	 * @hibernate.property
+ 	 * @hibernate.many-to-one column="uuid" cascade="none"
+ 	 * 
 	 * @return
 	 */
-	public Long getToolContentId() {
-		return toolContentId;
+	public Forum getForum() {
+		return forum;
 	}
-	public void setToolContentId(Long toolContentId) {
-		this.toolContentId = toolContentId;
-	}
-	/**
-	 * @hibernate.property
-	 * @return
-	 */
-	public Long getToolSessionId() {
-		return toolSessionId;
-	}
-	public void setToolSessionId(Long toolSessionId) {
-		this.toolSessionId = toolSessionId;
+	public void setForum(Forum forum) {
+		this.forum = forum;
 	}
 
 

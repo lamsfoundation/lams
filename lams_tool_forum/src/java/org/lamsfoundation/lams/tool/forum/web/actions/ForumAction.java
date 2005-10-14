@@ -29,7 +29,7 @@ import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.service.ForumManager;
+import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
@@ -38,31 +38,29 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Created by IntelliJ IDEA.
  * User: conradb
  * Date: 10/06/2005
  * Time: 12:18:57
- * To change this template use File | Settings | File Templates.
  */
 public class ForumAction extends Action {
   private static Logger log = Logger.getLogger(ForumAction.class.getName());
-  private ForumManager forumManager;
+  private IForumService forumManager;
   private ForumToolContentHandler toolContentHandler;
 
-  public void setForumManager(ForumManager forumManager) {
+  public void setForumManager(IForumService forumManager) {
       this.forumManager = forumManager;
   }
 
   //public ForumAction() {
-       //this.forumManager = (ForumManager) GenericObjectFactoryImpl.getInstance().lookup(ForumConstants.FORUM_MANAGER);
+       //this.forumManager = (IForumService) GenericObjectFactoryImpl.getInstance().lookup(ForumConstants.FORUM_MANAGER);
        //this.toolContentHandler = (ForumToolContentHandler) GenericObjectFactoryImpl.getInstance().lookup(ForumConstants.CONTENT_HANDLER);
       //GenericObjectFactoryImpl.getInstance().configure(this);
   //}
 
-  	private ForumManager getForumManager() {
+  	private IForumService getForumManager() {
   	    if ( forumManager == null ) {
   	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-  	      forumManager = (ForumManager) wac.getBean(ForumConstants.FORUM_MANAGER);
+  	      forumManager = (IForumService) wac.getBean(ForumConstants.FORUM_MANAGER);
   	    }
   	    return forumManager;
   	}

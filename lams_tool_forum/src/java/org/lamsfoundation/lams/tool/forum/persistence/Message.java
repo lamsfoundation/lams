@@ -23,13 +23,15 @@ public class Message {
 	private boolean isAnonymous;
 	private Message parent;
 	private Set replies;
-	private Forum forum;
+	private ToolSession toolSession;
+	private Learner learner;
 	
 	protected Date created;
 	protected Date updated;
   	protected Long createdBy;
     protected Long modifiedBy;
-    
+  	private Set attachments;
+
 	/**
 	 * Returns the object's creation date
 	 *
@@ -199,8 +201,8 @@ public class Message {
 	 * @param isAnonymous Indicates that the Message is to be shown
 	 * 			as an Annonymous message when set to true.
 	 */
-	public void setIsAnnonymous(boolean isAnnonymous) {
-		this.isAnonymous = isAnnonymous;
+	public void setIsAnonymous(boolean isAnonymous) {
+		this.isAnonymous = isAnonymous;
 	}
 
 	/**
@@ -227,23 +229,23 @@ public class Message {
 	}
 
     /**
-      * Gets the forum
+      * Gets the toolSession
       *
       * @hibernate.many-to-one
-      *	class="org.lamsfoundation.lams.tool.forum.persistence.Forum"
-      *	              column="FORUM"
+      *	class="org.lamsfoundation.lams.tool.forum.persistence.ToolSession"
+      *	              column="tool_session_id"
       *
       */
-     public Forum getForum() {
-         return forum;
+     public ToolSession getToolSession() {
+         return toolSession;
      }
 
 
 	/**
-	 * @param forum The forum that this Message belongs to
+	 * @param toolSession The toolSession that this Message belongs to
      */
-    public void setForum(Forum forum) {
-         this.forum = forum;
+    public void setToolSession(ToolSession forum) {
+         this.toolSession = forum;
      }
 
 	/**
@@ -256,6 +258,28 @@ public class Message {
     public Message getParent() {
         return parent;
     }
+	/**
+     * @return a set of Attachments to this Message.
+     *
+     * @hibernate.set table="ATTACHMENT"
+     * inverse="false"
+     * lazy="false"
+     * cascade="all"
+     * @hibernate.collection-key column="toolSession"
+     * @hibernate.collection-one-to-many
+     * 			class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
+     *
+     */
+	public Set getAttachments() {
+		return attachments;
+	}
+
+    /*
+	 * @param attachments The attachments to set.
+     */
+    public void setAttachments(Set attachments) {
+		this.attachments = attachments;
+	}
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
@@ -282,5 +306,19 @@ public class Message {
 		.append(updated).append(createdBy)
 		.append(modifiedBy)
 		.toHashCode();
+	}
+	/**
+	  * @hibernate.many-to-one
+      *	class="org.lamsfoundation.lams.tool.forum.persistence.Learner"
+      *	              column="learner_id"
+      *
+	 * @return
+	 */
+	public Learner getLearner() {
+		return learner;
+	}
+
+	public void setLearner(Learner learner) {
+		this.learner = learner;
 	}
 }

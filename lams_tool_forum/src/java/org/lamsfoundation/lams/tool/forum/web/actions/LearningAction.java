@@ -5,7 +5,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionForm;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.forum.service.ForumManager;
+import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
@@ -30,12 +30,12 @@ import java.util.List;
  */
 public class LearningAction extends Action {
   private static Logger log = Logger.getLogger(org.lamsfoundation.lams.tool.forum.web.actions.LearningAction.class.getName());
-  private ForumManager forumManager;
+  private IForumService forumManager;
   private PermissionManager permissionManager;
 
 
   public LearningAction() {
-       this.forumManager = (ForumManager) GenericObjectFactoryImpl.getInstance().lookup("forumManager");
+       this.forumManager = (IForumService) GenericObjectFactoryImpl.getInstance().lookup("forumManager");
        this.permissionManager = (PermissionManager) GenericObjectFactoryImpl.getInstance().lookup("permissionManager");
   }
 

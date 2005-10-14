@@ -41,7 +41,6 @@ public class Learner implements Serializable,Cloneable{
 	private Long userID;
 	private String userName;
 	private String fullName;
-	private Long sessionID;
 	private boolean status;
 	
 	/**
@@ -98,19 +97,7 @@ public class Learner implements Serializable,Cloneable{
 		}
 		return obj;
 	}
-	/**
-	 * @hibernate.property column="session_id" length="20"
-	 * @return Returns the sessionID.
-	 */
-	public Long getSessionID() {
-		return sessionID;
-	}
-	/**
-	 * @param sessionID The sessionID to set.
-	 */
-	public void setSessionID(Long sessionID) {
-		this.sessionID = sessionID;
-	}
+
 	/**
 	 * @hibernate.property length="255"
 	 * @return

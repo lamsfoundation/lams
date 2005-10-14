@@ -14,7 +14,7 @@
 <table-list>
 <table alias="" name="tl_lafrum11_attachment" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="10" y="10"/>
+<table-figure-bounds height="-1" width="-1" x="145" y="261"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uuid" remarks="">
 <column-description></column-description>
@@ -69,6 +69,19 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="toolSession" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key alias="" name="PRIMARY" remarks="">
 <primary-key-description></primary-key-description>
@@ -83,11 +96,22 @@
 </foreign-key-figure>
 <foreign-key-column column-name="forum" referenced-key-column-name="uuid"/>
 </foreign-key>
+<foreign-key alias="" name="FK389AD9A2290DA510" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_message" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="toolSession" referenced-key-column-name="uuid"/>
+</foreign-key>
 </foreign-key-list>
 <index-list>
 <index alias="" name="PRIMARY" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="uuid" sort="ASC"/>
+</index>
+<index alias="" name="FK389AD9A2290DA510" remarks="" unique="true">
+<index-description></index-description>
+<index-column name="toolSession" sort="ASC"/>
 </index>
 <index alias="" name="FK389AD9A29EAD680D" remarks="" unique="true">
 <index-description></index-description>
@@ -97,7 +121,7 @@
 </table>
 <table alias="" name="tl_lafrum11_forum" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="320" y="10"/>
+<table-figure-bounds height="-1" width="-1" x="65" y="-1"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uuid" remarks="">
 <column-description></column-description>
@@ -230,19 +254,6 @@
 <variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="tool_content_id" remarks="">
-<column-description></column-description>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
 </column-list>
 <primary-key alias="" name="PRIMARY" remarks="">
 <primary-key-description></primary-key-description>
@@ -259,7 +270,7 @@
 </table>
 <table alias="" name="tl_lafrum11_forum_learners" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="59" y="222"/>
+<table-figure-bounds height="-1" width="-1" x="564" y="271"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uuid" remarks="">
 <column-description></column-description>
@@ -300,19 +311,6 @@
 <variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="session_id" remarks="">
-<column-description></column-description>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
 <column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="fullName" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
@@ -343,7 +341,7 @@
 </table>
 <table alias="" name="tl_lafrum11_message" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="760" y="15"/>
+<table-figure-bounds height="-1" width="-1" x="681" y="60"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uuid" remarks="">
 <column-description></column-description>
@@ -435,7 +433,20 @@
 <variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="FORUM" remarks="">
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="tool_session_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="learner_id" remarks="">
 <column-description></column-description>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant type-name-pattern="BIGINT"/>
@@ -468,12 +479,19 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key alias="" name="FK4A6067E89EAD680D" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_forum" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key alias="" name="FK4A6067E823DF1BD4" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_tool_session" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
 <foreign-key-figure>
 <fk-fig-bendpoint-list/>
 </foreign-key-figure>
-<foreign-key-column column-name="FORUM" referenced-key-column-name="uuid"/>
+<foreign-key-column column-name="tool_session_id" referenced-key-column-name="uuid"/>
+</foreign-key>
+<foreign-key alias="" name="FK4A6067E837026725" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_forum_learners" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="learner_id" referenced-key-column-name="uuid"/>
 </foreign-key>
 <foreign-key alias="" name="FK4A6067E8F7440FBC" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_message" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
@@ -488,19 +506,23 @@
 <index-description></index-description>
 <index-column name="uuid" sort="ASC"/>
 </index>
+<index alias="" name="FK4A6067E837026725" remarks="" unique="true">
+<index-description></index-description>
+<index-column name="learner_id" sort="ASC"/>
+</index>
 <index alias="" name="FK4A6067E8F7440FBC" remarks="" unique="true">
 <index-description></index-description>
 <index-column name="parent" sort="ASC"/>
 </index>
-<index alias="" name="FK4A6067E89EAD680D" remarks="" unique="true">
+<index alias="" name="FK4A6067E823DF1BD4" remarks="" unique="true">
 <index-description></index-description>
-<index-column name="FORUM" sort="ASC"/>
+<index-column name="tool_session_id" sort="ASC"/>
 </index>
 </index-list>
 </table>
 <table alias="" name="tl_lafrum11_tool_session" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="359" y="252"/>
+<table-figure-bounds height="-1" width="-1" x="349" y="17"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uuid" remarks="">
 <column-description></column-description>
@@ -540,41 +562,27 @@
 <variant type-name-pattern="INT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="toolContentId" remarks="">
-<column-description></column-description>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="toolSessionId" remarks="">
-<column-description></column-description>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
 </column-list>
 <primary-key alias="" name="PRIMARY" remarks="">
 <primary-key-description></primary-key-description>
 <primary-key-column name="uuid"/>
 </primary-key>
 <unique-key-list/>
-<foreign-key-list/>
+<foreign-key-list>
+<foreign-key alias="" name="FK5A04D7AE9912CEA7" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_forum" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="uuid" referenced-key-column-name="uuid"/>
+</foreign-key>
+</foreign-key-list>
 <index-list>
 <index alias="" name="PRIMARY" remarks="" unique="false">
+<index-description></index-description>
+<index-column name="uuid" sort="ASC"/>
+</index>
+<index alias="" name="FK5A04D7AE9912CEA7" remarks="" unique="true">
 <index-description></index-description>
 <index-column name="uuid" sort="ASC"/>
 </index>

@@ -259,6 +259,8 @@
 				<include name="*.tld"/>
 				<include name="*.xml"/>
 				<include name="struts/*"/>
+				<include name="jstl/*"/>
+				<include name="fckeditor/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
 			<classes dir="${build.classes.java}"/>	

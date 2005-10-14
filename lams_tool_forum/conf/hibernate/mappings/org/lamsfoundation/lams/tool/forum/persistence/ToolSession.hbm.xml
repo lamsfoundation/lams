@@ -49,20 +49,14 @@
             column="status"
         />
 
-        <property
-            name="toolContentId"
-            type="java.lang.Long"
+        <many-to-one
+            name="forum"
+            class="org.lamsfoundation.lams.tool.forum.persistence.Forum"
+            cascade="none"
+            outer-join="auto"
             update="true"
             insert="true"
-            column="toolContentId"
-        />
-
-        <property
-            name="toolSessionId"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="toolSessionId"
+            column="uuid"
         />
 
         <!--

@@ -110,13 +110,43 @@
         </set>
 
         <many-to-one
-            name="forum"
-            class="org.lamsfoundation.lams.tool.forum.persistence.Forum"
+            name="toolSession"
+            class="org.lamsfoundation.lams.tool.forum.persistence.ToolSession"
             cascade="none"
             outer-join="auto"
             update="true"
             insert="true"
-            column="FORUM"
+            column="tool_session_id"
+        />
+
+        <set
+            name="attachments"
+            table="ATTACHMENT"
+            lazy="false"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+        >
+
+            <key
+                column="toolSession"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
+            />
+
+        </set>
+
+        <many-to-one
+            name="learner"
+            class="org.lamsfoundation.lams.tool.forum.persistence.Learner"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="learner_id"
         />
 
         <!--

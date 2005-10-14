@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao;
@@ -14,6 +20,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageDao;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +29,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.MessageDao;
  * Time: 15:13:54
  * To change this template use File | Settings | File Templates.
  */
-public class ForumManagerImpl implements ForumManager {
+public class ForumService implements IForumService,ToolContentManager,ToolSessionManager {
 	private ForumDao forumDao;
 	private AttachmentDao attachmentDao;
 	private MessageDao messageDao;
@@ -110,7 +117,8 @@ public class ForumManagerImpl implements ForumManager {
     }
 
     public Message createMessage(Long forumId, Message message) throws PersistenceException {
-        message.setForum(this.getForum(forumId));
+    	//TODO: need fix
+//        message.setToolSession(this.getForum(forumId));
         messageDao.saveOrUpdate(message);
         return message;
     }
@@ -118,7 +126,7 @@ public class ForumManagerImpl implements ForumManager {
      public Message editMessage(Message message) throws PersistenceException {
         Message reloaded = this.getMessage(message.getUuid());
         reloaded.setModifiedBy(message.getModifiedBy());
-        reloaded.setIsAnnonymous(message.getIsAnonymous());
+        reloaded.setIsAnonymous(message.getIsAnonymous());
         reloaded.setIsAuthored(message.getIsAuthored());
         reloaded.setSubject(message.getSubject());
         reloaded.setBody(message.getBody());
@@ -137,7 +145,7 @@ public class ForumManagerImpl implements ForumManager {
 
     public Message replyToMessage(Long messageId, Message replyMessage) throws PersistenceException {
         Message message = this.getMessage(messageId);
-        replyMessage.setForum(message.getForum());
+        replyMessage.setToolSession(message.getToolSession());
         replyMessage.setParent(message);
         messageDao.saveOrUpdate(replyMessage);
         Set replies = message.getReplies();
@@ -172,5 +180,35 @@ public class ForumManagerImpl implements ForumManager {
 
 	public void setMessageDao(MessageDao messageDao) {
 		this.messageDao = messageDao;
+	}
+
+	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
+	}
+
+	public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	}
+
+	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException {
+	}
+
+	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException {
+	}
+
+	public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException {
+	}
+
+	public String leaveToolSession(Long toolSessionId, User learner) throws DataMissingException, ToolException {
+		return null;
+	}
+
+	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+		return null;
+	}
+
+	public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException {
+		return null;
+	}
+
+	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	}
 }

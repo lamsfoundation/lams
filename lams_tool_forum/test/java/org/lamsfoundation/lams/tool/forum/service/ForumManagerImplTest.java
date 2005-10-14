@@ -17,11 +17,11 @@ import junit.framework.TestCase;
  * Time: 10:59:06
  */
 public class ForumManagerImplTest extends TestCase {
-    protected ForumManager forumManager;
+    protected IForumService forumManager;
 
     protected void setUp() throws Exception {
         super.setUp();
-        forumManager = (ForumManager) GenericObjectFactoryImpl.getTestInstance().lookup("forumManager");
+        forumManager = (IForumService) GenericObjectFactoryImpl.getTestInstance().lookup("forumManager");
     }
 
     public void testCreateAndDeleteForum() throws PersistenceException {
@@ -108,7 +108,7 @@ public class ForumManagerImplTest extends TestCase {
 
       Message reloaded = forumManager.getMessage(message.getUuid());
 
-      assertEquals(reloaded.getForum(), forum);
+      assertEquals(reloaded.getToolSession(), forum);
       assertEquals(reloaded.getCreatedBy(), new Long("1002"));
       assertEquals(reloaded.getIsAnonymous(), true);
       assertEquals(reloaded.getIsAuthored(), true);
@@ -118,11 +118,11 @@ public class ForumManagerImplTest extends TestCase {
       message.setModifiedBy(new Long("1004"));
       message.setSubject("MODIFIED SUBJECT");
       message.setBody("MODIFIED BODY");
-      message.setIsAnnonymous(false);
+      message.setIsAnonymous(false);
 
       forumManager.editMessage(message);
       message = forumManager.getMessage(message.getUuid());
-      assertEquals(message.getForum(), forum);
+      assertEquals(message.getToolSession(), forum);
       assertEquals(message.getCreatedBy(), new Long("1002"));
       assertEquals(message.getModifiedBy(), new Long("1004"));
       assertEquals(message.getIsAnonymous(), false);
@@ -145,7 +145,7 @@ public class ForumManagerImplTest extends TestCase {
       Message message = forumManager.createMessage(forum.getUuid(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
       assertNotNull("Message Id is null", message.getUuid());
       Message reloaded = forumManager.getMessage(message.getUuid());
-      assertEquals(reloaded.getForum(), forum);
+      assertEquals(reloaded.getToolSession(), forum);
       assertEquals(reloaded.getCreatedBy(), new Long("1002"));
       assertEquals(reloaded.getIsAnonymous(), true);
       assertEquals(reloaded.getIsAuthored(), true);
@@ -155,7 +155,7 @@ public class ForumManagerImplTest extends TestCase {
       Message reply = forumManager.replyToMessage(message.getUuid(), this.getMessage(new Long("1008"), "REPLY MESSAGE", "REPLY MESSAGE", true, false));
       assertNotNull("Message Id is null", reply.getUuid());
       reply = forumManager.getMessage(reply.getUuid());
-      assertEquals(message.getForum(), forum);
+      assertEquals(message.getToolSession(), forum);
       assertEquals(reply.getCreatedBy(), new Long("1008"));
       assertEquals(reply.getIsAnonymous(), true);
       assertEquals(reply.getIsAuthored(), false);
@@ -215,7 +215,7 @@ public class ForumManagerImplTest extends TestCase {
         message.setSubject(subject);
         message.setBody(body);
         message.setCreatedBy(createdBy);
-        message.setIsAnnonymous(isAnnonymous);
+        message.setIsAnonymous(isAnnonymous);
         message.setIsAuthored(isAuthored);
         return message;
     }

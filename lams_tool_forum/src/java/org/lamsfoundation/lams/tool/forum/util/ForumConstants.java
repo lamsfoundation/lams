@@ -12,5 +12,7 @@ public interface ForumConstants {
    
     public final static String FORUM_MANAGER = "forumManager";
     public final static String CONTENT_HANDLER = "toolContentHandler";
+
+	public static final String TOOL_CONTENT_ID = "toolContentID";
     
 }

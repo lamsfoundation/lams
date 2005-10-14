@@ -8,10 +8,9 @@
 	Forum tool
 </description>
 <context-param>
-  	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-  	<param-value>org.lamsfoundation.lams.tool.imscp.web.ApplicationResources</param-value>
+	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+	<param-value>org.lamsfoundation.lams.tool.forum.web.ApplicationResources</param-value>
 </context-param>
-
 <context-param>
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
@@ -20,10 +19,7 @@
   		classpath:/forumApplicationContext.xml
 	</param-value>
 </context-param>
-<context-param>
-	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-	<param-value>org.lamsfoundation.lams.tool.forum.web.ApplicationResources</param-value>
-</context-param>
+
 <listener>
 	<listener-class>
 		org.springframework.web.context.ContextLoaderListener
@@ -167,10 +163,6 @@
     <taglib-location>/WEB-INF/struts/struts-tiles-el.tld</taglib-location>
 </taglib>
 
-<taglib>
-    <taglib-uri>tags-c</taglib-uri>
-    <taglib-location>/WEB-INF/struts/c.tld</taglib-location>
-</taglib>
 <!--  ======================================================== -->	
 <!--  JSTL Tag Library -->
 <!--  ======================================================== -->	

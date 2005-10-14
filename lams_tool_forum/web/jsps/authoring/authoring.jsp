@@ -22,8 +22,7 @@
 <c:if test="${empty currentTab}"><c:set var="currentTab" value="b"/></c:if>
 <body onLoad="initTabs();showTab('<c:out value='${currentTab}'/>');">
 
-<html:form action="authoring" method="post"
-	focus="title"  enctype="multipart/form-data">
+<html:form action="authoring" method="post"	 enctype="multipart/form-data">
 		<html:hidden property="toolContentID"/>
 		<html:hidden  property="currentTab" styleId="currentTab"/>
 

@@ -56,7 +56,22 @@
 		parameter="tiles:/blank" />
 
       	<!-- Forum  related actions -->
-
+    <action
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
+      name="forumForm"
+      scope="request"
+      input="/authoring/authoring.jsp"
+      parameter="action"
+      unknown="false"
+      validate="true"
+	>
+      <forward
+        name="success"
+        path="/authoring/success.jsp"
+        redirect="false"
+      />
+    </action>
 	    <action path="/authoring/forum/create"
 		    type="org.apache.struts.actions.ForwardAction" parameter="tiles:/authoring/forum/create" />
 
@@ -260,10 +275,11 @@
 	<set-property property="pathnames"
 		value="/WEB-INF/struts/validator-rules.xml,/WEB-INF/struts/validation.xml" />
 </plug-in>
-<!--
+
 <plug-in className="org.apache.struts.tiles.TilesPlugin">
 	<set-property property="definitions-config" value="/WEB-INF/struts/tiles-defs.xml"/>
 </plug-in>
+<!--
 <plug-in className="net.sf.struts.saif.SAIFPlugin">
 	<set-property property="interceptor-config" value="/WEB-INF/interceptor-config.xml" />
 </plug-in>

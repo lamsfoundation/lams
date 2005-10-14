@@ -9,7 +9,12 @@ package org.lamsfoundation.lams.tool.forum.persistence;
  */
 public class ForumException extends RuntimeException {
 
-    public ForumException(String message) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7408922611270822369L;
+
+	public ForumException(String message) {
         super(message);
     }
 

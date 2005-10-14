@@ -33,8 +33,9 @@ public class MessageTest extends TestCase {
         Message message = new Message();
         message.setBody("Test Message");
         message.setSubject("Test Message");
-        message.setForum(forum);
-        message.setIsAnnonymous(false);
+        //TODO:need fix
+//        message.setToolSession(forum);
+        message.setIsAnonymous(false);
         message.setIsAuthored(true);
         message.setCreatedBy(new Long(1000));
         message.setModifiedBy(new Long(1002));
@@ -55,7 +56,7 @@ public class MessageTest extends TestCase {
         assertEquals("reloaded message not equal", message, reloaded);
         assertEquals("reloaded message body should be: Test Message", "Test Message", reloaded.getBody());
         assertEquals("reloaded message Subject should be: Test Message", "Test Message", reloaded.getSubject());
-        assertEquals("reloaded message Forum not equal", forum.getUuid(), reloaded.getForum().getUuid());
+        assertEquals("reloaded message Forum not equal", forum.getUuid(), reloaded.getToolSession().getUuid());
         assertEquals("reloaded message isAnnonymous not equal", false, reloaded.getIsAnonymous());
         assertEquals("reloaded message isAuthored not equal", true, reloaded.getIsAuthored());
         assertEquals("reloaded message createdBy not equal", new Long(1000), reloaded.getCreatedBy());
@@ -64,8 +65,9 @@ public class MessageTest extends TestCase {
         Message message2 = new Message();
         message2.setBody("Test Message2");
         message2.setSubject("Test Message2");
-        message2.setForum(forum);
-        message2.setIsAnnonymous(true);
+        //TODO:need fix
+//      message.setToolSession(forum);
+        message2.setIsAnonymous(true);
         message2.setIsAuthored(true);
         message2.setCreatedBy(new Long(1005));
         message2.setModifiedBy(new Long(1006));
@@ -79,7 +81,7 @@ public class MessageTest extends TestCase {
         assertEquals("reloaded message not equal", message2, reloaded2);
         assertEquals("reloaded message body should be: Test Message", "Test Message2", reloaded2.getBody());
         assertEquals("reloaded message Subject should be: Test Message", "Test Message2", reloaded2.getSubject());
-        assertEquals("reloaded message Forum not equal", forum.getUuid(), reloaded2.getForum().getUuid());
+        assertEquals("reloaded message Forum not equal", forum.getUuid(), reloaded2.getToolSession().getUuid());
         assertEquals("reloaded message isAnnonymous not equal", true, reloaded2.getIsAnonymous());
         assertEquals("reloaded message isAuthored not equal", true, reloaded2.getIsAuthored());
         assertEquals("reloaded message createdBy not equal", new Long(1005), reloaded2.getCreatedBy());
@@ -93,8 +95,9 @@ public class MessageTest extends TestCase {
         Message message3 = new Message();
         message3.setBody("Test Message2");
         message3.setSubject("Test Message2");
-        message3.setForum(forum);
-        message3.setIsAnnonymous(true);
+        //TODO:need fix
+//      message.setToolSession(forum);
+        message3.setIsAnonymous(true);
         message3.setIsAuthored(true);
         message3.setCreatedBy(new Long(1005));
         message3.setModifiedBy(new Long(1006));

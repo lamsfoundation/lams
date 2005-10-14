@@ -44,15 +44,6 @@
         />
 
         <property
-            name="sessionID"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="session_id"
-            length="20"
-        />
-
-        <property
             name="fullName"
             type="java.lang.String"
             update="true"

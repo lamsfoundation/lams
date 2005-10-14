@@ -15,7 +15,7 @@ import java.util.Map;
  * Time: 14:49:59
  * To change this template use File | Settings | File Templates.
  */
-public interface ForumManager {
+public interface IForumService {
 
     public Forum createForum(Forum forum, Map attachments, Map topics) throws PersistenceException;
     public Forum editForum(Forum forum, Map attachments, Map topics) throws PersistenceException;

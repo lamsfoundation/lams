@@ -54,7 +54,7 @@
         </property>
     </bean>
 
-    <bean id="forumManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="forumService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
             <ref local="forumManagerTarget"/>
