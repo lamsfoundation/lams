@@ -3,27 +3,32 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app >
-    <display-name>forum</display-name>
-    <description>
-		Forum tool
-    </description>
+ <display-name>forum</display-name>
+<description>
+	Forum tool
+</description>
 <context-param>
   	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
   	<param-value>org.lamsfoundation.lams.tool.imscp.web.ApplicationResources</param-value>
 </context-param>
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>
-			classpath:/org/lamsfoundation/lams/applicationContext.xml
-			classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
-	  		classpath:/forumApplicationContext.xml
-		</param-value>
-	</context-param>
-	<listener>
-		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>	
+
+<context-param>
+	<param-name>contextConfigLocation</param-name>
+	<param-value>
+		classpath:/org/lamsfoundation/lams/applicationContext.xml
+		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
+  		classpath:/forumApplicationContext.xml
+	</param-value>
+</context-param>
+<context-param>
+	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+	<param-value>org.lamsfoundation.lams.tool.forum.web.ApplicationResources</param-value>
+</context-param>
+<listener>
+	<listener-class>
+		org.springframework.web.context.ContextLoaderListener
+	</listener-class>
+</listener>	
 
     <!--
     To use non XDoclet filters, create a filters.xml file that
@@ -114,40 +119,97 @@
    <!ELEMENT mime-mapping (extension, mime-type)>
    -->
 
-   <!--
-   To specify error pages, create a file named error-pages.xml, put it in your project's mergedir.
-   Organize error-pages.xml following this DTD slice:
+  <error-page>
+	<error-code>403</error-code>
+	<location>/403.html</location>
+</error-page>
 
-   <!ELEMENT error-page ((error-code | exception-type), location)>
-   -->
-
-        <!-- Struts Tag Library Descriptors -->
-
-  <taglib>
-    <taglib-uri>/WEB-INF/struts/struts-bean.tld</taglib-uri>
+<!--  ======================================================== -->	
+<!-- Struts Tag Library Descriptors -->
+<!--  ======================================================== -->	
+<taglib>
+    <taglib-uri>tags-bean</taglib-uri>
     <taglib-location>/WEB-INF/struts/struts-bean.tld</taglib-location>
-  </taglib>
+</taglib>
 
-  <taglib>
-    <taglib-uri>/WEB-INF/struts/struts-html.tld</taglib-uri>
+<taglib>
+    <taglib-uri>tags-html</taglib-uri>
     <taglib-location>/WEB-INF/struts/struts-html.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-logic</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-logic.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-tiles</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-tiles.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-bean-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-bean-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-html-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-html-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-logic-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-logic-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-tiles-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-tiles-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-c</taglib-uri>
+    <taglib-location>/WEB-INF/struts/c.tld</taglib-location>
+</taglib>
+<!--  ======================================================== -->	
+<!--  JSTL Tag Library -->
+<!--  ======================================================== -->	
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/fmt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/fmt.tld</taglib-location>
   </taglib>
 
   <taglib>
-    <taglib-uri>/WEB-INF/struts/struts-logic.tld</taglib-uri>
-    <taglib-location>/WEB-INF/struts/struts-logic.tld</taglib-location>
+    <taglib-uri>http://java.sun.com/jstl/fmt-rt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/fmt-rt.tld</taglib-location>
   </taglib>
 
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/c.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/core-rt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/c-rt.tld</taglib-location>
+  </taglib>
+
+	<!--  ======================================================== -->	
+	<!--   Customized Tag Library -->
+	<!--  ======================================================== -->	
+	<taglib>
+	    <taglib-uri>fck-editor</taglib-uri>
+	    <taglib-location>/WEB-INF/fckeditor/FCKeditor.tld</taglib-location>
+	</taglib>
     <taglib>
         <taglib-uri>forum</taglib-uri>
         <taglib-location>/WEB-INF/forum.tld</taglib-location>
     </taglib>
-
-  <!-- Struts Tag Library Descriptors -->
-  <taglib>
-    <taglib-uri>datetime</taglib-uri>
-    <taglib-location>/WEB-INF/taglibs-datetime.tld</taglib-location>
-  </taglib>
+      <!-- Struts Tag Library Descriptors -->
+	  <taglib>
+	    <taglib-uri>datetime</taglib-uri>
+	    <taglib-location>/WEB-INF/taglibs-datetime.tld</taglib-location>
+	  </taglib>
 
    <!--
    To set up security settings for your web app, create a file named web-security.xml, put it in your project's mergedir.

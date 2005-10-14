@@ -1,30 +1,87 @@
-      <!-- Struts Tag Library Descriptors -->
 
-  <taglib>
-    <taglib-uri>/WEB-INF/struts/struts-bean.tld</taglib-uri>
+<!--  ======================================================== -->	
+<!-- Struts Tag Library Descriptors -->
+<!--  ======================================================== -->	
+<taglib>
+    <taglib-uri>tags-bean</taglib-uri>
     <taglib-location>/WEB-INF/struts/struts-bean.tld</taglib-location>
-  </taglib>
+</taglib>
 
-  <taglib>
-    <taglib-uri>/WEB-INF/struts/struts-html.tld</taglib-uri>
+<taglib>
+    <taglib-uri>tags-html</taglib-uri>
     <taglib-location>/WEB-INF/struts/struts-html.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-logic</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-logic.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-tiles</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-tiles.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-bean-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-bean-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-html-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-html-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-logic-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-logic-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-tiles-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/struts-tiles-el.tld</taglib-location>
+</taglib>
+
+<!--  ======================================================== -->	
+<!--  JSTL Tag Library -->
+<!--  ======================================================== -->	
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/fmt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/fmt.tld</taglib-location>
   </taglib>
 
   <taglib>
-    <taglib-uri>/WEB-INF/struts/struts-logic.tld</taglib-uri>
-    <taglib-location>/WEB-INF/struts/struts-logic.tld</taglib-location>
+    <taglib-uri>http://java.sun.com/jstl/fmt-rt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/fmt-rt.tld</taglib-location>
   </taglib>
 
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/c.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>http://java.sun.com/jstl/core-rt</taglib-uri>
+    <taglib-location>/WEB-INF/JSTL/c-rt.tld</taglib-location>
+  </taglib>
+
+
+	<!--  ======================================================== -->	
+	<!--   Customized Tag Library -->
+	<!--  ======================================================== -->	
+	<taglib>
+	    <taglib-uri>fck-editor</taglib-uri>
+	    <taglib-location>/WEB-INF/fckeditor/FCKeditor.tld</taglib-location>
+	</taglib>
+	    
     <taglib>
         <taglib-uri>forum</taglib-uri>
         <taglib-location>/WEB-INF/forum.tld</taglib-location>
     </taglib>
-
-  <!-- Struts Tag Library Descriptors -->
-  <taglib>
-    <taglib-uri>datetime</taglib-uri>
-    <taglib-location>/WEB-INF/taglibs-datetime.tld</taglib-location>
-  </taglib>
-
-    
-    
+      <!-- Struts Tag Library Descriptors -->
+	  <taglib>
+	    <taglib-uri>datetime</taglib-uri>
+	    <taglib-location>/WEB-INF/taglibs-datetime.tld</taglib-location>
+	  </taglib>
+  
+  

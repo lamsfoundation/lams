@@ -7,5 +7,5 @@
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams.jar"/>
 	<classpathentry sourcepath="/lams_contentrepository" kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE13_CONTAINER"/>
-	<classpathentry kind="output" path="build/classes"/>
+	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>
