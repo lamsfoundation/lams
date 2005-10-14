@@ -130,7 +130,10 @@ MM_reloadPage(true);
 									  		size="50" maxlength="255"> 
 									  	</td>
 									  	<td> 
-									  		ADD
+	  										<html:submit property="addQuestion" styleClass="linkbutton" 
+											onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+												<bean:message key="button.addNewQuestion"/>
+											</html:submit>
 									  	</td>
 									  	<td> 
 									  		EDIT
@@ -146,16 +149,16 @@ MM_reloadPage(true);
 								  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
-									  	<td> 
-									  		EDIT
-									  	</td>
-									  	
 										<td>									  										  		
 			 								<html:submit property="removeContent" styleClass="linkbutton"  onclick="removeQuestion(${queIndex});"
 			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 												<bean:message key="button.removeQuestion"/>
 											</html:submit>
 									  	</td>
+									  	<td> 
+									  		EDIT
+									  	</td>
+									  	
 								  </tr>
 							</c:if> 			
 						</c:forEach>

@@ -21,6 +21,8 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +37,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 
@@ -211,13 +214,25 @@ public class McAction extends DispatchAction implements McAppConstants
 		logger.debug("loadQ initialised...");
 	 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	
-	 	logger.debug("mcAuthoringForm.getEditDefaultQuestion():" + mcAuthoringForm.getEditDefaultQuestion());
-	 	String userAction=null;
+	 	Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
+	 	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
 	 	
+	 	mapQuestionsContent=repopulateMap(mapQuestionsContent, request);
+	 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
+	 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+	 	
+	 	
+	 	String userAction=null;
 	 	if (mcAuthoringForm.getAddQuestion() != null)
 	 	{
 	 		userAction="addQuestion";
 	 		request.setAttribute(USER_ACTION, userAction);
+	 		
+	 		int mapSize=mapQuestionsContent.size();
+			mapQuestionsContent.put(new Long(++mapSize).toString(), "");
+			logger.debug("updated Questions Map size: " + mapQuestionsContent.size());
+			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+    		logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
 	 		return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	else if (mcAuthoringForm.getEditDefaultQuestion() != null)
@@ -266,6 +281,40 @@ public class McAction extends DispatchAction implements McAppConstants
 		logger.debug("mcService:" + mcService);
 		return (mapping.findForward(LOAD_QUESTIONS));
 	}
+    
+    
+    /**
+     * shrinks the size of the Map to only used entries
+     * 
+     * @param mapQuestionContent
+     * @param request
+     * @return
+     */
+    protected Map repopulateMap(Map mapQuestionContent, HttpServletRequest request)
+    {
+    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
+    	
+    	long mapCounter=0;
+    	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
+		{
+			String candidateQuestionEntry =request.getParameter("questionContent" + i);
+			logger.debug("candidateQuestionEntry:" + candidateQuestionEntry);
+			if (
+				(candidateQuestionEntry != null) && 
+				(candidateQuestionEntry.length() > 0) &&  
+				!(candidateQuestionEntry.equals(""))
+				)
+			{
+				mapCounter++;
+				logger.debug("mapCounter:" + mapCounter);
+				mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateQuestionEntry);
+				logger.debug("added new entry: " + candidateQuestionEntry);	
+			}
+		}
+    	logger.debug("return repopulated Map: " + mapTempQuestionsContent);
+    	return mapTempQuestionsContent;
+    }
+    
     
     
     
