@@ -45,6 +45,7 @@
     <many-to-one
         name="mcSession"
         class="org.lamsfoundation.lams.tool.mc.McSession"
+        not-null="true"        
         cascade="none"
         outer-join="auto"
         update="true"
@@ -56,7 +57,7 @@
 
    	 <set
             name="mcUsrAttempts"
-            lazy="false"
+            lazy="true"
             inverse="true"
             cascade="all-delete-orphan"
             sort="unsorted"

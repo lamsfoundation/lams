@@ -76,6 +76,11 @@ public interface McAppConstants {
     public static final String LOAD										="load";
     public static final String LOAD_QUESTIONS							="load";
     public static final String LOAD_STARTER								="starter";
+    public static final String EDIT_OPTS_CONTENT						="editOptsContent";
+    public static final String ADD_OPTS_CONTENT							="addOptsContent";
+    public static final String REMOVE_OPTS_CONTENT						="removeOptsContent";
+    
+    
     public static final String AUTHORING_BASIC							="authoringBasic";
     public static final boolean MODE_OPTIONAL 							= false;
     public static final String DISABLE_TOOL								="disabled";

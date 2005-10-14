@@ -3,39 +3,38 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app >
-	<context-param>
-	  	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-	  	<param-value>org.lamsfoundation.lams.tool.mc.McResources</param-value>
-	</context-param>
+ <context-param>
+  	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+  	<param-value>org.lamsfoundation.lams.tool.mc.web.McResources</param-value>
+</context-param>
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			classpath:/org/lamsfoundation/lams/applicationContext.xml
-	    	classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
-	    	classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
-	    	classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
+            classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
+            classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
 			classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
+			classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
 			classpath:/org/lamsfoundation/lams/tool/mc/mcApplicationContext.xml
 		</param-value>
 	</context-param>
-	
 	<listener>
 		<listener-class>
 			org.springframework.web.context.ContextLoaderListener
 		</listener-class>
 	</listener>	
-<!-- 	
-	<filter>
-    <filter-name>contentFilter</filter-name>
-    <filter-class>org.lamsfoundation.lams.web.filter.ResponseCaptureFilter</filter-class>
-	</filter>
 
-	<filter-mapping>
-	    <filter-name>contentFilter</filter-name>
-	    <url-pattern>/portfolioExport</url-pattern>
-	</filter-mapping> -->
+    <filter>
+    <filter-name>hibernateFilter</filter-name>
+    <filter-class>
+      org.springframework.orm.hibernate3.support.OpenSessionInViewFilter
+    </filter-class>
+    <init-param>
+      <param-name>sessionFactoryBeanName</param-name>
+      <param-value>mcSessionFactory</param-value>
+    </init-param>
+   </filter>
    <!-- System session filter -->
-   
    <filter>
        <filter-name>SystemSessionFilter</filter-name>
          <filter-class>
@@ -44,44 +43,14 @@
      </filter>
 
     <filter-mapping>
- 	   <filter-name>SystemSessionFilter</filter-name>
-    	 <url-pattern>/*</url-pattern>
-   </filter-mapping>	
-	
+	    <filter-name>hibernateFilter</filter-name>
+    	 <url-pattern>*.do</url-pattern>
+  	</filter-mapping>
+    <filter-mapping>
+    	<filter-name>SystemSessionFilter</filter-name>
+     	<url-pattern>/*</url-pattern>
+	 </filter-mapping>
 
-    <!--
-    To use non XDoclet filters, create a filters.xml file that
-    contains the additional filters (eg Sitemesh) and place it in your
-    project's merge dir.  Don't include filter-mappings in this file,
-    include them in a file called filter-mappings.xml and put that in
-    the same directory.
-    -->
-
-    <!--
-    To use non XDoclet filter-mappings, create a filter-mappings.xml file that
-    contains the additional filter-mappings and place it in your
-    project's merge dir.
-    -->
-
-    <!--
-    To use non XDoclet listeners, create a listeners.xml file that
-    contains the additional listeners and place it in your
-    project's merge dir.
-    -->
-
-     	<!--
-	  - Loads the root application context of this web app at startup,
-	  - by default from "/WEB-INF/applicationContext.xml".
-		- Note that it is preferable to use ContextLoaderListener in a servlet container
-		- that follows the Servlet 2.4 initialization order (most Servlet 2.3 containers do).
-		-
-	  - Use WebApplicationContextUtils.getWebApplicationContext(servletContext)
-	  - to access it anywhere in the web application, outside of the framework.
-	  -
-	  - The root context is the parent of all servlet-specific contexts.
-	  - This means that its beans are automatically available in these child contexts,
-	  - both for getBean(name) calls and (external) bean references.
-		-->
 	<servlet>
 		<servlet-name>context</servlet-name>
 		<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
@@ -138,48 +107,96 @@
       <session-timeout>120</session-timeout>
    </session-config>
    
-   <taglib>
+     <error-page>
+		<error-code>403</error-code>
+		<location>/403.html</location>
+	</error-page>
+
+  <!-- Struts Tag Library Descriptors -->
+
+<taglib>
     <taglib-uri>fck-editor</taglib-uri>
     <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
-  </taglib>
+</taglib>
 
-   <!--
-   To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
-   Organize mime-mappings.xml following this DTD slice:
+  	<!--  Security Constraint -->
+	<security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>LEARNER</role-name>
+    		<role-name>TEACHER</role-name>
+    		<role-name>STAFF</role-name>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-   <!ELEMENT mime-mapping (extension, mime-type)>
-   -->
+   <!--  Security Constraint -->
+	<security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>LEARNER</role-name>
+    		<role-name>TEACHER</role-name>
+    		<role-name>STAFF</role-name>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-   <!--
-   To specify error pages, create a file named error-pages.xml, put it in your project's mergedir.
-   Organize error-pages.xml following this DTD slice:
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Authoring Update</web-resource-name>
+		    <url-pattern>/authoringStarter.do</url-pattern>
+		   <url-pattern>/authoring.do</url-pattern>
+		 </web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    
+    
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
+		    <url-pattern>/monitoringStarter.do</url-pattern>
+		    <url-pattern>/monitoring.do</url-pattern>		   
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>STAFF</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-   <!ELEMENT error-page ((error-code | exception-type), location)>
-   -->
+    
+	<!--  some combine role security setting -->
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Download Files</web-resource-name>
+		    <url-pattern>/download/</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>STAFF</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-  <!--
-  To add taglibs by xml, create a file called taglibs.xml and place it
-  in your merge dir.
-  -->
 
-   <!--
-   To set up security settings for your web app, create a file named web-security.xml, put it in your project's mergedir.
-   Organize web-security.xml following this DTD slice:
-
-   <!ELEMENT security-constraint (display-name?, web-resource-collection+, auth-constraint?, user-data-constraint?)>
-   <!ELEMENT web-resource-collection (web-resource-name, description?, url-pattern*, http-method*)>
-   <!ELEMENT web-resource-name (#PCDATA)>
-   <!ELEMENT url-pattern (#PCDATA)>
-   <!ELEMENT http-method (#PCDATA)>
-   <!ELEMENT user-data-constraint (description?, transport-guarantee)>
-   <!ELEMENT transport-guarantee (#PCDATA)>
-
-   <!ELEMENT login-config (auth-method?, realm-name?, form-login-config?)>
-   <!ELEMENT auth-method (#PCDATA)>
-   <!ELEMENT realm-name (#PCDATA)>
-   <!ELEMENT form-login-config (form-login-page, form-error-page)>
-   <!ELEMENT form-login-page (#PCDATA)>
-   <!ELEMENT form-error-page (#PCDATA)>
-   -->
+	<!--  Login Configuration -->
+  	<login-config>
+   		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+   		<form-login-config>
+    		<form-login-page>/login.jsp</form-login-page>
+   		</form-login-config>
+   	</login-config>
 
 </web-app>

@@ -23,7 +23,8 @@ import org.apache.struts.upload.FormFile;
 public class McAuthoringForm extends ActionForm implements McAppConstants {
 	/** form controllers */
 	protected String editDefaultQuestion;
-	
+	protected String addOptionContent;	
+	protected String removeOptionContent;
 	
 	protected String addContent;
 	protected String removeContent;
@@ -74,6 +75,9 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	public void resetUserAction()
     {
 		this.editDefaultQuestion=null;
+		this.addOptionContent=null;	
+		this.removeOptionContent=null;
+		
     	this.addContent=null;	
     	this.removeContent=null;
     	this.removeAllContent=null;
@@ -91,6 +95,10 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	
 	public void reset()
 	{
+		this.editDefaultQuestion=null;
+		this.addOptionContent=null;	
+		this.removeOptionContent=null;
+		
 		this.addContent=null;
 		this.removeContent=null;
 		this.removeAllContent=null;
@@ -550,5 +558,29 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setEditDefaultQuestion(String editDefaultQuestion) {
 		this.editDefaultQuestion = editDefaultQuestion;
+	}
+	/**
+	 * @return Returns the addOptionContent.
+	 */
+	public String getAddOptionContent() {
+		return addOptionContent;
+	}
+	/**
+	 * @param addOptionContent The addOptionContent to set.
+	 */
+	public void setAddOptionContent(String addOptionContent) {
+		this.addOptionContent = addOptionContent;
+	}
+	/**
+	 * @return Returns the removeOptionContent.
+	 */
+	public String getRemoveOptionContent() {
+		return removeOptionContent;
+	}
+	/**
+	 * @param removeOptionContent The removeOptionContent to set.
+	 */
+	public void setRemoveOptionContent(String removeOptionContent) {
+		this.removeOptionContent = removeOptionContent;
 	}
 }

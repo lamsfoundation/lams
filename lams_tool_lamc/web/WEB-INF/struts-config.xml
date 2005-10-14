@@ -73,6 +73,14 @@
         path=".starter"
         redirect="true"
       />
+      
+      
+      <forward
+        name="editOptsContent"
+        path=".editOptsContent"
+        redirect="true"
+      />
+      
     </action>
  </action-mappings>
 

@@ -45,6 +45,7 @@
     <many-to-one
         name="mcQueContent"
         class="org.lamsfoundation.lams.tool.mc.McQueContent"
+        not-null="true"        
         cascade="none"
         outer-join="auto"
         update="true"
@@ -53,11 +54,10 @@
     >
         <column name="mc_que_content_id" />
     </many-to-one>
-
     
     <set
         name="mcUsrAttempts"
-        lazy="false"
+        lazy="true"
         inverse="true"
 		cascade="all-delete-orphan"
     >
@@ -68,8 +68,6 @@
             class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
         />
     </set>
-    
-    
    
 </class>
 </hibernate-mapping>

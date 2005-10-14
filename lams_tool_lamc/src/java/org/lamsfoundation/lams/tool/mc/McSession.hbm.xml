@@ -28,8 +28,6 @@
     <property
         name="sessionStartDate"
         type="java.util.Date"
-        update="true"
-        insert="true"
         access="property"
         column="session_start_date"
         length="20"
@@ -38,8 +36,6 @@
     <property
         name="sessionEndDate"
         type="java.util.Date"
-        update="true"
-        insert="true"
         access="property"
         column="session_end_date"
         length="20"
@@ -48,8 +44,6 @@
     <property
         name="sessionStatus"
         type="java.lang.String"
-        update="true"
-        insert="true"
         access="property"
         column="session_status"
         length="100"
@@ -68,6 +62,7 @@
    <many-to-one
         name="mcContent"
         class="org.lamsfoundation.lams.tool.mc.McContent"
+        not-null="true"        
         cascade="none"
         outer-join="auto"
         update="true"
@@ -81,7 +76,7 @@
     
     <set
         name="mcQueUsers"
-        lazy="false"
+        lazy="true"
         inverse="true"
         cascade="all-delete-orphan"
         sort="unsorted"

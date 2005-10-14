@@ -216,6 +216,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	if (mcAuthoringForm.getEditDefaultQuestion() != null)
 	 	{
 	 		userAction="editDefaultQuestion";
+	 		return (mapping.findForward(EDIT_OPTS_CONTENT));
 	 		
 	 	}
 	 	logger.debug("userAction:" + userAction);
@@ -224,6 +225,39 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	logger.debug("mcService:" + mcService);
    	    return (mapping.findForward(LOAD_QUESTIONS));
     }
+    
+    
+    public ActionForward editDefaultContent(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+		logger.debug("editDefaultContent initialised...");
+		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+
+		String userAction=null;
+	 	if (mcAuthoringForm.getAddOptionContent() != null)
+	 	{
+	 		userAction="addOptionContent";
+	 		return (mapping.findForward(EDIT_OPTS_CONTENT));
+	 		
+	 	}
+	 	else if (mcAuthoringForm.getRemoveOptionContent() != null)
+	 	{
+	 		userAction="removeOptionContent";
+	 		return (mapping.findForward(EDIT_OPTS_CONTENT));
+	 		
+	 	}
+	 	logger.debug("userAction:" + userAction);
+		
+		
+		IMcService mcService =McUtils.getToolService(request);
+		logger.debug("mcService:" + mcService);
+		return (mapping.findForward(LOAD_QUESTIONS));
+	}
+    
+    
     
 
     /**
