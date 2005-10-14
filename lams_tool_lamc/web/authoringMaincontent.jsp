@@ -119,29 +119,50 @@ MM_reloadPage(true);
 							</td>
 						</tr>
 				
-			 		<!--default question content, this entry can not be deleted but can be updated -->
-				 		<tr> 
-						  	<td> 
-						 		<bean:message key="label.question1"/> : 
-						 	</td>
-						  	<td>
-								  	<input type="text" name="questionContent0" size="50" 
-								  	maxlength="255" value="<c:out value="${sessionScope.defaultQuestionContent}"/>"> 
-								  	&nbsp
-									<html:submit property="addContent" styleClass="linkbutton" 
-									onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-										<bean:message key="button.addNewQuestion"/>
-									</html:submit>
-						  	</td>
-						  	<td>						  	
-						  			<html:submit property="editDefaultQuestion" styleClass="linkbutton"  
-			 						onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-										<bean:message key="button.editQuestion"/>
-									</html:submit>
-						  	</td>									
-					  	</tr>
+
+			  	 		<c:set var="queIndex" scope="session" value="1"/>
+						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
+							  <c:if test="${questionEntry.key == 1}"> 			
+								  <tr>
+								  	<td> <c:out value="Question ${queIndex}"/> : </td>
+								  		<td> 
+								  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
+									  		size="50" maxlength="255"> 
+									  	</td>
+									  	<td> 
+									  		ADD
+									  	</td>
+									  	<td> 
+									  		EDIT
+									  	</td>
+									  	
+								  </tr>
+							</c:if> 			
+					  		<c:if test="${questionEntry.key > 1}"> 			
+								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+								  <tr>
+								  	<td> <c:out value="Question ${queIndex}"/> : </td>
+								  		<td> 
+								  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
+									  		size="50" maxlength="255"> 
+									  	</td>
+									  	<td> 
+									  		EDIT
+									  	</td>
+									  	
+										<td>									  										  		
+			 								<html:submit property="removeContent" styleClass="linkbutton"  onclick="removeQuestion(${queIndex});"
+			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+												<bean:message key="button.removeQuestion"/>
+											</html:submit>
+									  	</td>
+								  </tr>
+							</c:if> 			
+						</c:forEach>
+							<html:hidden property="questionIndex"/>
+
 	 				</table> 	 
-					<html:hidden property="questionIndex"/>
+					
 </div>
 <hr>
 <a href="javascript:;" class="button">Cancel</a>
@@ -185,7 +206,12 @@ Instructions are here
 	function editQuestion(questionIndex)
 	{
 		document.forms[0].questionIndex.value=questionIndex;
-		document.forms[0].isEditQuestion.value='1';
+		document.forms[0].submit();
+	}
+	
+	function removeQuestion(questionIndex)
+	{
+		document.forms[0].questionIndex.value=questionIndex;
 		document.forms[0].submit();
 	}
  </SCRIPT>

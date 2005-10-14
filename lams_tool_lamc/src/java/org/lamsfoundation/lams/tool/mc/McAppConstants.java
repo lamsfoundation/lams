@@ -79,6 +79,7 @@ public interface McAppConstants {
     public static final String EDIT_OPTS_CONTENT						="editOptsContent";
     public static final String ADD_OPTS_CONTENT							="addOptsContent";
     public static final String REMOVE_OPTS_CONTENT						="removeOptsContent";
+    public static final String USER_ACTION								="userAction";
     
     
     public static final String AUTHORING_BASIC							="authoringBasic";
@@ -105,8 +106,10 @@ public interface McAppConstants {
     /**
      * authoring mode constants
      */
-    public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
+    public static final String MAP_QUESTIONS_CONTENT					="mapQuestionsContent";
     public static final String MAP_OPTIONS_CONTENT						="mapOptionsContent";
+    
+    public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
     public static final String DEFAULT_QUESTION_CONTENT					="defaultQuestionContent";
     public static final String TITLE									="title";
     public static final String INSTRUCTIONS								="instructions";

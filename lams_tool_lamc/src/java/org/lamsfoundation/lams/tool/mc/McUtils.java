@@ -175,9 +175,8 @@ public abstract class McUtils implements McAppConstants {
 		{		
 			mcAuthoringForm.setTitle(defaultMcContent.getTitle());
 			mcAuthoringForm.setInstructions(defaultMcContent.getInstructions());
-			
-			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,defaultMcContent.getOfflineInstructions());
-		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,defaultMcContent.getOnlineInstructions());
+			mcAuthoringForm.setOfflineInstructions (defaultMcContent.getOfflineInstructions());
+			mcAuthoringForm.setOnlineInstructions (defaultMcContent.getOnlineInstructions());
 		}
 	}
 	

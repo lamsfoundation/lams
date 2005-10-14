@@ -213,12 +213,22 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	
 	 	logger.debug("mcAuthoringForm.getEditDefaultQuestion():" + mcAuthoringForm.getEditDefaultQuestion());
 	 	String userAction=null;
-	 	if (mcAuthoringForm.getEditDefaultQuestion() != null)
+	 	
+	 	if (mcAuthoringForm.getAddQuestion() != null)
+	 	{
+	 		userAction="addQuestion";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		return (mapping.findForward(LOAD_QUESTIONS));
+	 	}
+	 	else if (mcAuthoringForm.getEditDefaultQuestion() != null)
 	 	{
 	 		userAction="editDefaultQuestion";
+	 		request.setAttribute(USER_ACTION, userAction);
 	 		return (mapping.findForward(EDIT_OPTS_CONTENT));
-	 		
 	 	}
+	 	
+	 	
+	 	
 	 	logger.debug("userAction:" + userAction);
 
 	 	IMcService mcService =McUtils.getToolService(request);

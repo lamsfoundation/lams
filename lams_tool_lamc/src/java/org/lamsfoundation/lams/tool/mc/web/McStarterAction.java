@@ -105,7 +105,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {
 	
-		Map mapQuestionContent= new TreeMap(new McComparator());
+		Map mapQuestionsContent= new TreeMap(new McComparator());
 		Map mapOptionsContent= new TreeMap(new McComparator());
 		
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -192,10 +192,6 @@ public class McStarterAction extends Action implements McAppConstants {
 				persistError(request,"error.defaultQuestionContent.notAvailable");
 				return (mapping.findForward(LOAD_QUESTIONS));
 			}
-			/**
-        	 * display a single sample question
-        	 */
-    		request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, mcQueContent.getQuestion());
 		}
 		catch(Exception e)
 		{
@@ -287,6 +283,14 @@ public class McStarterAction extends Action implements McAppConstants {
 				persistError(request,"error.defaultQuestionContent.notAvailable");
 				return (mapping.findForward(LOAD_QUESTIONS));
 			}
+			/**
+        	 * display a single sample question
+        	 */
+    		request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, mcQueContent.getQuestion());
+    		mapQuestionsContent.put(new Long(1).toString(), mcQueContent.getQuestion());
+    		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+    		logger.debug("starter initialized the Questions Map: " + request.getSession().getAttribute("mapQuestionsContent") );
+    		
 			
 			/** hold all he options for this question*/
 			List list=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());

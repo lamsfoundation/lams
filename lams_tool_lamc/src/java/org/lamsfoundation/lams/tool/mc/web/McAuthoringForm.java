@@ -25,6 +25,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String editDefaultQuestion;
 	protected String addOptionContent;	
 	protected String removeOptionContent;
+	protected String addQuestion;
 	
 	protected String addContent;
 	protected String removeContent;
@@ -77,6 +78,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.editDefaultQuestion=null;
 		this.addOptionContent=null;	
 		this.removeOptionContent=null;
+		this.addQuestion=null;
 		
     	this.addContent=null;	
     	this.removeContent=null;
@@ -98,6 +100,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.editDefaultQuestion=null;
 		this.addOptionContent=null;	
 		this.removeOptionContent=null;
+		this.addQuestion=null;
 		
 		this.addContent=null;
 		this.removeContent=null;
@@ -582,5 +585,17 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setRemoveOptionContent(String removeOptionContent) {
 		this.removeOptionContent = removeOptionContent;
+	}
+	/**
+	 * @return Returns the addQuestion.
+	 */
+	public String getAddQuestion() {
+		return addQuestion;
+	}
+	/**
+	 * @param addQuestion The addQuestion to set.
+	 */
+	public void setAddQuestion(String addQuestion) {
+		this.addQuestion = addQuestion;
 	}
 }
