@@ -98,78 +98,43 @@ MM_reloadPage(true);
 <html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
  <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
-<h2>Basic Question Definitions</h2>
+<h2>Edit Question Options</h2>
 <div id="formtablecontainer">
 					<table align=center> 	 
- 						<tr> 
-					 		<td> <bean:message key="label.authoring.title"/>: </td>
-							<td class="formcontrol">
-							<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/">
-								  <c:out value="${McAuthoringForm.title}" escapeXml="false" />						  
-							</FCK:editor>
-							</td> 
-					  	</tr>
-					  	
-					  	<tr> 
-					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
-							<td class="formcontrol">
-							<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/">
-								  <c:out value="${McAuthoringForm.instructions}" escapeXml="false" />						  
-							</FCK:editor>
-							</td>
-						</tr>
-				
-
-			  	 		<c:set var="queIndex" scope="session" value="1"/>
-						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
-							  <c:if test="${questionEntry.key == 1}"> 			
+			  	 		<c:set var="optionIndex" scope="session" value="1"/>
+						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
+							  <c:if test="${optionEntry.key == 1}"> 			
 								  <tr>
-								  	<td> <c:out value="Question ${queIndex}"/> : </td>
 								  		<td> 
-								  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
+								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
 									  	<td> 
-	  										<html:submit property="addQuestion" styleClass="linkbutton" 
+	  										<html:submit property="addOption" styleClass="linkbutton" 
 											onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-												<bean:message key="button.addNewQuestion"/>
-											</html:submit>
-									  	</td>
-										<td>									  										  		
-			 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
-			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-												<bean:message key="label.options"/>
+												<bean:message key="button.add"/>
 											</html:submit>
 									  	</td>
 								  </tr>
 							</c:if> 			
-					  		<c:if test="${questionEntry.key > 1}"> 			
-								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+					  		<c:if test="${optionEntry.key > 1}"> 			
+								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
 								  <tr>
-								  	<td> <c:out value="Question ${queIndex}"/> : </td>
 								  		<td> 
-								  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
+								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
 										<td>									  										  		
-			 								<html:submit property="removeQuestion" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
+			 								<html:submit property="removeOption" styleClass="linkbutton"  onclick="javascript:document.forms[0].optionIndex.value=${optionIndex};"
 			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-												<bean:message key="button.removeQuestion"/>
-											</html:submit>
-									  	</td>
-										<td>									  										  		
-			 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
-			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-												<bean:message key="label.options"/>
+												<bean:message key="button.remove"/>
 											</html:submit>
 									  	</td>
 								  </tr>
 							</c:if> 			
 						</c:forEach>
-							<html:hidden property="questionIndex"/>
-
+							<html:hidden property="optionIndex"/>
 	 				</table> 	 
-					
 </div>
 <hr>
 <a href="javascript:;" class="button">Cancel</a>

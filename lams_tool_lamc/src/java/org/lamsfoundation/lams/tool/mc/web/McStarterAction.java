@@ -289,7 +289,7 @@ public class McStarterAction extends Action implements McAppConstants {
     		request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, mcQueContent.getQuestion());
     		mapQuestionsContent.put(new Long(1).toString(), mcQueContent.getQuestion());
     		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-    		logger.debug("starter initialized the Questions Map: " + request.getSession().getAttribute("mapQuestionsContent") );
+    		logger.debug("starter initialized the Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
     		
 			
 			/** hold all he options for this question*/
@@ -306,7 +306,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 	    	}
 	    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-			logger.debug("starter initialized the Options Map: " + request.getSession().getAttribute("mapOptionsContent") );
+			logger.debug("starter initialized the Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
 			
 		}
 		else
@@ -314,12 +314,6 @@ public class McStarterAction extends Action implements McAppConstants {
 			logger.debug("getting existing content with id:" + toolContentId);
 		}
     	
-    	
-    	
-    	
-    	
-    	
-	
 	
 	mcAuthoringForm.resetUserAction();
 	return (mapping.findForward(LOAD_QUESTIONS));

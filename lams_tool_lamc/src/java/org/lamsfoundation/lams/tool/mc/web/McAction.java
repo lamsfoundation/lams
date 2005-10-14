@@ -21,6 +21,8 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -38,6 +40,8 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McComparator;
+import org.lamsfoundation.lams.tool.mc.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 
@@ -213,9 +217,16 @@ public class McAction extends DispatchAction implements McAppConstants
     	
 		logger.debug("loadQ initialised...");
 	 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	logger.debug("mcService:" + mcService);
 	 	
 	 	Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
 	 	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+	 	
+	 	Map mapOptionsContent=(Map) request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+	 	logger.debug("mapOptionsContent: " + mapOptionsContent);
+	 	mapOptionsContent.clear();
 	 	
 	 	mapQuestionsContent=repopulateMap(mapQuestionsContent, request);
 	 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
@@ -254,21 +265,45 @@ public class McAction extends DispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
-	 	else if (mcAuthoringForm.getEditDefaultQuestion() != null)
+	 	else if (mcAuthoringForm.getEditOptions() != null)
 	 	{
-	 		userAction="editDefaultQuestion";
+	 		userAction="editOption";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		
-	 		mcAuthoringForm.resetUserAction();
-	 		return (mapping.findForward(EDIT_OPTS_CONTENT));
-	 	}
-	 	
-	 	
-	 	
-	 	logger.debug("userAction:" + userAction);
+	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
+			logger.debug("questionIndex:" + questionIndex);
+			String editableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
+			logger.debug("editableQuestionEntry:" + editableQuestionEntry);
+			McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(editableQuestionEntry);
+			logger.debug("mcQueContent:" + mcQueContent);
+			
+			if (mcQueContent != null)
+			{
+				/** hold all he options for this question*/
+				List list=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());
+		    	logger.debug("options list:" + list);
 
-	 	IMcService mcService =McUtils.getToolService(request);
-	 	logger.debug("mcService:" + mcService);
+		    	Iterator listIterator=list.iterator();
+		    	Long mapIndex=new Long(1);
+		    	while (listIterator.hasNext())
+		    	{
+		    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+		    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+		    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+		    		mapIndex=new Long(mapIndex.longValue()+1);
+		    	}
+		    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+				logger.debug("updated the Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+			}
+			else
+			{
+				logger.debug("we are not supposed to reach here: error getting question content by question text.");
+			}
+			
+			return (mapping.findForward(EDIT_OPTS_CONTENT));
+	 		
+	 	}
+	 	logger.debug("userAction:" + userAction);
 	 	
 	 	mcAuthoringForm.resetUserAction();
    	    return (mapping.findForward(LOAD_QUESTIONS));

@@ -71,6 +71,8 @@ public interface IMcService
     
     public McQueContent retrieveMcQueContentByUID(Long uid) throws McApplicationException;
     
+    public McQueContent getQuestionContentByQuestionText(final String question);
+    
     public McSession retrieveMcSession(Long mcSessionId) throws McApplicationException;
     
     public McContent retrieveMcBySessionId(Long mcSessionId) throws McApplicationException;

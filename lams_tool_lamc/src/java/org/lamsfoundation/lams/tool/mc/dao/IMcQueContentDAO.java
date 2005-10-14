@@ -35,6 +35,8 @@ public interface IMcQueContentDAO
 	public McQueContent getMcQueContentByUID(Long uid);
 	
 	public McQueContent getToolDefaultQuestionContent(final long mcContentId);
+	
+	public McQueContent getQuestionContentByQuestionText(final String question);
  	
  	public void saveMcQueContent(McQueContent mcQueContent);
     

@@ -80,7 +80,7 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
     	super.tearDown();
     }
     
-    
+    /*
     
     public void testInitDB()
     {
@@ -128,6 +128,6 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
      	McOptsContent mcOptionsContent3= new McOptsContent(new Long(999), false, "sample answer 3", mcQueContent1, new HashSet());
      	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent3);
    }
-
+*/
     
 }

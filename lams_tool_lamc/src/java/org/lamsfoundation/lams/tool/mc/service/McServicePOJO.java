@@ -270,6 +270,21 @@ public class McServicePOJO implements
 														   e);
         }
     }
+
+    
+    public McQueContent getQuestionContentByQuestionText(final String question)
+    {
+        try
+        {
+            return mcQueContentDAO.getQuestionContentByQuestionText(question);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is retrieving question content by question text: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    }
     
     
     public McSession retrieveMcSession(Long mcSessionId) throws McApplicationException

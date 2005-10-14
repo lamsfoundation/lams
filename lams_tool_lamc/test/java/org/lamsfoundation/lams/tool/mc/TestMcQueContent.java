@@ -91,10 +91,21 @@ public class TestMcQueContent extends McDataAccessTestCase
     }
     */
     
+    /*
     public void testGetToolDefaultQuestionContent()
     {
     	McQueContent mcQueContent = mcQueContentDAO.getToolDefaultQuestionContent(new Long(1).longValue());
     	System.out.print("mcQueContent:" + mcQueContent);
     }
+    */
+    
+    
+    public void testGetQuestionContentByQuestionText()
+    {
+    	McQueContent mcQueContent = mcQueContentDAO.getQuestionContentByQuestionText("A sample question");
+    	System.out.print("mcQueContent:" + mcQueContent);
+    }
+    
+    
     
 }

@@ -22,11 +22,19 @@ import org.apache.struts.upload.FormFile;
  */
 public class McAuthoringForm extends ActionForm implements McAppConstants {
 	/** form controllers */
-	protected String editDefaultQuestion;
+	
 	protected String addOptionContent;	
-	protected String removeOptionContent;
 	protected String addQuestion;
 	protected String removeQuestion;
+	protected String editOptions;
+	protected String addOption;
+	
+	protected String questionIndex;
+	protected String optionIndex;
+	
+	protected String editDefaultQuestion;
+	protected String removeOptionContent;
+	
 	
 	protected String addContent;
 	protected String removeContent;
@@ -46,7 +54,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	/** basic content */
 	protected String title;
 	protected String instructions;
-	protected String questionIndex;
+	
 	protected String isRemoveContent;
 	protected String toolContentId;
 	/** instructions content */
@@ -81,6 +89,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.removeOptionContent=null;
 		this.addQuestion=null;
 		this.removeQuestion=null;
+		this.editOptions=null;
+		this.addOption=null;
 		
     	this.addContent=null;	
     	this.removeContent=null;
@@ -104,6 +114,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.removeOptionContent=null;
 		this.addQuestion=null;
 		this.removeQuestion=null;
+		this.editOptions=null;
+		this.addOption=null;		
 		
 		this.addContent=null;
 		this.removeContent=null;
@@ -121,6 +133,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.title=null;
 		this.instructions=null;
 		this.questionIndex=null;
+		this.optionIndex=null;
 		this.isRemoveContent=null;
 		this.toolContentId=null;
 
@@ -612,5 +625,41 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setRemoveQuestion(String removeQuestion) {
 		this.removeQuestion = removeQuestion;
+	}
+	/**
+	 * @return Returns the editOptions.
+	 */
+	public String getEditOptions() {
+		return editOptions;
+	}
+	/**
+	 * @param editOptions The editOptions to set.
+	 */
+	public void setEditOptions(String editOptions) {
+		this.editOptions = editOptions;
+	}
+	/**
+	 * @return Returns the addOption.
+	 */
+	public String getAddOption() {
+		return addOption;
+	}
+	/**
+	 * @param addOption The addOption to set.
+	 */
+	public void setAddOption(String addOption) {
+		this.addOption = addOption;
+	}
+	/**
+	 * @return Returns the optionIndex.
+	 */
+	public String getOptionIndex() {
+		return optionIndex;
+	}
+	/**
+	 * @param optionIndex The optionIndex to set.
+	 */
+	public void setOptionIndex(String optionIndex) {
+		this.optionIndex = optionIndex;
 	}
 }
