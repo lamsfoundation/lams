@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -80,6 +81,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	private ITransitionDAO transitionDAO;
 	private IActivityDAO activityDAO;
     private ILearnerService learnerService;
+    private ILessonDAO lessonDAO;
+    
     
 	/**
 	 * @param learnerService The learnerService to set.
@@ -100,6 +103,13 @@ public class ExportPortfolioService implements IExportPortfolioService {
      */
     public void setActivityDAO(IActivityDAO activityDAO) {
         this.activityDAO = activityDAO;
+    }
+    
+    /**
+     * @param lessonDAO The lessonDAO to set.
+     */
+    public void setLessonDAO(ILessonDAO lessonDAO) {
+        this.lessonDAO = lessonDAO;
     }
     
 	/**
@@ -174,6 +184,36 @@ public class ExportPortfolioService implements IExportPortfolioService {
     		//throw new ExportPortfolioException(e);
 		}
     	return exports;
+	}
+	
+	public Portfolio[] exportPortfolioForTeacher(Long lessonId, Cookie[] cookies)
+	{
+	    Lesson lesson = lessonDAO.getLesson(lessonId);
+
+	    Vector portfolios = null; //each portfolio contains information about its activity, ordered in the same sequence as the ordered activity list.
+		Portfolio[] exports = null;
+				
+		if (lesson==null)
+		{
+			String error="lesson cannot be null";
+			throw new ExportPortfolioException(error);
+		}
+		Vector activities = getOrderedActivityList(lesson.getLearningDesign());
+		
+		try
+		{
+    		portfolios = setupPortfolios(activities, ToolAccessMode.TEACHER, null);	
+    	
+    		exports = doExport(portfolios, ExportPortfolioConstants.EXPORT_TMP_DIR, cookies);	    	
+    		
+		}
+    	catch (LamsToolServiceException e)
+		{
+    		throw new ExportPortfolioException(e);
+		}
+    	return exports;
+	    
+	   
 	}
 	
 
@@ -379,12 +419,17 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	public Portfolio[] doExport(Vector portfolios, String tempDirectoryName, Cookie[] cookies)
 	{
 		Iterator i = portfolios.iterator();
-	//	String baseSubDirectoryName = "Activity";
 		String activitySubDirectory;
 		String exportURL;
-		String toolLink;
-		
+		String toolLink;		
 		String mainFileName = null;
+		
+		//create the root directory for the export
+		if(!createDirectory(ExportPortfolioConstants.EXPORT_TMP_DIR))
+		{
+			throw new ExportPortfolioException("The export directory cannot be created. Cannot continue");
+		}
+		
 		//iterate through the list of portfolios, create subdirectory, 
 		while(i.hasNext())
 		{
@@ -446,6 +491,53 @@ public class ExportPortfolioService implements IExportPortfolioService {
 			throw new ExportPortfolioException("An error has occurred while creating the sub directory " + subDir);
 		}
 		
+		return created;
+	}
+	
+	/**
+	 * Helper method which calls the FileUtil to create directory. 
+	 * It will check whether the directory exists, if so, then it will 
+	 * overwrite the existing directory. (It is assumed that the cron jobs 
+	 * should delete the directory + files anyway, after the export is done)
+	 * @param parentDir The name of the parent directory
+	 * @param subDir The name of the child directory to create.
+	 * @return true is the subdirectory was created, false otherwise
+	 */
+	private boolean createDirectory(String directory)
+	{
+	    boolean created=false; 
+		if (FileUtil.directoryExist(directory))
+		{
+			//delete directory and create a new one
+			try
+			{
+				if (FileUtil.deleteDirectory(directory))
+				{
+					created = FileUtil.createDirectory(directory);
+				}
+				else
+				{
+					throw new ExportPortfolioException("Could not delete the temporary directory " + directory + ", please manually delete this directory in order to proceed.");
+				}
+				
+			}
+			catch(FileUtilException e)
+			{
+				throw new ExportPortfolioException("An error has occurred while trying to create the temporary directory for the export. Reason: ", e);
+			}
+		}
+		else
+		{
+			try
+			{		
+				created = FileUtil.createDirectory(directory);
+			}
+			catch(FileUtilException e)
+			{
+				throw new ExportPortfolioException("An error has occurred while trying to create the temporary directory for the export. Reason: ", e);
+			}
+					
+		}
 		return created;
 	}
 	

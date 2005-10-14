@@ -73,6 +73,7 @@ public interface IExportPortfolioService {
 	 */
 	public Portfolio[] exportPortfolioForTeacher(Lesson lesson, Cookie[] cookies);
 
+	public Portfolio[] exportPortfolioForTeacher(Long lessonId, Cookie[] cookies);
 	/**
 	 * The main method that performs the export for the student.
 	 * It will get the list of activities that the user has completed 
