@@ -44,6 +44,7 @@
     <many-to-one
         name="qaSession"
         class="org.lamsfoundation.lams.tool.qa.QaSession"
+        not-null="true"
         cascade="none"
         outer-join="auto"
         update="true"
@@ -55,7 +56,7 @@
     
     <set
             name="qaUsrResps"
-            lazy="false"
+            lazy="true"
             inverse="true"
             cascade="all-delete-orphan"
             sort="unsorted"

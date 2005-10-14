@@ -28,8 +28,6 @@
     <property
             name="hidden"
             type="boolean"
-            update="true"
-            insert="true"
             access="property"
             column="hidden"
    >
@@ -75,6 +73,7 @@
    <many-to-one
             name="qaQueContent"
             class="org.lamsfoundation.lams.tool.qa.QaQueContent"
+            not-null="true"            
             cascade="none"
             outer-join="auto"
             update="true"
@@ -90,6 +89,7 @@
   <many-to-one
             name="qaQueUser"
             class="org.lamsfoundation.lams.tool.qa.QaQueUsr"
+            not-null="true"            
             cascade="none"
             outer-join="auto"
             update="true"

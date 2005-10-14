@@ -50,7 +50,7 @@ public class TestQaContent extends QaDataAccessTestCase
         super(name);
     }
     
-    
+/*    
     public void testSimpleCreateNewQaContent()
     {
     	//create new qa content
@@ -81,8 +81,7 @@ public class TestQaContent extends QaDataAccessTestCase
 	    //create the new content
 	    qaContentDAO.createQa(qa);
     }
-    
-    
+  */  
     
    /* 
     public void testCreateNewQaContent()
@@ -203,7 +202,7 @@ public class TestQaContent extends QaDataAccessTestCase
     	System.out.println(this.getClass().getName() + "qaContent loaded : " + qaContent);
     }
     */
-    
+/*    
     public void testTimeZone()
     {
     	TimeZone timeZone=TimeZone.getDefault();
@@ -216,5 +215,6 @@ public class TestQaContent extends QaDataAccessTestCase
     	 System.out.println("10. " + DateFormat.getDateTimeInstance(
          DateFormat.LONG, DateFormat.LONG).format(now));	
     }
+*/    
     
 }

@@ -48,7 +48,7 @@
    </filter-mapping>	
    
    <!--  Servlet defination -->
-	<servlet>
+<!-- 	<servlet>
 		<servlet-name>exportPortfolio</servlet-name>
 		<display-name>Export Portfolio</display-name>
 		<description>Export Portfolio</description>		
@@ -58,7 +58,7 @@
 	<servlet-mapping>
 		<servlet-name>exportPortfolio</servlet-name>
 		<url-pattern>/portfolioExport</url-pattern>
-  	</servlet-mapping>
+  	</servlet-mapping> -->
 
     <!--
     To use non XDoclet filters, create a filters.xml file that

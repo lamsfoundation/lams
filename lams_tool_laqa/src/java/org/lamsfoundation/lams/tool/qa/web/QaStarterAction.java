@@ -143,8 +143,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		    logger.debug("retrieving qaService from proxy: " + qaService);
 		    request.getSession().setAttribute(TOOL_SERVICE, qaService);		
 		}
-		/** souble check if this is a good place to call */
-		QaUtils.configureContentRepository(request);
+		/** double check if this is a good place to call */
+		/** needs to be called only once.  */ 
+		/** QaUtils.configureContentRepository(request); */
 		
 	    /**
 	     * obtain and setup the current user's data 

@@ -22,8 +22,6 @@
     <property
         name="uuid"
         type="java.lang.String"
-        update="true"
-        insert="true"
         access="property"
         column="uuid"
         length="255"
@@ -32,8 +30,6 @@
    <property
             name="fileOnline"
             type="boolean"
-            update="true"
-            insert="true"
             access="property"
             column="isOnline_File"
    />
@@ -41,8 +37,6 @@
    <property
             name="fileName"
             type="java.lang.String"
-            update="true"
-            insert="true"
             access="property"
             column="fileName"
    />
@@ -61,6 +55,7 @@
    <many-to-one
         name="qaContent"
         class="org.lamsfoundation.lams.tool.qa.QaContent"
+        not-null="true"        
         cascade="none"
         outer-join="auto"
         update="true"

@@ -19,8 +19,6 @@
     <property
         name="session_start_date"
         type="java.util.Date"
-        update="true"
-        insert="true"
         access="property"
         column="session_start_date"
         length="10"
@@ -29,8 +27,6 @@
     <property
         name="session_end_date"
         type="java.util.Date"
-        update="true"
-        insert="true"
         access="property"
         column="session_end_date"
         length="10"
@@ -39,8 +35,6 @@
     <property
         name="session_status"
         type="java.lang.String"
-        update="true"
-        insert="true"
         access="property"
         column="session_status"
         length="100"
@@ -60,6 +54,7 @@
    <many-to-one
         name="qaContent"
         class="org.lamsfoundation.lams.tool.qa.QaContent"
+        not-null="true"        
         cascade="none"
         outer-join="auto"
         update="true"
@@ -73,7 +68,7 @@
     
     <set
         name="qaQueUsers"
-        lazy="false"
+        lazy="true"
         inverse="true"
         cascade="all-delete-orphan"
         sort="unsorted"

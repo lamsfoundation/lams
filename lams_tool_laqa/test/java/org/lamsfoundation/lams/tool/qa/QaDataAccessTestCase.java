@@ -80,7 +80,7 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     	super.tearDown();
     }
     
-    
+    /*
     protected QaQueUsr getExistingUser2(String username, String fullname)
     {
     	QaQueContent qaQueContent = qaQueContentDAO.getQaQueById(TEST_NEW_QUE_CONTENT_ID);
@@ -136,9 +136,38 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
 		qaUsrRespDAO.createUserResponse(qaUsrResp);
 		return qaUsrResp;
     }
+    */
     
     
-    
+    public void  testInitDB()
+    {
+    	QaContent qa = new QaContent();
+    	qa.setQaContentId(new Long(TEST_NEW_CONTENT_ID+1));
+    	qa.setTitle("New - Put Title Here");
+    	qa.setInstructions("New - Put instructions here.");
+    	qa.setCreationDate(new Date(System.currentTimeMillis()).toString() );
+    	qa.setCreatedBy(0);
+        qa.setUsernameVisible(false);
+        qa.setDefineLater(false);
+        qa.setSynchInMonitor(false);
+        qa.setOnlineInstructions("New- online instructions");
+        qa.setOfflineInstructions("New- offline instructions");
+        qa.setReportTitle("New-Report title");
+        qa.setQaQueContents(new TreeSet());
+        qa.setQaSessions(new TreeSet());
+        
+        //create new qa que content
+        QaQueContent qaQueContent = new QaQueContent("What planet are you from",
+        											4, 
+    												qa, 
+    												new TreeSet(), 
+    												new TreeSet());
+        
+        qa.getQaQueContents().add(qaQueContent);
+        
+        //create the new content
+        qaContentDAO.createQa(qa);
+    }
     
 
 }

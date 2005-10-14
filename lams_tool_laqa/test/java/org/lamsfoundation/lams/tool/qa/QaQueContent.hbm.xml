@@ -20,8 +20,6 @@
         <property
             name="question"
             type="java.lang.String"
-            update="true"
-            insert="true"
             access="property"
             column="question"
             length="65535"
@@ -30,8 +28,6 @@
         <property
             name="displayOrder"
             type="int"
-            update="true"
-            insert="true"
             access="property"
             column="display_order"
             length="11"
@@ -51,6 +47,7 @@
         <many-to-one
             name="qaContent"
             class="org.lamsfoundation.lams.tool.qa.QaContent"
+            not-null="true"
             cascade="none"
             outer-join="auto"
             update="true"
@@ -64,9 +61,9 @@
 
  		<set
             name="qaUsrResps"
-            lazy="false"
+            lazy="true"
             inverse="true"
-            cascade="none"
+            cascade="all-delete-orphan"
             sort="natural"
         >
               <key

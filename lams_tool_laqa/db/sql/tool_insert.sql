@@ -36,7 +36,7 @@ VALUES
 'qa',
 '1.1',
 NULL,
-NULL,
+10,
 0,
 1,
 1,
