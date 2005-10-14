@@ -66,7 +66,7 @@ insert into lams_tool (tool_id,tool_signature,service_name,tool_display_name,des
 grouping_support_type_id,supports_define_later_flag,supports_run_offline_flag,supports_moderation_flag,supports_contribute_flag,
 learner_url,author_url,define_later_url,export_portfolio_url,monitor_url,contribute_url,moderation_url,
 valid_flag,learning_library_id)
-values(6,'survey_signature','surveyService','Survey','Survey Description','survey','1.1',6,
+values(6,'survey_signature','srvyService','Survey','Survey Description','survey','1.1',6,
 2,1,1,1,1,
 '/lams_tool_survey/tool/survey/survey.do?method=loadQuestionnaire','/lams_tool_survey/tool/survey/authoring.do?method=loadSurvey','define_later_url','export_portfolio_url',
 '/lams_tool_survey/tool/survey/report.do?method=loadMonitorReport','contribute_url','moderation_url',
