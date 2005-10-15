@@ -68,6 +68,11 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	
 	/** advanced content */
 	protected String synchInMonitor;
+	protected String showFeedback;
+	protected String retries;
+	protected String passmark;
+	
+	
 	protected String reportTitle;
 	protected String monitoringReportTitle;
 	protected String endLearningMessage;
@@ -148,7 +153,10 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.reportTitle=null;
 		this.monitoringReportTitle=null;
 		this.questionsSequenced=null;
-    	
+		this.showFeedback=null;
+		this.retries=null;
+		this.passmark=null;
+		
 		this.summaryMonitoring=null;
     	this.instructionsMonitoring=null;
     	this.editActivityMonitoring=null;
@@ -661,5 +669,41 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setOptionIndex(String optionIndex) {
 		this.optionIndex = optionIndex;
+	}
+	/**
+	 * @return Returns the retries.
+	 */
+	public String getRetries() {
+		return retries;
+	}
+	/**
+	 * @param retries The retries to set.
+	 */
+	public void setRetries(String retries) {
+		this.retries = retries;
+	}
+	/**
+	 * @return Returns the showFeedback.
+	 */
+	public String getShowFeedback() {
+		return showFeedback;
+	}
+	/**
+	 * @param showFeedback The showFeedback to set.
+	 */
+	public void setShowFeedback(String showFeedback) {
+		this.showFeedback = showFeedback;
+	}
+	/**
+	 * @return Returns the passmark.
+	 */
+	public String getPassmark() {
+		return passmark;
+	}
+	/**
+	 * @param passmark The passmark to set.
+	 */
+	public void setPassmark(String passmark) {
+		this.passmark = passmark;
 	}
 }

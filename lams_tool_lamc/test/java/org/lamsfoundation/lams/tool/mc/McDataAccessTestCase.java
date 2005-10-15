@@ -80,7 +80,6 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
     	super.tearDown();
     }
     
-    /*
     
     public void testInitDB()
     {
@@ -110,24 +109,23 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
 	    
     	McContent mcContent = mcContentDAO.findMcContentById(DEFAULT_CONTENT_ID);
     	McQueContent mcQueContent=  new McQueContent("A sample question",
-													 new Integer(444),
+													 new Integer(1),
 													 mcContent,
 													 new HashSet(),
 													 new HashSet()
     												);
     	mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
     	 
-    	 
     	McQueContent mcQueContent1 = mcQueContentDAO.getMcQueContentByUID(new Long(1));
-     	McOptsContent mcOptionsContent= new McOptsContent(new Long(777), true, "sample answer 1", mcQueContent1, new HashSet());
+     	McOptsContent mcOptionsContent= new McOptsContent( true, "sample answer 1", mcQueContent1, new HashSet());
      	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent);
      	
-     	McOptsContent mcOptionsContent2= new McOptsContent(new Long(888), false, "sample answer 2", mcQueContent1, new HashSet());
+     	McOptsContent mcOptionsContent2= new McOptsContent(false, "sample answer 2", mcQueContent1, new HashSet());
      	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent2);
      	
-     	McOptsContent mcOptionsContent3= new McOptsContent(new Long(999), false, "sample answer 3", mcQueContent1, new HashSet());
+     	McOptsContent mcOptionsContent3= new McOptsContent(false, "sample answer 3", mcQueContent1, new HashSet());
      	mcOptionsContentDAO.saveMcOptionsContent(mcOptionsContent3);
-   }
-*/
+    }
     
 }
+    

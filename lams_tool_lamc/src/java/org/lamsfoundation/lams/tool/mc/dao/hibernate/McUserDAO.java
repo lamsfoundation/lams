@@ -57,10 +57,22 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	public McQueUsr findMcUserById(Long userId)
 	{
 		String query = "from McQueUsr user where user.queUsrId=?";
-		
+		/*
 		return (McQueUsr) getSession().createQuery(query)
 		.setLong(0,userId.longValue())
 		.uniqueResult();
+		*/
+		
+		HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(query)
+		.setLong(0,userId.longValue())
+		.list();
+		
+		if(list != null && list.size() > 0){
+			McQueUsr mcu = (McQueUsr) list.get(0);
+			return mcu;
+		}
+		return null;
 	}
 	
 	

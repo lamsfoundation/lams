@@ -107,6 +107,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	
 		Map mapQuestionsContent= new TreeMap(new McComparator());
 		Map mapOptionsContent= new TreeMap(new McComparator());
+		Map mapDefaultOptionsContent= new TreeMap(new McComparator());
 		
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		mcAuthoringForm.resetRadioBoxes();
@@ -178,8 +179,9 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		
 		/**
-		 * retrieve the default question content based on default content UID determined above
+		 * retrieve uid of the default question content
 		 */
+		long queContentUID=0;
 		try
 		{
 			logger.debug("retrieve the default question content based on default content UID: " + contentId);
@@ -192,6 +194,8 @@ public class McStarterAction extends Action implements McAppConstants {
 				persistError(request,"error.defaultQuestionContent.notAvailable");
 				return (mapping.findForward(LOAD_QUESTIONS));
 			}
+			logger.debug("using mcQueContent uid: " + mcQueContent.getUid());
+			queContentUID=mcQueContent.getUid().longValue();
 		}
 		catch(Exception e)
 		{
@@ -200,6 +204,33 @@ public class McStarterAction extends Action implements McAppConstants {
 			persistError(request,"error.defaultQuestionContent.notAvailable");
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
+		
+		
+		/**
+		 * retrieve default options content
+		 */
+		try
+		{
+			logger.debug("retrieve the default options content based on default question content UID: " + queContentUID);
+			List list=mcService.findMcOptionsContentByQueId(new Long(queContentUID));
+			logger.debug("using options list: " + list);
+			if (list == null)
+			{
+				logger.debug("Exception occured: No default options content");
+	    		request.setAttribute(USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE, new Boolean(true));
+				persistError(request,"error.defaultOptionsContent.notAvailable");
+				return (mapping.findForward(LOAD_QUESTIONS));
+			}
+		}
+		catch(Exception e)
+		{
+			logger.debug("Exception occured: No default options content");
+    		request.setAttribute(USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE, new Boolean(true));
+			persistError(request,"error.defaultOptionsContent.notAvailable");
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
+		
+	
 		
 		/**
 	     * mark the http session as an authoring activity 
@@ -227,7 +258,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		{
 	    	toolContentId=new Long(strToolContentId).longValue();
 	    	logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
-	    	request.getSession().setAttribute(TOOL_CONTENT_ID,strToolContentId);
+	    	request.getSession().setAttribute(TOOL_CONTENT_ID, new Long(strToolContentId));
     	}
     	catch(NumberFormatException e)
 		{
@@ -259,6 +290,26 @@ public class McStarterAction extends Action implements McAppConstants {
 				persistError(request,"error.defaultContent.notAvailable");
 				return (mapping.findForward(LOAD_QUESTIONS));
 			}
+			
+			request.getSession().setAttribute(TITLE,mcContent.getTitle());
+			request.getSession().setAttribute(INSTRUCTIONS,mcContent.getInstructions());
+			request.getSession().setAttribute(QUESTIONS_SEQUENCED,new Boolean(mcContent.isQuestionsSequenced()));
+			request.getSession().setAttribute(USERNAME_VISIBLE,new Boolean(mcContent.isUsernameVisible()));
+			request.getSession().setAttribute(CREATED_BY, new Long(mcContent.getCreatedBy()));
+			request.getSession().setAttribute(MONITORING_REPORT_TITLE,mcContent.getMonitoringReportTitle());
+			request.getSession().setAttribute(REPORT_TITLE,mcContent.getReportTitle());
+			request.getSession().setAttribute(RUN_OFFLINE, new Boolean(mcContent.isRunOffline()));
+			request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
+			request.getSession().setAttribute(SYNCH_IN_MONITOR, new Boolean(mcContent.isSynchInMonitor()));
+			request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
+			request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
+			request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
+			request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
+			request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
+			request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
+			request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
+			
+			
 			McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
 			logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
 			logger.debug("getting default content");
@@ -272,6 +323,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		    mcAuthoringForm.setUsernameVisible(OFF);
 		    mcAuthoringForm.setQuestionsSequenced(OFF);
 			mcAuthoringForm.setSynchInMonitor(OFF);
+			mcAuthoringForm.setRetries(OFF);
+			mcAuthoringForm.setShowFeedback(OFF);
 			
 			/** collect options for the default question content into a Map*/
 			McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(mcContent.getUid().longValue());
@@ -306,8 +359,10 @@ public class McStarterAction extends Action implements McAppConstants {
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 	    	}
 	    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+	    	mapDefaultOptionsContent=mapOptionsContent;
+	    	request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptionsContent);
 			logger.debug("starter initialized the Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-			
+			logger.debug("starter initialized the Default Options Map: " + request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT));
 		}
 		else
 		{

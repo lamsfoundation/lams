@@ -21,12 +21,15 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -56,15 +59,16 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 		
 	 	public McQueContent getToolDefaultQuestionContent(final long mcContentId)
 	    {
-	        return (McQueContent) getHibernateTemplate().execute(new HibernateCallback()
-	         {
-	             public Object doInHibernate(Session session) throws HibernateException
-	             {
-	                 return session.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-	                               .setLong("mcContentId", mcContentId)
-	                               .uniqueResult();
-	             }
-	         });
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
+				.setLong("mcContentId", mcContentId)
+				.list();
+			
+			if(list != null && list.size() > 0){
+				McQueContent mcq = (McQueContent) list.get(0);
+				return mcq;
+			}
+			return null;
 	    }
 	 	
 	 	

@@ -95,6 +95,8 @@ public interface McAppConstants {
     public static final String IS_REMOVE_QUESTION						="isRemoveQuestion";
     public static final String IS_REMOVE_CONTENT						="isRemoveContent";
     
+    public static final String QUESTIONS_SEQUENCED						="questionsSequenced";
+        
     /**
      * tab controllers, constants for authoring page html tabs, used within jsp
      */
@@ -109,13 +111,24 @@ public interface McAppConstants {
      */
     public static final String MAP_QUESTIONS_CONTENT					="mapQuestionsContent";
     public static final String MAP_OPTIONS_CONTENT						="mapOptionsContent";
+    public static final String MAP_DEFAULTOPTIONS_CONTENT				="mapDefaultOptionsContent";
+    
     
     public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
     public static final String DEFAULT_QUESTION_CONTENT					="defaultQuestionContent";
     public static final String TITLE									="title";
     public static final String INSTRUCTIONS								="instructions";
+    public static final String CREATED_BY								="createdBy";
     public static final String CREATION_DATE							="creationDate";
     public static final String USERNAME_VISIBLE							="usernameVisible";
+    public static final String RUN_OFFLINE								="runOffline";
+    public static final String DEFINE_LATER								="defineLater";
+    public static final String SYNCH_IN_MONITOR							="synchInMonitor";
+    public static final String RETRIES									="retries";
+    public static final String PASSMARK									="passMark";
+    public static final String SHOW_FEEDBACK							="showFeedback";
+    
+    
     public static final String ONLINE_INSTRUCTIONS						="onlineInstructions";
     public static final String OFFLINE_INSTRUCTIONS						="offlineInstructions";
     public static final String END_LEARNING_MESSSAGE					="endLearningMessage";
@@ -175,6 +188,8 @@ public interface McAppConstants {
     public static final String USER_EXCEPTION_TOOLSESSIONID_REQUIRED	="userExceptionToolSessionIdRequired";
     public static final String USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE 			="userExceptionDefaultContentNotAvailable";
     public static final String USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE 	="userExceptionDefaultQuestionContentNotAvailable";
+    public static final String USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE 	="userExceptionDefaultOptionsContentNotAvailable";
+    
     public static final String USER_EXCEPTION_USERID_NOTAVAILABLE		="userExceptionUserIdNotAvailable";
     public static final String USER_EXCEPTION_USERID_NOTNUMERIC			="userExceptionUserIdNotNumeric";
     public static final String USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS ="userExceptionOnlyContentAndNoSessions";
@@ -217,6 +232,7 @@ public interface McAppConstants {
     public static final String MONITORING_REPORT_TITLE					="monitoringReportTitle"; 
     public static final String REPORT_TITLE_LEARNER						="reportTitleLearner"; 
     public static final String END_LEARNING_MESSAGE						="endLearningMessage";
+    
     public static final String IS_TOOL_ACTIVITY_OFFLINE					="isToolActivityOffline";
     public static final String IS_USERNAME_VISIBLE						="isUsernameVisible";
     public static final String IS_ALL_SESSIONS_COMPLETED				="isAllSessionsCompleted";

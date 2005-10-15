@@ -28,6 +28,7 @@ import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.McContent;
+import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McSession;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -61,10 +62,22 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	public McContent findMcContentById(Long mcContentId)
 	{
 		String query = "from McContent as mc where mc.mcContentId = ?";
-		
+		/*
 		return (McContent) getSession().createQuery(query)
 		.setLong(0,mcContentId.longValue())
 		.uniqueResult();
+		*/
+		
+	    HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(query)
+			.setLong(0,mcContentId.longValue())
+			.list();
+		
+		if(list != null && list.size() > 0){
+			McContent mc = (McContent) list.get(0);
+			return mc;
+		}
+		return null;
 	}
     	
 	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#getMcContentBySession(java.lang.Long) */

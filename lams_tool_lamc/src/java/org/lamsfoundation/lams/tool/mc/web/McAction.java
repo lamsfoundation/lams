@@ -21,14 +21,18 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -40,10 +44,14 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McComparator;
+import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -224,10 +232,6 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
 	 	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
 	 	
-	 	Map mapOptionsContent=(Map) request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-	 	logger.debug("mapOptionsContent: " + mapOptionsContent);
-	 	mapOptionsContent.clear();
-	 	
 	 	mapQuestionsContent=repopulateMap(mapQuestionsContent, request);
 	 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 	 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
@@ -245,6 +249,28 @@ public class McAction extends DispatchAction implements McAppConstants
 			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
     		logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
     		
+    		McContent mcContent=createContent(request, mcAuthoringForm);
+    		logger.debug("mcContent: " + mcContent);
+    		
+    		/** iterate the questions Map and persist the questions into the DB*/
+    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+    	    while (itQuestionsMap.hasNext()) {
+    	        Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+    	        logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+    	        if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
+    	        {
+        	        McQueContent mcQueContent=  new McQueContent(pairs.getValue().toString(),
+           	        	 new Integer(pairs.getKey().toString()),
+          					 mcContent,
+          					 new HashSet(),
+          					 new HashSet()
+          					);
+        	        logger.debug("created mcQueContent: " + mcQueContent);
+           	        mcService.createMcQue(mcQueContent);    	        	
+    	        }
+    	    }
+       		
+    	    
     		mcAuthoringForm.resetUserAction();
 	 		return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
@@ -257,11 +283,24 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("questionIndex:" + questionIndex);
 			String deletableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
 			logger.debug("deletableQuestionEntry:" + deletableQuestionEntry);
-			mapQuestionsContent.remove(questionIndex);
-			logger.debug("removed entry:" + deletableQuestionEntry + " from the Map");
-			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-			logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
 			
+			if (!(deletableQuestionEntry.equals("")))
+			{
+				mapQuestionsContent.remove(questionIndex);
+				logger.debug("removed entry:" + deletableQuestionEntry + " from the Map");
+				request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+				logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+				
+				McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(deletableQuestionEntry);
+				logger.debug("mcQueContent:" + mcQueContent);
+				
+				if (mcQueContent != null)
+				{
+					mcService.retrieveMcQueContentByUID(mcQueContent.getUid());
+					logger.debug("removed mcQueContent from DB:" + mcQueContent);
+				}
+			}
+						
 			mcAuthoringForm.resetUserAction();
 			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
@@ -276,6 +315,9 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("editableQuestionEntry:" + editableQuestionEntry);
 			McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(editableQuestionEntry);
 			logger.debug("mcQueContent:" + mcQueContent);
+			
+			Map mapOptionsContent= new TreeMap(new McComparator());
+			logger.debug("initialized mapOptionsContent:" + mapOptionsContent);
 			
 			if (mcQueContent != null)
 			{
@@ -297,7 +339,12 @@ public class McAction extends DispatchAction implements McAppConstants
 			}
 			else
 			{
-				logger.debug("we are not supposed to reach here: error getting question content by question text.");
+				/** this is a new question content created by the user and has no options yet  */
+			 	logger.debug("this is a new question content created by the user and has no options yet");
+				mapOptionsContent=(Map) request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT);
+			 	logger.debug("mapOptionsContent is the default options Map: " + mapOptionsContent);
+			 	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+				logger.debug("updated the Options Map with the default Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
 			}
 			
 			return (mapping.findForward(EDIT_OPTS_CONTENT));
@@ -370,6 +417,146 @@ public class McAction extends DispatchAction implements McAppConstants
     	return mapTempQuestionsContent;
     }
     
+    
+
+    protected McContent createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	/** the tool content id is passed from the container to the tool and placed into session in the McStarterAction */
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	if ((toolContentId != null) && (toolContentId.longValue() != 0))
+    	{
+    		logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
+    		/**delete the existing content in the database before applying new content*/
+    		mcService.deleteMcById(toolContentId);  
+    		logger.debug("post-deletion existing content");
+		}
+    	
+		String title;
+    	String instructions;
+    	Long createdBy;
+    	String monitoringReportTitle="";
+    	String reportTitle="";
+    	
+    	String offlineInstructions="";
+    	String onlineInstructions="";
+    	String endLearningMessage="";
+    	String creationDate="";
+    	int passmark=0;
+    	
+    	boolean isQuestionsSequenced=false;
+    	boolean isSynchInMonitor=false;
+    	boolean isUsernameVisible=false;
+    	boolean isRunOffline=false;
+    	boolean isDefineLater=false;
+    	boolean isContentInUse=false;
+    	boolean isRetries=false;
+    	boolean isShowFeedback=false;
+    	
+    	
+		logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
+    	if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
+    		isQuestionsSequenced=true;
+    	
+    	logger.debug("isSynchInMonitor: " +  mcAuthoringForm.getSynchInMonitor());
+    	if (mcAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
+    		isSynchInMonitor=true;
+    	
+    	logger.debug("isUsernameVisible: " +  mcAuthoringForm.getUsernameVisible());
+    	if (mcAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
+    		isUsernameVisible=true;
+    	
+    	logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
+    	if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
+    		isRetries=true;
+    	
+    	logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
+    	if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
+    		isShowFeedback=true;
+    	    	
+    	logger.debug("MONITORING_REPORT_TITLE: " +  mcAuthoringForm.getMonitoringReportTitle());
+    	if (mcAuthoringForm.getMonitoringReportTitle() == null)
+    		monitoringReportTitle=(String)request.getSession().getAttribute(MONITORING_REPORT_TITLE);
+    	
+    	logger.debug("REPORT_TITLE: " +  mcAuthoringForm.getReportTitle());
+    	if (mcAuthoringForm.getReportTitle() == null)
+    		reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
+    	
+    	logger.debug("OFFLINE_INSTRUCTIONS: " +  mcAuthoringForm.getOfflineInstructions());
+    	if (mcAuthoringForm.getOfflineInstructions() == null)
+    		offlineInstructions=(String)request.getSession().getAttribute(OFFLINE_INSTRUCTIONS);
+
+    	logger.debug("ONLINE_INSTRUCTIONS: " +  mcAuthoringForm.getOnlineInstructions());
+    	if (mcAuthoringForm.getOnlineInstructions() == null)
+    		onlineInstructions=(String)request.getSession().getAttribute(ONLINE_INSTRUCTIONS);
+		
+    	logger.debug("END_LEARNING_MESSAGE: " +  mcAuthoringForm.getEndLearningMessage());
+    	if (mcAuthoringForm.getEndLearningMessage() == null)
+    		endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSAGE);
+
+
+    	/** 
+    	 * title and instructions are mandatory
+    	 */
+    	title=mcAuthoringForm.getTitle();
+    	if (title == null)
+    		title="dummy Title";
+    	
+    	instructions=mcAuthoringForm.getInstructions();
+    	if (instructions == null)
+    		instructions="dummy instructions";
+    	
+    	
+		creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
+		if (creationDate == null)
+			creationDate=new Date(System.currentTimeMillis()).toString();
+		
+				
+    		
+    	/**obtain user object from the session*/
+	    HttpSession ss = SessionManager.getSession();
+	    //get back login user DTO
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    	logger.debug("retrieving toolUser: " + toolUser);
+    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
+    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
+    	logger.debug("retrieving toolUser fullname: " + fullName);
+    	long userId=toolUser.getUserID().longValue();
+    	logger.debug("userId: " + userId);
+    	
+    	/** create a new qa content and leave the default content intact*/
+    	McContent mc = new McContent();
+		mc.setMcContentId(toolContentId);
+		mc.setTitle(title);
+		mc.setInstructions(instructions);
+		mc.setCreationDate(creationDate); /**preserve this from the db*/ 
+		mc.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
+		mc.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
+	    mc.setUsernameVisible(isUsernameVisible);
+	    mc.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
+	    mc.setOnlineInstructions(onlineInstructions);
+	    mc.setOfflineInstructions(offlineInstructions);
+	    mc.setRunOffline(false);
+	    mc.setDefineLater(false);
+	    mc.setSynchInMonitor(isSynchInMonitor);
+	    mc.setEndLearningMessage(endLearningMessage);
+	    mc.setReportTitle(reportTitle);
+	    mc.setMonitoringReportTitle(monitoringReportTitle);
+	    mc.setEndLearningMessage(endLearningMessage);
+	    mc.setRetries(isRetries);
+	    mc.setPassMark(new Integer(passmark));
+	    mc.setShowFeedback(isShowFeedback);
+	    mc.setMcQueContents(new TreeSet());
+	    mc.setMcSessions(new TreeSet());
+	    logger.debug("mc content :" +  mc);
+    	
+    	/**create the content in the db*/
+        mcService.createMc(mc);
+        logger.debug("mc created with content id: " + toolContentId);
+        
+        return mc;
+    }
     
     
     
