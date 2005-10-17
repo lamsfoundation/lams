@@ -108,13 +108,6 @@ public class TestMcContent extends McDataAccessTestCase
    }
    
     
-    public void testRetrieveMcContent()
-    {
-    	McContent mcContent = mcContentDAO.findMcContentById(TEST_CONTENT_ID);
-    	assertNotNull(mcContent);
-    	assertEquals(mcContent.getMcContentId(), new Long(2));
-    }
- 
     public void testRemoveMcContent()
     {
     	McContent mcContent = mcContentDAO.findMcContentById(TEST_CONTENT_ID);
@@ -128,4 +121,7 @@ public class TestMcContent extends McDataAccessTestCase
     	mcContentDAO.removeMcById(TEST_CONTENT_ID_OTHER);
     }
 */
+       
+    
+    
 }

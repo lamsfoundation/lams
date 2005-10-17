@@ -80,7 +80,7 @@ public class McDataAccessTestCase extends AbstractLamsTestCase
     	super.tearDown();
     }
     
-    
+
     public void testInitDB()
     {
     	//create new mc content
