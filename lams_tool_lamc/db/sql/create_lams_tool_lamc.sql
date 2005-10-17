@@ -20,6 +20,7 @@ CREATE TABLE lams.tl_lamc11_content (
      , retries TINYINT(1) NOT NULL DEFAULT 0
      , pass_mark INTEGER
      , show_feedback TINYINT(1) NOT NULL DEFAULT 0
+     , UNIQUE UQ_tl_lamc11_content_1 (content_id)
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
@@ -52,6 +53,7 @@ CREATE TABLE lams.tl_lamc11_session (
      , session_end_date DATETIME
      , session_status VARCHAR(100)
      , mc_content_id BIGINT(20) NOT NULL
+     , UNIQUE UQ_tl_lamc11_session_1 (mc_session_id)
      , PRIMARY KEY (uid)
      , INDEX (mc_content_id)
      , CONSTRAINT FK_tl_lamc_session_1 FOREIGN KEY (mc_content_id)
@@ -64,6 +66,7 @@ CREATE TABLE lams.tl_lamc11_que_usr (
      , mc_session_id BIGINT(20) NOT NULL
      , username VARCHAR(100)
      , fullname VARCHAR(100)
+     , UNIQUE UQ_tl_lamc11_que_usr_1 (que_usr_id)
      , PRIMARY KEY (uid)
      , INDEX (mc_session_id)
      , CONSTRAINT FK_tl_lamc_tool_usr_1 FOREIGN KEY (mc_session_id)
