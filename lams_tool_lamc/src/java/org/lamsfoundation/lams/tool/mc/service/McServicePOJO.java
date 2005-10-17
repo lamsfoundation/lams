@@ -270,6 +270,21 @@ public class McServicePOJO implements
 														   e);
         }
     }
+    
+    
+    public void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException
+	{
+    	try
+        {
+            mcQueContentDAO.removeMcQueContent(mcQueContent);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is removing mc question content: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
 
     
     public McQueContent getQuestionContentByQuestionText(final String question)

@@ -296,7 +296,8 @@ public class McAction extends DispatchAction implements McAppConstants
 				
 				if (mcQueContent != null)
 				{
-					mcService.retrieveMcQueContentByUID(mcQueContent.getUid());
+					mcQueContent=mcService.retrieveMcQueContentByUID(mcQueContent.getUid());
+					mcService.removeMcQueContent(mcQueContent);
 					logger.debug("removed mcQueContent from DB:" + mcQueContent);
 				}
 			}

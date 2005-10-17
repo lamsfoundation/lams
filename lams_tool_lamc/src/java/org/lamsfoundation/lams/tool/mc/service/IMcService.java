@@ -70,6 +70,8 @@ public interface IMcService
     public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
     
     public McQueContent retrieveMcQueContentByUID(Long uid) throws McApplicationException;
+	
+    public void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
     
     public McQueContent getQuestionContentByQuestionText(final String question);
     
