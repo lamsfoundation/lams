@@ -1,9 +1,10 @@
-<!ELEMENT Lams (ServerURL,LamsHome,TempDir,SMTPServer,LamsSupportEmail,UploadFileMaxSize,UploadLargeFileMaxSize,UploadFileMaxMemorySize,ChatServerName,ChatPortNumber,FileManagerDir,ExecutableExtensions,TicketFile,UserInactiveTimeout,AllowMultipleLogin)>
+<!ELEMENT Lams (ServerURL,LamsHome,TempDir,SMTPServer,LamsSupportEmail,ContentRepositoryPath,UploadFileMaxSize,UploadLargeFileMaxSize,UploadFileMaxMemorySize,ChatServerName,ChatPortNumber,FileManagerDir,ExecutableExtensions,TicketFile,UserInactiveTimeout,AllowMultipleLogin)>
 <!ELEMENT ServerURL (#PCDATA)>
 <!ELEMENT LamsHome (#PCDATA)>
 <!ELEMENT TempDir (#PCDATA)>
 <!ELEMENT SMTPServer (#PCDATA)>
 <!ELEMENT LamsSupportEmail (#PCDATA)>
+<!ELEMENT ContentRepositoryPath (#PCDATA)>
 <!ELEMENT UploadFileMaxSize (#PCDATA)>
 <!ELEMENT UploadLargeFileMaxSize (#PCDATA)>
 <!ELEMENT UploadFileMaxMemorySize (#PCDATA)>
@@ -14,3 +15,15 @@
 <!ELEMENT TicketFile (#PCDATA)>
 <!ELEMENT UserInactiveTimeout (#PCDATA)>
 <!ELEMENT AllowMultipleLogin (#PCDATA)>
+
+
+
+
+
+
+
+
+
+
+
+
