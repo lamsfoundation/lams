@@ -203,12 +203,12 @@
 		<!-- ================================================================ -->
 		<!-- Make jar archive for deployment        		    	          -->
 		<!-- ================================================================ -->
-		<target name="lams-lamc11-jar" depends="compile,compile.test,copyContext" description="creates jar file">
+		<target name="lams-lamc11-jar" depends="compile,compile.test" description="creates jar file">
 			<delete file="${build.lib}/${product}.jar"/>
 			<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 				<fileset dir="${build.classes.java}"/>
 				<fileset dir="${conf.hibernate.mapping.dir}"/>
-				<fileset dir="${build.web}"/>
+				<!-- <fileset dir="${build.web}"/> -->
 				<!--<fileset dir="${build.web.includes}"/>-->
 				<!--<fileset dir="${build.web.template}"/>-->
 			</jar>
@@ -273,7 +273,7 @@
 		<!-- =================================================================== -->
 		<!-- Deploy the jar and war                               -->
 		<!-- =================================================================== -->
-			<target name="deploy-war" depends="lams-lamc11-war" description="Deploy the SubmitFiles tool war file and jar file">
+			<target name="deploy-war" depends="lams-lamc11-war" description="Deploy the Mc tool war file and jar file">
 			<delete quiet="true">
 				<fileset dir="${jboss.deploy}/tmp"/>
 				<fileset dir="${jboss.deploy}/work"/>
@@ -289,7 +289,7 @@
 		<!-- Initialize database. 									 -->
 		<!-- =================================================================== -->
 		<target name="init-db"
-			description="rebuild Submit Files tables">
+			description="rebuild Mc Files tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 					password="${db.password}">
 				<classpath>
@@ -303,7 +303,7 @@
 		<!-- Clean and rebuild the database. 									 -->
 		<!-- =================================================================== -->
 		<target name="rebuild-db"
-			description="rebuild Submit Files tables">
+			description="rebuild Mc Files tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 					password="${db.password}">
 				<classpath>
@@ -319,7 +319,7 @@
 		<!-- Clean tool database. 									 -->
 		<!-- =================================================================== -->
 		<target name="clean-tool-db"
-			description="rebuild Submit Files tables">
+			description="rebuild Mc Files tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 					password="${db.password}">
 				<classpath>
