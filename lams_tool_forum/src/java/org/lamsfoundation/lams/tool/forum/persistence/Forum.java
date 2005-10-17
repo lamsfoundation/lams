@@ -15,8 +15,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @hibernate.query name="allForums" query="from Forum forum"
  */
 public class Forum {
+	private Long uid;
 	//tool contentID
-	private Long uuid;
+	private Long contentId;
 	private String title;
 	private boolean lockWhenFinished;
 	private boolean runOffline;
@@ -88,14 +89,14 @@ public class Forum {
     }
 
     /**
-     * @hibernate.id column="uuid" generator-class="native"
+     * @hibernate.id column="uid" generator-class="native"
      */
-	public Long getUuid() {
-		return uuid;
+	public Long getUid() {
+		return uid;
 	}
 
-	public void setUuid(Long uuid) {
-		this.uuid = uuid;
+	public void setUid(Long uid) {
+		this.uid = uid;
 	}
 
 	/**
@@ -225,7 +226,7 @@ public class Forum {
      * inverse="false"
      * lazy="false"
      * cascade="all"
-     * @hibernate.collection-key column="forum"
+     * @hibernate.collection-key column="forum_uid"
      * @hibernate.collection-one-to-many
      * 			class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
      *
@@ -261,7 +262,7 @@ public class Forum {
 		final Forum genericEntity = (Forum) o;
 
       	return new EqualsBuilder()
-      	.append(this.uuid,genericEntity.uuid)
+      	.append(this.uid,genericEntity.uid)
       	.append(this.title,genericEntity.title)
       	.append(this.instructions,genericEntity.instructions)
       	.append(this.onlineInstructions,genericEntity.onlineInstructions)
@@ -273,14 +274,14 @@ public class Forum {
 	}
 
 	public int hashCode() {
-		return new HashCodeBuilder().append(uuid).append(title)
+		return new HashCodeBuilder().append(uid).append(title)
 		.append(instructions).append(onlineInstructions)
 		.append(offlineInstructions).append(created)
 		.append(updated).append(createdBy)
 		.toHashCode();
 	}
 	/**
-	 * @hibernate.property column="content_in_use"
+	 * @hibernate.property  column="content_in_use"
 	 * @return
 	 */
 	public boolean isContentInUse() {
@@ -300,6 +301,17 @@ public class Forum {
 
 	public void setDefineLater(boolean defineLater) {
 		this.defineLater = defineLater;
+	}
+	/**
+	 * @hibernate.property column="content_id" 
+	 * @return
+	 */
+	public Long getContentId() {
+		return contentId;
+	}
+
+	public void setContentId(Long contentId) {
+		this.contentId = contentId;
 	}
 
 }

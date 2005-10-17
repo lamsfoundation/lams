@@ -7,19 +7,19 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.forum.persistence.Learner"
-        table="tl_lafrum11_forum_learners"
+        name="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
+        table="tl_lafrum11_forum_user"
     >
 
         <id
-            name="uuid"
-            column="uuid"
+            name="uid"
+            column="uid"
             type="java.lang.Long"
         >
             <generator class="identity">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-Learner.xml 
+                  hibernate-generator-params-ForumUser.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
@@ -48,7 +48,7 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            column="fullName"
+            column="full_name"
             length="255"
         />
 
@@ -57,13 +57,13 @@
             type="java.lang.String"
             update="true"
             insert="true"
-            column="userName"
+            column="user_name"
             length="255"
         />
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-Learner.xml
+                hibernate-properties-ForumUser.xml
             containing the additional properties and place it in your merge dir.
         -->
 

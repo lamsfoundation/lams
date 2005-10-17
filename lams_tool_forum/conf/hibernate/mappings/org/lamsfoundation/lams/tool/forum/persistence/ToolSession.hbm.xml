@@ -12,8 +12,8 @@
     >
 
         <id
-            name="uuid"
-            column="uuid"
+            name="uid"
+            column="uid"
             type="java.lang.Long"
         >
             <generator class="identity">
@@ -30,7 +30,7 @@
             type="java.util.Date"
             update="true"
             insert="true"
-            column="sessionEndDate"
+            column="session_end_date"
         />
 
         <property
@@ -38,7 +38,7 @@
             type="java.util.Date"
             update="true"
             insert="true"
-            column="sessionStartDate"
+            column="session_start_date"
         />
 
         <property
@@ -56,7 +56,15 @@
             outer-join="auto"
             update="true"
             insert="true"
-            column="uuid"
+            column="forum_uid"
+        />
+
+        <property
+            name="sessionId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="session_id"
         />
 
         <!--

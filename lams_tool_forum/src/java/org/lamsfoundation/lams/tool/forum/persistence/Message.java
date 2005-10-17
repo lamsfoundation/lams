@@ -16,7 +16,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @hibernate.query name="allMessagesByForum" query="from Message message where message.forum = ?"
  */
 public class Message {
-	private Long uuid;
+	private Long uid;
 	private String subject;
 	private String body;
 	private boolean isAuthored;
@@ -24,7 +24,7 @@ public class Message {
 	private Message parent;
 	private Set replies;
 	private ToolSession toolSession;
-	private Learner learner;
+	private ForumUser learner;
 	
 	protected Date created;
 	protected Date updated;
@@ -119,14 +119,14 @@ public class Message {
     }
 
     /**
-     * @hibernate.id column="uuid" generator-class="native"
+     * @hibernate.id column="uid" generator-class="native"
      */
-	public Long getUuid() {
-		return uuid;
+	public Long getUid() {
+		return uid;
 	}
 
-	public void setUuid(Long uuid) {
-		this.uuid = uuid;
+	public void setUid(Long uuid) {
+		this.uid = uuid;
 	}
 
     /**
@@ -212,7 +212,7 @@ public class Message {
      * inverse="false"
      * lazy="false"
      * cascade="all-delete-orphan"
-     * @hibernate.collection-key column="parent"
+     * @hibernate.collection-key column="parent_uid"
      * @hibernate.collection-one-to-many 
      * 			class="org.lamsfoundation.lams.tool.forum.persistence.Message"
      *
@@ -233,7 +233,7 @@ public class Message {
       *
       * @hibernate.many-to-one
       *	class="org.lamsfoundation.lams.tool.forum.persistence.ToolSession"
-      *	              column="tool_session_id"
+      *	              column="forum_session_uid"
       *
       */
      public ToolSession getToolSession() {
@@ -265,7 +265,7 @@ public class Message {
      * inverse="false"
      * lazy="false"
      * cascade="all"
-     * @hibernate.collection-key column="toolSession"
+     * @hibernate.collection-key column="message_uid"
      * @hibernate.collection-one-to-many
      * 			class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
      *
@@ -289,7 +289,7 @@ public class Message {
 		final Message genericEntity = (Message) o;
 
       	return new EqualsBuilder()
-      	.append(this.uuid,genericEntity.uuid)
+      	.append(this.uid,genericEntity.uid)
       	.append(this.subject,genericEntity.subject)
       	.append(this.body,genericEntity.body)
       	.append(this.created,genericEntity.created)
@@ -300,7 +300,7 @@ public class Message {
 	}
 
 	public int hashCode() {
-		return new HashCodeBuilder().append(uuid)
+		return new HashCodeBuilder().append(uid)
 		.append(subject).append(body)
 		.append(created)
 		.append(updated).append(createdBy)
@@ -309,16 +309,16 @@ public class Message {
 	}
 	/**
 	  * @hibernate.many-to-one
-      *	class="org.lamsfoundation.lams.tool.forum.persistence.Learner"
-      *	              column="learner_id"
+      *	class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
+      *	              column="user_uid"
       *
 	 * @return
 	 */
-	public Learner getLearner() {
+	public ForumUser getLearner() {
 		return learner;
 	}
 
-	public void setLearner(Learner learner) {
+	public void setLearner(ForumUser learner) {
 		this.learner = learner;
 	}
 }

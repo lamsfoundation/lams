@@ -108,7 +108,7 @@
 	
 	<!-- exports all the hbm mappings to the specified database -->
 	<target name="schemaexport" description="Exports all hbm.xml files in {conf.hibernate.mapping.dir}/hbm"
-		depends="generate-hbm">
+		depends="clean,generate-hbm">
 	    <echo message="Run the schema export for all hbm.xml files in ${conf.hibernate.mapping.dir}/hbm"/>
 		<taskdef
 			name="schemaexport"

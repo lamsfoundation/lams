@@ -30,8 +30,8 @@ public class ForumManagerImplTest extends TestCase {
         attachments.put("test file", attachment);
 
         Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), attachments, null);
-        assertNotNull("Forum Id is null", forum.getUuid());
-        Forum reloadedForum = forumManager.getForum(forum.getUuid());
+        assertNotNull("Forum Id is null", forum.getUid());
+        Forum reloadedForum = forumManager.getForum(forum.getUid());
         assertEquals(reloadedForum.getTitle(), "TEST");
         assertEquals(reloadedForum.getCreatedBy(), new Long("1002"));
         assertEquals(reloadedForum.getLockWhenFinished(), true);
@@ -44,9 +44,9 @@ public class ForumManagerImplTest extends TestCase {
         Attachment reloadedAttachment = (Attachment) (reloadedAttachments.toArray(new Attachment[0]))[0];
         assertTrue("Forum should contains attachment", reloadedAttachments.contains(attachment));
 
-        forumManager.deleteForum(forum.getUuid());
+        forumManager.deleteForum(forum.getUid());
         try {
-            Forum forum2 = forumManager.getForum(forum.getUuid());
+            Forum forum2 = forumManager.getForum(forum.getUid());
             fail("getForum should have barfed for non existing forum");
         } catch (Exception e) {
 
@@ -55,8 +55,8 @@ public class ForumManagerImplTest extends TestCase {
 
     public void testCreateAndDeleteForumWithNullAttachments() throws PersistenceException {
         Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), null, null);
-        assertNotNull("Forum Id is null", forum.getUuid());
-        Forum reloadedForum = forumManager.getForum(forum.getUuid());
+        assertNotNull("Forum Id is null", forum.getUid());
+        Forum reloadedForum = forumManager.getForum(forum.getUid());
         assertEquals(reloadedForum.getTitle(), "TEST");
         assertEquals(reloadedForum.getCreatedBy(), new Long("1002"));
         assertEquals(reloadedForum.getLockWhenFinished(), true);
@@ -68,9 +68,9 @@ public class ForumManagerImplTest extends TestCase {
         Set reloadedAttachments = reloadedForum.getAttachments();
         assertEquals("Forum should contains null attachments", 0, reloadedAttachments.size());
 
-        forumManager.deleteForum(forum.getUuid());
+        forumManager.deleteForum(forum.getUid());
         try {
-            forumManager.getForum(forum.getUuid());
+            forumManager.getForum(forum.getUid());
             fail("getForum should have barfed for non existing forum");
         } catch (Exception e) {
 
@@ -79,8 +79,8 @@ public class ForumManagerImplTest extends TestCase {
 
     public void testCreateAndDeleteForumWithNullInstructions() throws PersistenceException {
         Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), false, false , false, "", "", ""), null, null);
-        assertNotNull("Forum Id is null", forum.getUuid());
-        Forum reloadedForum = forumManager.getForum(forum.getUuid());
+        assertNotNull("Forum Id is null", forum.getUid());
+        Forum reloadedForum = forumManager.getForum(forum.getUid());
         assertEquals(reloadedForum.getTitle(), "TEST");
         assertEquals(reloadedForum.getCreatedBy(), new Long("1002"));
         assertEquals(reloadedForum.getLockWhenFinished(), false);
@@ -92,9 +92,9 @@ public class ForumManagerImplTest extends TestCase {
         Set reloadedAttachments = reloadedForum.getAttachments();
         assertEquals("Forum should contains null attachments", 0, reloadedAttachments.size());
 
-        forumManager.deleteForum(forum.getUuid());
+        forumManager.deleteForum(forum.getUid());
         try {
-            forumManager.getForum(forum.getUuid());
+            forumManager.getForum(forum.getUid());
             fail("getForum should have barfed for non existing forum");
         } catch (Exception e) {
 
@@ -103,10 +103,10 @@ public class ForumManagerImplTest extends TestCase {
 
     public void testCreateModifyAndDeleteMessage() throws PersistenceException {
       Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), new HashMap(), new HashMap());
-      Message message = forumManager.createMessage(forum.getUuid(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
-      assertNotNull("Message Id is null", message.getUuid());
+      Message message = forumManager.createMessage(forum.getUid(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
+      assertNotNull("Message Id is null", message.getUid());
 
-      Message reloaded = forumManager.getMessage(message.getUuid());
+      Message reloaded = forumManager.getMessage(message.getUid());
 
       assertEquals(reloaded.getToolSession(), forum);
       assertEquals(reloaded.getCreatedBy(), new Long("1002"));
@@ -121,7 +121,7 @@ public class ForumManagerImplTest extends TestCase {
       message.setIsAnonymous(false);
 
       forumManager.editMessage(message);
-      message = forumManager.getMessage(message.getUuid());
+      message = forumManager.getMessage(message.getUid());
       assertEquals(message.getToolSession(), forum);
       assertEquals(message.getCreatedBy(), new Long("1002"));
       assertEquals(message.getModifiedBy(), new Long("1004"));
@@ -129,11 +129,11 @@ public class ForumManagerImplTest extends TestCase {
       assertEquals(message.getSubject(), "MODIFIED SUBJECT");
       assertEquals(message.getBody(), "MODIFIED BODY");
 
-      forumManager.deleteMessage(message.getUuid());
+      forumManager.deleteMessage(message.getUid());
 
-      forumManager.deleteForum(forum.getUuid());
+      forumManager.deleteForum(forum.getUid());
       try {
-        forumManager.getMessage(forum.getUuid());
+        forumManager.getMessage(forum.getUid());
         fail("getMessage should have barfed for non existing message");
       } catch (Exception e) {
 
@@ -142,9 +142,9 @@ public class ForumManagerImplTest extends TestCase {
 
     public void testReplyToMessage() throws PersistenceException {
       Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), new HashMap(), new HashMap());
-      Message message = forumManager.createMessage(forum.getUuid(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
-      assertNotNull("Message Id is null", message.getUuid());
-      Message reloaded = forumManager.getMessage(message.getUuid());
+      Message message = forumManager.createMessage(forum.getUid(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
+      assertNotNull("Message Id is null", message.getUid());
+      Message reloaded = forumManager.getMessage(message.getUid());
       assertEquals(reloaded.getToolSession(), forum);
       assertEquals(reloaded.getCreatedBy(), new Long("1002"));
       assertEquals(reloaded.getIsAnonymous(), true);
@@ -152,9 +152,9 @@ public class ForumManagerImplTest extends TestCase {
       assertEquals(reloaded.getSubject(), "TEST");
       assertEquals(reloaded.getBody(), "TEST");
 
-      Message reply = forumManager.replyToMessage(message.getUuid(), this.getMessage(new Long("1008"), "REPLY MESSAGE", "REPLY MESSAGE", true, false));
-      assertNotNull("Message Id is null", reply.getUuid());
-      reply = forumManager.getMessage(reply.getUuid());
+      Message reply = forumManager.replyToMessage(message.getUid(), this.getMessage(new Long("1008"), "REPLY MESSAGE", "REPLY MESSAGE", true, false));
+      assertNotNull("Message Id is null", reply.getUid());
+      reply = forumManager.getMessage(reply.getUid());
       assertEquals(message.getToolSession(), forum);
       assertEquals(reply.getCreatedBy(), new Long("1008"));
       assertEquals(reply.getIsAnonymous(), true);
@@ -163,31 +163,31 @@ public class ForumManagerImplTest extends TestCase {
       assertEquals(reply.getBody(), "REPLY MESSAGE");
 
       //assert that the original message has the reply in the reply Set.
-      reloaded = forumManager.getMessage(message.getUuid());
+      reloaded = forumManager.getMessage(message.getUid());
       Set reloadedReplies = reloaded.getReplies();
 
       assertTrue("original message does not contain reply message in its reply set", reloadedReplies.contains(reply));
 
-      forumManager.deleteMessage(message.getUuid());
+      forumManager.deleteMessage(message.getUid());
       try {
-        forumManager.getMessage(reply.getUuid());
+        forumManager.getMessage(reply.getUid());
         fail("getMessage should have barfed for non existing message");
       } catch (Exception e) {
 
       }
       Message deleted = null;
       try {
-          deleted = forumManager.getMessage(message.getUuid());
+          deleted = forumManager.getMessage(message.getUid());
       } catch (Exception e) {
         assertNull(deleted);
       }
       Message deletedReply = null;
       try {
-          deleted = forumManager.getMessage(reply.getUuid());
+          deleted = forumManager.getMessage(reply.getUid());
       } catch (Exception e) {
             assertNull(deletedReply);
       }
-      forumManager.deleteForum(forum.getUuid());
+      forumManager.deleteForum(forum.getUid());
     }
 
     protected void tearDown() throws Exception {

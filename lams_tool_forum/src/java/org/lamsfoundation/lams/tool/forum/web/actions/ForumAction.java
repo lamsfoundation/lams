@@ -119,7 +119,7 @@ public class ForumAction extends Action {
         forumForm.setForum(forum);
 
         //populate topics with new topics
-        List topicList = getForumManager().getTopics(forum.getUuid());
+        List topicList = getForumManager().getTopics(forum.getUid());
         topics = new HashMap();
         Iterator it = topicList.iterator();
         while (it.hasNext()) {
@@ -151,7 +151,7 @@ public class ForumAction extends Action {
           throws IOException, ServletException, Exception {
         Long forumId = new Long((String) request.getParameter("forumId"));
         Forum forum = getForumManager().getForum(forumId);
-        List topicList = getForumManager().getTopics(forum.getUuid());
+        List topicList = getForumManager().getTopics(forum.getUid());
         ForumForm forumForm = new ForumForm();
 
         forumForm.setForum(forum);
@@ -173,7 +173,7 @@ public class ForumAction extends Action {
         while (it.hasNext()) {
             Attachment attachment = (Attachment) it.next();
             //ContentHandler handler = new ContentHandler();
-            Set properties = getToolContentHandler().getFileProperties(attachment.getUuid());
+            Set properties = getToolContentHandler().getFileProperties(attachment.getUid());
             Iterator propIt = properties.iterator();
             while (propIt.hasNext()) {
                 CrNodeVersionProperty property = (CrNodeVersionProperty) propIt.next();
@@ -270,7 +270,7 @@ public class ForumAction extends Action {
                 Attachment attachment = new Attachment();
                 attachment.setFileName(fileName);
                 attachment.setStream(file.getInputStream());
-                attachment.setUuid(node.getUuid());
+                attachment.setUid(node.getUuid());
                 attachment.setType(attachmentType);
                 attachmentsMap.put(keyName, attachment);
                 forumForm.setOnlineFile(null);
@@ -286,9 +286,9 @@ public class ForumAction extends Action {
         ForumForm forumForm = (ForumForm) form;
         Map attachments = forumForm.getAttachments();
         Attachment attachment = (Attachment) attachments.remove(fileName + "-" + type);
-        getToolContentHandler().deleteFile(attachment.getUuid());
-        if (attachment.getUuid() != null) {
-            getForumManager().deleteForumAttachment(attachment.getUuid());
+        getToolContentHandler().deleteFile(attachment.getUid());
+        if (attachment.getUid() != null) {
+            getForumManager().deleteForumAttachment(attachment.getUid());
         }
         List attachmentList = new ArrayList(attachments.values());
         request.getSession().setAttribute("attachmentList", attachmentList);
@@ -299,8 +299,8 @@ public class ForumAction extends Action {
         String topicName = (String) request.getParameter("topicName");
         Map topics = (Map) request.getSession().getAttribute("topics");
         Message topic = (Message) topics.remove(topicName);
-        if (topic.getUuid() != null) {
-            getForumManager().deleteMessage(topic.getUuid());
+        if (topic.getUid() != null) {
+            getForumManager().deleteMessage(topic.getUid());
         }
         request.getSession().setAttribute("topics", topics);
         request.getSession().setAttribute("topicList", new ArrayList(topics.values()));

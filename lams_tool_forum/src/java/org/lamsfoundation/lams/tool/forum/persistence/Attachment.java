@@ -18,6 +18,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @hibernate.query name="getAttachmentbyType" query="from Attachment attachment where attachment.type = ?"
  */
 public class Attachment {
+    private Long uid;
     private Long uuid;
     private Long versionId;
     private String type;
@@ -29,14 +30,14 @@ public class Attachment {
     public final static String TYPE_OFFLINE = "OFFLINE";
 
     /**
-     * @hibernate.id column="uuid" generator-class="native"
+     * @hibernate.id column="uid" generator-class="native"
      */
-    public Long getUuid() {
-        return uuid;
+    public Long getUid() {
+        return uid;
     }
 
-    public void setUuid(Long uuid) {
-        this.uuid = uuid;
+    public void setUid(Long uid) {
+        this.uid = uid;
     }
 
     /**
@@ -99,7 +100,7 @@ public class Attachment {
 		final Attachment genericEntity = (Attachment) o;
 
       	return new EqualsBuilder()
-      	.append(this.uuid,genericEntity.uuid)
+      	.append(this.uid,genericEntity.uid)
       	.append(this.versionId,genericEntity.versionId)
       	.append(this.fileName,genericEntity.fileName)
       	.append(this.type,genericEntity.type)
@@ -107,6 +108,17 @@ public class Attachment {
 	}
 
 	public int hashCode() {
-		return new HashCodeBuilder().append(uuid).append(versionId).append(fileName).append(type).toHashCode();
+		return new HashCodeBuilder().append(uid).append(versionId).append(fileName).append(type).toHashCode();
+	}
+	/**
+	 * @hibernate.property column="uuid"
+	 * @return
+	 */
+	public Long getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(Long uuid) {
+		this.uuid = uuid;
 	}
 }

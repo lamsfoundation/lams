@@ -12,8 +12,8 @@
     >
 
         <id
-            name="uuid"
-            column="uuid"
+            name="uid"
+            column="uid"
             type="java.lang.Long"
         >
             <generator class="native">
@@ -115,7 +115,7 @@
         >
 
             <key
-                column="forum"
+                column="forum_uid"
             >
             </key>
 
@@ -139,6 +139,14 @@
             update="true"
             insert="true"
             column="define_later"
+        />
+
+        <property
+            name="contentId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="content_id"
         />
 
         <!--

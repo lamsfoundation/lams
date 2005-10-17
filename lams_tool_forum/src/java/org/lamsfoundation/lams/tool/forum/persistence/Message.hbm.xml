@@ -12,8 +12,8 @@
     >
 
         <id
-            name="uuid"
-            column="uuid"
+            name="uid"
+            column="uid"
             type="java.lang.Long"
         >
             <generator class="native">
@@ -99,7 +99,7 @@
         >
 
             <key
-                column="parent"
+                column="parent_uid"
             >
             </key>
 
@@ -116,7 +116,7 @@
             outer-join="auto"
             update="true"
             insert="true"
-            column="tool_session_id"
+            column="forum_session_uid"
         />
 
         <set
@@ -129,7 +129,7 @@
         >
 
             <key
-                column="toolSession"
+                column="message_uid"
             >
             </key>
 
@@ -141,12 +141,12 @@
 
         <many-to-one
             name="learner"
-            class="org.lamsfoundation.lams.tool.forum.persistence.Learner"
+            class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
             cascade="none"
             outer-join="auto"
             update="true"
             insert="true"
-            column="learner_id"
+            column="user_uid"
         />
 
         <!--

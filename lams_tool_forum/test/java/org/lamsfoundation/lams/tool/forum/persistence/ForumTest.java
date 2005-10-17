@@ -44,13 +44,13 @@ public class ForumTest extends TestCase {
         //save
         ForumDao dao = (ForumDao) GenericObjectFactoryImpl.getTestInstance().lookup(ForumDao.class);
         dao.saveOrUpdate(entity);
-        assertNotNull(entity.getUuid());
+        assertNotNull(entity.getUid());
         assertNotNull("date created is null", entity.getCreated());
         assertNotNull("date updated is null", entity.getUpdated());
         assertEquals("date created and updated are different for first save", entity.getCreated(), entity.getUpdated());
 
         //load
-        Forum reloaded = (Forum) dao.getById(entity.getUuid());
+        Forum reloaded = (Forum) dao.getById(entity.getUid());
         //just because MySQL will wrap millisecond to zero. it is nonsesnce to compare data at this care.
         entity.setCreated(reloaded.created);
         entity.setUpdated(reloaded.updated);
@@ -74,7 +74,7 @@ public class ForumTest extends TestCase {
 
         //delete
         dao.delete(reloaded);
-        assertNull("object not deleted", dao.getById(entity.getUuid()) );
+        assertNull("object not deleted", dao.getById(entity.getUid()) );
     }
 
     protected void tearDown() throws Exception {

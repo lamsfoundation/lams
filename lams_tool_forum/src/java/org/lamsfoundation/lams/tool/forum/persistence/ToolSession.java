@@ -29,25 +29,26 @@ import java.util.Date;
  * @version $Revision$
  */
 public class ToolSession {
-	private Long uuid;
+	private Long uid;
+	private Long sessionId;
 	private Forum forum;
 	private Date sessionStartDate;
 	private Date sessionEndDate;
 	private int status;
 	
 	/**
-	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="uuid"
+	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="uid"
 	 * @return Returns the learnerID.
 	 */
-	public Long getUuid() {
-		return uuid;
+	public Long getUid() {
+		return uid;
 	}
-	public void setUuid(Long uuid) {
-		this.uuid = uuid;
+	public void setUid(Long uuid) {
+		this.uid = uuid;
 	}
 	
 	/**
-	 * @hibernate.property
+	 * @hibernate.property column="session_end_date"
 	 * @return
 	 */
 	public Date getSessionEndDate() {
@@ -57,7 +58,8 @@ public class ToolSession {
 		this.sessionEndDate = sessionEndDate;
 	}
 	/**
-	 * @hibernate.property
+	 * @hibernate.property column="session_start_date"
+	 * 
 	 * @return
 	 */
 	public Date getSessionStartDate() {
@@ -78,8 +80,8 @@ public class ToolSession {
 	}
 
 	/**
- 	 * @hibernate.many-to-one column="uuid" cascade="none"
- 	 * 
+ 	 * @hibernate.many-to-one  column="forum_uid"
+ 	 * cascade="none"
 	 * @return
 	 */
 	public Forum getForum() {
@@ -87,6 +89,16 @@ public class ToolSession {
 	}
 	public void setForum(Forum forum) {
 		this.forum = forum;
+	}
+	/**
+	 * @hibernate.property column="session_id"
+	 * @return
+	 */
+	public Long getSessionId() {
+		return sessionId;
+	}
+	public void setSessionId(Long sessionId) {
+		this.sessionId = sessionId;
 	}
 
 

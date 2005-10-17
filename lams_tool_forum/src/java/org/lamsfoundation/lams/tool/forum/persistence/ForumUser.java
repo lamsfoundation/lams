@@ -25,36 +25,36 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 /**
  * 
- * @hibernate.class table="tl_lafrum11_forum_learners"
+ * @hibernate.class table="tl_lafrum11_forum_user"
  * @author Steve.Ni
  * 
  * @version $Revision$
  * @serialData -7043502180037866257L
  */
-public class Learner implements Serializable,Cloneable{
+public class ForumUser implements Serializable,Cloneable{
 
 	private static final long serialVersionUID = -7043502180037866257L;
 
-	private static Logger log = Logger.getLogger(Learner.class);
+	private static Logger log = Logger.getLogger(ForumUser.class);
 	
-    private Long uuid;
+    private Long uid;
 	private Long userID;
 	private String userName;
 	private String fullName;
 	private boolean status;
 	
 	/**
-	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="uuid"
-	 * @return Returns the uuid.
+	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="uid"
+	 * @return Returns the uid.
 	 */
-	public Long getUuid() {
-		return uuid;
+	public Long getUid() {
+		return uid;
 	}
 	/**
-	 * @param uuid The uuid to set.
+	 * @param uid The uid to set.
 	 */
-	public void setUuid(Long learnerID) {
-		this.uuid = learnerID;
+	public void setUid(Long userID) {
+		this.uid = userID;
 	}
 
 	/**
@@ -93,13 +93,13 @@ public class Learner implements Serializable,Cloneable{
 		try {
 			obj = super.clone();
 		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Learner.class + " failed");
+			log.error("When clone " + ForumUser.class + " failed");
 		}
 		return obj;
 	}
 
 	/**
-	 * @hibernate.property length="255"
+	 * @hibernate.property length="255" column="full_name"
 	 * @return
 	 */
 	public String getFullName() {
@@ -109,7 +109,7 @@ public class Learner implements Serializable,Cloneable{
 		this.fullName = fullName;
 	}
 	/**
-	 * @hibernate.property length="255"
+	 * @hibernate.property length="255" column="user_name"
 	 * @return
 	 */
 	public String getUserName() {

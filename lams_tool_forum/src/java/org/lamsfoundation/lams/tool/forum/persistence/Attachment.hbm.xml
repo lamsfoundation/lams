@@ -12,8 +12,8 @@
     >
 
         <id
-            name="uuid"
-            column="uuid"
+            name="uid"
+            column="uid"
             type="java.lang.Long"
         >
             <generator class="native">
@@ -47,6 +47,14 @@
             update="true"
             insert="true"
             column="file_name"
+        />
+
+        <property
+            name="uuid"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="uuid"
         />
 
         <!--

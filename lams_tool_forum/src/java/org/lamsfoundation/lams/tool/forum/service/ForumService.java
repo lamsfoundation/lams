@@ -55,14 +55,14 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
           while (it.hasNext()) {
                 Message message = (Message) it.next();
                 message.setIsAuthored(true);
-                this.createMessage(forum.getUuid(), message);
+                this.createMessage(forum.getUid(), message);
           }
         }
         return forum;
     }
 
     public Forum editForum(Forum forum, Map attachments, Map topics) throws PersistenceException {
-        Forum reloaded = this.getForum(forum.getUuid());
+        Forum reloaded = this.getForum(forum.getUid());
         reloaded.setTitle(forum.getTitle());
         reloaded.setCreatedBy(forum.getCreatedBy());
         reloaded.setLockWhenFinished(forum.getLockWhenFinished());
@@ -90,7 +90,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
           Iterator it = topicList.iterator();
           while (it.hasNext()) {
                 Message message = (Message) it.next();
-                this.createMessage(forum.getUuid(), message);
+                this.createMessage(forum.getUid(), message);
           }
         }
 
@@ -124,7 +124,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     }
 
      public Message editMessage(Message message) throws PersistenceException {
-        Message reloaded = this.getMessage(message.getUuid());
+        Message reloaded = this.getMessage(message.getUid());
         reloaded.setModifiedBy(message.getModifiedBy());
         reloaded.setIsAnonymous(message.getIsAnonymous());
         reloaded.setIsAuthored(message.getIsAuthored());
