@@ -234,7 +234,12 @@
 <primary-key-description/>
 <primary-key-column name="uid"/>
 </primary-key>
-<unique-key-list/>
+<unique-key-list>
+<unique-key name="UQ_tl_lamc11_content_1" alias="" remarks="">
+<unique-key-description/>
+<unique-key-column name="content_id"/>
+</unique-key>
+</unique-key-list>
 <foreign-key-list/>
 <index-list/>
 </table>
@@ -434,7 +439,12 @@
 <primary-key-description/>
 <primary-key-column name="uid"/>
 </primary-key>
-<unique-key-list/>
+<unique-key-list>
+<unique-key name="UQ_tl_lamc11_que_usr_1" alias="" remarks="">
+<unique-key-description/>
+<unique-key-column name="que_usr_id"/>
+</unique-key>
+</unique-key-list>
 <foreign-key-list>
 <foreign-key name="FK_tl_lamc_tool_usr_1" alias="" remarks="" referenced-table-schema="lams" referenced-table="tl_lamc11_session" referenced-key="PK_TL_LAMC11_SESSION" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
@@ -513,7 +523,12 @@
 <primary-key-description/>
 <primary-key-column name="uid"/>
 </primary-key>
-<unique-key-list/>
+<unique-key-list>
+<unique-key name="UQ_tl_lamc11_session_1" alias="" remarks="">
+<unique-key-description/>
+<unique-key-column name="mc_session_id"/>
+</unique-key>
+</unique-key-list>
 <foreign-key-list>
 <foreign-key name="FK_tl_lamc_session_1" alias="" remarks="" referenced-table-schema="lams" referenced-table="tl_lamc11_content" referenced-key="PK_TL_LAMC11_CONTENT" on-update="" on-delete="" source-multiplicity="0..*" target-multiplicity="1" source-entity-role="" target-entity-role="" source-relationship-type="" target-relationship-type="">
 <foreign-key-description/>
