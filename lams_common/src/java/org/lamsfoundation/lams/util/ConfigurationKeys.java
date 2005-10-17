@@ -14,6 +14,7 @@ public class ConfigurationKeys {
 	public static String SMTP_SERVER="SMTPServer";
 	public static String LAMS_ADMIN_EMAIL="LamsSupportEmail";
 
+	public static String CONTENT_REPOSITORY_PATH = "ContentRepositoryPath";
 	public static String UPLOAD_FILE_MAX_SIZE="UploadFileSizeMax";
 	public static String UPLOAD_FILE_LARGE_MAX_SIZE="UploadFileLargeSizeMax";
 	public static String UPLOAD_FILE_MAX_MEMORY_SIZE="UploadFileMaxMemorySize";
