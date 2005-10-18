@@ -3,6 +3,9 @@
 <%@ taglib uri="/WEB-INF/struts-logic-el.tld" prefix="logic-el" %>
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
+
+
 
 	<!-- this form  exists temporarily to represent tool icon, remove this form once the tool is deployed into authoring environment -->
 <%

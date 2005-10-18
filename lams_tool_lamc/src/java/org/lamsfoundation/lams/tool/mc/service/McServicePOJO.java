@@ -287,11 +287,11 @@ public class McServicePOJO implements
 	}
 
     
-    public McQueContent getQuestionContentByQuestionText(final String question)
+    public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentId)
     {
         try
         {
-            return mcQueContentDAO.getQuestionContentByQuestionText(question);
+            return mcQueContentDAO.getQuestionContentByQuestionText(question, mcContentId);
         }
         catch (DataAccessException e)
         {

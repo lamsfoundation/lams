@@ -232,16 +232,16 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
 	 	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
 	 	
-	 	mapQuestionsContent=repopulateMap(mapQuestionsContent, request);
+	 	mapQuestionsContent=repopulateMap(mapQuestionsContent, request, "questionContent");
 	 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 	 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
-	 	
 	 	
 	 	String userAction=null;
 	 	if (mcAuthoringForm.getAddQuestion() != null)
 	 	{
 	 		userAction="addQuestion";
 	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
 	 		
 	 		int mapSize=mapQuestionsContent.size();
 			mapQuestionsContent.put(new Long(++mapSize).toString(), "");
@@ -278,6 +278,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	{
 	 		userAction="removeQuestion";
 	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
 	 		
 	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
 			logger.debug("questionIndex:" + questionIndex);
@@ -291,7 +292,10 @@ public class McAction extends DispatchAction implements McAppConstants
 				request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 				logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
 				
-				McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(deletableQuestionEntry);
+				Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+				logger.debug("toolContentId:" + toolContentId);
+				
+				McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(deletableQuestionEntry, toolContentId);
 				logger.debug("mcQueContent:" + mcQueContent);
 				
 				if (mcQueContent != null)
@@ -309,12 +313,17 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	{
 	 		userAction="editOption";
 	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
 	 		
 	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
 			logger.debug("questionIndex:" + questionIndex);
 			String editableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
 			logger.debug("editableQuestionEntry:" + editableQuestionEntry);
-			McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(editableQuestionEntry);
+			
+			Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+			logger.debug("toolContentId:" + toolContentId);
+	    	
+			McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(editableQuestionEntry, toolContentId);
 			logger.debug("mcQueContent:" + mcQueContent);
 			
 			Map mapOptionsContent= new TreeMap(new McComparator());
@@ -351,7 +360,64 @@ public class McAction extends DispatchAction implements McAppConstants
 			return (mapping.findForward(EDIT_OPTS_CONTENT));
 	 		
 	 	}
-	 	logger.debug("userAction:" + userAction);
+	 	else if (mcAuthoringForm.getAddOption() != null)
+	 	{
+	 		userAction="addOption";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		
+	 		Map mapOptionsContent=(Map) request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+		 	logger.debug("mapOptionsContent: " + mapOptionsContent);
+		 	
+		 	mapOptionsContent=repopulateMap(mapQuestionsContent, request,"optionContent");
+		 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
+		 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
+	 		
+	 		int mapSize=mapOptionsContent.size();
+	 		mapOptionsContent.put(new Long(++mapSize).toString(), "");
+			logger.debug("updated mapOptionsContent Map size: " + mapOptionsContent.size());
+			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapQuestionsContent);
+    		logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+    		
+    		McContent mcContent=createContent(request, mcAuthoringForm);
+    		logger.debug("mcContent: " + mcContent);
+    		
+    		/** iterate the questions Map and persist the questions into the DB*/
+    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+    	    while (itQuestionsMap.hasNext()) {
+    	        Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+    	        logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+    	        if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
+    	        {
+        	        McQueContent mcQueContent=  new McQueContent(pairs.getValue().toString(),
+           	        	 new Integer(pairs.getKey().toString()),
+          					 mcContent,
+          					 new HashSet(),
+          					 new HashSet()
+          					);
+        	        logger.debug("created mcQueContent: " + mcQueContent);
+           	        mcService.createMcQue(mcQueContent);    	        	
+    	        }
+    	    }
+       		
+    	    
+    		mcAuthoringForm.resetUserAction();
+						
+			return (mapping.findForward(EDIT_OPTS_CONTENT));
+	 	}
+	 	else if (mcAuthoringForm.getRemoveOption() != null)
+	 	{
+	 		userAction="removeOption";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		
+	 		String optionIndex =mcAuthoringForm.getOptionIndex();
+			logger.debug("optionIndex:" + optionIndex);
+						
+			return (mapping.findForward(EDIT_OPTS_CONTENT));
+	 	}
+	 	
+	 	
 	 	
 	 	mcAuthoringForm.resetUserAction();
    	    return (mapping.findForward(LOAD_QUESTIONS));
@@ -396,14 +462,15 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @return
      */
-    protected Map repopulateMap(Map mapQuestionContent, HttpServletRequest request)
+    protected Map repopulateMap(Map mapQuestionContent, HttpServletRequest request, String parameterType)
     {
     	Map mapTempQuestionsContent= new TreeMap(new McComparator());
+    	logger.debug("parameterType: " + parameterType);
     	
     	long mapCounter=0;
     	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
 		{
-			String candidateQuestionEntry =request.getParameter("questionContent" + i);
+			String candidateQuestionEntry =request.getParameter(parameterType + i);
 			if (
 				(candidateQuestionEntry != null) && 
 				(candidateQuestionEntry.length() > 0) &&  

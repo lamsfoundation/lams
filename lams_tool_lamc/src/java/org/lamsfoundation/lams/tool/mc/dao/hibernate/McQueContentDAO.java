@@ -47,7 +47,7 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
 	 	
-	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question";
+	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question and mcQueContent.mcContentId=:mcContentId";
 	 		 	
 	 	
 	 	public McQueContent getMcQueContentByUID(Long uid)
@@ -72,17 +72,19 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	    }
 	 	
 	 	
-	 	public McQueContent getQuestionContentByQuestionText(final String question)
+	 	public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentId)
 	    {
-	        return (McQueContent) getHibernateTemplate().execute(new HibernateCallback()
-	         {
-	             public Object doInHibernate(Session session) throws HibernateException
-	             {
-	                 return session.createQuery(LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT)
-	                               .setString("question", question)
-	                               .uniqueResult();
-	             }
-	         });
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT)
+				.setString("question", question)
+				.setLong("mcContentId", mcContentId.longValue())				
+				.list();
+			
+			if(list != null && list.size() > 0){
+				McQueContent mcq = (McQueContent) list.get(0);
+				return mcq;
+			}
+			return null;
 	    }
 	 	
 	 	

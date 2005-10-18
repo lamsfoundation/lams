@@ -70,37 +70,3 @@ VALUES (
 	
 	
 		
-INSERT INTO tl_lamc11_options_content  (
-	  uid,
-	  correct_option,
-	  mc_que_content_id,
-	  mc_que_option_text
-)
-VALUES (
-	null,
-	0,
-	1,
-	'sample answer 2');
-	
-	
-	
-INSERT INTO tl_lamc11_options_content  (
-	  uid,
-	  correct_option,
-	  mc_que_content_id,
-	  mc_que_option_text
-)
-VALUES (
-	null,
-	1,
-	1,
-	'sample answer 3');
-	
-	
-
-	
-	
-	
-	
-	
-	

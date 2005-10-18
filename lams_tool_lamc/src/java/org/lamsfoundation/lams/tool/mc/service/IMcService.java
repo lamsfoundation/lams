@@ -73,7 +73,7 @@ public interface IMcService
 	
     public void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
     
-    public McQueContent getQuestionContentByQuestionText(final String question);
+    public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentId);
     
     public McSession retrieveMcSession(Long mcSessionId) throws McApplicationException;
     
