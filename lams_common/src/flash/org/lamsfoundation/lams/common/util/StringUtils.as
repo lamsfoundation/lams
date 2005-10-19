@@ -1,4 +1,5 @@
-﻿import org.lamsfoundation.lams.common.util.*
+﻿import org.lamsfoundation.lams.common.*
+import org.lamsfoundation.lams.common.util.*
 
 /**
 * Util methods for string manipulation
@@ -18,6 +19,30 @@ class StringUtils {
 	//Getters+Setters
 	function get className():String{
 		return _className;
+	}
+	
+	public static function cleanNull(str:String):String{
+		if(str == undefined){
+			return "";
+		}
+		if(str == null){
+			return "";
+		}
+		if(str == ""){
+			return "";
+		}
+		if(str == Config.STRING_NULL_VALUE){
+			return "";
+		}
+		if(str == "undefined"){
+			return "";
+		}
+		if(str == "null"){
+			return "";
+		}
+		
+		return str;
+		
 	}
 
     /**
