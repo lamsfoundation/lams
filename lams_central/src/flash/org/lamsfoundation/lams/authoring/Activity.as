@@ -55,34 +55,32 @@ class org.lamsfoundation.lams.authoring.Activity {
     // Instance variables
     //---------------------------------------------------------------------
 	
-	private var _objectType:String;				
-	private var _activityTypeID:Number;			
+	private var _objectType:String;			//*	
+	private var _activityTypeID:Number;		//*	
 
 	
 	private var _activityID:Number;				
-	private var _activityCategoryID:Number;				
+	private var _activityCategoryID:Number;	//*			
 	
-	private var _activityUIID:Number;
+	private var _activityUIID:Number;			//*
 
-	private var _learningLibraryID:Number;		
+	private var _learningLibraryID:Number;		//*
 	//TODO: This will be removed by mai this week.
 	private var _learningDesignID:Number;			
 	private var _libraryActivityID:Number;		
 
 	private var _parentActivityID:Number;		
-	
-
 	private var _parentUIID:Number;		
 	
 
 	private var _orderID:Number;		
 	
-	private var _groupingID:Number;
+	private var _groupingID:Number;			
 	private var _groupingUIID:Number;
 	
 	
-	private var _title:String;						
-	private var _description:String;				
+	private var _title:String;					//*	
+	private var _description:String;			//*
 	private var _helpText:String;					
 	private var _xCoord:Number;
 	private var _yCoord:Number;
@@ -91,7 +89,11 @@ class org.lamsfoundation.lams.authoring.Activity {
 
 
 	private var _runOffline:Boolean;
+	/*
+	* these have now been removed, set in the tool content instead
 	private var _offlineInstructions:String;
+	private var _onlineInstructions:String;
+	*/
 	private var _defineLater:Boolean;
 	private var _createDateTime:Date;
 
@@ -186,7 +188,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 		dto.libraryActivityUIImage = (_libraryActivityUIImage) ?  _libraryActivityUIImage : Config.STRING_NULL_VALUE;
 		dto.applyGrouping= (_applyGrouping!=null) ?  _applyGrouping : Config.BOOLEAN_NULL_VALUE;
 		dto.runOffline= (_runOffline!=null) ?  _runOffline : Config.BOOLEAN_NULL_VALUE;
-		dto.offlineInstructions = (_offlineInstructions) ?  _offlineInstructions : Config.STRING_NULL_VALUE;
+		//dto.onlineInstructions = (_onlineInstructions) ?  _onlineInstructions: Config.STRING_NULL_VALUE;
+		//dto.offlineInstructions = (_offlineInstructions) ?  _offlineInstructions : Config.STRING_NULL_VALUE;
 		dto.defineLater= (_defineLater!=null) ?  _defineLater : Config.BOOLEAN_NULL_VALUE;
 		dto.createDateTime= (_createDateTime) ?  _createDateTime : Config.DATE_NULL_VALUE;
 		dto.groupingSupportType = (_groupingSupportType) ?  _groupingSupportType : Config.NUMERIC_NULL_VALUE;
@@ -216,7 +219,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 		n.libraryActivityUIImage = _libraryActivityUIImage;
 		n.applyGrouping = _applyGrouping;
 		n.runOffline = _runOffline;
-		n.offlineInstructions = _offlineInstructions;
+		//n.offlineInstructions = _offlineInstructions;
 		n.defineLater = _defineLater;
 		n.createDateTime = _createDateTime;
 		n.groupingSupportType = _groupingSupportType;
@@ -426,13 +429,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	}
 	public function get runOffline():Boolean{
 		return _runOffline;
-	}
-	
-	public function set offlineInstructions(a:String):Void{
-		_offlineInstructions = a;
-	}
-	public function get offlineInstructions():String{
-		return _offlineInstructions;
 	}
 	
 	public function set defineLater(a:Boolean):Void{

@@ -12,7 +12,7 @@ class org.lamsfoundation.lams.authoring.Transition {
 	//Transition properties
 	
 	private var _transitionID:Number;
-	private var _uiID:Number;
+	private var _transitionUIID:Number;
 	private var _fromActivityID:Number;
 	private var _fromUIID:Number;
 	private var _toActivityID:Number;
@@ -26,14 +26,16 @@ class org.lamsfoundation.lams.authoring.Transition {
 	private var _learningDesignID:Number;
 	
 	
-	function Transition(uiID,
+	function Transition(transitionUIID,
 						fromUIID,
 						toUIID,
 						learningDesignID){
-		_uiID = uiID;
+		_transitionUIID = transitionUIID;
 		_fromUIID = fromUIID;
 		_toUIID = toUIID;
 		_learningDesignID = learningDesignID;
+		
+		Debugger.log('Created a new transition, transitionUIID:'+transitionUIID,Debugger.GEN,'Constructor','Transition');
 		
 	}
 	
@@ -47,14 +49,13 @@ class org.lamsfoundation.lams.authoring.Transition {
 	public function toData():Object{
 		var dto:Object = new Object();
 		dto.transitionID = (_transitionID) ?  _transitionID : Config.NUMERIC_NULL_VALUE;
-		dto.uiID= (_uiID) ?  _uiID : Config.NUMERIC_NULL_VALUE;
+		dto.transitionUIID= (transitionUIID) ?  transitionUIID : Config.NUMERIC_NULL_VALUE;
 		dto.fromActivityID = (_fromActivityID) ?  _fromActivityID : Config.NUMERIC_NULL_VALUE;
 		dto.fromUIID = (_fromUIID) ?  _fromUIID : Config.NUMERIC_NULL_VALUE;
 		dto.toActivityID = (_toActivityID) ?  _toActivityID : Config.NUMERIC_NULL_VALUE;
 		dto.toUIID = (_toUIID) ?  _toUIID : Config.NUMERIC_NULL_VALUE;
 		dto.title = (_title) ?  _title : Config.STRING_NULL_VALUE;
 		dto.description = (_description) ?  _description : Config.STRING_NULL_VALUE;
-		 Debugger.log('Config.DATE_NULL_VALUE:' + Config.DATE_NULL_VALUE,Debugger.GEN,'toData','Canvas');
 		dto.createDateTime = (_createDateTime) ?  _createDateTime : Config.DATE_NULL_VALUE;
 		dto.learningDesignID = (_learningDesignID) ?  _learningDesignID : Config.NUMERIC_NULL_VALUE;
 		return dto;
@@ -65,11 +66,12 @@ class org.lamsfoundation.lams.authoring.Transition {
 	}
 	public function get transitionID():Number{
 		return _transitionID;
-	}	public function set uiID(a:Number):Void{
-		_uiID = a;
+	}	public function set transitionUIID(a:Number):Void{
+		_transitionUIID = a;
 	}
-	public function get uiID():Number{
-		return _uiID;
+	
+	public function get transitionUIID():Number{
+		return _transitionUIID;
 	}
 	
 	public function set fromActivityID(a:Number):Void{
