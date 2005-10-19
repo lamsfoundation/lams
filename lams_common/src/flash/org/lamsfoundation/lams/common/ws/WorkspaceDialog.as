@@ -64,7 +64,7 @@ class WorkspaceDialog extends MovieClip{
         delete this.onEnterFrame;
         
         //TODO DI 25/05/05 ID set as 1 is just a stub, selected id from dialog should replace
-        _selectedDesignId = 1;
+        //_selectedDesignId = 1;
         
         //Set up the treeview
         setUpTreeview();
@@ -76,7 +76,7 @@ class WorkspaceDialog extends MovieClip{
         Debugger.log('container=' + _container,Debugger.GEN,'init','org.lamsfoundation.lams.wsDialog');
 
         //Set the text on the labels
-        myLabel_lbl.text = 'text label';
+        myLabel_lbl.text = 'LD ID:';
         
         //Set the text for buttons
         ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
@@ -174,6 +174,8 @@ class WorkspaceDialog extends MovieClip{
     */
     private function ok(){
         trace('OK');
+		//set the selectedDesignId
+		_selectedDesignId = Number(input_txt.text);
        //If validation successful commit + close parent window
        //Fire callback with selectedId
        dispatchEvent({type:'okClicked',target:this});
