@@ -10,7 +10,7 @@ import org.lamsfoundation.lams.common.util.*
 * @see		   Activity
 */
 class ToolActivity extends Activity{
-	
+
 	private var _authoringURL:String;
 	private var _toolDisplayName:String;
 	
@@ -23,12 +23,58 @@ class ToolActivity extends Activity{
 	private var _supportsModeration:Boolean;
 	private var _supportsRunOffline:Boolean;
 	
-	
-	
 	function ToolActivity(activityUIID:Number){
 		super(activityUIID);
+		
+		_objectType = "ToolActivity";
+		
+		_activityTypeID = TOOL_ACTIVITY_TYPE;
 		//assign default values:
 		
+	}
+	
+	//todo ADD A VALIDATE() FUNCTION
+	
+	public function populateFromDTO(dto:Object):Void{
+			
+			//activity properties:
+			_activityTypeID = dto.activityTypeID;
+			_activityID = dto.activityID;
+			_activityCategoryID = dto.activityCategoryID;
+			_activityUIID = dto.activityUIID;
+			_learningLibraryID = dto.learningLibraryID;
+			_learningDesignID = dto.learningDesignID;
+			_libraryActivityID = dto.libraryActivityID;
+			_parentActivityID = dto.parentActivityID;
+			_parentUIID = dto.parentUIID
+			_orderID = dto.orderID
+			_groupingID = dto.groupingID;
+			_groupingUIID = dto.groupingUIID
+			_title = dto.title;
+			_description = dto.description;
+			_helpText =  dto.helpText;
+			_yCoord = dto.yCoord;
+			_xCoord = dto.xCoord;
+			_libraryActivityUIImage = dto.libraryActivityUIImage;
+			_applyGrouping = dto.applyGrouping;
+			_runOffline = dto.runOffline;
+			//now removed
+			//_offlineInstructions = dto.offlineInstructions;
+			//_onlineInstructions = dto.onlineInstructions;
+			_defineLater = dto.defineLater;
+			_createDateTime = dto.createDateTime;
+			_groupingSupportType = dto.groupingSupportType;
+			
+			//Toolactivity class props
+			_authoringURL = dto.authoringURL;
+			_toolDisplayName = dto.toolDisplayName;
+			_toolContentID = dto.toolContentID;
+			_toolID = dto.toolID;
+			_supportsContribute = dto.supportsContribute;
+			_supportsDefineLater = dto.supportsDefineLater;
+			_supportsModeration = dto.supportsRunOffline
+
+			//maybe return isValid();
 	}
 	
 	
@@ -40,10 +86,12 @@ class ToolActivity extends Activity{
 		dto.toolDisplayName = (_toolDisplayName) ?  _toolDisplayName: Config.STRING_NULL_VALUE;	
 		dto.toolContentID = (_toolContentID) ?  _toolContentID: Config.NUMERIC_NULL_VALUE;	
 		dto.toolID = (_toolID) ?  _toolID: Config.NUMERIC_NULL_VALUE;	
+		/* THESE are internal flags, not part of the design
 		dto.supportsContribute = (_supportsContribute!=null) ?  _supportsContribute: Config.BOOLEAN_NULL_VALUE;	
 		dto.supportsDefineLater = (_supportsDefineLater!=null) ?  _supportsDefineLater: Config.BOOLEAN_NULL_VALUE;	
 		dto.supportsModeration = (_supportsModeration!=null) ?  _supportsModeration: Config.BOOLEAN_NULL_VALUE;	
-		dto._supportsRunOffline = (_supportsRunOffline!=null) ?  _supportsRunOffline: Config.BOOLEAN_NULL_VALUE;	
+		dto.supportsRunOffline = (_supportsRunOffline!=null) ?  _supportsRunOffline: Config.BOOLEAN_NULL_VALUE;	
+		*/
 		return dto;
 	}
 	
@@ -74,7 +122,9 @@ class ToolActivity extends Activity{
 		n.libraryActivityUIImage = _libraryActivityUIImage;
 		n.applyGrouping = _applyGrouping;
 		n.runOffline = _runOffline;
-		n.offlineInstructions = _offlineInstructions;
+		//now removed
+		//n.offlineInstructions = _offlineInstructions;
+		//n.onlineInstructions = _onlineInstructions;
 		n.defineLater = _defineLater;
 		n.createDateTime = _createDateTime;
 		n.groupingSupportType = _groupingSupportType;
