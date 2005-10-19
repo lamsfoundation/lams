@@ -10,11 +10,14 @@ class MovieLoader {
 	private var _scope:Object;
 	private var _mcUrl:String;
 	private var _target_mc:MovieClip;
+
+	//TODO: Work out a way around this silly non cachable issue
+	public static var movieCache:Array;
 	
 
 	/**
 	 * Constructor  
-	 * @usage   var ml = new MovieLoader(_activity.libraryActivityUIImage,draw,this,_icon_mc);  
+	 * @usage   var ml = new MovieLoader(movieURL,fnToRunOnLoad,scopeObject,theTarget);  
 	 * @param   mcUrl 		URL of MovieCLip or JPEG to load
 	 * @param   fn			Funcation to call when onLoadInit
 	 * @param   scope   	Scope of function
@@ -38,6 +41,8 @@ class MovieLoader {
 	  public function onLoadInit(loaded_mc):Void{
 		  Debugger.log('mc:'+loaded_mc,Debugger.COMP,'onLoadInit','org.lamsfoundation.lams.common.util.MovieLoader');
 		  //Debugger.log('_fn:'+_fn,Debugger.COMP,'onLoadInit','org.lamsfoundation.lams.common.util.MovieLoader');
+		  //TODO: Make this actually cache the movie.
+		  MovieLoader.movieCache[_mcUrl] = loaded_mc;
 		  var myFn = Proxy.create(_scope,_fn,loaded_mc);
 		  myFn.call();
 		  //_fn.apply(_scope,[loaded_mc]);
@@ -56,7 +61,7 @@ class MovieLoader {
 				break;
 		}
 		
-		
+		//run the handler functions anyway
 		var myFn = Proxy.create(_scope,_fn,loaded_mc);
 		myFn.call();
 	}
