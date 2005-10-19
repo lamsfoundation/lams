@@ -170,7 +170,9 @@ public class ObjectExtractor {
 		// now process the "parts" of the learning design
 		parseActivities((Vector)table.get("activities"),learningDesign);
 		parseTransitions((Vector)table.get("transitions"),learningDesign);
-		calculateFirstActivity(WDDXProcessor.convertToInteger(table,"firstActivityUIID"),learningDesign);				
+
+		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
+		learningDesignDAO.update(learningDesign);
 
 		return learningDesign;	
 		}
@@ -205,12 +207,6 @@ public class ObjectExtractor {
 		learningDesign.setTransitions(set);
 		learningDesignDAO.update(learningDesign);
 	}
-	/**TODO This function has to be tested with real data*/
-	public void calculateFirstActivity(Integer firstID, LearningDesign design){		
-		Activity flashFirstActivity = activityDAO.getActivityByUIID(firstID,design);
-		design.setFirstActivity(flashFirstActivity);
-		learningDesignDAO.update(design);
-	}	
 	public Activity extractActivityObject(Hashtable activityDetails, LearningDesign design) throws WDDXProcessorConversionException, ObjectExtractorException {
 		
 		Integer activityTypeID = WDDXProcessor.convertToInteger(activityDetails, "activityTypeID");
