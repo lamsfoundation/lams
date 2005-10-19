@@ -243,35 +243,10 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
-	 		int mapSize=mapQuestionsContent.size();
-			mapQuestionsContent.put(new Long(++mapSize).toString(), "");
-			logger.debug("updated Questions Map size: " + mapQuestionsContent.size());
-			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-    		logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-    		
-    		McContent mcContent=createContent(request, mcAuthoringForm);
-    		logger.debug("mcContent: " + mcContent);
-    		
-    		/** iterate the questions Map and persist the questions into the DB*/
-    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
-    	    while (itQuestionsMap.hasNext()) {
-    	        Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
-    	        logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-    	        if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
-    	        {
-        	        McQueContent mcQueContent=  new McQueContent(pairs.getValue().toString(),
-           	        	 new Integer(pairs.getKey().toString()),
-          					 mcContent,
-          					 new HashSet(),
-          					 new HashSet()
-          					);
-        	        logger.debug("created mcQueContent: " + mcQueContent);
-           	        mcService.createMcQue(mcQueContent);    	        	
-    	        }
-    	    }
-       		
-    	    
-    		mcAuthoringForm.resetUserAction();
+	 		addQuestion(request, mcAuthoringForm, mapQuestionsContent);
+	 		logger.debug("after addQuestion");
+	 		
+    	    mcAuthoringForm.resetUserAction();
 	 		return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	else if (mcAuthoringForm.getRemoveQuestion() != null)
@@ -322,9 +297,28 @@ public class McAction extends DispatchAction implements McAppConstants
 			
 			Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
 			logger.debug("toolContentId:" + toolContentId);
+			
+			McContent mcContent=mcService.retrieveMc(toolContentId);
+			logger.debug("mcContent:" + mcContent);
+			
+			if (mcContent == null)
+			{
+				logger.debug("convenience add");
+				addQuestion(request, mcAuthoringForm, mapQuestionsContent);
+		 		logger.debug("after addQuestion");
+		 		mcContent=mcService.retrieveMc(toolContentId);
+		 		logger.debug("mcContent:" + mcContent);
+			}
+			logger.debug("mcContent uid :" + mcContent.getUid());
+			
+	    	McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(editableQuestionEntry, mcContent.getUid());
+	    	logger.debug("mcQueContent:" + mcQueContent);
 	    	
-			McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(editableQuestionEntry, toolContentId);
-			logger.debug("mcQueContent:" + mcQueContent);
+	    	request.getSession().setAttribute(SELECTED_QUESTION, mcQueContent.getQuestion());
+	    	logger.debug("SELECTED_QUESTION:" + request.getSession().getAttribute(SELECTED_QUESTION));
+	    	
+			request.getSession().setAttribute(SELECTED_QUESTION_CONTENT_UID, mcQueContent.getUid() );
+			logger.debug("SELECTED_QUESTION_CONTENT_UID:" + request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID));
 			
 			Map mapOptionsContent= new TreeMap(new McComparator());
 			logger.debug("initialized mapOptionsContent:" + mapOptionsContent);
@@ -334,15 +328,25 @@ public class McAction extends DispatchAction implements McAppConstants
 				/** hold all he options for this question*/
 				List list=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());
 		    	logger.debug("options list:" + list);
-
-		    	Iterator listIterator=list.iterator();
-		    	Long mapIndex=new Long(1);
-		    	while (listIterator.hasNext())
+		    	
+		    	if (list.size() == 0)
 		    	{
-		    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
-		    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
-		    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
-		    		mapIndex=new Long(mapIndex.longValue()+1);
+				 	logger.debug("empty options list: this is a new question content created by the user and has no options yet");
+					mapOptionsContent=(Map) request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT);
+				 	logger.debug("mapOptionsContent is the default options Map: " + mapOptionsContent);
+		    	}
+		    	else
+		    	{
+		    	 	logger.debug("not an empty options list");
+		    		Iterator listIterator=list.iterator();
+			    	Long mapIndex=new Long(1);
+			    	while (listIterator.hasNext())
+			    	{
+			    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+			    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+			    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+			    		mapIndex=new Long(mapIndex.longValue()+1);
+			    	}
 		    	}
 		    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
 				logger.debug("updated the Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
@@ -357,6 +361,7 @@ public class McAction extends DispatchAction implements McAppConstants
 				logger.debug("updated the Options Map with the default Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
 			}
 			
+			mcAuthoringForm.resetUserAction();
 			return (mapping.findForward(EDIT_OPTS_CONTENT));
 	 		
 	 	}
@@ -376,33 +381,25 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		int mapSize=mapOptionsContent.size();
 	 		mapOptionsContent.put(new Long(++mapSize).toString(), "");
 			logger.debug("updated mapOptionsContent Map size: " + mapOptionsContent.size());
-			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapQuestionsContent);
+			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
     		logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
     		
-    		McContent mcContent=createContent(request, mcAuthoringForm);
-    		logger.debug("mcContent: " + mcContent);
-    		
-    		/** iterate the questions Map and persist the questions into the DB*/
-    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
-    	    while (itQuestionsMap.hasNext()) {
-    	        Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
-    	        logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-    	        if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
-    	        {
-        	        McQueContent mcQueContent=  new McQueContent(pairs.getValue().toString(),
-           	        	 new Integer(pairs.getKey().toString()),
-          					 mcContent,
-          					 new HashSet(),
-          					 new HashSet()
-          					);
-        	        logger.debug("created mcQueContent: " + mcQueContent);
-           	        mcService.createMcQue(mcQueContent);    	        	
-    	        }
-    	    }
-       		
-    	    
-    		mcAuthoringForm.resetUserAction();
-						
+    		Long selectedQuestionContentUid=(Long) request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
+	 		logger.debug("selectedQuestionContentUid:" + selectedQuestionContentUid);
+	 		
+	 		McQueContent mcQueContent = mcService.retrieveMcQueContentByUID(selectedQuestionContentUid);
+			logger.debug("mcQueContent:" + mcQueContent);
+			
+	 		if (mcQueContent != null)
+	 		{
+	 			McOptsContent mcOptionsContent= new McOptsContent(false, "a sample answer", mcQueContent, new HashSet());
+	 			logger.debug("mcOptionsContent:" + mcOptionsContent);
+	 			mcService.saveMcOptionsContent(mcOptionsContent);
+	 			logger.debug("persisted a sample answer: " + mcOptionsContent);
+	 		}
+	 		
+	 		
+	 		mcAuthoringForm.resetUserAction();
 			return (mapping.findForward(EDIT_OPTS_CONTENT));
 	 	}
 	 	else if (mcAuthoringForm.getRemoveOption() != null)
@@ -413,10 +410,19 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		
 	 		String optionIndex =mcAuthoringForm.getOptionIndex();
 			logger.debug("optionIndex:" + optionIndex);
-						
+			
+			mcAuthoringForm.resetUserAction();			
 			return (mapping.findForward(EDIT_OPTS_CONTENT));
 	 	}
-	 	
+	 	else if (mcAuthoringForm.getDoneOptions() != null)
+	 	{
+	 		userAction="doneOptions";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		
+	 		mcAuthoringForm.resetUserAction();
+			return (mapping.findForward(LOAD_QUESTIONS));
+	 	}
 	 	
 	 	
 	 	mcAuthoringForm.resetUserAction();
@@ -627,6 +633,37 @@ public class McAction extends DispatchAction implements McAppConstants
     }
     
     
+    protected void addQuestion(HttpServletRequest request, McAuthoringForm mcAuthoringForm, Map mapQuestionsContent)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	int mapSize=mapQuestionsContent.size();
+    	mapQuestionsContent.put(new Long(++mapSize).toString(), "");
+    	logger.debug("updated Questions Map size: " + mapQuestionsContent.size());
+    	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+    	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+    	
+    	McContent mcContent=createContent(request, mcAuthoringForm);
+    	logger.debug("mcContent: " + mcContent);
+    	
+    	/** iterate the questions Map and persist the questions into the DB*/
+    	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+        while (itQuestionsMap.hasNext()) {
+            Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+            logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
+            {
+    	        McQueContent mcQueContent=  new McQueContent(pairs.getValue().toString(),
+       	        	 new Integer(pairs.getKey().toString()),
+      					 mcContent,
+      					 new HashSet(),
+      					 new HashSet()
+      					);
+    	        logger.debug("created mcQueContent: " + mcQueContent);
+       	        mcService.createMcQue(mcQueContent);    	        	
+            }
+        }
+    }
     
 
     /**

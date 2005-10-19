@@ -507,6 +507,22 @@ public class McServicePOJO implements
         }
 	}
     
+    
+    public void removeMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException
+    {
+    	try
+        {
+            mcOptionsContentDAO.removeMcOptionsContentByQueId(mcQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is removing by que id"
+                                                 + " the mc options content: "
+                                                 + e.getMessage(),e);
+        }
+    }
+    
+    
     public void deleteMcOptionsContentByUID(Long uid) throws McApplicationException
 	{
     	try

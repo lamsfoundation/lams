@@ -43,6 +43,8 @@ public interface IMcOptionsContentDAO
 	public void updateMcOptionsContent(McOptsContent mcOptionsContent);
 
 	public void removeMcOptionsContentByUID(Long uid);
+	
+	public void removeMcOptionsContentByQueId(Long mcQueContentId);
 		
 	public void removeMcOptionsContent(McOptsContent mcOptsContent);
         

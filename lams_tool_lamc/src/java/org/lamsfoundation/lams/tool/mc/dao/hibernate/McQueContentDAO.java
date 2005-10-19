@@ -47,7 +47,7 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
 	 	
-	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question and mcQueContent.mcContentId=:mcContentId";
+	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question and mcQueContent.mcContentId=:mcContentUid";
 	 		 	
 	 	
 	 	public McQueContent getMcQueContentByUID(Long uid)
@@ -72,12 +72,12 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	    }
 	 	
 	 	
-	 	public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentId)
+	 	public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid)
 	    {
 	        HibernateTemplate templ = this.getHibernateTemplate();
 			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT)
 				.setString("question", question)
-				.setLong("mcContentId", mcContentId.longValue())				
+				.setLong("mcContentUid", mcContentUid.longValue())				
 				.list();
 			
 			if(list != null && list.size() > 0){

@@ -73,7 +73,9 @@ public interface IMcService
 	
     public void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
     
-    public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentId);
+    public void removeMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
+    
+    public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
     
     public McSession retrieveMcSession(Long mcSessionId) throws McApplicationException;
     

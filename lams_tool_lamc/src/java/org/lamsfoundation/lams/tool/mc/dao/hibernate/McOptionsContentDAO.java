@@ -21,9 +21,12 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -81,6 +84,23 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	    	this.getHibernateTemplate().delete(mco);
 	    }
 		
+		
+		public void removeMcOptionsContentByQueId(Long mcQueContentId)
+	    {
+			HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+				.setLong(0,mcQueContentId.longValue())
+				.list();
+
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+		    		templ.delete(mcOptsContent);
+		    	}
+			}
+	    }
 				
 		
 		public void removeMcOptionsContent(McOptsContent mcOptsContent)

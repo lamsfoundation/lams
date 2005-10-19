@@ -240,36 +240,35 @@
 	   <!-- Make the WAR archive for deployment				 -->
 	   <!-- ================================================ -->	
 		
-	   <target name="lams-lamc11-war" depends="lams-lamc11-jar" description="creates war file">
-	   		<delete file="${build.lib}/${product}.war"/>	
-	   		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF"
-	   			 webxml="${conf.webinf.dir}/web.xml">
-	   			
-	   			<webinf dir="${conf.webinf.dir}">
-	   				<include name=".xml"/>
-	   				<include name="**/*.*"/>
-	   				<exclude name="web.xml"/>
-	   			</webinf>
+	<target name="lams-lamc11-war" depends="lams-lamc11-jar" description="creates war file">
+		   		<delete file="${build.lib}/${product}.war"/>	
+		   		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF"
+		   			 webxml="${conf.webinf.dir}/web.xml">
+		   			
+		   			<webinf dir="${conf.webinf.dir}">
+		   				<include name=".xml"/>
+		   				<include name="**/*.*"/>
+		   				<exclude name="web.xml"/>
+		   			</webinf>
 
-	   			<!-- <classes dir="${build.classes.java}"/>	 -->
-	   			
-	   			<fileset dir="${conf.web.dir}">
-						<include name="*"/>
-	   					<include name="author_page/**"/>
-				</fileset>
-				<!--
-	   			<fileset dir="${conf.includes.dir}">
-						<include name="*"/>
-				</fileset>
-	   			<fileset dir="${conf.template.dir}">
-						<include name="*"/>
-				</fileset>
-				-->
+		   			<!-- <classes dir="${build.classes.java}"/>	 -->
+		   			
+		   			<fileset dir="${conf.web.dir}">
+							<include name="*"/>
+		   					<include name="author_page/**"/>
+					</fileset>
+					<!--
+		   			<fileset dir="${conf.includes.dir}">
+							<include name="*"/>
+					</fileset>
+		   			<fileset dir="${conf.template.dir}">
+							<include name="*"/>
+					</fileset>
+					-->
 
-	   	   </war>
-	   	
-	   </target>
-	
+		   	   </war>
+		   	
+		   </target>	
 		<!-- =================================================================== -->
 		<!-- Deploy the jar and war                               -->
 		<!-- =================================================================== -->

@@ -101,6 +101,16 @@ MM_reloadPage(true);
 <h2>Edit Question Options</h2>
 <div id="formtablecontainer">
 					<table align=center> 	 
+					<tr>
+	 				 	<td colspan=2 align=left>								
+							<c:out value="${sessionScope.selectedQuestion}"/>					
+					  	</td>
+					</tr>
+					<tr>
+	 				 	<td colspan=2 align=left>								
+							&nbsp&nbsp
+					  	</td>
+					</tr>
 			  	 		<c:set var="optionIndex" scope="session" value="1"/>
 						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
 							  <c:if test="${optionEntry.key == 1}"> 			
@@ -134,7 +144,18 @@ MM_reloadPage(true);
 							</c:if> 			
 						</c:forEach>
 							<html:hidden property="optionIndex"/>
+	 				 <tr>
+	 				 	<td colspan=2 align=left>								
+							<html:submit property="doneOptions" styleClass="linkbutton" 
+							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+								<bean:message key="button.done"/>
+							</html:submit>	 				 		  										  		
+		 			  	</td>
+	 				 </tr>
 	 				</table> 	 
+	 				
+	 				
+	 				
 </div>
 <hr>
 <a href="javascript:;" class="button">Cancel</a>
