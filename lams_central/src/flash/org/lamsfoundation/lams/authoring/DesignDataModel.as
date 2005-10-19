@@ -3,9 +3,19 @@ import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.*;
 /*
 *
+* DesignDataModel stores all the data relating to the design
+* 
+* Note the hashtable of _activities might contain the following types:
+* 		1) ToolActivities
+* 		2) Grouping activities which reference a _groupings element
+* 		3) Parallel activities which reference 2 or more other _activitiy elements
+* 		4) Optional activities which reference 2 or more other _activitiy elements
+* 		5) Gate activities
+* 
+* 
 * @author      DC
 * @version     0.1
-* @comments    DesignDataModel stores a complete learning design
+*    
 */
 
 class org.lamsfoundation.lams.authoring.DesignDataModel {
@@ -20,28 +30,32 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 
 	private var _learningDesignID:Number;
-	private var _uiID:Number;
 	private var _title:String;
 	private var _description:String;
 	private var _helpText:String;
 	private var _version:String;
-	
 	private var _userID:Number;
-	private var _workspaceFolderID:Number;
-	private var _createDateTime:Date;
+	private var _duration:Number;
 	private var _readOnly:Boolean;
 	private var _validDesign:Boolean;
-	
 	private var _maxID:Number;
-	private var _firstID:Number;
+	private var _firstActivityID:Number;
+	private var _firstActivityUIID:Number;
+	private var _parentLearningDesignID:Number;
 	
 	private var _activities:Hashtable;
 	private var _transitions:Hashtable;
 	private var _groupings:Hashtable;
 	
 	
-    
-     
+	private var _licenseID:Number;
+	private var _licenseText:String;
+	private var _workspaceFolderID:Number;
+	private var _createDateTime:Date;
+	private var _lastModifiedDateTime:Date;
+	private var _dateReadOnly:Date;
+	
+	
     //Constructor
     function DesignDataModel(){
         //initialise the hashtables
@@ -49,12 +63,13 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_transitions = new Hashtable("_transitions");
 		
 		//set the defualts:
-		
 		_objectType = "LearningDesign";
 		_copyTypeID = COPY_TYPE_ID_AUTHORING;
 		_version = "1.1_beta";
 		_readOnly = false;
 		_validDesign = false;
+		
+		_userID = Config.getInstance().userID;
 		
     }
 	
@@ -103,7 +118,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function addTransition(transition:Transition):Boolean{
 		
 		Debugger.log('Transition from:'+transition.fromUIID+', to:'+transition.toUIID,4,'addActivity','DesignDataModel');
-		_transitions.put(transition.uiID,transition);
+		_transitions.put(transition.transitionUIID,transition);
 		
 		//TODO some validation would be nice
 		return true;
@@ -111,38 +126,6 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	
 	/**
-	* Clears the current design in the DDM. 
-	* @returns success
-	*/
-	public function clearDesign():Boolean{
-		var success:Boolean = false;
-		
-		//TODO:Validate if design is saved if not notify user
-		success = true;
-		_objectType = null;
-		_learningDesignID = null;
-		_title = null;
-		_description = null;
-		_helpText = null;
-		_version = null;
-	
-		_userID = null;
-		_workspaceFolderID = null;
-		_createDateTime = null;
-		_readOnly = null;
-		_validDesign = null;
-		
-		_maxID = null;
-		_firstID = null;
-		
-		_activities = new Hashtable("_activities");
-		_transitions = new Hashtable("_transitions");
-		
-		success = true;
-		
-		Debugger.log('Cleared design:'+success,Debugger.GEN,'clearDesign','DesignDataModel');
-		return success;
-	}	/**
 	 * Sets a new design for the DDM.
 	 * @usage   <DDM Instance>.setDesign(design:Object)
 	 * @param   design 
@@ -169,19 +152,32 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_validDesign = design.valid_design_flag;
 		
 		_maxID = design.max_id;
-		_firstID = design.first_id;
+		_firstActivityID = design.first_id;
 		
 		//set the activities in the hash table
 		for(var i=0; i<design.activities.length;i++){
 			//note if the design is being opened - then it must have ui_ids already
 			Debugger.log('Adding activity ID:'+design.activities[i].activityUIID,Debugger.GEN,'setDesign','DesignDataModel');
-			_activities.put(design.activities[i].activityUIID,design.activities[i]);
+			//TODO: we should be calling the constructor of these objects!
+			var dto = design.activities[i];
+			
+			//depending on the objectType call the relevent constructor.
+			if(dto.objectType = "ToolActivity"){
+				var newToolActivity:ToolActivity = new ToolActivity(dto.activityUIID);
+				newToolActivity.populateFromDTO(dto);				
+				_activities.put(newToolActivity.activityUIID,newToolActivity);
+			
+			}else if(dto.objectType = "ComplexActivity"){
+				
+			
+			}
 		}
 		
 		//set the activities in the hash table
 		for(var i=0; i<design.transitions.length;i++){
 			//note if the design is being opened - then it must have ui_ids already
 			Debugger.log('Adding transition ID:'+design.transitions[i].transitionUIID,Debugger.GEN,'setDesign','DesignDataModel');
+			//TODO: we should be calling the constructor of these objects!
 			_transitions.put(design.transitions[i].transitionUIID,design.transitions[i]);
 		}
 				
@@ -215,41 +211,33 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		//TODO: get this sorted - query string
 		Debugger.log('1 UserID:'+_userID,Debugger.GEN,'toData','DesignDataModel');
-		//design.userID = (_userID) ? _userID : 123;
-		if(_userID == undefined){
-			_userID = 4;
-		}
+		
 		
 		if(_copyTypeID == undefined){
 			_copyTypeID = COPY_TYPE_ID_AUTHORING;
 		}
 		
-		
-		
-		Debugger.log('2 UserID:'+_userID,Debugger.GEN,'toData','DesignDataModel');
-		//denull
-		Debugger.log('1 _objectType:'+_objectType,Debugger.GEN,'toData','DesignDataModel');
 		design.objectType = (_objectType) ? _objectType : Config.STRING_NULL_VALUE;
 		design.copyTypeID = (_copyTypeID) ? _copyTypeID : Config.NUMERIC_NULL_VALUE;
 		design.learningDesignID = (_learningDesignID) ? _learningDesignID : Config.NUMERIC_NULL_VALUE;
-		design.uiID = (_uiID) ? _uiID: Config.NUMERIC_NULL_VALUE;
 		design.title = _title ? _title : Config.STRING_NULL_VALUE;
 		design.description = (_description) ? _description : Config.STRING_NULL_VALUE;
 		design.helpText = (_helpText) ? _helpText : Config.STRING_NULL_VALUE;
 		design.version = (_version) ? _version : Config.STRING_NULL_VALUE;
-		
 		design.userID = (_userID) ? _userID : Config.NUMERIC_NULL_VALUE;
-		design.workspaceFolderID = (_workspaceFolderID) ? _workspaceFolderID : Config.NUMERIC_NULL_VALUE;
-		design.createDateTime = (_createDateTime) ? _createDateTime : Config.DATE_NULL_VALUE;
+		design.duration = (_duration) ? _duration: Config.NUMERIC_NULL_VALUE;
 		design.readOnly = (_readOnly!=null) ? _readOnly : Config.BOOLEAN_NULL_VALUE;
 		design.validDesign = (_validDesign!=null) ? _validDesign : Config.BOOLEAN_NULL_VALUE;
 		design.maxID = (_maxID) ? _maxID : Config.NUMERIC_NULL_VALUE;
-		design.firstID = (_firstID) ? _firstID : Config.NUMERIC_NULL_VALUE;
-		
-		
-		Debugger.log('3 design.userID:'+design.userID,Debugger.GEN,'toData','DesignDataModel');
-		Debugger.log('1 design.objectType:'+design.objectType,Debugger.GEN,'toData','DesignDataModel');
-		Debugger.log('1 design.copyTypeID:'+design.copyTypeID,Debugger.GEN,'toData','DesignDataModel');
+		design.firstActivityID = (_firstActivityID) ? _firstActivityID : Config.NUMERIC_NULL_VALUE;
+		design.firstActivityUIID = (_firstActivityUIID) ? _firstActivityUIID : Config.NUMERIC_NULL_VALUE;
+		design.parentLearningDesignID= (_parentLearningDesignID) ? _parentLearningDesignID: Config.NUMERIC_NULL_VALUE;
+		design.licenseID= (_licenseID) ? _licenseID: Config.NUMERIC_NULL_VALUE;
+		design.licenseText= (_licenseText) ? _licenseText: Config.STRING_NULL_VALUE;
+		design.workspaceFolderID = (_workspaceFolderID) ? _workspaceFolderID : Config.NUMERIC_NULL_VALUE;
+		design.createDateTime = (_createDateTime) ? _createDateTime : Config.DATE_NULL_VALUE;
+		design.lastModifiedDateTime= (_lastModifiedDateTime) ? _lastModifiedDateTime: Config.DATE_NULL_VALUE;
+		design.dateReadOnly = (_dateReadOnly) ? _dateReadOnly: Config.DATE_NULL_VALUE;
 		
 		
 		var classActs:Array = _activities.values();
@@ -399,12 +387,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function set maxID(a:Number):Void{
 		_maxID = a;
-	}	public function get firstID():Number{
-		return _firstID;
+	}	public function get firstActivityID():Number{
+		return _firstActivityID;
 	}
 	
-	public function set firstID(a:Number):Void{
-		_firstID = a;
+	public function set firstActivityID(a:Number):Void{
+		_firstActivityID = a;
 	}	public function get activities():Hashtable{
 		return _activities;
 	}
@@ -440,6 +428,131 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	}
 	
 	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newlastModifiedDateTime 
+	 * @return  
+	 */
+	public function set lastModifiedDateTime (newlastModifiedDateTime:Date):Void {
+		_lastModifiedDateTime = newlastModifiedDateTime;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get lastModifiedDateTime ():Date {
+		return _lastModifiedDateTime;
+	}
 	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newdateReadOnly 
+	 * @return  
+	 */
+	public function set dateReadOnly (newdateReadOnly:Date):Void {
+		_dateReadOnly = newdateReadOnly;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get dateReadOnly ():Date {
+		return _dateReadOnly;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newduration 
+	 * @return  
+	 */
+	public function set duration (newduration:Number):Void {
+		_duration = newduration;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get duration ():Number {
+		return _duration;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newfirstActivityUIID 
+	 * @return  
+	 */
+	public function set firstActivityUIID (newfirstActivityUIID:Number):Void {
+		_firstActivityUIID = newfirstActivityUIID;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get firstActivityUIID ():Number {
+		return _firstActivityUIID;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newlicenseID 
+	 * @return  
+	 */
+	public function set licenseID (newlicenseID:Number):Void {
+		_licenseID = newlicenseID;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get licenseID ():Number {
+		return _licenseID;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newlicenseText 
+	 * @return  
+	 */
+	public function set licenseText (newlicenseText:String):Void {
+		_licenseText = newlicenseText;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get licenseText ():String {
+		return _licenseText;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newparentLearningDesignID 
+	 * @return  
+	 */
+	public function set parentLearningDesignID (newparentLearningDesignID:Number):Void {
+		_parentLearningDesignID = newparentLearningDesignID;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get parentLearningDesignID ():Number {
+		return _parentLearningDesignID;
+	}
+
 	
 }
