@@ -79,6 +79,12 @@ class org.lamsfoundation.lams.common.util.Hashtable {
         return r;
     }
     
+	/**
+	 * Removes an element from the hashtable
+	 * @usage   
+	 * @param   o 
+	 * @return  the element being removed or null if its not found
+	 */
     public function remove(o) {
 		setBusy();
 
