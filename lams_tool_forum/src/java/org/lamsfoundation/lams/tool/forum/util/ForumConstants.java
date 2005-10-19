@@ -9,10 +9,15 @@ package org.lamsfoundation.lams.tool.forum.util;
  */
 public interface ForumConstants {
     public final static int MAX_FILE_SIZE = 250 * 1000;
-   
-    public final static String FORUM_MANAGER = "forumManager";
+    public final static String FORUM_SERVICE = "forumService";
+    
     public final static String CONTENT_HANDLER = "toolContentHandler";
 
-	public static final String TOOL_CONTENT_ID = "toolContentID";
+	public static final String TOOL_CONTENT_ID = "contentId";
     
+	public static final String AUTHORING_DTO = "authoring";
+	public static final String AUTHORING_TOPICS = "topics";
+	public static final String AUTHORING_TOPICS_LIST = "topicList";
+	public static final String AUTHORING_ATTACHMENT = "attachment";
+	public static final String DEFAULT_TITLE = "Forum";
 }

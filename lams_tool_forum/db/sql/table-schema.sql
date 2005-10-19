@@ -33,7 +33,7 @@ create table tl_lafrum11_forum (
    offline_instructions varchar(255),
    content_in_use bit,
    define_later bit,
-   content_id bigint,
+   content_id bigint unique,
    primary key (uid)
 );
 create table tl_lafrum11_forum_user (

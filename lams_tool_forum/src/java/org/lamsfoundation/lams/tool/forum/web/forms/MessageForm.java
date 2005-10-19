@@ -5,6 +5,7 @@ import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionError;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
 /**
@@ -12,25 +13,23 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
  * 	Message Form.
  *	@struts.form name="messageForm"
  *
- * Created by IntelliJ IDEA.
  * User: conradb
  * Date: 10/06/2005
  * Time: 15:44:47
- * To change this template use File | Settings | File Templates.
  */
 public class MessageForm extends ValidatorForm {
+	private static Logger logger = Logger.getLogger(ForumForm.class.getName());
     protected Message message;
     protected Long forumId;
     protected Long parentId;
     protected Long topicId;
-    private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
     public MessageForm() {
-        this.message = new Message();
+    	message = new Message();
     }
 
     public void setMessage(Message message) {
-        this.message = message;
+    	this.message = message;
     }
 
     public Message getMessage() {

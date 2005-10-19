@@ -15,28 +15,17 @@
 		at the top of the page
 	-->
 	<definition name="tiles:layout" path="/includes/layout.jsp">
-    	<put name="pageIcon" value="icon_settings_s.gif"/>
     	<put name="pageTitleKey" value=""/>
     	<put name="body" value=""/>
     	<put name="header" value="/includes/header.jsp"/>
     	<put name="footer" value="/includes/footer.jsp"/>
 	</definition>
 
-    <definition name="tiles:/authoring/forum/create" path="/includes/tabsLayout.jsp" >
-       	<put name="pageIcon" value="icon_settings_s.gif"/>
-       	<put name="pageTitleKey" value="title.forum.add"/>
-        <put name="selectedIndex" value="0" />
-        <put name="parameterName" value="selected" />
-        <put name="actionName" value="/authoring/forum/create.do" />
-        <put name="header" value="/includes/header.jsp"/>
-        <put name="footer" value="/includes/footer.jsp"/>
-        <putList name="tabList" >
-            <item value="Basic" link="/jsps/authoring/forum/basic.jsp" classtype="org.apache.struts.tiles.beans.SimpleMenuItem" />
-            <item value="Advanced" link="/jsps/authoring/forum/advanced.jsp" classtype="org.apache.struts.tiles.beans.SimpleMenuItem" />
-            <item value="Instructions" link="/jsps/authoring/forum/instructions.jsp" classtype="org.apache.struts.tiles.beans.SimpleMenuItem" />
-        </putList>
-    </definition>
-
+    <definition name="tiles:/authoring/forum/newTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.add"/>
+    	<put name="body" value="/jsps/authoring/message/create.jsp"/>
+	</definition>
+	
     <definition name="tiles:/authoring/forum/edit" path="/includes/tabsLayout.jsp" >
        	<put name="pageIcon" value="icon_settings_s.gif"/>
        	<put name="pageTitleKey" value="title.forum.edit"/>
@@ -81,11 +70,6 @@
 	<definition name="tiles:/authoring/forum/success" extends="tiles:layout">
     	<put name="pageTitleKey" value="title.forum.delete"/>
     	<put name="body" value="/jsps/authoring/forum/success.jsp"/>
-	</definition>
-
-    <definition name="tiles:/authoring/forum/newTopic" extends="tiles:layout">
-    	<put name="pageTitleKey" value="title.message.add"/>
-    	<put name="body" value="/jsps/authoring/message/create.jsp"/>
 	</definition>
 
 

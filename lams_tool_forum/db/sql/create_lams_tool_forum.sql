@@ -1,39 +1,67 @@
+SET FOREIGN_KEY_CHECKS=0;
 create table tl_lafrum11_attachment (
-   UUID bigint not null auto_increment,
-   VERSION bigint,
+   uid bigint not null auto_increment,
+   version_id bigint,
    type varchar(255),
-   NAME varchar(255),
-   forum bigint,
-   primary key (UUID)
+   file_name varchar(255),
+   uuid bigint,
+   forum_uid bigint,
+   message_uid bigint,
+   primary key (uid)
 );
 create table tl_lafrum11_forum (
-   UUID bigint not null auto_increment,
-   CREATED datetime,
-   UPDATED datetime,
-   CREATEDBY bigint,
-   TITLE varchar(255),
-   ALLOWANNOMITY bit,
-   FORCEOFFLINE bit,
-   LOCKWHENFINISHED bit,
-   INSTRUCTIONS varchar(255),
-   ONLINEINSTRUCTIONS varchar(255),
-   OFFLINEINSTRUCTIONS varchar(255),
-   primary key (UUID)
+   uid bigint not null auto_increment,
+   create_date datetime,
+   update_date datetime,
+   create_by bigint,
+   title varchar(255),
+   allow_anonym bit,
+   run_offline bit,
+   lock_on_finished bit,
+   instructions varchar(255),
+   online_instructions varchar(255),
+   offline_instructions varchar(255),
+   content_in_use bit,
+   define_later bit,
+   content_id bigint,
+   primary key (uid)
+);
+create table tl_lafrum11_forum_user (
+   uid bigint not null auto_increment,
+   user_id bigint,
+   status bit,
+   full_name varchar(255),
+   user_name varchar(255),
+   primary key (uid)
 );
 create table tl_lafrum11_message (
-   UUID bigint not null auto_increment,
-   CREATED datetime,
-   UPDATED datetime,
-   CREATEDBY bigint,
-   MODIFIEDBY bigint,
-   SUBJECT varchar(255),
-   BODY text,
-   ISAUTHORED bit,
-   ISANNONYMOUS bit,
-   FORUM bigint,
-   parent bigint,
-   primary key (UUID)
+   uid bigint not null auto_increment,
+   create_date datetime,
+   update_date datetime,
+   create_by bigint,
+   modified_by bigint,
+   subject varchar(255),
+   body text,
+   is_authored bit,
+   is_anonymous bit,
+   forum_session_uid bigint,
+   user_uid bigint,
+   parent_uid bigint,
+   primary key (uid)
 );
-alter table tl_lafrum11_attachment add index FK389AD9A29EAD680D (forum), add constraint FK389AD9A29EAD680D foreign key (forum) references tl_lafrum11_forum (UUID);
-alter table tl_lafrum11_message add index FK4A6067E8F7440FBC (parent), add constraint FK4A6067E8F7440FBC foreign key (parent) references tl_lafrum11_message (UUID);
-alter table tl_lafrum11_message add index FK4A6067E89EAD680D (FORUM), add constraint FK4A6067E89EAD680D foreign key (FORUM) references tl_lafrum11_forum (UUID);
+create table tl_lafrum11_tool_session (
+   uid bigint not null auto_increment,
+   session_end_date datetime,
+   session_start_date datetime,
+   status integer,
+   forum_uid bigint,
+   session_id bigint,
+   primary key (uid)
+);
+alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
+alter table tl_lafrum11_attachment add index FK389AD9A2131CE31E (forum_uid), add constraint FK389AD9A2131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
+alter table tl_lafrum11_message add index FK4A6067E824089E4D (parent_uid), add constraint FK4A6067E824089E4D foreign key (parent_uid) references tl_lafrum11_message (uid);
+alter table tl_lafrum11_message add index FK4A6067E8C6FF3C72 (forum_session_uid), add constraint FK4A6067E8C6FF3C72 foreign key (forum_session_uid) references tl_lafrum11_tool_session (uid);
+alter table tl_lafrum11_message add index FK4A6067E8B0A7E6B3 (user_uid), add constraint FK4A6067E8B0A7E6B3 foreign key (user_uid) references tl_lafrum11_forum_user (uid);
+alter table tl_lafrum11_tool_session add index FK5A04D7AE131CE31E (forum_uid), add constraint FK5A04D7AE131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
+SET FOREIGN_KEY_CHECKS=1;

@@ -160,11 +160,5 @@
         <query name="allMessages"><![CDATA[
             from Message message
         ]]></query>
-        <query name="allAuthoredMessagesOfForum"><![CDATA[
-            from Message message where message.forum.id = ? AND message.isAuthored = true
-        ]]></query>
-        <query name="allMessagesByForum"><![CDATA[
-            from Message message where message.forum = ?
-        ]]></query>
 
 </hibernate-mapping>

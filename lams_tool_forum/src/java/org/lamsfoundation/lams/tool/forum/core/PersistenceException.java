@@ -1,15 +1,15 @@
 package org.lamsfoundation.lams.tool.forum.core;
 
 /**
- * Created by IntelliJ IDEA.
  * User: conradb
  * Date: 6/06/2005
  * Time: 10:51:43
- * To change this template use File | Settings | File Templates.
  */
-public class PersistenceException extends Exception {
+public class PersistenceException extends RuntimeException {
 
-    public PersistenceException(String message) {
+	private static final long serialVersionUID = 3903937111808861090L;
+
+	public PersistenceException(String message) {
         super(message);
     }
 

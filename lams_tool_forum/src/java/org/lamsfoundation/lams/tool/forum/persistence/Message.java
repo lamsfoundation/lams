@@ -12,8 +12,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @hibernate.class table="tl_lafrum11_message"
  *
  * @hibernate.query name="allMessages" query="from Message message"
- * @hibernate.query name="allAuthoredMessagesOfForum" query="from Message message where message.forum.id = ? AND message.isAuthored = true"
- * @hibernate.query name="allMessagesByForum" query="from Message message where message.forum = ?"
  */
 public class Message {
 	private Long uid;
@@ -21,16 +19,17 @@ public class Message {
 	private String body;
 	private boolean isAuthored;
 	private boolean isAnonymous;
-	private Message parent;
-	private Set replies;
+
 	private ToolSession toolSession;
+	private Message parent;
 	private ForumUser learner;
+	private Set replies;
+	private Set attachments;
 	
-	protected Date created;
-	protected Date updated;
-  	protected Long createdBy;
-    protected Long modifiedBy;
-  	private Set attachments;
+	private Date created;
+	private Date updated;
+	private Long createdBy;
+	private Long modifiedBy;
 
 	/**
 	 * Returns the object's creation date

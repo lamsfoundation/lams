@@ -23,7 +23,7 @@
 <body onLoad="initTabs();showTab('<c:out value='${currentTab}'/>');">
 
 <html:form action="authoring" method="post"	 enctype="multipart/form-data">
-		<html:hidden property="toolContentID"/>
+		<html:hidden property="contentId"/>
 		<html:hidden  property="currentTab" styleId="currentTab"/>
 
 <!-- start tabs -->
@@ -66,7 +66,6 @@
   </tr>
 </table>
     <!-- end tab buttons -->
-
 
 	<%@ include file="basic.jsp"%>
 	<%@ include file="instructions.jsp"%>

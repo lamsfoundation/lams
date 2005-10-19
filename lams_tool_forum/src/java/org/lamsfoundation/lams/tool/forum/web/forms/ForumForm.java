@@ -17,27 +17,22 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
  * 	Message Form.
  *	@struts.form name="forumForm"
  *
- *  Created by IntelliJ IDEA.
  * User: conradb
  * Date: 10/06/2005
  * Time: 15:44:36
- * To change this template use File | Settings | File Templates.
  */
 public class ForumForm extends ValidatorForm {
-    protected Forum forum;
+	private static final long serialVersionUID = -6054354910960460120L;
+    private int currentTab;
     private FormFile offlineFile;
     private FormFile onlineFile;
-    protected Map attachments;
-    protected boolean lockWhenFinished;
-    protected boolean forceOffline;
-    protected boolean allowAnnomity;
+    private Forum forum;
 
     private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
     public ForumForm() {
         this.forum = new Forum();
         this.forum.setTitle("New Forum");
-        this.attachments = new HashMap();
     }
 
     public void setForum(Forum forum) {
@@ -64,37 +59,6 @@ public class ForumForm extends ValidatorForm {
         return offlineFile;
     }
 
-    public boolean getAllowAnnomity() {
-        return allowAnnomity;
-    }
-
-    public void setAllowAnnomity(boolean allowAnnomity) {
-        this.allowAnnomity = allowAnnomity;
-    }
-
-    public boolean getLockWhenFinished() {
-        return lockWhenFinished;
-    }
-
-    public void setLockWhenFinished(boolean lockWhenFinished) {
-        this.lockWhenFinished = lockWhenFinished;
-    }
-
-    public boolean getForceOffline() {
-        return forceOffline;
-    }
-
-    public void setForceOffline(boolean forceOffline) {
-        this.forceOffline = forceOffline;
-    }
-
-    public void setAttachments(Map attachments) {
-        this.attachments = attachments;
-    }
-
-    public Map getAttachments() {
-        return this.attachments;
-    }
 
     private float convertToMeg( int numBytes ) {
         return numBytes != 0 ? numBytes / 1024 / 1024 : 0;
@@ -125,4 +89,11 @@ public class ForumForm extends ValidatorForm {
         return errors;
     }
 
+	public int getCurrentTab() {
+		return currentTab;
+	}
+
+	public void setCurrentTab(int currentTab) {
+		this.currentTab = currentTab;
+	}
 }

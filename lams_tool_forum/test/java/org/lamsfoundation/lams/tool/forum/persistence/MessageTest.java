@@ -51,8 +51,8 @@ public class MessageTest extends TestCase {
         //load
         Message reloaded = (Message) messageDao.getById(message.getUid());
         //just because MySQL will wrap millisecond to zero. it is nonsesnce to compare data at this care.
-        message.setCreated(reloaded.created);
-        message.setUpdated(reloaded.updated);
+        message.setCreated(reloaded.getCreated());
+        message.setUpdated(reloaded.getUpdated());
         assertEquals("reloaded message not equal", message, reloaded);
         assertEquals("reloaded message body should be: Test Message", "Test Message", reloaded.getBody());
         assertEquals("reloaded message Subject should be: Test Message", "Test Message", reloaded.getSubject());
@@ -75,8 +75,8 @@ public class MessageTest extends TestCase {
         messageDao.saveOrUpdate(message2);
         Message reloaded2 = (Message) messageDao.getById(message2.getUid());
         //just because MySQL will wrap millisecond to zero. it is nonsesnce to compare data at this care.
-        message2.setCreated(reloaded2.created);
-        message2.setUpdated(reloaded2.updated);
+        message2.setCreated(reloaded2.getCreated());
+        message2.setUpdated(reloaded2.getUpdated());
 
         assertEquals("reloaded message not equal", message2, reloaded2);
         assertEquals("reloaded message body should be: Test Message", "Test Message2", reloaded2.getBody());

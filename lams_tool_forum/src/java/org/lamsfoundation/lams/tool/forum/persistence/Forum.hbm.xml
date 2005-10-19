@@ -147,6 +147,7 @@
             update="true"
             insert="true"
             column="content_id"
+            unique="true"
         />
 
         <!--
@@ -159,6 +160,9 @@
 
         <query name="allForums"><![CDATA[
             from Forum forum
+        ]]></query>
+        <query name="forumByContentId"><![CDATA[
+            from Forum forum where forum.contentId=?
         ]]></query>
 
 </hibernate-mapping>

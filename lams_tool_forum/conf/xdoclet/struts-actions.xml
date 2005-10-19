@@ -1,225 +1,131 @@
-	 <!-- ========== Action Mapping Definitions ============================== -->
-
-    <action path="/index"
-		type="org.apache.struts.actions.ForwardAction" parameter="tiles:/layout" />
-
-	<action path="/error"
-		type="org.apache.struts.actions.ForwardAction"
-		parameter="tiles:/error" />
-
-	<action path="/blank"
-		type="org.apache.struts.actions.ForwardAction"
-		parameter="tiles:/blank" />
-
-      	<!-- Forum  related actions -->
-    <action
-      path="/authoring"
-      type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-      name="forumForm"
-      scope="request"
-      input="/authoring/authoring.jsp"
-      parameter="action"
-      unknown="false"
-      validate="true"
-	>
-      <forward
-        name="success"
-        path="/authoring/success.jsp"
-        redirect="false"
-      />
-    </action>
-    
-	    <action path="/authoring/forum/create"
-		    type="org.apache.struts.actions.ForwardAction" parameter="tiles:/authoring/forum/create" />
-
-	    <action path="/authoring/forum/edit"
-		    type="org.apache.struts.actions.ForwardAction" parameter="tiles:/authoring/forum/edit" />
-
-        <action    path="/authoring/forum/instructions"
-        	type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			name="forumForm"
-			validate="true"
-            input="/authoring/forum/create.do?selected=2"
-			parameter="instructions"
-			scope="session">
-            <forward name="success"		path="/authoring/forum/create.do?selected=2"/>
-        </action>
-
-
-        <action    path="/authoring/forum/editInstructions"
-            type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-            name="forumForm"
-            validate="true"
-            input="/authoring/forum/edit.do?selected=2"
-            parameter="instructions"
-            scope="session">
-            <forward name="success"		path="/authoring/forum/edit.do?selected=2"/>
-        </action>
-
-        <action    path="/authoring/forum/advanced"
-        	type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			name="forumForm"
-			validate="true"
-            input="/authoring/forum/create.do?selected=1"
-			parameter="advanced"
-			scope="session">
-            <forward name="success"		path="/authoring/forum/create.do?selected=1"/>
-        </action>
-
-        <action    path="/authoring/forum/editAdvanced"
-        	type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			name="forumForm"
-			validate="true"
-            input="/authoring/forum/edit.do?selected=1"
-			parameter="advanced"
-			scope="session">
-            <forward name="success"		path="/authoring/forum/edit.do?selected=1"/>
-        </action>
-
-        <action    path="/authoring/forum/createForum"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			name="forumForm"
-			validate="true"
-            input="tiles:/authoring/forum/create"
-			parameter="createForum"
-			scope="session">
-            <forward name="success"		path="tiles:/authoring/forum/edit"/>
-        </action>
-
-        <action    path="/authoring/forum/getForum"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			parameter="getForum"
-			scope="session">
-            <forward name="success"		path="tiles:/authoring/forum/edit"/>
-        </action>
-
-		<action    path="/authoring/forum/editForum"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			name="forumForm"
-			validate="true"
-            input="/authoring/forum/edit.do"
-			parameter="editForum"
-			scope="session">
-			<forward name="success"		path="/authoring/forum/edit.do"/>
+		<!-- ========== Action Mapping Definitions ============================== -->
+		
+		<!-- ========== BEGIN: Authroing Definitions ============================== -->
+		<action path="/authoring/init"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			parameter="initPage" >
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
 		</action>
 
-        <action    path="/authoring/forum/deleteAttachment"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			name="forumForm"
-			validate="true"
-			parameter="deleteAttachment"
-			scope="session">
-            <forward name="success"		path="/authoring/forum/create.do?selected=2"/>
-        </action>
+		<action path="/authoring/update"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			name="forumForm" 
+			scope="request" 
+			parameter="updateContent" 
+			validate="false">
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+		</action>
 
-        <action    path="/authoring/forum/edit/deleteAttachment"
+		<action path="/authoring/uploadOnline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			name="forumForm" 
+			scope="request" 
+			parameter="uploadOnline" 
+			validate="false">
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+		</action>
+		
+		<action path="/authoring/uploadOffline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			name="forumForm" 
+			scope="request" 
+			parameter="uploadOffline" 
+			validate="false">
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+		</action>
+		
+		<action path="/authoring/deleteOnline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			parameter="deleteOnline" >
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+		</action>
+		
+		<action path="/authoring/deleteOffline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			parameter="deleteOffline" >
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+		</action>
+						
+		<action path="/authoring/newTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			name="forumForm"
-			validate="true"
-			parameter="deleteAttachment"
-			scope="session">
-            <forward name="success"		path="/authoring/forum/edit.do?selected=2"/>
-        </action>
-
-	    <action path="/authoring/forum/newTopic"
-		    type="org.apache.struts.actions.ForwardAction" parameter="tiles:/authoring/forum/newTopic" />
-
-		<action    path="/authoring/forum/createTopic"
+			parameter="newTopic">
+			<forward name="success" path="tiles:/authoring/forum/newTopic" />
+		</action>
+		
+		<action path="/authoring/createTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			name="messageForm"
+			name="messageForm" 
 			validate="true"
-            input="tiles:/authoring/forum/newTopic"
+			input="tiles:/authoring/forum/newTopic" 
 			parameter="createTopic"
 			scope="request">
-            <forward name="success"		path="tiles:/authoring/forum/create"/>
+			<forward name="success" path="/authoring/forum/newTopic" />
 		</action>
-
-        <action    path="/authoring/forum/deleteTopic"
+		
+		<action path="/authoring/deleteTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-            input="tiles:/authoring/forum/create"
+			input="tiles:/authoring/forum/create" 
 			parameter="deleteTopic"
-            scope="request">
-            <forward name="success"		path="tiles:/authoring/forum/create"/>
-        </action>
-
-        <action    path="/authoring/forum/edit/deleteTopic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-            input="tiles:/authoring/forum/create"
-			parameter="deleteTopic"
-            scope="request">
-            <forward name="success"		path="tiles:/authoring/forum/edit"/>
-        </action>
-
-        <action    path="/authoring/forum/getForum"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			validate="true"
-			parameter="getForum"
 			scope="request">
-			<forward name="success"		path="tiles:/authoring/forum/edit"/>
 		</action>
-
-		<action    path="/authoring/forum/delete"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			parameter="deleteForum"
-			scope="request">
-			<forward name="success"		path="titles:/authoring/forum/success"/>
-		</action>
-
+		
+		<!-- ========== END: Authroing Definitions ============================== -->
+		
 		<!-- Message related actions -->
-
-    	<action    path="/learning/forum/open"
+		
+		<action path="/learning/forum/open"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			parameter="openForum"
-			scope="request">
-			<forward name="success"		path="tiles:/learning/forum/open"/>
+			parameter="openForum" scope="request">
+			<forward name="success" path="tiles:/learning/forum/open" />
 		</action>
-
-    	<action    path="/learning/message/openTopic"
+		
+		<action path="/learning/message/openTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			parameter="openTopic"
-			scope="request">
-			<forward name="success"		path="tiles:/learning/message/open"/>
+			parameter="openTopic" scope="request">
+			<forward name="success" path="tiles:/learning/message/open" />
 		</action>
-
-    	<action    path="/learning/message/getMessage"
+		
+		<action path="/learning/message/getMessage"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			parameter="getMessage"
-			scope="request">
-			<forward name="success"		path="tiles:/learning/message/getMessage"/>
+			parameter="getMessage" scope="request">
+			<forward name="success" path="tiles:/learning/message/getMessage" />
 		</action>
-
-    	<action    path="/learning/message/post"
-		     type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			parameter="post"
-			scope="request">
-			<forward name="success"		path="tiles:/learning/message/post"/>
-		</action>
-
-		<action    path="/learning/message/reply"
+		
+		<action path="/learning/message/post"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			name="messageForm"
-			validate="true"
-			input="tiles:/learning/message/post"
-			parameter="reply"
-			scope="request">
-			<forward name="success"		path="/learning/message/openTopic.do"/>
+			parameter="post" scope="request">
+			<forward name="success" path="tiles:/learning/message/post" />
 		</action>
-
-		<action    path="/learning/message/editMessage"
+		
+		<action path="/learning/message/reply"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			name="messageForm"
-			validate="true"
-			input="tiles:/learning/message/getMessage"
-			parameter="editMessage"
-			scope="request">
-			<forward name="success"		path="/learning/message/openTopic.do"/>
+			name="messageForm" validate="true" input="tiles:/learning/message/post"
+			parameter="reply" scope="request">
+			<forward name="success" path="/learning/message/openTopic.do" />
 		</action>
-
-		<action    path="/learning/message/delete"
+		
+		<action path="/learning/message/editMessage"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			name="messageForm" validate="true"
+			input="tiles:/learning/message/getMessage" parameter="editMessage"
+			scope="request">
+			<forward name="success" path="/learning/message/openTopic.do" />
+		</action>
+		
+		<action path="/learning/message/delete"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			parameter="deleteMessage"
-			scope="request">
-			<forward name="success"		path="/learing/message/open.do"/>
+			parameter="deleteMessage" scope="request">
+			<forward name="success" path="/learing/message/open.do" />
 		</action>
-
-
+		
+				
+		<!-- System level actions -->
+		<action path="/index" type="org.apache.struts.actions.ForwardAction"
+			parameter="tiles:/layout" />
+		
+		<action path="/error" type="org.apache.struts.actions.ForwardAction"
+			parameter="tiles:/error" />
+		
+		<action path="/blank" type="org.apache.struts.actions.ForwardAction"
+			parameter="tiles:/blank" />
+				

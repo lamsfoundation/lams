@@ -285,7 +285,7 @@
 	<!-- =================================================================== -->
 	<!-- Generate the deploy package                                         -->
 	<!-- =================================================================== -->
-	<target name="create-deploy-package" depends="build-war" 
+	<target name="create-deploy-package" depends="build-war,jar" 
 		description="Generate the deployment package.">
 
 		<echo>+------------------------------------------+</echo>

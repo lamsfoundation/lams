@@ -52,8 +52,8 @@ public class ForumTest extends TestCase {
         //load
         Forum reloaded = (Forum) dao.getById(entity.getUid());
         //just because MySQL will wrap millisecond to zero. it is nonsesnce to compare data at this care.
-        entity.setCreated(reloaded.created);
-        entity.setUpdated(reloaded.updated);
+        entity.setCreated(reloaded.getCreated());
+        entity.setUpdated(reloaded.getUpdated());
         assertEquals("reloaded object not equal", entity, reloaded);
         assertEquals("date difference in database and memory", entity.getCreated().getTime()/1000, reloaded.getCreated().getTime()/1000);
         assertEquals("date difference in database and memory", entity.getUpdated().getTime()/1000, reloaded.getUpdated().getTime()/1000);

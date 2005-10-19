@@ -1,5 +1,7 @@
 package org.lamsfoundation.lams.tool.forum.service;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -7,6 +9,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.ICredentials;
+import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.LoginException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
+import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -18,21 +34,26 @@ import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageDao;
+import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
+import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
 
+
 /**
- * Created by IntelliJ IDEA.
- * User: conradb
- * Date: 8/06/2005
- * Time: 15:13:54
- * To change this template use File | Settings | File Templates.
+ * 
+ * @author Steve.Ni
+ * 
+ * @version $Revision$
  */
 public class ForumService implements IForumService,ToolContentManager,ToolSessionManager {
 	private ForumDao forumDao;
 	private AttachmentDao attachmentDao;
 	private MessageDao messageDao;
+	private ForumToolContentHandler toolContentHandler;
+	private IRepositoryService repositoryService;
 	
     public Forum createForum(Forum forum, Map attachments, Map topics) throws PersistenceException {
         if (attachments != null && attachments.size() !=0) {
@@ -101,6 +122,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         return (Forum) forumDao.getById(forumId);
     }
 
+	public Forum getForumByContentId(Long contentID)  throws PersistenceException {
+		return (Forum) forumDao.getByContentId(contentID);
+	}
     public void deleteForum(Long forumId) throws PersistenceException {
         Forum forum = this.getForum(forumId);
         forumDao.delete(forum);
@@ -210,5 +234,135 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	}
 
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+	}
+
+	public Attachment uploadInstructionFile(Long contentId, FormFile uploadFile, String fileType) {
+		Attachment refile = null;
+		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
+			throw new ForumException("Could not find upload file: " + uploadFile);
+		
+        Forum content = getForum(contentId);
+        if ( content == null || !contentId.equals(content.getContentId())) {
+        	content  = new Forum();
+        	content.setContentId(contentId);
+        	//user firstly upload file without any other input, even the not-null 
+        	//field "title". Set title as default title.
+        	content.setTitle(ForumConstants.DEFAULT_TITLE);
+        }
+		NodeKey nodeKey = processFile(uploadFile,fileType);
+		
+		Set fileSet = content.getAttachments();
+		if(fileSet == null){
+			fileSet = new HashSet();
+			content.setAttachments(fileSet);
+		}
+		Attachment file = new Attachment();
+		file.setType(fileType);
+		file.setUid(nodeKey.getUuid());
+		file.setVersionId(nodeKey.getVersion());
+		file.setFileName(uploadFile.getFileName());
+		fileSet.add(file);
+		forumDao.saveOrUpdate(content);
+		
+		refile = new Attachment();
+		try {
+			PropertyUtils.copyProperties(refile,file);
+		} catch (Exception e) {
+			throw new ForumException("Could not get return InstructionFile instance" +e.getMessage());
+		}
+		return refile;
+
+	}
+    /**
+     * Process an uploaded file.
+     * 
+     * @param forumForm
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
+     */
+    private NodeKey processFile(FormFile file, String fileType){
+    	NodeKey node = null;
+        if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
+            String fileName = file.getFileName();
+            try {
+				node = getToolContentHandler().uploadFile(file.getInputStream(), fileName, 
+				        file.getContentType(), fileType);
+			} catch (InvalidParameterException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (FileNotFoundException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (RepositoryCheckedException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (IOException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			}
+          }
+        return node;
+    }
+
+	/**
+	 * This method deletes the content with the given <code>uuid</code> and
+	 * <code>versionID</code> from the content repository
+	 * 
+	 * @param uuid
+	 *            The <code>uuid</code> of the node to be deleted
+	 * @param versionID
+	 *            The <code>version_id</code> of the node to be deleted.
+	 * @throws SubmitFilesException
+	 */
+	public void deleteFromRepository(Long uuid, Long versionID)
+			throws ForumException {
+		ITicket ticket = getRepositoryLoginTicket();
+		try {
+			repositoryService.deleteVersion(ticket, uuid,versionID);
+		} catch (Exception e) {
+			throw new ForumException(
+					"Exception occured while deleting files from"
+							+ " the repository " + e.getMessage());
+		}
+	}
+
+	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type){
+		forumDao.deleteInstrcutionFile(contentID, uuid, versionID, type);
+	}
+
+	public ForumToolContentHandler getToolContentHandler() {
+		return toolContentHandler;
+	}
+
+	public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
+		this.toolContentHandler = toolContentHandler;
+	}
+	/**
+	 * This method verifies the credentials of the SubmitFiles Tool and gives it
+	 * the <code>Ticket</code> to login and access the Content Repository.
+	 * 
+	 * A valid ticket is needed in order to access the content from the
+	 * repository. This method would be called evertime the tool needs to
+	 * upload/download files from the content repository.
+	 * 
+	 * @return ITicket The ticket for repostory access
+	 * @throws SubmitFilesException
+	 */
+	private ITicket getRepositoryLoginTicket() throws ForumException {
+		repositoryService = RepositoryProxy.getRepositoryService();
+		ICredentials credentials = new SimpleCredentials(
+				toolContentHandler.getRepositoryUser(),
+				toolContentHandler.getRepositoryId());
+		try {
+			ITicket ticket = repositoryService.login(credentials,
+					toolContentHandler.getRepositoryWorkspaceName());
+			return ticket;
+		} catch (AccessDeniedException ae) {
+			throw new ForumException("Access Denied to repository."
+					+ ae.getMessage());
+		} catch (WorkspaceNotFoundException we) {
+			throw new ForumException("Workspace not found."
+					+ we.getMessage());
+		} catch (LoginException e) {
+			throw new ForumException("Login failed." + e.getMessage());
+		}
 	}
 }

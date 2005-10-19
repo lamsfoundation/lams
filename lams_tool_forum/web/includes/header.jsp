@@ -1,19 +1,11 @@
 <%@ include file="/includes/taglibs.jsp" %>
 <%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-String pathToShare = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../../../..";
+ String LAMS_WEB_ROOT="/lams";
 %>
 <head>
 <title><bean:message key="appName" /></title>
-<link href='<html:rewrite page="/includes/style.jsp" />' rel="stylesheet" type="text/css" />	
-<script src='<%=pathToShare%>/includes/javascript/common.jsp'></script>
-<script src='<html:rewrite page="/includes/scripts.jsp" />'></script>
+<link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
+<script src='<%=LAMS_WEB_ROOT%>/includes/javascript/common.jsp'></script>
 <script src='<html:rewrite page="/includes/validator.jsp" />'></script>
 </head>
 

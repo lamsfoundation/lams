@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -13,6 +14,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @hibernate.class  table="tl_lafrum11_forum"
  *
  * @hibernate.query name="allForums" query="from Forum forum"
+ * @hibernate.query name="forumByContentId" query="from Forum forum where forum.contentId=?"
  */
 public class Forum {
 	private Long uid;
@@ -28,10 +30,13 @@ public class Forum {
 	private boolean defineLater;
 	private boolean contentInUse;
 	private Set attachments;
-	protected Date created;
-	protected Date updated;
-  	protected Long createdBy;
+	private Date created;
+	private Date updated;
+	private Long createdBy;
     
+  	public Forum(){
+  		attachments = new HashSet();
+  	}
 	/**
 	 * Returns the object's creation date
 	 *
@@ -303,7 +308,7 @@ public class Forum {
 		this.defineLater = defineLater;
 	}
 	/**
-	 * @hibernate.property column="content_id" 
+	 * @hibernate.property column="content_id" unique="true" 
 	 * @return
 	 */
 	public Long getContentId() {
