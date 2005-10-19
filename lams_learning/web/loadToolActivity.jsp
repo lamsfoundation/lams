@@ -24,7 +24,17 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="http://jakarta.apache.org/struts/struts-html" prefix="html"%>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jstl/fmt" prefix="fmt" %>
+<%
+String protocol = request.getProtocol();
+if(protocol.startsWith("HTTPS")){
+	protocol = "https://";
+}else{
+	protocol = "http://";
+}
+String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
+String pathToShare = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
 
+%>
 <body bgcolor="#9DC5EC">
 	<c:if test="${!empty activityForm.activityURLs}">
 		
@@ -33,7 +43,15 @@ http://www.gnu.org/licenses/gpl.txt
 				setTimeout("doRedirect()", 500);
 			}
 			function doRedirect() {
-				window.location.href = "<c:out value='${activityForm.activityURLs[0].url}' escapeXml="false" />";
+				var url = "<c:out value='${activityForm.activityURLs[0].url}' escapeXml="false" />";
+				if ( url.substring(0,4)!="http" ) {
+					if ( url.substring(0,1)=="/" ) {
+						url = "<%=pathToRoot%>.."+url;
+					} else {
+						url = "<%=pathToRoot%>../"+url;
+					}
+				}
+				window.location.href = url;
 			}
 			window.onload = redirectPage;
 			//-->
