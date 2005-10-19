@@ -65,6 +65,14 @@ input, select, textarea {
 	width: 20%;
 }
 
+	
+.error {
+	font-size: small;
+	color: red;
+	font-style: normal;
+	text-align: left;
+}
+
 .formcontrol {
 	font-size: small;
 	font-style: normal;

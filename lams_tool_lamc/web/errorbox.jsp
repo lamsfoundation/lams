@@ -20,24 +20,11 @@ http://www.gnu.org/licenses/gpl.txt
 -->
 <%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html-el" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
-<%@ page import="org.apache.struts.action.Action" %>
-<%@ page import="org.apache.struts.action.ActionErrors" %>
-<%
-String cprotocol = request.getProtocol();
-if(cprotocol.startsWith("HTTPS")){
-	cprotocol = "https://";
-}else{
-	cprotocol = "http://";
-}
-String rootPath = cprotocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-%>
-<logic:present name="<%=Action.ERROR_KEY%>">
-<tr>
-	<td width="10%"  align="right" >
-		<img src="<%=rootPath%>/images/error.jpg" alt="Error occured"/>
-	</td>
-	<td width="90%" valign="center" class="body" colspan="2">
-		<html-el:errors/>
-	</td>
-</tr>
-</logic:present>
+
+<logic:messagesPresent> 
+<UL>
+ <html:messages id="error"> 
+ <LI><bean:write name="error"/></LI>
+ </html:messages> 
+</UL> 
+</logic:messagesPresent>

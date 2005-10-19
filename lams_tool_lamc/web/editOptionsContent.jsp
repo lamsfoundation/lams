@@ -102,7 +102,7 @@ MM_reloadPage(true);
 <div id="formtablecontainer">
 					<table align=center> 	 
 					<tr>
-	 				 	<td colspan=2 align=left>								
+	 				 	<td colspan=2 align=left class="formlabel">								
 							<c:out value="${sessionScope.selectedQuestion}"/>					
 					  	</td>
 					</tr>
@@ -115,7 +115,7 @@ MM_reloadPage(true);
 						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
 							  <c:if test="${optionEntry.key == 1}"> 			
 								  <tr>
-								  		<td> 
+								  		<td class="input"> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
@@ -130,7 +130,7 @@ MM_reloadPage(true);
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
 								  <tr>
-								  		<td> 
+								  		<td class="input"> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>

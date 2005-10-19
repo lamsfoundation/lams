@@ -84,21 +84,20 @@ MM_reloadPage(true);
   </tr>
 </table>
 
- <!-- end tab buttons -->
-
-
-<!-- error holder table -->    
-<table border="0" cellspacing="0" cellpadding="0">
-<tr> 
-	<td class="error">   
-	<html:errors/>
-</td></tr>    
-</table>
+<!-- end tab buttons -->
 
 <html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
  <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
 <h2>Basic Question Definitions</h2>
+
+<table align=center> 	  
+<tr>   
+<td class="error">
+	<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+</td>
+</tr> 
+
 <div id="formtablecontainer">
 					<table align=center> 	 
  						<tr> 
@@ -125,7 +124,7 @@ MM_reloadPage(true);
 							  <c:if test="${questionEntry.key == 1}"> 			
 								  <tr>
 								  	<td> <c:out value="Question ${queIndex}"/> : </td>
-								  		<td> 
+								  		<td class="input"> 
 								  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
@@ -147,7 +146,7 @@ MM_reloadPage(true);
 								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 								  <tr>
 								  	<td> <c:out value="Question ${queIndex}"/> : </td>
-								  		<td> 
+								  		<td class="input"> 
 								  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
