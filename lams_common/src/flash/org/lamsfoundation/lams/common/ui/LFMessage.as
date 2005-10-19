@@ -22,6 +22,13 @@ class LFMessage{
   }
   
   	
+/**
+ * Shows an alert dialogue.  specify the OK Handler and icon.
+ * @usage   
+ * @param   msg       Message to display
+ * @param   okHandler TO execute on click - use the proxy function
+ * @param   icon      string linkage name of icon in library
+ */
   public static function showMessageAlert(msg ,okHandler, icon){
 	var alt:Alert;
 	//TODO: increase line breaks to account for stoopid bug in MMs alert.  
@@ -38,8 +45,26 @@ class LFMessage{
 	//alt.setSize(800,250);
   }
   
-  public static function showMessageConfirm(okHandler:Function, cancelHandler:Function){
-
+/**
+ * Shows an alert confirm dialogue.  It is centred in the root time line and diplays the standard LAMS alert icon
+ * @usage   
+ * @param   msg     	The message to display
+ * @param   handler		A handler for the click events broadcast when the buttons are clicked. In addition to the standard click event object properties, there is an additional detail property, which contains the flag value of the button that was clicked (Alert.OK, Alert.CANCEL, Alert.YES, Alert.NO). This handler can be a function or an object
+ * @return  
+ */
+  public static function showMessageConfirm(msg, okHandler:Function, cancelHandler:Function){
+	var alt:Alert;
+	var handlerObj = new Object();
+	handlerObj.click = function(e){
+		if(e.detail == Alert.OK){
+			okHandler();
+		}else if(e.detail == Alert.CANCEL){
+			cancelHandler();
+		}else{
+			Debugger.log('Unknows event detail form confirm:'+e.detail,Debugger.CRITICAL,"showMessageConfirm",'LFMessage');		
+		}
+	}
+	alt = Alert.show(msg,"__Confirm__",Alert.OK | Alert.CANCEL, null, handlerObj, null, Alert.OK);
   }
   
   public function get reference():Object{
