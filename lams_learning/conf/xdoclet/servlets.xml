@@ -52,3 +52,14 @@ http://www.gnu.org/licenses/gpl.txt
 		<description>Export Portfolio</description>		
 		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.MainExportServlet</servlet-class>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>exportDownload</servlet-name>
+		<display-name>Export Portfolio Download</display-name>
+		<description>Export Portfolio Download Page</description>		
+		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportDownloadServlet</servlet-class>
+	</servlet>
+	
+
+	
+	

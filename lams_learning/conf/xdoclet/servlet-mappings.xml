@@ -28,4 +28,10 @@ http://www.gnu.org/licenses/gpl.txt
 		<servlet-name>exportPortfolio</servlet-name>
 		<url-pattern>/portfolioExport</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+		<servlet-name>exportDownload</servlet-name>
+		<url-pattern>/exportDownload</url-pattern>
+</servlet-mapping>
+  	
 	
