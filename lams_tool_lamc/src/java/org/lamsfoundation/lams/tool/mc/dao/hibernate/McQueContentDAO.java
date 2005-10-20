@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
@@ -106,12 +107,14 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 		public void removeMcQueContentByUID(Long uid)
 	    {
 			McQueContent mcq = (McQueContent)getHibernateTemplate().get(McQueContent.class, uid);
+			this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().delete(mcq);
 	    }
 		
 		
 		public void removeMcQueContent(McQueContent mcQueContent)
 	    {
+			this.getSession().setFlushMode(FlushMode.AUTO);
 	        this.getHibernateTemplate().delete(mcQueContent);
 	    }
 		

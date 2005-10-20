@@ -133,6 +133,7 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     /** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#removeMcUser(org.lamsfoundation.lams.tool.mc.McUser) */
     public void removeMcUser(McQueUsr mcUser)
     {
+		this.getSession().setFlushMode(FlushMode.AUTO);
         this.getHibernateTemplate().delete(mcUser);
     }
     

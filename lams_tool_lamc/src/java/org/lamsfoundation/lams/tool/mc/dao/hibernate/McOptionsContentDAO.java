@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -45,6 +46,8 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	 	static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
 	 	
 	 	private static final String FIND_MC_OPTIONS_CONTENT = "from " + McOptsContent.class.getName() + " as mco where mc_que_content_id=?";
+	 	
+	 	private static final String LOAD_OPTION_CONTENT_BY_OPTION_TEXT = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueOptionText=:option and mcOptsContent.mcQueContentId=:mcQueContentUid";
 	 	
 	 	public McOptsContent getMcOptionsContentByUID(Long uid)
 		{
@@ -65,6 +68,21 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 			return null;
 	    }
 
+	 	
+	 	public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_OPTION_CONTENT_BY_OPTION_TEXT)
+				.setString("option", option)
+				.setLong("mcQueContentUid", mcQueContentUid.longValue())				
+				.list();
+			
+			if(list != null && list.size() > 0){
+				McOptsContent mcq = (McOptsContent) list.get(0);
+				return mcq;
+			}
+			return null;
+	    }
 	 	
 		
 		public void saveMcOptionsContent(McOptsContent mcOptsContent)
@@ -97,6 +115,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 		    	while (listIterator.hasNext())
 		    	{
 		    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+					this.getSession().setFlushMode(FlushMode.AUTO);
 		    		templ.delete(mcOptsContent);
 		    	}
 			}
@@ -105,6 +124,7 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 		
 		public void removeMcOptionsContent(McOptsContent mcOptsContent)
 	    {
+			this.getSession().setFlushMode(FlushMode.AUTO);
 	        this.getHibernateTemplate().delete(mcOptsContent);
 	    }
 		

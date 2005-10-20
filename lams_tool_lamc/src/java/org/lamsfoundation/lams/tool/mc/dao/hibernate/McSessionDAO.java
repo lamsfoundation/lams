@@ -124,6 +124,7 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#removeMcSession(org.lamsfoundation.lams.tool.mc.McSession) */
     public void removeMcSession(McSession mcSession)
     {
+		this.getSession().setFlushMode(FlushMode.AUTO);
         this.getHibernateTemplate().delete(mcSession);
     }
 

@@ -236,10 +236,11 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
-	 		Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
+	 		/*Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
 		 	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+		 	*/
 		 	
-		 	mapQuestionsContent=repopulateMap(mapQuestionsContent, request, "questionContent");
+		 	Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
 	 			 		
@@ -255,10 +256,12 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
+	 		/*
 	 		Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
 		 	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+		 	*/
 		 	
-		 	mapQuestionsContent=repopulateMap(mapQuestionsContent, request, "questionContent");
+		 	Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
 	 		
@@ -310,12 +313,15 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
+	 		/*
 	 		Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
 		 	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+		 	*/
 		 	
-		 	mapQuestionsContent=repopulateMap(mapQuestionsContent, request, "questionContent");
+		 	Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 	 		
 	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
 			logger.debug("questionIndex:" + questionIndex);
@@ -410,10 +416,12 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
+	 		/*
 	 		Map mapOptionsContent=(Map) request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
 		 	logger.debug("mapOptionsContent: " + mapOptionsContent);
+		 	*/
 		 	
-		 	mapOptionsContent=repopulateMap(mapOptionsContent, request,"optionContent");
+		 	Map mapOptionsContent=repopulateMap(request,"optionContent");
 		 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
 		 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
 	 		
@@ -462,18 +470,18 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		String optionIndex =mcAuthoringForm.getOptionIndex();
 			logger.debug("optionIndex:" + optionIndex);
 			
-			
+			/*
 			Map mapOptionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
 		 	logger.debug("mapQuestionsContent: " + mapOptionsContent);
+		 	*/
 		 	
-		 	mapOptionsContent=repopulateMap(mapOptionsContent, request, "optionContent");
+		 	Map mapOptionsContent=repopulateMap(request, "optionContent");
 		 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
 		 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
 		 	
 			String deletableOptionEntry=(String)mapOptionsContent.get(optionIndex);
 			logger.debug("deletableOptionEntry:" + deletableOptionEntry);
 					 	
-		 	
 			if (deletableOptionEntry != null)
 			{
 				if (!(deletableOptionEntry.equals("")))
@@ -483,20 +491,18 @@ public class McAction extends DispatchAction implements McAppConstants
 					request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
 					logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
 					
-					/*
-					Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-					logger.debug("toolContentId:" + toolContentId);
+					Long selectedQuestionContentUid=(Long) request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
+			 		logger.debug("selectedQuestionContentUid:" + selectedQuestionContentUid);
 					
-					McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(deletableQuestionEntry, toolContentId);
-					logger.debug("mcQueContent:" + mcQueContent);
+					logger.debug("deletableOptionEntry: " + deletableOptionEntry + "mcQueContentUid: " +  selectedQuestionContentUid);
+					McOptsContent mcOptsContent=mcService.getOptionContentByOptionText(deletableOptionEntry, selectedQuestionContentUid);
+					logger.debug("mcOptsContent: " + mcOptsContent);
 					
-					if (mcQueContent != null)
+					if (mcOptsContent != null)
 					{
-						mcQueContent=mcService.retrieveMcQueContentByUID(mcQueContent.getUid());
-						mcService.removeMcQueContent(mcQueContent);
-						logger.debug("removed mcQueContent from DB:" + mcQueContent);
+						mcService.removeMcOptionsContent(mcOptsContent);
+						logger.debug("removed mcOptsContent from DB:" + mcOptsContent);
 					}
-					*/
 				}
 			}
 			
@@ -557,7 +563,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @return
      */
-    protected Map repopulateMap(Map mapQuestionContent, HttpServletRequest request, String parameterType)
+    protected Map repopulateMap(HttpServletRequest request, String parameterType)
     {
     	Map mapTempQuestionsContent= new TreeMap(new McComparator());
     	logger.debug("parameterType: " + parameterType);
@@ -741,7 +747,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (toolContentId.longValue() != 0))
     	{
-    		logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
+    		logger.debug("TOOL_CONTENT_ID : " + toolContentId);
     		mcContent= mcService.retrieveMc(toolContentId);  
     		logger.debug("mcContent: " + mcContent);
 		}
@@ -773,6 +779,7 @@ public class McAction extends DispatchAction implements McAppConstants
            	        mcService.createMcQue(mcQueContent);
            	        logger.debug("persisted mcQueContent: " + mcQueContent);
             	}
+            	
             }
         }
                 

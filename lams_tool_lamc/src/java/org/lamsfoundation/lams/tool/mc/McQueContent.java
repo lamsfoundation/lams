@@ -44,6 +44,9 @@ public class McQueContent implements Serializable {
 
     /** nullable persistent field */
     private Integer displayOrder;
+
+    /** persistent field */
+    private boolean disabled;
     
     /** non persistent field */
     private Long mcContentId;
@@ -203,5 +206,17 @@ public class McQueContent implements Serializable {
 	 */
 	public void setMcContentId(Long mcContentId) {
 		this.mcContentId = mcContentId;
+	}
+	/**
+	 * @return Returns the disabled.
+	 */
+	public boolean isDisabled() {
+		return disabled;
+	}
+	/**
+	 * @param disabled The disabled to set.
+	 */
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
 	}
 }

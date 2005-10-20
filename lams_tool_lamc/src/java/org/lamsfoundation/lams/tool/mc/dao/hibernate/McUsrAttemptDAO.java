@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import org.apache.log4j.Logger;
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -60,12 +61,14 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 		public void removeMcUsrAttemptByUID(Long uid)
 	    {
 			McUsrAttempt mca = (McUsrAttempt)getHibernateTemplate().get(McUsrAttempt.class, uid);
+			this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().delete(mca);
 	    }
 		
 		
 		public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt)
 	    {
+			this.getSession().setFlushMode(FlushMode.AUTO);
 	        this.getHibernateTemplate().delete(mcUsrAttempt);
 	    }
 	 	

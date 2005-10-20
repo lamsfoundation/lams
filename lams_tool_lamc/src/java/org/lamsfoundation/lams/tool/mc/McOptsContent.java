@@ -43,6 +43,9 @@ public class McOptsContent implements Serializable {
     /** nullable persistent field */
     private String mcQueOptionText;
 
+    /** non persistent field */
+    private Long mcQueContentId;
+	
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent;
     
@@ -138,5 +141,18 @@ public class McOptsContent implements Serializable {
 	 */
 	public void setMcUsrAttempts(Set mcUsrAttempts) {
 		this.mcUsrAttempts = mcUsrAttempts;
+	}
+	
+	/**
+	 * @return Returns the mcQueContentId.
+	 */
+	public Long getMcQueContentId() {
+		return mcQueContentId;
+	}
+	/**
+	 * @param mcQueContentId The mcQueContentId to set.
+	 */
+	public void setMcQueContentId(Long mcQueContentId) {
+		this.mcQueContentId = mcQueContentId;
 	}
 }

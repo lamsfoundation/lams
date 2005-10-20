@@ -285,6 +285,20 @@ public class McServicePOJO implements
 														   e);
         }
 	}
+    
+    public void removeMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException
+    {
+    	try
+        {
+            mcOptionsContentDAO.removeMcOptionsContent(mcOptsContent);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is removing"
+                                                 + " the mc options content: "
+                                                 + e.getMessage(),e);
+        }
+    }
 
     
     public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentId)
@@ -477,6 +491,21 @@ public class McServicePOJO implements
                                                  + e.getMessage(),e);
         }
 	}
+    
+    public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid)
+    {
+    	try
+        {
+            return mcOptionsContentDAO.getOptionContentByOptionText(option, mcQueContentUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is returning the"
+                                                 + " option by option text: "
+                                                 + e.getMessage(),e);
+        }
+    }
+    
     
     public void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException
 	{

@@ -102,12 +102,15 @@ MM_reloadPage(true);
 <div id="formtablecontainer">
 					<table align=center> 	 
 					<tr>
-	 				 	<td colspan=2 align=left class="formlabel">								
-							<c:out value="${sessionScope.selectedQuestion}"/>					
+	 				 	<td colspan=2 align=center>								
+						<h4> 
+							<bean:message key="label.question"/>: &nbsp
+							<c:out value="${sessionScope.selectedQuestion}"/>	
+						</h4>
 					  	</td>
 					</tr>
 					<tr>
-	 				 	<td colspan=2 align=left>								
+	 				 	<td colspan=2 align=center>								
 							&nbsp&nbsp
 					  	</td>
 					</tr>

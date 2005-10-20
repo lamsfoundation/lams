@@ -40,6 +40,13 @@
     </property>
     
     <property
+        name="disabled"
+        type="boolean"
+        access="property"
+        column="disabled"
+   />
+    
+    <property
         name="mcContentId"
         type="java.lang.Long"
         column="mc_content_id"

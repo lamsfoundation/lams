@@ -38,6 +38,18 @@
         length="250"
     >
     </property>
+    
+    <property
+        name="mcQueContentId"
+        type="java.lang.Long"
+        column="mc_que_content_id"
+        not-null="true"
+   	    update="false"
+	    insert="false"
+        length="20"
+    >
+    </property>
+    
 
     <!-- Associations -->
   
