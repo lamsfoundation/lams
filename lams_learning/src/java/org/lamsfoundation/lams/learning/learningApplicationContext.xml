@@ -49,6 +49,7 @@
 				<property name="transitionDAO"><ref bean="transitionDAO"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>			
 				<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+				<property name="userDAO"><ref bean="userDAO"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
