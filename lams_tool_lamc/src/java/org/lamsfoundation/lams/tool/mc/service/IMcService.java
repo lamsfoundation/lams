@@ -75,6 +75,10 @@ public interface IMcService
     
     public void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
     
+    public void removeQuestionContentByMcUid(final Long mcContentUid) throws McApplicationException;
+    
+    public void resetAllQuestions(final Long mcContentUid) throws McApplicationException;
+    
     public void removeMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
     
     public void removeMcOptionsContent(McOptsContent mcOptsContent);

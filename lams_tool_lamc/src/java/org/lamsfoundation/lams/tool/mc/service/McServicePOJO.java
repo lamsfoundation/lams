@@ -196,6 +196,36 @@ public class McServicePOJO implements
         }
 	}
     
+    
+    public void removeQuestionContentByMcUid(final Long mcContentUid) throws McApplicationException
+	{
+    	try
+        {
+        	mcQueContentDAO.removeQuestionContentByMcUid(mcContentUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is removing mc que content by mc content id: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+    
+    public void resetAllQuestions(final Long mcContentUid) throws McApplicationException
+	{
+    	try
+        {
+        	mcQueContentDAO.resetAllQuestions(mcContentUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is resetting all questions: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+    
+    
   
     public void createMcSession(McSession mcSession) throws McApplicationException
     {

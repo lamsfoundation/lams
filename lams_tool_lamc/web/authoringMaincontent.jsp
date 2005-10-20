@@ -89,7 +89,7 @@ MM_reloadPage(true);
 <html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
  <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
-<h2>Basic Question Definitions</h2>
+<h2>Please define the questions and their options. </h2>
 
 <table align=center> 	  
 <tr>   
@@ -169,6 +169,20 @@ MM_reloadPage(true);
 									</c:if> 
 						</c:forEach>
 							<html:hidden property="questionIndex"/>
+					<tr>
+	 				 	<td colspan=2 align=center>								
+							&nbsp&nbsp
+					  	</td>
+					</tr>
+	 				 <tr>
+	 				 	<td colspan=2 align=left>								
+							<html:submit property="submitQuestions" styleClass="linkbutton" 
+							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+								<bean:message key="button.submit"/>
+							</html:submit>	 				 		  										  		
+		 			  	</td>
+	 				 </tr>
+							
 
 	 				</table> 	 
 					

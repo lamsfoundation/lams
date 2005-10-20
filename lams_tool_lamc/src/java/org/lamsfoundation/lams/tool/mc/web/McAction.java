@@ -239,20 +239,8 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
-		 	logger.debug("addQuestion action is not allowed.");
-			logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
-	 			 		
-		 	if (verifyAddQuestion(request) == false)
-		 	{
-		 		ActionMessages errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.question.addNotAllowed.thisScreen"));
-    			logger.debug("error.question.addNotAllowed.thisScreeto ActionMessages");
-    			saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
-    			logger.debug("return to LOAD_QUESTIONS to fix error.");
-    			return (mapping.findForward(LOAD_QUESTIONS));
-		 	}
-		 	
+		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+	 		
 		 	addQuestion(request, mcAuthoringForm, mapQuestionsContent, true);
 	 		logger.debug("after addQuestion");
 	 		
@@ -268,6 +256,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+		 	
 	 		
 	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
 			logger.debug("questionIndex:" + questionIndex);
@@ -309,27 +298,7 @@ public class McAction extends DispatchAction implements McAppConstants
 				logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
 			}
 			
-			Map  mapDisabledQuestions=(Map) request.getSession().getAttribute(MAP_DISABLED_QUESTIONS);
-			logger.debug("mapDisabledQuestions" + mapDisabledQuestions);
-			logger.debug("attempt removing deletableQuestionEntry from mapDisabledQuestions: " + mapDisabledQuestions);
 			
-			Iterator itMap = mapDisabledQuestions.entrySet().iterator();
-			while (itMap.hasNext()) {
- 	        	Map.Entry pairs = (Map.Entry)itMap.next();
-	            logger.debug("the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	            if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
-	            {
-	            	if (pairs.getValue().equals(deletableQuestionEntry))
-	            	{
-	            		logger.debug("deletableQuestionEntry found in mapDisabledQuestions: " + deletableQuestionEntry);
-	            		mapDisabledQuestions.remove(pairs.getKey());
-	            		logger.debug("removed deletableQuestionEntry from mapDisabledQuestions");
-	            		request.getSession().setAttribute(MAP_DISABLED_QUESTIONS, mapDisabledQuestions);
-	    				logger.debug("updated MAP_DISABLED_QUESTIONS: " + request.getSession().getAttribute(MAP_DISABLED_QUESTIONS));
-	            	}
-	            }
- 	        }
-
 			mcAuthoringForm.resetUserAction();
 			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
@@ -338,18 +307,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		userAction="editOption";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
-	 		
-	 		if (verifyAddQuestion(request) == false)
-		 	{
-		 		ActionMessages errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.question.addNotAllowed.thisScreen"));
-    			logger.debug("error.question.addNotAllowed.thisScreeto ActionMessages");
-    			saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
-    			logger.debug("return to LOAD_QUESTIONS to fix error.");
-    			return (mapping.findForward(LOAD_QUESTIONS));
-		 	}
-	 		
+
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
@@ -561,27 +519,6 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		
 	 		McQueContent mcQueContent = mcService.retrieveMcQueContentByUID(selectedQuestionContentUid);
 			logger.debug("mcQueContent:" + mcQueContent);
-			mcQueContent.setDisabled(true);
-			logger.debug("made the question content disabled");
-			mcService.saveOrUpdateMcQueContent(mcQueContent);
-			logger.debug("mcQueContent updated with disabled");
-			
-			
-			Map  mapDisabledQuestions=(Map) request.getSession().getAttribute(MAP_DISABLED_QUESTIONS);
-			logger.debug("mapDisabledQuestions" + mapDisabledQuestions);
-			
-			String selectedQuestionIndex=(String) request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
-	    	logger.debug("SELECTED_QUESTION_INDEX:" + selectedQuestionIndex);
-	    	
-	    	String selectedQuestion=(String) request.getSession().getAttribute(SELECTED_QUESTION);
-	    	logger.debug("SELECTED_QUESTION:" + selectedQuestion);
-	    	
-	    	mapDisabledQuestions.put(selectedQuestionIndex, selectedQuestion);
-	    	logger.debug("mapDisabledQuestions:" + mapDisabledQuestions);
-	    	
-	    	request.getSession().setAttribute(MAP_DISABLED_QUESTIONS, mapDisabledQuestions);
-	    	logger.debug("MAP_DISABLED_QUESTIONS:" + mapDisabledQuestions);
-	    	
 			
 			
 			/** parse all the options and persist them */
@@ -615,42 +552,50 @@ public class McAction extends DispatchAction implements McAppConstants
 			mcAuthoringForm.resetUserAction();
 			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
+	 	else if (mcAuthoringForm.getSubmitQuestions() != null)
+	 	{
+	 		/** persist the final Questions Map  */
+	 		userAction="submitQuestions";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		
+	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+		 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
+		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+		 	
+		 	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+	 	    logger.debug("toolContentId:" + toolContentId);
+				
+			McContent mcContent=mcService.retrieveMc(toolContentId);
+			logger.debug("mcContent:" + mcContent);
+			
+			mcService.resetAllQuestions(mcContent.getUid());
+			logger.debug("all question reset for :" + mcContent.getUid());
+			 
+			Iterator itMap = mapQuestionsContent.entrySet().iterator();
+			while (itMap.hasNext()) {
+			    Map.Entry pairs = (Map.Entry)itMap.next();
+			    if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
+			    {
+			    	McQueContent mcQueContent = mcService.getQuestionContentByQuestionText(pairs.getValue().toString(), mcContent.getUid());
+			    	logger.debug("retrieved mcQueContent: " + mcQueContent);
+			    	
+			    	if (mcQueContent != null)
+			    	{
+			    		mcQueContent.setDisabled(false);
+				    	logger.debug("enabled mcQueContent for question: " + pairs.getValue().toString());
+				    	mcService.saveOrUpdateMcQueContent(mcQueContent);
+			    	}
+			    }
+ 	        }
+			mcAuthoringForm.resetUserAction();
+	   	    return (mapping.findForward(LOAD_QUESTIONS));
+	 	}
 	 	
 	 	
 	 	mcAuthoringForm.resetUserAction();
    	    return (mapping.findForward(LOAD_QUESTIONS));
     }
-    
-    
-    public ActionForward editDefaultContent(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-	{
-		logger.debug("editDefaultContent initialised...");
-		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-
-		String userAction=null;
-	 	if (mcAuthoringForm.getAddOptionContent() != null)
-	 	{
-	 		userAction="addOptionContent";
-	 		return (mapping.findForward(EDIT_OPTS_CONTENT));
-	 		
-	 	}
-	 	else if (mcAuthoringForm.getRemoveOptionContent() != null)
-	 	{
-	 		userAction="removeOptionContent";
-	 		return (mapping.findForward(EDIT_OPTS_CONTENT));
-	 		
-	 	}
-	 	logger.debug("userAction:" + userAction);
-		
-		
-		IMcService mcService =McUtils.getToolService(request);
-		logger.debug("mcService:" + mcService);
-		return (mapping.findForward(LOAD_QUESTIONS));
-	}
     
     
     /**
@@ -671,8 +616,7 @@ public class McAction extends DispatchAction implements McAppConstants
 			String candidateQuestionEntry =request.getParameter(parameterType + i);
 			if (
 				(candidateQuestionEntry != null) && 
-				(candidateQuestionEntry.length() > 0) &&  
-				!(candidateQuestionEntry.equals(""))
+				(candidateQuestionEntry.length() > 0)   
 				)
 			{
 				mapCounter++;
@@ -684,7 +628,6 @@ public class McAction extends DispatchAction implements McAppConstants
     }
     
     
-
     protected McContent createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -886,41 +829,6 @@ public class McAction extends DispatchAction implements McAppConstants
         }
                 
     }
-    
-    protected boolean verifyAddQuestion(HttpServletRequest request)
-    {
-    	logger.debug("will verify addQuestion");
-    	Map  mapDisabledQuestions=(Map) request.getSession().getAttribute(MAP_DISABLED_QUESTIONS);
-    	logger.debug("MAP_DISABLED_QUESTIONS:" + mapDisabledQuestions);
-    	
-    	String parameterType="questionContent";
-    	
-    	Iterator itQuestionsMap = mapDisabledQuestions.entrySet().iterator();
-    	
-    	while (itQuestionsMap.hasNext()) {
-		   Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
-		   
-           	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
-	   		{
-	   			String candidateQuestionEntry =request.getParameter(parameterType + i);
-	   			//logger.debug("is it the same questionIndex?: "  + new Long(i).toString() + " *** " + i);
-	   			
-	   			if (new Long(i).toString().equalsIgnoreCase(pairs.getKey().toString()))
-				{
-	   				logger.debug( i + " is a disabled question: " +  candidateQuestionEntry + " *** " + pairs.getValue().toString());
-	   				
-	   				if (!(candidateQuestionEntry.equals(pairs.getValue().toString())))
-	   				{
-	   					logger.debug(candidateQuestionEntry + " " + i);
-	   					logger.debug("give a warning, the action is not allowed.");
-	   					return false;
-	   				}
-	   			}
-	   		}
-    	}
-    	return true;
-    }
-    
     
 
     /**

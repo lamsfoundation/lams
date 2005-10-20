@@ -69,7 +69,7 @@ public interface McAppConstants {
      * refers to number of questions presented initially, we have a single record for default content
      */
     public static final Long INITIAL_QUESTION_COUNT		=new Long(1);
-    public static final long MAX_QUESTION_COUNT 		=30;
+    public static final long MAX_QUESTION_COUNT 		=20;
     
     /**
      * Struts level constants

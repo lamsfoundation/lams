@@ -267,7 +267,7 @@
 <variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
 </data-type>
 </column>
-<column name="disabled" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="0" auto-increment="false">
+<column name="disabled" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="1" auto-increment="false">
 <column-description/>
 <data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
 <variant type-name-pattern="TINYINT"/>

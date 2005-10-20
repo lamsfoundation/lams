@@ -37,6 +37,10 @@ public interface IMcQueContentDAO
 	public McQueContent getToolDefaultQuestionContent(final long mcContentId);
 	
 	public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
+	
+	public void resetAllQuestions(final Long mcContentUid);
+	
+	public void removeQuestionContentByMcUid(final Long mcContentUid);
  	
  	public void saveMcQueContent(McQueContent mcQueContent);
     

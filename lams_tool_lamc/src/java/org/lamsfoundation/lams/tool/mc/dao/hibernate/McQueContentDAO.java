@@ -21,6 +21,7 @@
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -46,6 +47,7 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question and mcQueContent.mcContentId=:mcContentUid";
+	 	
 	 		 	
 	 	
 	 	public McQueContent getMcQueContentByUID(Long uid)
@@ -85,6 +87,45 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 			return null;
 	    }
 	 	
+	 	public void removeQuestionContentByMcUid(final Long mcContentUid)
+	    {
+			HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
+				.setLong("mcContentId", mcContentUid.longValue())
+				.list();
+
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+					this.getSession().setFlushMode(FlushMode.AUTO);
+		    		templ.delete(mcQueContent);
+		    	}
+			}
+	    }
+	 	
+
+	 	public void resetAllQuestions(final Long mcContentUid)
+	    {
+			HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
+				.setLong("mcContentId", mcContentUid.longValue())
+				.list();
+
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+		    		mcQueContent.setDisabled(true);
+					this.getSession().setFlushMode(FlushMode.AUTO);
+		    		templ.update(mcQueContent);
+		    	}
+			}
+	    }
+	 	
+
 	 	
 	 	public void saveMcQueContent(McQueContent mcQueContent)
 	    {
