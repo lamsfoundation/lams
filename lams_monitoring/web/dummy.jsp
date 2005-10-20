@@ -69,8 +69,8 @@
 			<TD><c:out value="${lesson.endDateTime}"/></TD>
 			<TD><c:out value="${lesson.lessonStateId}"/></TD>
 			<TD><A HREF='/lams/learning/learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonId}"/>'>Join Lesson as <lams:user property="firstName"/></a>
-			<TD><A HREF='/lams/???"/>'>Export Portfolio for all users</a>
-			<TD><A HREF='/lams/???"/>'>Export Portfolio as <lams:user property="firstName"/></a>
+			<TD><A HREF='/lams/learning/exportWaitingPage.jsp?mode=teacher&lessonID=<c:out value="${lesson.lessonId}"/>'>Export Portfolio for all users</a>
+			<TD><A HREF='/lams/learning/exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${lesson.lessonId}"/>'>Export Portfolio as <lams:user property="firstName"/></a>
 		</TR>
 	</c:forEach>
 	</TABLE>
