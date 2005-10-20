@@ -28,12 +28,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileUtilException;
 
 /**
  * Handles zip files - expands them to a temporary directory, and 
@@ -254,17 +256,22 @@ public class ZipFileUtil {
         else
             return newMessage;
     }
-    
+  
+    /**
+     * Creates a ZIP file and places it in the current working directory. The zip file is compressed
+     * at the default compression level of the Deflater.
+     * @param zipFileName the filename of the zip to create
+     * @param directoryToZip the directory you want to zip
+     * @return the filename of the zip file created
+     * @throws ZipFileUtilException
+     */
     public static String createZipFile(String zipFileName, String directoryToZip) throws ZipFileUtilException //public static String createZipFile(String ZipFileName, String[] filesToZip)
     {
-    	//check if a zip file already exists with that name "filename.zip" or "filename" is accepted as well
-    	//if so delete that existing file.
-    	//return the name of the zipfile
+    	
     	int dotIndex = zipFileName.indexOf(".");
-		//String shortZipName = dotIndex > -1 ? zipFileName.substring(0,dotIndex) : zipFileName;
+		
 		String fileNameOfZipToCreate = dotIndex > -1 ? zipFileName : zipFileName+".zip"; //append ".zip" extension if the filename doesnt contain .zip extension
         
-		//check the name of the directory given
 		
 		try
 		{
@@ -276,7 +283,7 @@ public class ZipFileUtil {
         	}
         	File[] files = directory.listFiles();
         	
-        	zipFiles(out, files);
+        	zipFiles(out, files, directory.getCanonicalPath());
         	out.close();       	
 		}
 		catch (IOException e1)
@@ -287,7 +294,62 @@ public class ZipFileUtil {
     	return fileNameOfZipToCreate;
     }
     
-    protected static void zipFiles(ZipOutputStream zop, File[] files) throws ZipFileUtilException
+    /**
+     * Creates a ZIP file and places it in the specified directory. The zip file is compressed
+     * at the default compression level of the Deflater.
+     * @param zipFileName the filename of the zip to create
+     * @param directoryToZip the directory you want to zip
+     * @param directoryToPlaceZip the place where you want to place the newly created zip file.
+     * @return the (absolute) filename of the zip that was created
+     * @throws ZipFileUtilException
+     */
+    public static String createZipFile(String zipFileName, String directoryToZip, String directoryToPlaceZip) throws ZipFileUtilException //public static String createZipFile(String ZipFileName, String[] filesToZip)
+    {
+        
+        //check if the directory to place zip file exists, if it doesnt, then create one.
+        /* TODO: should we overwrite and delete the folder if it already exists? */
+        if (!FileUtil.directoryExist(directoryToPlaceZip))
+        {
+            try
+            {
+                FileUtil.createDirectory(directoryToPlaceZip);
+            }
+            catch(FileUtilException e)
+            {
+                throw new ZipFileUtilException("The temporary directory to place the zip file could be not created: ", e);
+            }
+        }
+        
+    	int dotIndex = zipFileName.indexOf(".");
+		
+		String zipFile = dotIndex > -1 ? zipFileName : zipFileName+".zip"; //append ".zip" extension if the filename doesnt contain .zip extension
+        String fileNameOfZipToCreate = directoryToPlaceZip + File.separator + zipFile;
+		
+		
+		try
+		{
+        	ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileNameOfZipToCreate)));
+        	
+            File directory = new File(directoryToZip);
+        	if(!directory.exists())
+        	{
+        		throw new ZipFileUtilException("The specified directory " + directoryToZip + " does not exist");
+        	}
+        	File[] files = directory.listFiles();
+        	
+        	zipFiles(out, files, directory.getCanonicalPath());
+        	out.close();       	
+		}
+		catch (IOException e1)
+		{
+			throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: ", e1);
+		}
+      
+    	return fileNameOfZipToCreate;
+    }
+    
+    
+    protected static void zipFiles(ZipOutputStream zop, File[] files, String dirPath) throws ZipFileUtilException
     {
     	File file = null;
     	ZipEntry entry = null;
@@ -303,14 +365,16 @@ public class ZipFileUtil {
 	    		if (file.isDirectory())
 	    		{
 	    			File[] filesInsideDir = file.listFiles();
-	    			zipFiles(zop, filesInsideDir);
+	    			zipFiles(zop, filesInsideDir, dirPath);
 	    		}
 	    		else
 	    		{
-	    			
 	    			source = new BufferedInputStream(new FileInputStream(file));
-	    			entry = new ZipEntry(file.getPath());
-	    				    			
+	    			//entry = new ZipEntry(file.getPath());
+	    			entry = new ZipEntry(removeDirPath(file.getCanonicalPath(), dirPath));
+	    			zop.setMethod(ZipOutputStream.DEFLATED);
+	    			zop.setLevel(Deflater.DEFAULT_COMPRESSION);
+	    					
 		    		zop.putNextEntry(entry);
 		    		
 		    		//transfer bytes from file to ZIP file
@@ -336,8 +400,22 @@ public class ZipFileUtil {
 		}
     }
     
+    /**
+     * Helper method used to cut off the root directory path from the absolute path
+     * of the file. We want the relative path so that when zipped up, the upper directories
+     * arent shown.
+     * @param absoluteFilePath the absolute pathname of the file
+     * @param rootDirPath the root directory path
+     * @return
+     */
+   private static String removeDirPath(String absoluteFilePath, String rootDirPath)
+   {
+       int rootDirLength = rootDirPath.length();
+       return absoluteFilePath.substring(rootDirLength+1, absoluteFilePath.length()); //added one to remove the trailing "\" that is behind the root dir
+   }
    
    
+  
     
 }
 
