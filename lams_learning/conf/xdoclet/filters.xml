@@ -31,3 +31,11 @@ http://www.gnu.org/licenses/gpl.txt
 		<param-value>false</param-value>
 	</init-param>
 </filter>
+
+<filter>
+       <filter-name>SystemSessionFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.session.SystemSessionFilter
+         </filter-class>
+</filter>
+
