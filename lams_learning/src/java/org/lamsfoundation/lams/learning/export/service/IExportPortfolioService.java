@@ -69,22 +69,22 @@ public interface IExportPortfolioService {
 	 * Portfolio objects, in which the web layer can iterate through the array 
 	 * of portfolios to display the links to each activity.
 	 * @param lesson The specific instance of the LearningDesign and Class.
+	 * @param cookies. Are passed along to doExport, in order for access the export for other tools
 	 * @return Portfolio[] The array of portfolio objects.
 	 */
-	public Portfolio[] exportPortfolioForTeacher(Lesson lesson, Cookie[] cookies);
-
 	public Portfolio[] exportPortfolioForTeacher(Long lessonId, Cookie[] cookies);
+	
 	/**
 	 * The main method that performs the export for the student.
 	 * It will get the list of activities that the user has completed 
 	 * and will setup the portfolios for each activity. 
-	 * @param learnerProgressId The learner progress id, which is used to determine the learner progress and the 
-	 * list of activities completed by the learner.
-	 * @param user The learner.
+	 * @param userId The learner id.
+	 * @param lessonID The lesson id of the lesson, the learner is doing the export for
 	 * @param anonymity The anonymity flag, is true, then anonymity is on, otherwise username would be visible.
+	 * @param cookies Are passed along to doExport, in order for access the export for other tools
 	 * @return Portfolio[] The array of portfolio objects.
 	 */
-	public Portfolio[] exportPortfolioForStudent(Long learnerProgressId, User user, boolean anonymity, Cookie[] cookies);
+	public Portfolio[] exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity, Cookie[] cookies);
 	
 	/**
 	 * A helper method that sets up the export url for the activity. Will go through all key-value pairs
@@ -98,7 +98,7 @@ public interface IExportPortfolioService {
 	/**
 	 * Obtains the Tool from the ToolActivity and creates a portfolio object with properties activityId, activityName, 
 	 * activityDescription, exportURL set to the value of the ToolActivity's properties activityId, toolDisplayName 
-	 * (retrieved from Tool object) , title, exportPortfolioUrl respestively.
+	 * (retrieved from Tool object), title, exportPortfolioUrl respestively.
 	 * 
 	 * @param activity The Tool Activity
 	 * @return a Portfolio object
@@ -148,15 +148,6 @@ public interface IExportPortfolioService {
 	public Vector getOrderedActivityList(Long learnerProgressId);
 	
 	/**
-	 * Creates a directory with the name <code>directoryName</code>.
-	 * 
-	 * @param directoryName The name and location of the directory.
-	 * @return true if the directory has been created, false otherwise
-	 */
-	//	public boolean createTempDirectory(String directoryName);
-	
-	
-	/**
 	 * Zips up the directory specified by <code>directoryToZip</code> and
 	 * saves it in the filename given by <code>filename</code>.
 	 * 
@@ -167,16 +158,17 @@ public interface IExportPortfolioService {
 	public String zipPortfolio(String filename, String directoryToZip);
 	
 	/**
-	 * Iterates through the list of portfolios, creates a subdirectory for each of the tools
+	 * Creates the temporary root directory for the export and then 
+	 * iterates through the list of portfolios, creates a subdirectory for each of the tools
 	 * and appends the temporary export directory to the export url. It will then call each 
 	 * tool to write its files in the subdirectory.
 	 * The tool returns the name of the main html file written, the portfolio property
 	 * mainFileName is set to this value.
-	 * 
-	 * @param portfolios
+	 * @param portfolios The portfolios to iterate through.
+	 * @param cookies The cookies that are to be passed along 
 	 * @return An array of portfolios that can be used to generate the main export page.
 	 */
-	public Portfolio[] doExport(Vector portfolios, String tempDirectoryName, Cookie[] cookies);
+	public Portfolio[] doExport(Vector portfolios, Cookie[] cookies);
 	/**
 	 * This method is responsible for the call to the tool to export their portfolio via the export url.
 	 * It uses a HttpURLConnection to connect to the export url of each tool and returns the filename
@@ -185,8 +177,9 @@ public interface IExportPortfolioService {
 	 * @param tool The portfolio object, which contains the exportUrl in which to connect to.
 	 * @return The main file name of the tool's page.
 	 */
-	//commented out to use common code from HttpUrlConnectionUtil
 	public String connectToToolViaExportURL(String exportURL, Cookie[] cookies);
+	
+	public String getExportDir();
 	
 	/*	public Portfolio[] exportPortfolioForStudent(LearnerProgress learnerProgress, User user, boolean anonymity);
 	
