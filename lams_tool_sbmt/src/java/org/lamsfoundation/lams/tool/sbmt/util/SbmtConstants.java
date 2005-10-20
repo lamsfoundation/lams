@@ -30,5 +30,7 @@ public class SbmtConstants {
 	public static final String TOOL_SESSION_ID = "toolSessionID";
 	public static final String TOOL_CONTENT_ID = "toolContentID";
 	public static final String USER_ID = "userID";
+	
+	//TODO: hard code, need to read from config file/db
 	public static final String TOOL_URL_BASE = "/lams/tool/lasbmt11/";
 }
