@@ -129,7 +129,7 @@ public class AuthoringAction extends Action {
 		//set back STRUTS component value
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,topics);
 		request.setAttribute(ForumConstants.AUTHORING_DTO,forum);
-		return mapping.getInputForward();
+		return mapping.findForward("success");
 	}
 
 	private ActionForward newTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -166,7 +166,36 @@ public class AuthoringAction extends Action {
 		}
 		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS, topics);
 		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, new ArrayList(topics.values()));
-		return mapping.findForward("success");
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("<table width=\"100%\" cellspacing=\"8\" align=\"CENTER\" cellspacing=\"3\" cellpadding=\"3\" class=\"form\">");
+		sb.append("<tr>");
+		sb.append("<td valign=\"MIDDLE\"><b>Topic</b></td>");
+		sb.append("<td colspan=\"2\" />");
+		sb.append("</tr>");
+		Iterator iter = topics.values().iterator();
+		while(iter.hasNext()){
+			Message msg = (Message) iter.next();
+			sb.append("<tr>");
+			sb.append("<td valign=\"MIDDLE\">");
+			sb.append(msg.getSubject());
+			sb.append("</td>");
+			sb.append("<td colspan=\"2\" valign=\"MIDDLE\"><a href=\"javascript:loadDoc('");
+			sb.append(ForumConstants.TOOL_URL_BASE);
+			sb.append("authoring/deleteTopic.do?topicName=");
+			sb.append(msg.getSubject());
+			sb.append("\','topiclist')\"><b>Delete</b></a></td>"); 
+		    sb.append("</tr>");
+		}
+		sb.append("</table>");
+		try {
+			PrintWriter out = response.getWriter();
+			out.print(sb.toString());
+			out.flush();
+		} catch (IOException e) {
+			log.error(e);
+		}
+		return null;
 	}
 
 	/**
@@ -309,7 +338,9 @@ public class AuthoringAction extends Action {
 			sb.append(" <a href=\"../download/?uuid=").append(file.getUuid()).append("&preferDownload=true\">");
 			sb.append(this.getResources(request).getMessage("label.download"));
 			sb.append("</a>\r\n");
-			sb.append("<a href=\"javascript:loadDoc('/lams/tool/lasbmt11/deletefile.do?method=");
+			sb.append("<a href=\"javascript:loadDoc('");
+			sb.append(ForumConstants.TOOL_URL_BASE);
+			sb.append("deletefile.do?method=");
 			if(StringUtils.equals(type,IToolContentHandler.TYPE_OFFLINE))
 				sb.append("deleteOffline");
 			else

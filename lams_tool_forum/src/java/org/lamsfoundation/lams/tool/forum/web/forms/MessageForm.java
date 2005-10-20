@@ -1,11 +1,10 @@
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
-import org.apache.struts.validator.ValidatorForm;
+import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionError;
-import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
+import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
 /**
@@ -23,7 +22,8 @@ public class MessageForm extends ValidatorForm {
     protected Long forumId;
     protected Long parentId;
     protected Long topicId;
-
+    private String attachmentName;
+    
     public MessageForm() {
     	message = new Message();
     }
@@ -78,5 +78,13 @@ public class MessageForm extends ValidatorForm {
         }
         return errors;
     }
+
+	public String getAttachmentName() {
+		return attachmentName;
+	}
+
+	public void setAttachmentName(String attachmentName) {
+		this.attachmentName = attachmentName;
+	}
 
 }

@@ -43,24 +43,55 @@
    <action-mappings>
 
    		<!-- ========== Action Mapping Definitions ============================== -->
+		<!-- ========== BEGIN: Authroing Definitions ============================== -->
+		<action path="/authoring/init"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			parameter="initPage" >
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+		</action>
 
-		<action path="/authoring"
+		<action path="/authoring/update"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="forumForm" 
 			scope="request" 
-			input="/jsps/authoring/authoring.jsp"
-			parameter="action" 
-			validate="true">
-			<forward name="success" path="/jsps/authoring/success.jsp" />
+			parameter="updateContent" 
+			validate="false">
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
 		</action>
 
-		<action path="/authoring/forum/newTopic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
+		<action path="/authoring/uploadOnline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			name="forumForm" 
+			scope="request" 
+			parameter="uploadOnline" 
+			validate="false">
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+		</action>
+		<action path="/authoring/uploadOffline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			name="forumForm" 
+			scope="request" 
+			parameter="uploadOffline" 
+			validate="false">
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+		</action>
+		<action path="/authoring/deleteOnline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			parameter="deleteOnline" >
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+		</action>
+		<action path="/authoring/deleteOffline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			parameter="deleteOffline" >
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+		</action>
+		<action path="/authoring/newTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			parameter="newTopic">
 			<forward name="success" path="tiles:/authoring/forum/newTopic" />
 		</action>
-		<action path="/authoring/forum/createTopic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
+		<action path="/authoring/createTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="messageForm" 
 			validate="true"
 			input="tiles:/authoring/forum/newTopic" 
@@ -68,12 +99,13 @@
 			scope="request">
 			<forward name="success" path="tiles:/authoring/forum/newTopic" />
 		</action>
-		<action path="/authoring/forum/deleteTopic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
+		<action path="/authoring/deleteTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			input="tiles:/authoring/forum/create" 
 			parameter="deleteTopic"
 			scope="request">
 		</action>
+		<!-- ========== END: Authroing Definitions ============================== -->
 		<!-- Message related actions -->
 		<action path="/learning/forum/open"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"

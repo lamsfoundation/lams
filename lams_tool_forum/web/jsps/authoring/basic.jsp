@@ -25,7 +25,7 @@
 <table class="forms">
 	<tr>
 		<td class="formlabel"><fmt:message key="label.authoring.basic.title" />:</td>
-		<td class="formcontrol"><html:text property="title" /></td>
+		<td class="formcontrol"><html:text property="forum.title" /></td>
 	</tr>
 	<tr>
 		<td class="formlabel"><fmt:message
@@ -43,7 +43,7 @@
 	</tr>
 	<tr>
 		<td colspan="2" align="left">
-			<a href="javascript:launchPopup('<html:rewrite page="/authoring/forum/newTopic.do"/>');">
+			<a href="javascript:launchPopup('<html:rewrite page="/authoring/newTopic.do"/>');">
 				<fmt:message key="label.authoring.create.new.topic" />
 			</a>
 		</td>

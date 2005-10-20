@@ -22,8 +22,8 @@
 <c:if test="${empty currentTab}"><c:set var="currentTab" value="b"/></c:if>
 <body onLoad="initTabs();showTab('<c:out value='${currentTab}'/>');">
 
-<html:form action="authoring" method="post"	 enctype="multipart/form-data">
-		<html:hidden property="contentId"/>
+<html:form action="authoring/update" method="post"	 enctype="multipart/form-data">
+		<html:hidden property="forum.contentId"/>
 		<html:hidden  property="currentTab" styleId="currentTab"/>
 
 <!-- start tabs -->
@@ -68,9 +68,8 @@
     <!-- end tab buttons -->
 
 	<%@ include file="basic.jsp"%>
-	<%@ include file="instructions.jsp"%>
 	<%@ include file="advance.jsp"%>
-	
+	<%@ include file="instructions.jsp"%>
 </html:form>
 </body>
 </html:html>

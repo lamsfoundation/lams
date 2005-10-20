@@ -15,7 +15,7 @@
 	<tr>
 		<td valign="MIDDLE"><b><bean:message key="message.label.attachment" /></b></td>
 		<td valign="MIDDLE">&nbsp;&nbsp;<html:file tabindex="3"
-			property="message.attachmentName" /> <html:errors
+			property="attachmentName" /> <html:errors
 			property="message.attachment" /></td>
 	</tr>
 	<td>&nbsp;&nbsp;<html:submit>

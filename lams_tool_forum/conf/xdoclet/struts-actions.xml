@@ -47,23 +47,23 @@
 		</action>
 						
 		<action path="/authoring/newTopic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			parameter="newTopic">
 			<forward name="success" path="tiles:/authoring/forum/newTopic" />
 		</action>
 		
 		<action path="/authoring/createTopic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="messageForm" 
 			validate="true"
 			input="tiles:/authoring/forum/newTopic" 
 			parameter="createTopic"
 			scope="request">
-			<forward name="success" path="/authoring/forum/newTopic" />
+			<forward name="success" path="tiles:/authoring/forum/newTopic" />
 		</action>
 		
 		<action path="/authoring/deleteTopic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			input="tiles:/authoring/forum/create" 
 			parameter="deleteTopic"
 			scope="request">

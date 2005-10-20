@@ -20,4 +20,6 @@ public interface ForumConstants {
 	public static final String AUTHORING_TOPICS_LIST = "topicList";
 	public static final String AUTHORING_ATTACHMENT = "attachment";
 	public static final String DEFAULT_TITLE = "Forum";
+	//TODO:hard code!!! need to read from config
+	public static final String TOOL_URL_BASE = "/lams/tool/lafrum11/";
 }

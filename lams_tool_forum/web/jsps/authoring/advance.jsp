@@ -6,7 +6,7 @@
 		<!-- Instructions Row -->
 		<tr>
 			<td colspan="2 class="formcontrol">
-				<html:checkbox property="lockOnFinished" value="1">
+				<html:checkbox property="forum.lockWhenFinished" value="1">
 					<fmt:message key="label.authoring.advance.lock.on.finished" />
 				</html:checkbox>
 			</td>

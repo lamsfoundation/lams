@@ -285,7 +285,7 @@
 	<!-- =================================================================== -->
 	<!-- Generate the deploy package                                         -->
 	<!-- =================================================================== -->
-	<target name="create-deploy-package" depends="build-war,jar" 
+	<target name="create-deploy-package" depends="_build" 
 		description="Generate the deployment package.">
 
 		<echo>+------------------------------------------+</echo>
@@ -372,7 +372,7 @@
 	<!-- begin navigation tasks *************************************************************************************-->
 	<target
         name="_build"
-        depends="init, clean, compile-java, jar, web">
+        depends="clean,init, compile-java, jar, build-war">
 		<echo>+------------------------------------------+</echo>
 		<echo>| built war file                           |</echo>
 		<echo>+------------------------------------------+</echo>
