@@ -42,7 +42,7 @@ MM_reloadPage(true);
 </head>
 <body onLoad="initTabs()">
 
-<h1>Multipe Choice</h1>
+<h1><bean:message key="label.authoring.mc"/></h1>
     
     <!-- start tabs -->
 <!-- tab holder table -->
@@ -98,17 +98,27 @@ MM_reloadPage(true);
 <html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
  <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
-<h2>Edit Question Options</h2>
+<h2><bean:message key="label.authoring.mc.basic.editOptions"/></h2>
+
+<table align=center> 	  
+<tr>   
+<td class="error">
+	<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+</td>
+</tr> 
+</table>
+
 <div id="formtablecontainer">
-					<table align=center> 	 
-					<tr>
-	 				 	<td colspan=2 align=center>								
-						<h4> 
-							<bean:message key="label.question"/>: &nbsp
-							<c:out value="${sessionScope.selectedQuestion}"/>	
-						</h4>
-					  	</td>
-					</tr>
+<table align=center> 	 
+				<tr>
+ 				 	<td colspan=2 align=center>								
+						<bean:message key="label.question"/>: &nbsp
+			  				<input type="text" name="selectedQuestion" value="<c:out value="${sessionScope.selectedQuestion}"/>"   
+				  			size="50" maxlength="255"> 
+				  	</td>
+				</tr>
+</table> 	 
+<table align=center> 	 
 					<tr>
 	 				 	<td colspan=2 align=center>								
 							&nbsp&nbsp

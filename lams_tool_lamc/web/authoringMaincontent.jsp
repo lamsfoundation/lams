@@ -42,7 +42,7 @@ MM_reloadPage(true);
 </head>
 <body onLoad="initTabs()">
 
-<h1>Multipe Choice</h1>
+<h1><bean:message key="label.authoring.mc"/></h1>
     
     <!-- start tabs -->
 <!-- tab holder table -->
@@ -89,7 +89,7 @@ MM_reloadPage(true);
 <html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
  <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
-<h2>Please define the questions and their options. </h2>
+<h2><bean:message key="label.authoring.mc.basic"/></h2>
 
 <table align=center> 	  
 <tr>   
@@ -97,6 +97,7 @@ MM_reloadPage(true);
 	<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
 </td>
 </tr> 
+</table>
 
 <div id="formtablecontainer">
 					<table align=center> 	 
@@ -197,7 +198,7 @@ MM_reloadPage(true);
 
 <!-- tab content 2 Advanced-->
 <div id='content_a'  class="tabbody content_a">
-<h2>Advanced Question Definitions</h2>
+<h2>Advanced Definitions</h2>
 <div id="formtablecontainer">
 The advanced contents should go here
 </div>

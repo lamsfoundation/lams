@@ -226,6 +226,21 @@ public class McServicePOJO implements
 	}
     
     
+    
+    public void cleanAllQuestions(final Long mcContentUid) throws McApplicationException
+	{
+    	try
+        {
+        	mcQueContentDAO.cleanAllQuestions(mcContentUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is cleaning all questions: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+    
   
     public void createMcSession(McSession mcSession) throws McApplicationException
     {

@@ -38,6 +38,8 @@ public interface IMcQueContentDAO
 	
 	public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
 	
+ 	public void cleanAllQuestions(final Long mcContentUid);
+	
 	public void resetAllQuestions(final Long mcContentUid);
 	
 	public void removeQuestionContentByMcUid(final Long mcContentUid);

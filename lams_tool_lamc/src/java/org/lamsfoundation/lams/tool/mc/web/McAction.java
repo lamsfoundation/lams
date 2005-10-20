@@ -562,6 +562,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 		 	
 		 	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
 	 	    logger.debug("toolContentId:" + toolContentId);
@@ -588,6 +589,15 @@ public class McAction extends DispatchAction implements McAppConstants
 			    	}
 			    }
  	        }
+			
+			mcService.cleanAllQuestions(mcContent.getUid());
+			logger.debug("all questions cleaned for :" + mcContent.getUid());
+			
+			ActionMessages errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("submit.successful"));
+			logger.debug("add submit.successful to ActionMessages");
+			saveErrors(request,errors);
+			
 			mcAuthoringForm.resetUserAction();
 	   	    return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
