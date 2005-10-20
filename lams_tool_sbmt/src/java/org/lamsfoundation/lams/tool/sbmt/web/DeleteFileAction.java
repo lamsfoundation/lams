@@ -99,7 +99,9 @@ public class DeleteFileAction extends DispatchAction {
 			sb.append(" <a href=\"../download/?uuid=").append(file.getUuID()).append("&preferDownload=true\">");
 			sb.append(this.getResources(request).getMessage("label.download"));
 			sb.append("</a>\r\n");
-			sb.append("<a href=\"javascript:loadDoc('/lams/tool/lasbmt11/deletefile.do?method=");
+			sb.append("<a href=\"javascript:loadDoc('");
+			sb.append(SbmtConstants.TOOL_URL_BASE);
+			sb.append("deletefile.do?method=");
 			if(StringUtils.equals(type,IToolContentHandler.TYPE_OFFLINE))
 				sb.append("deleteOffline");
 			else
