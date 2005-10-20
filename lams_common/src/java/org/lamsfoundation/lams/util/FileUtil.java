@@ -24,6 +24,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.FileUtilException;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 /**
  * General File Utilities
@@ -31,6 +32,9 @@ import org.lamsfoundation.lams.util.FileUtilException;
 public class FileUtil {
 
 	private static Logger log = Logger.getLogger(FileUtil.class);
+	
+	protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
+	
 
 	/** 
 	 * Deleting a directory using File.delete() only works if
@@ -79,6 +83,45 @@ public class FileUtil {
 		return isDeleted;
 		
 	
+	}
+	
+	/**
+	 * Create a temporary directory with the name in the form
+	 * lamstmp_timestamp_suffix inside the default temporary-file directory 
+	 * for the system.
+	 * This method is protected (rather than private) so that it may be 
+	 * called by the junit tests for this class.
+	 * @param zipFileName
+	 * @return name of the new directory
+	 * @throws ZipFileUtilException if the java io temp directory is not defined,
+	 * or we are unable to calculate a unique name for the expanded directory,
+	 * or an IOException occurs.
+	 */
+	public static String createTempDirectory(String suffix) throws FileUtilException {
+	    
+		String tempSysDirName = System.getProperty( "java.io.tmpdir" );
+		if ( tempSysDirName == null )
+			throw new FileUtilException("No temporary directory known to the server. [System.getProperty( \"java.io.tmpdir\" ) returns null. ]\n Cannot upload package.");
+	
+		String tempDirName = tempSysDirName+File.separator
+			+prefix+System.currentTimeMillis()+"_"+suffix;
+		
+		// Set up the directory. Check it doesn't exist and if it does
+		// try 100 slightly different variations. If I can't find a unique
+		// one in ten tries, then give up.
+		File tempDir = new File(tempDirName);
+		int i = 0;
+		while ( tempDir.exists() && i < 100 ) {
+			tempDirName = tempSysDirName+File.separator
+				+prefix+System.currentTimeMillis()+"_"+i+suffix;
+			tempDir = new File(tempDirName);
+		}
+		if ( tempDir.exists() )
+			throw new FileUtilException("Unable to create temporary directory. The temporary filename/directory that we would use to extract files already exists: "
+					+tempDirName);
+		
+		tempDir.mkdirs();
+		return tempDirName;
 	}
 	
 	/**
