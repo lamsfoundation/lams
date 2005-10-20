@@ -180,6 +180,22 @@ public class McServicePOJO implements
 														   e);
         }
     }
+    
+    
+    public void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException
+	{
+    	try
+        {
+        	mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is updating mc que content: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+    
   
     public void createMcSession(McSession mcSession) throws McApplicationException
     {

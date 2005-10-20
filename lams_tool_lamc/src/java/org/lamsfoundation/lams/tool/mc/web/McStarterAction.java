@@ -109,6 +109,9 @@ public class McStarterAction extends Action implements McAppConstants {
 		Map mapOptionsContent= new TreeMap(new McComparator());
 		Map mapDefaultOptionsContent= new TreeMap(new McComparator());
 		
+		Map mapDisabledQuestions= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_DISABLED_QUESTIONS, mapDisabledQuestions);
+				
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		mcAuthoringForm.resetRadioBoxes();
 		
