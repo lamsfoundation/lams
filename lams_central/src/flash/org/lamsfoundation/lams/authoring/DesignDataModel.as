@@ -104,7 +104,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		//add to DDM
 		
-		ObjectUtils.printObject(activity);
+		//ObjectUtils.printObject(activity);
 		_activities.put(activity.activityUIID, activity);
 		
 		
@@ -113,6 +113,15 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		
 		return success;
+	}
+	
+	public function removeActivity(activityUIID):Object{
+		var r:Object = _activities.remove(activityUIID);
+		if(r==null){
+			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
+		}else{
+			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
+		}
 	}
 	
 	public function addTransition(transition:Transition):Boolean{
