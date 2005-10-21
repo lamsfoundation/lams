@@ -84,7 +84,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	private IUserDAO userDAO;
     private ILearnerService learnerService;
     private ILessonDAO lessonDAO;
-    private String exportTmpDir; //value assigned then the doExport method is executed
+    private String exportTmpDir; //value assigned when the doExport method is executed
     
     
     /**
@@ -141,43 +141,6 @@ public class ExportPortfolioService implements IExportPortfolioService {
         this.userDAO = userDAO;
     }
 		
-	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#getOrderedActivityList(org.lamsfoundation.lams.learningdesign.LearningDesign) */
-	public Vector getOrderedActivityList(LearningDesign learningDesign)
-	{
-		if (learningDesign == null)
-		{
-			String error="the learningdesign is null. Cannot continue";
-			throw new ExportPortfolioException(error);
-		}
-		HashMap activityTree = learningDesign.getActivityTree();				
-		Vector v = new Vector();
-		Activity nextActivity = learningDesign.getFirstActivity();
-		
-		while(nextActivity!=null){
-			addActivityToVector(activityTree, v, nextActivity);
-			nextActivity = transitionDAO.getNextActivity(nextActivity.getActivityId());	
-		}				
-		return v;
-	}
-	
-	/**
-	 * Used by getOrderedActivityList(LearningDesign)
-	 * 
-	 * @param activityTree
-	 * @param v
-	 * @param nextActivity
-	 */
-	private void addActivityToVector(HashMap activityTree, Vector v, Activity activity) {
-		Set childActivities = (Set) activityTree.get(activity.getActivityId());			
-		if(childActivities.size()!=0){
-			// must have been a complex activity
-			v.addAll(childActivities);
-		}else{
-			// must be a simple activity
-			v.add(activity);
-		}
-	}
-	
 	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#exportPortfolioForTeacher(org.lamsfoundation.lams.lesson.Lesson) */
 	public Portfolio[] exportPortfolioForTeacher(Long lessonId, Cookie[] cookies)
 	{
@@ -188,7 +151,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 				
 		if (lesson==null)
 		{
-			String error="lesson cannot be null";
+			String error="The Lesson with lessonID " + lessonId + "is null.";
+			log.error(error);
 			throw new ExportPortfolioException(error);
 		}
 		Vector activities = getOrderedActivityList(lesson.getLearningDesign());
@@ -202,7 +166,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		}
     	catch (LamsToolServiceException e)
 		{
-    		throw new ExportPortfolioException(e);
+    		throw new ExportPortfolioException("An exception has occurred while generating portfolios. The error is: " + e);
 		}
     	return exports;
 	    
@@ -221,7 +185,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	    
 	    if (learner == null || lesson == null)
 		{
-			String error="The learner or lesson cannot be found. Cannot Continue";
+			String error="The User object with userId" + userId + "or Lesson object with lessonId" + lessonID + " is null. Cannot Continue";
+			log.error(error);
 			throw new ExportPortfolioException(error);
 		}
 	    
@@ -245,17 +210,58 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	    
 	}
 	
+	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#getOrderedActivityList(org.lamsfoundation.lams.learningdesign.LearningDesign) */
+	public Vector getOrderedActivityList(LearningDesign learningDesign)
+	{
+		if (learningDesign == null)
+		{
+			String error="the learningdesign is null. Cannot continue";
+			log.error(error);
+			throw new ExportPortfolioException(error);
+		}
+		HashMap activityTree = learningDesign.getActivityTree();				
+		Vector v = new Vector();
+		Activity nextActivity = learningDesign.getFirstActivity();
+		
+		while(nextActivity!=null){
+			addActivityToVector(activityTree, v, nextActivity);
+			nextActivity = transitionDAO.getNextActivity(nextActivity.getActivityId());	
+		}				
+		return v;
+	}
+	
+    
+	/**
+	 * Used by getOrderedActivityList(LearningDesign)
+	 * 
+	 * @param activityTree
+	 * @param v
+	 * @param nextActivity
+	 */
+	private void addActivityToVector(HashMap activityTree, Vector v, Activity activity) {
+		Set childActivities = (Set) activityTree.get(activity.getActivityId());			
+		if(childActivities.size()!=0){
+			// must have been a complex activity
+			v.addAll(childActivities);
+		}else{
+			// must be a simple activity
+			v.add(activity);
+		}
+	}
+		
 	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#setupPortfolios(java.util.Vector, org.lamsfoundation.lams.tool.ToolAccessMode, org.lamsfoundation.lams.usermanagement.User) */
 	public Vector setupPortfolios(Vector sortedActivityList, ToolAccessMode accessMode, User user) throws LamsToolServiceException
 	{
 		if (sortedActivityList == null)
 		{
-			String error="the ordered activity list is null. Cannot continue";
+			String error="The ordered activity list is null. Cannot continue";
+			log.error(error);
 			throw new ExportPortfolioException(error);
 		}
 		if (accessMode != ToolAccessMode.TEACHER && user == null )
 		{
 			String error="Invalid User. User object is null. Cannot continue";
+			log.error(error);
 			throw new ExportPortfolioException(error);
 		}
 		
@@ -283,7 +289,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 					ToolSession toolSession = lamsCoreToolService.getToolSessionByActivity(user, toolActivity);
 					if (toolSession == null)
 					{
-					    String error = "The Tool Session for this user and activity is null. Cannot Continue";
+					    String error = "Cannot obtain the toolSessionId for this tool activity. The Tool Session for this user and activity is null. Cannot Continue";
+					    log.error(error);
 					    throw new ExportPortfolioException(error);
 					}
 					mapOfValuesToAppend.put(WebUtil.PARAM_MODE, ToolAccessMode.LEARNER.toString());
@@ -311,7 +318,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	{
 		if (activity == null)
 		{
-			String error="activity is null";
+			String error="Cannot create portfolio for this tool activity. Tool Activity is null";
+			log.error(error);
 			throw new ExportPortfolioException(error);
 		}
 		Portfolio p = new Portfolio();
@@ -347,7 +355,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	{
 		if (learnerProgressId == null)
 		{
-			String error="the learnerProgressId is null";
+			String error="Cannot obtain the ordered activity list for learner. The learner progress id is null,";
+			log.error(error);
 			throw new ExportPortfolioException(error);
 		}
 		
@@ -355,7 +364,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		Set activitySet = learnerProgress.getCompletedActivities();
 		if (activitySet.size() == 0)
 		{
-			String error="Cannot export your portfolio. You have not completed any activities yet.";
+			String error="Cannot export the portfolio for learner with learner progress id " + learnerProgressId + ". Learner has not completed any activities yet.";
+			log.error(error);
 			throw new ExportPortfolioException(error);
 		} 
 		
@@ -379,23 +389,6 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		
 	}
 	
-	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#createTempDirectory(String) */
-/*	public boolean createTempDirectory(String directoryName)
-	{
-		boolean created;
-		try
-		{
-			created = FileUtil.createDirectory(directoryName);
-	
-		}
-		catch (FileUtilException e)
-		{
-			throw new ExportPortfolioException("An error has occurred while creating a directory " + e);
-		}
-		
-		return created;
-	} */
-	
 	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#zipPortfolio(String, String) */
 	public String zipPortfolio(String filename, String directoryToZip)
 	{
@@ -409,11 +402,11 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		}
 		catch(FileUtilException e)
 		{
-		    throw new ExportPortfolioException("Cannot create tmp dir in which export is to be made.");
+		    throw new ExportPortfolioException("Cannot create the temporary directory for this export", e);
 		}
 		catch(ZipFileUtilException e)
 		{
-			throw new ExportPortfolioException("An error has occurred while zipping up the directory " + e);
+			throw new ExportPortfolioException("An error has occurred while zipping up the directory ", e);
 		}
 		return zipfileName;
 	}
@@ -440,25 +433,28 @@ public class ExportPortfolioService implements IExportPortfolioService {
 			String subDirectoryName = ExportPortfolioConstants.SUBDIRECTORY_BASENAME + portfolio.getActivityId().toString();
 			if(!createSubDirectory(tempDirectoryName, subDirectoryName))
 			{
-				throw new ExportPortfolioException("The subdirectory for the activity could not be created.");
+				throw new ExportPortfolioException("The subdirectory " + subDirectoryName + " could not be created.");
 			}
 			
 			// The directory in which the activity must place its files 
 			activitySubDirectory = tempDirectoryName + File.separator + subDirectoryName; 
 		
-			//append the directory name to the end of the export url, so that the tools know where to place its files
-			exportURL = WebUtil.appendParameterToURL(portfolio.getExportUrl(), WebUtil.PARAM_DIRECTORY_NAME, activitySubDirectory);
+			//for security reasons, append the relative directory name to the end of the export url instead of the whole path
+			String relativePath = activitySubDirectory.substring(ExportPortfolioConstants.TEMP_DIRECTORY.length()+1, activitySubDirectory.length());
+			exportURL = WebUtil.appendParameterToURL(portfolio.getExportUrl(), WebUtil.PARAM_DIRECTORY_NAME, relativePath);
 			
-			//append the host name to the export url for eg: http://localhost:8080/export_url
-			/**
-			 * TODO: Find if there is another way to determine the host name, instead of hard coding it.
-			 */
 			String absoluteExportURL = ExportPortfolioConstants.HOST + exportURL;		
 					
 			portfolio.setExportUrl(absoluteExportURL);
 				
 			//get tool to export its files, mainFileName is the name of the main HTML page that the tool exported.
 			mainFileName = connectToToolViaExportURL(absoluteExportURL, cookies);
+			
+			if (mainFileName == null)
+			{
+			    log.error("The main export file returned by the tool activity was null. Tool activity id " + portfolio.getActivityId());
+			    throw new ExportPortfolioException("The main file name the tool returned is null.Cannot continue with export.");
+			}
 			
 			//toolLink is used in main page, so that it can link with the tools export pages.
 			toolLink = subDirectoryName + "/" + mainFileName;	
@@ -513,7 +509,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	    }
 	    catch(FileUtilException e)
 	    {
-	        throw new ExportPortfolioException("Unable to create temporary directory for export", e);
+	        throw new ExportPortfolioException("Unable to create temporary directory " + name + " for export.", e);
 	    }
 	    return tmpDir;
 	}
@@ -536,7 +532,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		}
 		catch(IOException e)
 		{
-			throw new ExportPortfolioException("A problem has occurred while writing file. ", e);
+			throw new ExportPortfolioException("A problem has occurred while writing the contents of " + exportURL + " to file. ", e);
 		}
 		
 	}
