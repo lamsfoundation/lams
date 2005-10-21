@@ -34,7 +34,7 @@ public class FileUtil {
 	private static Logger log = Logger.getLogger(FileUtil.class);
 	
 	protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
-	
+	public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
 	/** 
 	 * Deleting a directory using File.delete() only works if
@@ -99,7 +99,7 @@ public class FileUtil {
 	 */
 	public static String createTempDirectory(String suffix) throws FileUtilException {
 	    
-		String tempSysDirName = System.getProperty( "java.io.tmpdir" );
+		String tempSysDirName = TEMP_DIR;
 		if ( tempSysDirName == null )
 			throw new FileUtilException("No temporary directory known to the server. [System.getProperty( \"java.io.tmpdir\" ) returns null. ]\n Cannot upload package.");
 	
