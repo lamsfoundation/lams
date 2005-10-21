@@ -1,8 +1,6 @@
 /*
  * Created on Sep 22, 2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
@@ -19,40 +17,14 @@ import org.lamsfoundation.lams.web.servlet.ExportPortfolioServletException;
 /**
  * @author mtruong
  *
- * TODO write a servlet mapping for this servlet. then test to see if the request parameters are also being
- * passed onto the export url
  */
 public class NbExportServlet extends AbstractExportPortfolioServlet {
 	
 	private final String FILENAME = "nb_main.html";
 	
-	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) throws NbApplicationException
+	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
-		/**
-		 * Implementation 1: using filters. Problem: cant generate more than one file
-		 */
-	/*	 try
-		{
-			String absoluteFilename = directoryName + File.separator + FILENAME;
-			request.setAttribute(WebUtil.PARAM_FILENAME, absoluteFilename);
-			
-			RequestDispatcher requestDip = getServletContext().getRequestDispatcher("/exportPortfolio.do");
-			requestDip.forward(request, response);
-		}
-		catch(ServletException e)
-		{
-			throw new NbApplicationException("An error has occurred while redirecting to export page. Reason: " + e.getMessage());
-		}
-		catch(IOException e)
-		{
-			throw new NbApplicationException("An error has occurred while redirecting to export page. Reason: " + e.getMessage());
-		}
-			*/
-		
-		/**
-		 * Implementation 2: using HttpURLConnection, can connect to as many pages as the tool wants.
-		 */
-		
+	
 		String mode = WebUtil.readStrParam(request, WebUtil.PARAM_MODE);
 		Long toolContentId, toolSessionId, userId;
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
