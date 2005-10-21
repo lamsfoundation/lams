@@ -20,9 +20,11 @@ http://www.gnu.org/licenses/gpl.txt
 --%>  
 
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
+<%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/struts/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
+
 
 <%
 String protocol = request.getProtocol();
@@ -76,6 +78,7 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 			updateindicator = updateindicator+"... ";
 		
 			var ready=req.readyState;
+			var msg;
 		
 			if (ready==READY_STATE_COMPLETE){
 			
@@ -86,10 +89,12 @@ String downloadServlet = learning_root + "exportDownload?fileLocation=";
 						window.location.href = url;
 						break;
 					case 404: //status 404 Not Found
-						alert("The export download page cannot be found");
+						msg = "<fmt:message key='error.message.404' />";
+						alert(msg);
 						break;
 					case 500: //status 500 Internal Server Error
-						alert("A problem has occurred. Could not generate portfolio");
+						msg = "<fmt:message key='error.system.export' />";
+						document.getElementById("message").innerHTML = msg;
 						break;
 				}
 				
