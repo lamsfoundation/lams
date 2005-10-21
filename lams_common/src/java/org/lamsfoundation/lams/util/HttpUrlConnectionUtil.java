@@ -29,22 +29,32 @@ public class HttpUrlConnectionUtil {
     
     private static Logger log = Logger.getLogger(HttpUrlConnectionUtil.class);
     
+    public static final int STATUS_OK = 1;
+    public static final int STATUS_ERROR = -1;
+    
+  
     /**
      * Mimics a browser connection and connects to the url <code>urlToConnectTo</code> and writes
      * the contents to the file with <code>filename</code> stored in <code>directoryToStoreFile</code>.
      * Also sets the necessary cookies needed in the form JSESSIONID=XXXX;JSESSIONIDSSO=XXXX;SYSSESSIONID=XXXX
+     * If the Http Status-Code returned is 200, then it will proceed to write the contents to a file.
+     * Otherwise it will return the value -1 to indicate that an error has occurred.
      * 
      * @param urlToConnectTo The url in which the HttpUrlConnection is to be made
      * @param directoryToStoreFile The directory to place the saved html file
      * @param filename	The name of the file, eg. export_main.html
      * @param cookies The Cookie objects which needs to be passed along with the request
+     * @return int returns 1 if success, -1 otherwise.
      * @throws MalformedURLException
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static void writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename, Cookie[] cookies) 
+    public static int writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename, Cookie[] cookies) 
     	throws MalformedURLException, FileNotFoundException, IOException
     {
+        int status;
+        int statusCode;
+        
         String absoluteFilePath = directoryToStoreFile + File.separator + filename;
 		
 			URL url = new URL(urlToConnectTo);
@@ -55,30 +65,45 @@ public class HttpUrlConnectionUtil {
 				log.debug("A connection has been established with "+urlToConnectTo);
 			}
 			InputStream inputStream = con.getInputStream();
-			OutputStream outStream = new FileOutputStream(absoluteFilePath);
-			   
-			int c = -1;
-			while ((c = inputStream.read())!= -1)
+			statusCode = con.getResponseCode();
+			status = getStatus(statusCode);
+			
+			if (status == STATUS_OK)
 			{
-				outStream.write(c);
+				OutputStream outStream = new FileOutputStream(absoluteFilePath);
+				   
+				int c = -1;
+				while ((c = inputStream.read())!= -1)
+				{
+					outStream.write(c);
+				}
+				   
+				inputStream.close();
+				outStream.close(); 
+				if ( log.isDebugEnabled() ) {
+					log.debug("A connection to "+urlToConnectTo + " has been closed");
+				}
+			
 			}
-			   
-			inputStream.close();
-			outStream.close(); 
-			if ( log.isDebugEnabled() ) {
-				log.debug("A connection to "+urlToConnectTo + " has been closed");
+			else
+			{
+			    log.error("A problem has occurred while connecting to this url " + urlToConnectTo);
 			}
+			
+			return status;
 	
     }
     
     /**
-     * Method used by the export service method. It will mimic a browsers and
-     * connects to the tools export url via a HttpUrlConnection. The tool's
-     * export page will return the name of the main file being exported, and this
-     * method reads the name and returns it to the calling code.
+     * Method used by the export service method. It will mimic a browser and
+     * connects to the tools export url via a HttpUrlConnection.
+     * If the Http Status-Code returned is 200, then it will proceed to read the 
+     * main file name returned by the tool.
+     * Otherwise it will return null to indicate that an error has occurred.
+     * 
      * @param toolsExportUrl The url in which the HttpUrlConnection is to be made
      * @param cookies The Cookie objects which needs to be passed along with the request
-     * @return String the main file that was exported by the tool
+     * @return String the main file that was exported by the tool, null if an error has occurred
      * @throws MalformedURLException
      * @throws FileNotFoundException
      * @throws IOException
@@ -86,23 +111,57 @@ public class HttpUrlConnectionUtil {
     public static String connectToToolExportURL(String toolsExportUrl, Cookie[] cookies)
     	throws MalformedURLException, FileNotFoundException, IOException
     {
+        int status;
+        int statusCode;
 	    String mainFileName = null;
 		
 	    URL url = new URL(toolsExportUrl);
 		HttpURLConnection con = (HttpURLConnection)url.openConnection();
 		con.setRequestProperty("Cookie", getCookieString(cookies));
 			
-		BufferedReader input = new BufferedReader(new InputStreamReader(con.getInputStream()));
-	
-		mainFileName = input.readLine();
+		InputStream inputStream = con.getInputStream();
+		statusCode = con.getResponseCode();
+		status = getStatus(statusCode);
+		
+		if (status == STATUS_OK)
+		{		
+			BufferedReader input = new BufferedReader(new InputStreamReader(inputStream));
 			
-		input.close();
-	
-		return mainFileName;	
+			mainFileName = input.readLine();
+				
+			input.close();
+		
+			return mainFileName;	
+		}
+		else
+		{
+		    log.error("A problem has occurred while connecting to the tools export url " + toolsExportUrl);
+		    return null;
+		}
 		
 	
 	}
     
+    private static int getStatus(int statusCode)
+    {
+        int status = STATUS_ERROR; //default to -1, if status isnt 200, it would be an error anyway
+        
+        switch(statusCode)
+        {
+        	case HttpURLConnection.HTTP_OK:
+        	    status = STATUS_OK;
+        		break;
+        	case HttpURLConnection.HTTP_INTERNAL_ERROR: //500
+        	    status =  STATUS_ERROR;
+        	    break;
+        	
+        	case HttpURLConnection.HTTP_NOT_FOUND: //404
+        	    status = STATUS_ERROR;
+        	    break;
+        }
+        
+        return status;
+    }
     
     /**
      * This helper method sets up the string which is passed as a parameter to
