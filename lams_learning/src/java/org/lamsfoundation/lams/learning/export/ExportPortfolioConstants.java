@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.learning.export;
 
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
 
 /**
  * @author mtruong
@@ -45,8 +46,7 @@ public class ExportPortfolioConstants {
 	public static final String HOST = getServerURL();
 	public static final String SUBDIRECTORY_BASENAME = "Activity"; //subdirectory for each activity is ActivityXX where XX is the activity Id
 	public static final String PARAM_FILE_LOCATION = "fileLocation";
-	public static final String TEMP_DIRECTORY = System.getProperty("java.io.tmpdir");
-	
+	public static final String TEMP_DIRECTORY = FileUtil.TEMP_DIR;
 	private static String getServerURL()
 	{
 	    return Configuration.get(ConfigurationKeys.SERVER_URL);
