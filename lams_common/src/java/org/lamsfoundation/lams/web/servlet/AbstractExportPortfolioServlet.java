@@ -71,10 +71,12 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		String directoryName = null;
 		String mode = null;
 		
-		Cookie[] cookies = request.getCookies();
+		Cookie[] cookies = request.getCookies();		
 		
+		directoryName = WebUtil.readStrParam(request, WebUtil.PARAM_DIRECTORY_NAME); 
 		
-		directoryName = WebUtil.readStrParam(request, WebUtil.PARAM_DIRECTORY_NAME);
+		//put the path together again, since the given directory was a relative one.
+		String absoluteDirectoryPath = FileUtil.TEMP_DIR + File.separator + directoryName;
 	
 		if (log.isDebugEnabled()) {
 			log.debug("Directory name to store files is "+directoryName);
@@ -83,9 +85,10 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		//check if the directory name has any trailing slashes, if so, remove it and return the new value
 		directoryName = checkDirectoryName(directoryName);
 		
+	
 		//check if the directory exists, if not throw exception
-		if (!FileUtil.directoryExist(directoryName))
-			throw new IOException("The directory supplied" + directoryName + " does not exist.");
+		if (!FileUtil.directoryExist(absoluteDirectoryPath))
+			throw new IOException("The directory supplied " + absoluteDirectoryPath + " does not exist.");
 		
 		mode = WebUtil.readStrParam(request, WebUtil.PARAM_MODE);			
 		
@@ -93,7 +96,7 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 			log.debug("Export is conducted in mode: " + mode);
 		}
 				
-		mainFileName = doExport(request, response, directoryName, cookies);
+		mainFileName = doExport(request, response, absoluteDirectoryPath, cookies);
 		
 		if (log.isDebugEnabled()) {
 			log.debug("The name of main html file is "+mainFileName);
@@ -142,47 +145,17 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	 * 
 	 * @param filename
 	 */
-	protected void writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename, Cookie[] cookies) throws ExportPortfolioServletException
+	protected int writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename, Cookie[] cookies) throws ExportPortfolioServletException
 	{
-		/* String absoluteFilePath = directoryToStoreFile + File.separator + filename;
-		try
-		{
-			URL url = new URL(urlToConnectTo);
-			HttpURLConnection con = (HttpURLConnection)url.openConnection();
-			if ( log.isDebugEnabled() ) {
-				log.debug("A connection has been established with "+urlToConnectTo);
-			}
-			InputStream inputStream = con.getInputStream();
-			OutputStream outStream = new FileOutputStream(absoluteFilePath);
-			   
-			int c = -1;
-			while ((c = inputStream.read())!= -1)
-			{
-				outStream.write(c);
-			}
-			   
-			inputStream.close();
-			outStream.close(); 
-			if ( log.isDebugEnabled() ) {
-				log.debug("A connection to "+urlToConnectTo + " has been closed");
-			}
-		}
-		catch(MalformedURLException e)
-		{
-			throw new ExportPortfolioServletException("The URL given is invalid. ",e);
-		}
-		catch(FileNotFoundException e)
-		{
-			throw new ExportPortfolioServletException("The directory or file may not exist. ",e);
-		}
-		catch(IOException e)
-		{
-			throw new ExportPortfolioServletException("A problem has occurred while writing file. ", e);
-		} */
-	    
+	  
 	    try
 	    {
-	        HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, filename, cookies);
+	       int status = HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, filename, cookies);
+	       if (status != HttpUrlConnectionUtil.STATUS_OK)
+	       {
+	           throw new ExportPortfolioServletException("error");
+	       }
+	      return status;
 	    }
 	    catch(MalformedURLException e)
 		{
