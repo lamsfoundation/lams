@@ -46,7 +46,7 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
 	 	
-	 	private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
+	 	private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId and mcQueContent.disabled=true";
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question and mcQueContent.mcContentId=:mcContentUid";
 	 	
@@ -103,6 +103,7 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 		    		McQueContent mcQueContent=(McQueContent)listIterator.next();
 					this.getSession().setFlushMode(FlushMode.AUTO);
 		    		templ.delete(mcQueContent);
+		    		templ.flush();
 		    	}
 			}
 	    }
@@ -136,15 +137,14 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 				.list();
 
 			if(list != null && list.size() > 0){
+				logger.debug("will iterate the list of McQueContent");
 				Iterator listIterator=list.iterator();
 		    	while (listIterator.hasNext())
 		    	{
 		    		McQueContent mcQueContent=(McQueContent)listIterator.next();
-		    		if ((mcQueContent != null) && (mcQueContent.isDisabled()));
-		    		{
-		    			this.getSession().setFlushMode(FlushMode.AUTO);
-			    		templ.delete(mcQueContent);	
-		    		}
+	    			this.getSession().setFlushMode(FlushMode.AUTO);
+	    			logger.debug("deleting mcQueContent: " + mcQueContent);
+		    		templ.delete(mcQueContent);	
 		    	}
 			}
 	    }

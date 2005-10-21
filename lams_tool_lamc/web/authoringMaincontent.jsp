@@ -105,7 +105,7 @@ MM_reloadPage(true);
 					 		<td> <bean:message key="label.authoring.title"/>: </td>
 							<td class="formcontrol">
 							<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/">
-								  <c:out value="${McAuthoringForm.title}" escapeXml="false" />						  
+								  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
 							</FCK:editor>
 							</td> 
 					  	</tr>
@@ -114,7 +114,7 @@ MM_reloadPage(true);
 					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
 							<td class="formcontrol">
 							<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/">
-								  <c:out value="${McAuthoringForm.instructions}" escapeXml="false" />						  
+								  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
 							</FCK:editor>
 							</td>
 						</tr>

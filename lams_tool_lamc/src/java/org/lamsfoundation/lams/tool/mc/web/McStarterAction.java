@@ -294,8 +294,8 @@ public class McStarterAction extends Action implements McAppConstants {
 				return (mapping.findForward(LOAD_QUESTIONS));
 			}
 			
-			request.getSession().setAttribute(TITLE,mcContent.getTitle());
-			request.getSession().setAttribute(INSTRUCTIONS,mcContent.getInstructions());
+			request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
+			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
 			request.getSession().setAttribute(QUESTIONS_SEQUENCED,new Boolean(mcContent.isQuestionsSequenced()));
 			request.getSession().setAttribute(USERNAME_VISIBLE,new Boolean(mcContent.isUsernameVisible()));
 			request.getSession().setAttribute(CREATED_BY, new Long(mcContent.getCreatedBy()));

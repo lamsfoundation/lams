@@ -111,16 +111,14 @@ MM_reloadPage(true);
 <div id="formtablecontainer">
 <table align=center> 	 
 				<tr>
- 				 	<td colspan=2 align=center>								
+ 				 	<td colspan=3 align=center>								
 						<bean:message key="label.question"/>: &nbsp
 			  				<input type="text" name="selectedQuestion" value="<c:out value="${sessionScope.selectedQuestion}"/>"   
 				  			size="50" maxlength="255"> 
 				  	</td>
 				</tr>
-</table> 	 
-<table align=center> 	 
 					<tr>
-	 				 	<td colspan=2 align=center>								
+	 				 	<td colspan=3 align=center>								
 							&nbsp&nbsp
 					  	</td>
 					</tr>
@@ -128,7 +126,10 @@ MM_reloadPage(true);
 						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
 							  <c:if test="${optionEntry.key == 1}"> 			
 								  <tr>
-								  		<td class="input"> 
+									<td class="input"> 
+									<input type="checkbox" name="isSelectionOption<c:out value="${optionIndex}"/>" >
+								  	</td>
+							  		<td class="input"> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
@@ -143,7 +144,10 @@ MM_reloadPage(true);
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
 								  <tr>
-								  		<td class="input"> 
+								  	<td class="input"> 
+										<input type="checkbox" name="isSelectionOption<c:out value="${optionIndex}"/>" >
+								  	</td>
+								  	<td class="input"> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
@@ -157,8 +161,10 @@ MM_reloadPage(true);
 							</c:if> 			
 						</c:forEach>
 							<html:hidden property="optionIndex"/>
+							
+							
 	 				 <tr>
-	 				 	<td colspan=2 align=left>								
+	 				 	<td colspan=3 align=left>								
 							<html:submit property="doneOptions" styleClass="linkbutton" 
 							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 								<bean:message key="button.done"/>

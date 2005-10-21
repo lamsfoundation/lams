@@ -197,6 +197,42 @@ public abstract class McUtils implements McAppConstants {
 	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
 	}
 	
+	
+	public static void persistRichText(HttpServletRequest request)
+	{
+	/*
+		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
+		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
+		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
+		logger.debug("read parameter richTextOnlineInstructions: " + richTextOnlineInstructions);
+		
+		if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,richTextOfflineInstructions);	
+		}
+		
+		if ((richTextOnlineInstructions != null) && (richTextOnlineInstructions.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,richTextOnlineInstructions);	
+		}
+		
+	*/
+		String richTextTitle=request.getParameter(RICHTEXT_TITLE);
+		logger.debug("read parameter richTextTitle: " + richTextTitle);
+		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
+		logger.debug("read parameter richTextInstructions: " + richTextInstructions);
+		
+		if ((richTextTitle != null) && (richTextTitle.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
+		}
+		
+		if ((richTextInstructions != null) && (richTextInstructions.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
+		}
+	}
+	
 	public static void configureContentRepository(HttpServletRequest request)
 	{
 		logger.debug("attempt configureContentRepository");

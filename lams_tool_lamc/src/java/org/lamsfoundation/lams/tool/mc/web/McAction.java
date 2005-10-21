@@ -223,11 +223,13 @@ public class McAction extends DispatchAction implements McAppConstants
                                                             ServletException
     {
     	
-		logger.debug("loadQ initialised...");
+		logger.debug("loadQ started...");
 	 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	logger.debug("mcService:" + mcService);
+	 	
+	 	McUtils.persistRichText(request);
 	 	
 	 	
 	 	String userAction=null;
@@ -558,7 +560,35 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		userAction="submitQuestions";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
+
+        	ActionMessages errors= new ActionMessages();
 	 		
+	 		String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
+        	logger.debug("richTextTitle: " + richTextTitle);
+        	String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
+        	logger.debug("richTextInstructions: " + richTextInstructions);
+        	
+	 		
+	 		if ((richTextTitle == null) || (richTextTitle.length() == 0) || richTextTitle.equalsIgnoreCase(RICHTEXT_BLANK))
+    		{
+        		errors.add(Globals.ERROR_KEY,new ActionMessage("error.title"));
+    			logger.debug("add title to ActionMessages");
+    		}
+
+    		if ((richTextInstructions == null) || (richTextInstructions.length() == 0) || richTextInstructions.equalsIgnoreCase(RICHTEXT_BLANK))
+    		{
+    			errors.add(Globals.ERROR_KEY, new ActionMessage("error.instructions"));
+    			logger.debug("add instructions to ActionMessages: ");
+    		}
+
+    		if (errors.size() > 0)  
+    		{
+    			logger.debug("either title or instructions or both is missingr. Returning back to from to fix errors:");
+    			return (mapping.findForward(LOAD_QUESTIONS));
+    		}
+    		
+    		
+    		
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
@@ -569,6 +599,11 @@ public class McAction extends DispatchAction implements McAppConstants
 				
 			McContent mcContent=mcService.retrieveMc(toolContentId);
 			logger.debug("mcContent:" + mcContent);
+			
+			logger.debug("updating mcContent title and instructions:" + mcContent);
+			mcContent.setTitle(richTextTitle);
+			mcContent.setInstructions(richTextInstructions);
+			
 			
 			mcService.resetAllQuestions(mcContent.getUid());
 			logger.debug("all question reset for :" + mcContent.getUid());
@@ -590,10 +625,12 @@ public class McAction extends DispatchAction implements McAppConstants
 			    }
  	        }
 			
+			/** attend here later again, for the moment we are not deleting unused question physically from the DB, 
+			 * we are just marking them as disabled */
 			mcService.cleanAllQuestions(mcContent.getUid());
 			logger.debug("all questions cleaned for :" + mcContent.getUid());
 			
-			ActionMessages errors= new ActionMessages();
+			errors.clear();
 			errors.add(Globals.ERROR_KEY,new ActionMessage("submit.successful"));
 			logger.debug("add submit.successful to ActionMessages");
 			saveErrors(request,errors);
@@ -714,24 +751,20 @@ public class McAction extends DispatchAction implements McAppConstants
     	if (mcAuthoringForm.getEndLearningMessage() == null)
     		endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSAGE);
 
-
-    	/** 
-    	 * title and instructions are mandatory
-    	 */
-    	title=mcAuthoringForm.getTitle();
-    	if (title == null)
-    		title="dummy Title";
+    	String richTextTitle="";
+    	richTextTitle = (String)request.getSession().getAttribute(RICHTEXT_TITLE);
+    	logger.debug("createContent richTextTitle from session: " + richTextTitle);
+    	if (richTextTitle == null) richTextTitle="";
     	
-    	instructions=mcAuthoringForm.getInstructions();
-    	if (instructions == null)
-    		instructions="dummy instructions";
+    	String richTextInstructions="";
+    	richTextInstructions = (String)request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
+    	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
+    	if (richTextInstructions == null) richTextInstructions="";
     	
-    	
-		creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
+    	creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
 		if (creationDate == null)
 			creationDate=new Date(System.currentTimeMillis()).toString();
 		
-				
     		
     	/**obtain user object from the session*/
 	    HttpSession ss = SessionManager.getSession();
@@ -747,8 +780,8 @@ public class McAction extends DispatchAction implements McAppConstants
     	/** create a new qa content and leave the default content intact*/
     	McContent mc = new McContent();
 		mc.setMcContentId(toolContentId);
-		mc.setTitle(title);
-		mc.setInstructions(instructions);
+		mc.setTitle(richTextTitle);
+		mc.setInstructions(richTextInstructions);
 		mc.setCreationDate(creationDate); /**preserve this from the db*/ 
 		mc.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
 		mc.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
