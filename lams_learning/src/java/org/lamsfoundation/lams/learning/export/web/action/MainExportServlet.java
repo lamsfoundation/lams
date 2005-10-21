@@ -80,9 +80,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * The main page will be generated after all tools have completed its 
  * export. At the time of writing, the html for the main page is
  * done manually. 
- * All of the outputs of the export will be zipped up and will be
- * available for download.
- * 
+ * All of the outputs of the export will be zipped up and placed
+ * in the temporary export directory. The relative path of the 
+ * file location of this zip file is returned. 
  * 
  */
 public class MainExportServlet extends HttpServlet {
@@ -105,12 +105,9 @@ public class MainExportServlet extends HttpServlet {
 	    /** Get the cookies that were sent along with this request, then pass it onto export service */
 		Cookie[] cookies = request.getCookies();	
 	
-		
 		IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this.getServletContext());
 		String htmlOutput=null;
 	
-		
-	  
 		Portfolio[] portfolios = null;
 		String mode = WebUtil.readStrParam(request, WebUtil.PARAM_MODE);
 		
