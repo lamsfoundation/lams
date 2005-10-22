@@ -35,6 +35,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	
 	protected String questionIndex;
 	protected String optionIndex;
+	protected String selectedIndex;
 	
 	protected String editDefaultQuestion;
 	protected String removeOptionContent;
@@ -90,6 +91,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String statsMonitoring;
 
 	protected String edit;
+	
 	
 	public void resetUserAction()
     {
@@ -149,6 +151,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.instructions=null;
 		this.questionIndex=null;
 		this.optionIndex=null;
+		this.selectedIndex=null;
 		this.isRemoveContent=null;
 		this.toolContentId=null;
 
@@ -179,6 +182,9 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.synchInMonitor		=OPTION_OFF;
 		this.usernameVisible	=OPTION_OFF;
 		this.questionsSequenced	=OPTION_OFF;
+		
+    	this.retries 			 =OPTION_OFF;
+    	this.showFeedback 		 =OPTION_OFF;
 	}
 
 	
@@ -751,5 +757,17 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setSubmitQuestions(String submitQuestions) {
 		this.submitQuestions = submitQuestions;
+	}
+	/**
+	 * @return Returns the selectedIndex.
+	 */
+	public String getSelectedIndex() {
+		return selectedIndex;
+	}
+	/**
+	 * @param selectedIndex The selectedIndex to set.
+	 */
+	public void setSelectedIndex(String selectedIndex) {
+		this.selectedIndex = selectedIndex;
 	}
 }

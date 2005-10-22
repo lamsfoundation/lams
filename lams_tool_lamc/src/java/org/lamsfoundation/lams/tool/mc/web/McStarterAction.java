@@ -314,6 +314,11 @@ public class McStarterAction extends Action implements McAppConstants {
 			
 			
 			McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
+			
+			/** reset all radioboxes to false*/
+			mcAuthoringForm.resetRadioBoxes();
+			logger.debug("all radioboxes arec reset");
+			
 			logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
 			logger.debug("getting default content");
 			/**
@@ -323,6 +328,7 @@ public class McStarterAction extends Action implements McAppConstants {
 			request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(false));
 		    logger.debug("CONTENT_IN_USE: " + request.getSession().getAttribute(CONTENT_IN_USE));
 		    
+		    /* this is already done in  mcAuthoringForm.resetRadioBoxes()*/ 
 		    mcAuthoringForm.setUsernameVisible(OFF);
 		    mcAuthoringForm.setQuestionsSequenced(OFF);
 			mcAuthoringForm.setSynchInMonitor(OFF);

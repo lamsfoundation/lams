@@ -100,22 +100,22 @@ MM_reloadPage(true);
 </table>
 
 <div id="formtablecontainer">
-					<table align=center> 	 
+					<table align=center class="forms" >
  						<tr> 
-					 		<td> <bean:message key="label.authoring.title"/>: </td>
+					 		<td class="formlabel"> <bean:message key="label.authoring.title"/>: </td>
 							<td class="formcontrol">
-							<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/">
-								  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
-							</FCK:editor>
+								<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/">
+									  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
+								</FCK:editor>
 							</td> 
 					  	</tr>
 					  	
 					  	<tr> 
-					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
+					 		<td class="formlabel"> <bean:message key="label.authoring.instructions"/>: </td>
 							<td class="formcontrol">
-							<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/">
-								  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
-							</FCK:editor>
+								<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/">
+									  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
+								</FCK:editor>
 							</td>
 						</tr>
 				
@@ -125,42 +125,45 @@ MM_reloadPage(true);
 								
 									  <c:if test="${questionEntry.key == 1}"> 			
 									    <tr>
-										  	<td> <c:out value="Question ${queIndex}"/> : </td>
+										  	<td class="formlabel"> <c:out value="Question ${queIndex}"/> : </td>
+										  	
 									  		<td class="input"> 
 									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
 										  		size="50" maxlength="255" > 
-										  	</td>
-
-										  	<td> 
+										  	
+										  		&nbsp&nbsp&nbsp
+										  		
 			  										<html:submit property="addQuestion" styleClass="linkbutton" 
 													onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="button.addNewQuestion"/>
 													</html:submit>
-											  	</td>
-												<td>									  										  		
+	
+												&nbsp&nbsp&nbsp	
+	
 					 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="label.options"/>
 													</html:submit>
-											  	</td>
+											</td>
 										  </tr>
 									</c:if> 			
 							  		<c:if test="${questionEntry.key > 1}"> 			
 										<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 										  <tr>
-										  	<td> <c:out value="Question ${queIndex}"/> : </td>
+										  	<td class="formlabel"> <c:out value="Question ${queIndex}"/> : </td>
+										  	
 										  		<td class="input"> 
 										  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
 											  		size="50" maxlength="255" > 
-											  	</td>
-
-												<td>									  										  		
-					 								<html:submit property="removeQuestion" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
+											
+												&nbsp&nbsp&nbsp
+				 								<html:submit property="removeQuestion" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="button.removeQuestion"/>
+											
 													</html:submit>
-											  	</td>
-												<td>									  										  		
+												&nbsp&nbsp&nbsp
+																				  										  		
 					 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="label.options"/>
@@ -176,15 +179,13 @@ MM_reloadPage(true);
 					  	</td>
 					</tr>
 	 				 <tr>
-	 				 	<td colspan=2 align=left>								
+	 				 	<td colspan=2 align=right>								
 							<html:submit property="submitQuestions" styleClass="linkbutton" 
 							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 								<bean:message key="button.submit"/>
 							</html:submit>	 				 		  										  		
 		 			  	</td>
 	 				 </tr>
-							
-
 	 				</table> 	 
 					
 </div>
@@ -198,9 +199,94 @@ MM_reloadPage(true);
 
 <!-- tab content 2 Advanced-->
 <div id='content_a'  class="tabbody content_a">
-<h2>Advanced Definitions</h2>
+<h2>Advanced Definitions </h2>
 <div id="formtablecontainer">
-The advanced contents should go here
+			<table class="forms">
+				<tr>
+	      			<td class="formlabel">
+		      			<bean:message key="label.authoring.title"/>:
+					</td>
+					<td>
+						<html:radio property="synchInMonitor" value="ON">
+						 <bean:message key="option.on"/>
+						</html:radio>
+
+						<html:radio property="synchInMonitor" value="OFF">
+						 <bean:message key="option.off"/>
+						</html:radio>
+	      			</td>
+		         </tr>
+		         
+				<tr>
+					<td class="formlabel">
+		      			<bean:message key="radiobox.usernameVisible"/>:
+					</td>
+					<td>
+						<html:radio property="usernameVisible" value="ON">
+						 <bean:message key="option.on"/>
+						</html:radio>
+
+						<html:radio property="usernameVisible" value="OFF">
+						 <bean:message key="option.off"/>
+						</html:radio>
+	      			</td>
+		         </tr>
+		         
+   				<tr>
+					<td class="formlabel">
+		      			<bean:message key="radiobox.questionsSequenced"/>:		      			
+					</td>
+					<td>
+						<html:radio property="questionsSequenced" value="ON">
+						 <bean:message key="option.on"/>
+						</html:radio>
+
+						<html:radio property="questionsSequenced" value="OFF">
+						 <bean:message key="option.off"/>
+						</html:radio>
+	      			</td>
+		        </tr>
+		         
+		         <tr> 
+					<td class="formlabel">
+			 			<bean:message key="label.report.title"/>: </td>
+			 		<td> 
+			 			<html:text property="reportTitle" size="60" maxlength="100"/>
+			 		</td>
+			  	</tr>
+			  	
+			  	<tr> 
+					<td class="formlabel">
+			 			<bean:message key="label.monitoringReport.title"/>: 
+			 		</td>
+			 		<td> 
+			 			<html:text property="monitoringReportTitle" size="60" maxlength="100"/>
+			 		</td>
+			  	</tr>
+			  	
+			  	<tr> 
+					<td class="formlabel">
+			 			<bean:message key="label.report.endLearningMessage"/>: 
+			 		</td>
+			 		<td> 
+			 			<html:text property="endLearningMessage" size="60" maxlength="100"/>
+			 		</td>
+			  	</tr>
+			  	
+		  		<tr>
+ 				 	<td colspan=2 align=center>								
+						&nbsp&nbsp
+				  	</td>
+				</tr>
+				<tr>
+					 <td class="body" colspan=2> 
+						 <html:submit property="submitTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+							<bean:message key="button.done"/>
+						</html:submit>
+					</td> 
+ 				 </tr>
+			</table>	  	
+
 </div>
 
 <!-- end of content_b -->
@@ -210,8 +296,20 @@ The advanced contents should go here
 <div id='content_i'  class="tabbody content_i">
 <h2>Instructions</h2>
 <div id="formtablecontainer">
-Instructions are here
+
+			<table class="forms">
+				<tr>
+					 <td class="body" colspan=2> 
+						 <html:submit property="submitTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+							<bean:message key="button.done"/>
+						</html:submit>
+					</td> 
+ 				 </tr>
+			</table>	  	
+
+
 </div>
+
 	<hr>
 <a href="javascript:;" class="button">Cancel</a>
 

@@ -551,6 +551,8 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		}
 			logger.debug("doneOptions persists all the options");
 			
+			
+			
 			mcAuthoringForm.resetUserAction();
 			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
@@ -586,7 +588,6 @@ public class McAction extends DispatchAction implements McAppConstants
     			logger.debug("either title or instructions or both is missingr. Returning back to from to fix errors:");
     			return (mapping.findForward(LOAD_QUESTIONS));
     		}
-    		
     		
     		
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");

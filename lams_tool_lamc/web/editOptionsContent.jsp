@@ -126,10 +126,7 @@ MM_reloadPage(true);
 						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
 							  <c:if test="${optionEntry.key == 1}"> 			
 								  <tr>
-									<td class="input"> 
-									<input type="checkbox" name="isSelectionOption<c:out value="${optionIndex}"/>" >
-								  	</td>
-							  		<td class="input"> 
+								  		<td class="input"> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
@@ -139,14 +136,16 @@ MM_reloadPage(true);
 												<bean:message key="button.add"/>
 											</html:submit>
 									  	</td>
-								  </tr>
+									  	
+									  	<td> 
+									  	 optionIndex: <c:out value="${optionIndex}"/>
+									  		<input type="radio" name="isSelectionOption"  onclick="javascript:document.forms[0].selectedIndex.value=<c:out value="${optionIndex}"/>;"> 
+									  	<td> 										
+							 </tr>
 							</c:if> 			
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
 								  <tr>
-								  	<td class="input"> 
-										<input type="checkbox" name="isSelectionOption<c:out value="${optionIndex}"/>" >
-								  	</td>
 								  	<td class="input"> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
@@ -157,12 +156,15 @@ MM_reloadPage(true);
 												<bean:message key="button.remove"/>
 											</html:submit>
 									  	</td>
+									  	<td> 
+									  	 optionIndex: <c:out value="${optionIndex}"/>
+									  		<input type="radio" name="isSelectionOption"  onclick="javascript:document.forms[0].selectedIndex.value=<c:out value="${optionIndex}"/>;"> 
+									  	<td> 										
+
 								  </tr>
 							</c:if> 			
 						</c:forEach>
-							<html:hidden property="optionIndex"/>
-							
-							
+							<html:hidden property="selectedIndex"/>							
 	 				 <tr>
 	 				 	<td colspan=3 align=left>								
 							<html:submit property="doneOptions" styleClass="linkbutton" 
