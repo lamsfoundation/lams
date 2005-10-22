@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
@@ -230,6 +231,15 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	logger.debug("mcService:" + mcService);
 	 	
 	 	McUtils.persistRichText(request);
+	 	
+	 	String selectedQuestion=request.getParameter(SELECTED_QUESTION);
+		logger.debug("read parameter selectedQuestion: " + selectedQuestion);
+		
+		if ((selectedQuestion != null) && (selectedQuestion.length() > 0))
+		{
+			request.getSession().setAttribute(SELECTED_QUESTION,selectedQuestion);
+			logger.debug("updated SELECTED_QUESTION");
+		}
 	 	
 	 	
 	 	String userAction=null;
@@ -514,13 +524,50 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		userAction="doneOptions";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
+
+	 		String selectedIndex=mcAuthoringForm.getSelectedIndex();
+	 		logger.debug("selectedIndex:" + selectedIndex);
+	 		
+	 		if ((selectedIndex == null) || (selectedIndex.equals("")))
+			{
+				ActionMessages errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.selectedIndex.empty"));
+    			logger.debug("add error.selectedIndex.empty to ActionMessages");
+    			saveErrors(request,errors);
+    			mcAuthoringForm.resetUserAction();
+    			logger.debug("return to EDIT_OPTS_CONTENT to fix error.");
+    			return (mapping.findForward(EDIT_OPTS_CONTENT));
+			}
+	 	
+	 		String parameterType="optionContent";
+	 		long mapCounter=0;
+	 		String selectedAnswer=null;
+	    	for (long i=1; i <= MAX_OPTION_COUNT ; i++)
+			{
+	    		if (selectedIndex.equals(new Long(i).toString()))
+				{
+	    			selectedAnswer=request.getParameter(parameterType + i);
+	    			logger.debug("found selectedAnswer: " + selectedAnswer);
+				}
+			}
+	    	
+	 	    Long selectedQuestionContentUid=(Long)request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
+	 	    logger.debug("selectedQuestionContentUid:" + selectedQuestionContentUid);
+	 	    
+	 	    selectedQuestion=(String) request.getSession().getAttribute(SELECTED_QUESTION);
+			logger.debug("final selectedQuestion:" + selectedQuestion);
 	 		
 	 		/** make the particular question content in the main page disabled for user access*/
-	 		Long selectedQuestionContentUid=(Long) request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
-	 		logger.debug("selectedQuestionContentUid:" + selectedQuestionContentUid);
-	 		
 	 		McQueContent mcQueContent = mcService.retrieveMcQueContentByUID(selectedQuestionContentUid);
 			logger.debug("mcQueContent:" + mcQueContent);
+			
+			mcQueContent.setQuestion(selectedQuestion);
+			mcService.saveOrUpdateMcQueContent(mcQueContent);
+			logger.debug("persisted  selectedQuestion" + selectedQuestion);
+			
+			Map mapQuestionsContent =rebuildQuestionMapfromDB(request);
+			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+			logger.debug("updated MAP_QUESTIONS_CONTENT with the changed question:" + mapQuestionsContent);
 			
 			
 			/** parse all the options and persist them */
@@ -551,6 +598,21 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		}
 			logger.debug("doneOptions persists all the options");
 			
+			if (selectedAnswer != null && selectedAnswer.length() > 0)
+			{
+				logger.debug("update the record for the correct option.");
+				McOptsContent mcOptsContent=mcService.getOptionContentByOptionText(selectedAnswer, selectedQuestionContentUid);
+		 	    logger.debug("found mcOptsContent to be updated " + mcOptsContent);
+		 	   
+		 	    if (mcOptsContent != null)
+		 	    {
+		 	    	logger.debug("found mcOptsContent is correctOption" + mcOptsContent.isCorrectOption());
+			 	    mcOptsContent.setCorrectOption(true);
+			 	    mcService.updateMcOptionsContent(mcOptsContent);
+			 	    logger.debug("persisted the updated mcOptsContent" + mcOptsContent);
+			 	    logger.debug("updated mcOptsContent isCorrect?" + mcOptsContent.isCorrectOption());	
+		 	    }
+			}
 			
 			
 			mcAuthoringForm.resetUserAction();
@@ -872,6 +934,35 @@ public class McAction extends DispatchAction implements McAppConstants
             }
         }
                 
+    }
+    
+    
+    protected Map rebuildQuestionMapfromDB(HttpServletRequest request)
+    {
+    	Map mapQuestionsContent= new TreeMap(new McComparator());
+    	
+    	IMcService mcService =McUtils.getToolService(request);
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+		logger.debug("toolContentId:" + toolContentId);
+
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+    	List list=mcService.refreshQuestionContent(mcContent.getUid());
+		logger.debug("refreshed list:" + list);
+		
+		Iterator listIterator=list.iterator();
+    	Long mapIndex=new Long(1);
+    	while (listIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+    		logger.debug("mcQueContent:" + mcQueContent);
+    		mapQuestionsContent.put(mapIndex.toString(),mcQueContent.getQuestion());
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	
+    	logger.debug("refreshed Map:" + mapQuestionsContent);
+    	return mapQuestionsContent;
     }
     
 

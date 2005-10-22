@@ -331,7 +331,22 @@ public class McServicePOJO implements
 														   e);
         }
     }
+   
     
+    public List refreshQuestionContent(final Long mcContentId) throws McApplicationException
+	{
+        try
+        {
+            return mcQueContentDAO.refreshQuestionContent(mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is refreshing  mc question content: "
+                                                         + e.getMessage(),
+														   e);
+        }
+    	
+	}
     
     public void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException
 	{

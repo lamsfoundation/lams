@@ -48,6 +48,9 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	 	
 	 	private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId and mcQueContent.disabled=true";
 	 	
+	 	private static final String REFRESH_QUESTION_CONTENT 			= "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId and mcQueContent.disabled=false";
+	 	
+	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question and mcQueContent.mcContentId=:mcContentUid";
 	 	
 	 		 	
@@ -71,6 +74,16 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 				return mcq;
 			}
 			return null;
+	    }
+	 	
+	 	public List refreshQuestionContent(final Long mcContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(REFRESH_QUESTION_CONTENT)
+				.setLong("mcContentId", mcContentId.longValue())
+				.list();
+			
+			return list;
 	    }
 	 	
 	 	

@@ -100,7 +100,7 @@ MM_reloadPage(true);
 </table>
 
 <div id="formtablecontainer">
-					<table align=center class="forms" >
+					<table class="forms" align=center>
  						<tr> 
 					 		<td class="formlabel"> <bean:message key="label.authoring.title"/>: </td>
 							<td class="formcontrol">

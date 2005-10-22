@@ -81,6 +81,8 @@ public interface IMcService
     
     public void cleanAllQuestions(final Long mcContentUid) throws McApplicationException;
     
+    public List refreshQuestionContent(final Long mcContentId) throws McApplicationException;
+    
     public void removeMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
     
     public void removeMcOptionsContent(McOptsContent mcOptsContent);

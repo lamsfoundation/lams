@@ -86,15 +86,6 @@ MM_reloadPage(true);
 
  <!-- end tab buttons -->
 
-
-<!-- error holder table -->    
-<table border="0" cellspacing="0" cellpadding="0">
-<tr> 
-	<td class="error">   
-	<html:errors/>
-</td></tr>    
-</table>
-
 <html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
  <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
@@ -109,36 +100,38 @@ MM_reloadPage(true);
 </table>
 
 <div id="formtablecontainer">
-<table align=center> 	 
-				<tr>
- 				 	<td colspan=3 align=center>								
-						<bean:message key="label.question"/>: &nbsp
-			  				<input type="text" name="selectedQuestion" value="<c:out value="${sessionScope.selectedQuestion}"/>"   
-				  			size="50" maxlength="255"> 
-				  	</td>
-				</tr>
+				<table align=center>
 					<tr>
-	 				 	<td colspan=3 align=center>								
-							&nbsp&nbsp
+	 				 	<td align=right> 
+							<bean:message key="label.question"/>:
+						</td>
+						<td colspan=3>
+			  				<input type="text" name="selectedQuestion" value="<c:out value="${sessionScope.selectedQuestion}"/>"   
+					  			size="50" maxlength="255"> 
 					  	</td>
 					</tr>
+						<tr>
+		 				 	<td colspan=4 align=center>								
+								&nbsp&nbsp
+						  	</td>
+						</tr>
+
 			  	 		<c:set var="optionIndex" scope="session" value="1"/>
 						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
 							  <c:if test="${optionEntry.key == 1}"> 			
 								  <tr>
-								  		<td class="input"> 
+								  	<td> </td>
+							  		<td class="input"> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
-									  	<td> 
+								  		<td class="input"> 
 	  										<html:submit property="addOption" styleClass="linkbutton" 
 											onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 												<bean:message key="button.add"/>
 											</html:submit>
 									  	</td>
-									  	
-									  	<td> 
-									  	 optionIndex: <c:out value="${optionIndex}"/>
+								  		<td class="input"> 
 									  		<input type="radio" name="isSelectionOption"  onclick="javascript:document.forms[0].selectedIndex.value=<c:out value="${optionIndex}"/>;"> 
 									  	<td> 										
 							 </tr>
@@ -146,37 +139,38 @@ MM_reloadPage(true);
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
 								  <tr>
+								  	<td> </td>
 								  	<td class="input"> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
-										<td>									  										  		
+								  		<td class="input"> 
 			 								<html:submit property="removeOption" styleClass="linkbutton"  onclick="javascript:document.forms[0].optionIndex.value=${optionIndex};"
 			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 												<bean:message key="button.remove"/>
 											</html:submit>
 									  	</td>
-									  	<td> 
-									  	 optionIndex: <c:out value="${optionIndex}"/>
+								  		<td class="input"> 
 									  		<input type="radio" name="isSelectionOption"  onclick="javascript:document.forms[0].selectedIndex.value=<c:out value="${optionIndex}"/>;"> 
 									  	<td> 										
-
 								  </tr>
 							</c:if> 			
 						</c:forEach>
 							<html:hidden property="selectedIndex"/>							
+					<tr>
+	 				 	<td colspan=3 align=center>								
+							&nbsp&nbsp
+					  	</td>
+					</tr>
 	 				 <tr>
-	 				 	<td colspan=3 align=left>								
+	 				 	<td class="input" colspan=3 align=left>
 							<html:submit property="doneOptions" styleClass="linkbutton" 
 							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 								<bean:message key="button.done"/>
 							</html:submit>	 				 		  										  		
 		 			  	</td>
 	 				 </tr>
-	 				</table> 	 
-	 				
-	 				
-	 				
+				</table> 	 
 </div>
 <hr>
 <a href="javascript:;" class="button">Cancel</a>

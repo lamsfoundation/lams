@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.tool.mc.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 
 
@@ -37,6 +39,8 @@ public interface IMcQueContentDAO
 	public McQueContent getToolDefaultQuestionContent(final long mcContentId);
 	
 	public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
+	
+	public List refreshQuestionContent(final Long mcContentId);
 	
  	public void cleanAllQuestions(final Long mcContentUid);
 	
