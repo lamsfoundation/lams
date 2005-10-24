@@ -20,6 +20,7 @@ http://www.gnu.org/licenses/gpl.txt
 */
 package org.lamsfoundation.lams.util.zipfile;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +32,7 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.zip.ZipOutputStream;
-
+import java.util.zip.ZipEntry;
 import junit.framework.TestCase;
 
 import org.lamsfoundation.lams.util.FileUtil;
@@ -230,6 +231,9 @@ public class TestZipFileUtil extends TestCase {
         }
     }
    
+    /**
+     * Creates a test directory + test files which is  used for testing the createZipFile function.
+     */
     private boolean createTestDirectoryAndFiles(String testDirName) throws FileUtilException, IOException
     {
        String testSubDirName = testDirName + "/subDirectory";       	
@@ -257,48 +261,32 @@ public class TestZipFileUtil extends TestCase {
          	
     } 
     
+	/**
+	 * Tests the createZipFile() function. This method creates the test directory, and tries to zip the
+	 * files in the directory and then checks whether or not this zip file has been created.
+	 * Limitation: it does not check whether the files have been zipped correctly, have to manually look 
+	 * at the zip archive.
+	 * @throws FileUtilException
+	 * @throws IOException
+	 * @throws ZipFileUtilException
+	 */  
     public void testCreateZipFile() throws FileUtilException, IOException, ZipFileUtilException
     {
-    	String directoryName = "testDirectory";
-    	boolean created = createTestDirectoryAndFiles(directoryName);
-    	if (created)
-    	{
-	    	String zipFileName = "test.zip";
-	    	
-	    	ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFileName)));
-	    	File directory = new File(directoryName);
-	        assertTrue(directory.exists());
-	    	File[] files = directory.listFiles();
-	  
-	    	ZipFileUtil.zipFiles(out, files);  
-	    	
-	    	out.close(); 
-	    	
-	    	FileUtil.deleteDirectory(directoryName);
-    	}
-    	else
-    	{
-    		assertFalse("Failed to run test", true);
-    	}
-    	
-    } 
-    
-   public void testCreateZipFile2() throws FileUtilException, IOException, ZipFileUtilException
-    {
     	  	
-	    	String directoryName = "/MaiTestDirectory";
-	    	boolean created = createTestDirectoryAndFiles(directoryName);
+	    	String directoryToZip = "ZipTestDirectory";
 	    	
-	    	if (created)
-	    	{
-	    	   	
-		    	String zipFileName= "maitest.zip";
+	    	String zipFileName= "testCreateZipFile.zip";	    	
+	    		    	
+	    	if (createTestDirectoryAndFiles(directoryToZip))
+	    	{	    	   	
+		    	ZipFileUtil.createZipFile(zipFileName, directoryToZip);
 		    	
-		    	ZipFileUtil.createZipFile(zipFileName, directoryName);
-		    	
-		
-		    	
-		    	FileUtil.deleteDirectory(directoryName);
+		    	// Check if the zip file was created
+		    	File zipFile = new File(zipFileName);
+		    	assertTrue("Making sure the zip file has been created", zipFile.exists());
+		    			    	
+		    	// Clean test data 
+		    	FileUtil.deleteDirectory(directoryToZip); 
 	    	}
 	    	else
 	    	{
@@ -307,5 +295,40 @@ public class TestZipFileUtil extends TestCase {
 	
     } 
     
- 
+    /**
+     * Tests the method createZipFile(filename, directoryToZp, directoryToPlaceZip)
+     * Similar to the function above, except that it saves the zip file created, into
+     * the specified directory you want.
+     * 
+     * @throws FileUtilException
+     * @throws IOException
+     * @throws ZipFileUtilException
+     */
+    public void testCreateZipFile2() throws FileUtilException, IOException, ZipFileUtilException
+    {
+        String directoryToZip = "ZipTestDirectory";
+ 	   String directoryToPlaceZip = FileUtil.TEMP_DIR + File.separator + "ZipTmpDir";
+ 	   	String zipFileName= "testCreateZipFile.zip";	    	
+ 	   		    	
+ 	   	if (createTestDirectoryAndFiles(directoryToZip))
+ 	   	{	    	   	
+ 		    	ZipFileUtil.createZipFile(zipFileName, directoryToZip, directoryToPlaceZip);
+ 		    	
+ 		    	// Check if the zip file was created 
+ 		    	File zipFile = new File(zipFileName);
+ 		    	assertTrue(zipFile.exists());
+ 		    			    	
+ 		    	// Clean test data 
+ 		    	FileUtil.deleteDirectory(directoryToZip);
+ 	   	}
+ 	   	else
+ 	   	{
+ 	   		assertFalse("Failed to run test", true);
+ 	   	} 
+
+    }
+  
+   
 }
+    
+
