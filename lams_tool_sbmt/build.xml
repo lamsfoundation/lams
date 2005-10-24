@@ -281,6 +281,7 @@
 	   			<fileset dir="${conf.web.dir}">
 						<include name="**/*.jsp"/>
 						<include name="**/*.html"/>
+						<include name="**/*.swf"/>
 						<include name="includes/**"/>
 				</fileset>
 	   			
