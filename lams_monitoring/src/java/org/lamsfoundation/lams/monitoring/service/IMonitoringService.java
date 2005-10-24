@@ -213,7 +213,7 @@ public interface IMonitoringService
      */
     public String getLearnerActivityURL(Long activityID,Integer userID)throws IOException,LamsToolServiceException;
     
-    /**
+     /**
      * This method returns the contribute url for the given activity
      * 
      * @param activityID The activity_id of the Activity whose URL will be returned
@@ -221,8 +221,25 @@ public interface IMonitoringService
      * @throws IOException
      */
     public String getActivityContributionURL(Long activityID)throws IOException;
-    
     /**
+     * This method returns the define later url for the given activity
+     * 
+     * @param activityID The activity_id of the Activity whose URL will be returned
+     * @return String The required information in WDDX format
+     * @throws IOException
+     */
+    public String getActivityDefineLaterURL(Long activityID)throws IOException;
+
+    /**
+     * This method returns the monitor url for the given activity
+     * 
+     * @param activityID The activity_id of the Activity whose URL will be returned
+     * @return String The required information in WDDX format
+     * @throws IOException
+     */
+    public String getActivityMonitorURL(Long activityID)throws IOException;
+  
+   /**
      * This method moves the learning design corresponding to the given
      * Lesson into the specified workspaceFolder. But before this action
      * is performed it checks whether the user is authorized to do so. 

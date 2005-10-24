@@ -38,10 +38,12 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
+import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -83,6 +85,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
     // output parameters
     private static final String DUMMY_FORWARD = "dummy";
     private static final String LESSONS_PARAMETER = "lessons";
+    
     
     private static final Integer ORGANIZATION_ID = new Integer(1);
     
@@ -179,7 +182,61 @@ public class DummyMonitoringAction extends LamsDispatchAction
     	}
     	throw new IOException("Unable to get user. User in session manager is "+user);
     }
-/*    public ActionForward getLessonDetails(ActionMapping mapping,
+    
+    public ActionForward gotoLearnerActivityURL(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException,LamsToolServiceException{
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.USER_ID));
+    	Long activityID = new Long(WebUtil.readLongParam(request,AttributeNames.ACTIVITY_ID));
+    	String wddxPacket = monitoringService.getLearnerActivityURL(activityID,userID);
+    	String url = extractURL(wddxPacket);
+    	response.sendRedirect(response.encodeRedirectURL(url));
+    	return null;
+    }
+
+    public ActionForward gotoMonitoringActivityURL(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException,LamsToolServiceException{
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	Long activityID = new Long(WebUtil.readLongParam(request,AttributeNames.ACTIVITY_ID));
+    	String wddxPacket = monitoringService.getActivityMonitorURL(activityID);
+    	String url = extractURL(wddxPacket);
+    	response.sendRedirect(response.encodeRedirectURL(url));
+    	return null;
+    }
+    public ActionForward gotoDefineLaterActivityURL(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException,LamsToolServiceException{
+    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	Long activityID = new Long(WebUtil.readLongParam(request,AttributeNames.ACTIVITY_ID));
+    	String wddxPacket = monitoringService.getActivityDefineLaterURL(activityID);
+    	String url = extractURL(wddxPacket);
+    	response.sendRedirect(response.encodeRedirectURL(url));
+    	return null;
+    }
+
+    /**
+	 * @param wddxPacket
+	 * @return
+	 */
+	private String extractURL(String wddxPacket) {
+		String url = null;
+    	String previousString = "<var name='activityURL'><string>";
+    	int index = wddxPacket.indexOf(previousString);
+    	if ( index > -1 && index+previousString.length() < wddxPacket.length() ) {
+    		url = wddxPacket.substring(index+previousString.length());
+    		index = url.indexOf("</string>");
+    		url = url.substring(0,index);
+    	}
+    	url = WebUtil.convertToFullURL(url);
+		return url;
+	}
+
+ /*    public ActionForward getLessonDetails(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)throws IOException{
@@ -222,16 +279,6 @@ public class DummyMonitoringAction extends LamsDispatchAction
     	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
     	String wddxPacket = monitoringService.getAllContributeActivities(lessonID);
-    	return outputPacket(mapping, request, response, wddxPacket, "details");
-    }
-    public ActionForward getLearnerActivityURL(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)throws IOException,LamsToolServiceException{
-    	this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-    	Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
-    	Long activityID = new Long(WebUtil.readLongParam(request,"activityID"));
-    	String wddxPacket = monitoringService.getLearnerActivityURL(activityID,userID);
     	return outputPacket(mapping, request, response, wddxPacket, "details");
     }
     public ActionForward getActivityContributionURL(ActionMapping mapping,

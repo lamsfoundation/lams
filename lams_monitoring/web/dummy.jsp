@@ -1,19 +1,39 @@
 <%@ page language="java" import="java.util.*" %>
-<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
-<%@ taglib uri="/WEB-INF/jstl/x.tld" prefix="x" %>
+<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 
+<%
+String protocol = request.getProtocol();
+if(protocol.startsWith("HTTPS")){
+	protocol = "https://";
+}else{
+	protocol = "http://";
+}
+String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
+String pathToShare = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../";
+
+%>
+
 <html>
   <head>
-    <title>Lesson Management</title>
-  </head>
-  
+	  <link href="<%=pathToShare%>/css/default.css" rel="stylesheet" type="text/css"/>
+
+<script language="JavaScript" type="text/JavaScript">
+<!--
+	function launchPopup(url) {
+		var popup = window.open(url,'');
+		popup.window.focus();
+	}
+//-->
+</script>
+	
+<title>Lesson Management</title>
   <body>
     <H1>Lesson Management</H1>
     
@@ -49,30 +69,80 @@
 	</html:form>
 	
 	<H2>Monitor Lessons</H2>
-	<TABLE border="1">
-		<TR>
-			<TD>lessonId</TD>
-			<TD>lessonName</TD>
-			<TD>lessonDescription</TD>
-			<TD>createDateTime</TD>
-			<TD>startDateTime</TD>
-			<TD>endDateTime</TD>
-			<TD>lessonStateId</TD>
-		</TR>
+	<p>All the links below should pop-up in new windows.</p>
 	<c:forEach var="lesson" items="${lessons}">
+	<TABLE border="1" summary="This table is being used for layout purposes only">
 		<TR>
-			<TD><c:out value="${lesson.lessonId}"/></TD>
-			<TD><c:out value="${lesson.lessonName}"/></TD>
-			<TD><c:out value="${lesson.lessonDescription}"/></TD>
-			<TD><c:out value="${lesson.createDateTime}"/></TD>
-			<TD><c:out value="${lesson.startDateTime}"/></TD>
-			<TD><c:out value="${lesson.endDateTime}"/></TD>
-			<TD><c:out value="${lesson.lessonStateId}"/></TD>
-			<TD><A HREF='/lams/learning/learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonId}"/>'>Join Lesson as <lams:user property="firstName"/></a>
-			<TD><A HREF='/lams/learning/exportWaitingPage.jsp?mode=teacher&lessonID=<c:out value="${lesson.lessonId}"/>'>Export Portfolio for all users</a>
-			<TD><A HREF='/lams/learning/exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${lesson.lessonId}"/>'>Export Portfolio as <lams:user property="firstName"/></a>
+			<TD class="formlabel">lessonId</TD>
+			<TD class="formcontrol"><c:out value="${lesson.lessonId}"/></TD>
 		</TR>
-	</c:forEach>
+		<TR>
+			<TD class="formlabel">lessonName</TD>
+			<TD class="formcontrol"><c:out value="${lesson.lessonName}"/></TD>
+		</TR>
+		<TR>
+			<TD class="formlabel">lessonDescription</TD>
+			<TD class="formcontrol"><c:out value="${lesson.lessonDescription}"/></TD>
+		</TR>
+		<TR>
+			<TD class="formlabel">learningDesignId</TD>
+			<TD class="formcontrol"><c:out value="${lesson.learningDesign.learningDesignId}"/></TD>
+		</TR>
+		<TR>
+			<TD class="formlabel">createDateTime</TD>
+			<TD class="formcontrol"><c:out value="${lesson.createDateTime}"/></TD>
+		</TR>
+		<TR>
+			<TD class="formlabel">startDateTime</TD>
+			<TD class="formcontrol"><c:out value="${lesson.startDateTime}"/></TD>
+		</TR>
+		<TR>
+			<TD class="formlabel">endDateTime</TD>
+			<TD class="formcontrol"><c:out value="${lesson.endDateTime}"/></TD>
+		</TR>
+		<TR>
+			<TD class="formlabel">lessonStateId</TD>
+			<TD class="formcontrol"><c:out value="${lesson.lessonStateId}"/></TD>
+		</TR>
+		<TR>
+			<TD class="formlabel">Pretend to be learner:</TD>
+			<TD class="formcontrol"><A HREF=javascript:launchPopup('/lams/learning/learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonId}"/>');>Join Lesson as <lams:user property="login"/></a>
+		</TR>
+		<TR>
+			<TD class="formlabel">Define Later &amp; Monitor</TD>
+			<TD class="formcontrol">
+			<c:forEach var="activity" items="${lesson.learningDesign.activities}">
+				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&activityID=<c:out value="${activity.activityId}"/>');">
+				 Monitor <c:out value="${activity.title}"/></A><BR/>
+				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&activityID=<c:out value="${activity.activityId}"/>');">
+				 Define Later <c:out value="${activity.title}"/></A>
+			</c:forEach>
+			</TD>
+		</TR>
+		<TR>
+			<TD class="formlabel">Export Portfolio:</TD>
+			<TD class="formcontrol"><A HREF=javascript:launchPopup('/lams/learning/exportWaitingPage.jsp?mode=teacher&lessonID=<c:out value="${lesson.lessonId}"/>');>Export Portfolio for all users</a><BR>
+			<A HREF=javascript:launchPopup('/lams/learning/exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${lesson.lessonId}"/>');>Export Portfolio as <lams:user property="login"/></a>
+		</TR>
+		<c:forEach var="progress" items="${lesson.learnerProgresses}">
+		<TR>
+			<TD class="formlabel">User Progress:</TD>
+			<TD>Login: <STRONG><c:out value="${progress.user.login}"/></STRONG><BR///>
+			<c:if test="${!empty progress.currentActivity}">
+					Current Activity <c:out value="${progress.currentActivity.title}"/> <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoLearnerActivityURL&userID=<c:out value="${progress.user.userId}"/>&activityID=<c:out value="${progress.currentActivity.activityId}"/>');">View</A> 
+				</c:if><BR>
+			Completed Activities:<BR>
+			<c:forEach var="completed" items="${progress.completedActivities}">
+				<A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoLearnerActivityURL&userID=<c:out value="${progress.user.userId}"/>&activityID=<c:out value="${progress.completed.activityId}"/>');">View</A> <c:out value="${progress.completed.title}"/><BR>
+			</c:forEach>
+			</TD>
+		</TR>
+		</c:forEach>
+		<TR>
+		</TR>
+		<TR><TD colspan="4"></TD></TR>
 	</TABLE>
+	<HR>
+	</c:forEach>
 	</body>
 </html>

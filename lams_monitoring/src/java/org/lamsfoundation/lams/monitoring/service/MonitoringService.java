@@ -61,7 +61,9 @@ import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -100,7 +102,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private IUserDAO userDAO;        
     private IWorkspaceFolderDAO workspaceFolderDAO;
     private ILearningDesignDAO learningDesignDAO;
-    private FlashMessage flashMessage;
     private IAuthoringService authoringService;
     private ILamsCoreToolService lamsCoreToolService;
     private IUserManagementService userManagementService;
@@ -226,9 +227,13 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public Lesson initializeLesson(String lessonName,
                                String lessonDescription,
                                long learningDesignId,
-                               User user)
+                               User user) 
     {
         LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
+        if ( originalLearningDesign == null) {
+        	throw new MonitoringServiceException("Learning design for id="+learningDesignId+" is missing. Unable to initialize lesson.");
+        }
+        
         //copy the current learning design
         LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
                                                                                   new Integer(LearningDesign.COPY_TYPE_LESSON),
@@ -285,7 +290,10 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
                                              List staffs)
     {
         Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
-        
+        if ( newLesson == null) {
+        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to create class for lesson.");
+        }
+       
         LessonClass newLessonClass = this.createLessonClass(organisation,
                                                             organizationUsers,
                                                             staffs,
@@ -306,8 +314,13 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         if(log.isDebugEnabled())
             log.debug("=============Starting Lesson "+lessonId+"==============");
+
         //we get the lesson just created
         Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+        if ( requestedLesson == null) {
+        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to start lesson.");
+        }
+
         Date lessonStartTime = new Date();
         //initialize tool sessions if necessary
         Set activities = requestedLesson.getLearningDesign().getActivities();
@@ -408,6 +421,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     public String getLessonDetails(Long lessonID)throws IOException{
     	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	FlashMessage flashMessage;
     	if(lesson!=null){
     		flashMessage = new FlashMessage("getLessonDetails",lesson.getLessonDetails());
     	}else
@@ -423,6 +437,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public String getLessonLearners(Long lessonID)throws IOException{
     	Vector lessonLearners = new Vector();
     	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	FlashMessage flashMessage;
     	if(lesson!=null){
     		Iterator iterator = lesson.getLessonClass().getLearners().iterator();
     		while(iterator.hasNext()){
@@ -451,6 +466,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public String getAllLearnersProgress(Long lessonID)throws IOException {
     	Vector progressData = new Vector();
     	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	FlashMessage flashMessage;
     	if(lesson!=null){
     		Iterator iterator = lesson.getLearnerProgresses().iterator();
     		while(iterator.hasNext()){
@@ -459,7 +475,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     		}
     		flashMessage = new FlashMessage("getAllLearnersProgress",progressData);
     	}else{
-    			flashMessage = new FlashMessage("getAllLearnersProgress",
+    		flashMessage = new FlashMessage("getAllLearnersProgress",
     											"No such lesson with a lesson_id of :"+ lessonID + " exists",
 												FlashMessage.ERROR);
     	}
@@ -480,6 +496,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     public String getAllContributeActivities(Long lessonID)throws IOException{
     	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	FlashMessage flashMessage;
     	if(lesson!=null){
     		Vector sortedSet = getOrderedActivityTree(lesson.getLearningDesign());
     		flashMessage = new FlashMessage("getAllContributeActivities",sortedSet);
@@ -497,6 +514,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public String getLearnerActivityURL(Long activityID,Integer userID)throws IOException, LamsToolServiceException{    	
     	Activity activity = activityDAO.getActivityByActivityId(activityID);
     	User user = userDAO.getUserById(userID);
+    	FlashMessage flashMessage;
     	if(activity==null || user==null){
     		flashMessage = new FlashMessage("getLearnerActivityURL",
     										"Invalid activityID/User :" + activityID + " : " + userID,
@@ -521,6 +539,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 */
 	public String getActivityContributionURL(Long activityID)throws IOException{
 		Activity activity = activityDAO.getActivityByActivityId(activityID);
+    	FlashMessage flashMessage = null;
 		if(activity!=null){
 			if(activity.isToolActivity()){
 				ToolActivity toolActivity = (ToolActivity)activity;
@@ -534,10 +553,79 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	}
 	/**
 	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityDefineLaterURL(java.lang.Long)
+	 */
+	public String getActivityDefineLaterURL(Long activityID)throws IOException{
+		Activity activity = activityDAO.getActivityByActivityId(activityID);
+    	FlashMessage flashMessage = null;
+		if(activity!=null){
+			if(activity.isToolActivity()){
+				ToolActivity toolActivity = (ToolActivity)activity;
+				String url = toolActivity.getTool().getDefineLaterUrl();
+				Long toolContentId = toolActivity.getToolContentId();
+				if ( url !=null &&  toolContentId != null ) {
+					url = WebUtil.appendParameterToURL(url,
+								AttributeNames.TOOL_CONTENT_ID,
+								toolActivity.getToolContentId().toString());
+					flashMessage = new FlashMessage("getActivityDefineLaterURL",new ProgressActivityDTO(activityID, url));
+				} else {
+					flashMessage = generateDataMissingPacket(activityID, url, "Define Late URL", toolContentId, "Tool Content ID");
+				}
+			}
+		}else
+			flashMessage = FlashMessage.getNoSuchActivityExists("getActivityDefineLaterURL",activityID);
+		
+		return flashMessage.serializeMessage();
+	}
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityMonitorURL(java.lang.Long)
+	 */
+	public String getActivityMonitorURL(Long activityID)throws IOException{
+		Activity activity = activityDAO.getActivityByActivityId(activityID);
+    	FlashMessage flashMessage = null;
+		if(activity!=null){
+			if(activity.isToolActivity()){
+				ToolActivity toolActivity = (ToolActivity)activity;
+				String url = toolActivity.getTool().getMonitorUrl();
+				Long toolContentId = toolActivity.getToolContentId();
+				if ( url !=null &&  toolContentId != null ) {
+					url = WebUtil.appendParameterToURL(url,
+								AttributeNames.TOOL_CONTENT_ID,
+								toolActivity.getToolContentId().toString());
+					flashMessage = new FlashMessage("getActivityMonitorURL",new ProgressActivityDTO(activityID, url));
+				} else {
+					flashMessage = generateDataMissingPacket(activityID, url, "Monitor URL", toolContentId, "Tool Content ID");
+				}
+			}
+		}else
+			flashMessage = FlashMessage.getNoSuchActivityExists("getActivityMonitorURL",activityID);
+		
+		return flashMessage.serializeMessage();	
+	}
+	/**
+	 * @param activityID
+	 * @param url
+	 * @param toolContentId
+	 */
+	private FlashMessage generateDataMissingPacket(Long activityID, String url, 
+			String urlDescription, Long toolContentId, String toolContentIdDescription) {
+		String[] missing = null;
+		if ( url !=null &&  toolContentId != null )
+			missing = new String[] {urlDescription, toolContentIdDescription};
+		else if ( url !=null )
+			missing = new String[] {urlDescription};
+		else if ( toolContentId !=null )
+			missing = new String[] {toolContentIdDescription};
+		return FlashMessage.getDataMissing("getActivityMonitorURL",missing);
+	}
+	/**
+	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#moveLesson(java.lang.Long, java.lang.Integer, java.lang.Integer)
 	 */
 	public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID,Integer userID)throws IOException{
 		Lesson lesson = lessonDAO.getLesson(lessonID);
+    	FlashMessage flashMessage;
 		if(lesson!=null){
 			if(lesson.getUser().getUserId().equals(userID)){
 				WorkspaceFolder workspaceFolder = workspaceFolderDAO.getWorkspaceFolderByID(targetWorkspaceFolderID);
@@ -566,6 +654,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 */
 	public String renameLesson(Long lessonID, String newName, Integer userID)throws IOException{
 	 	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	FlashMessage flashMessage;
 	 	if(lesson!=null){
 	 		if(lesson.getUser().getUserId().equals(userID)){
 	 			lesson.setLessonName(newName);
@@ -586,6 +675,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	 */
 	public String checkGateStatus(Long activityID, Long lessonID) throws IOException
 	{
+    	FlashMessage flashMessage;
 	    GateActivity gate = (GateActivity)activityDAO.getActivityByActivityId(activityID);
 	    Lesson lesson = lessonDAO.getLesson(lessonID); //used to calculate the total learners.
 	    
@@ -610,6 +700,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	public String releaseGate(Long activityID)throws IOException
 	{
 	    GateActivity gate = (GateActivity)activityDAO.getActivityByActivityId(activityID);
+    	FlashMessage flashMessage;
 	    if (gate ==null)
 	    {
 	        flashMessage = new FlashMessage("releaseGate", 
