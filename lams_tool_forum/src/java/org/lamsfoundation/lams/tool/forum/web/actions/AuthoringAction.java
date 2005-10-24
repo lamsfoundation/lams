@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -108,7 +109,7 @@ public class AuthoringAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) {
 
 		
-		Long contentId = new Long(WebUtil.readLongParam(request,ForumConstants.TOOL_CONTENT_ID));
+		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.TOOL_CONTENT_ID));
 		
 		//get back the topic list and display them on page
 		forumService = getForumManager();
@@ -121,6 +122,7 @@ public class AuthoringAction extends Action {
 				topics = forumService.getTopics(forum.getUid());
 				((ForumForm)form).setForum(forum);
 			}
+			((ForumForm)form).setToolContentID(contentId);
 		} catch (PersistenceException e) {
 			log.error(e);
 			return mapping.findForward("error");
@@ -214,7 +216,7 @@ public class AuthoringAction extends Action {
 		ForumForm forumForm = (ForumForm)(form);
 		Forum forum = forumForm.getForum();
 		Map topics = (Map) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS);
-		Map attachment = (Map) request.getSession().getAttribute(ForumConstants.AUTHORING_ATTACHMENT);
+		Map attachment = (Map) request.getSession().getAttribute(ForumConstants.AUTHORING_OFFLINE_FILE);
 		
 		try {
 			forumService = getForumManager();
@@ -283,10 +285,20 @@ public class AuthoringAction extends Action {
 		forumService = getForumManager();
 		Attachment att = forumService.uploadInstructionFile(content.getContentId(), file, type);
 		//update session
-		Map attachmentMap = (Map) request.getSession().getAttribute(ForumConstants.AUTHORING_ATTACHMENT);
-		attachmentMap.put(att.getUuid(),att);
-//		request.getSession().setAttribute(ForumConstants.AUTHORING_ATTACHMENT,attachmentMap);
-		return mapping.getInputForward();
+		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
+			Map attachmentMap = (Map) request.getSession().getAttribute(ForumConstants.AUTHORING_OFFLINE_FILE);
+			if(attachmentMap == null)
+				attachmentMap = new HashMap();
+			attachmentMap.put(att.getUuid(),att);
+			request.getSession().setAttribute(ForumConstants.AUTHORING_OFFLINE_FILE,attachmentMap);
+		}else{
+			Map attachmentMap = (Map) request.getSession().getAttribute(ForumConstants.AUTHORING_ONLINE_FILE);
+			if(attachmentMap == null)
+				attachmentMap = new HashMap();
+			attachmentMap.put(att.getUuid(),att);
+			request.getSession().setAttribute(ForumConstants.AUTHORING_ONLINE_FILE,attachmentMap);
+		}
+		return mapping.findForward("success");
 
 	}
 
@@ -306,18 +318,26 @@ public class AuthoringAction extends Action {
 	 * @return
 	 */
 	private ActionForward deleteFile(HttpServletRequest request, HttpServletResponse response, String type) {
-		Long contentID = new Long(WebUtil.readLongParam(request,ForumConstants.TOOL_CONTENT_ID));
+		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.TOOL_CONTENT_ID));
 		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
 		Long uuID = new Long(WebUtil.readLongParam(request,"uuID"));
 		
 		forumService = getForumManager();
 		forumService.deleteFromRepository(uuID,versionID);
-		Map attachmentMap = (Map) request.getSession().getAttribute(ForumConstants.AUTHORING_ATTACHMENT);
-		Attachment attachment = (Attachment) attachmentMap.remove(uuID);
+		Attachment attachment;
+		Map attachmentMap;
+		if(StringUtils.equals(IToolContentHandler.TYPE_OFFLINE,type)){
+			attachmentMap = (Map) request.getSession().getAttribute(ForumConstants.AUTHORING_OFFLINE_FILE);
+			attachment = (Attachment) attachmentMap.remove(uuID);
+			request.getSession().setAttribute(ForumConstants.AUTHORING_OFFLINE_FILE,attachmentMap);
+		}else{
+			attachmentMap = (Map) request.getSession().getAttribute(ForumConstants.AUTHORING_ONLINE_FILE);
+			attachment = (Attachment) attachmentMap.remove(uuID);
+			request.getSession().setAttribute(ForumConstants.AUTHORING_ONLINE_FILE,attachmentMap);
+		}
 		if (attachment.getUid() != null) {
 			forumService.deleteInstructionFile(contentID,uuID,versionID,type);
 		}
-//		request.getSession().setAttribute(ForumConstants.AUTHORING_ATTACHMENT,attachmentMap);
 		
 		Iterator iter = attachmentMap.values().iterator();
 		List list = new ArrayList();
@@ -381,10 +401,11 @@ public class AuthoringAction extends Action {
 		
 		Forum content = new Forum();
 		try {
-			PropertyUtils.copyProperties(forum,content);
+			PropertyUtils.copyProperties(content,forum);
 		} catch (Exception e) {
 			log.error(e);
-		} 
+		}
+		content.setContentId(authForm.getToolContentID());
 		return content;
 	}
 

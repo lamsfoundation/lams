@@ -57,7 +57,7 @@
 		<td colspan="2" class="formcontrol"><html:button property="cancel"
 			onclick="window.close()">
 			<fmt:message key="label.authoring.cancel.button" />
-		</html:button> <html:submit property="action">
+		</html:button> <html:submit property="save">
 			<fmt:message key="label.authoring.save.button" />
 		</html:submit></td>
 	</tr>

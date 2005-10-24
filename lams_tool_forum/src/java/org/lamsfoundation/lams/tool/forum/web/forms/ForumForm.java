@@ -1,14 +1,19 @@
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.apache.struts.validator.ValidatorForm;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.util.UploadFileUtil;
 
@@ -23,20 +28,43 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
  */
 public class ForumForm extends ValidatorForm {
 	private static final long serialVersionUID = -6054354910960460120L;
-    private int currentTab;
+	private Long toolContentID;
+	private int currentTab;
     private FormFile offlineFile;
     private FormFile onlineFile;
+    private List onlineFileList;
+    private List offlineFileList;
     private Forum forum;
 
     private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
     public ForumForm() {
+    	
+    	this.toolContentID = new Long(0);
         this.forum = new Forum();
         this.forum.setTitle("New Forum");
     }
 
     public void setForum(Forum forum) {
         this.forum = forum;
+        //set Form special varaible from given forum
+        if(forum != null){
+        	this.toolContentID = forum.getContentId();
+    		onlineFileList = new ArrayList();
+    		offlineFileList = new ArrayList();
+    		Set fileSet = forum.getAttachments();
+    		if(fileSet != null){
+    			Iterator iter = fileSet.iterator();
+    			while(iter.hasNext()){
+    				Attachment file = (Attachment) iter.next();
+    				if(StringUtils.equalsIgnoreCase(file.getType(),IToolContentHandler.TYPE_OFFLINE))
+    					offlineFileList.add(file);
+    				else
+    					onlineFileList.add(file);
+    			}
+    		}
+        }
+        
     }
 
     public Forum getForum() {
@@ -95,5 +123,29 @@ public class ForumForm extends ValidatorForm {
 
 	public void setCurrentTab(int currentTab) {
 		this.currentTab = currentTab;
+	}
+
+	public Long getToolContentID() {
+		return toolContentID;
+	}
+
+	public void setToolContentID(Long toolContentID) {
+		this.toolContentID = toolContentID;
+	}
+
+	public List getOfflineFileList() {
+		return offlineFileList;
+	}
+
+	public void setOfflineFileList(List offlineFileList) {
+		this.offlineFileList = offlineFileList;
+	}
+
+	public List getOnlineFileList() {
+		return onlineFileList;
+	}
+
+	public void setOnlineFileList(List onlineFileList) {
+		this.onlineFileList = onlineFileList;
 	}
 }

@@ -18,7 +18,7 @@
 				<fmt:message key="label.authoring.cancel.button" />
 			</html:button></td>
 			<td >
-			<html:submit property="action" styleClass="button">
+			<html:submit property="save" styleClass="button">
 				<fmt:message key="label.authoring.save.button" />
 			</html:submit></td>
 		</tr>

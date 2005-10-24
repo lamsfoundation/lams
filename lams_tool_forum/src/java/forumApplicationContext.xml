@@ -3,7 +3,7 @@
 <beans>
 
     <!-- Hibernate SessionFactory -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+    <bean id="forumSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="toolDataSource"/></property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 
@@ -22,28 +22,31 @@
     <!-- core beans -->
     <bean id="forumDao" class="org.lamsfoundation.lams.tool.forum.persistence.ForumDao">
         <property name="sessionFactory">
-            <ref local="sessionFactory"/>
+            <ref local="forumSessionFactory"/>
         </property>
     </bean>
 
 
    <bean id="attachmentDao" class="org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao">
         <property name="sessionFactory">
-            <ref local="sessionFactory"/>
+            <ref local="forumSessionFactory"/>
         </property>
     </bean>
 
 
    <bean id="messageDao" class="org.lamsfoundation.lams.tool.forum.persistence.MessageDao">
         <property name="sessionFactory">
-            <ref local="sessionFactory"/>
+            <ref local="forumSessionFactory"/>
         </property>
     </bean>
 
     <!-- Managers -->
     <bean id="permissionManager" class="org.lamsfoundation.lams.tool.forum.permissions.PermissionManagerImpl">
     </bean>
-
+	<bean id="toolContentHandler" class="org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler">
+	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
     <bean id="forumManagerTarget" class="org.lamsfoundation.lams.tool.forum.service.ForumService">
         <property name="forumDao">
             <ref local="forumDao"/>
@@ -53,6 +56,12 @@
         </property>
         <property name="messageDao">
             <ref local="messageDao"/>
+        </property>
+        <property name="toolContentHandler">
+            <ref local="toolContentHandler"/>
+        </property>
+        <property name="repositoryService">
+            <ref bean="repositoryService"/>
         </property>
     </bean>
 
@@ -75,9 +84,5 @@
             </props>
         </property>
     </bean>
-
-	<bean id="toolContentHandler" class="org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
 
 </beans>

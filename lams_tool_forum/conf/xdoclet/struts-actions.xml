@@ -3,7 +3,10 @@
 		<!-- ========== BEGIN: Authroing Definitions ============================== -->
 		<action path="/authoring/init"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
-			parameter="initPage" >
+			name="forumForm" 
+			scope="request" 
+			parameter="initPage" 
+			validate="false">
 			<forward name="success" path="/jsps/authoring/authoring.jsp" />
 		</action>
 

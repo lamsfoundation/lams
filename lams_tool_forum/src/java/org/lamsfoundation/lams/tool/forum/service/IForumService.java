@@ -32,8 +32,8 @@ public interface IForumService {
     public Message getMessage(Long messageId) throws PersistenceException;
     public void deleteMessage(Long messageId) throws PersistenceException;
     public Message replyToMessage(Long parentId, Message message) throws PersistenceException;
-	public Attachment uploadInstructionFile(Long contentId, FormFile file, String type);
-	public void deleteInstructionFile(Long contentID, Long uuID, Long versionID, String type);
-	public void deleteFromRepository(Long uuID, Long versionID);
+	public Attachment uploadInstructionFile(Long contentId, FormFile file, String type) throws PersistenceException;
+	public void deleteInstructionFile(Long contentID, Long uuID, Long versionID, String type) throws PersistenceException;
+	public void deleteFromRepository(Long uuID, Long versionID) throws PersistenceException;
 
 }

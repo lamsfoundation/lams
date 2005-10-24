@@ -21,7 +21,6 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -236,7 +235,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	}
 
-	public Attachment uploadInstructionFile(Long contentId, FormFile uploadFile, String fileType) {
+	public Attachment uploadInstructionFile(Long contentId, FormFile uploadFile, String fileType) throws PersistenceException{
 		Attachment refile = null;
 		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
 			throw new ForumException("Could not find upload file: " + uploadFile);
@@ -347,7 +346,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	 * @throws SubmitFilesException
 	 */
 	private ITicket getRepositoryLoginTicket() throws ForumException {
-		repositoryService = RepositoryProxy.getRepositoryService();
 		ICredentials credentials = new SimpleCredentials(
 				toolContentHandler.getRepositoryUser(),
 				toolContentHandler.getRepositoryId());
@@ -364,5 +362,13 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		} catch (LoginException e) {
 			throw new ForumException("Login failed." + e.getMessage());
 		}
+	}
+
+	public IRepositoryService getRepositoryService() {
+		return repositoryService;
+	}
+
+	public void setRepositoryService(IRepositoryService repositoryService) {
+		this.repositoryService = repositoryService;
 	}
 }

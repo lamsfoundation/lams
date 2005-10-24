@@ -14,6 +14,10 @@
 	    	var tag = document.getElementById("currentTab");
 	    	tag.value = curr;
 	    }
+	    function submitForm(actionUrl){
+	    	document.forms[0].action=actionUrl;
+	    	document.forms[0].submit();
+	    }
     </script>
 	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/tabcontroller.js"></script>    
 	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/common.js"></script>
@@ -23,7 +27,7 @@
 <body onLoad="initTabs();showTab('<c:out value='${currentTab}'/>');">
 
 <html:form action="authoring/update" method="post"	 enctype="multipart/form-data">
-		<html:hidden property="forum.contentId"/>
+		<html:hidden property="toolContentID"/>
 		<html:hidden  property="currentTab" styleId="currentTab"/>
 
 <!-- start tabs -->
