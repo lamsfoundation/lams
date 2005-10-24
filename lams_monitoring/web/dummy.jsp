@@ -45,9 +45,8 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 	
 	<P>Before you can start a lesson, you will need to create a learning design.
 	At the moment, the only way to do this is to go into the authoring client
-	and save a learning design containing your tool. Then get the tool_content_id
-	from the learning design activity record and run your authoring screen 
-	to create the tool content. Once that is done, you can start a lesson
+	and save a learning design containing your tool. Get the id of the learning 
+	design from the database. Once that is done, you can start a lesson
 	using the learning design id.
 	
 	<html:form action="/dummy" target="_self" method="POST">
@@ -112,10 +111,11 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 			<TD class="formlabel">Define Later &amp; Monitor</TD>
 			<TD class="formcontrol">
 			<c:forEach var="activity" items="${lesson.learningDesign.activities}">
+				Activity <c:out value="${activity.activityId}"/> <c:out value="${activity.title}"/><BR>
 				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&activityID=<c:out value="${activity.activityId}"/>');">
-				 Monitor <c:out value="${activity.title}"/></A><BR/>
+				 Monitor</A> &nbsp;&nbsp;
 				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&activityID=<c:out value="${activity.activityId}"/>');">
-				 Define Later <c:out value="${activity.title}"/></A>
+				 Define Later</A><BR>
 			</c:forEach>
 			</TD>
 		</TR>
