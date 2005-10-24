@@ -5,7 +5,6 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
-
 <%
 String protocol = request.getProtocol();
 if(protocol.startsWith("HTTPS")){
@@ -195,8 +194,6 @@ MM_reloadPage(true);
 <!-- end of content_b -->
 </div>
 
-
-
 <!-- tab content 2 Advanced-->
 <div id='content_a'  class="tabbody content_a">
 <h2>Advanced Definitions </h2>
@@ -204,7 +201,7 @@ MM_reloadPage(true);
 			<table class="forms">
 				<tr>
 	      			<td class="formlabel">
-		      			<bean:message key="label.authoring.title"/>:
+		      			<bean:message key="radiobox.synchInMonitor"/>:
 					</td>
 					<td>
 						<html:radio property="synchInMonitor" value="ON">
@@ -247,6 +244,47 @@ MM_reloadPage(true);
 	      			</td>
 		        </tr>
 		         
+		         <tr>
+					<td class="formlabel">
+		      			<bean:message key="radiobox.retries"/>:		      			
+					</td>
+					<td>
+						<html:radio property="retries" value="ON">
+						 <bean:message key="option.on"/>
+						</html:radio>
+
+						<html:radio property="retries" value="OFF">
+						 <bean:message key="option.off"/>
+						</html:radio>
+	      			</td>
+
+				</tr>	      			
+				<tr>
+	      			<td class="formlabel">
+		      			<bean:message key="radiobox.passmark"/>:		      			
+					</td>
+					
+			 		<td> 
+			 			<html:text property="passmark" size="60" maxlength="100"/>
+			 		</td>
+
+		        </tr>
+		        
+   				<tr>
+					<td class="formlabel">
+		      			<bean:message key="radiobox.showFeedback"/>:		      			
+					</td>
+					<td>
+						<html:radio property="showFeedback" value="ON">
+						 <bean:message key="option.on"/>
+						</html:radio>
+
+						<html:radio property="showFeedback" value="OFF">
+						 <bean:message key="option.off"/>
+						</html:radio>
+	      			</td>
+		        </tr>
+		         
 		         <tr> 
 					<td class="formlabel">
 			 			<bean:message key="label.report.title"/>: </td>
@@ -280,7 +318,7 @@ MM_reloadPage(true);
 				</tr>
 				<tr>
 					 <td class="body" colspan=2> 
-						 <html:submit property="submitTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+						 <html:submit property="advancedTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 							<bean:message key="button.done"/>
 						</html:submit>
 					</td> 

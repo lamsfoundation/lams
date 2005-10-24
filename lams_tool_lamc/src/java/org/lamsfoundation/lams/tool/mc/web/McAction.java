@@ -626,7 +626,57 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		logger.debug("userAction:" + userAction);
 
         	ActionMessages errors= new ActionMessages();
-	 		
+
+        	boolean isQuestionsSequenced=false;
+        	boolean isSynchInMonitor=false;
+        	boolean isUsernameVisible=false;
+        	boolean isRetries=false;
+        	boolean isShowFeedback=false;
+        	String monitoringReportTitle="";
+        	String reportTitle="";
+        	String endLearningMessage="";
+        	int passmark=0;
+        	
+        	logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
+        	if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
+        		isQuestionsSequenced=true;
+        	
+        	logger.debug("isSynchInMonitor: " +  mcAuthoringForm.getSynchInMonitor());
+        	if (mcAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
+        		isSynchInMonitor=true;
+        	
+        	logger.debug("isUsernameVisible: " +  mcAuthoringForm.getUsernameVisible());
+        	if (mcAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
+        		isUsernameVisible=true;
+        	
+        	logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
+        	if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
+        		isRetries=true;
+        	
+        	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
+        	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0)) 
+        		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
+        	
+        	logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
+        	if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
+        		isShowFeedback=true;
+        	    	
+        	logger.debug("MONITORING_REPORT_TITLE: " +  mcAuthoringForm.getMonitoringReportTitle());
+        	monitoringReportTitle=mcAuthoringForm.getMonitoringReportTitle();
+        	if ((monitoringReportTitle == null) || (monitoringReportTitle.length() == 0)) 
+        		monitoringReportTitle=(String)request.getSession().getAttribute(MONITORING_REPORT_TITLE);
+        	
+        	reportTitle=mcAuthoringForm.getReportTitle();
+        	logger.debug("REPORT_TITLE: " +  mcAuthoringForm.getReportTitle());
+        	if ((reportTitle == null) || (reportTitle.length() == 0)) 
+        		reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
+        	
+        	endLearningMessage=mcAuthoringForm.getEndLearningMessage();
+        	logger.debug("END_LEARNING_MESSAGE: " +  mcAuthoringForm.getEndLearningMessage());
+        	if ((endLearningMessage == null) || (endLearningMessage.length() == 0))
+        		endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSAGE);
+
+        	
 	 		String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
         	logger.debug("richTextTitle: " + richTextTitle);
         	String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
@@ -647,7 +697,7 @@ public class McAction extends DispatchAction implements McAppConstants
 
     		if (errors.size() > 0)  
     		{
-    			logger.debug("either title or instructions or both is missingr. Returning back to from to fix errors:");
+    			logger.debug("either title or instructions or both is missing. Returning back to from to fix errors:");
     			return (mapping.findForward(LOAD_QUESTIONS));
     		}
     		
@@ -666,7 +716,18 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("updating mcContent title and instructions:" + mcContent);
 			mcContent.setTitle(richTextTitle);
 			mcContent.setInstructions(richTextInstructions);
-			
+
+			mcContent.setQuestionsSequenced(isQuestionsSequenced); 
+		    mcContent.setSynchInMonitor(isSynchInMonitor);
+		    mcContent.setUsernameVisible(isUsernameVisible);
+		    mcContent.setRetries(isRetries);
+		    mcContent.setPassMark(new Integer(passmark));
+		    mcContent.setShowFeedback(isShowFeedback);
+		    mcContent.setEndLearningMessage(endLearningMessage);
+		    mcContent.setReportTitle(reportTitle);
+		    mcContent.setMonitoringReportTitle(monitoringReportTitle);
+		    mcContent.setEndLearningMessage(endLearningMessage);
+		    
 			
 			mcService.resetAllQuestions(mcContent.getUid());
 			logger.debug("all question reset for :" + mcContent.getUid());
@@ -699,6 +760,14 @@ public class McAction extends DispatchAction implements McAppConstants
 			saveErrors(request,errors);
 			
 			mcAuthoringForm.resetUserAction();
+	   	    return (mapping.findForward(LOAD_QUESTIONS));
+	 	}
+	 	else if (mcAuthoringForm.getAdvancedTabDone() != null)
+	 	{
+	 		userAction="advancedTabDone";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		mcAuthoringForm.resetUserAction();
 	   	    return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	
@@ -774,7 +843,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	boolean isShowFeedback=false;
     	
     	
-		logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
+    	logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
     	if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
     		isQuestionsSequenced=true;
     	
@@ -790,16 +859,22 @@ public class McAction extends DispatchAction implements McAppConstants
     	if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
     		isRetries=true;
     	
+    	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
+    	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0)) 
+    		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
+    	
     	logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
     	if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
     		isShowFeedback=true;
     	    	
     	logger.debug("MONITORING_REPORT_TITLE: " +  mcAuthoringForm.getMonitoringReportTitle());
-    	if (mcAuthoringForm.getMonitoringReportTitle() == null)
+    	monitoringReportTitle=mcAuthoringForm.getMonitoringReportTitle();
+    	if ((monitoringReportTitle == null) || (monitoringReportTitle.length() == 0)) 
     		monitoringReportTitle=(String)request.getSession().getAttribute(MONITORING_REPORT_TITLE);
     	
+    	reportTitle=mcAuthoringForm.getReportTitle();
     	logger.debug("REPORT_TITLE: " +  mcAuthoringForm.getReportTitle());
-    	if (mcAuthoringForm.getReportTitle() == null)
+    	if ((reportTitle == null) || (reportTitle.length() == 0)) 
     		reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
     	
     	logger.debug("OFFLINE_INSTRUCTIONS: " +  mcAuthoringForm.getOfflineInstructions());
@@ -810,8 +885,9 @@ public class McAction extends DispatchAction implements McAppConstants
     	if (mcAuthoringForm.getOnlineInstructions() == null)
     		onlineInstructions=(String)request.getSession().getAttribute(ONLINE_INSTRUCTIONS);
 		
+    	endLearningMessage=mcAuthoringForm.getEndLearningMessage();
     	logger.debug("END_LEARNING_MESSAGE: " +  mcAuthoringForm.getEndLearningMessage());
-    	if (mcAuthoringForm.getEndLearningMessage() == null)
+    	if ((endLearningMessage == null) || (endLearningMessage.length() == 0))
     		endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSAGE);
 
     	String richTextTitle="";
@@ -855,7 +931,9 @@ public class McAction extends DispatchAction implements McAppConstants
 	    mc.setRunOffline(false);
 	    mc.setDefineLater(false);
 	    mc.setSynchInMonitor(isSynchInMonitor);
+	    mc.setContentInUse(isContentInUse);
 	    mc.setEndLearningMessage(endLearningMessage);
+	    mc.setRunOffline(isRunOffline);
 	    mc.setReportTitle(reportTitle);
 	    mc.setMonitoringReportTitle(monitoringReportTitle);
 	    mc.setEndLearningMessage(endLearningMessage);

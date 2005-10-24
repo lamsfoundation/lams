@@ -57,6 +57,16 @@ public interface McAppConstants {
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
 	
+	
+	/** these constants are from org.lamsfoundation.lams.web.util.AttributeNames  */
+	public static final String USER= "user";
+	public static final String TOOL_CONTENT_ID = "toolContentID";
+	public static final String TOOL_SESSION_ID = "toolSessionID"; 
+	public static final String MODE = "mode";
+	public static final String USER_ID = "userID";
+    public static final String ACTIVITY_ID = "activityID";
+	
+	
 	/**
 	 * Mock constants below are temporary until the tool gets a User object from the container.
 	 */
@@ -174,12 +184,12 @@ public interface McAppConstants {
     /**
      * the author's current content id
      */
-    public static final String TOOL_CONTENT_ID							="toolContentId";
+    //public static final String TOOL_CONTENT_ID							="toolContentId";
     
     /**
      * the learner or monitoring environment provides toolSessionId
      */
-    public static final String TOOL_SESSION_ID							="toolSessionId";
+    //public static final String TOOL_SESSION_ID							="toolSessionId";
     public final long 	ONE_DAY 										=60 * 60 * 1000 * 24;
     public final static String NOT_ATTEMPTED 							="NOT_ATTEMPTED";
     public final static String INCOMPLETE 								="INCOMPLETE";
@@ -212,7 +222,6 @@ public interface McAppConstants {
     /**
      * export portfolio constants
      */
-    public static final String MODE										="mode";  
     public static final String LEARNER									="learner"; 
     public static final String TEACHER									="teacher";
     public static final String USER_EXCEPTION_MODE_REQUIRED				="userExceptionModeRequired";					

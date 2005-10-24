@@ -7,11 +7,12 @@
 
 
 
+
 	<!-- this form  exists temporarily to represent tool icon, remove this form once the tool is deployed into authoring environment -->
 <%
 	String userContentId="1234";
 	String userId="1111";
-	String toolUrl="/authoringStarter?userId=" + userId + "&toolContentId=" + userContentId;
+	String toolUrl="/authoringStarter?userId=" + userId + "&toolContentID=" + userContentId;
 %>
 
 

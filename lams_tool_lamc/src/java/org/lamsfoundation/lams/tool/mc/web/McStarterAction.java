@@ -61,6 +61,8 @@
 *
 */
 
+/** use from org.lamsfoundation.lams.web.util.AttributeNames  */
+
 /*
  * check back McUtils.configureContentRepository(request);
  */
@@ -90,6 +92,7 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
+//import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
@@ -179,7 +182,7 @@ public class McStarterAction extends Action implements McAppConstants {
     		persistError(request,"error.defaultContent.notSetup");
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
-		
+				
 		
 		/**
 		 * retrieve uid of the default question content
@@ -262,6 +265,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	    	toolContentId=new Long(strToolContentId).longValue();
 	    	logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
 	    	request.getSession().setAttribute(TOOL_CONTENT_ID, new Long(strToolContentId));
+	    	
     	}
     	catch(NumberFormatException e)
 		{
