@@ -166,4 +166,17 @@ public class FlashMessage implements Serializable {
         return new FlashMessage(methodName, "No such Tool with tool id of " + toolID + " exists",
                 FlashMessage.ERROR);
     }
+    public static FlashMessage getDataMissing(String methodName, String[] dataNames )
+    {
+    	String str = "Request can not be completed as data is missing. ";
+    	if ( dataNames!=null && dataNames.length > 0 ) {
+    		str += " Fields:";
+    		for ( int i=0; i<dataNames.length; i++ ) {
+   				str = str + (i!=0?", ":"") + dataNames[i];
+    		}
+    	}
+    	
+        return new FlashMessage(methodName, str, FlashMessage.ERROR);
+    }
+
 }
