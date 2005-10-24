@@ -42,6 +42,8 @@ public class AttributeNames {
 	public static final String TOOL_SESSION_ID = "toolSessionID"; 
 	public static final String MODE = "mode";
 	public static final String USER_ID = "userID";
+    public static final String ACTIVITY_ID = "activityID";
+
 	
 	
 }
