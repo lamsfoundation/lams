@@ -223,7 +223,7 @@ values
 1,null,0,0,
 null,4,'20050101',0,
 null,null,4,4,
-null,null,null,'/lams/tool/laqa/images/icon_questionanswer.swf',
+null,null,null,'tool/laqa/images/icon_questionanswer.swf',
 1,0,1);
 
 insert into lams_learning_activity (activity_id,activity_ui_id,description,title,xcoord,ycoord,parent_activity_id,help_text,
@@ -426,7 +426,7 @@ values
 1,null,0,1,
 1,4,'20050101',0,
 null,null,4,15,
-null,null,null,'/lams/tool/laqa/images/icon_questionanswer.swf',
+null,null,null,'tool/laqa/images/icon_questionanswer.swf',
 1,0,1);
 
 insert into lams_learning_activity
@@ -576,7 +576,7 @@ null,null,null,
 null,null,
 null,null,
 null,null,
-'/lams/tool/laqa/images/icon_questionanswer.swf',
+'tool/laqa/images/icon_questionanswer.swf',
 null,null,
 4,
 2,1,1);
@@ -611,7 +611,7 @@ null,null,null,
 null,null,
 null,null,
 null,null,
-'/lams/tool/laqa/images/icon_questionanswer.swf',
+'tool/laqa/images/icon_questionanswer.swf',
 null,null,
 4,
 1,0,1);
