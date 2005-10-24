@@ -398,5 +398,28 @@ public class WebUtil
             return url+"&";
     }
 
+    /** Converts a url (such as one from a tool) to a complete url. 
+     * If the url starts with "http" then it is assumed to be a complete url
+     * and is returned as is.
+     * Otherwise it assumes starts with the path of the webapp so it is 
+     * appended to the server url from the LAMS Configuration.
+     * @param url e.g. tool/lanb11/starter/learner.do
+     * @return complete url
+     */
+    public static String convertToFullURL(String url) {
+    	if ( url == null )
+    		return null;
+    	else if ( url.startsWith("http") )
+    		return url;
+    	else {
+        	String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
+        	if ( url.charAt(0) == '/' )
+        		return serverURL + url;
+        	else 
+        		return serverURL + '/' + url;
+    	}
+    }
+    
+
 
 }
