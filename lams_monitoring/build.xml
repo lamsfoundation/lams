@@ -125,8 +125,8 @@
 		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF" 
   				webxml="${conf.webinf.dir}/web.xml">
 			<webinf dir="${conf.webinf.dir}">
-				<include name="*.xml"/>
-				<include name="*.tld"/>
+				<include name="**/*.xml"/>
+				<include name="**/*.tld"/>
 				<include name="struts/*"/>
 				<include name="jstl/*"/>
 				<exclude name="web.xml"/>

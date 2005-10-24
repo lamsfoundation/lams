@@ -19,8 +19,8 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 -->
 <!-- taglib definition-->
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html-el" %>
-<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="tags-html-el" prefix="html-el" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
 
 <!-- end of taglib definition -->
 <tr>

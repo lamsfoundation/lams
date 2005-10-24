@@ -18,10 +18,10 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-<%@ taglib uri="/WEB-INF/struts/struts-tiles.tld" prefix="tiles" %>
-<%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
+<%@ taglib uri="tags-tiles" prefix="tiles" %>
+<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">

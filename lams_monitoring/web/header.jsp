@@ -18,7 +18,7 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
 <%
 String protocol = request.getProtocol();

@@ -13,6 +13,11 @@
   <!-- ========== Form Bean Definitions =================================== -->
   <form-beans>
 
+    <form-bean
+      name="DummyForm"
+      type="org.lamsfoundation.lams.monitoring.web.DummyForm"
+    />
+
    <form-bean name="GateForm"  type="org.apache.struts.action.DynaActionForm">
 	<form-property name="gate" type="org.lamsfoundation.lams.learningdesign.GateActivity" />
 	<form-property name="activityId" type="java.lang.Long" />
@@ -67,7 +72,7 @@ http://www.gnu.org/licenses/gpl.txt
       <exception
         key="error.system.monitor"
         type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
         path=".systemError"
         scope="request"
       />
@@ -94,7 +99,7 @@ http://www.gnu.org/licenses/gpl.txt
       <exception
         key="error.system.monitor"
         type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+        handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
         path=".systemError"
         scope="request"
       />
@@ -111,6 +116,28 @@ http://www.gnu.org/licenses/gpl.txt
       <forward
         name="viewScheduleGate"
         path=".viewScheduleGate"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/dummy"
+      type="org.lamsfoundation.lams.monitoring.web.DummyMonitoringAction"
+      name="DummyForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <exception
+        key="error.system.monitor"
+        type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
+        handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
+        path=".systemError"
+        scope="request"
+      />
+      <forward
+        name="dummy"
+        path="/dummy.jsp"
         redirect="false"
       />
     </action>
