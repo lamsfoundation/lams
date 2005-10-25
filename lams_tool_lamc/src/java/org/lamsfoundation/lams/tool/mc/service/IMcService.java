@@ -174,6 +174,14 @@ public interface IMcService
 	public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws McApplicationException;
 	
 	public InputStream downloadFile(Long uuid, Long versionID)throws McApplicationException;
+	
+	public List retrieveMcUploadedOfflineFilesUuid(McContent mc);
+	
+	public List retrieveMcUploadedOnlineFilesUuid(McContent mc);
+	
+	public List retrieveMcUploadedOfflineFilesName(McContent mc);
+	
+	public List retrieveMcUploadedOnlineFilesName(McContent mc);
     
 }
 

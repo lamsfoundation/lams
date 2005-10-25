@@ -40,6 +40,14 @@
     </property>
     
     <property
+        name="weight"
+        type="java.lang.Integer"
+        column="weight"
+        length="5"
+    >
+    </property>
+
+    <property
         name="disabled"
         type="boolean"
         access="property"

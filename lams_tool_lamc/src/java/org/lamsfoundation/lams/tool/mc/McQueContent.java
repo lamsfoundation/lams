@@ -44,7 +44,10 @@ public class McQueContent implements Serializable {
 
     /** nullable persistent field */
     private Integer displayOrder;
-
+    
+    /** nullable persistent field */
+    private Integer weight;
+    
     /** persistent field */
     private boolean disabled;
     
@@ -78,6 +81,17 @@ public class McQueContent implements Serializable {
         this.mcOptionsContents = mcOptionsContents;
     }
     
+    public McQueContent(String question, Integer displayOrder, Integer weight,  boolean disabled, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+        this.question = question;
+        this.displayOrder = displayOrder;
+        this.weight = weight;
+        this.disabled = disabled;
+        this.mcContent=mcContent;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
+    }
+    
+    
     public McQueContent(Long mcQueContentId, String question, Integer displayOrder,  Set mcUsrAttempts, Set mcOptionsContents) {
         this.mcQueContentId = mcQueContentId;
         this.question = question;
@@ -85,6 +99,17 @@ public class McQueContent implements Serializable {
         this.mcUsrAttempts = mcUsrAttempts;
         this.mcOptionsContents = mcOptionsContents;
     }
+    
+    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, Integer weight, Set mcUsrAttempts, Set mcOptionsContents) {
+        this.mcQueContentId = mcQueContentId;
+        this.question = question;
+        this.displayOrder = displayOrder;
+        this.weight=weight;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
+    }
+    
+    
     
     public McQueContent(String question, Integer displayOrder,  Set mcUsrAttempts, Set mcOptionsContents) {
         this.question = question;
@@ -116,12 +141,14 @@ public class McQueContent implements Serializable {
      * @return the new qa question content object
      */
     public static McQueContent newInstance(McQueContent queContent,
-    										McContent newQaContent,
+    										McContent newMcContent,
     										McQueContent parentQuestion)
     {
     	McQueContent newQueContent = new McQueContent(queContent.getQuestion(),
 													  queContent.getDisplayOrder(),
-													  newQaContent,
+													  queContent.getWeight(),
+													  queContent.isDisabled(), 
+													  newMcContent,
                                                       new TreeSet(),
                                                       new TreeSet());
     	return newQueContent;
@@ -218,5 +245,17 @@ public class McQueContent implements Serializable {
 	 */
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
+	}
+	/**
+	 * @return Returns the weight.
+	 */
+	public Integer getWeight() {
+		return weight;
+	}
+	/**
+	 * @param weight The weight to set.
+	 */
+	public void setWeight(Integer weight) {
+		this.weight = weight;
 	}
 }

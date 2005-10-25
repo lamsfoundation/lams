@@ -245,7 +245,7 @@
 </table>
 <table name="tl_lamc11_que_content" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="556" y="495" width="176" height="92"/>
+<table-figure-bounds x="559" y="508" width="176" height="104"/>
 <column-list>
 <column name="uid" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="true">
 <column-description/>
@@ -267,11 +267,24 @@
 <variant type-name-pattern="VARCHAR(%n) BINARY" precision-variable="%n" precision-min="1" precision-max="255"/>
 </data-type>
 </column>
+<column name="weight" alias="" remarks="" mandatory="true" column-size="5" decimal-digits="0" default-value="0" auto-increment="false">
+<column-description/>
+<data-type name="INT" jdbc-type="4" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant type-name-pattern="INT(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
 <column name="disabled" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="1" auto-increment="false">
 <column-description/>
 <data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>

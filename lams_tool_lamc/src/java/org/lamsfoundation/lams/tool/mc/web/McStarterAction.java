@@ -92,7 +92,6 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
-//import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
@@ -136,7 +135,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		long contentId=0;
 		try
 		{
-			logger.debug("attempt retrieving tool with signatute : " + MY_SIGNATURE);
+			logger.debug("attempt retrieving tool with signature : " + MY_SIGNATURE);
 			contentId=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
 			logger.debug("retrieved tool default contentId: " + contentId);
 			if (contentId == 0) 
@@ -290,6 +289,11 @@ public class McStarterAction extends Action implements McAppConstants {
 			McContent mcContent=mcService.retrieveMc(new Long(contentId));
 			logger.debug("mcContent:" + mcContent);
 			
+			/** reset all radioboxes to false*/
+			mcAuthoringForm.resetRadioBoxes();
+			logger.debug("all radioboxes arec reset");
+			
+			
 			if (mcContent == null)
 			{
 				logger.debug("Exception occured: No default content");
@@ -318,10 +322,6 @@ public class McStarterAction extends Action implements McAppConstants {
 			
 			
 			McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
-			
-			/** reset all radioboxes to false*/
-			mcAuthoringForm.resetRadioBoxes();
-			logger.debug("all radioboxes arec reset");
 			
 			logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
 			logger.debug("getting default content");
@@ -380,6 +380,94 @@ public class McStarterAction extends Action implements McAppConstants {
 		else
 		{
 			logger.debug("getting existing content with id:" + toolContentId);
+			McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+			logger.debug("existing mcContent:" + mcContent);
+			
+			request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
+			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
+			request.getSession().setAttribute(QUESTIONS_SEQUENCED,new Boolean(mcContent.isQuestionsSequenced()));
+			request.getSession().setAttribute(USERNAME_VISIBLE,new Boolean(mcContent.isUsernameVisible()));
+			request.getSession().setAttribute(CREATED_BY, new Long(mcContent.getCreatedBy()));
+			request.getSession().setAttribute(MONITORING_REPORT_TITLE,mcContent.getMonitoringReportTitle());
+			request.getSession().setAttribute(REPORT_TITLE,mcContent.getReportTitle());
+			request.getSession().setAttribute(RUN_OFFLINE, new Boolean(mcContent.isRunOffline()));
+			request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
+			request.getSession().setAttribute(SYNCH_IN_MONITOR, new Boolean(mcContent.isSynchInMonitor()));
+			request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
+			request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
+			request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
+			request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
+			request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
+			request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
+			request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
+			
+			
+			McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
+			logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
+			
+			if (mcContent.isUsernameVisible())
+			{
+				mcAuthoringForm.setUsernameVisible(ON);
+				logger.debug("setting userNameVisible to true");
+			}
+			else
+			{
+				mcAuthoringForm.setUsernameVisible(OFF);	
+				logger.debug("setting userNameVisible to false");				
+			}
+		    
+			
+			if (mcContent.isQuestionsSequenced())
+			{
+				mcAuthoringForm.setQuestionsSequenced(ON);
+				logger.debug("setting questionsSequenced to true");
+			}
+			else
+			{
+				mcAuthoringForm.setQuestionsSequenced(OFF);	
+				logger.debug("setting questionsSequenced to false");				
+			}
+
+
+			if (mcContent.isSynchInMonitor())
+			{
+				mcAuthoringForm.setSynchInMonitor(ON);	
+				logger.debug("setting SynchInMonitor to true");
+			}
+			else
+			{
+				mcAuthoringForm.setSynchInMonitor(OFF);	
+				logger.debug("setting SynchInMonitor to false");				
+			}
+
+			if (mcContent.isRetries())
+			{
+				mcAuthoringForm.setRetries(ON);	
+				logger.debug("setting retries to true");
+			}
+			else
+			{
+				mcAuthoringForm.setRetries(OFF);	
+				logger.debug("setting retries to false");				
+			}
+
+			if (mcContent.isShowFeedback())
+			{
+				mcAuthoringForm.setShowFeedback(ON);	
+				logger.debug("setting showFeedback to false");
+			}
+			else
+			{
+				mcAuthoringForm.setShowFeedback(OFF);	
+				logger.debug("setting showFeedback to false");				
+			}
+			
+			AuthoringUtil authoringUtil = new AuthoringUtil();
+			mapQuestionsContent=authoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
+			System.out.print("mapQuestionsContent:" + mapQuestionsContent);
+			
+    		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+    		logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
 		}
     	
 	

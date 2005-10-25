@@ -141,7 +141,7 @@ MM_reloadPage(true);
 	
 					 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-														<bean:message key="label.options"/>
+														<bean:message key="label.edit"/>
 													</html:submit>
 											</td>
 										  </tr>
@@ -165,7 +165,7 @@ MM_reloadPage(true);
 																				  										  		
 					 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-														<bean:message key="label.options"/>
+														<bean:message key="label.edit"/>
 													</html:submit>
 											  	</td>
 										  </tr>
@@ -334,18 +334,86 @@ MM_reloadPage(true);
 <div id='content_i'  class="tabbody content_i">
 <h2>Instructions</h2>
 <div id="formtablecontainer">
+		<table class="forms">
+				<tr> 
+					<td class="formlabel">
+          				<fmt:message key="label.offlineInstructions" />:
+          			</td>
+					<td class="formcontrol">
+					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckeditor/">
+						  <c:out value="${richTextOfflineInstructions}" escapeXml="false" />						  
+					</FCK:editor>
+					</td> 
+				</tr>
 
-			<table class="forms">
+				<tr> 
+					<td class="formlabel">
+          				<fmt:message key="label.offlineFiles" />
+          			</td>
+          			<td NOWRAP> 
+						<html:file  property="theOfflineFile"></html:file>
+					 	<html:submit property="submitOfflineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+								<bean:message key="label.upload"/>
+						</html:submit>
+					</td> 
+
+				</tr>
+				<tr> 
+					<td class="formlabel">
+          				<fmt:message key="label.uploadedOfflineFiles" />
+          			</td>
+					<td class="formlabel">
+						<c:forEach var='item' items='${sessionScope.listUploadedOfflineFileNames}'>
+				            <li><c:out value='${item}'/></li>
+	         			</c:forEach>
+					</td> 
+				</tr>
+          		<tr> 
+					<td class="formlabel">
+          				<fmt:message key="label.onlineInstructions" />
+          			</td>
+					<td class="formcontrol">
+					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckeditor/">
+						  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
+					</FCK:editor>
+					</td> 
+				</tr>
+				
+				<tr> 
+					<td class="formlabel">
+          				<fmt:message key="label.onlineFiles" />
+          			</td>
+          			<td NOWRAP> 
+						<html:file  property="theOnlineFile"></html:file>
+					 	<html:submit property="submitOnlineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+								<bean:message key="label.upload"/>
+						</html:submit>
+					</td> 
+				
+				</tr>
+				<tr>
+					<td class="formlabel">
+          				<fmt:message key="label.uploadedOnlineFiles" />
+          			</td>
+					<td class="formlabel">
+						<c:forEach var='item' items='${sessionScope.listUploadedOnlineFileNames}'>
+				            <li><c:out value='${item}'/></li>
+	         			</c:forEach>
+					</td> 
+				</tr>
+		  		<tr>
+ 				 	<td colspan=2 align=center>								
+						&nbsp&nbsp
+				  	</td>
+				</tr>
 				<tr>
 					 <td class="body" colspan=2> 
-						 <html:submit property="submitTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+						 <html:submit property="instructionsTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 							<bean:message key="button.done"/>
 						</html:submit>
 					</td> 
  				 </tr>
 			</table>	  	
-
-
 </div>
 
 	<hr>

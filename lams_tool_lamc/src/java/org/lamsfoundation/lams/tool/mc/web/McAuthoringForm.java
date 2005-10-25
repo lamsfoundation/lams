@@ -40,6 +40,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String editDefaultQuestion;
 	protected String removeOptionContent;
 	protected String advancedTabDone;
+	protected String instructionsTabDone;
 	
 	protected String addContent;
 	protected String removeContent;
@@ -106,6 +107,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.doneOptions=null;
 		this.submitQuestions=null;
 		this.advancedTabDone=null;
+		this.instructionsTabDone=null;
 		
     	this.addContent=null;	
     	this.removeContent=null;
@@ -135,6 +137,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.doneOptions=null;		
 		this.submitQuestions=null;
 		this.advancedTabDone=null;
+		this.instructionsTabDone=null;
 		
 		this.addContent=null;
 		this.removeContent=null;
@@ -783,5 +786,17 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setAdvancedTabDone(String advancedTabDone) {
 		this.advancedTabDone = advancedTabDone;
+	}
+	/**
+	 * @return Returns the instructionsTabDone.
+	 */
+	public String getInstructionsTabDone() {
+		return instructionsTabDone;
+	}
+	/**
+	 * @param instructionsTabDone The instructionsTabDone to set.
+	 */
+	public void setInstructionsTabDone(String instructionsTabDone) {
+		this.instructionsTabDone = instructionsTabDone;
 	}
 }

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -43,7 +44,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
@@ -241,7 +241,6 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("updated SELECTED_QUESTION");
 		}
 	 	
-	 	
 	 	String userAction=null;
 	 	if (mcAuthoringForm.getAddQuestion() != null)
 	 	{
@@ -362,15 +361,21 @@ public class McAction extends DispatchAction implements McAppConstants
 	    	McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(editableQuestionEntry, mcContent.getUid());
 	    	logger.debug("mcQueContent:" + mcQueContent);
 	    	
+	    	//FIX THIS!!!!
+	    	int weight=0;
 	    	if (mcQueContent == null)
         	{
 	    		logger.debug("convenience add mcQueContent");
         		mcQueContent=  new McQueContent(editableQuestionEntry,
           	        	 	new Integer(questionIndex),
+							new Integer(weight),
+							true,
          					mcContent,
          					new HashSet(),
          					new HashSet()
          					);
+        		
+        		
        	        mcService.createMcQue(mcQueContent);
        	        logger.debug("persisted convenience mcQueContent: " + mcQueContent);
         	}
@@ -701,7 +706,12 @@ public class McAction extends DispatchAction implements McAppConstants
     			return (mapping.findForward(LOAD_QUESTIONS));
     		}
     		
-    		
+    		String richTextOfflineInstructions=(String) request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+        	logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
+        	
+        	String richTextOnlineInstructions=(String) request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+        	logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
+        	
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
@@ -727,8 +737,9 @@ public class McAction extends DispatchAction implements McAppConstants
 		    mcContent.setReportTitle(reportTitle);
 		    mcContent.setMonitoringReportTitle(monitoringReportTitle);
 		    mcContent.setEndLearningMessage(endLearningMessage);
+		    mcContent.setOfflineInstructions(richTextOfflineInstructions);
+		    mcContent.setOnlineInstructions(richTextOnlineInstructions);
 		    
-			
 			mcService.resetAllQuestions(mcContent.getUid());
 			logger.debug("all question reset for :" + mcContent.getUid());
 			 
@@ -770,6 +781,30 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		mcAuthoringForm.resetUserAction();
 	   	    return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
+	 	else if (mcAuthoringForm.getInstructionsTabDone() != null)
+	 	{
+	 		userAction="instructionsTabDone";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		mcAuthoringForm.resetUserAction();
+	   	    return (mapping.findForward(LOAD_QUESTIONS));
+	 	} 
+	 	else if (mcAuthoringForm.getSubmitOfflineFile() != null)
+        {
+	 		userAction="submitOfflineFile";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		
+	 		//McUtils.addFileToContentRepository(request, mcAuthoringForm, true);
+            //logger.debug("offline file added to repository successfully.");
+            
+	 		
+	 		mcAuthoringForm.resetUserAction();
+	   	    return (mapping.findForward(LOAD_QUESTIONS));
+        }
+	 	
+	 	
+	 	
 	 	
 	 	
 	 	mcAuthoringForm.resetUserAction();
@@ -877,14 +912,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	if ((reportTitle == null) || (reportTitle.length() == 0)) 
     		reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
     	
-    	logger.debug("OFFLINE_INSTRUCTIONS: " +  mcAuthoringForm.getOfflineInstructions());
-    	if (mcAuthoringForm.getOfflineInstructions() == null)
-    		offlineInstructions=(String)request.getSession().getAttribute(OFFLINE_INSTRUCTIONS);
-
-    	logger.debug("ONLINE_INSTRUCTIONS: " +  mcAuthoringForm.getOnlineInstructions());
-    	if (mcAuthoringForm.getOnlineInstructions() == null)
-    		onlineInstructions=(String)request.getSession().getAttribute(ONLINE_INSTRUCTIONS);
-		
+    			
     	endLearningMessage=mcAuthoringForm.getEndLearningMessage();
     	logger.debug("END_LEARNING_MESSAGE: " +  mcAuthoringForm.getEndLearningMessage());
     	if ((endLearningMessage == null) || (endLearningMessage.length() == 0))
@@ -899,6 +927,16 @@ public class McAction extends DispatchAction implements McAppConstants
     	richTextInstructions = (String)request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
     	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
     	if (richTextInstructions == null) richTextInstructions="";
+
+    	String richTextOfflineInstructions="";
+    	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+    	logger.debug("createContent richTextOfflineInstructions from session: " + richTextOfflineInstructions);
+    	if (richTextOfflineInstructions == null) richTextOfflineInstructions="";
+    	
+    	String richTextOnlineInstructions="";
+    	richTextOnlineInstructions = (String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+    	logger.debug("createContent richTextOnlineInstructions from session: " + richTextOnlineInstructions);
+    	if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
     	
     	creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
 		if (creationDate == null)
@@ -926,8 +964,8 @@ public class McAction extends DispatchAction implements McAppConstants
 		mc.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
 	    mc.setUsernameVisible(isUsernameVisible);
 	    mc.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
-	    mc.setOnlineInstructions(onlineInstructions);
-	    mc.setOfflineInstructions(offlineInstructions);
+	    mc.setOnlineInstructions(richTextOnlineInstructions);
+	    mc.setOfflineInstructions(richTextOfflineInstructions);
 	    mc.setRunOffline(false);
 	    mc.setDefineLater(false);
 	    mc.setSynchInMonitor(isSynchInMonitor);
@@ -993,16 +1031,23 @@ public class McAction extends DispatchAction implements McAppConstants
         	 	McQueContent mcQueContent=mcService.getQuestionContentByQuestionText(pairs.getValue().toString(), mcContent.getUid());
         	 	
         	 	logger.debug("mcQueContent: " +  mcQueContent);
+        	 	//FIX THIS!!!!!
+        	 	int weight=0;
+        	 	
             	if (mcQueContent == null)
             	{
             		mcQueContent=  new McQueContent(pairs.getValue().toString(),
-              	        	 new Integer(pairs.getKey().toString()),
-             					 mcContent,
-             					 new HashSet(),
-             					 new HashSet()
-             					);
+              	        	 		new Integer(pairs.getKey().toString()),
+									new Integer(weight),
+									true,
+									mcContent,
+									new HashSet(),
+									new HashSet()
+             						);
            	        mcService.createMcQue(mcQueContent);
            	        logger.debug("persisted mcQueContent: " + mcQueContent);
+           	        
+           	        
             	}
             	else
             	{

@@ -1493,7 +1493,25 @@ public class McServicePOJO implements
 		logger.debug("files meta data has been cleaned up");
 		*/
 	}
-    
+
+	
+	public List retrieveMcUploadedOfflineFilesUuid(McContent mc) throws McApplicationException {
+		return null;
+		
+	}
+	
+	public List retrieveMcUploadedOnlineFilesUuid(McContent mc) throws McApplicationException {
+		return null;
+	}
+	
+	public List retrieveMcUploadedOfflineFilesName(McContent mc) throws McApplicationException {
+		return null;
+	}
+	
+	public List retrieveMcUploadedOnlineFilesName(McContent mc) throws McApplicationException {
+		return null;
+	}
+	
 	
 	/**
 	 * @return Returns the logger.
