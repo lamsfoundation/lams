@@ -44,6 +44,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
@@ -323,8 +324,11 @@ public class McAction extends DispatchAction implements McAppConstants
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
 		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-	 		
-	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
+		 	
+		 	removeRedundantQuestionEntries(request, mapQuestionsContent);
+		 	logger.debug("finished removeRedundantQuestionEntries");
+		 	
+		 	String questionIndex =mcAuthoringForm.getQuestionIndex();
 			logger.debug("questionIndex:" + questionIndex);
 			
 			String editableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
@@ -661,6 +665,29 @@ public class McAction extends DispatchAction implements McAppConstants
         	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
         	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0)) 
         		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
+        	else
+        	{
+        		errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.passMark.empty"));
+    			logger.debug("add error.passMark.empty to ActionMessages");
+    			saveErrors(request,errors);
+    			mcAuthoringForm.resetUserAction();
+    			logger.debug("return to LOAD_QUESTIONS to fix error.");
+    			return (mapping.findForward(LOAD_QUESTIONS));
+        	}
+        	
+        	
+        	try
+			{
+        		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
+			
+			}
+        	catch(Exception e)
+			{
+				logger.debug("Exception occured: passmark not integer");
+	    		persistError(request,"error.passmark.notInteger");
+				return (mapping.findForward(LOAD_QUESTIONS));
+			}
         	
         	logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
         	if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
@@ -1071,8 +1098,10 @@ public class McAction extends DispatchAction implements McAppConstants
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("mcContent:" + mcContent);
 		
-    	List list=mcService.refreshQuestionContent(mcContent.getUid());
-		logger.debug("refreshed list:" + list);
+    	//List list=mcService.refreshQuestionContent(mcContent.getUid());
+		
+    	List list=mcService.getAllQuestionEntries(mcContent.getUid());
+    	logger.debug("list:" + list);
 		
 		Iterator listIterator=list.iterator();
     	Long mapIndex=new Long(1);
@@ -1086,6 +1115,51 @@ public class McAction extends DispatchAction implements McAppConstants
     	
     	logger.debug("refreshed Map:" + mapQuestionsContent);
     	return mapQuestionsContent;
+    }
+    
+    
+    protected void removeRedundantQuestionEntries(HttpServletRequest request, Map mapQuestionsContent)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	logger.debug("main Map mapQuestionsContent:" + mapQuestionsContent);
+    	
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+		logger.debug("toolContentId:" + toolContentId);
+		
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+    	List allQuestions=mcService.getAllQuestionEntries(mcContent.getUid());
+    	logger.debug("allQuestions:" + allQuestions);
+    	
+    	Iterator listIterator=allQuestions.iterator();
+    	
+    	while (listIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+    		logger.debug("mcQueContent:" + mcQueContent);
+    		
+    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+    		boolean matchFound=false;
+            while (itQuestionsMap.hasNext()) {
+            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                
+                if (pairs.getValue().toString().equals(mcQueContent.getQuestion()))
+				{
+                    logger.debug("match found  the  pair: " + pairs.getValue().toString());
+                	matchFound=true;
+            	}
+            }
+            
+            if (matchFound == false)
+            {
+            	mcService.removeMcQueContent(mcQueContent);
+                logger.debug("removed mcQueContent: " + mcQueContent);
+            }
+    	}
+    	
     }
     
 

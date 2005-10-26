@@ -99,7 +99,7 @@ MM_reloadPage(true);
 </table>
 
 <div id="formtablecontainer">
-					<table class="forms" align=center>
+					<table class="forms" align=left>
  						<tr> 
 					 		<td class="formlabel"> <bean:message key="label.authoring.title"/>: </td>
 							<td class="formcontrol">
@@ -118,27 +118,34 @@ MM_reloadPage(true);
 							</td>
 						</tr>
 				
-
+					<tr>
+	 				 	<td colspan=2 align=center>								
+							&nbsp&nbsp
+					  	</td>
+					</tr>
+				
+					<tr> <td colspan=2 align=left>
+					
+					<table align=left>
 			  	 		<c:set var="queIndex" scope="session" value="1"/>
 						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
-								
-									  <c:if test="${questionEntry.key == 1}"> 			
+									<c:if test="${questionEntry.key == 1}"> 			
 									    <tr>
 										  	<td class="formlabel"> <c:out value="Question ${queIndex}"/> : </td>
 										  	
 									  		<td class="input"> 
-									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
-										  		size="50" maxlength="255" > 
-										  	
-										  		&nbsp&nbsp&nbsp
-										  		
+									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"
+										  		size="50" maxlength="255" >
+										  	</td>
+
+										  	<td>	
 			  										<html:submit property="addQuestion" styleClass="linkbutton" 
 													onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="button.addNewQuestion"/>
 													</html:submit>
-	
-												&nbsp&nbsp&nbsp	
-	
+											</td>	
+
+											<td>
 					 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="label.edit"/>
@@ -146,23 +153,24 @@ MM_reloadPage(true);
 											</td>
 										  </tr>
 									</c:if> 			
+									
 							  		<c:if test="${questionEntry.key > 1}"> 			
 										<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 										  <tr>
 										  	<td class="formlabel"> <c:out value="Question ${queIndex}"/> : </td>
 										  	
 										  		<td class="input"> 
-										  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"   
-											  		size="50" maxlength="255" > 
+										  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"  size="50" maxlength="255" > 
+												</td>											
 											
-												&nbsp&nbsp&nbsp
+												<td>
 				 								<html:submit property="removeQuestion" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="button.removeQuestion"/>
-											
 													</html:submit>
-												&nbsp&nbsp&nbsp
-																				  										  		
+												</td>
+												
+												<td>								  										  		
 					 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="label.edit"/>
@@ -172,6 +180,26 @@ MM_reloadPage(true);
 									</c:if> 
 						</c:forEach>
 							<html:hidden property="questionIndex"/>
+							
+					
+					<tr>
+					  	<td class="formlabel"><bean:message key="radiobox.passmark"/>: </td>
+						<td class="input"> 
+							  <html:text property="passmark"  size="3" maxlength="3"/>							
+						</td>
+						<td> &nbsp</td> <td>&nbsp </td>
+					</tr>
+							
+					</table>		
+					</td> </tr>
+							
+
+					<tr>
+	 				 	<td colspan=2 align=center>
+							&nbsp&nbsp
+					  	</td>
+					</tr>
+						
 					<tr>
 	 				 	<td colspan=2 align=center>								
 							&nbsp&nbsp
@@ -259,16 +287,6 @@ MM_reloadPage(true);
 	      			</td>
 
 				</tr>	      			
-				<tr>
-	      			<td class="formlabel">
-		      			<bean:message key="radiobox.passmark"/>:		      			
-					</td>
-					
-			 		<td> 
-			 			<html:text property="passmark" size="60" maxlength="100"/>
-			 		</td>
-
-		        </tr>
 		        
    				<tr>
 					<td class="formlabel">
@@ -426,6 +444,37 @@ MM_reloadPage(true);
 </html:form>
 <p></p>
 
+
+<SCRIPT language="JavaScript"> 
+
+<!--  addQuestion gets called everytime a new question content is added to the UI -->
+	
+	function removeQuestion(formIndex, questionIndex)
+	{
+		document.forms[formIndex].questionIndex.value=questionIndex;
+		document.forms[formIndex].isRemoveQuestion.value='1';
+		document.forms[formIndex].submit();
+	}
+
+	function isNumeric(sText)
+	{
+	   var validChars = "0123456789";
+	   var isNumber=true;
+	   var char;
+	
+	   for (i = 0; i < sText.length && isNumber == true; i++) 
+	   { 
+	      char = sText.charAt(i); 
+	      if (validChars.indexOf(char) == -1) 
+	      {
+	       	isNumber = false;
+	       	alert('Nooo');
+	      }
+	   }
+	   return isNumber;
+	}		
+
+ </SCRIPT>
 
 </body>
 </html:html>

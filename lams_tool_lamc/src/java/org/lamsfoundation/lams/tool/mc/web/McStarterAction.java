@@ -113,6 +113,9 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		Map mapDisabledQuestions= new TreeMap(new McComparator());
 		request.getSession().setAttribute(MAP_DISABLED_QUESTIONS, mapDisabledQuestions);
+		
+		Map mapWeights= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
 				
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		mcAuthoringForm.resetRadioBoxes();
@@ -319,9 +322,11 @@ public class McStarterAction extends Action implements McAppConstants {
 			request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
 			request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
 			request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
-			
+		
 			
 			McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
+			
+			logger.debug("PASSMARK:" + request.getSession().getAttribute(PASSMARK));
 			
 			logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
 			logger.debug("getting default content");
@@ -376,6 +381,17 @@ public class McStarterAction extends Action implements McAppConstants {
 	    	request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptionsContent);
 			logger.debug("starter initialized the Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
 			logger.debug("starter initialized the Default Options Map: " + request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT));
+			
+			/** reset all the weights to 0*/
+			long mapCounter=0;
+	    	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
+			{
+				mapCounter++;
+				mapWeights.put(new Long(mapCounter).toString(), new Integer(0));
+			}	
+			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+			
 		}
 		else
 		{
@@ -404,6 +420,9 @@ public class McStarterAction extends Action implements McAppConstants {
 			
 			McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
 			logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
+			
+			mcAuthoringForm.setPassmark((mcContent.getPassMark()).toString());
+			logger.debug("PASSMARK:" + mcAuthoringForm.getPassmark());
 			
 			if (mcContent.isUsernameVisible())
 			{
@@ -466,8 +485,26 @@ public class McStarterAction extends Action implements McAppConstants {
 			mapQuestionsContent=authoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
 			System.out.print("mapQuestionsContent:" + mapQuestionsContent);
 			
-    		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
     		logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+    		
+    		mapWeights=authoringUtil.rebuildWeightsMapfromDB(request, new Long(toolContentId));
+			System.out.print("mapWeights:" + mapWeights);
+    		
+			/** set the mapWeights */
+    		Iterator itWeightsMap = mapWeights.entrySet().iterator();
+			long mapWeightsCounter=0;
+            while (itWeightsMap.hasNext()) {
+                Map.Entry pairs = (Map.Entry)itWeightsMap.next();
+                if (pairs.getValue() != null) 
+                {
+        			System.out.print("the weight is:" + pairs.getValue());
+                	mapWeightsCounter++;
+                	mapWeights.put(new Long(mapWeightsCounter).toString(), new Integer(pairs.getValue().toString()));
+                }
+            }
+			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
 		}
     	
 	

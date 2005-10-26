@@ -44,15 +44,13 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class McQueContentDAO extends HibernateDaoSupport implements IMcQueContentDAO {
 	 	static Logger logger = Logger.getLogger(McQueContentDAO.class.getName());
 	 	
-	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
+	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId orderby displayOrder";
 	 	
 	 	private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId and mcQueContent.disabled=true";
 	 	
 	 	private static final String REFRESH_QUESTION_CONTENT 			= "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId and mcQueContent.disabled=false";
 	 	
-	 	
-	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question and mcQueContent.mcContentId=:mcContentUid";
-	 	
+	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question and mcQueContent.mcContentId=:mcContentUid orderby displayOrder";
 	 		 	
 	 	
 	 	public McQueContent getMcQueContentByUID(Long uid)
@@ -74,6 +72,16 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 				return mcq;
 			}
 			return null;
+	    }
+	 	
+	 	public List getAllQuestionEntries(final long mcContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
+				.setLong("mcContentId", mcContentId)
+				.list();
+			
+				return list;
 	    }
 	 	
 	 	public List refreshQuestionContent(final Long mcContentId)

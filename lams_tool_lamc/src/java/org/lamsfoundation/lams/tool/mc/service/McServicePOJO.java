@@ -331,6 +331,21 @@ public class McServicePOJO implements
 														   e);
         }
     }
+    
+    
+    public List getAllQuestionEntries(final Long uid) throws McApplicationException
+	{
+    	   try
+	        {
+	            return mcQueContentDAO.getAllQuestionEntries(uid.longValue());
+	        }
+	        catch (DataAccessException e)
+	        {
+	            throw new McApplicationException("Exception occured when lams is getting by uid  mc question content: "
+	                                                         + e.getMessage(),
+															   e);
+	        }
+	}
    
     
     public List refreshQuestionContent(final Long mcContentId) throws McApplicationException

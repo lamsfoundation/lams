@@ -187,6 +187,11 @@ public abstract class McUtils implements McAppConstants {
 			mcAuthoringForm.setInstructions(defaultMcContent.getInstructions());
 			mcAuthoringForm.setOfflineInstructions (defaultMcContent.getOfflineInstructions());
 			mcAuthoringForm.setOnlineInstructions (defaultMcContent.getOnlineInstructions());
+			
+			if (defaultMcContent.getPassMark() != null) 
+				mcAuthoringForm.setPassmark((defaultMcContent.getPassMark()).toString());
+			else
+				mcAuthoringForm.setPassmark(new Integer(0).toString());
 		}
 	}
 	

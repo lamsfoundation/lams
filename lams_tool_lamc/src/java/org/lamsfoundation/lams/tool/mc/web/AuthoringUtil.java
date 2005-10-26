@@ -58,6 +58,35 @@ public class AuthoringUtil implements McAppConstants {
     	return mapQuestionsContent;
     }
 
+    public Map rebuildWeightsMapfromDB(HttpServletRequest request, Long toolContentId)
+    {
+    	Map mapWeightsContent= new TreeMap(new McComparator());
+    	
+    	IMcService mcService =McUtils.getToolService(request);
+    	logger.debug("toolContentId:" + toolContentId);
+
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+    	List list=mcService.refreshQuestionContent(mcContent.getUid());
+		logger.debug("refreshed list:" + list);
+		
+		Iterator listIterator=list.iterator();
+    	Long mapIndex=new Long(1);
+    	while (listIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+    		logger.debug("mcQueContent:" + mcQueContent);
+    		mapWeightsContent.put(mapIndex.toString(),mcQueContent.getWeight());
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	
+    	logger.debug("refreshed Map:" + mapWeightsContent);
+    	return mapWeightsContent;
+    }
+
+    
+    
     
     public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
     {
