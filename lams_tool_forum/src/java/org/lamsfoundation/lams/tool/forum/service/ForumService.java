@@ -63,7 +63,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
             }
             forum.setAttachments(documents);
         }
-        forumDao.saveOrUpdate(forum);
+        forumDao.save(forum);
 
         //save topics of forum
         if (topics != null && topics.size() !=0) {

@@ -74,8 +74,23 @@
 		<action path="/authoring/deleteTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			input="tiles:/authoring/forum/create" 
-			parameter="deleteTopic"
-			scope="request">
+			parameter="deleteTopic">
+		</action>
+		
+		<action path="/authoring/viewTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			input="tiles:/authoring/forum/create" 
+			parameter="viewTopic">
+		</action>
+		
+		<action path="/authoring/finishTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			input="tiles:/authoring/forum/create" 
+			name="forumForm" 
+			scope="session" 
+			validate="false"
+			parameter="finishTopic" >
+			<forward name="success" path="/jsps/authoring/authoring.jsp" />
 		</action>
 		
 		<!-- ========== END: Authroing Definitions ============================== -->

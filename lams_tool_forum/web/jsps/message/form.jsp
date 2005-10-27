@@ -14,12 +14,21 @@
 	</tr>
 	<tr>
 		<td valign="MIDDLE"><b><bean:message key="message.label.attachment" /></b></td>
-		<td valign="MIDDLE">&nbsp;&nbsp;<html:file tabindex="3"
-			property="attachmentName" /> <html:errors
-			property="message.attachment" /></td>
+		<td valign="MIDDLE">
+			&nbsp;&nbsp;<html:file tabindex="3"
+				property="attachmentName" /> <html:errors
+				property="message.attachment" />
+		</td>
 	</tr>
-	<td>&nbsp;&nbsp;<html:submit>
-		<bean:message key="button.submit" />
-	</html:submit></td>
+		<td>&nbsp;&nbsp;
+			<html:submit>
+				<bean:message key="button.submit" />
+			</html:submit>
+		</td>
+		<td>
+			<html:button property="done" onclick="closeWin()">
+				<bean:message key="button.done" />
+			</html:button>
+		</td>
 	</tr>
 </table>

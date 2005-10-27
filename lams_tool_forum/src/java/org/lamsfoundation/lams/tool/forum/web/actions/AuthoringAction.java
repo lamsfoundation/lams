@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -79,6 +80,12 @@ public class AuthoringAction extends Action {
         if (param.equals("deleteTopic")) {
        		return deleteTopic(mapping, form, request, response);
         }
+        if (param.equals("viewTopic")) {
+       		return viewTopic(mapping, form, request, response);
+        }
+        if (param.equals("finishTopic")) {
+       		return finishTopic(mapping, form, request, response);
+        }
         if (param.equals("updateContent")) {
        		return updateContent(mapping, form, request, response);
         }
@@ -111,7 +118,7 @@ public class AuthoringAction extends Action {
 
 		
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.TOOL_CONTENT_ID));
-		
+		ForumForm forumForm = (ForumForm)form;
 		//get back the topic list and display them on page
 		forumService = getForumManager();
 		
@@ -121,17 +128,16 @@ public class AuthoringAction extends Action {
 			forum = forumService.getForumByContentId(contentId);
 			if(forum != null){
 				topics = forumService.getTopics(forum.getUid());
-				((ForumForm)form).setForum(forum);
+				forumForm.setForum(forum);
 			}
-			((ForumForm)form).setToolContentID(contentId);
+			forumForm.setToolContentID(contentId);
 		} catch (PersistenceException e) {
 			log.error(e);
 			return mapping.findForward("error");
 		}
 		
 		//set back STRUTS component value
-		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,topics);
-		request.setAttribute(ForumConstants.AUTHORING_DTO,forum);
+		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 		return mapping.findForward("success");
 	}
 
@@ -158,6 +164,7 @@ public class AuthoringAction extends Action {
 			topics = new ArrayList();
 		}
 		topics.add(message);
+		
 		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 		return mapping.findForward("success");
 	}
@@ -175,7 +182,7 @@ public class AuthoringAction extends Action {
 			}
 			request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,topics);
     	}
-		
+
 		StringBuffer sb = new StringBuffer();
 		sb.append("<table width=\"100%\" cellspacing=\"8\" align=\"CENTER\" cellspacing=\"3\" cellpadding=\"3\" class=\"form\">");
 		sb.append("<tr>");
@@ -206,7 +213,23 @@ public class AuthoringAction extends Action {
 		}
 		return null;
 	}
-
+    public ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws PersistenceException {
+    	//TODO
+    	return null;
+    	
+    }
+    
+    public ActionForward finishTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws PersistenceException {
+    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+    	ForumForm forumForm = (ForumForm)form;
+    	//TODO: topic sequence not write
+    	forumForm.getForum().setMessages(new HashSet(topics));
+    	
+    	return mapping.findForward("success");
+    	
+    }
 	/**
 	 * Update all content for submit tool except online/offline instruction
 	 * files list.
@@ -226,16 +249,18 @@ public class AuthoringAction extends Action {
 		Set attachment = forum.getAttachments();
 		try {
 			forumService = getForumManager();
-			Forum persistContent = forumService.getForum(forum.getContentId());
-			if(forum.getContentId().equals(persistContent.getContentId())){
+			Forum persistContent = forumService.getForumByContentId(forumForm.getToolContentID());
+			if(persistContent != null && forum.getContentId().equals(persistContent.getContentId())){
 				//keep Set type attribute for persist content becuase this update only 
 				//include updating simple properties from web page(i.e. text value, list value, etc)
 				
 				//copy web page value into persist content, as above, the "Set" type value kept.
 				PropertyUtils.copyProperties(persistContent,forum);
 				forumService.editForum(persistContent,attachment,topics);
-			}else
+			}else{
+				forum.setContentId(forumForm.getToolContentID());
 				forumService.createForum(forum,attachment,topics);
+			}
 		} catch (Exception e) {
 			log.error(e);
 		}
