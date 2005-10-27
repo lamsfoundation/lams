@@ -86,7 +86,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class ToolDownload extends Download {
 
-	protected static IToolContentHandler toolContentHandler = null;
+	protected IToolContentHandler toolContentHandler = null;
 
     /* (non-Javadoc)
      * @see org.lamsfoundation.lams.contentrepository.client.Download#getTicket()
@@ -105,12 +105,11 @@ public class ToolDownload extends Download {
     }
 
     protected IToolContentHandler getToolContentHandler() {
-	    if ( toolContentHandler == null ) {
-	    	log.debug("ToolDownload servlet calling context and getting repository singleton.");
-	        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-	    	toolContentHandler = (IToolContentHandler)wac.getBean(IToolContentHandler.SPRING_BEAN_NAME);
-	    }
-		return toolContentHandler;
+    	log.debug("ToolDownload servlet calling context and getting repository singleton.");
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+    	toolContentHandler = (IToolContentHandler)wac.getBean(IToolContentHandler.SPRING_BEAN_NAME);
+
+    	return toolContentHandler;
     }
 
 
