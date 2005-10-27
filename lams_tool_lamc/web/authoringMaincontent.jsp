@@ -124,12 +124,6 @@ MM_reloadPage(true);
 					  	</td>
 					</tr>
 				
-					<tr>
-					 	<td colspan=2 align=center>								
-							&nbsp&nbsp
-					  	</td>
-					</tr>
-				
 					<tr> <td colspan=2 align=center>
 					
 					<table align=center>

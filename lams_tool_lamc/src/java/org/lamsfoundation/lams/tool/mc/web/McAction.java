@@ -670,7 +670,6 @@ public class McAction extends DispatchAction implements McAppConstants
 				return (mapping.findForward(LOAD_QUESTIONS));
         	}
         	
-        	
         	boolean isQuestionsSequenced=false;
         	boolean isSynchInMonitor=false;
         	boolean isUsernameVisible=false;
@@ -814,20 +813,43 @@ public class McAction extends DispatchAction implements McAppConstants
 		    
 			mcService.resetAllQuestions(mcContent.getUid());
 			logger.debug("all question reset for :" + mcContent.getUid());
+			
+			Map mapWeights=repopulateCurrentWeightsMap(request, "questionWeight");
+		    logger.debug("final mapWeights :" + mapWeights);
+		    request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
 			 
-			Iterator itMap = mapQuestionsContent.entrySet().iterator();
+		    Iterator itMap = mapQuestionsContent.entrySet().iterator();
 			while (itMap.hasNext()) {
 			    Map.Entry pairs = (Map.Entry)itMap.next();
 			    if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
 			    {
 			    	McQueContent mcQueContent = mcService.getQuestionContentByQuestionText(pairs.getValue().toString(), mcContent.getUid());
 			    	logger.debug("retrieved mcQueContent: " + mcQueContent);
-			    	
+			
+			    	Integer currentWeight= new Integer(mapWeights.get(pairs.getKey()).toString());
+					logger.debug("currentWeight:" + currentWeight);
+					
 			    	if (mcQueContent != null)
 			    	{
 			    		mcQueContent.setDisabled(false);
-				    	logger.debug("enabled mcQueContent for question: " + pairs.getValue().toString());
+			    		mcQueContent.setWeight(currentWeight);
+			    		mcQueContent.setDisplayOrder(new Integer(pairs.getKey().toString()));
+			    		logger.debug("enabled mcQueContent for question: " + pairs.getValue().toString());
 				    	mcService.saveOrUpdateMcQueContent(mcQueContent);
+			    	}
+			    	else
+			    	{	/** create the question on the fly for submit */
+			    		logger.debug("create the question on the fly for submit : " + pairs.getValue().toString());
+			    		mcQueContent=  new McQueContent(pairs.getValue().toString(),
+			    				new Integer(pairs.getKey().toString()),
+			    				currentWeight,
+								false,
+	         					mcContent,
+	         					new HashSet(),
+	         					new HashSet()
+	         					);	
+			    		mcService.saveOrUpdateMcQueContent(mcQueContent);
 			    	}
 			    }
  	        }
@@ -913,7 +935,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	return mapTempQuestionsContent;
     }
     
-    
+	
     protected Map repopulateCurrentWeightsMap(HttpServletRequest request, String parameterType)
     {
     	Map mapTempQuestionsContent= new TreeMap(new McComparator());
@@ -922,16 +944,23 @@ public class McAction extends DispatchAction implements McAppConstants
     	long mapCounter=0;
     	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
 		{
-			String candidateQuestionEntry =request.getParameter(parameterType + i);
-			if (candidateQuestionEntry != null)
+			String candidateEntry =request.getParameter(parameterType + i);
+			String questionText =request.getParameter("questionContent" + i);
+			if ((questionText != null) && (questionText.length() > 0))
 			{
-				mapCounter++;
-				mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateQuestionEntry);
+				logger.debug("questionText: " + questionText);
+				if (candidateEntry != null)
+				{
+					mapCounter++;
+					mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateEntry);
+				}	
 			}
+			
 		}
     	logger.debug("return repopulated Map: " + mapTempQuestionsContent);
     	return mapTempQuestionsContent;
     }
+
     
     
     protected McContent createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
@@ -1120,6 +1149,10 @@ public class McAction extends DispatchAction implements McAppConstants
         	logger.debug("mcContent: " + mcContent);	
     	}
     	
+    	Map mapWeights=repopulateCurrentWeightsMap(request,"questionWeight");
+		logger.debug("mapWeights for add Question: " + mapWeights);
+		
+    	
     	/** iterate the questions Map and persist the questions into the DB*/
     	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
         while (itQuestionsMap.hasNext()) {
@@ -1134,11 +1167,14 @@ public class McAction extends DispatchAction implements McAppConstants
         	 	//FIX THIS!!!!!
         	 	int weight=0;
         	 	
+        	 	Integer currentWeight= new Integer(mapWeights.get(pairs.getKey()).toString());
+            	logger.debug("currentWeight:" + currentWeight);
+        	 	
             	if (mcQueContent == null)
             	{
             		mcQueContent=  new McQueContent(pairs.getValue().toString(),
               	        	 		new Integer(pairs.getKey().toString()),
-									new Integer(weight),
+              	        	 		currentWeight,
 									true,
 									mcContent,
 									new HashSet(),
