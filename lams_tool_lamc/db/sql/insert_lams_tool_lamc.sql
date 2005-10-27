@@ -41,22 +41,25 @@ VALUES (
 	0,
 	0);
 	
-	
+
 		
 INSERT INTO tl_lamc11_que_content  (
 	  uid,
 	  question,
+	  weight,
+	  disabled,
 	  display_order,
 	  mc_content_id
-)
-VALUES (
+)VALUES (
 	null,
 	'a sample question',
+	0,
+	1,
 	1,
 	1);
 	
 	
-INSERT INTO tl_lamc11_options_content  (
+	INSERT INTO tl_lamc11_options_content  (
 	  uid,
 	  correct_option,
 	  mc_que_content_id,

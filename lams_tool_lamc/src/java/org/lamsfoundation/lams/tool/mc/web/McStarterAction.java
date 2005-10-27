@@ -192,7 +192,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		long queContentUID=0;
 		try
 		{
-			logger.debug("retrieve the default question content based on default content UID: " + contentId);
+			logger.debug("retrieve the default question content based on default content UID: " + queContentUID);
 			McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(contentUID);
 			logger.debug("using mcQueContent: " + mcQueContent);
 			if (mcQueContent == null)

@@ -663,8 +663,32 @@ public class McAction extends DispatchAction implements McAppConstants
         		isRetries=true;
         	
         	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
-        	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0)) 
+        	
+        	if (mcAuthoringForm.getPassmark() != null)
+        	{
+        		try
+				{
+	        		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
+	        		logger.debug("tried passmark: " +  passmark);
+				}
+	        	catch(Exception e)
+				{
+	        		errors= new ActionMessages();
+					errors.add(Globals.ERROR_KEY,new ActionMessage("error.passmark.notInteger"));
+					logger.debug("add error.passmark.notInteger to ActionMessages");
+					saveErrors(request,errors);
+	    			mcAuthoringForm.resetUserAction();
+					persistError(request,"error.passmark.notInteger");
+					return (mapping.findForward(LOAD_QUESTIONS));
+				}
+        	}
+        	
+        	
+        	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0))
+        	{
         		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
+        		logger.debug("populated passmark: " +  passmark);
+        	}
         	else
         	{
         		errors= new ActionMessages();
@@ -675,19 +699,6 @@ public class McAction extends DispatchAction implements McAppConstants
     			logger.debug("return to LOAD_QUESTIONS to fix error.");
     			return (mapping.findForward(LOAD_QUESTIONS));
         	}
-        	
-        	
-        	try
-			{
-        		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
-			
-			}
-        	catch(Exception e)
-			{
-				logger.debug("Exception occured: passmark not integer");
-	    		persistError(request,"error.passmark.notInteger");
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
         	
         	logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
         	if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))

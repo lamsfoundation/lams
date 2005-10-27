@@ -124,9 +124,9 @@ MM_reloadPage(true);
 					  	</td>
 					</tr>
 				
-					<tr> <td colspan=2 align=left>
+					<tr> <td colspan=2 align=center>
 					
-					<table align=left>
+					<table align=center>
 			  	 		<c:set var="queIndex" scope="session" value="1"/>
 						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
 									<c:if test="${questionEntry.key == 1}"> 			
