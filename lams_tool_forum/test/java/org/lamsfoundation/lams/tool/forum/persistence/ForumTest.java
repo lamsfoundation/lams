@@ -1,13 +1,13 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import org.lamsfoundation.lams.tool.forum.core.FactoryException;
-import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
-
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 
 import junit.framework.TestCase;
+
+import org.lamsfoundation.lams.tool.forum.core.FactoryException;
+import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
 
 /**
  * Created by IntelliJ IDEA.

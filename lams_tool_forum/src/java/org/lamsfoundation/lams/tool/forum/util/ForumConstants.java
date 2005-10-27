@@ -14,10 +14,7 @@ public interface ForumConstants {
     public final static String CONTENT_HANDLER = "toolContentHandler";
 
 	public static final String AUTHORING_DTO = "authoring";
-	public static final String AUTHORING_TOPICS = "topics";
 	public static final String AUTHORING_TOPICS_LIST = "topicList";
-	public static final String AUTHORING_OFFLINE_FILE = "offlineFiles";
-	public static final String AUTHORING_ONLINE_FILE = "onlineFiles";
 	public static final String DEFAULT_TITLE = "Forum";
 	//TODO:hard code!!! need to read from config
 	public static final String TOOL_URL_BASE = "/lams/tool/lafrum11/";

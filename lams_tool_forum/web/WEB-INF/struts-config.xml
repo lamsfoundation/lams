@@ -25,11 +25,12 @@
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
-      <!-- B: global exceptions -->
+      <!-- B: global exceptions 
     <global-exceptions>
 	    <exception key="error.operation.failed"
 		    type="java.lang.Exception" path="tiles:/error"/>
     </global-exceptions>
+    -->
     <!-- B: end of global exceptions -->
 
   <!-- ========== Global Forward Definitions =================================== -->
@@ -47,7 +48,7 @@
 		<action path="/authoring/init"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="forumForm" 
-			scope="request" 
+			scope="session" 
 			parameter="initPage" 
 			validate="false">
 			<forward name="success" path="/jsps/authoring/authoring.jsp" />
@@ -56,7 +57,7 @@
 		<action path="/authoring/update"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="forumForm" 
-			scope="request" 
+			scope="session" 
 			parameter="updateContent" 
 			validate="false">
 			<forward name="success" path="/jsps/authoring/authoring.jsp" />
@@ -65,27 +66,33 @@
 		<action path="/authoring/uploadOnline"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="forumForm" 
-			scope="request" 
-			parameter="uploadOnline" 
+			scope="session" 
+			parameter="uploadOnlineFile" 
 			validate="false">
 			<forward name="success" path="/jsps/authoring/authoring.jsp" />
 		</action>
 		<action path="/authoring/uploadOffline"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="forumForm" 
-			scope="request" 
-			parameter="uploadOffline" 
-			validate="false">
+			scope="session" 
+			validate="false"
+			parameter="uploadOfflineFile" >
 			<forward name="success" path="/jsps/authoring/authoring.jsp" />
 		</action>
 		<action path="/authoring/deleteOnline"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
-			parameter="deleteOnline" >
+			name="forumForm" 
+			scope="session" 
+			validate="false"
+			parameter="deleteOnlineFile" >
 			<forward name="success" path="/jsps/authoring/authoring.jsp" />
 		</action>
 		<action path="/authoring/deleteOffline"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
-			parameter="deleteOffline" >
+			name="forumForm" 
+			scope="session" 
+			validate="false"
+			parameter="deleteOfflineFile" >
 			<forward name="success" path="/jsps/authoring/authoring.jsp" />
 		</action>
 		<action path="/authoring/newTopic"

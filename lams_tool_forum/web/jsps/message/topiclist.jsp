@@ -7,12 +7,12 @@
 		<td valign="MIDDLE"><b>Topic</b></td>
 		<td colspan="2" />
 	</tr>
-	<c:forEach items="${topicList}" var="topic">
+	<c:forEach items="${topicList}" var="topic" varStatus="status">
 		<tr>
 			<td valign="MIDDLE"><c:out value="${topic.subject}" /></td>
 			<td colspan="2" valign="MIDDLE">
 			<c:set var="deletetopic">
-				<html:rewrite page="/authoring/deleteTopic.do?topicName=${topic.subject}" />
+				<html:rewrite page="/authoring/deleteTopic.do?topicIndex=${status.index}" />
 			</c:set> 
 			<html:link href="javascript:loadDoc('${deletetopic}','topiclist')">
 				<b><fmt:message key="label.delete" /></b>

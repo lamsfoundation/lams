@@ -107,11 +107,11 @@
 
         <set
             name="attachments"
-            table="ATTACHMENT"
-            lazy="false"
+            lazy="true"
             inverse="false"
             cascade="all"
             sort="unsorted"
+            order-by="create_date desc"
         >
 
             <key
@@ -121,6 +121,26 @@
 
             <one-to-many
                   class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
+            />
+
+        </set>
+
+        <set
+            name="messages"
+            lazy="false"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+            order-by="create_date desc"
+        >
+
+            <key
+                column="forum_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.forum.persistence.Message"
             />
 
         </set>

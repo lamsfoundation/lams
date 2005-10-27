@@ -26,19 +26,19 @@
         </id>
 
         <property
-            name="versionId"
+            name="fileVersionId"
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="version_id"
+            column="file_version_id"
         />
 
         <property
-            name="type"
+            name="fileType"
             type="java.lang.String"
             update="true"
             insert="true"
-            column="type"
+            column="file_type"
         />
 
         <property
@@ -50,11 +50,19 @@
         />
 
         <property
-            name="uuid"
+            name="fileUuid"
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="uuid"
+            column="file_uuid"
+        />
+
+        <property
+            name="created"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="create_date"
         />
 
         <!--
@@ -69,7 +77,7 @@
             from Attachment attachment
         ]]></query>
         <query name="getAttachmentbyType"><![CDATA[
-            from Attachment attachment where attachment.type = ?
+            from Attachment attachment where file_type = ?
         ]]></query>
 
 </hibernate-mapping>

@@ -1,14 +1,13 @@
 package org.lamsfoundation.lams.tool.forum.service;
 
+import java.util.List;
+import java.util.Set;
+
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
-
-import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,8 +18,8 @@ import java.util.Map;
  */
 public interface IForumService {
 
-    public Forum createForum(Forum forum, Map attachments, Map topics) throws PersistenceException;
-    public Forum editForum(Forum forum, Map attachments, Map topics) throws PersistenceException;
+    public Forum createForum(Forum forum, Set attachments, Set topics) throws PersistenceException;
+    public Forum editForum(Forum forum, Set attachments, Set topics) throws PersistenceException;
     public Forum getForum(Long forumId) throws PersistenceException;
     public Forum getForumByContentId(Long contentID) throws PersistenceException;
     

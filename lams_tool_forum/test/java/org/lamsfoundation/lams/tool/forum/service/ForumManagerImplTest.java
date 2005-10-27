@@ -1,15 +1,15 @@
 package org.lamsfoundation.lams.tool.forum.service;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
 import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
+import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-
-import java.util.*;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 /**
  * User: conradb
@@ -25,9 +25,9 @@ public class ForumManagerImplTest extends TestCase {
     }
 
     public void testCreateAndDeleteForum() throws PersistenceException {
-        Map attachments = new HashMap();
+        Set attachments = new HashSet();
         Attachment attachment = new Attachment();
-        attachments.put("test file", attachment);
+        attachments.add(attachment);
 
         Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), attachments, null);
         assertNotNull("Forum Id is null", forum.getUid());
@@ -102,7 +102,7 @@ public class ForumManagerImplTest extends TestCase {
     }
 
     public void testCreateModifyAndDeleteMessage() throws PersistenceException {
-      Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), new HashMap(), new HashMap());
+      Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), new HashSet(), new HashSet());
       Message message = forumManager.createMessage(forum.getUid(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
       assertNotNull("Message Id is null", message.getUid());
 
@@ -141,7 +141,7 @@ public class ForumManagerImplTest extends TestCase {
     }
 
     public void testReplyToMessage() throws PersistenceException {
-      Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), new HashMap(), new HashMap());
+      Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), new HashSet(), new HashSet());
       Message message = forumManager.createMessage(forum.getUid(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
       assertNotNull("Message Id is null", message.getUid());
       Message reloaded = forumManager.getMessage(message.getUid());

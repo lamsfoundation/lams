@@ -2,11 +2,9 @@ package org.lamsfoundation.lams.tool.forum.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -54,11 +52,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private ForumToolContentHandler toolContentHandler;
 	private IRepositoryService repositoryService;
 	
-    public Forum createForum(Forum forum, Map attachments, Map topics) throws PersistenceException {
+    public Forum createForum(Forum forum, Set attachments, Set topics) throws PersistenceException {
         if (attachments != null && attachments.size() !=0) {
             Set documents = new HashSet();
-            Collection attachmentList = attachments.values();
-            Iterator it = attachmentList.iterator();
+            Iterator it = attachments.iterator();
             while (it.hasNext()) {
                 Attachment attachment = (Attachment) it.next();
                 attachmentDao.saveOrUpdate(attachment);
@@ -70,8 +67,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
         //save topics of forum
         if (topics != null && topics.size() !=0) {
-          Collection topicList = topics.values();
-          Iterator it = topicList.iterator();
+          Iterator it = topics.iterator();
           while (it.hasNext()) {
                 Message message = (Message) it.next();
                 message.setIsAuthored(true);
@@ -81,7 +77,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         return forum;
     }
 
-    public Forum editForum(Forum forum, Map attachments, Map topics) throws PersistenceException {
+    public Forum editForum(Forum forum, Set attachments, Set topics) throws PersistenceException {
         Forum reloaded = this.getForum(forum.getUid());
         reloaded.setTitle(forum.getTitle());
         reloaded.setCreatedBy(forum.getCreatedBy());
@@ -93,8 +89,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         reloaded.setOfflineInstructions(forum.getOfflineInstructions());
         if (attachments != null && attachments.size() !=0) {
             Set documents = reloaded.getAttachments();
-            Collection attachmentList = attachments.values();
-            Iterator it = attachmentList.iterator();
+            Iterator it = attachments.iterator();
             while (it.hasNext()) {
                 Attachment attachment = (Attachment) it.next();
                 attachmentDao.saveOrUpdate(attachment);
@@ -106,8 +101,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
         //save topics of forum
         if (topics != null && topics.size() !=0) {
-          Collection topicList = topics.values();
-          Iterator it = topicList.iterator();
+          Iterator it = topics.iterator();
           while (it.hasNext()) {
                 Message message = (Message) it.next();
                 this.createMessage(forum.getUid(), message);
@@ -130,7 +124,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     }
 
     public List getTopics(Long forumId) throws PersistenceException {
-        return messageDao.findByNamedQuery("allAuthoredMessagesOfForum", forumId);
+        return messageDao.allAuthoredMessage(forumId);
     }
 
     public void deleteForumAttachment(Long attachmentId) throws PersistenceException {
@@ -240,7 +234,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
 			throw new ForumException("Could not find upload file: " + uploadFile);
 		
-        Forum content = getForum(contentId);
+        Forum content = getForumByContentId(contentId);
         if ( content == null || !contentId.equals(content.getContentId())) {
         	content  = new Forum();
         	content.setContentId(contentId);
@@ -256,9 +250,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			content.setAttachments(fileSet);
 		}
 		Attachment file = new Attachment();
-		file.setType(fileType);
-		file.setUid(nodeKey.getUuid());
-		file.setVersionId(nodeKey.getVersion());
+		file.setFileType(fileType);
+		file.setFileUuid(nodeKey.getUuid());
+		file.setFileVersionId(nodeKey.getVersion());
 		file.setFileName(uploadFile.getFileName());
 		fileSet.add(file);
 		forumDao.saveOrUpdate(content);

@@ -1,4 +1,4 @@
-	
+
 	<!---------------------------Instruction Tab Content ------------------------>
 	<div id='content_i'  class="tabbody content_i">
 	<script type="text/javascript"	src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
@@ -14,29 +14,30 @@
 				key="label.authoring.online.instruction" />:</td>
 			<td class="formcontrol"><FCK:editor id="onlineInstruction"
 				basePath="/lams/fckeditor/" height="150" width="85%">
-				<c:out value="${authoring.onlineInstruction}" escapeXml="false"/>
+				<c:out value="${formBean.forum.onlineInstructions}" escapeXml="false"/>
 			</FCK:editor></td>
 		</tr>
 		<tr>
 			<td></td>
 			<td class="formcontrol">
+				
 				<div id="onlinefile">
-				<c:forEach var="file" items="${onlineFileList}">
-					<li><c:out value="${file.name}"/>
+				<c:forEach var="file" items="${formBean.onlineFileList}">
+					<li><c:out value="${file.fileName}"/>
 					<c:set var="viewURL">
-						<html:rewrite page="/download/?uuid=${file.uuID}&preferDownload=false"/>
+						<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=false"/>
 					</c:set>
 					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
 						<fmt:message key="label.view"/>
 					</a>&nbsp;
 					<c:set var="downloadURL">
-							<html:rewrite page="/download/?uuid=${file.uuID}&versionID=${details.versionID}&preferDownload=true"/>
+							<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true"/>
 					</c:set>
 					<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
 						<fmt:message key="label.download"/>
 					</a>&nbsp;
 					<c:set var="deleteonline">
-					<html:rewrite page="/authoring/deleteOnline.do?contentId=${authoring.contentID}&uuID=${file.uuID}&versionID=${file.versionID}"/>
+					<html:rewrite page="/authoring/deleteOnline.do?toolContentID=${formBean.toolContentID}&uuID=${file.fileUuid}&versionID=${file.fileVersionId}"/>
 					</c:set>
 					<html:link href="javascript:loadDoc('${deleteonline}','onlinefile')">
 						<fmt:message key="label.authoring.online.delete"/>
@@ -68,23 +69,29 @@
 				key="label.authoring.offline.instruction" />:</td>
 			<td class="formcontrol"><FCK:editor id="offlineInstruction"
 				basePath="/lams/fckeditor/" height="150" width="85%">
-				<c:out value="${authoring.offlineInstruction}" escapeXml="false"/>
+				<c:out value="${formBean.forum.offlineInstructions}" escapeXml="false"/>
 			</FCK:editor></td>
 		</tr>
 		<tr>
 			<td></td>
 			<td class="formcontrol">
 				<div id="offlinefile">
-				<c:forEach var="file" items="${offlineFileList}">
-					<li><c:out value="${file.name}"/>
-					<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
+				<c:forEach var="file" items="${formBean.offlineFileList}">
+					<li><c:out value="${file.fileName}"/>
+   				    <c:set var="viewURL">
+						<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=false"/>
+					</c:set>
+					<html:link href="javascript:launchInstructionsPopup('${viewURL}')">
 						<fmt:message key="label.view"/>
 					</html:link>
-					<html:link href="../download/?uuid=${file.uuID}&preferDownload=true">
+					<c:set var="downloadURL">
+							<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true"/>
+					</c:set>
+					<html:link href="${downloadURL}">
 						<fmt:message key="label.download"/>
 					</html:link>
 					<c:set var="deleteoffline">
-					<html:rewrite page="/authoring/deleteOffline.do?contentId=${authoring.contentID}&uuID=${file.uuID}&versionID=${file.versionID}"/>
+					<html:rewrite page="/authoring/deleteOffline.do?toolContentID=${formBean.toolContentID}&uuID=${file.fileUuid}&versionID=${file.fileVersionId}"/>
 					</c:set>
 					<html:link href="javascript:loadDoc('${deleteoffline}','offlinefile')">
 						<fmt:message key="label.authoring.offline.delete"/>

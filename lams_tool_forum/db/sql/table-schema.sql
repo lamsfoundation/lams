@@ -1,5 +1,6 @@
 alter table tl_lafrum11_attachment drop foreign key FK389AD9A2FE939F2A;
 alter table tl_lafrum11_attachment drop foreign key FK389AD9A2131CE31E;
+alter table tl_lafrum11_message drop foreign key FK4A6067E8131CE31E;
 alter table tl_lafrum11_message drop foreign key FK4A6067E824089E4D;
 alter table tl_lafrum11_message drop foreign key FK4A6067E8C6FF3C72;
 alter table tl_lafrum11_message drop foreign key FK4A6067E8B0A7E6B3;
@@ -11,10 +12,11 @@ drop table if exists tl_lafrum11_message;
 drop table if exists tl_lafrum11_tool_session;
 create table tl_lafrum11_attachment (
    uid bigint not null auto_increment,
-   version_id bigint,
-   type varchar(255),
+   file_version_id bigint,
+   file_type varchar(255),
    file_name varchar(255),
-   uuid bigint,
+   file_uuid bigint,
+   create_date datetime,
    forum_uid bigint,
    message_uid bigint,
    primary key (uid)
@@ -56,6 +58,7 @@ create table tl_lafrum11_message (
    is_anonymous bit,
    forum_session_uid bigint,
    user_uid bigint,
+   forum_uid bigint,
    parent_uid bigint,
    primary key (uid)
 );
@@ -70,6 +73,7 @@ create table tl_lafrum11_tool_session (
 );
 alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_attachment add index FK389AD9A2131CE31E (forum_uid), add constraint FK389AD9A2131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
+alter table tl_lafrum11_message add index FK4A6067E8131CE31E (forum_uid), add constraint FK4A6067E8131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 alter table tl_lafrum11_message add index FK4A6067E824089E4D (parent_uid), add constraint FK4A6067E824089E4D foreign key (parent_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_message add index FK4A6067E8C6FF3C72 (forum_session_uid), add constraint FK4A6067E8C6FF3C72 foreign key (forum_session_uid) references tl_lafrum11_tool_session (uid);
 alter table tl_lafrum11_message add index FK4A6067E8B0A7E6B3 (user_uid), add constraint FK4A6067E8B0A7E6B3 foreign key (user_uid) references tl_lafrum11_forum_user (uid);

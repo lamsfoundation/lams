@@ -29,6 +29,7 @@ public class Forum {
 	private String offlineInstructions;
 	private boolean defineLater;
 	private boolean contentInUse;
+	private Set messages;
 	private Set attachments;
 	private Date created;
 	private Date updated;
@@ -36,6 +37,7 @@ public class Forum {
     
   	public Forum(){
   		attachments = new HashSet();
+  		messages = new HashSet();
   	}
 	/**
 	 * Returns the object's creation date
@@ -225,16 +227,16 @@ public class Forum {
     }
 
 	/**
-     * @return a set of Attachments to this Message.
      *
-     * @hibernate.set table="ATTACHMENT"
-     * inverse="false"
-     * lazy="false"
-     * cascade="all"
+     * @hibernate.set   lazy="true"
+     * 					cascade="all"
+     * 					inverse="false"
+     * 					order-by="create_date desc"
      * @hibernate.collection-key column="forum_uid"
      * @hibernate.collection-one-to-many
      * 			class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
      *
+     * @return a set of Attachments to this Message.
      */
 	public Set getAttachments() {
 		return attachments;
@@ -246,6 +248,26 @@ public class Forum {
     public void setAttachments(Set attachments) {
 		this.attachments = attachments;
 	}
+
+	/**
+	 * 
+	 * 
+	 * @hibernate.set lazy="false"
+	 *                cascade="all"
+	 *                inverse="false"
+	 *                order-by="create_date desc"
+	 * @hibernate.collection-key column="forum_uid"
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+	 * 
+	 * @return
+	 */
+	public Set getMessages() {
+		return messages;
+	}
+	public void setMessages(Set messages) {
+		this.messages = messages;
+	}
+
 	/**
 	 * Updates the modification data for this entity.
 	 */
@@ -258,33 +280,6 @@ public class Forum {
 		this.setUpdated(new Date(now));
 	}
 
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof Forum))
-			return false;
-
-		final Forum genericEntity = (Forum) o;
-
-      	return new EqualsBuilder()
-      	.append(this.uid,genericEntity.uid)
-      	.append(this.title,genericEntity.title)
-      	.append(this.instructions,genericEntity.instructions)
-      	.append(this.onlineInstructions,genericEntity.onlineInstructions)
-      	.append(this.offlineInstructions,genericEntity.offlineInstructions)
-      	.append(this.created,genericEntity.created)
-      	.append(this.updated,genericEntity.updated)
-      	.append(this.createdBy,genericEntity.createdBy)
-      	.isEquals();
-	}
-
-	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(title)
-		.append(instructions).append(onlineInstructions)
-		.append(offlineInstructions).append(created)
-		.append(updated).append(createdBy)
-		.toHashCode();
-	}
 	/**
 	 * @hibernate.property  column="content_in_use"
 	 * @return
@@ -319,4 +314,31 @@ public class Forum {
 		this.contentId = contentId;
 	}
 
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Forum))
+			return false;
+
+		final Forum genericEntity = (Forum) o;
+
+      	return new EqualsBuilder()
+      	.append(this.uid,genericEntity.uid)
+      	.append(this.title,genericEntity.title)
+      	.append(this.instructions,genericEntity.instructions)
+      	.append(this.onlineInstructions,genericEntity.onlineInstructions)
+      	.append(this.offlineInstructions,genericEntity.offlineInstructions)
+      	.append(this.created,genericEntity.created)
+      	.append(this.updated,genericEntity.updated)
+      	.append(this.createdBy,genericEntity.createdBy)
+      	.isEquals();
+	}
+
+	public int hashCode() {
+		return new HashCodeBuilder().append(uid).append(title)
+		.append(instructions).append(onlineInstructions)
+		.append(offlineInstructions).append(created)
+		.append(updated).append(createdBy)
+		.toHashCode();
+	}
 }

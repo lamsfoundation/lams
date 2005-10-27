@@ -32,7 +32,7 @@
 			key="label.authoring.basic.instruction" />:</td>
 		<td class="formcontrol"><FCK:editor id="instructions"
 			basePath="/lams/fckeditor/" height="150" width="85%">
-			<c:out value="${authoring.instruction}" escapeXml="false" />
+			<c:out value="${authoring.instructions}" escapeXml="false" />
 		</FCK:editor></td>
 	</tr>
 	<!-- Topics List Row -->

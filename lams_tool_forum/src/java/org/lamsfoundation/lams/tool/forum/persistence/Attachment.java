@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.io.InputStream;
+import java.util.Date;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -15,19 +16,19 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @hibernate.class table="tl_lafrum11_attachment"
  *
  * @hibernate.query name="allAttachments" query="from Attachment attachment"
- * @hibernate.query name="getAttachmentbyType" query="from Attachment attachment where attachment.type = ?"
+ * @hibernate.query name="getAttachmentbyType" query="from Attachment attachment where file_type = ?"
  */
 public class Attachment {
     private Long uid;
-    private Long uuid;
-    private Long versionId;
-    private String type;
+    private Long fileUuid;
+    private Long fileVersionId;
+    private String fileType;
     private String fileName;
+    private Date created;
+    
+    //non-persist fields
     private InputStream inputStream;
     private String contentType;
-    
-    public final static String TYPE_ONLINE = "ONLINE";
-    public final static String TYPE_OFFLINE = "OFFLINE";
 
     /**
      * @hibernate.id column="uid" generator-class="native"
@@ -41,26 +42,26 @@ public class Attachment {
     }
 
     /**
-     * @hibernate.property column="version_id"
+     * @hibernate.property column="file_version_id"
      *
      */
-    public Long getVersionId() {
-        return versionId;
+    public Long getFileVersionId() {
+        return fileVersionId;
     }
 
-    public void setVersionId(Long version) {
-        this.versionId = version;
+    public void setFileVersionId(Long version) {
+        this.fileVersionId = version;
     }
 
     /**
-     * @hibernate.property column="type"
+     * @hibernate.property column="file_type"
      */
-    public String getType() {
-        return type;
+    public String getFileType() {
+        return fileType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setFileType(String type) {
+        this.fileType = type;
     }
 
     /**
@@ -101,24 +102,35 @@ public class Attachment {
 
       	return new EqualsBuilder()
       	.append(this.uid,genericEntity.uid)
-      	.append(this.versionId,genericEntity.versionId)
+      	.append(this.fileVersionId,genericEntity.fileVersionId)
       	.append(this.fileName,genericEntity.fileName)
-      	.append(this.type,genericEntity.type)
+      	.append(this.fileType,genericEntity.fileType)
       	.isEquals();
 	}
 
 	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(versionId).append(fileName).append(type).toHashCode();
+		return new HashCodeBuilder().append(uid).append(fileVersionId).append(fileName).append(fileType).toHashCode();
 	}
 	/**
-	 * @hibernate.property column="uuid"
+	 * @hibernate.property column="file_uuid"
 	 * @return
 	 */
-	public Long getUuid() {
-		return uuid;
+	public Long getFileUuid() {
+		return fileUuid;
 	}
 
-	public void setUuid(Long uuid) {
-		this.uuid = uuid;
+	public void setFileUuid(Long uuid) {
+		this.fileUuid = uuid;
+	}
+	/**
+	 * @hibernate.property column="create_date"
+	 * @return
+	 */
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 }

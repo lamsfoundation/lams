@@ -57,7 +57,7 @@ public class ForumForm extends ValidatorForm {
     			Iterator iter = fileSet.iterator();
     			while(iter.hasNext()){
     				Attachment file = (Attachment) iter.next();
-    				if(StringUtils.equalsIgnoreCase(file.getType(),IToolContentHandler.TYPE_OFFLINE))
+    				if(StringUtils.equalsIgnoreCase(file.getFileType(),IToolContentHandler.TYPE_OFFLINE))
     					offlineFileList.add(file);
     				else
     					onlineFileList.add(file);
