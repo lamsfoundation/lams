@@ -98,7 +98,7 @@ import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 
 
 public class McStarterAction extends Action implements McAppConstants {
-	static Logger logger = Logger.getLogger(McAppConstants.class.getName());
+	static Logger logger = Logger.getLogger(McStarterAction.class.getName());
 	
 	/**
 	 * A Map  data structure is used to present the UI.
@@ -507,7 +507,6 @@ public class McStarterAction extends Action implements McAppConstants {
 			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
 		}
     	
-	
 	mcAuthoringForm.resetUserAction();
 	return (mapping.findForward(LOAD_QUESTIONS));
   } 

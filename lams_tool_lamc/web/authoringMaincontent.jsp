@@ -119,7 +119,13 @@ MM_reloadPage(true);
 						</tr>
 				
 					<tr>
-	 				 	<td colspan=2 align=center>								
+					 	<td colspan=2 align=center>								
+							&nbsp&nbsp
+					  	</td>
+					</tr>
+				
+					<tr>
+					 	<td colspan=2 align=center>								
 							&nbsp&nbsp
 					  	</td>
 					</tr>
@@ -127,6 +133,19 @@ MM_reloadPage(true);
 					<tr> <td colspan=2 align=center>
 					
 					<table align=center>
+					<tr>
+						<td class="formlabel">
+						</td>
+						<td class="input" align="center">
+							<h4> <b> <bean:message key="label.Questions"/> </b> </h4>
+						</td>
+						<td class="input" align="center">
+							<h4> <b> <bean:message key="label.weight"/> </b> </h4>
+						</td>
+						<td class="input" colspan=2 align="center">
+							<h4> <b> <bean:message key="label.actions"/> </b> </h4>
+						</td>
+					</tr>
 			  	 		<c:set var="queIndex" scope="session" value="1"/>
 						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
 									<c:if test="${questionEntry.key == 1}"> 			
@@ -138,14 +157,24 @@ MM_reloadPage(true);
 										  		size="50" maxlength="255" >
 										  	</td>
 
-										  	<td>	
+                                            <td class="input" align=center>										  	
+												<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
+														<c:if test="${questionEntry.key == weightsEntry.key}"> 			
+													  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
+														  		size="3" maxlength="3">
+														</c:if>
+												</c:forEach>
+                                            </td>
+
+                                                   
+                                            <td class="input">										  	
 			  										<html:submit property="addQuestion" styleClass="linkbutton" 
 													onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="button.addNewQuestion"/>
 													</html:submit>
 											</td>	
-
-											<td>
+											&nbsp&nbsp&nbsp
+                                            <td class="input">										  	
 					 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="label.edit"/>
@@ -162,15 +191,24 @@ MM_reloadPage(true);
 										  		<td class="input"> 
 										  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"  size="50" maxlength="255" > 
 												</td>											
+
+	                                            <td class="input" align=center>										  	
+													<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
+															<c:if test="${questionEntry.key == weightsEntry.key}"> 			
+														  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
+															  		size="3" maxlength="3">
+															</c:if>
+													</c:forEach>
+	                                            </td>
 											
-												<td>
+                                               <td class="input">										  	
 				 								<html:submit property="removeQuestion" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="button.removeQuestion"/>
 													</html:submit>
 												</td>
-												
-												<td>								  										  		
+												&nbsp&nbsp&nbsp
+	                                            <td class="input">										  	
 					 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
 					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 														<bean:message key="label.edit"/>
@@ -180,7 +218,12 @@ MM_reloadPage(true);
 									</c:if> 
 						</c:forEach>
 							<html:hidden property="questionIndex"/>
-							
+
+					<tr>
+	 				 	<td colspan=5 align=center>
+							&nbsp&nbsp
+					  	</td>
+					</tr>		
 					
 					<tr>
 					  	<td class="formlabel"><bean:message key="radiobox.passmark"/>: </td>
@@ -189,30 +232,32 @@ MM_reloadPage(true);
 						</td>
 						<td> &nbsp</td> <td>&nbsp </td>
 					</tr>
-							
-					</table>		
-					</td> </tr>
-							
-
+					
 					<tr>
-	 				 	<td colspan=2 align=center>
+	 				 	<td colspan=5 align=center>
 							&nbsp&nbsp
 					  	</td>
 					</tr>
 						
 					<tr>
-	 				 	<td colspan=2 align=center>								
+	 				 	<td colspan=5 align=center>								
 							&nbsp&nbsp
 					  	</td>
 					</tr>
+
 	 				 <tr>
-	 				 	<td colspan=2 align=right>								
+	 				 	<td colspan=5 align=left>								
 							<html:submit property="submitQuestions" styleClass="linkbutton" 
 							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 								<bean:message key="button.submit"/>
 							</html:submit>	 				 		  										  		
 		 			  	</td>
 	 				 </tr>
+							
+					</table>		
+					</td> </tr>
+							
+
 	 				</table> 	 
 					
 </div>

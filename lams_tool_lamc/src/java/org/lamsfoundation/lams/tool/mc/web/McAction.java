@@ -249,13 +249,25 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
+	 		logger.debug("will validate weights");
+	 		boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
+        	logger.debug("weightsValid:" + weightsValid);
+        	if (weightsValid == false)
+        	{
+				return (mapping.findForward(LOAD_QUESTIONS));
+        	}
+	 		
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
-	 		
-		 	addQuestion(request, mcAuthoringForm, mapQuestionsContent, true);
-	 		logger.debug("after addQuestion");
-	 		
+		 	
+		 	Map mapWeights= repopulateMap(request, "questionWeight");
+			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+			
+			addQuestion(request, mcAuthoringForm, mapQuestionsContent, true);
+			logger.debug("after addQuestion");
+			
     	    mcAuthoringForm.resetUserAction();
 	 		return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
@@ -269,7 +281,6 @@ public class McAction extends DispatchAction implements McAppConstants
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
 		 	
-	 		
 	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
 			logger.debug("questionIndex:" + questionIndex);
 			String deletableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
@@ -324,6 +335,10 @@ public class McAction extends DispatchAction implements McAppConstants
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
 		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+		 	
+		 	Map mapWeights= repopulateMap(request, "questionWeight");
+			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
 		 	
 		 	removeRedundantQuestionEntries(request, mapQuestionsContent);
 		 	logger.debug("finished removeRedundantQuestionEntries");
@@ -636,6 +651,26 @@ public class McAction extends DispatchAction implements McAppConstants
 
         	ActionMessages errors= new ActionMessages();
 
+        	boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
+        	logger.debug("weightsValid:" + weightsValid);
+        	if (weightsValid == false)
+        	{
+				return (mapping.findForward(LOAD_QUESTIONS));
+        	}
+        	
+        	boolean isTotalWeightsValid=validateTotalWeight(request);
+        	logger.debug("isTotalWeightsValid:" + isTotalWeightsValid);
+        	if (isTotalWeightsValid == false)
+        	{
+        		errors= new ActionMessages();
+        		errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.total.invalid"));
+				saveErrors(request,errors);
+    			mcAuthoringForm.resetUserAction();
+				persistError(request,"error.weights.total.invalid");
+				return (mapping.findForward(LOAD_QUESTIONS));
+        	}
+        	
+        	
         	boolean isQuestionsSequenced=false;
         	boolean isSynchInMonitor=false;
         	boolean isUsernameVisible=false;
@@ -675,7 +710,6 @@ public class McAction extends DispatchAction implements McAppConstants
 				{
 	        		errors= new ActionMessages();
 					errors.add(Globals.ERROR_KEY,new ActionMessage("error.passmark.notInteger"));
-					logger.debug("add error.passmark.notInteger to ActionMessages");
 					saveErrors(request,errors);
 	    			mcAuthoringForm.resetUserAction();
 					persistError(request,"error.passmark.notInteger");
@@ -880,6 +914,26 @@ public class McAction extends DispatchAction implements McAppConstants
     }
     
     
+    protected Map repopulateCurrentWeightsMap(HttpServletRequest request, String parameterType)
+    {
+    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
+    	logger.debug("parameterType: " + parameterType);
+    	
+    	long mapCounter=0;
+    	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
+		{
+			String candidateQuestionEntry =request.getParameter(parameterType + i);
+			if (candidateQuestionEntry != null)
+			{
+				mapCounter++;
+				mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateQuestionEntry);
+			}
+		}
+    	logger.debug("return repopulated Map: " + mapTempQuestionsContent);
+    	return mapTempQuestionsContent;
+    }
+    
+    
     protected McContent createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -1039,7 +1093,15 @@ public class McAction extends DispatchAction implements McAppConstants
         	mapQuestionsContent.put(new Long(++mapSize).toString(), "");
         	logger.debug("updated Questions Map size: " + mapQuestionsContent.size());
         	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-        	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));	
+        	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+        	
+        	Map mapWeights = (Map) request.getSession().getAttribute(MAP_WEIGHTS);
+        	logger.debug("current mapWeights: " + mapWeights);
+        	int mapWeightsSize=mapWeights.size();
+        	mapWeights.put(new Long(++mapWeightsSize).toString(), "");
+        	logger.debug("updated mapWeights size: " + mapWeights.size());
+        	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+        	logger.debug("updated mapWeights: " + request.getSession().getAttribute(MAP_WEIGHTS));
     	}
     	
     	
@@ -1172,6 +1234,77 @@ public class McAction extends DispatchAction implements McAppConstants
     	}
     	
     }
+    
+    protected boolean validateQuestionWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+    {
+    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
+    	logger.debug("mapWeights: " + mapWeights);
+    	
+    	Iterator itMap = mapWeights.entrySet().iterator();
+		while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            if ((pairs.getValue() == null) || (pairs.getValue().toString().length() == 0)) 
+            {
+            	ActionMessages errors= new ActionMessages();
+        		errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.empty"));
+				saveErrors(request,errors);
+    			mcAuthoringForm.resetUserAction();
+				persistError(request,"error.weights.empty");
+				return false;
+            	
+            }
+
+            
+    		try
+			{
+    			int weight= new Integer(pairs.getValue().toString()).intValue();
+        		logger.debug("tried weight: " +  weight);
+			}
+        	catch(Exception e)
+			{
+        		ActionMessages errors= new ActionMessages();
+        		errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.notInteger"));
+				saveErrors(request,errors);
+    			mcAuthoringForm.resetUserAction();
+				persistError(request,"error.weights.notInteger");
+				return false;
+			}
+        }
+		mcAuthoringForm.resetUserAction();
+		return true;
+    }
+    
+    protected boolean validateTotalWeight(HttpServletRequest request)
+    {
+    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
+    	logger.debug("mapWeights: " + mapWeights);
+    	
+    	Iterator itMap = mapWeights.entrySet().iterator();
+    	int totalWeight=0;
+		while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            if ((pairs.getValue() != null) || (pairs.getValue().toString().length() > 0)) 
+            {
+            	totalWeight=totalWeight+ new Integer(pairs.getValue().toString()).intValue();
+            }
+		}
+
+            logger.debug("totalWeight: " +  totalWeight);
+            
+        if (totalWeight != 100)
+        {
+        	return false;
+        }
+
+        return true;
+    }
+
     
 
     /**
