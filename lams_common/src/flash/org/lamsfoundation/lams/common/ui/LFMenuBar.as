@@ -18,6 +18,7 @@ class LFMenuBar extends MovieClip {
     
     // variables in this script
     private var file_menu:Menu;
+    private var edit_menu:Menu;
     private var tools_menu:Menu;
     private var help_menu:Menu;
     
@@ -80,6 +81,21 @@ class LFMenuBar extends MovieClip {
         file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_save'), instanceName:"saveItem"});
 
 
+		/*=================
+            EDIT MENU
+        =================*/
+        edit_menu = _mb.addMenu("__Edit__");
+        
+        // "new" is the linkage id of the movie clip to be used as the icon for the "New" menu item.
+        //file_menu.addMenuItem({label:"New", instanceName:"newInstance", icon:"new"});
+        //_global.breakpoint();
+        edit_menu.addMenuItem({label:'__Undo__', instanceName:"undoItem"});
+        edit_menu.addMenuItem({label:'__Redo__', instanceName:"redoItem"});
+        edit_menu.addMenuItem({label:'__Cut__', instanceName:"cutItem"});
+        edit_menu.addMenuItem({label:'__Copy__', instanceName:"copyItem"});
+        edit_menu.addMenuItem({label:'__Paste__', instanceName:"pasteItem"});
+       
+
         /*=================
             TOOLS MENU
         =================*/
@@ -101,6 +117,7 @@ class LFMenuBar extends MovieClip {
         //set up listeners
         // register the listeners with the separate menus
         file_menu.addEventListener("change", Delegate.create(this,fileMenuClicked));
+        edit_menu.addEventListener("change", Delegate.create(this,editMenuClicked));
         tools_menu.addEventListener("change", Delegate.create(this,toolsMenuClicked));
 		
 		//Now that menu items have been set up make the menu bar visible
@@ -135,6 +152,34 @@ class LFMenuBar extends MovieClip {
 				Debugger.log('Clicked Flie > Save',Debugger.GEN,'fileMenuClicked','LFMenuBar');
                 app.getCanvas().saveDesignToServer();
                 break;
+				
+		
+        }        
+    }
+
+    /**
+    * event handler for file menu click
+    */
+    private function editMenuClicked(eventObj:Object):Void{
+        //Which item was clicked ?      
+        switch (eventObj.menuItem) {
+            case eventObj.menu.undoItem : 
+                trace('new selected');
+				 app.getCanvas().undo();
+                break;
+            case eventObj.menu.redoItem :
+                app.getCanvas().redo();
+                break;
+			 case eventObj.menu.cutItem :
+                app.cut();
+                break;
+			 case eventObj.menu.copyItem :
+                app.copy();
+                break;
+			 case eventObj.menu.pasteItem :
+                app.paste();
+                break;
+			
 		
         }        
     }
