@@ -330,7 +330,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		userAction="editOption";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
-
+	 		
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
@@ -406,6 +406,26 @@ public class McAction extends DispatchAction implements McAppConstants
 			request.getSession().setAttribute(SELECTED_QUESTION_CONTENT_UID, mcQueContent.getUid() );
 			logger.debug("SELECTED_QUESTION_CONTENT_UID:" + request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID));
 			
+			
+			Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
+	 		mapSelectedOptions.clear();
+	 		
+	 		List listSelectedOptions=mcService.getPersistedSelectedOptions(mcQueContent.getUid());
+	 		logger.debug("listSelectedOptions:" + listSelectedOptions);
+	 		
+	 		Iterator listIteratorSelectedOptions=listSelectedOptions.iterator();
+	    	Long mapIndex=new Long(1);
+	    	while (listIteratorSelectedOptions.hasNext())
+	    	{
+	    		McOptsContent mcOptsContent=(McOptsContent)listIteratorSelectedOptions.next();
+	    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+	    		mapSelectedOptions.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+	    		mapIndex=new Long(mapIndex.longValue()+1);
+	    	}
+	    	request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+	    	logger.debug("persisted SELECTED MAP_SELECTED_OPTIONS:" + request.getSession().getAttribute(MAP_SELECTED_OPTIONS));
+	 		
+			
 			request.getSession().setAttribute(SELECTED_QUESTION_INDEX, questionIndex);
 	    	logger.debug("SELECTED_QUESTION_INDEX:" + request.getSession().getAttribute(SELECTED_QUESTION_INDEX));
 			
@@ -428,7 +448,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		    	{
 		    	 	logger.debug("not an empty options list");
 		    		Iterator listIterator=list.iterator();
-			    	Long mapIndex=new Long(1);
+			    	mapIndex=new Long(1);
 			    	while (listIterator.hasNext())
 			    	{
 			    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
@@ -548,40 +568,27 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		userAction="doneOptions";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
-
-	 		String selectedIndex=mcAuthoringForm.getSelectedIndex();
-	 		logger.debug("selectedIndex:" + selectedIndex);
+			
+	 		boolean validateOptions=validateOptions(request);
+	 		logger.debug("validateOptions:" + validateOptions);
 	 		
-	 		if ((selectedIndex == null) || (selectedIndex.equals("")))
-			{
-				ActionMessages errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.selectedIndex.empty"));
-    			logger.debug("add error.selectedIndex.empty to ActionMessages");
+	 		if (validateOptions == false)
+	 		{
+	 			ActionMessages errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.checkBoxes.empty"));
+    			logger.debug("add error.checkBoxes.empty to ActionMessages");
     			saveErrors(request,errors);
     			mcAuthoringForm.resetUserAction();
     			logger.debug("return to EDIT_OPTS_CONTENT to fix error.");
-    			return (mapping.findForward(EDIT_OPTS_CONTENT));
-			}
-	 	
-	 		String parameterType="optionContent";
-	 		long mapCounter=0;
-	 		String selectedAnswer=null;
-	    	for (long i=1; i <= MAX_OPTION_COUNT ; i++)
-			{
-	    		if (selectedIndex.equals(new Long(i).toString()))
-				{
-	    			selectedAnswer=request.getParameter(parameterType + i);
-	    			logger.debug("found selectedAnswer: " + selectedAnswer);
-				}
-			}
-	    	
-	 	    Long selectedQuestionContentUid=(Long)request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
+    			return (mapping.findForward(EDIT_OPTS_CONTENT));	
+	 		}
+	 			 		
+	 		Long selectedQuestionContentUid=(Long)request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
 	 	    logger.debug("selectedQuestionContentUid:" + selectedQuestionContentUid);
-	 	    
+	 	   
 	 	    selectedQuestion=(String) request.getSession().getAttribute(SELECTED_QUESTION);
 			logger.debug("final selectedQuestion:" + selectedQuestion);
 	 		
-	 		/** make the particular question content in the main page disabled for user access*/
 	 		McQueContent mcQueContent = mcService.retrieveMcQueContentByUID(selectedQuestionContentUid);
 			logger.debug("mcQueContent:" + mcQueContent);
 			
@@ -593,51 +600,46 @@ public class McAction extends DispatchAction implements McAppConstants
 			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 			logger.debug("updated MAP_QUESTIONS_CONTENT with the changed question:" + mapQuestionsContent);
 			
-			
-			/** parse all the options and persist them */
-			Map mapOptionsContent=repopulateMap(request,"optionContent");
-		 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
-		 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
-	 		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-    		logger.debug("Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-    		
 			mcService.removeMcOptionsContentByQueId(selectedQuestionContentUid);
 			logger.debug("removed all mcOptionsContents for mcQueContentId :" + selectedQuestionContentUid);
 			
-			if (mcQueContent != null)
-	 		{
-	 			/** iterate the options Map and persist the options into the DB*/
-	 	    	Iterator itOptionsMap = mapOptionsContent.entrySet().iterator();
-	 	        while (itOptionsMap.hasNext()) {
-	 	            Map.Entry pairs = (Map.Entry)itOptionsMap.next();
-	 	            logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	 	            if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
-	 	            {
-	 	            	McOptsContent mcOptionsContent= new McOptsContent(false,pairs.getValue().toString() , mcQueContent, new HashSet());
-	 	    	        logger.debug("created mcOptionsContent: " + mcOptionsContent);
-	 	       	        mcService.saveMcOptionsContent(mcOptionsContent);
-	 	       	        logger.debug("persisted the answer: " + pairs.getValue().toString());
-	 	            }
-	 	        }
-	 		}
-			logger.debug("doneOptions persists all the options");
-			
-			if (selectedAnswer != null && selectedAnswer.length() > 0)
+	 		
+	 		String isCheckBoxSelected=null;
+	 		boolean isCorrect=false;
+	    	for (int i=1; i <= MAX_OPTION_COUNT ; i++)
 			{
-				logger.debug("update the record for the correct option.");
-				McOptsContent mcOptsContent=mcService.getOptionContentByOptionText(selectedAnswer, selectedQuestionContentUid);
-		 	    logger.debug("found mcOptsContent to be updated " + mcOptsContent);
-		 	   
-		 	    if (mcOptsContent != null)
-		 	    {
-		 	    	logger.debug("found mcOptsContent is correctOption" + mcOptsContent.isCorrectOption());
-			 	    mcOptsContent.setCorrectOption(true);
-			 	    mcService.updateMcOptionsContent(mcOptsContent);
-			 	    logger.debug("persisted the updated mcOptsContent" + mcOptsContent);
-			 	    logger.debug("updated mcOptsContent isCorrect?" + mcOptsContent.isCorrectOption());	
-		 	    }
+	    		isCorrect=false;
+	    		isCheckBoxSelected=request.getParameter("checkBoxSelected" + i);
+    			logger.debug("isCheckBoxSelected: " + isCheckBoxSelected);
+    			String selectedIndex=null;
+    			
+    			if (isCheckBoxSelected != null)
+    			{
+        			if (isCheckBoxSelected.equals("Correct"))
+        			{
+        				isCorrect=true;
+        			}
+
+        			logger.debug("looped isCorrect: " + isCorrect);
+    				logger.debug("looped selectedIndex: " + i);
+    		 		
+    		 		long mapCounter=0;
+    		 		String selectedAnswer=null;
+    		 		selectedAnswer=request.getParameter("optionContent" + i);
+	    			logger.debug("found selectedAnswer: " + selectedAnswer);
+	    			
+    				Map mapOptionsContent=repopulateMap(request,"optionContent");
+    			 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
+    			 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
+    		 		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+    	    		logger.debug("Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+    	    		
+    		       	McOptsContent mcOptionsContent= new McOptsContent(isCorrect,selectedAnswer , mcQueContent, new HashSet());
+ 	    	        logger.debug("created mcOptionsContent: " + mcOptionsContent);
+ 	       	        mcService.saveMcOptionsContent(mcOptionsContent);
+ 	       	        logger.debug("final persistance of option");
+    			}
 			}
-			
 			
 			mcAuthoringForm.resetUserAction();
 			return (mapping.findForward(LOAD_QUESTIONS));
@@ -1239,37 +1241,58 @@ public class McAction extends DispatchAction implements McAppConstants
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("mcContent:" + mcContent);
 		
-    	List allQuestions=mcService.getAllQuestionEntries(mcContent.getUid());
-    	logger.debug("allQuestions:" + allQuestions);
-    	
-    	Iterator listIterator=allQuestions.iterator();
-    	
-    	while (listIterator.hasNext())
-    	{
-    		McQueContent mcQueContent=(McQueContent)listIterator.next();
-    		logger.debug("mcQueContent:" + mcQueContent);
-    		
-    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
-    		boolean matchFound=false;
-            while (itQuestionsMap.hasNext()) {
-            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
-                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-                
-                if (pairs.getValue().toString().equals(mcQueContent.getQuestion()))
-				{
-                    logger.debug("match found  the  pair: " + pairs.getValue().toString());
-                	matchFound=true;
-            	}
-            }
-            
-            if (matchFound == false)
-            {
-            	mcService.removeMcQueContent(mcQueContent);
-                logger.debug("removed mcQueContent: " + mcQueContent);
-            }
-    	}
-    	
+		if (mcContent != null)
+		{
+			List allQuestions=mcService.getAllQuestionEntries(mcContent.getUid());
+	    	logger.debug("allQuestions:" + allQuestions);
+	    	
+	    	Iterator listIterator=allQuestions.iterator();
+	    	
+	    	while (listIterator.hasNext())
+	    	{
+	    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+	    		logger.debug("mcQueContent:" + mcQueContent);
+	    		
+	    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+	    		boolean matchFound=false;
+	            while (itQuestionsMap.hasNext()) {
+	            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+	                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+	                
+	                if (pairs.getValue().toString().equals(mcQueContent.getQuestion()))
+					{
+	                    logger.debug("match found  the  pair: " + pairs.getValue().toString());
+	                	matchFound=true;
+	            	}
+	            }
+	            
+	            if (matchFound == false)
+	            {
+	            	mcService.removeMcQueContent(mcQueContent);
+	                logger.debug("removed mcQueContent: " + mcQueContent);
+	            }
+	    	}
+		}
     }
+    
+    protected boolean validateOptions(HttpServletRequest request)
+    {
+    	logger.debug("will validateOptions");
+    	String parameterType="checkBoxSelected";
+    	for (int i=1; i <= MAX_OPTION_COUNT ; i++)
+    	{
+    		String isCorrect=request.getParameter(parameterType + i);
+    		logger.debug("isCorrect: " + isCorrect);
+    		
+    		if (isCorrect != null)
+    		{
+    			if (isCorrect.equals("Correct"))
+        			return true;	
+    		}
+    	}
+    	return false;
+    }
+	
     
     protected boolean validateQuestionWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {

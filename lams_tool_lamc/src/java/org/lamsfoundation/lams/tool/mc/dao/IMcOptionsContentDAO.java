@@ -40,6 +40,8 @@ public interface IMcOptionsContentDAO
 	
 	public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
 	
+	public List getPersistedSelectedOptions(Long mcQueContentId); 
+	
 	public void saveMcOptionsContent(McOptsContent mcOptionsContent);
     
 	public void updateMcOptionsContent(McOptsContent mcOptionsContent);

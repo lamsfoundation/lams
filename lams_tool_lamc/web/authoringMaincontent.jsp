@@ -131,13 +131,13 @@ MM_reloadPage(true);
 						<td class="formlabel">
 						</td>
 						<td class="input" align="center">
-							<h4> <b> <bean:message key="label.Questions"/> </b> </h4>
+							<h5> <b> <bean:message key="label.Questions"/> </b> </h5>
 						</td>
 						<td class="input" align="center">
-							<h4> <b> <bean:message key="label.weight"/> </b> </h4>
+							<h5> <b> <bean:message key="label.weight"/> </b> </h5>
 						</td>
 						<td class="input" colspan=2 align="center">
-							<h4> <b> <bean:message key="label.actions"/> </b> </h4>
+							<h5> <b> <bean:message key="label.actions"/> </b> </h5>
 						</td>
 					</tr>
 			  	 		<c:set var="queIndex" scope="session" value="1"/>

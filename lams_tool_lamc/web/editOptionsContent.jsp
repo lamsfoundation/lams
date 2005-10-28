@@ -102,7 +102,7 @@ MM_reloadPage(true);
 <div id="formtablecontainer">
 				<table align=center>
 					<tr>
-	 				 	<td align=right> 
+	 				 	<td class="formlabel" align=right> 
 							<bean:message key="label.question"/>:
 						</td>
 						<td colspan=3>
@@ -116,24 +116,58 @@ MM_reloadPage(true);
 						  	</td>
 						</tr>
 
+						<tr>
+						  	<td> </td>
+							<td class="input" align="center">
+								<h5> <b> <bean:message key="label.candidateAnswers"/> </b> </h5>
+							</td>
+							<td class="input" align="center">
+								<h5> <b> <bean:message key="label.isCorrect"/> </b> </h5>
+							</td>
+							<td class="input" colspan=2 align="center">
+								<h5> <b> <bean:message key="label.actions"/> </b> </h5>
+							</td>
+						</tr>
+
 			  	 		<c:set var="optionIndex" scope="session" value="1"/>
+			  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
 							  <c:if test="${optionEntry.key == 1}"> 			
 								  <tr>
 								  	<td> </td>
-							  		<td class="input"> 
+								  		<td class="input"> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
+									  	
+			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
+			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
+											  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
+						  							<td class="input" align=center> 
+													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
+															<option value="Incorrect" > Incorrect </option>
+															<option value="Correct" SELECTED>   Correct  </option>
+														</select>
+													</td>
+						  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
+						 					</c:if> 			
+										</c:forEach>
+										
+									  <c:if test="${selectedOptionFound == 0}"> 			
+								  				<td class="input" align=center> 
+												  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
+														<option value="Incorrect" SELECTED> Incorrect </option>
+														<option value="Correct">   Correct  </option>
+													</select>
+												</td>
+					 					</c:if> 			
+									  											
 								  		<td class="input"> 
 	  										<html:submit property="addOption" styleClass="linkbutton" 
 											onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 												<bean:message key="button.add"/>
 											</html:submit>
 									  	</td>
-								  		<td class="input"> 
-									  		<input type="radio" name="isSelectionOption"  onclick="javascript:document.forms[0].selectedIndex.value=<c:out value="${optionIndex}"/>;"> 
-									  	<td> 										
 							 </tr>
 							</c:if> 			
 					  		<c:if test="${optionEntry.key > 1}"> 			
@@ -144,26 +178,47 @@ MM_reloadPage(true);
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	</td>
+
+\			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
+			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
+											  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
+						  							<td class="input" align=center> 
+													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
+															<option value="Incorrect" > Incorrect </option>
+															<option value="Correct" SELECTED>   Correct  </option>
+														</select>
+													</td>
+						  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
+						 					</c:if> 			
+										</c:forEach>
+										
+									  <c:if test="${selectedOptionFound == 0}"> 			
+								  				<td class="input" align=center> 
+												  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
+														<option value="Incorrect" SELECTED> Incorrect </option>
+														<option value="Correct">   Correct  </option>
+													</select>
+												</td>
+					 					</c:if> 			
+									  	
 								  		<td class="input"> 
 			 								<html:submit property="removeOption" styleClass="linkbutton"  onclick="javascript:document.forms[0].optionIndex.value=${optionIndex};"
 			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 												<bean:message key="button.remove"/>
 											</html:submit>
 									  	</td>
-								  		<td class="input"> 
-									  		<input type="radio" name="isSelectionOption"  onclick="javascript:document.forms[0].selectedIndex.value=<c:out value="${optionIndex}"/>;"> 
-									  	<td> 										
 								  </tr>
 							</c:if> 			
+						  		<input type=hidden name="checkBoxSelected<c:out value="${optionIndex}"/>">
 						</c:forEach>
 							<html:hidden property="selectedIndex"/>							
 					<tr>
-	 				 	<td colspan=3 align=center>								
+	 				 	<td colspan=4 align=center>								
 							&nbsp&nbsp
 					  	</td>
 					</tr>
 	 				 <tr>
-	 				 	<td class="input" colspan=3 align=left>
+	 				 	<td class="input" colspan=4 align=left>
 							<html:submit property="doneOptions" styleClass="linkbutton" 
 							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 								<bean:message key="button.done"/>
@@ -205,6 +260,21 @@ Instructions are here
 </div>
 </html:form>
 <p></p>
+
+
+<SCRIPT language="JavaScript"> 
+
+<!--  addQuestion gets called everytime a new question content is added to the UI -->
+	
+	function removeQuestion(formIndex, questionIndex)
+	{
+		document.forms[formIndex].questionIndex.value=questionIndex;
+		document.forms[formIndex].isRemoveQuestion.value='1';
+		document.forms[formIndex].submit();
+	}
+
+
+ </SCRIPT>
 
 
 </body>

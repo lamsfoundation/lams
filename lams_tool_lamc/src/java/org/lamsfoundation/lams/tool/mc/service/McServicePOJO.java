@@ -391,6 +391,22 @@ public class McServicePOJO implements
         }
     }
 
+    public List getPersistedSelectedOptions(Long mcQueContentId) throws McApplicationException
+	{
+    	try
+        {
+            return mcOptionsContentDAO.getPersistedSelectedOptions(mcQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is gettong persisted selected"
+                                                 + " the mc options content: "
+                                                 + e.getMessage(),e);
+        }
+    	
+	}
+    
+    
     
     public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentId)
     {

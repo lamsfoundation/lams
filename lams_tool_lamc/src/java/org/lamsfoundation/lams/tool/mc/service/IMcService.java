@@ -89,6 +89,8 @@ public interface IMcService
     
     public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
     
+    public List getPersistedSelectedOptions(Long mcQueContentId);
+    
     public List getAllQuestionEntries(final Long mcContentId) throws McApplicationException;
     
     public McSession retrieveMcSession(Long mcSessionId) throws McApplicationException;

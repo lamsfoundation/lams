@@ -116,7 +116,16 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		Map mapWeights= new TreeMap(new McComparator());
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-				
+		
+		Map mapCheckBoxStates= new TreeMap(new McComparator());
+		mapCheckBoxStates.put("1" ,"INCORRECT");
+		mapCheckBoxStates.put("2" ,"CORRECT");
+		request.getSession().setAttribute(MAP_CHECKBOX_STATES, mapCheckBoxStates);
+
+		Map mapSelectedOptions= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+		
+		
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		mcAuthoringForm.resetRadioBoxes();
 		
