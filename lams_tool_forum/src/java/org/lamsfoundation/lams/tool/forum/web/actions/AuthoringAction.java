@@ -272,6 +272,9 @@ public class AuthoringAction extends Action {
 				//copy back
 				forumPO.setAttachments(attSet);
 				forumPO.setMessages(msgSet);
+			}else{
+				forumPO = forum;
+				forumPO.setContentId(forumForm.getToolContentID());
 			}
 			forumService.editForum(forumPO);
 		} catch (Exception e) {

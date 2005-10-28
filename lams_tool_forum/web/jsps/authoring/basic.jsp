@@ -30,9 +30,9 @@
 	<tr>
 		<td class="formlabel"><fmt:message
 			key="label.authoring.basic.instruction" />:</td>
-		<td class="formcontrol"><FCK:editor id="instructions"
+		<td class="formcontrol"><FCK:editor id="forum.instructions"
 			basePath="/lams/fckeditor/" height="150" width="85%">
-			<c:out value="${authoring.instructions}" escapeXml="false" />
+			<c:out value="${formBean.forum.instructions}" escapeXml="false" />
 		</FCK:editor></td>
 	</tr>
 	<!-- Topics List Row -->

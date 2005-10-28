@@ -12,7 +12,7 @@
 		<tr>
 			<td class="formlabel"><fmt:message
 				key="label.authoring.online.instruction" />:</td>
-			<td class="formcontrol"><FCK:editor id="onlineInstruction"
+			<td class="formcontrol"><FCK:editor id="forum.onlineInstructions"
 				basePath="/lams/fckeditor/" height="150" width="85%">
 				<c:out value="${formBean.forum.onlineInstructions}" escapeXml="false"/>
 			</FCK:editor></td>
@@ -67,7 +67,7 @@
 		<tr>
 			<td class="formlabel"><fmt:message
 				key="label.authoring.offline.instruction" />:</td>
-			<td class="formcontrol"><FCK:editor id="offlineInstruction"
+			<td class="formcontrol"><FCK:editor id="forum.offlineInstructions"
 				basePath="/lams/fckeditor/" height="150" width="85%">
 				<c:out value="${formBean.forum.offlineInstructions}" escapeXml="false"/>
 			</FCK:editor></td>
