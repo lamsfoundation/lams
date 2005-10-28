@@ -51,6 +51,13 @@ class org.lamsfoundation.lams.authoring.Application {
 	private static var UI_LOAD_CHECK_TIMEOUT_COUNT:Number = 200;
 
     private static var QUESTION_MARK_KEY:Number = 191;
+    private static var X_KEY:Number = 88;
+    private static var C_KEY:Number = 67;
+    private static var V_KEY:Number = 86;
+    private static var Z_KEY:Number = 90; 
+    private static var Y_KEY:Number = 89;
+	
+	
 
 	private var _uiLoadCheckCount = 0;				// instance counter for number of times we have checked to see if theme and dict are loaded
 	
@@ -86,6 +93,9 @@ class org.lamsfoundation.lams.authoring.Application {
     private var _canvasLoaded:Boolean;
     private var _toolkitLoaded:Boolean;
     private var _menuLoaded:Boolean;
+	
+	//clipboard
+	private var _clipboardData:Object;
     
     //Application instance is stored as a static in the application class
     private static var _instance:Application = null;     
@@ -356,7 +366,8 @@ class org.lamsfoundation.lams.authoring.Application {
     * Handles KEY presses for Application
     */
     private function onKeyDown(){
-        
+        //Debugger.log('Key.isDown(Key.CONTROL): ' + Key.isDown(Key.CONTROL),Debugger.GEN,'onKeyDown','Application');
+        //Debugger.log('Key: ' + Key.getCode(),Debugger.GEN,'onKeyDown','Application');
 		//the debug window:
         if (Key.isDown(Key.CONTROL) && Key.isDown(Key.ALT) && Key.isDown(QUESTION_MARK_KEY)) {
             if (!_debugDialog.content){
@@ -365,6 +376,35 @@ class org.lamsfoundation.lams.authoring.Application {
                hideDebugger();
             }               
         }
+		
+		//for copy and paste
+		//assuming that we are in the canvas...
+		if (Key.isDown(Key.CONTROL) && Key.isDown(X_KEY)) {
+             cut();
+        }
+		
+		if (Key.isDown(Key.CONTROL) && Key.isDown(C_KEY)) {
+           copy();
+        }
+		
+		if (Key.isDown(Key.CONTROL) && Key.isDown(V_KEY)) {
+			paste();
+			
+        }
+		
+		
+		//undo
+		if (Key.isDown(Key.CONTROL) && Key.isDown(Z_KEY)) {
+			_canvas.undo();
+			
+        }
+		
+		if (Key.isDown(Key.CONTROL) && Key.isDown(Y_KEY)) {
+			
+			
+        }		
+		
+		
     }
 	
 	public function showDebugger():Void{
@@ -374,6 +414,41 @@ class org.lamsfoundation.lams.authoring.Application {
 	public function hideDebugger():Void{
 		_debugDialog.deletePopUp();
 	}
+	
+	/**
+	 * stores a reference to the object
+	 * @usage   
+	 * @param   obj 
+	 * @return  
+	 */
+	public function setClipboardData(obj:Object):Void{
+		_clipboardData = obj;
+	}
+	
+	/**
+	 * returns a reference to the object on the clipboard.  
+	 * Note it must be cloned to be used. this should be taken care of by the destination class
+	 * @usage   
+	 * @return  
+	 */
+	public function getClipboardData():Object{
+		return _clipboardData;
+	}
+	
+	
+	public function cut():Void{
+		 setClipboardData(_canvas.model.selectedItem);
+	}
+	
+	public function copy():Void{
+		 setClipboardData(_canvas.model.selectedItem);
+	}
+	
+	public function paste():Void{
+		_canvas.setPastedItem(getClipboardData());
+	}
+	
+
     
 	/**
 	* get the ddm form the canvas.. this method is here as the ddm used to be stored inthe application.
