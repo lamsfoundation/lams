@@ -16,7 +16,7 @@ class Config {
     //static constants
 	//MS of delay between clicks to make a double click
 	//TODO - set this to 500 ms when not in IDE
-	public static var DOUBLE_CLICK_DELAY:Number = 2000;
+	public static var DOUBLE_CLICK_DELAY:Number = 500;
 	//message type codes
 	public static var MESSAGE_TYPE_ERROR:Number = 1;
 	public static var MESSAGE_TYPE_CRITICAL:Number = 2;
