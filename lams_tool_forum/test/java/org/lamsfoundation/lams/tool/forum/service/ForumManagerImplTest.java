@@ -28,8 +28,10 @@ public class ForumManagerImplTest extends TestCase {
         Set attachments = new HashSet();
         Attachment attachment = new Attachment();
         attachments.add(attachment);
-
-        Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), attachments, null);
+        Forum inForum = this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS");
+        inForum.setAttachments(attachments);
+        
+        Forum forum = forumManager.createForum(inForum);
         assertNotNull("Forum Id is null", forum.getUid());
         Forum reloadedForum = forumManager.getForum(forum.getUid());
         assertEquals(reloadedForum.getTitle(), "TEST");
@@ -54,7 +56,7 @@ public class ForumManagerImplTest extends TestCase {
     }
 
     public void testCreateAndDeleteForumWithNullAttachments() throws PersistenceException {
-        Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), null, null);
+        Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"));
         assertNotNull("Forum Id is null", forum.getUid());
         Forum reloadedForum = forumManager.getForum(forum.getUid());
         assertEquals(reloadedForum.getTitle(), "TEST");
@@ -78,7 +80,7 @@ public class ForumManagerImplTest extends TestCase {
     }
 
     public void testCreateAndDeleteForumWithNullInstructions() throws PersistenceException {
-        Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), false, false , false, "", "", ""), null, null);
+        Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), false, false , false, "", "", ""));
         assertNotNull("Forum Id is null", forum.getUid());
         Forum reloadedForum = forumManager.getForum(forum.getUid());
         assertEquals(reloadedForum.getTitle(), "TEST");
@@ -102,7 +104,7 @@ public class ForumManagerImplTest extends TestCase {
     }
 
     public void testCreateModifyAndDeleteMessage() throws PersistenceException {
-      Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), new HashSet(), new HashSet());
+      Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"));
       Message message = forumManager.createMessage(forum.getUid(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
       assertNotNull("Message Id is null", message.getUid());
 
@@ -141,7 +143,7 @@ public class ForumManagerImplTest extends TestCase {
     }
 
     public void testReplyToMessage() throws PersistenceException {
-      Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"), new HashSet(), new HashSet());
+      Forum forum = forumManager.createForum(this.getForum("TEST", new Long("1002"), true, true, false, "TEST INSTRUCTIONS", "TEST ONLINEINSTRUCTIONS", "TEST OFFLINEINSTRUCTIONS"));
       Message message = forumManager.createMessage(forum.getUid(), this.getMessage(new Long("1002"), "TEST", "TEST", true, true));
       assertNotNull("Message Id is null", message.getUid());
       Message reloaded = forumManager.getMessage(message.getUid());
