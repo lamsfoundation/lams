@@ -403,15 +403,26 @@ class org.lamsfoundation.lams.authoring.Activity {
 		return _helpText;
 	}
 	
+	/**
+	 * Rounds the value to an integer
+	 * @usage   
+	 * @param   a 
+	 * @return  
+	 */
 	public function set xCoord(a:Number):Void{
-		_xCoord = a;
+		_xCoord = Math.round(a);
 	}
 	public function get xCoord():Number{
 		return _xCoord;
 	}
-	
+	/**
+	 * Rounds the value to an integer
+	 * @usage   
+	 * @param   a 
+	 * @return  
+	 */
 	public function set yCoord(a:Number):Void{
-		_yCoord = a;
+		_yCoord = Math.round(a);
 	}
 	public function get yCoord():Number{
 		return _yCoord;
