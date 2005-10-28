@@ -222,8 +222,8 @@ public class ObjectExtractor {
 		activity.setDescription(WDDXProcessor.convertToString(activityDetails,"description"));
 		activity.setTitle(WDDXProcessor.convertToString(activityDetails,"title"));
 		activity.setHelpText(WDDXProcessor.convertToString(activityDetails,"helpText"));
-		activity.setXcoord(WDDXProcessor.convertToInteger(activityDetails, "xcoord"));
-		activity.setYcoord(WDDXProcessor.convertToInteger(activityDetails, "ycoord"));
+		activity.setXcoord(WDDXProcessor.convertToInteger(activityDetails, "xCoord"));
+		activity.setYcoord(WDDXProcessor.convertToInteger(activityDetails, "yCoord"));
 
 		Integer parentUIID = WDDXProcessor.convertToInteger(activityDetails, "parentUIID");
 		if( parentUIID!=null ) {
