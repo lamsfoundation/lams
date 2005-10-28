@@ -18,8 +18,8 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
  */
 public interface IForumService {
 
-    public Forum createForum(Forum forum, Set attachments, Set topics) throws PersistenceException;
-    public Forum editForum(Forum forum, Set attachments, Set topics) throws PersistenceException;
+    public Forum createForum(Forum forum) throws PersistenceException;
+    public Forum editForum(Forum forum) throws PersistenceException;
     public Forum getForum(Long forumId) throws PersistenceException;
     public Forum getForumByContentId(Long contentID) throws PersistenceException;
     

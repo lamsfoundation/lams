@@ -252,7 +252,7 @@ public class Forum {
 	/**
 	 * 
 	 * 
-	 * @hibernate.set lazy="false"
+	 * @hibernate.set lazy="true"
 	 *                cascade="all"
 	 *                inverse="false"
 	 *                order-by="create_date desc"

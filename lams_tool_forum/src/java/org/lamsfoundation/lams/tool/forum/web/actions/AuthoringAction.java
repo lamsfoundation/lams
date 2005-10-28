@@ -127,7 +127,7 @@ public class AuthoringAction extends Action {
 		try {
 			forum = forumService.getForumByContentId(contentId);
 			if(forum != null){
-				topics = forumService.getTopics(forum.getUid());
+				topics = new ArrayList(forum.getMessages());
 				forumForm.setForum(forum);
 			}
 			forumForm.setToolContentID(contentId);
@@ -223,9 +223,10 @@ public class AuthoringAction extends Action {
     public ActionForward finishTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws PersistenceException {
     	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+    	
     	ForumForm forumForm = (ForumForm)form;
-    	//TODO: topic sequence not write
-    	forumForm.getForum().setMessages(new HashSet(topics));
+    	Forum forum = forumForm.getForum();
+    	forum.setMessages(new HashSet(topics));
     	
     	return mapping.findForward("success");
     	
@@ -245,22 +246,34 @@ public class AuthoringAction extends Action {
 
 		ForumForm forumForm = (ForumForm)(form);
 		Forum forum = forumForm.getForum();
-		Set topics = forum.getMessages();
-		Set attachment = forum.getAttachments();
 		try {
 			forumService = getForumManager();
-			Forum persistContent = forumService.getForumByContentId(forumForm.getToolContentID());
-			if(persistContent != null && forum.getContentId().equals(persistContent.getContentId())){
-				//keep Set type attribute for persist content becuase this update only 
-				//include updating simple properties from web page(i.e. text value, list value, etc)
-				
-				//copy web page value into persist content, as above, the "Set" type value kept.
-				PropertyUtils.copyProperties(persistContent,forum);
-				forumService.editForum(persistContent,attachment,topics);
-			}else{
-				forum.setContentId(forumForm.getToolContentID());
-				forumService.createForum(forum,attachment,topics);
+			Forum forumPO = forumService.getForumByContentId(forumForm.getToolContentID());
+			if(forumPO != null && forumForm.getToolContentID().equals(forum.getContentId()) ){
+				//merge web page change into PO
+				Set msgSet = forumPO.getMessages();
+				Set attSet = forumPO.getAttachments();
+				if(forum.getMessages() != null){
+			    	if(msgSet == null){
+			    		msgSet = new HashSet();
+			    		forumPO.setMessages(msgSet);
+			    	}
+			    	//restore new topic into ForumPO message set.
+			    	Message msg;
+			    	Iterator iter = forum.getMessages().iterator();
+			    	while(iter.hasNext()){
+			    		msg = (Message) iter.next();
+			    		//new topic, then add to PO
+			    		if(msg.getUid() == null)
+			    			msgSet.add(msg);
+			    	}
+				}
+				PropertyUtils.copyProperties(forumPO,forum);
+				//copy back
+				forumPO.setAttachments(attSet);
+				forumPO.setMessages(msgSet);
 			}
+			forumService.editForum(forumPO);
 		} catch (Exception e) {
 			log.error(e);
 		}

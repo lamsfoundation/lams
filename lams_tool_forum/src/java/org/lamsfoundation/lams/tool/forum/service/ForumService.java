@@ -52,62 +52,13 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private ForumToolContentHandler toolContentHandler;
 	private IRepositoryService repositoryService;
 	
-    public Forum createForum(Forum forum, Set attachments, Set topics) throws PersistenceException {
-        if (attachments != null && attachments.size() !=0) {
-            Set documents = new HashSet();
-            Iterator it = attachments.iterator();
-            while (it.hasNext()) {
-                Attachment attachment = (Attachment) it.next();
-                attachmentDao.saveOrUpdate(attachment);
-                documents.add(attachment);
-            }
-            forum.setAttachments(documents);
-        }
-        forumDao.save(forum);
-
-        //save topics of forum
-        if (topics != null && topics.size() !=0) {
-          Iterator it = topics.iterator();
-          while (it.hasNext()) {
-                Message message = (Message) it.next();
-                message.setIsAuthored(true);
-                this.createMessage(forum.getUid(), message);
-          }
-        }
+    public Forum createForum(Forum forum) throws PersistenceException {
+    	forumDao.save(forum);
         return forum;
     }
 
-    public Forum editForum(Forum forum, Set attachments, Set topics) throws PersistenceException {
-        Forum reloaded = this.getForum(forum.getUid());
-        reloaded.setTitle(forum.getTitle());
-        reloaded.setCreatedBy(forum.getCreatedBy());
-        reloaded.setLockWhenFinished(forum.getLockWhenFinished());
-        reloaded.setRunOffline(forum.getRunOffline());
-        reloaded.setAllowAnonym(forum.getAllowAnonym());
-        reloaded.setInstructions(forum.getInstructions());
-        reloaded.setOnlineInstructions(forum.getOnlineInstructions());
-        reloaded.setOfflineInstructions(forum.getOfflineInstructions());
-        if (attachments != null && attachments.size() !=0) {
-            Set documents = reloaded.getAttachments();
-            Iterator it = attachments.iterator();
-            while (it.hasNext()) {
-                Attachment attachment = (Attachment) it.next();
-                attachmentDao.saveOrUpdate(attachment);
-                documents.add(attachment);
-            }
-            forum.setAttachments(documents);
-        }
-        forumDao.saveOrUpdate(reloaded);
-
-        //save topics of forum
-        if (topics != null && topics.size() !=0) {
-          Iterator it = topics.iterator();
-          while (it.hasNext()) {
-                Message message = (Message) it.next();
-                this.createMessage(forum.getUid(), message);
-          }
-        }
-
+    public Forum editForum(Forum forum) throws PersistenceException {
+        forumDao.saveOrUpdate(forum);
         return forum;
     }
 
