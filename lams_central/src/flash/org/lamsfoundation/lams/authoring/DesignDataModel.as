@@ -1,6 +1,7 @@
 ﻿import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.*;
+import mx.events.*
 /*
 *
 * DesignDataModel stores all the data relating to the design
@@ -22,7 +23,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public static var COPY_TYPE_ID_AUTHORING:Number = 1;
 	public static var COPY_TYPE_ID_RUN:Number = 2;
-	public static var COPY_TYPE_ID_PREVIEW:Number = 3;	
+	public static var COPY_TYPE_ID_PREVIEW:Number = 3;	
 	//LearningDesign Properties:
 	
 	private var _objectType:String;
@@ -55,6 +56,10 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _lastModifiedDateTime:Date;
 	private var _dateReadOnly:Date;
 	
+	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
+    private var dispatchEvent:Function;     
+	public var addEventListener:Function;
+    public var removeEventListener:Function;
 	
     //Constructor
     function DesignDataModel(){
@@ -71,6 +76,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		_userID = Config.getInstance().userID;
 		
+		EventDispatcher.initialize(this);
+
+		
     }
 	
 	/**
@@ -84,8 +92,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		return success;
 	}
 	
-	//Helper methods.
-	
+	////////////////////////////////////////////////////////////////////////////
+	////////////////////////   UPDATE METHODS    ///////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	/**
 	* Adds a template activity to the model. 
 	* 
@@ -104,17 +113,28 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		//add to DDM
 		
+		//dispatch an event to show the design  has changed
+		dispatchEvent({type:'ddmUpdate',target:this});
+		
 		//ObjectUtils.printObject(activity);
 		_activities.put(activity.activityUIID, activity);
+		
 		
 		
 		//TODO: Better validation of the addition
 		success = true;
 		
 		
+		
 		return success;
 	}
 	
+	/**
+	 * Removes the activity from the DDM
+	 * @usage   
+	 * @param   activityUIID 
+	 * @return  
+	 */
 	public function removeActivity(activityUIID):Object{
 		var r:Object = _activities.remove(activityUIID);
 		if(r==null){
@@ -124,6 +144,31 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 	}
 	
+	
+	
+	/**
+	 * Removes the transition from the DDM
+	 * @usage   
+	 * @param   transitionUIID 
+	 * @return  
+	 */
+	public function removeTransition(transitionUIID):Object{
+		var r:Object = _transitions.remove(transitionUIID);
+		if(r==null){
+			return new LFError("Removing transition failed:"+transitionUIID,"removeTransition",this,null);
+		}else{
+			Debugger.log('Removed:'+r.transitionUIID,Debugger.GEN,'removeTransition','DesignDataModel');
+		}
+	}
+	
+	
+	
+	/**
+	 * Adds a transition to the DDM
+	 * @usage   
+	 * @param   transition 
+	 * @return  
+	 */
 	public function addTransition(transition:Transition):Boolean{
 		
 		Debugger.log('Transition from:'+transition.fromUIID+', to:'+transition.toUIID,4,'addActivity','DesignDataModel');
@@ -136,11 +181,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	/**
 	 * Sets a new design for the DDM.
+	 * note the design must be empty to call this, use clearCanvas(true)
 	 * @usage   <DDM Instance>.setDesign(design:Object)
 	 * @param   design 
 	 * @return  success
 	 */
 	public function setDesign(design:Object):Boolean{
+		//note the design must be empty to call this
+		//TODO: Validate that the design is clear
 		var success:Boolean = false;
 		//TODO:Validate if design is saved if not notify user
 		success = true;
@@ -193,6 +241,15 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		return success;
 	}
 	
+	
+	
+	
+	/**
+	 * Readies the design to be saved, sets any date specific variables to now()
+	 * Validates the design, sets the first ID etc..
+	 * @usage   
+	 * @return  
+	 */
 	private function prepareDesignForSaving():Void{
 		
 		//set create date time to now
@@ -208,11 +265,21 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 	}
 	
+	/**
+	 * Calls prepare deign and then returns a DTO object ready to be saved to the server
+	 * @usage   
+	 * @return  
+	 */
 	public function getDesignForSaving():Object{
 		prepareDesignForSaving();
 		return toData();
 	}
 	
+	/**
+	 * Returns a DTO of the design
+	 * @usage   
+	 * @return  
+	 */
 	public function toData():Object{
 		var design:Object = new Object();
 		
