@@ -51,6 +51,11 @@ public class McQueContent implements Serializable {
     /** persistent field */
     private boolean disabled;
     
+    private String feedbackCorrect;
+    
+    private String feedbackIncorrect;
+    
+    
     /** non persistent field */
     private Long mcContentId;
     
@@ -86,6 +91,19 @@ public class McQueContent implements Serializable {
         this.displayOrder = displayOrder;
         this.weight = weight;
         this.disabled = disabled;
+        this.mcContent=mcContent;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
+    }
+    
+    
+    public McQueContent(String question, Integer displayOrder, Integer weight, String feedbackCorrect, String feedbackIncorrect, boolean disabled, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+        this.question = question;
+        this.displayOrder = displayOrder;
+        this.weight = weight;
+        this.disabled = disabled;
+        this.feedbackCorrect=feedbackCorrect;
+        this.feedbackIncorrect=feedbackIncorrect;
         this.mcContent=mcContent;
         this.mcUsrAttempts = mcUsrAttempts;
         this.mcOptionsContents = mcOptionsContents;
@@ -257,5 +275,29 @@ public class McQueContent implements Serializable {
 	 */
 	public void setWeight(Integer weight) {
 		this.weight = weight;
+	}
+	/**
+	 * @return Returns the feedbackCorrect.
+	 */
+	public String getFeedbackCorrect() {
+		return feedbackCorrect;
+	}
+	/**
+	 * @param feedbackCorrect The feedbackCorrect to set.
+	 */
+	public void setFeedbackCorrect(String feedbackCorrect) {
+		this.feedbackCorrect = feedbackCorrect;
+	}
+	/**
+	 * @return Returns the feedbackIncorrect.
+	 */
+	public String getFeedbackIncorrect() {
+		return feedbackIncorrect;
+	}
+	/**
+	 * @param feedbackIncorrect The feedbackIncorrect to set.
+	 */
+	public void setFeedbackIncorrect(String feedbackIncorrect) {
+		this.feedbackIncorrect = feedbackIncorrect;
 	}
 }

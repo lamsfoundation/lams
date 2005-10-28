@@ -5,165 +5,157 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
-<div id="basicTabContainer">	
-		<c:if test="${(requestScope.startMonitoringSummaryRequest != 'true')  || (sessionScope.editActivityEditMode=='true') }"> 			
-			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
-			<tr> <td>
-					<table align=center> 
-						<tr> 
-					 		<td> <bean:message key="label.authoring.title"/>: </td>
-					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-							<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/"
-							      height="200"
-								  width="100%">
-								  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
-							</FCK:editor>
+					<table class="forms" align=left>
+ 						<tr> 
+					 		<td class="formlabel"> <bean:message key="label.authoring.title"/>: </td>
+							<td class="formcontrol">
+								<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/">
+									  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
+								</FCK:editor>
 							</td> 
 					  	</tr>
+					  	
 					  	<tr> 
-					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
-					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-							<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/"
-							      height="200"
-								  width="100%">
-								  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
-							</FCK:editor>
+					 		<td class="formlabel"> <bean:message key="label.authoring.instructions"/>: </td>
+							<td class="formcontrol">
+								<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/">
+									  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
+								</FCK:editor>
 							</td>
 						</tr>
 				
-			 		<!--default question content, this entry can not be deleted but can be updated -->
-				 		<tr> 
-						  	<td> 
-						 		<bean:message key="label.question1"/> : 
-						 	</td>
-						  	<td>
-								  	<input type="text" name="questionContent0" size="50" 
-								  	maxlength="255" value="<c:out value="${sessionScope.defaultQuestionContent}"/>"> 
-								  	&nbsp
-									<html:submit property="addContent" styleClass="linkbutton" disabled="${sessionScope.isDefineLater}"
-									onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-									<bean:message key="button.addNewQuestion"/>
-									</html:submit>
-						  	</td>
-					  	</tr>
-		
-				  	<!--end of default question content -->
-				  	
-			  		<!-- if there is more than just the default content start presenting them -->
-			  	 		<c:set var="queIndex" scope="session" value="1"/>
-						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
-					  		<c:if test="${questionEntry.key > 1}"> 			
-								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-								  <tr>
-								  	<td> <c:out value="Question ${queIndex}"/> : </td>
-								  		<td> <input type="text" name="questionContent<c:out value="${queIndex-1}"/>" value="<c:out value="${questionEntry.value}"/>"   
-									  		size="50" maxlength="255"> 
-									  	&nbsp
-		 								<html:submit property="removeContent" styleClass="linkbutton"  onclick="removeQuestion(${formIndex}, ${queIndex});"
-		 								disabled="${sessionScope.isDefineLater}" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-											<bean:message key="button.removeQuestion"/>
-										</html:submit>
-									  	</td>
-								  </tr>
-							</c:if> 			
-						</c:forEach>
-						<html:hidden property="toolContentId" value="${sessionScope.toolContentId}"/>
-						<html:hidden property="questionIndex"/>
-						<html:hidden property="isRemoveContent"/>
+					<tr>
+					 	<td colspan=2 align=center>								
+							&nbsp&nbsp
+					  	</td>
 					</tr>
-					</table>
-		
-					<hr>
-					<table>
-							<tr>
-									 <td> 
-										 <html:submit property="submitAllContent" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-											<bean:message key="button.submitAllContent"/>
-										</html:submit>
-									</td> 
-							</tr>
-					</table>
-			</td></tr>			
-			</c:if>	
-		</c:if>	
-	
-		
-		<c:if test="${sessionScope.editActivityEditMode=='false'}"> 
-			<c:if test="${requestScope.startMonitoringSummaryRequest == 'true'}"> 
-			<c:if test="${requestScope.stopRenderingQuestions != 'true'}"> 			
-			<tr> <td>
-					<table align=center>
-						<tr> 
-					 		<td> <bean:message key="label.authoring.title"/>: </td>
-					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-						 		<c:out value="${sessionScope.richTextTitle}" escapeXml="false" />
-							</td> 
-					  	</tr>
-
-					  	<tr> 
-					 		<td> <bean:message key="label.authoring.instructions"/>: </td> 
-					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-							  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
-							</td>
-						</tr>
 				
-			 		<!--default question content, this entry can not be deleted but can be updated -->
-		
-				 		<tr> 
-						  	<td> 
-						  		<c:out value="Question 1"/> : </td>
-						  		<td>
-									<c:out value="${sessionScope.defaultQuestionContent}"/>
-						  		</td>
-					  	</tr>
-		
-				  	<!--end of default question content -->
-				  	
-			  		<!-- if there is more than just the default content start presenting them -->
+					<tr> <td colspan=2 align=center>
+					
+					<table align=center>
+					<tr>
+						<td class="formlabel">
+						</td>
+						<td class="input" align="center">
+							<h5> <b> <bean:message key="label.Questions"/> </b> </h5>
+						</td>
+						<td class="input" align="center">
+							<h5> <b> <bean:message key="label.weight"/> </b> </h5>
+						</td>
+						<td class="input" colspan=2 align="center">
+							<h5> <b> <bean:message key="label.actions"/> </b> </h5>
+						</td>
+					</tr>
 			  	 		<c:set var="queIndex" scope="session" value="1"/>
-						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContent}">
-					  		<c:if test="${questionEntry.key > 1}"> 			
-								<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-								  <tr>
-								  	<td> <c:out value="Question ${queIndex}"/> : </td>
-								  		<td> <c:out value="${questionEntry.value}"/>
-									  	&nbsp
-									  	</td>
-								  </tr>
-							</c:if> 			
+						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
+									<c:if test="${questionEntry.key == 1}"> 			
+									    <tr>
+										  	<td class="formlabel"> <c:out value="Question ${queIndex}"/> : </td>
+										  	
+									  		<td class="input"> 
+									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"
+										  		size="50" maxlength="255" >
+										  	</td>
+
+                                            <td class="input" align=center>										  	
+												<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
+														<c:if test="${questionEntry.key == weightsEntry.key}"> 			
+													  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
+														  		size="3" maxlength="3">
+														</c:if>
+												</c:forEach>
+                                            </td>
+
+                                                   
+                                            <td class="input">										  	
+			  										<html:submit property="addQuestion" styleClass="linkbutton" 
+													onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+														<bean:message key="button.addNewQuestion"/>
+													</html:submit>
+											</td>	
+											&nbsp&nbsp&nbsp
+                                            <td class="input">										  	
+					 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
+					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+														<bean:message key="label.edit"/>
+													</html:submit>
+											</td>
+										  </tr>
+									</c:if> 			
+									
+							  		<c:if test="${questionEntry.key > 1}"> 			
+										<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+										  <tr>
+										  	<td class="formlabel"> <c:out value="Question ${queIndex}"/> : </td>
+										  	
+										  		<td class="input"> 
+										  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"  size="50" maxlength="255" > 
+												</td>											
+
+	                                            <td class="input" align=center>										  	
+													<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
+															<c:if test="${questionEntry.key == weightsEntry.key}"> 			
+														  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
+															  		size="3" maxlength="3">
+															</c:if>
+													</c:forEach>
+	                                            </td>
+											
+                                               <td class="input">										  	
+				 								<html:submit property="removeQuestion" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
+					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+														<bean:message key="button.removeQuestion"/>
+													</html:submit>
+												</td>
+												&nbsp&nbsp&nbsp
+	                                            <td class="input">										  	
+					 								<html:submit property="editOptions" styleClass="linkbutton"  onclick="javascript:document.forms[0].questionIndex.value=${queIndex};"
+					 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+														<bean:message key="label.edit"/>
+													</html:submit>
+											  	</td>
+										  </tr>
+									</c:if> 
 						</c:forEach>
-						<html:hidden property="toolContentId" value="${sessionScope.toolContentId}"/>
-						<html:hidden property="questionIndex"/>
-						<html:hidden property="isRemoveContent"/>
-					</table>
-		
-					<hr>
-					<table>
-							<tr>
-									 <td> 
-										 <html:submit property="edit" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-											<bean:message key="label.edit"/>
-										</html:submit>
-									</td> 
-							</tr>
-					</table>
-			</td></tr>			
-			</c:if>	
-			</c:if>	
-		</c:if>	
-</div>	
+							<html:hidden property="questionIndex"/>
 
-<SCRIPT language="JavaScript"> 
+					<tr>
+	 				 	<td colspan=5 align=center>
+							&nbsp&nbsp
+					  	</td>
+					</tr>		
+					
+					<tr>
+					  	<td class="formlabel"><bean:message key="radiobox.passmark"/>: </td>
+						<td class="input"> 
+							  <html:text property="passmark"  size="3" maxlength="3"/>							
+						</td>
+						<td> &nbsp</td> <td>&nbsp </td>
+					</tr>
+					
+					<tr>
+	 				 	<td colspan=5 align=center>
+							&nbsp&nbsp
+					  	</td>
+					</tr>
+						
+					<tr>
+	 				 	<td colspan=5 align=center>								
+							&nbsp&nbsp
+					  	</td>
+					</tr>
 
-<!--  addQuestion gets called everytime a new question content is added to the UI -->
-	
-	function removeQuestion(formIndex, questionIndex)
-	{
-		document.forms[formIndex].questionIndex.value=questionIndex;
-		document.forms[formIndex].isRemoveQuestion.value='1';
-		document.forms[formIndex].submit();
-	}
-	
- </SCRIPT>
+	 				 <tr>
+	 				 	<td colspan=5 align=left>								
+							<html:submit property="submitQuestions" styleClass="linkbutton" 
+							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+								<bean:message key="button.submit"/>
+							</html:submit>	 				 		  										  		
+		 			  	</td>
+	 				 </tr>
+							
+					</table>		
+					</td> </tr>
+							
 
-		
+	 				</table> 	 

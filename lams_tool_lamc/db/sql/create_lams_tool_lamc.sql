@@ -29,6 +29,8 @@ CREATE TABLE lams.tl_lamc11_que_content (
      , question VARCHAR(255)
      , weight INT(5) NOT NULL DEFAULT 0
      , disabled TINYINT(1) NOT NULL DEFAULT 1
+     , feedbackCorrect VARCHAR(255)
+     , feedbackIncorrect VARCHAR(255)
      , display_order INT(5)
      , mc_content_id BIGINT(20) NOT NULL
      , PRIMARY KEY (uid)

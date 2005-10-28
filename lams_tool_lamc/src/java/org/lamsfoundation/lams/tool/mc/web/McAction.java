@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -44,7 +43,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
@@ -526,7 +524,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
-	 		String optionIndex =mcAuthoringForm.getOptionIndex();
+	 		String optionIndex =mcAuthoringForm.getDeletableOptionIndex();
 			logger.debug("optionIndex:" + optionIndex);
 			
 			Map mapOptionsContent=repopulateMap(request, "optionContent");
@@ -593,6 +591,19 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("mcQueContent:" + mcQueContent);
 			
 			mcQueContent.setQuestion(selectedQuestion);
+			logger.debug("updated question set");
+			
+			String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
+        	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
+        	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect=""; 
+			mcQueContent.setFeedbackCorrect(richTextFeedbackCorrect);
+        	
+        	String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
+        	logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
+        	if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
+        	mcQueContent.setFeedbackIncorrect(richTextFeedbackInCorrect);
+			
+			
 			mcService.saveOrUpdateMcQueContent(mcQueContent);
 			logger.debug("persisted  selectedQuestion" + selectedQuestion);
 			
@@ -603,7 +614,8 @@ public class McAction extends DispatchAction implements McAppConstants
 			mcService.removeMcOptionsContentByQueId(selectedQuestionContentUid);
 			logger.debug("removed all mcOptionsContents for mcQueContentId :" + selectedQuestionContentUid);
 			
-	 		
+			
+        	
 	 		String isCheckBoxSelected=null;
 	 		boolean isCorrect=false;
 	    	for (int i=1; i <= MAX_OPTION_COUNT ; i++)
@@ -634,10 +646,13 @@ public class McAction extends DispatchAction implements McAppConstants
     		 		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
     	    		logger.debug("Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
     	    		
-    		       	McOptsContent mcOptionsContent= new McOptsContent(isCorrect,selectedAnswer , mcQueContent, new HashSet());
- 	    	        logger.debug("created mcOptionsContent: " + mcOptionsContent);
- 	       	        mcService.saveMcOptionsContent(mcOptionsContent);
- 	       	        logger.debug("final persistance of option");
+    	    		if ((selectedAnswer != null) && (selectedAnswer.length() > 0))
+    	    		{
+    	    			McOptsContent mcOptionsContent= new McOptsContent(isCorrect,selectedAnswer , mcQueContent, new HashSet());
+     	    	        logger.debug("created mcOptionsContent: " + mcOptionsContent);
+     	       	        mcService.saveMcOptionsContent(mcOptionsContent);
+     	       	        logger.debug("final persistance of option");	
+    	    		}
     			}
 			}
 			
@@ -755,8 +770,9 @@ public class McAction extends DispatchAction implements McAppConstants
         		endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSAGE);
 
         	
-	 		String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
+        	String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
         	logger.debug("richTextTitle: " + richTextTitle);
+        	
         	String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
         	logger.debug("richTextInstructions: " + richTextInstructions);
         	
@@ -1332,6 +1348,22 @@ public class McAction extends DispatchAction implements McAppConstants
 				persistError(request,"error.weights.notInteger");
 				return false;
 			}
+        	
+        	
+        	int weight= new Integer(pairs.getValue().toString()).intValue();
+        	if (weight == 0) 
+            {
+            	ActionMessages errors= new ActionMessages();
+        		errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.zero"));
+				saveErrors(request,errors);
+    			mcAuthoringForm.resetUserAction();
+				persistError(request,"error.weights.zero");
+				return false;
+            	
+            }
+        	
+        	
         }
 		mcAuthoringForm.resetUserAction();
 		return true;

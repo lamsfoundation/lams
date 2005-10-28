@@ -236,6 +236,13 @@ public abstract class McUtils implements McAppConstants {
 		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
 		logger.debug("read parameter richTextInstructions: " + richTextInstructions);
 		
+		String richTextFeedbackCorrect=request.getParameter(RICHTEXT_FEEDBACK_CORRECT);
+		logger.debug("read parameter richTextFeedbackCorrect: " + richTextFeedbackCorrect);
+		
+		String richTextFeedbackInCorrect=request.getParameter(RICHTEXT_FEEDBACK_INCORRECT);
+		logger.debug("read parameter richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
+		
+		
 		if ((richTextTitle != null) && (richTextTitle.length() > 0))
 		{
 			request.getSession().setAttribute(RICHTEXT_TITLE,richTextTitle);
@@ -245,6 +252,18 @@ public abstract class McUtils implements McAppConstants {
 		{
 			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
 		}
+		
+		if ((richTextFeedbackCorrect != null) && (richTextFeedbackCorrect.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
+		}
+		
+		if ((richTextFeedbackInCorrect != null) && (richTextFeedbackInCorrect.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);
+		}
+
+		
 	}
 	
 	public static void addFileToContentRepository(HttpServletRequest request, McAuthoringForm mcAuthoringForm, boolean isOfflineFile)

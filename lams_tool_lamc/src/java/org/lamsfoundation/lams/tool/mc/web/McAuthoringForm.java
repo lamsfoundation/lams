@@ -36,6 +36,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String questionIndex;
 	protected String optionIndex;
 	protected String selectedIndex;
+	protected String deletableOptionIndex;
 	
 	protected String editDefaultQuestion;
 	protected String removeOptionContent;
@@ -157,6 +158,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.questionIndex=null;
 		this.optionIndex=null;
 		this.selectedIndex=null;
+		this.deletableOptionIndex=null;
 		this.isRemoveContent=null;
 		this.toolContentId=null;
 
@@ -798,5 +800,17 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setInstructionsTabDone(String instructionsTabDone) {
 		this.instructionsTabDone = instructionsTabDone;
+	}
+	/**
+	 * @return Returns the deletableOptionIndex.
+	 */
+	public String getDeletableOptionIndex() {
+		return deletableOptionIndex;
+	}
+	/**
+	 * @param deletableOptionIndex The deletableOptionIndex to set.
+	 */
+	public void setDeletableOptionIndex(String deletableOptionIndex) {
+		this.deletableOptionIndex = deletableOptionIndex;
 	}
 }
