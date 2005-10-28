@@ -66,11 +66,11 @@ public class LibraryActivityDTO extends BaseDTO {
 
 	/** UI specific attribute indicating the
 	 * position of the activity*/
-	private Integer xcoord;
+	private Integer xCoord;
 
 	/** UI specific attribute indicating the
 	 * position of the activity*/
-	private Integer ycoord;
+	private Integer yCoord;
 	
 	/** The image that represents the icon of this 
 	 * activity in the UI*/
@@ -97,8 +97,8 @@ public class LibraryActivityDTO extends BaseDTO {
 		this.description = description;
 		this.title = title;
 		this.helpText = helpText;
-		this.xcoord = xcoord;
-		this.ycoord = ycoord;		
+		this.xCoord = xcoord;
+		this.yCoord = ycoord;		
 		this.libraryActivityUiImage = libraryActivityUiImage;
 		this.tool = tool;
 	}
@@ -108,8 +108,8 @@ public class LibraryActivityDTO extends BaseDTO {
 		this.description = activity.getDescription();
 		this.title = activity.getTitle();
 		this.helpText = activity.getHelpText();
-		this.xcoord = activity.getXcoord();
-		this.ycoord = activity.getYcoord();			
+		this.xCoord = activity.getXcoord();
+		this.yCoord = activity.getYcoord();			
 		this.libraryActivityUiImage = activity.getLibraryActivityUiImage();
 		this.activityTypeID = activity.getActivityTypeId();
 		this.activityCategoryID = activity.getActivityCategoryID();
@@ -160,14 +160,14 @@ public class LibraryActivityDTO extends BaseDTO {
 	/**
 	 * @return Returns the xcoord.
 	 */
-	public Integer getXcoord() {
-		return xcoord!=null?xcoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	public Integer getxCoord() {
+		return xCoord!=null?xCoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}
 	/**
 	 * @return Returns the ycoord.
 	 */
-	public Integer getYcoord() {
-		return ycoord!=null?ycoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	public Integer getyCoord() {
+		return yCoord!=null?yCoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}	
 	/**
 	 * @return Returns the tool.

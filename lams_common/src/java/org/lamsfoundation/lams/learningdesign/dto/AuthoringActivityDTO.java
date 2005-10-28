@@ -63,11 +63,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 
 	/** UI specific attribute indicating the
 	 * position of the activity*/
-	private Integer xcoord;
+	private Integer xCoord;
 
 	/** UI specific attribute indicating the
 	 * position of the activity*/
-	private Integer ycoord;
+	private Integer yCoord;
 	
 	/** The activity that acts as a container/parent for
 	 * this activity. Normally would be one of the 
@@ -187,8 +187,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.description = description;
 		this.title = title;
 		this.helpText = helpText;
-		this.xcoord = xcoord;
-		this.ycoord = ycoord;
+		this.xCoord = xcoord;
+		this.yCoord = ycoord;
 		this.parentActivityID = parentActivityID;
 		this.parentUIID = parentUIID;
 		this.activityTypeID = activityTypeId;
@@ -228,8 +228,8 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.description = activity.getDescription();
 		this.title = activity.getTitle();
 		this.helpText = activity.getHelpText();
-		this.xcoord = activity.getXcoord();
-		this.ycoord = activity.getYcoord();
+		this.xCoord = activity.getXcoord();
+		this.yCoord = activity.getYcoord();
 		this.parentActivityID = activity.getParentActivity()!=null?
 								activity.getParentActivity().getActivityId():
 								WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
@@ -525,14 +525,14 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/**
 	 * @return Returns the xcoord.
 	 */
-	public Integer getXcoord() {
-		return xcoord!=null?xcoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	public Integer getxCoord() {
+		return xCoord!=null?xCoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}
 	/**
 	 * @return Returns the ycoord.
 	 */
-	public Integer getYcoord() {
-		return ycoord!=null?ycoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	public Integer getyCoord() {
+		return yCoord!=null?yCoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	}	
 	/*************************************************
 	 * Setters
@@ -761,16 +761,16 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/**
 	 * @param xcoord The xcoord to set.
 	 */
-	public void setXcoord(Integer xcoord) {
+	public void setxCoord(Integer xcoord) {
 		if(!xcoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			this.xcoord = xcoord;
+			this.xCoord = xcoord;
 	}
 	/**
 	 * @param ycoord The ycoord to set.
 	 */
-	public void setYcoord(Integer ycoord) {
-		if(!xcoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			this.ycoord = ycoord;
+	public void setyCoord(Integer ycoord) {
+		if(!xCoord.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
+			this.yCoord = ycoord;
 	}	
 	/**
 	 * @return Returns the applyGrouping.
