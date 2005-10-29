@@ -229,6 +229,9 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	logger.debug("mcService:" + mcService);
 	 	
+	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
+	 	
 	 	McUtils.persistRichText(request);
 	 	
 	 	String selectedQuestion=request.getParameter(SELECTED_QUESTION);
@@ -247,6 +250,24 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
+	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
+		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+		 	
+		 	logger.debug("will validate questions are not empty");
+	 		boolean questionsNotEmptyValid=validateQuestionsNotEmpty(mapQuestionsContent);
+        	logger.debug("questionsNotEmptyValid:" + questionsNotEmptyValid);
+        	if (questionsNotEmptyValid == false)
+        	{
+        		ActionMessages errors= new ActionMessages();
+        		errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.question.empty"));
+				saveErrors(request,errors);
+    			mcAuthoringForm.resetUserAction();
+				persistError(request,"error.question.empty");
+				return (mapping.findForward(LOAD_QUESTIONS));
+        	}
+	 		
 	 		logger.debug("will validate weights");
 	 		boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
         	logger.debug("weightsValid:" + weightsValid);
@@ -255,10 +276,7 @@ public class McAction extends DispatchAction implements McAppConstants
 				return (mapping.findForward(LOAD_QUESTIONS));
         	}
 	 		
-	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
-		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
-		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
-		 	
+	 		
 		 	Map mapWeights= repopulateMap(request, "questionWeight");
 			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
 			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
@@ -266,6 +284,8 @@ public class McAction extends DispatchAction implements McAppConstants
 			addQuestion(request, mcAuthoringForm, mapQuestionsContent, true);
 			logger.debug("after addQuestion");
 			
+		 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
     	    mcAuthoringForm.resetUserAction();
 	 		return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
@@ -319,7 +339,8 @@ public class McAction extends DispatchAction implements McAppConstants
 				logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
 			}
 			
-			
+		 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 			mcAuthoringForm.resetUserAction();
 			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
@@ -328,6 +349,9 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		userAction="editOption";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
+	 		
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
 	 		
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
@@ -355,6 +379,9 @@ public class McAction extends DispatchAction implements McAppConstants
     			saveErrors(request,errors);
     			mcAuthoringForm.resetUserAction();
     			logger.debug("return to LOAD_QUESTIONS to fix error.");
+    			
+    			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     			return (mapping.findForward(LOAD_QUESTIONS));
 			}
 			
@@ -378,7 +405,6 @@ public class McAction extends DispatchAction implements McAppConstants
 	    	McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(editableQuestionEntry, mcContent.getUid());
 	    	logger.debug("mcQueContent:" + mcQueContent);
 	    	
-	    	//FIX THIS!!!!
 	    	int weight=0;
 	    	if (mcQueContent == null)
         	{
@@ -392,7 +418,6 @@ public class McAction extends DispatchAction implements McAppConstants
          					new HashSet()
          					);
         		
-        		
        	        mcService.createMcQue(mcQueContent);
        	        logger.debug("persisted convenience mcQueContent: " + mcQueContent);
         	}
@@ -404,7 +429,16 @@ public class McAction extends DispatchAction implements McAppConstants
 			request.getSession().setAttribute(SELECTED_QUESTION_CONTENT_UID, mcQueContent.getUid() );
 			logger.debug("SELECTED_QUESTION_CONTENT_UID:" + request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID));
 			
-			
+        	String richTextFeedbackInCorrect=mcQueContent.getFeedbackIncorrect();
+			logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
+			if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
+			request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);
+        	
+			String richTextFeedbackCorrect=mcQueContent.getFeedbackCorrect();
+			logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
+			if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
+			request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
+        	
 			Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
 	 		mapSelectedOptions.clear();
 	 		
@@ -468,9 +502,10 @@ public class McAction extends DispatchAction implements McAppConstants
 				logger.debug("updated the Options Map with the default Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
 			}
 			
+		 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+			logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
 			mcAuthoringForm.resetUserAction();
-			return (mapping.findForward(EDIT_OPTS_CONTENT));
-	 		
+			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	else if (mcAuthoringForm.getAddOption() != null)
 	 	{
@@ -478,17 +513,34 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+	 		
 	 		Map mapOptionsContent=repopulateMap(request,"optionContent");
 		 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
 		 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
-	 		
-	 		int mapSize=mapOptionsContent.size();
+		 	
+		 	boolean verifyDuplicatesOptionsMap=verifyDuplicatesOptionsMap(mapOptionsContent);
+		 	logger.debug("verifyDuplicatesOptionsMap: " + verifyDuplicatesOptionsMap);
+		 	if (verifyDuplicatesOptionsMap == false)
+	 		{
+	 			ActionMessages errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.answers.duplicate"));
+    			logger.debug("add error.answers.duplicate to ActionMessages");
+    			saveErrors(request,errors);
+    			mcAuthoringForm.resetUserAction();
+    			logger.debug("return to LOAD_QUESTIONS to fix error.");
+    			
+    			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+    			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+    			return (mapping.findForward(LOAD_QUESTIONS));	
+	 		}
+		 	
+		 	int mapSize=mapOptionsContent.size();
 	 		mapOptionsContent.put(new Long(++mapSize).toString(), "");
 			logger.debug("updated mapOptionsContent Map size: " + mapOptionsContent.size());
 			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
     		logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-    		
-    		
     		
     		
     		Long selectedQuestionContentUid=(Long) request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
@@ -523,15 +575,19 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
 	 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
 	 		
-	 		
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+			logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
 	 		mcAuthoringForm.resetUserAction();
-			return (mapping.findForward(EDIT_OPTS_CONTENT));
+			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	else if (mcAuthoringForm.getRemoveOption() != null)
 	 	{
 	 		userAction="removeOption";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
+	 		
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
 	 		
 	 		String optionIndex =mcAuthoringForm.getDeletableOptionIndex();
 			logger.debug("optionIndex:" + optionIndex);
@@ -573,16 +629,19 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
 	 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
 
-			
-			
+	 	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+			logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
 			mcAuthoringForm.resetUserAction();			
-			return (mapping.findForward(EDIT_OPTS_CONTENT));
+			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	else if (mcAuthoringForm.getDoneOptions() != null)
 	 	{
 	 		userAction="doneOptions";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
+	 		
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 			
 	 		boolean validateOptions=validateOptions(request);
 	 		logger.debug("validateOptions:" + validateOptions);
@@ -594,8 +653,11 @@ public class McAction extends DispatchAction implements McAppConstants
     			logger.debug("add error.checkBoxes.empty to ActionMessages");
     			saveErrors(request,errors);
     			mcAuthoringForm.resetUserAction();
-    			logger.debug("return to EDIT_OPTS_CONTENT to fix error.");
-    			return (mapping.findForward(EDIT_OPTS_CONTENT));	
+    			logger.debug("return to LOAD_QUESTIONS to fix error.");
+    			
+    			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+    			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+    			return (mapping.findForward(LOAD_QUESTIONS));	
 	 		}
 	 			 		
 	 		Long selectedQuestionContentUid=(Long)request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
@@ -620,7 +682,6 @@ public class McAction extends DispatchAction implements McAppConstants
         	if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
         	mcQueContent.setFeedbackIncorrect(richTextFeedbackInCorrect);
 			
-			
 			mcService.saveOrUpdateMcQueContent(mcQueContent);
 			logger.debug("persisted  selectedQuestion" + selectedQuestion);
 			
@@ -631,9 +692,7 @@ public class McAction extends DispatchAction implements McAppConstants
 			mcService.removeMcOptionsContentByQueId(selectedQuestionContentUid);
 			logger.debug("removed all mcOptionsContents for mcQueContentId :" + selectedQuestionContentUid);
 			
-			
-        	
-	 		String isCheckBoxSelected=null;
+			String isCheckBoxSelected=null;
 	 		boolean isCorrect=false;
 	    	for (int i=1; i <= MAX_OPTION_COUNT ; i++)
 			{
@@ -673,6 +732,8 @@ public class McAction extends DispatchAction implements McAppConstants
     			}
 			}
 			
+	    	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 			mcAuthoringForm.resetUserAction();
 			return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
@@ -682,6 +743,9 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		userAction="submitQuestions";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
+	 		
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 
         	ActionMessages errors= new ActionMessages();
 
@@ -701,6 +765,9 @@ public class McAction extends DispatchAction implements McAppConstants
 				saveErrors(request,errors);
     			mcAuthoringForm.resetUserAction();
 				persistError(request,"error.weights.total.invalid");
+				
+				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 				return (mapping.findForward(LOAD_QUESTIONS));
         	}
         	
@@ -746,6 +813,9 @@ public class McAction extends DispatchAction implements McAppConstants
 					saveErrors(request,errors);
 	    			mcAuthoringForm.resetUserAction();
 					persistError(request,"error.passmark.notInteger");
+					
+					request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+	    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 					return (mapping.findForward(LOAD_QUESTIONS));
 				}
         	}
@@ -764,6 +834,9 @@ public class McAction extends DispatchAction implements McAppConstants
     			saveErrors(request,errors);
     			mcAuthoringForm.resetUserAction();
     			logger.debug("return to LOAD_QUESTIONS to fix error.");
+    			
+    			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     			return (mapping.findForward(LOAD_QUESTIONS));
         	}
         	
@@ -809,6 +882,8 @@ public class McAction extends DispatchAction implements McAppConstants
     		if (errors.size() > 0)  
     		{
     			logger.debug("either title or instructions or both is missing. Returning back to from to fix errors:");
+				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     			return (mapping.findForward(LOAD_QUESTIONS));
     		}
     		
@@ -830,7 +905,6 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("mcContent:" + mcContent);
 			
 						
-
 			if (mcContent != null)
 			{
 				logger.debug("updating mcContent title and instructions:" + mcContent);
@@ -909,6 +983,9 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("add submit.successful to ActionMessages");
 			saveErrors(request,errors);
 			
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+
 			mcAuthoringForm.resetUserAction();
 	   	    return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
@@ -1166,8 +1243,6 @@ public class McAction extends DispatchAction implements McAppConstants
              						);
            	        mcService.createMcQue(mcQueContent);
            	        logger.debug("persisted mcQueContent: " + mcQueContent);
-           	        
-           	        
             	}
             	else
             	{
@@ -1295,10 +1370,8 @@ public class McAction extends DispatchAction implements McAppConstants
     			mcAuthoringForm.resetUserAction();
 				persistError(request,"error.weights.empty");
 				return false;
-            	
             }
 
-            
     		try
 			{
     			int weight= new Integer(pairs.getValue().toString()).intValue();
@@ -1326,10 +1399,7 @@ public class McAction extends DispatchAction implements McAppConstants
     			mcAuthoringForm.resetUserAction();
 				persistError(request,"error.weights.zero");
 				return false;
-            	
             }
-        	
-        	
         }
 		mcAuthoringForm.resetUserAction();
 		return true;
@@ -1378,14 +1448,14 @@ public class McAction extends DispatchAction implements McAppConstants
     	long mapCounter=0;
     	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
 		{
-			String candidateQuestionEntry =request.getParameter(parameterType + i);
+			String candidateEntry =request.getParameter(parameterType + i);
 			if (
-				(candidateQuestionEntry != null) && 
-				(candidateQuestionEntry.length() > 0)   
+				(candidateEntry != null) && 
+				(candidateEntry.length() > 0)   
 				)
 			{
 				mapCounter++;
-				mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateQuestionEntry);
+				mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateEntry);
 			}
 		}
     	logger.debug("return repopulated Map: " + mapTempQuestionsContent);
@@ -1418,6 +1488,54 @@ public class McAction extends DispatchAction implements McAppConstants
     	return mapTempQuestionsContent;
     }
 
+    
+    protected boolean verifyDuplicatesOptionsMap(Map mapOptionsContent)
+	{
+    	Map originalMapOptionsContent=mapOptionsContent;
+    	Map backupMapOptionsContent=mapOptionsContent;
+    	
+    	int optionCount=0;
+    	for (long i=1; i <= MAX_OPTION_COUNT ; i++)
+		{
+    		String currentOption=(String)originalMapOptionsContent.get(new Long(i).toString());
+    		logger.debug("verified currentOption  " + currentOption);
+    		
+    		optionCount=0;
+    		for (long j=1; j <= MAX_OPTION_COUNT ; j++)
+    		{
+        		String backedOption=(String)backupMapOptionsContent.get(new Long(j).toString());
+        		
+        		if ((currentOption != null) && (backedOption !=null))
+        		{
+        			if (currentOption.equals(backedOption))
+    				{
+    					optionCount++;
+    			    	logger.debug("optionCount for  " + currentOption + " is: " + optionCount);
+    				}
+    				
+            		if (optionCount > 1)
+            			return false;	
+        		}
+    		}	
+		}
+    	return true;
+	}
+    
+    
+    protected boolean validateQuestionsNotEmpty(Map mapQuestionsContent)
+    {
+    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
+    	while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            if ((pairs.getValue() != null) && (pairs.getValue().toString().length() == 0))
+            	return false;
+            
+		}
+    	return true;
+    }
+    
     
     protected Map repopulateCurrentCheckBoxStatesMap(HttpServletRequest request)
     {
@@ -1458,5 +1576,4 @@ public class McAction extends DispatchAction implements McAppConstants
 		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
 	} 
-
 }

@@ -100,7 +100,12 @@ MM_reloadPage(true);
 <h2><bean:message key="label.authoring.mc.basic"/></h2>
 
 <div id="formtablecontainer">
-		<jsp:include page="BasicContent.jsp" />
+		<c:if test="${sessionScope.editOptionsMode == 0}"> 			
+			<jsp:include page="BasicContent.jsp" />
+		</c:if> 				
+		<c:if test="${sessionScope.editOptionsMode == 1}"> 			
+			<jsp:include page="OptionsContent.jsp" />
+		</c:if> 				
 </div>
 <hr>
 <a href="javascript:;" class="button">Cancel</a>

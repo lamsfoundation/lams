@@ -1,0 +1,177 @@
+<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-logic-el.tld" prefix="logic-el" %>
+<%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
+<%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
+
+
+				<table align=center>
+					<tr>
+	 				 	<td class="formlabel" align=right> 
+							<bean:message key="label.question"/>:
+						</td>
+						<td colspan=3>
+			  				<input type="text" name="selectedQuestion" value="<c:out value="${sessionScope.selectedQuestion}"/>"   
+					  			size="50" maxlength="255"> 
+					  	</td>
+					</tr>
+					<tr>
+	 				 	<td colspan=2 align=center>								
+					  	</td>
+					</tr>
+
+
+					<tr>
+					  	<td class="formlabel">  </td>
+						<td class=input colspan=3>
+							&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+							 <bean:message key="label.candidateAnswers"/> 
+
+							 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+
+							 <bean:message key="label.isCorrect"/>  
+							
+							&nbsp&nbsp&nbsp&nbsp
+
+
+							 <bean:message key="label.actions"/> 
+						</td>
+					</tr>
+
+			  	 		<c:set var="optionIndex" scope="session" value="1"/>
+			  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
+						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
+							  <c:if test="${optionEntry.key == 1}"> 			
+								  <tr>
+									  	<td class="formlabel"> <c:out value="Candidate Answer ${optionIndex}"/> : </td>
+
+								  		<td class="input" colspan=3> 
+								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
+									  		size="50" maxlength="255"> 
+									  		
+									  		&nbsp
+
+									  	
+			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
+			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
+											  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
+						  					
+													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
+															<option value="Incorrect" > Incorrect </option>
+															<option value="Correct" SELECTED>   Correct  </option>
+														</select>
+											
+						  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
+						 					</c:if> 			
+										</c:forEach>
+										
+									  <c:if test="${selectedOptionFound == 0}"> 			
+								  			
+												  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
+														<option value="Incorrect" SELECTED> Incorrect </option>
+														<option value="Correct">   Correct  </option>
+													</select>
+											
+					 					</c:if> 			
+									  											
+									  		&nbsp
+
+	  										<html:submit property="addOption" styleClass="linkbutton" 
+											onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+												<bean:message key="button.add"/>
+											</html:submit>
+									  	</td>
+							 </tr>
+							</c:if> 			
+					  		<c:if test="${optionEntry.key > 1}"> 			
+								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
+								  <tr>
+								  	<td> &nbsp </td>
+								  	<td class="input" colspan=3> 
+								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
+									  		size="50" maxlength="255"> 
+
+									  		&nbsp
+
+			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
+			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
+											  <c:if test="${selectedOptionEntry.value == optionEntry.value}"> 			
+
+													  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
+															<option value="Incorrect" > Incorrect </option>
+															<option value="Correct" SELECTED>   Correct  </option>
+														</select>
+
+						  				  	 		<c:set var="selectedOptionFound" scope="request" value="1"/>
+						 					</c:if> 			
+										</c:forEach>
+										
+									  <c:if test="${selectedOptionFound == 0}"> 			
+
+												  	<select name="checkBoxSelected<c:out value="${optionIndex}"/>">
+														<option value="Incorrect" SELECTED> Incorrect </option>
+														<option value="Correct">   Correct  </option>
+													</select>
+
+					 					</c:if> 			
+									  	
+									  		&nbsp
+
+			 								<html:submit property="removeOption" styleClass="linkbutton"  onclick="javascript:document.forms[0].deletableOptionIndex.value=${optionIndex};"
+			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+												<bean:message key="button.remove"/>
+											</html:submit>
+									  	</td>
+								  </tr>
+							</c:if> 			
+						  		<input type=hidden name="checkBoxSelected<c:out value="${optionIndex}"/>">
+						</c:forEach>
+							<html:hidden property="deletableOptionIndex"/>							
+					<tr>
+	 				 	<td colspan=4 align=center>								
+							&nbsp&nbsp
+					  	</td>
+					</tr>
+					<tr>
+	 				 	<td colspan=4 align=center>								
+							&nbsp&nbsp
+					  	</td>
+					</tr>
+
+
+
+					<tr>
+	 				 	<td class="formlabel" align=right> 
+							<bean:message key="label.feedback.incorrect"/>
+						</td>
+						<td class="formcontrol" colspan=3>
+							<FCK:editor id="richTextFeedbackInCorrect" basePath="/lams/fckeditor/">
+								  <c:out value="${sessionScope.richTextFeedbackInCorrect}" escapeXml="false" />						  
+							</FCK:editor>
+						</td> 
+					</tr>
+					
+					<tr>
+	 				 	<td class="formlabel" align=right> 
+							<bean:message key="label.feedback.correct"/>
+						</td>
+						<td class="formcontrol" colspan=3>
+							<FCK:editor id="richTextFeedbackCorrect" basePath="/lams/fckeditor/">
+								  <c:out value="${sessionScope.richTextFeedbackCorrect}" escapeXml="false" />						  
+							</FCK:editor>
+						</td> 
+					</tr>
+
+			
+	 				 <tr>
+	 				 <td> &nbsp</td>
+	 				 <td class="input" align=left colspan=3>
+							<html:submit property="doneOptions" styleClass="linkbutton" 
+							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+								<bean:message key="button.done"/>
+							</html:submit>	 				 		  										  		
+		 			  	</td>
+	 				 </tr>
+	 				 
+				</table> 	 

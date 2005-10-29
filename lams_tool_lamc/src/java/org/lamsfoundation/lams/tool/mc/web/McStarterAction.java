@@ -125,6 +125,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		Map mapSelectedOptions= new TreeMap(new McComparator());
 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
 		
+		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 		
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		mcAuthoringForm.resetRadioBoxes();

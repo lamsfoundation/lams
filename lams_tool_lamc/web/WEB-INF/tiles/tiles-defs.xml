@@ -47,12 +47,6 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageHeader" value = "Questions for Multiple Choice"/>
 		<put name="content" value="authoringMaincontent.jsp" />	
 	</definition>
-
-	<definition name=".editOptsContent" extends=".baseDef" >
-		<put name="title" value="Edit Options Content"/>
-		<put name="pageHeader" value = "Edit Options Content"/>
-		<put name="content" value="editOptionsContent.jsp" />	
-	</definition>
 		
 <!-- ============= Qa Authoring Starter Page Definitions ====================== -->	
 	<definition name=".starter" extends=".baseDef" >
@@ -60,8 +54,5 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageHeader" value = "Starter for Multiple Choice Authoring"/>
 		<put name="content" value="/index.jsp" />	
 	</definition>
-	
-	
-
 
 </tiles-definitions>
