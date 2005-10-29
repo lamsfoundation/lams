@@ -5,28 +5,23 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
-<div id="richTextContainer">
-		<tr> <td>
-			<table align=center>
+				<table class="forms">
 				<tr> 
-					<td>
-          				<fmt:message key="label.offlineInstructions" />:
+					<td class="formlabel">
+          				<bean:message key="label.offlineInstructions" />:
           			</td>
-					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckeditor/"
-					      height="200"
-						  width="100%">
-						  <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />						  
+					<td colspan=3 class="formcontrol">
+					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckeditor/">
+						  <c:out value="${richTextOfflineInstructions}" escapeXml="false" />						  
 					</FCK:editor>
 					</td> 
-					
 				</tr>
 
 				<tr> 
-					<td>
-          				<fmt:message key="label.offlineFiles" />
+					<td class="formlabel">
+          				<bean:message key="label.offlineFiles" />
           			</td>
-          			<td NOWRAP> 
+          			<td colspan=3 NOWRAP> 
 						<html:file  property="theOfflineFile"></html:file>
 					 	<html:submit property="submitOfflineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 								<bean:message key="label.upload"/>
@@ -35,33 +30,31 @@
 
 				</tr>
 				<tr> 
-					<td>
-          				<fmt:message key="label.uploadedOfflineFiles" />
+					<td align="right">
+          				<bean:message key="label.uploadedOfflineFiles" />
           			</td>
-					<td>
+					<td colspan=3>
 						<c:forEach var='item' items='${sessionScope.listUploadedOfflineFileNames}'>
 				            <li><c:out value='${item}'/></li>
 	         			</c:forEach>
 					</td> 
 				</tr>
           		<tr> 
-          			<td>
-          				<fmt:message key="label.onlineInstructions" />
+					<td align="right">
+          				<bean:message key="label.onlineInstructions" />
           			</td>
-					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckeditor/"
-					      height="200"
-						  width="100%">
-  						  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
+					<td colspan=3 class="formcontrol">
+					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckeditor/">
+						  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
 					</FCK:editor>
 					</td> 
 				</tr>
 				
 				<tr> 
-					<td>
-          				<fmt:message key="label.onlineFiles" />
+					<td class="formlabel">
+          				<bean:message key="label.onlineFiles" />
           			</td>
-          			<td NOWRAP> 
+          			<td colspan=3 NOWRAP> 
 						<html:file  property="theOnlineFile"></html:file>
 					 	<html:submit property="submitOnlineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 								<bean:message key="label.upload"/>
@@ -69,33 +62,32 @@
 					</td> 
 				
 				</tr>
+
 				<tr>
-					<td>
-          				<fmt:message key="label.uploadedOnlineFiles" />
+					<td align="right">
+          				<bean:message key="label.uploadedOnlineFiles" />
           			</td>
-					<td>
+					<td colspan=3>
 						<c:forEach var='item' items='${sessionScope.listUploadedOnlineFileNames}'>
 				            <li><c:out value='${item}'/></li>
 	         			</c:forEach>
 					</td> 
 				</tr>
-				
-				
-          		</table>	  	
-			  	<hr>
-				<table>
-	          		<tr>
-						 <td colspan=2> 
-							 <html:submit property="submitTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-								<bean:message key="button.done"/>
-							</html:submit>
-						</td> 
-					</tr>
-				</table>
 
-		</td></tr>
-</div>
-
-
-
-
+		  		<tr>
+ 				 	<td colspan=4 align=center>								
+						&nbsp
+				  	</td>
+				</tr>
+ 				 
+ 				 <tr>
+				 	<td>								
+				  	</td>
+					 <td colspan=3> 
+						 <html:submit property="instructionsTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+							<bean:message key="button.done"/>
+						</html:submit>
+					</td> 
+ 				 </tr>
+ 				 
+			</table>	  	

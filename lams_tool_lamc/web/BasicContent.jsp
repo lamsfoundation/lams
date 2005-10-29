@@ -58,15 +58,18 @@
 										  	</td>
 
                                             <td class="input" align=center>										  	
+	                                            &nbsp&nbsp
 												<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
 														<c:if test="${questionEntry.key == weightsEntry.key}"> 			
 													  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
 														  		size="3" maxlength="3">
 														</c:if>
 												</c:forEach>
+												 <bean:message key="label.percent"/> 
+	 											 &nbsp&nbsp&nbsp&nbsp
                                             </td>
 
-                                                   
+											                                                   
                                             <td class="input">										  	
 			  										<html:submit property="addQuestion" styleClass="linkbutton" 
 													onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
@@ -93,12 +96,15 @@
 												</td>											
 
 	                                            <td class="input" align=center>										  	
+		                                            &nbsp&nbsp
 													<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
 															<c:if test="${questionEntry.key == weightsEntry.key}"> 			
 														  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
 															  		size="3" maxlength="3">
 															</c:if>
 													</c:forEach>
+												 <bean:message key="label.percent"/> 
+	 											 &nbsp&nbsp&nbsp&nbsp
 	                                            </td>
 											
                                                <td class="input">										  	

@@ -99,7 +99,7 @@ MM_reloadPage(true);
 
 <h2><bean:message key="label.authoring.mc.basic"/></h2>
 
-<div id="formtablecontainer">
+<div id="formtablecontainer1">
 		<c:if test="${sessionScope.editOptionsMode == 0}"> 			
 			<jsp:include page="BasicContent.jsp" />
 		</c:if> 				
@@ -113,109 +113,23 @@ MM_reloadPage(true);
 <!-- end of content_b -->
 </div>
 
-<!-- tab content 2 Advanced-->
+
 <div id='content_a'  class="tabbody content_a">
-<h2>Advanced Definitions </h2>
-<div id="formtablecontainer">
-			<jsp:include page="AdvancedContent.jsp" />
+	<h2>Advanced Definitions </h2>
+	<div id="formtablecontainer2">
+				<jsp:include page="AdvancedContent.jsp" />
+	</div>
 </div>
 
-<!-- end of content_b -->
-</div>
 
-<!-- tab content 3 instructions -->
 <div id='content_i'  class="tabbody content_i">
-<h2>Instructions</h2>
-<div id="formtablecontainer">
-		<table align=center>
-				<tr> 
-					<td class="formlabel">
-          				<fmt:message key="label.offlineInstructions" />:
-          			</td>
-					<td class="formcontrol">
-					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckeditor/">
-						  <c:out value="${richTextOfflineInstructions}" escapeXml="false" />						  
-					</FCK:editor>
-					</td> 
-				</tr>
-
-				<tr> 
-					<td class="formlabel">
-          				<fmt:message key="label.offlineFiles" />
-          			</td>
-          			<td NOWRAP> 
-						<html:file  property="theOfflineFile"></html:file>
-					 	<html:submit property="submitOfflineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-								<bean:message key="label.upload"/>
-						</html:submit>
-					</td> 
-
-				</tr>
-				<tr> 
-					<td class="formlabel">
-          				<fmt:message key="label.uploadedOfflineFiles" />
-          			</td>
-					<td class="formlabel">
-						<c:forEach var='item' items='${sessionScope.listUploadedOfflineFileNames}'>
-				            <li><c:out value='${item}'/></li>
-	         			</c:forEach>
-					</td> 
-				</tr>
-          		<tr> 
-					<td class="formlabel">
-          				<fmt:message key="label.onlineInstructions" />
-          			</td>
-					<td class="formcontrol">
-					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckeditor/">
-						  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
-					</FCK:editor>
-					</td> 
-				</tr>
-				
-				<tr> 
-					<td class="formlabel">
-          				<fmt:message key="label.onlineFiles" />
-          			</td>
-          			<td NOWRAP> 
-						<html:file  property="theOnlineFile"></html:file>
-					 	<html:submit property="submitOnlineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-								<bean:message key="label.upload"/>
-						</html:submit>
-					</td> 
-				
-				</tr>
-				<tr>
-					<td class="formlabel">
-          				<fmt:message key="label.uploadedOnlineFiles" />
-          			</td>
-					<td class="formlabel">
-						<c:forEach var='item' items='${sessionScope.listUploadedOnlineFileNames}'>
-				            <li><c:out value='${item}'/></li>
-	         			</c:forEach>
-					</td> 
-				</tr>
-		  		<tr>
- 				 	<td colspan=2 align=center>								
-						&nbsp&nbsp
-				  	</td>
-				</tr>
-				<tr>
-					 <td class="body" colspan=2> 
-						 <html:submit property="instructionsTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-							<bean:message key="button.done"/>
-						</html:submit>
-					</td> 
- 				 </tr>
-			</table>	  	
-</div>
-
+	<h2>Instructions</h2>
+	<div id="formtablecontainer3">
+			<jsp:include page="InstructionsContent.jsp" />
+	</div>
 	<hr>
-<a href="javascript:;" class="button">Cancel</a>
-
-
-
-<!-- end of content_a -->
 </div>
+
 </html:form>
 <p></p>
 
@@ -230,25 +144,6 @@ MM_reloadPage(true);
 		document.forms[formIndex].isRemoveQuestion.value='1';
 		document.forms[formIndex].submit();
 	}
-
-	function isNumeric(sText)
-	{
-	   var validChars = "0123456789";
-	   var isNumber=true;
-	   var char;
-	
-	   for (i = 0; i < sText.length && isNumber == true; i++) 
-	   { 
-	      char = sText.charAt(i); 
-	      if (validChars.indexOf(char) == -1) 
-	      {
-	       	isNumber = false;
-	       	alert('Nooo');
-	      }
-	   }
-	   return isNumber;
-	}		
-
  </SCRIPT>
 
 </body>

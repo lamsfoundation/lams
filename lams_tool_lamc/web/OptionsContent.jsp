@@ -87,7 +87,7 @@
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
 								  <tr>
-								  	<td> &nbsp </td>
+								  	<td class="formlabel"> <c:out value="Candidate Answer ${optionIndex}"/> : </td>
 								  	<td class="input" colspan=3> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
