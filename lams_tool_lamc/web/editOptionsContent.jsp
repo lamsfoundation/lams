@@ -119,17 +119,17 @@ MM_reloadPage(true);
 					<tr>
 					  	<td class="formlabel">  </td>
 						<td class=input colspan=3>
-							<h5> <b> <bean:message key="label.candidateAnswers"/> </h5> </b>
+							&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+							 <bean:message key="label.candidateAnswers"/> 
 
-							 &nbsp&nbsp
+							 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 
-
-							<h5> <b> <bean:message key="label.isCorrect"/>  </h5> </b>
+							 <bean:message key="label.isCorrect"/>  
 							
-							&nbsp&nbsp
+							&nbsp&nbsp&nbsp&nbsp
 
 
-							<h5> <b> <bean:message key="label.actions"/> </h5> </b>
+							 <bean:message key="label.actions"/> 
 						</td>
 					</tr>
 
@@ -144,7 +144,7 @@ MM_reloadPage(true);
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  		
-									  		&nbsp&nbsp
+									  		&nbsp
 
 									  	
 			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
@@ -169,7 +169,7 @@ MM_reloadPage(true);
 											
 					 					</c:if> 			
 									  											
-									  		&nbsp&nbsp
+									  		&nbsp
 
 	  										<html:submit property="addOption" styleClass="linkbutton" 
 											onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
@@ -186,7 +186,7 @@ MM_reloadPage(true);
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 
-									  		&nbsp&nbsp
+									  		&nbsp
 
 			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
@@ -210,7 +210,7 @@ MM_reloadPage(true);
 
 					 					</c:if> 			
 									  	
-									  		&nbsp&nbsp
+									  		&nbsp
 
 			 								<html:submit property="removeOption" styleClass="linkbutton"  onclick="javascript:document.forms[0].deletableOptionIndex.value=${optionIndex};"
 			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">

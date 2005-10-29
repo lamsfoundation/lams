@@ -88,7 +88,6 @@ MM_reloadPage(true);
 <html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
  <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
-<h2><bean:message key="label.authoring.mc.basic"/></h2>
 
 <table align=center> 	  
 <tr>   
@@ -98,7 +97,8 @@ MM_reloadPage(true);
 </tr> 
 </table>
 
-<h2>Please define questions </h2>
+<h2><bean:message key="label.authoring.mc.basic"/></h2>
+
 <div id="formtablecontainer">
 		<jsp:include page="BasicContent.jsp" />
 </div>

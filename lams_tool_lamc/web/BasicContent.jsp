@@ -37,13 +37,13 @@
 						<td class="formlabel">
 						</td>
 						<td class="input" align="center">
-							<h5> <b> <bean:message key="label.Questions"/> </b> </h5>
+							 <bean:message key="label.Questions"/> 
 						</td>
 						<td class="input" align="center">
-							<h5> <b> <bean:message key="label.weight"/> </b> </h5>
+							 <bean:message key="label.weight"/> 
 						</td>
 						<td class="input" colspan=2 align="center">
-							<h5> <b> <bean:message key="label.actions"/> </b> </h5>
+							 <bean:message key="label.actions"/> 
 						</td>
 					</tr>
 			  	 		<c:set var="queIndex" scope="session" value="1"/>
