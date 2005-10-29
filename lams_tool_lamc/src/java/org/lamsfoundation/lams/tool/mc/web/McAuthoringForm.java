@@ -77,6 +77,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String synchInMonitor;
 	protected String showFeedback;
 	protected String retries;
+	protected String sln;
+	
 	protected String passmark;
 	
 	
@@ -175,6 +177,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.questionsSequenced=null;
 		this.showFeedback=null;
 		this.retries=null;
+		this.sln=null;
 		this.passmark=null;
 		
 		this.summaryMonitoring=null;
@@ -187,11 +190,11 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	public void resetRadioBoxes()
 	{
 		this.synchInMonitor		=OPTION_OFF;
-		this.usernameVisible	=OPTION_OFF;
 		this.questionsSequenced	=OPTION_OFF;
-		
     	this.retries 			 =OPTION_OFF;
+    	this.sln				 =OPTION_OFF;
     	this.showFeedback 		 =OPTION_OFF;
+    	this.usernameVisible	=OPTION_OFF;
 	}
 
 	
@@ -812,5 +815,17 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setDeletableOptionIndex(String deletableOptionIndex) {
 		this.deletableOptionIndex = deletableOptionIndex;
+	}
+	/**
+	 * @return Returns the sln.
+	 */
+	public String getSln() {
+		return sln;
+	}
+	/**
+	 * @param sln The sln to set.
+	 */
+	public void setSln(String sln) {
+		this.sln = sln;
 	}
 }

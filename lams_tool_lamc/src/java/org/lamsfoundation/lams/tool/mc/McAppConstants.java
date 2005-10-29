@@ -168,6 +168,8 @@ public interface McAppConstants {
     public static final String RICHTEXT_FEEDBACK_INCORRECT				="richTextFeedbackInCorrect";
     public static final String RICHTEXT_OFFLINEINSTRUCTIONS				="richTextOfflineInstructions";
     public static final String RICHTEXT_ONLINEINSTRUCTIONS				="richTextOnlineInstructions";
+    public static final String RICHTEXT_REPORT_TITLE					="richTextReportTitle";
+    public static final String RICHTEXT_END_LEARNING_MSG				="richTextEndLearningMsg";
     public static final String RICHTEXT_TITLE							="richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS					="richTextInstructions";
     public static final String RICHTEXT_BLANK							="<p>&nbsp;</p>";

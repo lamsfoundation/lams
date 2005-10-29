@@ -8,29 +8,14 @@
 			<table class="forms">
 				<tr>
 	      			<td class="formlabel">
-		      			<bean:message key="radiobox.synchInMonitor"/>:
+		      			<bean:message key="radiobox.sln"/>:
 					</td>
 					<td>
-						<html:radio property="synchInMonitor" value="ON">
+						<html:radio property="sln" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
 
-						<html:radio property="synchInMonitor" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
-	      			</td>
-		         </tr>
-		         
-				<tr>
-					<td class="formlabel">
-		      			<bean:message key="radiobox.usernameVisible"/>:
-					</td>
-					<td>
-						<html:radio property="usernameVisible" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
-
-						<html:radio property="usernameVisible" value="OFF">
+						<html:radio property="sln" value="OFF">
 						 <bean:message key="option.off"/>
 						</html:radio>
 	      			</td>
@@ -38,7 +23,7 @@
 		         
    				<tr>
 					<td class="formlabel">
-		      			<bean:message key="radiobox.questionsSequenced"/>:		      			
+		      			<bean:message key="radiobox.onepq"/>:		      			
 					</td>
 					<td>
 						<html:radio property="questionsSequenced" value="ON">
@@ -67,45 +52,26 @@
 
 				</tr>	      			
 		        
-   				<tr>
-					<td class="formlabel">
-		      			<bean:message key="radiobox.showFeedback"/>:		      			
-					</td>
-					<td>
-						<html:radio property="showFeedback" value="ON">
-						 <bean:message key="option.on"/>
-						</html:radio>
-
-						<html:radio property="showFeedback" value="OFF">
-						 <bean:message key="option.off"/>
-						</html:radio>
-	      			</td>
-		        </tr>
-		         
 		         <tr> 
 					<td class="formlabel">
-			 			<bean:message key="label.report.title"/>: </td>
-			 		<td> 
-			 			<html:text property="reportTitle" size="60" maxlength="100"/>
-			 		</td>
-			  	</tr>
-			  	
-			  	<tr> 
-					<td class="formlabel">
-			 			<bean:message key="label.monitoringReport.title"/>: 
-			 		</td>
-			 		<td> 
-			 			<html:text property="monitoringReportTitle" size="60" maxlength="100"/>
-			 		</td>
+				 			<bean:message key="label.report.title"/>: 
+				 	</td>
+	  				<td class="formcontrol">
+						<FCK:editor id="richTextReportTitle" basePath="/lams/fckeditor/">
+							  <c:out value="${sessionScope.richTextReportTitle}" escapeXml="false" />						  
+						</FCK:editor>
+					</td> 
 			  	</tr>
 			  	
 			  	<tr> 
 					<td class="formlabel">
 			 			<bean:message key="label.report.endLearningMessage"/>: 
 			 		</td>
-			 		<td> 
-			 			<html:text property="endLearningMessage" size="60" maxlength="100"/>
-			 		</td>
+	  				<td class="formcontrol">
+						<FCK:editor id="richTextEndLearningMsg" basePath="/lams/fckeditor/">
+							  <c:out value="${sessionScope.richTextEndLearningMsg}" escapeXml="false" />						  
+						</FCK:editor>
+					</td> 
 			  	</tr>
 			  	
 		  		<tr>
@@ -114,7 +80,10 @@
 				  	</td>
 				</tr>
 				<tr>
-					 <td class="body" colspan=2> 
+				 	<td>								
+						&nbsp&nbsp
+				  	</td>
+					 <td> 
 						 <html:submit property="advancedTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 							<bean:message key="button.done"/>
 						</html:submit>

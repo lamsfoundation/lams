@@ -438,7 +438,7 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
 			if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
 			request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
-        	
+			
 			Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
 	 		mapSelectedOptions.clear();
 	 		
@@ -776,6 +776,8 @@ public class McAction extends DispatchAction implements McAppConstants
         	boolean isUsernameVisible=false;
         	boolean isRetries=false;
         	boolean isShowFeedback=false;
+        	boolean isSln=false;
+        	
         	String monitoringReportTitle="";
         	String reportTitle="";
         	String endLearningMessage="";
@@ -796,6 +798,10 @@ public class McAction extends DispatchAction implements McAppConstants
         	logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
         	if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
         		isRetries=true;
+        	
+        	logger.debug("isSln" +  mcAuthoringForm.getSln());
+        	if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
+        		isSln=true;
         	
         	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
         	
@@ -893,6 +899,13 @@ public class McAction extends DispatchAction implements McAppConstants
         	String richTextOnlineInstructions=(String) request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
         	logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
         	
+        	String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
+    		logger.debug("richTextReportTitle: " + richTextReportTitle);
+    		
+    		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
+    		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
+        	
+        	
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
@@ -917,10 +930,11 @@ public class McAction extends DispatchAction implements McAppConstants
 			    mcContent.setRetries(isRetries);
 			    mcContent.setPassMark(new Integer(passmark));
 			    mcContent.setShowFeedback(isShowFeedback);
+			    mcContent.setShowReport(isSln);
 			    mcContent.setEndLearningMessage(endLearningMessage);
-			    mcContent.setReportTitle(reportTitle);
+			    mcContent.setReportTitle(richTextReportTitle);
 			    mcContent.setMonitoringReportTitle(monitoringReportTitle);
-			    mcContent.setEndLearningMessage(endLearningMessage);
+			    mcContent.setEndLearningMessage(richTextEndLearningMessage);
 			    mcContent.setOfflineInstructions(richTextOfflineInstructions);
 			    mcContent.setOnlineInstructions(richTextOnlineInstructions);
 			}
@@ -994,6 +1008,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		userAction="advancedTabDone";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
+	 		
 	 		mcAuthoringForm.resetUserAction();
 	   	    return (mapping.findForward(LOAD_QUESTIONS));
 	 	}

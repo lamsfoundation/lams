@@ -91,6 +91,8 @@ public class McContent implements Serializable {
     /** nullable persistent field */
     private boolean retries;
     
+    private boolean showReport;
+    
 	
     /** nullable persistent field */
     private Integer passMark;
@@ -403,4 +405,16 @@ public class McContent implements Serializable {
 		this.retries = retries;
 	}
 
+	/**
+	 * @return Returns the showReport.
+	 */
+	public boolean isShowReport() {
+		return showReport;
+	}
+	/**
+	 * @param showReport The showReport to set.
+	 */
+	public void setShowReport(boolean showReport) {
+		this.showReport = showReport;
+	}
 }

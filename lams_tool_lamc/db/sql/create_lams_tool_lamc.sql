@@ -18,8 +18,9 @@ CREATE TABLE lams.tl_lamc11_content (
      , end_learning_message VARCHAR(150) NOT NULL DEFAULT 'Thank you!'
      , content_in_use TINYINT(1) NOT NULL DEFAULT 0
      , retries TINYINT(1) NOT NULL DEFAULT 0
-     , pass_mark INTEGER
      , show_feedback TINYINT(1) NOT NULL DEFAULT 0
+     , pass_mark INTEGER
+     , show_report TINYINT(1) NOT NULL DEFAULT 0
      , UNIQUE UQ_tl_lamc11_content_1 (content_id)
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;

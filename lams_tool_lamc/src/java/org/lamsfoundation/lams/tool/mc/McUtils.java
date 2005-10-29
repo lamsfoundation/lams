@@ -236,12 +236,6 @@ public abstract class McUtils implements McAppConstants {
 		String richTextInstructions=request.getParameter(RICHTEXT_INSTRUCTIONS);
 		logger.debug("read parameter richTextInstructions: " + richTextInstructions);
 		
-		String richTextFeedbackCorrect=request.getParameter(RICHTEXT_FEEDBACK_CORRECT);
-		logger.debug("read parameter richTextFeedbackCorrect: " + richTextFeedbackCorrect);
-		
-		String richTextFeedbackInCorrect=request.getParameter(RICHTEXT_FEEDBACK_INCORRECT);
-		logger.debug("read parameter richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
-		
 		
 		if ((richTextTitle != null) && (richTextTitle.length() > 0))
 		{
@@ -253,6 +247,12 @@ public abstract class McUtils implements McAppConstants {
 			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,richTextInstructions);
 		}
 		
+		String richTextFeedbackCorrect=request.getParameter(RICHTEXT_FEEDBACK_CORRECT);
+		logger.debug("read parameter richTextFeedbackCorrect: " + richTextFeedbackCorrect);
+		
+		String richTextFeedbackInCorrect=request.getParameter(RICHTEXT_FEEDBACK_INCORRECT);
+		logger.debug("read parameter richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
+		
 		if ((richTextFeedbackCorrect != null) && (richTextFeedbackCorrect.length() > 0))
 		{
 			request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
@@ -262,8 +262,23 @@ public abstract class McUtils implements McAppConstants {
 		{
 			request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);
 		}
-
 		
+		
+		String richTextReportTitle=request.getParameter(RICHTEXT_REPORT_TITLE);
+		logger.debug("read parameter richTextReportTitle: " + richTextReportTitle);
+		
+		String richTextEndLearningMessage=request.getParameter(RICHTEXT_END_LEARNING_MSG);
+		logger.debug("read parameter richTextEndLearningMessage: " + richTextEndLearningMessage);
+		
+		if ((richTextReportTitle != null) && (richTextReportTitle.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,richTextReportTitle);
+		}
+		
+		if ((richTextEndLearningMessage != null) && (richTextEndLearningMessage.length() > 0))
+		{
+			request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,richTextEndLearningMessage);
+		}
 	}
 	
 	public static void addFileToContentRepository(HttpServletRequest request, McAuthoringForm mcAuthoringForm, boolean isOfflineFile)

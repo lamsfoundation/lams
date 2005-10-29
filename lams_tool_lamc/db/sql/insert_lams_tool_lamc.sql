@@ -19,6 +19,7 @@ INSERT INTO tl_lamc11_content  (
      , content_in_use 
      , retries 
      , show_feedback 
+     , show_report
 )
 VALUES (
 	null,
@@ -37,6 +38,7 @@ VALUES (
 	'offline instructions',
 	'online instructions',
 	'End of the activity...',
+	0,
 	0,
 	0,
 	0);
