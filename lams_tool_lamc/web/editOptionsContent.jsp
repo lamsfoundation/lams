@@ -110,26 +110,28 @@ MM_reloadPage(true);
 					  			size="50" maxlength="255"> 
 					  	</td>
 					</tr>
-						<tr>
-		 				 	<td colspan=4 align=center>								
-								&nbsp&nbsp
-						  	</td>
-						</tr>
+					<tr>
+	 				 	<td colspan=2 align=center>								
+					  	</td>
+					</tr>
 
-						<tr>
-						  	<td> </td>
-							<td class="formlabel">
-								<h5> <b> <bean:message key="label.candidateAnswers"/> </b> </h5>
 
-						  		&nbsp&nbsp&nbsp&nbsp&nbsp
+					<tr>
+					  	<td class="formlabel">  </td>
+						<td class=input colspan=3>
+							<h5> <b> <bean:message key="label.candidateAnswers"/> </h5> </b>
 
-								<h5> <b> <bean:message key="label.isCorrect"/> </b> </h5>
+							 &nbsp&nbsp
 
-						  		&nbsp&nbsp&nbsp&nbsp&nbsp
 
-								<h5> <b> <bean:message key="label.actions"/> </b> </h5>
-							</td>
-						</tr>
+							<h5> <b> <bean:message key="label.isCorrect"/>  </h5> </b>
+							
+							&nbsp&nbsp
+
+
+							<h5> <b> <bean:message key="label.actions"/> </h5> </b>
+						</td>
+					</tr>
 
 			  	 		<c:set var="optionIndex" scope="session" value="1"/>
 			  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
@@ -138,11 +140,11 @@ MM_reloadPage(true);
 								  <tr>
 									  	<td class="formlabel"> <c:out value="Candidate Answer ${optionIndex}"/> : </td>
 
-								  		<td class="input"> 
+								  		<td class="input" colspan=3> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  		
-									  		&nbsp&nbsp&nbsp&nbsp&nbsp
+									  		&nbsp&nbsp
 
 									  	
 			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
@@ -167,7 +169,7 @@ MM_reloadPage(true);
 											
 					 					</c:if> 			
 									  											
-									  		&nbsp&nbsp&nbsp&nbsp&nbsp
+									  		&nbsp&nbsp
 
 	  										<html:submit property="addOption" styleClass="linkbutton" 
 											onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
@@ -179,12 +181,12 @@ MM_reloadPage(true);
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
 								  <tr>
-								  	<td> </td>
-								  	<td class="input"> 
+								  	<td> &nbsp </td>
+								  	<td class="input" colspan=3> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 
-									  		&nbsp&nbsp&nbsp&nbsp&nbsp
+									  		&nbsp&nbsp
 
 			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
@@ -208,7 +210,7 @@ MM_reloadPage(true);
 
 					 					</c:if> 			
 									  	
-									  		&nbsp&nbsp&nbsp&nbsp&nbsp
+									  		&nbsp&nbsp
 
 			 								<html:submit property="removeOption" styleClass="linkbutton"  onclick="javascript:document.forms[0].deletableOptionIndex.value=${optionIndex};"
 			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
@@ -232,37 +234,33 @@ MM_reloadPage(true);
 					</tr>
 
 
+
 					<tr>
 	 				 	<td class="formlabel" align=right> 
 							<bean:message key="label.feedback.incorrect"/>
 						</td>
-						<td class="formcontrol">
+						<td class="formcontrol" colspan=3>
 							<FCK:editor id="richTextFeedbackInCorrect" basePath="/lams/fckeditor/">
 								  <c:out value="${sessionScope.richTextFeedbackInCorrect}" escapeXml="false" />						  
 							</FCK:editor>
 						</td> 
-						<td>&nbsp </td>  
-						<td> &nbsp </td>
-						
 					</tr>
 					
 					<tr>
 	 				 	<td class="formlabel" align=right> 
 							<bean:message key="label.feedback.correct"/>
 						</td>
-						<td class="formcontrol">
+						<td class="formcontrol" colspan=3>
 							<FCK:editor id="richTextFeedbackCorrect" basePath="/lams/fckeditor/">
 								  <c:out value="${sessionScope.richTextFeedbackCorrect}" escapeXml="false" />						  
 							</FCK:editor>
 						</td> 
-						<td> &nbsp</td> 
-						<td> &nbsp</td>
 					</tr>
-					
-					
+
+			
 	 				 <tr>
 	 				 <td> &nbsp</td>
-	 				 <td class="input" colspan=3 align=left>
+	 				 <td class="input" align=left colspan=3>
 							<html:submit property="doneOptions" styleClass="linkbutton" 
 							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 								<bean:message key="button.done"/>
