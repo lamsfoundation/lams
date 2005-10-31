@@ -109,7 +109,7 @@ public class MainExportServlet extends HttpServlet {
 		String htmlOutput=null;
 	
 		Portfolio[] portfolios = null;
-		String mode = WebUtil.readStrParam(request, WebUtil.PARAM_MODE);
+		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
 		
 			if (mode.equals(ToolAccessMode.LEARNER.toString()))
 			{

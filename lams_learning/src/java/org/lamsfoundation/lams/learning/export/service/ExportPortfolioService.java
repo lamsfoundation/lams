@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+
 import javax.servlet.http.Cookie;
 
 import org.apache.log4j.Logger;
@@ -60,12 +61,13 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
+import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 
@@ -293,13 +295,13 @@ public class ExportPortfolioService implements IExportPortfolioService {
 					    log.error(error);
 					    throw new ExportPortfolioException(error);
 					}
-					mapOfValuesToAppend.put(WebUtil.PARAM_MODE, ToolAccessMode.LEARNER.toString());
-					mapOfValuesToAppend.put(WebUtil.PARAM_USER_ID_NEW, user.getUserId().toString());
+					mapOfValuesToAppend.put(AttributeNames.PARAM_MODE, ToolAccessMode.LEARNER.toString());
+					mapOfValuesToAppend.put(AttributeNames.PARAM_USER_ID, user.getUserId().toString());
 					mapOfValuesToAppend.put("toolSessionId", toolSession.getToolSessionId().toString());
 				}
 				else if (accessMode == ToolAccessMode.TEACHER)
 				{
-					mapOfValuesToAppend.put(WebUtil.PARAM_MODE, ToolAccessMode.TEACHER.toString());
+					mapOfValuesToAppend.put(AttributeNames.PARAM_MODE, ToolAccessMode.TEACHER.toString());
 					mapOfValuesToAppend.put("toolContentId", toolActivity.getToolContentId().toString());
 				}
 				
@@ -441,7 +443,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		
 			//for security reasons, append the relative directory name to the end of the export url instead of the whole path
 			String relativePath = activitySubDirectory.substring(ExportPortfolioConstants.TEMP_DIRECTORY.length()+1, activitySubDirectory.length());
-			exportURL = WebUtil.appendParameterToURL(portfolio.getExportUrl(), WebUtil.PARAM_DIRECTORY_NAME, relativePath);
+			exportURL = WebUtil.appendParameterToURL(portfolio.getExportUrl(), AttributeNames.PARAM_DIRECTORY_NAME, relativePath);
 			
 			String absoluteExportURL = ExportPortfolioConstants.HOST + exportURL;		
 					

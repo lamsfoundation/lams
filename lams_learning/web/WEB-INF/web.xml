@@ -35,7 +35,12 @@ http://www.gnu.org/licenses/gpl.txt
 		classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
-		classpath*:applicationContext.xml
+		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
+		classpath:/org/lamsfoundation/lams/tool/imscp/applicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/survey/applicationContext.xml
 	</param-value>
 </context-param>
 <listener>
@@ -67,7 +72,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 <filter>
 	<filter-name>HibernateFilter</filter-name>
-	<filter-class>org.springframework.orm.hibernate.support.OpenSessionInViewFilter</filter-class>
+	<filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
 	<init-param>
 		<param-name>sessionFactoryBeanName</param-name>
 		<param-value>coreSessionFactory</param-value>
@@ -76,6 +81,13 @@ http://www.gnu.org/licenses/gpl.txt
 		<param-name>singleSession</param-name>
 		<param-value>false</param-value>
 	</init-param>
+</filter>
+
+<filter>
+       <filter-name>SystemSessionFilter</filter-name>
+         <filter-class>
+		   org.lamsfoundation.lams.web.session.SystemSessionFilter
+         </filter-class>
 </filter>
 
   <!--
@@ -105,6 +117,11 @@ http://www.gnu.org/licenses/gpl.txt
 <filter-mapping>
 	<filter-name>HibernateFilter</filter-name>
 	<url-pattern>*.jsp</url-pattern>
+</filter-mapping>
+
+<filter-mapping>
+    <filter-name>SystemSessionFilter</filter-name>
+     <url-pattern>/*</url-pattern>
 </filter-mapping>
 
     <!--
@@ -161,6 +178,19 @@ http://www.gnu.org/licenses/gpl.txt
     <load-on-startup>2</load-on-startup>
 </servlet>
 
+<servlet>
+		<servlet-name>exportPortfolio</servlet-name>
+		<display-name>Export Portfolio</display-name>
+		<description>Export Portfolio</description>		
+		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.MainExportServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>exportDownload</servlet-name>
+		<display-name>Export Portfolio Download</display-name>
+		<description>Export Portfolio Download Page</description>		
+		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportDownloadServlet</servlet-class>
+	</servlet>
+
   <!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
@@ -187,6 +217,16 @@ http://www.gnu.org/licenses/gpl.txt
     <url-pattern>*.do</url-pattern>
 </servlet-mapping>
 
+<servlet-mapping>
+		<servlet-name>exportPortfolio</servlet-name>
+		<url-pattern>/portfolioExport</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+		<servlet-name>exportDownload</servlet-name>
+		<url-pattern>/exportDownload</url-pattern>
+</servlet-mapping>
+
    <session-config>
       <session-timeout>120</session-timeout>
    </session-config>
@@ -198,12 +238,10 @@ http://www.gnu.org/licenses/gpl.txt
    <!ELEMENT mime-mapping (extension, mime-type)>
    -->
 
-   <!--
-   To specify error pages, create a file named error-pages.xml, put it in your project's mergedir.
-   Organize error-pages.xml following this DTD slice:
-
-   <!ELEMENT error-page ((error-code | exception-type), location)>
-   -->
+  <error-page>
+	<error-code>403</error-code>
+	<location>/403.html</location>
+</error-page>  
 
   <!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
@@ -285,24 +323,40 @@ http://www.gnu.org/licenses/gpl.txt
 	<taglib-location>/WEB-INF/jstl/x-rt.tld</taglib-location>
 </taglib>
 
-   <!--
-   To set up security settings for your web app, create a file named web-security.xml, put it in your project's mergedir.
-   Organize web-security.xml following this DTD slice:
+  	<!--  Security Constraint -->
+	<security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>LEARNER</role-name>
+    		<role-name>TEACHER</role-name>
+    		<role-name>STAFF</role-name>
+    		<role-name>AUTHOR</role-name>
+    		<role-name>ADMIN</role-name>
+    		<role-name>SYSADMIN</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-   <!ELEMENT security-constraint (display-name?, web-resource-collection+, auth-constraint?, user-data-constraint?)>
-   <!ELEMENT web-resource-collection (web-resource-name, description?, url-pattern*, http-method*)>
-   <!ELEMENT web-resource-name (#PCDATA)>
-   <!ELEMENT url-pattern (#PCDATA)>
-   <!ELEMENT http-method (#PCDATA)>
-   <!ELEMENT user-data-constraint (description?, transport-guarantee)>
-   <!ELEMENT transport-guarantee (#PCDATA)>
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Export</web-resource-name>
+		    <url-pattern>/portfolioExport</url-pattern>
+		 </web-resource-collection>
+    	<auth-constraint>
+    		<role-name>AUTHOR</role-name> <!-- have to change this to TEACHER have it as AUTHOR so that I can test it with user mmm -->
+			<role-name>LEARNER</role-name>
+    	</auth-constraint>
+    </security-constraint>
 
-   <!ELEMENT login-config (auth-method?, realm-name?, form-login-config?)>
-   <!ELEMENT auth-method (#PCDATA)>
-   <!ELEMENT realm-name (#PCDATA)>
-   <!ELEMENT form-login-config (form-login-page, form-error-page)>
-   <!ELEMENT form-login-page (#PCDATA)>
-   <!ELEMENT form-error-page (#PCDATA)>
-   -->
+	<!--  Login Configuration -->
+  	<login-config>
+   		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+   		<form-login-config>
+    		<form-login-page>/login.jsp</form-login-page>
+   		</form-login-config>
+   	</login-config>
 
 </web-app>

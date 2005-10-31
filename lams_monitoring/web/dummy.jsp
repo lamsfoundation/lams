@@ -133,7 +133,7 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 				</c:if><BR>
 			Completed Activities:<BR>
 			<c:forEach var="completed" items="${progress.completedActivities}">
-				<A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoLearnerActivityURL&userID=<c:out value="${progress.user.userId}"/>&activityID=<c:out value="${progress.completed.activityId}"/>');">View</A> <c:out value="${progress.completed.title}"/><BR>
+				<A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoLearnerActivityURL&userID=<c:out value="${progress.user.userId}"/>&activityID=<c:out value="${completed.activityId}"/>');">View</A> <c:out value="${completed.title}"/><BR>
 			</c:forEach>
 			</TD>
 		</TR>

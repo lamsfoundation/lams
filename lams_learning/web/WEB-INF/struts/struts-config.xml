@@ -86,21 +86,6 @@ http://www.gnu.org/licenses/gpl.txt
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/DisplayOptionsActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayOptionsActivityAction"
-      name="optionsActivityForm"
-      scope="request"
-      input="/Activity.do"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="displayOptions"
-        path=".optionsActivity"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/gate"
       type="org.lamsfoundation.lams.learning.web.action.GateAction"
       parameter="method"
@@ -117,6 +102,21 @@ http://www.gnu.org/licenses/gpl.txt
       <forward
         name="waiting"
         path=".gateWaiting"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/DisplayOptionsActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayOptionsActivityAction"
+      name="optionsActivityForm"
+      scope="request"
+      input="/Activity.do"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayOptions"
+        path=".optionsActivity"
         redirect="false"
       />
     </action>
@@ -269,8 +269,6 @@ http://www.gnu.org/licenses/gpl.txt
     <action
       path="/exportPortfolio"
       type="org.lamsfoundation.lams.learning.export.web.action.ExportPortfolioAction"
-      name="activityForm"
-      scope="request"
       unknown="false"
       validate="false"
     >
@@ -282,8 +280,18 @@ http://www.gnu.org/licenses/gpl.txt
         scope="request"
       />
       <forward
+        name="displayPrintVersion"
+        path="/exportPortfolioPrintVersion.jsp"
+        redirect="false"
+      />
+      <forward
         name="displayPortfolio"
         path="/exportPortfolio.jsp"
+        redirect="false"
+      />
+      <forward
+        name="loadExportPage"
+        path="/exportWaitingPage.jsp"
         redirect="false"
       />
     </action>

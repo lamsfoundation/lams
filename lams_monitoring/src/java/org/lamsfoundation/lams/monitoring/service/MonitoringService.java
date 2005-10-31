@@ -328,11 +328,9 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         {
             Activity activity = (Activity) i.next();
             System.out.println(activity);
-            //TODO this is for testing purpose as survey is the only tool available
-            //so far.
             if ( activity.getActivityTypeId().intValue() == Activity.TOOL_ACTIVITY_TYPE ) {
             	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId()); 
-				if (shouldInitToolSessionFor(toolActivity)&&this.isSurvey(toolActivity))
+				if (shouldInitToolSessionFor(toolActivity))
 					initToolSessionFor((ToolActivity) activity,
                                    requestedLesson.getAllLearners(),
                                    requestedLesson);
@@ -565,7 +563,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 				Long toolContentId = toolActivity.getToolContentId();
 				if ( url !=null &&  toolContentId != null ) {
 					url = WebUtil.appendParameterToURL(url,
-								AttributeNames.TOOL_CONTENT_ID,
+								AttributeNames.PARAM_TOOL_CONTENT_ID,
 								toolActivity.getToolContentId().toString());
 					flashMessage = new FlashMessage("getActivityDefineLaterURL",new ProgressActivityDTO(activityID, url));
 				} else {
@@ -591,7 +589,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 				Long toolContentId = toolActivity.getToolContentId();
 				if ( url !=null &&  toolContentId != null ) {
 					url = WebUtil.appendParameterToURL(url,
-								AttributeNames.TOOL_CONTENT_ID,
+								AttributeNames.PARAM_TOOL_CONTENT_ID,
 								toolActivity.getToolContentId().toString());
 					flashMessage = new FlashMessage("getActivityMonitorURL",new ProgressActivityDTO(activityID, url));
 				} else {
@@ -791,16 +789,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         return newLessonClass;
     }
 
-    /**
-     * This is more for testing purpose. 
-     * @param toolActivity the tool activity defined in the design.
-     * @return
-     */
-    private boolean isSurvey(ToolActivity toolActivity)
-    {
-        return toolActivity.getTool().getServiceName().equals("surveyService");
-    }
-    
     //---------------------------------------------------------------------
     // Helper Methods - start lesson
     //---------------------------------------------------------------------

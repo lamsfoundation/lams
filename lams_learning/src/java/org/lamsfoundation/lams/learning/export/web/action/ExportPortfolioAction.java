@@ -77,7 +77,7 @@ public class ExportPortfolioAction extends LamsAction {
 						            HttpServletResponse response) throws ExportPortfolioException
 	{
 		Portfolio[] portfolios = null;
-		String mode = WebUtil.readStrParam(request, WebUtil.PARAM_MODE);
+		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
 		IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(getServlet().getServletContext());
 		
 		//get the cookies that came along with the request and pass it onto export service method
