@@ -1,5 +1,5 @@
 <%@ include file="/includes/taglibs.jsp"%>
-<%@ taglib uri="/WEB-INF/struts/struts-tiles.tld" prefix="tiles"%>
+<%@ taglib uri="tags-tiles" prefix="tiles"%>
 <html>
 <tiles:insert attribute="header" />
 <body>

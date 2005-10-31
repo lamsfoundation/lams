@@ -1,25 +1,54 @@
-<div align="center"><script type="text/javascript"
-	src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>"></script>
+<div align="center">
+<script type="text/javascript"	src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>">
+</script>
+<script type="text/javascript">
+	function popupable(url,name){
+
+	if(window.opener == null)
+		//it is not in popup window, so pops it up
+		launchPopup(url,name);
+	else
+		//it is already a popup window, then just load it
+		location.href=url;
+	}
+</script>
 <div id="topiclist">
-<table width="100%" cellspacing="8" align="CENTER" cellspacing="3"
-	cellpadding="3" class="form">
-	<tr>
-		<td valign="MIDDLE"><b>Topic</b></td>
-		<td colspan="2" />
-	</tr>
-	<c:forEach items="${topicList}" var="topic" varStatus="status">
+	<div id="datatablecontainer">
+	<table width="100%" align="CENTER" 	class="form">
 		<tr>
-			<td valign="MIDDLE"><c:out value="${topic.subject}" /></td>
-			<td colspan="2" valign="MIDDLE">
-			<c:set var="deletetopic">
-				<html:rewrite page="/authoring/deleteTopic.do?topicIndex=${status.index}" />
-			</c:set> 
-			<html:link href="javascript:loadDoc('${deletetopic}','topiclist')">
-				<b><fmt:message key="label.delete" /></b>
-			</html:link>
-			</td>
+			<td valign="MIDDLE"><b>Topic</b></td>
+			<td colspan="3" />
 		</tr>
-	</c:forEach>
-</table>
+		<tr>
+			<th scope="col" width="50%" colspan="2"><fmt:message key="lable.topic.title.subject"/></th>
+			<th scope="col" width="25%"><fmt:message key="lable.topic.title.startedby"/></th>
+			<th scope="col" width="25%"><fmt:message key="lable.topic.title.update"/></th>
+		</tr>
+		<c:forEach items="${topicList}" var="topic" varStatus="status">
+			<tr>
+				<td valign="MIDDLE" width="48%">
+					<c:set var="viewtopic">
+						<html:rewrite page="/authoring/viewTopic.do?topicIndex=${status.index}&create=${topic.message.created.time}" />
+					</c:set> 
+					<html:link href="javascript:popupable('${viewtopic}','topiclist')">
+						<c:out value="${topic.message.subject}" />
+					</html:link>
+				</td>
+				<td width="2%">
+					<c:if test="${topic.hasAttachment}">
+						<img src="<html:rewrite page="/images/paperclip.gif"/>">
+					</c:if>
+				</td>
+				<td>
+					<c:out value="${topic.author}"/>
+				</td>
+				<td>
+					<fmt:formatDate value="${topic.message.updated}" type="time" timeStyle="short" />
+					<fmt:formatDate value="${topic.message.updated}" type="date" dateStyle="full" />
+				</td>
+			</tr>
+		</c:forEach>
+	</table>
+	</div>
 </div>
 </div>

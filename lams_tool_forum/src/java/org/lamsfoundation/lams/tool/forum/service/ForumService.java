@@ -3,7 +3,6 @@ package org.lamsfoundation.lams.tool.forum.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +17,7 @@ import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -52,10 +52,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private ForumToolContentHandler toolContentHandler;
 	private IRepositoryService repositoryService;
 	
-    public Forum createForum(Forum forum) throws PersistenceException {
-    	forumDao.save(forum);
-        return forum;
-    }
 
     public Forum editForum(Forum forum) throws PersistenceException {
         forumDao.saveOrUpdate(forum);
@@ -315,5 +311,19 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	public void setRepositoryService(IRepositoryService repositoryService) {
 		this.repositoryService = repositoryService;
+	}
+
+	public Attachment uploadAttachment(FormFile uploadFile) throws PersistenceException {
+		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
+			throw new ForumException("Could not find upload file: " + uploadFile);
+		
+		NodeKey nodeKey = processFile(uploadFile,IToolContentHandler.TYPE_ONLINE);
+		Attachment file = new Attachment();
+		file.setFileType(IToolContentHandler.TYPE_ONLINE);
+		file.setFileUuid(nodeKey.getUuid());
+		file.setFileVersionId(nodeKey.getVersion());
+		file.setFileName(uploadFile.getFileName());
+		
+		return file;
 	}
 }

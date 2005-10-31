@@ -116,8 +116,28 @@
 		</action>
 		<action path="/authoring/viewTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
-			input="tiles:/authoring/forum/create" 
-			parameter="viewTopic">
+			name="messageForm" 
+			validate="false"
+			parameter="viewTopic"
+			scope="request">
+			<forward name="success" path="tiles:/authoring/forum/viewTopic" />
+		</action>
+		<action path="/authoring/editTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			name="messageForm" 
+			validate="false"
+			parameter="editTopic"
+			scope="request">
+			<forward name="success" path="tiles:/authoring/forum/editTopic" />
+		</action>
+		<action path="/authoring/updateTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			name="messageForm" 
+			validate="true"
+			input="tiles:/authoring/forum/editTopic" 
+			parameter="updateTopic"
+			scope="request">
+			<forward name="success" path="/authoring/viewTopic.do" />
 		</action>
 		<action path="/authoring/finishTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"

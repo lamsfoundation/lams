@@ -1,9 +1,10 @@
 package org.lamsfoundation.lams.tool.forum.web.forms;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.upload.FormFile;
 import org.apache.struts.validator.ValidatorForm;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
@@ -17,12 +18,15 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
  * Time: 15:44:47
  */
 public class MessageForm extends ValidatorForm {
+	private static final long serialVersionUID = -9054365604649146734L;
+	
 	private static Logger logger = Logger.getLogger(ForumForm.class.getName());
     protected Message message;
     protected Long forumId;
     protected Long parentId;
     protected Long topicId;
     private String attachmentName;
+    private FormFile attachmentFile;
     
     public MessageForm() {
     	message = new Message();
@@ -63,14 +67,13 @@ public class MessageForm extends ValidatorForm {
     public ActionErrors validate(ActionMapping mapping,
                                  javax.servlet.http.HttpServletRequest request) {
         ActionErrors errors = super.validate(mapping, request);
-        ActionError ae;
         try{
             if ("".equals(message.getSubject())) {
-               ActionError error = new ActionError("error.valueReqd");
+               ActionMessage error = new ActionMessage("error.valueReqd");
                errors.add("message.subject", error);
             }
             if ("".equals(message.getBody())) {
-               ActionError error = new ActionError("error.valueReqd");
+            	ActionMessage error = new ActionMessage("error.valueReqd");
                errors.add("message.body", error);
             }
         } catch (Exception e) {
@@ -86,5 +89,15 @@ public class MessageForm extends ValidatorForm {
 	public void setAttachmentName(String attachmentName) {
 		this.attachmentName = attachmentName;
 	}
+
+	public FormFile getAttachmentFile() {
+		return attachmentFile;
+	}
+
+	public void setAttachmentFile(FormFile attachmentFile) {
+		this.attachmentFile = attachmentFile;
+	}
+
+
 
 }

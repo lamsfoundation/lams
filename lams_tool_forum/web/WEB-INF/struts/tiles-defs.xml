@@ -25,6 +25,14 @@
     	<put name="pageTitleKey" value="title.message.add"/>
     	<put name="body" value="/jsps/authoring/message/create.jsp"/>
 	</definition>
+	<definition name="tiles:/authoring/forum/viewTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.view"/>
+    	<put name="body" value="/jsps/authoring/message/view.jsp"/>
+	</definition>
+	<definition name="tiles:/authoring/forum/editTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.view"/>
+    	<put name="body" value="/jsps/authoring/message/edit.jsp"/>
+	</definition>
 	
     <definition name="tiles:/authoring/forum/edit" path="/includes/tabsLayout.jsp" >
        	<put name="pageIcon" value="icon_settings_s.gif"/>

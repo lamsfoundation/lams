@@ -1,7 +1,6 @@
 package org.lamsfoundation.lams.tool.forum.service;
 
 import java.util.List;
-import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
@@ -18,7 +17,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
  */
 public interface IForumService {
 
-    public Forum createForum(Forum forum) throws PersistenceException;
     public Forum editForum(Forum forum) throws PersistenceException;
     public Forum getForum(Long forumId) throws PersistenceException;
     public Forum getForumByContentId(Long contentID) throws PersistenceException;
@@ -32,6 +30,15 @@ public interface IForumService {
     public void deleteMessage(Long messageId) throws PersistenceException;
     public Message replyToMessage(Long parentId, Message message) throws PersistenceException;
 	public Attachment uploadInstructionFile(Long contentId, FormFile file, String type) throws PersistenceException;
+	/**
+	 * This method only upload the given file into system repository. It does not execute any database operation.
+	 * 
+	 * @param file
+	 * @return Attachment 
+	 * 		A new instance of attachment has uploaded file VersionID and UUID information.
+	 * @throws PersistenceException
+	 */
+	public Attachment uploadAttachment(FormFile file) throws PersistenceException;
 	public void deleteInstructionFile(Long contentID, Long uuID, Long versionID, String type) throws PersistenceException;
 	public void deleteFromRepository(Long uuID, Long versionID) throws PersistenceException;
 

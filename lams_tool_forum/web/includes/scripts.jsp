@@ -114,4 +114,12 @@
 		// Remove old objects
 		theSourceList.options.length = 0; 
 	}
+	
+	
+
+	function closeWin(){
+		window.opener.parent.location.href = "<html:rewrite page='/authoring/finishTopic.do'/>";
+		window.close();
+	}
+		
 //-->
