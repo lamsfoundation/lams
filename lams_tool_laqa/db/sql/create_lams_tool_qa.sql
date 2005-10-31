@@ -28,7 +28,7 @@ CREATE TABLE tl_laqa11_session (
      , PRIMARY KEY (qa_session_id)
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_session_1 FOREIGN KEY (qa_content_id)
-                  REFERENCES lams.tl_laqa11_content (qa_content_id)
+                  REFERENCES tl_laqa11_content (qa_content_id)
 )TYPE=InnoDB;
 
 CREATE TABLE tl_laqa11_que_usr (
@@ -39,7 +39,7 @@ CREATE TABLE tl_laqa11_que_usr (
      , PRIMARY KEY (que_usr_id)
      , INDEX (qa_session_id)
      , CONSTRAINT FK_tl_laqa11_que_usr_2 FOREIGN KEY (qa_session_id)
-                  REFERENCES lams.tl_laqa11_session (qa_session_id)
+                  REFERENCES tl_laqa11_session (qa_session_id)
 )TYPE=InnoDB;
 
 CREATE TABLE tl_laqa11_que_content (
@@ -50,7 +50,7 @@ CREATE TABLE tl_laqa11_que_content (
      , PRIMARY KEY (qa_que_content_id)
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_que_content_1 FOREIGN KEY (qa_content_id)
-                  REFERENCES lams.tl_laqa11_content (qa_content_id)
+                  REFERENCES tl_laqa11_content (qa_content_id)
 )TYPE=InnoDB;
 
 CREATE TABLE tl_laqa11_usr_resp (
@@ -64,10 +64,10 @@ CREATE TABLE tl_laqa11_usr_resp (
      , PRIMARY KEY (response_id)
      , INDEX (qa_que_content_id)
      , CONSTRAINT FK_tl_laqa11_usr_resp_2 FOREIGN KEY (qa_que_content_id)
-                  REFERENCES lams.tl_laqa11_que_content (qa_que_content_id)
+                  REFERENCES tl_laqa11_que_content (qa_que_content_id)
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_laqa11_usr_resp_3 FOREIGN KEY (que_usr_id)
-                  REFERENCES lams.tl_laqa11_que_usr (que_usr_id)
+                  REFERENCES tl_laqa11_que_usr (que_usr_id)
 )TYPE=InnoDB;
 
 CREATE TABLE tl_laqa11_uploadedFile (
@@ -79,7 +79,7 @@ CREATE TABLE tl_laqa11_uploadedFile (
      , PRIMARY KEY (submissionId)
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_que_content_1_1 FOREIGN KEY (qa_content_id)
-                  REFERENCES lams.tl_laqa11_content (qa_content_id)
+                  REFERENCES tl_laqa11_content (qa_content_id)
 )TYPE=InnoDB;
 
 

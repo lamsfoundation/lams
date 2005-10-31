@@ -24,7 +24,7 @@ CREATE TABLE tl_lanb11_session (
      , PRIMARY KEY (uid)
      , INDEX (nb_content_uid)
      , CONSTRAINT FK_tl_lanb11_session_1 FOREIGN KEY (nb_content_uid)
-                  REFERENCES lams.tl_lanb11_content (uid)
+                  REFERENCES tl_lanb11_content (uid)
 )TYPE=InnoDB;
 
 CREATE TABLE tl_lanb11_user (
@@ -37,7 +37,7 @@ CREATE TABLE tl_lanb11_user (
      , PRIMARY KEY (uid)
      , INDEX (nb_session_uid)
      , CONSTRAINT FK_tl_lanb11_user_1 FOREIGN KEY (nb_session_uid)
-                  REFERENCES lams.tl_lanb11_session (uid)
+                  REFERENCES tl_lanb11_session (uid)
 )TYPE=InnoDB;
 
 
@@ -51,7 +51,7 @@ CREATE TABLE tl_lanb11_attachment (
      , PRIMARY KEY (attachment_id)
      , INDEX (nb_content_uid)
      , CONSTRAINT FK_tl_lanb11_attachment_1 FOREIGN KEY (nb_content_uid)
-                  REFERENCES lams.tl_lanb11_content (uid)
+                  REFERENCES tl_lanb11_content (uid)
 )TYPE=InnoDB;
 
 -- Default Content For Noticeboard Tool
