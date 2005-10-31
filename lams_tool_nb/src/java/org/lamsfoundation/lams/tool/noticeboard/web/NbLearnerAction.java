@@ -98,8 +98,8 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
     public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException, ToolException, DataMissingException, ServletException, IOException {
 		
 	  NbLearnerForm learnerForm = (NbLearnerForm)form;
-	  Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionId());
-	  Long userID = NbWebUtil.convertToLong(learnerForm.getUserId());
+	  Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
+	  Long userID = NbWebUtil.convertToLong(learnerForm.getUserID());
 	  
 	  if (toolSessionID == null || userID == null)
 	  {
@@ -126,7 +126,7 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 		   * currently only the userId is set. There is no username or any other information
 		   */
 		  User user = new User();
-		  user.setUserId(new Integer(learnerForm.getUserId().toString()));
+		  user.setUserId(new Integer(learnerForm.getUserID().toString()));
 		 
 		 /**
 		  * TODO: when this method is called, it throws a NullPointerException.
@@ -140,7 +140,7 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 		  String nextActivityUrl;
 			try
 			{
-				nextActivityUrl = sessionMgrService.leaveToolSession(NbWebUtil.convertToLong(learnerForm.getToolSessionId()), user);
+				nextActivityUrl = sessionMgrService.leaveToolSession(NbWebUtil.convertToLong(learnerForm.getToolSessionID()), user);
 			}
 			catch (DataMissingException e)
 			{

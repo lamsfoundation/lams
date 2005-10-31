@@ -56,7 +56,7 @@ public class NbMonitoringForm extends ActionForm {
     static Logger logger = Logger.getLogger(NbMonitoringForm.class.getName());
     
        
-    private String toolContentId;
+    private String toolContentID;
     
     private String method;
     
@@ -110,14 +110,14 @@ public class NbMonitoringForm extends ActionForm {
     /**
      * @return Returns the toolContentId.
      */
-    public String getToolContentId() {
-        return toolContentId;
+    public String getToolContentID() {
+        return toolContentID;
     }
     /**
      * @param toolContentId The toolContentId to set.
      */
-    public void setToolContentId(String toolContentId) {
-        this.toolContentId = toolContentId;
+    public void setToolContentID(String toolContentId) {
+        this.toolContentID = toolContentId;
     }
     
     public void reset(ActionMapping mapping, HttpServletRequest request)

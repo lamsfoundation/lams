@@ -48,11 +48,11 @@ public class NbLearnerForm extends ActionForm{
     
     private String content;
     
-    private String userId;
+    private String userID;
     
-    private String toolSessionId;
+    private String toolSessionID;
     
-    private String toolContentId;
+    private String toolContentID;
     
     private String method;
     
@@ -63,38 +63,38 @@ public class NbLearnerForm extends ActionForm{
     /**
      * @return Returns the toolContentID.
      */
-    public String getToolContentId() {
-        return toolContentId;
+    public String getToolContentID() {
+        return toolContentID;
     }
     /**
      * @param toolContentID The toolContentID to set.
      */
-    public void setToolContentId(String toolContentID) {
-        this.toolContentId = toolContentID;
+    public void setToolContentID(String toolContentID) {
+        this.toolContentID = toolContentID;
     }
     /**
      * @return Returns the toolSessionID.
      */
-    public String getToolSessionId() {
-        return toolSessionId;
+    public String getToolSessionID() {
+        return toolSessionID;
     }
     /**
      * @param toolSessionID The toolSessionID to set.
      */
-    public void setToolSessionId(String toolSessionID) {
-        this.toolSessionId = toolSessionID;
+    public void setToolSessionID(String toolSessionID) {
+        this.toolSessionID = toolSessionID;
     }
     /**
      * @return Returns the userID.
      */
-    public String getUserId() {
-        return userId;
+    public String getUserID() {
+        return userID;
     }
     /**
      * @param userID The userID to set.
      */
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserID(String userId) {
+        this.userID = userId;
     }
     /**
      * @return Returns the content.
@@ -138,9 +138,9 @@ public class NbLearnerForm extends ActionForm{
 	{
 		this.content = null;
 		this.title = null;
-		this.toolContentId = null;
-		this.toolSessionId = null;
-		this.userId = null;
+		this.toolContentID = null;
+		this.toolSessionID = null;
+		this.userID = null;
 		this.method = null;
 		this.mode = null;
 			

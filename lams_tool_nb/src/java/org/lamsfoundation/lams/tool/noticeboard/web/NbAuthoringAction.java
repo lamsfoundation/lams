@@ -214,14 +214,14 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		copyAuthoringFormValuesIntoFormBean(request, nbForm);
 		
 		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-		String idAsString = nbForm.getToolContentId();
+		String idAsString = nbForm.getToolContentID();
 		if (idAsString == null)
 		{
 		    String error = "Unable to continue. Tool content id missing";
 		    logger.error(error);
 			throw new NbApplicationException(error);
 		}
-		Long content_id = NbWebUtil.convertToLong(nbForm.getToolContentId());
+		Long content_id = NbWebUtil.convertToLong(nbForm.getToolContentID());
 		
 		//throws exception if the content id does not exist
 		checkContentId(content_id);
@@ -259,7 +259,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 	    	FormFile theFile;
 	    	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 			
-	    	Long content_id = NbWebUtil.convertToLong(nbForm.getToolContentId());
+	    	Long content_id = NbWebUtil.convertToLong(nbForm.getToolContentID());
 			//throws exception if the content id does not exist
 			checkContentId(content_id);
 			NoticeboardContent nbContent = nbService.retrieveNoticeboard(content_id);

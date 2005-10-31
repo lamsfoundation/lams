@@ -138,7 +138,7 @@ public class NbAuthoringStarterAction extends LamsAction {
 		    logger.error(error);
 			throw new NbApplicationException(error);
 		}
-		nbForm.setToolContentId(contentId.toString());
+		nbForm.setToolContentID(contentId.toString());
 		
 		/* if there is a defineLater request parameter, set the form value
 		 * If a defineLater request parameter is not present, then it is just set to null.

@@ -119,7 +119,7 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
         NbMonitoringForm monitorForm = (NbMonitoringForm)form;                
       
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentId());
+        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentID());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 		NbWebUtil.copyValuesIntoSession(request, content);
 		if (NbWebUtil.isContentEditable(content))
@@ -130,7 +130,7 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
 		    
 		    //set up the request parameters to append to the URL
 		    Map map = new HashMap();
-		    map.put(NoticeboardConstants.TOOL_CONTENT_ID, monitorForm.getToolContentId());
+		    map.put(NoticeboardConstants.TOOL_CONTENT_ID, monitorForm.getToolContentID());
 		    map.put(NoticeboardConstants.DEFINE_LATER, "true");
 		    
 		    monitorForm.setParametersToAppend(map);
@@ -166,7 +166,7 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
         
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         NbMonitoringForm monitorForm = (NbMonitoringForm)form;
-        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentId());
+        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentID());
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 		NbWebUtil.copyValuesIntoSession(request, content);
 		
@@ -205,7 +205,7 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
        // Long toolContentId = getToolContentId(request);
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         NbMonitoringForm monitorForm = (NbMonitoringForm)form;
-        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentId());
+        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentID());
    		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
    		NbWebUtil.copyValuesIntoSession(request, content);
         
@@ -229,7 +229,7 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
         Map map = new HashMap();
        // Long toolContentId = getToolContentId(request);
         NbMonitoringForm monitorForm = (NbMonitoringForm)form;
-        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentId());
+        Long toolContentId = NbWebUtil.convertToLong(monitorForm.getToolContentID());
         
         NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
         

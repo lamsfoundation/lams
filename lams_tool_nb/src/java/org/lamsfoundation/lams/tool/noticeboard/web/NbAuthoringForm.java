@@ -85,7 +85,7 @@ public class NbAuthoringForm extends ActionForm {
 	private String offlineInstructions;
 	
 	private String method;
-	private String toolContentId;
+	private String toolContentID;
 	private String defineLater;
 	
 	private FormFile onlineFile;
@@ -218,14 +218,14 @@ public class NbAuthoringForm extends ActionForm {
 	/**
 	 * @return Returns the toolContentID.
 	 */
-	public String getToolContentId() {
-		return toolContentId;
+	public String getToolContentID() {
+		return toolContentID;
 	}
 	/**
 	 * @param toolContentID The toolContentID to set.
 	 */
-	public void setToolContentId(String toolContentID) {
-		this.toolContentId = toolContentID;
+	public void setToolContentID(String toolContentID) {
+		this.toolContentID = toolContentID;
 	}
 
 	public void reset(ActionMapping mapping, HttpServletRequest request)

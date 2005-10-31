@@ -110,8 +110,8 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         ActionMessages message = new ActionMessages();
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         
-        Long userId = NbWebUtil.convertToLong(learnerForm.getUserId());
-        Long toolSessionId = NbWebUtil.convertToLong(learnerForm.getToolSessionId());
+        Long userId = NbWebUtil.convertToLong(learnerForm.getUserID());
+        Long toolSessionId = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
        // Long toolContentId = NbWebUtil.convertToLong(learnerForm.getToolContentId());
         
         if(userId == null || toolSessionId ==null)
@@ -187,8 +187,8 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         ActionMessages message = new ActionMessages();
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         
-        Long userId = NbWebUtil.convertToLong(learnerForm.getUserId());
-        Long toolSessionId = NbWebUtil.convertToLong(learnerForm.getToolSessionId());
+        Long userId = NbWebUtil.convertToLong(learnerForm.getUserID());
+        Long toolSessionId = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
         
         if(userId == null || toolSessionId ==null)
 		{

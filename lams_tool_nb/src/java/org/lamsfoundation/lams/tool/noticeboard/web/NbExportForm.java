@@ -27,9 +27,9 @@ public class NbExportForm extends ActionForm {
     private String title;
 	private String content;
 	
-	private String toolContentId;
-	private String toolSessionId;
-	private String userId;
+	private String toolContentID;
+	private String toolSessionID;
+	private String userID;
 	private String mode;
 	
 	
@@ -86,38 +86,38 @@ public class NbExportForm extends ActionForm {
     /**
      * @return Returns the toolContentId.
      */
-    public String getToolContentId() {
-        return toolContentId;
+    public String getToolContentID() {
+        return toolContentID;
     }
     /**
      * @param toolContentId The toolContentId to set.
      */
-    public void setToolContentId(String toolContentId) {
-        this.toolContentId = toolContentId;
+    public void setToolContentID(String toolContentId) {
+        this.toolContentID = toolContentId;
     }
     /**
      * @return Returns the toolSessionId.
      */
-    public String getToolSessionId() {
-        return toolSessionId;
+    public String getToolSessionID() {
+        return toolSessionID;
     }
     /**
      * @param toolSessionId The toolSessionId to set.
      */
-    public void setToolSessionId(String toolSessionId) {
-        this.toolSessionId = toolSessionId;
+    public void setToolSessionID(String toolSessionId) {
+        this.toolSessionID = toolSessionId;
     }
     /**
      * @return Returns the userId.
      */
-    public String getUserId() {
-        return userId;
+    public String getUserID() {
+        return userID;
     }
     /**
      * @param userId The userId to set.
      */
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserID(String userId) {
+        this.userID = userId;
     }
     
     public void reset()
@@ -125,9 +125,9 @@ public class NbExportForm extends ActionForm {
         this.mode = null;
         this.title = null;
         this.content = null;
-        this.toolContentId = null;
-        this.toolSessionId = null;
-        this.userId = null;
+        this.toolContentID = null;
+        this.toolSessionID = null;
+        this.userID = null;
     }
     
     public void populateForm(NoticeboardContent content)

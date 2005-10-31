@@ -8,11 +8,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.servlet.ExportPortfolioServletException;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author mtruong
@@ -25,7 +26,7 @@ public class NbExportServlet extends AbstractExportPortfolioServlet {
 	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
 	{
 	
-		String mode = WebUtil.readStrParam(request, WebUtil.PARAM_MODE);
+		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
 		Long toolContentId, toolSessionId, userId;
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 

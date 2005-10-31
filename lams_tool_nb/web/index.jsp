@@ -5,13 +5,13 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
-String authorUrl = "/starter/authoring?toolContentId="+355;
-String learnerUrl = "/starter/learner?userId="+555+"&toolSessionId="+455+"&mode=learner";
-String learnerUrlTeacher = "/starter/learner?userId="+555+"&toolSessionId="+455+"&mode=teacher";
-String learnerUrlAuthor = "/starter/learner?userId="+555+"&toolSessionId="+455+"&mode=author";
-String monitoringUrl = "/starter/monitor?toolContentId="+355;
-String exportPortfolioTeacher ="/exportPortfolio.do?mode=teacher&toolContentId=355";
-String exportPortfolioStudent = "/exportPortfolio.do?mode=learner&toolSessionId=455&userId=555";
+String authorUrl = "/starter/authoring?toolContentID="+355;
+String learnerUrl = "/starter/learner?userId="+555+"&toolSessionID="+455+"&mode=learner";
+String learnerUrlTeacher = "/starter/learner?userId="+555+"&toolSessionID="+455+"&mode=teacher";
+String learnerUrlAuthor = "/starter/learner?userId="+555+"&toolSessionID="+455+"&mode=author";
+String monitoringUrl = "/starter/monitor?toolContentID="+355;
+String exportPortfolioTeacher ="/exportPortfolio.do?mode=teacher&toolContentID=355";
+String exportPortfolioStudent = "/exportPortfolio.do?mode=learner&toolSessionID=455&userID=555";
 %>
 
 <%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>

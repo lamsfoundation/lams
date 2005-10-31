@@ -37,7 +37,7 @@
 	<c:if test='${requestScope.isPageEditable == "true"}'>
 		<tr>
 			<td align="right">
-			<!--	<html:link forward="forwardToAuthorPage" paramName="NbMonitoringForm" paramProperty="toolContentId" paramId="toolContentId" styleClass="button">
+			<!--	<html:link forward="forwardToAuthorPage" paramName="NbMonitoringForm" paramProperty="toolContentID" paramId="toolContentID" styleClass="button">
 					<fmt:message key="button.edit" />
 				</html:link> -->
 				<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="button" target="_blank">

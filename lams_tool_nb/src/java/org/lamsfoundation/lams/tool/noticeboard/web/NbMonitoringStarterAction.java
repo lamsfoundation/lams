@@ -90,7 +90,7 @@ public class NbMonitoringStarterAction extends LamsAction {
 		    logger.error(error);
 			throw new NbApplicationException(error);
 		}
-        monitorForm.setToolContentId(toolContentId.toString());
+        monitorForm.setToolContentID(toolContentId.toString());
         
       //  request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE, toolContentId);
         
