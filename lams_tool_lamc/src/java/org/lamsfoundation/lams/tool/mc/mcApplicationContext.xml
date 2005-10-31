@@ -23,7 +23,7 @@
 			  	<value>/org/lamsfoundation/lams/tool/mc/McSession.hbm.xml</value>
 				<value>/org/lamsfoundation/lams/tool/mc/McQueUsr.hbm.xml</value>
 				<value>/org/lamsfoundation/lams/tool/mc/McUsrAttempt.hbm.xml</value>
-
+				<value>/org/lamsfoundation/lams/tool/mc/McUploadedFile.hbm.xml</value>				
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>

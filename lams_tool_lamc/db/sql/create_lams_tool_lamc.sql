@@ -97,3 +97,15 @@ CREATE TABLE lams.tl_lamc11_usr_attempt (
                   REFERENCES lams.tl_lamc11_options_content (uid)
 )TYPE=InnoDB;
 
+CREATE TABLE lams.tl_lamc11_uploadedFile (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , uuid VARCHAR(255) NOT NULL
+     , mc_content_id BIGINT(20) NOT NULL
+     , isOnline_File TINYINT(1) NOT NULL
+     , filename VARCHAR(255) NOT NULL
+     , PRIMARY KEY (uid)
+     , INDEX (mc_content_id)
+     , CONSTRAINT FK_tl_lamc11_uploadedFile FOREIGN KEY (mc_content_id)
+                  REFERENCES lams.tl_lamc11_content (uid)
+)TYPE=InnoDB;
+
