@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -144,11 +145,13 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
      */
     public void notifyToolsToCreateSession(Long toolSessionId, ToolActivity activity) throws ToolException
     {
-        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity);
-
-        sessionManager.createToolSession(toolSessionId,
-                                         activity.getToolContentId());
-        
+    	// TODO remove call to isToolOnClasspath. Should throw an error if tool cannot be found.
+    	if ( isToolOnClasspath(activity) ) {
+	        ToolSessionManager sessionManager = (ToolSessionManager) findToolService(activity);
+	
+	        sessionManager.createToolSession(toolSessionId,
+	                                         activity.getToolContentId());
+    	}
     }
 
     /**
@@ -162,10 +165,10 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     		throws DataMissingException, ToolException
     {
         Long newToolcontentID = contentIDGenerator.getNextToolContentIDFor(toolActivity.getTool());
-        //This is just for testing purpose because surveyService is the only 
-        //service is available at the moment. 
+        //This is just for testing purpose because only some tools are in the learning
+        // classpath
         //TODO we need to remove this once all done.
-        if (isSurvey(toolActivity))
+        if (isToolOnClasspath(toolActivity))
         {
 			ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity);
             contentManager.copyToolContent(toolActivity.getToolContentId(),
@@ -201,19 +204,19 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
             return setupToolURLWithToolSession(activity,
                                                learner,
                                                WebUtil.appendParameterToURL(activity.getTool().getLearnerUrl(),
-                                                                            WebUtil.PARAM_MODE,
+                                                                            AttributeNames.PARAM_MODE,
                                                                             ToolAccessMode.LEARNER.toString()));
         else if(accessMode == ToolAccessMode.TEACHER)
             return setupToolURLWithToolSession(activity,
                                                learner,
                                                WebUtil.appendParameterToURL(activity.getTool().getLearnerUrl(),
-                                                                            WebUtil.PARAM_MODE,
+                                               								AttributeNames.PARAM_MODE,
                                                                             ToolAccessMode.TEACHER.toString()));
         else if (accessMode == ToolAccessMode.AUTHOR)
             return setupToolURLWithToolSession(activity,
                                                learner,
                                                WebUtil.appendParameterToURL(activity.getTool().getLearnerUrl(),
-                                                                            WebUtil.PARAM_MODE,
+                                               								AttributeNames.PARAM_MODE,
                                                                             ToolAccessMode.AUTHOR.toString()));
         
         throw new LamsToolServiceException("Unknown tool access mode:"+accessMode.toString());
@@ -239,8 +242,8 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
         }
         
         return WebUtil.appendParameterToURL(toolURL,
-                                            WebUtil.PARAM_TOOL_SESSION_ID,
-                                            toolSession.getToolSessionId().toString());
+        		AttributeNames.PARAM_TOOL_SESSION_ID,
+				toolSession.getToolSessionId().toString());
     }
     
     /**
@@ -250,8 +253,8 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
                                               String toolURL)
     {
         return WebUtil.appendParameterToURL(toolURL,
-                                            WebUtil.PARAM_CONTENT_ID,
-                                            activity.getToolContentId().toString());
+        		AttributeNames.PARAM_TOOL_CONTENT_ID,
+				activity.getToolContentId().toString());
     }
     //---------------------------------------------------------------------
     // Helper Methods
@@ -270,13 +273,20 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     }
 
     /**
-     * This is more for testing purpose. 
+     * Is this one of the tools that is currently in the learning classpath.
+     * TODO remove when all tools in the test cases are implemented.
      * @param toolActivity the tool activity defined in the design.
      * @return
      */
-    private boolean isSurvey(ToolActivity toolActivity)
+    private boolean isToolOnClasspath(ToolActivity toolActivity)
     {
-        return toolActivity.getTool().getServiceName().equals("surveyService");
+    	String serviceName = toolActivity.getTool().getServiceName(); 
+        if ( serviceName == null )
+        	return false;
+    	
+    	return serviceName.equals("ImscpService") || serviceName.equals("nbService")
+			|| serviceName.equals("qaService") || serviceName.equals("sbmtService")
+			|| serviceName.equals("surveyService");
     }
 
 
