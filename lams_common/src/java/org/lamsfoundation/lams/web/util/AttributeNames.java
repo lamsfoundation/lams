@@ -37,13 +37,22 @@ public class AttributeNames {
 	public static final String ADMIN_ERR_MSG = "errormsg";
 
 	public static final String USER= "user";
-	
-	public static final String TOOL_CONTENT_ID = "toolContentID";
-	public static final String TOOL_SESSION_ID = "toolSessionID"; 
-	public static final String MODE = "mode";
-	public static final String USER_ID = "userID";
-    public static final String ACTIVITY_ID = "activityID";
 
-	
+    public static final String PARAM_MODE = "mode";
+    public static final String PARAM_SESSION_STATUS = "sessionStatus";
+    public static final String PARAM_USER_ID = "userID";
+	public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
+    public static final String PARAM_TOOL_SESSION_ID = "toolSessionID"; 
+    public static final String PARAM_ACTIVITY_ID = "activityID";
+    
+    public static final String PARAM_LESSON_ID = "lessonID";
+    public static final String PARAM_DIRECTORY_NAME = "directoryName";
+    public static final String PARAM_FILENAME = "filename";
+    
+    public static final String ATTR_MODE = "mode";
+    public static final String ATTR_USERNAME = "username";
+    public static final String ATTR_UPDATE_PROGRESS_BAR = "updateProgressBar";
+    public static final String ATTR_SESSION_STATUS = "sessionStatus";
+
 	
 }

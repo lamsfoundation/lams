@@ -27,8 +27,8 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolDataAccessTestCase;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -98,7 +98,7 @@ public class TestLamsCoreToolService extends ToolDataAccessTestCase
         assertNotNull(learnerUrl);
         assertTrue(learnerUrl.indexOf("?")>0);
         assertTrue(learnerUrl.indexOf(ToolAccessMode.LEARNER.toString())>0);
-        assertTrue(learnerUrl.indexOf(WebUtil.PARAM_MODE)>0);
+        assertTrue(learnerUrl.indexOf(AttributeNames.PARAM_MODE)>0);
         log.info("learner url:"+learnerUrl);
     }
     
@@ -110,7 +110,7 @@ public class TestLamsCoreToolService extends ToolDataAccessTestCase
         log.info("monitor url:"+monitorUrl);
         assertTrue(monitorUrl.indexOf("?")>0);
         assertTrue(monitorUrl.indexOf(ToolAccessMode.TEACHER.toString())>0);
-        assertTrue(monitorUrl.indexOf(WebUtil.PARAM_MODE)>0);
+        assertTrue(monitorUrl.indexOf(AttributeNames.PARAM_MODE)>0);
 
     }
     
@@ -122,7 +122,7 @@ public class TestLamsCoreToolService extends ToolDataAccessTestCase
         log.info("author url:"+authorUrl);
         assertTrue(authorUrl.indexOf("?")>0);
         assertTrue(authorUrl.indexOf(ToolAccessMode.AUTHOR.toString())>0);
-        assertTrue(authorUrl.indexOf(WebUtil.PARAM_MODE)>0);        
+        assertTrue(authorUrl.indexOf(AttributeNames.PARAM_MODE)>0);        
 
     }
     
@@ -134,7 +134,7 @@ public class TestLamsCoreToolService extends ToolDataAccessTestCase
         log.info("Non grouped activity learner url:"+learnerUrl);
         assertTrue(learnerUrl.indexOf("?")>0);
         assertTrue(learnerUrl.indexOf(ToolAccessMode.LEARNER.toString())!=-1);
-        assertTrue(learnerUrl.indexOf(WebUtil.PARAM_MODE)>0);
+        assertTrue(learnerUrl.indexOf(AttributeNames.PARAM_MODE)>0);
 
     }
     
@@ -143,7 +143,7 @@ public class TestLamsCoreToolService extends ToolDataAccessTestCase
         String testUrl = "http://localhost:8080/lams/test.do?method=test";
         String testUrlWithContent = toolService.setupToolURLWithToolContent(testNonGroupedActivity,testUrl);
         log.info("test url with content id:"+testUrlWithContent);
-        assertTrue(testUrlWithContent.indexOf(WebUtil.PARAM_CONTENT_ID)>0);
+        assertTrue(testUrlWithContent.indexOf(AttributeNames.PARAM_TOOL_CONTENT_ID)>0);
 
     }
 }

@@ -6,17 +6,11 @@
  */
 package org.lamsfoundation.lams.web.servlet;
 
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -25,10 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
-import org.lamsfoundation.lams.web.servlet.ExportPortfolioServletException;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -59,11 +53,6 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	
 	private static Logger log = Logger.getLogger(AbstractExportPortfolioServlet.class);
 	
-	protected final String TOOL_SESSION_ID = "toolSessionId";
-	protected final String TOOL_CONTENT_ID = "toolContentId";
-	protected final String USER_ID = "userId";
-
-	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException {
 		
@@ -73,7 +62,7 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		
 		Cookie[] cookies = request.getCookies();		
 		
-		directoryName = WebUtil.readStrParam(request, WebUtil.PARAM_DIRECTORY_NAME); 
+		directoryName = WebUtil.readStrParam(request, AttributeNames.PARAM_DIRECTORY_NAME); 
 		
 		//put the path together again, since the given directory was a relative one.
 		String absoluteDirectoryPath = FileUtil.TEMP_DIR + File.separator + directoryName;
@@ -90,7 +79,7 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		if (!FileUtil.directoryExist(absoluteDirectoryPath))
 			throw new IOException("The directory supplied " + absoluteDirectoryPath + " does not exist.");
 		
-		mode = WebUtil.readStrParam(request, WebUtil.PARAM_MODE);			
+		mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);			
 		
 		if (log.isDebugEnabled()) {
 			log.debug("Export is conducted in mode: " + mode);
@@ -184,9 +173,9 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	protected String appendParametersToLearnerExportURL(HttpServletRequest request, String url)
 	{
 		String finalURL;
-		finalURL = WebUtil.appendParameterToURL(url, WebUtil.PARAM_MODE, WebUtil.readStrParam(request, WebUtil.PARAM_MODE));
-		finalURL = WebUtil.appendParameterToURL(finalURL, TOOL_SESSION_ID, WebUtil.readStrParam(request, TOOL_SESSION_ID));
-		finalURL = WebUtil.appendParameterToURL(finalURL, USER_ID, WebUtil.readStrParam(request, USER_ID));
+		finalURL = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_MODE, WebUtil.readStrParam(request, AttributeNames.PARAM_MODE));
+		finalURL = WebUtil.appendParameterToURL(finalURL, AttributeNames.PARAM_TOOL_SESSION_ID, WebUtil.readStrParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+		finalURL = WebUtil.appendParameterToURL(finalURL, AttributeNames.PARAM_USER_ID, WebUtil.readStrParam(request, AttributeNames.PARAM_USER_ID));
 		
 		return finalURL;
 	}
@@ -203,8 +192,8 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	protected String appendParametersToTeacherExportURL(HttpServletRequest request, String url)
 	{
 		String finalURL;
-		finalURL = WebUtil.appendParameterToURL(url, WebUtil.PARAM_MODE, WebUtil.readStrParam(request, WebUtil.PARAM_MODE));
-		finalURL = WebUtil.appendParameterToURL(finalURL, TOOL_CONTENT_ID, WebUtil.readStrParam(request, TOOL_CONTENT_ID));		
+		finalURL = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_MODE, WebUtil.readStrParam(request, AttributeNames.PARAM_MODE));
+		finalURL = WebUtil.appendParameterToURL(finalURL, AttributeNames.PARAM_TOOL_CONTENT_ID, WebUtil.readStrParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));		
 		return finalURL;
 	}
 

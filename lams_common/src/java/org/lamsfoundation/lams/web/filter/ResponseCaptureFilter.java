@@ -1,11 +1,19 @@
 package org.lamsfoundation.lams.web.filter;
 
-import java.io.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.filter.ResponseWrapper;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author mtruong
@@ -41,7 +49,7 @@ public class ResponseCaptureFilter implements Filter
         chain.doFilter(request, responseWrapper);
         
         String responseBody = responseWrapper.toString(); //output of the original response that was stored in the response wrapper
-        String filename = (String)request.getAttribute(WebUtil.PARAM_FILENAME);
+        String filename = (String)request.getAttribute(AttributeNames.PARAM_FILENAME);
        
         if (filename != null && !filename.equals(""))
         {

@@ -19,24 +19,6 @@ public class WebUtil
     //---------------------------------------------------------------------
     // Class level constants - Session attributs
     //---------------------------------------------------------------------
-    public static final String PARAM_MODE = "mode";
-    public static final String PARAM_SESSION_STATUS = "sessionStatus";
-    public static final String PARAM_TOOL_SESSION_ID = "toolSessionID"; //works with survey but doesnt work with qa and nb which expects toolSessionId
-    //public static final String PARAM_TOOL_SESSION_ID = "toolSessionId";
-    public static final String PARAM_USER_ID_NEW = "userId";
-    
-    public static final String PARAM_CONTENT_ID = "content_id";
-    public static final String PARAM_USER_ID = "user_id";
-    public static final String PARAM_LESSON_ID = "lesson_id";
-    public static final String PARAM_TOOL_CONTENT_ID = "contentId";
-    public static final String PARAM_DIRECTORY_NAME = "directoryName";
-    public static final String PARAM_FILENAME = "filename";
-    
-    public static final String ATTR_MODE = "mode";
-    public static final String ATTR_USERNAME = "username";
-    public static final String ATTR_UPDATE_PROGRESS_BAR = "updateProgressBar";
-    public static final String ATTR_SESSION_STATUS = "sessionStatus";
-    public static final String ATTR_LESSON_ID = "lesson_id";
 
     
 	private static Logger log = Logger.getLogger(WebUtil.class);
