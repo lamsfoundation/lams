@@ -73,11 +73,20 @@ public interface ToolContentManager
 
     /**
      * Remove tool's content according specified the content id. It will be 
-     * needed by lams to modify the learning design. Note: if session data 
-     * for this toolContentId exists and removeSessionData = false, then
-     * the tool should throw SessionDataExists.
+     * needed by lams to modify the learning design. 
      * 
-     * If no matching data exists, return without throwing an exception.
+     * If the tool content includes files in the content repository (e.g.
+     * online and offline instructions) then the files should be removed
+     * from the repository.
+     * 
+     * If session data for this toolContentId exists and removeSessionData = true, 
+     * then the tool should delete the session data as well as the content data.
+     * 
+     * If session data for this toolContentId exists and removeSessionData = false, 
+     * then the tool should throw SessionDataExists.
+     * 
+     * If no matching data exists, the tool should return without throwing 
+     * an exception.
      * 
      * @param toolContentId the requested tool content id.
      * @param removeSessionData should it remove any related session data?
