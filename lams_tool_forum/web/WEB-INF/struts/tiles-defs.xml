@@ -30,7 +30,7 @@
     	<put name="body" value="/jsps/authoring/message/view.jsp"/>
 	</definition>
 	<definition name="tiles:/authoring/forum/editTopic" extends="tiles:layout">
-    	<put name="pageTitleKey" value="title.message.view"/>
+    	<put name="pageTitleKey" value="title.message.edit"/>
     	<put name="body" value="/jsps/authoring/message/edit.jsp"/>
 	</definition>
 	

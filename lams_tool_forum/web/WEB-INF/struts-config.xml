@@ -111,7 +111,7 @@
 		</action>
 		<action path="/authoring/deleteTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
-			input="tiles:/authoring/forum/create" 
+			input="tiles:/authoring/forum/viewTopic" 
 			parameter="deleteTopic">
 		</action>
 		<action path="/authoring/viewTopic"
@@ -127,7 +127,15 @@
 			name="messageForm" 
 			validate="false"
 			parameter="editTopic"
-			scope="request">
+			scope="session">
+			<forward name="success" path="tiles:/authoring/forum/editTopic" />
+		</action>
+		<action path="/authoring/deleteAttachment"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			name="messageForm" 
+			validate="false"
+			parameter="deleteAttachment"
+			scope="session">
 			<forward name="success" path="tiles:/authoring/forum/editTopic" />
 		</action>
 		<action path="/authoring/updateTopic"
@@ -136,7 +144,7 @@
 			validate="true"
 			input="tiles:/authoring/forum/editTopic" 
 			parameter="updateTopic"
-			scope="request">
+			scope="session">
 			<forward name="success" path="/authoring/viewTopic.do" />
 		</action>
 		<action path="/authoring/finishTopic"

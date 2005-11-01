@@ -21,4 +21,5 @@ public interface ForumConstants {
 	public static final String DEFAULT_TITLE = "Forum";
 	//TODO:hard code!!! need to read from config
 	public static final String TOOL_URL_BASE = "/lams/tool/lafrum11/";
+	public static final String SUCCESS_FLAG = "SUCCESS_FLAG";
 }

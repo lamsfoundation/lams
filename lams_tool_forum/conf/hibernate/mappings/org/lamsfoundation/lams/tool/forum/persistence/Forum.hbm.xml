@@ -170,6 +170,22 @@
             unique="true"
         />
 
+        <property
+            name="allowEdit"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_edit"
+        />
+
+        <property
+            name="allowRichEditor"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_rich_editor"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Forum.xml

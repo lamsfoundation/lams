@@ -266,6 +266,7 @@
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="includes/**"/>
+				<include name="images/**"/>
 				<include name="jsps/**"/> 
 			</fileset>
 		</war>

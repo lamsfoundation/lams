@@ -6,7 +6,7 @@
 	onsubmit="return validateMessageForm(this);"  enctype="multipart/form-data">
 	<fieldset>
 		<input type="hidden" name="topicIndex" value="<c:out value="${topicIndex}"/>">
-		<%@ include file="/jsps/message/form.jsp" %>
+		<%@ include file="/jsps/message/topiceditform.jsp" %>
 	 </fieldset>
  </html:form>
 </div>

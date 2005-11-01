@@ -1,4 +1,3 @@
-
 <table width="80%" cellspacing="8" align="CENTER" class="forms">
 	<tr>
 		<td valign="MIDDLE"><b><bean:message key="message.label.subject" /></b></td>
@@ -24,11 +23,6 @@
 			<html:submit>
 				<bean:message key="button.submit" />
 			</html:submit>
-		</td>
-		<td>
-			<html:button property="done" onclick="submit();closeWin()">
-				<bean:message key="button.done" />
-			</html:button>
 		</td>
 	</tr>
 </table>

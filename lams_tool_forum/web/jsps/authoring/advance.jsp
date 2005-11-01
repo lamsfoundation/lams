@@ -11,6 +11,20 @@
 				</html:checkbox>
 			</td>
 		</tr>
+		<tr>
+			<td colspan="2 class="formcontrol">
+				<html:checkbox property="forum.allowEdit" value="1">
+					<fmt:message key="label.authoring.advance.allow.edit" />
+				</html:checkbox>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2 class="formcontrol">
+				<html:checkbox property="forum.allowRichEditor" value="1">
+					<fmt:message key="label.authoring.advance.use.richeditor" />
+				</html:checkbox>
+			</td>
+		</tr>
 		<!-- Button Row -->
 		<tr><td colspan="2"><html:errors/></td></tr>
 		<tr>

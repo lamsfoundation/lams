@@ -24,6 +24,8 @@ public class Forum {
 	private boolean lockWhenFinished;
 	private boolean runOffline;
 	private boolean allowAnonym;
+	private boolean allowEdit;
+	private boolean allowRichEditor;
 	private String instructions;
 	private String onlineInstructions;
 	private String offlineInstructions;
@@ -340,5 +342,25 @@ public class Forum {
 		.append(offlineInstructions).append(created)
 		.append(updated).append(createdBy)
 		.toHashCode();
+	}
+	/**
+	 * @hibernate.property column="allow_edit"
+	 * @return
+	 */
+	public boolean isAllowEdit() {
+		return allowEdit;
+	}
+	public void setAllowEdit(boolean allowEdit) {
+		this.allowEdit = allowEdit;
+	}
+	/**
+	 * @hibernate.property column="allow_rich_editor"
+	 * @return
+	 */
+	public boolean isAllowRichEditor() {
+		return allowRichEditor;
+	}
+	public void setAllowRichEditor(boolean allowRichEditor) {
+		this.allowRichEditor = allowRichEditor;
 	}
 }

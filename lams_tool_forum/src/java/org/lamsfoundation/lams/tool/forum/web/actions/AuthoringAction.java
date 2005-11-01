@@ -94,6 +94,9 @@ public class AuthoringAction extends Action {
         if (param.equals("updateTopic")) {
         	return updateTopic(mapping, form, request, response);
         }
+        if (param.equals("deleteAttachment")) {
+        	return deleteAttachment(mapping, form, request, response);
+        }
         if (param.equals("finishTopic")) {
        		return finishTopic(mapping, form, request, response);
         }
@@ -198,6 +201,7 @@ public class AuthoringAction extends Action {
 
 		topics.add(MessageDTO.getMessageDTO(message,user.getFirstName()+" "+user.getLastName()));
 		
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"SUCCESS");
 		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 		return mapping.findForward("success");
 	}
@@ -216,42 +220,8 @@ public class AuthoringAction extends Action {
 			}
 			request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,topics);
     	}
-
-		StringBuffer sb = new StringBuffer();
-		sb.append("<table width=\"100%\" cellspacing=\"8\" align=\"CENTER\" cellspacing=\"3\" cellpadding=\"3\" class=\"form\">");
-		sb.append("<tr>");
-		sb.append("<td valign=\"MIDDLE\"><b>Topic</b></td>");
-		sb.append("<td colspan=\"2\" />");
-		sb.append("</tr>");
-		Iterator iter = topics.iterator();
-		for(int idx=0;iter.hasNext();idx++){
-//			MessageDTO msg = (MessageDTO) iter.next();
-//			sb.append("<tr>");
-//			sb.append("<td valign=\"MIDDLE\">");
-//			sb.append(msg.getSubject());
-//			sb.append("</td>");
-//			sb.append("<td colspan=\"2\" valign=\"MIDDLE\"><a href=\"javascript:loadDoc('");
-//			sb.append(ForumConstants.TOOL_URL_BASE);
-//			sb.append("authoring/deleteTopic.do?topicIndex=");
-//			sb.append(idx);
-//			//This parameter is useless for program logic. But when browser is IE
-//			//there is not a identify param for an item, IE won't submit the request to server.
-//			//For instance, if only use topicIndex and there are 3 topics list currently,
-//			//if user delete topicIndex=2 firstly, and next time, try to delete topicIndex=2 (old sequence is 3)
-//			//IE won't submit this request!
-//			sb.append("&create=").append(msg.getCreated().getTime());
-//			sb.append("\','topiclist')\"><b>Delete</b></a></td>"); 
-//		    sb.append("</tr>");
-		}
-		sb.append("</table>");
-		try {
-			PrintWriter out = response.getWriter();
-			out.print(sb.toString());
-			out.flush();
-		} catch (IOException e) {
-			log.error(e);
-		}
-		return null;
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"SUCCESS");
+		return mapping.getInputForward();
 	}
     public ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws PersistenceException {
@@ -283,6 +253,7 @@ public class AuthoringAction extends Action {
 			if (topic != null) {
 				msgForm.setMessage(topic.getMessage());
 			}
+			request.setAttribute(ForumConstants.AUTHORING_TOPICS,topic);
     	}
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
     	return mapping.findForward("success");
@@ -323,6 +294,28 @@ public class AuthoringAction extends Action {
 		return mapping.findForward("success");
     }
     
+    public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws PersistenceException {
+		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
+		Long uuID = new Long(WebUtil.readLongParam(request,"uuid"));
+		forumService = getForumManager();
+		forumService.deleteFromRepository(uuID,versionID);
+		
+    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
+		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
+		
+		if(topicIdx != -1){
+			MessageDTO oldMsg = (MessageDTO) topics.get(topicIdx);
+			if(oldMsg.getMessage()== null)
+				oldMsg.setMessage(new Message());
+			oldMsg.getMessage().setUpdated(new Date());
+			oldMsg.setHasAttachment(false);
+			oldMsg.getMessage().setAttachments(null);
+			
+		}
+    	return mapping.findForward("success");
+    }
     
     public ActionForward finishTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws PersistenceException {

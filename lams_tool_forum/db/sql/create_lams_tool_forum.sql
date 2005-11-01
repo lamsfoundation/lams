@@ -1,4 +1,9 @@
 SET FOREIGN_KEY_CHECKS=0;
+drop table if exists tl_lafrum11_attachment;
+drop table if exists tl_lafrum11_forum;
+drop table if exists tl_lafrum11_forum_user;
+drop table if exists tl_lafrum11_message;
+drop table if exists tl_lafrum11_tool_session;
 create table tl_lafrum11_attachment (
    uid bigint not null auto_increment,
    file_version_id bigint,
@@ -25,6 +30,8 @@ create table tl_lafrum11_forum (
    content_in_use bit,
    define_later bit,
    content_id bigint unique,
+   allow_edit bit,
+   allow_rich_editor bit,
    primary key (uid)
 );
 create table tl_lafrum11_forum_user (
