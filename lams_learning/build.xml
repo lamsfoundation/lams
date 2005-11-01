@@ -26,14 +26,16 @@ http://www.gnu.org/licenses/gpl.txt
 
 <project name="lams_learning" default="usage" basedir=".">
 
-	<property file="build.properties" />
+	<!-- import properties from the specified file -->
+	<property file="build.properties"/>
+	<property file="../lams_build/common.properties"/>
 
 	<path id="all-libs">
 		<fileset dir="${sharedlib}">
 			<include name="**/*.jar"/>
 		</fileset>
 		<fileset dir="${j2eelibs}">
-				<include name="**/*.jar"/>
+			<include name="**/*.jar"/>
 		</fileset>
 	</path>
 
@@ -91,25 +93,25 @@ http://www.gnu.org/licenses/gpl.txt
 
 	<target name="compile.java" depends="clean"
 		description="compile java sources">
-		<javac srcdir="${src.dir.java}" compiler="modern"
+		<javac srcdir="${src.java.dir}" compiler="modern"
 			destdir="${build.classes.java}" deprecation="on" debug="on">
 			<classpath>
 				<path refid="project.classpath" />
 			</classpath>
 		</javac>
   		<copy overwrite="yes" todir="${build.classes.java}">
-  			<fileset dir="${src.dir.java}">
+  			<fileset dir="${src.java.dir}">
   				<include name="*.hbm.xml"/>
   			</fileset>
   		</copy>	
 		<copy overwrite="yes"
 			todir="${build.classes.test}/${learning.path}">
-			<fileset dir="${src.dir.java}/${learning.path}">
+			<fileset dir="${src.java.dir}/${learning.path}">
 				<include name="*.xml" />
 			</fileset>
 		</copy>
   		<copy overwrite="yes" todir="${build.classes.java}/${learning.path}">
-  			<fileset dir="${src.dir.java}/${learning.path}">
+  			<fileset dir="${src.java.dir}/${learning.path}">
   				<include name="**/*.properties"/>
 				<include name="**/*.xml"/>
   			</fileset>
@@ -118,14 +120,14 @@ http://www.gnu.org/licenses/gpl.txt
 
 	<target name="compile.test" depends="compile.java">
 		<javac destdir="${build.classes.test}" compiler="modern">
-			<src path="${src.dir.test}" />
+			<src path="${src.test.dir}" />
 			<classpath>
 				<pathelement location="${build.classes.java}" />
 				<path refid="project.classpath" />
 			</classpath>
 		</javac>
 		<copy overwrite="yes" todir="${build.classes.test}">
-			<fileset dir="${src.dir.test}">
+			<fileset dir="${src.test.dir}">
 				<include name="**/*.xml"/>
 			</fileset>
 		</copy>
@@ -202,7 +204,7 @@ http://www.gnu.org/licenses/gpl.txt
 			excludedtags="@version,@author,@todo" force="${generated.forced}"
 			verbose="true">
 
-			<fileset dir="${src.dir.java}">
+			<fileset dir="${src.java.dir}">
 				<include name="${survey.path}/*.java" />
 			</fileset>
 			<hibernate version="3.0" />
@@ -215,11 +217,11 @@ http://www.gnu.org/licenses/gpl.txt
 		<webdoclet destdir="${generated.java}"
 			force="${xdoclet.force}">
 
-			<fileset dir="${src.dir.java}">
+			<fileset dir="${src.java.dir}">
 				<include name="**/web/action/*.java" />
 				<include name="**/web/form/*.java" />
 			</fileset>
-			<fileset dir="${src.dir.test}">
+			<fileset dir="${src.test.dir}">
 				<include name="**/web/action/*.java" />
 				<include name="**/web/form/*.java" />
 			</fileset>
@@ -279,7 +281,7 @@ http://www.gnu.org/licenses/gpl.txt
 			<formatter type="plain" usefile="false" />
 			<formatter type="xml" />
 			<batchtest todir="${build.report}">
-				<fileset dir="${src.dir.test}">
+				<fileset dir="${src.test.dir}">
 					<include name="**/Test*.java" />
 					<exclude name="**/*Action.java" />
 					<exclude name="**/*Form.java" />

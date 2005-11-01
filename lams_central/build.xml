@@ -24,11 +24,9 @@
 
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
+	<property file="../lams_build/common.properties"/>
 
 	<path id="all-libs">
-		<fileset dir="${sharedlib}">
-			<include name="**/*.jar"/>
-		</fileset>
 		<fileset dir="${sharedlib}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -36,7 +34,7 @@
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
-
+	
 	<path id="project.classpath">
 		<path refid="all-libs"/>
 		<!-- Java CLASSPATH should be added as the last item -->
@@ -62,6 +60,8 @@
 
 	<target name="print-classpath">
 		<echo message="java.class.path = ${java.class.path}"/>
+		<property name="path.string" refid="project.classpath"/>
+		<echo message="project.classpath = ${path.string}"/>
 	</target>
 
 	
@@ -71,18 +71,20 @@
 	<target name="preparedirs">
 		<mkdir dir="${build}"/>
 		<mkdir dir="${build.lib}"/>
-		<mkdir dir="${build.classes}"/>
-		<mkdir dir="${build.test}"/>
+		<mkdir dir="${build.classes.java}"/>
+		<mkdir dir="${build.classes.test}"/>
 		<mkdir dir="${build.web}"/>				
 	</target>
 
 
 	<target name="clean" depends="preparedirs" description="removes all class files">
 		<delete>
-			<fileset dir="${build.classes}"/>
+			<fileset dir="${build.classes.java}"/>
+			<fileset dir="${build.classes.test}"/>
+			<fileset dir="${build.lib}"/>
 		</delete>
-		<mkdir dir="${build.classes}"/>	
-		<delete dir="${build.lib}"/>
+		<mkdir dir="${build.classes.java}"/>	
+		<mkdir dir="${build.classes.test}"/>	
 		<mkdir dir="${build.lib}"/>
 	</target>
 
@@ -93,16 +95,15 @@
 	<target name="compile" depends="clean" description="compile java sources">
  	   <!--<property name="cp" refid="project.classpath"/>
 	   <echo message="Classpath is ${cp}"/> -->
-		<javac srcdir="${src.java}" compiler="modern"
-	         	 	destdir="${build.classes}" deprecation="on" debug="on">
+		<javac srcdir="${src.java.dir}" compiler="modern"
+	         	 	destdir="${build.classes.java}" deprecation="on" debug="on">
 			<classpath>
-				<!--pathelement location="${build.classes.java}"/-->
 				<path refid="project.classpath"/>
 			</classpath>
 		</javac>
 		<!-- Spring files -->
-		<copy overwrite="yes" todir="${build.classes}/org/lamsfoundation/lams/">
-				<fileset dir="${src.java}/org/lamsfoundation/lams/">
+		<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/">
+				<fileset dir="${src.java.dir}/org/lamsfoundation/lams/">
 						<include name="**/*.xml"/>
 						<include name="**/*.properties"/>
 				</fileset>
@@ -110,8 +111,8 @@
 	</target>
 
 	<target name="compile.test" depends="compile">
-		<javac destdir="${build.test}" compiler="modern">
-			<src path="${src.test.java}"/>
+		<javac destdir="${build.classes.test}" compiler="modern">
+			<src path="${src.test.dir}"/>
 			<classpath>
 				<path refid="project.classpath"/>
 			</classpath>
@@ -120,7 +121,7 @@
 	
 	<target name="copyContext">
 		<copy overwrite="yes" todir="${build.web}">
-			<fileset dir="${web}">
+			<fileset dir="${conf.web.dir}">
 				<include name="**/*.xml"/>
 				<include name="**/*.tld"/>
 			</fileset>
@@ -132,10 +133,10 @@
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<target name="build-war" depends="webdoclet,build-jar" description="creates war file">
 		<delete file="${build.lib}/${product}.war"/>
-		<copy overwrite="yes" file="${web}/css/aqua.css" tofile="${web}/css/default.css"/>
+		<copy overwrite="yes" file="${conf.web.dir}/css/aqua.css" tofile="${conf.web.dir}/css/default.css"/>
 		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF"
-  				webxml="${webinf}/web.xml">
-			<webinf dir="${webinf}">
+  				webxml="${conf.webinf.dir}/web.xml">
+			<webinf dir="${conf.webinf.dir}">
 				<include name="*.xml"/>
 				<include name="*.tld"/>
 				<include name="*.properties"/>
@@ -144,8 +145,8 @@
 				<include name="tiles/**"/>
 				<exclude name="web.xml"/>
 			</webinf>
-			<classes dir="${build.classes}"/>				
-			<fileset dir="${web}">
+			<classes dir="${build.classes.java}"/>				
+			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="css/*"/>
 				<include name="includes/**"/>
@@ -164,8 +165,8 @@
 	<target name="build-jar" depends="compile,copyContext" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
 		<jar jarfile="${build.lib}/${product}.jar"  manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
-			<fileset dir="${build.classes}"/>
-			<fileset dir="${build.test}"/>
+			<fileset dir="${build.classes.java}"/>
+			<fileset dir="${build.classes.test}"/>
 			<fileset dir="${build.web}"/>
 		</jar>
 	</target>
@@ -180,13 +181,13 @@
 				<formatter type="plain" usefile="false"/>
 				<formatter type="xml"/>
 				<batchtest todir="${build.report}">
-					<fileset dir="${src.test.java}">
+					<fileset dir="${src.test.dir}">
 						<include name="**/Test*.java"/>
 					</fileset>
 				</batchtest>			
 				<classpath>
-					<pathelement location="${build.classes}"/>
-					<pathelement location="${build.test}"/>
+					<pathelement location="${build.classes.java}"/>
+					<pathelement location="${build.classes.test}"/>
 					<pathelement location="${build.web}"/>
 					<path refid="project.classpath"/>
 				</classpath>			
@@ -212,7 +213,7 @@
 
 	<target name="webdoclet" depends="preparedirs">
 		<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
-	         <fileset dir="${src.java}">
+	         <fileset dir="${src.java.dir}">
 	            <include name="**/*Servlet.java" />
 	            <include name="**/*Action.java" />
 	            <include name="**/*ActionForm.java" />
@@ -221,14 +222,14 @@
 
 	         <deploymentdescriptor 
 	         				servletspec="2.3" 
-	         				destdir="${webinf}"
-				         	mergedir="${conf.xdoclet}"
+	         				destdir="${conf.webinf.dir}"
+				         	mergedir="${conf.xdoclet.dir}"
 	         				sessiontimeout="${sessiontimeout}"/>
 			
 	         <strutsconfigxml 
-	         				destdir="${webinf.struts}"
+	         				destdir="${conf.struts.dir}"
 	         				version="1.2" 
-	         				mergedir="${conf.xdoclet}"/>
+	         				mergedir="${conf.xdoclet.dir}"/>
 			 
 			 <jsptaglib jspversion="1.1"
 						taglibversion="1.0"
@@ -237,8 +238,8 @@
 					 	description="LAMS custom tags"
 			 			filename="lams.tld"
 					 	validatexml="true"
-						destdir="${webinf}"
-        				mergedir="${conf.xdoclet}"/>
+						destdir="${conf.webinf.dir}"
+        				mergedir="${conf.xdoclet.dir}"/>
 	     </webdoclet>
 	</target>
 		
