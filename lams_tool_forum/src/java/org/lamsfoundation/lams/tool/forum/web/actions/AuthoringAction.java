@@ -201,7 +201,7 @@ public class AuthoringAction extends Action {
 
 		topics.add(MessageDTO.getMessageDTO(message,user.getFirstName()+" "+user.getLastName()));
 		
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"SUCCESS");
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"CREATE_SUCCESS");
 		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 		return mapping.findForward("success");
 	}
@@ -220,7 +220,7 @@ public class AuthoringAction extends Action {
 			}
 			request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,topics);
     	}
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"SUCCESS");
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"DELETE_SUCCESS");
 		return mapping.getInputForward();
 	}
     public ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -291,6 +291,7 @@ public class AuthoringAction extends Action {
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
 		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 		
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"EDIT_SUCCESS");
 		return mapping.findForward("success");
     }
     
@@ -314,6 +315,7 @@ public class AuthoringAction extends Action {
 			oldMsg.getMessage().setAttachments(null);
 			
 		}
+		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
     	return mapping.findForward("success");
     }
     

@@ -3,7 +3,7 @@
 <script type="text/javascript">
 	function success(){
 		var flag = "<c:out value="${SUCCESS_FLAG}"/>";
-		if(flag == "SUCCESS"){
+		if(flag == "CREATE_SUCCESS"){
 			closeWin();
 		}
 	}

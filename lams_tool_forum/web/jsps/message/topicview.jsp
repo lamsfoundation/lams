@@ -3,7 +3,7 @@
 <script type="text/javascript">
 	function success(){
 		var flag = "<c:out value="${SUCCESS_FLAG}"/>";
-		if(flag == "SUCCESS"){
+		if(flag == "DELETE_SUCCESS"){
 			closeWin();
 		}
 	}
@@ -60,9 +60,6 @@
 				</c:set> 
 				<html:link href="${deletetopic}">
 					<b><fmt:message key="label.delete" /></b>
-				</html:link>
-				<html:link href="javascript:closeWin()">
-					<b><fmt:message key="label.done" /></b>
 				</html:link>
 			</td>
 		</tr>

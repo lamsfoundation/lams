@@ -7,7 +7,7 @@
 	</tr>
 	<tr>
 		<td valign="MIDDLE"><b><bean:message key="message.label.body" /></b></td>
-		<td valign="MIDDLE">&nbsp;&nbsp;<html:textarea rows="10" cols="60"
+		<td valign="TOP"><b class="required">*</b><html:textarea rows="10" cols="60"
 			tabindex="2" property="message.body" /> 
 			<BR><html:errors property="message.body" /></td>
 	</tr>
