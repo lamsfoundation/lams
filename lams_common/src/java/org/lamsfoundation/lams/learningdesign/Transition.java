@@ -67,6 +67,10 @@ public class Transition implements Serializable {
 	/** persistent field */
 	LearningDesign learningDesign;
 
+	/*
+	 * If the value for createDateTime is null then it will
+	 * be assigned the default value equal to the current datetime 
+	 */
 	/** full constructor */
 	public Transition(
 			Long transitionId,
@@ -83,7 +87,7 @@ public class Transition implements Serializable {
 		this.transitionUIID = id;
 		this.description = description;
 		this.title = title;
-		this.createDateTime = createDateTime;
+		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 		this.toActivity = toActivity;
 		this.fromActivity = fromActivity;
 		this.learningDesign = learningDesign;
@@ -93,6 +97,7 @@ public class Transition implements Serializable {
 
 	/** default constructor */
 	public Transition() {
+	    this.createDateTime = new Date(); //default value is set to when the Transition object is created
 	}
 
 	/** minimal constructor */
@@ -103,7 +108,7 @@ public class Transition implements Serializable {
 			Activity fromActivity,
 			LearningDesign learningDesign) {
 		this.transitionId = transitionId;
-		this.createDateTime = createDateTime;
+		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 		this.toActivity = toActivity;
 		this.fromActivity = fromActivity;
 		this.learningDesign = learningDesign;
@@ -185,7 +190,7 @@ public class Transition implements Serializable {
 	}
 
 	public void setCreateDateTime(Date createDateTime) {
-		this.createDateTime = createDateTime;
+		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 	}
 
 	/**

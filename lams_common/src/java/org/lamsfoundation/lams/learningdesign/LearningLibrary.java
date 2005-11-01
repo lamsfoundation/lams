@@ -65,23 +65,25 @@ public class LearningLibrary implements Serializable {
     /** persistent field */
     private Boolean validLibrary;
 
+    /* If the values for createDateTime is null, it will default to the current datetime */
     /** full constructor */
     public LearningLibrary(Long learningLibraryId, String description, String title, Date createDateTime, Set activities) {
         this.learningLibraryId = learningLibraryId;
         this.description = description;
         this.title = title;
-        this.createDateTime = createDateTime;
+        this.createDateTime = createDateTime != null ? createDateTime : new Date();
         this.activities = activities;
     }
 
     /** default constructor */
     public LearningLibrary() {
+        this.createDateTime = new Date();
     }
 
     /** minimal constructor */
     public LearningLibrary(Long learningLibraryId, Date createDateTime, Set activities) {
         this.learningLibraryId = learningLibraryId;
-        this.createDateTime = createDateTime;
+        this.createDateTime = createDateTime != null ? createDateTime : new Date();
         this.activities = activities;
     }
 
@@ -140,7 +142,7 @@ public class LearningLibrary implements Serializable {
     }
 
     public void setCreateDateTime(Date createDateTime) {
-        this.createDateTime = createDateTime;
+        this.createDateTime = createDateTime != null ? createDateTime : new Date();
     }
 
     /** 

@@ -186,6 +186,11 @@ public abstract class Activity implements Serializable,Nullable {
     //---------------------------------------------------------------------
     // Object constructors
     //---------------------------------------------------------------------
+	
+	/* For the createDateTime fields, if the value is null, then it will default
+	 * to the current time.
+	 */
+	
 	/** full constructor */
 	public Activity(
 			Long activityId,
@@ -214,7 +219,7 @@ public abstract class Activity implements Serializable,Nullable {
 		this.ycoord = ycoord;
 		this.orderId = orderId;
 		this.defineLater = defineLater;
-		this.createDateTime = createDateTime;
+		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 		this.learningLibrary = learningLibrary;
 		this.parentActivity = parentActivity;
 		this.parentUIID = parentUIID;
@@ -227,7 +232,8 @@ public abstract class Activity implements Serializable,Nullable {
 	}	
 	/** default constructor */
 	public Activity() {
-		this.grouping = null;		
+		this.grouping = null;	
+		this.createDateTime = new Date(); //default value is set to when the object is created
 	}
 
 	/** minimal constructor */
@@ -244,7 +250,7 @@ public abstract class Activity implements Serializable,Nullable {
 			Transition transitionFrom) {
 		this.activityId = activityId;
 		this.defineLater = defineLater;
-		this.createDateTime = createDateTime;
+		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 		this.learningLibrary = learningLibrary;
 		this.parentActivity = parentActivity;
 		this.learningDesign = learningDesign;
@@ -388,8 +394,9 @@ public abstract class Activity implements Serializable,Nullable {
 		return this.createDateTime;
 	}
 
+	/* If createDateTime is null, then it will default to the current date/time */
 	public void setCreateDateTime(Date createDateTime) {
-		this.createDateTime = createDateTime;
+		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 	}
 
 	/**

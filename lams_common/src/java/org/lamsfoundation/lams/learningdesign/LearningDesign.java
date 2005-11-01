@@ -73,7 +73,7 @@ public class LearningDesign implements Serializable {
 	private String description;
 
 	/** nullable persistent field */
-	private String title;
+	private String title; 
 
 	/** nullable persistent field */
 	private Activity firstActivity;
@@ -157,6 +157,10 @@ public class LearningDesign implements Serializable {
     private String onlineInstructions;
 	
 
+    /* If the values for createDateTime and/or lastModifiedDateTime
+     * are null, then it will default to the current datetime.
+     */
+    
 	/** full constructor */
 	public LearningDesign(
 			Long learningDesignId,
@@ -192,7 +196,7 @@ public class LearningDesign implements Serializable {
 		this.dateReadOnly = dateReadOnly;
 		this.helpText = helpText;
 		this.copyTypeID = copyTypeID;
-		this.createDateTime = createDateTime;
+		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 		this.version = version;
 		this.user = user;
 		this.parentLearningDesign = parentLearningDesign;
@@ -205,10 +209,14 @@ public class LearningDesign implements Serializable {
 		this.license = license;
 		this.offlineInstructions = offlineInstructions;
 		this.onlineInstructions = onlineInstructions;
+		this.lastModifiedDateTime = new Date();
 	}
 
 	/** default constructor */
 	public LearningDesign() {
+	    //set the default values to the current datetime
+	    this.createDateTime = new Date();
+	    this.lastModifiedDateTime = new Date();
 	}
 
 	/** minimal constructor */
@@ -227,7 +235,7 @@ public class LearningDesign implements Serializable {
 		this.validDesign = validDesign;
 		this.readOnly = readOnly;
 		this.copyTypeID = copyTypeID;
-		this.createDateTime = createDateTime;
+		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 		this.version = version;
 		this.user = user;
 		this.parentLearningDesign = parentLearningDesign;
@@ -235,6 +243,7 @@ public class LearningDesign implements Serializable {
 		this.lessons = lessons;
 		this.transitions = transitions;
 		this.activities = activities;
+		this.lastModifiedDateTime = new Date();
 	}
 	public static LearningDesign createLearningDesignCopy(LearningDesign design, Integer designCopyType){
 		LearningDesign newDesign = newInstance(design);
@@ -329,7 +338,7 @@ public class LearningDesign implements Serializable {
 		return createDateTime;
 	}
 	public void setCreateDateTime(Date createDateTime) {
-		this.createDateTime = createDateTime;
+		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 	}
 	public String getVersion() {
 		return version;
@@ -500,7 +509,7 @@ public class LearningDesign implements Serializable {
 		return lastModifiedDateTime;
 	}
 	public void setLastModifiedDateTime(Date lastModifiedDateTime) {
-		this.lastModifiedDateTime = lastModifiedDateTime;
+		this.lastModifiedDateTime = lastModifiedDateTime != null ? lastModifiedDateTime : new Date();
 	}
 	
 	public String getOfflineInstructions() {
@@ -526,4 +535,12 @@ public class LearningDesign implements Serializable {
 	public FolderContentDTO getFolderContentDTO(){
 		return new FolderContentDTO();
 	}
+	
+/*	private Date ifNullSetAsCurrentTime(Date dateToCheck)
+	{
+	    return dateToCheck != null ? dateToCheck : new Date();
+	}
+	*/
+	
+
 }
