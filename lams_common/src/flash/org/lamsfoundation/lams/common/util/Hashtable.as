@@ -19,6 +19,13 @@ class org.lamsfoundation.lams.common.util.Hashtable {
 		clearBusy();
     }
     
+	/**
+	 * Adds element to the hashtable
+	 * @usage   
+	 * @param   key 
+	 * @param   val 
+	 * @return  r	The value that was replaced
+	 */
     public function put(key, val) {		setBusy();
        //Debugger.debug('called','Hashtable.prototype.put');
         var i = this._getIndex(key);
