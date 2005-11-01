@@ -1,6 +1,4 @@
 <div align="center">
-<script type="text/javascript"	src="<html:rewrite page='/includes/javascript/xmlrequest.js'/>">
-</script>
 <script type="text/javascript">
 	function popupable(url,name){
 

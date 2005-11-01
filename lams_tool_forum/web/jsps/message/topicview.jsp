@@ -47,7 +47,7 @@
 			<c:set var="deletetopic">
 				<html:rewrite page="/authoring/deleteTopic.do?topicIndex=${topicIndex}" />
 			</c:set> 
-			<html:link href="javascript:loadDoc('${deletetopic}','topiclist')">
+			<html:link href="${deletetopic}" onclick="closeWin()">
 				<b><fmt:message key="label.delete" /></b>
 			</html:link>
 			<html:link href="javascript:closeWin()">
