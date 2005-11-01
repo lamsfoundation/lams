@@ -22,10 +22,12 @@ package org.lamsfoundation.lams.web.servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Writer;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -108,12 +110,42 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 			writer.println(replyPacket);
 	}
 	
-	/* Get the post body */
+
+	/**
+	 * Method to get the post body.
+	 * Retrieves the body of the post as binary data, and then converts back to a character stream.
+	 * The reason why we didn't use getReader() which retrieves the body of the post as character
+	 * data, is because for very large learning designs, the wddx packet read in gets corrupted
+	 * or truncated. The reason for this, is still unknown, however using getInputStream() doesn't 
+	 * seem to have this problem.
+	 * TODO: investigate why getReader() doesn't work for large learning designs. The original code has 
+	 * been commented out below.
+	 * @param req
+	 * @return
+	 * @throws IOException
+	 */
   	private String getBody(HttpServletRequest req)
   		throws IOException
   	{
-		BufferedReader  tempReader  = req.getReader();
+  	    int tempContentLength = req.getContentLength();
+  	    ServletInputStream sis = req.getInputStream();
+  	     	    	  
+  	    BufferedReader buff = new BufferedReader(new InputStreamReader(sis));
+  	   
+  	    StringBuffer tempStrBuf = new StringBuffer( tempContentLength>0 ? tempContentLength : 200 );
+		String tempStr;
+		tempStr = buff.readLine(); 
+		while ( tempStr != null )
+		{
+			tempStrBuf.append(tempStr);
+			tempStr = buff.readLine();
+		}
+
+		return(tempStrBuf.toString()); 
+  	   
+	/*	BufferedReader  tempReader  = req.getReader();
 		int tempContentLength = req.getContentLength();
+		
 		StringBuffer tempStrBuf = new StringBuffer( tempContentLength>0 ? tempContentLength : 200 );
 		String tempStr;
 		tempStr = tempReader.readLine(); 
@@ -123,7 +155,8 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 			tempStr = tempReader.readLine();
 		}
 
-		return(tempStrBuf.toString());
+		return(tempStrBuf.toString()); */
+  	    
   	}
 
   	/** 
