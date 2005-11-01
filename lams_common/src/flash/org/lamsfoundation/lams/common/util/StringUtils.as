@@ -21,6 +21,13 @@ class StringUtils {
 		return _className;
 	}
 	
+	/**
+	 * If the value passed in is any null type value or LAMS NULL VALUE then blank string is returned
+	 * Used to prevent "undefined" appearing in the UI
+	 * @usage   var myStr = StringUtils.cleanNull(STR)
+	 * @param   str The string to search
+	 * @return  a clean string
+	 */
 	public static function cleanNull(str:String):String{
 		if(str == undefined){
 			return "";
@@ -44,6 +51,41 @@ class StringUtils {
 		return str;
 		
 	}
+	
+	/**
+	 * Converts < to &lt; and > to &gt; 
+	 * Used good for displaying html looking tags in textfields that expect HTML.
+	 * @usage   var myStr:String = StringUtils.escapeAngleBrackets(str);
+	 * @param   str 
+	 * @return  
+	 */
+	public static function escapeAngleBrackets(str:String):String{
+		var r:String = new String();
+		//str = new String(str);
+		r = replace(str, "<","&lt;");
+		r = replace(r, ">","&gt;");
+		return r;
+	}
+	
+	/**
+	 * Search replace function, leaves original string untouched
+	 * @usage   var myStr:String = StringUtils.replace(str,search, replace);
+	 * @param   s      The string to work on
+	 * @param   p_str  The string to find
+	 * @param   p_repl The string to replace
+	 * @return  		The result
+	 */
+	public static function replace (s:String,p_str:String,p_repl:String) {
+		//var s:String = this.toString();
+		//var s:String = new String(;
+		var position:Number;
+		while((position = s.indexOf(p_str)) != -1) {
+			position= s.indexOf(p_str);
+			s = s.substring(0,position)+p_repl+s.substring(position+p_str.length,s.length)
+		}
+		return s
+	}
+	
 
     /**
     * Converts a query string to an object with attribute-value properies 
