@@ -79,6 +79,7 @@ class org.lamsfoundation.lams.common.util.Debugger {
 	public static function log(msg:Object,level:Number,fname:String,currentClass:Object):Void{
         //Ensure we have an instance
         getInstance();
+		var rawMsgStr = String(msg);
         
 		if(_allowDebug){
 			if(arguments.length == 1){
@@ -86,6 +87,7 @@ class org.lamsfoundation.lams.common.util.Debugger {
 			}			
 			if(_severityLevel >= level){
                 var date:Date = new Date();
+				
 				//Build debug log object for this entry
 				var obj = {date:date,msg:msg,level:level,func:fname};
 				
@@ -97,8 +99,10 @@ class org.lamsfoundation.lams.common.util.Debugger {
 					obj.scope = currentClass;
 				}
 				
-				//Write to trace
+				//Write to trace(NOT USED??)
                 msg = "["+fname+"]"+msg
+				
+				//chuck it to the trace window
 				trace(msg);
 				
                 
@@ -152,6 +156,19 @@ class org.lamsfoundation.lams.common.util.Debugger {
         }
         return ret;
     }
+	
+	/**
+    * @param format:Object  An object containing various format options for viewing the log
+    * @returns the message log formatted
+    */
+    public function getLatestMsg(format:Object):String {
+        var ret:String;
+        if(!format){
+            format = {};
+            format.date = false;
+        }
+        return buildMessage(format,_msgLog[_msgLog.length-1]);
+    }
     
     /**
     * Construct a message from the msgObject using the format object
@@ -198,8 +215,11 @@ class org.lamsfoundation.lams.common.util.Debugger {
             ret += 'date : ' + msgObj.date.toString() + ' ';
         } 
 		
+		//escape the message incase we asent XML in
+		var theMsg = Object(StringUtils.escapeAngleBrackets(String(msgObj.msg)));
+		
 		//Add function/method + message
-		ret += '[' + msgObj.func + ']' +  msgObj.msg;
+		ret += '[' + msgObj.func + ']' +  theMsg;
 		
 		//Add closing font tag and line break
 		ret += fontCloseTag + '<BR>'		

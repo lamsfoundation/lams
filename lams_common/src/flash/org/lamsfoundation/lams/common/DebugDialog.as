@@ -142,8 +142,15 @@ class DebugDialog extends MovieClip implements Dialog{
     */
     private function showDebugLog(){
         //Set the text in the text area + scroll to the bottom
-        messages_ta.text = debug.getFormattedMsgLog();
-        messages_ta.vPosition = messages_ta.maxVPosition;
+		//TODO: Make this more efficient, currently the WHOLE log is re-rendered each update.... grrrr
+        
+		if(messages_ta.length < 1){
+			messages_ta.text = debug.getFormattedMsgLog();
+		}else{
+			messages_ta.text += debug.getLatestMsg();
+		}
+		
+		messages_ta.vPosition = messages_ta.maxVPosition;
     }
     
     /**
