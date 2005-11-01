@@ -109,17 +109,20 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		//validate if we can do it?
 		
-		//generate a new ID
 		
-		//add to DDM
+		
+		//TODO: 2nd time, after undo, in this is failing....;
+			
 		
 		//dispatch an event to show the design  has changed
 		dispatchEvent({type:'ddmUpdate',target:this});
 		
 		//ObjectUtils.printObject(activity);
+		
+		//TODO: MAYBE the UIID being created is the same as an existing activity after an undo, therefore overwriting in the hash table
 		_activities.put(activity.activityUIID, activity);
 		
-		
+		Debugger.log('Succesfully added:'+_activities.get(activity.activityUIID).title,4,'addActivity','DesignDataModel');
 		
 		//TODO: Better validation of the addition
 		success = true;
@@ -136,6 +139,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @return  
 	 */
 	public function removeActivity(activityUIID):Object{
+		//dispatch an event to show the design  has changed
+		dispatchEvent({type:'ddmUpdate',target:this});
+		
 		var r:Object = _activities.remove(activityUIID);
 		if(r==null){
 			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
@@ -153,6 +159,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @return  
 	 */
 	public function removeTransition(transitionUIID):Object{
+		//dispatch an event to show the design  has changed
+		dispatchEvent({type:'ddmUpdate',target:this});
+		
 		var r:Object = _transitions.remove(transitionUIID);
 		if(r==null){
 			return new LFError("Removing transition failed:"+transitionUIID,"removeTransition",this,null);
@@ -170,7 +179,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @return  
 	 */
 	public function addTransition(transition:Transition):Boolean{
-		
+		//dispatch an event to show the design  has changed
+		dispatchEvent({type:'ddmUpdate',target:this});
 		Debugger.log('Transition from:'+transition.fromUIID+', to:'+transition.toUIID,4,'addActivity','DesignDataModel');
 		_transitions.put(transition.transitionUIID,transition);
 		
@@ -315,26 +325,28 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		design.lastModifiedDateTime= (_lastModifiedDateTime) ? _lastModifiedDateTime: Config.DATE_NULL_VALUE;
 		design.dateReadOnly = (_dateReadOnly) ? _dateReadOnly: Config.DATE_NULL_VALUE;
 		
-		
+		design.activities = new Array();
 		var classActs:Array = _activities.values();
 		if(classActs.length > 0){
-			design.activities = new Array();
+			
 			for(var i=0; i<classActs.length; i++){
 				design.activities[i] = classActs[i].toData();
 			}
 		}
 		
+		design.transitions = new Array();
 		var classTrans:Array = _transitions.values();
 		if(classTrans.length > 0){
-			design.transitions = new Array();
+			
 			for(var i=0; i<classTrans.length; i++){
 				design.transitions[i] = classTrans[i].toData();
 			}
 		}
 		
+		design.groupings = new Array();
 		var classGroups:Array = _groupings.values();
 		if(classGroups.length > 0){
-			design.groupings = new Array();
+			
 			for(var i=0; i<classGroups.length; i++){
 				//TODO: Add a toData to the gorup class (after we make the group class :)
 				design[i] = classGroups[i].toData();
