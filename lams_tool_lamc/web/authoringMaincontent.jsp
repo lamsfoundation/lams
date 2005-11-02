@@ -97,38 +97,42 @@ MM_reloadPage(true);
 </tr> 
 </table>
 
-<h2><bean:message key="label.authoring.mc.basic"/></h2>
-
-<div id="formtablecontainer1">
-		<c:if test="${sessionScope.editOptionsMode == 0}"> 			
-			<jsp:include page="BasicContent.jsp" />
-		</c:if> 				
-		<c:if test="${sessionScope.editOptionsMode == 1}"> 			
-			<jsp:include page="OptionsContent.jsp" />
-		</c:if> 				
-</div>
-<hr>
-<a href="javascript:;" class="button">Cancel</a>
-
-<!-- end of content_b -->
-</div>
-
-
-<div id='content_a'  class="tabbody content_a">
-	<h2>Advanced Definitions </h2>
-	<div id="formtablecontainer2">
-				<jsp:include page="AdvancedContent.jsp" />
-	</div>
-</div>
-
-
-<div id='content_i'  class="tabbody content_i">
-	<h2>Instructions</h2>
-	<div id="formtablecontainer3">
-			<jsp:include page="InstructionsContent.jsp" />
+	<h2><bean:message key="label.authoring.mc.basic"/></h2>
+	
+	<div id="formtablecontainer1">
+			<c:if test="${sessionScope.editOptionsMode == 0}"> 			
+				<jsp:include page="BasicContent.jsp" />
+			</c:if> 				
+			<c:if test="${sessionScope.editOptionsMode == 1}"> 			
+				<jsp:include page="OptionsContent.jsp" />
+			</c:if> 				
+			<c:if test="${sessionScope.editOptionsMode == 2}"> 			
+				<jsp:include page="InstructionsContent.jsp" />
+			</c:if> 				
 	</div>
 	<hr>
-</div>
+	<a href="javascript:;" class="button">Cancel</a>
+	
+	<!-- end of content_b -->
+	</div>
+
+
+	<div id='content_a'  class="tabbody content_a">
+		<h2>Advanced Definitions </h2>
+		<div id="formtablecontainer2">
+					<jsp:include page="AdvancedContent.jsp" />
+		</div>
+	</div>
+
+
+	<div id='content_i'  class="tabbody content_i">
+		<h2>Instructions</h2>
+		<div id="formtablecontainer3">
+				<jsp:include page="InstructionsContent.jsp" />
+		</div>
+		<hr>
+	</div>
+
 
 </html:form>
 <p></p>

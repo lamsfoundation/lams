@@ -192,6 +192,7 @@ public abstract class McUtils implements McAppConstants {
 				mcAuthoringForm.setPassmark((defaultMcContent.getPassMark()).toString());
 			else
 				mcAuthoringForm.setPassmark(new Integer(0).toString());
+			
 		}
 	}
 	
@@ -283,7 +284,7 @@ public abstract class McUtils implements McAppConstants {
 	
 	public static void addFileToContentRepository(HttpServletRequest request, McAuthoringForm mcAuthoringForm, boolean isOfflineFile)
 	{
-		logger.debug("attempt addFileToContentRepository");
+		logger.debug("attempt addFileToContentRepository,  isOfflineFile: " + isOfflineFile);
     	IMcService mcService =McUtils.getToolService(request);
     	logger.debug("mcService: " + mcService);
     	
@@ -297,7 +298,7 @@ public abstract class McUtils implements McAppConstants {
             McContent  defaultMcContent=mcService.retrieveMc(toolContentId);
             logger.debug("defaultMcContent: " + defaultMcContent);
             
-            //populateUploadedFilesMetaDataFromDb(request, defaultMcContent);
+            populateUploadedFilesMetaDataFromDb(request, defaultMcContent);
             logger.debug("done populateUploadedFilesMetaDataFromDb");	
     	}
     	
@@ -352,7 +353,7 @@ public abstract class McUtils implements McAppConstants {
     		while (listUploadedOfflineFilesNameIterator.hasNext())
     		{
     				String fileName = (String)listUploadedOfflineFilesNameIterator.next();
-    				/*
+    				
     				if (!offLineFileNameExists(request,fileName))
     				{
     					logger.debug("reading with counter: " + new Integer(counter).toString());
@@ -365,7 +366,7 @@ public abstract class McUtils implements McAppConstants {
     				{
     					logger.debug("offline fileName exists: " +fileName);
     				}
-    				*/
+    				
     		}
     		logger.debug("final listUploadedOfflineFiles: " + listUploadedOfflineFiles);
     		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
@@ -405,7 +406,7 @@ public abstract class McUtils implements McAppConstants {
     		while (listUploadedOnlineFilesNameIterator.hasNext())
     		{
     			String fileName = (String)listUploadedOnlineFilesNameIterator.next();
-    			/*
+    			
     			if (!onLineFileNameExists(request,fileName))
     			{
     				logger.debug("reading with counter: " + new Integer(counter).toString());
@@ -418,7 +419,7 @@ public abstract class McUtils implements McAppConstants {
     			{
     				logger.debug("online fileName exists: " +fileName);
     			}
-    			*/
+    			
     		}
     		logger.debug("final listUploadedOnlineFiles: " + listUploadedOnlineFiles);
     		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
@@ -527,60 +528,198 @@ public abstract class McUtils implements McAppConstants {
 	}
 	
 	
-	public static void configureContentRepository(HttpServletRequest request)
+	public static void configureContentRepository(HttpServletRequest request, IMcService mcService)
 	{
 		logger.debug("attempt configureContentRepository");
-    	IMcService mcService =McUtils.getToolService(request);
-    	logger.debug("retrieving mcService from session: " + mcService);
-    	logger.debug("calling configureContentRepository()");
+    	
+		logger.debug("calling configureContentRepository()");
 	    mcService.configureContentRepository();
 	    logger.debug("configureContentRepository ran successfully");
 	}
 	
+	public static void populateUploadedFilesData(HttpServletRequest request, McContent defaultMcContent)
+	{
+		populateUploadedFilesMetaDataFromDb(request, defaultMcContent);
+	    request.getSession().setAttribute(POPULATED_UPLOADED_FILESDATA, new Boolean(true));
+	}
 	
 	public static void populateUploadedFilesMetaDataFromDb(HttpServletRequest request, McContent defaultMcContent)
 	{
-		logger.debug("attempt populateUploadedFilesData");
+		logger.debug("attempt populateUploadedFilesData for: " + defaultMcContent);
 		IMcService mcService =McUtils.getToolService(request);
     	logger.debug("mcService: " + mcService);
 
-		/** just for jsp purposes **
+		/** just for jsp purposes **  
 	    /** read the uploaded offline uuid + file name pair */
-	    List listOfflineFilesUuid=new LinkedList();
-	    listOfflineFilesUuid=mcService.retrieveMcUploadedOfflineFilesUuid(defaultMcContent);
-	    logger.debug("initial listOfflineFilesUuid: " + listOfflineFilesUuid);
+	    //List listOfflineFilesUuid=new LinkedList();
+	    //listOfflineFilesUuid=mcService.retrieveMcUploadedOfflineFilesUuid(defaultMcContent);
+    	logger.debug("using defaultMcContent.getUid() " + defaultMcContent.getUid());
+	    List listOffFilesUuid=mcService.retrieveMcUploadedOfflineFilesUuid(defaultMcContent.getUid());
+	    
+   
+	    
+	    logger.debug("initial listOfflineFilesUuid: " + listOffFilesUuid);
 	    request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILES_UUID);
-	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES_UUID, listOfflineFilesUuid);
+	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES_UUID, listOffFilesUuid);
 	    
 	    /** read the uploaded online uuid + file name pair */
-	    List listOnlineFilesUuid=new LinkedList();
-	    listOnlineFilesUuid=mcService.retrieveMcUploadedOnlineFilesUuid(defaultMcContent);
-	    logger.debug("initial listOnlineFilesUuid: " + listOnlineFilesUuid);
+	    //List listOnlineFilesUuid=new LinkedList();
+	    List listOnFilesUuid=mcService.retrieveMcUploadedOnlineFilesUuid(defaultMcContent.getUid());
+	    logger.debug("initial listOnlineFilesUuid: " + listOnFilesUuid);
 	    request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILES_UUID);
-	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES_UUID, listOnlineFilesUuid);
+	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES_UUID, listOnFilesUuid);
 	    
 	    
 	    /** read the uploaded offline uuid + file name pair */
-	    List listOfflineFilesName=new LinkedList();
-	    listOfflineFilesName=mcService.retrieveMcUploadedOfflineFilesName(defaultMcContent);
-	    logger.debug("initial listOfflineFilesName: " + listOfflineFilesName);
+	    //List listOfflineFilesName=new LinkedList();
+	    List listOffFilesName=mcService.retrieveMcUploadedOfflineFilesName(defaultMcContent.getUid());
+	    logger.debug("initial listOfflineFilesName: " + listOffFilesName);
 	    request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILES_NAME);
-	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES_NAME, listOfflineFilesName);
+	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES_NAME, listOffFilesName);
 	    
 	    
 	    /** read the uploaded online uuid + file name pair */
-	    List listOnlineFilesName=new LinkedList();
-	    listOnlineFilesName=mcService.retrieveMcUploadedOnlineFilesName(defaultMcContent);
-	    logger.debug("initial listOnlineFilesName: " + listOnlineFilesName);
+	    //List listOnlineFilesName=new LinkedList();
+	    List listOnFilesName=mcService.retrieveMcUploadedOnlineFilesName(defaultMcContent.getUid());
+	    logger.debug("initial listOnlineFilesName: " + listOnFilesName);
 	    request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILES_NAME);
-	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES_NAME, listOnlineFilesName);
+	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES_NAME, listOnFilesName);
 	    
 	    	    
 	    request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
 	    request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
-	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listOfflineFilesName);
-	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listOnlineFilesName);
+	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listOffFilesName);
+	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listOnFilesName);
 	}
-
+	
+	public static boolean offLineFileNameExists(HttpServletRequest request,String fileName)
+	{
+		logger.debug("checking offLineFileNameExists");
+		IMcService mcService =McUtils.getToolService(request);
+    	logger.debug("mcService: " + mcService);
+    	
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+        logger.debug("toolContentId: " + toolContentId);
+        McContent  defaultMcContent=mcService.retrieveMc(toolContentId);
+        logger.debug("defaultMcContent: " + defaultMcContent);
+    	
+	    /** read the uploaded offline uuid + file name pair */
+	    //List listOfflineFilesName=new LinkedList();
+	    List listOffFilesName=mcService.retrieveMcUploadedOfflineFilesName(defaultMcContent.getUid());
+	    logger.debug("listOfflineFilesName: " + listOffFilesName);
+	    
+	    Iterator listOfflineFilesNameIterator=listOffFilesName.iterator();
+		while (listOfflineFilesNameIterator.hasNext())
+		{
+			String currentFileName = (String)listOfflineFilesNameIterator.next();
+    		logger.debug("currentFileName: " + currentFileName);
+    		if (currentFileName.equalsIgnoreCase(fileName))
+    		{
+    			logger.debug("existing fileName: " + currentFileName);
+    			return true;
+    		}
+		}
+		return false;
+	}
+	
+	public static boolean onLineFileNameExists(HttpServletRequest request,String fileName)
+	{
+		logger.debug("checking  onLineFileNameExists");
+		IMcService mcService =McUtils.getToolService(request);
+    	logger.debug("mcService: " + mcService);
+    	
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+        logger.debug("toolContentId: " + toolContentId);
+        McContent  defaultMcContent=mcService.retrieveMc(toolContentId);
+        logger.debug("defaultMcContent: " + defaultMcContent);
+    	
+	    /** read the uploaded offline uuid + file name pair */
+	    //List listOnlineFilesName=new LinkedList();
+	    List listOnFilesName=mcService.retrieveMcUploadedOnlineFilesName(defaultMcContent.getUid());
+	    logger.debug("listOnlineFilesName: " + listOnFilesName);
+	    
+	    Iterator listOnlineFilesNameIterator=listOnFilesName.iterator();
+		while (listOnlineFilesNameIterator.hasNext())
+		{
+			String currentFileName = (String)listOnlineFilesNameIterator.next();
+    		logger.debug("currentFileName: " + currentFileName);
+    		if (currentFileName.equalsIgnoreCase(fileName))
+    		{
+    			logger.debug("existing fileName: " + currentFileName);
+    			return true;
+    		}
+    			
+		}
+		return false;
+	}
+	
+	
+	public static void addUploadedFilesMetaData(HttpServletRequest request, McContent mc)
+	{
+		logger.debug("doing addUploadedFilesMetaData...");
+		IMcService mcService =McUtils.getToolService(request);
+    	logger.debug("mcService: " + mcService);
+    	
+		logger.debug("attempt cleaning files meta data from the db");
+	    mcService.cleanUploadedFilesMetaData();
+		logger.debug("cleaned up files meta data from the db");
+		
+	    LinkedList listUploadedOfflineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILES);
+		logger.debug("final listUploadedOfflineFiles: " + listUploadedOfflineFiles);
+		LinkedList listUploadedOnlineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES);
+		logger.debug("final listUploadedOnlineFiles: " + listUploadedOnlineFiles);
+		
+		try{
+			logger.debug("start persisting offline file information to db...");
+	    	Iterator offlineFilesIterator=listUploadedOfflineFiles.iterator();
+	    	while (offlineFilesIterator.hasNext())
+	    	{
+	    		String uuidAndFileName=(String) offlineFilesIterator.next();
+	    		logger.debug("iterated uuidAndFileName: " + uuidAndFileName);
+	    		if ((uuidAndFileName != null) && (uuidAndFileName.indexOf('~') > 0))
+	    		{
+	    			int separator=uuidAndFileName.indexOf('~');
+	    			logger.debug("separator: " + separator);
+	    			String uuid=uuidAndFileName.substring(0,separator);
+	    			String fileName=uuidAndFileName.substring(separator+1);
+	    			logger.debug("using uuid: " + uuid);
+	    			logger.debug("using fileName: " + fileName);
+	    			mcService.persistFile(uuid,false, fileName,mc);
+	    		}
+	    	}
+	    	logger.debug("all offline files data has been persisted");	
+		}
+		catch(Exception e)
+		{
+			logger.debug("error persisting offline files data: " + listUploadedOfflineFiles);
+		}
+		
+		try{
+	    	logger.debug("start persisting online file information to db...");
+	    	Iterator onlineFilesIterator=listUploadedOnlineFiles.iterator();
+	    	while (onlineFilesIterator.hasNext())
+	    	{
+	    		String uuidAndFileName=(String) onlineFilesIterator.next();
+	    		logger.debug("iterated uuidAndFileName: " + uuidAndFileName);
+	    		if ((uuidAndFileName != null) && (uuidAndFileName.indexOf('~') > 0))
+	    		{
+	    			int separator=uuidAndFileName.indexOf('~');
+	    			logger.debug("separator: " + separator);
+	    			String uuid=uuidAndFileName.substring(0,separator);
+	    			String fileName=uuidAndFileName.substring(separator+1);
+	    			logger.debug("using uuid: " + uuid);
+	    			logger.debug("using fileName: " + fileName);
+	    			mcService.persistFile(uuid,true, fileName,mc);
+	    		}
+	    	}
+	    	logger.debug("all online files data has been persisted");
+		}
+		catch(Exception e)
+		{
+			logger.debug("error persisting offline files data: " + listUploadedOnlineFiles);
+		}
+		
+	}
+	
 		
 }

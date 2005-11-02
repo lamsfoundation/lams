@@ -57,11 +57,13 @@ import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.McSession;
+import org.lamsfoundation.lams.tool.mc.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
+import org.lamsfoundation.lams.tool.mc.dao.IMcUploadedFileDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -109,6 +111,7 @@ public class McServicePOJO implements
 	private IMcSessionDAO			mcSessionDAO;
 	private IMcUserDAO				mcUserDAO;
 	private IMcUsrAttemptDAO		mcUsrAttemptDAO;
+	private IMcUploadedFileDAO  	mcUploadedFileDAO;
 	
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
@@ -1501,14 +1504,13 @@ public class McServicePOJO implements
 	 * 
 	 * adds a new entry to the uploaded files table
 	 */
-	public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent qaContent) throws McApplicationException {
-		/*
-		logger.debug("attempt persisting file to the db: " + uuid + " " + isOnlineFile + " " + fileName + " " + qaContent);
-		QaUploadedFile qaUploadedFile= new QaUploadedFile(uuid, isOnlineFile, fileName, qaContent);
-		logger.debug("created qaUploadedFile: " + qaUploadedFile);
-		qaUploadedFileDAO.saveUploadFile(qaUploadedFile);
-		logger.debug("persisted qaUploadedFile: " + qaUploadedFile);
-		*/
+	public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent) throws McApplicationException {
+		
+		logger.debug("attempt persisting file to the db: " + uuid + " " + isOnlineFile + " " + fileName + " " + mcContent);
+		McUploadedFile mcUploadedFile= new McUploadedFile(uuid, isOnlineFile, fileName, mcContent);
+		logger.debug("created mcUploadedFile: " + mcUploadedFile);
+		mcUploadedFileDAO.saveUploadFile(mcUploadedFile);
+		logger.debug("persisted mcUploadedFile: " + mcUploadedFile);
 	}
 
 	/**
@@ -1518,30 +1520,80 @@ public class McServicePOJO implements
 	 * removes all the entries in the uploaded files table
 	 */
 	public void cleanUploadedFilesMetaData() throws McApplicationException {
-		/*
 		logger.debug("attempt cleaning up uploaded file meta data table from the db");
-		qaUploadedFileDAO.cleanUploadedFilesMetaData();
+		mcUploadedFileDAO.cleanUploadedFilesMetaData();
 		logger.debug("files meta data has been cleaned up");
-		*/
+	}
+	
+	
+	public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline) throws McApplicationException {
+        try
+        {
+            return mcUploadedFileDAO.retrieveMcUploadedFiles(mcContentId, fileOnline);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+
+	public List retrieveMcUploadedOfflineFilesUuid(Long mcContentId) throws McApplicationException {
+		try
+        {
+            return mcUploadedFileDAO.retrieveMcUploadedOfflineFilesUuid(mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: offline + uuids "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+	
+	
+	public List retrieveMcUploadedOnlineFilesUuid(Long mcContentId) throws McApplicationException {
+		try
+        {
+            return mcUploadedFileDAO.retrieveMcUploadedOnlineFilesUuid(mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: online + uuids "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+	
+	
+	public List retrieveMcUploadedOfflineFilesName(Long mcContentId) throws McApplicationException {
+		try
+        {
+            return mcUploadedFileDAO.retrieveMcUploadedOfflineFilesName(mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: offline + fileNames "
+                                                         + e.getMessage(),
+														   e);
+        }
 	}
 
 	
-	public List retrieveMcUploadedOfflineFilesUuid(McContent mc) throws McApplicationException {
-		return null;
-		
+	public List retrieveMcUploadedOnlineFilesName(Long mcContentId) throws McApplicationException {
+    	try
+        {
+            return mcUploadedFileDAO.retrieveMcUploadedOnlineFilesName(mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is loading mc uploaded files: online + fileNames "
+                                                         + e.getMessage(),
+														   e);
+        }
 	}
 	
-	public List retrieveMcUploadedOnlineFilesUuid(McContent mc) throws McApplicationException {
-		return null;
-	}
-	
-	public List retrieveMcUploadedOfflineFilesName(McContent mc) throws McApplicationException {
-		return null;
-	}
-	
-	public List retrieveMcUploadedOnlineFilesName(McContent mc) throws McApplicationException {
-		return null;
-	}
 	
 	
 	/**
@@ -1709,4 +1761,16 @@ public class McServicePOJO implements
         this.toolService = toolService;
     }
 
+	/**
+	 * @return Returns the mcUploadedFileDAO.
+	 */
+	public IMcUploadedFileDAO getMcUploadedFileDAO() {
+		return mcUploadedFileDAO;
+	}
+	/**
+	 * @param mcUploadedFileDAO The mcUploadedFileDAO to set.
+	 */
+	public void setMcUploadedFileDAO(IMcUploadedFileDAO mcUploadedFileDAO) {
+		this.mcUploadedFileDAO = mcUploadedFileDAO;
+	}
 }

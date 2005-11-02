@@ -22,12 +22,14 @@
 
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.mc.McContent;
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUploadedFileDAO;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -41,14 +43,17 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploadedFileDAO {
 	 	static Logger logger = Logger.getLogger(McUploadedFileDAO.class.getName());
 	 	
-	 	private static final String GET_ONLINE_FILENAMES_FOR_CONTENT = "select mcUploadedFile.fileName from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mc and mcUploadedFile.fileOnline=1";
-	 	private static final String GET_OFFLINE_FILENAMES_FOR_CONTENT = "select mcUploadedFile.fileName from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mc and mcUploadedFile.fileOnline=0";
+	 	private static final String GET_ONLINE_FILENAMES_FOR_CONTENT = "select mcUploadedFile.filename from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=1";
+	 	private static final String GET_OFFLINE_FILENAMES_FOR_CONTENT = "select mcUploadedFile.filename from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
 	 	
-	 	private static final String GET_ONLINE_FILES_UUID = "select mcUploadedFile.uuid from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mc and mcUploadedFile.fileOnline=1";
-	 	private static final String GET_ONLINE_FILES_NAME ="select mcUploadedFile.fileName from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mc and mcUploadedFile.fileOnline=1 order by mcUploadedFile.uuid";
+	 	private static final String GET_ONLINE_FILES_UUID = "select mcUploadedFile.uuid from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=1";
+	 	private static final String GET_ONLINE_FILES_NAME ="select mcUploadedFile.filename from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=1 order by mcUploadedFile.uuid";
 	 	
-	 	private static final String GET_OFFLINE_FILES_UUID = "select mcUploadedFile.uuid from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mc and mcUploadedFile.fileOnline=0";
-	 	private static final String GET_OFFLINE_FILES_NAME ="select mcUploadedFile.fileName from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mc and mcUploadedFile.fileOnline=0 order by mcUploadedFile.uuid";
+	 	private static final String GET_OFFLINE_FILES_UUID = "select mcUploadedFile.uuid    from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
+	 	private static final String GET_OFFLINE_FILES_NAME ="select mcUploadedFile.filename from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0 order by mcUploadedFile.uuid";
+	 	
+	 	private static final String FIND_ALL_UPLOADED_FILE_DATA = "from mcUploadedFile in class McUploadedFile";
+		
 	 	
 	 	public McUploadedFile getUploadedFileById(long submissionId)
 	    {
@@ -60,9 +65,9 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
 	 	 * 
 	 	 * return null if not found
 	 	 */
-	 	public McUploadedFile loadUploadedFileById(long submissionId)
+	 	public McUploadedFile loadUploadedFileById(long uid)
 	    {
-	    	return (McUploadedFile) this.getHibernateTemplate().get(McUploadedFile.class, new Long(submissionId));
+	    	return (McUploadedFile) this.getHibernateTemplate().get(McUploadedFile.class, new Long(uid));
 	    }
 
 	 	
@@ -91,18 +96,30 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
 	    
 	    public void cleanUploadedFilesMetaData()
 	    {
-	    	String query = "from uploadedFile in class org.lamsfoundation.lams.tool.mc.McUploadedFile";
-	            this.getHibernateTemplate().delete(query);
+	    	HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(FIND_ALL_UPLOADED_FILE_DATA)
+				.list();
+
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    		McUploadedFile mcFile=(McUploadedFile)listIterator.next();
+					this.getSession().setFlushMode(FlushMode.AUTO);
+		    		templ.delete(mcFile);
+		    		templ.flush();
+		    	}
+			}
 	    }
 	    
-	    public void removeUploadFile(Long submissionId)
+	    public void removeUploadFile(Long uid)
 	    {
-	    	if (submissionId != null ) {
+	    	if (uid != null ) {
 	    		
 	    		String query = "from uploadedFile in class org.lamsfoundation.lams.tool.mc.McUploadedFile"
-	            + " where uploadedFile.submissionId = ?";
+	            + " where uploadedFile.uid = ?";
 	    		Object obj = this.getSession().createQuery(query)
-					.setLong(0,submissionId.longValue())
+					.setLong(0,uid.longValue())
 					.uniqueResult();
 	    		if ( obj != null ) { 
 	    			this.getHibernateTemplate().delete(obj);
@@ -110,71 +127,68 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
 	    	}
     	}
 	    
-	    public List retrieveMcUploadedFiles(McContent mc, boolean fileOnline)
+	    public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline)
 	    {
 	      List listFilenames=null;
 	    	
 	      if (fileOnline)
 	      {
 	      	listFilenames=(getHibernateTemplate().findByNamedParam(GET_ONLINE_FILENAMES_FOR_CONTENT,
-	                "mc",
-	                mc));	
+	                "mcContentId",
+					mcContentId));	
 	      }
 	      else
 	      {
 	      	listFilenames=(getHibernateTemplate().findByNamedParam(GET_OFFLINE_FILENAMES_FOR_CONTENT,
-	                "mc",
-	                mc));  	
+	                "mcContentId",
+					mcContentId));  	
 	      }
 		  return listFilenames;	
 	    }
 	    
 	    
-	    public List retrieveMcUploadedOfflineFilesUuid(McContent mc)
+	    public List retrieveMcUploadedOfflineFilesUuid(Long mcContentId)
 	    {
-	      List listFilesUuid=null;
-	    	
-	      listFilesUuid=(getHibernateTemplate().findByNamedParam(GET_OFFLINE_FILES_UUID,
-	                "mc",
-	                mc));	
+	      HibernateTemplate templ = this.getHibernateTemplate();
+	      List list = getSession().createQuery(GET_OFFLINE_FILES_UUID)
+				.setLong("mcContentId", mcContentId.longValue())
+				.list();
 	      
-		  return listFilesUuid;
+	      
+		  return list;
 	    }
 	    
-	    public List retrieveMcUploadedOnlineFilesUuid(McContent mc)
+	    public List retrieveMcUploadedOnlineFilesUuid(Long mcContentId)
 	    {
-	      List listFilesUuid=null;
-	    	
-	      listFilesUuid=(getHibernateTemplate().findByNamedParam(GET_ONLINE_FILES_UUID,
-	                "mc",
-	                mc));	
+	      HibernateTemplate templ = this.getHibernateTemplate();
+	      List list = getSession().createQuery(GET_ONLINE_FILES_UUID)
+				.setLong("mcContentId", mcContentId.longValue())
+				.list();
 	      
-		  return listFilesUuid;
+		  return list;
 	    }
 	    
 	    
-	    public List retrieveMcUploadedOfflineFilesName(McContent mc)
+	    public List retrieveMcUploadedOfflineFilesName(Long mcContentId)
 	    {
-	      List listFilesUuid=null;
-	    	
-	      listFilesUuid=(getHibernateTemplate().findByNamedParam(GET_OFFLINE_FILES_NAME,
-	                "mc",
-	                mc));	
+	      HibernateTemplate templ = this.getHibernateTemplate();
+	      List list = getSession().createQuery(GET_OFFLINE_FILES_NAME)
+				.setLong("mcContentId", mcContentId.longValue())
+				.list();
 	      
-		  return listFilesUuid;
+		  return list;
 	    }
+
 	    
-	    public List retrieveMcUploadedOnlineFilesName(McContent mc)
+	    public List retrieveMcUploadedOnlineFilesName(Long mcContentId)
 	    {
-	      List listFilesUuid=null;
-	    	
-	      listFilesUuid=(getHibernateTemplate().findByNamedParam(GET_ONLINE_FILES_NAME,
-	                "mc",
-	                mc));	
+	      HibernateTemplate templ = this.getHibernateTemplate();
+	      List list = getSession().createQuery(GET_ONLINE_FILES_NAME)
+				.setLong("mcContentId", mcContentId.longValue())
+				.list();
 	      
-		  return listFilesUuid;
+		  return list;
 	    }
-	    
 	    
 	    
 	    public void deleteUploadFile(McUploadedFile mcUploadedFile)

@@ -228,7 +228,8 @@ public class McAction extends DispatchAction implements McAppConstants
 
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	logger.debug("mcService:" + mcService);
-	 	
+
+	 	/** define the next tab as Basic tab by default*/
 	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 	 	
@@ -287,7 +288,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
     	    mcAuthoringForm.resetUserAction();
-	 		return (mapping.findForward(LOAD_QUESTIONS));
+    	    return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	else if (mcAuthoringForm.getRemoveQuestion() != null)
 	 	{
@@ -541,7 +542,6 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("updated mapOptionsContent Map size: " + mapOptionsContent.size());
 			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
     		logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-    		
     		
     		Long selectedQuestionContentUid=(Long) request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
 	 		logger.debug("selectedQuestionContentUid:" + selectedQuestionContentUid);
@@ -895,9 +895,11 @@ public class McAction extends DispatchAction implements McAppConstants
     		
     		String richTextOfflineInstructions=(String) request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
         	logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
+        	if (richTextOfflineInstructions == null) richTextOfflineInstructions="";
         	
         	String richTextOnlineInstructions=(String) request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
         	logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
+        	if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
         	
         	String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
     		logger.debug("richTextReportTitle: " + richTextReportTitle);
@@ -992,6 +994,10 @@ public class McAction extends DispatchAction implements McAppConstants
 			mcService.cleanAllQuestions(mcContent.getUid());
 			logger.debug("all questions cleaned for :" + mcContent.getUid());
 			
+			logger.debug("will do addUploadedFilesMetaData");
+			McUtils.addUploadedFilesMetaData(request,mcContent);
+			logger.debug("done addUploadedFilesMetaData");
+			
 			errors.clear();
 			errors.add(Globals.ERROR_KEY,new ActionMessage("submit.successful"));
 			logger.debug("add submit.successful to ActionMessages");
@@ -1026,16 +1032,31 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
-	 		//McUtils.addFileToContentRepository(request, mcAuthoringForm, true);
-            //logger.debug("offline file added to repository successfully.");
-            
+	 		McUtils.addFileToContentRepository(request, mcAuthoringForm, true);
+            logger.debug("offline file added to repository successfully.");
 	 		
 	 		mcAuthoringForm.resetUserAction();
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
+	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2 );
+	   	    return (mapping.findForward(LOAD_QUESTIONS));
+        }
+	 	else if (mcAuthoringForm.getSubmitOnlineFile() != null)
+        {
+	 		userAction="submitOnlineFile";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		
+	 		McUtils.addFileToContentRepository(request, mcAuthoringForm, false);
+            logger.debug("online file added to repository successfully.");
+	 		
+	 		mcAuthoringForm.resetUserAction();
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
+	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2 );
 	   	    return (mapping.findForward(LOAD_QUESTIONS));
         }
 	 	
 	 	mcAuthoringForm.resetUserAction();
-   	    return (mapping.findForward(LOAD_QUESTIONS));
+	 	return (mapping.findForward(LOAD_QUESTIONS));
     }
     
     

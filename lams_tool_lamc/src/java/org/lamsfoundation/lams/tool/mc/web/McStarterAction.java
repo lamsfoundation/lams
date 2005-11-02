@@ -70,6 +70,7 @@
 package org.lamsfoundation.lams.tool.mc.web;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -106,7 +107,43 @@ public class McStarterAction extends Action implements McAppConstants {
 	 */
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {
-	
+		/**
+		 * retrive the service
+		 */
+		IMcService mcService = McUtils.getToolService(request);
+		logger.debug("retrieving mcService from session: " + mcService);
+		if (mcService == null)
+		{
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from proxy: " + mcService);
+		    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
+		}
+		
+		/**  CURRENT_TAB == 1 defines Basic Tab
+		 *   CURRENT_TAB == 2 defines Avanced Tab
+		 *   CURRENT_TAB == 3 defines Instructions Tab
+		 * */ 
+		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+		
+		/**  needs to run only once per tool*/ 
+		/** McUtils.configureContentRepository(request, mcService); */
+		
+		/** these two are for repository access */
+		/**holds the final offline files  list */
+		LinkedList listUploadedOfflineFiles= new LinkedList();
+		LinkedList listUploadedOnlineFiles= new LinkedList();
+		
+		/** these two are for jsp */
+		LinkedList listUploadedOfflineFileNames= new LinkedList();
+		LinkedList listUploadedOnlineFileNames= new LinkedList();
+		
+		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
+		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
+		
+		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
+		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
+		
+			
 		Map mapQuestionsContent= new TreeMap(new McComparator());
 		Map mapOptionsContent= new TreeMap(new McComparator());
 		Map mapDefaultOptionsContent= new TreeMap(new McComparator());
@@ -130,18 +167,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 		mcAuthoringForm.resetRadioBoxes();
-		
-		/**
-		 * retrive the service
-		 */
-		IMcService mcService = McUtils.getToolService(request);
-		logger.debug("retrieving mcService from session: " + mcService);
-		if (mcService == null)
-		{
-			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-		    logger.debug("retrieving mcService from proxy: " + mcService);
-		    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
-		}
 		
 		/**
 		 * retrieve the default content id based on tool signature
@@ -328,6 +353,8 @@ public class McStarterAction extends Action implements McAppConstants {
 			request.getSession().setAttribute(SYNCH_IN_MONITOR, new Boolean(mcContent.isSynchInMonitor()));
 			request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
 			request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
+			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
+		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
 			request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
 			request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
 			request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
@@ -336,7 +363,7 @@ public class McStarterAction extends Action implements McAppConstants {
 			request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
 			request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
 			
-    		McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
+			McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
 			
 			logger.debug("PASSMARK:" + request.getSession().getAttribute(PASSMARK));
 			
@@ -423,6 +450,8 @@ public class McStarterAction extends Action implements McAppConstants {
 			request.getSession().setAttribute(SYNCH_IN_MONITOR, new Boolean(mcContent.isSynchInMonitor()));
 			request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
 			request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
+			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
+		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
 			request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
 			request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
 			request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
@@ -435,6 +464,17 @@ public class McStarterAction extends Action implements McAppConstants {
 			
 			mcAuthoringForm.setPassmark((mcContent.getPassMark()).toString());
 			logger.debug("PASSMARK:" + mcAuthoringForm.getPassmark());
+			
+			logger.debug("getting name lists based on uid:" + mcContent.getUid());
+			
+			List listUploadedOffFiles= mcService.retrieveMcUploadedOfflineFilesName(mcContent.getUid());
+			logger.debug("existing listUploadedOfflineFileNames:" + listUploadedOffFiles);
+			request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOffFiles);
+			
+			List listUploadedOnFiles= mcService.retrieveMcUploadedOnlineFilesName(mcContent.getUid());
+			logger.debug("existing listUploadedOnlineFileNames:" + listUploadedOnFiles);
+			request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnFiles);
+			
 			
 			if (mcContent.isUsernameVisible())
 			{
@@ -493,9 +533,13 @@ public class McStarterAction extends Action implements McAppConstants {
 				logger.debug("setting showFeedback to false");				
 			}
 			
+			McUtils.populateUploadedFilesData(request, mcContent);
+		    logger.debug("populated UploadedFilesData");
+		    
 			AuthoringUtil authoringUtil = new AuthoringUtil();
 			mapQuestionsContent=authoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
 			System.out.print("mapQuestionsContent:" + mapQuestionsContent);
+			
 			
 			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
     		logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));

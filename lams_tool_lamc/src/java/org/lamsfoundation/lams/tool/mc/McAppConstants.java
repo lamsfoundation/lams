@@ -65,7 +65,8 @@ public interface McAppConstants {
 	public static final String MODE = "mode";
 	public static final String USER_ID = "userID";
     public static final String ACTIVITY_ID = "activityID";
-	
+    public static final String CURRENT_TAB = "currentTab";
+    
 	
 	/**
 	 * Mock constants below are temporary until the tool gets a User object from the container.

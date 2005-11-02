@@ -46,15 +46,15 @@ public interface IMcUploadedFileDAO
 	    
 	    public void deleteUploadFile(McUploadedFile mcUploadedFile);
 	    
-	    public List retrieveMcUploadedFiles(McContent mc, boolean fileOnline);
+	    public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline);
 	    
-	    public List retrieveMcUploadedOfflineFilesUuid(McContent mc);
+	    public List retrieveMcUploadedOfflineFilesUuid(Long mcContentId);
 	    
-	    public List retrieveMcUploadedOnlineFilesUuid(McContent mc);
+	    public List retrieveMcUploadedOnlineFilesUuid(Long mcContentId);
 	    
-	    public List retrieveMcUploadedOfflineFilesName(McContent mc);
+	    public List retrieveMcUploadedOfflineFilesName(Long mcContentId);
 	    
-	    public List retrieveMcUploadedOnlineFilesName(McContent mc);
+	    public List retrieveMcUploadedOnlineFilesName(Long mcContentId);
 	    
 	    public void cleanUploadedFilesMetaData();
 	    

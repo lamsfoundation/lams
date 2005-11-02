@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.McSession;
+import org.lamsfoundation.lams.tool.mc.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -177,15 +178,20 @@ public interface IMcService
 	
 	public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws McApplicationException;
 	
-	public InputStream downloadFile(Long uuid, Long versionID)throws McApplicationException;
+	public InputStream downloadFile(Long uuid, Long versionID) throws McApplicationException;
 	
-	public List retrieveMcUploadedOfflineFilesUuid(McContent mc);
+	public List retrieveMcUploadedOfflineFilesUuid(Long mcContentId) throws McApplicationException;
 	
-	public List retrieveMcUploadedOnlineFilesUuid(McContent mc);
+	public List retrieveMcUploadedOnlineFilesUuid(Long mcContentId) throws McApplicationException;
 	
-	public List retrieveMcUploadedOfflineFilesName(McContent mc);
+	public List retrieveMcUploadedOfflineFilesName(Long mcContentId) throws McApplicationException;
 	
-	public List retrieveMcUploadedOnlineFilesName(McContent mc);
+	public List retrieveMcUploadedOnlineFilesName(Long mcContentId) throws McApplicationException;
+	
+	public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline) throws McApplicationException;
+	
+    public void cleanUploadedFilesMetaData() throws McApplicationException;
     
+    public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent) throws McApplicationException;
 }
 

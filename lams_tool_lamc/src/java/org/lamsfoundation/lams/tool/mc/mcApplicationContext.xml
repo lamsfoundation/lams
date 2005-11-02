@@ -59,11 +59,11 @@
 		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
 
-<!-- 	
+
 	<bean id="mcUploadedFileDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUploadedFileDAO">
 		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
--->
+
 	<!-- end of tool beans -->
 
 	<bean id="mcService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -78,7 +78,7 @@
 					<property name="mcUsrAttemptDAO"><ref bean="mcUsrAttemptDAO"/></property>													
 					<property name="toolService"><ref bean="lamsToolService"/></property>
 					<property name="repositoryService"><ref bean="repositoryService"/></property>
-			<!-- 	<property name="mcUploadedFileDAO"><ref bean="mcUploadedFileDAO"/></property>	-->							
+			 		<property name="mcUploadedFileDAO"><ref bean="mcUploadedFileDAO"/></property>
 				</bean>
 			</property>
 			<property name="transactionAttributes">
