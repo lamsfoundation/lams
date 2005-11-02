@@ -22,4 +22,5 @@ public interface ForumConstants {
 	//TODO:hard code!!! need to read from config
 	public static final String TOOL_URL_BASE = "/lams/tool/lafrum11/";
 	public static final String SUCCESS_FLAG = "SUCCESS_FLAG";
+	public static final String FORUM_ID = "forum_id";
 }

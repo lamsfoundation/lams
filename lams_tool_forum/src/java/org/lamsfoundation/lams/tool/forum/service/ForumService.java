@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -46,6 +47,8 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @version $Revision$
  */
 public class ForumService implements IForumService,ToolContentManager,ToolSessionManager {
+	private static final Logger log = Logger.getLogger(ForumService.class);
+	
 	private ForumDao forumDao;
 	private AttachmentDao attachmentDao;
 	private MessageDao messageDao;
@@ -63,7 +66,11 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     }
 
 	public Forum getForumByContentId(Long contentID)  throws PersistenceException {
-		return (Forum) forumDao.getByContentId(contentID);
+		Forum forum = (Forum) forumDao.getByContentId(contentID);
+		if(forum == null){
+			log.error("Could not find the content by given ID:"+contentID);
+		}
+		return forum; 
 	}
     public void deleteForum(Long forumId) throws PersistenceException {
         Forum forum = this.getForum(forumId);
@@ -81,8 +88,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     }
 
     public Message createMessage(Long forumId, Message message) throws PersistenceException {
-    	//TODO: need fix
-//        message.setToolSession(this.getForum(forumId));
+    	Forum forum = new Forum();
+    	forum.setUid(forumId);
+    	message.setForum(forum);
         messageDao.saveOrUpdate(message);
         return message;
     }
@@ -325,5 +333,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		file.setFileName(uploadFile.getFileName());
 		
 		return file;
+	}
+
+	public Forum createForum(Long contentId) throws PersistenceException {
+		return null;
 	}
 }

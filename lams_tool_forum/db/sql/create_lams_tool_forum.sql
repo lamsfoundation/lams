@@ -75,4 +75,5 @@ alter table tl_lafrum11_message add index FK4A6067E8C6FF3C72 (forum_session_uid)
 alter table tl_lafrum11_message add index FK4A6067E8B0A7E6B3 (user_uid), add constraint FK4A6067E8B0A7E6B3 foreign key (user_uid) references tl_lafrum11_forum_user (uid);
 alter table tl_lafrum11_tool_session add index FK5A04D7AE131CE31E (forum_uid), add constraint FK5A04D7AE131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 
+INSERT INTO tl_lafrum11_forum (title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_edit,allow_rich_editor) VALUES("LAMS Forum","Instruction","Online instruction","Offline instruction",1,0,0,0,0,0,0,0);
 SET FOREIGN_KEY_CHECKS=1;

@@ -25,6 +25,7 @@ public class Message {
 	private ToolSession toolSession;
 	private Message parent;
 	private ForumUser learner;
+	private Forum forum;
 	private Set replies;
 	private Set attachments;
 	
@@ -321,5 +322,17 @@ public class Message {
 
 	public void setLearner(ForumUser learner) {
 		this.learner = learner;
+	}
+	/**
+	 * @hibernate.many-to-one column="forum_uid"
+	 * 			  cascade="none"
+	 * @return
+	 */
+	public Forum getForum() {
+		return forum;
+	}
+
+	public void setForum(Forum forum) {
+		this.forum = forum;
 	}
 }

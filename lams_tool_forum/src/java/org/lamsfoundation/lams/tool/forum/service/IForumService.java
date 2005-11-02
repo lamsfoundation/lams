@@ -24,6 +24,9 @@ public interface IForumService {
     public void deleteForum(Long forumId) throws PersistenceException;
     public List getTopics(Long forumId) throws PersistenceException;
     public void deleteForumAttachment(Long attachmentId) throws PersistenceException;
+    public Forum createForum(Long contentId) throws PersistenceException;
+    
+    
     public Message createMessage(Long forumId, Message message) throws PersistenceException ;
     public Message editMessage(Message message) throws PersistenceException;
     public Message getMessage(Long messageId) throws PersistenceException;

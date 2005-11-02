@@ -149,6 +149,16 @@
             column="user_uid"
         />
 
+        <many-to-one
+            name="forum"
+            class="org.lamsfoundation.lams.tool.forum.persistence.Forum"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="forum_uid"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Message.xml
