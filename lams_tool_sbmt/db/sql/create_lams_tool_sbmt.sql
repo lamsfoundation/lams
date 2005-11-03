@@ -1,74 +1,62 @@
 SET FOREIGN_KEY_CHECKS=0;
-create table tl_lafrum11_attachment (
-   uid bigint not null auto_increment,
-   file_version_id bigint,
-   file_type varchar(255),
-   file_name varchar(255),
-   file_uuid bigint,
-   create_date datetime,
-   forum_uid bigint,
-   message_uid bigint,
-   primary key (uid)
-);
-create table tl_lafrum11_forum (
-   uid bigint not null auto_increment,
-   create_date datetime,
-   update_date datetime,
-   create_by bigint,
-   title varchar(255),
-   allow_anonym bit,
-   run_offline bit,
-   lock_on_finished bit,
-   instructions varchar(255),
-   online_instructions varchar(255),
-   offline_instructions varchar(255),
+create table tl_lasbmt11_content (
+   content_id bigint not null,
+   title varchar(64) not null,
+   instruction text,
+   define_later bit not null,
+   run_offline bit not null,
+   offline_instruction text,
+   online_instruction text,
+   run_offline_instruction text,
    content_in_use bit,
-   define_later bit,
-   content_id bigint unique,
-   allow_edit bit,
-   allow_rich_editor bit,
-   primary key (uid)
+   lock_on_finished bit,
+   primary key (content_id)
 );
-create table tl_lafrum11_forum_user (
-   uid bigint not null auto_increment,
+create table tl_lasbmt11_instruction_files (
+   file_id bigint not null auto_increment,
+   uuid bigint,
+   version_id bigint,
+   type varchar(20),
+   name varchar(255),
+   content_id bigint,
+   primary key (file_id)
+);
+create table tl_lasbmt11_report (
+   report_id bigint not null auto_increment,
+   comments varchar(250),
+   marks bigint,
+   date_marks_released datetime,
+   primary key (report_id)
+);
+create table tl_lasbmt11_session (
+   session_id bigint not null auto_increment,
+   status integer not null,
+   content_id bigint,
+   primary key (session_id)
+);
+create table tl_lasbmt11_session_learners (
+   learner_id bigint not null auto_increment,
    user_id bigint,
-   status bit,
-   full_name varchar(255),
-   user_name varchar(255),
-   primary key (uid)
-);
-create table tl_lafrum11_message (
-   uid bigint not null auto_increment,
-   create_date datetime,
-   update_date datetime,
-   create_by bigint,
-   modified_by bigint,
-   subject varchar(255),
-   body text,
-   is_authored bit,
-   is_anonymous bit,
-   forum_session_uid bigint,
-   user_uid bigint,
-   forum_uid bigint,
-   parent_uid bigint,
-   primary key (uid)
-);
-create table tl_lafrum11_tool_session (
-   uid bigint not null auto_increment,
-   session_end_date datetime,
-   session_start_date datetime,
-   status integer,
-   forum_uid bigint,
+   finished bit,
    session_id bigint,
-   primary key (uid)
+   primary key (learner_id)
 );
-alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
-alter table tl_lafrum11_attachment add index FK389AD9A2131CE31E (forum_uid), add constraint FK389AD9A2131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
-alter table tl_lafrum11_message add index FK4A6067E8131CE31E (forum_uid), add constraint FK4A6067E8131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
-alter table tl_lafrum11_message add index FK4A6067E824089E4D (parent_uid), add constraint FK4A6067E824089E4D foreign key (parent_uid) references tl_lafrum11_message (uid);
-alter table tl_lafrum11_message add index FK4A6067E8C6FF3C72 (forum_session_uid), add constraint FK4A6067E8C6FF3C72 foreign key (forum_session_uid) references tl_lafrum11_tool_session (uid);
-alter table tl_lafrum11_message add index FK4A6067E8B0A7E6B3 (user_uid), add constraint FK4A6067E8B0A7E6B3 foreign key (user_uid) references tl_lafrum11_forum_user (uid);
-alter table tl_lafrum11_tool_session add index FK5A04D7AE131CE31E (forum_uid), add constraint FK5A04D7AE131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
+create table tl_lasbmt11_submission_details (
+   submission_id bigint not null auto_increment,
+   filePath varchar(250),
+   fileDescription varchar(250),
+   date_of_submission datetime,
+   uuid bigint,
+   version_id bigint,
+   session_id bigint,
+   learner_id bigint,
+   primary key (submission_id)
+);
+alter table tl_lasbmt11_instruction_files add index FKA75538F9785A173A (content_id), add constraint FKA75538F9785A173A foreign key (content_id) references tl_lasbmt11_content (content_id);
+alter table tl_lasbmt11_session add index FKEC8C77C9785A173A (content_id), add constraint FKEC8C77C9785A173A foreign key (content_id) references tl_lasbmt11_content (content_id);
+alter table tl_lasbmt11_session_learners add index FKC56CD05893C861A (session_id), add constraint FKC56CD05893C861A foreign key (session_id) references tl_lasbmt11_session (session_id);
+alter table tl_lasbmt11_submission_details add index FK1411A53C93C861A (session_id), add constraint FK1411A53C93C861A foreign key (session_id) references tl_lasbmt11_session (session_id);
+alter table tl_lasbmt11_submission_details add index FK1411A53C10BBAB1B (learner_id), add constraint FK1411A53C10BBAB1B foreign key (learner_id) references tl_lasbmt11_session_learners (learner_id);
 
 INSERT INTO `tl_lasbmt11_content` (content_id,title,instruction,define_later,run_offline,content_in_use,lock_on_finished) values(1,"Java Submission","Submit your java programs",0,0,0,0);
 INSERT INTO `tl_lasbmt11_session` (session_id,content_id,status) values(1,1,1);
