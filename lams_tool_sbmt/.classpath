@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry output="JBOSS4" kind="src" path="src/java"/>
+	<classpathentry kind="src" path="src/java"/>
 	<classpathentry output="build/classes/test/java" kind="src" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams.jar"/>

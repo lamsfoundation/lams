@@ -1,74 +1,74 @@
 SET FOREIGN_KEY_CHECKS=0;
-CREATE TABLE tl_lasbmt11_report (
-       report_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , comments VARCHAR(250)
-     , marks BIGINT(20)
-     , date_marks_released DATETIME
-     , PRIMARY KEY (report_id)
+create table tl_lafrum11_attachment (
+   uid bigint not null auto_increment,
+   file_version_id bigint,
+   file_type varchar(255),
+   file_name varchar(255),
+   file_uuid bigint,
+   create_date datetime,
+   forum_uid bigint,
+   message_uid bigint,
+   primary key (uid)
 );
-
-CREATE TABLE tl_lasbmt11_session_learners (
-       learner_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , user_id BIGINT(20)
-     , finished TINYINT(1)
-     , session_id BIGINT(20)
-     , PRIMARY KEY (learner_id)
-)TYPE=InnoDB;
-
-CREATE TABLE tl_lasbmt11_content (
-       content_id BIGINT(20) NOT NULL DEFAULT 0
-     , title VARCHAR(64) NOT NULL
-     , instruction TEXT
-     , define_later TINYINT(1) NOT NULL DEFAULT 0
-     , run_offline TINYINT(1) NOT NULL DEFAULT 0
-     , offline_instruction TEXT
-     , online_instruction TEXT
-     , run_offline_instruction TEXT
-     , content_in_use TINYINT(1)
-     , lock_on_finished TINYINT(1)
-     , PRIMARY KEY (content_id)
-)TYPE=InnoDB;
-
-CREATE TABLE tl_lasbmt11_session (
-       session_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , status INT(11) NOT NULL DEFAULT 0
-     , content_id BIGINT(20)
-     , PRIMARY KEY (session_id)
-     , INDEX (content_id)
-     , CONSTRAINT FKEC8C77C9FC4BEA1 FOREIGN KEY (content_id)
-                  REFERENCES tl_lasbmt11_content (content_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
-CREATE TABLE tl_lasbmt11_instruction_files (
-       file_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , uuid BIGINT(20)
-     , version_id BIGINT(20)
-     , type VARCHAR(20)
-     , name VARCHAR(255)
-     , content_id BIGINT(20)
-     , PRIMARY KEY (file_id)
-     , INDEX (content_id)
-     , CONSTRAINT FKA75538F9FC4BEA1 FOREIGN KEY (content_id)
-                  REFERENCES tl_lasbmt11_content (content_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-
-CREATE TABLE tl_lasbmt11_submission_details (
-       submission_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , filePath VARCHAR(250)
-     , fileDescription VARCHAR(250)
-     , date_of_submission DATETIME
-     , uuid BIGINT(20)
-     , version_id BIGINT(20)
-     , session_id BIGINT(20)
-     , learner_id BIGINT(20)
-     , PRIMARY KEY (submission_id)
-     , INDEX (learner_id)
-     , CONSTRAINT FK1411A53C3A4D8629 FOREIGN KEY (learner_id)
-                  REFERENCES tl_lasbmt11_session_learners (learner_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-     , INDEX (session_id)
-     , CONSTRAINT FK1411A53C630DDF64 FOREIGN KEY (session_id)
-                  REFERENCES tl_lasbmt11_session (session_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
+create table tl_lafrum11_forum (
+   uid bigint not null auto_increment,
+   create_date datetime,
+   update_date datetime,
+   create_by bigint,
+   title varchar(255),
+   allow_anonym bit,
+   run_offline bit,
+   lock_on_finished bit,
+   instructions varchar(255),
+   online_instructions varchar(255),
+   offline_instructions varchar(255),
+   content_in_use bit,
+   define_later bit,
+   content_id bigint unique,
+   allow_edit bit,
+   allow_rich_editor bit,
+   primary key (uid)
+);
+create table tl_lafrum11_forum_user (
+   uid bigint not null auto_increment,
+   user_id bigint,
+   status bit,
+   full_name varchar(255),
+   user_name varchar(255),
+   primary key (uid)
+);
+create table tl_lafrum11_message (
+   uid bigint not null auto_increment,
+   create_date datetime,
+   update_date datetime,
+   create_by bigint,
+   modified_by bigint,
+   subject varchar(255),
+   body text,
+   is_authored bit,
+   is_anonymous bit,
+   forum_session_uid bigint,
+   user_uid bigint,
+   forum_uid bigint,
+   parent_uid bigint,
+   primary key (uid)
+);
+create table tl_lafrum11_tool_session (
+   uid bigint not null auto_increment,
+   session_end_date datetime,
+   session_start_date datetime,
+   status integer,
+   forum_uid bigint,
+   session_id bigint,
+   primary key (uid)
+);
+alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
+alter table tl_lafrum11_attachment add index FK389AD9A2131CE31E (forum_uid), add constraint FK389AD9A2131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
+alter table tl_lafrum11_message add index FK4A6067E8131CE31E (forum_uid), add constraint FK4A6067E8131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
+alter table tl_lafrum11_message add index FK4A6067E824089E4D (parent_uid), add constraint FK4A6067E824089E4D foreign key (parent_uid) references tl_lafrum11_message (uid);
+alter table tl_lafrum11_message add index FK4A6067E8C6FF3C72 (forum_session_uid), add constraint FK4A6067E8C6FF3C72 foreign key (forum_session_uid) references tl_lafrum11_tool_session (uid);
+alter table tl_lafrum11_message add index FK4A6067E8B0A7E6B3 (user_uid), add constraint FK4A6067E8B0A7E6B3 foreign key (user_uid) references tl_lafrum11_forum_user (uid);
+alter table tl_lafrum11_tool_session add index FK5A04D7AE131CE31E (forum_uid), add constraint FK5A04D7AE131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 
 INSERT INTO `tl_lasbmt11_content` (content_id,title,instruction,define_later,run_offline,content_in_use,lock_on_finished) values(1,"Java Submission","Submit your java programs",0,0,0,0);
 INSERT INTO `tl_lasbmt11_session` (session_id,content_id,status) values(1,1,1);

@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
  * @hibernate.class table="tl_lasbmt11_session_learners"
  * @author Steve.Ni
  * 
- * $version$
+ * @version $Revision$
  * @serial 4951104689120529660L;
  */
 public class Learner implements Serializable,Cloneable{

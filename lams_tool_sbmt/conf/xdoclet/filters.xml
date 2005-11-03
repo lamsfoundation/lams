@@ -8,6 +8,7 @@
       <param-value>sbmtSessionFactory</param-value>
     </init-param>
    </filter>
+   
    <!-- System session filter -->
    <filter>
        <filter-name>SystemSessionFilter</filter-name>
