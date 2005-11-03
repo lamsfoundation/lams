@@ -130,7 +130,7 @@ public class AuthoringAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) {
 
 		
-		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.TOOL_CONTENT_ID));
+		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		ForumForm forumForm = (ForumForm)form;
 		//get back the topic list and display them on page
 		forumService = getForumManager();
@@ -327,6 +327,7 @@ public class AuthoringAction extends Action {
 			forumService.createMessage(forumId,newMsg.getMessage());
 			
 		}
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"ATT_SUCCESS_FLAG");
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
     	return mapping.findForward("success");
     }
@@ -488,7 +489,7 @@ public class AuthoringAction extends Action {
 	 * @return
 	 */
 	private ActionForward deleteFile(HttpServletRequest request, HttpServletResponse response, ActionForm form, String type) {
-		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.TOOL_CONTENT_ID));
+		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
 		Long uuID = new Long(WebUtil.readLongParam(request,"uuID"));
 		

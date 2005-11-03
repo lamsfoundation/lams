@@ -17,7 +17,7 @@
 			<b><bean:message key="message.label.attachment" /></b>
 		</td>
 		<td valign="MIDDLE">&nbsp;
-			<c:if test="${not empty topic.message.attachments}">
+			<c:if test="${topic.hasAttachment}">
 				<c:forEach var="file" items="${topic.message.attachments}">
 					<c:set var="downloadURL">
 							<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true"/>
@@ -34,7 +34,7 @@
 					</a>					
 				</c:forEach>
 			</c:if>
-			<c:if test="${empty topic.message.attachments}">
+			<c:if test="${not topic.hasAttachment}">
 				<html:file tabindex="3"		property="attachmentFile" /> <html:errors	property="message.attachment" />
 			</c:if>
 		</td>
