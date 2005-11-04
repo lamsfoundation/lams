@@ -1,0 +1,4 @@
+Implementation-Title: LAMS
+Implementation-Version: 1.1
+Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
+Class-Path: jboss-cache.jar, jgroups.jar

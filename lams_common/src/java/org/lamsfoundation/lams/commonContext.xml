@@ -16,7 +16,9 @@
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
   
   	<!-- Hibernate Properties. Should be used by all Hibernate session factories unless -->
-  	<!--  the tool has a specific need for a different setting. 					    -->
+  	<!--  the tool has a specific need for a different setting. 						-->			
+  	<!-- If you change hibernate.treecache.objectName, you will also need to change the -->
+  	<!--  cacheManager object 															-->
   	<bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 	  	<property name="properties">
 		<props>
@@ -26,11 +28,14 @@
 			<prop key="hibernate.c3p0.maxPoolSize">20</prop>
 			<prop key="hibernate.c3p0.timeout">1800</prop>
 			<prop key="hibernate.c3p0.max_statement">50</prop>
-				<!-- will need to be revisited for JBOSS 4.0 -->
-				<!--  <prop key="hibernate.cache.provider_class">net.sf.hibernate.cache.TreeCacheProvider</prop> -->
+  			<prop key="hibernate.cache.provider_class">org.jboss.hibernate.cache.DeployedTreeCacheProvider</prop>
+			<prop key="hibernate.treecache.objectName">jboss.cache:service=TreeCache</prop>
 		</props>
 		</property>
   	</bean>
+  	
+  <!-- 			<prop key="hibernate.cache.provider_class">org.hibernate.cache.JndiBoundTreeCacheProvider</prop> -->
+  	<!-- hibernate.cache.jndi -->
   	
 	<!-- Hibernate SessionFactory -->
 	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
@@ -96,6 +101,7 @@
 		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
 		<property name="userManagementWorkspaceDAO"><ref bean="userManagementWorkspaceDAO"/></property>
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="cacheManager"><ref local="cacheManager"/></property>
 	</bean>	
 	
 	<!-- Transactional proxy for the user management primary business object -->
@@ -193,6 +199,11 @@
 	    destroy-method="destroy"
 		singleton="true">
 		<property name="monitorPeriod"><value>60</value></property>
+	</bean>
+	
+	<!-- Cache Manager bean. cacheObjectName should be the same value as hibernate.treecache.objectName -->
+	<bean id="cacheManager" class="org.lamsfoundation.lams.cache.CacheManager">
+		<property name="cacheObjectName"><value>jboss.cache:service=TreeCache</value></property>
 	</bean>
 	
 </beans>

@@ -23,30 +23,33 @@
 package org.lamsfoundation.lams.usermanagement.service;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.cache.ICacheManager;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
+import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dao.IAuthenticationMethodDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IOrganisationTypeDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationRoleDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
 /**
@@ -54,9 +57,15 @@ import org.lamsfoundation.lams.util.wddx.FlashMessage;
  * <a href="UserManagementService.java.html"> <i>View Source </i> </a>
  * </p>
  * 
+ * Manually caches the user objects (by user id) in the shared cache.
+ * Whenever a user object is modified, the cached version must be 
+ * removed.
+ * 
  * @author Fei Yang, Manpreet Minhas
  */
 public class UserManagementService implements IUserManagementService {
+
+	protected Logger log = Logger.getLogger(UserManagementService.class);	
 
 	private IUserDAO userDAO;
 
@@ -78,8 +87,11 @@ public class UserManagementService implements IUserManagementService {
 
 	protected ILearningDesignDAO learningDesignDAO;
 
+	protected ICacheManager cacheManager;
+
 	private FlashMessage flashMessage;
 
+	private String[] userClassParts = null; 
 	/**
 	 * @param workspaceFolderDAO
 	 *            The workspaceFolderDAO to set.
@@ -139,13 +151,29 @@ public class UserManagementService implements IUserManagementService {
 		this.authenticationMethodDAO = authenticationMethodDAO;
 	}
 
+	public void setCacheManager(ICacheManager cacheManager) {
+		this.cacheManager = cacheManager;
+	}	
+
 	/**
+	 * Tries to get the user from the cache and if that fails then reads it from the database and puts it in the cache.
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUserById(java.lang.Integer)
 	 */
 	public User getUserById(Integer userId) {
-		return userDAO.getUserById(userId);
-	}
+		if ( this.userClassParts == null ) {
+			this.userClassParts = cacheManager.getPartsFromClass(User.class);
+		}
 
+		User user = (User) cacheManager.getItem(this.userClassParts, userId);
+		if ( user == null ) {
+			user = userDAO.getUserById(userId);
+			if ( user != null ) {
+				cacheManager.addItem(this.userClassParts,userId,user);
+			}
+		} 
+		return user;
+	}
+	
 	/**
 	 * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUserByLogin(java.lang.String)
 	 */
@@ -550,5 +578,6 @@ public class UserManagementService implements IUserManagementService {
 							+ organisationID + " exists", FlashMessage.ERROR);
 
 		return flashMessage.serializeMessage();
-	}	
+	}
+
 }
