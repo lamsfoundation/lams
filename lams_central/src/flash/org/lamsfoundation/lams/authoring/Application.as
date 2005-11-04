@@ -213,13 +213,13 @@ class org.lamsfoundation.lams.authoring.Application {
 			_uiLoadCheckCount++;
             //If all events dispatched clear interval and call start()
             if(_dictionaryEventDispatched && _themeEventDispatched){
-				Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
+				//Debugger.log('Clearing Interval and calling start :',Debugger.CRITICAL,'checkUILoaded','Application');	
                 clearInterval(_UILoadCheckIntervalID);
 				start();
             }else {
                 //If UI loaded check which events can be broadcast
                 if(_UILoaded){
-					Debugger.log('ALL UI LOADED, waiting for all true to dispatch init events: _dictionaryLoaded:'+_dictionaryLoaded+'_themeLoaded:'+_themeLoaded ,Debugger.GEN,'checkUILoaded','Application');
+					//Debugger.log('ALL UI LOADED, waiting for all true to dispatch init events: _dictionaryLoaded:'+_dictionaryLoaded+'_themeLoaded:'+_themeLoaded ,Debugger.GEN,'checkUILoaded','Application');
 
                     //If dictionary is loaded and event hasn't been dispatched - dispatch it
                     if(_dictionaryLoaded && !_dictionaryEventDispatched){
@@ -251,7 +251,7 @@ class org.lamsfoundation.lams.authoring.Application {
     * @param UIElementID:String - Identifier for the Element that was loaded
     */
     public function UIElementLoaded(evt:Object) {
-        Debugger.log('UIElementLoaded: ' + evt.target.className,Debugger.GEN,'UIElementLoaded','Application');
+        //Debugger.log('UIElementLoaded: ' + evt.target.className,Debugger.GEN,'UIElementLoaded','Application');
         if(evt.type=='load'){
             //Which item has loaded
             switch (evt.target.className) {
