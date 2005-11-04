@@ -76,7 +76,7 @@ class WorkspaceDialog extends MovieClip{
         Debugger.log('container=' + _container,Debugger.GEN,'init','org.lamsfoundation.lams.wsDialog');
 
         //Set the text on the labels
-        myLabel_lbl.text = 'LD ID:';
+        myLabel_lbl.text = 'Enter the ID of the design you want to open:';
         
         //Set the text for buttons
         ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
