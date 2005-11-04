@@ -179,7 +179,7 @@
 	<!-- =================================================================== -->
 	<!-- Deploy the jar and war                               -->
 	<!-- =================================================================== -->
-	<target name="deploy-war" depends="build-war" description="Deploy the SubmitFiles tool war file and jar file">
+	<target name="deploy-war" depends="build-war" description="Deploy the Admin war file and jar file">
 		<delete quiet="true">
 			<fileset dir="${jboss.deploy}/tmp"/>
 			<fileset dir="${jboss.deploy}/work"/>
