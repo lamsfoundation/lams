@@ -1,4 +1,4 @@
-<form-bean name ="SbmtAuthoringForm" type="org.apache.struts.action.DynaActionForm">
+<form-bean name ="SbmtAuthoringForm" type="org.apache.struts.action.DynaValidatorForm">
 	<form-property name="title" 
 				   type="java.lang.String" />
 				   
