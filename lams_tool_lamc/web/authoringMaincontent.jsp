@@ -85,6 +85,11 @@ MM_reloadPage(true);
 
 <!-- end tab buttons -->
 
+current tab <c:out value="${sessionScope.currentTab}"/>
+
+edit mode <c:out value="${sessionScope.editOptionsMode}"/>
+
+
 <html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
  <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
@@ -99,17 +104,17 @@ MM_reloadPage(true);
 
 	<h2><bean:message key="label.authoring.mc.basic"/></h2>
 	
-	<div id="formtablecontainer1">
-			<c:if test="${sessionScope.editOptionsMode == 0}"> 			
-				<jsp:include page="BasicContent.jsp" />
-			</c:if> 				
-			<c:if test="${sessionScope.editOptionsMode == 1}"> 			
-				<jsp:include page="OptionsContent.jsp" />
-			</c:if> 				
-			<c:if test="${sessionScope.editOptionsMode == 2}"> 			
-				<jsp:include page="InstructionsContent.jsp" />
-			</c:if> 				
-	</div>
+	<c:if test="${sessionScope.currentTab == 1}"> 
+		<div id="formtablecontainer1">
+				<c:if test="${sessionScope.editOptionsMode == 0}"> 			
+					<jsp:include page="BasicContent.jsp" />
+				</c:if> 				
+				<c:if test="${sessionScope.editOptionsMode == 1}"> 			
+					<jsp:include page="OptionsContent.jsp" />
+				</c:if> 				
+		</div>
+	</c:if> 				
+	
 	<hr>
 	<a href="javascript:;" class="button">Cancel</a>
 	
@@ -125,14 +130,23 @@ MM_reloadPage(true);
 	</div>
 
 
-	<div id='content_i'  class="tabbody content_i">
-		<h2>Instructions</h2>
-		<div id="formtablecontainer3">
-				<jsp:include page="InstructionsContent.jsp" />
-		</div>
-		<hr>
-	</div>
 
+	<div id='content_i'  class="tabbody content_i">
+			<h2>Instructions</h2>
+			<div id="formtablecontainer3">
+					<jsp:include page="InstructionsContent.jsp" />
+			</div>
+			<hr>
+	</div>
+	
+	<c:if test="${sessionScope.currentTab == 3}"> 
+		<div id="formtablecontainer4">
+					<h2>Instructions</h2>
+					<jsp:include page="InstructionsContent.jsp" />
+		</div>
+	</c:if> 	
+	
+	
 
 </html:form>
 <p></p>

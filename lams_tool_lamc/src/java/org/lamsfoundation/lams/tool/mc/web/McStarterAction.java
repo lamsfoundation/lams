@@ -124,6 +124,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		 *   CURRENT_TAB == 3 defines Instructions Tab
 		 * */ 
 		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		
 		/**  needs to run only once per tool*/ 
 		/** McUtils.configureContentRepository(request, mcService); */
