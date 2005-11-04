@@ -22,6 +22,10 @@
       type="org.lamsfoundation.lams.admin.web.UsersRemoveActionForm"
     />
     <form-bean
+      name="CacheActionForm"
+      type="org.lamsfoundation.lams.admin.web.CacheActionForm"
+    />
+    <form-bean
       name="UserActionForm"
       type="org.lamsfoundation.lams.admin.web.UserActionForm"
     />
@@ -148,6 +152,21 @@
       />
     </action>
     <action
+      path="/cache"
+      type="org.lamsfoundation.lams.admin.web.CacheAction"
+      name="CacheActionForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="cache"
+        path="/cache.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/usersadd"
       type="org.lamsfoundation.lams.admin.web.UsersAddAction"
       name="UsersAddActionForm"
@@ -178,7 +197,7 @@
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
 
-<message-resources parameter="org.lamsfoundation.lams.admin.application" />
+      <message-resources parameter="org.lamsfoundation.lams.admin.applicationResources"/>
 
 <plug-in className="org.apache.struts.tiles.TilesPlugin">
 	<set-property property="definitions-config"

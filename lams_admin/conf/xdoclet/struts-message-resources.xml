@@ -1,2 +1,1 @@
-
-<message-resources parameter="org.lamsfoundation.lams.admin.application" />
+    <message-resources parameter="org.lamsfoundation.lams.admin.applicationResources"/>

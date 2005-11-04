@@ -139,22 +139,22 @@
 <!--  ======================================================== -->	
   <taglib>
     <taglib-uri>http://java.sun.com/jstl/fmt</taglib-uri>
-    <taglib-location>/WEB-INF/JSTL/tlds/fmt.tld</taglib-location>
+    <taglib-location>/WEB-INF/jstl/tlds/fmt.tld</taglib-location>
   </taglib>
 
   <taglib>
     <taglib-uri>http://java.sun.com/jstl/fmt-rt</taglib-uri>
-    <taglib-location>/WEB-INF/JSTL/tlds/fmt-rt.tld</taglib-location>
+    <taglib-location>/WEB-INF/jstl/tlds/fmt-rt.tld</taglib-location>
   </taglib>
 
   <taglib>
     <taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
-    <taglib-location>/WEB-INF/JSTL/tlds/c.tld</taglib-location>
+    <taglib-location>/WEB-INF/jstl/tlds/c.tld</taglib-location>
   </taglib>
 
   <taglib>
     <taglib-uri>http://java.sun.com/jstl/core-rt</taglib-uri>
-    <taglib-location>/WEB-INF/JSTL/tlds/c-rt.tld</taglib-location>
+    <taglib-location>/WEB-INF/jstl/tlds/c-rt.tld</taglib-location>
   </taglib>
 <!--  ======================================================== -->	
 <!--   Customized Tag Library -->
