@@ -145,7 +145,6 @@
 				<include name="tiles/**"/>
 				<exclude name="web.xml"/>
 			</webinf>
-			<classes dir="${build.classes.java}"/>				
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="css/*"/>
@@ -155,6 +154,7 @@
 				<include name="development/**"/>
 				<include name="flashxml/**"/>
 				<exclude name="lams_example_tool"/>
+				<exclude name="classes"/>
 			</fileset>
 		</war>
 	</target>
@@ -167,7 +167,6 @@
 		<jar jarfile="${build.lib}/${product}.jar"  manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 			<fileset dir="${build.classes.java}"/>
 			<fileset dir="${build.classes.test}"/>
-			<fileset dir="${build.web}"/>
 		</jar>
 	</target>
 	<!-- =================================================================== -->
