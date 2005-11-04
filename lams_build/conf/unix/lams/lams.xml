@@ -20,4 +20,6 @@
 	<!-- If a user is allowed to login with different clients at the same time-->
 	<!-- It should be always false except when running testHarness-->
 	<AllowMultipleLogin>false</AllowMultipleLogin>
+	<!--  Turn on the cache debugging listener. Set to false in production -->
+	<UseCacheDebugListener>false</UseCacheDebugListener>
 </Lams>

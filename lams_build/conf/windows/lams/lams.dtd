@@ -15,7 +15,7 @@
 <!ELEMENT TicketFile (#PCDATA)>
 <!ELEMENT UserInactiveTimeout (#PCDATA)>
 <!ELEMENT AllowMultipleLogin (#PCDATA)>
-
+<!ELEMENT UseCacheDebugListener (#PCDATA)>
 
 
 
