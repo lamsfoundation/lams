@@ -41,7 +41,6 @@ Ant build file.
 		<echo message="rebuild-db   --> Clean and rebuild the database"/>
 		<echo message="insert-test-data --> Insert test data to database"/>
 		<echo message="lams-jar  --> Make jar archive for deployment"/>
-		<echo message="lams-war  --> Make war archive for deployment"/>
 		<echo message="middlegen-learningdesign --> Run middlegen for learningdesign tables"/>
 		<echo message="hbm2java-learningdesign  --> Run hbm2java for learningdesign mapping files"/>
 		<echo message=""/>
@@ -201,16 +200,6 @@ Ant build file.
 		</copy>
 	</target>
 				
-	<target name="copyContext">
-		<deltree dir="${build.web}"/>
-		<mkdir dir="${build.web}"/>
-		<!--copy overwrite="yes" todir="${build.web}">
-			<fileset dir="${web}">
-				<include name="**/*.xml"/>
-				<include name="**/*.tld"/>
-			</fileset>
-		</copy-->
-	</target>
         <!-- effectively a synonym for lams-jar 
             required by the master build script
         -->
@@ -219,13 +208,12 @@ Ant build file.
 	<!-- ================================================================ -->
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
-	<target name="lams-jar" depends="compile,compile.test,copyContext" description="creates jar file">
+	<target name="lams-jar" depends="compile,compile.test" description="creates jar file">
 		<delete file="${build.lib}/${product}.jar"/>
 		<delete file="${build.lib}/lams-session.jar"/>
 		<jar jarfile="${build.lib}/${product}.jar">
 			<fileset dir="${build.classes.java}"/>
 			<fileset dir="${conf.hibernate.mapping.dir}"/>
-			<fileset dir="${build.web}"/>
 		</jar>
 		<jar jarfile="${build.lib}/lams-session.jar">
 			<fileset dir="${build.classes.java}">
@@ -330,30 +318,5 @@ Ant build file.
 		</junitreport>
 	</target>	
 	
-	<!-- =================================================================== -->
-	<!-- Run xdoclet for hibernate                                           -->
-	<!-- =================================================================== -->
-		<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask">
-		    <classpath refid="all-libs"/>
-		</taskdef>
-
-		<target name="webdoclet" depends="preparedirs">
-			<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
-		         <fileset dir="${src.java.dir}">
-		            <include name="**/*Action.java" />
-		         </fileset>
-
-		         <deploymentdescriptor 
-		         				servletspec="2.3" 
-		         				destdir="${webinf}"
-					         	mergedir="${conf.xdoclet.dir}"
-		         				sessiontimeout="${sessiontimeout}"/>
-				
-		         <strutsconfigxml 
-		         				destdir="${webinf.struts}"
-		         				version="1.2" 
-		         				mergedir="${conf.xdoclet.dir}"/>
-		     </webdoclet>
-		</target>
 </project>
 
