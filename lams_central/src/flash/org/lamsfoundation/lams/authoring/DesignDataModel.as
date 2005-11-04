@@ -77,7 +77,10 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_userID = Config.getInstance().userID;
 		
 		EventDispatcher.initialize(this);
-
+		
+		//dispatch an event now the design  has changed
+		dispatchEvent({type:'ddmUpdate',target:this});
+		
 		
     }
 	
@@ -102,7 +105,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function addActivity(activity:Activity):Boolean{
 		var success = false;
 		//create an Activity from the template actvity.
-		Debugger.log('activity:'+activity.title,4,'addActivity','DesignDataModel');
+		Debugger.log('activity:'+activity.title+':'+activity.activityUIID,4,'addActivity','DesignDataModel');
 		
 		
 		//validate the activity ??
@@ -114,15 +117,20 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		//TODO: 2nd time, after undo, in this is failing....;
 			
 		
-		//dispatch an event to show the design  has changed
-		dispatchEvent({type:'ddmUpdate',target:this});
+		//dispatch an event before the design  has changed
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 		
 		//ObjectUtils.printObject(activity);
 		
 		//TODO: MAYBE the UIID being created is the same as an existing activity after an undo, therefore overwriting in the hash table
 		_activities.put(activity.activityUIID, activity);
 		
-		Debugger.log('Succesfully added:'+_activities.get(activity.activityUIID).title,4,'addActivity','DesignDataModel');
+		var tmp:Activity = _activities.get(activity.activityUIID)
+		Debugger.log('Succesfully added:'+tmp.title+':'+tmp.activityUIID,4,'addActivity','DesignDataModel');
+		
+		
+		//dispatch an event now the design  has changed
+		dispatchEvent({type:'ddmUpdate',target:this});
 		
 		//TODO: Better validation of the addition
 		success = true;
@@ -140,13 +148,17 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function removeActivity(activityUIID):Object{
 		//dispatch an event to show the design  has changed
-		dispatchEvent({type:'ddmUpdate',target:this});
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
+	
 		
 		var r:Object = _activities.remove(activityUIID);
 		if(r==null){
 			return new LFError("Removing activity failed:"+activityUIID,"removeActivity",this,null);
 		}else{
 			Debugger.log('Removed:'+r.activityUIID,Debugger.GEN,'removeActivity','DesignDataModel');
+				dispatchEvent({type:'ddmUpdate',target:this});
+			
+			
 		}
 	}
 	
@@ -160,13 +172,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function removeTransition(transitionUIID):Object{
 		//dispatch an event to show the design  has changed
-		dispatchEvent({type:'ddmUpdate',target:this});
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 		
 		var r:Object = _transitions.remove(transitionUIID);
 		if(r==null){
 			return new LFError("Removing transition failed:"+transitionUIID,"removeTransition",this,null);
 		}else{
 			Debugger.log('Removed:'+r.transitionUIID,Debugger.GEN,'removeTransition','DesignDataModel');
+			dispatchEvent({type:'ddmUpdate',target:this});
 		}
 	}
 	
@@ -180,10 +193,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function addTransition(transition:Transition):Boolean{
 		//dispatch an event to show the design  has changed
-		dispatchEvent({type:'ddmUpdate',target:this});
+		dispatchEvent({type:'ddmBeforeUpdate',target:this});
+	
 		Debugger.log('Transition from:'+transition.fromUIID+', to:'+transition.toUIID,4,'addActivity','DesignDataModel');
 		_transitions.put(transition.transitionUIID,transition);
-		
+			dispatchEvent({type:'ddmUpdate',target:this});
 		//TODO some validation would be nice
 		return true;
 	}
@@ -198,34 +212,36 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 */
 	public function setDesign(design:Object):Boolean{
 		//note the design must be empty to call this
+		//note: Dont fire the update event as we dont want to store this change in an undo!
 		//TODO: Validate that the design is clear
 		var success:Boolean = false;
 		//TODO:Validate if design is saved if not notify user
 		success = true;
 		//_global.breakpoint();
-		Debugger.log('Printing the design revieced:...',Debugger.GEN,'setDesign','DesignDataModel');
-		ObjectUtils.printObject(design);
-		_objectType = design.objectType;
-		_learningDesignID = design.learning_design_id;
+		Debugger.log('Setting design ID:'+design.learningDesignID,Debugger.GEN,'setDesign','DesignDataModel');
+		//Debugger.log('Printing the design revieced:...',Debugger.GEN,'setDesign','DesignDataModel');
+		//ObjectUtils.printObject(design);
+		
+		_learningDesignID = design.learningDesignID;
 		_title = design.title;
 		_description = design.description;
-		_helpText = design.help_text;
+		_helpText = design.helpText;
 		_version = design.version;
 	
-		_userID = design.user_id;
-		_workspaceFolderID = design.workspace_folder_id;
-		_createDateTime = design.create_date_time;
-		_readOnly = design.read_only_flag;
-		_validDesign = design.valid_design_flag;
+		_userID = design.userID;
+		_workspaceFolderID = design.workspaceFolderID;
+		_createDateTime = design.createDateTime;
+		_readOnly = design.readReadOnly;
+		_validDesign = design.validDesign;
 		
-		_maxID = design.max_id;
-		_firstActivityID = design.first_id;
+		_maxID = design.maxID;
+		_firstActivityID = design.firstActivityUIID;
 		
 		//set the activities in the hash table
 		for(var i=0; i<design.activities.length;i++){
 			//note if the design is being opened - then it must have ui_ids already
-			Debugger.log('Adding activity ID:'+design.activities[i].activityUIID,Debugger.GEN,'setDesign','DesignDataModel');
-			//TODO: we should be calling the constructor of these objects!
+			//Debugger.log('Adding activity ID:'+design.activities[i].activityUIID,Debugger.GEN,'setDesign','DesignDataModel');
+			
 			var dto = design.activities[i];
 			
 			//depending on the objectType call the relevent constructor.
@@ -244,8 +260,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		for(var i=0; i<design.transitions.length;i++){
 			//note if the design is being opened - then it must have ui_ids already
 			Debugger.log('Adding transition ID:'+design.transitions[i].transitionUIID,Debugger.GEN,'setDesign','DesignDataModel');
-			//TODO: we should be calling the constructor of these objects!
-			_transitions.put(design.transitions[i].transitionUIID,design.transitions[i]);
+			
+			var tdto = design.transitions[i];
+			var newTransition:Transition = new Transition(tdto.transitionUIID,
+											tdto.fromUIID,
+											tdto.toUIID,
+											tdto.learningDesignID);
+			newTransition.transitionID = tdto.transitionID;
+			_transitions.put(newTransition.transitionUIID,newTransition);
 		}
 				
 		return success;
@@ -365,10 +387,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function newUIID():Number{
 		//if this is the first time then initialise to 1
 		if(_maxID == null){
+			Debugger.log('MaxID was null, resetting',Debugger.GEN,'newUIID','DesignDataModel');
 			_maxID = 0;
 		}
 		//add one for a new ID
 		_maxID++;
+		Debugger.log('New maxID:'+_maxID,Debugger.GEN,'newUIID','DesignDataModel');
 		return _maxID;
 	}
 	
