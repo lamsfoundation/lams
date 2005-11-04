@@ -20,6 +20,11 @@
 <archive path="/lams_build/lib/jakarta-commons/commons-validator.jar"/>
 <archive path="/lams_build/lib/jakarta-poi/poi-2.5.1-final-20040804.jar"/>
 <archive path="/lams_build/lib/jakarta-taglibs/standard.jar"/>
+<archive path="/lams_build/lib/jboss/jboss-cache.jar"/>
+<archive path="/lams_build/lib/jboss/jboss-jmx.jar"/>
+<archive path="/lams_build/lib/jboss/jboss-system.jar"/>
+<archive path="/lams_build/lib/jboss/jboss-common.jar"/>
+<archive path="/lams_build/lib/jboss/jgroups.jar"/>
 <archive path="/lams_build/lib/jdom/jdom.jar"/>
 <archive path="/lams_build/lib/junit/junit.jar"/>
 <archive path="/lams_build/lib/jfreechart/jfreechart-0.9.21.jar"/>

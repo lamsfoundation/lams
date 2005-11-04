@@ -53,9 +53,7 @@
 			inheritAll="false" />
 		<ant antfile="../${lams_learning}/build.xml" target="build-war" inheritAll="false"/>
 		<ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/>
-		<!--
-			<ant antfile="../${lams_admin}/build.xml" target="build-war" inheritAll="false"/>
-		-->
+		<ant antfile="../${lams_admin}/build.xml" target="build-war" inheritAll="false"/>
 	</target>
 
 	<!-- build sub-projects -->
@@ -133,7 +131,8 @@
 				<include name="${lams-monitoring.war}"/>
 				<include name="${lams-learning.jar}"/>
 				<include name="${lams-learning.war}"/>
-				<!-- <include name="lams-admin.war"/-->
+				<include name="${lams-admin.jar}"/>
+				<include name="${lams-admin.war}"/>
 			</fileset>
 		</copy>
 		<!-- create a temporary ear -->
@@ -227,6 +226,7 @@
 		<copy overwrite="yes" todir="${jboss.ear.deploy}">
 			<fileset dir="${conf.jboss}/service">
 				<include name="mysql*.xml" />
+				<include name="local-service.xml" />
 			</fileset>
 		</copy>
 		<copy overwrite="yes" todir="${jboss.ear.deploy}/jbossweb-tomcat55.sar/META-INF">
