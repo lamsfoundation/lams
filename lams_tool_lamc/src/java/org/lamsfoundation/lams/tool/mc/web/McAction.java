@@ -250,6 +250,9 @@ public class McAction extends DispatchAction implements McAppConstants
 		mcAuthoringForm.setEditOptions(null);
 		mcAuthoringForm.setMoveUp(null);
 		mcAuthoringForm.setMoveDown(null);
+		mcAuthoringForm.setAddOption(null);
+		mcAuthoringForm.setRemoveOption(null);
+		
 		
 		String addQuestion=request.getParameter("addQuestion");
 		logger.debug("parameter addQuestion" + addQuestion);
@@ -292,6 +295,21 @@ public class McAction extends DispatchAction implements McAppConstants
 			mcAuthoringForm.setMoveUp("1");
 		}
 		
+		String addOption=request.getParameter("addOption");
+		logger.debug("parameter addOption" + addOption);
+		if ((addOption != null) && addOption.equals("1"))
+		{
+			logger.debug("parameter addOption is selected " + addOption);
+			mcAuthoringForm.setAddOption("1");
+		}
+		
+		String removeOption=request.getParameter("removeOption");
+		logger.debug("parameter removeOption" + removeOption);
+		if ((removeOption != null) && removeOption.equals("1"))
+		{
+			logger.debug("parameter removeOption is selected " + removeOption);
+			mcAuthoringForm.setRemoveOption("1");
+		}
 		
 
 		String userAction=null;

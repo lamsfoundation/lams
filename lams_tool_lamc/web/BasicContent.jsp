@@ -33,7 +33,7 @@
 				
 					<tr> <td colspan=2 align=center valign=top>
 					
-					<table align=center>
+
 
 				<!--
 					<tr>
@@ -50,6 +50,8 @@
 						</td>
 					</tr>
 				-->
+				
+					<table align="center" border="1" cellspacing="2" cellpadding="2" summary="layout and Content">
 			  	 		<c:set var="queIndex" scope="session" value="1"/>
 						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
 						
@@ -117,6 +119,8 @@
 										  </tr>
 									</c:if> 
 						</c:forEach>
+						
+					</table> </td> </tr>
 							<html:hidden property="questionIndex"/>
 							<html:hidden property="addQuestion"/>
 							<html:hidden property="editOptions"/>
@@ -134,7 +138,8 @@
 						<td class="input" valign=top> 
 							  <html:text property="passmark"  size="3" maxlength="3"/>							
 						</td>
-						<td valign=top> </td> <td valign=top> </td>
+						<td valign=top> </td> 
+						<td valign=top> </td>
 					</tr>
 					
 					<tr>
@@ -150,16 +155,15 @@
 					</tr>
 
 	 				 <tr>
-	 				 	<td colspan=5 align=left valign=top>								
+ 						<td valign=top> </td> 
+						<td class="input" colspan=3 align=left valign=top>								
 							<html:submit property="submitQuestions" styleClass="linkbutton" 
 							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 								<bean:message key="button.submit"/>
 							</html:submit>	 				 		  										  		
 		 			  	</td>
-	 				 </tr>
-							
-					</table>		
-					</td> </tr>
-							
-
+						<td valign=top> </td> 
+						<td valign=top> </td>
+					</tr>
+	 				 
 	 				</table> 	 
