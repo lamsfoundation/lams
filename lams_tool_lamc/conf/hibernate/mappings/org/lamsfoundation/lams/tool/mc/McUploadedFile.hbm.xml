@@ -40,18 +40,16 @@
         column="filename"
         length="255"
    />
-    
-    
-    <property
+   
+  <property
         name="mcContentId"
         type="java.lang.Long"
+        update="false"
+        insert="false"
+        access="property"
         column="mc_content_id"
-        not-null="true"
-   	    update="false"
-	    insert="false"
         length="20"
-    >
-    </property>
+    />
     
    <many-to-one
         name="mcContent"

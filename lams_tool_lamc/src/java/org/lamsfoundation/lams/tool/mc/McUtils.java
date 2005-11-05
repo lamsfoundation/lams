@@ -691,6 +691,8 @@ public abstract class McUtils implements McAppConstants {
 		}
 		catch(Exception e)
 		{
+			logger.debug("error persisting offline files data, full error: " + e);
+			logger.debug("error persisting offline files data, error msg: " + e.getMessage());
 			logger.debug("error persisting offline files data: " + listUploadedOfflineFiles);
 		}
 		

@@ -52,6 +52,9 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
 	 	private static final String GET_OFFLINE_FILES_UUID = "select mcUploadedFile.uuid    from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
 	 	private static final String GET_OFFLINE_FILES_NAME ="select mcUploadedFile.filename from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0 order by mcUploadedFile.uuid";
 	 	
+	 	
+	 	private static final String GET_OFFLINE_FILES_UUIDPLUSFILENAME = "select (mcUploadedFile.uuid + '~' + mcUploadedFile.filename)   from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
+	 	
 	 	private static final String FIND_ALL_UPLOADED_FILE_DATA = "from mcUploadedFile in class McUploadedFile";
 		
 	 	
@@ -75,12 +78,14 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
 	 	public void updateUploadFile(McUploadedFile mcUploadedFile)
 	    {
 	        this.getHibernateTemplate().update(mcUploadedFile);
+			this.getSession().setFlushMode(FlushMode.AUTO);
 	    }
 	 	
 	     
 	    public void saveUploadFile(McUploadedFile mcUploadedFile) 
 	    {
 	    	this.getHibernateTemplate().save(mcUploadedFile);
+			this.getSession().setFlushMode(FlushMode.AUTO);
 	    }
 	    
 	    public void createUploadFile(McUploadedFile mcUploadedFile) 
@@ -167,6 +172,18 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
 	      
 		  return list;
 	    }
+	    
+	    public List retrieveMcUploadedOfflineFilesUuidPlusFilename(Long mcContentId)
+	    {
+	      HibernateTemplate templ = this.getHibernateTemplate();
+	      List list = getSession().createQuery(GET_OFFLINE_FILES_UUIDPLUSFILENAME)
+				.setLong("mcContentId", mcContentId.longValue())
+				.list();
+	      
+		  return list;
+	    }
+	    
+	    
 	    
 	    
 	    public List retrieveMcUploadedOfflineFilesName(Long mcContentId)

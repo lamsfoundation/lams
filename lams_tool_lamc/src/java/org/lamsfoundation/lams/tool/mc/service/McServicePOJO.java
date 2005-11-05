@@ -1595,6 +1595,21 @@ public class McServicePOJO implements
 	}
 	
 	
+	public List retrieveMcUploadedOfflineFilesUuidPlusFilename(Long mcContentId) throws McApplicationException {
+		try
+        {
+            return mcUploadedFileDAO.retrieveMcUploadedOfflineFilesUuidPlusFilename(mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is loading mc uploaded offline file uuid plus filename:  "
+                                                         + e.getMessage(),
+														   e);
+        }
+		
+		
+	}
+	
 	
 	/**
 	 * @return Returns the logger.

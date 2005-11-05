@@ -83,6 +83,17 @@ public class McUploadedFile implements Serializable
         this.mcContent=mcContent;
     }
     
+    public McUploadedFile(String uuid, 
+			boolean fileOnline, 
+			String filename,
+			Long mcContentId)  
+		{
+		this.uuid = uuid;
+		this.fileOnline = fileOnline;
+		this.filename = filename;
+		this.mcContentId=mcContentId;
+}
+    
     
     public String toString() {
         return new ToStringBuilder(this)

@@ -1057,7 +1057,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
 	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2 );
 			request.getSession().setAttribute(CURRENT_TAB, new Long(3));
-	   	    return (mapping.findForward(LOAD_QUESTIONS));
+	   	    return (mapping.findForward(ALL_INSTRUCTIONS));
         }
 	 	else if (mcAuthoringForm.getSubmitOnlineFile() != null)
         {
@@ -1070,8 +1070,9 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		
 	 		mcAuthoringForm.resetUserAction();
 	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
-	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2 );
-	   	    return (mapping.findForward(LOAD_QUESTIONS));
+	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
+			request.getSession().setAttribute(CURRENT_TAB, new Long(3));
+	   	    return (mapping.findForward(ALL_INSTRUCTIONS));
         }
 	 	
 	 	mcAuthoringForm.resetUserAction();

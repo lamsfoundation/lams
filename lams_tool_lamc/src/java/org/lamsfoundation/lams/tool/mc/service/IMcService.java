@@ -190,6 +190,8 @@ public interface IMcService
 	
 	public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline) throws McApplicationException;
 	
+	public List retrieveMcUploadedOfflineFilesUuidPlusFilename(Long mcContentId) throws McApplicationException;
+	
     public void cleanUploadedFilesMetaData() throws McApplicationException;
     
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent) throws McApplicationException;

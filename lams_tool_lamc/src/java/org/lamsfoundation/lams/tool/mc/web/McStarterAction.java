@@ -476,6 +476,10 @@ public class McStarterAction extends Action implements McAppConstants {
 			logger.debug("existing listUploadedOnlineFileNames:" + listUploadedOnFiles);
 			request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnFiles);
 			
+			List listUploadedOffFilesUuidPlusFilename= mcService.retrieveMcUploadedOfflineFilesUuidPlusFilename(mcContent.getUid());
+			logger.debug("existing listUploadedOffFilesUuidPlusFilename:" + listUploadedOffFilesUuidPlusFilename);
+			request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOffFilesUuidPlusFilename);
+			
 			
 			if (mcContent.isUsernameVisible())
 			{

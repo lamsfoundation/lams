@@ -43,10 +43,19 @@ http://www.gnu.org/licenses/gpl.txt
 
 <!-- ============= Qa Authoring Page Definitions ====================== -->	
 	<definition name=".questions" extends=".baseDef" >
-		<put name="title" value="Questions for Multiple Choice"/>
-		<put name="pageHeader" value = "Questions for Multiple Choice"/>
+		<put name="title" value="Multiple Choice"/>
+		<put name="pageHeader" value = "Multiple Choice"/>
 		<put name="content" value="authoringMaincontent.jsp" />	
 	</definition>
+
+
+<!-- ============= Qa Authoring Page Definitions ====================== -->	
+	<definition name=".allInstructions" extends=".baseDef" >
+		<put name="title" value="Multiple Choice"/>
+		<put name="pageHeader" value = "Multiple Choice"/>
+		<put name="content" value="allInstructionsContent.jsp" />	
+	</definition>
+
 		
 <!-- ============= Qa Authoring Starter Page Definitions ====================== -->	
 	<definition name=".starter" extends=".baseDef" >

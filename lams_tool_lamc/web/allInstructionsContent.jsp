@@ -40,7 +40,7 @@ MM_reloadPage(true);
 //-->
 </script>
 </head>
-<body onLoad="initTabs()">
+<body onLoad="initTabs(); showTab('i');">
 
 
 <h1><bean:message key="label.authoring.mc"/></h1>
@@ -102,14 +102,9 @@ MM_reloadPage(true);
 <div id='content_b' class="tabbody content_b" >
 
 		<h2><bean:message key="label.authoring.mc.basic"/></h2>
-		
+
 		<div id="formtablecontainer1">
-				<c:if test="${sessionScope.editOptionsMode == 0}"> 			
-					<jsp:include page="BasicContent.jsp" />
-				</c:if> 				
-				<c:if test="${sessionScope.editOptionsMode == 1}"> 			
-					<jsp:include page="OptionsContent.jsp" />
-				</c:if> 				
+				<jsp:include page="BasicContent.jsp" />
 		</div>
 		<hr>
 			<a href="javascript:;" class="button">Cancel</a>

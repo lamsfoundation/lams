@@ -56,6 +56,8 @@ public interface IMcUploadedFileDAO
 	    
 	    public List retrieveMcUploadedOnlineFilesName(Long mcContentId);
 	    
+	    public List retrieveMcUploadedOfflineFilesUuidPlusFilename(Long mcContentId);
+	    
 	    public void cleanUploadedFilesMetaData();
 	    
 	    public void flush();
