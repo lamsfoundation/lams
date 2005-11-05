@@ -65,13 +65,14 @@ public interface McAppConstants {
 	
 	
 	/** these constants are from org.lamsfoundation.lams.web.util.AttributeNames  */
-	public static final String USER= "user";
-	public static final String TOOL_CONTENT_ID = "toolContentID";
-	public static final String TOOL_SESSION_ID = "toolSessionID"; 
-	public static final String MODE = "mode";
-	public static final String USER_ID = "userID";
-    public static final String ACTIVITY_ID = "activityID";
-    public static final String CURRENT_TAB = "currentTab";
+	public static final String USER										= "user";
+	public static final String TOOL_CONTENT_ID 							= "toolContentID";
+	public static final String TOOL_SESSION_ID 							= "toolSessionID"; 
+	public static final String MODE 									= "mode";
+	public static final String USER_ID 									= "userID";
+    public static final String ACTIVITY_ID 								= "activityID";
+    public static final String CURRENT_TAB 								= "currentTab";
+    public static final String MAX_QUESTION_INDEX 						= "maxQuestionIndex";
     
 	
 	/**
@@ -88,6 +89,7 @@ public interface McAppConstants {
     public static final Long INITIAL_QUESTION_COUNT		=new Long(1);
     public static final long MAX_QUESTION_COUNT 		=20;
     public static final long MAX_OPTION_COUNT 			=10;
+    
     
     
     /**

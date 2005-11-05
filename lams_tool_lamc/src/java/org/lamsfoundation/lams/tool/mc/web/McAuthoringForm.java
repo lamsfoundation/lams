@@ -32,6 +32,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String addOption;
 	protected String removeOption;
 	protected String doneOptions;
+	protected String moveDown;
+	protected String moveUp;
 	
 	protected String questionIndex;
 	protected String optionIndex;
@@ -111,6 +113,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.submitQuestions=null;
 		this.advancedTabDone=null;
 		this.instructionsTabDone=null;
+		this.moveDown=null;
+		this.moveUp=null;
 		
     	this.addContent=null;	
     	this.removeContent=null;
@@ -141,6 +145,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.submitQuestions=null;
 		this.advancedTabDone=null;
 		this.instructionsTabDone=null;
+		this.moveDown=null;
+		this.moveUp=null;
 		
 		this.addContent=null;
 		this.removeContent=null;
@@ -827,5 +833,29 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setSln(String sln) {
 		this.sln = sln;
+	}
+	/**
+	 * @return Returns the moveDown.
+	 */
+	public String getMoveDown() {
+		return moveDown;
+	}
+	/**
+	 * @param moveDown The moveDown to set.
+	 */
+	public void setMoveDown(String moveDown) {
+		this.moveDown = moveDown;
+	}
+	/**
+	 * @return Returns the moveUp.
+	 */
+	public String getMoveUp() {
+		return moveUp;
+	}
+	/**
+	 * @param moveUp The moveUp to set.
+	 */
+	public void setMoveUp(String moveUp) {
+		this.moveUp = moveUp;
 	}
 }

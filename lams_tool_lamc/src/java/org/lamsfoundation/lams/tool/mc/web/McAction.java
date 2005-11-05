@@ -248,7 +248,8 @@ public class McAction extends DispatchAction implements McAppConstants
 		mcAuthoringForm.setAddQuestion(null);
 		mcAuthoringForm.setRemoveQuestion(null);
 		mcAuthoringForm.setEditOptions(null);
-		
+		mcAuthoringForm.setMoveUp(null);
+		mcAuthoringForm.setMoveDown(null);
 		
 		String addQuestion=request.getParameter("addQuestion");
 		logger.debug("parameter addQuestion" + addQuestion);
@@ -275,6 +276,22 @@ public class McAction extends DispatchAction implements McAppConstants
 			mcAuthoringForm.setRemoveQuestion("1");
 		}
 		
+		String moveDown=request.getParameter("moveDown");
+		logger.debug("parameter moveDown" + moveDown);
+		if ((moveDown != null) && moveDown.equals("1"))
+		{
+			logger.debug("parameter moveDown is selected " + moveDown);
+			mcAuthoringForm.setMoveDown("1");
+		}
+
+		String moveUp=request.getParameter("moveUp");
+		logger.debug("parameter moveUp" + moveUp);
+		if ((moveUp != null) && moveUp.equals("1"))
+		{
+			logger.debug("parameter moveUp is selected " + moveUp);
+			mcAuthoringForm.setMoveUp("1");
+		}
+		
 		
 
 		String userAction=null;
@@ -299,6 +316,10 @@ public class McAction extends DispatchAction implements McAppConstants
 				saveErrors(request,errors);
     			mcAuthoringForm.resetUserAction();
 				persistError(request,"error.question.empty");
+				
+				int maxQuestionIndex=mapQuestionsContent.size();
+				request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+				logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 				return (mapping.findForward(LOAD_QUESTIONS));
         	}
 	 		
@@ -309,6 +330,10 @@ public class McAction extends DispatchAction implements McAppConstants
         	{
         		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
         		mcAuthoringForm.resetUserAction();
+        		
+        		int maxQuestionIndex=mapQuestionsContent.size();
+    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 				return (mapping.findForward(LOAD_QUESTIONS));
         	}
 	 		
@@ -320,10 +345,14 @@ public class McAction extends DispatchAction implements McAppConstants
 			addQuestion(request, mcAuthoringForm, mapQuestionsContent, true);
 			logger.debug("after addQuestion");
 			
-		 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
     	    mcAuthoringForm.resetUserAction();
     	    request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    	    
+    	    int maxQuestionIndex=mapQuestionsContent.size();
+			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
     	    return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	else if (mcAuthoringForm.getRemoveQuestion() != null)
@@ -380,7 +409,69 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 			mcAuthoringForm.resetUserAction();
 			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+			
+			int maxQuestionIndex=mapQuestionsContent.size();
+			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 			return (mapping.findForward(LOAD_QUESTIONS));
+	 	}
+	 	else if (mcAuthoringForm.getMoveDown() != null)
+	 	{
+	 		userAction="moveDown";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		
+	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+		 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
+		 	
+	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
+			logger.debug("questionIndex:" + questionIndex);
+			String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
+			logger.debug("movableQuestionEntry:" + movableQuestionEntry);
+			
+			mapQuestionsContent= shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "down");
+			logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
+			
+		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+			logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+	 		
+	 		mcAuthoringForm.resetUserAction();
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
+    	    request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    	    
+    	    int maxQuestionIndex=mapQuestionsContent.size();
+			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+    	    return (mapping.findForward(LOAD_QUESTIONS));
+	 	}
+	 	else if (mcAuthoringForm.getMoveUp() != null)
+	 	{
+	 		userAction="moveUp";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		
+	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+		 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
+	 		
+	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
+			logger.debug("questionIndex:" + questionIndex);
+			String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
+			logger.debug("movableQuestionEntry:" + movableQuestionEntry);
+			
+			mapQuestionsContent= shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "up");
+			logger.debug("mapQuestionsContent after move up: " + mapQuestionsContent);
+	 		
+	 		mcAuthoringForm.resetUserAction();
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
+    	    request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    	    
+			
+    	    int maxQuestionIndex=mapQuestionsContent.size();
+			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+    	    return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	else if (mcAuthoringForm.getEditOptions() != null)
 	 	{
@@ -791,7 +882,10 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 
-        	ActionMessages errors= new ActionMessages();
+			Map mapQuestionsContent=repopulateMap(request, "questionContent");
+		 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
+		 	
+	 		ActionMessages errors= new ActionMessages();
 
         	boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
         	logger.debug("weightsValid:" + weightsValid);
@@ -799,6 +893,10 @@ public class McAction extends DispatchAction implements McAppConstants
         	{
     			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
     			mcAuthoringForm.resetUserAction();
+    			
+    			int maxQuestionIndex=mapQuestionsContent.size();
+    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 				return (mapping.findForward(LOAD_QUESTIONS));
         	}
         	
@@ -815,6 +913,10 @@ public class McAction extends DispatchAction implements McAppConstants
 				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    			
+    			int maxQuestionIndex=mapQuestionsContent.size();
+    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 				return (mapping.findForward(LOAD_QUESTIONS));
         	}
         	
@@ -870,6 +972,10 @@ public class McAction extends DispatchAction implements McAppConstants
 					request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 	    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 	    			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+	    			
+	    			int maxQuestionIndex=mapQuestionsContent.size();
+	    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+	    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 					return (mapping.findForward(LOAD_QUESTIONS));
 				}
         	}
@@ -892,6 +998,10 @@ public class McAction extends DispatchAction implements McAppConstants
     			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    			
+    			int maxQuestionIndex=mapQuestionsContent.size();
+    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
     			return (mapping.findForward(LOAD_QUESTIONS));
         	}
         	
@@ -941,6 +1051,10 @@ public class McAction extends DispatchAction implements McAppConstants
     			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
     			mcAuthoringForm.resetUserAction();
+    			
+    			int maxQuestionIndex=mapQuestionsContent.size();
+    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
     			return (mapping.findForward(LOAD_QUESTIONS));
     		}
     		
@@ -959,7 +1073,7 @@ public class McAction extends DispatchAction implements McAppConstants
     		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
         	
         	
-	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+	 		mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
 		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
@@ -1059,6 +1173,10 @@ public class McAction extends DispatchAction implements McAppConstants
 
 			mcAuthoringForm.resetUserAction();
 			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+			
+			int maxQuestionIndex=mapQuestionsContent.size();
+			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 	   	    return (mapping.findForward(LOAD_QUESTIONS));
 	 	}
 	 	else if (mcAuthoringForm.getAdvancedTabDone() != null)
@@ -1521,6 +1639,69 @@ public class McAction extends DispatchAction implements McAppConstants
         return true;
     }
 
+    
+    protected Map shiftMap(Map mapQuestionsContent, String questionIndex , String movableQuestionEntry, String direction)
+    {
+    	logger.debug("movableQuestionEntry: " +  movableQuestionEntry);
+    	
+    	/** map to be returned */
+    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
+    	
+    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
+    	String shiftableEntry=null;
+    	
+    	int shiftableIndex=0;
+    	if (direction.equals("down"))
+        {
+    		shiftableIndex=new Integer(questionIndex).intValue() + 1;
+    		
+    		logger.debug("shiftableIndex: " +  shiftableIndex);
+        	shiftableEntry=(String)mapQuestionsContent.get(new Integer(shiftableIndex).toString());
+        	logger.debug("shiftable entry: " +  shiftableEntry);
+        	
+        	if (shiftableEntry != null)
+        	{
+        		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+        		long mapCounter=0;
+        		while (itQuestionsMap.hasNext()) {
+                	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+                    logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                    mapCounter++;
+                    logger.debug("mapCounter: " +  mapCounter);
+                    
+                    if (!pairs.getKey().equals(questionIndex) && !pairs.getKey().equals(new Integer(shiftableIndex).toString()))
+                    {
+                    	logger.debug("normal copy " +  questionIndex);
+                    	mapTempQuestionsContent.put(new Long(mapCounter).toString(), pairs.getValue());
+                    }
+                    else if (pairs.getKey().equals(questionIndex))
+                    {
+                    	logger.debug("move type 1 " +  questionIndex);
+                    	mapTempQuestionsContent.put(new Long(mapCounter).toString(), shiftableEntry);
+                    }
+                    else if (pairs.getKey().equals(new Integer(shiftableIndex).toString()))
+                    {
+                    	logger.debug("move type 2 " +  shiftableIndex);
+                    	mapTempQuestionsContent.put(new Long(mapCounter).toString(), movableQuestionEntry);
+                    }
+                }
+        	}
+        	else
+        	{
+        		logger.debug("no change to map");
+        		mapTempQuestionsContent=mapQuestionsContent;
+        	}
+        		return mapTempQuestionsContent;
+        }
+    	else
+    	{
+    		shiftableIndex=new Integer(questionIndex).intValue() - 1;	
+    	}
+    	
+		return null;
+    	
+    }
+    
     
     /**
      * shrinks the size of the Map to only used entries
