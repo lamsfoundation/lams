@@ -338,6 +338,8 @@
    			<fileset dir="${conf.web.dir}">
 					<include name="*"/>
    					<include name="author_page/**"/>
+					<include name="images/*"/>
+	   				<include name="**/*.*"/>
 			</fileset>
 			<!--
    			<fileset dir="${conf.includes.dir}">
@@ -349,8 +351,10 @@
 			-->
 
    	   </war>
-   	
    </target>	
+	
+	
+	
 <!-- =================================================================== -->
 <!-- Deploy the jar and war                               -->
 <!-- =================================================================== -->
