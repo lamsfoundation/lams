@@ -453,21 +453,23 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
-	 		
+		 	
 	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
 			logger.debug("questionIndex:" + questionIndex);
 			String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
 			logger.debug("movableQuestionEntry:" + movableQuestionEntry);
 			
 			mapQuestionsContent= shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "up");
-			logger.debug("mapQuestionsContent after move up: " + mapQuestionsContent);
+			logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
+			
+		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+			logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
 	 		
 	 		mcAuthoringForm.resetUserAction();
 	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
     	    request.getSession().setAttribute(CURRENT_TAB, new Long(1));
     	    
-			
     	    int maxQuestionIndex=mapQuestionsContent.size();
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
@@ -1653,13 +1655,21 @@ public class McAction extends DispatchAction implements McAppConstants
     	int shiftableIndex=0;
     	if (direction.equals("down"))
         {
+    		logger.debug("moving map down");
     		shiftableIndex=new Integer(questionIndex).intValue() + 1;
+        }
+    	else
+    	{
+    		logger.debug("moving map up");
+    		shiftableIndex=new Integer(questionIndex).intValue() - 1;
+        
+    	}
     		
     		logger.debug("shiftableIndex: " +  shiftableIndex);
         	shiftableEntry=(String)mapQuestionsContent.get(new Integer(shiftableIndex).toString());
         	logger.debug("shiftable entry: " +  shiftableEntry);
         	
-        	if (shiftableEntry != null)
+        	if (shiftableEntry != null) 
         	{
         		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
         		long mapCounter=0;
@@ -1692,14 +1702,7 @@ public class McAction extends DispatchAction implements McAppConstants
         		mapTempQuestionsContent=mapQuestionsContent;
         	}
         		return mapTempQuestionsContent;
-        }
-    	else
-    	{
-    		shiftableIndex=new Integer(questionIndex).intValue() - 1;	
-    	}
-    	
-		return null;
-    	
+
     }
     
     

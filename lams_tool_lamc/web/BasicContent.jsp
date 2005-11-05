@@ -5,8 +5,6 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
-sessionScope.maxQuestionIndex <c:out value="${sessionScope.maxQuestionIndex}"/>
-
 					<table width="100%" align="left" border="0" cellspacing="2" cellpadding="2" summary="layout and Content">
 					
  						<tr> 
@@ -87,8 +85,6 @@ sessionScope.maxQuestionIndex <c:out value="${sessionScope.maxQuestionIndex}"/>
 									
 							  		<c:if test="${questionEntry.key > 1}"> 			
 										<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-										
-										queIndex aaa		<c:out value="${sessionScope.queIndex}"/> 
 										
 										  <tr>
 										  	<td bgcolor="#EEEEEE" class="formlabel" valign=top> <c:out value="Question ${queIndex}"/> : </td>
