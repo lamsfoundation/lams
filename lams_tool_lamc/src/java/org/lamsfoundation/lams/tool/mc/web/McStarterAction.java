@@ -107,6 +107,22 @@ public class McStarterAction extends Action implements McAppConstants {
 	 */
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {
+
+		
+		String protocol = request.getProtocol();
+		if(protocol.startsWith("HTTPS")){
+			protocol = "https://";
+		}else{
+			protocol = "http://";
+		}
+		String root = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
+		String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
+		request.getSession().setAttribute(ROOT, root);
+		request.getSession().setAttribute(ROOT_PATH, root);
+		request.getSession().setAttribute(PATH_TO_LAMS, pathToLams);
+		
+		logger.debug("setting root to: " + request.getSession().getAttribute(ROOT));
+		
 		/**
 		 * retrive the service
 		 */

@@ -243,6 +243,39 @@ public class McAction extends DispatchAction implements McAppConstants
 			request.getSession().setAttribute(SELECTED_QUESTION,selectedQuestion);
 			logger.debug("updated SELECTED_QUESTION");
 		}
+		
+		
+		mcAuthoringForm.setAddQuestion(null);
+		mcAuthoringForm.setRemoveQuestion(null);
+		mcAuthoringForm.setEditOptions(null);
+		
+		
+		String addQuestion=request.getParameter("addQuestion");
+		logger.debug("parameter addQuestion" + addQuestion);
+		if ((addQuestion != null) && addQuestion.equals("1"))
+		{
+			logger.debug("parameter addQuestion is selected " + addQuestion);
+			mcAuthoringForm.setAddQuestion("1");
+		}
+		
+		
+		String editOptions=request.getParameter("editOptions");
+		logger.debug("parameter editOptions" + editOptions);
+		if ((editOptions != null) && editOptions.equals("1"))
+		{
+			logger.debug("parameter editOptions is selected " + editOptions);
+			mcAuthoringForm.setEditOptions("1");
+		}
+		
+		String removeQuestion=request.getParameter("removeQuestion");
+		logger.debug("parameter removeQuestion" + removeQuestion);
+		if ((removeQuestion != null) && removeQuestion.equals("1"))
+		{
+			logger.debug("parameter removeQuestion is selected " + removeQuestion);
+			mcAuthoringForm.setRemoveQuestion("1");
+		}
+		
+		
 
 		String userAction=null;
 	 	if (mcAuthoringForm.getAddQuestion() != null)
@@ -275,6 +308,7 @@ public class McAction extends DispatchAction implements McAppConstants
         	if (weightsValid == false)
         	{
         		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+        		mcAuthoringForm.resetUserAction();
 				return (mapping.findForward(LOAD_QUESTIONS));
         	}
 	 		
@@ -764,6 +798,7 @@ public class McAction extends DispatchAction implements McAppConstants
         	if (weightsValid == false)
         	{
     			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    			mcAuthoringForm.resetUserAction();
 				return (mapping.findForward(LOAD_QUESTIONS));
         	}
         	
@@ -905,6 +940,7 @@ public class McAction extends DispatchAction implements McAppConstants
 				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
     			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    			mcAuthoringForm.resetUserAction();
     			return (mapping.findForward(LOAD_QUESTIONS));
     		}
     		

@@ -35,6 +35,12 @@ public interface McAppConstants {
      * This will be replaced when the deploy logic automatically assigns a default content id in the deploy script.
      */
 	
+	
+	public static final String ROOT 									="root";
+	public static final String ROOT_PATH								="rootPath";
+	public static final String PATH_TO_LAMS 							="pathToLams";
+	
+	
 	public static final String MY_SIGNATURE 							="lamc11";
 	public static final long DEFAULT_CONTENT_ID 						=0;
     public static final long DEFAULT_QUE_CONTENT_ID 					=1;
