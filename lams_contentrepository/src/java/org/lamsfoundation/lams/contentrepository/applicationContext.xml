@@ -117,8 +117,6 @@
 	</bean>  
 
 	<!--  Most DAO's are for Hibernate. fileDAO manages reading and writing files to the filesystem -->
-	<bean id="fileDAO" class="org.lamsfoundation.lams.contentrepository.dao.file.FileDAO">
-		<property name="repositoryLocation"><value>/tmp/repository</value></property>
-	</bean>  
+	<bean id="fileDAO" class="org.lamsfoundation.lams.contentrepository.dao.file.FileDAO" />
 
 </beans>

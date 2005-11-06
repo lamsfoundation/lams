@@ -32,6 +32,8 @@ import java.io.OutputStream;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.dao.IFileDAO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 
 /**
@@ -42,7 +44,6 @@ import org.lamsfoundation.lams.contentrepository.dao.IFileDAO;
  */
 public class FileDAO implements IFileDAO {
 
-	private String repositoryLocation;
 	protected Logger log = Logger.getLogger(FileDAO.class);
 
 	/** 
@@ -51,11 +52,11 @@ public class FileDAO implements IFileDAO {
 	 */
 	protected String[] generateFilePath(Long uuid, Long versionId) 
 						throws FileException  {
-
-		if ( repositoryLocation == null )
+	    
+        String directoryPath = Configuration.get(ConfigurationKeys.CONTENT_REPOSITORY_PATH);
+        
+		if ( directoryPath == null )
 			throw new FileException("Repository location unknown. Cannot access files. This should have been configured in the Spring context.");
-
-		String directoryPath = repositoryLocation;
 		
 		if ( uuid == null || uuid.longValue() < 1 )
 			throw new FileException("Unable to generate new filename for uuid="+uuid);
@@ -230,19 +231,5 @@ public class FileDAO implements IFileDAO {
 						throws FileException {
 	    File file = new File( getFilePath(uuid, versionId));
 	    return ( file.exists() );	    
-	}
-
-	/* ***************** Getters and setters for Spring  *****************/
-	/**
-	 * @return Returns the repositoryLocation.
-	 */
-	public String getRepositoryLocation() {
-		return repositoryLocation;
-	}
-	/**
-	 * @param repositoryLocation The repositoryLocation to set.
-	 */
-	public void setRepositoryLocation(String repositoryLocation) {
-		this.repositoryLocation = repositoryLocation;
 	}
 }
