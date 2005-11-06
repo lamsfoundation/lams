@@ -45,6 +45,9 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String advancedTabDone;
 	protected String instructionsTabDone;
 	
+	protected String fileItem;
+	protected String viewFileItem;
+	
 	protected String addContent;
 	protected String removeContent;
 	protected String removeAllContent;
@@ -116,6 +119,9 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.moveDown=null;
 		this.moveUp=null;
 		
+		this.fileItem=null;
+		this.viewFileItem=null;
+		
     	this.addContent=null;	
     	this.removeContent=null;
     	this.removeAllContent=null;
@@ -147,6 +153,9 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.instructionsTabDone=null;
 		this.moveDown=null;
 		this.moveUp=null;
+		
+		this.fileItem=null;
+		this.viewFileItem=null;
 		
 		this.addContent=null;
 		this.removeContent=null;
@@ -857,5 +866,29 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setMoveUp(String moveUp) {
 		this.moveUp = moveUp;
+	}
+	/**
+	 * @return Returns the fileItem.
+	 */
+	public String getFileItem() {
+		return fileItem;
+	}
+	/**
+	 * @param fileItem The fileItem to set.
+	 */
+	public void setFileItem(String fileItem) {
+		this.fileItem = fileItem;
+	}
+	/**
+	 * @return Returns the viewFileItem.
+	 */
+	public String getViewFileItem() {
+		return viewFileItem;
+	}
+	/**
+	 * @param viewFileItem The viewFileItem to set.
+	 */
+	public void setViewFileItem(String viewFileItem) {
+		this.viewFileItem = viewFileItem;
 	}
 }

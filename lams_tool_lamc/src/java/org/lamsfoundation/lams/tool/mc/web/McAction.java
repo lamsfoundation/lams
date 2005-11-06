@@ -252,6 +252,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		mcAuthoringForm.setMoveDown(null);
 		mcAuthoringForm.setAddOption(null);
 		mcAuthoringForm.setRemoveOption(null);
+		mcAuthoringForm.setViewFileItem(null);
 		
 		
 		String addQuestion=request.getParameter("addQuestion");
@@ -309,6 +310,14 @@ public class McAction extends DispatchAction implements McAppConstants
 		{
 			logger.debug("parameter removeOption is selected " + removeOption);
 			mcAuthoringForm.setRemoveOption("1");
+		}
+		
+		String viewFileItem=request.getParameter("viewFileItem");
+		logger.debug("parameter viewFileItem" + viewFileItem);
+		if ((viewFileItem != null) && viewFileItem.equals("1"))
+		{
+			logger.debug("parameter viewFileItem is selected " + viewFileItem);
+			mcAuthoringForm.setViewFileItem("1");
 		}
 		
 
@@ -1265,6 +1274,21 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		
 	 		McUtils.addFileToContentRepository(request, mcAuthoringForm, false);
             logger.debug("online file added to repository successfully.");
+	 		
+	 		mcAuthoringForm.resetUserAction();
+	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
+	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
+			request.getSession().setAttribute(CURRENT_TAB, new Long(3));
+	   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+        }
+	 	else if (mcAuthoringForm.getViewFileItem() != null)
+        {
+	 		userAction="viewFileItem";
+	 		request.setAttribute(USER_ACTION, userAction);
+	 		logger.debug("userAction:" + userAction);
+	 		
+	 		String fileItem= request.getParameter("fileItem");
+	 		logger.debug("fileItem:" + fileItem);
 	 		
 	 		mcAuthoringForm.resetUserAction();
 	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));

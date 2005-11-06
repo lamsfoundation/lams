@@ -5,7 +5,7 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
-					<table width="100%" align="left" border="0" cellspacing="2" cellpadding="2" summary="layout and Content">
+					<table class="forms">
 					
  						<tr> 
 					 		<td class="formlabel" valign=top> <bean:message key="label.authoring.title"/>: </td>
