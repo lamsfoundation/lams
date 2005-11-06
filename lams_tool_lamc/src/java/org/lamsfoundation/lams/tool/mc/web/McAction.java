@@ -354,6 +354,27 @@ public class McAction extends DispatchAction implements McAppConstants
     			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
 				return (mapping.findForward(LOAD_QUESTIONS));
         	}
+        	
+        	
+        	logger.debug("will validate SubTotalWeights");
+	 		boolean subWeightsValid=validateSubTotalWeights(request,mcAuthoringForm);
+        	logger.debug("subWeightsValid:" + subWeightsValid);
+        	if (subWeightsValid == false)
+        	{
+        		ActionMessages errors= new ActionMessages();
+        		errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.question.weight.total"));
+				saveErrors(request,errors);
+    			mcAuthoringForm.resetUserAction();
+				persistError(request,"error.question.weight.total");
+        		
+        		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+        		
+        		int maxQuestionIndex=mapQuestionsContent.size();
+    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+				return (mapping.findForward(LOAD_QUESTIONS));
+        	}
 	 		
 	 		
 		 	Map mapWeights= repopulateMap(request, "questionWeight");
@@ -1187,6 +1208,9 @@ public class McAction extends DispatchAction implements McAppConstants
 			errors.add(Globals.ERROR_KEY,new ActionMessage("submit.successful"));
 			logger.debug("add submit.successful to ActionMessages");
 			saveErrors(request,errors);
+			request.setAttribute(SUBMIT_SUCCESS, new Integer(1));
+			logger.debug("set SUBMIT_SUCCESS to 1");
+			
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
@@ -1577,6 +1601,29 @@ public class McAction extends DispatchAction implements McAppConstants
     	return false;
     }
 	
+    
+    protected boolean validateSubTotalWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+    {
+    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
+    	logger.debug("mapWeights: " + mapWeights);
+    	
+    	int totalWeight=0;
+    	Iterator itMap = mapWeights.entrySet().iterator();
+		while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            int currentWeight=new Integer(pairs.getValue().toString()).intValue();
+            totalWeight= totalWeight + currentWeight;
+            logger.debug("sub totalWeight: " +  totalWeight);
+		}
+        logger.debug("final totalWeight: " +  totalWeight);
+        
+        if (totalWeight > 100)
+        	return false;
+        else
+        	return true;
+    }
     
     protected boolean validateQuestionWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {

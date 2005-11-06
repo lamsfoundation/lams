@@ -5,23 +5,26 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
-
-				<table align=center>
+				<table align="center">
 					<tr>
-	 				 	<td class="formlabel" align=right> 
+	 				 	<td class="formlabel" align=right valign=top> 
 							<bean:message key="label.question"/>:
 						</td>
-						<td colspan=3>
+						
+						<td colspan=3 valign=top>
 			  				<input type="text" name="selectedQuestion" value="<c:out value="${sessionScope.selectedQuestion}"/>"   
 					  			size="50" maxlength="255"> 
 					  	</td>
 					</tr>
+					
 					<tr>
-	 				 	<td colspan=2 align=center>								
+	 				 	<td colspan=4 align=center valign=top>				
+	 				 	&nbsp				
 					  	</td>
 					</tr>
 
 
+				<!--
 					<tr>
 					  	<td class="formlabel">  </td>
 						<td class=input colspan=3>
@@ -38,20 +41,22 @@
 							 <bean:message key="label.actions"/> 
 						</td>
 					</tr>
-
+					-->
+					
+					<tr> <td colspan=4 align=center valign=top width="100%">
+					
+					<table align="center" border="1">
+					
 			  	 		<c:set var="optionIndex" scope="session" value="1"/>
 			  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
 							  <c:if test="${optionEntry.key == 1}"> 			
 								  <tr>
-									  	<td class="formlabel"> <c:out value="Candidate Answer ${optionIndex}"/> : </td>
+									  	<td bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Candidate Answer ${optionIndex}"/> :  </b>  </font>
 
-								  		<td class="input" colspan=3> 
 								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
-									  		size="50" maxlength="255"> 
-									  		
-									  		&nbsp
-
+									  		size="50" maxlength="255">
+							
 									  	
 			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
@@ -72,27 +77,21 @@
 														<option value="Incorrect" SELECTED> Incorrect </option>
 														<option value="Correct">   Correct  </option>
 													</select>
-											
 					 					</c:if> 			
-									  											
-									  		&nbsp
-
-	  										<html:submit property="addOption" styleClass="linkbutton" 
-											onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-												<bean:message key="button.add"/>
-											</html:submit>
+										</td>
+	
+										<td bgcolor="#EEEEEE" class="input" valign=top>
+	       								    <img src="images/add.gif" align=left onclick="javascript:document.forms[0].addOption.value=1; document.forms[0].submit();">
 									  	</td>
 							 </tr>
 							</c:if> 			
 					  		<c:if test="${optionEntry.key > 1}"> 			
 								<c:set var="optionIndex" scope="session" value="${optionIndex +1}"/>
 								  <tr>
-								  	<td class="formlabel"> <c:out value="Candidate Answer ${optionIndex}"/> : </td>
-								  	<td class="input" colspan=3> 
-								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"   
-									  		size="50" maxlength="255"> 
+								  	<td bgcolor="#EEEEEE" class="input" valign=top> <font size=2> <b> <c:out value="Candidate Answer ${optionIndex}"/> : </b></font>
 
-									  		&nbsp
+								  			<input type="text" name="optionContent<c:out value="${optionIndex}"/>" value="<c:out value="${optionEntry.value}"/>"
+									  		size="50" maxlength="255">
 
 			  				  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 			  							<c:forEach var="selectedOptionEntry" items="${sessionScope.mapSelectedOptions}">
@@ -113,39 +112,39 @@
 														<option value="Incorrect" SELECTED> Incorrect </option>
 														<option value="Correct">   Correct  </option>
 													</select>
-
 					 					</c:if> 			
-									  	
-									  		&nbsp
-
-			 								<html:submit property="removeOption" styleClass="linkbutton"  onclick="javascript:document.forms[0].deletableOptionIndex.value=${optionIndex};"
-			 								onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-												<bean:message key="button.remove"/>
-											</html:submit>
-									  	</td>
+										</td>
+	
+										<td bgcolor="#EEEEEE" class="input" valign=top>
+	       								    <img src="images/delete.gif" align=left onclick="javascript:document.forms[0].removeOption.value=1; document.forms[0].submit();">
+    								  	</td>
 								  </tr>
 							</c:if> 			
 						  		<input type=hidden name="checkBoxSelected<c:out value="${optionIndex}"/>">
 						</c:forEach>
-							<html:hidden property="deletableOptionIndex"/>							
+						
+					</table> </td> </tr>	
+					
+					<html:hidden property="deletableOptionIndex"/>							
+					<html:hidden property="addOption"/>
+					<html:hidden property="removeOption"/>
+					
 					<tr>
-	 				 	<td colspan=4 align=center>								
-							&nbsp&nbsp
+	 				 	<td colspan=4 align=center valign=top>								
+							&nbsp
 					  	</td>
 					</tr>
 					<tr>
-	 				 	<td colspan=4 align=center>								
-							&nbsp&nbsp
+	 				 	<td colspan=4 align=center valign=top>								
+							&nbsp
 					  	</td>
 					</tr>
 
-
-
 					<tr>
-	 				 	<td class="formlabel" align=right> 
+	 				 	<td class="formlabel" align=right valign=top> 
 							<bean:message key="label.feedback.incorrect"/>
 						</td>
-						<td class="formcontrol" colspan=3>
+						<td class="formcontrol" colspan=3 valign=top>
 							<FCK:editor id="richTextFeedbackInCorrect" basePath="/lams/fckeditor/">
 								  <c:out value="${sessionScope.richTextFeedbackInCorrect}" escapeXml="false" />						  
 							</FCK:editor>
@@ -153,10 +152,10 @@
 					</tr>
 					
 					<tr>
-	 				 	<td class="formlabel" align=right> 
+	 				 	<td class="formlabel" align=right valign=top> 
 							<bean:message key="label.feedback.correct"/>
 						</td>
-						<td class="formcontrol" colspan=3>
+						<td class="formcontrol" colspan=3 valign=top>
 							<FCK:editor id="richTextFeedbackCorrect" basePath="/lams/fckeditor/">
 								  <c:out value="${sessionScope.richTextFeedbackCorrect}" escapeXml="false" />						  
 							</FCK:editor>
@@ -165,8 +164,8 @@
 
 			
 	 				 <tr>
-	 				 <td> &nbsp</td>
-	 				 <td class="input" align=left colspan=3>
+	 				 <td valign=top> </td>
+	 				 <td class="input" align=left colspan=3 valign=top>
 							<html:submit property="doneOptions" styleClass="linkbutton" 
 							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
 								<bean:message key="button.done"/>

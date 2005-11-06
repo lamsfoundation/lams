@@ -57,7 +57,7 @@
 						
 									<c:if test="${questionEntry.key == 1}"> 			
 									    <tr>
-										  	<td bgcolor="#EEEEEE" class="formlabel" valign=top> <c:out value="Question ${queIndex}"/> : </td>
+										  	<td bgcolor="#EEEEEE" class="input" valign=top> <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b> </font>  </td>
 										  	
 									  		<td bgcolor="#EEEEEE" class="input" valign=top> 
 									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"
@@ -89,11 +89,12 @@
 										<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
 										
 										  <tr>
-										  	<td bgcolor="#EEEEEE" class="formlabel" valign=top> <c:out value="Question ${queIndex}"/> : </td>
+										  	<td bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b>  </font> </td>
 										  	
 									  		<td bgcolor="#EEEEEE" class="input" valign=top> 
-									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"  size="50" maxlength="255" > 
-											</td>											
+									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"
+										  		size="50" maxlength="255" >
+										  	</td>
 
 										  	<td bgcolor="#EEEEEE" class="input" align=center valign=top>										  	
 

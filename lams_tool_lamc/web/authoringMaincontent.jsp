@@ -96,7 +96,7 @@ MM_reloadPage(true);
 		
 		<table align=center> 	  
 		<tr>   
-		<td class="error">
+		<td class=error>
 			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
 		</td>
 		</tr> 

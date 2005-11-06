@@ -127,6 +127,7 @@ public interface McAppConstants {
     public static final String CHOICE_TYPE_ADVANCED						="choiceTypeAdvanced";
     public static final String CHOICE_TYPE_INSTRUCTIONS					="choiceTypeInstructions";
     public static final String EDIT_OPTIONS_MODE						="editOptionsMode";
+    public static final String SUBMIT_SUCCESS							="submitSuccess";
 
     
     /**
