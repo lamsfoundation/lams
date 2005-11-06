@@ -89,45 +89,59 @@ MM_reloadPage(true);
 
 <html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
 
-<table align=center> 	  
-<tr>   
-<td class="error">
-	<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
-</td>
-</tr> 
-</table>
-
-
  <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
 
 		<h2><bean:message key="label.authoring.mc.basic"/></h2>
-
+		
+		<table align=center> 	  
+		<tr>   
+		<td class=error>
+			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+		</td>
+		</tr> 
+		</table>
+		
 		<div id="formtablecontainer1">
-				<jsp:include page="BasicContent.jsp" />
+					<jsp:include page="BasicContent.jsp" />
 		</div>
-		<hr>
-			<a href="javascript:;" class="button">Cancel</a>
-			
+		<a href="javascript:;" class="button">Cancel</a>
 			<!-- end of content_b -->
 </div>
 	
 
-	<div id='content_a'  class="tabbody content_a">
-		<h2>Advanced Definitions </h2>
-		<div id="formtablecontainer2">
-					<jsp:include page="AdvancedContent.jsp" />
+<div id='content_a'  class="tabbody content_a">
+	<h2>Advanced Definitions </h2>
+	
+		<table align=center> 	  
+		<tr>   
+		<td class=error>
+			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+		</td>
+		</tr> 
+		</table>
+	
+	<div id="formtablecontainer2">
+				<jsp:include page="AdvancedContent.jsp" />
+	</div>
+</div>
+
+
+<div id='content_i'  class="tabbody content_i">
+		<h2>Instructions</h2>
+
+		<table align=center> 	  
+		<tr>   
+		<td class=error>
+			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+		</td>
+		</tr> 
+		</table>
+		
+		<div id="formtablecontainer3">
+				<jsp:include page="InstructionsContent.jsp" />
 		</div>
-	</div>
-
-
-	<div id='content_i'  class="tabbody content_i">
-			<h2>Instructions</h2>
-			<div id="formtablecontainer3">
-					<jsp:include page="InstructionsContent.jsp" />
-			</div>
-			<hr>
-	</div>
+</div>
 
 </html:form>
 <p></p>

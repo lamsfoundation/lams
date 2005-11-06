@@ -180,6 +180,8 @@ public interface IMcService
 	
 	public InputStream downloadFile(Long uuid, Long versionID) throws McApplicationException;
 	
+	public String getFileUuid(String filename) throws McApplicationException;
+	
 	public List retrieveMcUploadedOfflineFilesUuid(Long mcContentId) throws McApplicationException;
 	
 	public List retrieveMcUploadedOnlineFilesUuid(Long mcContentId) throws McApplicationException;

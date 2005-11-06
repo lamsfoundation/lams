@@ -35,14 +35,14 @@
           			</td>
 					<td colspan=3 align=left valign=top width="100%">
 						<table align="left" border="1">
-							<tr>
 									<c:forEach var='item' items='${sessionScope.listUploadedOfflineFileNames}'>
+									<tr>
 								         <td valign=top><font size=2> <b> <c:out value='${item}'/> </b> </font> </td>
 								      	<td valign=top>
 								      		<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].fileItem.value='<c:out value='${item}'/>' ; document.forms[0].viewFileItem.value=1; document.forms[0].submit();">	  										  		
 								      	</td>
+								     </tr> 	
 				         			</c:forEach>
-		         			</tr>
 	         			</table>
 					</td> 
 				</tr>
@@ -76,14 +76,14 @@
           			
 					<td colspan=3 align=left valign=top width="100%">
 						<table align="left" border="1">
-							<tr>
 									<c:forEach var='item' items='${sessionScope.listUploadedOnlineFileNames}'>
-								         <td valign=top><font size=2> <b> <c:out value='${item}'/> </b> </font> </td>
-								      	<td valign=top>
-								      		<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].fileItem.value='<c:out value='${item}'/>' ; document.forms[0].viewFileItem.value=1; document.forms[0].submit();">	  										  		
-								      	</td>
+										<tr>									
+									         <td valign=top><font size=2> <b> <c:out value='${item}'/> </b> </font> </td>
+									      	<td valign=top>
+									      		<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].fileItem.value='<c:out value='${item}'/>' ; document.forms[0].viewFileItem.value=1; document.forms[0].submit();">	  										  		
+									      	</td>
+					         			</tr>								      	
 				         			</c:forEach>
-		         			</tr>
 	         			</table>
 					</td> 
 				</tr>
@@ -107,5 +107,32 @@
 						</html:submit>
 					</td> 
  				 </tr>
+ 				 
+ 				 <tr>
+ 				 	<td colspan=4 align=center valign=top>								
+						&nbsp
+				  	</td>
+				</tr>
+				
+				<c:if test="${requestScope.fileContentReady == 1}"> 			
+					<tr>
+						<td align="right" valign=top>
+	          				 <bean:message key="label.fileContent" /> : 
+	          			</td>
+					
+	 				 	<td colspan=3 align=left valign=top>								
+	 				 		<table>
+	 				 			<tr> 
+	 				 				<td align=center> <font size=2> <b>
+	 				 					 <c:out value="${sessionScope.fileName}"/>  
+	 				 				</b> </font> </td>
+				 				 </tr>
+				 				 <tr>
+			 				 		<td> <textarea ROWS=20 COLS=80><c:out value="${sessionScope.fileContent}"/> </textarea> </td>				 				 
+				 				 </tr>
+	 				 		</table>
+					  	</td>
+					</tr>
+				</c:if> 			
  				 
 			</table>	  	

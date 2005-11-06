@@ -47,6 +47,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	
 	protected String fileItem;
 	protected String viewFileItem;
+	protected FormFile receivedFile;
 	
 	protected String addContent;
 	protected String removeContent;
@@ -156,6 +157,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		
 		this.fileItem=null;
 		this.viewFileItem=null;
+		this.receivedFile=null;
 		
 		this.addContent=null;
 		this.removeContent=null;
@@ -890,5 +892,17 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setViewFileItem(String viewFileItem) {
 		this.viewFileItem = viewFileItem;
+	}
+	/**
+	 * @return Returns the receivedFile.
+	 */
+	public FormFile getReceivedFile() {
+		return receivedFile;
+	}
+	/**
+	 * @param receivedFile The receivedFile to set.
+	 */
+	public void setReceivedFile(FormFile receivedFile) {
+		this.receivedFile = receivedFile;
 	}
 }

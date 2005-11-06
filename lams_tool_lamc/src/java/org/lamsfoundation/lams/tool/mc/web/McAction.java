@@ -20,7 +20,10 @@
  */
 package org.lamsfoundation.lams.tool.mc.web;
 
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1274,8 +1277,8 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		
 	 		McUtils.addFileToContentRepository(request, mcAuthoringForm, false);
             logger.debug("online file added to repository successfully.");
-	 		
-	 		mcAuthoringForm.resetUserAction();
+            
+            mcAuthoringForm.resetUserAction();
 	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
 	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
 			request.getSession().setAttribute(CURRENT_TAB, new Long(3));
@@ -1287,8 +1290,52 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
-	 		String fileItem= request.getParameter("fileItem");
-	 		logger.debug("fileItem:" + fileItem);
+	 		String filename= request.getParameter("fileItem");
+	 		logger.debug("filename:" + filename);
+	 		
+	 		String uuid=mcService.getFileUuid(filename);
+	 		logger.debug("uuid:" + uuid);
+	 		
+	 		if (uuid == null)
+	 		{
+	 			ActionMessages errors= new ActionMessages();
+        		errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.file.notPersisted"));
+				saveErrors(request,errors);
+    			mcAuthoringForm.resetUserAction();
+				persistError(request,"error.file.notPersisted");
+				
+				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
+		 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
+				request.getSession().setAttribute(CURRENT_TAB, new Long(3));
+		   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+	 		}
+	 		
+	 		InputStream fileInputStream=mcService.downloadFile(new Long(uuid), null);
+	 		logger.debug("fileInputStream:" + fileInputStream);
+	 		
+	 		DataInputStream dis = new DataInputStream(fileInputStream);
+	 		logger.debug("dis:" + dis);
+	 		
+	 		String allFileText="";
+	 		try {
+	 			String input="";
+	 			while ((input = dis.readLine()) != null) {
+	 		        logger.debug("input:" + input);
+	 		        allFileText = allFileText + input + "\r\n";
+	 		    }    
+	 		} catch (EOFException e) {
+	 			logger.debug("error reading the file :" + e);
+	 			logger.debug("error msg reading the file :" + e.getMessage());
+	 		}
+	 		
+	 		logger.debug("allFileText:" + allFileText);
+	 		request.getSession().setAttribute(FILE_CONTENT, allFileText);
+	 		
+	 		request.setAttribute(FILE_CONTENT_READY, new Integer(1));
+	 		logger.debug("set FILE_CONTENT_READY to 1");
+	 		
+	 		request.getSession().setAttribute(FILE_NAME, filename);
 	 		
 	 		mcAuthoringForm.resetUserAction();
 	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
@@ -1298,7 +1345,7 @@ public class McAction extends DispatchAction implements McAppConstants
         }
 	 	
 	 	mcAuthoringForm.resetUserAction();
-	 	return (mapping.findForward(LOAD_QUESTIONS));
+	 	return (mapping.findForward(LOAD_FILE_CONTENT));
     }
     
     

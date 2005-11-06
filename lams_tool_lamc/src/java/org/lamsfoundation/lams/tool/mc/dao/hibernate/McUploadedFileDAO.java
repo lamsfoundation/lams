@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUploadedFileDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -51,6 +52,8 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
 	 	
 	 	private static final String GET_OFFLINE_FILES_UUID = "select mcUploadedFile.uuid    from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
 	 	private static final String GET_OFFLINE_FILES_NAME ="select mcUploadedFile.filename from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0 order by mcUploadedFile.uuid";
+	 	
+	 	private static final String GET_FILES_UUID ="select mcUploadedFile.uuid from McUploadedFile mcUploadedFile where mcUploadedFile.filename=:filename";
 	 	
 	 	
 	 	private static final String GET_OFFLINE_FILES_UUIDPLUSFILENAME = "select (mcUploadedFile.uuid + '~' + mcUploadedFile.filename)   from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
@@ -116,6 +119,35 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
 		    	}
 			}
 	    }
+	    
+	    
+	    public String getFileUuid(String filename)
+	    {
+
+	      logger.debug("starting getFileUuid :" + filename);	
+	      HibernateTemplate templ = this.getHibernateTemplate();
+	      List list = getSession().createQuery(GET_FILES_UUID)
+				.setString("filename", filename)
+				.list();
+	      
+	      logger.debug("list getFileUuid :" + list);
+	      
+	      if (list != null && list.size() > 0){
+	      	Iterator listIterator=list.iterator();
+	    	while (listIterator.hasNext())
+	    	{
+	    		String uuid=(String)listIterator.next();
+	    		logger.debug("uuid :" + uuid);
+   				return uuid; 
+			}
+	      }
+	      else
+	      {
+	      	return null;	
+	      }
+	      return null;
+		}
+
 	    
 	    public void removeUploadFile(Long uid)
 	    {

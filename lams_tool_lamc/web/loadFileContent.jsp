@@ -117,15 +117,6 @@ MM_reloadPage(true);
 
 <div id='content_a'  class="tabbody content_a">
 	<h2>Advanced Definitions </h2>
-	
-		<table align=center> 	  
-		<tr>   
-		<td class=error>
-			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
-		</td>
-		</tr> 
-		</table>
-	
 	<div id="formtablecontainer2">
 				<jsp:include page="AdvancedContent.jsp" />
 	</div>
@@ -134,15 +125,6 @@ MM_reloadPage(true);
 
 <div id='content_i'  class="tabbody content_i">
 		<h2>Instructions</h2>
-
-		<table align=center> 	  
-		<tr>   
-		<td class=error>
-			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
-		</td>
-		</tr> 
-		</table>
-		
 		<div id="formtablecontainer3">
 				<jsp:include page="InstructionsContent.jsp" />
 		</div>

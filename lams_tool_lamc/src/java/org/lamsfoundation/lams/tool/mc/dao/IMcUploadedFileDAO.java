@@ -22,7 +22,6 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McUploadedFile;
 
 /**
@@ -45,6 +44,8 @@ public interface IMcUploadedFileDAO
 	    public void removeUploadFile(Long submissionId);
 	    
 	    public void deleteUploadFile(McUploadedFile mcUploadedFile);
+	    
+	    public String getFileUuid(String filename);
 	    
 	    public List retrieveMcUploadedFiles(Long mcContentId, boolean fileOnline);
 	    

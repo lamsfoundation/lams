@@ -47,9 +47,7 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageHeader" value = "Multiple Choice"/>
 		<put name="content" value="authoringMaincontent.jsp" />	
 	</definition>
-
-
-<!-- ============= Qa Authoring Page Definitions ====================== -->	
+	
 	<definition name=".allInstructions" extends=".baseDef" >
 		<put name="title" value="Multiple Choice"/>
 		<put name="pageHeader" value = "Multiple Choice"/>

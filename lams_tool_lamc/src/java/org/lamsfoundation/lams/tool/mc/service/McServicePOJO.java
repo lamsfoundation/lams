@@ -1499,6 +1499,23 @@ public class McServicePOJO implements
 		}
 	}
 	
+	
+	
+	
+	public String getFileUuid(String filename) throws McApplicationException
+	{
+	    try
+        {
+            return mcUploadedFileDAO.getFileUuid(filename);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is loading uuid by filename: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+	
 	/**
 	 *  !! COMPLETE THIS !!
 	 * 
