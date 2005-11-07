@@ -6,7 +6,6 @@
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry sourcepath="ECLIPSE_HOME/plugins/org.eclipse.jdt.source_3.0.0/src/org.junit_3.8.1/junitsrc.zip" kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
-	<classpathentry sourcepath="/lams_common" kind="lib" path="D:/eclipse/workspace/lams_build/lib/lams/lams.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-workspace.jar"/>
+	<classpathentry kind="lib" path="/lams_build/lib/lams/lams.jar"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>
