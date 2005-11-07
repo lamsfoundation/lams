@@ -268,24 +268,6 @@ Ant build file.
 	</target>
 
 	<!-- =================================================================== -->
-	<!-- Copy the third party jar files and cofiguration files for deployment-->
-	<!-- Only copy the required ones for this project - which at present is  -->
-	<!-- only jgroups and the jboss-cache									 -->
-	<!-- =================================================================== -->
-	<target name="copyfiles" description="copy lib and config files">
-		<copy overwrite="yes" todir="${jboss.home}/server/default/lib/">
-			<fileset dir="${lib}/jboss-cache/">
-				<include name="*.jar"/>
-			</fileset>
-		</copy>
-		<copy overwrite="yes" todir="${jboss.home}/server/default/lib/">
-			<fileset dir="${lib}/ehcache/">
-				<include name="*.jar"/>
-			</fileset>
-		</copy>
-	</target>
-
-	<!-- =================================================================== -->
 	<!-- Deploy the project's jar file only                                  -->
 	<!-- =================================================================== -->
 	<target name="deploy-jar" depends="build-jar" description="deploy jar file">
