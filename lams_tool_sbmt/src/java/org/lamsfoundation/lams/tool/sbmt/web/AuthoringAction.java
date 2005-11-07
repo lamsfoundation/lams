@@ -185,7 +185,11 @@ public class AuthoringAction extends LookupDispatchAction {
 				.getServlet().getServletContext());
 		
 		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
-		//if this content does not exist(empty without id), or find out wrong content(id not match),  
+		//if this content does not exist(empty without id), create a content by default content record.
+		if(persistContent == null){
+			persistContent = submitFilesService.createDefaultContent(contentID);
+		}
+		//if find out wrong content(id not match),  
 		//then reset the contentID to current value in order to keep it on HTML page.
 		if(!contentID.equals(persistContent.getContentID())){
 			persistContent = new SubmitFilesContent();

@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -215,7 +216,7 @@ public class SubmitFilesService implements ToolContentManager,
 
 		SubmitFilesContent fromContent = submitFilesContentDAO.getContentByID(fromContentId);
 		if ( fromContent == null ) {
-			// TODO need to get default content here!!!
+			fromContent = createDefaultContent(fromContentId);
 		}
 		SubmitFilesContent toContent = (SubmitFilesContent) fromContent.clone();
 		//reset some new attributes for toContent
@@ -323,17 +324,19 @@ public class SubmitFilesService implements ToolContentManager,
 		submitFilesContentDAO.save(content);
 	}
 
-	/**
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#updateSubmitFilesContent(org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent)
 	 */
 	public void updateSubmitFilesContent(SubmitFilesContent submitFilesContent) {
 		submitFilesContentDAO.update(submitFilesContent);
-
+	}
+	public void saveSubmitFilesContent(SubmitFilesContent submitFilesContent) {
+		submitFilesContentDAO.save(submitFilesContent);
 	}
 
-	/**
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getSubmitFilesContent(java.lang.Long)
@@ -351,7 +354,7 @@ public class SubmitFilesService implements ToolContentManager,
 		return content;
 	}
 
-	/**
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getSubmitFilesReport(java.lang.Long)
@@ -417,7 +420,7 @@ public class SubmitFilesService implements ToolContentManager,
 		submitFilesContentDAO.deleteInstructionFile(contentID, uuid, versionID, type);
 	}
 
-	/**
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long,
@@ -456,7 +459,7 @@ public class SubmitFilesService implements ToolContentManager,
 
 	}
 
-	/**
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long,
@@ -779,5 +782,47 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 	}
 
-
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getToolDefaultContentIdBySignature(java.lang.Long)
+     */
+    public Long getToolDefaultContentIdBySignature(String toolSignature)
+    {
+        Long contentId = null;
+    	contentId=new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));    
+    	if (contentId == null)
+    	{
+    	    String error="Could not retrieve default content id for this tool";
+    	    log.error(error);
+    	    throw new SubmitFilesException(error);
+    	}
+	    return contentId;
+    }
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#createDefaultContent(java.lang.Long)
+     */
+	public SubmitFilesContent createDefaultContent(Long contentID) {
+    	if (contentID == null)
+    	{
+    	    String error="Could not retrieve default content id for this tool";
+    	    log.error(error);
+    	    throw new SubmitFilesException(error);
+    	}
+    	Long defaultToolContentId = getToolDefaultContentIdBySignature(SbmtConstants.TOOLSIGNNATURE);
+    	SubmitFilesContent defaultContent = getSubmitFilesContent(defaultToolContentId);
+    	if(defaultContent == null)
+    	{
+    	    String error="Could not retrieve default content record for this tool";
+    	    log.error(error);
+    	    throw new SubmitFilesException(error);
+    	}
+    	
+    	//save default content by given ID.
+    	SubmitFilesContent content = new SubmitFilesContent();
+    	content = (SubmitFilesContent) defaultContent.clone();
+		content.setContentID(contentID);
+		saveSubmitFilesContent(content);
+		
+    	
+		return content;
+	}
 }

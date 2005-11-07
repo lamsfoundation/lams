@@ -177,4 +177,20 @@ public interface ISubmitFilesService {
 	 * @return
 	 */
 	public Learner getLearner(Long sessionID, Long userID);
+    /**
+     * Create the default content for the given contentID. These default data will copy from default record in 
+     * Tool Content database table.
+     * 
+     * @return
+     * 		The SubmitFilesContent with default content and given contentID
+     */
+	public SubmitFilesContent createDefaultContent(Long contentID);
+	
+	
+    /**
+     * This method retrieves the default content id.
+     * @param toolSignature The tool signature which is defined in lams_tool table.
+     * @return the default content id
+     */
+    public Long getToolDefaultContentIdBySignature(String toolSignature);
 }
