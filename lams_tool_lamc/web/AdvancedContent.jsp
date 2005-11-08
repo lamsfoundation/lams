@@ -11,11 +11,11 @@
 		      			<bean:message key="radiobox.sln"/>:
 					</td>
 					<td valign=top>
-						<html:radio property="sln" value="ON">
+						<html:radio property="sln"  value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
 
-						<html:radio property="sln" value="OFF">
+						<html:radio property="sln"  value="OFF">
 						 <bean:message key="option.off"/>
 						</html:radio>
 	      			</td>

@@ -165,6 +165,12 @@ public class McStarterAction extends Action implements McAppConstants {
 		Map mapOptionsContent= new TreeMap(new McComparator());
 		Map mapDefaultOptionsContent= new TreeMap(new McComparator());
 		
+		Map mapGeneralOptionsContent= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+		
+		Map mapGeneralSelectedOptionsContent= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		
 		Map mapDisabledQuestions= new TreeMap(new McComparator());
 		request.getSession().setAttribute(MAP_DISABLED_QUESTIONS, mapDisabledQuestions);
 		
@@ -178,6 +184,12 @@ public class McStarterAction extends Action implements McAppConstants {
 
 		Map mapSelectedOptions= new TreeMap(new McComparator());
 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+		
+		Map mapFeedbackIncorrect= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
+		
+		Map mapFeedbackCorrect= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
@@ -257,6 +269,8 @@ public class McStarterAction extends Action implements McAppConstants {
 			}
 			logger.debug("using mcQueContent uid: " + mcQueContent.getUid());
 			queContentUID=mcQueContent.getUid().longValue();
+			request.getSession().setAttribute(DEFAULT_QUESTION_UID, new Long(queContentUID));
+			logger.debug("DEFAULT_QUESTION_UID: " + queContentUID);
 		}
 		catch(Exception e)
 		{
@@ -282,6 +296,7 @@ public class McStarterAction extends Action implements McAppConstants {
 				persistError(request,"error.defaultOptionsContent.notAvailable");
 				return (mapping.findForward(LOAD_QUESTIONS));
 			}
+			
 		}
 		catch(Exception e)
 		{
@@ -399,6 +414,9 @@ public class McStarterAction extends Action implements McAppConstants {
 			mcAuthoringForm.setSynchInMonitor(OFF);
 			mcAuthoringForm.setRetries(OFF);
 			mcAuthoringForm.setShowFeedback(OFF);
+			mcAuthoringForm.setSln(OFF);
+			logger.debug("sln set to OFF");
+			
 			
 			/** collect options for the default question content into a Map*/
 			McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(mcContent.getUid().longValue());

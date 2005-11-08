@@ -116,7 +116,7 @@
 										</td>
 	
 										<td bgcolor="#EEEEEE" class="input" valign=top>
-	       								    <img src="images/delete.gif" align=left onclick="javascript:document.forms[0].removeOption.value=1; document.forms[0].submit();">
+	       								    <img src="images/delete.gif" align=left onclick="javascript:document.forms[0].removeOption.value=1; document.forms[0].deletableOptionIndex.value=<c:out value="${optionIndex}"/>; document.forms[0].submit();">
     								  	</td>
 								  </tr>
 							</c:if> 			

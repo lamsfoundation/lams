@@ -51,7 +51,7 @@
 					</tr>
 				-->
 				
-					<table align="center" border="1" cellspacing="2" cellpadding="2" summary="layout and Content">
+					<table align="center" border="1" summary="layout and Content" width="60%">
 			  	 		<c:set var="queIndex" scope="session" value="1"/>
 						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
 						
@@ -72,12 +72,13 @@
 												<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
 														<c:if test="${questionEntry.key == weightsEntry.key}"> 			
 													  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>" 
-														  		size="3" maxlength="3"><bean:message key="label.percent"/> 
+														  		size="3" maxlength="3">
+														  		<bean:message key="label.percent"/> 
 														</c:if>
 												</c:forEach>
                                             </td>
 
-                                            <td bgcolor="#EEEEEE" class="input" valign=top>								
+                                            <td bgcolor="#EEEEEE" class="input" width=30 valign=top>								
 												    <img src="images/edit.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].editOptions.value=1; document.forms[0].submit();">		  	
                    								    <img src="images/add.gif" align=left onclick="javascript:document.forms[0].addQuestion.value=1; document.forms[0].submit();">		  													    
 											</td>
@@ -108,12 +109,13 @@
 													<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
 															<c:if test="${questionEntry.key == weightsEntry.key}"> 			
 														  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
-															  		size="3" maxlength="3"><bean:message key="label.percent"/>
+															  		size="3" maxlength="3">
+															  		<bean:message key="label.percent"/>
 															</c:if>
 													</c:forEach>
 	                                            </td>
 																								
-                                               <td bgcolor="#EEEEEE" class="input" valign=top>								
+                                               <td bgcolor="#EEEEEE" class="input" width=30 valign=top>								
 													<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].editOptions.value=1; document.forms[0].submit();">	                                            			  	
 													<img src="images/delete.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].removeQuestion.value=1; document.forms[0].submit();">                                               		  														
 											  	</td>
