@@ -2,9 +2,13 @@ package org.lamsfoundation.lams.tool.forum.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
@@ -35,8 +39,11 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageDao;
+import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
+import org.lamsfoundation.lams.tool.forum.persistence.MessageSeqDao;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
+import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.usermanagement.User;
 
 
@@ -48,10 +55,10 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class ForumService implements IForumService,ToolContentManager,ToolSessionManager {
 	private static final Logger log = Logger.getLogger(ForumService.class);
-	
-	private ForumDao forumDao;
+		private ForumDao forumDao;
 	private AttachmentDao attachmentDao;
 	private MessageDao messageDao;
+	private MessageSeqDao messageSeqDao;
 	private ForumToolContentHandler toolContentHandler;
 	private IRepositoryService repositoryService;
 	
@@ -91,17 +98,11 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     	Forum forum = new Forum();
     	forum.setUid(forumId);
     	message.setForum(forum);
-        messageDao.saveOrUpdate(message);
+        messageDao.save(message);
         return message;
     }
 
      public Message editMessage(Message message) throws PersistenceException {
-        Message reloaded = this.getMessage(message.getUid());
-        reloaded.setModifiedBy(message.getModifiedBy());
-        reloaded.setIsAnonymous(message.getIsAnonymous());
-        reloaded.setIsAuthored(message.getIsAuthored());
-        reloaded.setSubject(message.getSubject());
-        reloaded.setBody(message.getBody());
         messageDao.saveOrUpdate(message);
         return message;
     }
@@ -120,12 +121,12 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         replyMessage.setToolSession(message.getToolSession());
         replyMessage.setParent(message);
         messageDao.saveOrUpdate(replyMessage);
-        Set replies = message.getReplies();
-        if (replies == null) {
-            replies = new HashSet();
-        }
-        replies.add(replyMessage);
-        message.setReplies(replies);
+//        Set replies = message.getReplies();
+//        if (replies == null) {
+//            replies = new HashSet();
+//        }
+//        replies.add(replyMessage);
+//        message.setReplies(replies);
         messageDao.saveOrUpdate(message);
         return replyMessage;
     }
@@ -334,7 +335,21 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		
 		return file;
 	}
-
+	public List getTopicThread(Long rootTopicId){
+		
+		List unsortedThread =  messageSeqDao.getTopicThread(rootTopicId);
+		Iterator iter = unsortedThread.iterator();
+		MessageSeq msgSeq;
+		SortedMap map = new TreeMap(new TopicComparator());
+		while(iter.hasNext()){
+			msgSeq = (MessageSeq) iter.next();
+			map.put(msgSeq,msgSeq.getMessage());
+		}
+		return 	new ArrayList(map.values());
+	}
+	public List getRootTopics(Long forumId){
+		return messageDao.getRootTopics(forumId);
+	}
 	public Forum createForum(Long contentId) throws PersistenceException {
 		return null;
 	}

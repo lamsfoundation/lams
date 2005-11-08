@@ -26,7 +26,7 @@
         </id>
 
         <property
-            name="userID"
+            name="userId"
             type="java.lang.Long"
             update="true"
             insert="true"
@@ -35,29 +35,20 @@
         />
 
         <property
-            name="status"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="status"
-            length="1"
-        />
-
-        <property
-            name="fullName"
+            name="lastName"
             type="java.lang.String"
             update="true"
             insert="true"
-            column="full_name"
+            column="last_name"
             length="255"
         />
 
         <property
-            name="userName"
+            name="firstName"
             type="java.lang.String"
             update="true"
             insert="true"
-            column="user_name"
+            column="first_name"
             length="255"
         />
 

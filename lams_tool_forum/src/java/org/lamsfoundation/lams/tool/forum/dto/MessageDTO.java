@@ -20,11 +20,14 @@
  */
 package org.lamsfoundation.lams.tool.forum.dto;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
+
 
 public class MessageDTO {
 
@@ -63,6 +66,26 @@ public class MessageDTO {
 		}
 		return retSet;
 	}
+	public static List getMessageDTO(List msgList){
+		List retSet = new ArrayList();
+		if(msgList == null || msgList.isEmpty())
+			return retSet;
+		
+		Iterator iter = msgList.iterator();
+		while(iter.hasNext()){
+			Message msg = (Message) iter.next();
+			MessageDTO msgDto = new MessageDTO();
+			if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
+				msgDto.setHasAttachment(false);
+			else
+				msgDto.setHasAttachment(true);
+			msgDto.setMessage(msg);
+			msgDto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
+			retSet.add(msgDto);
+		}
+		return retSet;
+	}
+	
 	public String getAuthor() {
 		return author;
 	}

@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
@@ -192,7 +193,7 @@ public class AuthoringAction extends Action {
 			attSet.add(att);
 		}
 		message.setAttachments(attSet);
-		message.setCreatedBy(new Long(user.getUserID().intValue()));
+		message.setCreatedBy(new ForumUser(user));
 		
 		if (topics == null) {
 			topics = new ArrayList();
@@ -292,7 +293,7 @@ public class AuthoringAction extends Action {
 			}
 			//save message into database
 			forumService = getForumManager();
-			forumService.createMessage(forumId,newMsg.getMessage());
+			forumService.editMessage(newMsg.getMessage());
 		}
 		
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
@@ -324,7 +325,7 @@ public class AuthoringAction extends Action {
 			newMsg.getMessage().setAttachments(null);
 			//save message into database
 			forumService = getForumManager();
-			forumService.createMessage(forumId,newMsg.getMessage());
+			forumService.editMessage(newMsg.getMessage());
 			
 		}
 		request.setAttribute(ForumConstants.SUCCESS_FLAG,"ATT_SUCCESS_FLAG");

@@ -45,4 +45,6 @@ public interface IForumService {
 	public void deleteInstructionFile(Long contentID, Long uuID, Long versionID, String type) throws PersistenceException;
 	public void deleteFromRepository(Long uuID, Long versionID) throws PersistenceException;
 
+	public List getTopicThread(Long rootTopicId);
+	public List getRootTopics(Long forumId);
 }

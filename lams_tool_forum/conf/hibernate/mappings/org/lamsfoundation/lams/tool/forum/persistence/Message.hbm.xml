@@ -41,17 +41,21 @@
             column="update_date"
         />
 
-        <property
+        <many-to-one
             name="createdBy"
-            type="java.lang.Long"
+            class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
+            cascade="save-update"
+            outer-join="auto"
             update="true"
             insert="true"
             column="create_by"
         />
 
-        <property
+        <many-to-one
             name="modifiedBy"
-            type="java.lang.Long"
+            class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
+            cascade="save-update"
+            outer-join="auto"
             update="true"
             insert="true"
             column="modified_by"
@@ -138,16 +142,6 @@
             />
 
         </set>
-
-        <many-to-one
-            name="learner"
-            class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
-            cascade="none"
-            outer-join="auto"
-            update="true"
-            insert="true"
-            column="user_uid"
-        />
 
         <many-to-one
             name="forum"

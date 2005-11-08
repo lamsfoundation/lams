@@ -127,60 +127,44 @@
 		<!-- ========== END: Authroing Definitions ============================== -->
 		
 		<!-- Message related actions -->
-		
-		<action path="/learning/forum/open"
+		<action path="/learning/viewForum"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			parameter="openForum" scope="request">
-			<forward name="success" path="tiles:/learning/forum/open" />
+			parameter="viewForum" scope="request">
+			<forward name="success" path="tiles:/learning/forum/viewForum" />
 		</action>
-		
-		<action path="/learning/message/openTopic"
+		<action path="/learning/viewThread"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			parameter="openTopic" scope="request">
-			<forward name="success" path="tiles:/learning/message/open" />
+			parameter="viewThread" scope="request">
+			<forward name="success" path="tiles:/learning/forum/viewThread" />
 		</action>
-		
-		<action path="/learning/message/getMessage"
+		<action path="/learning/newTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			parameter="getMessage" scope="request">
-			<forward name="success" path="tiles:/learning/message/getMessage" />
+			parameter="newTopic" scope="request">
+			<forward name="success" path="tiles:/learning/forum/newTopic" />
 		</action>
-		
-		<action path="/learning/message/post"
+		<action path="/learning/replyTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			parameter="post" scope="request">
-			<forward name="success" path="tiles:/learning/message/post" />
+			parameter="replyTopic" scope="request">
+			<forward name="success" path="tiles:/learning/forum/replyTopic" />
 		</action>
-		
-		<action path="/learning/message/reply"
+		<action path="/learning/message/editTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			name="messageForm" validate="true" input="tiles:/learning/message/post"
-			parameter="reply" scope="request">
-			<forward name="success" path="/learning/message/openTopic.do" />
+			parameter="editTopic" scope="request">
+			<forward name="success" path="tiles:/learning/forum/editTopic" />
 		</action>
-		
-		<action path="/learning/message/editMessage"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			name="messageForm" validate="true"
-			input="tiles:/learning/message/getMessage" parameter="editMessage"
-			scope="request">
-			<forward name="success" path="/learning/message/openTopic.do" />
-		</action>
-		
-		<action path="/learning/message/delete"
+		<action path="/learning/message/deleteTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			parameter="deleteMessage" scope="request">
-			<forward name="success" path="/learing/message/open.do" />
+			parameter="deleteTopic" scope="request">
+			<forward name="success" path="tiles:/learning/forum/editTopic" />
 		</action>
 		
-				
 		<!-- System level actions -->
 		<action path="/index" type="org.apache.struts.actions.ForwardAction"
 			parameter="tiles:/layout" />
-		
 		<action path="/error" type="org.apache.struts.actions.ForwardAction"
 			parameter="tiles:/error" />
-		
 		<action path="/blank" type="org.apache.struts.actions.ForwardAction"
 			parameter="tiles:/blank" />
+							
 				

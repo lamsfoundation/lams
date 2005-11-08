@@ -1,13 +1,12 @@
 <div align="center">
 <script type="text/javascript">
 	function popupable(url,name){
-
-	if(window.opener == null)
-		//it is not in popup window, so pops it up
-		launchPopup(url,name);
-	else
+	if(window.opener != null || (typeof popFobidden != "undefined"))
 		//it is already a popup window, then just load it
 		location.href=url;
+	else
+		//it is not in popup window, so pops it up
+		launchPopup(url,name);
 	}
 </script>
 <div id="topiclist">

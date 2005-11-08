@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
-        table="tl_lafrum11_forum_user"
+        name="org.lamsfoundation.lams.tool.forum.persistence.MessageSeq"
+        table="tl_lafrum11_message_seq"
     >
 
         <id
@@ -16,45 +16,46 @@
             column="uid"
             type="java.lang.Long"
         >
-            <generator class="identity">
+            <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-ForumUser.xml 
+                  hibernate-generator-params-MessageSeq.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
-        <property
-            name="userId"
-            type="java.lang.Long"
+        <many-to-one
+            name="rootMessage"
+            class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+            cascade="none"
+            outer-join="auto"
             update="true"
             insert="true"
-            column="user_id"
-            length="20"
+            column="root_message_uid"
+        />
+
+        <many-to-one
+            name="message"
+            class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="message_uid"
         />
 
         <property
-            name="lastName"
-            type="java.lang.String"
+            name="messageLevel"
+            type="short"
             update="true"
             insert="true"
-            column="last_name"
-            length="255"
-        />
-
-        <property
-            name="firstName"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="first_name"
-            length="255"
+            column="message_level"
         />
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-ForumUser.xml
+                hibernate-properties-MessageSeq.xml
             containing the additional properties and place it in your merge dir.
         -->
 

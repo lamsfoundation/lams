@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 /**
  * 
  * @hibernate.class table="tl_lafrum11_forum_user"
@@ -38,11 +39,15 @@ public class ForumUser implements Serializable,Cloneable{
 	private static Logger log = Logger.getLogger(ForumUser.class);
 	
     private Long uid;
-	private Long userID;
-	private String userName;
-	private String fullName;
-	private boolean status;
+	private Long userId;
+	private String firstName;
+	private String lastName;
 	
+	public ForumUser(UserDTO user) {
+		this.userId = new Long(user.getUserID().intValue());
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+	}
 	/**
 	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="uid"
 	 * @return Returns the uid.
@@ -59,30 +64,17 @@ public class ForumUser implements Serializable,Cloneable{
 
 	/**
 	 * @hibernate.property column="user_id" length="20"
-	 * @return Returns the userID.
+	 * @return Returns the userId.
 	 */
-	public Long getUserID() {
-		return userID;
+	public Long getUserId() {
+		return userId;
 	}
 	/**
-	 * @param userID
-	 *            The userID to set.
+	 * @param userId
+	 *            The userId to set.
 	 */
-	public void setUserID(Long userID) {
-		this.userID = userID;
-	}
-	/**
-	 * @hibernate.property column="status" length="1"
-	 * @return Returns the status.
-	 */
-	public boolean isStatus() {
-		return status;
-	}
-	/**
-	 * @param status The status to set.
-	 */
-	public void setStatus(boolean finished) {
-		this.status = finished;
+	public void setUserId(Long userID) {
+		this.userId = userID;
 	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
@@ -99,24 +91,24 @@ public class ForumUser implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.property length="255" column="full_name"
+	 * @hibernate.property length="255" column="last_name"
 	 * @return
 	 */
-	public String getFullName() {
-		return fullName;
+	public String getLastName() {
+		return lastName;
 	}
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 	/**
-	 * @hibernate.property length="255" column="user_name"
+	 * @hibernate.property length="255" column="first_name"
 	 * @return
 	 */
-	public String getUserName() {
-		return userName;
+	public String getFirstName() {
+		return firstName;
 	}
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
 }

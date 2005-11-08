@@ -14,12 +14,17 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author conradb
  */
 public class MessageDao extends HibernateDaoSupport {
-
+	private static final String SQL_QUERY_FIND_ROOT_TOPICS = "from " + Message.class.getName() 
+					+ " where parent_uid is null and forum_uid=?";
 	public void saveOrUpdate(Message message) {
 		message.updateModificationData();
 		this.getHibernateTemplate().saveOrUpdate(message);
 	}
 
+	public void save(Message message) {
+		message.updateModificationData();
+		this.getHibernateTemplate().save(message);
+	}
 	public Message getById(Long messageId) {
 		return (Message) getHibernateTemplate().get(Message.class,messageId);
 
@@ -46,5 +51,10 @@ public class MessageDao extends HibernateDaoSupport {
 	public List allAuthoredMessage(Long forumId) {
 		return findByNamedQuery("allAuthoredMessagesOfForum", forumId);
 	}
+
+	public List getRootTopics(Long forumId) {
+		return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_TOPICS, forumId);
+	}
+
 
 }

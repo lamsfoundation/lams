@@ -24,15 +24,13 @@ public class Message {
 
 	private ToolSession toolSession;
 	private Message parent;
-	private ForumUser learner;
 	private Forum forum;
-	private Set replies;
 	private Set attachments;
 	
 	private Date created;
 	private Date updated;
-	private Long createdBy;
-	private Long modifiedBy;
+	private ForumUser createdBy;
+	private ForumUser modifiedBy;
 
 	/**
 	 * Returns the object's creation date
@@ -75,18 +73,19 @@ public class Message {
     /**
      * @return Returns the userid of the user who created the Forum.
      *
-     * @hibernate.property
+     * @hibernate.many-to-one
      * 		column="create_by"
+     *  	cascade="save-update"
      *
      */
-    public Long getCreatedBy() {
+    public ForumUser getCreatedBy() {
         return createdBy;
     }
 
     /**
      * @param createdBy The userid of the user who created this Forum.
      */
-    public void setCreatedBy(Long createdBy) {
+    public void setCreatedBy(ForumUser createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -102,21 +101,20 @@ public class Message {
 	}
 
     /**
-     * @return Returns the userid of the user who modified the posting.
-     *
-     *
-     * @hibernate.property
+     * @hibernate.many-to-one
      * 		column="modified_by"
-     *
+     * 		cascade="save-update"
+     * 
+     * @return Returns the userid of the user who modified the posting.
      */
-    public Long getModifiedBy() {
+    public ForumUser getModifiedBy() {
         return modifiedBy;
     }
 
     /**
      * @param modifiedBy The userid of the user who modified the posting.
      */
-    public void setModifiedBy(Long modifiedBy) {
+    public void setModifiedBy(ForumUser modifiedBy) {
         this.modifiedBy = modifiedBy;
     }
 
@@ -207,29 +205,6 @@ public class Message {
 		this.isAnonymous = isAnonymous;
 	}
 
-	/**
-     * @return a set of relpies to this Message.
-     *
-     * @hibernate.set table="MESSAGE"
-     * inverse="false"
-     * lazy="false"
-     * cascade="all-delete-orphan"
-     * @hibernate.collection-key column="parent_uid"
-     * @hibernate.collection-one-to-many 
-     * 			class="org.lamsfoundation.lams.tool.forum.persistence.Message"
-     *
-     */	 
-	public Set getReplies() {
-		return replies;
-	}
-	
-	/**
-	 * @param replies The reply Messages that is associated with this Message.
-	 */
-	public void setReplies(Set replies) {
-		this.replies = replies;
-	}
-
     /**
       * Gets the toolSession
       *
@@ -256,7 +231,10 @@ public class Message {
     public void setParent(Message parent) {
         this.parent = parent;
     }
-
+    /**
+     * @hibernate.many-to-one column="parent_uid"
+     * @return
+     */
     public Message getParent() {
         return parent;
     }
@@ -308,20 +286,6 @@ public class Message {
 		.append(updated).append(createdBy)
 		.append(modifiedBy)
 		.toHashCode();
-	}
-	/**
-	  * @hibernate.many-to-one
-      *	class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
-      *	              column="user_uid"
-      *
-	 * @return
-	 */
-	public ForumUser getLearner() {
-		return learner;
-	}
-
-	public void setLearner(ForumUser learner) {
-		this.learner = learner;
 	}
 	/**
 	 * @hibernate.many-to-one column="forum_uid"
