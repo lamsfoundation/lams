@@ -26,7 +26,11 @@
             <ref local="forumSessionFactory"/>
         </property>
     </bean>
-
+    <bean id="forumUserDao" class="org.lamsfoundation.lams.tool.forum.persistence.ForumUserDao">
+        <property name="sessionFactory">
+            <ref local="forumSessionFactory"/>
+        </property>
+    </bean>
 
    <bean id="attachmentDao" class="org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao">
         <property name="sessionFactory">
@@ -51,6 +55,9 @@
     <bean id="forumManagerTarget" class="org.lamsfoundation.lams.tool.forum.service.ForumService">
         <property name="forumDao">
             <ref local="forumDao"/>
+        </property>
+        <property name="forumUserDao">
+            <ref local="forumUserDao"/>
         </property>
         <property name="attachmentDao">
             <ref local="attachmentDao"/>

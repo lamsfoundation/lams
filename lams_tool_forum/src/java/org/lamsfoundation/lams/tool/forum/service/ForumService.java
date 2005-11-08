@@ -37,6 +37,8 @@ import org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumUserDao;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageDao;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
@@ -59,6 +61,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private AttachmentDao attachmentDao;
 	private MessageDao messageDao;
 	private MessageSeqDao messageSeqDao;
+	private ForumUserDao forumUserDao;
 	private ForumToolContentHandler toolContentHandler;
 	private IRepositoryService repositoryService;
 	
@@ -352,5 +355,25 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	}
 	public Forum createForum(Long contentId) throws PersistenceException {
 		return null;
+	}
+
+	public ForumUser getUserByUserId(Long userId) {
+		List list =  forumUserDao.getUserByUserId(userId);
+		if(list == null || list.isEmpty())
+			return null;
+		
+		return (ForumUser) list.get(0);
+	}
+
+	public void createUser(ForumUser forumUser) {
+		forumUserDao.save(forumUser);
+	}
+
+	public ForumUserDao getForumUserDao() {
+		return forumUserDao;
+	}
+
+	public void setForumUserDao(ForumUserDao forumUserDao) {
+		this.forumUserDao = forumUserDao;
 	}
 }

@@ -193,8 +193,16 @@ public class AuthoringAction extends Action {
 			attSet.add(att);
 		}
 		message.setAttachments(attSet);
-		message.setCreatedBy(new ForumUser(user));
-		
+		//check whether this user exist or not
+		ForumUser forumUser = forumService.getUserByUserId(new Long(user.getUserID().intValue()));
+		if(forumUser == null){
+			//if user not exist, create new one in database
+			forumUser = new ForumUser(user);
+			forumService.createUser(forumUser);
+		}
+		message.setCreatedBy(forumUser);
+		//same person with create at first time
+		message.setModifiedBy(forumUser);
 		if (topics == null) {
 			topics = new ArrayList();
 		}

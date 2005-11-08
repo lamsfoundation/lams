@@ -44,7 +44,7 @@
         <many-to-one
             name="createdBy"
             class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
-            cascade="save-update"
+            cascade="none"
             outer-join="auto"
             update="true"
             insert="true"
@@ -54,7 +54,7 @@
         <many-to-one
             name="modifiedBy"
             class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
-            cascade="save-update"
+            cascade="none"
             outer-join="auto"
             update="true"
             insert="true"
@@ -93,26 +93,6 @@
             column="is_anonymous"
         />
 
-        <set
-            name="replies"
-            table="MESSAGE"
-            lazy="false"
-            inverse="false"
-            cascade="all-delete-orphan"
-            sort="unsorted"
-        >
-
-            <key
-                column="parent_uid"
-            >
-            </key>
-
-            <one-to-many
-                  class="org.lamsfoundation.lams.tool.forum.persistence.Message"
-            />
-
-        </set>
-
         <many-to-one
             name="toolSession"
             class="org.lamsfoundation.lams.tool.forum.persistence.ToolSession"
@@ -121,6 +101,16 @@
             update="true"
             insert="true"
             column="forum_session_uid"
+        />
+
+        <many-to-one
+            name="parent"
+            class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="parent_uid"
         />
 
         <set

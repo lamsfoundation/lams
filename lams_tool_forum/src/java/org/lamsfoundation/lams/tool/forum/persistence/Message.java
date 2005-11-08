@@ -75,7 +75,7 @@ public class Message {
      *
      * @hibernate.many-to-one
      * 		column="create_by"
-     *  	cascade="save-update"
+     *  	cascade="none"
      *
      */
     public ForumUser getCreatedBy() {
@@ -103,7 +103,7 @@ public class Message {
     /**
      * @hibernate.many-to-one
      * 		column="modified_by"
-     * 		cascade="save-update"
+     * 		cascade="none"
      * 
      * @return Returns the userid of the user who modified the posting.
      */

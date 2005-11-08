@@ -6,6 +6,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
 /**
@@ -47,4 +48,6 @@ public interface IForumService {
 
 	public List getTopicThread(Long rootTopicId);
 	public List getRootTopics(Long forumId);
+	public ForumUser getUserByUserId(Long userId);
+	public void createUser(ForumUser forumUser);
 }

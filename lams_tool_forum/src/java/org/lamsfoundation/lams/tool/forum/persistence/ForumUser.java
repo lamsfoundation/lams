@@ -43,6 +43,9 @@ public class ForumUser implements Serializable,Cloneable{
 	private String firstName;
 	private String lastName;
 	
+	public ForumUser(){
+	}
+	
 	public ForumUser(UserDTO user) {
 		this.userId = new Long(user.getUserID().intValue());
 		this.firstName = user.getFirstName();
