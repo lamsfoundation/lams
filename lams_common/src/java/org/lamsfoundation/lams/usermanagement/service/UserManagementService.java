@@ -59,7 +59,8 @@ import org.lamsfoundation.lams.util.wddx.FlashMessage;
  * 
  * Manually caches the user objects (by user id) in the shared cache.
  * Whenever a user object is modified, the cached version must be 
- * removed.
+ * removed. 
+ * TODO complete the caching - need to remove the user from the cache on modification.
  * 
  * @author Fei Yang, Manpreet Minhas
  */
