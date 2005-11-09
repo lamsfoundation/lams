@@ -48,6 +48,12 @@
     </module>
     <module>
         <web>
+            <web-uri>lams-admin.war</web-uri>
+            <context-root>/lams/admin</context-root>
+	</web>
+    </module>
+    <module>
+        <web>
             <web-uri>lams-monitoring.war</web-uri>
             <context-root>/lams/monitoring</context-root>
 	</web>
