@@ -29,6 +29,7 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -43,8 +44,11 @@ import org.xml.sax.SAXException;
  * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-public class ConfigurationLoader {
-	
+public class ConfigurationLoader {   
+    private static Logger log = Logger.getLogger(ConfigurationLoader.class);
+    
+    public static final String ENV_CONFIG_PARAMETER = "LAMS_CONF_FILE"; 
+    
 	private static final String CONFIG_FILE_PATH_WINDOWS = "c:/lamsconf/lams.xml";
 
 	private static final String CONFIG_FILE_PATH_UNIX = "/usr/local/lamsconf/lams.xml";
@@ -62,16 +66,24 @@ public class ConfigurationLoader {
 	 * @param configFilePath The configFilePath to set.
 	 */
 	private static void setConfigFilePath() {
-		//Suppose windows and unix are the only platforms where lams will be installed
-		//TODO make it complete
-		String osName = System.getProperty("os.name");
-		if((osName.indexOf("Windows")!=-1)||(osName.indexOf("windows")!=-1))
-		{
-			ConfigurationLoader.configFilePath = CONFIG_FILE_PATH_WINDOWS;
-		}else
-		{
-			ConfigurationLoader.configFilePath = CONFIG_FILE_PATH_UNIX;
-		}
+        //check if environment variable is set
+        String envConfigFilePath = System.getenv(ENV_CONFIG_PARAMETER);
+        if(envConfigFilePath != null){
+            ConfigurationLoader.configFilePath = envConfigFilePath;
+        }
+        else{
+    		//Suppose windows and unix are the only platforms where lams will be installed
+    		//TODO make it complete
+    		String osName = System.getProperty("os.name");
+    		if((osName.indexOf("Windows")!=-1)||(osName.indexOf("windows")!=-1))
+    		{
+    			ConfigurationLoader.configFilePath = CONFIG_FILE_PATH_WINDOWS;
+    		}else
+    		{
+    			ConfigurationLoader.configFilePath = CONFIG_FILE_PATH_UNIX;
+    		}
+        }
+        log.debug("Loading Configuration File From: " + ConfigurationLoader.configFilePath);
 	}
 
 	public static Map load() 
@@ -93,15 +105,15 @@ public class ConfigurationLoader {
 			}
 		}catch(IOException e)
 		{
-System.out.println("===>IOExcpetion in ConfigurationLoader "+e);			
+            log.error("===>IOExcpetion in ConfigurationLoader", e);
 			//nothing to do
 		}catch(SAXException e)
 		{
-System.out.println("===>SAXExcpetion in ConfigurationLoader "+e);
+		    log.error("===>SAXExcpetion in ConfigurationLoader", e);
 			//nothing to do
 		}catch(ParserConfigurationException e)
 		{
-System.out.println("===>ParserConfigurationException in ConfigurationLoader "+e);
+            log.error("===>ParserConfigurationException in ConfigurationLoader ", e);
 			//nothing to do
 		}
 		return items;
