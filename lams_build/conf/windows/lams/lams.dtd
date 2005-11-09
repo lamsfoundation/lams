@@ -1,4 +1,4 @@
-<!ELEMENT Lams (ServerURL,LamsHome,TempDir,SMTPServer,LamsSupportEmail,ContentRepositoryPath,UploadFileMaxSize,UploadLargeFileMaxSize,UploadFileMaxMemorySize,ChatServerName,ChatPortNumber,FileManagerDir,ExecutableExtensions,TicketFile,UserInactiveTimeout,AllowMultipleLogin)>
+<!ELEMENT Lams (ServerURL,LamsHome,TempDir,SMTPServer,LamsSupportEmail,ContentRepositoryPath,UploadFileMaxSize,UploadLargeFileMaxSize,UploadFileMaxMemorySize,ChatServerName,ChatPortNumber,FileManagerDir,ExecutableExtensions,TicketFile,UserInactiveTimeout,AllowMultipleLogin,UseCacheDebugListener)>
 <!ELEMENT ServerURL (#PCDATA)>
 <!ELEMENT LamsHome (#PCDATA)>
 <!ELEMENT TempDir (#PCDATA)>
