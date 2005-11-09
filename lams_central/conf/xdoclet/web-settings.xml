@@ -19,6 +19,11 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 -->
 <context-param>
+	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+  	<param-value>org.lamsfoundation.lams.applicationResources</param-value>
+</context-param>
+
+<context-param> 
 	<param-name>contextConfigLocation</param-name>
 	<param-value>
 				classpath:/org/lamsfoundation/lams/applicationContext.xml
