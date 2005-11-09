@@ -74,7 +74,7 @@ public class LibraryActivityDTO extends BaseDTO {
 	
 	/** The image that represents the icon of this 
 	 * activity in the UI*/
-	private String libraryActivityUiImage;
+	private String libraryActivityUIImage;
 	
 	/** The type of activity */
 	private Integer activityTypeID;
@@ -99,7 +99,7 @@ public class LibraryActivityDTO extends BaseDTO {
 		this.helpText = helpText;
 		this.xCoord = xcoord;
 		this.yCoord = ycoord;		
-		this.libraryActivityUiImage = libraryActivityUiImage;
+		this.libraryActivityUIImage = libraryActivityUiImage;
 		this.tool = tool;
 	}
 	public LibraryActivityDTO(ToolActivity activity){
@@ -110,7 +110,7 @@ public class LibraryActivityDTO extends BaseDTO {
 		this.helpText = activity.getHelpText();
 		this.xCoord = activity.getXcoord();
 		this.yCoord = activity.getYcoord();			
-		this.libraryActivityUiImage = activity.getLibraryActivityUiImage();
+		this.libraryActivityUIImage = activity.getLibraryActivityUiImage();
 		this.activityTypeID = activity.getActivityTypeId();
 		this.activityCategoryID = activity.getActivityCategoryID();
 		this.tool = activity.getTool().getAuthoringToolDTO();
@@ -125,49 +125,49 @@ public class LibraryActivityDTO extends BaseDTO {
 	 * @return Returns the activityID.
 	 */
 	public Long getActivityID() {
-		return activityID!=null?activityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return activityID;
 	}	
 	/**
 	 * @return Returns the activityUIID.
 	 */
 	public Integer getActivityUIID() {
-		return activityUIID!=null?activityUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return activityUIID;
 	}	
 	/**
 	 * @return Returns the description.
 	 */
 	public String getDescription() {
-		return description!=null?description:WDDXTAGS.STRING_NULL_VALUE;
+		return description;
 	}
 	/**
 	 * @return Returns the helpText.
 	 */
 	public String getHelpText() {
-		return helpText!=null?helpText:WDDXTAGS.STRING_NULL_VALUE;
+		return helpText;
 	}
 	/**
 	 * @return Returns the libraryActivityUiImage.
 	 */
-	public String getLibraryActivityUiImage() {
-		return libraryActivityUiImage!=null?libraryActivityUiImage:WDDXTAGS.STRING_NULL_VALUE;
+	public String getLibraryActivityUIImage() {
+		return libraryActivityUIImage;
 	}	
 	/**
 	 * @return Returns the title.
 	 */
 	public String getTitle() {
-		return title!=null?title:WDDXTAGS.STRING_NULL_VALUE;
+		return title;
 	}	
 	/**
 	 * @return Returns the xcoord.
 	 */
 	public Integer getxCoord() {
-		return xCoord!=null?xCoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return xCoord;
 	}
 	/**
 	 * @return Returns the ycoord.
 	 */
 	public Integer getyCoord() {
-		return yCoord!=null?yCoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return yCoord;
 	}	
 	/**
 	 * @return Returns the tool.

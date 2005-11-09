@@ -149,7 +149,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	
 	/** The image that represents the icon of this 
 	 * activity in the UI*/
-	private String libraryActivityUiImage;
+	private String libraryActivityUIImage;
 	
 	private Long createGroupingID;
 	
@@ -212,7 +212,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.gateEndTimeOffset = gateEndTimeOffset;
 		this.gateStartDateTime = gateStartDateTime;
 		this.gateEndDateTime = gateEndDateTime;
-		this.libraryActivityUiImage = libraryActivityUiImage;
+		this.libraryActivityUIImage = libraryActivityUiImage;
 		this.createGroupingID = createGroupingID;
 		this.createGroupingUIID = createGroupingUIID;
 		this.libraryActivityID = libraryActivityID;
@@ -232,30 +232,30 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.yCoord = activity.getYcoord();
 		this.parentActivityID = activity.getParentActivity()!=null?
 								activity.getParentActivity().getActivityId():
-								WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+								null;
 		this.parentUIID = activity.getParentUIID();
 		this.activityTypeID = activity.getActivityTypeId();
 		
 		this.groupingID = activity.getGrouping()!=null?
 						  activity.getGrouping().getGroupingId():
-						  WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+						  null;
 		
 		this.groupingUIID = activity.getGroupingUIID();
 		this.orderID = activity.getOrderId();
 		this.defineLater = activity.getDefineLater();
 		this.learningDesignID = activity.getLearningDesign()!=null?
 								activity.getLearningDesign().getLearningDesignId():
-								WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+								null;
 		this.learningLibraryID = activity.getLearningLibrary()!=null?
 								 activity.getLearningLibrary().getLearningLibraryId():
-								 WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+								 null;
 		this.createDateTime = activity.getCreateDateTime();
 		this.runOffline = activity.getRunOffline();
 		this.activityCategoryID = activity.getActivityCategoryID();		
-		this.libraryActivityUiImage = activity.getLibraryActivityUiImage();		
+		this.libraryActivityUIImage = activity.getLibraryActivityUiImage();		
 		this.libraryActivityID = activity.getLibraryActivity()!=null?
 								 activity.getLibraryActivity().getActivityId():
-								 WDDXTAGS.NUMERIC_NULL_VALUE_LONG;	
+								 null;	
 		this.applyGrouping = activity.getApplyGrouping();
 		this.groupingSupportType = activity.getGroupingSupportType();
 	}
@@ -334,205 +334,205 @@ public class AuthoringActivityDTO extends BaseDTO{
 	 * @return Returns the activityCategoryID.
 	 */
 	public Integer getActivityCategoryID() {
-		return activityCategoryID!=null?activityCategoryID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return activityCategoryID;
 	}
 	/**
 	 * @return Returns the activityID.
 	 */
 	public Long getActivityID() {
-		return activityID!=null?activityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return activityID;
 	}
 	/**
 	 * @return Returns the activityTypeID.
 	 */
 	public Integer getActivityTypeID() {
-		return activityTypeID!=null?activityTypeID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return activityTypeID;
 	}
 	/**
 	 * @return Returns the activityUIID.
 	 */
 	public Integer getActivityUIID() {
-		return activityUIID!=null?activityUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return activityUIID;
 	}
 	/**
 	 * @return Returns the createDateTime.
 	 */
 	public Date getCreateDateTime() {
-		return createDateTime!=null?createDateTime:WDDXTAGS.DATE_NULL_VALUE;
+		return createDateTime;
 	}
 	/**
 	 * @return Returns the createGroupingID.
 	 */
 	public Long getCreateGroupingID() {
-		return createGroupingID!=null?createGroupingID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return createGroupingID;
 	}
 	/**
 	 * @return Returns the createGroupingUIID.
 	 */
 	public Integer getCreateGroupingUIID() {
-		return createGroupingUIID!=null?createGroupingUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return createGroupingUIID;
 	}
 	/**
 	 * @return Returns the defineLater.
 	 */
 	public Boolean getDefineLater() {
-		return defineLater!=null?defineLater:WDDXTAGS.BOOLEAN_NULL_VALUE;
+		return defineLater;
 	}
 	/**
 	 * @return Returns the description.
 	 */
 	public String getDescription() {
-		return description!=null?description:WDDXTAGS.STRING_NULL_VALUE;
+		return description;
 	}
 	/**
 	 * @return Returns the gateActivityLevelID.
 	 */
 	public Integer getGateActivityLevelID() {
-		return gateActivityLevelID!=null?gateActivityLevelID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return gateActivityLevelID;
 	}
 	/**
 	 * @return Returns the gateEndDateTime.
 	 */
 	public Date getGateEndDateTime() {
-		return gateEndDateTime!=null?gateEndDateTime:WDDXTAGS.DATE_NULL_VALUE;
+		return gateEndDateTime;
 	}
 	/**
 	 * @return Returns the gateEndTimeOffset.
 	 */
 	public Long getGateEndTimeOffset() {
-		return gateEndTimeOffset!=null?gateEndTimeOffset:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return gateEndTimeOffset;
 	}
 	/**
 	 * @return Returns the gateOpen.
 	 */
 	public Boolean getGateOpen() {
-		return gateOpen!=null?gateOpen:WDDXTAGS.BOOLEAN_NULL_VALUE;
+		return gateOpen;
 	}
 	/**
 	 * @return Returns the gateStartDateTime.
 	 */
 	public Date getGateStartDateTime() {
-		return gateStartDateTime!=null?gateStartDateTime:WDDXTAGS.DATE_NULL_VALUE;
+		return gateStartDateTime;
 	}
 	/**
 	 * @return Returns the gateStartTimeOffset.
 	 */
 	public Long getGateStartTimeOffset() {
-		return gateStartTimeOffset!=null?gateStartTimeOffset:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return gateStartTimeOffset;
 	}
 	/**
 	 * @return Returns the groupingID.
 	 */
 	public Long getGroupingID() {
-		return groupingID!=null?groupingID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return groupingID;
 	}
 	/**
 	 * @return Returns the groupingUIID.
 	 */
 	public Integer getGroupingUIID() {
-		return groupingUIID!=null?groupingUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return groupingUIID;
 	}
 	/**
 	 * @return Returns the helpText.
 	 */
 	public String getHelpText() {
-		return helpText!=null?helpText:WDDXTAGS.STRING_NULL_VALUE;
+		return helpText;
 	}
 	/**
 	 * @return Returns the learningDesignID.
 	 */
 	public Long getLearningDesignID() {
-		return learningDesignID!=null?learningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return learningDesignID;
 	}
 	/**
 	 * @return Returns the learningLibraryID.
 	 */
 	public Long getLearningLibraryID() {
-		return learningLibraryID!=null?libraryActivityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return learningLibraryID;
 	}
 	/**
 	 * @return Returns the libraryActivityID.
 	 */
 	public Long getLibraryActivityID() {
-		return libraryActivityID!=null?libraryActivityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return libraryActivityID;
 	}
 	/**
 	 * @return Returns the libraryActivityUiImage.
 	 */
-	public String getLibraryActivityUiImage() {
-		return libraryActivityUiImage!=null?libraryActivityUiImage:WDDXTAGS.STRING_NULL_VALUE;
+	public String getLibraryActivityUIImage() {
+		return libraryActivityUIImage;
 	}
 	/**
 	 * @return Returns the maxOptions.
 	 */
 	public Integer getMaxOptions() {
-		return maxOptions!=null?maxOptions:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return maxOptions;
 	}
 	/**
 	 * @return Returns the minOptions.
 	 */
 	public Integer getMinOptions() {
-		return minOptions!=null?minOptions:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return minOptions;
 	}
 	/**
 	 * @return Returns the optionsInstructions.
 	 */
 	public String getOptionsInstructions() {
-		return optionsInstructions!=null?optionsInstructions:WDDXTAGS.STRING_NULL_VALUE;
+		return optionsInstructions;
 	}
 	/**
 	 * @return Returns the orderID.
 	 */
 	public Integer getOrderID() {
-		return orderID!=null?orderID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return orderID;
 	}
 	/**
 	 * @return Returns the parentActivityID.
 	 */
 	public Long getParentActivityID() {
-		return parentActivityID!=null?parentActivityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return parentActivityID;
 	}
 	/**
 	 * @return Returns the parentUIID.
 	 */
 	public Integer getParentUIID() {
-		return parentUIID!=null?parentUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return parentUIID;
 	}
 	/**
 	 * @return Returns the runOffline.
 	 */
 	public Boolean getRunOffline() {
-		return runOffline!=null?runOffline:WDDXTAGS.BOOLEAN_NULL_VALUE;
+		return runOffline;
 	}
 	/**
 	 * @return Returns the title.
 	 */
 	public String getTitle() {
-		return title!=null?title:WDDXTAGS.STRING_NULL_VALUE;
+		return title;
 	}
 	/**
 	 * @return Returns the toolContentID.
 	 */
 	public Long getToolContentID() {
-		return toolContentID!=null?toolContentID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return toolContentID;
 	}
 	/**
 	 * @return Returns the toolID.
 	 */
 	public Long getToolID() {
-		return toolID!=null?toolID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return toolID;
 	}
 	/**
 	 * @return Returns the xcoord.
 	 */
 	public Integer getxCoord() {
-		return xCoord!=null?xCoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return xCoord;
 	}
 	/**
 	 * @return Returns the ycoord.
 	 */
 	public Integer getyCoord() {
-		return yCoord!=null?yCoord:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return yCoord;
 	}	
 	/*************************************************
 	 * Setters
@@ -685,9 +685,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	/**
 	 * @param libraryActivityUiImage The libraryActivityUiImage to set.
 	 */
-	public void setLibraryActivityUiImage(String libraryActivityUiImage) {
+	public void setLibraryActivityUIImage(String libraryActivityUiImage) {
 		if(!libraryActivityUiImage.equals(WDDXTAGS.STRING_NULL_VALUE))
-			this.libraryActivityUiImage = libraryActivityUiImage;
+			this.libraryActivityUIImage = libraryActivityUiImage;
 	}
 	/**
 	 * @param maxOptions The maxOptions to set.
