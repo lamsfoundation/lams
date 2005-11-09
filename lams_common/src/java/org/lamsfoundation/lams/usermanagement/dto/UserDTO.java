@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.usermanagement.dto;
 
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
  * @author Manpreet Minhas
@@ -51,24 +50,32 @@ public class UserDTO {
 	 * @return Returns the firstName.
 	 */
 	public String getFirstName() {
-		return firstName!=null?firstName:WDDXTAGS.STRING_NULL_VALUE;
+		return firstName;
 	}
 	/**
 	 * @return Returns the lastName.
 	 */
 	public String getLastName() {
-		return lastName!=null?lastName:WDDXTAGS.STRING_NULL_VALUE;
+		return lastName;
 	}
 	/**
 	 * @return Returns the login.
 	 */
 	public String getLogin() {
-		return login!=null?login:WDDXTAGS.STRING_NULL_VALUE;
+		return login;
 	}
 	/**
 	 * @return Returns the userID.
 	 */
 	public Integer getUserID() {
 		return userID;
+	}
+	
+	public CSSThemeVisualElement getTheme() {
+		return theme;
+	}
+	
+	public void setTheme(CSSThemeVisualElement theme) {
+		this.theme = theme;
 	}
 }
