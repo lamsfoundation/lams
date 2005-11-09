@@ -1,7 +1,8 @@
+<!-- The calling code must set two variables - "themeName" and "imgRoot", -->
+<!-- both used in the generating the img names. -->
+
 var tabsContents = new Array();
 var tab_lefts = new Array();
-//TODO:we need to set this variable, maybe from the praent or direct from JSP/Java
-var themeName = "aqua";
 
 function getKey(keyStroke) {
 	isNetscape=(document.layers);
@@ -10,8 +11,6 @@ function getKey(keyStroke) {
 	if(which=="a" || which=="b" || which=="i"){
 		showTab(which);
 	}
-
-
 }
 document.onkeypress = getKey;
 
