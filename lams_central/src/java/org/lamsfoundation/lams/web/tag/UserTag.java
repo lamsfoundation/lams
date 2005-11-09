@@ -38,7 +38,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 /**
  * Output a property from the userDTO object in the shared session.
  * 
- * Has a single paramter "property", which is the name of the property from the UserDTO to be accessed.
+ * Has a single parameter "property", which is the name of the property from the UserDTO to be accessed.
  * May be: 	userID, firstName, lastName, login, email.
  * 
  * Doesn't support theme yet - to be added when we work out what we want from the theme details.
@@ -51,6 +51,8 @@ import org.apache.commons.beanutils.PropertyUtils;
  * @author Fiona Malikoff
  */
 public class UserTag extends TagSupport {
+
+	private static final long serialVersionUID = -2801719186682639858L;
 
 	private static final Logger log = Logger.getLogger(UserTag.class);
 
