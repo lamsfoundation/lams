@@ -287,6 +287,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		//set create date time to now
 		_createDateTime = new Date();
 		//validate and set field
+		
+		if(_learningDesignID == null){
+			_learningDesignID = Config.NUMERIC_NULL_VALUE;
+		}
+		
 		_validDesign = validate();
 		if(_validDesign){
 			//set first ID
@@ -325,6 +330,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			_copyTypeID = COPY_TYPE_ID_AUTHORING;
 		}
 		
+		/*
+		* //09-11-05: converted to not including nulls in the packet
 		design.objectType = (_objectType) ? _objectType : Config.STRING_NULL_VALUE;
 		design.copyTypeID = (_copyTypeID) ? _copyTypeID : Config.NUMERIC_NULL_VALUE;
 		design.learningDesignID = (_learningDesignID) ? _learningDesignID : Config.NUMERIC_NULL_VALUE;
@@ -346,6 +353,33 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		design.createDateTime = (_createDateTime) ? _createDateTime : Config.DATE_NULL_VALUE;
 		design.lastModifiedDateTime= (_lastModifiedDateTime) ? _lastModifiedDateTime: Config.DATE_NULL_VALUE;
 		design.dateReadOnly = (_dateReadOnly) ? _dateReadOnly: Config.DATE_NULL_VALUE;
+		*/
+		
+		//if the value is null, it is not included in the DTO
+		
+		if(_copyTypeID){		design.copyTypeID 		= _copyTypeID;			}
+		if(_learningDesignID){	design.learningDesignID	= _learningDesignID;	}
+		if(_title){				design.title			= _title;				}
+		if(_description){		design.description		= _description;			}
+		if(_helpText){			design.helpText			= _helpText;			}
+		if(_version){			design.version			= _version;				}
+		if(_userID){			design.userID			= _userID;				}
+		if(_duration){			design.duration			= _duration;			}
+		//readOnly must be in the DTO, so if its null, then give a false
+		design.readOnly = (_readOnly==null) ? false : _readOnly;
+		//valid design must be in the DTO, so if its null, then give a false
+		design.validDesign = (_validDesign==null) ? false : _validDesign;
+		if(_maxID){				design.maxID			= _maxID;				}
+		if(_firstActivityID){	design.firstActivityID	= _firstActivityID;		}
+		if(_firstActivityUIID){	design.firstActivityUIID= _firstActivityID;		}
+		if(_parentLearningDesignID){design.parentLearningDesignID= _parentLearningDesignID; }
+		if(_licenseID){			design.licenseID		= _licenseID;			}
+		if(_licenseText){		design.licenseText		= _licenseText;			}
+		if(_workspaceFolderID){	design.workspaceFolderID= _workspaceFolderID;	}
+		if(_createDateTime){	design.createDateTime 	= _createDateTime;		}
+		if(_lastModifiedDateTime){ design.lastModifiedDateTime = _lastModifiedDateTime;	}
+		if(_dateReadOnly){		design.dateReadOnly		= _dateReadOnly;		}
+		
 		
 		design.activities = new Array();
 		var classActs:Array = _activities.values();
