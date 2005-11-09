@@ -79,61 +79,61 @@ public class TransitionDTO extends BaseDTO{
 	 * @return Returns the createDateTime.
 	 */
 	public Date getCreateDateTime() {
-		return createDateTime!=null?createDateTime:WDDXTAGS.DATE_NULL_VALUE;
+		return createDateTime;
 	}
 	/**
 	 * @return Returns the description.
 	 */
 	public String getDescription() {
-		return description!=null?description:WDDXTAGS.STRING_NULL_VALUE;
+		return description;
 	}
 	/**
 	 * @return Returns the fromActivityID.
 	 */
 	public Long getFromActivityID() {
-		return fromActivityID!=null?fromActivityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return fromActivityID;
 	}
 	/**
 	 * @return Returns the fromUIID.
 	 */
 	public Integer getFromUIID() {
-		return fromUIID!=null?fromUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return fromUIID;
 	}
 	/**
 	 * @return Returns the learningDesignID.
 	 */
 	public Long getLearningDesignID() {
-		return learningDesignID!=null?learningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return learningDesignID;
 	}
 	/**
 	 * @return Returns the title.
 	 */
 	public String getTitle() {
-		return title!=null?title:WDDXTAGS.STRING_NULL_VALUE;
+		return title;
 	}
 	/**
 	 * @return Returns the toActivityID.
 	 */
 	public Long getToActivityID() {
-		return toActivityID!=null?toActivityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return toActivityID;
 	}
 	/**
 	 * @return Returns the toUIID.
 	 */
 	public Integer getToUIID() {
-		return toUIID!=null?toUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return toUIID;
 	}
 	/**
 	 * @return Returns the transitionID.
 	 */
 	public Long getTransitionID() {
-		return transitionID!=null?transitionID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return transitionID;
 	}
 	/**
 	 * @return Returns the transitionUIID.
 	 */
 	public Integer getTransitionUIID() {
-		return transitionUIID!=null?transitionUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return transitionUIID;
 	}
 	/**
 	 * @param createDateTime The createDateTime to set.

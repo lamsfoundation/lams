@@ -85,7 +85,7 @@ public class GroupingDTO extends BaseDTO{
 	 * @return Returns the groupingID.
 	 */
 	public Long getGroupingID() {
-		return groupingID!=null?groupingID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return groupingID;
 	}
 	/**
 	 * @param groupingID The groupingID to set.
@@ -98,7 +98,7 @@ public class GroupingDTO extends BaseDTO{
 	 * @return Returns the groupingType.
 	 */
 	public Integer getGroupingType() {
-		return groupingType!=null?groupingType:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return groupingType;
 	}
 	/**
 	 * @param groupingType The groupingType to set.
@@ -111,7 +111,7 @@ public class GroupingDTO extends BaseDTO{
 	 * @return Returns the groupingUIID.
 	 */
 	public Integer getGroupingUIID() {
-		return groupingUIID!=null?groupingUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return groupingUIID;
 	}
 	/**
 	 * @param groupingUIID The groupingUIID to set.
@@ -124,7 +124,7 @@ public class GroupingDTO extends BaseDTO{
 	 * @return Returns the learnersPerGroup.
 	 */
 	public Integer getLearnersPerGroup() {
-		return learnersPerGroup!=null?learnersPerGroup:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return learnersPerGroup;
 	}
 	/**
 	 * @param learnersPerGroup The learnersPerGroup to set.
@@ -137,7 +137,7 @@ public class GroupingDTO extends BaseDTO{
 	 * @return Returns the maxNumberOfGroups.
 	 */
 	public Integer getMaxNumberOfGroups() {
-		return maxNumberOfGroups!=null?maxNumberOfGroups:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return maxNumberOfGroups;
 	}
 	/**
 	 * @param maxNumberOfGroups The maxNumberOfGroups to set.
@@ -150,7 +150,7 @@ public class GroupingDTO extends BaseDTO{
 	 * @return Returns the numberOfGroups.
 	 */
 	public Integer getNumberOfGroups() {
-		return numberOfGroups!=null?numberOfGroups:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return numberOfGroups;
 	}
 	/**
 	 * @param numberOfGroups The numberOfGroups to set.
@@ -163,7 +163,7 @@ public class GroupingDTO extends BaseDTO{
 	 * @return Returns the staffGroupID.
 	 */
 	public Long getStaffGroupID() {
-		return staffGroupID!=null?staffGroupID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return staffGroupID;
 	}
 	/**
 	 * @param staffGroupID The staffGroupID to set.

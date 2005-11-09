@@ -139,10 +139,10 @@ public class LearningDesignDTO extends BaseDTO{
 		this.title = learningDesign.getTitle();
 		this.firstActivityID = learningDesign.getFirstActivity()!=null?
 							   learningDesign.getFirstActivity().getActivityId():
-							   WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+							   null;
 		this.firstActivityUIID = learningDesign.getFirstActivity()!=null?
 								 learningDesign.getFirstActivity().getActivityUIID():
-								 WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+								 null;
 		this.maxID = learningDesign.getMaxID();
 		this.validDesign = learningDesign.getValidDesign();
 		this.readOnly = learningDesign.getReadOnly();
@@ -153,7 +153,7 @@ public class LearningDesignDTO extends BaseDTO{
 		
 		this.userID = learningDesign.getUser()!=null?
 					  learningDesign.getUser().getUserId():
-					  WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+					  null;
 		
 					  this.helpText = learningDesign.getHelpText();
 		this.copyTypeID = learningDesign.getCopyTypeID();
@@ -162,18 +162,18 @@ public class LearningDesignDTO extends BaseDTO{
 		
 		this.parentLearningDesignID = learningDesign.getParentLearningDesign()!=null?
 									  learningDesign.getParentLearningDesign().getLearningDesignId():
-									  WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+									  null;
 		
 	    this.workspaceFolderID = learningDesign.getWorkspaceFolder()!=null?
 								 learningDesign.getWorkspaceFolder().getWorkspaceFolderId():
-								 WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+								 null;
 								 
 		this.duration = learningDesign.getDuration();
 		this.licenseText = learningDesign.getLicenseText();
 		
 		this.licenseID = learningDesign.getLicense()!=null?
 						 learningDesign.getLicense().getLicenseID():
-						 WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+						 null;
 		
 		this.lessonOrgID = learningDesign.getLessonOrgID();
 		
@@ -190,151 +190,176 @@ public class LearningDesignDTO extends BaseDTO{
 	 * @return Returns the copyTypeID.
 	 */
 	public Integer getCopyTypeID() {
-		return copyTypeID!=null?copyTypeID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		//return copyTypeID!=null?copyTypeID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	    return copyTypeID;
 	}
 	/**
 	 * @return Returns the createDateTime.
 	 */
 	public Date getCreateDateTime() {
-		return createDateTime!=null?createDateTime:WDDXTAGS.DATE_NULL_VALUE;
+		//return createDateTime!=null?createDateTime:WDDXTAGS.DATE_NULL_VALUE;
+	    return createDateTime;
 	}
 	/**
 	 * @return Returns the dateReadOnly.
 	 */
 	public Date getDateReadOnly() {
-		return dateReadOnly!=null?dateReadOnly:WDDXTAGS.DATE_NULL_VALUE;
+		//return dateReadOnly!=null?dateReadOnly:WDDXTAGS.DATE_NULL_VALUE;
+	    return dateReadOnly;
 	}
 	/**
 	 * @return Returns the description.
 	 */
 	public String getDescription() {
-		return description!=null?description:WDDXTAGS.STRING_NULL_VALUE;
+		//return description!=null?description:WDDXTAGS.STRING_NULL_VALUE;
+	    return description;
 	}
 	/**
 	 * @return Returns the duration.
 	 */
 	public Long getDuration() {
-		return duration!=null?duration:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		//return duration!=null?duration:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	    return duration;
 	}
 	/**
 	 * @return Returns the firstActivityID.
 	 */
 	public Long getFirstActivityID() {
-		return firstActivityID!=null?firstActivityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		//return firstActivityID!=null?firstActivityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	    return firstActivityID;
 	}
 	/**
 	 * @return Returns the helpText.
 	 */
 	public String getHelpText() {
-		return helpText!=null?helpText:WDDXTAGS.STRING_NULL_VALUE;
+		//return helpText!=null?helpText:WDDXTAGS.STRING_NULL_VALUE;
+	    return helpText;
 	}
 	/**
 	 * @return Returns the lastModifiedDateTime.
 	 */
 	public Date getLastModifiedDateTime() {
-		return lastModifiedDateTime!=null?lastModifiedDateTime:WDDXTAGS.DATE_NULL_VALUE;
+		//return lastModifiedDateTime!=null?lastModifiedDateTime:WDDXTAGS.DATE_NULL_VALUE;
+	    return lastModifiedDateTime;
 	}
 	/**
 	 * @return Returns the learningDesignID.
 	 */
 	public Long getLearningDesignID() {
-		return learningDesignID!=null?learningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		//return learningDesignID!=null?learningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	    return learningDesignID;
 	}
 	/**
 	 * @return Returns the learningDesignUIID.
 	 */
 	public Integer getLearningDesignUIID() {
-		return learningDesignUIID!=null?learningDesignUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		//return learningDesignUIID!=null?learningDesignUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	    return learningDesignUIID;
 	}
 	/**
 	 * @return Returns the lessonID.
 	 */
 	public Long getLessonID() {
-		return lessonID!=null?lessonID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		//return lessonID!=null?lessonID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	    return lessonID;
 	}
 	/**
 	 * @return Returns the lessonName.
 	 */
 	public String getLessonName() {
-		return lessonName!=null?lessonName:WDDXTAGS.STRING_NULL_VALUE;
+		//return lessonName!=null?lessonName:WDDXTAGS.STRING_NULL_VALUE;
+	    return lessonName;
 	}
 	/**
 	 * @return Returns the lessonOrgID.
 	 */
 	public Long getLessonOrgID() {
-		return lessonOrgID!=null?lessonOrgID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		//return lessonOrgID!=null?lessonOrgID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	    return lessonOrgID;
 	}
 	/**
 	 * @return Returns the lessonOrgName.
 	 */
 	public String getLessonOrgName() {
-		return lessonOrgName!=null?lessonOrgName:WDDXTAGS.STRING_NULL_VALUE;
+		//return lessonOrgName!=null?lessonOrgName:WDDXTAGS.STRING_NULL_VALUE;
+	    return lessonOrgName;
 	}
 	/**
 	 * @return Returns the lessonStartDateTime.
 	 */
 	public Date getLessonStartDateTime() {
-		return lessonStartDateTime!=null?lessonStartDateTime:WDDXTAGS.DATE_NULL_VALUE;
+		//return lessonStartDateTime!=null?lessonStartDateTime:WDDXTAGS.DATE_NULL_VALUE;
+	    return lessonStartDateTime;
 	}
 	/**
 	 * @return Returns the licenseID.
 	 */
 	public Long getLicenseID() {
-		return licenseID!=null?licenseID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		//return licenseID!=null?licenseID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	    return licenseID;
 	}
 	/**
 	 * @return Returns the licenseText.
 	 */
 	public String getLicenseText() {
-		return licenseText!=null?licenseText:WDDXTAGS.STRING_NULL_VALUE;
+		//return licenseText!=null?licenseText:WDDXTAGS.STRING_NULL_VALUE;
+	    return licenseText;
 	}
 	/**
 	 * @return Returns the maxID.
 	 */
 	public Integer getMaxID() {
-		return maxID!=null?maxID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		//return maxID!=null?maxID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	    return maxID;
 	}
 	/**
 	 * @return Returns the parentLearningDesignID.
 	 */
 	public Long getParentLearningDesignID() {
-		return parentLearningDesignID!=null?parentLearningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		//return parentLearningDesignID!=null?parentLearningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+	    return parentLearningDesignID;
 	}
 	/**
 	 * @return Returns the readOnly.
 	 */
 	public Boolean getReadOnly() {
-		return readOnly!=null?readOnly:WDDXTAGS.BOOLEAN_NULL_VALUE;
+		//return readOnly!=null?readOnly:WDDXTAGS.BOOLEAN_NULL_VALUE;
+	    return readOnly;
 	}
 	/**
 	 * @return Returns the title.
 	 */
 	public String getTitle() {
-		return title!=null?title:WDDXTAGS.STRING_NULL_VALUE;
+		//return title!=null?title:WDDXTAGS.STRING_NULL_VALUE;
+	    return title;
 	}
 	/**
 	 * @return Returns the userID.
 	 */
 	public Integer getUserID() {
-		return userID!=null?userID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		//return userID!=null?userID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	    return userID;
 	}
 	/**
 	 * @return Returns the validDesign.
 	 */
 	public Boolean getValidDesign() {
-		return validDesign!=null?validDesign:WDDXTAGS.BOOLEAN_NULL_VALUE;
+		//return validDesign!=null?validDesign:WDDXTAGS.BOOLEAN_NULL_VALUE;
+	    return validDesign;
 	}
 	/**
 	 * @return Returns the version.
 	 */
 	public String getVersion() {
-		return version!=null?version:WDDXTAGS.STRING_NULL_VALUE;
+		//return version!=null?version:WDDXTAGS.STRING_NULL_VALUE;
+	    return version;
 	}
 	/**
 	 * @return Returns the workspaceFolderID.
 	 */
 	public Integer getWorkspaceFolderID() {
-		return workspaceFolderID!=null?workspaceFolderID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		//return workspaceFolderID!=null?workspaceFolderID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	    return workspaceFolderID;
 	}	
 	public ArrayList getActivities(){
 		return activities;
@@ -581,7 +606,7 @@ public class LearningDesignDTO extends BaseDTO{
 	 * @return Returns the onlineInstructions.
 	 */
 	public String getOnlineInstructions() {
-		return onlineInstructions!=null?onlineInstructions:WDDXTAGS.STRING_NULL_VALUE;
+		return onlineInstructions;
 	}
 	/**
 	 * @param onlineInstructions The onlineInstructions to set.
@@ -601,7 +626,7 @@ public class LearningDesignDTO extends BaseDTO{
 	 * @return Returns the offlineInstructions.
 	 */
 	public String getOfflineInstructions() {
-		return offlineInstructions!=null?offlineInstructions:WDDXTAGS.STRING_NULL_VALUE;
+		return offlineInstructions;
 	}
 
 

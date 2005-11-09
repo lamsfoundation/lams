@@ -64,42 +64,43 @@ public class MonitoringActivityDTO {
 	 * @return Returns the activityID.
 	 */
 	public Long getActivityID() {
-		return activityID!=null?activityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return activityID;
 	}
 	/**
 	 * @return Returns the activityTypeID.
 	 */
 	public Integer getActivityTypeID() {
-		return activityTypeID!=null?activityTypeID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return activityTypeID;
 	}	
 	/**
 	 * @return Returns the description.
 	 */
 	public String getDescription() {
-		return description!=null?description:WDDXTAGS.STRING_NULL_VALUE;
+		return description;
 	}
 	/**
 	 * @return Returns the orderID.
 	 */
 	public Integer getOrderID() {
-		return orderID!=null?orderID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return orderID;
 	}
 	/**
 	 * @return Returns the title.
 	 */
 	public String getTitle() {
-		return title!=null?title:WDDXTAGS.STRING_NULL_VALUE;
+		return title;
+		
 	}
 	/**
 	 * @return Returns the contributionType.
 	 */
 	public Integer getContributionType() {
-		return contributionType!=null?contributionType:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return contributionType;
 	}
 	/**
 	 * @return Returns the isRequired.
 	 */
 	public Boolean getIsRequired() {
-		return isRequired!=null?isRequired:new Boolean(false);
+		return isRequired;
 	}
 }

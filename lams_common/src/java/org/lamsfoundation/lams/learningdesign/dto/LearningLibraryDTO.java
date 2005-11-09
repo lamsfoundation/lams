@@ -83,25 +83,25 @@ public class LearningLibraryDTO extends BaseDTO {
 	 * @return Returns the description.
 	 */
 	public String getDescription() {
-		return description!=null?description:WDDXTAGS.STRING_NULL_VALUE;
+		return description;
 	}
 	/**
 	 * @return Returns the learningLibraryID.
 	 */
 	public Long getLearningLibraryID() {
-		return learningLibraryID!=null?learningLibraryID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+		return learningLibraryID;
 	}
 	/**
 	 * @return Returns the title.
 	 */
 	public String getTitle() {
-		return title!=null?title:WDDXTAGS.STRING_NULL_VALUE;
+		return title;
 	}
 	/**
 	 * @return Returns the validFlag.
 	 */
 	public Boolean getValidFlag() {
-		return validFlag!=null?validFlag:WDDXTAGS.BOOLEAN_NULL_VALUE;
+		return validFlag;
 	}
 	
 	/**
