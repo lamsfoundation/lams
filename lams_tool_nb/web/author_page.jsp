@@ -1,33 +1,26 @@
-<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
-<%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts/struts-logic.tld" prefix="logic" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
+<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-fck-editor" prefix="FCK" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
-<%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String root = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 
-%>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 <html:html>
+<head>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title>Noticeboard tool</title>
-<script type="text/javascript" src="<%=root%>author_page/js/tabcontroller.js"></script>
-<script src="<%=pathToLams%>/includes/javascript/common.js"></script>
+<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>
+<script src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
 <!-- this is the custom CSS for hte tool -->
-<link href="<%=root%>author_page/css/tool_custom.css" rel="stylesheet" type="text/css">
+<link href="<c:out value="${tool}"/>css/tool_custom.css" rel="stylesheet" type="text/css">
 <!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-<link href="<%=root%>author_page/css/aqua.css" rel="stylesheet" type="text/css">
+<lams:css/>
 <script language="JavaScript" type="text/JavaScript">
 <!--
 function MM_reloadPage(init) {  //reloads the window if Nav4 resized
@@ -40,7 +33,7 @@ MM_reloadPage(true);
 </script>
 </head>
 <body onLoad="initTabs()">
-<html:form action="/authoringv2" target="_self" enctype="multipart/form-data">
+<html:form action="/authoring" target="_self" enctype="multipart/form-data">
 <h1>Noticeboard</h1>
     
     <!-- start tabs -->
@@ -51,9 +44,9 @@ MM_reloadPage(true);
 	<!-- table for tab 1 (basic)-->
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
-		<td><a href="#"  onClick="showTab('b');return false;" ><img src="author_page/images/aqua_tab_s_left.gif" name="tab_left_b" width="8" height="25" border="0" id="tab_left_b"/></a></td>
+		<td><a href="#"  onClick="showTab('b');return false;" ><img src="<c:out value="${lams}"/>images/aqua_tab_s_left.gif" name="tab_left_b" width="8" height="25" border="0" id="tab_left_b"/></a></td>
 		<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_b"  onClick="showTab('b');return false;" ><label for="b" accesskey="b"><a href="#" onClick="showTab('b');return false;" id="b" >Basic</a></label></td>
-		<td><a href="#" onClick="showTab('b');return false;"><img src="author_page/images/aqua_tab_s_right.gif"  name="tab_right_b" width="8" height="25" border="0" id="tab_right_b"/></a></td>
+		<td><a href="#" onClick="showTab('b');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_s_right.gif"  name="tab_right_b" width="8" height="25" border="0" id="tab_right_b"/></a></td>
 	  </tr>
 	</table>
 
@@ -62,9 +55,9 @@ MM_reloadPage(true);
 	<!-- table for tab 2 (advanced) -->
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
-		<td><a href="#" onClick="showTab('a');return false;"><img src="author_page/images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
+		<td><a href="#" onClick="showTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
 		<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');return false;"><label for="a" accesskey="a"><a href="#" onClick="showTab('a');return false;" id="a" >Advanced</a></label></td>
-		<td><a href="#" onClick="showTab('a');return false;"><img src="author_page/images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
+		<td><a href="#" onClick="showTab('a');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
 	  </tr>
 	</table>
 
@@ -73,9 +66,9 @@ MM_reloadPage(true);
 	<!-- table for ab 3 (instructions) -->
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
-		<td ><a href="#" onClick="showTab('i');return false;"><img border="0" src="author_page/images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
+		<td ><a href="#" onClick="showTab('i');return false;"><img border="0" src="<c:out value="${lams}"/>images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
 		<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');return false;" ><label for="i" accesskey="i"><a href="#" onClick="showTab('i');return false;" id="i" >Instructions</a></label></td>
-		<td ><a href="#" onClick="showTab('i');return false;"><img src="author_page/images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
+		<td ><a href="#" onClick="showTab('i');return false;"><img src="<c:out value="${lams}"/>images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
 	  </tr>
 	</table>
 
@@ -124,8 +117,7 @@ MM_reloadPage(true);
 </div>
 
 <hr>
-<a href="javascript:;" class="button">Cancel</a>
-<html:submit property="method" styleClass="button"><fmt:message key="button.ok" /></html:submit>
+<html:submit property="method" styleClass="button"><fmt:message key="button.save" /></html:submit>
 <!-- end of content_b -->
 </div>
 
@@ -244,7 +236,7 @@ MM_reloadPage(true);
 							                </html:link>
 						                </td>
 						                <td>
-							            	<html:link page="/authoringv2.do?method=Delete" 
+							            	<html:link page="/authoring.do?method=Delete" 
 							                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
 							                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 							                         	target="_self" styleClass="button">
@@ -265,8 +257,7 @@ MM_reloadPage(true);
  </logic:notEqual>
  </logic:present>
 	<hr>
-<a href="javascript:;" class="button">Cancel</a>
-<html:submit property="method" styleClass="button"><fmt:message key="button.ok" /></html:submit>
+<html:submit property="method" styleClass="button"><fmt:message key="button.save" /></html:submit>
 
 
 <!-- end of content_a -->
@@ -279,7 +270,7 @@ MM_reloadPage(true);
 
 <!--
 <div id="formtablecontainer">
-<html:submit property="method" styleClass="button"><fmt:message key="button.ok" /></html:submit>
+<html:submit property="method" styleClass="button"><fmt:message key="button.save" /></html:submit>
 <div> -->
 
 

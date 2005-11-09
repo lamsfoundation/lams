@@ -1,5 +1,4 @@
-<%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 
 <hr>
 <BR>

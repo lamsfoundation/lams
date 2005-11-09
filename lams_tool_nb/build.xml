@@ -178,15 +178,13 @@ Ant build file.
 		<war warfile="${build.lib}/${product}.war" 
   				webxml="${conf.webinf.dir}/web.xml" manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
 			<webinf dir="${conf.webinf.dir}">
-				<include name="*.tld"/>
+				<include name="**/*.tld"/>
 				<include name="*.xml"/>
 				<include name="*.properties"/>
 				<exclude name="web.xml"/>
-				<include name="jstl/*.tld"/>
 				<include name="spring/*"/>
 				<include name="tiles/*.xml"/>
 				<include name="struts/*"/>
-				<include name="fckeditor/tlds/*"/>
 			</webinf>
 			<lib dir="${build.lib}">
 				<include name="${product}.jar"/> </lib>
@@ -195,7 +193,7 @@ Ant build file.
 				<include name="includes/*"/>
 				<include name="images/*"/>
 				<include name="template/*"/> <!-- used by tiles -->
-				<include name="author_page/**"/>
+				<include name="css/**"/>
 				<include name="template2/**"/>
 			</fileset>
 		</war>

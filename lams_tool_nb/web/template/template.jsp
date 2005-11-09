@@ -18,23 +18,15 @@
 
   http://www.gnu.org/licenses/gpl.txt 
 -->
+<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-tiles" prefix="tiles" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
-<%@ taglib uri="/WEB-INF/struts/struts-tiles.tld" prefix="tiles" %>
-<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 
-<%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-String pathToShare = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
-
-%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">
@@ -42,13 +34,11 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
       <html:base/>
 	  <fmt:setBundle basename = "org.lamsfoundation.lams.tool.noticeboard.web.ApplicationResources" />
       <title><tiles:getAsString name="title"/></title>
-      <script src="<%=pathToShare%>/includes/javascript/common.js"></script>
+      <script src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
-	   <link href="<%=pathToShare%>/css/aqua.css" rel="stylesheet" type="text/css">
-	
-	 
-    </head>
+      <lams:css/>
+   </head>
     
     <body summary="This table is being used for layout purposes only">
       

@@ -1,20 +1,17 @@
-<%@ page language="java" import="java.util.*" %>
 <%@ page import="org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants" %>
-<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html" %>
+<%@ taglib uri="tags-html-el" prefix="html" %>
 <%
-String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
 String authorUrl = "/starter/authoring?toolContentID="+355;
-String learnerUrl = "/starter/learner?userId="+555+"&toolSessionID="+455+"&mode=learner";
+String learnerUrl = "/starter/learner?toolSessionID="+455+"&mode=learner";
 String learnerUrlTeacher = "/starter/learner?userId="+555+"&toolSessionID="+455+"&mode=teacher";
-String learnerUrlAuthor = "/starter/learner?userId="+555+"&toolSessionID="+455+"&mode=author";
-String monitoringUrl = "/starter/monitor?toolContentID="+355;
+String learnerUrlAuthor = "/starter/learner?&toolSessionID="+455+"&mode=author";
+String monitoringUrl = "/starter/monitor?toolContentID="+355;	
 String exportPortfolioTeacher ="/exportPortfolio.do?mode=teacher&toolContentID=355";
 String exportPortfolioStudent = "/exportPortfolio.do?mode=learner&toolSessionID=455&userID=555";
 %>
 
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">

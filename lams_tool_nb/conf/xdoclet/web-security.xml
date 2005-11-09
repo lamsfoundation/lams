@@ -59,5 +59,6 @@
 		<realm-name>LAMS</realm-name>
    		<form-login-config>
     		<form-login-page>/login.jsp</form-login-page>
+    		<form-error-page>/login.jsp?failed=y</form-error-page>
    		</form-login-config>
    	</login-config>

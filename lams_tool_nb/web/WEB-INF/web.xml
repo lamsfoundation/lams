@@ -133,9 +133,91 @@
 
   <!-- Struts Tag Library Descriptors -->
 
+<!--  ======================================================== -->	
+<!-- Struts Tag Library Descriptors -->
+<!--  ======================================================== -->	
 <taglib>
-    <taglib-uri>fck-editor</taglib-uri>
+    <taglib-uri>tags-bean</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-bean.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-html</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-html.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-logic</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-logic.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-tiles</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-tiles.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-bean-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-bean-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-html-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-html-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-logic-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-logic-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-tiles-el</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/struts-tiles-el.tld</taglib-location>
+</taglib>
+
+<taglib>
+    <taglib-uri>tags-c</taglib-uri>
+    <taglib-location>/WEB-INF/struts/tlds/c.tld</taglib-location>
+</taglib>
+
+<!--  ======================================================== -->	
+<!--  JSTL Tag Library -->
+<!--  ======================================================== -->	
+  <taglib>
+    <taglib-uri>tags-fmt</taglib-uri>
+    <taglib-location>/WEB-INF/jstl/tlds/fmt.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>tags-fmt-rt</taglib-uri>
+    <taglib-location>/WEB-INF/jstl/tlds/fmt-rt.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>tags-core</taglib-uri>
+    <taglib-location>/WEB-INF/jstl/tlds/c.tld</taglib-location>
+  </taglib>
+
+  <taglib>
+    <taglib-uri>tags-core-rt</taglib-uri>
+    <taglib-location>/WEB-INF/jstl/tlds/c-rt.tld</taglib-location>
+  </taglib>
+
+<!--  ======================================================== -->	
+<!--   FCKEditor Tag Library -->
+<!--  ======================================================== -->	
+<taglib>
+    <taglib-uri>tags-fck-editor</taglib-uri>
     <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
+</taglib>
+
+<!--  ======================================================== -->	
+<!--   LAMS Tag Library -->
+<!--  ======================================================== -->	
+<taglib>
+   <taglib-uri>tags-lams</taglib-uri>
+   <taglib-location>/WEB-INF/lams.tld</taglib-location>
 </taglib>
 
   	<!--  Security Constraint -->
@@ -196,6 +278,7 @@
 		<realm-name>LAMS</realm-name>
    		<form-login-config>
     		<form-login-page>/login.jsp</form-login-page>
+    		<form-error-page>/login.jsp?failed=y</form-error-page>
    		</form-login-config>
    	</login-config>
 

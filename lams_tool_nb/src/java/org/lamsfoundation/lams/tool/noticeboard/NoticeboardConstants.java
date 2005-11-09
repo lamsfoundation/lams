@@ -51,7 +51,6 @@ public class NoticeboardConstants
     public static final String INSTRUCTIONS = "Instructions";
     
     public static final String AUTHOR_PAGE = "authoringContent";
-    public static final String AUTHOR_PAGE2 = "authoringContent2";
     
     public static final String DISPLAY_MESSAGE = "displayMessage";
     public static final String DISPLAY_LEARNER_CONTENT = "displayLearnerContent";
@@ -111,7 +110,7 @@ public class NoticeboardConstants
     public static final String BUTTON_BASIC = "button.basic";
     public static final String BUTTON_ADVANCED = "button.advanced";
     public static final String BUTTON_INSTRUCTIONS = "button.instructions";
-    public static final String BUTTON_SAVE = "button.ok";
+    public static final String BUTTON_SAVE = "button.save";
     public static final String BUTTON_DONE = "button.done";
     public static final String BUTTON_FINISH = "button.finish";
    // public static final String BUTTON_CANCEL = "button.cancel";
