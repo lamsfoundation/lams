@@ -38,8 +38,18 @@
         </property>
     </bean>
 
-
    <bean id="messageDao" class="org.lamsfoundation.lams.tool.forum.persistence.MessageDao">
+        <property name="sessionFactory">
+            <ref local="forumSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="messageSeqDao" class="org.lamsfoundation.lams.tool.forum.persistence.MessageSeqDao">
+        <property name="sessionFactory">
+            <ref local="forumSessionFactory"/>
+        </property>
+    </bean>
+   <bean id="forumToolSessionDao" class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao">
         <property name="sessionFactory">
             <ref local="forumSessionFactory"/>
         </property>
@@ -64,6 +74,12 @@
         </property>
         <property name="messageDao">
             <ref local="messageDao"/>
+        </property>
+        <property name="messageSeqDao">
+            <ref local="messageSeqDao"/>
+        </property>
+        <property name="forumToolSessionDao">
+            <ref local="forumToolSessionDao"/>
         </property>
         <property name="toolContentHandler">
             <ref local="toolContentHandler"/>

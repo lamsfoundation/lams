@@ -51,7 +51,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeqDao;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
-import org.lamsfoundation.lams.tool.forum.util.LastReplayDateComparator;
+import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -70,7 +70,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private MessageDao messageDao;
 	private MessageSeqDao messageSeqDao;
 	private ForumUserDao forumUserDao;
-	private ForumToolSessionDao toolSessionDao;
+	private ForumToolSessionDao forumToolSessionDao;
 	
 	//system level handler and service 
 	private ForumToolContentHandler toolContentHandler;
@@ -409,7 +409,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		
 		//sorted by last post date
 		Message msg;
-		SortedMap map = new TreeMap(new LastReplayDateComparator());
+		SortedMap map = new TreeMap(new DateComparator());
 		Iterator iter = topicsBySession.iterator();
 		while(iter.hasNext()){
 			msg = (Message) iter.next();
@@ -448,7 +448,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	}
 
 	public ForumToolSession getSessionBySessionId(Long sessionId) {
-		return toolSessionDao.getBySessionId(sessionId);
+		return forumToolSessionDao.getBySessionId(sessionId);
 	}
 	
 	/**
@@ -468,5 +468,21 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			msgDtoList.add(dto);
 		}
 		return msgDtoList;
+	}
+
+	public MessageSeqDao getMessageSeqDao() {
+		return messageSeqDao;
+	}
+
+	public void setMessageSeqDao(MessageSeqDao messageSeqDao) {
+		this.messageSeqDao = messageSeqDao;
+	}
+
+	public ForumToolSessionDao getForumToolSessionDao() {
+		return forumToolSessionDao;
+	}
+
+	public void setForumToolSessionDao(ForumToolSessionDao forumToolSessionDao) {
+		this.forumToolSessionDao = forumToolSessionDao;
 	}
 }

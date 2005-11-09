@@ -21,20 +21,20 @@
 package org.lamsfoundation.lams.tool.forum.util;
 
 import java.util.Comparator;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
-public class LastReplayDateComparator implements Comparator {
+public class DateComparator implements Comparator {
 
-	private static final Logger log = Logger.getLogger(LastReplayDateComparator.class);
+	private static final Logger log = Logger.getLogger(DateComparator.class);
 	
 	public int compare(Object arg0, Object arg1) {
-		if(!(arg0 instanceof Message) || !(arg1 instanceof Message)){
-			log.error("Topic is not Message instance.");
+		if(!(arg0 instanceof Date) || !(arg1 instanceof Date)){
+			log.error("Topic is not Date instance.");
 			return 0;
 		}
-		return ((Message)arg0).getUpdated().after(((Message)arg1).getUpdated())?1:-1;
+		return ((Date)arg0).after(((Date)arg0))?1:-1;
 	}
 
 }
