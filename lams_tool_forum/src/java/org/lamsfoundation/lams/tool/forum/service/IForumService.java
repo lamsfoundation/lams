@@ -8,6 +8,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,13 +28,14 @@ public interface IForumService {
     public void deleteForumAttachment(Long attachmentId) throws PersistenceException;
     public Forum createForum(Long contentId) throws PersistenceException;
     
-    
-    public Message createMessage(Long forumId, Message message) throws PersistenceException ;
-    public Message editMessage(Message message) throws PersistenceException;
+    public Attachment uploadInstructionFile(Long contentId, FormFile file, String type) throws PersistenceException;
+
     public Message getMessage(Long messageId) throws PersistenceException;
-    public void deleteMessage(Long messageId) throws PersistenceException;
-    public Message replyToMessage(Long parentId, Message message) throws PersistenceException;
-	public Attachment uploadInstructionFile(Long contentId, FormFile file, String type) throws PersistenceException;
+    
+    public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException ;
+    public Message updateTopic(Message message) throws PersistenceException;
+    public Message replyTopic(Long parentId, Message message) throws PersistenceException;
+    public void deleteTopic(Long messageId) throws PersistenceException;
 	/**
 	 * This method only upload the given file into system repository. It does not execute any database operation.
 	 * 
@@ -45,9 +47,26 @@ public interface IForumService {
 	public Attachment uploadAttachment(FormFile file) throws PersistenceException;
 	public void deleteInstructionFile(Long contentID, Long uuID, Long versionID, String type) throws PersistenceException;
 	public void deleteFromRepository(Long uuID, Long versionID) throws PersistenceException;
-
+	
+	/** 
+	 * Get topics list by given root topic ID.  
+	 *  
+	 * @param rootTopicId
+	 * @return
+	 * 		List of MessageDTO
+	 */
 	public List getTopicThread(Long rootTopicId);
-	public List getRootTopics(Long forumId);
+	/**
+	 * Get root topics by a given sessionID value. Simultanousely, it gets back topics, which author 
+	 * posted in authoring page for this forum, which is related with the given sessionID value.
+	 * 
+	 * @param sessionId
+	 * @return
+	 * 		List of MessageDTO
+	 */
+	public List getRootTopics(Long sessionId);
+	
 	public ForumUser getUserByUserId(Long userId);
 	public void createUser(ForumUser forumUser);
+	public ForumToolSession getSessionBySessionId(Long sessionId);
 }

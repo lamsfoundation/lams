@@ -28,12 +28,13 @@ import java.util.Date;
  * 
  * @version $Revision$
  */
-public class ToolSession {
+public class ForumToolSession {
 	private Long uid;
 	private Long sessionId;
 	private Forum forum;
 	private Date sessionStartDate;
 	private Date sessionEndDate;
+	//finish or not
 	private int status;
 	
 	/**

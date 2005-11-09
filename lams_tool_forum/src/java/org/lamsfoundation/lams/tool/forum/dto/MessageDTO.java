@@ -34,6 +34,8 @@ public class MessageDTO {
 	private Message message;
 	private String author;
 	private boolean hasAttachment;
+	private short level;
+	
 	public static MessageDTO getMessageDTO(Message msg, String authorName){
 		if(msg == null)
 			return null;
@@ -41,6 +43,19 @@ public class MessageDTO {
 		MessageDTO dto = new MessageDTO();
 		dto.setMessage(msg);
 		dto.setAuthor(authorName);
+		if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
+			dto.setHasAttachment(false);
+		else
+			dto.setHasAttachment(true);
+		return dto;
+	}
+	public static MessageDTO getMessageDTO(Message msg){
+		if(msg == null)
+			return null;
+		
+		MessageDTO dto = new MessageDTO();
+		dto.setMessage(msg);
+		dto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
 		if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 			dto.setHasAttachment(false);
 		else
@@ -103,6 +118,12 @@ public class MessageDTO {
 	}
 	public void setMessage(Message message) {
 		this.message = message;
+	}
+	public short getLevel() {
+		return level;
+	}
+	public void setLevel(short level) {
+		this.level = level;
 	}
 	
 }

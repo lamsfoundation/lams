@@ -122,7 +122,7 @@ public class ForumManagerImplTest extends TestCase {
       message.setBody("MODIFIED BODY");
       message.setIsAnonymous(false);
 
-      forumManager.editMessage(message);
+      forumManager.updateTopic(message);
       message = forumManager.getMessage(message.getUid());
       assertEquals(message.getToolSession(), forum);
       assertEquals(message.getCreatedBy(), new Long("1002"));
@@ -131,7 +131,7 @@ public class ForumManagerImplTest extends TestCase {
       assertEquals(message.getSubject(), "MODIFIED SUBJECT");
       assertEquals(message.getBody(), "MODIFIED BODY");
 
-      forumManager.deleteMessage(message.getUid());
+      forumManager.deleteTopic(message.getUid());
 
       forumManager.deleteForum(forum.getUid());
       try {
@@ -154,7 +154,7 @@ public class ForumManagerImplTest extends TestCase {
       assertEquals(reloaded.getSubject(), "TEST");
       assertEquals(reloaded.getBody(), "TEST");
 
-      Message reply = forumManager.replyToMessage(message.getUid(), this.getMessage(new Long("1008"), "REPLY MESSAGE", "REPLY MESSAGE", true, false));
+      Message reply = forumManager.replyTopic(message.getUid(), this.getMessage(new Long("1008"), "REPLY MESSAGE", "REPLY MESSAGE", true, false));
       assertNotNull("Message Id is null", reply.getUid());
       reply = forumManager.getMessage(reply.getUid());
       assertEquals(message.getToolSession(), forum);
@@ -170,7 +170,7 @@ public class ForumManagerImplTest extends TestCase {
 
       assertTrue("original message does not contain reply message in its reply set", reloadedReplies.contains(reply));
 
-      forumManager.deleteMessage(message.getUid());
+      forumManager.deleteTopic(message.getUid());
       try {
         forumManager.getMessage(reply.getUid());
         fail("getMessage should have barfed for non existing message");

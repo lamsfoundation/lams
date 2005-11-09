@@ -15,7 +15,10 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class MessageDao extends HibernateDaoSupport {
 	private static final String SQL_QUERY_FIND_ROOT_TOPICS = "from " + Message.class.getName() 
-					+ " where parent_uid is null and forum_uid=?";
+					+ " where parent_uid is null and forum_session_uid=?";
+	private static final String SQL_QUERY_FIND_TOPICS_FROM_AUTHOR = "from " + Message.class.getName()
+					+ " where is_authored = true and forum_uid=?";
+	
 	public void saveOrUpdate(Message message) {
 		message.updateModificationData();
 		this.getHibernateTemplate().saveOrUpdate(message);
@@ -52,8 +55,17 @@ public class MessageDao extends HibernateDaoSupport {
 		return findByNamedQuery("allAuthoredMessagesOfForum", forumId);
 	}
 
-	public List getRootTopics(Long forumId) {
-		return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_TOPICS, forumId);
+	public List getRootTopics(Long sessionId) {
+		return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_TOPICS, sessionId);
+	}
+	public List getTopicsFromAuthor(Long forumId) {
+		return this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPICS_FROM_AUTHOR, forumId);
+	}
+
+	public void deleteById(Long uid) {
+		Message msg = getById(uid);
+		if(msg != null)
+			this.getHibernateTemplate().delete(msg);
 	}
 
 

@@ -76,6 +76,22 @@ public class AuthoringAction extends Action {
 	  	if (param.equals("initPage")) {
        		return initPage(mapping, form, request, response);
         }
+        if (param.equals("updateContent")) {
+       		return updateContent(mapping, form, request, response);
+        }
+        if (param.equals("uploadOnlineFile")) {
+       		return uploadOnline(mapping, form, request, response);
+        }
+        if (param.equals("uploadOfflineFile")) {
+       		return uploadOffline(mapping, form, request, response);
+        }
+        if (param.equals("deleteOnlineFile")) {
+        	return deleteOnlineFile(mapping, form, request, response);
+        }
+        if (param.equals("deleteOfflineFile")) {
+        	return deleteOfflineFile(mapping, form, request, response);
+        }
+        //-----------------------Topic function ---------------------------
 	  	if (param.equals("newTopic")) {
        		return newTopic(mapping, form, request, response);
         }
@@ -99,21 +115,6 @@ public class AuthoringAction extends Action {
         }
         if (param.equals("finishTopic")) {
        		return finishTopic(mapping, form, request, response);
-        }
-        if (param.equals("updateContent")) {
-       		return updateContent(mapping, form, request, response);
-        }
-        if (param.equals("uploadOnlineFile")) {
-       		return uploadOnline(mapping, form, request, response);
-        }
-        if (param.equals("uploadOfflineFile")) {
-       		return uploadOffline(mapping, form, request, response);
-        }
-        if (param.equals("deleteOnlineFile")) {
-        	return deleteOnlineFile(mapping, form, request, response);
-        }
-        if (param.equals("deleteOfflineFile")) {
-        	return deleteOfflineFile(mapping, form, request, response);
         }
         return mapping.findForward("error");
 	}
@@ -183,6 +184,7 @@ public class AuthoringAction extends Action {
 		message.setIsAuthored(true);
 		message.setCreated(new Date());
 		message.setUpdated(new Date());
+		message.setLastReplyDate(new Date());
 		Set attSet = null;
 		if(messageForm.getAttachmentFile() != null 
 			&&  !StringUtils.isEmpty(messageForm.getAttachmentFile().getFileName())){
@@ -208,7 +210,7 @@ public class AuthoringAction extends Action {
 		}
 		//save message into database
 		forumService = getForumManager();
-		forumService.createMessage(forumId,message);
+		forumService.createRootTopic(forumId,null, message);
 		
 		topics.add(MessageDTO.getMessageDTO(message,user.getFirstName()+" "+user.getLastName()));
 		
@@ -227,7 +229,7 @@ public class AuthoringAction extends Action {
 		if(topicIdx != -1){
 			MessageDTO topic = (MessageDTO) topics.remove(topicIdx);
 			if (topic != null && topic.getMessage() != null && topic.getMessage().getUid() != null) {
-				getForumManager().deleteMessage(topic.getMessage().getUid());
+				getForumManager().deleteTopic(topic.getMessage().getUid());
 			}
 			request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,topics);
     	}
@@ -301,7 +303,7 @@ public class AuthoringAction extends Action {
 			}
 			//save message into database
 			forumService = getForumManager();
-			forumService.editMessage(newMsg.getMessage());
+			forumService.updateTopic(newMsg.getMessage());
 		}
 		
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
@@ -333,7 +335,7 @@ public class AuthoringAction extends Action {
 			newMsg.getMessage().setAttachments(null);
 			//save message into database
 			forumService = getForumManager();
-			forumService.editMessage(newMsg.getMessage());
+			forumService.updateTopic(newMsg.getMessage());
 			
 		}
 		request.setAttribute(ForumConstants.SUCCESS_FLAG,"ATT_SUCCESS_FLAG");

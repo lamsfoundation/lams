@@ -5,7 +5,7 @@
 <html:form action="/learning/createTopic.do" focus="message.subject"
 	onsubmit="return validateMessageForm(this);"  enctype="multipart/form-data">
 <fieldset>
-<%@ include file="/jsps/message/topicform.jsp" %>
+<%@ include file="/jsps/learning/message/topicform.jsp" %>
  </fieldset>
  </html:form>
 </div>

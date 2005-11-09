@@ -3,12 +3,15 @@ package org.lamsfoundation.lams.tool.forum.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
@@ -32,11 +35,14 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
+import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUserDao;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
@@ -45,6 +51,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeqDao;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
+import org.lamsfoundation.lams.tool.forum.util.LastReplayDateComparator;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -57,11 +64,15 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class ForumService implements IForumService,ToolContentManager,ToolSessionManager {
 	private static final Logger log = Logger.getLogger(ForumService.class);
-		private ForumDao forumDao;
+	//DAO variables
+	private ForumDao forumDao;
 	private AttachmentDao attachmentDao;
 	private MessageDao messageDao;
 	private MessageSeqDao messageSeqDao;
 	private ForumUserDao forumUserDao;
+	private ForumToolSessionDao toolSessionDao;
+	
+	//system level handler and service 
 	private ForumToolContentHandler toolContentHandler;
 	private IRepositoryService repositoryService;
 	
@@ -97,16 +108,41 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
     }
 
-    public Message createMessage(Long forumId, Message message) throws PersistenceException {
-    	Forum forum = new Forum();
-    	forum.setUid(forumId);
+    public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException {
+    	//get Forum and ForumToolSesion
+    	Forum forum = getForumByContentId(forumId);
     	message.setForum(forum);
+    	//if topic created by author, sessionId will be null.
+    	if(sessionId != null){
+    		ForumToolSession session = getSessionBySessionId(sessionId);
+    		message.setToolSession(session);
+    	}
+    	//create message in database
         messageDao.save(message);
+        
+        //update message sequence
+        MessageSeq msgSeq = new MessageSeq();
+        msgSeq.setMessage(message);
+        msgSeq.setMessageLevel((short) 0);
+        //set itself as root
+        msgSeq.setRootMessage(message);
+        messageSeqDao.save(msgSeq);
+        
         return message;
     }
 
-     public Message editMessage(Message message) throws PersistenceException {
-        messageDao.saveOrUpdate(message);
+     public Message updateTopic(Message message) throws PersistenceException {
+    	 //update message
+    	messageDao.saveOrUpdate(message);
+    	
+    	//udate root message's lastReply date if this message
+    	//if this message is root message, then actually, it will update itself lastReplayDate
+    	MessageSeq msgSeq = messageSeqDao.getByTopicId(message.getUid());
+    	Message root = msgSeq.getRootMessage();
+        //update last reply date for root message
+        root.setLastReplyDate(new Date());
+        messageDao.saveOrUpdate(root);
+        
         return message;
     }
 
@@ -114,23 +150,33 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         return (Message) messageDao.getById(messageId);
     }
 
-    public void deleteMessage(Long messageId) throws PersistenceException {
-        Message message = this.getMessage(messageId);
-        messageDao.delete(message);
+    public void deleteTopic(Long topicUid) throws PersistenceException {
+        messageDao.deleteById(topicUid);
+        messageSeqDao.deleteByTopicId(topicUid);
      }
 
-    public Message replyToMessage(Long messageId, Message replyMessage) throws PersistenceException {
-        Message message = this.getMessage(messageId);
-        replyMessage.setToolSession(message.getToolSession());
-        replyMessage.setParent(message);
+    public Message replyTopic(Long parentId, Message replyMessage) throws PersistenceException {
+    	//set parent
+        Message parent = this.getMessage(parentId);
+        replyMessage.setParent(parent);
         messageDao.saveOrUpdate(replyMessage);
-//        Set replies = message.getReplies();
-//        if (replies == null) {
-//            replies = new HashSet();
-//        }
-//        replies.add(replyMessage);
-//        message.setReplies(replies);
-        messageDao.saveOrUpdate(message);
+        
+        //get root topic and create record in MessageSeq table
+        MessageSeq parentSeq = messageSeqDao.getByTopicId(parent.getUid());
+        if(parentSeq == null){
+        	log.error("Message Sequence table is broken becuase topic " + parent +" can not get Sequence Record");
+        }
+        Message root = parentSeq.getRootMessage();
+        MessageSeq msgSeq = new MessageSeq();
+        msgSeq.setMessage(replyMessage);
+        msgSeq.setMessageLevel((short) (parentSeq.getMessageLevel() + 1));
+        msgSeq.setRootMessage(root);
+        messageSeqDao.save(msgSeq);
+        
+        //update last reply date for root message
+        root.setLastReplyDate(new Date());
+        messageDao.saveOrUpdate(root);
+        
         return replyMessage;
     }
 
@@ -348,10 +394,34 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			msgSeq = (MessageSeq) iter.next();
 			map.put(msgSeq,msgSeq.getMessage());
 		}
-		return 	new ArrayList(map.values());
+		return 	getSortedMessageDTO(map);
 	}
-	public List getRootTopics(Long forumId){
-		return messageDao.getRootTopics(forumId);
+
+
+	public List getRootTopics(Long sessionId){
+		List topicsBySession =  messageDao.getRootTopics(sessionId);
+		ForumToolSession session = getSessionBySessionId(sessionId);
+		if(session == null || session.getForum() == null){
+			log.error("Failed on getting session by given sessionID:" + sessionId);
+			throw new ForumException("Failed on getting session by given sessionID:" + sessionId);
+		}
+		List topicsFromAuthor = messageDao.getTopicsFromAuthor(session.getForum().getUid());
+		
+		//sorted by last post date
+		Message msg;
+		SortedMap map = new TreeMap(new LastReplayDateComparator());
+		Iterator iter = topicsBySession.iterator();
+		while(iter.hasNext()){
+			msg = (Message) iter.next();
+			map.put(msg.getLastReplyDate(),msg);
+		}
+		iter = topicsFromAuthor.iterator();
+		while(iter.hasNext()){
+			msg = (Message) iter.next();
+			map.put(msg.getLastReplyDate(),msg);
+		}
+		return 	new ArrayList(map.values());
+		
 	}
 	public Forum createForum(Long contentId) throws PersistenceException {
 		return null;
@@ -375,5 +445,28 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	public void setForumUserDao(ForumUserDao forumUserDao) {
 		this.forumUserDao = forumUserDao;
+	}
+
+	public ForumToolSession getSessionBySessionId(Long sessionId) {
+		return toolSessionDao.getBySessionId(sessionId);
+	}
+	
+	/**
+	 * @param map
+	 * @return
+	 */
+	private List getSortedMessageDTO(SortedMap map) {
+		Iterator iter;
+		MessageSeq msgSeq;
+		List msgDtoList = new ArrayList();
+		iter =map.keySet().iterator();
+		while(iter.hasNext()){
+			Map.Entry entry = (Entry) iter.next();
+			msgSeq = (MessageSeq) entry.getKey();
+			MessageDTO dto = MessageDTO.getMessageDTO((Message) entry.getValue());
+			dto.setLevel(msgSeq.getMessageLevel());
+			msgDtoList.add(dto);
+		}
+		return msgDtoList;
 	}
 }

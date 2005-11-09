@@ -24,32 +24,15 @@ import java.util.List;
 
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-public class MessageSeqDao extends HibernateDaoSupport {
-	private static final String SQL_QUERY_FIND_TOPIC_THREAD = "from " + MessageSeq.class.getName() 
-										+ " where root_message_uid = ?";
-	private static final String SQL_QUERY_FIND_TOPIC_ID = "from " + MessageSeq.class.getName() 
-						+ " where message_uid = ?";
+public class ForumToolSessionDao extends HibernateDaoSupport {
 
-	public List getTopicThread(Long rootTopicId) {
-		return this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPIC_THREAD,rootTopicId);
-	}
-
-	public MessageSeq getByTopicId(Long messageId) {
-		List list =  this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPIC_ID,messageId);
+	private static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + ForumToolSession.class.getName() + " where session_id=?";
+	
+	public ForumToolSession getBySessionId(Long sessionId) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID,sessionId);
 		if(list == null || list.isEmpty())
 			return null;
-		return (MessageSeq) list.get(0);
+		return (ForumToolSession) list.get(0);
 	}
-
-	public void save(MessageSeq msgSeq) {
-		this.getHibernateTemplate().save(msgSeq);
-	}
-
-	public void deleteByTopicId(Long topicUid) {
-		MessageSeq seq = getByTopicId(topicUid);
-		if(seq != null)
-			this.getHibernateTemplate().delete(seq);
-	}
-
 
 }

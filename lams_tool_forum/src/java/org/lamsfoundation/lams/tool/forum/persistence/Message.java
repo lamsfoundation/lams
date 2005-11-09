@@ -22,7 +22,7 @@ public class Message {
 	private boolean isAuthored;
 	private boolean isAnonymous;
 
-	private ToolSession toolSession;
+	private ForumToolSession toolSession;
 	private Message parent;
 	private Forum forum;
 	private Set attachments;
@@ -31,6 +31,8 @@ public class Message {
 	private Date updated;
 	private ForumUser createdBy;
 	private ForumUser modifiedBy;
+	private Date lastReplyDate;
+
 
 	/**
 	 * Returns the object's creation date
@@ -50,7 +52,19 @@ public class Message {
 	public void setCreated(Date created) {
 	    this.created = created;
 	}
+	/**
+	 * Returns this topic last reply date
+	 *
+	 * @return date
+	 * @hibernate.property column="last_reply_date"
+	 */
+	public Date getLastReplyDate() {
+		return lastReplyDate;
+	}
 
+	public void setLastReplyDate(Date lastPostDate) {
+		this.lastReplyDate = lastPostDate;
+	}
 	/**
 	 * Returns the object's date of last update
 	 *
@@ -209,11 +223,11 @@ public class Message {
       * Gets the toolSession
       *
       * @hibernate.many-to-one
-      *	class="org.lamsfoundation.lams.tool.forum.persistence.ToolSession"
+      *	class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession"
       *	              column="forum_session_uid"
       *
       */
-     public ToolSession getToolSession() {
+     public ForumToolSession getToolSession() {
          return toolSession;
      }
 
@@ -221,7 +235,7 @@ public class Message {
 	/**
 	 * @param toolSession The toolSession that this Message belongs to
      */
-    public void setToolSession(ToolSession forum) {
+    public void setToolSession(ForumToolSession forum) {
          this.toolSession = forum;
      }
 

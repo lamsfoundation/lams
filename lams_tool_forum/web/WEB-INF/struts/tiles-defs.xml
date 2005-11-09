@@ -48,9 +48,9 @@
     	<put name="body" value="/jsps/learning/viewforum.jsp"/>
 	</definition>
 	
-	<definition name="tiles:/learning/forum/viewThread" extends="tiles:layout">
-    	<put name="pageTitleKey" value="title.message.view.thread"/>
-    	<put name="body" value="/jsps/learning/viewthread.jsp"/>
+	<definition name="tiles:/learning/forum/viewTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.view.topic"/>
+    	<put name="body" value="/jsps/learning/viewtopic.jsp"/>
 	</definition>
 	
     <definition name="tiles:/learning/forum/newTopic" extends="tiles:layout">

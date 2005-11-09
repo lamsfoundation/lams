@@ -44,6 +44,7 @@ public class MessageSeq {
 	}
 	/**
 	 * @hibernate.many-to-one column="root_message_uid"
+	 * 	cascade="none"
 	 */
 	public Message getRootMessage() {
 		return rootMessage;
@@ -53,6 +54,7 @@ public class MessageSeq {
 	}
 	/**
 	 * @hibernate.many-to-one column="message_uid"
+	 * 	cascade="none"
 	 */
 	public Message getMessage() {
 		return message;
