@@ -1,4 +1,4 @@
-<%@ taglib uri="http://jakarta.apache.org/struts/struts-html" prefix="html"%>
+<%@ taglib uri="tags-html" prefix="html"%>
 
 <table width="100%" height="295" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
 	<tr> 

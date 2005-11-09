@@ -19,9 +19,9 @@
   http://www.gnu.org/licenses/gpl.txt 
 -->
 
-<%@ taglib uri="/WEB-INF/struts/struts-html-el.tld" prefix="html-el" %>
-<%@ taglib uri="/WEB-INF/struts/struts-logic.tld" prefix="logic" %>
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
+<%@ taglib uri="tags-html-el" prefix="html-el" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-core" prefix="c" %>
 <%@ page import="org.apache.struts.action.Action" %>
 <%
 String cprotocol = request.getProtocol();

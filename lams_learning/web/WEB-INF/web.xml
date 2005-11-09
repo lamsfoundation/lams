@@ -244,83 +244,88 @@ http://www.gnu.org/licenses/gpl.txt
 </error-page>  
 
   <!--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-USA
-
-http://www.gnu.org/licenses/gpl.txt
+	Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+	USA
+	http://www.gnu.org/licenses/gpl.txt
 -->
+
 <!-- Struts Tag Library Defintions -->
 <taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-bean</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-bean.tld</taglib-location>
+	<taglib-uri>tags-bean</taglib-uri>
+	<taglib-location>/WEB-INF/struts/tlds/struts-bean.tld</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-bean-el</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-bean-el.tld</taglib-location>
+	<taglib-uri>tags-html</taglib-uri>
+	<taglib-location>/WEB-INF/struts/tlds/struts-html.tld</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-html</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-html.tld</taglib-location>
+	<taglib-uri>tags-logic</taglib-uri>
+	<taglib-location>/WEB-INF/struts/tlds/struts-logic.tld</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-html-el</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-html-el.tld</taglib-location>
+	<taglib-uri>tags-tiles</taglib-uri>
+	<taglib-location>/WEB-INF/struts/tlds/struts-tiles.tld</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-logic</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-logic.tld</taglib-location>
+	<taglib-uri>tags-bean-el</taglib-uri>
+	<taglib-location>
+		/WEB-INF/struts/tlds/struts-bean-el.tld
+	</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-logic-el</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-logic-el.tld</taglib-location>
+	<taglib-uri>tags-html-el</taglib-uri>
+	<taglib-location>
+		/WEB-INF/struts/tlds/struts-html-el.tld
+	</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-template</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-template.tld</taglib-location>
+	<taglib-uri>tags-logic-el</taglib-uri>
+	<taglib-location>
+		/WEB-INF/struts/tlds/struts-logic-el.tld
+	</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://jakarta.apache.org/struts/struts-tiles</taglib-uri>
-	<taglib-location>/WEB-INF/struts/struts-tiles.tld</taglib-location>
+	<taglib-uri>tags-tiles-el</taglib-uri>
+	<taglib-location>
+		/WEB-INF/struts/tlds/struts-tiles-el.tld
+	</taglib-location>
 </taglib>
 
 <!-- JSTL Tag Library Defintions -->
 <taglib>
-	<taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/c.tld</taglib-location>
+	<taglib-uri>tags-fmt</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/tlds/fmt.tld</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://java.sun.com/jstl/core_rt</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/c-rt.tld</taglib-location>
+	<taglib-uri>tags-fmt-rt</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/tlds/fmt-rt.tld</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://java.sun.com/jstl/fmt</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/fmt.tld</taglib-location>
+	<taglib-uri>tags-core</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/tlds/c.tld</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://java.sun.com/jstl/fmt_rt</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/fmt-rt.tld</taglib-location>
+	<taglib-uri>tags-core-rt</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/tlds/c-rt.tld</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://java.sun.com/jstl/xml</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/x.tld</taglib-location>
+	<taglib-uri>tags-xml</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/tlds/x.tld</taglib-location>
 </taglib>
 <taglib>
-	<taglib-uri>http://java.sun.com/jstl/xml_rt</taglib-uri>
-	<taglib-location>/WEB-INF/jstl/x-rt.tld</taglib-location>
+	<taglib-uri>tags-xml_rt</taglib-uri>
+	<taglib-location>/WEB-INF/jstl/tlds/x-rt.tld</taglib-location>
 </taglib>
 
   	<!--  Security Constraint -->

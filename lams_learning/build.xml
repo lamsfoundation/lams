@@ -245,7 +245,9 @@ http://www.gnu.org/licenses/gpl.txt
 			<webinf dir="${conf.webinf.dir}">
 				<include name="*.xml"/>
 				<include name="struts/*"/>
+				<include name="struts/tlds/*"/>
 				<include name="jstl/*"/>
+				<include name="jstl/tlds/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
 			<lib dir="${conf.webinf.dir}/lib"/>

@@ -20,10 +20,10 @@ http://www.gnu.org/licenses/gpl.txt
 --%>
 
 <%@ page language="java"%>
-<%@ taglib uri="http://jakarta.apache.org/struts/struts-bean" prefix="bean"%>
-<%@ taglib uri="http://jakarta.apache.org/struts/struts-html" prefix="html"%>
-<%@ taglib uri="http://jakarta.apache.org/struts/struts-tiles" prefix="tiles"%>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-tiles" prefix="tiles"%>
+<%@ taglib uri="tags-core" prefix="c"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 

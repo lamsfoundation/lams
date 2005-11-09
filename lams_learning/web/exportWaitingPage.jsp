@@ -19,11 +19,11 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 --%>  
 
-<%@ taglib uri="/WEB-INF/jstl/c.tld" prefix="c" %>
-<%@ taglib uri="/WEB-INF/jstl/fmt.tld" prefix="fmt" %>
-<%@ taglib uri="/WEB-INF/struts/struts-logic.tld" prefix="logic" %>
-<%@ taglib uri="/WEB-INF/struts/struts-html.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/struts/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
 
 
 <%
