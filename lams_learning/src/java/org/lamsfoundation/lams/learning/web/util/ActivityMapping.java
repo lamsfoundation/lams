@@ -40,6 +40,8 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 
 /**
@@ -61,11 +63,11 @@ public class ActivityMapping implements Serializable
     public static final String NO_SESSION_ERROR = "noSessionError";
     public static final String NO_ACCESS_ERROR = "noAccessError";
     public static final String DOUBLE_SUBMIT_ERROR = "doubleSubmitError";
+    public static final String LEARNING = "learning";
 
     private ActivityMappingStrategy activityMappingStrategy = new ActivityMappingStrategy();
 
     private ILamsCoreToolService toolService;
-    private String baseURL;
 
     /**
      * Creates a Struts ActionForward to display an activity.
@@ -274,16 +276,11 @@ public class ActivityMapping implements Serializable
         }
         if (useContext)
         {
-            String lamsUrl = getLamsURL();
+            String lamsUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + LEARNING;
             url = lamsUrl + url;
         }
 
         return url;
-    }
-
-    private String getLamsURL()
-    {
-        return baseURL;
     }
 
     /**
@@ -341,11 +338,6 @@ public class ActivityMapping implements Serializable
     public void setToolService(ILamsCoreToolService toolService)
     {
         this.toolService = toolService;
-    }
-
-    public void setBaseURL(String baseURL)
-    {
-        this.baseURL = baseURL;
     }
 
     public ActivityMappingStrategy getActivityMappingStrategy()

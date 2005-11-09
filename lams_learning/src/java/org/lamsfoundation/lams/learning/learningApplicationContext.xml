@@ -72,7 +72,6 @@
 	
 	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" singleton="false">
 		<property name="toolService"><ref bean="lamsCoreToolService"/></property>
-		<property name="baseURL"><value>http://localhost:8080/lams/learning</value></property>
 	</bean>
 	
 	<!-- bean id="dummyLearnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
