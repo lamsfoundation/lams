@@ -367,7 +367,7 @@ public class LearningAction extends Action {
     public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws PersistenceException {
     	//get value from HttpSession
-		Long topicId = new Long(WebUtil.readLongParam(request,"topicId"));
+    	Long topicId = (Long) request.getSession().getAttribute("topicId");
 		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
 		Long uuID = new Long(WebUtil.readLongParam(request,"uuid"));
 		forumService = getForumManager();
