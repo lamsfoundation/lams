@@ -51,7 +51,7 @@
 					</tr>
 				-->
 				
-					<table align="center" border="1" summary="layout and Content" width="60%">
+					<table align="center" border="1" summary="layout and Content" width="50%">
 			  	 		<c:set var="queIndex" scope="session" value="1"/>
 						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
 						
@@ -59,7 +59,7 @@
 									    <tr>
 										  	<td bgcolor="#EEEEEE" class="input" valign=top> <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b> </font>  </td>
 										  	
-									  		<td bgcolor="#EEEEEE" class="input" valign=top> 
+									  		<td bgcolor="#EEEEEE" class="input" valign=top width=50> 
 									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"
 										  		size="50" maxlength="255" >
 										  	</td>
@@ -78,7 +78,7 @@
 												</c:forEach>
                                             </td>
 
-                                            <td bgcolor="#EEEEEE" class="input" width=30 valign=top>								
+                                            <td bgcolor="#EEEEEE" class="input" width=40 valign=top>								
 												    <img src="images/edit.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].editOptions.value=1; document.forms[0].submit();">		  	
                    								    <img src="images/add.gif" align=left onclick="javascript:document.forms[0].addQuestion.value=1; document.forms[0].submit();">		  													    
 											</td>
@@ -92,7 +92,7 @@
 										  <tr>
 										  	<td bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b>  </font> </td>
 										  	
-									  		<td bgcolor="#EEEEEE" class="input" valign=top> 
+									  		<td bgcolor="#EEEEEE" class="input" valign=top width=50> 
 									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"
 										  		size="50" maxlength="255" >
 										  	</td>
@@ -115,7 +115,7 @@
 													</c:forEach>
 	                                            </td>
 																								
-                                               <td bgcolor="#EEEEEE" class="input" width=30 valign=top>								
+                                               <td bgcolor="#EEEEEE" class="input" width=40 valign=top>								
 													<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].editOptions.value=1; document.forms[0].submit();">	                                            			  	
 													<img src="images/delete.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].removeQuestion.value=1; document.forms[0].submit();">                                               		  														
 											  	</td>
