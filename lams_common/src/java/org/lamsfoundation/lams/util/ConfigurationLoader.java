@@ -67,7 +67,13 @@ public class ConfigurationLoader {
 	 */
 	private static void setConfigFilePath() {
         //check if environment variable is set
-        String envConfigFilePath = System.getenv(ENV_CONFIG_PARAMETER);
+        String envConfigFilePath = null;
+        try{
+            envConfigFilePath = System.getenv(ENV_CONFIG_PARAMETER);
+        }
+        catch(Throwable t){
+            log.error("Fail to get " + ENV_CONFIG_PARAMETER + "from environment", t);
+        }
         if(envConfigFilePath != null){
             ConfigurationLoader.configFilePath = envConfigFilePath;
         }
