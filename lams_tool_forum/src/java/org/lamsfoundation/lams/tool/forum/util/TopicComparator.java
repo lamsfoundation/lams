@@ -46,7 +46,7 @@ public class TopicComparator implements Comparator {
 		Message parent1,parent2;
 		//choose the smaller level value
 		short lessLevel = level1>level2? level2:level1;
-		for(int compareLevel=0;compareLevel < lessLevel;compareLevel++){
+		for(int compareLevel=0;compareLevel <= lessLevel;compareLevel++){
 			//init value, loop from current message
 			parent1 = msg1;
 			parent2 = msg2;
@@ -70,13 +70,23 @@ public class TopicComparator implements Comparator {
 				parent2 = parent2.getParent();
 				level2--;
 			}
+			//this comparation will handle different branch node
 			if(parent1 != parent2){
 				//compare last modified date, the latest is at beginning
-				return  parent1.getUpdated().after(parent2.getUpdated())?1:-1;
+				return  parent1.getUpdated().before(parent2.getUpdated())?1:-1;
 			}
+			//this comparation will handle same branch node
+			//the direct parent level, their parent(or themselves) are still equal
+			if(compareLevel==lessLevel){
+				if(msgSeq1.getMessageLevel() != msgSeq2.getMessageLevel())
+					return msgSeq1.getMessageLevel() -msgSeq2.getMessageLevel();
+				else
+					return msg1.getUpdated().before(msg2.getUpdated())?1:-1;
+			}
+			
 		}
 		
-		return msg1.getUpdated().after(msg2.getUpdated())?1:-1;
+		return msg1.getUpdated().before(msg2.getUpdated())?1:-1;
 	}
 
 }

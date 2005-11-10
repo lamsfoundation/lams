@@ -24,13 +24,12 @@ public interface IForumService {
     public Forum getForumByContentId(Long contentID) throws PersistenceException;
     
     public void deleteForum(Long forumId) throws PersistenceException;
-    public List getTopics(Long forumId) throws PersistenceException;
     public void deleteForumAttachment(Long attachmentId) throws PersistenceException;
     public Forum createForum(Long contentId) throws PersistenceException;
     
     public Attachment uploadInstructionFile(Long contentId, FormFile file, String type) throws PersistenceException;
 
-    public Message getMessage(Long messageId) throws PersistenceException;
+    public Message getMessage(Long messageUid) throws PersistenceException;
     
     public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException ;
     public Message updateTopic(Message message) throws PersistenceException;
@@ -69,4 +68,10 @@ public interface IForumService {
 	public ForumUser getUserByUserId(Long userId);
 	public void createUser(ForumUser forumUser);
 	public ForumToolSession getSessionBySessionId(Long sessionId);
+	/**
+	 * This method will look up root topic ID by any level topicID.
+	 * @param topicId
+	 * @return
+	 */
+	public Long getRootTopicId(Long topicId);
 }

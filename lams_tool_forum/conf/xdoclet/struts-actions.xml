@@ -144,45 +144,61 @@
 		</action>
 		<action path="/learning/createTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			name="messageForm" validate="true" 
+			name="messageForm" 
+			validate="true" 
+			input="tiles:/learning/forum/newTopic" 
 			parameter="createTopic" 
 			scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewForum" />
 		</action>
 		<action path="/learning/newReplyTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			parameter="newReplyTopic" scope="request">
+			name="messageForm" 
+			validate="false" 
+			parameter="newReplyTopic" 
+			scope="request">
 			<forward name="success" path="tiles:/learning/forum/replyTopic" />
 		</action>
 		<action path="/learning/replyTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			name="messageForm" validate="true" 
+			name="messageForm" 
+			validate="true" 
+			input="tiles:/learning/forum/replyTopic" 
 			parameter="replyTopic" 
 			scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewTopic" />
 		</action>
-		
-		
 		<action path="/learning/editTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			name="messageForm" validate="false" 
-			input="tiles:/learning/forum/viewTopic"
+			name="messageForm" 
+			validate="false" 
 			parameter="editTopic" 
 			scope="request">
 			<forward name="success" path="tiles:/learning/forum/editTopic" />
 		</action>
 		<action path="/learning/updateTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
-			name="messageForm" validate="true" 
+			name="messageForm" 
+			validate="true" 
 			input="tiles:/learning/forum/editTopic"
 			parameter="updateTopic" 
 			scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewTopic" />
 		</action>
+				
+		<action path="/learning/deleteAttachment"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			name="messageForm" 
+			validate="false"
+			parameter="deleteAttachment"
+			scope="session">
+			<forward name="success" path="tiles:/learning/forum/editTopic" />
+		</action>
 		
 		<action path="/learning/message/deleteTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			parameter="deleteTopic" scope="request">
+			parameter="deleteTopic" 
+			scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewForum" />
 		</action>
 		

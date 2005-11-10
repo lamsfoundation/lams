@@ -16,7 +16,8 @@ public interface ForumConstants {
 	public static final String AUTHORING_DTO = "authoring";
 	public static final String AUTHORING_TOPICS_LIST = "topicList";
 	public static final String AUTHORING_TOPICS_INDEX = "topicIndex";
-	public static final String AUTHORING_TOPICS = "topic";
+	public static final String AUTHORING_TOPIC_THREAD = "topicThread";
+	public static final String AUTHORING_TOPIC = "topic";
 	
 	public static final String DEFAULT_TITLE = "Forum";
 	//TODO:hard code!!! need to read from config

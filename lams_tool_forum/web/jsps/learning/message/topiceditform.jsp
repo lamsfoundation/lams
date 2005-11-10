@@ -26,7 +26,7 @@
 						<c:out value="${file.fileName}" />
 					</a>
 					<c:set var="deleteURL">
-							<html:rewrite page="/authoring/deleteAttachment.do?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&topicIndex=${topicIndex}"/>
+							<html:rewrite page="/learning/deleteAttachment.do?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&topicIndex=${topicIndex}"/>
 					</c:set>
 					&nbsp;
 					<a href="<c:out value='${deleteURL}'/>">

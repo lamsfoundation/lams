@@ -250,7 +250,7 @@ public class AuthoringAction extends Action {
 		if(topicIdx != -1){
 			MessageDTO topic = (MessageDTO) topics.get(topicIdx);
 			request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
-			request.setAttribute(ForumConstants.AUTHORING_TOPICS,topic);
+			request.setAttribute(ForumConstants.AUTHORING_TOPIC,topic);
     	}
 		
     	return mapping.findForward("success");
@@ -267,7 +267,7 @@ public class AuthoringAction extends Action {
 			if (topic != null) {
 				msgForm.setMessage(topic.getMessage());
 			}
-			request.setAttribute(ForumConstants.AUTHORING_TOPICS,topic);
+			request.setAttribute(ForumConstants.AUTHORING_TOPIC,topic);
     	}
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
     	return mapping.findForward("success");

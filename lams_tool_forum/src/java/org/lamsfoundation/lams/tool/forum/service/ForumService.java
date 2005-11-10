@@ -98,10 +98,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         forumDao.delete(forum);
     }
 
-    public List getTopics(Long forumId) throws PersistenceException {
-        return messageDao.allAuthoredMessage(forumId);
-    }
-
     public void deleteForumAttachment(Long attachmentId) throws PersistenceException {
         Attachment attachment = (Attachment) attachmentDao.getById(attachmentId);
         attachmentDao.delete(attachment);
@@ -118,7 +114,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     		message.setToolSession(session);
     	}
     	//create message in database
-        messageDao.save(message);
+        messageDao.saveOrUpdate(message);
         
         //update message sequence
         MessageSeq msgSeq = new MessageSeq();
@@ -146,13 +142,14 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         return message;
     }
 
-    public Message getMessage(Long messageId) throws PersistenceException {
-        return (Message) messageDao.getById(messageId);
+    public Message getMessage(Long messageUid) throws PersistenceException {
+        return (Message) messageDao.getById(messageUid);
     }
 
     public void deleteTopic(Long topicUid) throws PersistenceException {
+    	//TODO: cascade delete children topic
+    	messageSeqDao.deleteByTopicId(topicUid);
         messageDao.deleteById(topicUid);
-        messageSeqDao.deleteByTopicId(topicUid);
      }
 
     public Message replyTopic(Long parentId, Message replyMessage) throws PersistenceException {
@@ -459,7 +456,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		Iterator iter;
 		MessageSeq msgSeq;
 		List msgDtoList = new ArrayList();
-		iter =map.keySet().iterator();
+		iter =map.entrySet().iterator();
 		while(iter.hasNext()){
 			Map.Entry entry = (Entry) iter.next();
 			msgSeq = (MessageSeq) entry.getKey();
@@ -484,5 +481,14 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	public void setForumToolSessionDao(ForumToolSessionDao forumToolSessionDao) {
 		this.forumToolSessionDao = forumToolSessionDao;
+	}
+
+	public Long getRootTopicId(Long topicId) {
+		MessageSeq seq = messageSeqDao.getByTopicId(topicId);
+		if(seq == null ||seq.getRootMessage() == null){
+			log.error("A sequence information can not be found for topic ID:" + topicId);
+			return null;
+		}
+		return seq.getRootMessage().getUid();
 	}
 }

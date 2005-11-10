@@ -22,11 +22,13 @@ public class MessageDao extends HibernateDaoSupport {
 	public void saveOrUpdate(Message message) {
 		message.updateModificationData();
 		this.getHibernateTemplate().saveOrUpdate(message);
+		this.getHibernateTemplate().flush();
 	}
 
 	public void save(Message message) {
 		message.updateModificationData();
 		this.getHibernateTemplate().save(message);
+		this.getHibernateTemplate().flush();
 	}
 	public Message getById(Long messageId) {
 		return (Message) getHibernateTemplate().get(Message.class,messageId);
@@ -64,8 +66,10 @@ public class MessageDao extends HibernateDaoSupport {
 
 	public void deleteById(Long uid) {
 		Message msg = getById(uid);
-		if(msg != null)
+		if(msg != null){
 			this.getHibernateTemplate().delete(msg);
+			this.getHibernateTemplate().flush();
+		}
 	}
 
 

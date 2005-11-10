@@ -34,7 +34,7 @@ public class DateComparator implements Comparator {
 			log.error("Topic is not Date instance.");
 			return 0;
 		}
-		return ((Date)arg0).after(((Date)arg0))?1:-1;
+		return ((Date)arg0).before(((Date)arg1))?1:-1;
 	}
 
 }

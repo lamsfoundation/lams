@@ -160,7 +160,7 @@ public class LearningAction extends Action {
 		forumService = getForumManager();
 		List msgDtoList = forumService.getTopicThread(topicId);
 		
-		request.setAttribute(ForumConstants.AUTHORING_TOPICS,msgDtoList);
+		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
 		return mapping.findForward("success");
 	}
 	/**
@@ -196,6 +196,9 @@ public class LearningAction extends Action {
 		Long sessionId = (Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
 		forumService.createRootTopic(forumId,sessionId,message);
 		
+		//echo back current root topic to fourm init page
+		List rootTopics = forumService.getRootTopics(sessionId);
+		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,MessageDTO.getMessageDTO(rootTopics));
 		return mapping.findForward("success");
 	}
 	/**
@@ -221,7 +224,7 @@ public class LearningAction extends Action {
     	}
     	
     	//cache this parentId in order to create reply
-    	request.setAttribute("parentId",parentId);
+    	request.getSession().setAttribute("parentId",parentId);
 		return mapping.findForward("success");
 	}
 	/**
@@ -235,7 +238,7 @@ public class LearningAction extends Action {
 	 */
 	private ActionForward replyTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Long parentId = new Long(WebUtil.readLongParam(request,"parentId"));
+		Long parentId = (Long) request.getSession().getAttribute("parentId");
 		
 		MessageForm messageForm = (MessageForm) form;
 		Message message = messageForm.getMessage();
@@ -251,6 +254,12 @@ public class LearningAction extends Action {
 		//save message into database
 		forumService = getForumManager();
 		forumService.replyTopic(parentId,message);
+		
+		//echo back this topic thread into page
+		forumService = getForumManager();
+		Long rootTopicId = forumService.getRootTopicId(parentId);
+		List msgDtoList = forumService.getTopicThread(rootTopicId);
+		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
 		
 		return mapping.findForward("success");
 	}
@@ -273,8 +282,11 @@ public class LearningAction extends Action {
     	if(topic != null){
     		MessageForm msgForm = (MessageForm)form;
     		msgForm.setMessage(topic.getMessage());
+    		request.setAttribute(ForumConstants.AUTHORING_TOPIC,topic);
     	}
-
+    	
+    	//cache this topicId in order to create reply
+    	request.getSession().setAttribute("topicId",topicId);
     	return mapping.findForward("success");
     }
   	/**
@@ -290,7 +302,7 @@ public class LearningAction extends Action {
   	public ActionForward updateTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws PersistenceException {
     	//get value from HttpSession
-		Long topicId = new Long(WebUtil.readLongParam(request,"topicId"));
+		Long topicId = (Long) request.getSession().getAttribute("topicId");
 		forumService = getForumManager();
 		
 		MessageForm messageForm = (MessageForm) form;
@@ -305,6 +317,12 @@ public class LearningAction extends Action {
 		
 		//save message into database
 		forumService.updateTopic(messagePO);
+
+		//echo back this topic thread into page
+		forumService = getForumManager();
+		Long rootTopicId = forumService.getRootTopicId(topicId);
+		List msgDtoList = forumService.getTopicThread(rootTopicId);
+		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
 		
 		return mapping.findForward("success");
     }
@@ -325,6 +343,14 @@ public class LearningAction extends Action {
     	
     	Long topicId = new Long(WebUtil.readLongParam(request,"topicId"));
 		getForumManager().deleteTopic(topicId);
+		
+
+		//echo back this topic thread into page
+		forumService = getForumManager();
+		Long rootTopicId = forumService.getRootTopicId(topicId);
+		List msgDtoList = forumService.getTopicThread(rootTopicId);
+		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
+		
 		return mapping.findForward("success");
 	}
     
@@ -353,7 +379,7 @@ public class LearningAction extends Action {
 		messagePO.setAttachments(null);
 		//save message into database
 		forumService.updateTopic(messagePO);
-			
+		
     	return mapping.findForward("success");
     }
 
@@ -367,10 +393,7 @@ public class LearningAction extends Action {
 	private MessageDTO getTopic(Long topicId) {
 		//get Topic content according to TopicID
 		forumService = getForumManager();
-		List topics = forumService.getTopics(topicId);
-		MessageDTO topic = null;
-		if(topics != null && !topics.isEmpty())
-			topic = MessageDTO.getMessageDTO((Message) topics.get(0));
+		MessageDTO topic = MessageDTO.getMessageDTO(forumService.getMessage(topicId));
 		return topic;
 	}
 	
