@@ -413,6 +413,10 @@ public class McAction extends DispatchAction implements McAppConstants
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
 	 		
+	 		Map mapWeights= repopulateMap(request, "questionWeight");
+			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+			
 	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
 		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
@@ -1473,19 +1477,23 @@ public class McAction extends DispatchAction implements McAppConstants
 			
 			mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
 			logger.debug("Submit final MAP_QUESTIONS_CONTENT :" + mapQuestionsContent);
-
-			Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-			logger.debug("Submit final MAP_GENERAL_OPTIONS_CONTENT :" + mapGeneralOptionsContent);
-
-			Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-			logger.debug("Submit final MAP_GENERAL_SELECTED_OPTIONS_CONTENT :" + mapGeneralSelectedOptionsContent);
 			
 			Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
 			logger.debug("Submit final MAP_FEEDBACK_INCORRECT :" + mapFeedbackIncorrect);
 
 			Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
 			logger.debug("Submit final MAP_FEEDBACK_CORRECT :" + mapFeedbackCorrect);
-
+			
+			cleanupExistingQuestions(request, mcContent);
+			logger.debug("post cleanupExistingQuestions");
+			
+			
+			persistQuestions(request, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mcContent);
+			logger.debug("post persistQuestions");
+			
+						
+			
+			
 
 /*			
 			Map mapWeights=repopulateCurrentWeightsMap(request, "questionWeight");
@@ -1535,13 +1543,11 @@ public class McAction extends DispatchAction implements McAppConstants
 			//logger.debug("all questions cleaned for :" + mcContent.getUid());
 			
 			
-			
-/*			
 			logger.debug("will do addUploadedFilesMetaData");
 			McUtils.addUploadedFilesMetaData(request,mcContent);
 			logger.debug("done addUploadedFilesMetaData");
 			
-*/
+
 			
 			errors.clear();
 			errors.add(Globals.ERROR_KEY,new ActionMessage("submit.successful"));
@@ -1674,7 +1680,162 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	mcAuthoringForm.resetUserAction();
 	 	return (mapping.findForward(LOAD_FILE_CONTENT));
     }
+
     
+    protected void cleanupExistingQuestions(HttpServletRequest request, McContent mcContent)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	logger.debug("remove questions by  mcQueContent uid : " + mcContent.getUid());
+    	mcService.cleanAllQuestionsSimple(mcContent.getUid());
+    }
+    
+    protected void persistQuestions(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McContent mcContent)
+	{
+    	IMcService mcService =McUtils.getToolService(request);
+    	logger.debug("mapQuestionsContent to be persisted :" + mapQuestionsContent);
+    	logger.debug("mapFeedbackIncorrect :" + mapFeedbackIncorrect);
+    	logger.debug("mapFeedbackCorrect :" + mapFeedbackCorrect);
+
+    	
+  	    Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("final MAP_GENERAL_OPTIONS_CONTENT :" + mapGeneralOptionsContent);
+
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("final MAP_GENERAL_SELECTED_OPTIONS_CONTENT :" + mapGeneralSelectedOptionsContent);
+
+    	Map mapWeights= repopulateMap(request, "questionWeight");
+		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+		
+    	
+    	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+        while (itQuestionsMap.hasNext()) {
+            Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
+            {
+            	logger.debug("checking existing question text: " +  pairs.getValue().toString() + " and mcContent uid():" + mcContent.getUid());
+            	/*
+            	McQueContent mcQueContent=mcService.getQuestionContentByQuestionText(pairs.getValue().toString(), mcContent.getUid());
+        	 	logger.debug("mcQueContent: " +  mcQueContent);
+        	 	Integer currentWeight= new Integer(mapWeights.get(pairs.getKey()).toString());
+            	logger.debug("currentWeight:" + currentWeight);
+            	*/
+            	
+            	String currentFeedbackIncorrect=(String)mapFeedbackIncorrect.get(pairs.getKey());
+        	 	logger.debug("currentFeedbackIncorrect: " +  currentFeedbackIncorrect);
+        	 	if (currentFeedbackIncorrect == null) currentFeedbackIncorrect="";
+        	 	
+        	 	String currentFeedbackCorrect=(String)mapFeedbackCorrect.get(pairs.getKey());
+        	 	logger.debug("currentFeedbackCorrect: " +  currentFeedbackCorrect);
+        	 	if (currentFeedbackCorrect == null) currentFeedbackCorrect=""; 
+            	
+            	String currentWeight=(String) mapWeights.get(pairs.getKey().toString());
+            	logger.debug("currentWeight: " + currentWeight);
+
+            	McQueContent mcQueContent=  new McQueContent(pairs.getValue().toString(),
+              	        	 		new Integer(pairs.getKey().toString()),
+              	        	 		new Integer(currentWeight),
+									false,
+									currentFeedbackIncorrect,
+									currentFeedbackCorrect,
+									mcContent,
+									new HashSet(),
+									new HashSet()
+             						);
+           	        mcService.createMcQue(mcQueContent);
+           	        logger.debug("persisted mcQueContent: " + mcQueContent);
+           	
+           	     logger.debug("remove existing options for  mcQueContent : " + mcQueContent.getUid());
+           	     mcService.removeMcOptionsContentByQueId(mcQueContent.getUid());
+           	     logger.debug("removed all mcOptionsContents for mcQueContentId :" + mcQueContent.getUid());
+     			
+           	        
+           	         if (mcQueContent != null)
+           	         {
+           	         	logger.debug("pre persistOptions for: " + mcQueContent);
+           	         	logger.debug("sending :" + pairs.getKey().toString());
+           	         	persistOptions(request, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent, mcQueContent, pairs.getKey().toString());
+           	         	logger.debug("post persistOptions"); 	
+           	         }
+            }
+        }
+    	
+	}
+    
+    
+    protected void persistOptions(HttpServletRequest request, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, McQueContent mcQueContent, String questionIndex)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	logger.debug("passed questionIndex: " +  questionIndex);
+    	
+    	Iterator itOptionsMap = mapGeneralOptionsContent.entrySet().iterator();
+    	while (itOptionsMap.hasNext()) {
+            Map.Entry pairs = (Map.Entry)itOptionsMap.next();
+            logger.debug("checking the general options  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
+            {
+            	Iterator itSelectedOptionsMap = mapGeneralSelectedOptionsContent.entrySet().iterator();    	
+            	while (itSelectedOptionsMap.hasNext()) 
+            	{
+            		Map.Entry selectedPairs = (Map.Entry)itSelectedOptionsMap.next();
+                    logger.debug("checking the general selected options pair: " +  selectedPairs.getKey() + " = " + selectedPairs.getValue());
+                    
+                    logger.debug("dubuging: " +  pairs.getKey() + "---" + questionIndex);
+                    if (pairs.getKey().equals(selectedPairs.getKey())  && questionIndex.equals(pairs.getKey())) 
+            		{
+                    	logger.debug("using updated equal question: " +  pairs.getKey());
+                    	Map currentOptions=(Map) pairs.getValue();
+                    	Map selectedOptions=(Map) selectedPairs.getValue();
+             
+                    	persistOptionsFinal(request, currentOptions,selectedOptions,mcQueContent);
+            		}
+            	}
+            }
+        }
+    }
+    
+    
+    protected void persistOptionsFinal(HttpServletRequest request, Map currentOptions, Map selectedOptions, McQueContent mcQueContent)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+        logger.debug("passed currentOptions: " + currentOptions);
+        logger.debug("passed selectedOptions: " + selectedOptions);
+        
+        Iterator itCurrentOptions = currentOptions.entrySet().iterator();
+        
+        
+        boolean selected=false;
+        while (itCurrentOptions.hasNext()) 
+        {
+            Map.Entry pairs = (Map.Entry)itCurrentOptions.next();
+            logger.debug("checking the current options  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            selected=false;
+            Iterator itSelectedOptions = selectedOptions.entrySet().iterator();    
+            while (itSelectedOptions.hasNext())
+            {
+            	Map.Entry selectedPairs = (Map.Entry)itSelectedOptions.next();
+            	logger.debug("checking the selected options  pair: " +  selectedPairs.getKey() + " = " + selectedPairs.getValue());
+            	selected=false;
+            	if (pairs.getValue().equals(selectedPairs.getValue()))
+            	{
+            		selected=true;
+            		logger.debug("set selected to true for: " + pairs.getValue());
+            		break;
+            	}
+            }
+            
+            logger.debug("pre-persist mcOptionsContent: " + pairs.getValue() + " " + selected);
+            logger.debug("pre-persist mcOptionsContent, using mcQueContent: " + mcQueContent);
+            McOptsContent mcOptionsContent= new McOptsContent(selected,pairs.getValue().toString() , mcQueContent, new HashSet());
+	        logger.debug("created mcOptionsContent: " + mcOptionsContent);
+   	        mcService.saveMcOptionsContent(mcOptionsContent);
+   	        logger.debug("persisted the answer: " + pairs.getValue().toString());
+        }
+    }
     
     protected McContent createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {

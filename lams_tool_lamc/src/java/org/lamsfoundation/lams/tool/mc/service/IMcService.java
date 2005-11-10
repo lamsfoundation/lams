@@ -39,7 +39,6 @@ import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.McSession;
-import org.lamsfoundation.lams.tool.mc.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -77,6 +76,8 @@ public interface IMcService
     public void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
     
     public void removeQuestionContentByMcUid(final Long mcContentUid) throws McApplicationException;
+    
+    public void cleanAllQuestionsSimple(final Long mcContentUid) throws McApplicationException;
     
     public void resetAllQuestions(final Long mcContentUid) throws McApplicationException;
     

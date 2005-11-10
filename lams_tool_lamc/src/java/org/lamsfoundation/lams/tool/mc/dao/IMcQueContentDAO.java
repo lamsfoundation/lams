@@ -45,6 +45,8 @@ public interface IMcQueContentDAO
 	public List refreshQuestionContent(final Long mcContentId);
 	
  	public void cleanAllQuestions(final Long mcContentUid);
+ 	
+ 	public void cleanAllQuestionsSimple(final Long mcContentUid);
 	
 	public void resetAllQuestions(final Long mcContentUid);
 	

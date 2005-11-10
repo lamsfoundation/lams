@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -91,6 +92,18 @@ public class McQueContent implements Serializable {
         this.displayOrder = displayOrder;
         this.weight = weight;
         this.disabled = disabled;
+        this.mcContent=mcContent;
+        this.mcUsrAttempts = mcUsrAttempts;
+        this.mcOptionsContents = mcOptionsContents;
+    }
+    
+    public McQueContent(String question, Integer displayOrder, Integer weight,  boolean disabled, String feedbackIncorrect, String feedbackCorrect, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
+        this.question = question;
+        this.displayOrder = displayOrder;
+        this.weight = weight;
+        this.disabled = disabled;
+        this.feedbackIncorrect = feedbackIncorrect;
+        this.feedbackCorrect = feedbackCorrect;
         this.mcContent=mcContent;
         this.mcUsrAttempts = mcUsrAttempts;
         this.mcOptionsContents = mcOptionsContents;

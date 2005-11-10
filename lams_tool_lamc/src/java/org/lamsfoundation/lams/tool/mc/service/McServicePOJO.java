@@ -334,7 +334,21 @@ public class McServicePOJO implements
 														   e);
         }
     }
+   
     
+    public void cleanAllQuestionsSimple(final Long mcContentId) throws McApplicationException
+	{
+    	try
+        {
+            mcQueContentDAO.cleanAllQuestionsSimple(mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is cleaning mc question content by mcContentId : "
+                                                         + e.getMessage(),
+														   e);
+        }    	
+	}
     
     public List getAllQuestionEntries(final Long uid) throws McApplicationException
 	{
