@@ -444,44 +444,6 @@ public class McAction extends DispatchAction implements McAppConstants
 				logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
 			}
 			
-			
-
-			/*
-			if (deletableQuestionEntry != null)
-			{
-				if (!(deletableQuestionEntry.equals("")))
-				{
-					mapQuestionsContent.remove(questionIndex);
-					logger.debug("removed entry:" + deletableQuestionEntry + " from the Map");
-					request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-					logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-					
-					Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-					logger.debug("toolContentId:" + toolContentId);
-					
-					McContent mcContent =mcService.retrieveMc(toolContentId);
-					logger.debug("mcContent:" + mcContent);
-					if  (mcContent != null)
-					{
-						McQueContent mcQueContent =mcService.getQuestionContentByQuestionText(deletableQuestionEntry, mcContent.getUid());
-						logger.debug("mcQueContent:" + mcQueContent);
-						
-						if (mcQueContent != null)
-						{
-							mcQueContent=mcService.retrieveMcQueContentByUID(mcQueContent.getUid());
-							mcService.removeMcQueContent(mcQueContent);
-							logger.debug("removed mcQueContent from DB:" + mcQueContent);
-						}	
-					}
-				}
-			}
-			else
-			{
-				request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-				logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-			}
-	 		*/
-			
 		 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 			mcAuthoringForm.resetUserAction();
@@ -555,8 +517,8 @@ public class McAction extends DispatchAction implements McAppConstants
 	    	
 	    	if (mcQueContent != null)
 	    	{
-	    		logger.debug("mcQueContent is not null " + mcQueContent.getMcQueContentId());
-	    		List listOptionsContent=mcService.findMcOptionsContentByQueId(mcQueContent.getMcQueContentId());
+	    		logger.debug("mcQueContent is not null " + mcQueContent.getUid());
+	    		List listOptionsContent=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());
 	    		logger.debug("listOptionsContent: " + listOptionsContent);
 	    		
 	    		Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);

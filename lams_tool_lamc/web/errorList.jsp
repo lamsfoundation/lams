@@ -27,7 +27,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 
 	<table align="center" border="0" width="100%">
-	<tr> <td>
+	<tr> <td align=center>
 		    <img src="images/error.jpg" align="left" width=20 height=20> </img> 
 				<bean:message key="error.default.content.notSetup"/>			    
 	</td> </tr>
