@@ -295,6 +295,7 @@
 				</classpath>
 				<transaction src="${db.scripts}/drop_lams_tool_qa.sql"/>
 				<transaction src="${db.scripts}/create_lams_tool_qa.sql"/>
+				<transaction src="${db.scripts}/insert_tool_qa_data.sql"/>
 			</sql>
 		</target>
 
@@ -438,5 +439,6 @@
 				</junitreport>
 
 			</target>
+	
 	
 </project>

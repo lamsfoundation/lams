@@ -171,7 +171,7 @@ public class AuthoringUtil implements QaAppConstants {
     	String choiceAdvanced=qaAuthoringForm.getChoiceAdvanced();
     	String choiceInstructions=qaAuthoringForm.getChoiceInstructions();
     	
-    	/** make the Basic tab the default one */
+    	/* make the Basic tab the default one */
     	request.getSession().setAttribute(CHOICE,CHOICE_TYPE_BASIC);
     	
 		if (choiceBasic != null)
@@ -191,13 +191,13 @@ public class AuthoringUtil implements QaAppConstants {
     	}
 
     	logger.debug("CHOICE is:" + request.getSession().getAttribute(CHOICE));
-    	/** reset tab controllers */
+    	/* reset tab controllers */
 		qaAuthoringForm.choiceBasic=null;
 		qaAuthoringForm.choiceAdvanced=null;
 		qaAuthoringForm.choiceInstructions=null;
 		
 		
-		/**
+		/*
 		 * if the presentation is for monitoring EditActivity screen, keep preserving request scope START_MONITORING_SUMMARY_REQUEST
 		 */
 		Boolean renderMonitoringEditActivity=(Boolean)request.getSession().getAttribute(RENDER_MONITORING_EDITACTIVITY);
@@ -246,7 +246,7 @@ public class AuthoringUtil implements QaAppConstants {
     
     
     /**
-     * createContent(TreeMap mapQuestionContent)
+     * QaContent createContent(Map mapQuestionContent, HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
      * return QaContent
      * At this stage, the Map is available from the presentaion layer and can be passed to services layer for persistance.
      * We are making the content and question contents persistent.
@@ -256,15 +256,16 @@ public class AuthoringUtil implements QaAppConstants {
     {
     	IQaService qaService =QaUtils.getToolService(request);
     	
-    	/** the tool content id is passed from the container to the tool and placed into session in the QaStarterAction */
+    	/* the tool content id is passed from the container to the tool and placed into session in the QaStarterAction */
     	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	if ((toolContentId != null) && (!toolContentId.equals("")))
-    	{
-    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
-    		/**delete the existing content in the database before applying new content*/
-    		qaService.deleteQaById(new Long(toolContentId));
-    		logger.debug("post-deletion existing content");
-		}
+	    /*
+	    	if ((toolContentId != null) && (!toolContentId.equals("")))
+	    	{
+	    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
+	    		qaService.deleteQaById(new Long(toolContentId));
+	    		logger.debug("post-deletion existing content");
+			}
+	    */
     	logger.debug("using TOOL_CONTENT_ID: " +  toolContentId);
     	request.getSession().setAttribute(TOOL_CONTENT_ID,toolContentId);
     	
@@ -330,8 +331,7 @@ public class AuthoringUtil implements QaAppConstants {
 		if (creationDate == null)
 			creationDate=new Date(System.currentTimeMillis()).toString();
 		
-		
-		/** read rich text values */
+		/* read rich text values */
 		String richTextOfflineInstructions="";
     	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
     	logger.debug("createContent:  richTextOfflineInstructions from session: " + richTextOfflineInstructions);
@@ -353,9 +353,9 @@ public class AuthoringUtil implements QaAppConstants {
     	if (richTextInstructions == null) richTextInstructions="";
     	
     		
-    	/**obtain user object from the session*/
+    	/* obtain user object from the session*/
 	    HttpSession ss = SessionManager.getSession();
-	    //get back login user DTO
+	    /* get back login user DTO*/
 	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
     	logger.debug("retrieving toolUser: " + toolUser);
     	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
@@ -363,7 +363,7 @@ public class AuthoringUtil implements QaAppConstants {
     	logger.debug("retrieving toolUser fullname: " + fullName);
     	long userId=toolUser.getUserID().longValue();
     	
-    	/** create a new qa content and leave the default content intact*/
+    	/* create a new qa content and leave the default content intact*/
     	QaContent qa = new QaContent();
 		qa.setQaContentId(new Long(toolContentId));
 		qa.setTitle(richTextTitle);
@@ -384,7 +384,7 @@ public class AuthoringUtil implements QaAppConstants {
 	    qa.setQaUploadedFiles(new TreeSet());
 	    logger.debug("qa content :" +  qa);
     	
-    	/**create the content in the db*/
+    	/* create the content in the db*/
         qaService.createQa(qa);
         logger.debug("qa created with content id: " + toolContentId);
         
@@ -468,7 +468,7 @@ public class AuthoringUtil implements QaAppConstants {
 	        Map.Entry pairs = (Map.Entry)itMap.next();
 	        logger.debug("using the pair: " +  pairs.getKey() + " = " + pairs.getValue());
 	        
-	        /**make sure question entered is NOT blank*/
+	        /*make sure question entered is NOT blank*/
 	        if (pairs.getValue().toString().length() != 0)
 	        {	        	
 		        QaQueContent queContent=  new QaQueContent(pairs.getValue().toString(), 
@@ -510,7 +510,7 @@ public class AuthoringUtil implements QaAppConstants {
     	if ((toolContentId != null) && (!toolContentId.equals(""))) 
 		{
     		logger.debug("simulate container behaviour by calling: removeToolContent with: " + new Long(toolContentId));
-    		/**
+    		/*
     		 * we are calling removeToolContent to clear content tables although this method normally 
     		 * gets called only in the monitoring mode automatically by the core.
     		 * 

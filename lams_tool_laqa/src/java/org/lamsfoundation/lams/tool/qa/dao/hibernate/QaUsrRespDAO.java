@@ -20,8 +20,7 @@
  */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
-import org.hibernate.Hibernate;
-
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
@@ -44,6 +43,7 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
 
 	public void createUserResponse(QaUsrResp qaUsrResp)
     {
+		this.getSession().setFlushMode(FlushMode.AUTO);
     	this.getHibernateTemplate().save(qaUsrResp);    	
     }
 
@@ -59,6 +59,7 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
      */
     public void saveUserResponse(QaUsrResp resp)
     {
+    	this.getSession().setFlushMode(FlushMode.AUTO);    	
         this.getHibernateTemplate().save(resp);
     }
 
@@ -67,11 +68,13 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
      */
     public void updateUserResponse(QaUsrResp resp)
     {
+    	this.getSession().setFlushMode(FlushMode.AUTO);
         this.getHibernateTemplate().update(resp);        
     }
     
     public void removeUserResponse(QaUsrResp resp)
     {
+    	this.getSession().setFlushMode(FlushMode.AUTO);
         this.getHibernateTemplate().delete(resp);        
     }
 
@@ -85,6 +88,7 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
 				.setLong(0,qaQueId.longValue())
 				.uniqueResult();
             if ( obj != null ) {
+            	this.getSession().setFlushMode(FlushMode.AUTO);
             	getHibernateTemplate().delete(obj);
             }
     	}

@@ -70,6 +70,7 @@ public class QaSession implements Serializable,Comparable, Nullable
     /** persistent field */
     private Set qaQueUsers;
     
+    /** persistent field */
     private Long qaContentId;
 
 

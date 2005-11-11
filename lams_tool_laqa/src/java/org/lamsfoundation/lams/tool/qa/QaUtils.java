@@ -55,7 +55,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * Common utility functions live here.  
  */
 public abstract class QaUtils implements QaAppConstants {
-
 	static Logger logger = Logger.getLogger(QaUtils.class.getName());
 	
 	public static IQaService getToolService(HttpServletRequest request)
@@ -64,14 +63,6 @@ public abstract class QaUtils implements QaAppConstants {
 	    return qaService;
 	}
 	
-	
-	/**
-	 * generateId()
-	 * return long
-	 * IMPORTANT: The way we obtain either content id or tool session id must be modified
-	 * so that we only use lams common to get these ids. This functionality is not 
-	 * available yet in the lams common as of 21/04/2005.
-	 */
 	public static long generateId()
 	{
 		Random generator = new Random();
@@ -94,16 +85,14 @@ public abstract class QaUtils implements QaAppConstants {
 	}
 	
 	
-	
 	/**
      * cleanupSession(TreeMap mapQuestionContent, HttpServletRequest request)
      * return void
      * cleans up the session of the content details
      */
-
     public static void cleanupSession(HttpServletRequest request)
     {
-    	//remove session attributes in Authoring mode 
+    	/* remove session attributes in Authoring mode */ 
 		request.getSession().removeAttribute(DEFAULT_QUESTION_CONTENT);
 		request.getSession().removeAttribute(MAP_QUESTION_CONTENT);
 		request.getSession().removeAttribute(CHOICE);
@@ -117,8 +106,7 @@ public abstract class QaUtils implements QaAppConstants {
 	    request.getSession().removeAttribute(TITLE);
 	    request.getSession().removeAttribute(CONTENT_LOCKED);
 	    
-		
-		//remove session attributes in Learner mode
+		/* remove session attributes in Learner mode */
 		request.getSession().removeAttribute(MAP_ANSWERS);
 		request.getSession().removeAttribute(MAP_QUESTION_CONTENT_LEARNER);
 		request.getSession().removeAttribute(CURRENT_QUESTION_INDEX);
@@ -135,11 +123,11 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(END_LEARNING_MESSAGE);
 		request.getSession().removeAttribute(IS_TOOL_ACTIVITY_OFFLINE);
 		
-		//remove session attributes in Monitoring mode
+		/* remove session attributes in Monitoring mode */
 		request.getSession().removeAttribute(MAP_TOOL_SESSIONS);
 		request.getSession().removeAttribute(MAP_MONITORING_QUESTIONS);
 		
-		//remove session attributes used commonly
+		/* remove session attributes used commonly */
 		request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
 		request.getSession().removeAttribute(REPORT_TITLE_MONITOR);
 		request.getSession().removeAttribute(IS_ALL_SESSIONS_COMPLETED);
@@ -148,12 +136,18 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(ATTR_USERDATA);
 		request.getSession().removeAttribute(TOOL_SERVICE);
 		request.getSession().removeAttribute(TARGET_MODE);
-
     }
 
+    /**
+     * setDefaultSessionAttributes(HttpServletRequest request, QaContent defaultQaContent, QaAuthoringForm qaAuthoringForm)
+     * 
+     * @param request
+     * @param defaultQaContent
+     * @param qaAuthoringForm
+     */
     public static void setDefaultSessionAttributes(HttpServletRequest request, QaContent defaultQaContent, QaAuthoringForm qaAuthoringForm)
 	{
-		/**should never be null anyway as default content MUST exist in the db*/
+		/*should never be null anyway as default content MUST exist in the db*/
 		if (defaultQaContent != null)
 		{		
 			qaAuthoringForm.setTitle(defaultQaContent.getTitle());
@@ -187,17 +181,17 @@ public abstract class QaUtils implements QaAppConstants {
     {
         User userCompleteData = (User) request.getSession().getAttribute(ATTR_USERDATA);
 	    logger.debug(logger + " " + "QaUtils" +  "retrieving userCompleteData: " + userCompleteData);
-        /**
+        /*
          * if no session cache available, retrieve it from data source
          */
         if (userCompleteData == null)
         {	
-        	/**
+        	/*
              * WebUtil.getUsername(request,DEVELOPMENT_FLAG) returns the current learner's username based on 
              * user principals defined in the container. If no username is defined in the container, we get a RunTimeException.
              */
         	
-        	/**
+        	/*
         	 * pass testing flag as false to obtain user principal 
         	 */
         	try
@@ -213,7 +207,7 @@ public abstract class QaUtils implements QaAppConstants {
 			}
         	
             logger.debug(logger + " " + "QaUtils" +  "retrieving userCompleteData from service: " + userCompleteData);
-            //this can be redundant as we keep the User data in TOOL_USER
+            /* this can be redundant as we keep the User data in TOOL_USER */
             request.getSession().setAttribute(ATTR_USERDATA, userCompleteData);
         }
         return userCompleteData;
@@ -222,7 +216,7 @@ public abstract class QaUtils implements QaAppConstants {
 	public static int getCurrentUserId(HttpServletRequest request) throws QaApplicationException
     {
 	    HttpSession ss = SessionManager.getSession();
-	    //get back login user DTO
+	    /* get back login user DTO */
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		logger.debug(logger + " " + "QaUtils" +  " Current user is: " + user + " with id: " + user.getUserID());
 		return user.getUserID().intValue();
@@ -281,7 +275,6 @@ public abstract class QaUtils implements QaAppConstants {
 	}
 	
 	
-	
 	public static User createSimpleUser(Integer userId)
 	{
 		User user=new User();
@@ -315,9 +308,6 @@ public abstract class QaUtils implements QaAppConstants {
 	 */
 	public static boolean existsContent(long toolContentId, HttpServletRequest request)
 	{
-		/**
-		 * retrive the service
-		 */
 		IQaService qaService =QaUtils.getToolService(request);
 	    
     	QaContent qaContent=qaService.loadQa(toolContentId);
@@ -336,9 +326,6 @@ public abstract class QaUtils implements QaAppConstants {
 	 */
 	public static boolean existsSession(long toolSessionId, HttpServletRequest request)
 	{
-		/**
-		 * get the service
-		 */
 		logger.debug("existsSession");
     	IQaService qaService =QaUtils.getToolService(request);
 	    QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId);
@@ -366,7 +353,12 @@ public abstract class QaUtils implements QaAppConstants {
 	    logger.debug("current timezone id: " + timeZone.getID());
 	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
 	}
-	
+
+	/**
+	 * stores the rich text values on the forms into the session scope
+	 * persistRichText(HttpServletRequest request)
+	 * @param request
+	 */
 	public static void persistRichText(HttpServletRequest request)
 	{
 		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
@@ -400,6 +392,7 @@ public abstract class QaUtils implements QaAppConstants {
 		}
 	}
 	
+	
 	public static void configureContentRepository(HttpServletRequest request)
 	{
 		logger.debug("attempt configureContentRepository");
@@ -409,6 +402,7 @@ public abstract class QaUtils implements QaAppConstants {
 	    qaService.configureContentRepository();
 	    logger.debug("configureContentRepository ran successfully");
 	}
+	
 	
 	public static void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm, boolean isOfflineFile)
 	{
@@ -507,7 +501,7 @@ public abstract class QaUtils implements QaAppConstants {
     	*/
     	
     	
-    	/**holds final online files list */
+    	/* holds final online files list */
     	List listUploadedOnlineFiles= (List) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES);
     	logger.debug("listUploadedOnlineFiles: " + listUploadedOnlineFiles);
     	
@@ -554,7 +548,7 @@ public abstract class QaUtils implements QaAppConstants {
     	
     	if (isOfflineFile)
     	{
-    		/** read uploaded file informtion  - offline file*/
+    		/* read uploaded file informtion  - offline file*/
     		logger.debug("retrieve theOfflineFile.");
     		FormFile theOfflineFile = qaAuthoringForm.getTheOfflineFile();
     		logger.debug("retrieved theOfflineFile: " + theOfflineFile);
@@ -694,7 +688,7 @@ public abstract class QaUtils implements QaAppConstants {
         QaContent  defaultQaContent=qaService.loadQa(new Long(toolContentId).longValue());
         logger.debug("defaultQaContent: " + defaultQaContent);
     	
-	    /** read the uploaded offline uuid + file name pair */
+	    /* read the uploaded offline uuid + file name pair */
 	    List listOnlineFilesName=new LinkedList();
 	    listOnlineFilesName=qaService.retrieveQaUploadedOnlineFilesName(defaultQaContent);
 	    logger.debug("listOnlineFilesName: " + listOnlineFilesName);
@@ -727,42 +721,38 @@ public abstract class QaUtils implements QaAppConstants {
 		IQaService qaService =QaUtils.getToolService(request);
     	logger.debug("qaService: " + qaService);
 
-		/** just for jsp purposes **
-	    /** read the uploaded offline uuid + file name pair */
+		/* just for jsp purposes **
+	    /* read the uploaded offline uuid + file name pair */
 	    List listOfflineFilesUuid=new LinkedList();
 	    listOfflineFilesUuid=qaService.retrieveQaUploadedOfflineFilesUuid(defaultQaContent);
 	    logger.debug("initial listOfflineFilesUuid: " + listOfflineFilesUuid);
 	    request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILES_UUID);
 	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES_UUID, listOfflineFilesUuid);
 	    
-	    /** read the uploaded online uuid + file name pair */
+	    /* read the uploaded online uuid + file name pair */
 	    List listOnlineFilesUuid=new LinkedList();
 	    listOnlineFilesUuid=qaService.retrieveQaUploadedOnlineFilesUuid(defaultQaContent);
 	    logger.debug("initial listOnlineFilesUuid: " + listOnlineFilesUuid);
 	    request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILES_UUID);
 	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES_UUID, listOnlineFilesUuid);
 	    
-	    
-	    /** read the uploaded offline uuid + file name pair */
+	    /* read the uploaded offline uuid + file name pair */
 	    List listOfflineFilesName=new LinkedList();
 	    listOfflineFilesName=qaService.retrieveQaUploadedOfflineFilesName(defaultQaContent);
 	    logger.debug("initial listOfflineFilesName: " + listOfflineFilesName);
 	    request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILES_NAME);
 	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES_NAME, listOfflineFilesName);
 	    
-	    
-	    /** read the uploaded online uuid + file name pair */
+	    /* read the uploaded online uuid + file name pair */
 	    List listOnlineFilesName=new LinkedList();
 	    listOnlineFilesName=qaService.retrieveQaUploadedOnlineFilesName(defaultQaContent);
 	    logger.debug("initial listOnlineFilesName: " + listOnlineFilesName);
 	    request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILES_NAME);
 	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES_NAME, listOnlineFilesName);
 	    
-	    	    
 	    request.getSession().removeAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
 	    request.getSession().removeAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
 	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listOfflineFilesName);
 	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listOnlineFilesName);
 	}
-	
 }

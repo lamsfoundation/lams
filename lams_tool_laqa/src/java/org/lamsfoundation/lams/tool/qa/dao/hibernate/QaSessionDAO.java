@@ -22,6 +22,7 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
@@ -83,6 +84,7 @@ public class QaSessionDAO extends HibernateDaoSupport implements
      */
     public void CreateQaSession(QaSession session)
     {
+    	this.getSession().setFlushMode(FlushMode.AUTO);
         this.getHibernateTemplate().save(session);
     }
 
@@ -91,6 +93,7 @@ public class QaSessionDAO extends HibernateDaoSupport implements
      */
     public void UpdateQaSession(QaSession session)
     {
+    	this.getSession().setFlushMode(FlushMode.AUTO);    	
         this.getHibernateTemplate().update(session);
     }
 
@@ -99,6 +102,7 @@ public class QaSessionDAO extends HibernateDaoSupport implements
      */
     public void deleteQaSession(QaSession qaSession)
     {
+    	this.getSession().setFlushMode(FlushMode.AUTO);    	
         this.getHibernateTemplate().delete(qaSession);
     }
 

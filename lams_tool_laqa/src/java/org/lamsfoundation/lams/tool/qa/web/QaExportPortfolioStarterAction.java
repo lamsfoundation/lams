@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -62,32 +61,29 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, QaApplicationException, ToolException 
 	{
-		/**
-		 * retrive the service
-		 */
     	IQaService qaService=null;
    		qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
    	    logger.debug("retrieved qaService : " + qaService);
    	    request.getSession().setAttribute(TOOL_SERVICE, qaService);	
 
-    	    	
-    	/**
+    	/*
 	     * persist time zone information to session scope. 
 	     */
 	    QaUtils.persistTimeZone(request);
     	
-	    /**
-	     * mark the http session as an authoring activity 
+	    /*
+	     * mark the http session as an export portfolio activity 
 	     */
-	    //request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_EXPORT_PORTFOLIO);
+
+	    //request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_EXPORT_PORTFOLIO); 
 	    
-	    /**
+	    /*
 	     * obtain and setup the current user's data 
 	     */
 
-	    //get session from shared session.
+	    /* get session from shared session.*/
 	    HttpSession ss = SessionManager.getSession();
-	    //get back login user DTO
+	    /* get back login user DTO */
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if ((user == null) || (user.getUserID() == null))
 	    {
@@ -153,7 +149,6 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			}
 			logger.debug("final toolSessionId before exists test :" + toolSessionId);
 		
-		
 			QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
 			if (qaSession == null)
 			{
@@ -204,10 +199,9 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			}
 		}
 	
-		/**
+		/*
 			at this point we have session attributes TOOL_CONTENT_ID, TOOL_SESSION_ID AND MODE ready to use  
 		*/
-	
 		mode=(String)request.getSession().getAttribute(MODE);
 		logger.debug("mode is: " + mode);
 		
@@ -226,7 +220,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		    logger.debug("using qaContent id : " + qaContent.getQaContentId());
 		    request.getSession().setAttribute(TOOL_CONTENT_ID, qaContent.getQaContentId());
 		    
-		    /** is other learner's full name visible to this learner */
+		    /* other learner's full name visible to this learner? */
 		    logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
 		    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(qaContent.isUsernameVisible()));
 		    
@@ -251,7 +245,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		    	
 			logger.debug("generate portfolio for mode: " + mode);
 			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_LEARNING);
-			/** a single toolSessionId */
+			/* a single toolSessionId */
 			request.getSession().setAttribute(TOOL_SESSION_ID, toolSessionId);
 			logger.debug("build a learner report:");
 			learningUtil.buidLearnerReport(request, 1);
@@ -265,7 +259,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			logger.debug("generate portfolio for mode: " + mode);
 			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_MONITORING);
 
-			/** we already know that this content exists in the db */
+			/* we already know that this content exists in the db */
 			QaContent qa=qaService.loadQa(toolContentId.longValue());
 			logger.debug("qa: " + qa);
 			listToolSessions= qaService.getToolSessionsForContent(qa);
@@ -291,7 +285,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			}
 		}
 		
-		/** the flag to differentiate between request for monitoring versus request for portfolio */
+		/* the flag to differentiate between request for monitoring versus request for portfolio */
 		request.setAttribute(PORTFOLIO_REQUEST, new Boolean(true));
 		logger.debug("generate portfolio jsp for mode: " + mode);
 		logger.debug("mapToolSessions: " + request.getSession().getAttribute(MAP_TOOL_SESSIONS));

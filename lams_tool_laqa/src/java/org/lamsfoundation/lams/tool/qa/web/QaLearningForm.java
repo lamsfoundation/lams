@@ -22,7 +22,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 public class QaLearningForm extends ActionForm implements QaAppConstants {
 	protected String answer;
 	protected String currentQuestionIndex;
-	/** form controllers */
+	/* form controllers */
 	protected String submitAnswersContent;
 	protected String getNextQuestion;
 	protected String getPreviousQuestion;

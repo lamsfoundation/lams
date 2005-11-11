@@ -33,7 +33,6 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -104,11 +103,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class QaLearningStarterAction extends Action implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaLearningStarterAction.class.getName());
 
-	/**
+	/*
 	 * holds the question contents for a given tool session and relevant content
 	 */
 	protected Map mapQuestions= new TreeMap(new QaComparator());
-	/**
+	/*
 	 * holds the answers
 	 */  
 	protected Map mapAnswers= new TreeMap(new QaComparator());
@@ -118,47 +117,44 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 		QaLearningForm qaQaLearningForm = (QaLearningForm) form;
 		
-		/**
+		/*
 		 * reset the question index to 1. 
 		 */
 		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
 		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
 
-		/**
+		/*
 		 * reset the current answer
 		 */
 		request.getSession().setAttribute(CURRENT_ANSWER, "");
 
-		/**
+		/*
 		 * initialize available question display modes in the session
 		 */
 		request.getSession().setAttribute(QUESTION_LISTING_MODE_SEQUENTIAL,QUESTION_LISTING_MODE_SEQUENTIAL);
 	    request.getSession().setAttribute(QUESTION_LISTING_MODE_COMBINED, QUESTION_LISTING_MODE_COMBINED);
 	    
-	    /**
-		 * retrive the service
-		 */
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	    logger.debug("retrieving qaService: " + qaService);
 	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
 	    
-	    /**
+	    /*
 	     * mark the http session as a learning activity 
 	     */
 	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_LEARNING);
 	    
-	    /**
+	    /*
 	     * persist time zone information to session scope. 
 	     */
 	    QaUtils.persistTimeZone(request);
 	    
-	    /**
+	    /*
 	     * obtain and setup the current user's data 
 	     */
 	    String userId = "";
-	    //get session from shared session.
+	    /* get session from shared session.*/
 	    HttpSession ss = SessionManager.getSession();
-	    //get back login user DTO
+	    /* get back login user DTO*/
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if ((user == null) || (user.getUserID() == null))
 	    {
@@ -170,7 +166,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	userId = user.getUserID().toString();
 		
 	    
-	    /**
+	    /*
 	     * process incoming tool session id and later derive toolContentId from it. 
 	     */
 	    String strToolSessionId=request.getParameter(TOOL_SESSION_ID);
@@ -200,7 +196,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			}
 	    }
 		
-	    /**
+	    /*
 	     * By now, the passed tool session id MUST exist in the db through the calling of:
 	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
 	     *  
@@ -228,7 +224,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 				 
 		}
 		
-		/**
+		/*
 		 * by now, we made sure that the passed tool session id exists in the db as a new record
 		 * Make sure we can retrieve it and relavent content
 		 */
@@ -236,12 +232,12 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 		QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId);
 	    logger.debug("retrieving qaSession: " + qaSession);
-	    /**
+	    /*
 	     * find out what content this tool session is referring to
 	     * get the content for this tool session (many to one mapping)
 	     */
 	    
-	    /**
+	    /*
 	     * Each passed tool session id points to a particular content. Many to one mapping.
 	     */
 		QaContent qaContent=qaSession.getQaContent();
@@ -250,7 +246,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    logger.debug("using TOOL_CONTENT_ID: " + qaContent.getQaContentId());
 	    	    
 	    
-	    /**
+	    /*
 	     * The content we retrieved above must have been created before in Authoring time. 
 	     * And the passed tool session id already refers to it.
 	     */
@@ -267,7 +263,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 	    request.getSession().setAttribute(END_LEARNING_MESSAGE,qaContent.getEndLearningMessage());
 	    logger.debug("END_LEARNING_MESSAGE: " + qaContent.getEndLearningMessage());
-	    /**
+	    /*
 	     * Is the tool activity been checked as Run Offline in the property inspector?
 	     */
 	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + qaContent.isRunOffline());
@@ -275,14 +271,14 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 	    logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
 	    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(qaContent.isUsernameVisible()));
-	    /**
+	    /*
 	     * Is the tool activity been checked as Define Later in the property inspector?
 	     */
 	    logger.debug("IS_DEFINE_LATER: " + qaContent.isDefineLater());
 	    request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(qaContent.isDefineLater()));
 	    
-	    /**
-	     * convince jsp: Learning mode requires this setting for jsp to generate the user's report 
+	    /*
+	     * Learning mode requires this setting for jsp to generate the user's report 
 	     */
 	    request.getSession().setAttribute(CHECK_ALL_SESSIONS_COMPLETED, new Boolean(false));
 	    	    
@@ -300,7 +296,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    }
 	    logger.debug("QUESTION_LISTING_MODE: " + request.getSession().getAttribute(QUESTION_LISTING_MODE));
 	    
-    	/**
+    	/*
     	 * fetch question content from content
     	 */
     	Iterator contentIterator=qaContent.getQaQueContents().iterator();
@@ -312,7 +308,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     			int displayOrder=qaQueContent.getDisplayOrder();
         		if (displayOrder != 0)
         		{
-        			/**
+        			/*
     	    		 *  add the question to the questions Map in the displayOrder
     	    		 */
             		mapQuestions.put(new Integer(displayOrder).toString(),qaQueContent.getQuestion());
@@ -329,7 +325,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     	request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
     	
     	
-    	/**
+    	/*
 	     * Verify that userId does not already exist in the db.
 	     * If it does exist, that means, that user already responded to the content and 
 	     * his answers must be displayed  read-only
@@ -345,7 +341,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    	logger.debug("buidLearnerReport called successfully, forwarding to: " + LEARNER_REPORT);
 	    	return (mapping.findForward(LEARNER_REPORT));
 	    }
-    	/**
+    	/*
     	 * present user with the questions.
     	 */
 		logger.debug("forwarding to: " + LOAD);

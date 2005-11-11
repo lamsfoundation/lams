@@ -7,7 +7,7 @@
  */
 package org.lamsfoundation.lams.tool.qa.web;
 
-/**
+/*
  * ActionForm for the Authoring environment
  */
 import org.apache.struts.action.ActionForm;
@@ -21,7 +21,7 @@ import org.apache.struts.upload.FormFile;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class QaAuthoringForm extends ActionForm implements QaAppConstants {
-	/** form controllers */
+	/* form controllers */
 	protected String addContent;
 	protected String removeContent;
 	protected String removeAllContent;
@@ -30,25 +30,25 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	protected String submitOfflineFile;
 	protected String submitOnlineFile;
 	
-	/** tab controller, these may go away once the Flash wraps the jsp */
+	/* tab controller, these may go away once the Flash wraps the jsp */
 	protected String choice;
 	protected String choiceBasic;
 	protected String choiceAdvanced;
 	protected String choiceInstructions;
 	
-	/** basic content */
+	/* basic content */
 	protected String title;
 	protected String instructions;
 	protected String questionIndex;
 	protected String isRemoveContent;
 	protected String toolContentId;
-	/** instructions content */
+	/* instructions content */
 	protected String onlineInstructions;
 	protected String offlineInstructions;
 	protected FormFile theOfflineFile;
 	protected FormFile theOnlineFile;
 	
-	/** advanced content */
+	/* advanced content */
 	protected String synchInMonitor;
 	protected String reportTitle;
 	protected String monitoringReportTitle;
@@ -56,7 +56,7 @@ public class QaAuthoringForm extends ActionForm implements QaAppConstants {
 	protected String usernameVisible;
 	protected String questionsSequenced;
 	
-	/** proxy controllers for Monitoring tabs */ 
+	/* proxy controllers for Monitoring tabs */ 
 	protected String summaryMonitoring;
 	protected String instructionsMonitoring;
 	protected String editActivityMonitoring;

@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
@@ -80,12 +81,14 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 	 	
 		public void createQueContent(QaQueContent queContent) 
 	    {
+			this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().save(queContent);
 	    }
 		
 		public void removeQueContent(long qaQueContentId) 
 	    {
 			QaQueContent qaQueContent= (QaQueContent) this.getHibernateTemplate().load(QaQueContent.class, new Long(qaQueContentId));
+			this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().delete(qaQueContent);
 	    }
 } 

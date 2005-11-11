@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import org.apache.log4j.Logger;
+import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -128,17 +129,20 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 		    	Object obj = getSession().createQuery(query)
 					.setLong(0,qaContentId.longValue())
 					.uniqueResult();
+		    	this.getSession().setFlushMode(FlushMode.AUTO);
 		    	getHibernateTemplate().delete(obj);
 	    	}
     	}
 	    
 	    public void deleteQa(QaContent qaContent)
 	    {
-	            this.getHibernateTemplate().delete(qaContent);
+	    	this.getSession().setFlushMode(FlushMode.AUTO);
+	        this.getHibernateTemplate().delete(qaContent);
     	}
 
 	    public void removeQaById(Long qaId)
 	    {
+	    	this.getSession().setFlushMode(FlushMode.AUTO);
 	    	removeQa(qaId);
 	    }
 

@@ -40,14 +40,15 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class LearningUtil implements QaAppConstants{
 	static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 
-	/** 
+	/**
 	 * NEVER USED: redundant method.
+	 * deleteSessionUsersAndResponses(HttpServletRequest request)
 	 * @param request
 	 */
 	protected void deleteSessionUsersAndResponses(HttpServletRequest request)
     {
         IQaService qaService =QaUtils.getToolService(request);
-        /**
+        /*
          * retrive contentId from the http session
          */
         logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
@@ -92,7 +93,7 @@ public class LearningUtil implements QaAppConstants{
     protected void deleteExistingUsersAndResponses(HttpServletRequest request)
     {
         IQaService qaService =QaUtils.getToolService(request);
-        /**
+        /*
          * retrive contentId from the http session
          */
         logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
@@ -101,9 +102,6 @@ public class LearningUtil implements QaAppConstants{
         
         logger.debug("retrieving qaContent: " + qaContent);
         
-        /**
-         * get iterator of questions collection
-         */
     	Iterator contentIterator=qaContent.getQaQueContents().iterator();
     	while (contentIterator.hasNext())
     	{
@@ -113,7 +111,7 @@ public class LearningUtil implements QaAppConstants{
     		{
     			Set qaQueUsers=qaQueContent.getQaQueUsers();
     			logger.debug("qaQueUsers size: " + qaQueUsers.size());
-        		/**
+        		/*
         		 * iterate users and delete them
         		 */
         		Iterator usersIterator=qaQueUsers.iterator();
@@ -159,12 +157,12 @@ public class LearningUtil implements QaAppConstants{
         logger.debug("createUsers-retrieving qaService: " + qaService);
         
 	    HttpSession ss = SessionManager.getSession();
-	    //get back login user DTO
+	    /* get back login user DTO */
 	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
     	logger.debug("retrieving toolUser: " + toolUser);
     	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
     	logger.debug("retrieving toolUser username: " + toolUser.getLogin());
-    	/**
+    	/*
     	 * !!double check this!!
     	 */
     	String userName=toolUser.getLogin(); 
@@ -173,18 +171,18 @@ public class LearningUtil implements QaAppConstants{
     	
     	Long userId=new Long(toolUser.getUserID().longValue());
     	
-        /**
+        /*
          * retrive contentId from the http session
          */
         logger.debug("createUsers-attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
         Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-        /**
+        /*
          * obtain QaContent to be used in creating QaQueUsr
          */  
         QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
         logger.debug("createUsers-retrieving qaContent: " + qaContent);
 
-        /**
+        /*
          * get QaSession to be used in creating QaQueUsr
          */
         Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
@@ -214,16 +212,16 @@ public class LearningUtil implements QaAppConstants{
     		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
     		if (qaQueContent != null)
     		{
-    	        /**
+    	        /*
                  * get the question
                  */
         		String question=qaQueContent.getQuestion();
-        		/**
+        		/*
         		 * get the question's display order
         		 */
         		String displayOrder=new Long(qaQueContent.getDisplayOrder()).toString();
         		
-        		/**
+        		/*
         		 * get the answer from the map of that displayOrder
         		 */
         		String answer=(String)mapAnswers.get(displayOrder);
@@ -266,21 +264,20 @@ public class LearningUtil implements QaAppConstants{
     {
     	IQaService qaService =QaUtils.getToolService(request);
     	
-    	/**
+    	/*
     	 * find out the current tool session
     	 */
     	Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
     	logger.debug("processUserResponses using toolSessionId: " + toolSessionId);
     	
-    	/**
+    	/*
     	 * holds all the tool sessions passed in from the url
     	 * used in monitoring mode
     	 */
     	Map mapToolSessions=(Map)request.getSession().getAttribute(MAP_TOOL_SESSIONS);
 		logger.debug("retrieving MAP_TOOL_SESSIONS from the session: " + mapToolSessions);
 		
-		
-		/**
+		/*
     	 * keys of the Map refers to questions and values refers to user info and their entries
     	 * used in learning mode
     	 */
@@ -296,13 +293,13 @@ public class LearningUtil implements QaAppConstants{
     	logger.debug("content iteration count: " + qaContent.getQaQueContents().size());
     	
     	int questionIndex=0;
-    	/**
+    	/*
     	 * used to iterate responses to questions within the tool sessions in the jsp level in the monitoring mode
     	 */
     	Map mapQuestions= new TreeMap(new QaStringComparator());
     	logger.debug("mapQuestions created with QaStringComparator");
     	
-    	/**
+    	/*
     	 * used to iterate questions within the tool sessions in the jsp level in the monitoring mode
     	 */
     	Map mapMonitoringQuestions= new TreeMap(new QaStringComparator());
@@ -314,13 +311,13 @@ public class LearningUtil implements QaAppConstants{
         	logger.debug("retrieve qaQueContent: " + qaQueContent);
         	if (qaQueContent != null)
     		{
-        		/**
+        		/*
         		 * obtain All responses from ALL users to this question
         		 */
         		Set qaUsrResps=qaQueContent.getQaUsrResps();
         		logger.debug("the set of user responses qaUsrResps: " + qaUsrResps);
         		
-        		/**
+        		/*
         		 * deal with all responses
         		 */
         		questionIndex=questionIndex+1;
@@ -333,12 +330,12 @@ public class LearningUtil implements QaAppConstants{
             	if (targetMode.equalsIgnoreCase(TARGET_MODE_MONITORING))
             	{
             		Map mapUserResponses=processUserResponses(request, qaUsrResps, questionIndex, new TreeMap());
-            		/**
+            		/*
             		 * Map mapQuestions for holding the question index /responses pair 
             		 */
             		mapQuestions.put(new Integer(questionIndex).toString(),mapUserResponses);
             		logger.debug("getting mapQuestions: " + mapQuestions);
-            		/**
+            		/*
             		 * Map mapQuestions for holding the questions themselves 
             		 */
             		mapMonitoringQuestions.put(new Integer(questionIndex).toString(),qaQueContent.getQuestion());
@@ -383,13 +380,13 @@ public class LearningUtil implements QaAppConstants{
     {
     	logger.debug("will be processing user responses: ");
     	
-    	/**
+    	/*
     	 * find out the current tool session
     	 */
     	Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
     	logger.debug("processUserResponses using toolSessionId: " + toolSessionId);
     	
-    	/**
+    	/*
     	 * find out the tool's mode. We produce different reports for learning and monitoring
     	 */
     	String targetMode=(String)request.getSession().getAttribute(TARGET_MODE);
@@ -403,7 +400,7 @@ public class LearningUtil implements QaAppConstants{
         		logger.debug("the set of user responses for a particular question is empty.");	
         	
         	Iterator itResps=qaUsrResps.iterator();
-        	/**
+        	/*
         	 * obtain each response and the user that replied with that response 
         	 */
         	int responseIndex=0;
@@ -411,7 +408,7 @@ public class LearningUtil implements QaAppConstants{
         	{
         		QaUsrResp qaUsrResp=(QaUsrResp)itResps.next();
         		logger.debug("using qaUsrResp: " + qaUsrResp + " with responseIndex: " + responseIndex);
-        		/**
+        		/*
         		 * Don't include the blank answers in the report. Make sure it is the requirement.
         		 */
         		if ((qaUsrResp != null) && (qaUsrResp.getAnswer() != null) && (!qaUsrResp.getAnswer().equals("")))
@@ -419,7 +416,7 @@ public class LearningUtil implements QaAppConstants{
         			logger.debug("iterated qaUsrResp:" + qaUsrResp);
         			logger.debug("isResponseHidden:   " + qaUsrResp.isHidden());
     	    		QaQueUsr qaQueUsr=qaUsrResp.getQaQueUser();
-    	    		//find out what you need to display: fullname or login (userName)?
+    	    		/* find out what you need to display: fullname or login (userName)? */
     	    		logger.debug("iterated qaQueUsr fullName:" + qaQueUsr.getFullname());
     	    		logger.debug("iterated qaQueUsr userName:" + qaQueUsr.getUsername());
     	    		logger.debug("iterated qaQueUsr userName:" + qaQueUsr.getQaSession());
@@ -450,18 +447,18 @@ public class LearningUtil implements QaAppConstants{
     	else if (targetMode.equalsIgnoreCase(TARGET_MODE_LEARNING))
     	{
     		logger.debug("processUserResponses for TARGET_MODE: " + targetMode);
-    		/**
+    		/*
         	 * find out whos is the current user. Important to know for reporting responses in learning mode 
         	 */
     	    HttpSession ss = SessionManager.getSession();
-    	    //get back login user DTO
+    	    /* get back login user DTO */
     	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
         	logger.debug("retrieving toolUser: " + toolUser + " userName: " + toolUser.getLogin());
-        	/**
+        	/*
         	 * !!double check if String userName=toolUser.getLogin(); 
         	 */
         	
-        	/**
+        	/*
         	 * see whether you have to report only the current learner's name and make invisible all the other learner's names in the report. 
         	 * A boolean true isUsernameVisible indicates that all user names to be displayed.
         	 * Only applies to learning mode.
@@ -475,7 +472,7 @@ public class LearningUtil implements QaAppConstants{
         		logger.debug("the set of user responses for a particular question is empty.");	
         	
         	Iterator itResps=qaUsrResps.iterator();
-        	/**
+        	/*
         	 * obtain each response and the user that replied with that response 
         	 */
         	int responseIndex=0;
@@ -483,7 +480,7 @@ public class LearningUtil implements QaAppConstants{
         	{
         		QaUsrResp qaUsrResp=(QaUsrResp)itResps.next();
         		logger.debug("using qaUsrResp: " + qaUsrResp + " with responseIndex: " + responseIndex);
-        		/**
+        		/*
         		 * Don't include the blank answers in the report. Make sure it is the requirement.
         		 */
         		if ((qaUsrResp != null) && (!qaUsrResp.isHidden()) && (qaUsrResp.getAnswer() != null) && (!qaUsrResp.getAnswer().equals("")))
@@ -496,18 +493,18 @@ public class LearningUtil implements QaAppConstants{
     	    		logger.debug("iterated qaQueUsr userName:" + qaQueUsr.getQaSession());
     	    		logger.debug("using responseIndex: " + responseIndex);
     	    		
-    	    		/**
+    	    		/*
     	    		 * find out if the current tool user's login(userName) is the same as the iterated user's userName.
     	    		 * If there is a match we need to display that person first in the report
     	    		 * !!do this when User objkect issue is resolved!!!
     	    		 */
 	    		
-    	    		/**
+    	    		/*
 	    			 * these are all the other users. See if we have the permission to display their names.
 	    			 * if we are permitted, get ready to display all available information
 	    			 */
     	    			
-    	    		/**
+    	    		/*
     	    		 * get user's tool session
     	    		 */
     	    		QaSession qaSession=qaQueUsr.getQaSession();
@@ -530,14 +527,14 @@ public class LearningUtil implements QaAppConstants{
 		        	    		request.getSession().setAttribute(FULLNAME + questionIndex +""+ responseIndex, qaQueUsr.getFullname());
 		        	    	
 			    			}
-			    			else /** we won't display the usernames of these users*/
+			    			else /* we won't display the usernames of these users*/
 			    			{
 			    				logger.debug("IS_USERNAME_VISIBLE:" + isUsernameVisible.booleanValue());
 			    				mapUserResponses.put(new Integer(responseIndex).toString(), " " + qaUsrResp.getAttemptTime() + " " + qaUsrResp.getAnswer());
 		        	    		logger.debug("Building request level response data with: " + 
 		        	    															"aTime" + questionIndex +""+ responseIndex);
 			    			}
-			    			/**
+			    			/*
 			    			 * place these whether username visible or not
 			    			 */
 			    			

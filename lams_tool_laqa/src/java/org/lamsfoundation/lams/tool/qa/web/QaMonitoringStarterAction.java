@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -62,9 +61,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	{
 		QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
     	
-		/**
-		 * retrive the service
-		 */
     	IQaService qaService=null;
     	qaService =(IQaService)request.getSession().getAttribute(TOOL_SERVICE);
     	if (qaService == null)
@@ -75,23 +71,23 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
     	}
     	logger.debug("retrieved qaService: " + qaService);
     	
-    	/**
+    	/*
 	     * persist time zone information to session scope. 
 	     */
 	    QaUtils.persistTimeZone(request);
     	
-	    /**
+	    /*
 	     * mark the http session as an authoring activity 
 	     */
 	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_MONITORING);
 	    
-	    /**
+	    /*
 	     * obtain and setup the current user's data 
 	     */
 	    String userId = "";
-	    //get session from shared session.
+	    /* get session from shared session. */
 	    HttpSession ss = SessionManager.getSession();
-	    //get back login user DTO
+	    /* get back login user DTO */
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if ((user == null) || (user.getUserID() == null))
 	    {
@@ -143,7 +139,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		}
 		logger.debug("final INITIAL_MONITORING_TOOL_CONTENT_ID: " + request.getSession().getAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID));
 		
-		/**
+		/*
 		 * load the values for online and offline instructions
 		 */
 		initialMonitoringContentId=(Long)request.getSession().getAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID);
@@ -156,7 +152,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 			logger.debug("session updated with online/offline instructions");
 		}
 		
-		/**
+		/*
 		 * find out if only content id but no tool sessions has been passed
 		 * since with the updated tool contract only userId+toolContentId is passed
 		 * this will always return true 
@@ -168,7 +164,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		request.getSession().setAttribute(NO_TOOL_SESSIONS_AVAILABLE, new Boolean(false));
 		if (isOnlyContentIdAvailable == false)
 		{
-			/**
+			/*
 			 * this block of code will normally never run!
 			 */
 			logger.debug("Warning! We are not supposed to reach here!");
@@ -207,13 +203,13 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    String strFromToolContentId="";
 	    String strToToolContentId="";
 	  	    
-	    /**
-	     * simulate Monitoring Service bean by calling the interface methods here
-	     */
+		    /*
+		     * simulate Monitoring Service bean by calling the interface methods here
+		     */
 	    	if (qaMonitoringForm.getStartLesson() != null)
 	    	{
 	    		qaMonitoringForm.resetUserAction();
-	    		/**
+	    		/*
 	    	     * In deployment, we won't be passing FROM_TOOL_CONTENT_ID, TO_TOOL_CONTENT_ID and TOOL_SESSION_ID from url
 	    	     * the Monitoring Service bean calls:
 	    	     * copyToolContent(Long fromContentId, Long toContentId)  
@@ -234,11 +230,12 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 				}
 	    		logger.debug("test successfull: copyToolContent.");
 		    	
-		    	/** calls to these two methods will be made from Monitoring Service bean optionally depending on
+		    	/*
+		    	 *  calls to these two methods will be made from Monitoring Service bean optionally depending on
 		    	 *  the the tool is setup for DefineLater and (or) RunOffline 
 		    	 */
 	    		
-	    		/**
+	    		/*
 	    		 * TESTED to work
 	    		 * qaService.setAsDefineLater(new Long(strToToolContentId));
 		    	   qaService.setAsRunOffline(new Long(strToToolContentId));
@@ -248,7 +245,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    	else if (qaMonitoringForm.getDeleteLesson() != null)
 	    	{
 	    		qaMonitoringForm.resetUserAction();
-	    		/**
+	    		/*
 	    		 * TESTED to work
 		    	 */
 	    		strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
@@ -260,12 +257,12 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    	    }
 	    		qaService.removeToolContent(new Long(strToToolContentId));
 	    	}
-	    	/**
+	    	/*
 	    	 *forceComplete is an API call to service bean from monitoring environment with userId as the parameter
 	    	 */
 	    	else if (qaMonitoringForm.getForceComplete() != null)
 	    	{
-	    		/**
+	    		/*
 	    		 * Parameter: userId
 	    		 */
 	    		qaMonitoringForm.resetUserAction();
@@ -275,7 +272,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    		qaService.setAsForceComplete(new Long(userId));
 	    		logger.debug("end of setAsForceComplete with userId: " + userId);
 	    	}
-	    	/**
+	    	/*
 	    	 * summary tab is one of the main tabs in monitoring screen, summary is the default tab
 	    	 */
 	    	else if (qaMonitoringForm.getSummary() != null)
@@ -303,7 +300,11 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		return null;
 	}
 
-
+	/**
+	 * boolean isOnlyContentIdAvailable(HttpServletRequest request)
+	 * @param request
+	 * @return boolean
+	 */
 	public boolean isOnlyContentIdAvailable(HttpServletRequest request)
 	{
 		boolean existsContentId=false;
@@ -333,8 +334,13 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		}
 	}
 	
+	
 	/**
 	 * verify that toolSession and content is compatible
+	 * boolean isToolSessionCompatibleToContent(Long toolContentId, HttpServletRequest request)
+	 * @param toolContentId
+	 * @param request
+	 * @return boolean
 	 */
 	public boolean isToolSessionCompatibleToContent(Long toolContentId, HttpServletRequest request)
 	{

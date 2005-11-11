@@ -22,12 +22,15 @@
 
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUploadedFileDAO;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
@@ -50,6 +53,8 @@ public class QaUploadedFileDAO extends HibernateDaoSupport implements IQaUploade
 	 	private static final String GET_OFFLINE_FILES_UUID = "select qaUploadedFile.uuid from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContentId = :qa and qaUploadedFile.fileOnline=0";
 	 	private static final String GET_OFFLINE_FILES_NAME ="select qaUploadedFile.fileName from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContentId = :qa and qaUploadedFile.fileOnline=0 order by qaUploadedFile.uuid";
 	 	
+	 	private static final String DELETE_FILES_META_DATA = "from qaUploadedFile in class QaUploadedFile";
+	 	
 	 	public QaUploadedFile getUploadedFileById(long submissionId)
 	    {
 	        return (QaUploadedFile) this.getHibernateTemplate()
@@ -69,30 +74,51 @@ public class QaUploadedFileDAO extends HibernateDaoSupport implements IQaUploade
 	 	
 	 	public void updateUploadFile(QaUploadedFile qaUploadedFile)
 	    {
+	 		this.getSession().setFlushMode(FlushMode.AUTO);
 	        this.getHibernateTemplate().update(qaUploadedFile);
 	    }
 	 	
 	     
 	    public void saveUploadFile(QaUploadedFile qaUploadedFile) 
 	    {
+	    	this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().save(qaUploadedFile);
 	    }
 	    
 	    public void createUploadFile(QaUploadedFile qaUploadedFile) 
 	    {
+	    	this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().save(qaUploadedFile);
 	    }
 	    
 	    public void UpdateUploadFile(QaUploadedFile qaUploadedFile)
 	    {
+	    	this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().update(qaUploadedFile);	
 	    }
 
 	    
 	    public void cleanUploadedFilesMetaData()
 	    {
+	    	/*
 	    	String query = "from uploadedFile in class org.lamsfoundation.lams.tool.qa.QaUploadedFile";
-	            this.getHibernateTemplate().delete(query);
+	    	this.getSession().setFlushMode(FlushMode.AUTO);
+	        this.getHibernateTemplate().delete(query);
+	        */
+			HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(DELETE_FILES_META_DATA)
+				.list();
+
+			if(list != null && list.size() > 0){
+				Iterator listIterator=list.iterator();
+		    	while (listIterator.hasNext())
+		    	{
+		    		QaUploadedFile mcFile=(QaUploadedFile)listIterator.next();
+					this.getSession().setFlushMode(FlushMode.AUTO);
+		    		templ.delete(mcFile);
+		    		templ.flush();
+		    	}
+			}
 	    }
 	    
 	    public void removeUploadFile(Long submissionId)
@@ -105,6 +131,7 @@ public class QaUploadedFileDAO extends HibernateDaoSupport implements IQaUploade
 					.setLong(0,submissionId.longValue())
 					.uniqueResult();
 	    		if ( obj != null ) { 
+	    			this.getSession().setFlushMode(FlushMode.AUTO);
 	    			this.getHibernateTemplate().delete(obj);
 	    		}
 	    	}
@@ -179,6 +206,7 @@ public class QaUploadedFileDAO extends HibernateDaoSupport implements IQaUploade
 	    
 	    public void deleteUploadFile(QaUploadedFile qaUploadedFile)
 	    {
+	    		this.getSession().setFlushMode(FlushMode.AUTO);
 	            this.getHibernateTemplate().delete(qaUploadedFile);
     	}
 	    

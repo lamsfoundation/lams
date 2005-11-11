@@ -7,9 +7,6 @@
  */
 package org.lamsfoundation.lams.tool.qa.web;
 
-/**
- * ActionForm for the Monitoring environment
- */
 import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 

@@ -58,7 +58,6 @@ public class QaQueContent implements Serializable,Comparable, Nullable
     /** nullable persistent field */
     private int displayOrder;
     
-    
     /** nullable persistent field */
     private org.lamsfoundation.lams.tool.qa.QaContent qaContent;
     
@@ -68,10 +67,10 @@ public class QaQueContent implements Serializable,Comparable, Nullable
     /** persistent field */
     private Set qaQueUsers; 
     
-    /** Struts form convenient field */
+    /** Struts form convenience field */
     private String[] userResponses = {};
 
-    /** Struts form convenient field */
+    /** Struts form convenience field */
     private String otherResponse;
 
     /** nullable persistent field */

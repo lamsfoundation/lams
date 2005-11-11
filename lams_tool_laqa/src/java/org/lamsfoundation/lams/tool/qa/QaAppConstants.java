@@ -14,7 +14,7 @@ package org.lamsfoundation.lams.tool.qa;
  * 
  */
 public interface QaAppConstants {
-	/**
+	/*
 	 * Currently we are hardcoding the default content id.
      * This will be replaced when the deploy logic automatically assigns a default content id in the deploy script.
      */
@@ -23,12 +23,12 @@ public interface QaAppConstants {
 	public static final long DEFAULT_CONTENT_ID 						=0;
     public static final long DEFAULT_QUE_CONTENT_ID 					=1;
 
-	/**
+	/*
 	 * temporarily refers to an existing content id for an incoming tool session id, won't need it in deployment environment 
 	 */
 	public static final long THE_MOCKED_CONTENT_ID						=1803739427456570536L;  
 	public static final String TOOL_SERVICE								="tool_service";
-	/**
+	/*
 	 * indicates which mode the tool runs under between Authoring, Learning, Monitoring
 	 */
 	public static final String TARGET_MODE								="targetMode";
@@ -41,7 +41,7 @@ public interface QaAppConstants {
 	public static final String LEARNING_STARTER							="learningStarter";
 	public static final String MONITORING_STARTER						="monitoringStarter";
 	
-	/**
+	/*
 	 * Mock constants below are temporary until the tool gets a User object from the container.
 	 */
 	public static final Integer	MOCK_USER_ID							= new Integer(111);
@@ -49,12 +49,12 @@ public interface QaAppConstants {
 	public static final String  MOCK_USER_LASTNAME						="Demirtas";
 	public static final String  MOCK_LOGIN_NAME							="ozgur";
 	
-    /**
+    /*
      * refers to number of questions presented initially, we have a single record for default content
      */
     public static final Long INITIAL_QUESTION_COUNT		=new Long(1);
     
-    /**
+    /*
      * Struts level constants
      */
     public static final String LOAD										="load";
@@ -65,14 +65,14 @@ public interface QaAppConstants {
     public static final String DISABLE_TOOL								="disabled";
     public static final String IS_DEFINE_LATER							="isDefineLater";
     
-    /**
+    /*
      * authoring mode controllers
      */ 
     public static final String IS_ADD_QUESTION							="isAddQuestion";
     public static final String IS_REMOVE_QUESTION						="isRemoveQuestion";
     public static final String IS_REMOVE_CONTENT						="isRemoveContent";
     
-    /**
+    /*
      * tab controllers, constants for authoring page html tabs, used within jsp
      */
     public static final String CHOICE									="choice";
@@ -81,7 +81,7 @@ public interface QaAppConstants {
     public static final String CHOICE_TYPE_INSTRUCTIONS					="choiceTypeInstructions";
 
     
-    /**
+    /*
      * authoring mode constants
      */
     public static final String MAP_QUESTION_CONTENT						="mapQuestionContent";
@@ -121,12 +121,12 @@ public interface QaAppConstants {
     public static final String POPULATED_UPLOADED_FILESDATA				="populateUploadedFilesData";
     
     
-    /**
+    /*
      * the author's current content id
      */
     public static final String TOOL_CONTENT_ID							="toolContentId";
     
-    /**
+    /*
      * the learner or monitoring environment provides toolSessionId
      */
     public static final String TOOL_SESSION_ID							="toolSessionId";
@@ -157,7 +157,7 @@ public interface QaAppConstants {
     public static final String USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP	="userExceptionDefaultContentNotSetup";
     public static final String USER_EXCEPTION_NO_TOOL_SESSIONS			="userExceptionNoToolSessions";
     
-    /**
+    /*
      * export portfolio constants
      */
     public static final String MODE										="mode";  
@@ -168,7 +168,7 @@ public interface QaAppConstants {
     public static final String PORTFOLIO_REQUEST						="portfolioRequest";
     public static final int    MAX_GROUPS_COUNT							=250;						
         
-    /**
+    /*
      * user actions
      */
     public static final String ADD_NEW_QUESTION							="addNewQuestion";
@@ -203,7 +203,7 @@ public interface QaAppConstants {
     public static final String ACTIVITY_TITLE							="activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS					="activityInstructions";
         
-    /**
+    /*
      * Monitoring Mode constants
      */
     public static final String REPORT_TITLE_MONITOR						="reportTitleMonitor"; 
@@ -240,7 +240,7 @@ public interface QaAppConstants {
     public static final String MONITORED_ONLINE_INSTRUCTIONS			="monitoredOnlineInstructions";
     public static final String MONITORING_INSTRUCTIONS_UPDATE_MESSAGE	="monitoringInstructionsUpdateMessage";
     
-    /**
+    /*
      * Monitor and Learning common constants - used in jsp reporting
      */
     public static final String FULLNAME									="fullName";
@@ -254,7 +254,7 @@ public interface QaAppConstants {
     public static final String TIMEZONE									="timeZone";
     public static final String TIMEZONE_ID								="timeZoneId";
     
-    /**
+    /*
      * following tell whether author prefers to  have the questions listed all in one page or listed sequentially. The default is all in one page.
      */
     public static final String QUESTION_LISTING_MODE					="questionListingMode";
@@ -265,7 +265,7 @@ public interface QaAppConstants {
     public static final String FEEDBACK_TYPE_COMBINED					="You are being presented a total of : ";
     public static final String QUESTIONS								=" questions.";
 
-    /**
+    /*
      * constants redundant for the moment
      */
     public static final String DISPLAY_QUESTIONS 						="display";

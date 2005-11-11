@@ -110,8 +110,7 @@ public class QaServicePOJO implements
     
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
-    
-    
+
     public void configureContentRepository() throws QaApplicationException {
     	logger.debug("retrieved repService: " + repositoryService);
         cred = new SimpleCredentials(repositoryUser, repositoryId);
@@ -629,7 +628,7 @@ public class QaServicePOJO implements
         try
         {
         	logger.debug("getCurrentUserData: " + username);
-        	/**
+        	/*
              * this will return null if the username not found
              */
         	User user=userManagementService.getUserByLogin(username);
@@ -721,9 +720,11 @@ public class QaServicePOJO implements
 	
 	
 	/**
-	 * checks the paramter content in the user responses table 
+	 * checks the paramter content in the user responses table
+	 * boolean studentActivityOccurredGlobal(QaContent qaContent) throws QaApplicationException
+	 * 
 	 * @param qa
-	 * @return
+	 * @return boolean
 	 * @throws QaApplicationException
 	 */
 	public boolean studentActivityOccurredGlobal(QaContent qaContent) throws QaApplicationException
@@ -738,7 +739,7 @@ public class QaServicePOJO implements
         	while (responsesIterator.hasNext())
         	{
         		logger.debug("there is at least one response");
-        		/**
+        		/*
         		 * proved the fact that there is at least one response for this content.
         		 */
         		return true;
@@ -749,6 +750,14 @@ public class QaServicePOJO implements
 	}
 	
 
+	/**
+	 * counts the number of sessions marked INCOMPLETE for a content
+	 * int countIncompleteSession(QaContent qa) throws QaApplicationException
+	 * 
+	 * @param qa
+	 * @return int
+	 * @throws QaApplicationException
+	 */
 	public int countIncompleteSession(QaContent qa) throws QaApplicationException
 	{
 		logger.debug("start of countIncompleteSession: " + qa);
@@ -759,10 +768,11 @@ public class QaServicePOJO implements
 	}
 	
 	/**
-	 * checks the parameter content in the tool sessions table
-	 * 
+	 * checks the parameter content in the tool sessions table.
 	 * find out if any student has ever used (logged in through the url  and replied) to this content
 	 * return true even if you have only one content passed as parameter referenced in the tool sessions table
+	 * 
+	 * boolean studentActivityOccurred(QaContent qa) throws QaApplicationException
 	 * @param qa
 	 * @return boolean
 	 * @throws QaApplicationException
@@ -787,12 +797,10 @@ public class QaServicePOJO implements
 	 * default content (or author created content) already goes.
 	 * ToolContentManager CONTRACT
 	 * 
-	 * 
 	 * similar to public void removeToolContent(Long toolContentId)
 	 * gets called by Container+Flash
 	 * 
 	 */
-	
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException
     {
     	logger.debug("start of copyToolContent with ids: " + fromContentId + " and " + toContentId);
@@ -872,11 +880,11 @@ public class QaServicePOJO implements
     
     /**
      * TO BE DEFINED-FUTURE API
+     * setAsForceCompleteSession(Long toolSessionId) throws QaApplicationException
      * 
      * update the tool session status to COMPLETE for this tool session
      * IMPLEMENT THIS!!!! Is this from ToolContentManager???
      * 
-
      * @param Long toolSessionId
      */
     public void setAsForceCompleteSession(Long toolSessionId) throws QaApplicationException
@@ -894,11 +902,11 @@ public class QaServicePOJO implements
     
     /**
      * TO BE DEFINED
+     * setAsForceComplete(Long userId) throws QaApplicationException
+     * 
      * TESTED
      * update the tool session status to COMPLETE for this user
      * IMPLEMENT THIS!!!! Is this from ToolContentManager???
-     * 
-
      * @param userId
      */
     public void setAsForceComplete(Long userId) throws QaApplicationException
@@ -926,7 +934,7 @@ public class QaServicePOJO implements
             	logger.debug("qaSession uses qaContent : " + qaContent);
             	logger.debug("qaSession uses qaContentId : " + qaContent.getQaContentId());
             	
-            	/**
+            	/*
             	 * if all the sessions of this content is COMPLETED, unlock the content
             	 * 
             	 */
@@ -978,6 +986,7 @@ public class QaServicePOJO implements
     }
     
     /**
+     * setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException
      * TESTED
      * set the defineLater to true on this content
      * 
@@ -1004,6 +1013,7 @@ public class QaServicePOJO implements
     }
 
     /**
+     * setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException
      * TESTED
      * set the runOffline to true on this content
      * 
@@ -1030,9 +1040,10 @@ public class QaServicePOJO implements
     }
 
         
-    
     /** 
-     * !!! UNUSED !!!
+     * 
+     * removeToolContent(Long toolContentId)
+     * ! UNUSED !
      * TESTED
      * gets automatically called only in monitoring mode when the author chooses to delete a lesson.
      * 
@@ -1080,11 +1091,11 @@ public class QaServicePOJO implements
     }
     
     
-    /*
+    /**
      * DOUBLE CHECK!
+     * removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
      * Will need an update on the core tool signature: reason : when  qaContent is null throw an exception 
-     *  (non-Javadoc)
-     * @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long, boolean)
+     * 
      */
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException
 	{
@@ -1168,6 +1179,7 @@ public class QaServicePOJO implements
 	}
     
     /**
+     * createToolSession(Long toolSessionId, Long toolContentId) throws ToolException
      * TESTED
      * ToolSessionManager CONTRACT : creates a tool session with the incoming toolSessionId in the tool session table
      * 
@@ -1229,7 +1241,7 @@ public class QaServicePOJO implements
         logger.debug("final - retrieved qaContent: " + qaContent);
 
             
-        /**
+        /*
          * create a new a new tool session if it does not already exist in the tool session table
          */
         if (!existsSession(toolSessionId.longValue()))
@@ -1299,12 +1311,13 @@ public class QaServicePOJO implements
 	
     
     /**FIX THIS ONE!!!!
+     * String leaveToolSession(Long toolSessionId,User learner) throws DataMissingException, ToolException
+     * 
      * TO BE TESTED
      * ToolSessionManager CONTRACT
      * gets called only in the Learner mode.
-     * 
      * Call controller service to complete the qa session
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long)
+     * 
      */
     public String leaveToolSession(Long toolSessionId,User learner) throws DataMissingException, ToolException 
     {
@@ -1485,6 +1498,7 @@ public class QaServicePOJO implements
 		}
 	}
 
+	
 	public InputStream downloadFile(Long uuid, Long versionID)throws QaApplicationException{
 		ITicket ticket = getRepositoryLoginTicket();		
 		try{

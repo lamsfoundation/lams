@@ -7,7 +7,7 @@
  */
 package org.lamsfoundation.lams.tool.qa.web;
 
-/**
+/*
  * ActionForm for the Monitoring environment
  */
 import org.apache.log4j.Logger;
@@ -23,14 +23,14 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 public class QaMonitoringForm extends ActionForm implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaMonitoringForm.class.getName());
 
-	/**
-	 * these buttons  are not used in the deployment
+	/*
+	 * these buttons are only for development purposes
 	 */
 	protected String startLesson;
 	protected String deleteLesson;
 	protected String forceComplete;
 	
-	/**
+	/*
 	 * buttons
 	 */
 	protected String editReport;

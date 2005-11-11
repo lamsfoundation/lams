@@ -19,10 +19,9 @@
  *http://www.gnu.org/licenses/gpl.txt
  */
 
-/**
- * 
+ /**
  * @author Ozgur Demirtas
-*/
+ */
 
 package org.lamsfoundation.lams.tool.qa.web;
 
@@ -69,7 +68,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		monitoringUtil.findSelectedMonitoringTab(form, request);
 		logger.debug("done with findSelectedMonitoringTab");
 
-		/**
+		/*
 		 * load the values for online and offline instructions
 		 */
 		handleInstructionsScreen(mapping, form, request);
@@ -84,7 +83,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 			logger.debug("session updated with online/offline instructions");
 		}
 		
-		/**
+		/*
 		 * determine what screen(tab) to generate
 		 */
 		String choiceMonitoring=(String)request.getSession().getAttribute(CHOICE_MONITORING);
@@ -116,7 +115,24 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		return null;
 	}
 
-	
+
+	/**
+	 * 
+	 * produces the summary screen
+	 * ActionForward generateSummaryScreen(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                      ServletException
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return ActionForward
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	public ActionForward generateSummaryScreen(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -180,7 +196,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		String isToolSessionChanged=request.getParameter(IS_TOOL_SESSION_CHANGED);
 		logger.debug("IS_TOOL_SESSION_CHANGED - initial: " + isToolSessionChanged);
 		
-		/**
+		/*
 		 * sessionList holds all the toolSessionIds passed to summary page to be presented in a drop-down box.
 		 */
 		Map sessionList = new TreeMap();
@@ -188,7 +204,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		
 		logger.debug("isNonDefaultScreensVisited: " + monitoringUtil.isNonDefaultScreensVisited(request));
 		
-		/**
+		/*
 		 * Following conditions test which entry has been selected in the monitoring mode-summary screen drop box.
 		 * is Default page 
 		 */
@@ -200,7 +216,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		{
 			logger.debug("First case based on null. Gets rendered only once in http session life time");
 			logger.debug("summary to use MAX_TOOL_SESSION_COUNT");
-			/**
+			/*
 			 * initialize sessionList with "All", which is the default option.
 			 */
 			sessionList.put("All", "All");
@@ -219,14 +235,14 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		{
 			String selectedToolSessionId=(String)request.getParameter("toolSessionId1");
 			logger.debug("selectedToolSessionId" + selectedToolSessionId);
-			/**
+			/*
 			 * is "All" selected 
 			 */
 			if (selectedToolSessionId.equalsIgnoreCase("All"))
 			{
 				logger.debug("Second case");
 				logger.debug("summary to use MAX_TOOL_SESSION_COUNT");
-				/**
+				/*
 				 * initialize sessionList with "All", which is the default option.
 				 */
 				sessionList.put("All", "All");
@@ -236,7 +252,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 			}
 			else
 			{
-				/**
+				/*
 				 * is a single session id selected 
 				 */
 				logger.debug("Third case");
@@ -249,7 +265,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		}
 		else if (isToolSessionChanged.equals("")  && (selectionCase.equals("3"))) 
 		{
-			/**
+			/*
 			 * is a single session id selected 
 			 */
 			logger.debug("case with single session and edit or update selected");
@@ -281,7 +297,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		}
 		qaMonitoringForm.resetUserAction();
 		
-		/**
+		/*
 		 * holds all the toolSessionIds passed in the form toolSessionId1, toolSessionId2 etc.
 		 */
 		Map mapToolSessions= new TreeMap(new QaStringComparator());
@@ -292,7 +308,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		request.getSession().setAttribute(MAP_USER_RESPONSES,mapUserResponses);
 		logger.debug("MAP_USER_RESPONSES placed into session");
 		logger.debug("request for contributeLesson");
-		/**
+		/*
 		 * monitoring reads all the toolSessionsIds appended one after other until it finds a null one. The cap was limited to 500.
 		 * This is the case all the tool sessions are using the same content.
 		 * 
@@ -319,7 +335,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 	    logger.debug("retrieving ORIGINAL_TOOL_SESSIONS");
 	    Map originalSessionList=(Map)request.getSession().getAttribute(ORIGINAL_TOOL_SESSIONS);
 	    logger.debug("retrieved ORIGINAL_TOOL_SESSIONS : " + originalSessionList);
-		/**
+		/*
 		 *  monitoredToolSessionsCounter holds the total number of valid toolSessionIds passed to the monitoring url
 		 */
 		logger.debug("READABLE_TOOL_SESSION_COUNT: " + READABLE_TOOL_SESSION_COUNT);
@@ -341,7 +357,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 			logger.debug("original strToolSessionId: " + strToolSessionId);
 					    
 		    String strRetrievableToolSessionId="";
-		    /**
+		    /*
 		     * catering for un-formatted monitoring url
 		     * Watch for case where the "All" is selected in the drop-down.
 		     */
@@ -392,32 +408,32 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		    		if (READABLE_TOOL_SESSION_COUNT.equals(MAX_TOOL_SESSION_COUNT))
 		    		{
 		    			logger.debug("default screen - READABLE_TOOL_SESSION_COUNT equals MAX_TOOL_SESSION_COUNT");
-		    	    	/**
+		    	    	/*
 			    	     * add the current toolSessionId to the arraylist for the drop-down box
 			    	     */
 			    	    sessionList.put("Group" + monitoredToolSessionsCounter, strToolSessionId);
 			    	    logger.debug("sessionList Map new entry, strToolSessionId added to the list: " + toolSessionIdCounter + "->" + strToolSessionId );	
 		    		}
 		    	    
-		    	    /**
+		    	    /*
 		    	     * get to content from the tool session
 		    	     */
 		    		QaContent qaContent=qaSession.getQaContent();
 		    	    logger.debug("using qaContent: " + qaContent);
 		    	    logger.debug("Monitor - contribute will be using TOOL_CONTENT_ID: " + qaContent.getQaContentId());
 		    	    
-		    	    /**
+		    	    /*
 		    	     * editActivity-defineLater screen depends on MONITORED_CONTENT_ID
 		    	     */
 		    	    request.getSession().setAttribute(MONITORED_CONTENT_ID,qaContent.getQaContentId());
 		    	    
-		    	    /**
+		    	    /*
 		    	     * place it into TOOL_CONTENT_ID session attribute since learningUtil.buidLearnerReport(request) depends on it
 		    	     * to generate a report
 		    	     */
 		    	    request.getSession().setAttribute(TOOL_CONTENT_ID,qaContent.getQaContentId());
 		    	    
-		    	    /**
+		    	    /*
 		    	     * this is to convince jsp although usernameVisible applies only to learning mode
 		    	     */
 		    	    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(true));
@@ -426,13 +442,13 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		    	    request.getSession().setAttribute(REPORT_TITLE_MONITOR,qaContent.getMonitoringReportTitle());
 		    	    
 		    	    
-		    	    /**
+		    	    /*
 		    	     * check if the author requires that the all tool sessions must be COMPLETED before the report in Monitoring
 		    	     */
 		    	    boolean isAllSessionsCompleted=monitoringUtil.isSessionsSync(request,qaContent.getQaContentId().longValue());
 		    	    logger.debug("Monitor - contribute will be using isAllSessionsCompleted: " + isAllSessionsCompleted);
 		    	    logger.debug("Monitor - contribute will be using isSynchInMonitor: " + qaContent.isSynchInMonitor());
-		    	    /**
+		    	    /*
 		    	     * if the author requires syncronization but not all the sessions are COMPLETED give an error
 		    	     */
 		    	    if (qaContent.isSynchInMonitor() && (!isAllSessionsCompleted))
@@ -453,7 +469,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		    	    logger.debug("CHECK_ALL_SESSIONS_COMPLETED" + request.getSession().getAttribute(CHECK_ALL_SESSIONS_COMPLETED));
 		    	    		
 		    	    LearningUtil learningUtil= new LearningUtil();
-		    		/**
+		    		/*
 		    		 * generate a report for the Author/Teacher
 		    		 */
 		    	    logger.debug("calling buidMonitoringReport with toolSessionIdCounter:" + toolSessionIdCounter);
@@ -462,7 +478,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		    }
 		}
 		
-			/**
+			/*
 			 * store the arrayList in the session
 			 */
 			if (READABLE_TOOL_SESSION_COUNT.equals(MAX_TOOL_SESSION_COUNT))
@@ -496,6 +512,23 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 				return (mapping.findForward(MONITORING_REPORT));
 	}
 
+	/**
+	 * produces the Instructions screen
+	 * 
+	 * ActionForward generateInstructionsScreen(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                      ServletException
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return ActionForward
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	public ActionForward generateInstructionsScreen(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -519,7 +552,23 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		return (mapping.findForward(MONITORING_REPORT));
 	}
 
-
+	/**
+	 * produces the EditActivity screen
+	 * 
+	 * ActionForward generateEditActivityScreen(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                      ServletException
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return ActionForward
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	public ActionForward generateEditActivityScreen(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -537,10 +586,10 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		
 		if (toolContentId == null)
 		{
-		/**
-		*  toolContentId is not available from the toolSessions passed to the monitoring url.
-		*  in this case,  toolContentId must have been passed separetely 
-		*/
+			/*
+			*  toolContentId is not available from the toolSessions passed to the monitoring url.
+			*  in this case,  toolContentId must have been passed separetely 
+			*/
 			Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
 			logger.debug("will generateEditActivityScreen: " + monitoredContentId);
 			    
@@ -567,7 +616,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		qaMonitoringForm.resetUserAction();
 		if (studentActivity == false)
 		{
-			/**
+			/*
 			 * forward to Authoring Basic tab
 			 */
 			QaStarterAction qaStarterAction = new QaStarterAction();
@@ -590,7 +639,23 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		}
 	}
 	
-	
+	/**
+	 * produces the Stats screen
+	 * 
+	 * ActionForward generateStatsScreen(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                      ServletException
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	public ActionForward generateStatsScreen(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -653,7 +718,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 	 * @param form
 	 * @param request
 	 * @param response
-	 * @return
+	 * @return ActionForward
 	 * @throws IOException
 	 * @throws ServletException
 	 * 
@@ -671,10 +736,17 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		return generateSummaryScreen(mapping, form, request, response);
 	}
 	
-	
+
+	/**
+	 * ActionForward handleInstructionsScreen(ActionMapping mapping,ActionForm form, HttpServletRequest request)
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @return ActionForward
+	 */
 	public ActionForward handleInstructionsScreen(ActionMapping mapping,ActionForm form, HttpServletRequest request)
 	{
-		/**
+		/*
 		 * update online and offline instuctions content if there is a request.
 		 */
 		QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
@@ -697,7 +769,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 			}
 			else
 			{
-				/**
+				/*
 				 * update the content
 				 */
 				logger.debug("content id: " +  initialMonitoringContentId);
@@ -720,6 +792,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 	
 	/**
      * persists error messages to request scope
+     * persistError(HttpServletRequest request, String message)
      * @param request
      * @param message
      */

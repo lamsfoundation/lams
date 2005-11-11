@@ -1,9 +1,3 @@
-/**
- * 
- * Keeps all operations needed for Learning mode. 
- * @author ozgurd
- *
- */
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.Iterator;
@@ -32,10 +26,10 @@ public class MonitoringUtil implements QaAppConstants{
 
 	/**
 	 * determine whether all the tool sessions for a particular content has been COMPLETED
+	 * boolean isSessionsSync(HttpServletRequest request, long toolContentId)
 	 * @param toolContentId
-	 * @return
+	 * @return boolean
 	 */
-	
 	public boolean isSessionsSync(HttpServletRequest request, long toolContentId)
 	{
 		logger.debug("start of isSessionsSync with toolContentId: " + toolContentId);
@@ -44,7 +38,7 @@ public class MonitoringUtil implements QaAppConstants{
     	QaContent qaContent =qaService.loadQa(toolContentId); 
     	logger.debug("retrieving qaContent: " + qaContent);
     
-    	/**
+    	/*
     	 * iterate all the tool sessions, if even one session is INCOMPLETE, the function returns false
     	 */
     	if (qaContent != null)
@@ -62,6 +56,11 @@ public class MonitoringUtil implements QaAppConstants{
 	return true;
 	}
 	
+	
+	/**
+	 * cleanupMonitoringSession(HttpServletRequest request)
+	 * @param request
+	 */
 	public void cleanupMonitoringSession(HttpServletRequest request)
 	{
 		request.getSession().removeAttribute(MAP_TOOL_SESSIONS);
@@ -73,7 +72,7 @@ public class MonitoringUtil implements QaAppConstants{
 		request.getSession().removeAttribute(DATAMAP_EDITABLE_RESPONSE_ID);
 		request.getSession().removeAttribute(DATAMAP_HIDDEN_RESPONSE_ID);
 		
-		/** remove session attributes used commonly */
+		/* remove session attributes used commonly */
 		request.getSession().removeAttribute(IS_USERNAME_VISIBLE);
 		request.getSession().removeAttribute(REPORT_TITLE_MONITOR);
 		request.getSession().removeAttribute(IS_ALL_SESSIONS_COMPLETED);
@@ -84,7 +83,13 @@ public class MonitoringUtil implements QaAppConstants{
 		request.getSession().removeAttribute(TARGET_MODE);
 	}
 
-	
+	/**
+	 * startLesson(QaMonitoringForm qaMonitoringForm, HttpServletRequest request) throws ToolException
+	 * 
+	 * @param qaMonitoringForm
+	 * @param request
+	 * @throws ToolException
+	 */
 	public void startLesson(QaMonitoringForm qaMonitoringForm, HttpServletRequest request) throws ToolException
 	{
 		IQaService qaService=QaUtils.getToolService(request);
@@ -93,7 +98,7 @@ public class MonitoringUtil implements QaAppConstants{
 	    String strToToolContentId="";
 	    
 		qaMonitoringForm.resetUserAction();
-		/**
+		/*
 	     * In deployment, we won't be passing FROM_TOOL_CONTENT_ID, TO_TOOL_CONTENT_ID and TOOL_SESSION_ID from url
 	     * the Monitoring Service bean calls:
 	     * copyToolContent(Long fromContentId, Long toContentId)  
@@ -124,11 +129,11 @@ public class MonitoringUtil implements QaAppConstants{
 	    	throw e;
 		}
 		
-		/** calls to these two methods will be made from Monitoring Service bean optionally depending on
+		/* calls to these two methods will be made from Monitoring Service bean optionally depending on
 		 *  the the tool is setup for DefineLater and (or) RunOffline 
 		 */
 		
-		/**
+		/*
 		 * TESTED to work
 		 * qaService.setAsDefineLater(new Long(strToToolContentId));
 		   qaService.setAsRunOffline(new Long(strToToolContentId));
@@ -137,7 +142,11 @@ public class MonitoringUtil implements QaAppConstants{
 		qaMonitoringForm.resetUserAction();
 	}
 	
-	
+	/**
+	 * deleteLesson(QaMonitoringForm qaMonitoringForm, HttpServletRequest request)
+	 * @param qaMonitoringForm
+	 * @param request
+	 */
 	public void deleteLesson(QaMonitoringForm qaMonitoringForm, HttpServletRequest request)
 	{
 		IQaService qaService=QaUtils.getToolService(request);
@@ -147,7 +156,7 @@ public class MonitoringUtil implements QaAppConstants{
 		
 	    qaMonitoringForm.resetUserAction();
 				
-		/**
+		/*
 		 * TESTED to work
 		 */
 		strToToolContentId=request.getParameter(TO_TOOL_CONTENT_ID);
@@ -161,11 +170,16 @@ public class MonitoringUtil implements QaAppConstants{
 		qaMonitoringForm.resetUserAction();
 	}
 	
-		
+
+	/**
+	 * forceComplete(QaMonitoringForm qaMonitoringForm, HttpServletRequest request)
+	 * @param qaMonitoringForm
+	 * @param request
+	 */
 	public void forceComplete(QaMonitoringForm qaMonitoringForm, HttpServletRequest request)
 	{
 		IQaService qaService=QaUtils.getToolService(request);
-		/**
+		/*
 		 * Parameter: userId
 		 */
 		qaMonitoringForm.resetUserAction();
@@ -176,8 +190,12 @@ public class MonitoringUtil implements QaAppConstants{
 		logger.debug("end of setAsForceComplete with userId: " + userId);
 	}
 	
-	
-	public  boolean isDefaultMonitoringScreen(QaMonitoringForm qaMonitoringForm)
+	/**
+	 * boolean isDefaultMonitoringScreen(QaMonitoringForm qaMonitoringForm)
+	 * @param qaMonitoringForm
+	 * @return boolean
+	 */	
+	public boolean isDefaultMonitoringScreen(QaMonitoringForm qaMonitoringForm)
 	{
 		if ((qaMonitoringForm.getSummary() == null) &&
 		   (qaMonitoringForm.getInstructions() == null) &&
@@ -207,7 +225,7 @@ public class MonitoringUtil implements QaAppConstants{
 		String choiceTypeMonitoringEditActivity=qaMonitoringForm.getEditActivity();
 		String choiceTypeMonitoringStats=qaMonitoringForm.getStats();
 		
-		/**make the Summary tab the default one */
+		/* make the Summary tab the default one */
 		request.getSession().setAttribute(CHOICE_MONITORING,CHOICE_TYPE_MONITORING_SUMMARY);
 		
 		if (choiceTypeMonitoringSummary != null)
@@ -232,13 +250,18 @@ public class MonitoringUtil implements QaAppConstants{
 		}
 		logger.debug("CHOICE_MONITORING is:" + request.getSession().getAttribute(CHOICE_MONITORING));
 		
-		/** reset tab controllers */
+		/* reset tab controllers */
 		qaMonitoringForm.setSummary(null);
 		qaMonitoringForm.setInstructions(null);
 		qaMonitoringForm.setEditActivity(null);
 		qaMonitoringForm.setStats(null);
 	}
 	
+	/**
+	 * boolean isNonDefaultScreensVisited(HttpServletRequest request)
+	 * @param request
+	 * @return boolean
+	 */
 	public boolean isNonDefaultScreensVisited(HttpServletRequest request)
 	{
 		Boolean monitoringInstructionsVisited = (Boolean) request.getSession().getAttribute(MONITORING_INSTRUCTIONS_VISITED);
@@ -259,7 +282,13 @@ public class MonitoringUtil implements QaAppConstants{
 		
 		return false;
 	}
-	
+
+	/**
+	 * updateResponse(HttpServletRequest request, String responseId, String updatedResponse)
+	 * @param request
+	 * @param responseId
+	 * @param updatedResponse
+	 */
 	public void updateResponse(HttpServletRequest request, String responseId, String updatedResponse)
 	{
 		IQaService qaService=QaUtils.getToolService(request);
@@ -272,6 +301,11 @@ public class MonitoringUtil implements QaAppConstants{
 		logger.debug("updated user response in the db:  " + qaUsrResp);
 	}
 	
+	/**
+	 * hideResponse(HttpServletRequest request, String responseId)
+	 * @param request
+	 * @param responseId
+	 */
 	public void hideResponse(HttpServletRequest request, String responseId)
 	{
 		IQaService qaService=QaUtils.getToolService(request);
@@ -284,7 +318,11 @@ public class MonitoringUtil implements QaAppConstants{
 		logger.debug("updated user response in the db:  " + qaUsrResp);
 	}
 	
-	
+	/**
+	 * unHideResponse(HttpServletRequest request, String responseId)
+	 * @param request
+	 * @param responseId
+	 */
 	public void unHideResponse(HttpServletRequest request, String responseId)
 	{
 		IQaService qaService=QaUtils.getToolService(request);
