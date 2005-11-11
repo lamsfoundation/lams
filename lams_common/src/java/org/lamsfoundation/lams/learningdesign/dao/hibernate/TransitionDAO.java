@@ -28,6 +28,7 @@ import org.hibernate.Query;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 
 /**
  * @author Manpreet Minhas
@@ -39,6 +40,9 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 	private static final String FIND_BY_FROM_ACTIVITY = "from " + TABLENAME +" in class " + Transition.class.getName()+ " where from_activity_id =?";
 	private static final String FIND_BY_LEARNING_DESIGN_ID = "from " + TABLENAME +" in class " + Transition.class.getName()+
 															" where learning_design_id=?";
+	private static final String FIND_BY_UI_ID ="from " + TABLENAME +
+										  " in class " + Transition.class.getName() +
+										  " where transition_ui_id=?" + " AND " + " learning_design_id=?" ;
 	
 	/**
 	 * (non-Javadoc)
@@ -89,4 +93,16 @@ public class TransitionDAO extends BaseDAO implements ITransitionDAO {
 		else
 			return null;
 	}	
+	
+	public Transition getTransitionByUUID(Integer transitionUUID, LearningDesign learningDesign)
+	{
+	    if ( transitionUUID != null && learningDesign != null ) {
+			Long designID = learningDesign.getLearningDesignId();
+			Query query = this.getSession().createQuery(FIND_BY_UI_ID);
+			query.setInteger(0,transitionUUID.intValue());
+			query.setLong(1,designID.longValue());
+			return (Transition) query.uniqueResult();
+		}
+		return null;
+	}
 }
