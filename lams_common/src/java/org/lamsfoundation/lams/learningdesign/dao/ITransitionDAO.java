@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 
 /**
  * @author Manpreet Minhas
@@ -63,5 +64,7 @@ public interface ITransitionDAO extends IBaseDAO {
 	 * @return Activity The activity that comes after fromActivityID 
 	 */
 	public Activity getNextActivity(Long fromActivityID);
+	
+	public Transition getTransitionByUUID(Integer transitionUUID, LearningDesign learningDesign);
 
 }
