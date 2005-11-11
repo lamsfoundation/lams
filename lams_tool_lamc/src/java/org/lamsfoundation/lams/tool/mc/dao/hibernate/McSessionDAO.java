@@ -49,22 +49,15 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     
     private static final String GET_SESSIONS_FROM_CONTENT = "select ms.mcSessionId from McSession ms where ms.mcContent= :mcContent";
     
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#getMcSessionByUID(java.lang.Long) */
     public McSession getMcSessionByUID(Long uid)
 	{
 		 return (McSession) this.getHibernateTemplate()
          .get(McSession.class, uid);
 	}
 	
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#findMcSessionById(java.lang.Long) */
     public McSession findMcSessionById(Long mcSessionId)
     {
     	String query = "from McSession mcs where mcs.mcSessionId=?";
-    /*	
-		return (McSession) getSession().createQuery(query)
-		.setLong(0,mcSessionId.longValue())
-		.uniqueResult();
-	*/
 		
 		HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(query)
@@ -79,28 +72,24 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 	}
     
     
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#saveMcSession(org.lamsfoundation.lams.tool.mc.McSession) */
     public void saveMcSession(McSession mcSession)
     {
     	this.getHibernateTemplate().save(mcSession);
     }
     
 	
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#updateMcSession(org.lamsfoundation.lams.tool.mc.McSession) */
     public void updateMcSession(McSession mcSession)
     {
     	this.getHibernateTemplate().update(mcSession);
     }
 
    
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#removeMcSessionByUID(java.lang.Long) */
     public void removeMcSessionByUID(Long uid)
     {
         McSession ms = (McSession)getHibernateTemplate().get(McSession.class, uid);
     	this.getHibernateTemplate().delete(ms);
     }
     
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#removeMcSession(java.lang.Long) */
     public void removeMcSessionById(Long mcSessionId)
     {
         String query = "from McSession as mcs where mcs.mcSessionId =";
@@ -121,7 +110,7 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
         
         
     }
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#removeMcSession(org.lamsfoundation.lams.tool.mc.McSession) */
+
     public void removeMcSession(McSession mcSession)
     {
 		this.getSession().setFlushMode(FlushMode.AUTO);
@@ -129,7 +118,7 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     }
 
     
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#getMcSessionByUser(java.lang.Long) */
+
     public McSession getMcSessionByUser(final Long userId)
 	{
 		 return (McSession) getHibernateTemplate().execute(new HibernateCallback()
@@ -146,14 +135,12 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 	}
 	
 	 
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#removeMcUsers(org.lamsfoundation.lams.tool.mc.McSession) */
     public void removeMcUsers(McSession mcSession)
     {
     	this.getHibernateTemplate().deleteAll(mcSession.getMcQueUsers());
     }
 	
     
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#addMcUsers(java.lang.Long, org.lamsfoundation.lams.tool.mc.McSession) */
     public void addMcUsers(Long mcSessionId, McQueUsr user)
 	{
     	McSession session = findMcSessionById(mcSessionId);
@@ -164,12 +151,11 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 	    	    
 	}
 	
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO#getSessionsFromContent(org.lamsfoundation.lams.tool.mc.McSession) */
+
 	public List getSessionsFromContent(McContent mcContent)
 	{
 	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT,
 	            "mcContent",
 				mcContent));
 	}
-    	
 }

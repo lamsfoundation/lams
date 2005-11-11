@@ -50,6 +50,19 @@
 		    path=".questions"
 		    redirect="true"
 	  	/>
+	  	
+	  	<forward
+		    name="error"
+		    path=".error"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+		    name="errorList"
+		    path=".errorList"
+		    redirect="true"
+	  	/>
+	  	
 	</action>  
 	
 	<action

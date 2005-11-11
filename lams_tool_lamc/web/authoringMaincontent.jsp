@@ -90,18 +90,18 @@ MM_reloadPage(true);
 <html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
 
  <!-- tab content one (basic)-->
+ 
 <div id='content_b' class="tabbody content_b" >
 
 		<h2><bean:message key="label.authoring.mc.basic"/></h2>
-		
-		<table align=center> 	  
-		<tr>   
-		<td class=error>
-			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
-		</td>
-		</tr> 
-		</table>
-		
+			<table align=center> 	  
+			<tr>   
+			<td class=error>
+				<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+			</td>
+			</tr> 
+			</table>
+
 		<div id="formtablecontainer1">
 				<c:if test="${sessionScope.editOptionsMode == 0}"> 			
 					<jsp:include page="BasicContent.jsp" />

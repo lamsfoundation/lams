@@ -28,7 +28,6 @@ import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.McContent;
-import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McSession;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -37,7 +36,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author ozgurd
- * <p>Hibernate implementation for database access to Mc content for the mc tool.</p>
+ * <p>Hibernate implementation for database access to McContent for the mc tool.</p>
  */
 
 public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
@@ -46,9 +45,6 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	private static final String LOAD_MC_BY_SESSION = "select mc from McContent mc left join fetch "
         + "mc.mcSessions session where session.mcSessionId=:sessionId";
 
-	
-
-	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#getMcContentByUID(java.lang.Long) */
 	public McContent getMcContentByUID(Long uid)
 	{
 		return (McContent) this.getHibernateTemplate().get(McContent.class, uid);
@@ -58,16 +54,9 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	/** Finds a package via the tool content id. Returns
 	 * null if not found
 	 */
-	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#findMcContentById(java.lang.Long) */
 	public McContent findMcContentById(Long mcContentId)
 	{
 		String query = "from McContent as mc where mc.mcContentId = ?";
-		/*
-		return (McContent) getSession().createQuery(query)
-		.setLong(0,mcContentId.longValue())
-		.uniqueResult();
-		*/
-		
 	    HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(query)
 			.setLong(0,mcContentId.longValue())
@@ -80,7 +69,7 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 		return null;
 	}
     	
-	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#getMcContentBySession(java.lang.Long) */
+
 	public McContent getMcContentBySession(final Long mcSessionId)
 	{
 		 return (McContent) getHibernateTemplate().execute(new HibernateCallback()
@@ -97,20 +86,19 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	}
 	
 	
-	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#saveMcContent(org.lamsfoundation.lams.tool.mc.McContent) */
+
 	public void saveMcContent(McContent mcContent)
     {
     	this.getHibernateTemplate().save(mcContent);
     }
     
-	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#updateMcContent(org.lamsfoundation.lams.tool.mc.McContent) */
+
 	public void updateMcContent(McContent mcContent)
     {
     	this.getHibernateTemplate().update(mcContent);
     }
 
    
-	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#removeMc(java.lang.Long)*/
 	public void removeMcById(Long mcContentId)
     {
 		HibernateTemplate templ = this.getHibernateTemplate();
@@ -128,21 +116,18 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 		}
     }
 	
-	
-    
-	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#removeMc(org.lamsfoundation.lams.tool.mc.McContent)*/
     public void removeMc(McContent mcContent)
     {
         this.getHibernateTemplate().delete(mcContent);
     }
    
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#removeMcSessions(org.lamsfoundation.lams.tool.mc.McContent)*/
+
     public void removeMcSessions(McContent mcContent)
     {
     	this.getHibernateTemplate().deleteAll(mcContent.getMcSessions());
     }
     
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO#addMcSession(java.lang.Long, org.lamsfoundation.lams.tool.mc.McSession) */
+
     public void addMcSession(Long mcContentId, McSession mcSession)
     {
         McContent content = findMcContentById(mcContentId);
@@ -161,6 +146,4 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
     {
         this.getHibernateTemplate().flush();
     }
-    
-  
 }

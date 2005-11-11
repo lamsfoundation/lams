@@ -32,14 +32,49 @@ import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
  */
 public interface IMcUsrAttemptDAO
 {
+	/**
+	 *  * <p>Return the persistent instance of a McUsrAttempt  
+	 * with the given identifier <code>uid</code>, returns null if not found. </p>
+	 * 
+	 * @param uid
+	 * @return McQueContent
+	 */
 	public McUsrAttempt getMcUserAttemptByUID(Long uid);
-	
+
+	/**
+	 *  * <p>saves McUsrAttempt  
+	 * with the given identifier <code>mcUsrAttempt</code> </p>
+	 * 
+	 * @param uid
+	 * @return 
+	 */
 	public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt);
     
+	/**
+	 *  * <p>updates McUsrAttempt  
+	 * with the given identifier <code>mcUsrAttempt</code> </p>
+	 * 
+	 * @param uid
+	 * @return 
+	 */	
 	public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt);
 	
+	/**
+	 *  * <p>removes McUsrAttempt  
+	 * with the given identifier <code>uid</code> </p>
+	 * 
+	 * @param uid
+	 * @return 
+	 */	
 	public void removeMcUsrAttemptByUID(Long uid);
-	
+
+	/**
+	 *  * <p>removes McUsrAttempt  
+	 * with the given identifier <code>mcUsrAttempt</code> </p>
+	 * 
+	 * @param uid
+	 * @return 
+	 */
 	public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt);
 }
 

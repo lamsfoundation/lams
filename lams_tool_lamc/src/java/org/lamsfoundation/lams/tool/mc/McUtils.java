@@ -143,9 +143,6 @@ public abstract class McUtils implements McAppConstants {
 	 */
 	public static boolean existsContent(Long toolContentId, HttpServletRequest request)
 	{
-		/**
-		 * retrive the service
-		 */
 		IMcService mcService =McUtils.getToolService(request);
 	    
     	McContent mcContent=mcService.retrieveMc(toolContentId);
@@ -164,9 +161,6 @@ public abstract class McUtils implements McAppConstants {
 	 */
 	public static boolean existsSession(Long toolSessionId, HttpServletRequest request)
 	{
-		/**
-		 * get the service
-		 */
 		logger.debug("existsSession");
     	IMcService mcService =McUtils.getToolService(request);
 	    McSession mcSession=mcService.retrieveMcSession(toolSessionId);
@@ -180,7 +174,7 @@ public abstract class McUtils implements McAppConstants {
 	
 	public static void setDefaultSessionAttributes(HttpServletRequest request, McContent defaultMcContent, McAuthoringForm mcAuthoringForm)
 	{
-		/**should never be null anyway as default content MUST exist in the db*/
+		/*should never be null anyway as default content MUST exist in the db*/
 		if (defaultMcContent != null)
 		{		
 			mcAuthoringForm.setTitle(defaultMcContent.getTitle());
@@ -428,7 +422,7 @@ public abstract class McUtils implements McAppConstants {
     	
     	if (isOfflineFile)
     	{
-    		/** read uploaded file informtion  - offline file*/
+    		/* read uploaded file informtion  - offline file*/
     		logger.debug("retrieve theOfflineFile.");
     		FormFile theOfflineFile = mcAuthoringForm.getTheOfflineFile();
     		logger.debug("retrieved theOfflineFile: " + theOfflineFile);
@@ -473,7 +467,7 @@ public abstract class McUtils implements McAppConstants {
     	}
     	else
     	{
-    		/** read uploaded file information  - online file*/
+    		/* read uploaded file information  - online file*/
     		logger.debug("retrieve theOnlineFile");
     		FormFile theOnlineFile = mcAuthoringForm.getTheOnlineFile();
     		logger.debug("retrieved theOnlineFile: " + theOnlineFile);
@@ -722,6 +716,5 @@ public abstract class McUtils implements McAppConstants {
 		}
 		
 	}
-	
 		
 }

@@ -27,7 +27,7 @@ import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
-/** @author Hibernate CodeGenerator */
+/** @author Ozgur Demirtas */
 public class McUsrAttempt implements Serializable {
 
     /** identifier field */

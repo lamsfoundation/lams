@@ -28,16 +28,10 @@ import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-
-
-
 /**
  * @author ozgurd
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * <p>Hibernate implementation for database access to McUsrAttempt for the mc tool.</p>
  */
-
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
 	 	static Logger logger = Logger.getLogger(McUsrAttemptDAO.class.getName());
 	 	
@@ -46,7 +40,6 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 			 return (McUsrAttempt) this.getHibernateTemplate()
 	         .get(McUsrAttempt.class, uid);
 		}
-		
 		
 		public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt)
 	    {

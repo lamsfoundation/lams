@@ -78,11 +78,6 @@ import org.springframework.dao.DataAccessException;
  * are implemented in this class. It translate the request from presentation
  * layer and perform approporiate database operation.
  * 
- * Two construtors are provided in this class. The constuctor with Hibernate
- * session object allows survey tool to handle long run application transaction.
- * The developer can store Hibernate session in http session and pass across
- * different http request. This implementation also make the testing out side 
- * JBoss container much easier.
  * 
  * Every method is implemented as a Hibernate session transaction. It open an
  * new persistent session or connect to existing persistent session in the 

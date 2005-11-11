@@ -100,8 +100,6 @@ public interface IMcContentDAO {
      * 
      * @param mcContent The instance of McContent in which corresponding instances of McSession should be deleted.
      */
-    
-    
     public void removeMcSessions(McContent mcContent);
     
     /**

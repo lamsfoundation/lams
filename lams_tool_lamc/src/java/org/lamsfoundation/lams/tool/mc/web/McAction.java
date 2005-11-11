@@ -218,6 +218,8 @@ public class McAction extends DispatchAction implements McAppConstants
 	 * if the passed toolContentId exists in the db, we need to get the relevant data into the Map 
 	 * if not, create the default Map 
 	*/
+
+	
 	
     public ActionForward loadQ(ActionMapping mapping,
                                ActionForm form,
@@ -563,7 +565,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	    		Map mapSelectedOptions=(Map)request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
 	    		mapSelectedOptions.clear();
 	    		
-	    		/** options have been persisted before */ 
+	    		/* options have been persisted before */ 
 	    		if (listOptionsContent != null)
 		 		{
 	    			logger.debug("listOptionsContent not null" );
@@ -580,7 +582,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	    			logger.debug("MAP_OPTIONS_CONTENT reconstructed from db" );
 	    			
 	    			
-	    			/** we have to assume that some of the optons are selected as this is forced in the ui.
+	    			/* we have to assume that some of the optons are selected as this is forced in the ui.
 	    			 * retrieve and present the selected options from the db
 	    			 * */
 	    			List listSelectedOptions=mcService.getPersistedSelectedOptions(mcQueContent.getUid());
@@ -638,7 +640,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	    	    	logger.debug("MAP_SELECTED_OPTIONS set as empty list :" + mapSelectedOptions);
 	    		}
 
-	    		/** present the feedback content the same way for the conditions above*/
+	    		/* present the feedback content the same way for the conditions above*/
 	    		String richTextFeedbackInCorrect=mcQueContent.getFeedbackIncorrect();
 				logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
 				if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
@@ -666,7 +668,7 @@ public class McAction extends DispatchAction implements McAppConstants
 				Map mapGsoc=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
 				logger.debug("mapGsoc from the cache: " + mapGsoc);
 				
-				/** extract the relavent question's option from the larger Map */
+				/* extract the relavent question's option from the larger Map */
 	        	while (itMapGeneral.hasNext()) 
 	        	{
 	            	Map.Entry pairs = (Map.Entry)itMapGeneral.next();
@@ -710,7 +712,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	    		}
 
 	        	
-	        	/** present the default content*/
+	        	/* present the default content*/
 	        	if (optionsPresentationValid == false)
 	        	{
             		logger.debug("optionsPresentationValid is false, present default content");
@@ -721,7 +723,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	    			List listDefaultOption=mcService.findMcOptionsContentByQueId(queContentUID);
 	    			logger.debug("listDefaultOption: " + listDefaultOption);
 	    			
-	    			/** normally iterates only once */
+	    			/* normally iterates only once */
 	    			Iterator itDefaultOption=listDefaultOption.iterator();
 			    	Long mapIndex=new Long(1);
 			    	while (itDefaultOption.hasNext())
@@ -923,7 +925,7 @@ public class McAction extends DispatchAction implements McAppConstants
     		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
     		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
     		
-    		/** update feedback Maps*/
+    		/* update feedback Maps*/
 			Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
 			logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
 			String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
@@ -1029,7 +1031,7 @@ public class McAction extends DispatchAction implements McAppConstants
     		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
     		
 			
-    		/** update feedback Maps*/
+    		/* update feedback Maps*/
 			Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
 			logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
 			String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
@@ -1131,7 +1133,7 @@ public class McAction extends DispatchAction implements McAppConstants
     		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
 			
 			
-			/** update feedback Maps*/
+			/* update feedback Maps*/
 			Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
 			logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
 			String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
@@ -1234,7 +1236,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	}
 	 	else if (mcAuthoringForm.getSubmitQuestions() != null)
 	 	{
-	 		/** persist the final Questions Map  */
+	 		/* persist the final Questions Map  */
 	 		userAction="submitQuestions";
 	 		request.setAttribute(USER_ACTION, userAction);
 	 		logger.debug("userAction:" + userAction);
@@ -1472,9 +1474,6 @@ public class McAction extends DispatchAction implements McAppConstants
 				logger.debug("mcContent created");
 			}
 					    
-			//mcService.resetAllQuestions(mcContent.getUid());
-			//logger.debug("all question reset for :" + mcContent.getUid());
-			
 			mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
 			logger.debug("Submit final MAP_QUESTIONS_CONTENT :" + mapQuestionsContent);
 			
@@ -1491,63 +1490,9 @@ public class McAction extends DispatchAction implements McAppConstants
 			persistQuestions(request, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mcContent);
 			logger.debug("post persistQuestions");
 			
-						
-			
-			
-
-/*			
-			Map mapWeights=repopulateCurrentWeightsMap(request, "questionWeight");
-		    logger.debug("final mapWeights :" + mapWeights);
-		    request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
-			 
-		    Iterator itMap = mapQuestionsContent.entrySet().iterator();
-			while (itMap.hasNext()) {
-			    Map.Entry pairs = (Map.Entry)itMap.next();
-			    if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
-			    {
-			    	McQueContent mcQueContent = mcService.getQuestionContentByQuestionText(pairs.getValue().toString(), mcContent.getUid());
-			    	logger.debug("retrieved mcQueContent: " + mcQueContent);
-			
-			    	Integer currentWeight= new Integer(mapWeights.get(pairs.getKey()).toString());
-					logger.debug("currentWeight:" + currentWeight);
-					
-			    	if (mcQueContent != null)
-			    	{
-			    		mcQueContent.setDisabled(false);
-			    		mcQueContent.setWeight(currentWeight);
-			    		mcQueContent.setDisplayOrder(new Integer(pairs.getKey().toString()));
-			    		logger.debug("enabled mcQueContent for question: " + pairs.getValue().toString());
-				    	mcService.saveOrUpdateMcQueContent(mcQueContent);
-			    	}
-			    	else
-			    	{	
-			    		logger.debug("create the question on the fly for submit : " + pairs.getValue().toString());
-			    		mcQueContent=  new McQueContent(pairs.getValue().toString(),
-			    				new Integer(pairs.getKey().toString()),
-			    				currentWeight,
-								false,
-	         					mcContent,
-	         					new HashSet(),
-	         					new HashSet()
-	         					);	
-			    		mcService.saveOrUpdateMcQueContent(mcQueContent);
-			    	}
-			    }
- 	        }
- */
-			
-			/** attend here later again, for the moment we are not deleting unused question physically from the DB, 
-			 * we are just marking them as disabled */
-			//mcService.cleanAllQuestions(mcContent.getUid());
-			//logger.debug("all questions cleaned for :" + mcContent.getUid());
-			
-			
 			logger.debug("will do addUploadedFilesMetaData");
 			McUtils.addUploadedFilesMetaData(request,mcContent);
 			logger.debug("done addUploadedFilesMetaData");
-			
-
 			
 			errors.clear();
 			errors.add(Globals.ERROR_KEY,new ActionMessage("submit.successful"));
@@ -1555,7 +1500,6 @@ public class McAction extends DispatchAction implements McAppConstants
 			saveErrors(request,errors);
 			request.setAttribute(SUBMIT_SUCCESS, new Integer(1));
 			logger.debug("set SUBMIT_SUCCESS to 1");
-			
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
@@ -1715,12 +1659,6 @@ public class McAction extends DispatchAction implements McAppConstants
             if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
             {
             	logger.debug("checking existing question text: " +  pairs.getValue().toString() + " and mcContent uid():" + mcContent.getUid());
-            	/*
-            	McQueContent mcQueContent=mcService.getQuestionContentByQuestionText(pairs.getValue().toString(), mcContent.getUid());
-        	 	logger.debug("mcQueContent: " +  mcQueContent);
-        	 	Integer currentWeight= new Integer(mapWeights.get(pairs.getKey()).toString());
-            	logger.debug("currentWeight:" + currentWeight);
-            	*/
             	
             	String currentFeedbackIncorrect=(String)mapFeedbackIncorrect.get(pairs.getKey());
         	 	logger.debug("currentFeedbackIncorrect: " +  currentFeedbackIncorrect);
@@ -1743,21 +1681,20 @@ public class McAction extends DispatchAction implements McAppConstants
 									new HashSet(),
 									new HashSet()
              						);
-           	        mcService.createMcQue(mcQueContent);
-           	        logger.debug("persisted mcQueContent: " + mcQueContent);
+       	        mcService.createMcQue(mcQueContent);
+       	        logger.debug("persisted mcQueContent: " + mcQueContent);
            	
-           	     logger.debug("remove existing options for  mcQueContent : " + mcQueContent.getUid());
-           	     mcService.removeMcOptionsContentByQueId(mcQueContent.getUid());
-           	     logger.debug("removed all mcOptionsContents for mcQueContentId :" + mcQueContent.getUid());
+        	    logger.debug("remove existing options for  mcQueContent : " + mcQueContent.getUid());
+           	    mcService.removeMcOptionsContentByQueId(mcQueContent.getUid());
+           	    logger.debug("removed all mcOptionsContents for mcQueContentId :" + mcQueContent.getUid());
      			
-           	        
-           	         if (mcQueContent != null)
-           	         {
-           	         	logger.debug("pre persistOptions for: " + mcQueContent);
-           	         	logger.debug("sending :" + pairs.getKey().toString());
-           	         	persistOptions(request, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent, mcQueContent, pairs.getKey().toString());
-           	         	logger.debug("post persistOptions"); 	
-           	         }
+       	         if (mcQueContent != null)
+       	         {
+       	         	logger.debug("pre persistOptions for: " + mcQueContent);
+       	         	logger.debug("sending :" + pairs.getKey().toString());
+       	         	persistOptions(request, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent, mcQueContent, pairs.getKey().toString());
+       	         	logger.debug("post persistOptions"); 	
+       	         }
             }
         }
     	
@@ -1841,12 +1778,12 @@ public class McAction extends DispatchAction implements McAppConstants
     {
     	IMcService mcService =McUtils.getToolService(request);
     	
-    	/** the tool content id is passed from the container to the tool and placed into session in the McStarterAction */
+    	/* the tool content id is passed from the container to the tool and placed into session in the McStarterAction */
     	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (toolContentId.longValue() != 0))
     	{
     		logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
-    		/**delete the existing content in the database before applying new content*/
+    		/*delete the existing content in the database before applying new content*/
     		mcService.deleteMcById(toolContentId);  
     		logger.debug("post-deletion existing content");
 		}
@@ -1938,9 +1875,9 @@ public class McAction extends DispatchAction implements McAppConstants
 			creationDate=new Date(System.currentTimeMillis()).toString();
 		
     		
-    	/**obtain user object from the session*/
+    	/*obtain user object from the session*/
 	    HttpSession ss = SessionManager.getSession();
-	    //get back login user DTO
+	    /* get back login user DTO */
 	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
     	logger.debug("retrieving toolUser: " + toolUser);
     	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
@@ -1949,16 +1886,16 @@ public class McAction extends DispatchAction implements McAppConstants
     	long userId=toolUser.getUserID().longValue();
     	logger.debug("userId: " + userId);
     	
-    	/** create a new qa content and leave the default content intact*/
+    	/* create a new qa content and leave the default content intact*/
     	McContent mc = new McContent();
 		mc.setMcContentId(toolContentId);
 		mc.setTitle(richTextTitle);
 		mc.setInstructions(richTextInstructions);
-		mc.setCreationDate(creationDate); /**preserve this from the db*/ 
-		mc.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
-		mc.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
+		mc.setCreationDate(creationDate); /*preserve this from the db*/ 
+		mc.setUpdateDate(new Date(System.currentTimeMillis())); /* keep updating this one*/
+		mc.setCreatedBy(userId); /* make sure we are setting the userId from the User object above*/
 	    mc.setUsernameVisible(isUsernameVisible);
-	    mc.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
+	    mc.setQuestionsSequenced(isQuestionsSequenced); /* the default question listing in learner mode will be all in the same page*/
 	    mc.setOnlineInstructions(richTextOnlineInstructions);
 	    mc.setOfflineInstructions(richTextOfflineInstructions);
 	    mc.setRunOffline(false);
@@ -1977,7 +1914,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	    mc.setMcSessions(new TreeSet());
 	    logger.debug("mc content :" +  mc);
     	
-    	/**create the content in the db*/
+    	/*create the content in the db*/
         mcService.createMc(mc);
         logger.debug("mc created with content id: " + toolContentId);
         
@@ -2046,8 +1983,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	Map mapWeights=repopulateCurrentWeightsMap(request,"questionWeight");
 		logger.debug("mapWeights for add Question: " + mapWeights);
 		
-    	
-    	/** iterate the questions Map and persist the questions into the DB*/
+    	/* iterate the questions Map and persist the questions into the DB*/
     	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
         while (itQuestionsMap.hasNext()) {
             Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
@@ -2095,8 +2031,6 @@ public class McAction extends DispatchAction implements McAppConstants
 
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("mcContent:" + mcContent);
-		
-    	//List list=mcService.refreshQuestionContent(mcContent.getUid());
 		
     	List list=mcService.getAllQuestionEntries(mcContent.getUid());
     	logger.debug("list:" + list);
@@ -2289,8 +2223,7 @@ public class McAction extends DispatchAction implements McAppConstants
     protected Map shiftMap(Map mapQuestionsContent, String questionIndex , String movableQuestionEntry, String direction)
     {
     	logger.debug("movableQuestionEntry: " +  movableQuestionEntry);
-    	
-    	/** map to be returned */
+    	/* map to be returned */
     	Map mapTempQuestionsContent= new TreeMap(new McComparator());
     	
     	Iterator itMap = mapQuestionsContent.entrySet().iterator();
@@ -2309,43 +2242,43 @@ public class McAction extends DispatchAction implements McAppConstants
         
     	}
     		
-    		logger.debug("shiftableIndex: " +  shiftableIndex);
-        	shiftableEntry=(String)mapQuestionsContent.get(new Integer(shiftableIndex).toString());
-        	logger.debug("shiftable entry: " +  shiftableEntry);
-        	
-        	if (shiftableEntry != null) 
-        	{
-        		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
-        		long mapCounter=0;
-        		while (itQuestionsMap.hasNext()) {
-                	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
-                    logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-                    mapCounter++;
-                    logger.debug("mapCounter: " +  mapCounter);
-                    
-                    if (!pairs.getKey().equals(questionIndex) && !pairs.getKey().equals(new Integer(shiftableIndex).toString()))
-                    {
-                    	logger.debug("normal copy " +  questionIndex);
-                    	mapTempQuestionsContent.put(new Long(mapCounter).toString(), pairs.getValue());
-                    }
-                    else if (pairs.getKey().equals(questionIndex))
-                    {
-                    	logger.debug("move type 1 " +  questionIndex);
-                    	mapTempQuestionsContent.put(new Long(mapCounter).toString(), shiftableEntry);
-                    }
-                    else if (pairs.getKey().equals(new Integer(shiftableIndex).toString()))
-                    {
-                    	logger.debug("move type 2 " +  shiftableIndex);
-                    	mapTempQuestionsContent.put(new Long(mapCounter).toString(), movableQuestionEntry);
-                    }
+		logger.debug("shiftableIndex: " +  shiftableIndex);
+    	shiftableEntry=(String)mapQuestionsContent.get(new Integer(shiftableIndex).toString());
+    	logger.debug("shiftable entry: " +  shiftableEntry);
+    	
+    	if (shiftableEntry != null) 
+    	{
+    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+    		long mapCounter=0;
+    		while (itQuestionsMap.hasNext()) {
+            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                mapCounter++;
+                logger.debug("mapCounter: " +  mapCounter);
+                
+                if (!pairs.getKey().equals(questionIndex) && !pairs.getKey().equals(new Integer(shiftableIndex).toString()))
+                {
+                	logger.debug("normal copy " +  questionIndex);
+                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), pairs.getValue());
                 }
-        	}
-        	else
-        	{
-        		logger.debug("no change to map");
-        		mapTempQuestionsContent=mapQuestionsContent;
-        	}
-        		return mapTempQuestionsContent;
+                else if (pairs.getKey().equals(questionIndex))
+                {
+                	logger.debug("move type 1 " +  questionIndex);
+                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), shiftableEntry);
+                }
+                else if (pairs.getKey().equals(new Integer(shiftableIndex).toString()))
+                {
+                	logger.debug("move type 2 " +  shiftableIndex);
+                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), movableQuestionEntry);
+                }
+            }
+    	}
+    	else
+    	{
+    		logger.debug("no change to map");
+    		mapTempQuestionsContent=mapQuestionsContent;
+    	}
+    		return mapTempQuestionsContent;
 
     }
     

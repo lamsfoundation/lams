@@ -26,20 +26,16 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
-
 /**
  * @author ozgurd
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * <p>Hibernate implementation for database access to McOptionsContent for the mc tool.</p>
  */
 
 public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptionsContentDAO {

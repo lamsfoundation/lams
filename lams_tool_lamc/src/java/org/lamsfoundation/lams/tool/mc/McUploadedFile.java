@@ -27,13 +27,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * 
  * @author Ozgur Demirtas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
-
-/**
- * Holds uploaded file information  
  */
 
 public class McUploadedFile implements Serializable

@@ -61,5 +61,17 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageHeader" value = "Starter for Multiple Choice Authoring"/>
 		<put name="content" value="/index.jsp" />	
 	</definition>
-
+	
+	<definition name=".error" extends=".baseDef" >
+		<put name="title" value="Error"/>
+		<put name="pageHeader" value = "Error"/>
+		<put name="content" value="errorbox.jsp" />	
+	</definition>
+	
+	<definition name=".errorList" extends=".baseDef" >
+		<put name="title" value="Error"/>
+		<put name="pageHeader" value = "Error"/>
+		<put name="content" value="errorList.jsp" />	
+	</definition>
+	
 </tiles-definitions>

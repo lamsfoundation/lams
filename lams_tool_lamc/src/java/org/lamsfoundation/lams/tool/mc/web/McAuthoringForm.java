@@ -1,15 +1,6 @@
-/*
- * ozgurd
- * Created on 26/04/2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.lamsfoundation.lams.tool.mc.web;
 
-/**
- * ActionForm for the Authoring environment
- */
+
 import org.apache.struts.action.ActionForm;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.apache.struts.upload.FormFile;
@@ -17,12 +8,10 @@ import org.apache.struts.upload.FormFile;
 /**
  * @author ozgurd
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * ActionForm for the Authoring environment
  */
 public class McAuthoringForm extends ActionForm implements McAppConstants {
-	/** form controllers */
-	
+	/* form controllers */
 	protected String addOptionContent;	
 	protected String addQuestion;
 	protected String removeQuestion;
@@ -58,19 +47,19 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String submitOnlineFile;
 	
 		
-	/** tab controller, these may go away once the Flash wraps the jsp */
+	/* tab controller, these may go away once the Flash wraps the jsp */
 	protected String choice;
 	protected String choiceBasic;
 	protected String choiceAdvanced;
 	protected String choiceInstructions;
 	
-	/** basic content */
+	/* basic content */
 	protected String title;
 	protected String instructions;
 	
 	protected String isRemoveContent;
 	protected String toolContentId;
-	/** instructions content */
+	/* instructions content */
 	protected String onlineInstructions;
 	protected String offlineInstructions;
 	protected FormFile theOfflineFile;
@@ -79,14 +68,13 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String richTextOfflineInstructions;
 	protected String richTextOnlineInstructions;
 	
-	/** advanced content */
+	/* advanced content */
 	protected String synchInMonitor;
 	protected String showFeedback;
 	protected String retries;
 	protected String sln;
 	
 	protected String passmark;
-	
 	
 	protected String reportTitle;
 	protected String monitoringReportTitle;

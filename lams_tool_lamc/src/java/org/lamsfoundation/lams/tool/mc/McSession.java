@@ -30,7 +30,7 @@ import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
-/** @author Hibernate CodeGenerator */
+/** @author Ozgur Demirtas */
 public class McSession implements Serializable {
 
 	public final static String INCOMPLETE = "INCOMPLETE";

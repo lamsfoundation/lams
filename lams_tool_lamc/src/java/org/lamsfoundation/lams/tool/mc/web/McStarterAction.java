@@ -100,15 +100,229 @@ import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 
 public class McStarterAction extends Action implements McAppConstants {
 	static Logger logger = Logger.getLogger(McStarterAction.class.getName());
-	
-	/**
-	 * A Map  data structure is used to present the UI.
-	 * It is fetched by subsequent Action classes to manipulate its content and gets parsed in the presentation layer for display.
-	 */
+
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {
+		IMcService mcService = McUtils.getToolService(request);
+		logger.debug("retrieving mcService from session: " + mcService);
+		if (mcService == null)
+		{
+			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+		    logger.debug("retrieving mcService from proxy: " + mcService);
+		    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
+		}
 
+		setupPaths(request);
+		initialiseAttributes(request);
 		
+		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+		mcAuthoringForm.resetRadioBoxes();
+		
+		ActionForward validateParameters=populateParameters(request,mapping);
+		logger.debug("validateParameters:  " + validateParameters);
+		if (validateParameters != null)
+		{
+			logger.debug("validateParameters not null : " + validateParameters);
+			return validateParameters;
+		}
+		else
+		{
+			/* mark the http session as an authoring activity */
+		    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_AUTHORING);
+		    
+		    /* define tab controllers for jsp */
+		    request.getSession().setAttribute(CHOICE_TYPE_BASIC,CHOICE_TYPE_BASIC);
+		    request.getSession().setAttribute(CHOICE_TYPE_ADVANCED,CHOICE_TYPE_ADVANCED);
+		    request.getSession().setAttribute(CHOICE_TYPE_INSTRUCTIONS,CHOICE_TYPE_INSTRUCTIONS);
+		
+		    logger.debug("will render authoring screen");
+		    String strToolContentId="";
+		    strToolContentId=request.getParameter(TOOL_CONTENT_ID);
+		    
+		    /* Process incoming tool content id. 
+		     * Either exists or not exists in the db yet, a toolContentId must be passed to the tool from the container */
+		    long toolContentId=0;
+	    	try
+			{
+		    	toolContentId=new Long(strToolContentId).longValue();
+		    	logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
+		    	request.getSession().setAttribute(TOOL_CONTENT_ID, new Long(strToolContentId));
+	    	}
+	    	catch(NumberFormatException e)
+			{
+		    	persistError(request,"error.numberFormatException");
+				request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
+				logger.debug("forwarding to: " + LOAD_QUESTIONS);
+				return (mapping.findForward(LOAD_QUESTIONS));
+			}
+		
+	    	/*
+			 * find out if the passed tool content id exists in the db 
+			 * present user either a first timer screen with default content data or fetch the existing content.
+			 * 
+			 * if the toolcontentid does not exist in the db, create the default Map,
+			 * there is no need to check if the content is in use in this case.
+			 * It is always unlocked -> not in use since it is the default content.
+			*/
+			if (!existsContent(toolContentId, request))
+			{
+				System.out.print("retrieving default content");
+				retrieveDefaultContent(request, mcAuthoringForm);
+			}
+			else
+			{
+				System.out.print("retrieving existing content for: " + toolContentId);
+				retrieveExistingContent(request, mcAuthoringForm, toolContentId);
+			}
+		}
+		mcAuthoringForm.resetUserAction();
+		return (mapping.findForward(LOAD_QUESTIONS));
+	} 
+	
+	public ActionForward populateParameters(HttpServletRequest request, ActionMapping mapping)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+		/* retrieve the default content id based on tool signature */
+		long contentId=0;
+		try
+		{
+			logger.debug("attempt retrieving tool with signature : " + MY_SIGNATURE);
+			contentId=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+			logger.debug("retrieved tool default contentId: " + contentId);
+			if (contentId == 0) 
+			{
+				logger.debug("default content id has not been setup");
+				request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
+				persistError(request,"error.defaultContent.notSetup");
+				return (mapping.findForward(ERROR_LIST));	
+			}
+		}
+		catch(Exception e)
+		{
+			logger.debug("error getting the default content id: " + e.getMessage());
+			request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
+			persistError(request,"error.defaultContent.notSetup");
+			return (mapping.findForward(ERROR_LIST));
+		}
+
+		/* retrieve uid of the content based on default content id determined above */
+		long contentUID=0;
+		try
+		{
+			logger.debug("retrieve uid of the content based on default content id determined above: " + contentId);
+			McContent mcContent=mcService.retrieveMc(new Long(contentId));
+			if (mcContent == null)
+			{
+				logger.debug("Exception occured: No default content");
+	    		request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
+	    		persistError(request,"error.defaultContent.notSetup");
+				return (mapping.findForward(ERROR_LIST));
+			}
+			logger.debug("using mcContent: " + mcContent);
+			logger.debug("using mcContent uid: " + mcContent.getUid());
+			contentUID=mcContent.getUid().longValue();
+		}
+		catch(Exception e)
+		{
+			logger.debug("Exception occured: No default question content");
+			request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
+    		persistError(request,"error.defaultContent.notSetup");
+			return (mapping.findForward(ERROR_LIST));
+		}
+				
+		
+		/* retrieve uid of the default question content  */
+		long queContentUID=0;
+		try
+		{
+			logger.debug("retrieve the default question content based on default content UID: " + queContentUID);
+			McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(contentUID);
+			logger.debug("using mcQueContent: " + mcQueContent);
+			if (mcQueContent == null)
+			{
+				logger.debug("Exception occured: No default question content");
+	    		request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
+				persistError(request,"error.defaultQuestionContent.notAvailable");
+				return (mapping.findForward(ERROR_LIST));
+			}
+			logger.debug("using mcQueContent uid: " + mcQueContent.getUid());
+			queContentUID=mcQueContent.getUid().longValue();
+			request.getSession().setAttribute(DEFAULT_QUESTION_UID, new Long(queContentUID));
+			logger.debug("DEFAULT_QUESTION_UID: " + queContentUID);
+		}
+		catch(Exception e)
+		{
+			logger.debug("Exception occured: No default question content");
+    		request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
+			persistError(request,"error.defaultQuestionContent.notAvailable");
+			return (mapping.findForward(ERROR_LIST));
+		}
+		
+		
+		/* retrieve default options content */
+		try
+		{
+			logger.debug("retrieve the default options content based on default question content UID: " + queContentUID);
+			List list=mcService.findMcOptionsContentByQueId(new Long(queContentUID));
+			logger.debug("using options list: " + list);
+			if (list == null)
+			{
+				logger.debug("Exception occured: No default options content");
+	    		request.setAttribute(USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE, new Boolean(true));
+				persistError(request,"error.defaultOptionsContent.notAvailable");
+				return (mapping.findForward(ERROR_LIST));
+			}
+			
+		}
+		catch(Exception e)
+		{
+			logger.debug("Exception occured: No default options content");
+    		request.setAttribute(USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE, new Boolean(true));
+			persistError(request,"error.defaultOptionsContent.notAvailable");
+			return (mapping.findForward(ERROR_LIST));
+		}		
+		
+		return null;
+	}
+	
+
+	/**
+	 * existsContent(long toolContentId)
+	 * @param long toolContentId
+	 * @return boolean
+	 * determine whether a specific toolContentId exists in the db
+	 */
+	protected boolean existsContent(long toolContentId, HttpServletRequest request)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+		McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+	    if (mcContent == null) 
+	    	return false;
+	    
+		return true;	
+	}
+	
+	/**
+	 * find out if the content is locked or not. If it is a locked content, the author can not modify it.
+	 * The idea of content being locked is, once any one learner starts using a particular content
+	 * that content should become unmodifiable. 
+	 * @param mcContent
+	 * @return
+	 */
+	protected boolean isContentInUse(McContent mcContent)
+	{
+		logger.debug("is content inuse: " + mcContent.isContentInUse());
+		return  mcContent.isContentInUse();
+	}
+	
+	
+	/**
+	 * sets up ROOT_PATH and PATH_TO_LAMS attributes for presentation purposes
+	 * setupPaths(HttpServletRequest request)
+	 * @param request
+	 */
+	protected void setupPaths(HttpServletRequest request)
+	{
 		String protocol = request.getProtocol();
 		if(protocol.startsWith("HTTPS")){
 			protocol = "https://";
@@ -122,35 +336,287 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(PATH_TO_LAMS, pathToLams);
 		
 		logger.debug("setting root to: " + request.getSession().getAttribute(ROOT));
+	}
+	
+	
+	/**
+	 * retrieves the contents of an existing content from the db and prepares it for presentation
+	 * retrieveExistingContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm, long toolContentId)
+	 * 
+	 * @param request
+	 * @param mcAuthoringForm
+	 * @param toolContentId
+	 */
+	protected void retrieveExistingContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm, long toolContentId)
+	{
+		IMcService mcService =McUtils.getToolService(request);
 		
-		/**
-		 * retrive the service
-		 */
-		IMcService mcService = McUtils.getToolService(request);
-		logger.debug("retrieving mcService from session: " + mcService);
-		if (mcService == null)
+		logger.debug("getting existing content with id:" + toolContentId);
+		McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
+		logger.debug("existing mcContent:" + mcContent);
+		
+		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
+		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
+		request.getSession().setAttribute(QUESTIONS_SEQUENCED,new Boolean(mcContent.isQuestionsSequenced()));
+		request.getSession().setAttribute(USERNAME_VISIBLE,new Boolean(mcContent.isUsernameVisible()));
+		request.getSession().setAttribute(CREATED_BY, new Long(mcContent.getCreatedBy()));
+		request.getSession().setAttribute(MONITORING_REPORT_TITLE,mcContent.getMonitoringReportTitle());
+		request.getSession().setAttribute(REPORT_TITLE,mcContent.getReportTitle());
+		request.getSession().setAttribute(RUN_OFFLINE, new Boolean(mcContent.isRunOffline()));
+		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
+		request.getSession().setAttribute(SYNCH_IN_MONITOR, new Boolean(mcContent.isSynchInMonitor()));
+		request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
+		request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
+		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
+	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
+		request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
+		request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
+		request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
+		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
+		request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
+		
+		McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
+		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
+		
+		mcAuthoringForm.setPassmark((mcContent.getPassMark()).toString());
+		logger.debug("PASSMARK:" + mcAuthoringForm.getPassmark());
+		
+		logger.debug("getting name lists based on uid:" + mcContent.getUid());
+		
+		List listUploadedOffFiles= mcService.retrieveMcUploadedOfflineFilesName(mcContent.getUid());
+		logger.debug("existing listUploadedOfflineFileNames:" + listUploadedOffFiles);
+		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOffFiles);
+		
+		List listUploadedOnFiles= mcService.retrieveMcUploadedOnlineFilesName(mcContent.getUid());
+		logger.debug("existing listUploadedOnlineFileNames:" + listUploadedOnFiles);
+		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnFiles);
+		
+		List listUploadedOffFilesUuidPlusFilename= mcService.retrieveMcUploadedOfflineFilesUuidPlusFilename(mcContent.getUid());
+		logger.debug("existing listUploadedOffFilesUuidPlusFilename:" + listUploadedOffFilesUuidPlusFilename);
+		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOffFilesUuidPlusFilename);
+		
+		if (mcContent.isUsernameVisible())
 		{
-			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-		    logger.debug("retrieving mcService from proxy: " + mcService);
-		    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
+			mcAuthoringForm.setUsernameVisible(ON);
+			logger.debug("setting userNameVisible to true");
+		}
+		else
+		{
+			mcAuthoringForm.setUsernameVisible(OFF);	
+			logger.debug("setting userNameVisible to false");				
+		}
+	    
+		
+		if (mcContent.isQuestionsSequenced())
+		{
+			mcAuthoringForm.setQuestionsSequenced(ON);
+			logger.debug("setting questionsSequenced to true");
+		}
+		else
+		{
+			mcAuthoringForm.setQuestionsSequenced(OFF);	
+			logger.debug("setting questionsSequenced to false");				
+		}
+
+		if (mcContent.isSynchInMonitor())
+		{
+			mcAuthoringForm.setSynchInMonitor(ON);	
+			logger.debug("setting SynchInMonitor to true");
+		}
+		else
+		{
+			mcAuthoringForm.setSynchInMonitor(OFF);	
+			logger.debug("setting SynchInMonitor to false");				
+		}
+
+		if (mcContent.isRetries())
+		{
+			mcAuthoringForm.setRetries(ON);	
+			logger.debug("setting retries to true");
+		}
+		else
+		{
+			mcAuthoringForm.setRetries(OFF);	
+			logger.debug("setting retries to false");				
+		}
+
+		if (mcContent.isShowFeedback())
+		{
+			mcAuthoringForm.setShowFeedback(ON);	
+			logger.debug("setting showFeedback to false");
+		}
+		else
+		{
+			mcAuthoringForm.setShowFeedback(OFF);	
+			logger.debug("setting showFeedback to false");				
 		}
 		
-		/**  CURRENT_TAB == 1 defines Basic Tab
-		 *   CURRENT_TAB == 2 defines Avanced Tab
-		 *   CURRENT_TAB == 3 defines Instructions Tab
-		 * */ 
+		McUtils.populateUploadedFilesData(request, mcContent);
+	    logger.debug("populated UploadedFilesData");
+	    
+		AuthoringUtil authoringUtil = new AuthoringUtil();
+		Map mapQuestionsContent=authoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
+		System.out.print("mapQuestionsContent:" + mapQuestionsContent);
+		
+		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+		logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+		
+		Map mapWeights=authoringUtil.rebuildWeightsMapfromDB(request, new Long(toolContentId));
+		System.out.print("mapWeights:" + mapWeights);
+		
+		/*set the mapWeights */
+		Iterator itWeightsMap = mapWeights.entrySet().iterator();
+		long mapWeightsCounter=0;
+	    while (itWeightsMap.hasNext()) {
+	        Map.Entry pairs = (Map.Entry)itWeightsMap.next();
+	        if (pairs.getValue() != null) 
+	        {
+				System.out.print("the weight is:" + pairs.getValue());
+	        	mapWeightsCounter++;
+	        	mapWeights.put(new Long(mapWeightsCounter).toString(), new Integer(pairs.getValue().toString()));
+	        }
+	    }
+		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+	}
+	
+	
+	/**
+	 * retrieves the contents of the default content from the db and prepares it for presentation
+	 * retrieveDefaultContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+	 * 
+	 * @param request
+	 * @param mcAuthoringForm
+	 */
+	protected void retrieveDefaultContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+		
+		long contentId=0;
+		logger.debug("getting default content");
+		contentId=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+		McContent mcContent=mcService.retrieveMc(new Long(contentId));
+		logger.debug("mcContent:" + mcContent);
+		
+		/* reset all radioboxes to false*/
+		mcAuthoringForm.resetRadioBoxes();
+		logger.debug("all radioboxes arec reset");
+		
+		request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
+		request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
+		request.getSession().setAttribute(QUESTIONS_SEQUENCED,new Boolean(mcContent.isQuestionsSequenced()));
+		request.getSession().setAttribute(USERNAME_VISIBLE,new Boolean(mcContent.isUsernameVisible()));
+		request.getSession().setAttribute(CREATED_BY, new Long(mcContent.getCreatedBy()));
+		request.getSession().setAttribute(MONITORING_REPORT_TITLE,mcContent.getMonitoringReportTitle());
+		request.getSession().setAttribute(REPORT_TITLE,mcContent.getReportTitle());
+		request.getSession().setAttribute(RUN_OFFLINE, new Boolean(mcContent.isRunOffline()));
+		request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
+		request.getSession().setAttribute(SYNCH_IN_MONITOR, new Boolean(mcContent.isSynchInMonitor()));
+		request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
+		request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
+		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
+	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
+		request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
+		request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
+		request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
+		request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
+		request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
+		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
+		request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
+		
+		McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
+		
+		logger.debug("PASSMARK:" + request.getSession().getAttribute(PASSMARK));
+		
+		logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
+		logger.debug("getting default content");
+		/*
+		 * this is a new content creation, the content must not be in use.
+		 * relevant attribute: CONTENT_IN_USE  
+		 */
+		request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(false));
+	    logger.debug("CONTENT_IN_USE: " + request.getSession().getAttribute(CONTENT_IN_USE));
+	    
+	    /* this is already done in  mcAuthoringForm.resetRadioBoxes()*/ 
+	    mcAuthoringForm.setUsernameVisible(OFF);
+	    mcAuthoringForm.setQuestionsSequenced(OFF);
+		mcAuthoringForm.setSynchInMonitor(OFF);
+		mcAuthoringForm.setRetries(OFF);
+		mcAuthoringForm.setShowFeedback(OFF);
+		mcAuthoringForm.setSln(OFF);
+		logger.debug("sln set to OFF");
+		
+		/* collect options for the default question content into a Map*/
+		McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(mcContent.getUid().longValue());
+		System.out.print("mcQueContent:" + mcQueContent);
+		
+		/* mcQueContent can not be null since here it was verified before*/ 
+		/* display a single sample question */
+		request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, mcQueContent.getQuestion());
+		
+		Map mapQuestionsContent= new TreeMap(new McComparator());
+		mapQuestionsContent.put(new Long(1).toString(), mcQueContent.getQuestion());
+		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+		logger.debug("starter initialized the Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+		
+		/* hold all he options for this question*/
+		List list=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());
+		logger.debug("options list:" + list);
+
+		Map mapOptionsContent= new TreeMap(new McComparator());
+		Iterator listIterator=list.iterator();
+		Long mapIndex=new Long(1);
+		while (listIterator.hasNext())
+		{
+			McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+			logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+			mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+			mapIndex=new Long(mapIndex.longValue()+1);
+		}
+		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+		Map mapDefaultOptionsContent=mapOptionsContent;
+		request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptionsContent);
+		logger.debug("starter initialized the Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+		logger.debug("starter initialized the Default Options Map: " + request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT));
+		
+		Map mapWeights= new TreeMap(new McComparator());
+		/* reset all the weights to 0*/
+		long mapCounter=0;
+		for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
+		{
+			mapCounter++;
+			mapWeights.put(new Long(mapCounter).toString(), new Integer(0));
+		}	
+		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));	
+	}
+	
+	
+	/**
+	 * initialisation
+	 * initialiseAttributes(HttpServletRequest request)
+	 * 
+	 * @param request
+	 */
+	protected void initialiseAttributes(HttpServletRequest request)
+	{
+		System.out.print("starting initialiseAttributes...");
+		/*  CURRENT_TAB == 1 defines Basic Tab
+		 *  CURRENT_TAB == 2 defines Avanced Tab
+		 *  CURRENT_TAB == 3 defines Instructions Tab
+		 */ 
 		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		
-		/**  needs to run only once per tool*/ 
-		/** McUtils.configureContentRepository(request, mcService); */
+		/* needs to run only once per tool*/ 
+		/* McUtils.configureContentRepository(request, mcService); */
 		
-		/** these two are for repository access */
-		/**holds the final offline files  list */
+		/* these two are for repository access */
+		/* holds the final offline files  list */
 		LinkedList listUploadedOfflineFiles= new LinkedList();
 		LinkedList listUploadedOnlineFiles= new LinkedList();
 		
-		/** these two are for jsp */
+		/* these two are for jsp */
 		LinkedList listUploadedOfflineFileNames= new LinkedList();
 		LinkedList listUploadedOnlineFileNames= new LinkedList();
 		
@@ -160,7 +626,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
 		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
 		
-			
 		Map mapQuestionsContent= new TreeMap(new McComparator());
 		Map mapOptionsContent= new TreeMap(new McComparator());
 		Map mapDefaultOptionsContent= new TreeMap(new McComparator());
@@ -193,452 +658,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
-		
-		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-		mcAuthoringForm.resetRadioBoxes();
-		
-		/**
-		 * retrieve the default content id based on tool signature
-		 */
-		long contentId=0;
-		try
-		{
-			logger.debug("attempt retrieving tool with signature : " + MY_SIGNATURE);
-			contentId=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
-			logger.debug("retrieved tool default contentId: " + contentId);
-			if (contentId == 0) 
-			{
-				logger.debug("default content id has not been setup");
-				request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
-				persistError(request,"error.defaultContent.notSetup");
-				return (mapping.findForward(LOAD_QUESTIONS));	
-			}
-		}
-		catch(Exception e)
-		{
-			logger.debug("error getting the default content id: " + e.getMessage());
-			request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
-			persistError(request,"error.defaultContent.notSetup");
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
-
-		
-		/**
-		 * retrieve uid of the content based on default content id determined above
-		 */
-		long contentUID=0;
-		try
-		{
-			logger.debug("retrieve uid of the content based on default content id determined above: " + contentId);
-			McContent mcContent=mcService.retrieveMc(new Long(contentId));
-			if (mcContent == null)
-			{
-				logger.debug("Exception occured: No default content");
-	    		request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
-	    		persistError(request,"error.defaultContent.notSetup");
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
-			logger.debug("using mcContent: " + mcContent);
-			logger.debug("using mcContent uid: " + mcContent.getUid());
-			contentUID=mcContent.getUid().longValue();
-		}
-		catch(Exception e)
-		{
-			logger.debug("Exception occured: No default question content");
-			request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
-    		persistError(request,"error.defaultContent.notSetup");
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
-				
-		
-		/**
-		 * retrieve uid of the default question content
-		 */
-		long queContentUID=0;
-		try
-		{
-			logger.debug("retrieve the default question content based on default content UID: " + queContentUID);
-			McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(contentUID);
-			logger.debug("using mcQueContent: " + mcQueContent);
-			if (mcQueContent == null)
-			{
-				logger.debug("Exception occured: No default question content");
-	    		request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
-				persistError(request,"error.defaultQuestionContent.notAvailable");
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
-			logger.debug("using mcQueContent uid: " + mcQueContent.getUid());
-			queContentUID=mcQueContent.getUid().longValue();
-			request.getSession().setAttribute(DEFAULT_QUESTION_UID, new Long(queContentUID));
-			logger.debug("DEFAULT_QUESTION_UID: " + queContentUID);
-		}
-		catch(Exception e)
-		{
-			logger.debug("Exception occured: No default question content");
-    		request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
-			persistError(request,"error.defaultQuestionContent.notAvailable");
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
-		
-		
-		/**
-		 * retrieve default options content
-		 */
-		try
-		{
-			logger.debug("retrieve the default options content based on default question content UID: " + queContentUID);
-			List list=mcService.findMcOptionsContentByQueId(new Long(queContentUID));
-			logger.debug("using options list: " + list);
-			if (list == null)
-			{
-				logger.debug("Exception occured: No default options content");
-	    		request.setAttribute(USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE, new Boolean(true));
-				persistError(request,"error.defaultOptionsContent.notAvailable");
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
-			
-		}
-		catch(Exception e)
-		{
-			logger.debug("Exception occured: No default options content");
-    		request.setAttribute(USER_EXCEPTION_DEFAULTOPTIONSCONTENT_NOT_AVAILABLE, new Boolean(true));
-			persistError(request,"error.defaultOptionsContent.notAvailable");
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
-		
-	
-		
-		/**
-	     * mark the http session as an authoring activity 
-	     */
-	    request.getSession().setAttribute(TARGET_MODE,TARGET_MODE_AUTHORING);
-	    
-	    /**
-	     * define tab controllers for jsp
-	     */
-	    request.getSession().setAttribute(CHOICE_TYPE_BASIC,CHOICE_TYPE_BASIC);
-	    request.getSession().setAttribute(CHOICE_TYPE_ADVANCED,CHOICE_TYPE_ADVANCED);
-	    request.getSession().setAttribute(CHOICE_TYPE_INSTRUCTIONS,CHOICE_TYPE_INSTRUCTIONS);
-	
-	    
-	    logger.debug("will render authoring screen");
-	    String strToolContentId="";
-	    strToolContentId=request.getParameter(TOOL_CONTENT_ID);
-	    
-	    /**
-	     * Process incoming tool content id
-	     * Either exists or not exists in the db yet, a toolContentId must be passed to the tool from the container 
-	     */
-	    long toolContentId=0;
-    	try
-		{
-	    	toolContentId=new Long(strToolContentId).longValue();
-	    	logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
-	    	request.getSession().setAttribute(TOOL_CONTENT_ID, new Long(strToolContentId));
-	    	
-    	}
-    	catch(NumberFormatException e)
-		{
-	    	persistError(request,"error.numberFormatException");
-			request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
-			logger.debug("forwarding to: " + LOAD_QUESTIONS);
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
-	
-    	/**
-		 * find out if the passed tool content id exists in the db 
-		 * present user either a first timer screen with default content data or fetch the existing content.
-		 * 
-		 * if the toolcontentid does not exist in the db, create the default Map,
-		 * there is no need to check if the content is in use in this case.
-		 * It is always unlocked -> not in use since it is the default content.
-		*/
-		if (!existsContent(toolContentId, request))
-		{
-			logger.debug("getting default content");
-			contentId=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
-			McContent mcContent=mcService.retrieveMc(new Long(contentId));
-			logger.debug("mcContent:" + mcContent);
-			
-			/** reset all radioboxes to false*/
-			mcAuthoringForm.resetRadioBoxes();
-			logger.debug("all radioboxes arec reset");
-			
-			
-			if (mcContent == null)
-			{
-				logger.debug("Exception occured: No default content");
-				request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE, new Boolean(true));
-				persistError(request,"error.defaultContent.notAvailable");
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
-			
-			request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
-			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
-			request.getSession().setAttribute(QUESTIONS_SEQUENCED,new Boolean(mcContent.isQuestionsSequenced()));
-			request.getSession().setAttribute(USERNAME_VISIBLE,new Boolean(mcContent.isUsernameVisible()));
-			request.getSession().setAttribute(CREATED_BY, new Long(mcContent.getCreatedBy()));
-			request.getSession().setAttribute(MONITORING_REPORT_TITLE,mcContent.getMonitoringReportTitle());
-			request.getSession().setAttribute(REPORT_TITLE,mcContent.getReportTitle());
-			request.getSession().setAttribute(RUN_OFFLINE, new Boolean(mcContent.isRunOffline()));
-			request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
-			request.getSession().setAttribute(SYNCH_IN_MONITOR, new Boolean(mcContent.isSynchInMonitor()));
-			request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
-			request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
-			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
-		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
-			request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
-			request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
-			request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
-			request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
-			request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
-			request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
-			request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
-			
-			McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
-			
-			logger.debug("PASSMARK:" + request.getSession().getAttribute(PASSMARK));
-			
-			logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
-			logger.debug("getting default content");
-			/**
-			 * this is a new content creation, the content must not be in use.
-			 * relevant attribute: CONTENT_IN_USE  
-			 */
-			request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(false));
-		    logger.debug("CONTENT_IN_USE: " + request.getSession().getAttribute(CONTENT_IN_USE));
-		    
-		    /* this is already done in  mcAuthoringForm.resetRadioBoxes()*/ 
-		    mcAuthoringForm.setUsernameVisible(OFF);
-		    mcAuthoringForm.setQuestionsSequenced(OFF);
-			mcAuthoringForm.setSynchInMonitor(OFF);
-			mcAuthoringForm.setRetries(OFF);
-			mcAuthoringForm.setShowFeedback(OFF);
-			mcAuthoringForm.setSln(OFF);
-			logger.debug("sln set to OFF");
-			
-			
-			/** collect options for the default question content into a Map*/
-			McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(mcContent.getUid().longValue());
-			System.out.print("mcQueContent:" + mcQueContent);
-			if (mcQueContent == null)
-			{
-				logger.debug("Exception occured: No default question content");
-				request.setAttribute(USER_EXCEPTION_DEFAULTQUESTIONCONTENT_NOT_AVAILABLE, new Boolean(true));
-				persistError(request,"error.defaultQuestionContent.notAvailable");
-				return (mapping.findForward(LOAD_QUESTIONS));
-			}
-			/**
-        	 * display a single sample question
-        	 */
-    		request.getSession().setAttribute(DEFAULT_QUESTION_CONTENT, mcQueContent.getQuestion());
-    		mapQuestionsContent.put(new Long(1).toString(), mcQueContent.getQuestion());
-    		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-    		logger.debug("starter initialized the Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-    		
-			
-			/** hold all he options for this question*/
-			List list=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());
-	    	logger.debug("options list:" + list);
-
-	    	Iterator listIterator=list.iterator();
-	    	Long mapIndex=new Long(1);
-	    	while (listIterator.hasNext())
-	    	{
-	    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
-	    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
-	    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
-	    		mapIndex=new Long(mapIndex.longValue()+1);
-	    	}
-	    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-	    	mapDefaultOptionsContent=mapOptionsContent;
-	    	request.getSession().setAttribute(MAP_DEFAULTOPTIONS_CONTENT, mapDefaultOptionsContent);
-			logger.debug("starter initialized the Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-			logger.debug("starter initialized the Default Options Map: " + request.getSession().getAttribute(MAP_DEFAULTOPTIONS_CONTENT));
-			
-			/** reset all the weights to 0*/
-			long mapCounter=0;
-	    	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
-			{
-				mapCounter++;
-				mapWeights.put(new Long(mapCounter).toString(), new Integer(0));
-			}	
-			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
-			
-		}
-		else
-		{
-			logger.debug("getting existing content with id:" + toolContentId);
-			McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
-			logger.debug("existing mcContent:" + mcContent);
-			
-			request.getSession().setAttribute(RICHTEXT_TITLE,mcContent.getTitle());
-			request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,mcContent.getInstructions());
-			request.getSession().setAttribute(QUESTIONS_SEQUENCED,new Boolean(mcContent.isQuestionsSequenced()));
-			request.getSession().setAttribute(USERNAME_VISIBLE,new Boolean(mcContent.isUsernameVisible()));
-			request.getSession().setAttribute(CREATED_BY, new Long(mcContent.getCreatedBy()));
-			request.getSession().setAttribute(MONITORING_REPORT_TITLE,mcContent.getMonitoringReportTitle());
-			request.getSession().setAttribute(REPORT_TITLE,mcContent.getReportTitle());
-			request.getSession().setAttribute(RUN_OFFLINE, new Boolean(mcContent.isRunOffline()));
-			request.getSession().setAttribute(DEFINE_LATER, new Boolean(mcContent.isDefineLater()));
-			request.getSession().setAttribute(SYNCH_IN_MONITOR, new Boolean(mcContent.isSynchInMonitor()));
-			request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
-			request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
-			request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
-		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
-			request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
-			request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
-			request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
-			request.getSession().setAttribute(PASSMARK, mcContent.getPassMark()); //Integer
-			request.getSession().setAttribute(SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback())); 
-			
-			
-			McUtils.setDefaultSessionAttributes(request, mcContent, mcAuthoringForm);
-			logger.debug("RICHTEXT_TITLE:" + request.getSession().getAttribute(RICHTEXT_TITLE));
-			
-			mcAuthoringForm.setPassmark((mcContent.getPassMark()).toString());
-			logger.debug("PASSMARK:" + mcAuthoringForm.getPassmark());
-			
-			logger.debug("getting name lists based on uid:" + mcContent.getUid());
-			
-			List listUploadedOffFiles= mcService.retrieveMcUploadedOfflineFilesName(mcContent.getUid());
-			logger.debug("existing listUploadedOfflineFileNames:" + listUploadedOffFiles);
-			request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOffFiles);
-			
-			List listUploadedOnFiles= mcService.retrieveMcUploadedOnlineFilesName(mcContent.getUid());
-			logger.debug("existing listUploadedOnlineFileNames:" + listUploadedOnFiles);
-			request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnFiles);
-			
-			List listUploadedOffFilesUuidPlusFilename= mcService.retrieveMcUploadedOfflineFilesUuidPlusFilename(mcContent.getUid());
-			logger.debug("existing listUploadedOffFilesUuidPlusFilename:" + listUploadedOffFilesUuidPlusFilename);
-			request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOffFilesUuidPlusFilename);
-			
-			
-			if (mcContent.isUsernameVisible())
-			{
-				mcAuthoringForm.setUsernameVisible(ON);
-				logger.debug("setting userNameVisible to true");
-			}
-			else
-			{
-				mcAuthoringForm.setUsernameVisible(OFF);	
-				logger.debug("setting userNameVisible to false");				
-			}
-		    
-			
-			if (mcContent.isQuestionsSequenced())
-			{
-				mcAuthoringForm.setQuestionsSequenced(ON);
-				logger.debug("setting questionsSequenced to true");
-			}
-			else
-			{
-				mcAuthoringForm.setQuestionsSequenced(OFF);	
-				logger.debug("setting questionsSequenced to false");				
-			}
-
-
-			if (mcContent.isSynchInMonitor())
-			{
-				mcAuthoringForm.setSynchInMonitor(ON);	
-				logger.debug("setting SynchInMonitor to true");
-			}
-			else
-			{
-				mcAuthoringForm.setSynchInMonitor(OFF);	
-				logger.debug("setting SynchInMonitor to false");				
-			}
-
-			if (mcContent.isRetries())
-			{
-				mcAuthoringForm.setRetries(ON);	
-				logger.debug("setting retries to true");
-			}
-			else
-			{
-				mcAuthoringForm.setRetries(OFF);	
-				logger.debug("setting retries to false");				
-			}
-
-			if (mcContent.isShowFeedback())
-			{
-				mcAuthoringForm.setShowFeedback(ON);	
-				logger.debug("setting showFeedback to false");
-			}
-			else
-			{
-				mcAuthoringForm.setShowFeedback(OFF);	
-				logger.debug("setting showFeedback to false");				
-			}
-			
-			McUtils.populateUploadedFilesData(request, mcContent);
-		    logger.debug("populated UploadedFilesData");
-		    
-			AuthoringUtil authoringUtil = new AuthoringUtil();
-			mapQuestionsContent=authoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
-			System.out.print("mapQuestionsContent:" + mapQuestionsContent);
-			
-			
-			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-    		logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-    		
-    		mapWeights=authoringUtil.rebuildWeightsMapfromDB(request, new Long(toolContentId));
-			System.out.print("mapWeights:" + mapWeights);
-    		
-			/** set the mapWeights */
-    		Iterator itWeightsMap = mapWeights.entrySet().iterator();
-			long mapWeightsCounter=0;
-            while (itWeightsMap.hasNext()) {
-                Map.Entry pairs = (Map.Entry)itWeightsMap.next();
-                if (pairs.getValue() != null) 
-                {
-        			System.out.print("the weight is:" + pairs.getValue());
-                	mapWeightsCounter++;
-                	mapWeights.put(new Long(mapWeightsCounter).toString(), new Integer(pairs.getValue().toString()));
-                }
-            }
-			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
-		}
-    	
-	mcAuthoringForm.resetUserAction();
-	return (mapping.findForward(LOAD_QUESTIONS));
-  } 
-	
-
-	/**
-	 * existsContent(long toolContentId)
-	 * @param long toolContentId
-	 * @return boolean
-	 * determine whether a specific toolContentId exists in the db
-	 */
-	protected boolean existsContent(long toolContentId, HttpServletRequest request)
-	{
-		/**
-		 * retrive the service
-		 */
-		IMcService mcService =McUtils.getToolService(request);
-		McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
-	    if (mcContent == null) 
-	    	return false;
-	    
-		return true;	
 	}
-	
-	/**
-	 * find out if the content is locked or not. If it is a locked content, the author can not modify it.
-	 * The idea of content being locked is, once any one learner starts using a particular content
-	 * that content should become unmodifiable. 
-	 * @param mcContent
-	 * @return
-	 */
-	protected boolean isContentInUse(McContent mcContent)
-	{
-		logger.debug("is content inuse: " + mcContent.isContentInUse());
-		return  mcContent.isContentInUse();
-	}
-	
 	
 	
 	/**

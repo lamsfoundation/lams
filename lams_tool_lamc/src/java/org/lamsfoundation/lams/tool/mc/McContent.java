@@ -31,7 +31,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/** @author Hibernate CodeGenerator */
+/** @author Ozgur Demirtas */
 public class McContent implements Serializable {
 
     /** identifier field */

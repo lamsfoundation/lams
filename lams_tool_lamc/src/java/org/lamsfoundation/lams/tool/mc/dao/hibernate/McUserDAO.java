@@ -44,25 +44,17 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	private static final String COUNT_USERS_IN_SESSION = "select mu.queUsrId from McQueUsr mu where mu.mcSession= :mcSession";
    
     
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#getMcUserByUID(java.lang.Long) */
-	public McQueUsr getMcUserByUID(Long uid)
+   public McQueUsr getMcUserByUID(Long uid)
 	{
 		 return (McQueUsr) this.getHibernateTemplate()
          .get(McQueUsr.class, uid);
 	}
 	
 	
-	
-	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#getMcUserByID(java.lang.Long) */
 	public McQueUsr findMcUserById(Long userId)
 	{
 		String query = "from McQueUsr user where user.queUsrId=?";
-		/*
-		return (McQueUsr) getSession().createQuery(query)
-		.setLong(0,userId.longValue())
-		.uniqueResult();
-		*/
-		
+	
 		HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(query)
 		.setLong(0,userId.longValue())
@@ -76,7 +68,6 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	}
 	
 	
-	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#getMcUserBySession(java.lang.Long, java.lang.Long)*/
 	public McQueUsr getMcUserBySession(Long userId, Long sessionId)
 	{
 		/*
@@ -99,19 +90,18 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	}
 
 	
-		/** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#saveMcUser(org.lamsfoundation.lams.tool.mc.McUser) */
 	public void saveMcUser(McQueUsr mcUser)
     {
     	this.getHibernateTemplate().save(mcUser);
     }
 	
-	/** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#updateMcUser(org.lamsfoundation.lams.tool.mc.McUser) */
+
     public void updateMcUser(McQueUsr mcUser)
     {
     	this.getHibernateTemplate().update(mcUser);
     }
     
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#removeMcUser(java.lang.Long) */
+
     public void removeMcUserById(Long userId)
     {
     	HibernateTemplate templ = this.getHibernateTemplate();
@@ -130,20 +120,19 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
       
     }
     
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#removeMcUser(org.lamsfoundation.lams.tool.mc.McUser) */
+
     public void removeMcUser(McQueUsr mcUser)
     {
 		this.getSession().setFlushMode(FlushMode.AUTO);
         this.getHibernateTemplate().delete(mcUser);
     }
     
-    /** @see org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO#getNumberOfUsers((org.lamsfoundation.lams.tool.mc.McSession) */
+
     public int getNumberOfUsers(McSession mcSession)
     {
         return (getHibernateTemplate().findByNamedParam(COUNT_USERS_IN_SESSION,
 	            "mcSession",
 				mcSession)).size();
-    }
-    
+    }  
     
 }

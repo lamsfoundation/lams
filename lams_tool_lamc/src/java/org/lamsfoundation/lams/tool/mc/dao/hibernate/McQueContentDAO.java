@@ -22,7 +22,6 @@
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -33,15 +32,11 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
-
-
 /**
  * @author ozgurd
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * <p>Hibernate implementation for database access to McQueContent for the mc tool.</p>
  */
-
 public class McQueContentDAO extends HibernateDaoSupport implements IMcQueContentDAO {
 	 	static Logger logger = Logger.getLogger(McQueContentDAO.class.getName());
 	 	
