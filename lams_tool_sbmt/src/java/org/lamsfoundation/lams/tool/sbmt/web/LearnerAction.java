@@ -22,6 +22,7 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
@@ -32,6 +33,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -52,9 +54,35 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  */
 public class LearnerAction extends DispatchAction {
-	
+    
+    private static final boolean MODE_OPTIONAL = false;
+    
 	public ISubmitFilesService submitFilesService;
 	public static Logger logger = Logger.getLogger(LearnerAction.class);
+    
+    
+    public ActionForward unspecified(
+            ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+    {
+        
+        //set the mode into http session 
+        ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,MODE_OPTIONAL);
+        request.getSession().setAttribute(AttributeNames.ATTR_MODE, mode);
+                
+        if(mode.equals(ToolAccessMode.LEARNER)){
+            return listFiles(mapping, form, request, response);
+        }
+        else if(mode.equals(ToolAccessMode.AUTHOR) || mode.equals(ToolAccessMode.TEACHER)){
+            //TODO: implement AUTHOR and TEACHER mode
+
+        }
+        logger.error("Requested mode + '" + mode.toString() + "' not supported");
+        return returnErrors(mapping,request,"submit.modenotsupported","upload");
+    }
+    
 	/**
 	 * The initial page of learner in Submission tool. This page will list all uploaded files and learn 
 	 * @param mapping
@@ -68,7 +96,6 @@ public class LearnerAction extends DispatchAction {
 									HttpServletRequest request,
 									HttpServletResponse response){
 		
-
 		DynaActionForm authForm= (DynaActionForm)form;
 		Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
 		//get session from shared session.
