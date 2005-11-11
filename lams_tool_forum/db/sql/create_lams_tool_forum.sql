@@ -56,6 +56,8 @@ create table tl_lafrum11_message (
    forum_session_uid bigint,
    parent_uid bigint,
    forum_uid bigint,
+   reply_number integer,
+   hide_flag bit,
    primary key (uid)
 );
 create table tl_lafrum11_message_seq (

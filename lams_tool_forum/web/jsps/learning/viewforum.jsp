@@ -8,14 +8,17 @@
 <c:set var="newtopic">
 	<html:rewrite page="/learning/newTopic.do" />
 </c:set> 
+<c:set var="refresh">
+	<html:rewrite page="/learning/viewForum.do?toolSessionID=${param.toolSessionID}" />
+</c:set> 
 <c:set var="finish">
-	<html:rewrite page="/learning/finish.do" />
+	<html:rewrite page="/learning/finish.do?toolSessionID=${param.toolSessionID}" />
 </c:set> 
 	
 <html:button property="newtopic" onclick="javascript:location.href='${newtopic}';">
 	<fmt:message key="label.newtopic"/>
 </html:button>
-<html:button property="refresh" >
+<html:button property="refresh" onclick="javascript:location.href='${refresh}';" >
 	<fmt:message key="label.refresh"/>
 </html:button>
 <html:button property="finish" onclick="javascript:location.href='${finish}';">

@@ -21,7 +21,7 @@
 			<tr>
 				<td>
 					<br>
-					<c:out value="${topic.message.body}" />
+					<c:out value="${topic.bodyByHtml}" escapeXml="false" />
 				</td>
 			</tr>
 			<tr>

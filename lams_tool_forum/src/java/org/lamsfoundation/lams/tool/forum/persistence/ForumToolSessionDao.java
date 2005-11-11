@@ -34,5 +34,10 @@ public class ForumToolSessionDao extends HibernateDaoSupport {
 			return null;
 		return (ForumToolSession) list.get(0);
 	}
+	
+	public void saveOrUpdate(ForumToolSession session){
+		this.getHibernateTemplate().saveOrUpdate(session);
+		this.getHibernateTemplate().flush();
+	}
 
 }

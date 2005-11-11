@@ -205,7 +205,7 @@
 			name="messageForm" 
 			validate="false" 
 			parameter="editTopic" 
-			scope="request">
+			scope="session">
 			<forward name="success" path="tiles:/learning/forum/editTopic" />
 		</action>
 		<action path="/learning/updateTopic"
@@ -214,7 +214,7 @@
 			validate="true" 
 			input="tiles:/learning/forum/editTopic"
 			parameter="updateTopic" 
-			scope="request">
+			scope="session">
 			<forward name="success" path="tiles:/learning/forum/viewTopic" />
 		</action>
 		<action path="/learning/deleteAttachment"
@@ -225,12 +225,12 @@
 			scope="session">
 			<forward name="success" path="tiles:/learning/forum/editTopic" />
 		</action>
-		<action path="/learning/message/deleteTopic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			parameter="deleteTopic" 
-			scope="request">
+		<action path="/learning/finish"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			parameter="finish">
 			<forward name="success" path="tiles:/learning/forum/viewForum" />
 		</action>
+
 		<!-- System level actions -->
 		<action path="/index" type="org.apache.struts.actions.ForwardAction"
 			parameter="tiles:/layout" />

@@ -145,8 +145,7 @@ public class AuthoringAction extends Action {
 		Forum forum = null;
 		try {
 			forum = forumService.getForumByContentId(contentId);
-			topics = new ArrayList(MessageDTO.getMessageDTO(forum.getMessages(), user.getFirstName() + " "
-					+ user.getLastName()));
+			topics = forumService.getAuthoredTopics(contentId);
 			forumForm.setForum(forum);
 			forumForm.setToolContentID(contentId);
 		} catch (PersistenceException e) {

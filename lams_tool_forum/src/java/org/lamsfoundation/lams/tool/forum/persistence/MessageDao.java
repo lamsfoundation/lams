@@ -53,7 +53,7 @@ public class MessageDao extends HibernateDaoSupport {
 		this.getHibernateTemplate().deleteAll(list);
 	}
 
-	public List allAuthoredMessage(Long forumId) {
+	public List getAuthoredMessage(Long forumId) {
 		return findByNamedQuery("allAuthoredMessagesOfForum", forumId);
 	}
 

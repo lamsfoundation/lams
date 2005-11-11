@@ -32,6 +32,8 @@ public class Message {
 	private ForumUser createdBy;
 	private ForumUser modifiedBy;
 	private Date lastReplyDate;
+	private int replyNumber;
+	private boolean hideFlag;
 
 
 	/**
@@ -313,4 +315,28 @@ public class Message {
 	public void setForum(Forum forum) {
 		this.forum = forum;
 	}
+	
+	/**
+	 * @hibernate.property column="reply_number"
+	 * @return
+	 */
+	public int getReplyNumber() {
+		return replyNumber;
+	}
+
+	public void setReplyNumber(int replyNumber) {
+		this.replyNumber = replyNumber;
+	}
+	/**
+	 * @hibernate.property column="hide_flag"
+	 * @return
+	 */
+	public boolean isHideFlag() {
+		return hideFlag;
+	}
+
+	public void setHideFlag(boolean hideFlag) {
+		this.hideFlag = hideFlag;
+	}
+
 }

@@ -14,7 +14,7 @@
 <table-list>
 <table alias="" name="tl_lafrum11_attachment" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="275" y="298"/>
+<table-figure-bounds height="-1" width="-1" x="132" y="286"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -140,7 +140,7 @@
 </table>
 <table alias="" name="tl_lafrum11_forum" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="58" y="43"/>
+<table-figure-bounds height="-1" width="-1" x="168" y="-10"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -332,7 +332,7 @@
 </table>
 <table alias="" name="tl_lafrum11_forum_user" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="536" y="486"/>
+<table-figure-bounds height="-1" width="-1" x="915" y="323"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -390,7 +390,7 @@
 </table>
 <table alias="" name="tl_lafrum11_message" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="725" y="169"/>
+<table-figure-bounds height="-1" width="-1" x="621" y="193"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -527,6 +527,32 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="reply_number" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="hide_flag" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT(%n)">
+<variant type-name-pattern="TINYINT"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key alias="" name="PRIMARY" remarks="">
 <primary-key-description></primary-key-description>
@@ -599,7 +625,7 @@
 </table>
 <table alias="" name="tl_lafrum11_message_seq" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="797" y="483"/>
+<table-figure-bounds height="-1" width="-1" x="849" y="154"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -692,7 +718,7 @@
 </table>
 <table alias="" name="tl_lafrum11_tool_session" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="449" y="23"/>
+<table-figure-bounds height="-1" width="-1" x="550" y="10"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>

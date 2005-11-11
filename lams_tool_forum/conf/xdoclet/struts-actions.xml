@@ -194,14 +194,13 @@
 			scope="session">
 			<forward name="success" path="tiles:/learning/forum/editTopic" />
 		</action>
-		
-		<action path="/learning/message/deleteTopic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.ForumAction"
-			parameter="deleteTopic" 
-			scope="request">
+				
+		<action path="/learning/finish"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			parameter="finish">
 			<forward name="success" path="tiles:/learning/forum/viewForum" />
 		</action>
-		
+
 		<!-- System level actions -->
 		<action path="/index" type="org.apache.struts.actions.ForwardAction"
 			parameter="tiles:/layout" />

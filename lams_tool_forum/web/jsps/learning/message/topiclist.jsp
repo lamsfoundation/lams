@@ -8,7 +8,8 @@
 		</tr>
 		<tr>
 			<th scope="col" width="50%" colspan="2"><fmt:message key="lable.topic.title.subject"/></th>
-			<th scope="col" width="25%"><fmt:message key="lable.topic.title.startedby"/></th>
+			<th scope="col" width="15%"><fmt:message key="lable.topic.title.startedby"/></th>
+			<th scope="col" width="10%"><fmt:message key="lable.topic.title.replies"/></th>
 			<th scope="col" width="25%"><fmt:message key="lable.topic.title.update"/></th>
 		</tr>
 		<c:forEach items="${topicList}" var="topic" >
@@ -28,6 +29,9 @@
 				</td>
 				<td>
 					<c:out value="${topic.author}"/>
+				</td>
+				<td>
+					<c:out value="${topic.message.replyNumber}"/>
 				</td>
 				<td>
 					<fmt:formatDate value="${topic.message.updated}" type="time" timeStyle="short" />

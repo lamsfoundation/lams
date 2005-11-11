@@ -172,6 +172,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         
         //update last reply date for root message
         root.setLastReplyDate(new Date());
+        //update reply message number for root 
+        root.setReplyNumber(root.getReplyNumber()+1);
         messageDao.saveOrUpdate(root);
         
         return replyMessage;
@@ -417,7 +419,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			msg = (Message) iter.next();
 			map.put(msg.getLastReplyDate(),msg);
 		}
-		return 	new ArrayList(map.values());
+		return 	MessageDTO.getMessageDTO(new ArrayList(map.values()));
 		
 	}
 	public Forum createForum(Long contentId) throws PersistenceException {
@@ -490,5 +492,14 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			return null;
 		}
 		return seq.getRootMessage().getUid();
+	}
+
+	public List getAuthoredTopics(Long forumId) {
+		List list = messageDao.getAuthoredMessage(forumId);
+		return MessageDTO.getMessageDTO(list);
+	}
+
+	public void updateSession(ForumToolSession session) {
+		forumToolSessionDao.saveOrUpdate(session);
 	}
 }

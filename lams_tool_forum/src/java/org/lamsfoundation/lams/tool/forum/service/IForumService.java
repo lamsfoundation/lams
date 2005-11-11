@@ -64,6 +64,11 @@ public interface IForumService {
 	 * 		List of MessageDTO
 	 */
 	public List getRootTopics(Long sessionId);
+	/**
+	 * @return
+	 * 		List of MessageDTO
+	 */
+	public List getAuthoredTopics(Long forumId);
 	
 	public ForumUser getUserByUserId(Long userId);
 	public void createUser(ForumUser forumUser);
@@ -74,4 +79,5 @@ public interface IForumService {
 	 * @return
 	 */
 	public Long getRootTopicId(Long topicId);
+	public void updateSession(ForumToolSession session);
 }

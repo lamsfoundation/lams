@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
 
@@ -35,13 +36,20 @@ public class MessageDTO {
 	private String author;
 	private boolean hasAttachment;
 	private short level;
+	private String bodyByHtml;
+	private int threadNum;
 	
+
 	public static MessageDTO getMessageDTO(Message msg, String authorName){
 		if(msg == null)
 			return null;
 		
 		MessageDTO dto = new MessageDTO();
 		dto.setMessage(msg);
+		if(!StringUtils.isEmpty(msg.getBody()))
+			dto.setBodyByHtml(msg.getBody().replaceAll("\n","<BR>"));
+		else
+			dto.setBodyByHtml("");		
 		dto.setAuthor(authorName);
 		if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 			dto.setHasAttachment(false);
@@ -49,21 +57,13 @@ public class MessageDTO {
 			dto.setHasAttachment(true);
 		return dto;
 	}
+	
 	public static MessageDTO getMessageDTO(Message msg){
-		if(msg == null)
-			return null;
-		
-		MessageDTO dto = new MessageDTO();
-		dto.setMessage(msg);
-		dto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
-		if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
-			dto.setHasAttachment(false);
-		else
-			dto.setHasAttachment(true);
-		return dto;
+		return getMessageDTO(msg,msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
 	}
-	public static Set getMessageDTO(Set msgSet,String authorName){
-		Set retSet = new HashSet();
+	
+	public static List getMessageDTO(List msgSet,String authorName){
+		List retSet = new ArrayList();
 		if(msgSet == null || msgSet.isEmpty())
 			return retSet;
 		
@@ -71,6 +71,10 @@ public class MessageDTO {
 		while(iter.hasNext()){
 			Message msg = (Message) iter.next();
 			MessageDTO msgDto = new MessageDTO();
+			if(!StringUtils.isEmpty(msg.getBody()))
+				msgDto.setBodyByHtml(msg.getBody().replaceAll("\n","<BR>"));
+			else
+				msgDto.setBodyByHtml("");
 			if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 				msgDto.setHasAttachment(false);
 			else
@@ -90,6 +94,10 @@ public class MessageDTO {
 		while(iter.hasNext()){
 			Message msg = (Message) iter.next();
 			MessageDTO msgDto = new MessageDTO();
+			if(!StringUtils.isEmpty(msg.getBody()))
+				msgDto.setBodyByHtml(msg.getBody().replaceAll("\n","<BR>"));
+			else
+				msgDto.setBodyByHtml("");
 			if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 				msgDto.setHasAttachment(false);
 			else
@@ -125,5 +133,18 @@ public class MessageDTO {
 	public void setLevel(short level) {
 		this.level = level;
 	}
-	
+	public int getThreadNum() {
+		return threadNum;
+	}
+	public void setThreadNum(int threadNum) {
+		this.threadNum = threadNum;
+	}
+
+	public String getBodyByHtml() {
+		return bodyByHtml;
+	}
+
+	public void setBodyByHtml(String bodyByHtml) {
+		this.bodyByHtml = bodyByHtml;
+	}	
 }

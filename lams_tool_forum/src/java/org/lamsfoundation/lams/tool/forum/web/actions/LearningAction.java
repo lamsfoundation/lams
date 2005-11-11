@@ -70,9 +70,6 @@ public class LearningAction extends Action {
 	  	if (param.equals("replyTopic")) {
 	  		return replyTopic(mapping, form, request, response);
 	  	}
-        if (param.equals("deleteTopic")) {
-       		return deleteTopic(mapping, form, request, response);
-        }
         if (param.equals("editTopic")) {
         	return editTopic(mapping, form, request, response);
         }
@@ -111,7 +108,7 @@ public class LearningAction extends Action {
 		
 		//get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);
-		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,MessageDTO.getMessageDTO(rootTopics));
+		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,rootTopics);
 		return mapping.findForward("success");
 	}
 	/**
@@ -136,7 +133,14 @@ public class LearningAction extends Action {
 	 */
 	private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		//TODO
+
+		//get sessionId from HttpServletRequest
+		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		forumService = getForumManager();
+		ForumToolSession session = forumService.getSessionBySessionId(sessionId);
+		session.setStatus(ForumConstants.SESSION_STATUS_FINISHED);
+		forumService.updateSession(session);
+		
 		return mapping.findForward("success");
 	}
 
@@ -158,8 +162,8 @@ public class LearningAction extends Action {
 		Long topicId = new Long(WebUtil.readLongParam(request,"topicId"));
 		
 		forumService = getForumManager();
+		//get root topic list
 		List msgDtoList = forumService.getTopicThread(topicId);
-		
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
 		return mapping.findForward("success");
 	}
@@ -198,7 +202,7 @@ public class LearningAction extends Action {
 		
 		//echo back current root topic to fourm init page
 		List rootTopics = forumService.getRootTopics(sessionId);
-		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,MessageDTO.getMessageDTO(rootTopics));
+		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,rootTopics);
 		return mapping.findForward("success");
 	}
 	/**
@@ -327,33 +331,6 @@ public class LearningAction extends Action {
 		return mapping.findForward("success");
     }
 
-
-  	/**
-  	 * Delete a topic.
-  	 * 
-  	 * @param mapping
-  	 * @param form
-  	 * @param request
-  	 * @param response
-  	 * @return
-  	 * @throws PersistenceException
-  	 */
-    public ActionForward deleteTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws PersistenceException {
-    	
-    	Long topicId = new Long(WebUtil.readLongParam(request,"topicId"));
-		getForumManager().deleteTopic(topicId);
-		
-
-		//echo back this topic thread into page
-		forumService = getForumManager();
-		Long rootTopicId = forumService.getRootTopicId(topicId);
-		List msgDtoList = forumService.getTopicThread(rootTopicId);
-		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
-		
-		return mapping.findForward("success");
-	}
-    
     /**
      * Only delete the attachemnt file for current topic.
      * 

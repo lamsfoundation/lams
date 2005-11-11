@@ -151,6 +151,22 @@
             column="forum_uid"
         />
 
+        <property
+            name="replyNumber"
+            type="int"
+            update="true"
+            insert="true"
+            column="reply_number"
+        />
+
+        <property
+            name="hideFlag"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="hide_flag"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Message.xml
