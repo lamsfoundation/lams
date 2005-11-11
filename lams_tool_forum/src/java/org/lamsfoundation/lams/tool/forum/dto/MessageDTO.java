@@ -21,12 +21,9 @@
 package org.lamsfoundation.lams.tool.forum.dto;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
 
@@ -36,7 +33,6 @@ public class MessageDTO {
 	private String author;
 	private boolean hasAttachment;
 	private short level;
-	private String bodyByHtml;
 	private int threadNum;
 	
 
@@ -46,10 +42,6 @@ public class MessageDTO {
 		
 		MessageDTO dto = new MessageDTO();
 		dto.setMessage(msg);
-		if(!StringUtils.isEmpty(msg.getBody()))
-			dto.setBodyByHtml(msg.getBody().replaceAll("\n","<BR>"));
-		else
-			dto.setBodyByHtml("");		
 		dto.setAuthor(authorName);
 		if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 			dto.setHasAttachment(false);
@@ -71,10 +63,6 @@ public class MessageDTO {
 		while(iter.hasNext()){
 			Message msg = (Message) iter.next();
 			MessageDTO msgDto = new MessageDTO();
-			if(!StringUtils.isEmpty(msg.getBody()))
-				msgDto.setBodyByHtml(msg.getBody().replaceAll("\n","<BR>"));
-			else
-				msgDto.setBodyByHtml("");
 			if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 				msgDto.setHasAttachment(false);
 			else
@@ -94,10 +82,6 @@ public class MessageDTO {
 		while(iter.hasNext()){
 			Message msg = (Message) iter.next();
 			MessageDTO msgDto = new MessageDTO();
-			if(!StringUtils.isEmpty(msg.getBody()))
-				msgDto.setBodyByHtml(msg.getBody().replaceAll("\n","<BR>"));
-			else
-				msgDto.setBodyByHtml("");
 			if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 				msgDto.setHasAttachment(false);
 			else
@@ -139,12 +123,5 @@ public class MessageDTO {
 	public void setThreadNum(int threadNum) {
 		this.threadNum = threadNum;
 	}
-
-	public String getBodyByHtml() {
-		return bodyByHtml;
-	}
-
-	public void setBodyByHtml(String bodyByHtml) {
-		this.bodyByHtml = bodyByHtml;
-	}	
+	
 }

@@ -31,11 +31,12 @@ public class Forum {
 	private String offlineInstructions;
 	private boolean defineLater;
 	private boolean contentInUse;
-	private Set messages;
-	private Set attachments;
 	private Date created;
 	private Date updated;
 	private Long createdBy;
+	
+	private Set messages;
+	private Set attachments;
     
   	public Forum(){
   		attachments = new HashSet();

@@ -136,11 +136,7 @@ public class AuthoringAction extends Action {
 		ForumForm forumForm = (ForumForm)form;
 		//get back the topic list and display them on page
 		forumService = getForumManager();
-		//get login user (author)
-		HttpSession ss = SessionManager.getSession();
-		//get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		
+
 		List topics = null;
 		Forum forum = null;
 		try {
@@ -148,7 +144,7 @@ public class AuthoringAction extends Action {
 			topics = forumService.getAuthoredTopics(contentId);
 			forumForm.setForum(forum);
 			forumForm.setToolContentID(contentId);
-		} catch (PersistenceException e) {
+		} catch (Exception e) {
 			log.error(e);
 			return mapping.findForward("error");
 		}
@@ -389,14 +385,14 @@ public class AuthoringAction extends Action {
 			    		forumPO.setMessages(msgSet);
 			    	}
 			    	//restore new topic into ForumPO message set.
-			    	Message msg;
-			    	Iterator iter = forum.getMessages().iterator();
-			    	while(iter.hasNext()){
-			    		msg = (Message) iter.next();
-			    		//new topic, then add to PO
-			    		if(msg.getUid() == null)
-			    			msgSet.add(msg);
-			    	}
+//			    	Message msg;
+//			    	Iterator iter = forum.getMessages().iterator();
+//			    	while(iter.hasNext()){
+//			    		msg = (Message) iter.next();
+//			    		//new topic, then add to PO
+//			    		if(msg.getUid() == null)
+//			    			msgSet.add(msg);
+//			    	}
 				}
 				PropertyUtils.copyProperties(forumPO,forum);
 				//copy back

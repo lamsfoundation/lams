@@ -21,7 +21,7 @@
 			<tr>
 				<td>
 					<br>
-					<c:out value="${topic.bodyByHtml}" escapeXml="false" />
+					<c:out value="${topic.message.body}" escapeXml="false" />
 				</td>
 			</tr>
 			<tr>
@@ -40,13 +40,14 @@
 			<tr>
 				<td align="right">
 					<br>
-					<c:set var="edittopic">
-						<html:rewrite page="/learning/editTopic.do?topicId=${topic.message.uid}&create=${topic.message.created.time}" />
-					</c:set> 
-					<html:link href="${edittopic}">
-						<b><fmt:message key="label.edit" /></b>
-					</html:link>
-					
+					<c:if test="${sessionScope.allowEdit}">
+						<c:set var="edittopic">
+							<html:rewrite page="/learning/editTopic.do?topicId=${topic.message.uid}&create=${topic.message.created.time}" />
+						</c:set> 
+						<html:link href="${edittopic}">
+							<b><fmt:message key="label.edit" /></b>
+						</html:link>
+					</c:if>
 					<c:set var="replytopic">
 						<html:rewrite page="/learning/newReplyTopic.do?parentId=${topic.message.uid}" />
 					</c:set> 

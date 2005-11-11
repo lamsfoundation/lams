@@ -26,6 +26,8 @@ public interface ForumConstants {
 	public static final String FORUM_ID = "forum_id";
 
 	public static final int SESSION_STATUS_FINISHED = 1;
+	public static final String ALLOW_EDIT = "allowEdit";
+	public static final String ALLOW_RICH_EDITOR = "allowRichEditor";
 	
 	
 }

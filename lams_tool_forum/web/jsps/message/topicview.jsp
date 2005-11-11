@@ -29,7 +29,7 @@
 		<tr>
 			<td>
 				<br>
-				<c:out value="${topic.bodyByHtml}" escapeXml="false" />
+				<c:out value="${topic.message.body}" escapeXml="false" />
 			</td>
 		</tr>
 		<tr>
