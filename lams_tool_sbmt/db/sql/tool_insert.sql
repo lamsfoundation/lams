@@ -30,7 +30,7 @@ create_date_time
 VALUES
 (
 'lasbmt11',
-'sbmtService',
+'submitFilesService',
 'Submit File',
 'Submit File Tool Description',
 'submitfile',
@@ -43,7 +43,7 @@ NULL,
 1,
 1,
 0,
-'tool/lasbmt11/learning.do',
+'tool/lasbmt11/learner.do',
 'tool/lasbmt11/authoring.do',
 'tool/lasbmt11/definelater.do',
 'tool/lasbmt11/export.do',
