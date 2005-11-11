@@ -535,12 +535,6 @@ public class LearningDesign implements Serializable {
 	public FolderContentDTO getFolderContentDTO(){
 		return new FolderContentDTO();
 	}
-	
-/*	private Date ifNullSetAsCurrentTime(Date dateToCheck)
-	{
-	    return dateToCheck != null ? dateToCheck : new Date();
-	}
-	*/
-	
+		
 
 }
