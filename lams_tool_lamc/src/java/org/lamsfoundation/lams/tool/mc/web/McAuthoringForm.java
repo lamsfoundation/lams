@@ -82,7 +82,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String usernameVisible;
 	protected String questionsSequenced;
 	
-	/** proxy controllers for Monitoring tabs */ 
+	/* proxy controllers for Monitoring tabs */ 
 	protected String summaryMonitoring;
 	protected String instructionsMonitoring;
 	protected String editActivityMonitoring;

@@ -414,6 +414,26 @@
 	</sql>
 </target>
 
+<target name="deploy-tool" depends="create-deploy-package" 
+	description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
+
+	<path id="deploy.classpath">
+		<fileset dir="${build.deploy}">
+			<include name="lib/*.jar"/>
+		</fileset>
+	</path> 
+
+	<echo>Deploying the Question and Answer tool</echo>
+
+	<java
+		classname="org.lamsfoundation.lams.tool.deploy.Deploy"
+		classpathref="deploy.classpath"
+		fork="true">
+			<arg file="${build.deploy}/deploy.properties"/>
+			<arg value="True"/> 
+	</java>
+				
+</target>
 
 <!-- =================================================================== -->
 <!-- Generate the deploy package                                         -->
@@ -476,27 +496,6 @@
 		toolContext="${toolContext}"
 		toolWebUri="${product}.war"
 		/>
-</target>
-
-<target name="deploy-tool" depends="create-deploy-package" 
-	description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
-
-	<path id="deploy.classpath">
-		<fileset dir="${build.deploy}">
-			<include name="lib/*.jar"/>
-		</fileset>
-	</path> 
-
-	<echo>Deploying the Question and Answer tool</echo>
-
-	<java
-		classname="org.lamsfoundation.lams.tool.deploy.Deploy"
-		classpathref="deploy.classpath"
-		fork="true">
-			<arg file="${build.deploy}/deploy.properties"/>
-			<arg value="True"/> 
-	</java>
-				
 </target>
 	
 

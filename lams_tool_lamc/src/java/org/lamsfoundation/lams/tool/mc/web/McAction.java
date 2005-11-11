@@ -157,7 +157,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  */
 
-
 /**
  * 
  * GROUPING SUPPORT: Find out what to do.
@@ -219,1375 +218,1529 @@ public class McAction extends DispatchAction implements McAppConstants
 	 * if not, create the default Map 
 	*/
 
-	
-	
     public ActionForward loadQ(ActionMapping mapping,
                                ActionForm form,
                                HttpServletRequest request,
                                HttpServletResponse response) throws IOException,
                                                             ServletException
     {
-    	
-		logger.debug("loadQ started...");
 	 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-
 	 	IMcService mcService =McUtils.getToolService(request);
-	 	logger.debug("mcService:" + mcService);
 
 	 	/** define the next tab as Basic tab by default*/
 	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 	 	
 	 	McUtils.persistRichText(request);
+	 	populateParameters(request, mcAuthoringForm);
 	 	
-	 	String selectedQuestion=request.getParameter(SELECTED_QUESTION);
-		logger.debug("read parameter selectedQuestion: " + selectedQuestion);
-		
-		if ((selectedQuestion != null) && (selectedQuestion.length() > 0))
-		{
-			request.getSession().setAttribute(SELECTED_QUESTION,selectedQuestion);
-			logger.debug("updated SELECTED_QUESTION");
-		}
-		
-		
-		mcAuthoringForm.setAddQuestion(null);
-		mcAuthoringForm.setRemoveQuestion(null);
-		mcAuthoringForm.setEditOptions(null);
-		mcAuthoringForm.setMoveUp(null);
-		mcAuthoringForm.setMoveDown(null);
-		mcAuthoringForm.setAddOption(null);
-		mcAuthoringForm.setRemoveOption(null);
-		mcAuthoringForm.setViewFileItem(null);
-		
-		
-		String addQuestion=request.getParameter("addQuestion");
-		logger.debug("parameter addQuestion" + addQuestion);
-		if ((addQuestion != null) && addQuestion.equals("1"))
-		{
-			logger.debug("parameter addQuestion is selected " + addQuestion);
-			mcAuthoringForm.setAddQuestion("1");
-		}
-		
-		
-		String editOptions=request.getParameter("editOptions");
-		logger.debug("parameter editOptions" + editOptions);
-		if ((editOptions != null) && editOptions.equals("1"))
-		{
-			logger.debug("parameter editOptions is selected " + editOptions);
-			mcAuthoringForm.setEditOptions("1");
-		}
-		
-		String removeQuestion=request.getParameter("removeQuestion");
-		logger.debug("parameter removeQuestion" + removeQuestion);
-		if ((removeQuestion != null) && removeQuestion.equals("1"))
-		{
-			logger.debug("parameter removeQuestion is selected " + removeQuestion);
-			mcAuthoringForm.setRemoveQuestion("1");
-		}
-		
-		String moveDown=request.getParameter("moveDown");
-		logger.debug("parameter moveDown" + moveDown);
-		if ((moveDown != null) && moveDown.equals("1"))
-		{
-			logger.debug("parameter moveDown is selected " + moveDown);
-			mcAuthoringForm.setMoveDown("1");
-		}
-
-		String moveUp=request.getParameter("moveUp");
-		logger.debug("parameter moveUp" + moveUp);
-		if ((moveUp != null) && moveUp.equals("1"))
-		{
-			logger.debug("parameter moveUp is selected " + moveUp);
-			mcAuthoringForm.setMoveUp("1");
-		}
-		
-		String addOption=request.getParameter("addOption");
-		logger.debug("parameter addOption" + addOption);
-		if ((addOption != null) && addOption.equals("1"))
-		{
-			logger.debug("parameter addOption is selected " + addOption);
-			mcAuthoringForm.setAddOption("1");
-		}
-		
-		String removeOption=request.getParameter("removeOption");
-		logger.debug("parameter removeOption" + removeOption);
-		if ((removeOption != null) && removeOption.equals("1"))
-		{
-			logger.debug("parameter removeOption is selected " + removeOption);
-			mcAuthoringForm.setRemoveOption("1");
-		}
-		
-		String viewFileItem=request.getParameter("viewFileItem");
-		logger.debug("parameter viewFileItem" + viewFileItem);
-		if ((viewFileItem != null) && viewFileItem.equals("1"))
-		{
-			logger.debug("parameter viewFileItem is selected " + viewFileItem);
-			mcAuthoringForm.setViewFileItem("1");
-		}
-		
-
 		String userAction=null;
 	 	if (mcAuthoringForm.getAddQuestion() != null)
 	 	{
-	 		userAction="addQuestion";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
-		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
-		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
-		 	
-		 	logger.debug("will validate questions are not empty");
-	 		boolean questionsNotEmptyValid=validateQuestionsNotEmpty(mapQuestionsContent);
-        	logger.debug("questionsNotEmptyValid:" + questionsNotEmptyValid);
-        	if (questionsNotEmptyValid == false)
-        	{
-        		ActionMessages errors= new ActionMessages();
-        		errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.question.empty"));
-				saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
-				persistError(request,"error.question.empty");
-				
-				int maxQuestionIndex=mapQuestionsContent.size();
-				request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-				logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-				return (mapping.findForward(LOAD_QUESTIONS));
-        	}
-	 		
-	 		logger.debug("will validate weights");
-	 		boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
-        	logger.debug("weightsValid:" + weightsValid);
-        	if (weightsValid == false)
-        	{
-        		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-        		mcAuthoringForm.resetUserAction();
-        		
-        		int maxQuestionIndex=mapQuestionsContent.size();
-    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-				return (mapping.findForward(LOAD_QUESTIONS));
-        	}
-        	
-        	
-        	logger.debug("will validate SubTotalWeights");
-	 		boolean subWeightsValid=validateSubTotalWeights(request,mcAuthoringForm);
-        	logger.debug("subWeightsValid:" + subWeightsValid);
-        	if (subWeightsValid == false)
-        	{
-        		ActionMessages errors= new ActionMessages();
-        		errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.question.weight.total"));
-				saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
-				persistError(request,"error.question.weight.total");
-        		
-        		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-        		
-        		int maxQuestionIndex=mapQuestionsContent.size();
-    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-				return (mapping.findForward(LOAD_QUESTIONS));
-        	}
-	 		
-	 		
-		 	Map mapWeights= repopulateMap(request, "questionWeight");
-			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
-			
-			//addQuestion(request, mcAuthoringForm, mapQuestionsContent, true);
-			addQuestionMemory(request, mcAuthoringForm, mapQuestionsContent, true);
-			logger.debug("after addQuestionMemory");
-			
-			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
-    	    mcAuthoringForm.resetUserAction();
-    	    request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-    	    
-    	    int maxQuestionIndex=mapQuestionsContent.size();
-			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-    	    return (mapping.findForward(LOAD_QUESTIONS));
+	 		return addNewQuestion(request, mcAuthoringForm, mapping);
 	 	}
 	 	else if (mcAuthoringForm.getRemoveQuestion() != null)
 	 	{
-	 		userAction="removeQuestion";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		Map mapWeights= repopulateMap(request, "questionWeight");
-			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
-			
-	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
-		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
-		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
-		 	
-	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
-			logger.debug("questionIndex:" + questionIndex);
-			String deletableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
-			logger.debug("deletableQuestionEntry:" + deletableQuestionEntry);
-			
-			if (deletableQuestionEntry != null)
-			{
-				if (!(deletableQuestionEntry.equals("")))
-				{
-					mapQuestionsContent.remove(questionIndex);
-					logger.debug("removed entry:" + deletableQuestionEntry + " from the Map");
-					request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-					logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-				}
-			}
-			else
-			{
-				request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-				logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-			}
-			
-		 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
-			mcAuthoringForm.resetUserAction();
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-			
-			int maxQuestionIndex=mapQuestionsContent.size();
-			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-			return (mapping.findForward(LOAD_QUESTIONS));
+	 		return removeQuestion(request, mcAuthoringForm, mapping);
 	 	}
 	 	else if (mcAuthoringForm.getEditOptions() != null)
 	 	{
-	 		userAction="editOption";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-    		logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-    		
-    		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
-			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-	 		
-			Map mapQuestionsContent=repopulateMap(request, "questionContent");
-		 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
-		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
-		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-		 	
-		 	Map mapWeights= repopulateMap(request, "questionWeight");
-			request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-			System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
-		 	
-			String questionIndex =mcAuthoringForm.getQuestionIndex();
-			logger.debug("questionIndex:" + questionIndex);
-			request.getSession().setAttribute(SELECTED_QUESTION_INDEX, questionIndex);
-			logger.debug("set SELECTED_QUESTION_INDEX to:" + questionIndex);
-			
-			String editableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
-			logger.debug("editableQuestionEntry:" + editableQuestionEntry);
-			
-			if ((editableQuestionEntry == null) || (editableQuestionEntry.equals("")))
-			{
-				ActionMessages errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.emptyQuestion"));
-    			logger.debug("add error.emptyQuestion to ActionMessages");
-    			saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
-    			logger.debug("return to LOAD_QUESTIONS to fix error.");
-    			
-    			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-    			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-    			return (mapping.findForward(LOAD_QUESTIONS));
-			}
-			
-			Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-			logger.debug("toolContentId:" + toolContentId);
-			
-			McContent mcContent=mcService.retrieveMc(toolContentId);
-			logger.debug("mcContent:" + mcContent);
-			
-			McQueContent mcQueContent=null;
-			if (mcContent != null)
-			{
-				logger.debug("mcContent is not null");
-				mcQueContent=mcService.getQuestionContentByQuestionText(editableQuestionEntry, mcContent.getUid());
-		    	logger.debug("mcQueContent:" + mcQueContent);
-			}
-			
-			request.getSession().setAttribute(SELECTED_QUESTION, editableQuestionEntry);
-	    	logger.debug("SELECTED_QUESTION:" + request.getSession().getAttribute(SELECTED_QUESTION));
-	    	
-	    	if (mcQueContent != null)
-	    	{
-	    		logger.debug("mcQueContent is not null " + mcQueContent.getUid());
-	    		List listOptionsContent=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());
-	    		logger.debug("listOptionsContent: " + listOptionsContent);
-	    		
-	    		Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
-	    		mapOptionsContent.clear();
-	    		
-	    		Map mapSelectedOptions=(Map)request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
-	    		mapSelectedOptions.clear();
-	    		
-	    		/* options have been persisted before */ 
-	    		if (listOptionsContent != null)
-		 		{
-	    			logger.debug("listOptionsContent not null" );
-		 			Iterator listIteratorOptions=listOptionsContent.iterator();
-			    	Long mapIndex=new Long(1);
-			    	while (listIteratorOptions.hasNext())
-			    	{
-			    		McOptsContent mcOptsContent=(McOptsContent)listIteratorOptions.next();
-			    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
-			    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
-			    		mapIndex=new Long(mapIndex.longValue()+1);
-			    	}
-			    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-	    			logger.debug("MAP_OPTIONS_CONTENT reconstructed from db" );
-	    			
-	    			
-	    			/* we have to assume that some of the optons are selected as this is forced in the ui.
-	    			 * retrieve and present the selected options from the db
-	    			 * */
-	    			List listSelectedOptions=mcService.getPersistedSelectedOptions(mcQueContent.getUid());
-	    	 		logger.debug("listSelectedOptions:" + listSelectedOptions);
-	    	 		
-	    	 		if (listSelectedOptions != null)
-	    	 		{
-	    	 			Iterator listIteratorSelectedOptions=listSelectedOptions.iterator();
-	    		    	mapIndex=new Long(1);
-	    		    	while (listIteratorSelectedOptions.hasNext())
-	    		    	{
-	    		    		McOptsContent mcOptsContent=(McOptsContent)listIteratorSelectedOptions.next();
-	    		    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
-	    		    		mapSelectedOptions.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
-	    		    		mapIndex=new Long(mapIndex.longValue()+1);
-	    		    	}	
-	    	 		}
-	    	    	request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
-	    	    	logger.debug("MAP_SELECTED_OPTIONS reconstructed from db:" + mapSelectedOptions);
-	    	    	
-	    	    	String richTextFeedbackInCorrect=mcQueContent.getFeedbackIncorrect();
-					logger.debug("richTextFeedbackInCorrect:" + richTextFeedbackInCorrect);
-					if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
-					request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);
-					
-					String richTextFeedbackCorrect=mcQueContent.getFeedbackCorrect();
-					logger.debug("richTextFeedbackCorrect:" + richTextFeedbackCorrect);
-					if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
-					request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
-		 		}
-	    		else
-	    		{
-	    			logger.debug("listOptionsContent is null: no options persisted yet" );
-	    			logger.debug("present default options content" );
-	    			Long queContentUID=(Long)request.getSession().getAttribute(DEFAULT_QUESTION_UID);
-	    			logger.debug("DEFAULT_QUESTION_UID: " + queContentUID);
-	    			List listDefaultOption=mcService.findMcOptionsContentByQueId(queContentUID);
-	    			logger.debug("listDefaultOption: " + listDefaultOption);
-	    			
-	    			/** normally iterates only once */
-	    			Iterator itDefaultOption=listDefaultOption.iterator();
-			    	Long mapIndex=new Long(1);
-			    	while (itDefaultOption.hasNext())
-			    	{
-			    		McOptsContent mcOptsContent=(McOptsContent)itDefaultOption.next();
-			    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
-			    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
-			    		mapIndex=new Long(mapIndex.longValue()+1);
-			    	}
-			    	logger.debug("mapOptionsContent from default content: " + mapOptionsContent);
-			    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-	    			logger.debug("MAP_OPTIONS_CONTENT reconstructed from default option content" );
-	    			
-	    			request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
-	    	    	logger.debug("MAP_SELECTED_OPTIONS set as empty list :" + mapSelectedOptions);
-	    		}
-
-	    		/* present the feedback content the same way for the conditions above*/
-	    		String richTextFeedbackInCorrect=mcQueContent.getFeedbackIncorrect();
-				logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
-				if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
-				request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);
-	        	
-				String richTextFeedbackCorrect=mcQueContent.getFeedbackCorrect();
-				logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
-				if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
-				request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
-	    	}
-	    	else
-	    	{
-	    		logger.debug("mcQueContent is null, check the session for any activity");
-	    		logger.debug("check if the current question's option data has been stored in the MAP_GENERAL_OPTIONS_CONTENT");
-	    		
-	    		String selectedQuestionIndex=(String) request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
-				logger.debug("SELECTED_QUESTION_INDEX to:" + selectedQuestionIndex);
-				
-	    		logger.debug("mapGeneralOptionsContent to be checked: "  + mapGeneralOptionsContent);
-				Iterator itMapGeneral = mapGeneralOptionsContent.entrySet().iterator();
-	    		boolean optionsPresentationValid=false;
-	    		
-	    		Map mapOptionsContent= new TreeMap(new McComparator());
-				Map mapSelectedOptions= new TreeMap(new McComparator());
-				Map mapGsoc=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-				logger.debug("mapGsoc from the cache: " + mapGsoc);
-				
-				/* extract the relavent question's option from the larger Map */
-	        	while (itMapGeneral.hasNext()) 
-	        	{
-	            	Map.Entry pairs = (Map.Entry)itMapGeneral.next();
-	            	logger.debug("using the  pair: " +  pairs);
-	                logger.debug("using the  pair entries: " +  pairs.getKey() + " = " + pairs.getValue());
-	                
-	                if ((pairs.getKey() != null))
-	                {
-	                	if (pairs.getKey().equals(selectedQuestionIndex))
-	                	{
-	                		logger.debug("question found with options in the cache");
-	                		optionsPresentationValid=true;
-	                		
-	                		mapOptionsContent=(Map) pairs.getValue();
-	                		logger.debug("mapOptionsContent from the cache: " + mapOptionsContent);
-	                		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-	                		logger.debug("updated MAP_OPTIONS_CONTENT: " + mapOptionsContent);
-	                		
-	                		logger.debug("mapGsoc: " + mapGsoc);
-	    	        		Iterator itMapSelected = mapGsoc.entrySet().iterator();
-	    		    		
-	    		        	while (itMapSelected.hasNext()) {
-	    		            	Map.Entry spairs = (Map.Entry)itMapSelected.next();
-	    		                logger.debug("using the  spairs entries: " +  spairs.getKey() + " = " + spairs.getValue());
-	    		                
-	    		                if ((spairs.getKey() != null))
-	    		                {
-	    		                	if (spairs.getKey().equals(selectedQuestionIndex))
-	    		                	{
-	    		                		logger.debug("selected options for question found in the cache");
-
-	    		                		mapSelectedOptions=(Map) spairs.getValue();
-	    		                		logger.debug("mapSelectedOptionsContent from the cache: " + mapSelectedOptions);
-	    		                		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
-	    		                		logger.debug("updated MAP_SELECTED_OPTIONS: " + mapSelectedOptions);
-	    		                	}
-	    		                }
-	    		    		}
-	                	}
-	                }
-	    		}
-
-	        	
-	        	/* present the default content*/
-	        	if (optionsPresentationValid == false)
-	        	{
-            		logger.debug("optionsPresentationValid is false, present default content");
-	        		logger.debug("listOptionsContent is null: no options persisted yet" );
-	    			logger.debug("present default options content" );
-	    			Long queContentUID=(Long)request.getSession().getAttribute(DEFAULT_QUESTION_UID);
-	    			logger.debug("DEFAULT_QUESTION_UID: " + queContentUID);
-	    			List listDefaultOption=mcService.findMcOptionsContentByQueId(queContentUID);
-	    			logger.debug("listDefaultOption: " + listDefaultOption);
-	    			
-	    			/* normally iterates only once */
-	    			Iterator itDefaultOption=listDefaultOption.iterator();
-			    	Long mapIndex=new Long(1);
-			    	while (itDefaultOption.hasNext())
-			    	{
-			    		McOptsContent mcOptsContent=(McOptsContent)itDefaultOption.next();
-			    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
-			    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
-			    		mapIndex=new Long(mapIndex.longValue()+1);
-			    	}
-			    	logger.debug("mapOptionsContent from default content: " + mapOptionsContent);
-			    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-	    			logger.debug("MAP_OPTIONS_CONTENT reconstructed from default option content" );
-	    			
-	    			request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
-	    	    	logger.debug("MAP_SELECTED_OPTIONS set as empty list :" + mapSelectedOptions);
-	        	}
-	        	
-	        	
-	        	Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
-				logger.debug("cached MAP_FEEDBACK_INCORRECT :" + mapFeedbackIncorrect);
-				if (mapFeedbackIncorrect != null)
-				{
-					String richTextFeedbackInCorrect=(String)mapFeedbackIncorrect.get(selectedQuestionIndex);
-					logger.debug("cached richTextFeedbackInCorrect:" + richTextFeedbackInCorrect);
-					request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);	
-				}
-				else
-				{
-					logger.debug("mapFeedbackIncorrect is null");
-					request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,"");
-				}
-				
-				Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
-				logger.debug("Submit final MAP_FEEDBACK_CORRECT :" + mapFeedbackCorrect);
-				if (mapFeedbackCorrect != null)
-				{
-					String richTextFeedbackCorrect=(String)mapFeedbackCorrect.get(selectedQuestionIndex);
-					logger.debug("cached richTextFeedbackCorrect:" + richTextFeedbackCorrect);
-					request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
-				}
-				else
-				{
-					logger.debug("mapFeedbackCorrect is null");
-					request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,"");
-				}
-	    	}	
-				
-		 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
-			logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
-			mcAuthoringForm.resetUserAction();
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-			return (mapping.findForward(LOAD_QUESTIONS));
-	 	
+	 	    return editOptions(request,mcAuthoringForm, mapping);
 	 	}
 	 	else if (mcAuthoringForm.getMoveDown() != null)
 	 	{
-	 		userAction="moveDown";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
-		 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
-		 	
-	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
-			logger.debug("questionIndex:" + questionIndex);
-			String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
-			logger.debug("movableQuestionEntry:" + movableQuestionEntry);
-			
-			mapQuestionsContent= shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "down");
-			logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
-			
-		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-			logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-	 		
-	 		mcAuthoringForm.resetUserAction();
-	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
-    	    request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-    	    
-    	    int maxQuestionIndex=mapQuestionsContent.size();
-			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-    	    return (mapping.findForward(LOAD_QUESTIONS));
+	 		return moveQuestionDown(request, mcAuthoringForm, mapping);
 	 	}
 	 	else if (mcAuthoringForm.getMoveUp() != null)
 	 	{
-	 		userAction="moveUp";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
-		 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
-		 	
-	 		String questionIndex =mcAuthoringForm.getQuestionIndex();
-			logger.debug("questionIndex:" + questionIndex);
-			String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
-			logger.debug("movableQuestionEntry:" + movableQuestionEntry);
-			
-			mapQuestionsContent= shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "up");
-			logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
-			
-		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-			logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-	 		
-	 		mcAuthoringForm.resetUserAction();
-	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-			logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
-    	    request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-    	    
-    	    int maxQuestionIndex=mapQuestionsContent.size();
-			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-    	    return (mapping.findForward(LOAD_QUESTIONS));
+	 		return moveQuestionUp(request, mcAuthoringForm, mapping);
 	 	}
 	 	else if (mcAuthoringForm.getAddOption() != null)
 	 	{
-	 		userAction="addOption";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
-			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-	 		
-	 		Map mapOptionsContent=repopulateMap(request,"optionContent");
-		 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
-		 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
-		 	
-		 	boolean verifyDuplicatesOptionsMap=verifyDuplicatesOptionsMap(mapOptionsContent);
-		 	logger.debug("verifyDuplicatesOptionsMap: " + verifyDuplicatesOptionsMap);
-		 	if (verifyDuplicatesOptionsMap == false)
-	 		{
-	 			ActionMessages errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.answers.duplicate"));
-    			logger.debug("add error.answers.duplicate to ActionMessages");
-    			saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
-    			logger.debug("return to LOAD_QUESTIONS to fix error.");
-    			
-    			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
-    			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-    			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-    			return (mapping.findForward(LOAD_QUESTIONS));	
-	 		}
-		 	
-		 	String selectedQuestionIndex=(String)request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
-			logger.debug("selectedQuestionIndex:" + selectedQuestionIndex);
-			
-		 	int mapSize=mapOptionsContent.size();
-	 		mapOptionsContent.put(new Long(++mapSize).toString(), "");
-			logger.debug("updated mapOptionsContent Map size: " + mapOptionsContent.size());
-			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-    		logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-    		
-    		
-    		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-    		logger.debug("current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-    		mapGeneralOptionsContent.put(selectedQuestionIndex,mapOptionsContent);
-    		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
-    		logger.debug("updated  MAP_GENERAL_OPTIONS_CONTENT after add: " + mapGeneralOptionsContent);
-    		
-    		
-    		/*
-    		Long selectedQuestionContentUid=(Long) request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
-	 		logger.debug("selectedQuestionContentUid:" + selectedQuestionContentUid);
-	 		
-	 		McQueContent mcQueContent = mcService.retrieveMcQueContentByUID(selectedQuestionContentUid);
-			logger.debug("mcQueContent:" + mcQueContent);
-			
-			mcService.removeMcOptionsContentByQueId(selectedQuestionContentUid);
-			logger.debug("removed all mcOptionsContents for mcQueContentId :" + selectedQuestionContentUid);
-			
-			
-	 		if (mcQueContent != null)
-	 		{
-	 	    	Iterator itOptionsMap = mapOptionsContent.entrySet().iterator();
-	 	        while (itOptionsMap.hasNext()) {
-	 	            Map.Entry pairs = (Map.Entry)itOptionsMap.next();
-	 	            logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	 	            if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
-	 	            {
-	 	            	McOptsContent mcOptionsContent= new McOptsContent(false,pairs.getValue().toString() , mcQueContent, new HashSet());
-	 	    	        logger.debug("created mcOptionsContent: " + mcOptionsContent);
-	 	       	        mcService.saveMcOptionsContent(mcOptionsContent);
-	 	       	        logger.debug("persisted the answer: " + pairs.getValue().toString());
-	 	            }
-	 	        }
-	 		}
-	 		*/
-	 		
-	 		Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
-	 		mapSelectedOptions.clear();
-	 		mapSelectedOptions = repopulateCurrentCheckBoxStatesMap(request);
-	 		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
-	 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
-	 		
-	 		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-    		logger.debug("current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
-    		mapGeneralSelectedOptionsContent.put(selectedQuestionIndex,mapSelectedOptions);
-    		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
-    		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
-    		
-    		/* update feedback Maps*/
-			Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
-			logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
-			String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
-			logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
-			
-			if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
-        	mapFeedbackIncorrect.put(selectedQuestionIndex, richTextFeedbackInCorrect);
-        	request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
-			logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackIncorrect);
-			
-			Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
-			logger.debug("current mapFeedbackCorrect:" +  mapFeedbackCorrect);
-			String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
-        	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
-        	
-        	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
-        	mapFeedbackCorrect.put(selectedQuestionIndex, richTextFeedbackCorrect);
-        	request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
-			logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackCorrect);
-	 		
-	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
-			logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
-	 		mcAuthoringForm.resetUserAction();
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-			return (mapping.findForward(LOAD_QUESTIONS));
+	 		return addOption(request, mcAuthoringForm, mapping);
 	 	}
 	 	else if (mcAuthoringForm.getRemoveOption() != null)
 	 	{
-	 		userAction="removeOption";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
-			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-	 		
-	 		String optionIndex =mcAuthoringForm.getDeletableOptionIndex();
-			logger.debug("optionIndex:" + optionIndex);
-			
-			Map mapOptionsContent=repopulateMap(request, "optionContent");
-		 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
-		 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
-		 	
-			String deletableOptionEntry=(String)mapOptionsContent.get(optionIndex);
-			logger.debug("deletableOptionEntry:" + deletableOptionEntry);
-
-			/*
-			if (deletableOptionEntry != null)
-			{
-				if (!(deletableOptionEntry.equals("")))
-				{
-					mapOptionsContent.remove(optionIndex);
-					logger.debug("removed entry:" + deletableOptionEntry + " from the Map");
-					request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-					logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-					
-					Long selectedQuestionContentUid=(Long) request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
-			 		logger.debug("selectedQuestionContentUid:" + selectedQuestionContentUid);
-					
-					logger.debug("deletableOptionEntry: " + deletableOptionEntry + "mcQueContentUid: " +  selectedQuestionContentUid);
-					McOptsContent mcOptsContent=mcService.getOptionContentByOptionText(deletableOptionEntry, selectedQuestionContentUid);
-					logger.debug("mcOptsContent: " + mcOptsContent);
-					
-					if (mcOptsContent != null)
-					{
-						mcService.removeMcOptionsContent(mcOptsContent);
-						logger.debug("removed mcOptsContent from DB:" + mcOptsContent);
-					}
-				}
-			}
-			*/
-			
-			if (deletableOptionEntry != null)
-			{
-				if (!(deletableOptionEntry.equals("")))
-				{
-					mapOptionsContent.remove(optionIndex);
-					logger.debug("removed entry:" + deletableOptionEntry + " from the Map");
-					request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-					logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-				}
-			}
-
-			String selectedQuestionIndex=(String)request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
-			logger.debug("selectedQuestionIndex:" + selectedQuestionIndex);
-    		
-    		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-    		logger.debug("current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-    		mapGeneralOptionsContent.put(selectedQuestionIndex,mapOptionsContent);
-    		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
-    		logger.debug("updated  MAP_GENERAL_OPTIONS_CONTENT after remove: " + mapGeneralOptionsContent);
-    		
-    		
-    		Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
-	 		mapSelectedOptions.clear();
-	 		mapSelectedOptions = repopulateCurrentCheckBoxStatesMap(request);
-	 		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
-	 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
-	 		
-    		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-    		logger.debug("current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
-    		mapGeneralSelectedOptionsContent.put(selectedQuestionIndex,mapSelectedOptions);
-    		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
-    		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
-    		
-			
-    		/* update feedback Maps*/
-			Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
-			logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
-			String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
-			logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
-			
-			if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
-        	mapFeedbackIncorrect.put(selectedQuestionIndex, richTextFeedbackInCorrect);
-        	request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
-			logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackIncorrect);
-			
-			Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
-			logger.debug("current mapFeedbackCorrect:" +  mapFeedbackCorrect);
-			String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
-        	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
-        	
-        	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
-        	mapFeedbackCorrect.put(selectedQuestionIndex, richTextFeedbackCorrect);
-        	request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
-			logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackCorrect);
-    		
-    		
-	 	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
-			logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
-			mcAuthoringForm.resetUserAction();			
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-			return (mapping.findForward(LOAD_QUESTIONS));
+	 		return removeOption(request, mcAuthoringForm, mapping);
 	 	}
 	 	else if (mcAuthoringForm.getDoneOptions() != null)
 	 	{
-	 		userAction="doneOptions";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-			
-	 		boolean validateOptions=validateOptions(request);
-	 		logger.debug("validateOptions:" + validateOptions);
-	 		
-	 		if (validateOptions == false)
-	 		{
-	 			ActionMessages errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.checkBoxes.empty"));
-    			logger.debug("add error.checkBoxes.empty to ActionMessages");
-    			saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
-    			logger.debug("return to LOAD_QUESTIONS to fix error.");
-    			
-    			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
-    			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-    			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-    			return (mapping.findForward(LOAD_QUESTIONS));	
-	 		}
-	 			 		
-	 		/*
-	 		Long selectedQuestionContentUid=(Long)request.getSession().getAttribute(SELECTED_QUESTION_CONTENT_UID);
-	 	    logger.debug("selectedQuestionContentUid:" + selectedQuestionContentUid);
-	 	   
-	 	    selectedQuestion=(String) request.getSession().getAttribute(SELECTED_QUESTION);
-			logger.debug("final selectedQuestion:" + selectedQuestion);
-	 		
-	 		McQueContent mcQueContent = mcService.retrieveMcQueContentByUID(selectedQuestionContentUid);
-			logger.debug("mcQueContent:" + mcQueContent);
-			
-			mcQueContent.setQuestion(selectedQuestion);
-			logger.debug("updated question set");
-			*/
-			
-	 		Map mapOptionsContent=repopulateMap(request, "optionContent");
-		 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
-		 	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-			logger.debug("final done  MAP_OPTIONS_CONTENT: " + mapOptionsContent);
-		 	
-	 		
-	 		String selectedQuestionIndex=(String) request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
-			logger.debug("retrieved SELECTED_QUESTION_INDEX to:" + selectedQuestionIndex);
-			
-			/** update the questions Map with the new question*/
-			Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
-		 	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
-		 	selectedQuestion=(String) request.getSession().getAttribute(SELECTED_QUESTION);
-			logger.debug("final selectedQuestion:" + selectedQuestion);
-			mapQuestionsContent.put(selectedQuestionIndex,selectedQuestion);
-			logger.debug("updated mapQuestionsContent with:" +  selectedQuestionIndex + " and " + selectedQuestion);
-			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-			logger.debug("updated MAP_QUESTIONS_CONTENT:" +  mapQuestionsContent);
-			
-			
-			Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
-	 		mapSelectedOptions.clear();
-	 		mapSelectedOptions = repopulateCurrentCheckBoxStatesMap(request);
-	 		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
-	 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
-	 		
-    		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-    		logger.debug("current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
-    		mapGeneralSelectedOptionsContent.put(selectedQuestionIndex,mapSelectedOptions);
-    		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
-    		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
-			
-			
-			/* update feedback Maps*/
-			Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
-			logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
-			String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
-			logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
-			
-			if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
-        	mapFeedbackIncorrect.put(selectedQuestionIndex, richTextFeedbackInCorrect);
-        	request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
-			logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackIncorrect);
-			
-			Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
-			logger.debug("current mapFeedbackCorrect:" +  mapFeedbackCorrect);
-			String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
-        	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
-        	
-        	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
-        	mapFeedbackCorrect.put(selectedQuestionIndex, richTextFeedbackCorrect);
-        	request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
-			logger.debug("updated MAP_FEEDBACK_CORRECT:" +  mapFeedbackCorrect);
-			
-			
-			
-			//FIX HERE
-			/*
-			String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
-        	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
-        	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect=""; 
-			mcQueContent.setFeedbackCorrect(richTextFeedbackCorrect);
-        	
-        	String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
-        	logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
-        	if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
-        	mcQueContent.setFeedbackIncorrect(richTextFeedbackInCorrect);
-			
-			mcService.saveOrUpdateMcQueContent(mcQueContent);
-			logger.debug("persisted  selectedQuestion" + selectedQuestion);
-			
-			
-			
-			Map mapQuestionsContent =rebuildQuestionMapfromDB(request);
-			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-			logger.debug("updated MAP_QUESTIONS_CONTENT with the changed question:" + mapQuestionsContent);
-			
-			mcService.removeMcOptionsContentByQueId(selectedQuestionContentUid);
-			logger.debug("removed all mcOptionsContents for mcQueContentId :" + selectedQuestionContentUid);
-			
-			String isCheckBoxSelected=null;
-	 		boolean isCorrect=false;
-	    	for (int i=1; i <= MAX_OPTION_COUNT ; i++)
-			{
-	    		isCorrect=false;
-	    		isCheckBoxSelected=request.getParameter("checkBoxSelected" + i);
-    			logger.debug("isCheckBoxSelected: " + isCheckBoxSelected);
-    			String selectedIndex=null;
-    			
-    			if (isCheckBoxSelected != null)
-    			{
-        			if (isCheckBoxSelected.equals("Correct"))
-        			{
-        				isCorrect=true;
-        			}
-
-        			logger.debug("looped isCorrect: " + isCorrect);
-    				logger.debug("looped selectedIndex: " + i);
-    		 		
-    		 		long mapCounter=0;
-    		 		String selectedAnswer=null;
-    		 		selectedAnswer=request.getParameter("optionContent" + i);
-	    			logger.debug("found selectedAnswer: " + selectedAnswer);
-	    			
-    				Map mapOptionsContent=repopulateMap(request,"optionContent");
-    			 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
-    			 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
-    		 		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-    	    		logger.debug("Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-    	    		
-    	    		if ((selectedAnswer != null) && (selectedAnswer.length() > 0))
-    	    		{
-    	    			McOptsContent mcOptionsContent= new McOptsContent(isCorrect,selectedAnswer , mcQueContent, new HashSet());
-     	    	        logger.debug("created mcOptionsContent: " + mcOptionsContent);
-     	       	        mcService.saveMcOptionsContent(mcOptionsContent);
-     	       	        logger.debug("final persistance of option");	
-    	    		}
-    			}
-			}
-			
-			*/
-			
-			Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-    		logger.debug("current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-    		mapGeneralOptionsContent.put(selectedQuestionIndex,mapOptionsContent);
-    		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
-    		logger.debug("updated  MAP_GENERAL_OPTIONS_CONTENT after done: " + mapGeneralOptionsContent);
-			
-	    	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-			mcAuthoringForm.resetUserAction();
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-			return (mapping.findForward(LOAD_QUESTIONS));
+	 		return doneOptions(request, mcAuthoringForm, mapping);
 	 	}
 	 	else if (mcAuthoringForm.getSubmitQuestions() != null)
 	 	{
-	 		/* persist the final Questions Map  */
-	 		userAction="submitQuestions";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-
-			Map mapQuestionsContent=repopulateMap(request, "questionContent");
-		 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
-		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-		 	
-	 		ActionMessages errors= new ActionMessages();
-
-        	boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
-        	logger.debug("weightsValid:" + weightsValid);
-        	if (weightsValid == false)
-        	{
-    			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-    			mcAuthoringForm.resetUserAction();
-    			
-    			int maxQuestionIndex=mapQuestionsContent.size();
-    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-				return (mapping.findForward(LOAD_QUESTIONS));
-        	}
-        	
-        	boolean isTotalWeightsValid=validateTotalWeight(request);
-        	logger.debug("isTotalWeightsValid:" + isTotalWeightsValid);
-        	if (isTotalWeightsValid == false)
-        	{
-        		errors= new ActionMessages();
-        		errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.total.invalid"));
-				saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
-				persistError(request,"error.weights.total.invalid");
-				
-				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-    			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-    			
-    			int maxQuestionIndex=mapQuestionsContent.size();
-    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-				return (mapping.findForward(LOAD_QUESTIONS));
-        	}
-        	
-        	boolean isQuestionsSequenced=false;
-        	boolean isSynchInMonitor=false;
-        	boolean isUsernameVisible=false;
-        	boolean isRetries=false;
-        	boolean isShowFeedback=false;
-        	boolean isSln=false;
-        	
-        	String monitoringReportTitle="";
-        	String reportTitle="";
-        	String endLearningMessage="";
-        	int passmark=0;
-        	
-        	logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
-        	if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
-        		isQuestionsSequenced=true;
-        	
-        	logger.debug("isSynchInMonitor: " +  mcAuthoringForm.getSynchInMonitor());
-        	if (mcAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
-        		isSynchInMonitor=true;
-        	
-        	logger.debug("isUsernameVisible: " +  mcAuthoringForm.getUsernameVisible());
-        	if (mcAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
-        		isUsernameVisible=true;
-        	
-        	logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
-        	if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
-        		isRetries=true;
-        	
-        	logger.debug("isSln" +  mcAuthoringForm.getSln());
-        	if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
-        		isSln=true;
-        	
-        	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
-        	
-        	if (mcAuthoringForm.getPassmark() != null)
-        	{
-        		try
-				{
-	        		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
-	        		logger.debug("tried passmark: " +  passmark);
-				}
-	        	catch(Exception e)
-				{
-	        		errors= new ActionMessages();
-					errors.add(Globals.ERROR_KEY,new ActionMessage("error.passmark.notInteger"));
-					saveErrors(request,errors);
-	    			mcAuthoringForm.resetUserAction();
-					persistError(request,"error.passmark.notInteger");
-					
-					request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-	    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-	    			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-	    			
-	    			int maxQuestionIndex=mapQuestionsContent.size();
-	    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-	    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-					return (mapping.findForward(LOAD_QUESTIONS));
-				}
-        	}
-        	
-        	
-        	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0))
-        	{
-        		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
-        		logger.debug("populated passmark: " +  passmark);
-        	}
-        	else
-        	{
-        		errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.passMark.empty"));
-    			logger.debug("add error.passMark.empty to ActionMessages");
-    			saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
-    			logger.debug("return to LOAD_QUESTIONS to fix error.");
-    			
-    			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-    			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-    			
-    			int maxQuestionIndex=mapQuestionsContent.size();
-    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-    			return (mapping.findForward(LOAD_QUESTIONS));
-        	}
-        	
-        	logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
-        	if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
-        		isShowFeedback=true;
-        	    	
-        	logger.debug("MONITORING_REPORT_TITLE: " +  mcAuthoringForm.getMonitoringReportTitle());
-        	monitoringReportTitle=mcAuthoringForm.getMonitoringReportTitle();
-        	if ((monitoringReportTitle == null) || (monitoringReportTitle.length() == 0)) 
-        		monitoringReportTitle=(String)request.getSession().getAttribute(MONITORING_REPORT_TITLE);
-        	
-        	reportTitle=mcAuthoringForm.getReportTitle();
-        	logger.debug("REPORT_TITLE: " +  mcAuthoringForm.getReportTitle());
-        	if ((reportTitle == null) || (reportTitle.length() == 0)) 
-        		reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
-        	
-        	endLearningMessage=mcAuthoringForm.getEndLearningMessage();
-        	logger.debug("END_LEARNING_MESSAGE: " +  mcAuthoringForm.getEndLearningMessage());
-        	if ((endLearningMessage == null) || (endLearningMessage.length() == 0))
-        		endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSAGE);
-
-        	
-        	String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
-        	logger.debug("richTextTitle: " + richTextTitle);
-        	
-        	String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
-        	logger.debug("richTextInstructions: " + richTextInstructions);
-        	
-	 		
-	 		if ((richTextTitle == null) || (richTextTitle.length() == 0) || richTextTitle.equalsIgnoreCase(RICHTEXT_BLANK))
-    		{
-        		errors.add(Globals.ERROR_KEY,new ActionMessage("error.title"));
-    			logger.debug("add title to ActionMessages");
-    		}
-
-    		if ((richTextInstructions == null) || (richTextInstructions.length() == 0) || richTextInstructions.equalsIgnoreCase(RICHTEXT_BLANK))
-    		{
-    			errors.add(Globals.ERROR_KEY, new ActionMessage("error.instructions"));
-    			logger.debug("add instructions to ActionMessages: ");
-    		}
-
-    		if (errors.size() > 0)  
-    		{
-    			logger.debug("either title or instructions or both is missing. Returning back to from to fix errors:");
-				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-    			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-    			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-    			mcAuthoringForm.resetUserAction();
-    			
-    			int maxQuestionIndex=mapQuestionsContent.size();
-    			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-    			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-    			return (mapping.findForward(LOAD_QUESTIONS));
-    		}
-    		
-    		String richTextOfflineInstructions=(String) request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
-        	logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
-        	if (richTextOfflineInstructions == null) richTextOfflineInstructions="";
-        	
-        	String richTextOnlineInstructions=(String) request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
-        	logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
-        	if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
-        	
-        	String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
-    		logger.debug("richTextReportTitle: " + richTextReportTitle);
-    		
-    		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
-    		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
-        	
-        	
-	 		mapQuestionsContent=repopulateMap(request, "questionContent");
-		 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
-		 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
-		 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-		 	
-		 	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-	 	    logger.debug("toolContentId:" + toolContentId);
-				
-			McContent mcContent=mcService.retrieveMc(toolContentId);
-			logger.debug("mcContent:" + mcContent);
-			
-						
-			if (mcContent != null)
-			{
-				logger.debug("updating mcContent title and instructions:" + mcContent);
-				mcContent.setTitle(richTextTitle);
-				mcContent.setInstructions(richTextInstructions);
-
-				mcContent.setQuestionsSequenced(isQuestionsSequenced); 
-			    mcContent.setSynchInMonitor(isSynchInMonitor);
-			    mcContent.setUsernameVisible(isUsernameVisible);
-			    mcContent.setRetries(isRetries);
-			    mcContent.setPassMark(new Integer(passmark));
-			    mcContent.setShowFeedback(isShowFeedback);
-			    mcContent.setShowReport(isSln);
-			    mcContent.setEndLearningMessage(endLearningMessage);
-			    mcContent.setReportTitle(richTextReportTitle);
-			    mcContent.setMonitoringReportTitle(monitoringReportTitle);
-			    mcContent.setEndLearningMessage(richTextEndLearningMessage);
-			    mcContent.setOfflineInstructions(richTextOfflineInstructions);
-			    mcContent.setOnlineInstructions(richTextOnlineInstructions);
-			}
-			else
-			{
-				mcContent=createContent(request, mcAuthoringForm);		
-				logger.debug("mcContent created");
-			}
-					    
-			mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
-			logger.debug("Submit final MAP_QUESTIONS_CONTENT :" + mapQuestionsContent);
-			
-			Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
-			logger.debug("Submit final MAP_FEEDBACK_INCORRECT :" + mapFeedbackIncorrect);
-
-			Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
-			logger.debug("Submit final MAP_FEEDBACK_CORRECT :" + mapFeedbackCorrect);
-			
-			cleanupExistingQuestions(request, mcContent);
-			logger.debug("post cleanupExistingQuestions");
-			
-			
-			persistQuestions(request, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mcContent);
-			logger.debug("post persistQuestions");
-			
-			logger.debug("will do addUploadedFilesMetaData");
-			McUtils.addUploadedFilesMetaData(request,mcContent);
-			logger.debug("done addUploadedFilesMetaData");
-			
-			errors.clear();
-			errors.add(Globals.ERROR_KEY,new ActionMessage("submit.successful"));
-			logger.debug("add submit.successful to ActionMessages");
-			saveErrors(request,errors);
-			request.setAttribute(SUBMIT_SUCCESS, new Integer(1));
-			logger.debug("set SUBMIT_SUCCESS to 1");
-			
-			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-
-			mcAuthoringForm.resetUserAction();
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-			
-			int maxQuestionIndex=mapQuestionsContent.size();
-			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
-			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-	   	    return (mapping.findForward(LOAD_QUESTIONS));
+	 		return submitQuestions(request, mcAuthoringForm, mapping);
 	 	}
 	 	else if (mcAuthoringForm.getAdvancedTabDone() != null)
 	 	{
-	 		userAction="advancedTabDone";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		mcAuthoringForm.resetUserAction();
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-	   	    return (mapping.findForward(LOAD_QUESTIONS));
+	 		return doneAdvancedTab(request, mcAuthoringForm, mapping);
 	 	}
 	 	else if (mcAuthoringForm.getInstructionsTabDone() != null)
 	 	{
-	 		userAction="instructionsTabDone";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		mcAuthoringForm.resetUserAction();
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-	   	    return (mapping.findForward(LOAD_QUESTIONS));
+	 		return doneInstructionsTab(request, mcAuthoringForm, mapping);
 	 	} 
 	 	else if (mcAuthoringForm.getSubmitOfflineFile() != null)
         {
-	 		userAction="submitOfflineFile";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		McUtils.addFileToContentRepository(request, mcAuthoringForm, true);
-            logger.debug("offline file added to repository successfully.");
-	 		
-	 		mcAuthoringForm.resetUserAction();
-	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
-	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2 );
-			request.getSession().setAttribute(CURRENT_TAB, new Long(3));
-	   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+	 		return submitOfflineFiles(request, mcAuthoringForm, mapping);
         }
 	 	else if (mcAuthoringForm.getSubmitOnlineFile() != null)
         {
-	 		userAction="submitOnlineFile";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		McUtils.addFileToContentRepository(request, mcAuthoringForm, false);
-            logger.debug("online file added to repository successfully.");
-            
-            mcAuthoringForm.resetUserAction();
-	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
-	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
-			request.getSession().setAttribute(CURRENT_TAB, new Long(3));
-	   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+	 		return submitOnlineFiles(request, mcAuthoringForm, mapping);
         }
 	 	else if (mcAuthoringForm.getViewFileItem() != null)
         {
-	 		userAction="viewFileItem";
-	 		request.setAttribute(USER_ACTION, userAction);
-	 		logger.debug("userAction:" + userAction);
-	 		
-	 		String filename= request.getParameter("fileItem");
-	 		logger.debug("filename:" + filename);
-	 		
-	 		String uuid=mcService.getFileUuid(filename);
-	 		logger.debug("uuid:" + uuid);
-	 		
-	 		if (uuid == null)
-	 		{
-	 			ActionMessages errors= new ActionMessages();
-        		errors= new ActionMessages();
-				errors.add(Globals.ERROR_KEY,new ActionMessage("error.file.notPersisted"));
-				saveErrors(request,errors);
-    			mcAuthoringForm.resetUserAction();
-				persistError(request,"error.file.notPersisted");
-				
-				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
-		 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
-				request.getSession().setAttribute(CURRENT_TAB, new Long(3));
-		   	    return (mapping.findForward(ALL_INSTRUCTIONS));
-	 		}
-	 		
-	 		InputStream fileInputStream=mcService.downloadFile(new Long(uuid), null);
-	 		logger.debug("fileInputStream:" + fileInputStream);
-	 		
-	 		DataInputStream dis = new DataInputStream(fileInputStream);
-	 		logger.debug("dis:" + dis);
-	 		
-	 		String allFileText="";
-	 		try {
-	 			String input="";
-	 			while ((input = dis.readLine()) != null) {
-	 		        logger.debug("input:" + input);
-	 		        allFileText = allFileText + input + "\r\n";
-	 		    }    
-	 		} catch (EOFException e) {
-	 			logger.debug("error reading the file :" + e);
-	 			logger.debug("error msg reading the file :" + e.getMessage());
-	 		}
-	 		
-	 		logger.debug("allFileText:" + allFileText);
-	 		request.getSession().setAttribute(FILE_CONTENT, allFileText);
-	 		
-	 		request.setAttribute(FILE_CONTENT_READY, new Integer(1));
-	 		logger.debug("set FILE_CONTENT_READY to 1");
-	 		
-	 		request.getSession().setAttribute(FILE_NAME, filename);
-	 		
-	 		mcAuthoringForm.resetUserAction();
-	 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
-	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
-			request.getSession().setAttribute(CURRENT_TAB, new Long(3));
-	   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+	 		return viewFileItem(request, mcAuthoringForm, mapping);
         }
 	 	
 	 	mcAuthoringForm.resetUserAction();
 	 	return (mapping.findForward(LOAD_FILE_CONTENT));
     }
 
+
     
+    protected Map rebuildQuestionMapfromDB(HttpServletRequest request)
+    {
+    	Map mapQuestionsContent= new TreeMap(new McComparator());
+    	
+    	IMcService mcService =McUtils.getToolService(request);
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+		logger.debug("toolContentId:" + toolContentId);
+
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+    	List list=mcService.getAllQuestionEntries(mcContent.getUid());
+    	logger.debug("list:" + list);
+		
+		Iterator listIterator=list.iterator();
+    	Long mapIndex=new Long(1);
+    	while (listIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+    		logger.debug("mcQueContent:" + mcQueContent);
+    		mapQuestionsContent.put(mapIndex.toString(),mcQueContent.getQuestion());
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	
+    	logger.debug("refreshed Map:" + mapQuestionsContent);
+    	return mapQuestionsContent;
+    }
+    
+    
+    protected void removeRedundantQuestionEntries(HttpServletRequest request, Map mapQuestionsContent)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	logger.debug("main Map mapQuestionsContent:" + mapQuestionsContent);
+    	
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+		logger.debug("toolContentId:" + toolContentId);
+		
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+		if (mcContent != null)
+		{
+			List allQuestions=mcService.getAllQuestionEntries(mcContent.getUid());
+	    	logger.debug("allQuestions:" + allQuestions);
+	    	
+	    	Iterator listIterator=allQuestions.iterator();
+	    	
+	    	while (listIterator.hasNext())
+	    	{
+	    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+	    		logger.debug("mcQueContent:" + mcQueContent);
+	    		
+	    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+	    		boolean matchFound=false;
+	            while (itQuestionsMap.hasNext()) {
+	            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+	                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+	                
+	                if (pairs.getValue().toString().equals(mcQueContent.getQuestion()))
+					{
+	                    logger.debug("match found  the  pair: " + pairs.getValue().toString());
+	                	matchFound=true;
+	            	}
+	            }
+	            
+	            if (matchFound == false)
+	            {
+	            	mcService.removeMcQueContent(mcQueContent);
+	                logger.debug("removed mcQueContent: " + mcQueContent);
+	            }
+	    	}
+		}
+    }
+
+    
+    /**
+     * populates request parameters
+     * populateParameters(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     */
+    protected void populateParameters(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+    {
+        String selectedQuestion=request.getParameter(SELECTED_QUESTION);
+    	logger.debug("read parameter selectedQuestion: " + selectedQuestion);
+    	
+    	if ((selectedQuestion != null) && (selectedQuestion.length() > 0))
+    	{
+    		request.getSession().setAttribute(SELECTED_QUESTION,selectedQuestion);
+    		logger.debug("updated SELECTED_QUESTION");
+    	}
+    	
+    	mcAuthoringForm.setAddQuestion(null);
+    	mcAuthoringForm.setRemoveQuestion(null);
+    	mcAuthoringForm.setEditOptions(null);
+    	mcAuthoringForm.setMoveUp(null);
+    	mcAuthoringForm.setMoveDown(null);
+    	mcAuthoringForm.setAddOption(null);
+    	mcAuthoringForm.setRemoveOption(null);
+    	mcAuthoringForm.setViewFileItem(null);
+    	
+    	
+    	String addQuestion=request.getParameter("addQuestion");
+    	logger.debug("parameter addQuestion" + addQuestion);
+    	if ((addQuestion != null) && addQuestion.equals("1"))
+    	{
+    		logger.debug("parameter addQuestion is selected " + addQuestion);
+    		mcAuthoringForm.setAddQuestion("1");
+    	}
+    	
+    	
+    	String editOptions=request.getParameter("editOptions");
+    	logger.debug("parameter editOptions" + editOptions);
+    	if ((editOptions != null) && editOptions.equals("1"))
+    	{
+    		logger.debug("parameter editOptions is selected " + editOptions);
+    		mcAuthoringForm.setEditOptions("1");
+    	}
+    	
+    	String removeQuestion=request.getParameter("removeQuestion");
+    	logger.debug("parameter removeQuestion" + removeQuestion);
+    	if ((removeQuestion != null) && removeQuestion.equals("1"))
+    	{
+    		logger.debug("parameter removeQuestion is selected " + removeQuestion);
+    		mcAuthoringForm.setRemoveQuestion("1");
+    	}
+    	
+    	String moveDown=request.getParameter("moveDown");
+    	logger.debug("parameter moveDown" + moveDown);
+    	if ((moveDown != null) && moveDown.equals("1"))
+    	{
+    		logger.debug("parameter moveDown is selected " + moveDown);
+    		mcAuthoringForm.setMoveDown("1");
+    	}
+
+    	String moveUp=request.getParameter("moveUp");
+    	logger.debug("parameter moveUp" + moveUp);
+    	if ((moveUp != null) && moveUp.equals("1"))
+    	{
+    		logger.debug("parameter moveUp is selected " + moveUp);
+    		mcAuthoringForm.setMoveUp("1");
+    	}
+    	
+    	String addOption=request.getParameter("addOption");
+    	logger.debug("parameter addOption" + addOption);
+    	if ((addOption != null) && addOption.equals("1"))
+    	{
+    		logger.debug("parameter addOption is selected " + addOption);
+    		mcAuthoringForm.setAddOption("1");
+    	}
+    	
+    	String removeOption=request.getParameter("removeOption");
+    	logger.debug("parameter removeOption" + removeOption);
+    	if ((removeOption != null) && removeOption.equals("1"))
+    	{
+    		logger.debug("parameter removeOption is selected " + removeOption);
+    		mcAuthoringForm.setRemoveOption("1");
+    	}
+    	
+    	String viewFileItem=request.getParameter("viewFileItem");
+    	logger.debug("parameter viewFileItem" + viewFileItem);
+    	if ((viewFileItem != null) && viewFileItem.equals("1"))
+    	{
+    		logger.debug("parameter viewFileItem is selected " + viewFileItem);
+    		mcAuthoringForm.setViewFileItem("1");
+    	}
+    }
+
+
+    /**
+     * adds a new entry to the questions Map
+     * addNewQuestion(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return ActionForward
+     */
+    protected ActionForward addNewQuestion(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+    	String userAction="addQuestion";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		
+    	Map mapQuestionsContent=repopulateMap(request, "questionContent");
+     	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
+     	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+     	
+     	logger.debug("will validate questions are not empty");
+    	boolean questionsNotEmptyValid=validateQuestionsNotEmpty(mapQuestionsContent);
+    	logger.debug("questionsNotEmptyValid:" + questionsNotEmptyValid);
+    	if (questionsNotEmptyValid == false)
+    	{
+    		ActionMessages errors= new ActionMessages();
+    		errors= new ActionMessages();
+    		errors.add(Globals.ERROR_KEY,new ActionMessage("error.question.empty"));
+    		saveErrors(request,errors);
+    		mcAuthoringForm.resetUserAction();
+    		persistError(request,"error.question.empty");
+    		
+    		int maxQuestionIndex=mapQuestionsContent.size();
+    		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+    		return (mapping.findForward(LOAD_QUESTIONS));
+    	}
+    		
+    	logger.debug("will validate weights");
+    	boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
+    	logger.debug("weightsValid:" + weightsValid);
+    	if (weightsValid == false)
+    	{
+    		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    		mcAuthoringForm.resetUserAction();
+    		
+    		int maxQuestionIndex=mapQuestionsContent.size();
+    		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+    		return (mapping.findForward(LOAD_QUESTIONS));
+    	}
+    	
+    	
+    	logger.debug("will validate SubTotalWeights");
+    	boolean subWeightsValid=validateSubTotalWeights(request,mcAuthoringForm);
+    	logger.debug("subWeightsValid:" + subWeightsValid);
+    	if (subWeightsValid == false)
+    	{
+    		ActionMessages errors= new ActionMessages();
+    		errors= new ActionMessages();
+    		errors.add(Globals.ERROR_KEY,new ActionMessage("error.question.weight.total"));
+    		saveErrors(request,errors);
+    		mcAuthoringForm.resetUserAction();
+    		persistError(request,"error.question.weight.total");
+    		
+    		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    		
+    		int maxQuestionIndex=mapQuestionsContent.size();
+    		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+    		return (mapping.findForward(LOAD_QUESTIONS));
+    	}
+    		
+    		
+     	Map mapWeights= repopulateMap(request, "questionWeight");
+    	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+    	System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+    	
+    	addQuestionMemory(request, mcAuthoringForm, mapQuestionsContent, true);
+    	logger.debug("after addQuestionMemory");
+    	
+    	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+    	logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
+        mcAuthoringForm.resetUserAction();
+        request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+        
+        int maxQuestionIndex=mapQuestionsContent.size();
+    	request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    	logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+        return (mapping.findForward(LOAD_QUESTIONS));	
+    }
+
+    /**
+     * removes an entry from the questions Map
+     * 
+     * removeQuestion(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return ActionForward
+     */
+    protected ActionForward removeQuestion(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+		String userAction="removeQuestion";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		
+ 		Map mapWeights= repopulateMap(request, "questionWeight");
+		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+		
+ 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+	 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
+	 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+	 	
+ 		String questionIndex =mcAuthoringForm.getQuestionIndex();
+		logger.debug("questionIndex:" + questionIndex);
+		String deletableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
+		logger.debug("deletableQuestionEntry:" + deletableQuestionEntry);
+		
+		if (deletableQuestionEntry != null)
+		{
+			if (!(deletableQuestionEntry.equals("")))
+			{
+				mapQuestionsContent.remove(questionIndex);
+				logger.debug("removed entry:" + deletableQuestionEntry + " from the Map");
+				request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+				logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+			}
+		}
+		else
+		{
+			request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+			logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+		}
+		
+	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
+		mcAuthoringForm.resetUserAction();
+		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+		
+		int maxQuestionIndex=mapQuestionsContent.size();
+		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+		return (mapping.findForward(LOAD_QUESTIONS));
+    }
+
+    
+    /**
+     * prepares the UI so that candidate answers for a question can be edited
+     * editQuestion(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return
+     */
+    protected ActionForward editOptions(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+        String userAction="editOption";
+    	request.setAttribute(USER_ACTION, userAction);
+    	logger.debug("userAction:" + userAction);
+    	
+    	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+    	logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+    	
+    	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+    	logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+    		
+    	Map mapQuestionsContent=repopulateMap(request, "questionContent");
+     	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
+     	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+     	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+     	
+     	Map mapWeights= repopulateMap(request, "questionWeight");
+    	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+    	System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+     	
+    	String questionIndex =mcAuthoringForm.getQuestionIndex();
+    	logger.debug("questionIndex:" + questionIndex);
+    	request.getSession().setAttribute(SELECTED_QUESTION_INDEX, questionIndex);
+    	logger.debug("set SELECTED_QUESTION_INDEX to:" + questionIndex);
+    	
+    	String editableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
+    	logger.debug("editableQuestionEntry:" + editableQuestionEntry);
+    	
+    	if ((editableQuestionEntry == null) || (editableQuestionEntry.equals("")))
+    	{
+    		ActionMessages errors= new ActionMessages();
+    		errors.add(Globals.ERROR_KEY,new ActionMessage("error.emptyQuestion"));
+    		logger.debug("add error.emptyQuestion to ActionMessages");
+    		saveErrors(request,errors);
+    		mcAuthoringForm.resetUserAction();
+    		logger.debug("return to LOAD_QUESTIONS to fix error.");
+    		
+    		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+    		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+    		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    		return (mapping.findForward(LOAD_QUESTIONS));
+    	}
+    	
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId:" + toolContentId);
+    	
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+    	logger.debug("mcContent:" + mcContent);
+    	
+    	McQueContent mcQueContent=null;
+    	if (mcContent != null)
+    	{
+    		logger.debug("mcContent is not null");
+    		mcQueContent=mcService.getQuestionContentByQuestionText(editableQuestionEntry, mcContent.getUid());
+        	logger.debug("mcQueContent:" + mcQueContent);
+    	}
+    	
+    	request.getSession().setAttribute(SELECTED_QUESTION, editableQuestionEntry);
+    	logger.debug("SELECTED_QUESTION:" + request.getSession().getAttribute(SELECTED_QUESTION));
+    	
+    	if (mcQueContent != null)
+    	{
+    		logger.debug("mcQueContent is not null " + mcQueContent.getUid());
+    		List listOptionsContent=mcService.findMcOptionsContentByQueId(mcQueContent.getUid());
+    		logger.debug("listOptionsContent: " + listOptionsContent);
+    		
+    		Map mapOptionsContent=(Map)request.getSession().getAttribute(MAP_OPTIONS_CONTENT);
+    		mapOptionsContent.clear();
+    		
+    		Map mapSelectedOptions=(Map)request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
+    		mapSelectedOptions.clear();
+    		
+    		/* options have been persisted before */ 
+    		if (listOptionsContent != null)
+     		{
+    			logger.debug("listOptionsContent not null" );
+     			Iterator listIteratorOptions=listOptionsContent.iterator();
+    	    	Long mapIndex=new Long(1);
+    	    	while (listIteratorOptions.hasNext())
+    	    	{
+    	    		McOptsContent mcOptsContent=(McOptsContent)listIteratorOptions.next();
+    	    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+    	    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+    	    		mapIndex=new Long(mapIndex.longValue()+1);
+    	    	}
+    	    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+    			logger.debug("MAP_OPTIONS_CONTENT reconstructed from db" );
+    			
+    			
+    			/* we have to assume that some of the optons are selected as this is forced in the ui.
+    			 * retrieve and present the selected options from the db
+    			 * */
+    			List listSelectedOptions=mcService.getPersistedSelectedOptions(mcQueContent.getUid());
+    	 		logger.debug("listSelectedOptions:" + listSelectedOptions);
+    	 		
+    	 		if (listSelectedOptions != null)
+    	 		{
+    	 			Iterator listIteratorSelectedOptions=listSelectedOptions.iterator();
+    		    	mapIndex=new Long(1);
+    		    	while (listIteratorSelectedOptions.hasNext())
+    		    	{
+    		    		McOptsContent mcOptsContent=(McOptsContent)listIteratorSelectedOptions.next();
+    		    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+    		    		mapSelectedOptions.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+    		    		mapIndex=new Long(mapIndex.longValue()+1);
+    		    	}	
+    	 		}
+    	    	request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+    	    	logger.debug("MAP_SELECTED_OPTIONS reconstructed from db:" + mapSelectedOptions);
+    	    	
+    	    	String richTextFeedbackInCorrect=mcQueContent.getFeedbackIncorrect();
+    			logger.debug("richTextFeedbackInCorrect:" + richTextFeedbackInCorrect);
+    			if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
+    			request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);
+    			
+    			String richTextFeedbackCorrect=mcQueContent.getFeedbackCorrect();
+    			logger.debug("richTextFeedbackCorrect:" + richTextFeedbackCorrect);
+    			if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
+    			request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
+     		}
+    		else
+    		{
+    			logger.debug("listOptionsContent is null: no options persisted yet" );
+    			logger.debug("present default options content" );
+    			Long queContentUID=(Long)request.getSession().getAttribute(DEFAULT_QUESTION_UID);
+    			logger.debug("DEFAULT_QUESTION_UID: " + queContentUID);
+    			List listDefaultOption=mcService.findMcOptionsContentByQueId(queContentUID);
+    			logger.debug("listDefaultOption: " + listDefaultOption);
+    			
+    			/** normally iterates only once */
+    			Iterator itDefaultOption=listDefaultOption.iterator();
+    	    	Long mapIndex=new Long(1);
+    	    	while (itDefaultOption.hasNext())
+    	    	{
+    	    		McOptsContent mcOptsContent=(McOptsContent)itDefaultOption.next();
+    	    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+    	    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+    	    		mapIndex=new Long(mapIndex.longValue()+1);
+    	    	}
+    	    	logger.debug("mapOptionsContent from default content: " + mapOptionsContent);
+    	    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+    			logger.debug("MAP_OPTIONS_CONTENT reconstructed from default option content" );
+    			
+    			request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+    	    	logger.debug("MAP_SELECTED_OPTIONS set as empty list :" + mapSelectedOptions);
+    		}
+
+    		/* present the feedback content the same way for the conditions above*/
+    		String richTextFeedbackInCorrect=mcQueContent.getFeedbackIncorrect();
+    		logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
+    		if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
+    		request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);
+        	
+    		String richTextFeedbackCorrect=mcQueContent.getFeedbackCorrect();
+    		logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
+    		if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
+    		request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
+    	}
+    	else
+    	{
+    		logger.debug("mcQueContent is null, check the session for any activity");
+    		logger.debug("check if the current question's option data has been stored in the MAP_GENERAL_OPTIONS_CONTENT");
+    		
+    		String selectedQuestionIndex=(String) request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
+    		logger.debug("SELECTED_QUESTION_INDEX to:" + selectedQuestionIndex);
+    		
+    		logger.debug("mapGeneralOptionsContent to be checked: "  + mapGeneralOptionsContent);
+    		Iterator itMapGeneral = mapGeneralOptionsContent.entrySet().iterator();
+    		boolean optionsPresentationValid=false;
+    		
+    		Map mapOptionsContent= new TreeMap(new McComparator());
+    		Map mapSelectedOptions= new TreeMap(new McComparator());
+    		Map mapGsoc=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+    		logger.debug("mapGsoc from the cache: " + mapGsoc);
+    		
+    		/* extract the relavent question's option from the larger Map */
+        	while (itMapGeneral.hasNext()) 
+        	{
+            	Map.Entry pairs = (Map.Entry)itMapGeneral.next();
+            	logger.debug("using the  pair: " +  pairs);
+                logger.debug("using the  pair entries: " +  pairs.getKey() + " = " + pairs.getValue());
+                
+                if ((pairs.getKey() != null))
+                {
+                	if (pairs.getKey().equals(selectedQuestionIndex))
+                	{
+                		logger.debug("question found with options in the cache");
+                		optionsPresentationValid=true;
+                		
+                		mapOptionsContent=(Map) pairs.getValue();
+                		logger.debug("mapOptionsContent from the cache: " + mapOptionsContent);
+                		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+                		logger.debug("updated MAP_OPTIONS_CONTENT: " + mapOptionsContent);
+                		
+                		logger.debug("mapGsoc: " + mapGsoc);
+    	        		Iterator itMapSelected = mapGsoc.entrySet().iterator();
+    		    		
+    		        	while (itMapSelected.hasNext()) {
+    		            	Map.Entry spairs = (Map.Entry)itMapSelected.next();
+    		                logger.debug("using the  spairs entries: " +  spairs.getKey() + " = " + spairs.getValue());
+    		                
+    		                if ((spairs.getKey() != null))
+    		                {
+    		                	if (spairs.getKey().equals(selectedQuestionIndex))
+    		                	{
+    		                		logger.debug("selected options for question found in the cache");
+
+    		                		mapSelectedOptions=(Map) spairs.getValue();
+    		                		logger.debug("mapSelectedOptionsContent from the cache: " + mapSelectedOptions);
+    		                		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+    		                		logger.debug("updated MAP_SELECTED_OPTIONS: " + mapSelectedOptions);
+    		                	}
+    		                }
+    		    		}
+                	}
+                }
+    		}
+
+        	
+        	/* present the default content*/
+        	if (optionsPresentationValid == false)
+        	{
+        		logger.debug("optionsPresentationValid is false, present default content");
+        		logger.debug("listOptionsContent is null: no options persisted yet" );
+    			logger.debug("present default options content" );
+    			Long queContentUID=(Long)request.getSession().getAttribute(DEFAULT_QUESTION_UID);
+    			logger.debug("DEFAULT_QUESTION_UID: " + queContentUID);
+    			List listDefaultOption=mcService.findMcOptionsContentByQueId(queContentUID);
+    			logger.debug("listDefaultOption: " + listDefaultOption);
+    			
+    			/* normally iterates only once */
+    			Iterator itDefaultOption=listDefaultOption.iterator();
+    	    	Long mapIndex=new Long(1);
+    	    	while (itDefaultOption.hasNext())
+    	    	{
+    	    		McOptsContent mcOptsContent=(McOptsContent)itDefaultOption.next();
+    	    		logger.debug("option text:" + mcOptsContent.getMcQueOptionText());
+    	    		mapOptionsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+    	    		mapIndex=new Long(mapIndex.longValue()+1);
+    	    	}
+    	    	logger.debug("mapOptionsContent from default content: " + mapOptionsContent);
+    	    	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+    			logger.debug("MAP_OPTIONS_CONTENT reconstructed from default option content" );
+    			
+    			request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+    	    	logger.debug("MAP_SELECTED_OPTIONS set as empty list :" + mapSelectedOptions);
+        	}
+        	
+        	
+        	Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
+    		logger.debug("cached MAP_FEEDBACK_INCORRECT :" + mapFeedbackIncorrect);
+    		if (mapFeedbackIncorrect != null)
+    		{
+    			String richTextFeedbackInCorrect=(String)mapFeedbackIncorrect.get(selectedQuestionIndex);
+    			logger.debug("cached richTextFeedbackInCorrect:" + richTextFeedbackInCorrect);
+    			request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,richTextFeedbackInCorrect);	
+    		}
+    		else
+    		{
+    			logger.debug("mapFeedbackIncorrect is null");
+    			request.getSession().setAttribute(RICHTEXT_FEEDBACK_INCORRECT,"");
+    		}
+    		
+    		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
+    		logger.debug("Submit final MAP_FEEDBACK_CORRECT :" + mapFeedbackCorrect);
+    		if (mapFeedbackCorrect != null)
+    		{
+    			String richTextFeedbackCorrect=(String)mapFeedbackCorrect.get(selectedQuestionIndex);
+    			logger.debug("cached richTextFeedbackCorrect:" + richTextFeedbackCorrect);
+    			request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,richTextFeedbackCorrect);
+    		}
+    		else
+    		{
+    			logger.debug("mapFeedbackCorrect is null");
+    			request.getSession().setAttribute(RICHTEXT_FEEDBACK_CORRECT,"");
+    		}
+    	}	
+    		
+     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+    	logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
+    	mcAuthoringForm.resetUserAction();
+    	request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+    	return (mapping.findForward(LOAD_QUESTIONS));
+    }
+
+    
+    /**
+     * adds an option entry to the options Map
+     * addOption(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return ActionForward
+     */
+    protected ActionForward addOption(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+		String userAction="addOption";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+		logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+ 		
+ 		Map mapOptionsContent=repopulateMap(request,"optionContent");
+	 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
+	 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
+	 	
+	 	boolean verifyDuplicatesOptionsMap=verifyDuplicatesOptionsMap(mapOptionsContent);
+	 	logger.debug("verifyDuplicatesOptionsMap: " + verifyDuplicatesOptionsMap);
+	 	if (verifyDuplicatesOptionsMap == false)
+ 		{
+ 			ActionMessages errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.answers.duplicate"));
+			logger.debug("add error.answers.duplicate to ActionMessages");
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			logger.debug("return to LOAD_QUESTIONS to fix error.");
+			
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+			return (mapping.findForward(LOAD_QUESTIONS));	
+ 		}
+	 	
+	 	String selectedQuestionIndex=(String)request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
+		logger.debug("selectedQuestionIndex:" + selectedQuestionIndex);
+		
+	 	int mapSize=mapOptionsContent.size();
+ 		mapOptionsContent.put(new Long(++mapSize).toString(), "");
+		logger.debug("updated mapOptionsContent Map size: " + mapOptionsContent.size());
+		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+		logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+		
+		
+		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		mapGeneralOptionsContent.put(selectedQuestionIndex,mapOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+		logger.debug("updated  MAP_GENERAL_OPTIONS_CONTENT after add: " + mapGeneralOptionsContent);
+		
+		
+		Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
+ 		mapSelectedOptions.clear();
+ 		mapSelectedOptions = repopulateCurrentCheckBoxStatesMap(request);
+ 		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
+ 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+ 		
+ 		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+		mapGeneralSelectedOptionsContent.put(selectedQuestionIndex,mapSelectedOptions);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
+		
+		/* update feedback Maps*/
+		Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
+		logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
+		String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
+		logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
+		
+		if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
+    	mapFeedbackIncorrect.put(selectedQuestionIndex, richTextFeedbackInCorrect);
+    	request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
+		logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackIncorrect);
+		
+		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
+		logger.debug("current mapFeedbackCorrect:" +  mapFeedbackCorrect);
+		String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
+    	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
+    	
+    	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
+    	mapFeedbackCorrect.put(selectedQuestionIndex, richTextFeedbackCorrect);
+    	request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
+		logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackCorrect);
+ 		
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+		logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
+ 		mcAuthoringForm.resetUserAction();
+		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+		return (mapping.findForward(LOAD_QUESTIONS));
+    }
+    
+    
+    /**
+     * removes an option entry from the options Map
+     * addOption(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return ActionForward
+     */
+    protected ActionForward removeOption(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+		String userAction="removeOption";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+		logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+ 		
+ 		String optionIndex =mcAuthoringForm.getDeletableOptionIndex();
+		logger.debug("optionIndex:" + optionIndex);
+		
+		Map mapOptionsContent=repopulateMap(request, "optionContent");
+	 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
+	 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
+	 	
+		String deletableOptionEntry=(String)mapOptionsContent.get(optionIndex);
+		logger.debug("deletableOptionEntry:" + deletableOptionEntry);
+
+		if (deletableOptionEntry != null)
+		{
+			if (!(deletableOptionEntry.equals("")))
+			{
+				mapOptionsContent.remove(optionIndex);
+				logger.debug("removed entry:" + deletableOptionEntry + " from the Map");
+				request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+				logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+			}
+		}
+
+		String selectedQuestionIndex=(String)request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
+		logger.debug("selectedQuestionIndex:" + selectedQuestionIndex);
+		
+		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		mapGeneralOptionsContent.put(selectedQuestionIndex,mapOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+		logger.debug("updated  MAP_GENERAL_OPTIONS_CONTENT after remove: " + mapGeneralOptionsContent);
+		
+		
+		Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
+ 		mapSelectedOptions.clear();
+ 		mapSelectedOptions = repopulateCurrentCheckBoxStatesMap(request);
+ 		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
+ 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+ 		
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+		mapGeneralSelectedOptionsContent.put(selectedQuestionIndex,mapSelectedOptions);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
+		
+		/* update feedback Maps*/
+		Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
+		logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
+		String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
+		logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
+		
+		if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
+    	mapFeedbackIncorrect.put(selectedQuestionIndex, richTextFeedbackInCorrect);
+    	request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
+		logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackIncorrect);
+		
+		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
+		logger.debug("current mapFeedbackCorrect:" +  mapFeedbackCorrect);
+		String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
+    	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
+    	
+    	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
+    	mapFeedbackCorrect.put(selectedQuestionIndex, richTextFeedbackCorrect);
+    	request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
+		logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackCorrect);
+		
+ 	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+		logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
+		mcAuthoringForm.resetUserAction();			
+		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+		return (mapping.findForward(LOAD_QUESTIONS));
+    }
+    
+    
+    /**
+     * moves a question entry a step down the questions Map
+     * moveQuestionDown(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return ActionForward
+     */
+    protected ActionForward moveQuestionDown(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+    	String userAction="moveDown";
+    	request.setAttribute(USER_ACTION, userAction);
+    	logger.debug("userAction:" + userAction);
+    	
+    	Map mapQuestionsContent=repopulateMap(request, "questionContent");
+     	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
+     	
+    		String questionIndex =mcAuthoringForm.getQuestionIndex();
+    	logger.debug("questionIndex:" + questionIndex);
+    	String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
+    	logger.debug("movableQuestionEntry:" + movableQuestionEntry);
+    	
+    	mapQuestionsContent= shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "down");
+    	logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
+    	
+     	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+    	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+    		
+		mcAuthoringForm.resetUserAction();
+		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+    	logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
+        request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+        
+        int maxQuestionIndex=mapQuestionsContent.size();
+    	request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+    	logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+        return (mapping.findForward(LOAD_QUESTIONS));	
+    }
+    
+    
+    /**
+     * moves a question entry a step up the questions Map
+     * moveQuestionUp(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return ActionForward
+     */
+    protected ActionForward moveQuestionUp(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+		String userAction="moveUp";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		
+ 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+	 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
+	 	
+ 		String questionIndex =mcAuthoringForm.getQuestionIndex();
+		logger.debug("questionIndex:" + questionIndex);
+		String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
+		logger.debug("movableQuestionEntry:" + movableQuestionEntry);
+		
+		mapQuestionsContent= shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "up");
+		logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
+		
+	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+		logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+ 		
+ 		mcAuthoringForm.resetUserAction();
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
+	    request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+	    
+	    int maxQuestionIndex=mapQuestionsContent.size();
+		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+	    return (mapping.findForward(LOAD_QUESTIONS));
+    }
+
+    /**
+     * completes the candidate options screen
+     * doneOptions(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return ActionForward
+     */
+    protected ActionForward doneOptions(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+		String userAction="doneOptions";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+		
+ 		boolean validateOptions=validateOptions(request);
+ 		logger.debug("validateOptions:" + validateOptions);
+ 		
+ 		if (validateOptions == false)
+ 		{
+ 			ActionMessages errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.checkBoxes.empty"));
+			logger.debug("add error.checkBoxes.empty to ActionMessages");
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			logger.debug("return to LOAD_QUESTIONS to fix error.");
+			
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+			return (mapping.findForward(LOAD_QUESTIONS));	
+ 		}
+		
+ 		Map mapOptionsContent=repopulateMap(request, "optionContent");
+	 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
+	 	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+		logger.debug("final done  MAP_OPTIONS_CONTENT: " + mapOptionsContent);
+	 	
+ 		
+ 		String selectedQuestionIndex=(String) request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
+		logger.debug("retrieved SELECTED_QUESTION_INDEX to:" + selectedQuestionIndex);
+		
+		/** update the questions Map with the new question*/
+		Map mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
+	 	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+	 	String selectedQuestion=(String) request.getSession().getAttribute(SELECTED_QUESTION);
+		logger.debug("final selectedQuestion:" + selectedQuestion);
+		mapQuestionsContent.put(selectedQuestionIndex,selectedQuestion);
+		logger.debug("updated mapQuestionsContent with:" +  selectedQuestionIndex + " and " + selectedQuestion);
+		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+		logger.debug("updated MAP_QUESTIONS_CONTENT:" +  mapQuestionsContent);
+		
+		
+		Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
+ 		mapSelectedOptions.clear();
+ 		mapSelectedOptions = repopulateCurrentCheckBoxStatesMap(request);
+ 		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
+ 		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+ 		
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+		mapGeneralSelectedOptionsContent.put(selectedQuestionIndex,mapSelectedOptions);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		logger.debug("updated  MAP_GENERAL_SELECTED_OPTIONS_CONTENT after add: " + mapGeneralSelectedOptionsContent);
+		
+		
+		/* update feedback Maps*/
+		Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
+		logger.debug("current mapFeedbackIncorrect:" +  mapFeedbackIncorrect);
+		String richTextFeedbackInCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_INCORRECT);
+		logger.debug("richTextFeedbackInCorrect: " + richTextFeedbackInCorrect);
+		
+		if (richTextFeedbackInCorrect == null) richTextFeedbackInCorrect="";
+    	mapFeedbackIncorrect.put(selectedQuestionIndex, richTextFeedbackInCorrect);
+    	request.getSession().setAttribute(MAP_FEEDBACK_INCORRECT, mapFeedbackIncorrect);
+		logger.debug("updated MAP_FEEDBACK_INCORRECT:" +  mapFeedbackIncorrect);
+		
+		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
+		logger.debug("current mapFeedbackCorrect:" +  mapFeedbackCorrect);
+		String richTextFeedbackCorrect=(String) request.getSession().getAttribute(RICHTEXT_FEEDBACK_CORRECT);
+    	logger.debug("richTextFeedbackCorrect: " + richTextFeedbackCorrect);
+    	
+    	if (richTextFeedbackCorrect == null) richTextFeedbackCorrect="";
+    	mapFeedbackCorrect.put(selectedQuestionIndex, richTextFeedbackCorrect);
+    	request.getSession().setAttribute(MAP_FEEDBACK_CORRECT, mapFeedbackCorrect);
+		logger.debug("updated MAP_FEEDBACK_CORRECT:" +  mapFeedbackCorrect);
+		
+		
+		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		mapGeneralOptionsContent.put(selectedQuestionIndex,mapOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+		logger.debug("updated  MAP_GENERAL_OPTIONS_CONTENT after done: " + mapGeneralOptionsContent);
+		
+    	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+		mcAuthoringForm.resetUserAction();
+		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+		return (mapping.findForward(LOAD_QUESTIONS));
+    }
+
+    
+    /**
+     * submits questions Map
+     * submitQuestions(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return ActionForward
+     */
+    protected ActionForward submitQuestions(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+     	IMcService mcService =McUtils.getToolService(request);
+		/* persist the final Questions Map  */
+		String userAction="submitQuestions";
+		request.setAttribute(USER_ACTION, userAction);
+		logger.debug("userAction:" + userAction);
+		
+		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+	
+		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+	 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
+	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+	 	
+		ActionMessages errors= new ActionMessages();
+	
+		boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
+		logger.debug("weightsValid:" + weightsValid);
+		if (weightsValid == false)
+		{
+			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+			mcAuthoringForm.resetUserAction();
+			
+			int maxQuestionIndex=mapQuestionsContent.size();
+			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
+		
+		boolean isTotalWeightsValid=validateTotalWeight(request);
+		logger.debug("isTotalWeightsValid:" + isTotalWeightsValid);
+		if (isTotalWeightsValid == false)
+		{
+			errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.weights.total.invalid"));
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			persistError(request,"error.weights.total.invalid");
+			
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+			
+			int maxQuestionIndex=mapQuestionsContent.size();
+			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
+		
+		boolean isQuestionsSequenced=false;
+		boolean isSynchInMonitor=false;
+		boolean isUsernameVisible=false;
+		boolean isRetries=false;
+		boolean isShowFeedback=false;
+		boolean isSln=false;
+		
+		String monitoringReportTitle="";
+		String reportTitle="";
+		String endLearningMessage="";
+		int passmark=0;
+		
+		logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
+		if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
+			isQuestionsSequenced=true;
+		
+		logger.debug("isSynchInMonitor: " +  mcAuthoringForm.getSynchInMonitor());
+		if (mcAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
+			isSynchInMonitor=true;
+		
+		logger.debug("isUsernameVisible: " +  mcAuthoringForm.getUsernameVisible());
+		if (mcAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
+			isUsernameVisible=true;
+		
+		logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
+		if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
+			isRetries=true;
+		
+		logger.debug("isSln" +  mcAuthoringForm.getSln());
+		if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
+			isSln=true;
+		
+		logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
+		
+		if (mcAuthoringForm.getPassmark() != null)
+		{
+			try
+			{
+	    		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
+	    		logger.debug("tried passmark: " +  passmark);
+			}
+	    	catch(Exception e)
+			{
+	    		errors= new ActionMessages();
+				errors.add(Globals.ERROR_KEY,new ActionMessage("error.passmark.notInteger"));
+				saveErrors(request,errors);
+				mcAuthoringForm.resetUserAction();
+				persistError(request,"error.passmark.notInteger");
+				
+				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+				logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+				request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+				
+				int maxQuestionIndex=mapQuestionsContent.size();
+				request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+				logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+				return (mapping.findForward(LOAD_QUESTIONS));
+			}
+		}
+		
+		
+		if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0))
+		{
+			passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
+			logger.debug("populated passmark: " +  passmark);
+		}
+		else
+		{
+			errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.passMark.empty"));
+			logger.debug("add error.passMark.empty to ActionMessages");
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			logger.debug("return to LOAD_QUESTIONS to fix error.");
+			
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+			
+			int maxQuestionIndex=mapQuestionsContent.size();
+			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
+		
+		logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
+		if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
+			isShowFeedback=true;
+		    	
+		logger.debug("MONITORING_REPORT_TITLE: " +  mcAuthoringForm.getMonitoringReportTitle());
+		monitoringReportTitle=mcAuthoringForm.getMonitoringReportTitle();
+		if ((monitoringReportTitle == null) || (monitoringReportTitle.length() == 0)) 
+			monitoringReportTitle=(String)request.getSession().getAttribute(MONITORING_REPORT_TITLE);
+		
+		reportTitle=mcAuthoringForm.getReportTitle();
+		logger.debug("REPORT_TITLE: " +  mcAuthoringForm.getReportTitle());
+		if ((reportTitle == null) || (reportTitle.length() == 0)) 
+			reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
+		
+		endLearningMessage=mcAuthoringForm.getEndLearningMessage();
+		logger.debug("END_LEARNING_MESSAGE: " +  mcAuthoringForm.getEndLearningMessage());
+		if ((endLearningMessage == null) || (endLearningMessage.length() == 0))
+			endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSAGE);
+	
+		
+		String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
+		logger.debug("richTextTitle: " + richTextTitle);
+		
+		String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
+		logger.debug("richTextInstructions: " + richTextInstructions);
+		
+			
+			if ((richTextTitle == null) || (richTextTitle.length() == 0) || richTextTitle.equalsIgnoreCase(RICHTEXT_BLANK))
+		{
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.title"));
+			logger.debug("add title to ActionMessages");
+		}
+	
+		if ((richTextInstructions == null) || (richTextInstructions.length() == 0) || richTextInstructions.equalsIgnoreCase(RICHTEXT_BLANK))
+		{
+			errors.add(Globals.ERROR_KEY, new ActionMessage("error.instructions"));
+			logger.debug("add instructions to ActionMessages: ");
+		}
+	
+		if (errors.size() > 0)  
+		{
+			logger.debug("either title or instructions or both is missing. Returning back to from to fix errors:");
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+			mcAuthoringForm.resetUserAction();
+			
+			int maxQuestionIndex=mapQuestionsContent.size();
+			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
+		
+		String richTextOfflineInstructions=(String) request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+		logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
+		if (richTextOfflineInstructions == null) richTextOfflineInstructions="";
+		
+		String richTextOnlineInstructions=(String) request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+		logger.debug("richTextOnlineInstructions: " + richTextOnlineInstructions);
+		if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
+		
+		String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
+		logger.debug("richTextReportTitle: " + richTextReportTitle);
+		
+		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
+		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
+		
+		
+		mapQuestionsContent=repopulateMap(request, "questionContent");
+	 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
+	 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
+	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+	 	
+	 	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+		    logger.debug("toolContentId:" + toolContentId);
+			
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+					
+		if (mcContent != null)
+		{
+			logger.debug("updating mcContent title and instructions:" + mcContent);
+			mcContent.setTitle(richTextTitle);
+			mcContent.setInstructions(richTextInstructions);
+	
+			mcContent.setQuestionsSequenced(isQuestionsSequenced); 
+		    mcContent.setSynchInMonitor(isSynchInMonitor);
+		    mcContent.setUsernameVisible(isUsernameVisible);
+		    mcContent.setRetries(isRetries);
+		    mcContent.setPassMark(new Integer(passmark));
+		    mcContent.setShowFeedback(isShowFeedback);
+		    mcContent.setShowReport(isSln);
+		    mcContent.setEndLearningMessage(endLearningMessage);
+		    mcContent.setReportTitle(richTextReportTitle);
+		    mcContent.setMonitoringReportTitle(monitoringReportTitle);
+		    mcContent.setEndLearningMessage(richTextEndLearningMessage);
+		    mcContent.setOfflineInstructions(richTextOfflineInstructions);
+		    mcContent.setOnlineInstructions(richTextOnlineInstructions);
+		}
+		else
+		{
+			mcContent=createContent(request, mcAuthoringForm);		
+			logger.debug("mcContent created");
+		}
+				    
+		mapQuestionsContent=(Map) request.getSession().getAttribute(MAP_QUESTIONS_CONTENT);
+		logger.debug("Submit final MAP_QUESTIONS_CONTENT :" + mapQuestionsContent);
+		
+		Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
+		logger.debug("Submit final MAP_FEEDBACK_INCORRECT :" + mapFeedbackIncorrect);
+	
+		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
+		logger.debug("Submit final MAP_FEEDBACK_CORRECT :" + mapFeedbackCorrect);
+		
+		cleanupExistingQuestions(request, mcContent);
+		logger.debug("post cleanupExistingQuestions");
+		
+		
+		persistQuestions(request, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mcContent);
+		logger.debug("post persistQuestions");
+		
+		logger.debug("will do addUploadedFilesMetaData");
+		McUtils.addUploadedFilesMetaData(request,mcContent);
+		logger.debug("done addUploadedFilesMetaData");
+		
+		errors.clear();
+		errors.add(Globals.ERROR_KEY,new ActionMessage("submit.successful"));
+		logger.debug("add submit.successful to ActionMessages");
+		saveErrors(request,errors);
+		request.setAttribute(SUBMIT_SUCCESS, new Integer(1));
+		logger.debug("set SUBMIT_SUCCESS to 1");
+		
+		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+	
+		mcAuthoringForm.resetUserAction();
+		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+		
+		int maxQuestionIndex=mapQuestionsContent.size();
+		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+		return (mapping.findForward(LOAD_QUESTIONS));
+    }
+
+
+    /**
+     * presents contents of uploaded files
+     * viewFileItem(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return
+     */
+    protected ActionForward viewFileItem(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	String userAction="viewFileItem";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		
+ 		String filename= request.getParameter("fileItem");
+ 		logger.debug("filename:" + filename);
+ 		
+ 		String uuid=mcService.getFileUuid(filename);
+ 		logger.debug("uuid:" + uuid);
+ 		
+ 		if (uuid == null)
+ 		{
+ 			ActionMessages errors= new ActionMessages();
+    		errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.file.notPersisted"));
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			persistError(request,"error.file.notPersisted");
+			
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
+	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
+			request.getSession().setAttribute(CURRENT_TAB, new Long(3));
+	   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+ 		}
+ 		
+ 		InputStream fileInputStream=mcService.downloadFile(new Long(uuid), null);
+ 		logger.debug("fileInputStream:" + fileInputStream);
+ 		
+ 		DataInputStream dis = new DataInputStream(fileInputStream);
+ 		logger.debug("dis:" + dis);
+ 		
+ 		String allFileText="";
+ 		try 
+		{
+ 			String input="";
+ 			while ((input = dis.readLine()) != null) 
+ 			{
+ 				logger.debug("input:" + input);
+ 				allFileText = allFileText + input + "\r\n";
+ 			}    
+ 		} catch (EOFException e) {
+ 			logger.debug("error reading the file :" + e);
+ 			logger.debug("error msg reading the file :" + e.getMessage());
+ 		}
+    	catch (IOException e) {
+			logger.debug("error reading the file :" + e);
+			logger.debug("error msg reading the file :" + e.getMessage());
+		}
+ 		
+ 		logger.debug("allFileText:" + allFileText);
+ 		request.getSession().setAttribute(FILE_CONTENT, allFileText);
+ 		
+ 		request.setAttribute(FILE_CONTENT_READY, new Integer(1));
+ 		logger.debug("set FILE_CONTENT_READY to 1");
+ 		
+ 		request.getSession().setAttribute(FILE_NAME, filename);
+ 		
+ 		mcAuthoringForm.resetUserAction();
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
+ 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
+		request.getSession().setAttribute(CURRENT_TAB, new Long(3));
+   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+    }
+    
+    /**
+     * moves from Advanced Tab to Basic Tab
+     * doneAdvancedTabDone(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return
+     */
+    protected ActionForward doneAdvancedTab(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+        String userAction="advancedTabDone";
+    	request.setAttribute(USER_ACTION, userAction);
+    	logger.debug("userAction:" + userAction);
+    	
+    	mcAuthoringForm.resetUserAction();
+    	request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+        return (mapping.findForward(LOAD_QUESTIONS));
+    }
+    
+    /**
+     * moves from Instructions Tab to Basic Tab
+     * doneInstructionsTab(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return
+     */
+    protected ActionForward doneInstructionsTab(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+		String userAction="instructionsTabDone";
+		request.setAttribute(USER_ACTION, userAction);
+		logger.debug("userAction:" + userAction);
+		mcAuthoringForm.resetUserAction();
+		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+	    return (mapping.findForward(LOAD_QUESTIONS));
+    }
+
+
+    /**
+     * submitOfflineFiles(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return
+     */
+    protected ActionForward submitOfflineFiles(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+		String userAction="submitOfflineFile";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		
+ 		McUtils.addFileToContentRepository(request, mcAuthoringForm, true);
+        logger.debug("offline file added to repository successfully.");
+ 		
+ 		mcAuthoringForm.resetUserAction();
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
+ 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2 );
+		request.getSession().setAttribute(CURRENT_TAB, new Long(3));
+   	    return (mapping.findForward(ALL_INSTRUCTIONS));    
+    }
+    
+    /**
+     * submitOnlineFiles(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapping
+     * @return
+     */
+    protected ActionForward submitOnlineFiles(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
+    {
+		String userAction="submitOnlineFile";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		
+ 		McUtils.addFileToContentRepository(request, mcAuthoringForm, false);
+        logger.debug("online file added to repository successfully.");
+        
+        mcAuthoringForm.resetUserAction();
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
+ 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
+		request.getSession().setAttribute(CURRENT_TAB, new Long(3));
+   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+    }
+    
+
     protected void cleanupExistingQuestions(HttpServletRequest request, McContent mcContent)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -1903,160 +2056,7 @@ public class McAction extends DispatchAction implements McAppConstants
         	logger.debug("updated mapWeights: " + request.getSession().getAttribute(MAP_WEIGHTS));
     	}
     }
-    
-    protected void addQuestion(HttpServletRequest request, McAuthoringForm mcAuthoringForm, Map mapQuestionsContent, boolean increaseMapSize)
-    {
-    	IMcService mcService =McUtils.getToolService(request);
-    	logger.debug("increaseMapSize: " +  increaseMapSize);
-    	
-    	if (increaseMapSize)
-    	{
-    		int mapSize=mapQuestionsContent.size();
-        	mapQuestionsContent.put(new Long(++mapSize).toString(), "");
-        	logger.debug("updated Questions Map size: " + mapQuestionsContent.size());
-        	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-        	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-        	
-        	Map mapWeights = (Map) request.getSession().getAttribute(MAP_WEIGHTS);
-        	logger.debug("current mapWeights: " + mapWeights);
-        	int mapWeightsSize=mapWeights.size();
-        	mapWeights.put(new Long(++mapWeightsSize).toString(), "");
-        	logger.debug("updated mapWeights size: " + mapWeights.size());
-        	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-        	logger.debug("updated mapWeights: " + request.getSession().getAttribute(MAP_WEIGHTS));
-    	}
-    	
-    	
-    	McContent mcContent=null;
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	if ((toolContentId != null) && (toolContentId.longValue() != 0))
-    	{
-    		logger.debug("TOOL_CONTENT_ID : " + toolContentId);
-    		mcContent= mcService.retrieveMc(toolContentId);  
-    		logger.debug("mcContent: " + mcContent);
-		}
-    	
-    	if (mcContent == null)
-    	{
-    		mcContent=createContent(request, mcAuthoringForm);
-        	logger.debug("mcContent: " + mcContent);	
-    	}
-    	
-    	Map mapWeights=repopulateCurrentWeightsMap(request,"questionWeight");
-		logger.debug("mapWeights for add Question: " + mapWeights);
-		
-    	/* iterate the questions Map and persist the questions into the DB*/
-    	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
-        while (itQuestionsMap.hasNext()) {
-            Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
-            logger.debug("adding the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
-            {
-            	logger.debug("checking existing question text: " +  pairs.getValue().toString() + " and mcContent uid():" + mcContent.getUid());
-        	 	McQueContent mcQueContent=mcService.getQuestionContentByQuestionText(pairs.getValue().toString(), mcContent.getUid());
-        	 	
-        	 	logger.debug("mcQueContent: " +  mcQueContent);
-        	 	Integer currentWeight= new Integer(mapWeights.get(pairs.getKey()).toString());
-            	logger.debug("currentWeight:" + currentWeight);
-        	 	
-            	if (mcQueContent == null)
-            	{
-            		mcQueContent=  new McQueContent(pairs.getValue().toString(),
-              	        	 		new Integer(pairs.getKey().toString()),
-              	        	 		currentWeight,
-									true,
-									mcContent,
-									new HashSet(),
-									new HashSet()
-             						);
-           	        mcService.createMcQue(mcQueContent);
-           	        logger.debug("persisted mcQueContent: " + mcQueContent);
-            	}
-            	else
-            	{
-            		logger.debug("is mcQueContent disabled: " +  mcQueContent.isDisabled());
-            	}
-            	
-            }
-        }
-                
-    }
-    
-    
-    protected Map rebuildQuestionMapfromDB(HttpServletRequest request)
-    {
-    	Map mapQuestionsContent= new TreeMap(new McComparator());
-    	
-    	IMcService mcService =McUtils.getToolService(request);
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-		logger.debug("toolContentId:" + toolContentId);
 
-		McContent mcContent=mcService.retrieveMc(toolContentId);
-		logger.debug("mcContent:" + mcContent);
-		
-    	List list=mcService.getAllQuestionEntries(mcContent.getUid());
-    	logger.debug("list:" + list);
-		
-		Iterator listIterator=list.iterator();
-    	Long mapIndex=new Long(1);
-    	while (listIterator.hasNext())
-    	{
-    		McQueContent mcQueContent=(McQueContent)listIterator.next();
-    		logger.debug("mcQueContent:" + mcQueContent);
-    		mapQuestionsContent.put(mapIndex.toString(),mcQueContent.getQuestion());
-    		mapIndex=new Long(mapIndex.longValue()+1);
-    	}
-    	
-    	logger.debug("refreshed Map:" + mapQuestionsContent);
-    	return mapQuestionsContent;
-    }
-    
-    
-    protected void removeRedundantQuestionEntries(HttpServletRequest request, Map mapQuestionsContent)
-    {
-    	IMcService mcService =McUtils.getToolService(request);
-    	
-    	logger.debug("main Map mapQuestionsContent:" + mapQuestionsContent);
-    	
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-		logger.debug("toolContentId:" + toolContentId);
-		
-		McContent mcContent=mcService.retrieveMc(toolContentId);
-		logger.debug("mcContent:" + mcContent);
-		
-		if (mcContent != null)
-		{
-			List allQuestions=mcService.getAllQuestionEntries(mcContent.getUid());
-	    	logger.debug("allQuestions:" + allQuestions);
-	    	
-	    	Iterator listIterator=allQuestions.iterator();
-	    	
-	    	while (listIterator.hasNext())
-	    	{
-	    		McQueContent mcQueContent=(McQueContent)listIterator.next();
-	    		logger.debug("mcQueContent:" + mcQueContent);
-	    		
-	    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
-	    		boolean matchFound=false;
-	            while (itQuestionsMap.hasNext()) {
-	            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
-	                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	                
-	                if (pairs.getValue().toString().equals(mcQueContent.getQuestion()))
-					{
-	                    logger.debug("match found  the  pair: " + pairs.getValue().toString());
-	                	matchFound=true;
-	            	}
-	            }
-	            
-	            if (matchFound == false)
-	            {
-	            	mcService.removeMcQueContent(mcQueContent);
-	                logger.debug("removed mcQueContent: " + mcQueContent);
-	            }
-	    	}
-		}
-    }
     
     protected boolean validateOptions(HttpServletRequest request)
     {
