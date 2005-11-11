@@ -776,7 +776,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	 * @return Returns the applyGrouping.
 	 */
 	public Boolean getApplyGrouping() {
-		return applyGrouping!=null?applyGrouping:WDDXTAGS.BOOLEAN_NULL_VALUE;
+		return applyGrouping;
 	}
 	/**
 	 * @param applyGrouping The applyGrouping to set.
@@ -788,7 +788,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	 * @return Returns the groupingSupportType.
 	 */
 	public Integer getGroupingSupportType() {
-		return groupingSupportType!=null?groupingSupportType:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return groupingSupportType;
 	}
 	/**
 	 * @param groupingSupportType The groupingSupportType to set.
@@ -801,7 +801,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 	 * @return Returns the groupingType.
 	 */
 	public Integer getGroupingType() {
-		return groupingType!=null?groupingType:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		return groupingType;
 	}
 	/**
 	 * @param groupingType The groupingType to set.
