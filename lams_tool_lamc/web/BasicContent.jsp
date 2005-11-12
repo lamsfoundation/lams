@@ -52,80 +52,66 @@
 				-->
 				
 					<table align="center" border="1" summary="layout and Content" width="55%">
-			  	 		<c:set var="queIndex" scope="session" value="1"/>
+				     <tr>
+							  	<td bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=left>
+								  	 <font size=2> <b> <bean:message key="label.mc.questions"/> </b> </font>
+							  	</td>
+						 </tr>					
+					     <tr>
+							  	<td bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
+									<html:submit property="addQuestion" styleClass="linkbutton" 
+									onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+										<bean:message key="label.add.question"/>
+									</html:submit>	 				 		  										  		
+						  	</td>
+						 </tr>							
+					
+			  	 		<c:set var="queIndex" scope="session" value="0"/>
 						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
-						
-									<c:if test="${questionEntry.key == 1}"> 			
-									    <tr>
-										  	<td bgcolor="#EEEEEE" class="input" valign=top> <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b> </font>  </td>
-										  	
-									  		<td bgcolor="#EEEEEE" class="input" valign=top width=50> 
-									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"
-										  		size="50" maxlength="255" >
-										  	</td>
-										  	
-										  	<td  bgcolor="#EEEEEE" class="input" align=center valign=top>										  	
-                   								    <img src="images/down.gif" align=left onclick="javascript:document.forms[0].moveDown.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">		  	
-                                            </td>
-										  	
-                                            <td bgcolor="#EEEEEE" class="input" align=left valign=top>										  	
-												<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
-														<c:if test="${questionEntry.key == weightsEntry.key}"> 			
-													  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>" 
-														  		size="3" maxlength="3">
-														  		<bean:message key="label.percent"/> 
-														</c:if>
-												</c:forEach>
-                                            </td>
+							<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
+							
+							  <tr>
+							  	<td bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b>  </font> </td>
+							  	
+						  		<td bgcolor="#EEEEEE" class="input" valign=top width=50> 
+						  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"
+							  		size="50" maxlength="255" >
+							  	</td>
 
-                                            <td bgcolor="#EEEEEE" class="input" width=40 valign=top>								
-												    <img src="images/edit.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].editOptions.value=1; document.forms[0].submit();">		  	
-                   								    <img src="images/add.gif" align=left onclick="javascript:document.forms[0].addQuestion.value=1; document.forms[0].submit();">		  													    
-											</td>
-										  </tr>
-									</c:if> 			
+							  	<td bgcolor="#EEEEEE" class="input"  align=center valign=top>			
+							 		<c:if test="${sessionScope.queIndex == 1}"> 		
+	   								    <img src="images/down.gif" align=left onclick="javascript:document.forms[0].moveDown.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">
+	   								</c:if> 			
+	
+					  				<c:if test="${sessionScope.maxQuestionIndex == sessionScope.queIndex}"> 			
+	     								 <img src="images/up.gif" align=left onclick="javascript:document.forms[0].moveUp.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">		  	
+	     							</c:if> 	    
 									
-									
-							  		<c:if test="${questionEntry.key > 1}"> 			
-										<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-										
-										  <tr>
-										  	<td bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b>  </font> </td>
-										  	
-									  		<td bgcolor="#EEEEEE" class="input" valign=top width=50> 
-									  			<input type="text" name="questionContent<c:out value="${queIndex}"/>" value="<c:out value="${questionEntry.value}"/>"
-										  		size="50" maxlength="255" >
-										  	</td>
+	 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
+	   								    <img src="images/down.gif" align=left onclick="javascript:document.forms[0].moveDown.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">		  	   								 
+	       								<img src="images/up.gif" align=left onclick="javascript:document.forms[0].moveUp.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">		  	
+									</c:if> 	           								 
+                                </td>
 
-										  	<td bgcolor="#EEEEEE" class="input"  align=center valign=top>										  	
-
-							  				<c:if test="${sessionScope.maxQuestionIndex != sessionScope.queIndex}"> 			
-               								    <img src="images/down.gif" align=left onclick="javascript:document.forms[0].moveDown.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">		  	
-											</c:if> 	    
-                 								 <img src="images/up.gif" align=left onclick="javascript:document.forms[0].moveUp.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">		  	
-                                            </td>
-
-	                                            <td bgcolor="#EEEEEE" class="input" align=left valign=top>										  	
-													<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
-															<c:if test="${questionEntry.key == weightsEntry.key}"> 			
-														  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
-															  		size="3" maxlength="3">
-															  		<bean:message key="label.percent"/>
-															</c:if>
-													</c:forEach>
-	                                            </td>
-																								
-                                               <td bgcolor="#EEEEEE" class="input" width=40 valign=top>								
-													<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].editOptions.value=1; document.forms[0].submit();">	                                            			  	
-													<img src="images/delete.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].removeQuestion.value=1; document.forms[0].submit();">                                               		  														
-											  	</td>
-										  </tr>
-									</c:if> 
+                                    <td bgcolor="#EEEEEE" class="input" align=left valign=top>										  	
+										<c:forEach var="weightsEntry" items="${sessionScope.mapWeights}">                                            
+												<c:if test="${questionEntry.key == weightsEntry.key}"> 			
+											  			<input type="text" name="questionWeight<c:out value="${queIndex}"/>" value="<c:out value="${weightsEntry.value}"/>"
+												  		size="3" maxlength="3">
+												  		<bean:message key="label.percent"/>
+												</c:if>
+										</c:forEach>
+                                    </td>
+																					
+                                   <td bgcolor="#EEEEEE" class="input" width=40 valign=top>								
+										<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].editOptions.value=1; document.forms[0].submit();">	                                            			  	
+										<img src="images/delete.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].removeQuestion.value=1; document.forms[0].submit();">                                               		  														
+								  	</td>
+							  </tr>
 						</c:forEach>
 						
 					</table> </td> </tr>
 							<html:hidden property="questionIndex"/>
-							<html:hidden property="addQuestion"/>
 							<html:hidden property="editOptions"/>
 							<html:hidden property="removeQuestion"/>
 							<html:hidden property="moveDown"/>							

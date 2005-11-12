@@ -14,9 +14,7 @@ if(protocol.startsWith("HTTPS")){
 }
 String root = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
 String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
-
 %>
-
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html>

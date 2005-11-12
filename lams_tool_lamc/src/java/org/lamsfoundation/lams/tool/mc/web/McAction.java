@@ -1,5 +1,4 @@
-/*
- *Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+/* *Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  *
  *This program is free software; you can redistribute it and/or modify
  *it under the terms of the GNU General Public License as published by
@@ -293,7 +292,7 @@ public class McAction extends DispatchAction implements McAppConstants
         }
 	 	
 	 	mcAuthoringForm.resetUserAction();
-	 	return (mapping.findForward(LOAD_FILE_CONTENT));
+	 	return null;
     }
 
 
@@ -392,7 +391,7 @@ public class McAction extends DispatchAction implements McAppConstants
     		logger.debug("updated SELECTED_QUESTION");
     	}
     	
-    	mcAuthoringForm.setAddQuestion(null);
+    	
     	mcAuthoringForm.setRemoveQuestion(null);
     	mcAuthoringForm.setEditOptions(null);
     	mcAuthoringForm.setMoveUp(null);
@@ -402,6 +401,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	mcAuthoringForm.setViewFileItem(null);
     	
     	
+    	/*
     	String addQuestion=request.getParameter("addQuestion");
     	logger.debug("parameter addQuestion" + addQuestion);
     	if ((addQuestion != null) && addQuestion.equals("1"))
@@ -409,6 +409,7 @@ public class McAction extends DispatchAction implements McAppConstants
     		logger.debug("parameter addQuestion is selected " + addQuestion);
     		mcAuthoringForm.setAddQuestion("1");
     	}
+    	*/
     	
     	
     	String editOptions=request.getParameter("editOptions");
@@ -503,6 +504,9 @@ public class McAction extends DispatchAction implements McAppConstants
     		int maxQuestionIndex=mapQuestionsContent.size();
     		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
     		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+    		
+        	mcAuthoringForm.setAddQuestion(null);
+    		mcAuthoringForm.setSubmitQuestions(null);
     		return (mapping.findForward(LOAD_QUESTIONS));
     	}
     		
@@ -517,6 +521,9 @@ public class McAction extends DispatchAction implements McAppConstants
     		int maxQuestionIndex=mapQuestionsContent.size();
     		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
     		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+    		
+        	mcAuthoringForm.setAddQuestion(null);
+    		mcAuthoringForm.setSubmitQuestions(null);
     		return (mapping.findForward(LOAD_QUESTIONS));
     	}
     	
@@ -538,6 +545,9 @@ public class McAction extends DispatchAction implements McAppConstants
     		int maxQuestionIndex=mapQuestionsContent.size();
     		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
     		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+    		
+        	mcAuthoringForm.setAddQuestion(null);
+    		mcAuthoringForm.setSubmitQuestions(null);
     		return (mapping.findForward(LOAD_QUESTIONS));
     	}
     		
@@ -557,7 +567,10 @@ public class McAction extends DispatchAction implements McAppConstants
         int maxQuestionIndex=mapQuestionsContent.size();
     	request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
     	logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
-        return (mapping.findForward(LOAD_QUESTIONS));	
+    	
+    	mcAuthoringForm.setAddQuestion(null);
+		mcAuthoringForm.setSubmitQuestions(null);
+    	return (mapping.findForward(LOAD_QUESTIONS));	
     }
 
     /**
@@ -1306,12 +1319,31 @@ public class McAction extends DispatchAction implements McAppConstants
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 	
-		Map mapQuestionsContent=repopulateMap(request, "questionContent");
-	 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
-	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-	 	
 		ActionMessages errors= new ActionMessages();
-	
+		
+		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+	 	logger.debug("mapQuestionsContent before submit: " + mapQuestionsContent);
+	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+
+	 	/* make sure the questions Map is not empty*/ 
+	 	int mapSize=mapQuestionsContent.size();	 	
+	 	logger.debug("mapSize: " + mapSize);
+	 	
+		if (mapSize == 0)
+		{
+			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+			
+			errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.questions.submitted.none"));
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			persistError(request,"error.questions.submitted.none");
+			
+	    	mcAuthoringForm.setAddQuestion(null);
+			mcAuthoringForm.setSubmitQuestions(null);
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
+
 		boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
 		logger.debug("weightsValid:" + weightsValid);
 		if (weightsValid == false)
@@ -1322,6 +1354,9 @@ public class McAction extends DispatchAction implements McAppConstants
 			int maxQuestionIndex=mapQuestionsContent.size();
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+			
+	    	mcAuthoringForm.setAddQuestion(null);
+			mcAuthoringForm.setSubmitQuestions(null);
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
 		
@@ -1342,6 +1377,9 @@ public class McAction extends DispatchAction implements McAppConstants
 			int maxQuestionIndex=mapQuestionsContent.size();
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+			
+	    	mcAuthoringForm.setAddQuestion(null);
+			mcAuthoringForm.setSubmitQuestions(null);
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
 		
@@ -1401,6 +1439,9 @@ public class McAction extends DispatchAction implements McAppConstants
 				int maxQuestionIndex=mapQuestionsContent.size();
 				request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 				logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+				
+		    	mcAuthoringForm.setAddQuestion(null);
+				mcAuthoringForm.setSubmitQuestions(null);
 				return (mapping.findForward(LOAD_QUESTIONS));
 			}
 		}
@@ -1427,6 +1468,9 @@ public class McAction extends DispatchAction implements McAppConstants
 			int maxQuestionIndex=mapQuestionsContent.size();
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+			
+	    	mcAuthoringForm.setAddQuestion(null);
+			mcAuthoringForm.setSubmitQuestions(null);
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
 		
@@ -1457,7 +1501,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		logger.debug("richTextInstructions: " + richTextInstructions);
 		
 			
-			if ((richTextTitle == null) || (richTextTitle.length() == 0) || richTextTitle.equalsIgnoreCase(RICHTEXT_BLANK))
+		if ((richTextTitle == null) || (richTextTitle.length() == 0) || richTextTitle.equalsIgnoreCase(RICHTEXT_BLANK))
 		{
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.title"));
 			logger.debug("add title to ActionMessages");
@@ -1480,6 +1524,9 @@ public class McAction extends DispatchAction implements McAppConstants
 			int maxQuestionIndex=mapQuestionsContent.size();
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+			
+	    	mcAuthoringForm.setAddQuestion(null);
+			mcAuthoringForm.setSubmitQuestions(null);
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
 		
@@ -1572,6 +1619,9 @@ public class McAction extends DispatchAction implements McAppConstants
 		int maxQuestionIndex=mapQuestionsContent.size();
 		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+		
+    	mcAuthoringForm.setAddQuestion(null);
+		mcAuthoringForm.setSubmitQuestions(null);
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
 

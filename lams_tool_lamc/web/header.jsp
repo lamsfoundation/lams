@@ -20,12 +20,3 @@ http://www.gnu.org/licenses/gpl.txt
 -->
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
 <%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
-<%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-%>

@@ -6,8 +6,6 @@
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
 
-
-
 	<!-- this form  exists temporarily to represent tool icon, remove this form once the tool is deployed into authoring environment -->
 <%
 	String userContentId="1234";
