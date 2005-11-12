@@ -396,10 +396,10 @@ public class McAction extends DispatchAction implements McAppConstants
     	mcAuthoringForm.setEditOptions(null);
     	mcAuthoringForm.setMoveUp(null);
     	mcAuthoringForm.setMoveDown(null);
-    	mcAuthoringForm.setAddOption(null);
     	mcAuthoringForm.setRemoveOption(null);
     	mcAuthoringForm.setViewFileItem(null);
     	
+    	//mcAuthoringForm.setAddOption(null);
     	
     	/*
     	String addQuestion=request.getParameter("addQuestion");
@@ -444,6 +444,7 @@ public class McAction extends DispatchAction implements McAppConstants
     		mcAuthoringForm.setMoveUp("1");
     	}
     	
+    	/*
     	String addOption=request.getParameter("addOption");
     	logger.debug("parameter addOption" + addOption);
     	if ((addOption != null) && addOption.equals("1"))
@@ -451,6 +452,7 @@ public class McAction extends DispatchAction implements McAppConstants
     		logger.debug("parameter addOption is selected " + addOption);
     		mcAuthoringForm.setAddOption("1");
     	}
+    	*/
     	
     	String removeOption=request.getParameter("removeOption");
     	logger.debug("parameter removeOption" + removeOption);
@@ -515,7 +517,6 @@ public class McAction extends DispatchAction implements McAppConstants
     	logger.debug("weightsValid:" + weightsValid);
     	if (weightsValid == false)
     	{
-    		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
     		mcAuthoringForm.resetUserAction();
     		
     		int maxQuestionIndex=mapQuestionsContent.size();
@@ -540,7 +541,6 @@ public class McAction extends DispatchAction implements McAppConstants
     		mcAuthoringForm.resetUserAction();
     		persistError(request,"error.question.weight.total");
     		
-    		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
     		
     		int maxQuestionIndex=mapQuestionsContent.size();
     		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
@@ -562,7 +562,6 @@ public class McAction extends DispatchAction implements McAppConstants
     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     	logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
         mcAuthoringForm.resetUserAction();
-        request.getSession().setAttribute(CURRENT_TAB, new Long(1));
         
         int maxQuestionIndex=mapQuestionsContent.size();
     	request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
@@ -620,7 +619,6 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 		mcAuthoringForm.resetUserAction();
-		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 		
 		int maxQuestionIndex=mapQuestionsContent.size();
 		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
@@ -679,7 +677,6 @@ public class McAction extends DispatchAction implements McAppConstants
     		
     		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-    		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
     		return (mapping.findForward(LOAD_QUESTIONS));
     	}
     	
@@ -921,7 +918,6 @@ public class McAction extends DispatchAction implements McAppConstants
      	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
     	logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
     	mcAuthoringForm.resetUserAction();
-    	request.getSession().setAttribute(CURRENT_TAB, new Long(1));
     	return (mapping.findForward(LOAD_QUESTIONS));
     }
 
@@ -961,7 +957,6 @@ public class McAction extends DispatchAction implements McAppConstants
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 			return (mapping.findForward(LOAD_QUESTIONS));	
  		}
 	 	
@@ -1018,7 +1013,6 @@ public class McAction extends DispatchAction implements McAppConstants
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
  		mcAuthoringForm.resetUserAction();
-		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
     
@@ -1047,6 +1041,21 @@ public class McAction extends DispatchAction implements McAppConstants
 		Map mapOptionsContent=repopulateMap(request, "optionContent");
 	 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
 	 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
+	 	int mapSize=mapOptionsContent.size();
+	 	if ((mapSize == 1) && (optionIndex.equals("1")))
+		{
+	 		ActionMessages errors= new ActionMessages();
+    		errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("options.count.zero"));
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			persistError(request,"options.count.zero");
+			
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 1);
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
+	 	
 	 	
 		String deletableOptionEntry=(String)mapOptionsContent.get(optionIndex);
 		logger.debug("deletableOptionEntry:" + deletableOptionEntry);
@@ -1108,7 +1117,6 @@ public class McAction extends DispatchAction implements McAppConstants
  	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
 		mcAuthoringForm.resetUserAction();			
-		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
     
@@ -1131,7 +1139,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	Map mapQuestionsContent=repopulateMap(request, "questionContent");
      	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
      	
-    		String questionIndex =mcAuthoringForm.getQuestionIndex();
+    	String questionIndex =mcAuthoringForm.getQuestionIndex();
     	logger.debug("questionIndex:" + questionIndex);
     	String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
     	logger.debug("movableQuestionEntry:" + movableQuestionEntry);
@@ -1145,7 +1153,6 @@ public class McAction extends DispatchAction implements McAppConstants
 		mcAuthoringForm.resetUserAction();
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     	logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
-        request.getSession().setAttribute(CURRENT_TAB, new Long(1));
         
         int maxQuestionIndex=mapQuestionsContent.size();
     	request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
@@ -1186,7 +1193,6 @@ public class McAction extends DispatchAction implements McAppConstants
  		mcAuthoringForm.resetUserAction();
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
-	    request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 	    
 	    int maxQuestionIndex=mapQuestionsContent.size();
 		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
@@ -1226,7 +1232,6 @@ public class McAction extends DispatchAction implements McAppConstants
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 			return (mapping.findForward(LOAD_QUESTIONS));	
  		}
 		
@@ -1294,7 +1299,6 @@ public class McAction extends DispatchAction implements McAppConstants
     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 		mcAuthoringForm.resetUserAction();
-		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
 
@@ -1331,8 +1335,6 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	
 		if (mapSize == 0)
 		{
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-			
 			errors= new ActionMessages();
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.questions.submitted.none"));
 			saveErrors(request,errors);
@@ -1348,7 +1350,6 @@ public class McAction extends DispatchAction implements McAppConstants
 		logger.debug("weightsValid:" + weightsValid);
 		if (weightsValid == false)
 		{
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 			mcAuthoringForm.resetUserAction();
 			
 			int maxQuestionIndex=mapQuestionsContent.size();
@@ -1372,8 +1373,7 @@ public class McAction extends DispatchAction implements McAppConstants
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-			
+
 			int maxQuestionIndex=mapQuestionsContent.size();
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
@@ -1434,8 +1434,7 @@ public class McAction extends DispatchAction implements McAppConstants
 				
 				request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 				logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-				request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-				
+
 				int maxQuestionIndex=mapQuestionsContent.size();
 				request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 				logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
@@ -1463,8 +1462,7 @@ public class McAction extends DispatchAction implements McAppConstants
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
-			
+
 			int maxQuestionIndex=mapQuestionsContent.size();
 			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
@@ -1518,7 +1516,7 @@ public class McAction extends DispatchAction implements McAppConstants
 			logger.debug("either title or instructions or both is missing. Returning back to from to fix errors:");
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
-			request.getSession().setAttribute(CURRENT_TAB, new Long(1));
+
 			mcAuthoringForm.resetUserAction();
 			
 			int maxQuestionIndex=mapQuestionsContent.size();
@@ -1614,7 +1612,6 @@ public class McAction extends DispatchAction implements McAppConstants
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 	
 		mcAuthoringForm.resetUserAction();
-		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 		
 		int maxQuestionIndex=mapQuestionsContent.size();
 		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
@@ -1659,8 +1656,7 @@ public class McAction extends DispatchAction implements McAppConstants
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
 	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
-			request.getSession().setAttribute(CURRENT_TAB, new Long(3));
-	   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+			return (mapping.findForward(ALL_INSTRUCTIONS));
  		}
  		
  		InputStream fileInputStream=mcService.downloadFile(new Long(uuid), null);
@@ -1698,7 +1694,6 @@ public class McAction extends DispatchAction implements McAppConstants
  		mcAuthoringForm.resetUserAction();
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
  		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
-		request.getSession().setAttribute(CURRENT_TAB, new Long(3));
    	    return (mapping.findForward(ALL_INSTRUCTIONS));
     }
     
@@ -1718,7 +1713,6 @@ public class McAction extends DispatchAction implements McAppConstants
     	logger.debug("userAction:" + userAction);
     	
     	mcAuthoringForm.resetUserAction();
-    	request.getSession().setAttribute(CURRENT_TAB, new Long(1));
         return (mapping.findForward(LOAD_QUESTIONS));
     }
     
@@ -1737,7 +1731,6 @@ public class McAction extends DispatchAction implements McAppConstants
 		request.setAttribute(USER_ACTION, userAction);
 		logger.debug("userAction:" + userAction);
 		mcAuthoringForm.resetUserAction();
-		request.getSession().setAttribute(CURRENT_TAB, new Long(1));
 	    return (mapping.findForward(LOAD_QUESTIONS));
     }
 
@@ -1762,7 +1755,6 @@ public class McAction extends DispatchAction implements McAppConstants
  		mcAuthoringForm.resetUserAction();
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
  		logger.debug("setting EDIT_OPTIONS_MODE :" + 2 );
-		request.getSession().setAttribute(CURRENT_TAB, new Long(3));
    	    return (mapping.findForward(ALL_INSTRUCTIONS));    
     }
     
@@ -1786,7 +1778,6 @@ public class McAction extends DispatchAction implements McAppConstants
         mcAuthoringForm.resetUserAction();
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
  		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
-		request.getSession().setAttribute(CURRENT_TAB, new Long(3));
    	    return (mapping.findForward(ALL_INSTRUCTIONS));
     }
     

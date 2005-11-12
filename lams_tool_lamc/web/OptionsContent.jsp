@@ -46,8 +46,21 @@
 					<tr> <td colspan=4 align=center valign=top width="100%">
 					
 					<table align="center" border="1">
+					     <tr>
+							  	<td bgcolor="#EEEEEE" colspan=4 class="input" valign=top align=left>
+								  	 <font size=2> <b> <bean:message key="label.mc.options"/> </b> </font>
+							  	</td>
+						 </tr>					
+					     <tr>
+							  	<td bgcolor="#EEEEEE" colspan=4 class="input" valign=top align=right>
+									<html:submit property="addOption" styleClass="linkbutton" 
+									onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+										<bean:message key="label.add.option"/>
+									</html:submit>	 				 		  										  		
+						  	</td>
+						 </tr>							
 					
-			  	 		<c:set var="optionIndex" scope="session" value="1"/>
+						<c:set var="optionIndex" scope="session" value="1"/>
 			  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
 						<c:forEach var="optionEntry" items="${sessionScope.mapOptionsContent}">
 							  <c:if test="${optionEntry.key == 1}"> 			
@@ -81,7 +94,7 @@
 										</td>
 	
 										<td bgcolor="#EEEEEE" class="input" valign=top>
-	       								    <img src="images/add.gif" align=left onclick="javascript:document.forms[0].addOption.value=1; document.forms[0].submit();">
+	       								    <img src="images/delete.gif" align=left onclick="javascript:document.forms[0].removeOption.value=1; document.forms[0].deletableOptionIndex.value=1; document.forms[0].submit();">
 									  	</td>
 							 </tr>
 							</c:if> 			
@@ -126,7 +139,6 @@
 					</table> </td> </tr>	
 					
 					<html:hidden property="deletableOptionIndex"/>							
-					<html:hidden property="addOption"/>
 					<html:hidden property="removeOption"/>
 					
 					<tr>
