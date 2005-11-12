@@ -194,12 +194,12 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	
 	public void resetRadioBoxes()
 	{
-		this.synchInMonitor		=OPTION_OFF;
-		this.questionsSequenced	=OPTION_OFF;
+		this.synchInMonitor		 =OPTION_OFF;
+		this.questionsSequenced	 =OPTION_OFF;
     	this.retries 			 =OPTION_OFF;
     	this.sln				 =OPTION_OFF;
     	this.showFeedback 		 =OPTION_OFF;
-    	this.usernameVisible	=OPTION_OFF;
+    	this.usernameVisible	 =OPTION_OFF;
 	}
 
 	

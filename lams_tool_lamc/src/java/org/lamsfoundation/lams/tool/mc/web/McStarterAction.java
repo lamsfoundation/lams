@@ -443,12 +443,23 @@ public class McStarterAction extends Action implements McAppConstants {
 		if (mcContent.isShowFeedback())
 		{
 			mcAuthoringForm.setShowFeedback(ON);	
-			logger.debug("setting showFeedback to false");
+			logger.debug("setting showFeedback to true");
 		}
 		else
 		{
 			mcAuthoringForm.setShowFeedback(OFF);	
 			logger.debug("setting showFeedback to false");				
+		}
+		
+		if (mcContent.isShowReport())
+		{
+			mcAuthoringForm.setSln(ON);	
+			logger.debug("setting sln to true");
+		}
+		else
+		{
+			mcAuthoringForm.setSln(OFF);	
+			logger.debug("setting sln to false");				
 		}
 		
 		McUtils.populateUploadedFilesData(request, mcContent);
@@ -544,8 +555,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		mcAuthoringForm.setRetries(OFF);
 		mcAuthoringForm.setShowFeedback(OFF);
 		mcAuthoringForm.setSln(OFF);
-		logger.debug("sln set to OFF");
-		
+				
 		/* collect options for the default question content into a Map*/
 		McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(mcContent.getUid().longValue());
 		System.out.print("mcQueContent:" + mcQueContent);

@@ -51,7 +51,7 @@
 					</tr>
 				-->
 				
-					<table align="center" border="1" summary="layout and Content" width="50%">
+					<table align="center" border="1" summary="layout and Content" width="55%">
 			  	 		<c:set var="queIndex" scope="session" value="1"/>
 						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
 						
@@ -97,7 +97,7 @@
 										  		size="50" maxlength="255" >
 										  	</td>
 
-										  	<td bgcolor="#EEEEEE" class="input" align=center valign=top>										  	
+										  	<td bgcolor="#EEEEEE" class="input"  align=center valign=top>										  	
 
 							  				<c:if test="${sessionScope.maxQuestionIndex != sessionScope.queIndex}"> 			
                								    <img src="images/down.gif" align=left onclick="javascript:document.forms[0].moveDown.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">		  	
