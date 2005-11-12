@@ -658,9 +658,9 @@ public abstract class McUtils implements McAppConstants {
 	    mcService.cleanUploadedFilesMetaData();
 		logger.debug("cleaned up files meta data from the db");
 		
-	    LinkedList listUploadedOfflineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILES);
+	    List listUploadedOfflineFiles = (List) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILES);
 		logger.debug("final listUploadedOfflineFiles: " + listUploadedOfflineFiles);
-		LinkedList listUploadedOnlineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES);
+		List listUploadedOnlineFiles = (List) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES);
 		logger.debug("final listUploadedOnlineFiles: " + listUploadedOnlineFiles);
 		
 		try{

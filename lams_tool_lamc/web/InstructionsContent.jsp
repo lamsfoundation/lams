@@ -23,7 +23,7 @@
           			</td>
           			<td colspan=3 NOWRAP valign=top> 
 						<html:file  property="theOfflineFile"></html:file>
-					 	<html:submit property="submitOfflineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+					 	<html:submit property="submitOfflineFile" styleClass="a.button">
 								<bean:message key="label.upload"/>
 						</html:submit>
 					</td> 
@@ -63,7 +63,7 @@
           			</td>
           			<td colspan=3 NOWRAP valign=top> 
 						<html:file  property="theOnlineFile"></html:file>
-					 	<html:submit property="submitOnlineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+					 	<html:submit property="submitOnlineFile" styleClass="a.button">
 								<bean:message key="label.upload"/>
 						</html:submit>
 					</td> 
@@ -102,7 +102,7 @@
 				 	<td valign=top>								
 				  	</td>
 					 <td colspan=3 valign=top> 
-						 <html:submit property="instructionsTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+						 <html:submit property="instructionsTabDone" styleClass="a.button">
 							<bean:message key="button.done"/>
 						</html:submit>
 					</td> 
