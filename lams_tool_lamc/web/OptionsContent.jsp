@@ -53,8 +53,7 @@
 						 </tr>					
 					     <tr>
 							  	<td bgcolor="#EEEEEE" colspan=4 class="input" valign=top align=right>
-									<html:submit property="addOption" styleClass="linkbutton" 
-									onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+									<html:submit property="addOption" styleClass="a.button" >
 										<bean:message key="label.add.option"/>
 									</html:submit>	 				 		  										  		
 						  	</td>
@@ -178,8 +177,7 @@
 	 				 <tr>
 	 				 <td valign=top> </td>
 	 				 <td class="input" align=left colspan=3 valign=top>
-							<html:submit property="doneOptions" styleClass="linkbutton" 
-							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+							<html:submit property="doneOptions" styleClass="a.button">
 								<bean:message key="button.done"/>
 							</html:submit>	 				 		  										  		
 		 			  	</td>

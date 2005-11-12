@@ -59,8 +59,7 @@
 						 </tr>					
 					     <tr>
 							  	<td bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
-									<html:submit property="addQuestion" styleClass="linkbutton" 
-									onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+									<html:submit property="addQuestion" styleClass="a.button" >
 										<bean:message key="label.add.question"/>
 									</html:submit>	 				 		  										  		
 						  	</td>
@@ -103,7 +102,7 @@
 										</c:forEach>
                                     </td>
 																					
-                                   <td bgcolor="#EEEEEE" class="input" width=40 valign=top>								
+                                   <td bgcolor="#EEEEEE" class="input" valign=top>								
 										<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].editOptions.value=1; document.forms[0].submit();">	                                            			  	
 										<img src="images/delete.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].removeQuestion.value=1; document.forms[0].submit();">                                               		  														
 								  	</td>
@@ -146,10 +145,10 @@
 	 				 <tr>
  						<td valign=top> </td> 
 						<td class="input" colspan=3 align=left valign=top>								
-							<html:submit property="submitQuestions" styleClass="linkbutton" 
-							onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+							<html:submit property="submitQuestions" styleClass="a.button">
 								<bean:message key="button.submit"/>
-							</html:submit>	 				 		  										  		
+							</html:submit>	 				 		  					
+												  		
 		 			  	</td>
 						<td valign=top> </td> 
 						<td valign=top> </td>
