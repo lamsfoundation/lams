@@ -95,6 +95,8 @@ public interface McAppConstants {
     public static final String LOAD										="load";
     public static final String LOAD_QUESTIONS							="load";
     public static final String LOAD_STARTER								="starter";
+    public static final String LOAD_LEARNER								="loadLearner";
+    
     public static final String ALL_INSTRUCTIONS							="allInstructions";
     public static final String EDIT_OPTS_CONTENT						="editOptsContent";
     public static final String ADD_OPTS_CONTENT							="addOptsContent";

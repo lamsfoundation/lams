@@ -14,6 +14,7 @@
 
 <form-beans>
 	<form-bean name="McAuthoringForm" type="org.lamsfoundation.lams.tool.mc.web.McAuthoringForm"/>
+	<form-bean name="McLearningForm" type="org.lamsfoundation.lams.tool.mc.web.McLearningForm"/>
 </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -99,6 +100,24 @@
         redirect="true"
       />
     </action>
+    
+   <!--Learning Starter  -->
+   <action path="/learningStarter" type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
+   			name="McLearningForm" input=".learningStarter"> 
+	  	<forward
+		    name="loadLearner"
+		    path=".answers"
+		    redirect="true"
+	  	/>
+	  	
+	  	<forward
+		    name="errorList"
+		    path=".errorList"
+		    redirect="true"
+	  	/>
+	</action>  
+    
+    
  </action-mappings>
 
   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

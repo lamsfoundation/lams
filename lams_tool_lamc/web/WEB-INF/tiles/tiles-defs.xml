@@ -41,7 +41,7 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/systemErrorContent.jsp" />	
 	</definition>
 
-<!-- ============= Qa Authoring Page Definitions ====================== -->	
+<!-- ============= Mc Authoring Page Definitions ====================== -->	
 	<definition name=".questions" extends=".baseDef" >
 		<put name="title" value="Multiple Choice"/>
 		<put name="pageHeader" value = "Multiple Choice"/>
@@ -55,7 +55,7 @@ http://www.gnu.org/licenses/gpl.txt
 	</definition>
 
 		
-<!-- ============= Qa Authoring Starter Page Definitions ====================== -->	
+<!-- ============= Mc Authoring Starter Page Definitions ====================== -->	
 	<definition name=".starter" extends=".baseDef" >
 		<put name="title" value="Starter for Multiple Choice Authoring"/>
 		<put name="pageHeader" value = "Starter for Multiple Choice Authoring"/>
@@ -73,5 +73,19 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageHeader" value = "Error"/>
 		<put name="content" value="errorList.jsp" />	
 	</definition>
+	
+<!-- ============= Mc Learning Starter Page Definitions ====================== -->		
+		<definition name=".answers" extends=".baseDef" >
+		<put name="title" value="Answers for MCQ"/>
+		<put name="pageHeader" value = "Answers for MCQ"/>
+		<put name="content" value="/answersContent.jsp" />	
+	</definition>
+	
+	<definition name=".learningStarter" extends=".baseDef" >
+		<put name="title" value="Starter for Q/A Learning"/>
+		<put name="pageHeader" value = "Starter for Q/A Learning"/>
+		<put name="content" value="/learningIndex.jsp" />	
+	</definition>
+
 	
 </tiles-definitions>
