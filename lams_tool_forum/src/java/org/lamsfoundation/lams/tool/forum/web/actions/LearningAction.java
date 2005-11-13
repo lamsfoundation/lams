@@ -92,7 +92,14 @@ public class LearningAction extends Action {
 	private ActionForward viewForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		//get sessionId from HttpServletRequest
-		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		String sessionIdStr = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+		Long sessionId;
+		if(StringUtils.isEmpty(sessionIdStr))
+			//if SessionID in request is empty, then try to get it from session. This happens when client "refresh"
+			//page after create a new topic
+			sessionId = (Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
+		else
+			sessionId = new Long(Long.parseLong(sessionIdStr));
 		//cache this sessionId into HttpSession
 		request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 		
@@ -139,12 +146,15 @@ public class LearningAction extends Action {
 			HttpServletResponse response) {
 
 		//get sessionId from HttpServletRequest
-		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		Long sessionId = (Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
 		forumService = getForumManager();
 		ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 		session.setStatus(ForumConstants.SESSION_STATUS_FINISHED);
 		forumService.updateSession(session);
 		
+		//get all root topic to display on init page
+		List rootTopics = forumService.getRootTopics(sessionId);
+		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,rootTopics);
 		return mapping.findForward("success");
 	}
 
