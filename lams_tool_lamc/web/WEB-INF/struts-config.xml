@@ -62,7 +62,6 @@
 		    path=".errorList"
 		    redirect="true"
 	  	/>
-	  	
 	</action>  
 	
 	<action
@@ -99,7 +98,6 @@
         path=".allInstructions"
         redirect="true"
       />
-      
     </action>
  </action-mappings>
 

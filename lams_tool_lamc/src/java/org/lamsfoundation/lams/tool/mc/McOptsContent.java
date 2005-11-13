@@ -29,7 +29,14 @@ import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
-/** @author Ozgur Demirtas */ 
+/**
+ * <p>Persistent  object/bean that defines the content for the MCQ tool.
+ * Provides accessors and mutators to get/set attributes
+ * It maps to database table: tl_lamc11_options_content
+ * </p>
+ * 
+ * @author Ozgur Demirtas
+ */ 
 public class McOptsContent implements Serializable {
 	
     /** identifier field */

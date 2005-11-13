@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.tool.mc.McUploadedFile;
 /**
  * 
  * @author Ozgur Demirtas
+ * <p>Interface for the McUploadedFile DAO, defines methods needed to access/modify mc uploadedFile content</p>
  *
  */
 public interface IMcUploadedFileDAO

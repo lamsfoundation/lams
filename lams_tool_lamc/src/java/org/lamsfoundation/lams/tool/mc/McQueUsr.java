@@ -29,7 +29,14 @@ import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
-/** @author Ozgur Demirtas */
+/**
+ * <p>Persistent  object/bean that defines the user for the MCQ tool.
+ * Provides accessors and mutators to get/set attributes
+ * It maps to database table: tl_lamc11_que_usr
+ * </p>
+ * 
+ * @author Ozgur Demirtas
+ */
 public class McQueUsr implements Serializable {
 
     /** identifier field */

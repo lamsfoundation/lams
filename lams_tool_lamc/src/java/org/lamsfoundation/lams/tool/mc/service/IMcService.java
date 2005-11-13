@@ -44,10 +44,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
- * This interface define the contract that all MCQ service provider must
- * follow.
+ * @author Ozgur Demirtas
  * 
- * @author ozgurd
+ * Interface that defines the contract that all MCQ service provider must follow.
  */
 public interface IMcService 
 {

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+
+<class 
+    name="org.lamsfoundation.lams.tool.mc.McUploadedFile" 
+    table="tl_lamc11_uploadedfile"
+>
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <generator class="native" />
+    </id>
+
+	<property
+        name="uuid"
+        type="java.lang.String"
+        column="uuid"
+        not-null="true"
+        length="255"
+    >
+    </property>
+    
+   <property
+        name="fileOnline"
+        type="boolean"
+        access="property"
+        column="isOnline_File"
+   />
+   
+      <property
+        name="filename"
+        type="java.lang.String"
+        access="property"
+        column="filename"
+        length="255"
+   />
+   
+  <property
+        name="mcContentId"
+        type="java.lang.Long"
+        update="false"
+        insert="false"
+        access="property"
+        column="mc_content_id"
+        length="20"
+    />
+    
+   <many-to-one
+        name="mcContent"
+        class="org.lamsfoundation.lams.tool.mc.McContent"
+        not-null="true"        
+        cascade="none"
+        outer-join="auto"
+        update="true"
+        insert="true"
+        access="property"
+    >
+        <column
+            name="mc_content_id" 
+        />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

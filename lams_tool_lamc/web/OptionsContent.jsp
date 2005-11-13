@@ -47,7 +47,7 @@
 					
 					<table align="center" border="1">
 					     <tr>
-							  	<td bgcolor="#EEEEEE" colspan=4 class="input" valign=top align=left>
+							  	<td bgcolor="#A8C7DE" colspan=4 class="input" valign=top align=left>
 								  	 <font size=2> <b> <bean:message key="label.mc.options"/> </b> </font>
 							  	</td>
 						 </tr>					

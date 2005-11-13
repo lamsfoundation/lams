@@ -30,7 +30,14 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
-/** @author Ozgur Demirtas */
+/**
+ * <p>Persistent  object/bean that defines the question content for the MCQ tool.
+ * Provides accessors and mutators to get/set attributes
+ * It maps to database table: tl_lamc11_que_content
+ * </p>
+ * 
+ * @author Ozgur Demirtas
+ */
 public class McQueContent implements Serializable {
 
     /** identifier field */

@@ -33,22 +33,21 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
+ * @author Ozgur Demirtas
+ *  
  * <p>This class act as the proxy between web layer and service layer. It is
  * designed to decouple the presentation logic and business logic completely.
  * In this way, the presentation tier will no longer be aware of the changes in
  * service layer. Therefore we can feel free to switch the business logic
  * implementation.</p>
- * 
- * @author ozgurd
- *
  */
 public class McServiceProxy
 {
     /**
-     * Return the qa domain service object. It will delegate to the Spring
+     * Return the mc domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.
      * @param servletContext the servletContext for current application
-     * @return survey service object.
+     * @return mcq service object.
      */
     public static final IMcService getMcService(ServletContext servletContext)
     {

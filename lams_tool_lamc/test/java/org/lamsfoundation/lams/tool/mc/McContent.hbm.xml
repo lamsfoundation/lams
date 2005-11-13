@@ -44,17 +44,17 @@
 
 
    <property
-            name="defineLater"
-            type="boolean"
-            access="property"
-            column="define_later"
+        name="defineLater"
+        type="boolean"
+        access="property"
+        column="define_later"
    />
 
    <property
-            name="runOffline"
-            type="boolean"
-            access="property"
-            column="run_offline"
+        name="runOffline"
+        type="boolean"
+        access="property"
+        column="run_offline"
    />
 
 
@@ -77,10 +77,10 @@
 
 
    <property
-            name="questionsSequenced"
-            type="boolean"
-            access="property"
-            column="questions_sequenced"
+        name="questionsSequenced"
+        type="boolean"
+        access="property"
+        column="questions_sequenced"
    />
 
     <property
@@ -162,6 +162,14 @@
         column="retries"
         length="1"
     />
+    
+   <property
+        name="showReport"
+        type="boolean"
+        access="property"
+        column="show_report"
+   />
+    
     
     <property
         name="passMark"

@@ -30,9 +30,9 @@ import org.lamsfoundation.lams.tool.mc.McSession;
 
 
 /**
- * <p>Interface for the McSession DAO, defines methods needed to access/modify
- * mc session</p>
- * @author ozgurd
+ * @author Ozgur Demirtas
+ * <p>Interface for the McSession DAO, defines methods needed to access/modify mc session</p>
+ * 
  */
 public interface IMcSessionDAO {
 	

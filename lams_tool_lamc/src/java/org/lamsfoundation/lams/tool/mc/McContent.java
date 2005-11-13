@@ -31,7 +31,14 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/** @author Ozgur Demirtas */
+/**
+ * <p>Persistent  object/bean that defines the content for the MCQ tool.
+ * Provides accessors and mutators to get/set attributes
+ * It maps to database table: tl_lamc11_content
+ * </p>
+ * 
+ * @author Ozgur Demirtas
+ */
 public class McContent implements Serializable {
 
     /** identifier field */

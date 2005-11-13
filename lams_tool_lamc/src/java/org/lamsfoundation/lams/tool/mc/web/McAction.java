@@ -55,114 +55,9 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
-
 /**
+ * * @author Ozgur Demirtas
  * 
- * change the logic about completion status
- *
- */
-
-/**
- * 
- * once lams_learning is ready and appContext file is src/ then FINISH toool session will work.
- * 
- */
-
-/**
- * 
- * done: removed styling, except error messages and table centering
- * 
- */
-
-/**
- * The tool's Spring configuration file: qaCompactApplicationContext.xml
- * Main service bean of the tool is: org.lamsfoundation.lams.tool.qa.service.McServicePOJO
- * 
- * done: config file is read from classpath
- */
-
-
-/**
- * 
- * the tool's web.xml will be modified to have classpath to learning service.
- * This is how the tool gets the definition of "learnerService"
- */
-
-/**
- * 
- * when to reset define later and synchin monitor etc..
- *  
- */
-
-/** make sure the tool gets called on:
- *	setAsForceComplete(Long userId) throws McApplicationException 
- */
-
-
-/**
- * 
- * User Issue:
- * Right now:
- * 1- the tool gets the request object from the container.
- * 2- Principal principal = req.getUserPrincipal();
- * 3- String username = principal.getName();
- * 4- User userCompleteData = qaService.getCurrentUserData(userName);
- * 5- write back userCompleteData.getUserId()
- */
-
-
-/**
- * 
- * JBoss Issue: 
- * Currently getUserPrincipal() returns null and ServletRequest.isUserInRole() always returns false on unsecured pages, 
- * even after the user has been authenticated.
- * http://jira.jboss.com/jira/browse/JBWEB-19 
- */
-
-
-/**
- * eliminate calls:
- * authoringUtil.simulatePropertyInspector_RunOffline(request);
- * authoringUtil.simulatePropertyInspector_setAsDefineLater(request);
- */
-
-
-/**
- * 
- * @author ozgurd
- *
- * TOOL PARAMETERS: ?? (toolAccessMode) ??
- * Authoring environment: toolContentId
- * Learning environment: toolSessionId + toolContentId  
- * Monitoring environment: toolContentId / Contribute tab:toolSessionId(s)
- * 	 
- * 
- */
-
-/**
- * Note: the tool must support deletion of an existing content from within the authoring environment.
- * The current support for this is by implementing the tool contract : removeToolContent(Long toolContentId)
- */
-
-
-/**
- * 
- * We have had to simulate container bahaviour in development stage by calling 
- * createToolSession and leaveToolSession from the web layer. These will go once the tool is 
- * in deployment environment.
- * 
- * 
- * CHECK: leaveToolSession and relavent LearnerService may need to be defined in the spring config file.
- * 
- */
-
-/**
- * 
- * GROUPING SUPPORT: Find out what to do.
- */
-
-
-/**
  * <p>Action class that controls the logic of tool behavior. </p>
  * 
  * <p>Note that Struts action class only has the responsibility to navigate 
@@ -176,10 +71,57 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * Struts action class as all of them are handled in 
  * <code>CustomStrutsExceptionHandler<code>.
  * 
- * @author Ozgur Demirtas
- */
+ 
+	<action
+		path="/authoring"
+		type="org.lamsfoundation.lams.tool.mc.web.McAction"
+		name="McAuthoringForm"
+		scope="session"
+		input=".questions"
+		parameter="method"
+		unknown="false"
+		validate="true"
+	>
+	<forward
+		  name="load"
+		  path=".questions"
+		  redirect="true"
+	/>
+	
+	<forward
+		  name="starter"
+		  path=".starter"
+		  redirect="true"
+	/>
+	
+	<forward
+		  name="editOptsContent"
+		  path=".editOptsContent"
+		  redirect="true"
+	/>
+	
+	 <forward
+		  name="allInstructions"
+		  path=".allInstructions"
+		  redirect="true"
+	/>
+	</action>
+*/
 public class McAction extends DispatchAction implements McAppConstants
 {
+	/*
+	 * change the logic about completion status
+
+	 * once lams_learning is ready and appContext file is src/ then FINISH toool session will work.
+	 * 
+	 * when to reset define later and synchin monitor etc..
+	 *
+	 * make sure the tool gets called on:
+	 * setAsForceComplete(Long userId) throws McApplicationException 
+	 * 
+	 * Note: the tool must support deletion of an existing content from within the authoring environment.
+	 * The current support for this is by implementing the tool contract : removeToolContent(Long toolContentId)
+	 */
 	static Logger logger = Logger.getLogger(McAction.class.getName());
 	
     /** 
@@ -295,83 +237,6 @@ public class McAction extends DispatchAction implements McAppConstants
 	 	return null;
     }
 
-
-    
-    protected Map rebuildQuestionMapfromDB(HttpServletRequest request)
-    {
-    	Map mapQuestionsContent= new TreeMap(new McComparator());
-    	
-    	IMcService mcService =McUtils.getToolService(request);
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-		logger.debug("toolContentId:" + toolContentId);
-
-		McContent mcContent=mcService.retrieveMc(toolContentId);
-		logger.debug("mcContent:" + mcContent);
-		
-    	List list=mcService.getAllQuestionEntries(mcContent.getUid());
-    	logger.debug("list:" + list);
-		
-		Iterator listIterator=list.iterator();
-    	Long mapIndex=new Long(1);
-    	while (listIterator.hasNext())
-    	{
-    		McQueContent mcQueContent=(McQueContent)listIterator.next();
-    		logger.debug("mcQueContent:" + mcQueContent);
-    		mapQuestionsContent.put(mapIndex.toString(),mcQueContent.getQuestion());
-    		mapIndex=new Long(mapIndex.longValue()+1);
-    	}
-    	
-    	logger.debug("refreshed Map:" + mapQuestionsContent);
-    	return mapQuestionsContent;
-    }
-    
-    
-    protected void removeRedundantQuestionEntries(HttpServletRequest request, Map mapQuestionsContent)
-    {
-    	IMcService mcService =McUtils.getToolService(request);
-    	
-    	logger.debug("main Map mapQuestionsContent:" + mapQuestionsContent);
-    	
-    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-		logger.debug("toolContentId:" + toolContentId);
-		
-		McContent mcContent=mcService.retrieveMc(toolContentId);
-		logger.debug("mcContent:" + mcContent);
-		
-		if (mcContent != null)
-		{
-			List allQuestions=mcService.getAllQuestionEntries(mcContent.getUid());
-	    	logger.debug("allQuestions:" + allQuestions);
-	    	
-	    	Iterator listIterator=allQuestions.iterator();
-	    	
-	    	while (listIterator.hasNext())
-	    	{
-	    		McQueContent mcQueContent=(McQueContent)listIterator.next();
-	    		logger.debug("mcQueContent:" + mcQueContent);
-	    		
-	    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
-	    		boolean matchFound=false;
-	            while (itQuestionsMap.hasNext()) {
-	            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
-	                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	                
-	                if (pairs.getValue().toString().equals(mcQueContent.getQuestion()))
-					{
-	                    logger.debug("match found  the  pair: " + pairs.getValue().toString());
-	                	matchFound=true;
-	            	}
-	            }
-	            
-	            if (matchFound == false)
-	            {
-	            	mcService.removeMcQueContent(mcQueContent);
-	                logger.debug("removed mcQueContent: " + mcQueContent);
-	            }
-	    	}
-		}
-    }
-
     
     /**
      * populates request parameters
@@ -398,19 +263,6 @@ public class McAction extends DispatchAction implements McAppConstants
     	mcAuthoringForm.setMoveDown(null);
     	mcAuthoringForm.setRemoveOption(null);
     	mcAuthoringForm.setViewFileItem(null);
-    	
-    	//mcAuthoringForm.setAddOption(null);
-    	
-    	/*
-    	String addQuestion=request.getParameter("addQuestion");
-    	logger.debug("parameter addQuestion" + addQuestion);
-    	if ((addQuestion != null) && addQuestion.equals("1"))
-    	{
-    		logger.debug("parameter addQuestion is selected " + addQuestion);
-    		mcAuthoringForm.setAddQuestion("1");
-    	}
-    	*/
-    	
     	
     	String editOptions=request.getParameter("editOptions");
     	logger.debug("parameter editOptions" + editOptions);
@@ -443,16 +295,6 @@ public class McAction extends DispatchAction implements McAppConstants
     		logger.debug("parameter moveUp is selected " + moveUp);
     		mcAuthoringForm.setMoveUp("1");
     	}
-    	
-    	/*
-    	String addOption=request.getParameter("addOption");
-    	logger.debug("parameter addOption" + addOption);
-    	if ((addOption != null) && addOption.equals("1"))
-    	{
-    		logger.debug("parameter addOption is selected " + addOption);
-    		mcAuthoringForm.setAddOption("1");
-    	}
-    	*/
     	
     	String removeOption=request.getParameter("removeOption");
     	logger.debug("parameter removeOption" + removeOption);
@@ -487,12 +329,12 @@ public class McAction extends DispatchAction implements McAppConstants
  		request.setAttribute(USER_ACTION, userAction);
  		logger.debug("userAction:" + userAction);
  		
-    	Map mapQuestionsContent=repopulateMap(request, "questionContent");
+    	Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
      	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
      	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
      	
      	logger.debug("will validate questions are not empty");
-    	boolean questionsNotEmptyValid=validateQuestionsNotEmpty(mapQuestionsContent);
+    	boolean questionsNotEmptyValid=AuthoringUtil.validateQuestionsNotEmpty(mapQuestionsContent);
     	logger.debug("questionsNotEmptyValid:" + questionsNotEmptyValid);
     	if (questionsNotEmptyValid == false)
     	{
@@ -530,7 +372,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	
     	
     	logger.debug("will validate SubTotalWeights");
-    	boolean subWeightsValid=validateSubTotalWeights(request,mcAuthoringForm);
+    	boolean subWeightsValid=AuthoringUtil.validateSubTotalWeights(request,mcAuthoringForm);
     	logger.debug("subWeightsValid:" + subWeightsValid);
     	if (subWeightsValid == false)
     	{
@@ -552,7 +394,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	}
     		
     		
-     	Map mapWeights= repopulateMap(request, "questionWeight");
+     	Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
     	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
     	System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
     	
@@ -587,11 +429,11 @@ public class McAction extends DispatchAction implements McAppConstants
  		request.setAttribute(USER_ACTION, userAction);
  		logger.debug("userAction:" + userAction);
  		
- 		Map mapWeights= repopulateMap(request, "questionWeight");
+ 		Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
 		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
 		
- 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+ 		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
 	 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
 	 	
@@ -649,12 +491,12 @@ public class McAction extends DispatchAction implements McAppConstants
     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
     	logger.debug("setting  EDIT_OPTIONS_MODE to 1");
     		
-    	Map mapQuestionsContent=repopulateMap(request, "questionContent");
+    	Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
      	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
      	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
      	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
      	
-     	Map mapWeights= repopulateMap(request, "questionWeight");
+     	Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
     	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
     	System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
      	
@@ -886,6 +728,10 @@ public class McAction extends DispatchAction implements McAppConstants
         	}
         	
         	
+        	
+        	
+        	
+        	
         	Map mapFeedbackIncorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_INCORRECT);
     		logger.debug("cached MAP_FEEDBACK_INCORRECT :" + mapFeedbackIncorrect);
     		if (mapFeedbackIncorrect != null)
@@ -940,11 +786,11 @@ public class McAction extends DispatchAction implements McAppConstants
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 1");
  		
- 		Map mapOptionsContent=repopulateMap(request,"optionContent");
+ 		Map mapOptionsContent=AuthoringUtil.repopulateMap(request,"optionContent");
 	 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
 	 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
 	 	
-	 	boolean verifyDuplicatesOptionsMap=verifyDuplicatesOptionsMap(mapOptionsContent);
+	 	boolean verifyDuplicatesOptionsMap=AuthoringUtil.verifyDuplicatesOptionsMap(mapOptionsContent);
 	 	logger.debug("verifyDuplicatesOptionsMap: " + verifyDuplicatesOptionsMap);
 	 	if (verifyDuplicatesOptionsMap == false)
  		{
@@ -979,7 +825,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		
 		Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
  		mapSelectedOptions.clear();
- 		mapSelectedOptions = repopulateCurrentCheckBoxStatesMap(request);
+ 		mapSelectedOptions = AuthoringUtil.repopulateCurrentCheckBoxStatesMap(request);
  		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
  		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
  		
@@ -1038,7 +884,7 @@ public class McAction extends DispatchAction implements McAppConstants
  		String optionIndex =mcAuthoringForm.getDeletableOptionIndex();
 		logger.debug("optionIndex:" + optionIndex);
 		
-		Map mapOptionsContent=repopulateMap(request, "optionContent");
+		Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
 	 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
 	 	logger.debug("mapOptionsContent size after shrinking: " + mapOptionsContent.size());
 	 	int mapSize=mapOptionsContent.size();
@@ -1083,7 +929,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		
 		Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
  		mapSelectedOptions.clear();
- 		mapSelectedOptions = repopulateCurrentCheckBoxStatesMap(request);
+ 		mapSelectedOptions = AuthoringUtil.repopulateCurrentCheckBoxStatesMap(request);
  		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
  		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
  		
@@ -1136,7 +982,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	request.setAttribute(USER_ACTION, userAction);
     	logger.debug("userAction:" + userAction);
     	
-    	Map mapQuestionsContent=repopulateMap(request, "questionContent");
+    	Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
      	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
      	
     	String questionIndex =mcAuthoringForm.getQuestionIndex();
@@ -1144,7 +990,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
     	logger.debug("movableQuestionEntry:" + movableQuestionEntry);
     	
-    	mapQuestionsContent= shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "down");
+    	mapQuestionsContent= AuthoringUtil.shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "down");
     	logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
     	
      	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
@@ -1176,7 +1022,7 @@ public class McAction extends DispatchAction implements McAppConstants
  		request.setAttribute(USER_ACTION, userAction);
  		logger.debug("userAction:" + userAction);
  		
- 		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+ 		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent before move down: " + mapQuestionsContent);
 	 	
  		String questionIndex =mcAuthoringForm.getQuestionIndex();
@@ -1184,7 +1030,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		String movableQuestionEntry=(String)mapQuestionsContent.get(questionIndex);
 		logger.debug("movableQuestionEntry:" + movableQuestionEntry);
 		
-		mapQuestionsContent= shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "up");
+		mapQuestionsContent= AuthoringUtil.shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "up");
 		logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
 		
 	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
@@ -1218,7 +1064,7 @@ public class McAction extends DispatchAction implements McAppConstants
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 		
- 		boolean validateOptions=validateOptions(request);
+ 		boolean validateOptions=AuthoringUtil.validateOptions(request);
  		logger.debug("validateOptions:" + validateOptions);
  		
  		if (validateOptions == false)
@@ -1235,7 +1081,7 @@ public class McAction extends DispatchAction implements McAppConstants
 			return (mapping.findForward(LOAD_QUESTIONS));	
  		}
 		
- 		Map mapOptionsContent=repopulateMap(request, "optionContent");
+ 		Map mapOptionsContent=AuthoringUtil.repopulateMap(request, "optionContent");
 	 	logger.debug("mapOptionsContent after shrinking: " + mapOptionsContent);
 	 	request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
 		logger.debug("final done  MAP_OPTIONS_CONTENT: " + mapOptionsContent);
@@ -1257,7 +1103,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		
 		Map mapSelectedOptions= (Map) request.getSession().getAttribute(MAP_SELECTED_OPTIONS);
  		mapSelectedOptions.clear();
- 		mapSelectedOptions = repopulateCurrentCheckBoxStatesMap(request);
+ 		mapSelectedOptions = AuthoringUtil.repopulateCurrentCheckBoxStatesMap(request);
  		logger.debug("after add mapSelectedOptions: " + mapSelectedOptions);
  		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
  		
@@ -1304,7 +1150,7 @@ public class McAction extends DispatchAction implements McAppConstants
 
     
     /**
-     * submits questions Map
+     * submits questions Map and persists questions as well as options information in the db.
      * submitQuestions(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
      * 
      * @param request
@@ -1325,7 +1171,7 @@ public class McAction extends DispatchAction implements McAppConstants
 	
 		ActionMessages errors= new ActionMessages();
 		
-		Map mapQuestionsContent=repopulateMap(request, "questionContent");
+		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent before submit: " + mapQuestionsContent);
 	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 
@@ -1361,7 +1207,7 @@ public class McAction extends DispatchAction implements McAppConstants
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
 		
-		boolean isTotalWeightsValid=validateTotalWeight(request);
+		boolean isTotalWeightsValid=AuthoringUtil.validateTotalWeight(request);
 		logger.debug("isTotalWeightsValid:" + isTotalWeightsValid);
 		if (isTotalWeightsValid == false)
 		{
@@ -1543,7 +1389,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
 		
 		
-		mapQuestionsContent=repopulateMap(request, "questionContent");
+		mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
 	 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
 	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
@@ -1624,7 +1470,7 @@ public class McAction extends DispatchAction implements McAppConstants
 
 
     /**
-     * presents contents of uploaded files
+     * prepares data to view the contents of uploaded files
      * viewFileItem(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
      * 
      * @param request
@@ -1736,6 +1582,7 @@ public class McAction extends DispatchAction implements McAppConstants
 
 
     /**
+     * adds the offline file information in the content repository.
      * submitOfflineFiles(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
      * 
      * @param request
@@ -1759,6 +1606,7 @@ public class McAction extends DispatchAction implements McAppConstants
     }
     
     /**
+     * adds the online file information in the content repository.
      * submitOnlineFiles(HttpServletRequest request, McAuthoringForm mcAuthoringForm, ActionMapping mapping)
      * 
      * @param request
@@ -1789,6 +1637,17 @@ public class McAction extends DispatchAction implements McAppConstants
     	mcService.cleanAllQuestionsSimple(mcContent.getUid());
     }
     
+    
+    /**
+     * creates the questions from the user in the db and makes a call to persist options.
+     * persistQuestions(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McContent mcContent)
+     *  
+     * @param request
+     * @param mapQuestionsContent
+     * @param mapFeedbackIncorrect
+     * @param mapFeedbackCorrect
+     * @param mcContent
+     */
     protected void persistQuestions(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McContent mcContent)
 	{
     	IMcService mcService =McUtils.getToolService(request);
@@ -1803,7 +1662,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
 		logger.debug("final MAP_GENERAL_SELECTED_OPTIONS_CONTENT :" + mapGeneralSelectedOptionsContent);
 
-    	Map mapWeights= repopulateMap(request, "questionWeight");
+    	Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
 		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
 		
@@ -1856,7 +1715,16 @@ public class McAction extends DispatchAction implements McAppConstants
     	
 	}
     
-    
+    /**
+     * prepares the data to persist options in the db
+     * persistOptions(HttpServletRequest request, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, McQueContent mcQueContent, String questionIndex)
+     * 
+     * @param request
+     * @param mapGeneralOptionsContent
+     * @param mapGeneralSelectedOptionsContent
+     * @param mcQueContent
+     * @param questionIndex
+     */
     protected void persistOptions(HttpServletRequest request, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, McQueContent mcQueContent, String questionIndex)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -1890,6 +1758,15 @@ public class McAction extends DispatchAction implements McAppConstants
     }
     
     
+    /**
+     * creates the options for a particular question in the db
+     * persistOptionsFinal(HttpServletRequest request, Map currentOptions, Map selectedOptions, McQueContent mcQueContent)
+     * 
+     * @param request
+     * @param currentOptions
+     * @param selectedOptions
+     * @param mcQueContent
+     */
     protected void persistOptionsFinal(HttpServletRequest request, Map currentOptions, Map selectedOptions, McQueContent mcQueContent)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -1930,6 +1807,14 @@ public class McAction extends DispatchAction implements McAppConstants
         }
     }
     
+    /**
+     * creates the questions content in the db.
+     * createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @return
+     */
     protected McContent createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -2078,6 +1963,15 @@ public class McAction extends DispatchAction implements McAppConstants
     }
     
     
+    /**
+     * includes the new question entry in the questions Map
+     * addQuestionMemory(HttpServletRequest request, McAuthoringForm mcAuthoringForm, Map mapQuestionsContent, boolean increaseMapSize)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapQuestionsContent
+     * @param increaseMapSize
+     */
     protected void addQuestionMemory(HttpServletRequest request, McAuthoringForm mcAuthoringForm, Map mapQuestionsContent, boolean increaseMapSize)
     {
     	if (increaseMapSize)
@@ -2099,51 +1993,17 @@ public class McAction extends DispatchAction implements McAppConstants
     }
 
     
-    protected boolean validateOptions(HttpServletRequest request)
-    {
-    	logger.debug("will validateOptions");
-    	String parameterType="checkBoxSelected";
-    	for (int i=1; i <= MAX_OPTION_COUNT ; i++)
-    	{
-    		String isCorrect=request.getParameter(parameterType + i);
-    		logger.debug("isCorrect: " + isCorrect);
-    		
-    		if (isCorrect != null)
-    		{
-    			if (isCorrect.equals("Correct"))
-        			return true;	
-    		}
-    	}
-    	return false;
-    }
-	
-    
-    protected boolean validateSubTotalWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
-    {
-    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
-    	logger.debug("mapWeights: " + mapWeights);
-    	
-    	int totalWeight=0;
-    	Iterator itMap = mapWeights.entrySet().iterator();
-		while (itMap.hasNext()) {
-        	Map.Entry pairs = (Map.Entry)itMap.next();
-            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            
-            int currentWeight=new Integer(pairs.getValue().toString()).intValue();
-            totalWeight= totalWeight + currentWeight;
-            logger.debug("sub totalWeight: " +  totalWeight);
-		}
-        logger.debug("final totalWeight: " +  totalWeight);
-        
-        if (totalWeight > 100)
-        	return false;
-        else
-        	return true;
-    }
-    
+    /**
+     * ensures that the weight valued entered are valid
+     * validateQuestionWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @return
+     */
     protected boolean validateQuestionWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {
-    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
+    	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
     	logger.debug("mapWeights: " + mapWeights);
     	
     	Iterator itMap = mapWeights.entrySet().iterator();
@@ -2195,228 +2055,8 @@ public class McAction extends DispatchAction implements McAppConstants
 		return true;
     }
     
-    protected boolean validateTotalWeight(HttpServletRequest request)
-    {
-    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
-    	logger.debug("mapWeights: " + mapWeights);
-    	
-    	Iterator itMap = mapWeights.entrySet().iterator();
-    	int totalWeight=0;
-		while (itMap.hasNext()) {
-        	Map.Entry pairs = (Map.Entry)itMap.next();
-            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+    
             
-            if ((pairs.getValue() != null) || (pairs.getValue().toString().length() > 0)) 
-            {
-            	totalWeight=totalWeight+ new Integer(pairs.getValue().toString()).intValue();
-            }
-		}
-
-            logger.debug("totalWeight: " +  totalWeight);
-            
-        if (totalWeight != 100)
-        {
-        	return false;
-        }
-
-        return true;
-    }
-
-    
-    protected Map shiftMap(Map mapQuestionsContent, String questionIndex , String movableQuestionEntry, String direction)
-    {
-    	logger.debug("movableQuestionEntry: " +  movableQuestionEntry);
-    	/* map to be returned */
-    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
-    	
-    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
-    	String shiftableEntry=null;
-    	
-    	int shiftableIndex=0;
-    	if (direction.equals("down"))
-        {
-    		logger.debug("moving map down");
-    		shiftableIndex=new Integer(questionIndex).intValue() + 1;
-        }
-    	else
-    	{
-    		logger.debug("moving map up");
-    		shiftableIndex=new Integer(questionIndex).intValue() - 1;
-        
-    	}
-    		
-		logger.debug("shiftableIndex: " +  shiftableIndex);
-    	shiftableEntry=(String)mapQuestionsContent.get(new Integer(shiftableIndex).toString());
-    	logger.debug("shiftable entry: " +  shiftableEntry);
-    	
-    	if (shiftableEntry != null) 
-    	{
-    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
-    		long mapCounter=0;
-    		while (itQuestionsMap.hasNext()) {
-            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
-                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-                mapCounter++;
-                logger.debug("mapCounter: " +  mapCounter);
-                
-                if (!pairs.getKey().equals(questionIndex) && !pairs.getKey().equals(new Integer(shiftableIndex).toString()))
-                {
-                	logger.debug("normal copy " +  questionIndex);
-                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), pairs.getValue());
-                }
-                else if (pairs.getKey().equals(questionIndex))
-                {
-                	logger.debug("move type 1 " +  questionIndex);
-                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), shiftableEntry);
-                }
-                else if (pairs.getKey().equals(new Integer(shiftableIndex).toString()))
-                {
-                	logger.debug("move type 2 " +  shiftableIndex);
-                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), movableQuestionEntry);
-                }
-            }
-    	}
-    	else
-    	{
-    		logger.debug("no change to map");
-    		mapTempQuestionsContent=mapQuestionsContent;
-    	}
-    		return mapTempQuestionsContent;
-
-    }
-    
-    
-    /**
-     * shrinks the size of the Map to only used entries
-     * 
-     * @param mapQuestionContent
-     * @param request
-     * @return
-     */
-    protected Map repopulateMap(HttpServletRequest request, String parameterType)
-    {
-    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
-    	logger.debug("parameterType: " + parameterType);
-    	
-    	long mapCounter=0;
-    	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
-		{
-			String candidateEntry =request.getParameter(parameterType + i);
-			if (
-				(candidateEntry != null) && 
-				(candidateEntry.length() > 0)   
-				)
-			{
-				mapCounter++;
-				mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateEntry);
-			}
-		}
-    	logger.debug("return repopulated Map: " + mapTempQuestionsContent);
-    	return mapTempQuestionsContent;
-    }
-    
-	
-    protected Map repopulateCurrentWeightsMap(HttpServletRequest request, String parameterType)
-    {
-    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
-    	logger.debug("parameterType: " + parameterType);
-    	
-    	long mapCounter=0;
-    	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
-		{
-			String candidateEntry =request.getParameter(parameterType + i);
-			String questionText =request.getParameter("questionContent" + i);
-			if ((questionText != null) && (questionText.length() > 0))
-			{
-				logger.debug("questionText: " + questionText);
-				if (candidateEntry != null)
-				{
-					mapCounter++;
-					mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateEntry);
-				}	
-			}
-			
-		}
-    	logger.debug("return repopulated Map: " + mapTempQuestionsContent);
-    	return mapTempQuestionsContent;
-    }
-
-    
-    protected boolean verifyDuplicatesOptionsMap(Map mapOptionsContent)
-	{
-    	Map originalMapOptionsContent=mapOptionsContent;
-    	Map backupMapOptionsContent=mapOptionsContent;
-    	
-    	int optionCount=0;
-    	for (long i=1; i <= MAX_OPTION_COUNT ; i++)
-		{
-    		String currentOption=(String)originalMapOptionsContent.get(new Long(i).toString());
-    		logger.debug("verified currentOption  " + currentOption);
-    		
-    		optionCount=0;
-    		for (long j=1; j <= MAX_OPTION_COUNT ; j++)
-    		{
-        		String backedOption=(String)backupMapOptionsContent.get(new Long(j).toString());
-        		
-        		if ((currentOption != null) && (backedOption !=null))
-        		{
-        			if (currentOption.equals(backedOption))
-    				{
-    					optionCount++;
-    			    	logger.debug("optionCount for  " + currentOption + " is: " + optionCount);
-    				}
-    				
-            		if (optionCount > 1)
-            			return false;	
-        		}
-    		}	
-		}
-    	return true;
-	}
-    
-    
-    protected boolean validateQuestionsNotEmpty(Map mapQuestionsContent)
-    {
-    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
-    	while (itMap.hasNext()) {
-        	Map.Entry pairs = (Map.Entry)itMap.next();
-            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            
-            if ((pairs.getValue() != null) && (pairs.getValue().toString().length() == 0))
-            	return false;
-            
-		}
-    	return true;
-    }
-    
-    
-    protected Map repopulateCurrentCheckBoxStatesMap(HttpServletRequest request)
-    {
-    	Map mapTempContent= new TreeMap(new McComparator());
-    	
-    	long mapCounter=0;
-    	for (long i=1; i <= MAX_OPTION_COUNT ; i++)
-		{
-			String candidateEntry =request.getParameter("checkBoxSelected" + i);
-			String optionText =request.getParameter("optionContent" + i);
-			
-			if (
-					(candidateEntry != null) && 
-					(candidateEntry.length() > 0)   
-					)
-				{
-					if (candidateEntry.equals("Correct"))
-					{
-						mapCounter++;
-						mapTempContent.put(new Long(mapCounter).toString(), optionText);
-					}
-				}
-		}
-    	logger.debug("return repopulated currentCheckBoxStatesMap: " + mapTempContent);
-    	return mapTempContent;
-    }
-
-        
     /**
      * persists error messages to request scope
      * @param request

@@ -53,7 +53,7 @@
 				
 					<table align="center" border="1" summary="layout and Content" width="55%">
 				     <tr>
-							  	<td bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=left>
+							  	<td bgcolor="#A8C7DE" colspan=5 class="input" valign=top align=left>
 								  	 <font size=2> <b> <bean:message key="label.mc.questions"/> </b> </font>
 							  	</td>
 						 </tr>					

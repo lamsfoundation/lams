@@ -29,7 +29,8 @@ import org.lamsfoundation.lams.tool.mc.McQueContent;
 
 /**
  * 
- * @author ozgurd
+ * @author Ozgur Demirtas
+ * <p>Interface for the McQueContent DAO, defines methods needed to access/modify mc question content</p>
  *
  */
 public interface IMcQueContentDAO

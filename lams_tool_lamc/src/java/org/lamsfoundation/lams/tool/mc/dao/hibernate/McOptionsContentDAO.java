@@ -33,11 +33,9 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
 /**
- * @author ozgurd
- * 
+ * @author Ozgur Demirtas
  * <p>Hibernate implementation for database access to McOptionsContent for the mc tool.</p>
  */
-
 public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptionsContentDAO {
 	 	static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
 	 	

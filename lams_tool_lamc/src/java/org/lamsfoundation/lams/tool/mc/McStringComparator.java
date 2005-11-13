@@ -30,13 +30,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Ozgur Demirtas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
-
-/**
- *  A comparator implementation that can be used as a constructor to collections. 
+ *  *  A comparator implementation that can be used as a constructor to collections. 
  *  The TreeMap in the web layer makes use of it.
  * 
  */

@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.tool.mc;
 
 
 /**
- * <p>This exception wraps all basic exception occured in the qa tool. It is 
+ * <p>This exception wraps all basic exception occured in the mcq tool. It is 
  * not suppose to be try and catched in any level. The struts should be taking
  * care of handling this exception.</p>
  * 

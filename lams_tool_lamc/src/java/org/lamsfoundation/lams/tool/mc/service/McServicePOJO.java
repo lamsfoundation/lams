@@ -71,22 +71,15 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.dao.DataAccessException;
 
-
-
 /**
- * The POJO implementation of Mc service. All business logics of survey tool
+ * 
+ * @author Ozgur Demirtas
+ * 
+ * The POJO implementation of Mc service. All business logics of MCQ tool
  * are implemented in this class. It translate the request from presentation
- * layer and perform approporiate database operation.
+ * layer and perform appropriate database operation.
  * 
- * 
- * Every method is implemented as a Hibernate session transaction. It open an
- * new persistent session or connect to existing persistent session in the 
- * begining and it close or disconnect to the persistent session in the end.
- * 
- * @author ozgurd
- *  
  */
-
 public class McServicePOJO implements
                               IMcService, ToolContentManager, ToolSessionManager, McAppConstants
                

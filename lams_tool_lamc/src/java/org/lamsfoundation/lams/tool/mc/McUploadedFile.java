@@ -25,10 +25,13 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
+ * <p>Persistent  object/bean that defines the uploaded file for the MCQ tool.
+ * Provides accessors and mutators to get/set attributes
+ * It maps to database table: tl_lamc11_uploadedFile
+ * </p>
  * 
  * @author Ozgur Demirtas
  */
-
 public class McUploadedFile implements Serializable
 {
 	/** identifier field */

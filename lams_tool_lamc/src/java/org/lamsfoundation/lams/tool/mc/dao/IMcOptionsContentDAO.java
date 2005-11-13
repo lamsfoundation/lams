@@ -26,11 +26,10 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
 
-
 /**
+ * @author Ozgur Demirtas
+ * <p>Interface for the McOptionsContent DAO, defines methods needed to access/modify mc options content</p>
  * 
- * @author ozgurd
- *
  */
 public interface IMcOptionsContentDAO
 {

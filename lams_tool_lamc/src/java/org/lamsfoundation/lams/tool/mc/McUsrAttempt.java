@@ -27,7 +27,14 @@ import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
-/** @author Ozgur Demirtas */
+/**
+ * <p>Persistent  object/bean that defines the user attempt for the MCQ tool.
+ * Provides accessors and mutators to get/set attributes
+ * It maps to database table: tl_lamc11_usr_attempt
+ * </p>
+ * 
+ * @author Ozgur Demirtas
+ */
 public class McUsrAttempt implements Serializable {
 
     /** identifier field */

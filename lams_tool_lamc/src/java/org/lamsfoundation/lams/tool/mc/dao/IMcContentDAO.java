@@ -28,13 +28,11 @@ import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McSession;
 
 /**
- * <p>Interface for the McContent DAO, defines methods needed to access/modify
- * mc content</p>
- * @author ozgurd
+ * @author Ozgur Demirtas
+ * <p>Interface for the McContent DAO, defines methods needed to access/modify mc content</p>
+ * 
  */
 public interface IMcContentDAO {
-    
-    
     /**
 	 * <p>Return the persistent instance of a McContent  
 	 * with the given identifier <code>uid</code>, returns null if not found. </p>
@@ -115,5 +113,4 @@ public interface IMcContentDAO {
     public List findAll(Class objClass);
    
     public void flush();
-    
   }

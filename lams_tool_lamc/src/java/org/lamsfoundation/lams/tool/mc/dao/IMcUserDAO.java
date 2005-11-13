@@ -27,10 +27,8 @@ import org.lamsfoundation.lams.tool.mc.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.McSession;
 
 /**
- * @author ozgurd
- * 
- * <p>Interface for the McSession DAO, defines methods needed to access/modify
- * mc users (learners of the mc activity) </p>
+ * @author Ozgur Demirtas
+ * <p>Interface for the McUser DAO, defines methods needed to access/modify user data</p>
  */
 public interface IMcUserDAO {
     

@@ -27,7 +27,8 @@ import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 
 /**
  * 
- * @author ozgurd
+ * @author Ozgur Demirtas
+ * * <p>Interface for the McUsrAttempt DAO, defines methods needed to access/modify user attempt data</p>
  *
  */
 public interface IMcUsrAttemptDAO
