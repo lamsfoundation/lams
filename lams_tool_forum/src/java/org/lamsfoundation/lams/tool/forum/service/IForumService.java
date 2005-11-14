@@ -3,12 +3,12 @@ package org.lamsfoundation.lams.tool.forum.service;
 import java.util.List;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
+import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 
 /**
  * Created by IntelliJ IDEA.

@@ -44,12 +44,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
@@ -73,6 +73,7 @@ public class AuthoringAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, PersistenceException {
 		
 		String param = mapping.getParameter();
+		//-----------------------Forum Author function ---------------------------
 	  	if (param.equals("initPage")) {
        		return initPage(mapping, form, request, response);
         }
@@ -98,17 +99,17 @@ public class AuthoringAction extends Action {
 	  	if (param.equals("createTopic")) {
        		return createTopic(mapping, form, request, response);
         }
-        if (param.equals("deleteTopic")) {
-       		return deleteTopic(mapping, form, request, response);
-        }
+	  	if (param.equals("editTopic")) {
+	  		return editTopic(mapping, form, request, response);
+	  	}
+	  	if (param.equals("updateTopic")) {
+	  		return updateTopic(mapping, form, request, response);
+	  	}
         if (param.equals("viewTopic")) {
        		return viewTopic(mapping, form, request, response);
         }
-        if (param.equals("editTopic")) {
-        	return editTopic(mapping, form, request, response);
-        }
-        if (param.equals("updateTopic")) {
-        	return updateTopic(mapping, form, request, response);
+        if (param.equals("deleteTopic")) {
+        	return deleteTopic(mapping, form, request, response);
         }
         if (param.equals("deleteAttachment")) {
         	return deleteAttachment(mapping, form, request, response);
@@ -207,7 +208,7 @@ public class AuthoringAction extends Action {
 		forumService = getForumManager();
 		forumService.createRootTopic(forumId,null, message);
 		
-		topics.add(MessageDTO.getMessageDTO(message,user.getFirstName()+" "+user.getLastName()));
+		topics.add(MessageDTO.getMessageDTO(message));
 		
 		request.setAttribute(ForumConstants.SUCCESS_FLAG,"CREATE_SUCCESS");
 		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);

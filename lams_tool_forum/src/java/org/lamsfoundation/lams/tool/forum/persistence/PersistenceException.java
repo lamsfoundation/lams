@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.tool.forum.core;
+package org.lamsfoundation.lams.tool.forum.persistence;
 
 /**
  * User: conradb

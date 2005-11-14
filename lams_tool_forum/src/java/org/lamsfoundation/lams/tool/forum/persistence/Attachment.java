@@ -1,6 +1,5 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import java.io.InputStream;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -25,10 +24,7 @@ public class Attachment {
     private String fileType;
     private String fileName;
     private Date created;
-    
-    //non-persist fields
-    private InputStream inputStream;
-    private String contentType;
+
 
     /**
      * @hibernate.id column="uid" generator-class="native"
@@ -75,23 +71,6 @@ public class Attachment {
         this.fileName = name;
     }
 
-    public InputStream getInputStream() {
-        return inputStream;
-    }
-
-    public void setStream(InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-    
-    
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;

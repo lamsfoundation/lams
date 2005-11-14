@@ -6,10 +6,10 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
-import org.lamsfoundation.lams.tool.forum.core.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 
 /**
  * User: conradb

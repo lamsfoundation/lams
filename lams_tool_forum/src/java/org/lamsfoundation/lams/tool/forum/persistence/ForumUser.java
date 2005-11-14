@@ -35,7 +35,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 public class ForumUser implements Serializable,Cloneable{
 
 	private static final long serialVersionUID = -7043502180037866257L;
-
 	private static Logger log = Logger.getLogger(ForumUser.class);
 	
     private Long uid;

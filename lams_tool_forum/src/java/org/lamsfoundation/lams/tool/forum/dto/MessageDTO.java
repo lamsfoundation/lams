@@ -35,25 +35,31 @@ public class MessageDTO {
 	private short level;
 	private int threadNum;
 	
-
-	public static MessageDTO getMessageDTO(Message msg, String authorName){
+	/**
+	 * Get a <code>MessageDTO</code> instance from a given <code>Message</code>.
+	 * @param msg
+	 * @return
+	 */
+	public static MessageDTO getMessageDTO(Message msg){
 		if(msg == null)
 			return null;
 		
 		MessageDTO dto = new MessageDTO();
 		dto.setMessage(msg);
-		dto.setAuthor(authorName);
+		dto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
 		if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 			dto.setHasAttachment(false);
 		else
 			dto.setHasAttachment(true);
 		return dto;
 	}
-	
-	public static MessageDTO getMessageDTO(Message msg){
-		return getMessageDTO(msg,msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
-	}
-	
+	/**
+	 * Get a list of <code>MessageDTO</code> according to given list of <code>Message</code> and author name.
+	 * These returned <code>MessageDTO</code> will use same author name with the given author name.   
+	 * @param msgSet
+	 * @param authorName
+	 * @return
+	 */
 	public static List getMessageDTO(List msgSet,String authorName){
 		List retSet = new ArrayList();
 		if(msgSet == null || msgSet.isEmpty())
@@ -73,6 +79,11 @@ public class MessageDTO {
 		}
 		return retSet;
 	}
+	/**
+	 * Get a list of <code>MessageDTO</code> according to given list of <code>Message</code>.
+	 * @param msgList
+	 * @return
+	 */
 	public static List getMessageDTO(List msgList){
 		List retSet = new ArrayList();
 		if(msgList == null || msgList.isEmpty())
@@ -92,7 +103,7 @@ public class MessageDTO {
 		}
 		return retSet;
 	}
-	
+	//-------------------------------DTO get/set method------------------------------
 	public String getAuthor() {
 		return author;
 	}

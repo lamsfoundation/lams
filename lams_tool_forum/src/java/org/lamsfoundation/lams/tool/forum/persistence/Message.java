@@ -22,19 +22,19 @@ public class Message {
 	private boolean isAuthored;
 	private boolean isAnonymous;
 
-	private ForumToolSession toolSession;
-	private Message parent;
-	private Forum forum;
-	private Set attachments;
 	
 	private Date created;
 	private Date updated;
-	private ForumUser createdBy;
-	private ForumUser modifiedBy;
 	private Date lastReplyDate;
 	private int replyNumber;
 	private boolean hideFlag;
 
+	private ForumToolSession toolSession;
+	private Message parent;
+	private Forum forum;
+	private Set attachments;
+	private ForumUser createdBy;
+	private ForumUser modifiedBy;
 
 	/**
 	 * Returns the object's creation date
