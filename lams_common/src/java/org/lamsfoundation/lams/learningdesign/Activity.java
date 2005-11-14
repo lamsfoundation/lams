@@ -762,7 +762,7 @@ public abstract class Activity implements Serializable,Nullable {
 		return new AuthoringActivityDTO(this);
 	}
 	public LibraryActivityDTO getLibraryActivityDTO(){
-		return new LibraryActivityDTO((ToolActivity)this);
+		return new LibraryActivityDTO(this);
 	}
 	
 	/** Create a deep copy of the this activity. It should return the same
