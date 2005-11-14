@@ -1,0 +1,1 @@
+You are not the topic author, permission denied to edit it. Sorry.

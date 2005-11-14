@@ -134,7 +134,6 @@ public class AuthoringAction extends Action {
 	protected ActionForward initPage(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		ForumForm forumForm = (ForumForm)form;
 		//get back the topic list and display them on page
@@ -151,20 +150,24 @@ public class AuthoringAction extends Action {
 			topics = forumService.getAuthoredTopics(contentId);
 			//tear down PO to normal object using clone() method
 			forumForm.setForum((Forum) forum.clone());
-			forumForm.setToolContentID(contentId);
 		} catch (Exception e) {
 			log.error(e);
 			return mapping.findForward("error");
 		}
 		
 		//set back STRUTS component value
-		request.getSession().setAttribute(ForumConstants.FORUM_ID,forum.getUid());
 		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 		return mapping.findForward("success");
 	}
 	/**
-	 * Update all content for submit tool except online/offline instruction
-	 * files list.
+	 * Update all content for forum. These contents contain
+	 * <ol>
+	 * 	<li>Forum authoring infomation, e.g. online/offline instruction, title, advacnce options, etc.</li>
+	 *  <li>Uploaded offline/online instruction files</li>
+	 *  <li>Author user information</li>
+	 *  <li>Topics author created</li>
+	 *  <li>Topics' attachment file</li>
+	 * </ol>
 	 * 
 	 * @param mapping
 	 * @param form
@@ -190,20 +193,26 @@ public class AuthoringAction extends Action {
 			    		forumPO.setMessages(msgSet);
 			    	}
 			    	//restore new topic into ForumPO message set.
-//			    	Message msg;
-//			    	Iterator iter = forum.getMessages().iterator();
-//			    	while(iter.hasNext()){
-//			    		msg = (Message) iter.next();
-//			    		//new topic, then add to PO
-//			    		if(msg.getUid() == null)
-//			    			msgSet.add(msg);
-//			    	}
+			    	Message msg;
+			    	Iterator iter = forum.getMessages().iterator();
+			    	while(iter.hasNext()){
+			    		msg = (Message) iter.next();
+			    		//new topic, then add to PO
+			    		if(msg.getUid() == null)
+			    			msgSet.add(msg);
+//						if (topic != null && topic.getMessage() != null && topic.getMessage().getUid() != null) {
+//						getForumManager().deleteTopic(topic.getMessage().getUid());
+//					}
+			    		//TODO:above JavaDoc save content...
+
+			    	}
 				}
 				PropertyUtils.copyProperties(forumPO,forum);
 				//copy back
 				forumPO.setAttachments(attSet);
 				forumPO.setMessages(msgSet);
 			}else{
+				//new Forum, create it.
 				forumPO = forum;
 				forumPO.setContentId(forumForm.getToolContentID());
 			}
@@ -419,18 +428,29 @@ public class AuthoringAction extends Action {
 			HttpServletResponse response) throws IOException, ServletException, PersistenceException {
 		
 		List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-		Long forumId = (Long) request.getSession().getAttribute(ForumConstants.FORUM_ID);
 		//get login user (author)
 		HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		
+		//get message info from web page
 		MessageForm messageForm = (MessageForm) form;
 		Message message = messageForm.getMessage();
+		//init some basic variables for first time create
 		message.setIsAuthored(true);
 		message.setCreated(new Date());
 		message.setUpdated(new Date());
 		message.setLastReplyDate(new Date());
+		//check whether this user exist or not
+		ForumUser forumUser = forumService.getUserByUserId(new Long(user.getUserID().intValue()));
+		if(forumUser == null){
+			//if user not exist, create new one in database
+			forumUser = new ForumUser(user);
+		}
+		message.setCreatedBy(forumUser);
+		//same person with create at first time
+		message.setModifiedBy(forumUser);
+		//set attachment of this topic
 		Set attSet = null;
 		if(messageForm.getAttachmentFile() != null 
 			&&  !StringUtils.isEmpty(messageForm.getAttachmentFile().getFileName())){
@@ -441,27 +461,16 @@ public class AuthoringAction extends Action {
 			attSet.add(att);
 		}
 		message.setAttachments(attSet);
-		//check whether this user exist or not
-		ForumUser forumUser = forumService.getUserByUserId(new Long(user.getUserID().intValue()));
-		if(forumUser == null){
-			//if user not exist, create new one in database
-			forumUser = new ForumUser(user);
-			forumService.createUser(forumUser);
-		}
-		message.setCreatedBy(forumUser);
-		//same person with create at first time
-		message.setModifiedBy(forumUser);
+		
 		if (topics == null) {
 			topics = new ArrayList();
 		}
-		//save message into database
-		forumService = getForumManager();
-		forumService.createRootTopic(forumId,null, message);
-		
+		//save the new message into HttpSession
 		topics.add(MessageDTO.getMessageDTO(message));
 		
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"CREATE_SUCCESS");
+		//echo back to web page
 		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"CREATE_SUCCESS");
 		return mapping.findForward("success");
 	}
 	/**
@@ -482,10 +491,8 @@ public class AuthoringAction extends Action {
 		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
 
 		if(topicIdx != -1){
-			MessageDTO topic = (MessageDTO) topics.remove(topicIdx);
-			if (topic != null && topic.getMessage() != null && topic.getMessage().getUid() != null) {
-				getForumManager().deleteTopic(topic.getMessage().getUid());
-			}
+			topics.remove(topicIdx);
+			//reset it into HttpSession
 			request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,topics);
     	}
 		
@@ -509,10 +516,14 @@ public class AuthoringAction extends Action {
     	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
     	String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
+		
+		//if topicIndex is empty, try to get it from Request Attribute again.
+		//This may be caused by reresh this page, back from edit page etc.
 		if(topicIdx == -1){
 			topicIndex = (String) request.getAttribute(ForumConstants.AUTHORING_TOPICS_INDEX);
 			topicIdx = NumberUtils.stringToInt(topicIndex,-1);
 		}
+		
 		if(topicIdx != -1){
 			MessageDTO topic = (MessageDTO) topics.get(topicIdx);
 			request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
@@ -535,6 +546,7 @@ public class AuthoringAction extends Action {
      */
     public ActionForward editTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws PersistenceException {
+    	
     	MessageForm msgForm = (MessageForm)form;
     	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
     	String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
@@ -542,10 +554,23 @@ public class AuthoringAction extends Action {
 		if(topicIdx != -1){
 			MessageDTO topic = (MessageDTO) topics.get(topicIdx);
 			if (topic != null) {
+				//check whehter the edit topic and the current user are same person, if not, forbidden to edit topic
+				if(topic.getMessage() != null && topic.getMessage().getCreatedBy() != null){
+					//get login user (author)
+					HttpSession ss = SessionManager.getSession();
+					//get back login user DTO
+					UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+					Long topicAuthorId = topic.getMessage().getCreatedBy().getUserId();
+					if(!(new Long(user.getUserID().intValue()).equals(topicAuthorId)))
+						return mapping.findForward("forbiden");
+				}
+				//update message to HTML Form to echo back to web page: for subject, body display
 				msgForm.setMessage(topic.getMessage());
 			}
+			//echo back to web page: for attachment display
 			request.setAttribute(ForumConstants.AUTHORING_TOPIC,topic);
     	}
+		
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
     	return mapping.findForward("success");
     }
@@ -565,7 +590,6 @@ public class AuthoringAction extends Action {
 			HttpServletResponse response) throws PersistenceException {
     	//get value from HttpSession
 		List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-		Long forumId = (Long) request.getSession().getAttribute(ForumConstants.FORUM_ID);
 		//get param from HttpServletRequest
 		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
@@ -573,12 +597,15 @@ public class AuthoringAction extends Action {
 		if(topicIdx != -1){
 			MessageForm messageForm = (MessageForm) form;
 			Message message = messageForm.getMessage();
+			
 			MessageDTO newMsg = (MessageDTO) topics.get(topicIdx);
 			if(newMsg.getMessage()== null)
 				newMsg.setMessage(new Message());
+			
 			newMsg.getMessage().setSubject(message.getSubject());
 			newMsg.getMessage().setBody(message.getBody());
 			newMsg.getMessage().setUpdated(new Date());
+			//update attachment
 			if(messageForm.getAttachmentFile() != null 
 					&&  !StringUtils.isEmpty(messageForm.getAttachmentFile().getFileName())){
 				forumService = getForumManager();
@@ -589,9 +616,6 @@ public class AuthoringAction extends Action {
 				newMsg.setHasAttachment(true);
 				newMsg.getMessage().setAttachments(attSet);
 			}
-			//save message into database
-			forumService = getForumManager();
-			forumService.updateTopic(newMsg.getMessage());
 		}
 		
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
@@ -617,7 +641,6 @@ public class AuthoringAction extends Action {
 		forumService.deleteFromRepository(uuID,versionID);
 //		get value from HttpSession
     	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-    	Long forumId = (Long) request.getSession().getAttribute(ForumConstants.FORUM_ID);
     	//get param from HttpServletRequest
 		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 		
@@ -630,10 +653,6 @@ public class AuthoringAction extends Action {
 			newMsg.getMessage().setUpdated(new Date());
 			newMsg.setHasAttachment(false);
 			newMsg.getMessage().setAttachments(null);
-			//save message into database
-			forumService = getForumManager();
-			forumService.updateTopic(newMsg.getMessage());
-			
 		}
 		request.setAttribute(ForumConstants.SUCCESS_FLAG,"ATT_SUCCESS_FLAG");
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);

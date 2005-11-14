@@ -70,6 +70,8 @@ public class ForumForm extends ValidatorForm {
     					onlineFileList.add(file);
     			}
     		}
+        }else{
+        	logger.error("Initial ForumForm failed by null value of Forum.");
         }
         
     }

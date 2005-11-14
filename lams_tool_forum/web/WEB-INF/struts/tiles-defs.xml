@@ -39,6 +39,10 @@
     	<put name="pageTitleKey" value="title.message.edit"/>
     	<put name="body" value="/jsps/authoring/message/edit.jsp"/>
 	</definition>
+	<definition name="tiles:/authoring/forum/forbiddenEditTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="title.message.edit"/>
+    	<put name="body" value="/jsps/authoring/message/forbiddenedit.jsp"/>
+	</definition>
 	<!-- E: Authoring -->
 
 	<!-- B: Learning -->
