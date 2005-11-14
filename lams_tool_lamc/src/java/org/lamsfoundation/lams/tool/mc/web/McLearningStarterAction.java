@@ -2,6 +2,8 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -23,6 +25,9 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
+import org.lamsfoundation.lams.tool.mc.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.McQueContent;
+import org.lamsfoundation.lams.tool.mc.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.McSession;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
@@ -114,55 +119,15 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     * persist time zone information to session scope. 
 	     */
 	    McUtils.persistTimeZone(request);
-	    
-	    /*
-	     * obtain and setup the current user's data 
-	     */
-	    String userId = "";
-	    /* get session from shared session.*/
-	    HttpSession ss = SessionManager.getSession();
-	    /* get back login user DTO*/
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if ((user == null) || (user.getUserID() == null))
+	    ActionForward validateParameters=validateParameters(request, mapping);
+	    logger.debug("validateParamaters: " + validateParameters);
+	    if (validateParameters != null)
 	    {
-	    	logger.debug("error: The tool expects userId");
-	    	persistError(request,"error.learningUser.notAvailable");
-	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
-			return (mapping.findForward(ERROR_LIST));
-	    }else
-	    	userId = user.getUserID().toString();
-	    
-	    logger.debug("retrieved userId: " + userId);
-		
-	    
-	    /*
-	     * process incoming tool session id and later derive toolContentId from it. 
-	     */
-	    String strToolSessionId=request.getParameter(TOOL_SESSION_ID);
-	    long toolSessionId=0;
-	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
-	    {
-	    	persistError(request, "error.toolSessionId.required");
-	    	request.setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true));
-			return (mapping.findForward(ERROR_LIST));
+	    	return validateParameters;
 	    }
-	    else
-	    {
-	    	try
-			{
-	    		toolSessionId=new Long(strToolSessionId).longValue();
-		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
-		    	request.getSession().setAttribute(TOOL_SESSION_ID,new Long(toolSessionId));	
-			}
-	    	catch(NumberFormatException e)
-			{
-	    		persistError(request, "error.sessionId.numberFormatException");
-	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
-				request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
-				return (mapping.findForward(ERROR_LIST));
-			}
-	    }
-		
+  
+	    Long toolSessionID=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+	    logger.debug("retrieved toolSessionID: " + toolSessionID);
 	    /*
 	     * By now, the passed tool session id MUST exist in the db through the calling of:
 	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
@@ -170,18 +135,18 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     * make sure this session exists in tool's session table by now.
 	     */
 		
-	    if (!McUtils.existsSession(new Long(toolSessionId), request)) 
+	    if (!McUtils.existsSession(toolSessionID, request)) 
 		{
-				logger.debug("tool session does not exist" + toolSessionId);
+				logger.debug("tool session does not exist" + toolSessionID);
 				/*
 				 *for testing only, remove this line in development 
 				 */
 				Long currentToolContentId= new Long(1234);
 				logger.debug("simulating container behaviour: calling createToolSession with toolSessionId : " + 
-						new Long(toolSessionId) + " and toolContentId: " + currentToolContentId);
+						toolSessionID + " and toolContentId: " + currentToolContentId);
 				try
 				{
-					mcService.createToolSession(new Long(toolSessionId), currentToolContentId);
+					mcService.createToolSession(toolSessionID, currentToolContentId);
 					logger.debug("simulated container behaviour.");
 				}
 				catch(ToolException e)
@@ -196,8 +161,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		 * Make sure we can retrieve it and the relavent content
 		 */
 		
-		McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionId));
-	    logger.debug("retrieving qaSession: " + mcSession);
+		McSession mcSession=mcService.retrieveMcSession(toolSessionID);
+	    logger.debug("retrieving mcSession: " + mcSession);
 	    
 	    /*
 	     * find out what content this tool session is referring to
@@ -217,7 +182,71 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     * And the passed tool session id already refers to it.
 	     */
 	    setupAttributes(request, mcContent);
-	    	    
+	    
+	    
+	    /*
+    	 * fetch question content from content
+    	 */
+    	Iterator contentIterator=mcContent.getMcQueContents().iterator();
+    	while (contentIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)contentIterator.next();
+    		if (mcQueContent != null)
+    		{
+    			int displayOrder=mcQueContent.getDisplayOrder().intValue();
+        		if (displayOrder != 0)
+        		{
+        			/* add the question to the questions Map in the displayOrder*/
+        			mapQuestionsContent.put(new Integer(displayOrder).toString(),mcQueContent.getQuestion());
+        		}
+        		
+        		/* prepare the first question's candidate answers for presentation*/ 
+        		if (displayOrder == 1)
+        		{
+        			logger.debug("first question... ");
+        			Long uid=mcQueContent.getUid();
+        			logger.debug("uid : " + uid);
+        			List listMcOptions=mcService.findMcOptionsContentByQueId(uid);
+        			logger.debug("listMcOptions : " + listMcOptions);
+        			Map mapOptionsContent=McUtils.generateOptionsMap(listMcOptions);
+        			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+        			logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+        		}
+    		}
+    	}
+    	
+    	request.getSession().setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
+    	logger.debug("MAP_QUESTION_CONTENT_LEARNER: " +  request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
+    	logger.debug("mcContent has : " + mapQuestionsContent.size() + " entries.");
+    	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
+    	
+    	
+    	/*
+	     * Verify that userId does not already exist in the db.
+	     * If it does exist, that means, that user already responded to the content and 
+	     * his answers must be displayed  read-only
+	     * 
+	     */
+    	String userID=(String) request.getSession().getAttribute(USER_ID);
+    	logger.debug("userID:" + userID);
+	    McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(new Long(userID));
+	    logger.debug("mcQueUsr:" + mcQueUsr);
+	    
+	    if (mcQueUsr != null)
+	    {
+	    	logger.debug("the learner has already responsed to this content, just generate a read-only report.");
+	    	//LearningUtil learningUtil= new LearningUtil();
+	    	//learningUtil.buidLearnerReport(request,1);    	
+	    	//logger.debug("buidLearnerReport called successfully, forwarding to: " + LEARNER_REPORT);
+	    	return (mapping.findForward(LEARNER_REPORT));
+	    }
+	    
+	    
+	    request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+		logger.debug("final Options Map for the first question: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+		
+		
 		return (mapping.findForward(LOAD_LEARNER));	
 		
 	}
@@ -296,12 +325,66 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		logger.debug("IS_USERNAME_VISIBLE: " + mcContent.isUsernameVisible());
 	    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(mcContent.isUsernameVisible()).toString());
 	    
-		    logger.debug("IS_SHOW_FEEDBACK: " + new Boolean(mcContent.isShowFeedback()).toString());
+		logger.debug("IS_SHOW_FEEDBACK: " + new Boolean(mcContent.isShowFeedback()).toString());
 	    request.getSession().setAttribute(IS_SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback()).toString());
 	    /* .. till here */
 	}
 	
 	
+	protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping)
+	{
+		/*
+	     * obtain and setup the current user's data 
+	     */
+		
+	    String userID = "";
+	    /* get session from shared session.*/
+	    HttpSession ss = SessionManager.getSession();
+	    /* get back login user DTO*/
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if ((user == null) || (user.getUserID() == null))
+	    {
+	    	logger.debug("error: The tool expects userId");
+	    	persistError(request,"error.learningUser.notAvailable");
+	    	request.setAttribute(USER_EXCEPTION_USERID_NOTAVAILABLE, new Boolean(true));
+			return (mapping.findForward(ERROR_LIST));
+	    }else
+	    	userID = user.getUserID().toString();
+	    
+	    logger.debug("retrieved userId: " + userID);
+    	request.getSession().setAttribute(USER_ID, userID);
+		
+	    
+	    /*
+	     * process incoming tool session id and later derive toolContentId from it. 
+	     */
+	    String strToolSessionId=request.getParameter(TOOL_SESSION_ID);
+	    long toolSessionId=0;
+	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
+	    {
+	    	persistError(request, "error.toolSessionId.required");
+	    	request.setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true));
+			return (mapping.findForward(ERROR_LIST));
+	    }
+	    else
+	    {
+	    	try
+			{
+	    		toolSessionId=new Long(strToolSessionId).longValue();
+		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
+		    	request.getSession().setAttribute(TOOL_SESSION_ID,new Long(toolSessionId));	
+			}
+	    	catch(NumberFormatException e)
+			{
+	    		persistError(request, "error.sessionId.numberFormatException");
+	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
+				request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
+				return (mapping.findForward(ERROR_LIST));
+			}
+	    }
+	    return null;
+	}
+
 	
 	/**
 	 * sets up ROOT_PATH and PATH_TO_LAMS attributes for presentation purposes

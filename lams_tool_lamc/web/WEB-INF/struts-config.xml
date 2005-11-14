@@ -116,7 +116,32 @@
 		    redirect="true"
 	  	/>
 	</action>  
-    
+	
+	
+	<action
+      path="/learning"
+      type="org.lamsfoundation.lams.tool.mc.web.McAction"
+      name="McLearningForm"
+      scope="session"
+      input=".answers"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+
+	  	<forward
+		    name="loadLearner"
+		    path=".answers"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+		    name="errorList"
+		    path=".errorList"
+		    redirect="true"
+	  	/>
+
+    </action>
     
  </action-mappings>
 

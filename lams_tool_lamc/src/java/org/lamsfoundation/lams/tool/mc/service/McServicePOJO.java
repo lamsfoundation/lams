@@ -261,6 +261,7 @@ public class McServicePOJO implements
         }
     }
     
+
     
     public McQueUsr retrieveMcQueUsr(Long userId) throws McApplicationException
     {

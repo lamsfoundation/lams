@@ -24,23 +24,25 @@ String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()
 </head>
 <body>
 
-<h1><bean:message key="label.assessment"/></h1>
-
-		<table align=center> 	  
-		<tr>   
-		<td class=error>
-			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
-		</td>
-		</tr> 
-		</table>
+	<table align=center> 	  
+	<tr>   
+	<td class=error>
+		<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+	</td>
+	</tr> 
+	</table>
 
 
-MAIN CONTENT
-
-
-
-
-
+<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
+		<c:choose> 
+		  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 
+				<jsp:include page="SequentialAnswersContent.jsp" /> 
+		  </c:when> 
+		  <c:otherwise>
+			  	<jsp:include page="CombinedAnswersContent.jsp" /> 
+		  </c:otherwise>
+		</c:choose> 
+</html:form>
 
 </body>
 </html:html>

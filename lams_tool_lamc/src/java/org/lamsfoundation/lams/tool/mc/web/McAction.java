@@ -2066,5 +2066,112 @@ public class McAction extends DispatchAction implements McAppConstants
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
 		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
-	} 
+	}
+    
+    
+    /**
+     *  responds to learner activity in learner mode.
+     * 
+     * ActionForward displayMc(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                      ServletException
+     * 
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward displayMc(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                      ServletException
+   {
+    	logger.debug("displayMc starting..");
+    	
+    	McLearningForm mcLearningForm = (McLearningForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+    	if (mcLearningForm.getContinueOptions() != null)
+	 	{
+    		logger.debug("continue options requested.");
+    		String currentQuestionIndex=(String)request.getSession().getAttribute(CURRENT_QUESTION_INDEX);
+			logger.debug("currentQuestionIndex:" + currentQuestionIndex);
+    		
+			int newQuestionIndex=new Integer(currentQuestionIndex).intValue() + 1;
+    		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Integer(newQuestionIndex).toString());
+    		logger.debug("updated questionIndex:" + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+    		
+    		Long toolContentID= (Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	    logger.debug("TOOL_CONTENT_ID: " + toolContentID);
+    	    
+    	    McContent mcContent=mcService.retrieveMc(toolContentID);
+    	    logger.debug("mcContent: " + mcContent);
+    	    
+    	    String totalQuestionCount= (String) request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
+    	    int totalQCount= new Integer(totalQuestionCount).intValue();
+    	    logger.debug("totalQCount: " +totalQCount);
+    	    
+    	    
+    	    /*
+        	 * fetch question content from content
+        	 */
+    	    logger.debug("newQuestionIndex: " + newQuestionIndex);
+        	Iterator contentIterator=mcContent.getMcQueContents().iterator();
+        	boolean lastQuestion=false;
+        	while (contentIterator.hasNext())
+        	{
+        		McQueContent mcQueContent=(McQueContent)contentIterator.next();
+        		if (mcQueContent != null)
+        		{
+        			int displayOrder=mcQueContent.getDisplayOrder().intValue();
+        			logger.debug("displayOrder: " + displayOrder);
+        			
+            		/* prepare the next question's candidate answers for presentation*/ 
+            		if (newQuestionIndex == displayOrder)
+            		{
+            			logger.debug("get the next question... ");
+            			Long uid=mcQueContent.getUid();
+            			logger.debug("uid : " + uid);
+            			/* get the options for this question */
+            			List listMcOptions=mcService.findMcOptionsContentByQueId(uid);
+            			logger.debug("listMcOptions : " + listMcOptions);
+            			Map mapOptionsContent=McUtils.generateOptionsMap(listMcOptions);
+            			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+            			logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+            		}
+            		
+            		if (totalQCount == newQuestionIndex)
+            		{
+            			logger.debug("this is the last question... ");
+            			lastQuestion=true;
+            		}
+            		
+        		}
+        	}
+	 	}
+    	
+    	return (mapping.findForward(LOAD_LEARNER));
+   }
+    
+    
+   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

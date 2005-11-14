@@ -10,18 +10,19 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
  * ActionForm for the Learning environment
  */
 public class McLearningForm extends ActionForm implements McAppConstants {
-	protected String test;	
+	protected String continueOptions;
+	
 
 	/**
-	 * @return Returns the test.
+	 * @return Returns the continueOptions.
 	 */
-	public String getTest() {
-		return test;
+	public String getContinueOptions() {
+		return continueOptions;
 	}
 	/**
-	 * @param test The test to set.
+	 * @param continueOptions The continueOptions to set.
 	 */
-	public void setTest(String test) {
-		this.test = test;
+	public void setContinueOptions(String continueOptions) {
+		this.continueOptions = continueOptions;
 	}
 }

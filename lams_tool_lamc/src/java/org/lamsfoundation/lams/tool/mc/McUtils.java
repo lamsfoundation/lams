@@ -109,6 +109,32 @@ public abstract class McUtils implements McAppConstants {
 	}
 	
 	
+	/**
+	 * returns a Map of options
+	 * generateOptionsMap(List listMcOptions)
+	 * 
+	 * @param listMcOptions
+	 * @return Map
+	 */
+	public static Map generateOptionsMap(List listMcOptions)
+	{
+		logger.debug("incoming listMcOptions" + listMcOptions);
+		Map mapOptionsContent= new TreeMap(new McComparator());
+		
+		Iterator listIterator=listMcOptions.iterator();
+    	Long mapIndex=new Long(1);
+    	while (listIterator.hasNext())
+    	{
+    		McOptsContent mcOptionsContent = (McOptsContent)listIterator.next();
+    		logger.debug("mcOptionsContent:" + mcOptionsContent);
+    		mapOptionsContent.put(mapIndex.toString(),mcOptionsContent.getMcQueOptionText());
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	logger.debug("generated mcOptionsContent: " + mapOptionsContent);
+    	return mapOptionsContent;
+	}
+
+	
 	public static String getFormattedDateString(Date date)
 	{
 		logger.debug(logger + " " + " McUtils getFormattedDateString: " +  
