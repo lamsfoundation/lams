@@ -134,7 +134,13 @@
 		    path=".answers"
 		    redirect="true"
 	  	/>
-
+	  	
+	  	<forward
+		    name="individualReport"
+		    path=".individualReport"
+		    redirect="true"
+	  	/>
+	  	
 	  	<forward
 		    name="errorList"
 		    path=".errorList"

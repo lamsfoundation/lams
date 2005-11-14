@@ -87,5 +87,10 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/learningIndex.jsp" />	
 	</definition>
 
+	<definition name=".individualReport" extends=".baseDef" >
+		<put name="title" value="Individual Report"/>
+		<put name="pageHeader" value = "Individual Report"/>
+		<put name="content" value="/IndividualReport.jsp" />	
+	</definition>
 	
 </tiles-definitions>

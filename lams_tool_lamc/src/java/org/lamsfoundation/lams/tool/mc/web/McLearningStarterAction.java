@@ -247,6 +247,15 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		logger.debug("final Options Map for the first question: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
 		
 		
+		/*also prepare for combined answers view */
+		Map mapGeneralOptionsContent= new TreeMap(new McComparator());
+		logger.debug("current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    		
+		
+		
+		
+		
 		return (mapping.findForward(LOAD_LEARNER));	
 		
 	}

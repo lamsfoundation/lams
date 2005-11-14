@@ -41,7 +41,7 @@
 					<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 				  		<c:if test="${questionEntry.key == sessionScope.currentQuestionIndex}"> 			
 						  <tr>
-						  	<td align=left class="input" valign=top bgColor=#336666 colspan=2> 
+						  	<td align=left class="input" valign=top bgColor="#009999" colspan=2> 
 							  	<font color="#FFFFFF"> 
 							  		<c:out value="${questionEntry.value}"/> 
 							  	</font> 

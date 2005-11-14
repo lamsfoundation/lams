@@ -2114,17 +2114,12 @@ public class McAction extends DispatchAction implements McAppConstants
     	    McContent mcContent=mcService.retrieveMc(toolContentID);
     	    logger.debug("mcContent: " + mcContent);
     	    
-    	    String totalQuestionCount= (String) request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
-    	    int totalQCount= new Integer(totalQuestionCount).intValue();
-    	    logger.debug("totalQCount: " +totalQCount);
-    	    
-    	    
     	    /*
         	 * fetch question content from content
         	 */
     	    logger.debug("newQuestionIndex: " + newQuestionIndex);
         	Iterator contentIterator=mcContent.getMcQueContents().iterator();
-        	boolean lastQuestion=false;
+        	boolean questionFound=false;
         	while (contentIterator.hasNext())
         	{
         		McQueContent mcQueContent=(McQueContent)contentIterator.next();
@@ -2145,33 +2140,25 @@ public class McAction extends DispatchAction implements McAppConstants
             			Map mapOptionsContent=McUtils.generateOptionsMap(listMcOptions);
             			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
             			logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+            			questionFound=true;
             		}
-            		
-            		if (totalQCount == newQuestionIndex)
-            		{
-            			logger.debug("this is the last question... ");
-            			lastQuestion=true;
-            		}
-            		
         		}
         	}
+        	
+        	if (questionFound == false)
+        	{
+    			logger.debug("no more questions... ");
+    			return (mapping.findForward(INDIVIDUAL_REPORT));
+        	}
+        	else
+        	{
+        		logger.debug("go back to have more answers...");
+        		return (mapping.findForward(LOAD_LEARNER));
+        	}
 	 	}
-    	
-    	return (mapping.findForward(LOAD_LEARNER));
-   }
-    
-    
-   
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+ 		return (mapping.findForward(LOAD_LEARNER));
+  }
+
+
 }
+    
