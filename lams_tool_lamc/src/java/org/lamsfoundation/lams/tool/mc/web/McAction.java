@@ -1833,7 +1833,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	boolean isContentInUse=false;
     	boolean isRetries=false;
     	boolean isShowFeedback=false;
-    	
+    	boolean isSln=false;
     	
     	logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
     	if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
@@ -1850,6 +1850,11 @@ public class McAction extends DispatchAction implements McAppConstants
     	logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
     	if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
     		isRetries=true;
+    	
+    	
+		logger.debug("isSln" +  mcAuthoringForm.getSln());
+		if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
+			isSln=true;
     	
     	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
     	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0)) 
@@ -1895,6 +1900,13 @@ public class McAction extends DispatchAction implements McAppConstants
     	logger.debug("createContent richTextOnlineInstructions from session: " + richTextOnlineInstructions);
     	if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
     	
+    	
+    	String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
+		logger.debug("richTextReportTitle: " + richTextReportTitle);
+		
+		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
+		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
+    	
     	creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
 		if (creationDate == null)
 			creationDate=new Date(System.currentTimeMillis()).toString();
@@ -1929,11 +1941,12 @@ public class McAction extends DispatchAction implements McAppConstants
 	    mc.setContentInUse(isContentInUse);
 	    mc.setEndLearningMessage(endLearningMessage);
 	    mc.setRunOffline(isRunOffline);
-	    mc.setReportTitle(reportTitle);
+	    mc.setReportTitle(richTextReportTitle);
 	    mc.setMonitoringReportTitle(monitoringReportTitle);
-	    mc.setEndLearningMessage(endLearningMessage);
+	    mc.setEndLearningMessage(richTextEndLearningMessage);
 	    mc.setRetries(isRetries);
 	    mc.setPassMark(new Integer(passmark));
+	    mc.setShowReport(isSln);
 	    mc.setShowFeedback(isShowFeedback);
 	    mc.setMcQueContents(new TreeSet());
 	    mc.setMcSessions(new TreeSet());

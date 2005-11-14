@@ -22,6 +22,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
+import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McSession;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
@@ -175,7 +176,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 				/*
 				 *for testing only, remove this line in development 
 				 */
-				Long currentToolContentId= new Long(10);
+				Long currentToolContentId= new Long(1234);
 				logger.debug("simulating container behaviour: calling createToolSession with toolSessionId : " + 
 						new Long(toolSessionId) + " and toolContentId: " + currentToolContentId);
 				try
@@ -192,16 +193,114 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		
 		/*
 		 * by now, we made sure that the passed tool session id exists in the db as a new record
-		 * Make sure we can retrieve it and relavent content
+		 * Make sure we can retrieve it and the relavent content
 		 */
 		
-	    
 		McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionId));
 	    logger.debug("retrieving qaSession: " + mcSession);
 	    
+	    /*
+	     * find out what content this tool session is referring to
+	     * get the content for this tool session (many to one mapping)
+	     */
+	    
+	    /*
+	     * Each passed tool session id points to a particular content. Many to one mapping.
+	     */
+		McContent mcContent=mcSession.getMcContent();
+	    logger.debug("using mcContent: " + mcContent);
+	    request.getSession().setAttribute(TOOL_CONTENT_ID, mcContent.getMcContentId());
+	    logger.debug("using TOOL_CONTENT_ID: " + mcContent.getMcContentId());
+	    
+	    /*
+	     * The content we retrieved above must have been created before in Authoring time. 
+	     * And the passed tool session id already refers to it.
+	     */
+	    setupAttributes(request, mcContent);
+	    	    
 		return (mapping.findForward(LOAD_LEARNER));	
 		
-  }
+	}
+	
+	
+	/**
+	 * sets up session scope attributes based on content linked to the passed tool session id
+	 * setupAttributes(HttpServletRequest request, McContent mcContent)
+	 * 
+	 * @param request
+	 * @param mcContent
+	 */
+	protected void setupAttributes(HttpServletRequest request, McContent mcContent)
+	{
+		/* returns Integer:  can be 0 or greater than 0,  0 is no passmark, otherwise there is a passmark. */
+	    logger.debug("PASSMARK: " + mcContent.getPassMark());
+	    if (mcContent.getPassMark() != null)
+	    {
+	    	int passMark=mcContent.getPassMark().intValue();
+	    	request.getSession().setAttribute(PASSMARK, mcContent.getPassMark());
+	    }
+	    else
+	    {
+	    	request.getSession().setAttribute(PASSMARK, new Integer(0));
+	    }
+
+	    request.getSession().setAttribute(IS_SHOW_LEARNERS_REPORT, new Boolean(mcContent.isShowReport()).toString());
+	    logger.debug("IS_SHOW_LEARNERS_REPORT: " + new Boolean(mcContent.isShowReport()).toString());
+
+	    /* same as 1 page per question */
+	    logger.debug("IS_QUESTIONS_SEQUENCED: " + mcContent.isQuestionsSequenced());
+	    if (mcContent.isQuestionsSequenced())
+		{
+			request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_SEQUENTIAL);
+		}
+	    else
+	    {
+	    	request.getSession().setAttribute(QUESTION_LISTING_MODE, QUESTION_LISTING_MODE_COMBINED);
+	    }
+	    logger.debug("QUESTION_LISTING_MODE: " + request.getSession().getAttribute(QUESTION_LISTING_MODE));
+	    
+	    logger.debug("IS_RETRIES: " + new Boolean(mcContent.isRetries()).toString());
+	    request.getSession().setAttribute(IS_RETRIES, new Boolean(mcContent.isRetries()).toString());
+	    
+	    logger.debug("REPORT_TITLE_LEARNER: " + mcContent.getReportTitle());
+	    request.getSession().setAttribute(REPORT_TITLE_LEARNER,mcContent.getReportTitle());
+	    
+	    request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
+	    logger.debug("END_LEARNING_MESSAGE: " + mcContent.getEndLearningMessage());
+	    
+	    logger.debug("IS_CONTENT_IN_USE: " + mcContent.isContentInUse());
+	    request.getSession().setAttribute(IS_CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()).toString());
+	    
+	    /*
+	     * Is the tool activity been checked as Define Later in the property inspector?
+	     */
+	    logger.debug("IS_DEFINE_LATER: " + mcContent.isDefineLater());
+	    request.getSession().setAttribute(IS_DEFINE_LATER, new Boolean(mcContent.isDefineLater()).toString());
+	    
+	    /*
+	     * Is the tool activity been checked as Run Offline in the property inspector?
+	     */
+	    logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + mcContent.isRunOffline());
+	    request.getSession().setAttribute(IS_TOOL_ACTIVITY_OFFLINE, new Boolean(mcContent.isRunOffline()).toString());
+	    
+	    
+	    /* the following attributes are unused for the moment.
+	     * from here...
+	     */
+	    logger.debug("ACTIVITY_TITLE: " + mcContent.getTitle());
+	    request.getSession().setAttribute(ACTIVITY_TITLE,mcContent.getTitle());
+	    
+	    logger.debug("ACTIVITY_INSTRUCTIONS: " + mcContent.getInstructions());
+	    request.getSession().setAttribute(ACTIVITY_INSTRUCTIONS,mcContent.getInstructions());
+	    
+		logger.debug("IS_USERNAME_VISIBLE: " + mcContent.isUsernameVisible());
+	    request.getSession().setAttribute(IS_USERNAME_VISIBLE, new Boolean(mcContent.isUsernameVisible()).toString());
+	    
+		    logger.debug("IS_SHOW_FEEDBACK: " + new Boolean(mcContent.isShowFeedback()).toString());
+	    request.getSession().setAttribute(IS_SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback()).toString());
+	    /* .. till here */
+	}
+	
 	
 	
 	/**
