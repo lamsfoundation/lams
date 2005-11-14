@@ -22,11 +22,13 @@
  */
 package org.lamsfoundation.lams.learningdesign.dto;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
@@ -111,13 +113,38 @@ public class LearningLibraryDTO extends BaseDTO {
 		return templateActivities;
 	} 
 	
-	public Vector populateActivities(Iterator iterator){		
+  /* public Vector populateActivities(Iterator iterator){		
 		Vector activities = new Vector();
 		while(iterator.hasNext()){
 			Activity activity = (Activity)iterator.next();
 			activities.add(activity.getLibraryActivityDTO());
 		}		
 		return activities;		
+	}
+	*/
+	
+	public Vector populateActivities(Iterator iterator)
+	{
+	    Vector activities = new Vector();
+	    Vector childActivities = null;
+		while(iterator.hasNext()){
+			Activity object = (Activity) iterator.next();
+			
+			if(object.isComplexActivity()){ //parallel, sequence or options activity
+				ComplexActivity complexActivity = (ComplexActivity)object;
+				Iterator childIterator = complexActivity.getActivities().iterator();
+				childActivities = new Vector();
+				while(childIterator.hasNext()){
+					Activity activity =(Activity)childIterator.next();
+					childActivities.add(activity.getLibraryActivityDTO());					
+				}				
+				activities.add(complexActivity.getLibraryActivityDTO());
+				activities.addAll(childActivities);
+			}else{
+				activities.add(object.getLibraryActivityDTO());
+			}			
+		}
+		return activities;
 	}
 	
 	
