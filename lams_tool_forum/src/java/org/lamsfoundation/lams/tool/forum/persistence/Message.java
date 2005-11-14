@@ -1,10 +1,13 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.log4j.Logger;
 
 /**
  * @author conradb
@@ -15,7 +18,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @hibernate.query name="allMessagesByForum" query="from Message m where forum_uid=? order by create_date"
  * @hibernate.query name="allAuthoredMessagesOfForum" query="from Message m where is_authored=true and forum_uid=? order by create_date"
  */
-public class Message {
+public class Message implements Cloneable{
+
+	private static Logger log = Logger.getLogger(Message.class);
+	
 	private Long uid;
 	private String subject;
 	private String body;
@@ -29,13 +35,94 @@ public class Message {
 	private int replyNumber;
 	private boolean hideFlag;
 
-	private ForumToolSession toolSession;
 	private Message parent;
+	private ForumToolSession toolSession;
 	private Forum forum;
-	private Set attachments;
 	private ForumUser createdBy;
 	private ForumUser modifiedBy;
+	private Set attachments;
 
+	public Message(){
+		attachments = new TreeSet();
+	}
+//  **********************************************************
+  	//		Function method for Message
+//  **********************************************************
+	/**
+	 * <em>This method DOES NOT deep clone <code>Forum</code> to avoid dead loop in clone.</em>
+	 */
+  	public Object clone(){
+  		
+  		Message msg = null;
+  		try{
+  			msg = (Message) super.clone();
+  			if(parent != null){
+  				msg.parent = (Message) parent.clone();
+  			}
+  			if(toolSession != null){
+  				msg.toolSession = (ForumToolSession) toolSession.clone();
+  			}
+  			//don't  deep clone forum to avoid dead loop in clone
+  			if(createdBy != null){
+  				msg.createdBy = (ForumUser) createdBy.clone();
+  			}
+  			if(modifiedBy != null)
+  				msg.modifiedBy = (ForumUser) modifiedBy.clone();
+  			//clone attachment
+  			if(attachments != null){
+  				Iterator iter = attachments.iterator();
+  				Set set = new TreeSet();
+  				while(iter.hasNext())
+  					set.add(((Attachment)iter.next()).clone());
+  				msg.attachments = set;
+  			}
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + Forum.class + " failed");
+		}
+  		
+  		return msg;
+  	}
+	/**
+	 * Updates the modification data for this entity.
+	 */
+	public void updateModificationData() {
+		long now = System.currentTimeMillis();
+		if (created == null) {
+			this.setCreated(new Date(now));
+		}
+		this.setUpdated(new Date(now));
+	}
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Message))
+			return false;
+		
+		final Message genericEntity = (Message) o;
+
+      	return new EqualsBuilder()
+      	.append(this.uid,genericEntity.uid)
+      	.append(this.subject,genericEntity.subject)
+      	.append(this.body,genericEntity.body)
+      	.append(this.created,genericEntity.created)
+      	.append(this.updated,genericEntity.updated)
+      	.append(this.createdBy,genericEntity.createdBy)
+      	.append(this.modifiedBy,genericEntity.modifiedBy)
+      	.isEquals();
+	}
+
+	public int hashCode() {
+		return new HashCodeBuilder().append(uid)
+		.append(subject).append(body)
+		.append(created)
+		.append(updated).append(createdBy)
+		.append(modifiedBy)
+		.toHashCode();
+	}
+	
+//  **********************************************************
+  	//		get/set methods
+//  **********************************************************
 	/**
 	 * Returns the object's creation date
 	 *
@@ -105,16 +192,6 @@ public class Message {
         this.createdBy = createdBy;
     }
 
-	/**
-	 * Updates the modification data for this entity.
-	 */
-	public void updateModificationData() {
-		long now = System.currentTimeMillis();
-		if (created == null) {
-			this.setCreated(new Date(now));
-		}
-		this.setUpdated(new Date(now));
-	}
 
     /**
      * @hibernate.many-to-one
@@ -276,33 +353,7 @@ public class Message {
     public void setAttachments(Set attachments) {
 		this.attachments = attachments;
 	}
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof Message))
-			return false;
-		
-		final Message genericEntity = (Message) o;
-
-      	return new EqualsBuilder()
-      	.append(this.uid,genericEntity.uid)
-      	.append(this.subject,genericEntity.subject)
-      	.append(this.body,genericEntity.body)
-      	.append(this.created,genericEntity.created)
-      	.append(this.updated,genericEntity.updated)
-      	.append(this.createdBy,genericEntity.createdBy)
-      	.append(this.modifiedBy,genericEntity.modifiedBy)
-      	.isEquals();
-	}
-
-	public int hashCode() {
-		return new HashCodeBuilder().append(uid)
-		.append(subject).append(body)
-		.append(created)
-		.append(updated).append(createdBy)
-		.append(modifiedBy)
-		.toHashCode();
-	}
+    
 	/**
 	 * @hibernate.many-to-one column="forum_uid"
 	 * 			  cascade="none"

@@ -50,6 +50,29 @@ public class ForumUser implements Serializable,Cloneable{
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
 	}
+	
+
+//  **********************************************************
+  	//		Function method for ForumUser
+//  **********************************************************
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	public Object clone() {
+		
+		Object obj = null;
+		try {
+			obj = super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + ForumUser.class + " failed");
+		}
+		return obj;
+	}
+
+
+//  **********************************************************
+  	//		Get/Set methods
+//  **********************************************************
 	/**
 	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="uid"
 	 * @return Returns the uid.
@@ -77,19 +100,6 @@ public class ForumUser implements Serializable,Cloneable{
 	 */
 	public void setUserId(Long userID) {
 		this.userId = userID;
-	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#clone()
-	 */
-	public Object clone() {
-		
-		Object obj = null;
-		try {
-			obj = super.clone();
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + ForumUser.class + " failed");
-		}
-		return obj;
 	}
 
 	/**

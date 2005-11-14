@@ -85,6 +85,9 @@
         <property name="repositoryService">
             <ref bean="repositoryService"/>
         </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
     </bean>
 
     <bean id="forumService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

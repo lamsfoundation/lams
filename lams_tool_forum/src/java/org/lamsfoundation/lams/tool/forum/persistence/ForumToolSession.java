@@ -22,13 +22,18 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 /**
  * @hibernate.class table="tl_lafrum11_tool_session"
  * @author Steve.Ni
  * 
  * @version $Revision$
  */
-public class ForumToolSession {
+public class ForumToolSession implements Cloneable{
+
+	private static Logger log = Logger.getLogger(ForumToolSession.class);
+	
 	private Long uid;
 	private Long sessionId;
 	private Forum forum;
@@ -37,6 +42,26 @@ public class ForumToolSession {
 	//finish or not
 	private int status;
 	
+	
+//  **********************************************************
+  	//		Function method for ForumToolSession
+//  **********************************************************
+  	public Object clone(){
+  		
+  		ForumToolSession session = null;
+  		try{
+  			session = (ForumToolSession) super.clone();
+  		
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + ForumToolSession.class + " failed");
+		}
+  		return session;
+  	}
+
+  	
+//  **********************************************************
+  	//		Get/Set methods
+//  **********************************************************
 	/**
 	 * @hibernate.id generator-class="identity" type="java.lang.Long" column="uid"
 	 * @return Returns the learnerID.

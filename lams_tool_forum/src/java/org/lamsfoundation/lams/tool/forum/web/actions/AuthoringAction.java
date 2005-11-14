@@ -119,7 +119,9 @@ public class AuthoringAction extends Action {
         }
         return mapping.findForward("error");
 	}
-
+	//******************************************************************************************************************
+	//              Forum Author functions
+	//******************************************************************************************************************
 	/**
 	 * This page will display initial submit tool content. Or just a blank page if the toolContentID does not
 	 * exist before. 
@@ -142,8 +144,13 @@ public class AuthoringAction extends Action {
 		Forum forum = null;
 		try {
 			forum = forumService.getForumByContentId(contentId);
+			//if forum does not exist, try to use default content instead.
+			if(forum == null){
+				forum = forumService.getDefaultForum(); 
+			}
 			topics = forumService.getAuthoredTopics(contentId);
-			forumForm.setForum(forum);
+			//tear down PO to normal object using clone() method
+			forumForm.setForum((Forum) forum.clone());
 			forumForm.setToolContentID(contentId);
 		} catch (Exception e) {
 			log.error(e);
@@ -155,209 +162,6 @@ public class AuthoringAction extends Action {
 		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
 		return mapping.findForward("success");
 	}
-
-	private ActionForward newTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-		if (topics == null) {
-			topics = new ArrayList();
-		}
-		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
-		return mapping.findForward("success");
-	}
-	public ActionForward createTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws IOException, ServletException, PersistenceException {
-		
-		List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-		Long forumId = (Long) request.getSession().getAttribute(ForumConstants.FORUM_ID);
-		//get login user (author)
-		HttpSession ss = SessionManager.getSession();
-		//get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		
-		MessageForm messageForm = (MessageForm) form;
-		Message message = messageForm.getMessage();
-		message.setIsAuthored(true);
-		message.setCreated(new Date());
-		message.setUpdated(new Date());
-		message.setLastReplyDate(new Date());
-		Set attSet = null;
-		if(messageForm.getAttachmentFile() != null 
-			&&  !StringUtils.isEmpty(messageForm.getAttachmentFile().getFileName())){
-			forumService = getForumManager();
-			Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
-			//only allow one attachment, so replace whatever
-			attSet = new HashSet();
-			attSet.add(att);
-		}
-		message.setAttachments(attSet);
-		//check whether this user exist or not
-		ForumUser forumUser = forumService.getUserByUserId(new Long(user.getUserID().intValue()));
-		if(forumUser == null){
-			//if user not exist, create new one in database
-			forumUser = new ForumUser(user);
-			forumService.createUser(forumUser);
-		}
-		message.setCreatedBy(forumUser);
-		//same person with create at first time
-		message.setModifiedBy(forumUser);
-		if (topics == null) {
-			topics = new ArrayList();
-		}
-		//save message into database
-		forumService = getForumManager();
-		forumService.createRootTopic(forumId,null, message);
-		
-		topics.add(MessageDTO.getMessageDTO(message));
-		
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"CREATE_SUCCESS");
-		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
-		return mapping.findForward("success");
-	}
-
-    public ActionForward deleteTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws PersistenceException {
-    	
-    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
-		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
-
-		if(topicIdx != -1){
-			MessageDTO topic = (MessageDTO) topics.remove(topicIdx);
-			if (topic != null && topic.getMessage() != null && topic.getMessage().getUid() != null) {
-				getForumManager().deleteTopic(topic.getMessage().getUid());
-			}
-			request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,topics);
-    	}
-		
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"DELETE_SUCCESS");
-		return mapping.getInputForward();
-	}
-    public ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws PersistenceException {
-    	
-    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-    	String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
-		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
-		if(topicIdx == -1){
-			topicIndex = (String) request.getAttribute(ForumConstants.AUTHORING_TOPICS_INDEX);
-			topicIdx = NumberUtils.stringToInt(topicIndex,-1);
-		}
-		if(topicIdx != -1){
-			MessageDTO topic = (MessageDTO) topics.get(topicIdx);
-			request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
-			request.setAttribute(ForumConstants.AUTHORING_TOPIC,topic);
-    	}
-		
-    	return mapping.findForward("success");
-    	
-    }
-    public ActionForward editTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws PersistenceException {
-    	MessageForm msgForm = (MessageForm)form;
-    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-    	String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
-		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
-		if(topicIdx != -1){
-			MessageDTO topic = (MessageDTO) topics.get(topicIdx);
-			if (topic != null) {
-				msgForm.setMessage(topic.getMessage());
-			}
-			request.setAttribute(ForumConstants.AUTHORING_TOPIC,topic);
-    	}
-		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
-    	return mapping.findForward("success");
-    }
-    
-    public ActionForward updateTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws PersistenceException {
-    	//get value from HttpSession
-		List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-		Long forumId = (Long) request.getSession().getAttribute(ForumConstants.FORUM_ID);
-		//get param from HttpServletRequest
-		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
-		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
-		
-		if(topicIdx != -1){
-			MessageForm messageForm = (MessageForm) form;
-			Message message = messageForm.getMessage();
-			MessageDTO newMsg = (MessageDTO) topics.get(topicIdx);
-			if(newMsg.getMessage()== null)
-				newMsg.setMessage(new Message());
-			newMsg.getMessage().setSubject(message.getSubject());
-			newMsg.getMessage().setBody(message.getBody());
-			newMsg.getMessage().setUpdated(new Date());
-			if(messageForm.getAttachmentFile() != null 
-					&&  !StringUtils.isEmpty(messageForm.getAttachmentFile().getFileName())){
-				forumService = getForumManager();
-				Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
-				//only allow one attachment, so replace whatever
-				Set attSet = attSet = new HashSet();
-				attSet.add(att);
-				newMsg.setHasAttachment(true);
-				newMsg.getMessage().setAttachments(attSet);
-			}
-			//save message into database
-			forumService = getForumManager();
-			forumService.updateTopic(newMsg.getMessage());
-		}
-		
-		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
-		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"EDIT_SUCCESS");
-		return mapping.findForward("success");
-    }
-    
-    public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws PersistenceException {
-		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
-		Long uuID = new Long(WebUtil.readLongParam(request,"uuid"));
-		forumService = getForumManager();
-		forumService.deleteFromRepository(uuID,versionID);
-//		get value from HttpSession
-    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-    	Long forumId = (Long) request.getSession().getAttribute(ForumConstants.FORUM_ID);
-    	//get param from HttpServletRequest
-		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
-		
-		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
-		
-		if(topicIdx != -1){
-			MessageDTO newMsg = (MessageDTO) topics.get(topicIdx);
-			if(newMsg.getMessage()== null)
-				newMsg.setMessage(new Message());
-			newMsg.getMessage().setUpdated(new Date());
-			newMsg.setHasAttachment(false);
-			newMsg.getMessage().setAttachments(null);
-			//save message into database
-			forumService = getForumManager();
-			forumService.updateTopic(newMsg.getMessage());
-			
-		}
-		request.setAttribute(ForumConstants.SUCCESS_FLAG,"ATT_SUCCESS_FLAG");
-		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
-    	return mapping.findForward("success");
-    }
-    
-    public ActionForward finishTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws PersistenceException {
-    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
-    	
-    	ForumForm forumForm = (ForumForm)form;
-    	Forum forum = forumForm.getForum();
-    	Set msgSet = new HashSet();
-    	if(topics != null){
-    		Iterator iter = topics.iterator();
-    		while(iter.hasNext()){
-    			MessageDTO dto = (MessageDTO) iter.next();
-    			msgSet.add(dto.getMessage());
-    		}
-    	}
-    	forum.setMessages(msgSet);
-    	
-    	return mapping.findForward("success");
-    	
-    }
 	/**
 	 * Update all content for submit tool except online/offline instruction
 	 * files list.
@@ -409,10 +213,9 @@ public class AuthoringAction extends Action {
 		}
 		return mapping.findForward("success");
 	}
+
 	/**
-	 * Handle upload online instruction files request. Once the file uploaded successfully, database
-	 * will update accordingly. 
-	 * 
+	 * Handle upload online instruction files request. 
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -424,8 +227,7 @@ public class AuthoringAction extends Action {
 		return uploadFile(mapping, form, IToolContentHandler.TYPE_ONLINE,request);
 	}
 	/**
-	 * Handle upload offline instruction files request. Once the file uploaded successfully, database
-	 * will update accordingly. 
+	 * Handle upload offline instruction files request.
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -478,11 +280,26 @@ public class AuthoringAction extends Action {
 		return mapping.findForward("success");
 
 	}
-
+	/**
+	 * Delete offline instruction file from current Forum authoring page.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward deleteOfflineFile(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		return deleteFile(request, response,form, IToolContentHandler.TYPE_OFFLINE);
 	}
+	/**
+	 * Delete online instruction file from current Forum authoring page.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public ActionForward deleteOnlineFile(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		return deleteFile(request, response,form, IToolContentHandler.TYPE_ONLINE);
@@ -563,10 +380,291 @@ public class AuthoringAction extends Action {
 		}
 		return null;
 	}
-
+	
+	//******************************************************************************************************************
+	//              Topic functions
+	//******************************************************************************************************************
 	/**
-	 * The private method to get content from ActionForm parameters (web page).
+	 * Display emtpy topic page for user input topic information. This page will contain all topics list which 
+	 * this author posted before.
+	 *  
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private ActionForward newTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+		if (topics == null) {
+			topics = new ArrayList();
+		}
+		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
+		return mapping.findForward("success");
+	}
+	/**
+	 * Create a topic in memory. This topic will be saved when user save entire authoring page.
 	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws PersistenceException
+	 */
+	public ActionForward createTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException, PersistenceException {
+		
+		List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+		Long forumId = (Long) request.getSession().getAttribute(ForumConstants.FORUM_ID);
+		//get login user (author)
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		
+		MessageForm messageForm = (MessageForm) form;
+		Message message = messageForm.getMessage();
+		message.setIsAuthored(true);
+		message.setCreated(new Date());
+		message.setUpdated(new Date());
+		message.setLastReplyDate(new Date());
+		Set attSet = null;
+		if(messageForm.getAttachmentFile() != null 
+			&&  !StringUtils.isEmpty(messageForm.getAttachmentFile().getFileName())){
+			forumService = getForumManager();
+			Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
+			//only allow one attachment, so replace whatever
+			attSet = new HashSet();
+			attSet.add(att);
+		}
+		message.setAttachments(attSet);
+		//check whether this user exist or not
+		ForumUser forumUser = forumService.getUserByUserId(new Long(user.getUserID().intValue()));
+		if(forumUser == null){
+			//if user not exist, create new one in database
+			forumUser = new ForumUser(user);
+			forumService.createUser(forumUser);
+		}
+		message.setCreatedBy(forumUser);
+		//same person with create at first time
+		message.setModifiedBy(forumUser);
+		if (topics == null) {
+			topics = new ArrayList();
+		}
+		//save message into database
+		forumService = getForumManager();
+		forumService.createRootTopic(forumId,null, message);
+		
+		topics.add(MessageDTO.getMessageDTO(message));
+		
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"CREATE_SUCCESS");
+		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
+		return mapping.findForward("success");
+	}
+	/**
+	 * Delete a topic form current topic list. But database record will be deleted only when user save whole authoring 
+	 * page. 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws PersistenceException
+	 */
+    public ActionForward deleteTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws PersistenceException {
+    	
+    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
+		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
+
+		if(topicIdx != -1){
+			MessageDTO topic = (MessageDTO) topics.remove(topicIdx);
+			if (topic != null && topic.getMessage() != null && topic.getMessage().getUid() != null) {
+				getForumManager().deleteTopic(topic.getMessage().getUid());
+			}
+			request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,topics);
+    	}
+		
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"DELETE_SUCCESS");
+		return mapping.getInputForward();
+	}
+    /**
+     * Diplay a special topic information. Only display author created root message content,  even this topic already
+     * has some reply messages from learner in some cases. 
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws PersistenceException
+     */
+    public ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws PersistenceException {
+    	
+    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+    	String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
+		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
+		if(topicIdx == -1){
+			topicIndex = (String) request.getAttribute(ForumConstants.AUTHORING_TOPICS_INDEX);
+			topicIdx = NumberUtils.stringToInt(topicIndex,-1);
+		}
+		if(topicIdx != -1){
+			MessageDTO topic = (MessageDTO) topics.get(topicIdx);
+			request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
+			request.setAttribute(ForumConstants.AUTHORING_TOPIC,topic);
+    	}
+		
+    	return mapping.findForward("success");
+    	
+    }
+    /**
+     * Display a HTML FORM which contains subject, body and attachment information from a special topic. This page
+     * is ready for user update this topic.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws PersistenceException
+     */
+    public ActionForward editTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws PersistenceException {
+    	MessageForm msgForm = (MessageForm)form;
+    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+    	String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
+		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
+		if(topicIdx != -1){
+			MessageDTO topic = (MessageDTO) topics.get(topicIdx);
+			if (topic != null) {
+				msgForm.setMessage(topic.getMessage());
+			}
+			request.setAttribute(ForumConstants.AUTHORING_TOPIC,topic);
+    	}
+		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
+    	return mapping.findForward("success");
+    }
+    
+    /**
+     * Submit user updated inforamion in a topic to memory. This update will be submit to database only when user
+     * save whole authoring page.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws PersistenceException
+     */
+    public ActionForward updateTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws PersistenceException {
+    	//get value from HttpSession
+		List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+		Long forumId = (Long) request.getSession().getAttribute(ForumConstants.FORUM_ID);
+		//get param from HttpServletRequest
+		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
+		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
+		
+		if(topicIdx != -1){
+			MessageForm messageForm = (MessageForm) form;
+			Message message = messageForm.getMessage();
+			MessageDTO newMsg = (MessageDTO) topics.get(topicIdx);
+			if(newMsg.getMessage()== null)
+				newMsg.setMessage(new Message());
+			newMsg.getMessage().setSubject(message.getSubject());
+			newMsg.getMessage().setBody(message.getBody());
+			newMsg.getMessage().setUpdated(new Date());
+			if(messageForm.getAttachmentFile() != null 
+					&&  !StringUtils.isEmpty(messageForm.getAttachmentFile().getFileName())){
+				forumService = getForumManager();
+				Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
+				//only allow one attachment, so replace whatever
+				Set attSet = attSet = new HashSet();
+				attSet.add(att);
+				newMsg.setHasAttachment(true);
+				newMsg.getMessage().setAttachments(attSet);
+			}
+			//save message into database
+			forumService = getForumManager();
+			forumService.updateTopic(newMsg.getMessage());
+		}
+		
+		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
+		request.getSession().setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, topics);
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"EDIT_SUCCESS");
+		return mapping.findForward("success");
+    }
+    /**
+     * Delete a topic's attachment file. This update will be submit to database only when user
+     * save whole authoring page.
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws PersistenceException
+     */
+    public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws PersistenceException {
+		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
+		Long uuID = new Long(WebUtil.readLongParam(request,"uuid"));
+		forumService = getForumManager();
+		forumService.deleteFromRepository(uuID,versionID);
+//		get value from HttpSession
+    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+    	Long forumId = (Long) request.getSession().getAttribute(ForumConstants.FORUM_ID);
+    	//get param from HttpServletRequest
+		String topicIndex = (String) request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
+		
+		int topicIdx = NumberUtils.stringToInt(topicIndex,-1);
+		
+		if(topicIdx != -1){
+			MessageDTO newMsg = (MessageDTO) topics.get(topicIdx);
+			if(newMsg.getMessage()== null)
+				newMsg.setMessage(new Message());
+			newMsg.getMessage().setUpdated(new Date());
+			newMsg.setHasAttachment(false);
+			newMsg.getMessage().setAttachments(null);
+			//save message into database
+			forumService = getForumManager();
+			forumService.updateTopic(newMsg.getMessage());
+			
+		}
+		request.setAttribute(ForumConstants.SUCCESS_FLAG,"ATT_SUCCESS_FLAG");
+		request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX,topicIndex);
+    	return mapping.findForward("success");
+    }
+    
+    public ActionForward finishTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws PersistenceException {
+    	List topics = (List) request.getSession().getAttribute(ForumConstants.AUTHORING_TOPICS_LIST);
+    	
+    	ForumForm forumForm = (ForumForm)form;
+    	Forum forum = forumForm.getForum();
+    	Set msgSet = new HashSet();
+    	if(topics != null){
+    		Iterator iter = topics.iterator();
+    		while(iter.hasNext()){
+    			MessageDTO dto = (MessageDTO) iter.next();
+    			msgSet.add(dto.getMessage());
+    		}
+    	}
+    	forum.setMessages(msgSet);
+    	
+    	return mapping.findForward("success");
+    	
+    }
+
+	//******************************************************************************************************************
+	//              Private method for internal functions
+	//******************************************************************************************************************
+	/*
+	 * The private method to get content from ActionForm parameters (web page).
 	 * @param form
 	 * @return
 	 */

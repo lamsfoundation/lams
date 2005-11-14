@@ -5,9 +5,9 @@ import java.util.List;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 
 /**
@@ -80,4 +80,14 @@ public interface IForumService {
 	 */
 	public Long getRootTopicId(Long topicId);
 	public void updateSession(ForumToolSession session);
+	
+	/**
+	 * Get default content ID by tool signature.
+	 * @param toolSignature
+	 * @return
+	 */
+    public Long getToolDefaultContentIdBySignature(String toolSignature);
+    
+    public Forum getDefaultForum();
+
 }

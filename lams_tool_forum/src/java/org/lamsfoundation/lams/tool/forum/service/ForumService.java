@@ -53,6 +53,7 @@ import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 
 
@@ -71,8 +72,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private MessageSeqDao messageSeqDao;
 	private ForumUserDao forumUserDao;
 	private ForumToolSessionDao forumToolSessionDao;
-	
 	//system level handler and service 
+	private ILamsToolService toolService;
 	private ForumToolContentHandler toolContentHandler;
 	private IRepositoryService repositoryService;
 	
@@ -501,5 +502,44 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	public void updateSession(ForumToolSession session) {
 		forumToolSessionDao.saveOrUpdate(session);
+	}
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getToolDefaultContentIdBySignature(java.lang.Long)
+     */
+    public Long getToolDefaultContentIdBySignature(String toolSignature)
+    {
+        Long contentId = null;
+    	contentId=new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));    
+    	if (contentId == null)
+    	{
+    	    String error="Could not retrieve default content id for this tool";
+    	    log.error(error);
+    	    throw new ForumException(error);
+    	}
+	    return contentId;
+    }
+    public Forum getDefaultForum(){
+    	Long defaultForumId = getToolDefaultContentIdBySignature(ForumConstants.TOOLSIGNNATURE);
+    	Forum defaultForum = getForum(defaultForumId);
+    	if(defaultForum == null)
+    	{
+    	    String error="Could not retrieve default content record for this tool";
+    	    log.error(error);
+    	    throw new ForumException(error);
+    	}
+    	
+    	//save default content by given ID.
+    	Forum forum = new Forum();
+    	forum = (Forum) defaultForum.clone();
+    	
+    	return forum;
+
+    }
+	public ILamsToolService getToolService() {
+		return toolService;
+	}
+
+	public void setToolService(ILamsToolService toolService) {
+		this.toolService = toolService;
 	}
 }

@@ -16,6 +16,7 @@
 	<param-value>
 		classpath:/org/lamsfoundation/lams/applicationContext.xml
 		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
+		classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml	
   		classpath:/forumApplicationContext.xml
 	</param-value>
 </context-param>

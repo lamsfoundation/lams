@@ -2,10 +2,13 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.log4j.Logger;
 
 /**
  * Forum
@@ -16,7 +19,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @hibernate.query name="allForums" query="from Forum forum"
  * @hibernate.query name="forumByContentId" query="from Forum forum where forum.contentId=?"
  */
-public class Forum {
+public class Forum implements Cloneable{
+	private static final Logger log = Logger.getLogger(Forum.class);
+	
+	//key 
 	private Long uid;
 	//tool contentID
 	private Long contentId;
@@ -38,10 +44,75 @@ public class Forum {
 	private Set messages;
 	private Set attachments;
     
+	/**
+	 * Default contruction method. 
+	 *
+	 */
   	public Forum(){
   		attachments = new HashSet();
   		messages = new HashSet();
   	}
+//  **********************************************************
+  	//		Function method for Forum
+//  **********************************************************
+  	public Object clone(){
+  		
+  		Forum forum = null;
+  		try{
+  			forum = (Forum) super.clone();
+  			//clone message
+  			if(messages != null){
+				Iterator iter = messages.iterator();
+				Set set = new TreeSet();
+				while(iter.hasNext())
+					set.add(((Message)iter.next()).clone());
+				forum.messages = set;
+  			}
+  			//clone attachment
+  			if(attachments != null){
+  				Iterator iter = attachments.iterator();
+  				Set set = new TreeSet();
+  				while(iter.hasNext())
+  					set.add(((Attachment)iter.next()).clone());
+  				forum.attachments = set;
+  			}
+		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + Forum.class + " failed");
+		}
+  		
+  		return forum;
+  	}
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Forum))
+			return false;
+
+		final Forum genericEntity = (Forum) o;
+
+      	return new EqualsBuilder()
+      	.append(this.uid,genericEntity.uid)
+      	.append(this.title,genericEntity.title)
+      	.append(this.instructions,genericEntity.instructions)
+      	.append(this.onlineInstructions,genericEntity.onlineInstructions)
+      	.append(this.offlineInstructions,genericEntity.offlineInstructions)
+      	.append(this.created,genericEntity.created)
+      	.append(this.updated,genericEntity.updated)
+      	.append(this.createdBy,genericEntity.createdBy)
+      	.isEquals();
+	}
+
+	public int hashCode() {
+		return new HashCodeBuilder().append(uid).append(title)
+		.append(instructions).append(onlineInstructions)
+		.append(offlineInstructions).append(created)
+		.append(updated).append(createdBy)
+		.toHashCode();
+	}
+	
+	//**********************************************************
+	// get/set methods
+	//**********************************************************
 	/**
 	 * Returns the object's creation date
 	 *
@@ -189,7 +260,7 @@ public class Forum {
      *
      * @hibernate.property
      * 		column="instructions"
-     *      //type="text"
+     *      type="text"
      */
     public String getInstructions() {
         return instructions;
@@ -204,7 +275,7 @@ public class Forum {
      *
      * @hibernate.property
      * 		column="online_instructions"
-     *      //type="text"
+     *      type="text"
      */
     public String getOnlineInstructions() {
         return onlineInstructions;
@@ -219,7 +290,7 @@ public class Forum {
      *
      * @hibernate.property
      * 		column="offline_instructions"
-     *      //type="text"
+     *      type="text"
      */
     public String getOfflineInstructions() {
         return offlineInstructions;
@@ -317,33 +388,6 @@ public class Forum {
 		this.contentId = contentId;
 	}
 
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof Forum))
-			return false;
-
-		final Forum genericEntity = (Forum) o;
-
-      	return new EqualsBuilder()
-      	.append(this.uid,genericEntity.uid)
-      	.append(this.title,genericEntity.title)
-      	.append(this.instructions,genericEntity.instructions)
-      	.append(this.onlineInstructions,genericEntity.onlineInstructions)
-      	.append(this.offlineInstructions,genericEntity.offlineInstructions)
-      	.append(this.created,genericEntity.created)
-      	.append(this.updated,genericEntity.updated)
-      	.append(this.createdBy,genericEntity.createdBy)
-      	.isEquals();
-	}
-
-	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(title)
-		.append(instructions).append(onlineInstructions)
-		.append(offlineInstructions).append(created)
-		.append(updated).append(createdBy)
-		.toHashCode();
-	}
 	/**
 	 * @hibernate.property column="allow_edit"
 	 * @return

@@ -83,7 +83,7 @@
 
         <property
             name="instructions"
-            type="java.lang.String"
+            type="text"
             update="true"
             insert="true"
             column="instructions"
@@ -91,7 +91,7 @@
 
         <property
             name="onlineInstructions"
-            type="java.lang.String"
+            type="text"
             update="true"
             insert="true"
             column="online_instructions"
@@ -99,7 +99,7 @@
 
         <property
             name="offlineInstructions"
-            type="java.lang.String"
+            type="text"
             update="true"
             insert="true"
             column="offline_instructions"
