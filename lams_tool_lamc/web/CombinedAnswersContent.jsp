@@ -29,7 +29,7 @@
 					  </tr>
 					</c:if> 			
 
-			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
+			 		<c:if test="${sessionScope.isRetries == 'true' && sessionScope.passMark > 0}"> 		
 					  <tr>
 					  	<td align=left class="input" valign=top colspan=2> 
 						  	<font size=2> <b>  <bean:message key="label.learner.message"/> (<c:out value="${sessionScope.passMark}"/><bean:message key="label.percent"/> ) 
@@ -59,30 +59,68 @@
 										<c:if test="${sessionScope.mainQueIndex == sessionScope.queIndex}"> 		
 									  		<c:forEach var="subEntry" items="${mainEntry.value}">
 									  		
-										
-												<tr> 
-													<td align=left class="input" valign=top> 
-														<input type="checkbox" 
-														name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
-														onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
-														document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
-														document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
-														if (this.checked == 1)
-														{
-															document.forms[0].checked.value=true;
-														}
-														else
-														{
-															document.forms[0].checked.value=false;
-														}
-														document.forms[0].submit();"> 
-													</td> 
-													<td align=left class="input" valign=top> 
-														<c:out value="${subEntry.value}"/>
-													</td>
-												</tr>										
 
-										
+							  		  	 		<c:set var="checkedOptionFound" scope="request" value="0"/>
+												<!-- traverse the selected option from here --> 									  		
+	  											<c:forEach var="selectedMainEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
+														<c:if test="${selectedMainEntry.key == sessionScope.queIndex}"> 		
+													  		<c:forEach var="selectedSubEntry" items="${selectedMainEntry.value}">
+
+																<c:if test="${subEntry.key == selectedSubEntry.key}"> 		
+									  							
+																	<tr> 
+																		<td align=left class="input" valign=top> 
+																			<input type="checkbox" 
+																			name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
+																			onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
+																			document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
+																			document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
+																			if (this.checked == 1)
+																			{
+																				document.forms[0].checked.value=true;
+																			}
+																			else
+																			{
+																				document.forms[0].checked.value=false;
+																			}
+																			document.forms[0].submit();" CHECKED> 
+																		</td> 
+																		<td align=left class="input" valign=top> 
+																			<c:out value="${subEntry.value}"/>
+																		</td>
+																	</tr>	
+												  		  	 		<c:set var="checkedOptionFound" scope="request" value="1"/>
+				  												</c:if> 			
+
+														</c:forEach>																						
+	  												</c:if> 			
+												</c:forEach>									
+												<!-- till  here --> 									  					
+
+												<c:if test="${requestScope.checkedOptionFound == 0}"> 		
+																	<tr> 
+																		<td align=left class="input" valign=top> 
+																			<input type="checkbox" 
+																			name=optionCheckBox<c:out value="${sessionScope.queIndex}"/>-<c:out value="${subEntry.key}"/>
+																			onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
+																			document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
+																			document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
+																			if (this.checked == 1)
+																			{
+																				document.forms[0].checked.value=true;
+																			}
+																			else
+																			{
+																				document.forms[0].checked.value=false;
+																			}
+																			document.forms[0].submit();"> 
+																		</td> 
+																		<td align=left class="input" valign=top> 
+																			<c:out value="${subEntry.value}"/>
+																		</td>
+																	</tr>	
+  												</c:if> 			
+
 											</c:forEach>
 										</c:if> 			
 								</c:forEach>

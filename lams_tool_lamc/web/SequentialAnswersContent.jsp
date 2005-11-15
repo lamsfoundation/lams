@@ -29,7 +29,7 @@
 					  </tr>
 					</c:if> 			
 
-			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
+			 		<c:if test="${sessionScope.isRetries == 'true' && sessionScope.passMark > 0}"> 		
 					  <tr>
 					  	<td align=left class="input" valign=top colspan=2> 
 						  	<font size=2> <b>  <bean:message key="label.learner.message"/> (<c:out value="${sessionScope.passMark}"/><bean:message key="label.percent"/> ) 

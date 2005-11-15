@@ -326,6 +326,15 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    
 		logger.debug("IS_SHOW_FEEDBACK: " + new Boolean(mcContent.isShowFeedback()).toString());
 	    request.getSession().setAttribute(IS_SHOW_FEEDBACK, new Boolean(mcContent.isShowFeedback()).toString());
+	    
+	    Map mapGeneralCheckedOptionsContent= new TreeMap(new McComparator());
+	    request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+	    
+	    Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
+	    request.getSession().setAttribute(MAP_LEARNER_CHECKED_OPTIONS_CONTENT, mapLeanerCheckedOptionsContent);
+	    
+	    
+	    
 	    /* .. till here */
 	}
 	

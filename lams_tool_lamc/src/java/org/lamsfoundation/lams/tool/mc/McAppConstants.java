@@ -144,6 +144,11 @@ public interface McAppConstants {
     public static final String MAP_DISABLED_QUESTIONS					="mapDisabledQuestions";
     public static final String MAP_GENERAL_OPTIONS_CONTENT				="mapGeneralOptionsContent";
     public static final String MAP_GENERAL_SELECTED_OPTIONS_CONTENT		="mapGeneralSelectedOptionsContent";
+    public static final String MAP_GENERAL_CHECKED_OPTIONS_CONTENT		="mapGeneralCheckedOptionsContent";
+    public static final String MAP_LEARNER_QUESTIONS_CONTENT			="mapLearnerQuestionsContent";
+    public static final String MAP_LEARNER_CHECKED_OPTIONS_CONTENT		="mapLearnerCheckedOptionsContent";
+    
+    
     
     public static final String MAP_WEIGHTS								="mapWeights";
     public static final String MAP_CHECKBOX_STATES						="mapCheckBoxStates";

@@ -2201,8 +2201,60 @@ public class McAction extends DispatchAction implements McAppConstants
     		logger.debug("questionIndex: " + mcLearningForm.getQuestionIndex());
     		logger.debug("optionIndex: " + mcLearningForm.getOptionIndex());
     		logger.debug("checked: " + mcLearningForm.getChecked());
+    		
+    		Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+    		logger.debug("mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+    		
+    		if (mapGeneralCheckedOptionsContent.size() == 0)
+    		{
+    			logger.debug("mapGeneralCheckedOptionsContent size is 0");
+    			Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
+    			
+    			if (mcLearningForm.getChecked().equals("true"))
+    				mapLeanerCheckedOptionsContent.put(mcLearningForm.getOptionIndex(), "CHECKED");
+    			else
+    				mapLeanerCheckedOptionsContent.remove(mcLearningForm.getOptionIndex());
+    			
+    			mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapLeanerCheckedOptionsContent);
+    			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+    		}
+    		else
+    		{
+    			Map mapCurrentOptions=(Map) mapGeneralCheckedOptionsContent.get(questionIndex);
+    			
+    			logger.debug("mapCurrentOptions: " + mapCurrentOptions);
+    			if (mapCurrentOptions != null)
+    			{
+        			if (mcLearningForm.getChecked().equals("true"))
+        				mapCurrentOptions.put(mcLearningForm.getOptionIndex(), "CHECKED");
+        			else
+        				mapCurrentOptions.remove(mcLearningForm.getOptionIndex());
+    				
+        			logger.debug("updated mapCurrentOptions: " + mapCurrentOptions);
+        			
+        			mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapCurrentOptions);
+        			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);	
+    			}
+    			else
+    			{
+    				logger.debug("no options for this questions has been selected yet");
+        			Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
+        			        			
+        			if (mcLearningForm.getChecked().equals("true"))
+        				mapLeanerCheckedOptionsContent.put(mcLearningForm.getOptionIndex(), "CHECKED");
+        			else
+        				mapLeanerCheckedOptionsContent.remove(mcLearningForm.getOptionIndex());        			
+        			
+        			mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapLeanerCheckedOptionsContent);
+        			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+    			}
+    		}
+    		
+    		mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+    		logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+    		
+    		
     	}
-    	
     	
  		return (mapping.findForward(LOAD_LEARNER));
   }

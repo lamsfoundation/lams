@@ -382,8 +382,6 @@ public class AuthoringUtil implements McAppConstants {
     }
 
     
-    
-    
     public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
     {
     	IMcService qaService =McUtils.getToolService(request);
