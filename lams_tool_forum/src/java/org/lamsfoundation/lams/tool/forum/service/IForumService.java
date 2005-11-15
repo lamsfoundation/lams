@@ -27,7 +27,7 @@ public interface IForumService {
     public void deleteForumAttachment(Long attachmentId) throws PersistenceException;
     public Forum createForum(Long contentId) throws PersistenceException;
     
-    public Attachment uploadInstructionFile(Long contentId, FormFile file, String type) throws PersistenceException;
+    public Attachment uploadInstructionFile(FormFile file, String type) throws PersistenceException;
 
     public Message getMessage(Long messageUid) throws PersistenceException;
     

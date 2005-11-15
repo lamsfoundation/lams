@@ -4,16 +4,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
@@ -107,23 +104,28 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
     public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException {
     	//get Forum and ForumToolSesion
-    	Forum forum = getForumByContentId(forumId);
-    	message.setForum(forum);
+    	if(message.getForum() == null){
+    		Forum forum = new Forum();
+    		forum.setUid(forumId);
+    		message.setForum(forum);
+    	}
     	//if topic created by author, sessionId will be null.
     	if(sessionId != null){
     		ForumToolSession session = getSessionBySessionId(sessionId);
     		message.setToolSession(session);
     	}
+    	
+    	if(message.getUid() == null){
+	    	//update message sequence
+	    	MessageSeq msgSeq = new MessageSeq();
+	    	msgSeq.setMessage(message);
+	    	msgSeq.setMessageLevel((short) 0);
+	    	//set itself as root
+	    	msgSeq.setRootMessage(message);
+	    	messageSeqDao.save(msgSeq);
+    	}
     	//create message in database
         messageDao.saveOrUpdate(message);
-        
-        //update message sequence
-        MessageSeq msgSeq = new MessageSeq();
-        msgSeq.setMessage(message);
-        msgSeq.setMessageLevel((short) 0);
-        //set itself as root
-        msgSeq.setRootMessage(message);
-        messageSeqDao.save(msgSeq);
         
         return message;
     }
@@ -148,7 +150,15 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     }
 
     public void deleteTopic(Long topicUid) throws PersistenceException {
-    	//TODO: cascade delete children topic
+    	List children = messageDao.getChildrenTopics(topicUid);
+    	//cascade delete children topic by recursive
+    	if(children != null){
+    		Iterator iter = children.iterator();
+    		while(iter.hasNext()){
+    			Message msg = (Message) iter.next();
+    			this.deleteTopic(msg.getUid());
+    		}
+    	}
     	messageSeqDao.deleteByTopicId(topicUid);
         messageDao.deleteById(topicUid);
      }
@@ -157,6 +167,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     	//set parent
         Message parent = this.getMessage(parentId);
         replyMessage.setParent(parent);
+        replyMessage.setForum(parent.getForum());
+        replyMessage.setToolSession(parent.getToolSession());
         messageDao.saveOrUpdate(replyMessage);
         
         //get root topic and create record in MessageSeq table
@@ -234,41 +246,21 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	}
 
-	public Attachment uploadInstructionFile(Long contentId, FormFile uploadFile, String fileType) throws PersistenceException{
-		Attachment refile = null;
+	public Attachment uploadInstructionFile(FormFile uploadFile, String fileType) throws PersistenceException{
 		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
 			throw new ForumException("Could not find upload file: " + uploadFile);
 		
-        Forum content = getForumByContentId(contentId);
-        if ( content == null || !contentId.equals(content.getContentId())) {
-        	content  = new Forum();
-        	content.setContentId(contentId);
-        	//user firstly upload file without any other input, even the not-null 
-        	//field "title". Set title as default title.
-        	content.setTitle(ForumConstants.DEFAULT_TITLE);
-        }
+		//upload file to repository
 		NodeKey nodeKey = processFile(uploadFile,fileType);
 		
-		Set fileSet = content.getAttachments();
-		if(fileSet == null){
-			fileSet = new HashSet();
-			content.setAttachments(fileSet);
-		}
+		//create new attachement
 		Attachment file = new Attachment();
 		file.setFileType(fileType);
 		file.setFileUuid(nodeKey.getUuid());
 		file.setFileVersionId(nodeKey.getVersion());
 		file.setFileName(uploadFile.getFileName());
-		fileSet.add(file);
-		forumDao.saveOrUpdate(content);
 		
-		refile = new Attachment();
-		try {
-			PropertyUtils.copyProperties(refile,file);
-		} catch (Exception e) {
-			throw new ForumException("Could not get return InstructionFile instance" +e.getMessage());
-		}
-		return refile;
+		return file;
 
 	}
     /**

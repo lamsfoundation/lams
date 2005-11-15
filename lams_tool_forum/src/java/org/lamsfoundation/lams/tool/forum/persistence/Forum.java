@@ -63,7 +63,7 @@ public class Forum implements Cloneable{
   			//clone message
   			if(messages != null){
 				Iterator iter = messages.iterator();
-				Set set = new TreeSet();
+				Set set = new HashSet();
 				while(iter.hasNext())
 					set.add(((Message)iter.next()).clone());
 				forum.messages = set;
@@ -71,7 +71,7 @@ public class Forum implements Cloneable{
   			//clone attachment
   			if(attachments != null){
   				Iterator iter = attachments.iterator();
-  				Set set = new TreeSet();
+  				Set set = new HashSet();
   				while(iter.hasNext())
   					set.add(((Attachment)iter.next()).clone());
   				forum.attachments = set;
@@ -327,8 +327,8 @@ public class Forum implements Cloneable{
 	 * 
 	 * 
 	 * @hibernate.set lazy="true"
-	 *                cascade="all"
-	 *                inverse="false"
+	 *                inverse="true"
+	 *                cascade="none"
 	 *                order-by="create_date desc"
 	 * @hibernate.collection-key column="forum_uid"
 	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"

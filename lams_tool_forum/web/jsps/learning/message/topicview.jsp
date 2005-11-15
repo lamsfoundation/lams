@@ -40,6 +40,7 @@
 			<tr>
 				<td align="right">
 					<br>
+					<c:if test="${topic.isAuthor}">
 					<c:if test="${sessionScope.allowEdit}">
 						<c:set var="edittopic">
 							<html:rewrite page="/learning/editTopic.do?topicId=${topic.message.uid}&create=${topic.message.created.time}" />
@@ -47,6 +48,7 @@
 						<html:link href="${edittopic}">
 							<b><fmt:message key="label.edit" /></b>
 						</html:link>
+					</c:if>
 					</c:if>
 					<c:set var="replytopic">
 						<html:rewrite page="/learning/newReplyTopic.do?parentId=${topic.message.uid}" />

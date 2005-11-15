@@ -34,9 +34,10 @@ public class MessageDTO {
 	private boolean hasAttachment;
 	private short level;
 	private int threadNum;
-	
+	private boolean isAuthor;
 	/**
 	 * Get a <code>MessageDTO</code> instance from a given <code>Message</code>.
+	 * 
 	 * @param msg
 	 * @return
 	 */
@@ -51,34 +52,10 @@ public class MessageDTO {
 			dto.setHasAttachment(false);
 		else
 			dto.setHasAttachment(true);
+				
 		return dto;
 	}
-	/**
-	 * Get a list of <code>MessageDTO</code> according to given list of <code>Message</code> and author name.
-	 * These returned <code>MessageDTO</code> will use same author name with the given author name.   
-	 * @param msgSet
-	 * @param authorName
-	 * @return
-	 */
-	public static List getMessageDTO(List msgSet,String authorName){
-		List retSet = new ArrayList();
-		if(msgSet == null || msgSet.isEmpty())
-			return retSet;
-		
-		Iterator iter = msgSet.iterator();
-		while(iter.hasNext()){
-			Message msg = (Message) iter.next();
-			MessageDTO msgDto = new MessageDTO();
-			if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
-				msgDto.setHasAttachment(false);
-			else
-				msgDto.setHasAttachment(true);
-			msgDto.setMessage(msg);
-			msgDto.setAuthor(authorName);
-			retSet.add(msgDto);
-		}
-		return retSet;
-	}
+
 	/**
 	 * Get a list of <code>MessageDTO</code> according to given list of <code>Message</code>.
 	 * @param msgList
@@ -99,6 +76,7 @@ public class MessageDTO {
 				msgDto.setHasAttachment(true);
 			msgDto.setMessage(msg);
 			msgDto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
+
 			retSet.add(msgDto);
 		}
 		return retSet;
@@ -133,6 +111,14 @@ public class MessageDTO {
 	}
 	public void setThreadNum(int threadNum) {
 		this.threadNum = threadNum;
+	}
+
+	public boolean getIsAuthor() {
+		return isAuthor;
+	}
+
+	public void setAuthor(boolean isAuthor) {
+		this.isAuthor = isAuthor;
 	}
 	
 }

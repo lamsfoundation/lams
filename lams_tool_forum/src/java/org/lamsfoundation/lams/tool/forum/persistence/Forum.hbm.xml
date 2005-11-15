@@ -128,8 +128,8 @@
         <set
             name="messages"
             lazy="true"
-            inverse="false"
-            cascade="all"
+            inverse="true"
+            cascade="none"
             sort="unsorted"
             order-by="create_date desc"
         >

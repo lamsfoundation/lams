@@ -130,6 +130,7 @@
 			parameter="editTopic"
 			scope="session">
 			<forward name="success" path="tiles:/authoring/forum/editTopic" />
+			<forward name="forbidden" path="tiles:/authoring/forum/forbiddenEditTopic" />
 		</action>
 		<action path="/authoring/deleteAttachment"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"

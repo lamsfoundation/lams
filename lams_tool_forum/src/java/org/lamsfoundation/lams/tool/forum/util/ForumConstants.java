@@ -28,6 +28,19 @@ public interface ForumConstants {
 	public static final int SESSION_STATUS_FINISHED = 1;
 	public static final String ALLOW_EDIT = "allowEdit";
 	public static final String ALLOW_RICH_EDITOR = "allowRichEditor";
+
+	public static final String ONLINE_ATTACHMENT = "online_att";
+	public static final String OFFLINE_ATTACHMENT = "offline_att";
+
+	public static final String ATTACHMENT_LIST = "attachmentList";
+	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
+
+	public static final String TOPIC_DELETED_ATTACHMENT_LIST = "topicDeletedAttachmentList";
+
+	public static final String NEW_FORUM_USER = "newUser";
+
+	public static final String DELETED_AUTHORING_TOPICS_LIST = "deletedAuthoringTopicList";
+
 	
 	
 }

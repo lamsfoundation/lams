@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.tool.forum.web.actions;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -178,8 +179,25 @@ public class LearningAction extends Action {
 		forumService = getForumManager();
 		//get root topic list
 		List msgDtoList = forumService.getTopicThread(topicId);
+		
+		//set current user to web page, so that can display "edit" button correct. Only author alow to edit.
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		Long currUserId = new Long(user.getUserID().intValue());
+		Iterator iter = msgDtoList.iterator();
+		while(iter.hasNext()){
+			MessageDTO dto = (MessageDTO) iter.next();
+			if(dto.getMessage().getCreatedBy() != null 
+					&& currUserId.equals(dto.getMessage().getCreatedBy().getUserId()))
+				dto.setAuthor(true);
+			else
+				dto.setAuthor(false);
+		}
+		
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
 		return mapping.findForward("success");
+		
 	}
 	/**
 	 * Create a new root topic. 

@@ -314,8 +314,8 @@ public class Message implements Cloneable{
 	/**
 	 * @param toolSession The toolSession that this Message belongs to
      */
-    public void setToolSession(ForumToolSession forum) {
-         this.toolSession = forum;
+    public void setToolSession(ForumToolSession session) {
+         this.toolSession = session;
      }
 
 	/**

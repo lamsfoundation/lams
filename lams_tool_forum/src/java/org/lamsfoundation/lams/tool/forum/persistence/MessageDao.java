@@ -18,6 +18,8 @@ public class MessageDao extends HibernateDaoSupport {
 					+ " where parent_uid is null and forum_session_uid=?";
 	private static final String SQL_QUERY_FIND_TOPICS_FROM_AUTHOR = "from " + Message.class.getName()
 					+ " where is_authored = true and forum_uid=?";
+	private static final String SQL_QUERY_FIND_CHILDREN = "from " + Message.class.getName()
+	+ " where parent=?";
 	
 	public void saveOrUpdate(Message message) {
 		message.updateModificationData();
@@ -70,6 +72,10 @@ public class MessageDao extends HibernateDaoSupport {
 			this.getHibernateTemplate().delete(msg);
 			this.getHibernateTemplate().flush();
 		}
+	}
+
+	public List getChildrenTopics(Long parentId) {
+		return this.getHibernateTemplate().find(SQL_QUERY_FIND_CHILDREN, parentId);
 	}
 
 
