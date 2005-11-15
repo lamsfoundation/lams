@@ -2098,6 +2098,45 @@ public class McAction extends DispatchAction implements McAppConstants
     	McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
+	 	String optionCheckBoxSelected=request.getParameter("optionCheckBoxSelected");
+    	logger.debug("parameter optionCheckBoxSelected: " + optionCheckBoxSelected);
+    	
+    	mcLearningForm.setOptionCheckBoxSelected(null);
+    	mcLearningForm.setQuestionIndex(null);
+		mcLearningForm.setOptionIndex(null);
+		mcLearningForm.setChecked(null);
+    	
+    	if ((optionCheckBoxSelected != null) && optionCheckBoxSelected.equals("1"))
+    	{
+    		logger.debug("parameter optionCheckBoxSelected is selected " + optionCheckBoxSelected);
+    		mcLearningForm.setOptionCheckBoxSelected("1");
+    	}
+    	
+    	String questionIndex=request.getParameter("questionIndex");
+    	logger.debug("parameter questionIndex: " + questionIndex);
+    	if ((questionIndex != null))
+    	{
+    		logger.debug("parameter questionIndex is selected " + questionIndex);
+    		mcLearningForm.setQuestionIndex(questionIndex);
+    	}
+    	
+    	String optionIndex=request.getParameter("optionIndex");
+    	logger.debug("parameter optionIndex: " + optionIndex);
+    	if (optionIndex != null)
+    	{
+    		logger.debug("parameter optionIndex is selected " + optionIndex);
+    		mcLearningForm.setOptionIndex(optionIndex);
+    	}
+    	
+    	String checked=request.getParameter("checked");
+    	logger.debug("parameter checked: " + checked);
+    	if (checked != null)
+    	{
+    		logger.debug("parameter checked is selected " + checked);
+    		mcLearningForm.setChecked(checked);
+    	}
+
+    	
     	if (mcLearningForm.getContinueOptions() != null)
 	 	{
     		logger.debug("continue options requested.");
@@ -2156,6 +2195,15 @@ public class McAction extends DispatchAction implements McAppConstants
         		return (mapping.findForward(LOAD_LEARNER));
         	}
 	 	}
+    	else if (mcLearningForm.getOptionCheckBoxSelected() != null)
+    	{
+    		logger.debug("requested optionCheckBoxSelected...");
+    		logger.debug("questionIndex: " + mcLearningForm.getQuestionIndex());
+    		logger.debug("optionIndex: " + mcLearningForm.getOptionIndex());
+    		logger.debug("checked: " + mcLearningForm.getChecked());
+    	}
+    	
+    	
  		return (mapping.findForward(LOAD_LEARNER));
   }
 

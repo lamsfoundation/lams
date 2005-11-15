@@ -291,7 +291,7 @@ public class AuthoringUtil implements McAppConstants {
 	    }
 
 	
-    public Map rebuildQuestionMapfromDB(HttpServletRequest request, Long toolContentId)
+    public static Map rebuildQuestionMapfromDB(HttpServletRequest request, Long toolContentId)
     {
     	Map mapQuestionsContent= new TreeMap(new McComparator());
     	
@@ -317,6 +317,42 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("refreshed Map:" + mapQuestionsContent);
     	return mapQuestionsContent;
     }
+    
+    /**
+     * returns all the options for all the questions for a content
+     * generateGeneralOptionsContentMap(HttpServletRequest request, McContent mcContent)
+     * 
+     * @param request
+     * @param mcContent
+     * @return Map
+     */
+    public static Map generateGeneralOptionsContentMap(HttpServletRequest request, McContent mcContent)
+    {
+    	Map mapGeneralOptionsContent= new TreeMap(new McComparator());
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	Iterator mcQueIterator=mcContent.getMcQueContents().iterator();
+		Long mapIndex=new Long(1);
+    	while (mcQueIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)mcQueIterator.next();
+    		if (mcQueContent != null)
+    		{
+    			Long uid=mcQueContent.getUid();
+    			logger.debug("uid : " + uid);
+    			/* get the options for this question */
+    			List listMcOptions=mcService.findMcOptionsContentByQueId(uid);
+    			logger.debug("listMcOptions : " + listMcOptions);
+    			Map mapOptionsContent=McUtils.generateOptionsMap(listMcOptions);
+    			logger.debug("mapOptionsContent : " + mapOptionsContent);
+    			mapGeneralOptionsContent.put(mapIndex.toString(), mapOptionsContent);
+        		mapIndex=new Long(mapIndex.longValue()+1);
+    		}
+    	}
+		logger.debug("current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		return mapGeneralOptionsContent;
+    }
+    
 
     public Map rebuildWeightsMapfromDB(HttpServletRequest request, Long toolContentId)
     {
