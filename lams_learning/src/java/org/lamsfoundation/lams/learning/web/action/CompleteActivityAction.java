@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 
 /**
  * @author daveg
@@ -82,7 +83,7 @@ public class CompleteActivityAction extends ActivityAction {
 		Lesson lesson = sessionBean.getLesson();
 		
 		LearnerProgress progress = getLearnerProgress(request);
-		Activity activity = getActivity(request, form, progress);
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
 		
 		if (activity == null) {
 		    log.error(className+": No activity in request or session");
@@ -98,13 +99,13 @@ public class CompleteActivityAction extends ActivityAction {
 		catch (LearnerServiceException e) {
 			return mapping.findForward("error");
 		}
-		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, progress.getNextActivity());
+		LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
 
 		// Save progress in session for Flash request
 		sessionBean.setLearnerProgress(progress);
 		setSessionBean(sessionBean, request);
 
-		ActionForward forward = actionMappings.getProgressForward(progress,true,request);
+		ActionForward forward = actionMappings.getProgressForward(progress,true,request, learnerService);
 		
 		return forward;
 	}

@@ -30,11 +30,12 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.web.bean.SessionBean;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 
 /**
  * @author daveg
@@ -79,7 +80,7 @@ public class ChooseActivityAction extends ActivityAction {
 		Lesson lesson = sessionBean.getLesson();
 		
 		LearnerProgress progress = getLearnerProgress(request);
-		Activity activity = getActivity(request, form, progress);
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
 		
 		if (activity == null) {
 		    log.error(className+": No activity in request or session");

@@ -87,40 +87,6 @@ public class ActivityAction extends LamsAction {
 	}
 	
 	/**
-	 * Convenience method to get the requested activity. First check the
-	 * request attribute to see if it has been loaded already this request.
-	 * If not in request then load from the LearnerProgress using the forms
-	 * activityId. If no activityId specified then return null.
-	 * @param request
-	 * @param form
-	 * @param learnerProgress, the current LearerProgress
-	 * @return Activity in request
-	 */
-	protected Activity getActivity(HttpServletRequest request, ActivityForm form, LearnerProgress learnerProgress) 
-	{
-		Activity activity = (Activity)request.getAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE);
-		if (activity == null) 
-		{
-			Long activityId = form.getActivityId();
-			if (activityId != null) 
-			    activity = getLearnerService().getActivity(activityId);
-		}
-		return activity;
-	}
-	
-	/**
-	 * Sets an Activity in the request attributes so that it can be used by
-	 * actions forwarded to without reloading it.
-	 * @param request
-	 * @param activity
-	 */
-	protected void setActivity(HttpServletRequest request, Activity activity) 
-	{
-		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, activity);
-	}
-	
-	
-	/**
 	 * Gets the session bean from session.
 	 * @return SessionBean for this request, null if no session.
 	 */

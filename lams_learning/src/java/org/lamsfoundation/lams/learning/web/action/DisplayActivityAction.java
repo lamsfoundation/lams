@@ -79,7 +79,7 @@ public class DisplayActivityAction extends ActivityAction {
 		    log.debug("Entering display activity: the session bean is"
 		              + learnerProgress.toString());
 		
-		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,request);
+		ActionForward forward =actionMappings.getProgressForward(learnerProgress,false,request,getLearnerService());
 	
 		if(log.isDebugEnabled())
 		    log.debug(forward.toString());

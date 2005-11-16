@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ForwardingActionForward;
 import org.apache.struts.action.RedirectingActionForward;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.action.ActivityAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -109,7 +109,8 @@ public class ActivityMapping implements Serializable
      */
     public ActionForward getProgressForward(LearnerProgress progress,
                                             boolean redirect,
-                                            HttpServletRequest request)
+                                            HttpServletRequest request,
+                                            ILearnerService learnerService)
     {
         ActionForward actionForward = null;
 
@@ -157,8 +158,9 @@ public class ActivityMapping implements Serializable
                                                        progress,
                                                        redirect);
                     //setup activity into request for display
-                    request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE,
-                                         progress.getNextActivity());
+                    LearningWebUtil.putActivityInRequest(request,
+                                         progress.getNextActivity(),
+                                         learnerService);
                 }
             }
         }
@@ -349,4 +351,5 @@ public class ActivityMapping implements Serializable
     {
         this.activityMappingStrategy = activityMappingStrategy;
     }
+
 }

@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learning.web.util.ParallelActivityMappingStrategy;
 
 /** 
@@ -67,7 +68,7 @@ public class DisplayParallelActivityAction extends ActivityAction {
 		actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request);
-		Activity activity = getActivity(request, form, learnerProgress);
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
 		if (!(activity instanceof ParallelActivity)) {
 		    log.error(className+": activity not ParallelActivity "+activity.getActivityId());
 			return mapping.findForward(ActivityMapping.ERROR);

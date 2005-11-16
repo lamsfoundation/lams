@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 
 /**
  * Action class to display an OptionsActivity.
@@ -69,7 +70,7 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		ActivityMapping actionMappings = getActivityMapping();
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request);
-		Activity activity = getActivity(request, form, learnerProgress);
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
 		if (!(activity instanceof OptionsActivity)) {
 		    log.error(className+": activity not OptionsActivity "+activity.getActivityId());
 			return mapping.findForward(ActivityMapping.ERROR);

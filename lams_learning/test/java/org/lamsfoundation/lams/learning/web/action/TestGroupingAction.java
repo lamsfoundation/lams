@@ -108,7 +108,7 @@ public class TestGroupingAction extends AbstractTestAction
         addRequestParameter("method", "viewGrouping");
         addRequestParameter(LearningWebUtil.PARAM_USER_ID, TEST_LEARNER_ID);
         addRequestParameter(LearningWebUtil.PARAM_LESSON_ID, TEST_LESSON_ID);
-        request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE,groupingActivity);
+        LearningWebUtil.putActivityInRequest(request,groupingActivity,learnerService);
         
         actionPerform();
     

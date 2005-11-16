@@ -210,4 +210,19 @@ public class LearningWebUtil
         }
         return activity;
     }
+    
+    /**
+     * Put an activity into the request. Calls LearnerService to get the activity, to ensure 
+     * that it is a "real" activity, not one of the cglib proxies. 
+     * activity.
+     * @param request
+     * @param activity
+     */
+    public static void putActivityInRequest(HttpServletRequest request, Activity activity,
+                                                  ILearnerService learnerService)
+    {
+        Activity realActivity = learnerService.getActivity(activity.getActivityId());
+        request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, realActivity);
+    }
+
 }

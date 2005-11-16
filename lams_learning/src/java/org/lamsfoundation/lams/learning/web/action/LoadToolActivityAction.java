@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 
 /** 
  * Action class to forward the user to a Tool using an intermediate loading page.
@@ -52,6 +53,7 @@ public class LoadToolActivityAction extends ActivityAction {
 	/**
 	 * Gets an activity from the request (attribute) and forwards onto a
 	 * loading page.
+	 * TODO when this is first called after creating a new tool session, ToolActivity isn't a ToolActivity - its a cglib.
 	 */
 	public ActionForward execute(ActionMapping mapping,
 	                             ActionForm actionForm,
@@ -62,8 +64,10 @@ public class LoadToolActivityAction extends ActivityAction {
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request);
-		Activity activity = getActivity(request, form, learnerProgress);
-		
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
+				
+		// With Hibernate 3.x the activity is sometimes the proxy, not a true  
+		// ToolActivity.
 		if (!(activity instanceof ToolActivity)) 
 		{
 		    log.error(className+": activity not ToolActivity");

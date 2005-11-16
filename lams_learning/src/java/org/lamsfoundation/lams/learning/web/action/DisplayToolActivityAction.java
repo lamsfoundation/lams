@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.lesson.*;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 
 /** 
  * Action class to forward the user to a Tool.
@@ -58,7 +59,7 @@ public class DisplayToolActivityAction extends ActivityAction {
 		ActivityMapping actionMappings = getActivityMapping();
 		
 		LearnerProgress learnerProgress = getLearnerProgress(request);
-		Activity activity = getActivity(request, form, learnerProgress);
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, getLearnerService());
 		if (!(activity instanceof ToolActivity)) 
 		{
 		    log.error(className+": activity not ToolActivity");
