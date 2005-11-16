@@ -353,7 +353,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	    //remove session data
 	    nbContent = nbService.retrieveNoticeboard(TEST_NB_ID);
 	    nbContent.getNbSessions().clear();
-	    nbService.updateNoticeboard(nbContent);
+	    nbService.saveNoticeboard(nbContent);
 	    
 	    nbContentManager.removeToolContent(TEST_NB_ID, false);
 	    

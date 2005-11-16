@@ -21,11 +21,12 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
-import java.util.List;
 
 
 /**
@@ -59,16 +60,8 @@ public interface INoticeboardService {
 	public NoticeboardContent retrieveNoticeboard(Long nbContentId);
 	
 	
-	 /**
-     * <p>Update the given persistent instance of NoticeboardContent.</p>
-     * 
-     * @param nbContent The instance of NoticeboardContent to persist.
-     */
-	public void updateNoticeboard(NoticeboardContent nbContent);
-	
-	
 	/**
-	 * <p>Persist the given persistent instance of NoticeboardContent.</p>
+	 * <p>Persist/Update the given persistent instance of NoticeboardContent.</p>
 	 * 
 	 * @param nbContent The instance of NoticeboardContent to persist.
 	 */
@@ -297,22 +290,24 @@ public interface INoticeboardService {
     /**
      * <p> Saves (persists) or update the NoticeboardAttachment object in the
      * database.</p>
+     * @param content The overall noticeboard content object to which the attachment is to be added
      * @param attachment The instance of NoticeboardAttachment to save
      */
-    public void saveAttachment(NoticeboardAttachment attachment);
+    public void saveAttachment(NoticeboardContent content, NoticeboardAttachment attachment);
     
     /**
      * Removes the NoticeboardAttachment object from the database.
+     * @param content The overall noticeboard content object to which the attachment is to be added
      * @param attachment The instance of NoticeboardAttachment to delete.
      */
-    public void removeAttachment(NoticeboardAttachment attachment);
+    public void removeAttachment(NoticeboardContent content, NoticeboardAttachment attachment);
     
-    /**
+    /* Not used?
      * Removes the NoticeboardAttachment object from the database
      * with uuid <code>uuid</code>
      * @param uuid The uuid of the file
-     */
     public void removeAttachmentByUuid(Long uuid);
+     */
     
     /**
      * This method retrieves the default content id.

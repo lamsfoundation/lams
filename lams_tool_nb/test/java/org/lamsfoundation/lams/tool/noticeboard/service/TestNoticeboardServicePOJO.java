@@ -103,7 +103,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    nbContent.setContent(newContent);
 		
 		//save the new changes
-		nbService.updateNoticeboard(nbContent);
+		nbService.saveNoticeboard(nbContent);
 		
 		//check whether the changes has been saved
 		NoticeboardContent newNb = nbService.retrieveNoticeboard(TEST_NB_ID);

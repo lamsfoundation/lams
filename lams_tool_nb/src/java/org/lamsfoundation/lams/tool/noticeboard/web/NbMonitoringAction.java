@@ -26,9 +26,9 @@
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,15 +37,13 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-//import org.apache.struts.actions.LookupDispatchAction;
-import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
+import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
-import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
+import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
 
 /**
  * @author mtruong
@@ -172,19 +170,9 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
 		
 		request.setAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS, content.getOnlineInstructions());
 		
-		Map attachmentMap = monitorForm.getAttachments();
-	        
-	        List attachmentIdList = nbService.getAttachmentIdsFromContent(content);
-			for (int i=0; i<attachmentIdList.size(); i++)
-			{
-			    NoticeboardAttachment file = nbService.retrieveAttachment((Long)attachmentIdList.get(i));
-			    String fileType = file.returnFileType();
-			    String keyName = file.getFilename() + "-" + fileType;
-			    attachmentMap.put(keyName, file);
-			}
-			monitorForm.setAttachments(attachmentMap);
-			NbWebUtil.addUploadsToSession(request, attachmentMap);
-		
+		List attachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.ATTACHMENT_LIST);
+		NbWebUtil.setupAttachmentList(nbService, attachmentList, content);
+		NbWebUtil.addUploadsToSession(request, attachmentList, null);
 		
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }

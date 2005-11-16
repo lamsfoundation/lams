@@ -22,36 +22,30 @@
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
+import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
-import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO;
-
-import org.springframework.dao.DataAccessException;
-import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
-
-import org.lamsfoundation.lams.tool.ToolContentManager;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
-
-import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
-
-import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
-
-import org.lamsfoundation.lams.usermanagement.User;
-
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.springframework.dao.DataAccessException;
 
 
 
@@ -76,7 +70,6 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	private NoticeboardUser nbUser;
 	private INoticeboardUserDAO nbUserDAO=null;
 	
-	private NoticeboardAttachment nbAttachment;
 	private INoticeboardAttachmentDAO nbAttachmentDAO = null;
 	
 	
@@ -145,31 +138,17 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	
 	
 	/**
-	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#updateNoticeboard(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
-	 */
-	public void updateNoticeboard(NoticeboardContent nbContent)
-	{
-		try
-		{
-			nbContentDAO.updateNbContent(nbContent);
-		}
-		catch (DataAccessException e)
-		{
-			throw new NbApplicationException("An exception has occured while trying to update a noticeboard content object: "
-                                                         + e.getMessage(),
-														   e);
-		}
-
-	}
-	
-	/**
 	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#saveNoticeboard(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent)
 	 */
 	public void saveNoticeboard(NoticeboardContent nbContent)
 	{
 		try
 		{
-			nbContentDAO.saveNbContent(nbContent);
+			if ( nbContent.getUid() == null ) {
+				nbContentDAO.saveNbContent(nbContent);
+			} else {
+				nbContentDAO.updateNbContent(nbContent);
+			}
 		}
 		catch (DataAccessException e)
 		{
@@ -727,11 +706,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	}
 	
 	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#saveAttachment(org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment) */
-	public void saveAttachment(NoticeboardAttachment attachment)
+	public void saveAttachment(NoticeboardContent content, NoticeboardAttachment attachment)
 	{
 	    try
 	    {
-	        nbAttachmentDAO.saveAttachment(attachment);
+	    	content.getNbAttachments().add(attachment);
+			attachment.setNbContent(content);
+			saveNoticeboard(content);
 	    }
 	    catch (DataAccessException e)
 	    {
@@ -741,11 +722,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	}
 	
 	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeAttachment(org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment) */
-	public void removeAttachment(NoticeboardAttachment attachment)
+	public void removeAttachment(NoticeboardContent content, NoticeboardAttachment attachment)
 	{
 	    try
 	    {
-	        nbAttachmentDAO.removeAttachment(attachment);
+			attachment.setNbContent(null);
+			content.getNbAttachments().remove(attachment);
+			saveNoticeboard(content);
 	    }
 	    catch (DataAccessException e)
 	    {
@@ -754,7 +737,8 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    }
 	}
 	
-	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeAttachmentByUuid(java.lang.Long) */
+	/* Not used?
+	 @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeAttachmentByUuid(java.lang.Long) 
 	public void removeAttachmentByUuid(Long uuid)
 	{
 	    if (uuid == null)
@@ -773,7 +757,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	                + e.getMessage(), e);
 	    }
 	}
-	
+	*/
 	
 	
 	
@@ -826,7 +810,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		
 	    nbContent.setDefineLater(true);
 	    //nbContent.setContentInUse(false); //if define later is set to true, then contentInUse flag should be false
-	    updateNoticeboard(nbContent);
+	    saveNoticeboard(nbContent);
 		
 	}
 	
@@ -836,7 +820,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    NoticeboardContent nbContent = getAndCheckIDandObject(toolContentId);
 	    
 		nbContent.setForceOffline(true);
-		updateNoticeboard(nbContent);
+		saveNoticeboard(nbContent);
 	}
 	   
 	/** @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long)*/

@@ -34,26 +34,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-//import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
-
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
-
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
-import org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerForm;
-
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
-
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.ActionMessage;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * Creation Date: 27-06-05
  * 
@@ -87,7 +83,7 @@ import org.apache.struts.action.ActionMessage;
 public class NbLearnerStarterAction extends LamsDispatchAction {
     
     static Logger logger = Logger.getLogger(NbLearnerStarterAction.class.getName());
-       
+          
     public ActionForward unspecified(
     		ActionMapping mapping,
     		ActionForm form,
@@ -144,12 +140,14 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
             saveMessages(request, message);
             return mapping.findForward(NoticeboardConstants.DISPLAY_MESSAGE);
         }
-        if (learnerForm.getMode().equals(NoticeboardConstants.TOOL_ACCESS_MODE_LEARNER))
+        
+        ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,false);
+        if (mode == ToolAccessMode.LEARNER)
         {
             /* Set the ContentInUse flag to true, and defineLater flag to false */
             nbContent.setContentInUse(true);
           //  nbContent.setDefineLater(false); /* defineLater should be false anyway */
-            nbService.updateNoticeboard(nbContent);
+            nbService.saveNoticeboard(nbContent);
                      
             if (nbUser != null)
 	        {

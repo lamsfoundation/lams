@@ -25,41 +25,41 @@
  */
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
-import java.util.Date;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
-
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
-import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbToolContentHandler;
-import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
-import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.apache.struts.upload.FormFile;
 import org.apache.struts.util.MessageResources;
-import org.lamsfoundation.lams.util.WebUtil;
-
-//import org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
+import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbToolContentHandler;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -123,7 +123,6 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		return map;
 	}
 
-    
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException {
         
         MessageResources resources = getResources(request);
@@ -156,7 +155,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		 * Retrieve the Service
 		 */
 		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-		Map attachmentMap = nbForm.getAttachments();
+		List attachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.ATTACHMENT_LIST);
 		
 		if (!contentExists(nbService, contentId))
 		{
@@ -166,7 +165,6 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		  //  logger.debug("Default tool content id is " + defaultToolContentId);
 		    NoticeboardContent nb = nbService.retrieveNoticeboard(defaultToolContentId);
 			
-			/** TODO: add a check to see if object is null */
 		    if (nb==null)
 		    {
 		        String error= "There is data missing in the database";
@@ -174,24 +172,14 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		        throw new NbApplicationException(error);
 		    }
 			
-			//create a new noticeboard object and prefill with default content, save to database
-			NoticeboardContent nbContentNew = new NoticeboardContent(contentId,
-			        												nb.getTitle(),
-			        												nb.getContent(),
-			        												nb.getOnlineInstructions(),
-			        												nb.getOfflineInstructions(),
-			        												new Date(System.currentTimeMillis()));
-			
-			nbContentNew = setTrueIfDefineLaterIsSet(nbForm, nbContentNew);
-			
-			//save new tool content into db
-			nbService.saveNoticeboard(nbContentNew);
-			
 			//initialise the values in the form, so the values will be shown in the jsp
-			nbForm.populateFormWithNbContentValues(nbContentNew);
+			nbForm.setToolContentID(contentId.toString());
+			nbForm.setTitle(nb.getTitle());
+			nbForm.setContent(nb.getContent());
+			nbForm.setOnlineInstructions(nb.getOnlineInstructions());
+			nbForm.setOfflineInstructions(nb.getOfflineInstructions());
 			
-			
-							
+			attachmentList = NbWebUtil.setupAttachmentList(nbService,null,null);
 		
 		}
 		else //content already exists on the database
@@ -209,7 +197,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 			     * So that users cannot start using the content while the staff member is editing the content */
 			    nbForm.populateFormWithNbContentValues(nb);
 			    nb = setTrueIfDefineLaterIsSet(nbForm, nb);
-			    nbService.updateNoticeboard(nb);
+			    nbService.saveNoticeboard(nb);
 			    
 			    /** TODO: setup values in the instructions map */
 			 
@@ -226,24 +214,13 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 			}
 			
 			//Setup the map containing the files that have been uploaded for this particular tool content id
-						
-			List attachmentIdList = nbService.getAttachmentIdsFromContent(nb);
-			for (int i=0; i<attachmentIdList.size(); i++)
-			{
-			    NoticeboardAttachment file = nbService.retrieveAttachment((Long)attachmentIdList.get(i));
-			    String fileType = file.returnFileType();
-			    String keyName = file.getFilename() + "-" + fileType;
-			    attachmentMap.put(keyName, file);
-			}
-			nbForm.setAttachments(attachmentMap);
-			
-			
+			attachmentList = NbWebUtil.setupAttachmentList(nbService,attachmentList,nb);
 		
 		}
-		NbWebUtil.addUploadsToSession(request, attachmentMap);
+		NbWebUtil.addUploadsToSession(request, attachmentList, NbWebUtil.setupDeletedAttachmentList());
 		request.getSession().setAttribute(FORM, nbForm);
 	
-    		return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
+    	return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
     }
     	
     	/**
@@ -279,12 +256,13 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     			
     			NbAuthoringForm nbForm = (NbAuthoringForm)form;
     			copyAuthoringFormValuesIntoFormBean(request, nbForm);
-    			
+
     			INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
     			String idAsString = nbForm.getToolContentID();
     			if (idAsString == null)
     			{
-    			    String error = "Unable to continue. Tool content id missing";
+    		        MessageResources resources = getResources(request);
+    			    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "Tool Content Id");
     			    logger.error(error);
     				throw new NbApplicationException(error);
     			}
@@ -294,14 +272,93 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     			checkContentId(content_id);
     			
     			NoticeboardContent nbContent = nbService.retrieveNoticeboard(content_id);
+    			if ( nbContent == null ) {
+    				//create a new noticeboard object 
+    				nbContent = new NoticeboardContent();
+    				nbContent.setNbContentId(content_id);
+    			}
+    			
     			nbForm.copyValuesIntoNbContent(nbContent);
-    			/* Author has finished editing the content and mark the defineLater flag to false */
+    			if ( nbContent.getDateCreated() == null )
+    				nbContent.setDateCreated(nbContent.getDateUpdated()); 
+
+    			// set up the user details
+   		    	HttpSession ss = SessionManager.getSession();
+   		    	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    		    if ( user == null )
+    			{
+    		        MessageResources resources = getResources(request);
+    			    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "User");
+    			    logger.error(error);
+    				throw new NbApplicationException(error);
+    			}
+    			nbContent.setCreatorUserId(new Long(user.getUserID().longValue()));
+    			
+    			// Author has finished editing the content and mark the defineLater flag to false
     			nbContent.setDefineLater(false);
-    			nbService.updateNoticeboard(nbContent);
-    				
-    			return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
+    			nbService.saveNoticeboard(nbContent);
+    			
+    			// Save the attachments then update the attachment collections in the session.
+    			List attachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.ATTACHMENT_LIST);
+		    	List deletedAttachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST);
+		    	deletedAttachmentList = saveAttachments(nbService, nbContent, attachmentList, deletedAttachmentList, mapping, request);
+		    	NbWebUtil.addUploadsToSession(request, attachmentList, deletedAttachmentList);
+
+		    	return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
     		}
     		
+	  		/** 
+	  		* Go through the attachments collections. Remove any content repository or tool objects
+	  		* matching entries in the the deletedAttachments collection, add any new attachments in the
+	  		* attachments collection. Clear the deletedAttachments collection, ready for new editing.
+	  		*/ 
+    	  	private List saveAttachments (INoticeboardService nbService, NoticeboardContent nbContent, 
+    	  			List attachmentList, List deletedAttachmentList,
+    	  			ActionMapping mapping, HttpServletRequest request) {
+
+    	  		if ( deletedAttachmentList != null ) {
+    	  			Iterator iter = deletedAttachmentList.iterator();
+    	  			while (iter.hasNext()) {
+						NoticeboardAttachment attachment = (NoticeboardAttachment) iter.next();
+						
+				    	// remove entry from content repository. deleting a non-existent entry 
+    	  				// shouldn't cause any errors.
+				    	try
+				    	{
+				    	    getToolContentHandler().deleteFile(attachment.getUuid());
+				    	}
+				    	catch (RepositoryCheckedException e) {
+				            logger.error("Unable to delete file",e);
+				    		ActionMessages am = new ActionMessages(); 
+				    		am.add( ActionMessages.GLOBAL_MESSAGE,  
+				    	           new ActionMessage( NoticeboardConstants.ERROR_FILE_UPLOAD_CONTENT_REPOSITORY , 
+				    	        		   			  attachment.getFilename())); 
+				    		saveErrors( request, am ); 
+				    	}
+
+				    	// remove tool entry from db
+						if ( attachment.getAttachmentId() != null ) {
+							nbService.removeAttachment(nbContent, attachment);
+						}
+    	  			}
+    	  			deletedAttachmentList.clear();
+    	  		}
+    	  		
+    	  		if ( attachmentList != null ) {
+    	  			Iterator iter = attachmentList.iterator();
+    	  			while (iter.hasNext()) {
+						NoticeboardAttachment attachment = (NoticeboardAttachment) iter.next();
+
+						if ( attachment.getAttachmentId() == null ) {
+							// add entry to tool table - file already in content repository
+							nbService.saveAttachment(nbContent, attachment);
+						}
+    	  			}
+    	  		}
+    	  			
+    	  		return deletedAttachmentList;
+    	  	}
+    	  	
     	    /**
     		 * This method will either upload an online instructions file or an offline instructions file. 
     		 * It will upload an online file if the bean property onlineFile is not null and similarly,
@@ -341,61 +398,30 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     			    	boolean isOnlineFile = ((nbForm.getOnlineFile() != null && (nbForm.getOnlineFile().getFileName().trim().length() != 0)) ? true: false );
     			    	theFile = (isOnlineFile ? nbForm.getOnlineFile() : nbForm.getOfflineFile());
     			    	String fileType = isOnlineFile ? NoticeboardAttachment.TYPE_ONLINE : NoticeboardAttachment.TYPE_OFFLINE;
+
+    					List attachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.ATTACHMENT_LIST);
+    			    	List deletedAttachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST);
     			    	
-    			    	//check to see if FileExists
-    			    	NoticeboardAttachment file = nbService.retrieveAttachmentByFilename(theFile.getFileName());
+    			    	// if a file with the same name already exists then move the old one to deleted
+    			    	deletedAttachmentList = moveToDelete(theFile.getFileName(), isOnlineFile, attachmentList, deletedAttachmentList );
     			    	
-    			    		    			    	
     			    	try
     			    	{
+			    	        // This is a new file and so is saved to the content repository. Add it to the 
+    			    		// attachments collection, but don't add it to the tool's tables yet.
+			    	        NodeKey node = getToolContentHandler().uploadFile(theFile.getInputStream(), theFile.getFileName(), 
+			                        theFile.getContentType(), fileType); 
+			    	        NoticeboardAttachment file = new NoticeboardAttachment();
+				    	    file.setFilename(theFile.getFileName());
+				    	   	file.setOnlineFile(isOnlineFile);
+					    	file.setNbContent(nbContent);
+					    	file.setUuid(node.getUuid());
+					    	file.setVersionId(node.getVersion()); 
+					    	
+    				    	// add the files to the attachment collection - if one existed, it should have already been removed.
+   				    	    attachmentList.add(file);
     				    	
-    			    	    if (fileExists(content_id, file, isOnlineFile))
-    			    		{
-    			    	        /**
-    			    	         * The same file belonging to the same toolcontent id already exists.
-    			    	         * The old version of this file is deleted from the content repository 
-    			    	         * and the new one is saved in the content repository.
-    			    	         * 
-    			    	         * The entry in the database is then updated with the new uuid and version
-    			    	         */
-    			    	        getToolContentHandler().deleteFile(file.getUuid());
-    			    	        
-    			    	        nbService.removeAttachment(file);
-    			    	        
-    			    	      /*  NodeKey node = getToolContentHandler().uploadFile(theFile.getInputStream(), theFile.getFileName(), 
-    			                        theFile.getContentType(), fileType); 
-    			    	        
-    			    	        file.setUuid(node.getUuid()); //only need to update the uuid, the rest of the info is the same
-    			    	        file.setVersionId(node.getVersion());
-    			    	        nbService.saveAttachment(file); */
-    			    	        
-    			    		}
-    			    	        /**
-    			    	         * This is a new file and so is saved to the content repository.
-    			    	         * 
-    			    	         * A new entry is added to the database.
-    			    	         */
-    			    	        NodeKey node = getToolContentHandler().uploadFile(theFile.getInputStream(), theFile.getFileName(), 
-    			                        theFile.getContentType(), fileType); 
-    			    	        file = new NoticeboardAttachment();
-    				    	    file.setFilename(theFile.getFileName());
-    				    	   	file.setOnlineFile(isOnlineFile);
-    					    	file.setNbContent(nbContent);
-    					    	file.setUuid(node.getUuid());
-    					    	file.setVersionId(node.getVersion()); 
-    					    	nbService.saveAttachment(file);
-    			    	    
-    			    	    
-    				    	String keyName = file.returnKeyName();
-    					    
-    				    	//add the files to the map
-    				    	Map attachmentMap = nbForm.getAttachments();
-    				    	if (!attachmentMap.containsKey(keyName))
-    				    	{
-    				    	    attachmentMap.put(keyName, file);
-    				    	}
-    				    	
-    				    	NbWebUtil.addUploadsToSession(request, attachmentMap);
+    				    	NbWebUtil.addUploadsToSession(request, attachmentList, deletedAttachmentList);
     				    	//reset the fields so that more files can be uploaded
     				    	nbForm.setOfflineFile(null);
     				    	nbForm.setOnlineFile(null);
@@ -417,58 +443,77 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     				return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
     		}
     		
+    		/** If this file exists in attachments list, move it to the deleted attachments list.
+    		 * Returns the updated deletedAttachments list, creating a new one if needed. Uses the filename 
+    		 * and isOnline flag to match up the attachment entry */
+    		private List moveToDelete(String filename, boolean isOnline, List attachmentsList, List deletedAttachmentsList ) {
+    			return moveToDelete(filename, isOnline, null, attachmentsList, deletedAttachmentsList);
+    		}
+    		/** If this file exists in attachments list, move it to the deleted attachments list.
+    		 * Returns the updated deletedAttachments list, creating a new one if needed. Uses the uuid of the
+    		 * file to match up the attachment entry */
+    		private List moveToDelete(Long uuid, List attachmentsList, List deletedAttachmentsList ) {
+    			return moveToDelete(null, false, uuid, attachmentsList, deletedAttachmentsList);
+    		}
+    		
+    		/** If this file exists in attachments map, move it to the deleted attachments map.
+    		 * Returns the updated deletedAttachments map, creating a new one if needed. If uuid supplied
+    		 * then tries to match on that, otherwise uses filename and isOnline. */
+    		private List moveToDelete(String filename, boolean isOnline, Long uuid, List attachmentsList, List deletedAttachmentsList ) {
+
+    			List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : NbWebUtil.setupDeletedAttachmentList();
+    			
+    			if ( attachmentsList != null ) {
+    				Iterator iter = attachmentsList.iterator();
+    				NoticeboardAttachment attachment = null;
+    				while ( iter.hasNext() && attachment == null ) {
+    					NoticeboardAttachment value = (NoticeboardAttachment) iter.next();
+    					
+    					if ( uuid != null ) {
+    						// compare using uuid
+    						if ( uuid.equals(value.getUuid()) ) {
+    							attachment = value;
+    						}
+    					} else {
+    						// compare using filename and online/offline flag
+    						if ( value.isOnlineFile() == isOnline && value.getFilename().equals(filename) ) {
+    							attachment = value;
+    						}
+    					}
+    				}
+    				if ( attachment != null ) {
+    					deletedList.add(attachment);
+    					attachmentsList.remove(attachment);
+    				}
+    			}
+    			
+    			return deletedList;
+    		}
     		
     		public ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     			throws InvalidParameterException, RepositoryCheckedException, NbApplicationException {
     		
     		    Long uuid = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.UUID));
-    		    
-    		    NbAuthoringForm nbForm = (NbAuthoringForm)form;
-    		 //  copyAuthoringFormValuesIntoFormBean(request, nbForm);
-    		    
-    	    	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-    		    
     	    	if (uuid == null)
     	    	{
     	    	    String error = "Unable to continue. The file uuid is missing.";
     				logger.error(error);
     				throw new NbApplicationException(error);
     	    	}
-    	    	NoticeboardAttachment attachment = nbService.retrieveAttachmentByUuid(uuid);
-    	    	if (attachment == null)
-    	    	{
-    	    	    String error = "Unable to continue. The file does not exist";
-					logger.error(error);
-					throw new NbApplicationException(error);
-	    	    	    
-    	    	}
-    	       	String keyName = attachment.returnKeyName();
     	    	
-    	    	//remove entry from map
-    	    	Map attachmentMap = nbForm.getAttachments();
-    	    	attachmentMap.remove(keyName);
-    	    	NbWebUtil.addUploadsToSession(request, attachmentMap);
-    	    	
-    	    	//remove entry from content repository
-    	    	try
-    	    	{
-    	    	    getToolContentHandler().deleteFile(uuid);
-    	    	}
-    	    	catch (RepositoryCheckedException e) {
-    	            logger.error("Unable to delete file",e);
-    	            throw new NbApplicationException("Unable to delete file, exception was "+e.getMessage());
-    	    	}		
-    	    	
-    	    	//remove entry from db
-    	    	nbService.removeAttachment(attachment);
+    	    	// move the file's details from the attachment collection to the deleted attachments collection
+    	    	// the attachment will be delete on saving.
+    		    NbAuthoringForm nbForm = (NbAuthoringForm)form;
+    			List attachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.ATTACHMENT_LIST);
+		    	List deletedAttachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST);
+    	    	deletedAttachmentList = moveToDelete(uuid, attachmentList, deletedAttachmentList );
     	    	
     	    	nbForm.setMethod(NoticeboardConstants.INSTRUCTIONS);
-    		   
+    		
     		   	return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
     		}
     		
-    		
-    		
+
     		/**
     		 * It is assumed that the contentId is passed as a http parameter
     		 * if the contentId is null, an exception is thrown, otherwise proceed as normal
@@ -520,48 +565,6 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     		    
     		} */
     		
-    		
-    		
-    		
-    		
-    		/**
-    		 * This method checks whether a file
-    		 * already exists in the database. If this file already exists, then the 
-    		 * type of file is checked, along with the associated toolContentId. 
-    		 * If both files are also of the same type, ie.
-    		 * both are offline files or both are online files and the tool content Id matches
-    		 * <code>toolContentId</code>, then this method will 
-    		 * return true, to indicate that the file already exists in the database. 
-    		 * Otherwise false is returned. 
-    		 * @param filename The filename of the attachment to check
-    		 * @param isOnlineFile A boolean to indicate whether it is an online File. 1 indicates an online file. The value 0 indicates an offline file.
-    		 * @return
-    		 */
-    		private boolean fileExists(Long toolContentId, NoticeboardAttachment fileFromDatabase, boolean isFileUploadedAnOnlineFile)
-    		{
-    		    
-    		   if (fileFromDatabase == null)
-    		   {
-    		       return false;
-    		   }
-    		   else
-    		   {
-    		       /**
-    		        * true && true = true <-- both files are both online files
-    		        * true && false = false <-- the files are different types
-    		        * false && true = false <-- the files are different types
-    		        * false && false = true <-- both files are offline files
-    		        */
-    		       if (fileFromDatabase.isOnlineFile() && isFileUploadedAnOnlineFile && fileFromDatabase.getNbContent().getNbContentId().equals(toolContentId))
-    		       {
-    		           return true;
-    		       }
-    		       else
-    		           return false;
-    		   }
-    		}
-    
-  
 
 }	
 	

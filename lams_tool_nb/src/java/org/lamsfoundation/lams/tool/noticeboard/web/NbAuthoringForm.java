@@ -30,23 +30,16 @@
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import java.util.Date;
-import java.util.Map;
-import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionMessage;
-
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.util.MessageResources;
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-
-
+import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.util.UploadFileUtil;
 
 
@@ -77,6 +70,8 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
 
 public class NbAuthoringForm extends ActionForm {
 	
+	private static final long serialVersionUID = -8425012664714570196L;
+
 	static Logger logger = Logger.getLogger(NbAuthoringForm.class.getName());
 
 	private String title;
@@ -90,26 +85,7 @@ public class NbAuthoringForm extends ActionForm {
 	
 	private FormFile onlineFile;
 	private FormFile offlineFile;
-	private Map attachments = new HashMap();
-	
-    
-	 /**
-     * @return Returns the attachments.
-     */
-    public Map getAttachments() {
-        if (attachments == null)
-        {
-            return new HashMap();
-        }
-        return attachments;
-    }
-    /**
-     * @param attachments The attachments to set.
-     */
-    public void setAttachments(Map attachments) {
-        this.attachments = attachments;
-    }
-	
+
 	/**
      * @return Returns the offlineFile.
      */
@@ -268,9 +244,6 @@ public class NbAuthoringForm extends ActionForm {
 	    //check the tool content id
 	    //check the title and instructions
 	    
-	    MessageResources resources =
-            (MessageResources) request.getAttribute(Globals.MESSAGES_KEY);
-	    
 	    float maxFileSize = UploadFileUtil.getMaxFileSize();
 	  
 	   if (this.offlineFile != null && offlineFile.getFileSize()!= 0) 
@@ -302,10 +275,5 @@ public class NbAuthoringForm extends ActionForm {
 	    
 	}
 	
-	private boolean isEmpty(String str) {
-		return str == null || str.trim().length() == 0 ;
-	}
-	
-
   
 }

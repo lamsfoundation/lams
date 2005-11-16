@@ -27,14 +27,15 @@
 package org.lamsfoundation.lams.tool.noticeboard.util;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 
 /**
  * This Web Utility class contains helper methods used in the Action Servlets
@@ -63,6 +64,7 @@ public class NbWebUtil {
 	 	{
 	 	    request.getSession().removeAttribute(NoticeboardConstants.TOOL_CONTENT_ID);
 	 	    request.getSession().removeAttribute(NoticeboardConstants.ATTACHMENT_LIST);
+	 	    request.getSession().removeAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST);
 	 	}
 	 	
 	 	public static void cleanLearnerSession(HttpServletRequest request)
@@ -79,6 +81,9 @@ public class NbWebUtil {
 	         request.getSession().removeAttribute(NoticeboardConstants.OFFLINE_INSTRUCTIONS);
 	         request.getSession().removeAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS);
 	         request.getSession().removeAttribute(NoticeboardConstants.ATTACHMENT_LIST);
+	         // deleted attachments probably isn't used in monitoring, but included 
+	         // here to keep it consistent with authoring.
+	 	     request.getSession().removeAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST);
 	      
 	     }
 	     
@@ -126,24 +131,63 @@ public class NbWebUtil {
 	    }
 	    
 	    /**
-	     * <p>This method takes in a Map as a parameter and converts it
-	     * into a Collections view of the values of this map. A new 
-	     * ArrayList is formed from this Collection of values and stored in
-	     * the session scope variable <code>attachmentList</code> (represented by NoticeboardConstants.ATTACHMENT_LIST) </p>
-	     * 
 	     * <p>This method is used in authoring and monitoring to display the list of files that have been uploaded.
-	     * They key for this map is the filename-fileType where fileType is either "online" or "offline"
-	     * and the value that maps to this key, is an NoticeboardAttachment object.</p>
+	     * Contents of the collections are NoticeboardAttachments. The current files are included in the attachmentList, 
+	     * files that the user has nominated to delete are in the deletedAttachementList.</p>
+	     * 
+	     * <p>If the input collections are null, then the session variables are not modified. This
+	     * is particularly useful for the deleted files.</p>
 	     * 
 	     * @param request the HttpServletRequest which is used to obtain the HttpSession
-	     * @param map
+	     * @param attachmentList
+	     * @param deletedAttachmentList
 	     */
-	    public static void addUploadsToSession(HttpServletRequest request, Map map)
+	    public static void addUploadsToSession(HttpServletRequest request, List attachmentList, List deletedAttachmentList)
 	    {
-	        Collection entries = map.values();
-	        List attachmentList = new ArrayList(entries);
-	        request.getSession().setAttribute(NoticeboardConstants.ATTACHMENT_LIST, attachmentList);
+	    	if ( attachmentList != null ) {
+		        request.getSession().setAttribute(NoticeboardConstants.ATTACHMENT_LIST, attachmentList);
+	    	}
+	        
+	        // deleted will be empty most of the time
+	        if ( deletedAttachmentList != null ) {
+	        	request.getSession().setAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST, deletedAttachmentList);
+	        }
+
 	    }
 	    
 	    
+		/** Setup the map containing the files that have been uploaded for this particular tool content id.
+		 * If NoticeboardContent content exists, set nb=null and an empty list will be created.
+		 *
+		 * @param nbService
+		 * @param attachmentMap
+		 * @param nb
+		 * @return the updated attachmentMap
+		 */
+	    public static List setupAttachmentList(INoticeboardService nbService, List attachmentList, NoticeboardContent nb) {
+
+			List updatedList = attachmentList != null ? attachmentList : new ArrayList();
+
+			if ( nbService!=null && nb!=null ) {
+				List attachmentIdList = nbService.getAttachmentIdsFromContent(nb);
+				for (int i=0; i<attachmentIdList.size(); i++)
+				{
+				    NoticeboardAttachment file = nbService.retrieveAttachment((Long)attachmentIdList.get(i));
+				    updatedList.add(file);
+				}
+				return updatedList;
+			} else {
+				return new ArrayList();
+			}
+		}
+
+		/** 
+		 * Setup an empty deleted attachment map
+		 * @return the new attachmentMap
+		 */
+	    public static List setupDeletedAttachmentList() {
+			return new ArrayList();
+		}
+
+
 }

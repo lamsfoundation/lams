@@ -26,14 +26,13 @@
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 
-import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
 
 /**
  * @author mtruong
@@ -53,7 +52,10 @@ import javax.servlet.http.HttpServletRequest;
  */ 
 public class NbMonitoringForm extends ActionForm {
 
-    static Logger logger = Logger.getLogger(NbMonitoringForm.class.getName());
+	private static final long serialVersionUID = 6958826482877304278L;
+
+
+	static Logger logger = Logger.getLogger(NbMonitoringForm.class.getName());
     
        
     private String toolContentID;
@@ -62,27 +64,6 @@ public class NbMonitoringForm extends ActionForm {
     
     private Map parametersToAppend;
     
-    private Map attachments = new HashMap();
-    
-
-    
-    /**
-     * @return Returns the attachments.
-     */
-    public Map getAttachments() {
-        if (attachments == null)
-        {
-            return new HashMap();
-        }
-        return attachments;
-        
-    }
-    /**
-     * @param attachments The attachments to set.
-     */
-    public void setAttachments(Map attachments) {
-        this.attachments = attachments;
-    }
     /**
      * @return Returns the parametersToAppend.
      */
@@ -124,7 +105,6 @@ public class NbMonitoringForm extends ActionForm {
 	{
 		this.method = null;
 		this.parametersToAppend = null;		
-		this.attachments = null;
 		
 	}
  

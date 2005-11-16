@@ -36,6 +36,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -49,7 +50,9 @@ import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 
 
@@ -110,8 +113,8 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 	  INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 	  ToolSessionManager sessionMgrService = NoticeboardServiceProxy.getNbSessionManager(getServlet().getServletContext());
 		  
-	 	  
-	  if (learnerForm.getMode().equals(NoticeboardConstants.TOOL_ACCESS_MODE_LEARNER))
+      ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,false);
+      if (mode == ToolAccessMode.LEARNER)
 	  {
 		  NoticeboardSession nbSession = nbService.retrieveNoticeboardSession(toolSessionID);
 		  NoticeboardUser nbUser = nbService.retrieveNoticeboardUser(userID);

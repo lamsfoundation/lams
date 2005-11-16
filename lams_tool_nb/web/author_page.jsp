@@ -15,11 +15,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title>Noticeboard tool</title>
+
+<script lang="javascript">
+var imgRoot="<c:out value="${lams}"/>images/";
+var themeName="aqua";
+</script>
 <script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>
 <script src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
+
 <!-- this is the custom CSS for hte tool -->
 <link href="<c:out value="${tool}"/>css/tool_custom.css" rel="stylesheet" type="text/css">
-<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
 <lams:css/>
 <script language="JavaScript" type="text/JavaScript">
 <!--

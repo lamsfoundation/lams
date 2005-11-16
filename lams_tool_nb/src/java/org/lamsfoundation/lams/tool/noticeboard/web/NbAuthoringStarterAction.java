@@ -27,35 +27,24 @@ package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
-//import org.apache.struts.action.Action;
-import org.lamsfoundation.lams.web.action.LamsAction;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.apache.struts.util.MessageResources;
+import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
-
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
-
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
-
-import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil; 
-
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.util.MessageResources;
-
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.web.action.LamsAction;
 
 
 /**
@@ -153,7 +142,7 @@ public class NbAuthoringStarterAction extends LamsAction {
 		 * Retrieve the Service
 		 */
 		INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
-		Map attachmentMap = nbForm.getAttachments();
+		List attachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.ATTACHMENT_LIST);
 		
 		if (!contentExists(nbService, contentId))
 		{
@@ -206,7 +195,7 @@ public class NbAuthoringStarterAction extends LamsAction {
 			     * So that users cannot start using the content while the staff member is editing the content */
 			    nbForm.populateFormWithNbContentValues(nb);
 			    nb = setTrueIfDefineLaterIsSet(nbForm, nb);
-			    nbService.updateNoticeboard(nb);
+			    nbService.saveNoticeboard(nb);
 			    
 			    /** TODO: setup values in the instructions map */
 			 
@@ -222,27 +211,15 @@ public class NbAuthoringStarterAction extends LamsAction {
 			    
 			}
 			
-			//Setup the map containing the files that have been uploaded for this particular tool content id
-						
-			List attachmentIdList = nbService.getAttachmentIdsFromContent(nb);
-			for (int i=0; i<attachmentIdList.size(); i++)
-			{
-			    NoticeboardAttachment file = nbService.retrieveAttachment((Long)attachmentIdList.get(i));
-			    String fileType = file.returnFileType();
-			    String keyName = file.getFilename() + "-" + fileType;
-			    attachmentMap.put(keyName, file);
-			}
-			nbForm.setAttachments(attachmentMap);
-			
-			
+			attachmentList = NbWebUtil.setupAttachmentList(nbService, attachmentList, nb);
 		
 		}
-		NbWebUtil.addUploadsToSession(request, attachmentMap);
+		NbWebUtil.addUploadsToSession(request, attachmentList, NbWebUtil.setupDeletedAttachmentList());
 		request.getSession().setAttribute(FORM, nbForm);
 	
 		return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
 	}
-	
+
 	/**
 	 * Checks the session to see if the title and content session variables exist or not.
 	 * 

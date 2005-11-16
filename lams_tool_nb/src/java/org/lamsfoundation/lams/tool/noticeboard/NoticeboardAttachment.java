@@ -25,7 +25,9 @@
 package org.lamsfoundation.lams.tool.noticeboard;
 
 import java.io.Serializable;
-import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 
 /**
@@ -40,7 +42,9 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
  */
 public class NoticeboardAttachment implements Serializable {
     
-    /** identifier field */
+	private static final long serialVersionUID = -3471513404550541296L;
+
+	/** identifier field */
     private Long attachmentId;
     
     /** persistent field. Cannot be null */
@@ -183,5 +187,29 @@ public class NoticeboardAttachment implements Serializable {
     public String returnKeyName()
     {
         return (getFilename() + "-" + returnFileType());
+    }
+    
+    /** Are two NoticeboardAttachments equal? Checks attachmentId, filename,
+     * uuid, version id and online/offline status. Does not check the related
+     * content object.
+     */
+    public boolean equals(Object other) {
+        if ( (this == other ) ) return true;
+        if ( !(other instanceof NoticeboardAttachment) ) return false;
+        NoticeboardAttachment castOther = (NoticeboardAttachment) other;
+        return new EqualsBuilder()
+            .append(this.getAttachmentId(), castOther.getAttachmentId())
+            .append(this.getFilename(), castOther.getFilename())
+            .append(this.getUuid(), castOther.getUuid())
+            .append(this.getVersionId(), castOther.getVersionId())
+            .append(this.isOnlineFile(), castOther.isOnlineFile())
+            .isEquals();
+    }
+
+    /** Generate the hashcode for the class. Based on the attachment id only. */
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(getAttachmentId())
+            .toHashCode();
     }
 }

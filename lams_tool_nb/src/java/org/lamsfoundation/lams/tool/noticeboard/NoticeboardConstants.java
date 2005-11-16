@@ -55,10 +55,6 @@ public class NoticeboardConstants
     public static final String DISPLAY_MESSAGE = "displayMessage";
     public static final String DISPLAY_LEARNER_CONTENT = "displayLearnerContent";
     
-    public static final String TOOL_ACCESS_MODE_LEARNER = "learner";
-    public static final String TOOL_ACCESS_MODE_AUTHOR = "author";
-    public static final String TOOL_ACCESS_MODE_TEACHER = "teacher";
-    
     public static final String MONITOR_PAGE = "monitorPage";
     
     // ------------------------------
@@ -87,19 +83,20 @@ public class NoticeboardConstants
     public static final String EXPORT_PORTFOLIO = "exportPortfolio";
     
     //used in authoring
-    public static final String TOOL_CONTENT_ID = "toolContentId";  //request + session variable
+    public static final String TOOL_CONTENT_ID = "toolContentID";  //request + session variable
     public static final String RICH_TEXT_TITLE = "richTextTitle";
     public static final String RICH_TEXT_CONTENT = "richTextContent";
     public static final String RICH_TEXT_ONLINE_INSTRN = "richTextOnlineInstructions";
     public static final String RICH_TEXT_OFFLINE_INSTRN = "richTextOfflineInstructions";
     
     public static final String ATTACHMENT_LIST = "attachmentList";
+    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
     
     public static final String READ_ONLY_MODE = "readOnlyMode";
    
     
-    public static final String USER_ID = "userId";
-    public static final String TOOL_SESSION_ID = "toolSessionId";
+    public static final String USER_ID = "userID";
+    public static final String TOOL_SESSION_ID = "toolSessionID";
     public static final String UUID = "uuid";
     
     // ---------------------------------------------------------------------------
@@ -137,5 +134,5 @@ public class NoticeboardConstants
     public static final String ERROR_NBAPPLICATION = "error.exception.NbApplication";
     public static final String ERROR_MANDATORY="error.mandatoryField";
     public static final String ERR_MISSING_PARAM = "error.missingParam";
-    
+    public static final String ERROR_FILE_UPLOAD_CONTENT_REPOSITORY = "error.contentrepository";   
 }
