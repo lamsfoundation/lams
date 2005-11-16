@@ -90,7 +90,13 @@ http://www.gnu.org/licenses/gpl.txt
 	<definition name=".individualReport" extends=".baseDef" >
 		<put name="title" value="Individual Report"/>
 		<put name="pageHeader" value = "Individual Report"/>
-		<put name="content" value="/IndividualReport.jsp" />	
+		<put name="content" value="/IndividualLearnerResults.jsp" />	
+	</definition>
+	
+	<definition name=".viewSummary" extends=".baseDef" >
+		<put name="title" value="View Summary"/>
+		<put name="pageHeader" value = "View Summary"/>
+		<put name="content" value="/ViewSummary.jsp" />	
 	</definition>
 	
 </tiles-definitions>

@@ -2105,6 +2105,8 @@ public class McAction extends DispatchAction implements McAppConstants
     	mcLearningForm.setQuestionIndex(null);
 		mcLearningForm.setOptionIndex(null);
 		mcLearningForm.setChecked(null);
+		mcLearningForm.setOptionValue(null);
+		
     	
     	if ((optionCheckBoxSelected != null) && optionCheckBoxSelected.equals("1"))
     	{
@@ -2128,6 +2130,14 @@ public class McAction extends DispatchAction implements McAppConstants
     		mcLearningForm.setOptionIndex(optionIndex);
     	}
     	
+    	String optionValue=request.getParameter("optionValue");
+    	logger.debug("parameter optionValue: " + optionValue);
+    	if (optionValue != null)
+    	{
+    		mcLearningForm.setOptionValue(optionValue);
+    	}
+    	
+    	
     	String checked=request.getParameter("checked");
     	logger.debug("parameter checked: " + checked);
     	if (checked != null)
@@ -2137,128 +2147,182 @@ public class McAction extends DispatchAction implements McAppConstants
     	}
 
     	
-    	if (mcLearningForm.getContinueOptions() != null)
+    	if (mcLearningForm.getContinueOptionsCombined() != null)
+    	{
+    		logger.debug("continue options combined requested.");
+    		
+    		/* process the answers */
+    		mcLearningForm.resetCommands();
+    		return (mapping.findForward(INDIVIDUAL_REPORT));
+    	}
+    	else if (mcLearningForm.getContinueOptions() != null)
 	 	{
-    		logger.debug("continue options requested.");
-    		String currentQuestionIndex=(String)request.getSession().getAttribute(CURRENT_QUESTION_INDEX);
-			logger.debug("currentQuestionIndex:" + currentQuestionIndex);
-    		
-			int newQuestionIndex=new Integer(currentQuestionIndex).intValue() + 1;
-    		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Integer(newQuestionIndex).toString());
-    		logger.debug("updated questionIndex:" + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
-    		
-    		Long toolContentID= (Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-    	    logger.debug("TOOL_CONTENT_ID: " + toolContentID);
-    	    
-    	    McContent mcContent=mcService.retrieveMc(toolContentID);
-    	    logger.debug("mcContent: " + mcContent);
-    	    
-    	    /*
-        	 * fetch question content from content
-        	 */
-    	    logger.debug("newQuestionIndex: " + newQuestionIndex);
-        	Iterator contentIterator=mcContent.getMcQueContents().iterator();
-        	boolean questionFound=false;
-        	while (contentIterator.hasNext())
-        	{
-        		McQueContent mcQueContent=(McQueContent)contentIterator.next();
-        		if (mcQueContent != null)
-        		{
-        			int displayOrder=mcQueContent.getDisplayOrder().intValue();
-        			logger.debug("displayOrder: " + displayOrder);
-        			
-            		/* prepare the next question's candidate answers for presentation*/ 
-            		if (newQuestionIndex == displayOrder)
-            		{
-            			logger.debug("get the next question... ");
-            			Long uid=mcQueContent.getUid();
-            			logger.debug("uid : " + uid);
-            			/* get the options for this question */
-            			List listMcOptions=mcService.findMcOptionsContentByQueId(uid);
-            			logger.debug("listMcOptions : " + listMcOptions);
-            			Map mapOptionsContent=McUtils.generateOptionsMap(listMcOptions);
-            			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
-            			logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-            			questionFound=true;
-            		}
-        		}
-        	}
-        	
-        	if (questionFound == false)
-        	{
-    			logger.debug("no more questions... ");
+    		logger.debug("requested continueOptions...");
+    		boolean continueOptions=continueOptions(request);
+    		if (continueOptions == true)
+    		{
+    			/* get the next question */
+    			mcLearningForm.resetCommands();
+    			return (mapping.findForward(LOAD_LEARNER));
+    		}
+    		else
+    		{
+    			/* no more questions */
+    			mcLearningForm.resetCommands();
     			return (mapping.findForward(INDIVIDUAL_REPORT));
-        	}
-        	else
-        	{
-        		logger.debug("go back to have more answers...");
-        		return (mapping.findForward(LOAD_LEARNER));
-        	}
+    		}
 	 	}
     	else if (mcLearningForm.getOptionCheckBoxSelected() != null)
     	{
-    		logger.debug("requested optionCheckBoxSelected...");
-    		logger.debug("questionIndex: " + mcLearningForm.getQuestionIndex());
-    		logger.debug("optionIndex: " + mcLearningForm.getOptionIndex());
-    		logger.debug("checked: " + mcLearningForm.getChecked());
+    		logger.debug("requested selectOptionsCheckBox...");
+    		selectOptionsCheckBox(request,mcLearningForm, questionIndex);
+    	}
+    	else if (mcLearningForm.getRedoQuestions() != null)
+    	{
+    		logger.debug("requested redoQuestions...");
+    		/* reset the checked options MAP */
+    		Map mapGeneralCheckedOptionsContent= new TreeMap(new McComparator());
+    		request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+    		mcLearningForm.resetCommands();
+    		return (mapping.findForward(LOAD_LEARNER));
+    	}
+    	else if (mcLearningForm.getViewSummary() != null)
+    	{
+    		logger.debug("requested view summary...");
+    		mcLearningForm.resetCommands();
+    		return (mapping.findForward(VIEW_SUMMARY));
+    	}
+
+    	mcLearningForm.resetCommands();	
+ 		return (mapping.findForward(LOAD_LEARNER));
+   }
+
+    
+    /**
+     * updates the Map based on learner activity
+     * selectOptionsCheckBox(HttpServletRequest request,McLearningForm mcLearningForm, String questionIndex)
+     * 
+     * @param request
+     * @param form
+     */
+    protected void selectOptionsCheckBox(HttpServletRequest request,McLearningForm mcLearningForm, String questionIndex)
+    {
+    	logger.debug("requested optionCheckBoxSelected...");
+    	logger.debug("questionIndex: " + mcLearningForm.getQuestionIndex());
+    	logger.debug("optionIndex: " + mcLearningForm.getOptionIndex());
+    	logger.debug("optionValue: " + mcLearningForm.getOptionValue());
+    	logger.debug("checked: " + mcLearningForm.getChecked());
+    	
+    	Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+    	logger.debug("mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+    	
+    	if (mapGeneralCheckedOptionsContent.size() == 0)
+    	{
+    		logger.debug("mapGeneralCheckedOptionsContent size is 0");
+    		Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
     		
-    		Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
-    		logger.debug("mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+    		if (mcLearningForm.getChecked().equals("true"))
+    			mapLeanerCheckedOptionsContent.put(mcLearningForm.getOptionIndex(), mcLearningForm.getOptionValue());
+    		else
+    			mapLeanerCheckedOptionsContent.remove(mcLearningForm.getOptionIndex());
     		
-    		if (mapGeneralCheckedOptionsContent.size() == 0)
+    		mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapLeanerCheckedOptionsContent);
+    		request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
+    	}
+    	else
+    	{
+    		Map mapCurrentOptions=(Map) mapGeneralCheckedOptionsContent.get(questionIndex);
+    		
+    		logger.debug("mapCurrentOptions: " + mapCurrentOptions);
+    		if (mapCurrentOptions != null)
     		{
-    			logger.debug("mapGeneralCheckedOptionsContent size is 0");
-    			Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
-    			
     			if (mcLearningForm.getChecked().equals("true"))
-    				mapLeanerCheckedOptionsContent.put(mcLearningForm.getOptionIndex(), "CHECKED");
+    				mapCurrentOptions.put(mcLearningForm.getOptionIndex(), mcLearningForm.getOptionValue());
     			else
-    				mapLeanerCheckedOptionsContent.remove(mcLearningForm.getOptionIndex());
+    				mapCurrentOptions.remove(mcLearningForm.getOptionIndex());
+    			
+    			logger.debug("updated mapCurrentOptions: " + mapCurrentOptions);
+    			
+    			mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapCurrentOptions);
+    			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);	
+    		}
+    		else
+    		{
+    			logger.debug("no options for this questions has been selected yet");
+    			Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
+    			        			
+    			if (mcLearningForm.getChecked().equals("true"))
+    				mapLeanerCheckedOptionsContent.put(mcLearningForm.getOptionIndex(), mcLearningForm.getOptionValue());
+    			else
+    				mapLeanerCheckedOptionsContent.remove(mcLearningForm.getOptionIndex());        			
     			
     			mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapLeanerCheckedOptionsContent);
     			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
     		}
-    		else
-    		{
-    			Map mapCurrentOptions=(Map) mapGeneralCheckedOptionsContent.get(questionIndex);
-    			
-    			logger.debug("mapCurrentOptions: " + mapCurrentOptions);
-    			if (mapCurrentOptions != null)
-    			{
-        			if (mcLearningForm.getChecked().equals("true"))
-        				mapCurrentOptions.put(mcLearningForm.getOptionIndex(), "CHECKED");
-        			else
-        				mapCurrentOptions.remove(mcLearningForm.getOptionIndex());
-    				
-        			logger.debug("updated mapCurrentOptions: " + mapCurrentOptions);
-        			
-        			mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapCurrentOptions);
-        			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);	
-    			}
-    			else
-    			{
-    				logger.debug("no options for this questions has been selected yet");
-        			Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
-        			        			
-        			if (mcLearningForm.getChecked().equals("true"))
-        				mapLeanerCheckedOptionsContent.put(mcLearningForm.getOptionIndex(), "CHECKED");
-        			else
-        				mapLeanerCheckedOptionsContent.remove(mcLearningForm.getOptionIndex());        			
-        			
-        			mapGeneralCheckedOptionsContent.put(mcLearningForm.getQuestionIndex(),mapLeanerCheckedOptionsContent);
-        			request.getSession().setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
-    			}
-    		}
-    		
-    		mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
-    		logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
-    		
-    		
     	}
     	
- 		return (mapping.findForward(LOAD_LEARNER));
-  }
-
+    	mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+    	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+    }
+    
+    
+    /**
+     * continueOptions(HttpServletRequest request)
+     * 
+     * @param request
+     * @return boolean
+     */
+    protected boolean continueOptions(HttpServletRequest request)
+    {
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+    	logger.debug("continue options requested.");
+    	String currentQuestionIndex=(String)request.getSession().getAttribute(CURRENT_QUESTION_INDEX);
+    	logger.debug("currentQuestionIndex:" + currentQuestionIndex);
+    	
+    	int newQuestionIndex=new Integer(currentQuestionIndex).intValue() + 1;
+    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Integer(newQuestionIndex).toString());
+    	logger.debug("updated questionIndex:" + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+    	
+    	Long toolContentID= (Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+        logger.debug("TOOL_CONTENT_ID: " + toolContentID);
+        
+        McContent mcContent=mcService.retrieveMc(toolContentID);
+        logger.debug("mcContent: " + mcContent);
+        
+        /*
+    	 * fetch question content from content
+    	 */
+        logger.debug("newQuestionIndex: " + newQuestionIndex);
+    	Iterator contentIterator=mcContent.getMcQueContents().iterator();
+    	boolean questionFound=false;
+    	while (contentIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)contentIterator.next();
+    		if (mcQueContent != null)
+    		{
+    			int displayOrder=mcQueContent.getDisplayOrder().intValue();
+    			logger.debug("displayOrder: " + displayOrder);
+    			
+        		/* prepare the next question's candidate answers for presentation*/ 
+        		if (newQuestionIndex == displayOrder)
+        		{
+        			logger.debug("get the next question... ");
+        			Long uid=mcQueContent.getUid();
+        			logger.debug("uid : " + uid);
+        			/* get the options for this question */
+        			List listMcOptions=mcService.findMcOptionsContentByQueId(uid);
+        			logger.debug("listMcOptions : " + listMcOptions);
+        			Map mapOptionsContent=McUtils.generateOptionsMap(listMcOptions);
+        			request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+        			logger.debug("updated Options Map: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+        			questionFound=true;
+        		}
+    		}
+    	}
+    	logger.debug("questionFound: " + questionFound);
+		return questionFound;
+    }
 
 }
     

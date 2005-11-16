@@ -5,7 +5,7 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 
 	<!--options content goes here-->
-				<table align=center>
+				<table align=center bgcolor="#FFFFFF">
 					  <tr>
 					  	<td align=left class="input" valign=top bgColor="#333366" colspan=2> 
 						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> </font>
@@ -42,7 +42,7 @@
 					<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 					<c:set var="mainQueIndex" scope="session" value="${mainQueIndex +1}"/>
 						  <tr>
-						  	<td align=left class="input" valign=top bgColor="#669999" colspan=2> 
+						  	<td align=left class="input" valign=top bgColor="#999966" colspan=2> 
 							  	<font color="#FFFFFF"> 
 							  		<c:out value="${questionEntry.value}"/> 
 							  	</font> 
@@ -75,6 +75,8 @@
 																			onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
 																			document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
 																			document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
+																			document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';
+																			
 																			if (this.checked == 1)
 																			{
 																				document.forms[0].checked.value=true;
@@ -86,7 +88,7 @@
 																			document.forms[0].submit();" CHECKED> 
 																		</td> 
 																		<td align=left class="input" valign=top> 
-																			<c:out value="${subEntry.value}"/>
+																			<font color="#CCCC99"> 	<c:out value="${subEntry.value}"/> </font>
 																		</td>
 																	</tr>	
 												  		  	 		<c:set var="checkedOptionFound" scope="request" value="1"/>
@@ -105,6 +107,8 @@
 																			onclick="javascript:document.forms[0].optionCheckBoxSelected.value=1; 
 																			document.forms[0].questionIndex.value=<c:out value="${sessionScope.queIndex}"/>; 
 																			document.forms[0].optionIndex.value=<c:out value="${subEntry.key}"/>;
+																			document.forms[0].optionValue.value='<c:out value="${subEntry.value}"/>';																			
+
 																			if (this.checked == 1)
 																			{
 																				document.forms[0].checked.value=true;
@@ -116,7 +120,7 @@
 																			document.forms[0].submit();"> 
 																		</td> 
 																		<td align=left class="input" valign=top> 
-																			<c:out value="${subEntry.value}"/>
+																			<font color="#CCCC99"> <c:out value="${subEntry.value}"/> </font>
 																		</td>
 																	</tr>	
   												</c:if> 			
@@ -133,6 +137,7 @@
 				  	   	<html:hidden property="optionCheckBoxSelected"/>
 						<html:hidden property="questionIndex"/>
 						<html:hidden property="optionIndex"/>
+						<html:hidden property="optionValue"/>						
 						<html:hidden property="checked"/>
 				 		<td colspan=2 class="input" valign=top> 
 				 		&nbsp
@@ -141,7 +146,7 @@
 			  	   
 	  	   		  <tr>
 				  	<td colspan=2 align=right class="input" valign=top> 
-			  			<html:submit property="continueOptions" styleClass="a.button">
+			  			<html:submit property="continueOptionsCombined" styleClass="a.button">
 							<bean:message key="button.continue"/>
 						</html:submit>	 				 		  					
 				  	 </td>

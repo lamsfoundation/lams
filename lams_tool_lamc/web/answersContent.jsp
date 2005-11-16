@@ -20,7 +20,7 @@ String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()
 <html:html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>Tool</title>
+<title></title>
 </head>
 <body>
 
