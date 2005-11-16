@@ -73,7 +73,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lafrum11/images/icon_forum.gif'
+, 'tool/lafrum11/images/icon_forum.swf'
 , NULL
 , NULL
 , NULL
