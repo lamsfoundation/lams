@@ -75,13 +75,13 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private IRepositoryService repositoryService;
 	
 
-    public Forum editForum(Forum forum) throws PersistenceException {
+    public Forum updateForum(Forum forum) throws PersistenceException {
         forumDao.saveOrUpdate(forum);
         return forum;
     }
 
-    public Forum getForum(Long forumId) throws PersistenceException {
-        return (Forum) forumDao.getById(forumId);
+    public Forum getForum(Long forumUid) throws PersistenceException {
+        return (Forum) forumDao.getById(forumUid);
     }
 
 	public Forum getForumByContentId(Long contentID)  throws PersistenceException {
@@ -91,15 +91,10 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 		return forum; 
 	}
-    public void deleteForum(Long forumId) throws PersistenceException {
-        Forum forum = this.getForum(forumId);
-        forumDao.delete(forum);
-    }
 
     public void deleteForumAttachment(Long attachmentId) throws PersistenceException {
         Attachment attachment = (Attachment) attachmentDao.getById(attachmentId);
         attachmentDao.delete(attachment);
-
     }
 
     public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException {
@@ -192,60 +187,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         return replyMessage;
     }
 
-	public AttachmentDao getAttachmentDao() {
-		return attachmentDao;
-	}
-
-	public void setAttachmentDao(AttachmentDao attachmentDao) {
-		this.attachmentDao = attachmentDao;
-	}
-
-	public ForumDao getForumDao() {
-		return forumDao;
-	}
-
-	public void setForumDao(ForumDao forumDao) {
-		this.forumDao = forumDao;
-	}
-
-	public MessageDao getMessageDao() {
-		return messageDao;
-	}
-
-	public void setMessageDao(MessageDao messageDao) {
-		this.messageDao = messageDao;
-	}
-
-	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-	}
-
-	public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException {
-	}
-
-	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException {
-	}
-
-	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException {
-	}
-
-	public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException {
-	}
-
-	public String leaveToolSession(Long toolSessionId, User learner) throws DataMissingException, ToolException {
-		return null;
-	}
-
-	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-		return null;
-	}
-
-	public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException {
-		return null;
-	}
-
-	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-	}
-
 	public Attachment uploadInstructionFile(FormFile uploadFile, String fileType) throws PersistenceException{
 		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
 			throw new ForumException("Could not find upload file: " + uploadFile);
@@ -263,35 +204,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		return file;
 
 	}
-    /**
-     * Process an uploaded file.
-     * 
-     * @param forumForm
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
-     */
-    private NodeKey processFile(FormFile file, String fileType){
-    	NodeKey node = null;
-        if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
-            String fileName = file.getFileName();
-            try {
-				node = getToolContentHandler().uploadFile(file.getInputStream(), fileName, 
-				        file.getContentType(), fileType);
-			} catch (InvalidParameterException e) {
-				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			} catch (FileNotFoundException e) {
-				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			} catch (RepositoryCheckedException e) {
-				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			} catch (IOException e) {
-				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			}
-          }
-        return node;
-    }
-
+ 
 	/**
 	 * This method deletes the content with the given <code>uuid</code> and
 	 * <code>versionID</code> from the content repository
@@ -314,54 +227,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 	}
 
-	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type){
-		forumDao.deleteInstrcutionFile(contentID, uuid, versionID, type);
-	}
-
-	public ForumToolContentHandler getToolContentHandler() {
-		return toolContentHandler;
-	}
-
-	public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
-	}
-	/**
-	 * This method verifies the credentials of the SubmitFiles Tool and gives it
-	 * the <code>Ticket</code> to login and access the Content Repository.
-	 * 
-	 * A valid ticket is needed in order to access the content from the
-	 * repository. This method would be called evertime the tool needs to
-	 * upload/download files from the content repository.
-	 * 
-	 * @return ITicket The ticket for repostory access
-	 * @throws SubmitFilesException
-	 */
-	private ITicket getRepositoryLoginTicket() throws ForumException {
-		ICredentials credentials = new SimpleCredentials(
-				toolContentHandler.getRepositoryUser(),
-				toolContentHandler.getRepositoryId());
-		try {
-			ITicket ticket = repositoryService.login(credentials,
-					toolContentHandler.getRepositoryWorkspaceName());
-			return ticket;
-		} catch (AccessDeniedException ae) {
-			throw new ForumException("Access Denied to repository."
-					+ ae.getMessage());
-		} catch (WorkspaceNotFoundException we) {
-			throw new ForumException("Workspace not found."
-					+ we.getMessage());
-		} catch (LoginException e) {
-			throw new ForumException("Login failed." + e.getMessage());
-		}
-	}
-
-	public IRepositoryService getRepositoryService() {
-		return repositoryService;
-	}
-
-	public void setRepositoryService(IRepositoryService repositoryService) {
-		this.repositoryService = repositoryService;
-	}
 
 	public Attachment uploadAttachment(FormFile uploadFile) throws PersistenceException {
 		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
@@ -415,9 +280,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		return 	MessageDTO.getMessageDTO(new ArrayList(map.values()));
 		
 	}
-	public Forum createForum(Long contentId) throws PersistenceException {
-		return null;
-	}
 
 	public ForumUser getUserByUserId(Long userId) {
 		List list =  forumUserDao.getUserByUserId(userId);
@@ -430,52 +292,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void createUser(ForumUser forumUser) {
 		forumUserDao.save(forumUser);
 	}
-
-	public ForumUserDao getForumUserDao() {
-		return forumUserDao;
-	}
-
-	public void setForumUserDao(ForumUserDao forumUserDao) {
-		this.forumUserDao = forumUserDao;
-	}
-
 	public ForumToolSession getSessionBySessionId(Long sessionId) {
 		return forumToolSessionDao.getBySessionId(sessionId);
-	}
-	
-	/**
-	 * @param map
-	 * @return
-	 */
-	private List getSortedMessageDTO(SortedMap map) {
-		Iterator iter;
-		MessageSeq msgSeq;
-		List msgDtoList = new ArrayList();
-		iter =map.entrySet().iterator();
-		while(iter.hasNext()){
-			Map.Entry entry = (Entry) iter.next();
-			msgSeq = (MessageSeq) entry.getKey();
-			MessageDTO dto = MessageDTO.getMessageDTO((Message) entry.getValue());
-			dto.setLevel(msgSeq.getMessageLevel());
-			msgDtoList.add(dto);
-		}
-		return msgDtoList;
-	}
-
-	public MessageSeqDao getMessageSeqDao() {
-		return messageSeqDao;
-	}
-
-	public void setMessageSeqDao(MessageSeqDao messageSeqDao) {
-		this.messageSeqDao = messageSeqDao;
-	}
-
-	public ForumToolSessionDao getForumToolSessionDao() {
-		return forumToolSessionDao;
-	}
-
-	public void setForumToolSessionDao(ForumToolSessionDao forumToolSessionDao) {
-		this.forumToolSessionDao = forumToolSessionDao;
 	}
 
 	public Long getRootTopicId(Long topicId) {
@@ -495,9 +313,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void updateSession(ForumToolSession session) {
 		forumToolSessionDao.saveOrUpdate(session);
 	}
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getToolDefaultContentIdBySignature(java.lang.Long)
-     */
+
     public Long getToolDefaultContentIdBySignature(String toolSignature)
     {
         Long contentId = null;
@@ -527,6 +343,123 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     	return forum;
 
     }
+	
+
+    //***************************************************************************************************************
+    // ToolContentManager and ToolSessionManager methods
+    //***************************************************************************************************************
+	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
+	}
+
+	public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	}
+
+	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException {
+	}
+
+	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException {
+	}
+
+	public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException {
+	}
+
+	public String leaveToolSession(Long toolSessionId, User learner) throws DataMissingException, ToolException {
+		return null;
+	}
+
+	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+		return null;
+	}
+
+	public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException {
+		return null;
+	}
+
+	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+	}
+
+    //***************************************************************************************************************
+    // Private methods
+    //***************************************************************************************************************
+	/**
+	 * @param map
+	 * @return
+	 */
+	private List getSortedMessageDTO(SortedMap map) {
+		Iterator iter;
+		MessageSeq msgSeq;
+		List msgDtoList = new ArrayList();
+		iter =map.entrySet().iterator();
+		while(iter.hasNext()){
+			Map.Entry entry = (Entry) iter.next();
+			msgSeq = (MessageSeq) entry.getKey();
+			MessageDTO dto = MessageDTO.getMessageDTO((Message) entry.getValue());
+			dto.setLevel(msgSeq.getMessageLevel());
+			msgDtoList.add(dto);
+		}
+		return msgDtoList;
+	}
+	   /**
+     * Process an uploaded file.
+     * 
+     * @param forumForm
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
+     */
+    private NodeKey processFile(FormFile file, String fileType){
+    	NodeKey node = null;
+        if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
+            String fileName = file.getFileName();
+            try {
+				node = getToolContentHandler().uploadFile(file.getInputStream(), fileName, 
+				        file.getContentType(), fileType);
+			} catch (InvalidParameterException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (FileNotFoundException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (RepositoryCheckedException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			} catch (IOException e) {
+				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
+			}
+          }
+        return node;
+    }
+	/**
+	 * This method verifies the credentials of the SubmitFiles Tool and gives it
+	 * the <code>Ticket</code> to login and access the Content Repository.
+	 * 
+	 * A valid ticket is needed in order to access the content from the
+	 * repository. This method would be called evertime the tool needs to
+	 * upload/download files from the content repository.
+	 * 
+	 * @return ITicket The ticket for repostory access
+	 * @throws SubmitFilesException
+	 */
+	private ITicket getRepositoryLoginTicket() throws ForumException {
+		ICredentials credentials = new SimpleCredentials(
+				toolContentHandler.getRepositoryUser(),
+				toolContentHandler.getRepositoryId());
+		try {
+			ITicket ticket = repositoryService.login(credentials,
+					toolContentHandler.getRepositoryWorkspaceName());
+			return ticket;
+		} catch (AccessDeniedException ae) {
+			throw new ForumException("Access Denied to repository."
+					+ ae.getMessage());
+		} catch (WorkspaceNotFoundException we) {
+			throw new ForumException("Workspace not found."
+					+ we.getMessage());
+		} catch (LoginException e) {
+			throw new ForumException("Login failed." + e.getMessage());
+		}
+	}
+
+    //***************************************************************************************************************
+    // Get / Set methods
+    //***************************************************************************************************************
 	public ILamsToolService getToolService() {
 		return toolService;
 	}
@@ -534,4 +467,69 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setToolService(ILamsToolService toolService) {
 		this.toolService = toolService;
 	}
+	
+	public AttachmentDao getAttachmentDao() {
+		return attachmentDao;
+	}
+
+	public void setAttachmentDao(AttachmentDao attachmentDao) {
+		this.attachmentDao = attachmentDao;
+	}
+
+	public ForumDao getForumDao() {
+		return forumDao;
+	}
+
+	public void setForumDao(ForumDao forumDao) {
+		this.forumDao = forumDao;
+	}
+
+	public MessageDao getMessageDao() {
+		return messageDao;
+	}
+
+	public void setMessageDao(MessageDao messageDao) {
+		this.messageDao = messageDao;
+	}
+
+
+	public MessageSeqDao getMessageSeqDao() {
+		return messageSeqDao;
+	}
+
+	public void setMessageSeqDao(MessageSeqDao messageSeqDao) {
+		this.messageSeqDao = messageSeqDao;
+	}
+
+	public ForumToolSessionDao getForumToolSessionDao() {
+		return forumToolSessionDao;
+	}
+
+	public void setForumToolSessionDao(ForumToolSessionDao forumToolSessionDao) {
+		this.forumToolSessionDao = forumToolSessionDao;
+	}
+
+	public ForumUserDao getForumUserDao() {
+		return forumUserDao;
+	}
+
+	public void setForumUserDao(ForumUserDao forumUserDao) {
+		this.forumUserDao = forumUserDao;
+	}
+
+	public IRepositoryService getRepositoryService() {
+		return repositoryService;
+	}
+
+	public void setRepositoryService(IRepositoryService repositoryService) {
+		this.repositoryService = repositoryService;
+	}
+	public ForumToolContentHandler getToolContentHandler() {
+		return toolContentHandler;
+	}
+
+	public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
+		this.toolContentHandler = toolContentHandler;
+	}
+
 }

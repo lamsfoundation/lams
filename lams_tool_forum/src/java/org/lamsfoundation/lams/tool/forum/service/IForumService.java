@@ -11,31 +11,98 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 
 /**
- * Created by IntelliJ IDEA.
  * User: conradb
  * Date: 8/06/2005
  * Time: 14:49:59
- * To change this template use File | Settings | File Templates.
  */
 public interface IForumService {
-
-    public Forum editForum(Forum forum) throws PersistenceException;
-    public Forum getForum(Long forumId) throws PersistenceException;
-    public Forum getForumByContentId(Long contentID) throws PersistenceException;
-    
-    public void deleteForum(Long forumId) throws PersistenceException;
-    public void deleteForumAttachment(Long attachmentId) throws PersistenceException;
-    public Forum createForum(Long contentId) throws PersistenceException;
-    
-    public Attachment uploadInstructionFile(FormFile file, String type) throws PersistenceException;
-
-    public Message getMessage(Long messageUid) throws PersistenceException;
-    
-    public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException ;
-    public Message updateTopic(Message message) throws PersistenceException;
-    public Message replyTopic(Long parentId, Message message) throws PersistenceException;
-    public void deleteTopic(Long messageId) throws PersistenceException;
+	//************************************************************************************
+	// Forum Method
+	//************************************************************************************
 	/**
+	 * Get default content ID by tool signature.
+	 * @param toolSignature
+	 * @return
+	 */
+    public Long getToolDefaultContentIdBySignature(String toolSignature);
+    /**
+     * Get a default instance of Forum by signature of tool.
+     * @return
+     */
+    public Forum getDefaultForum();
+    
+	/**
+	 * Update forum by given <code>Forum</code>. If forum does not exist, the create a new forum.
+	 * @param forum
+	 * @return
+	 * @throws PersistenceException
+	 */
+    public Forum updateForum(Forum forum) throws PersistenceException;
+    /**
+     * Upload instruction file
+     * @param file
+     * @param type
+     * @return
+     * @throws PersistenceException
+     */
+    public Attachment uploadInstructionFile(FormFile file, String type) throws PersistenceException;
+    /**
+     * Get forum by forum UID 
+     * @param forumUid
+     * @return
+     * @throws PersistenceException
+     */
+    public Forum getForum(Long forumUid) throws PersistenceException;
+    /**
+     * Get forum by forum ID(not record UID)
+     * @param contentID
+     * @return
+     * @throws PersistenceException
+     */
+    public Forum getForumByContentId(Long contentID) throws PersistenceException;
+
+    /**
+     * Delete authoring page instruction files.
+     * @param attachmentId
+     * @throws PersistenceException
+     */
+    public void deleteForumAttachment(Long attachmentId) throws PersistenceException;
+	//************************************************************************************
+	//Topic Method
+	//************************************************************************************
+    /**
+     * Create a root topic.
+     * @param forumId
+     * @param sessionId
+     * @param message
+     * @return
+     * @throws PersistenceException
+     */
+    public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException ;
+    /**
+     * Update a topic by give <code>Message</code> instance.
+     * @param message
+     * @return
+     * @throws PersistenceException
+     */
+    public Message updateTopic(Message message) throws PersistenceException;
+    /**
+     * Reply a topic.
+     * @param parentId
+     * @param message
+     * @return
+     * @throws PersistenceException
+     */
+    public Message replyTopic(Long parentId, Message message) throws PersistenceException;
+
+    /**
+     * Delete the topic by given topic ID. The function will delete all children topics under this topic.
+     * @param topicId
+     * @throws PersistenceException
+     */
+    public void deleteTopic(Long topicId) throws PersistenceException;
+	/**
+	 * Upload message attachment file into repository.
 	 * This method only upload the given file into system repository. It does not execute any database operation.
 	 * 
 	 * @param file
@@ -44,11 +111,20 @@ public interface IForumService {
 	 * @throws PersistenceException
 	 */
 	public Attachment uploadAttachment(FormFile file) throws PersistenceException;
-	public void deleteInstructionFile(Long contentID, Long uuID, Long versionID, String type) throws PersistenceException;
+
+	/**
+	 * Delete  file from repository.
+	 * @param uuID
+	 * @param versionID
+	 * @throws PersistenceException
+	 */
 	public void deleteFromRepository(Long uuID, Long versionID) throws PersistenceException;
 	
+	//************************************************************************************
+	//*********************Get topic methods **********************
+	//************************************************************************************
 	/** 
-	 * Get topics list by given root topic ID.  
+	 * Get topic and its children list by given root topic ID.  
 	 *  
 	 * @param rootTopicId
 	 * @return
@@ -59,35 +135,59 @@ public interface IForumService {
 	 * Get root topics by a given sessionID value. Simultanousely, it gets back topics, which author 
 	 * posted in authoring page for this forum, which is related with the given sessionID value.
 	 * 
+	 * This method will used by  user to display initial topic page for a forum. 
 	 * @param sessionId
 	 * @return
 	 * 		List of MessageDTO
 	 */
 	public List getRootTopics(Long sessionId);
 	/**
+	 * Get topics posted by author role.
 	 * @return
 	 * 		List of MessageDTO
 	 */
 	public List getAuthoredTopics(Long forumId);
-	
-	public ForumUser getUserByUserId(Long userId);
-	public void createUser(ForumUser forumUser);
-	public ForumToolSession getSessionBySessionId(Long sessionId);
 	/**
 	 * This method will look up root topic ID by any level topicID.
 	 * @param topicId
 	 * @return
 	 */
 	public Long getRootTopicId(Long topicId);
-	public void updateSession(ForumToolSession session);
-	
+    /**
+     * Get message by given message UID
+     * @param messageUid
+     * @return
+     * @throws PersistenceException
+     */
+    public Message getMessage(Long messageUid) throws PersistenceException;
+    
+	//************************************************************************************
+	// Session Method
+	//************************************************************************************
 	/**
-	 * Get default content ID by tool signature.
-	 * @param toolSignature
+	 * Get Forum tool session by Session ID (not record UID).
+	 * @param sessionId
 	 * @return
 	 */
-    public Long getToolDefaultContentIdBySignature(String toolSignature);
-    
-    public Forum getDefaultForum();
+	public ForumToolSession getSessionBySessionId(Long sessionId);
+	/**
+	 * Update Forum Tool Session record in database. 
+	 * @param session
+	 */
+	public void updateSession(ForumToolSession session);
 
+	//************************************************************************************
+	// User  Method
+	//************************************************************************************
+    /**
+     * Create a new user in database.
+     * @param forumUser
+     */
+    public void createUser(ForumUser forumUser);
+    /**
+     * Get user by user ID (not record UID).
+     * @param userId
+     * @return
+     */
+    public ForumUser getUserByUserId(Long userId);
 }

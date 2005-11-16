@@ -239,9 +239,8 @@ public class AuthoringAction extends Action {
 				forumPO = forum;
 				forumPO.setContentId(forumForm.getToolContentID());
 			}
-			forum = forumService.editForum(forumPO);
+			forum = forumService.updateForum(forumPO);
 			
-			//Handle message
 			//delete message attachment
 			List topicDeleteAttachmentList = getTopicDeletedAttachmentList(request);
 			Iterator iter = topicDeleteAttachmentList.iterator();
@@ -252,7 +251,7 @@ public class AuthoringAction extends Action {
 			}
 			topicDeleteAttachmentList.clear();
 			
-			//handle topic
+			//Handle message
 			List topics = getTopicList(request);
 	    	iter = topics.iterator();
 	    	while(iter.hasNext()){
@@ -270,7 +269,7 @@ public class AuthoringAction extends Action {
 	    	}
 	    	delTopics.clear();
 
-			//re initialize attachmentList
+			//initialize attachmentList again
 			List attachmentList = getAttachmentList(request);
 			attachmentList.addAll(forum.getAttachments());
 		} catch (Exception e) {
@@ -767,25 +766,6 @@ public class AuthoringAction extends Action {
 	//******************************************************************************************************************
 	//              Private method for internal functions
 	//******************************************************************************************************************
-	/*
-	 * The private method to get content from ActionForm parameters (web page).
-	 * @param form
-	 * @return
-	 */
-//	private Forum getContent(ActionForm form) {
-//		ForumForm authForm = (ForumForm) form;
-//		Forum forum = authForm.getForum();
-//		
-//		Forum content = new Forum();
-//		try {
-//			PropertyUtils.copyProperties(content,forum);
-//		} catch (Exception e) {
-//			log.error(e);
-//		}
-//		content.setContentId(authForm.getToolContentID());
-//		return content;
-//	}
-
   	private IForumService getForumManager() {
   	    if ( forumService == null ) {
   	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
