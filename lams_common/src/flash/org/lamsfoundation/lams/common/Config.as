@@ -48,6 +48,10 @@ class Config {
 	//passed in from the query string:
     private var _serverUrl:String;
     private var _userID:Number;
+	//where are we? 1=authoring, 2=monitor
+	private var _mode:Number;
+
+
     
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -184,6 +188,7 @@ class Config {
 		
         _serverUrl = _root.serverURL;
 		_userID = _root.userID;
+		_mode = _root.mode;
 		//TODO 31/05/05 Deal with alternative sources other than cookie or server. i.e. Browser + _root (query string)
 		Debugger.log('Confirming ServerURL passed in - _serverUrl:' + _serverUrl,Debugger.GEN,'serverDefaultsLoaded','Config');
         
@@ -294,5 +299,22 @@ class Config {
 	
 	function get userID():Number{
 		return _userID;
+	}
+		/**
+	 * 
+	 * @usage   
+	 * @param   newmode 
+	 * @return  
+	 */
+	public function set mode (newmode:Number):Void {
+		_mode = newmode;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get mode ():Number {
+		return _mode;
 	}
 }
