@@ -69,7 +69,9 @@ public interface IMcOptionsContentDAO
 	 * @param mcQueContentId
 	 * @return List
 	 */
-	public List getPersistedSelectedOptions(Long mcQueContentId); 
+	public List getPersistedSelectedOptions(Long mcQueContentId);
+	
+	public List getCorrectOption(Long mcQueContentId);
 	
 	/**
 	 *  <p>saves McOptsContent </p>

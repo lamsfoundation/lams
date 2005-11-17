@@ -333,7 +333,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    Map mapLeanerCheckedOptionsContent= new TreeMap(new McComparator());
 	    request.getSession().setAttribute(MAP_LEARNER_CHECKED_OPTIONS_CONTENT, mapLeanerCheckedOptionsContent);
 	    
-	    
+	    Map mapLeanerAssessmentResults= new TreeMap(new McComparator());
+	    request.getSession().setAttribute(MAP_LEARNER_ASSESSMENT_RESULTS, mapLeanerAssessmentResults);
 	    
 	    /* .. till here */
 	}

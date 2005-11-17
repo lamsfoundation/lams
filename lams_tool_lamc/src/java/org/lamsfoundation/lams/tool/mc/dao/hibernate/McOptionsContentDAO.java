@@ -45,6 +45,8 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	 	
 	 	private static final String LOAD_PERSISTED_SELECTED_OPTIONS = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid and  mcOptsContent.correctOption = 1";
 	 	
+	 	private static final String LOAD_CORRECT_OPTION = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid and  mcOptsContent.correctOption = 1";
+	 	
 	 	public McOptsContent getMcOptionsContentByUID(Long uid)
 		{
 			 return (McOptsContent) this.getHibernateTemplate()
@@ -85,6 +87,16 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	 	{
 	 		HibernateTemplate templ = this.getHibernateTemplate();
 			List list = getSession().createQuery(LOAD_PERSISTED_SELECTED_OPTIONS)
+				.setLong("mcQueContentUid", mcQueContentId.longValue())
+				.list();
+			
+			return list;
+	 	}
+	 	
+	 	public List getCorrectOption(Long mcQueContentId) 
+	 	{
+	 		HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_CORRECT_OPTION)
 				.setLong("mcQueContentUid", mcQueContentId.longValue())
 				.list();
 			

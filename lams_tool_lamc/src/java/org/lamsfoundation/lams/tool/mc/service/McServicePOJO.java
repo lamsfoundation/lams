@@ -619,6 +619,20 @@ public class McServicePOJO implements
         }
     }
     
+
+   public List getCorrectOption(Long mcQueContentId)
+   {
+		try
+	    {
+	        return mcOptionsContentDAO.getCorrectOption(mcQueContentId);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new McApplicationException("Exception occured when lams is returning the "
+	                                             + " correct option: "
+	                                             + e.getMessage(),e);
+	    }
+   }
     
     public void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException
 	{

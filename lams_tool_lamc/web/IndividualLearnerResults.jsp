@@ -71,34 +71,35 @@
 												</tr>	
 											</c:forEach>
 
-												<tr> 
-													<td align=left class="input" valign=top> 
-					   								    <bean:message key="label.you.answered"/>
-													</td> 
-													<td align=left class="input" valign=top> 											
-														<table align=left>
-													  		<c:forEach var="subEntry" items="${mainEntry.value}">
-	
+												<tr>												
+												<td colspan=2 align=left class="input" valign=top> 
+				   								    <bean:message key="label.you.answered"/>
+												</td> 
+												</tr>
+												
+												<tr>
+												<td colspan=2 align=left class="input" valign=top> 											
+													<table align=left>
+												  		<c:forEach var="subEntry" items="${mainEntry.value}">
 					  											<c:forEach var="selectedMainEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
-																	<tr> 
 																			<c:if test="${selectedMainEntry.key == sessionScope.queIndex}"> 		
 																		  		<c:forEach var="selectedSubEntry" items="${selectedMainEntry.value}">
-					
 																					<c:if test="${subEntry.key == selectedSubEntry.key}"> 		
-	
-																							<td align=left class="input" valign=top> 
-																								<b> <c:out value="${subEntry.value}"/> </b>
-																							</td> 
+																							<tr> 
+																								<td align=left class="input" valign=top> 
+																									<b> <c:out value="${subEntry.value}"/> </b>
+																								</td> 
+																							</tr>
 									  												</c:if> 			
 																				</c:forEach>																						
 						  													</c:if> 			
-																	</tr>			
 																</c:forEach>		
-																
-												  		</c:forEach>											
-														</table>
-													</td>
+															</tr>																			
+											  			</c:forEach>											
+													</table>
+												</td>
 												</tr>
+													
 											
 										</c:if> 			
 								</c:forEach>

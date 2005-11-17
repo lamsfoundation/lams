@@ -28,7 +28,16 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 		this.setRedoQuestions( null); 
 		this.setViewSummary(null);
 	}
-	
+
+	public void resetParameters()
+	{
+		this.setOptionCheckBoxSelected(null);
+		this.setQuestionIndex(null);
+		this.setOptionIndex(null);
+		this.setChecked(null);
+		this.setOptionValue(null);
+	}
+
 
 	/**
 	 * @return Returns the continueOptions.
