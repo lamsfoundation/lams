@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE tiles-definitions PUBLIC
-   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
-   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
- 
 <tiles-definitions>
 <!-- ============= template Definitions ====================== -->
 	<definition name=".baseDef" path="/template/template.jsp">
@@ -28,13 +24,6 @@
 		<put name="content" value="/message.jsp" />	
 	</definition>
 	
-<!-- ============= Noticeboard Authoring Page Definitions ====================== -->	
-	<definition name=".authoringContent" extends=".baseDef" >
-		<put name="title" value="Noticeboard"/>
-		<put name="pageHeader" value = "Noticeboard"/>
-		<put name="content" value="/authorContent.jsp" />	
-	</definition>
-
 <!-- ============= Noticeboard Learner Page Definitions ====================== -->	
 	<definition name=".learnerContent" extends=".baseDef" >
 		<put name="title" value="Noticeboard"/>

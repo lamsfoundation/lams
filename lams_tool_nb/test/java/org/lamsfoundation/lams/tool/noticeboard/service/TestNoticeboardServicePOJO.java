@@ -506,7 +506,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    file.setOnlineFile(isOnline);
 	    file.setUuid(uuid);
 	    
-	    nbService.saveAttachment(file);
+	    nbService.saveAttachment(nbContent, file);
 	    
 	}
 	
@@ -515,19 +515,7 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    initNbAttachmentData();
 	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
 	    
-	    nbService.removeAttachment(attachment);
-	   
-	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
-	    
-	    assertNull(attachment);
-	    
-	}
-	
-	public void testRemoveAttachmentByUuid()
-	{
-	    initNbAttachmentData();
-	    	    
-	    nbService.removeAttachmentByUuid(TEST_UUID);
+	    nbService.removeAttachment(nbService.retrieveNoticeboard(TEST_NB_ID), attachment);
 	   
 	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
 	    

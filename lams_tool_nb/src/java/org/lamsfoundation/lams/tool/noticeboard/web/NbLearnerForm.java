@@ -42,36 +42,21 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 
 public class NbLearnerForm extends ActionForm{
     
-    static Logger logger = Logger.getLogger(NbLearnerForm.class.getName());
+	private static final long serialVersionUID = -669035956406254875L;
+
+	static Logger logger = Logger.getLogger(NbLearnerForm.class.getName());
     
     private String title;
     
     private String content;
     
-    private String userID;
-    
     private String toolSessionID;
-    
-    private String toolContentID;
     
     private String method;
     
     private String mode;
     
     
-
-    /**
-     * @return Returns the toolContentID.
-     */
-    public String getToolContentID() {
-        return toolContentID;
-    }
-    /**
-     * @param toolContentID The toolContentID to set.
-     */
-    public void setToolContentID(String toolContentID) {
-        this.toolContentID = toolContentID;
-    }
     /**
      * @return Returns the toolSessionID.
      */
@@ -83,18 +68,6 @@ public class NbLearnerForm extends ActionForm{
      */
     public void setToolSessionID(String toolSessionID) {
         this.toolSessionID = toolSessionID;
-    }
-    /**
-     * @return Returns the userID.
-     */
-    public String getUserID() {
-        return userID;
-    }
-    /**
-     * @param userID The userID to set.
-     */
-    public void setUserID(String userId) {
-        this.userID = userId;
     }
     /**
      * @return Returns the content.
@@ -138,9 +111,7 @@ public class NbLearnerForm extends ActionForm{
 	{
 		this.content = null;
 		this.title = null;
-		this.toolContentID = null;
 		this.toolSessionID = null;
-		this.userID = null;
 		this.method = null;
 		this.mode = null;
 			

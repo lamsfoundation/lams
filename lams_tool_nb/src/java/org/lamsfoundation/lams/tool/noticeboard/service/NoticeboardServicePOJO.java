@@ -914,11 +914,11 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	}
 	
 	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long, org.lamsfoundation.lams.usermanagement.User)*/
-	public String leaveToolSession(Long toolSessionId, User learner) throws DataMissingException, ToolException
+	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException
 	{
 	    getAndCheckSessionIDandObject(toolSessionId);
 	    
-	   return learnerService.completeToolSession(toolSessionId, learner);
+	   return learnerService.completeToolSession(toolSessionId, learnerId);
 	}
    
 	/** @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.lang.Long)*/ 

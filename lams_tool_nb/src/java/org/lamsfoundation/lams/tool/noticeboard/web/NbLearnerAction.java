@@ -35,12 +35,16 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.util.MessageResources;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
@@ -50,6 +54,7 @@ import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -89,6 +94,21 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 		return map;
 	}
     
+    /** Get the user id from the shared session */
+	public Long getUserID(HttpServletRequest request) {
+		// set up the user details
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		if ( user == null )
+		{
+		    MessageResources resources = getResources(request);
+		    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "User");
+		    logger.error(error);
+			throw new NbApplicationException(error);
+		}
+        return new Long(user.getUserID().longValue());
+	}
+
     /**
      * Indicates that the user has finished viewing the noticeboard.
      * The session is set to complete and leaveToolSession is called.
@@ -101,19 +121,20 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
     public ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws NbApplicationException, ToolException, DataMissingException, ServletException, IOException {
 		
 	  NbLearnerForm learnerForm = (NbLearnerForm)form;
-	  Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
-	  Long userID = NbWebUtil.convertToLong(learnerForm.getUserID());
+	  Long userID = getUserID(request);
 	  
-	  if (toolSessionID == null || userID == null)
+	  Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
+	  if (toolSessionID == null)
 	  {
-	      String error = "Unable to continue. The parameters tool session id or user id is missing";
+	      String error = "Unable to continue. The parameters tool session id is missing";
 	      logger.error(error);
 	      throw new NbApplicationException(error);
 	  }
+	  
 	  INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 	  ToolSessionManager sessionMgrService = NoticeboardServiceProxy.getNbSessionManager(getServlet().getServletContext());
 		  
-      ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,false);
+      ToolAccessMode mode = WebUtil.getToolAccessMode(learnerForm.getMode());
       if (mode == ToolAccessMode.LEARNER)
 	  {
 		  NoticeboardSession nbSession = nbService.retrieveNoticeboardSession(toolSessionID);
@@ -123,14 +144,6 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 		  nbService.updateNoticeboardSession(nbSession);
 		  nbService.updateNoticeboardUser(nbUser);
 		  
-		  //Notify the progress engine of the user's completion
-		  /**
-		   * TODO: Find out how to construct the User object that is passed to the method leaveToolSession() 
-		   * currently only the userId is set. There is no username or any other information
-		   */
-		  User user = new User();
-		  user.setUserId(new Integer(learnerForm.getUserID().toString()));
-		 
 		 /**
 		  * TODO: when this method is called, it throws a NullPointerException.
 		  * This is an error due to the learner service method completeToolSession(). 
@@ -143,7 +156,7 @@ public class NbLearnerAction extends LamsLookupDispatchAction {
 		  String nextActivityUrl;
 			try
 			{
-				nextActivityUrl = sessionMgrService.leaveToolSession(NbWebUtil.convertToLong(learnerForm.getToolSessionID()), user);
+				nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, getUserID(request));
 			}
 			catch (DataMissingException e)
 			{

@@ -87,7 +87,7 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  *                          path=".error"
  *                          handler="org.lamsfoundation.lams.tool.noticeboard.web.CustomStrutsExceptionHandler"
  * @struts:action-forward name="displayMessage" path=".message"
- * @struts:action-forward name="authoringContent" path=".authoringContent"
+ * @struts:action-forward name="authoringContent" path="/author_page.jsp"
  * ----------------XDoclet Tags--------------------
  */
 public class NbAuthoringStarterAction extends LamsAction {

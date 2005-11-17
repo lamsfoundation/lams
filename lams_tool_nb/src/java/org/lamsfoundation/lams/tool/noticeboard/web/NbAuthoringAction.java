@@ -113,6 +113,21 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     	    return toolContentHandler;
    	} 
    
+    /** Get the user from the shared session */
+	public UserDTO getUser(HttpServletRequest request) {
+		// set up the user details
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		if ( user == null )
+		{
+		    MessageResources resources = getResources(request);
+		    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "User");
+		    logger.error(error);
+			throw new NbApplicationException(error);
+		}
+		return user;
+	}
+
     protected Map getKeyMethodMap()
 	{
 		Map map = new HashMap();
@@ -282,16 +297,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     			if ( nbContent.getDateCreated() == null )
     				nbContent.setDateCreated(nbContent.getDateUpdated()); 
 
-    			// set up the user details
-   		    	HttpSession ss = SessionManager.getSession();
-   		    	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-    		    if ( user == null )
-    			{
-    		        MessageResources resources = getResources(request);
-    			    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "User");
-    			    logger.error(error);
-    				throw new NbApplicationException(error);
-    			}
+    			UserDTO user = getUser(request);
     			nbContent.setCreatorUserId(new Long(user.getUserID().longValue()));
     			
     			// Author has finished editing the content and mark the defineLater flag to false

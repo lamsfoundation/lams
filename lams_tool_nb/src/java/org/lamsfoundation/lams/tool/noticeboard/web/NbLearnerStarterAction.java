@@ -32,6 +32,7 @@ package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -39,6 +40,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.util.MessageResources;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
@@ -47,8 +49,10 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * Creation Date: 27-06-05
@@ -83,7 +87,22 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class NbLearnerStarterAction extends LamsDispatchAction {
     
     static Logger logger = Logger.getLogger(NbLearnerStarterAction.class.getName());
-          
+   
+    /** Get the user id from the shared session */
+	public Long getUserID(HttpServletRequest request) {
+		// set up the user details
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		if ( user == null )
+		{
+		    MessageResources resources = getResources(request);
+		    String error = resources.getMessage(NoticeboardConstants.ERR_MISSING_PARAM, "User");
+		    logger.error(error);
+			throw new NbApplicationException(error);
+		}
+        return new Long(user.getUserID().longValue());
+	}
+
     public ActionForward unspecified(
     		ActionMapping mapping,
     		ActionForm form,
@@ -106,18 +125,17 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         ActionMessages message = new ActionMessages();
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         
-        Long userId = NbWebUtil.convertToLong(learnerForm.getUserID());
-        Long toolSessionId = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
-       // Long toolContentId = NbWebUtil.convertToLong(learnerForm.getToolContentId());
+        Long userID = getUserID(request);
+        Long toolSessionID = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
         
-        if(userId == null || toolSessionId ==null)
+        if (toolSessionID == null)
 		{
-			String error = "Unable to continue. The user ID or tool session ID";
-			logger.error(error);
-			throw new NbApplicationException(error);
+        	String error = "Unable to continue. The parameters tool session id is missing";
+		    logger.error(error);
+		    throw new NbApplicationException(error);
 		}
 
-        nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionId);
+        nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
 	       // nbSession = nbService.retrieveNoticeboardSession(toolSessionId);
 	   
 	    
@@ -128,7 +146,7 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 			throw new NbApplicationException(error);
 		}   
 
-	    nbUser = nbService.retrieveNbUserBySession(userId, toolSessionId);
+	    nbUser = nbService.retrieveNbUserBySession(userID, toolSessionID);
 	    
 	    /*
          * Checks to see if the defineLater or runOffline flag is set.
@@ -157,8 +175,8 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
             else
             {
             	//create a new user with this session id
-            	NoticeboardUser newUser = new NoticeboardUser(userId);
-            	nbService.addUser(toolSessionId, newUser);
+            	NoticeboardUser newUser = new NoticeboardUser(userID);
+            	nbService.addUser(toolSessionID, newUser);
             }
             
             
@@ -176,7 +194,6 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         
         /* will show a different screen if defineLater flag is set and running in preview mode */
     	NoticeboardContent nbContent = null;
-        NoticeboardUser nbUser = null;
         NbWebUtil.cleanLearnerSession(request);
         saveMessages(request, null);
         
@@ -185,15 +202,8 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
         ActionMessages message = new ActionMessages();
         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
         
-        Long userId = NbWebUtil.convertToLong(learnerForm.getUserID());
-        Long toolSessionId = NbWebUtil.convertToLong(learnerForm.getToolSessionID());
-        
-        if(userId == null || toolSessionId ==null)
-		{
-			String error = "Unable to continue. The user ID, tool session ID or tool contentID is missing.";
-			logger.error(error);
-			throw new NbApplicationException(error);
-		}
+        Long toolSessionId = new Long(WebUtil.checkLong(NoticeboardConstants.TOOL_SESSION_ID, 
+    			request.getParameter(NoticeboardConstants.TOOL_SESSION_ID)));
 
         nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionId);
 	      
@@ -204,8 +214,6 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 			throw new NbApplicationException(error);
 		}   
 	    
-	    nbUser = nbService.retrieveNbUserBySession(userId, toolSessionId);	    
-       
         if (displayMessageToAuthor(nbContent, message))
         {
             saveMessages(request, message);

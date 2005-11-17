@@ -106,7 +106,7 @@
       />
       <forward
         name="authoringContent"
-        path=".authoringContent"
+        path="/author_page.jsp"
         redirect="false"
       />
     </action>

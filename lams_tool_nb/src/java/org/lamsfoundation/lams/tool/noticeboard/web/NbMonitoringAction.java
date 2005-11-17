@@ -170,7 +170,7 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
 		
 		request.setAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS, content.getOnlineInstructions());
 		
-		List attachmentList = (List) request.getSession().getAttribute(NoticeboardConstants.ATTACHMENT_LIST);
+		List attachmentList = NbWebUtil.setupAttachmentList(nbService, null, content);
 		NbWebUtil.setupAttachmentList(nbService, attachmentList, content);
 		NbWebUtil.addUploadsToSession(request, attachmentList, null);
 		

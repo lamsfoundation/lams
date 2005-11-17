@@ -157,7 +157,7 @@ public class NbWebUtil {
 	    
 	    
 		/** Setup the map containing the files that have been uploaded for this particular tool content id.
-		 * If NoticeboardContent content exists, set nb=null and an empty list will be created.
+		 * If NoticeboardContent content does not exist, set nb=null and an empty list will be created.
 		 *
 		 * @param nbService
 		 * @param attachmentMap
