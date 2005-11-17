@@ -73,8 +73,6 @@ public class DummyMonitoringAction extends LamsDispatchAction
     //---------------------------------------------------------------------
     // Instance variables
     //---------------------------------------------------------------------
-	private static Logger log = Logger.getLogger(DummyMonitoringAction.class);
-	
 	private IMonitoringService monitoringService;
     private IUserManagementService usermanageService;
 
@@ -232,7 +230,10 @@ public class DummyMonitoringAction extends LamsDispatchAction
     		index = url.indexOf("</string>");
     		url = url.substring(0,index);
     	}
+    	// replace any &amp; with &
+    	url = url.replace("&amp;","&");
     	url = WebUtil.convertToFullURL(url);
+    	
 		return url;
 	}
 
