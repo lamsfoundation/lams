@@ -27,8 +27,8 @@ public class SbmtConstants {
 
 	public static final String AUTHORING_DTO = "authoring";
 
-	public static final String TOOL_SESSION_ID = "toolSessionID";
-	public static final String TOOL_CONTENT_ID = "toolContentID";
+//	public static final String TOOL_SESSION_ID = "toolSessionID";
+//	public static final String TOOL_CONTENT_ID = "toolContentID";
 	public static final String USER_ID = "userID";
 	
 	//TODO: hard code, need to read from config file/db
