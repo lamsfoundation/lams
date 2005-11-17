@@ -97,11 +97,11 @@ public interface ILearnerService
      * the learning design. This method is for tools to redirect the client on 
      * complete.
      * @param toolSessionId, session ID for completed tool
-     * @param learner the learne who is completing the tool session.
+     * @param learnerId the learner who is completing the tool session.
      * @return the URL for the next activity
      * @throws LearnerServiceException in case of problems.
      */
-    public String completeToolSession(Long toolSessionId, User learner);
+    public String completeToolSession(Long toolSessionId, Long learnerId);
     
     /**
      * Complete the activity in the progress engine and delegate to the progress 

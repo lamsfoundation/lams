@@ -177,7 +177,8 @@ public class TestLearnerService extends AbstractLamsTestCase
 
     public void testCompleteToolSession()
     {
-        String urlForNextActivity = learnerService.completeToolSession(new Long(TEST_TOOL_SESSION_ID),testUser);
+        String urlForNextActivity = learnerService.completeToolSession(new Long(TEST_TOOL_SESSION_ID),
+        		new Long(testUser.getUserId().longValue()));
         
         ToolSession toolSession = toolSessionDao.getToolSession(new Long(TEST_TOOL_SESSION_ID));
         

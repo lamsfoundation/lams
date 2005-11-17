@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 /**
  * This class is a facade over the Learning middle tier.
  * @author chris, Jacky Fang
@@ -69,6 +70,7 @@ public class LearnerService implements ILearnerService
     private IToolSessionDAO toolSessionDAO;
     private ILamsCoreToolService lamsCoreToolService;
     private ActivityMapping activityMapping;
+    private IUserManagementService userManagementService;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
     //---------------------------------------------------------------------
@@ -131,7 +133,19 @@ public class LearnerService implements ILearnerService
     public void setGroupingDAO(IGroupingDAO groupingDAO)
     {
         this.groupingDAO = groupingDAO;
-    }    
+    }
+    /**
+     * @return the User Management Service
+     */
+	public IUserManagementService getUserManagementService() {
+		return userManagementService;
+	}
+	/**
+	 * @param userService User Management Service
+	 */
+	public void setUserManagementService(IUserManagementService userService) {
+		this.userManagementService = userService;
+	}
     //---------------------------------------------------------------------
     // Service Methods
     //---------------------------------------------------------------------
@@ -278,8 +292,10 @@ public class LearnerService implements ILearnerService
     /**
      * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeToolSession(long, User)
      */
-    public String completeToolSession(Long toolSessionId, User learner) 
+    public String completeToolSession(Long toolSessionId, Long learnerId) 
     {
+    	User learner = userManagementService.getUserById(new Integer(learnerId.intValue()));
+    	
         //update tool session state in lams
         ToolSession toolSession = lamsCoreToolService.getToolSessionById(toolSessionId);
     	

@@ -22,6 +22,7 @@
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="activityMapping"><ref bean="activityMapping"/></property>
+		<property name="userManagementService"><ref bean="userManagementService"/></property>
 	</bean>
 	
 	<bean id="learnerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
