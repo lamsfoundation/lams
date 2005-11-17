@@ -1,9 +1,14 @@
 ﻿import org.lamsfoundation.lams.authoring.*;
 /*
-*
+* This class represents all the complex activity types.  they are not much different, so we can handle them in one class.
+* For reference these are the activity types
+* <pre><code>
+* public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
+* public static var OPTIONS_ACTIVITY_TYPE:Number = 7;
+* public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
+* </code></pre>
 * @author      DC
 * @version     0.1
-* @comments    Tool Activity Data storage class. 
 * @see		   Activity
 */
 class ComplexActivity extends Activity{
@@ -14,12 +19,23 @@ class ComplexActivity extends Activity{
 	
 	
 	
-	function ComplexActivity(activityUIID:Number, activityTypeID:Number, activityCategoryID:Number, learningLibraryID:Number,libraryActivityUIImage:String){
-		super(activityUIID, activityTypeID, activityCategoryID, learningLibraryID,libraryActivityUIImage);
+	function ComplexActivity(activityUIID:Number){
+		super(activityUIID);
 	}
 	
+	
+	public function populateFromDTO(dto:Object){
+		super.populateFromDTO(dto);
+		if(_activityTypeID == Activity.OPTIONS_ACTIVITY_TYPE){
+			_maxOptions = dto.maxOptions;
+			_minOptions = dto.minOptions;
+			//TODO: This is missing in the Library packet - tell mai.
+			_optionsInstructions = dto.optionsInstructions;
+		}
+	}
+	
 	/**
-	 * 
+	 * Used by OPTIONS_ACTIVITY_TYPE
 	 * @usage   
 	 * @param   newmaxOptions 
 	 * @return  
@@ -28,7 +44,7 @@ class ComplexActivity extends Activity{
 		_maxOptions = newmaxOptions;
 	}
 	/**
-	 * 
+	 * used by OPTIONS_ACTIVITY_TYPE
 	 * @usage   
 	 * @return  
 	 */
@@ -38,7 +54,7 @@ class ComplexActivity extends Activity{
 
 	
 	/**
-	 * 
+	 * used by OPTIONS_ACTIVITY_TYPE
 	 * @usage   
 	 * @param   newminOptions 
 	 * @return  
@@ -47,7 +63,7 @@ class ComplexActivity extends Activity{
 		_minOptions = newminOptions;
 	}
 	/**
-	 * 
+	 * used by OPTIONS_ACTIVITY_TYPE
 	 * @usage   
 	 * @return  
 	 */
