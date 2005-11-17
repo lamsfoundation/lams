@@ -3,10 +3,9 @@ import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.*
 import org.lamsfoundation.lams.common.util.*
 /*
-*
+*Activity Data storage class. USed as a base class for extending to be Tool, Gate and Complex
 * @author      DC
-* @version     0.1
-* @comments    Activity Data storage class. USed as a base class for extending to be Tool, Gate and Complex
+* @version     0.1  
 */
 class org.lamsfoundation.lams.authoring.Activity {
 	
@@ -165,6 +164,39 @@ class org.lamsfoundation.lams.authoring.Activity {
 		}
 	}
 	
+	public function populateFromDTO(dto:Object){
+	
+	
+			//activity properties:
+			_activityTypeID = dto.activityTypeID;
+			_activityID = dto.activityID;
+			_activityCategoryID = dto.activityCategoryID;
+			_activityUIID = dto.activityUIID;
+			_learningLibraryID = dto.learningLibraryID;
+			_learningDesignID = dto.learningDesignID;
+			_libraryActivityID = dto.libraryActivityID;
+			_parentActivityID = dto.parentActivityID;
+			_parentUIID = dto.parentUIID
+			_orderID = dto.orderID
+			_groupingID = dto.groupingID;
+			_groupingUIID = dto.groupingUIID
+			_title = dto.title;
+			_description = dto.description;
+			_helpText =  dto.helpText;
+			_yCoord = dto.yCoord;
+			_xCoord = dto.xCoord;
+			_libraryActivityUIImage = dto.libraryActivityUIImage;
+			_applyGrouping = dto.applyGrouping;
+			_runOffline = dto.runOffline;
+			_defineLater = dto.defineLater;
+			_createDateTime = dto.createDateTime;
+			_groupingSupportType = dto.groupingSupportType;
+	
+	
+
+		
+	}
+	
 	public function toData(){
 		var dto:Object = new Object();
 		dto.objectType = (_objectType) ?  _objectType : Config.STRING_NULL_VALUE;
@@ -192,7 +224,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 		//dto.offlineInstructions = (_offlineInstructions) ?  _offlineInstructions : Config.STRING_NULL_VALUE;
 		dto.defineLater= (_defineLater!=null) ?  _defineLater : Config.BOOLEAN_NULL_VALUE;
 		dto.createDateTime= (_createDateTime) ?  _createDateTime : Config.DATE_NULL_VALUE;
-		dto.groupingSupportType = (_groupingSupportType) ?  _groupingSupportType : Config.NUMERIC_NULL_VALUE;
+		//dto.groupingSupportType = (_groupingSupportType) ?  _groupingSupportType : Config.NUMERIC_NULL_VALUE;
+		dto.groupingSupportType = 2;
 		return dto;
 	}
 	
