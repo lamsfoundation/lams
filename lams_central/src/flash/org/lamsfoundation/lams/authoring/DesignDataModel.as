@@ -42,8 +42,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _maxID:Number;
 	private var _firstActivityID:Number;
 	private var _firstActivityUIID:Number;
+	//James has asked for previous and next fields so I can build up a sequence map of LDs when browsing workspaces...
 	private var _parentLearningDesignID:Number;
-	
 	private var _activities:Hashtable;
 	private var _transitions:Hashtable;
 	private var _groupings:Hashtable;
@@ -243,7 +243,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			//Debugger.log('Adding activity ID:'+design.activities[i].activityUIID,Debugger.GEN,'setDesign','DesignDataModel');
 			
 			var dto = design.activities[i];
-			
+			//change to using if _activityTypeID == Activity.TOOL_ACTIVITY_TYPE
 			//depending on the objectType call the relevent constructor.
 			if(dto.objectType = "ToolActivity"){
 				var newToolActivity:ToolActivity = new ToolActivity(dto.activityUIID);
