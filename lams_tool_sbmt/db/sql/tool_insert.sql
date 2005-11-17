@@ -47,9 +47,9 @@ NULL,
 'tool/lasbmt11/authoring.do',
 'tool/lasbmt11/definelater.do',
 'tool/lasbmt11/export.do',
-'tool/lasbmt11/monitoringStarter.do',
-'tool/lasbmt11/monitoringStarter.do',
-'tool/lasbmt11/monitoringStarter.do',
+'tool/lasbmt11/monitoring.do',
+'tool/lasbmt11/monitoring.do',
+'tool/lasbmt11/monitoring.do',
 NOW()
 );
 
