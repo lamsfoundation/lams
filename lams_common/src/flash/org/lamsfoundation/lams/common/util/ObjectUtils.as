@@ -57,8 +57,7 @@ class org.lamsfoundation.lams.common.util.ObjectUtils{
 	
 	private static function replaceNullValues(val){
 		//Debugger.log('Communication.STRING_NULL_VALUE:'+Communication.STRING_NULL_VALUE,Debugger.GEN,'deNull','org.lamsfoundation.lams.common.util.ObjectUtils');
-		
-		_global.breakpoint();
+
 		switch(typeof(val)){
 			
 			case "string":
