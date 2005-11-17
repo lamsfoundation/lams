@@ -150,6 +150,9 @@ public interface McAppConstants {
     public static final String MAP_LEARNER_QUESTIONS_CONTENT			="mapLearnerQuestionsContent";
     public static final String MAP_LEARNER_CHECKED_OPTIONS_CONTENT		="mapLearnerCheckedOptionsContent";
     public static final String MAP_LEARNER_ASSESSMENT_RESULTS			="mapLearnerAssessmentResults";
+    public static final String MAP_LEARNER_FEEDBACK_INCORRECT			="mapLeanerFeedbackIncorrect";
+    public static final String MAP_LEARNER_FEEDBACK_CORRECT				="mapLeanerFeedbackCorrect";
+    
     
     
     public static final String MAP_WEIGHTS								="mapWeights";

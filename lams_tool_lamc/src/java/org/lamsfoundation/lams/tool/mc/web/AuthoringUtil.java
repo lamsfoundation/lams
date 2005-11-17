@@ -411,6 +411,56 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("refreshed Map:" + mapWeightsContent);
     	return mapWeightsContent;
     }
+    
+    
+    public static Map buildInCorrectFeedbackMap(HttpServletRequest request, Long toolContentId)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	Map mapIncorrectFeedback= new TreeMap(new McComparator());
+    	
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+    	List questionsContent=mcService.refreshQuestionContent(mcContent.getUid());
+    	logger.debug("questionsContent:" + questionsContent);
+    	
+    	Iterator listIterator=questionsContent.iterator();
+    	Long mapIndex=new Long(1);
+    	while (listIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+    		logger.debug("mcQueContent:" + mcQueContent);
+    		mapIncorrectFeedback.put(mapIndex.toString(),mcQueContent.getFeedbackIncorrect());
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	
+    	return mapIncorrectFeedback;
+    }
+    
+    
+    public static Map buildCorrectFeedbackMap(HttpServletRequest request, Long toolContentId)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	Map mapCorrectFeedback= new TreeMap(new McComparator());
+    	
+    	McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("mcContent:" + mcContent);
+		
+    	List questionsContent=mcService.refreshQuestionContent(mcContent.getUid());
+    	logger.debug("questionsContent:" + questionsContent);
+    	
+    	Iterator listIterator=questionsContent.iterator();
+    	Long mapIndex=new Long(1);
+    	while (listIterator.hasNext())
+    	{
+    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+    		logger.debug("mcQueContent:" + mcQueContent);
+    		mapCorrectFeedback.put(mapIndex.toString(),mcQueContent.getFeedbackCorrect());
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	
+    	return mapCorrectFeedback;
+    }
 
     
     public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
