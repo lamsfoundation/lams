@@ -330,6 +330,26 @@ public class WebUtil
     }
 
     /**
+     * Retrieve the tool access mode from a string value, presumably from a Form
+     * @param request
+     * @param param_mode
+     * @return the ToolAccessMode object
+     */
+    public static ToolAccessMode getToolAccessMode(String modeValue)
+    {
+    	if ( modeValue != null ) {
+	        if(modeValue.equals(ToolAccessMode.AUTHOR.toString()))
+	            return ToolAccessMode.AUTHOR;
+	        else if(modeValue.equals(ToolAccessMode.LEARNER.toString()))
+	            return ToolAccessMode.LEARNER;
+	        else if(modeValue.equals(ToolAccessMode.TEACHER.toString()))
+	            return ToolAccessMode.TEACHER;
+    	}
+        throw new IllegalArgumentException("["+modeValue+"] is not a legal mode" +
+            		"in LAMS");
+    }
+
+    /**
      * <p>This helper method create the struts action forward name using the path.
      * It will chop all path related characters, such as "/" and ".do".</p>
      * 
