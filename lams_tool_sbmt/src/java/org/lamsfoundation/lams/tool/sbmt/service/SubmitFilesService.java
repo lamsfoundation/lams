@@ -825,4 +825,11 @@ public class SubmitFilesService implements ToolContentManager,
     	
 		return content;
 	}
+
+    public List getSubmitFilesSessionByContentID(Long contentID) {
+        List learners = submitFilesSessionDAO.getSubmitFilesSessionByContentID(contentID);
+        if(learners == null)
+            learners = new ArrayList(); //return sized 0 list rather than null value
+        return learners;
+    }
 }

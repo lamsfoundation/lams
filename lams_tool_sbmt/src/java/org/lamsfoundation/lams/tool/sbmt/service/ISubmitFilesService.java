@@ -193,4 +193,12 @@ public interface ISubmitFilesService {
      * @return the default content id
      */
     public Long getToolDefaultContentIdBySignature(String toolSignature);
+    
+    /**
+     * This method retrieves a list of SubmitFileSession from the contentID.
+     * @param contentID
+     * @return a list of SubmitFileSession
+     */
+    //public List getSubmitFilesSessionsByContentID(Long contentID);
+    public List getSubmitFilesSessionByContentID(Long contentID);
 }

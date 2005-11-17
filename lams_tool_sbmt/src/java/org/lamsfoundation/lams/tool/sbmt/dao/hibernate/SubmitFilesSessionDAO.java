@@ -6,6 +6,8 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
@@ -16,6 +18,11 @@ import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
 public class SubmitFilesSessionDAO extends BaseDAO implements
 		ISubmitFilesSessionDAO {
 
+    private static final String FIND_LEARNER_BY_CONTENT_ID = 
+        " from SubmitFilesSession session " +
+        " where session.content.contentID = :contentID";
+
+    
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO#getSessionByID(java.lang.Long)
@@ -30,5 +37,14 @@ public class SubmitFilesSessionDAO extends BaseDAO implements
 	public void createSession(SubmitFilesSession submitSession) {
 		 this.getHibernateTemplate().save(submitSession);
 	}
+    
+    public List getSubmitFilesSessionByContentID(Long contentID){
+        if ( contentID != null ) {
+            return this.getSession().createQuery(FIND_LEARNER_BY_CONTENT_ID)
+                .setLong("contentID", contentID.longValue())
+                .list();
+        }
+        return null;
+    }
 
 }
