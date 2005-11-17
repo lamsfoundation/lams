@@ -14,12 +14,12 @@
   <form-beans>
 
     <form-bean
-      name="WDDXPostActionForm"
-      type="org.lamsfoundation.lams.web.development.WDDXPostActionForm"
-    />
-    <form-bean
       name="PasswordChangeActionForm"
       type="org.lamsfoundation.lams.web.PasswordChangeActionForm"
+    />
+    <form-bean
+      name="WDDXPostActionForm"
+      type="org.lamsfoundation.lams.web.development.WDDXPostActionForm"
     />
 
     <!--

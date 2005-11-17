@@ -44,7 +44,8 @@
 				}
 				else
 				{
-					teachWin = window.open('home.do?method=staff&orgId='+orgId,'tWindow','width=779,height=575');
+					// teachWin = window.open('home.do?method=staff&orgId='+orgId,'tWindow','width=779,height=575');
+					teachWin = window.open('home.do?method=staff&orgId='+orgId,'tWindow','width=779,height=575,resizable,scrollbars');
 				}
 			}
 			else
@@ -55,7 +56,8 @@
 				}
 				else
 				{
-					teachWin = window.open('home.do?method=staff&orgId='+orgId,'tWindow','width=779,height=575,resizable');
+					// teachWin = window.open('home.do?method=staff&orgId='+orgId,'tWindow','width=779,height=575,resizable');
+					teachWin = window.open('home.do?method=staff&orgId='+orgId,'tWindow','width=779,height=575,resizable,resizable,scrollbars');
 				}
 			}
 		}
