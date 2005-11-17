@@ -14,53 +14,66 @@
   </head>
   
   <body>
-
+	<html:errors/>
   	<div id="datatablecontainer">
-  		<table class="forms">
-  		<c:set var="userlist" scope="request" value="${userList}"/>
-  		<logic:notEmpty name="userlist">
-			<logic:iterate id="element" name="userlist">
-				<tr>
-				<html:form  action="/monitoring">
-				<html:hidden property="method" value="getFilesUploadedByUser"/>
-				<html:hidden property="toolSessionID" value="${toolSessionID}"/>
-				<bean:define id="details" name="element" property="userID"/>
-
-				<html:hidden property="userID" value="${details}"/>
-				<td class="formlabel"><b><bean:write name="element" property="firstName"/> <bean:write name="element" property="lastName"/></b></td>
-				<td class="formlabel"><b><bean:write name="element" property="login"/></b></td>
-				<td class="formcontrol"><b><html:submit property="Mark" value="Mark"/></b></td>
-				</html:form>
-				</tr>		
+  		<c:set var="sessionUserMap" scope="request" value="${sessionUserMap}"/>
+  		<logic:notEmpty name="sessionUserMap">
+			<logic:iterate id="element" name="sessionUserMap">
+				<bean:define id="sessionID" name="element" property="key"/>
+				<bean:define id="userlist" name="element" property="value"/>
+		  		<table class="forms">
+				    <tr>
+				        <td style="border-bottom:1px #000 solid;" colspan="4"><b>SESSION ID: <c:out value="${sessionID}" /></td>
+				    </tr>
+			  		<logic:notEmpty name="userlist">
+						<logic:iterate id="user" name="userlist">
+							<tr>
+							<html:form  action="/monitoring">
+							<html:hidden property="method" value="getFilesUploadedByUser"/>
+							<html:hidden property="toolSessionID" value="${sessionID}"/>
+							
+							<bean:define id="details" name="user" property="userID"/>
+							<html:hidden property="userID" value="${details}"/>
+							
+							<td class="formlabel"><b><bean:write name="user" property="firstName"/> <bean:write name="user" property="lastName"/></b></td>
+							<td class="formlabel"><b><bean:write name="user" property="login"/></b></td>
+							<td class="formcontrol"><b><html:submit property="Mark" value="Mark"/></b></td>
+							</html:form>
+							</tr>		
+						</logic:iterate>
+			  		</logic:notEmpty>
+			  		<logic:empty name="userlist">
+			  			<tr><td colspan="3">NO USERS AVAILABLE</td></tr>
+			  		</logic:empty>
+				    
+	  				<tr>
+			  			<td class="formcontrol">
+			  			<html:form  action="/monitoring">
+			  				<html:hidden property="method" value="viewAllMarks"/>
+							<html:hidden property="toolSessionID" value="${sessionID}"/>
+				  			<html:submit property="viewAllMarks" value="View all marks"/>
+		  				</html:form>
+			  			</td>
+			  			<td class="formcontrol">
+			  			<html:form  action="/monitoring">
+			  				<html:hidden property="method" value="releaseMarks"/>
+							<html:hidden property="toolSessionID" value="${sessionID}"/>
+				  			<html:submit property="releaseMarks" value="Release marks"/>
+		  				</html:form>
+			  			</td>
+			  			<td class="formcontrol">
+			  			<html:form  action="/monitoring">
+			  				<html:hidden property="method" value="downloadMarks"/>
+							<html:hidden property="toolSessionID" value="${sessionID}"/>
+				  			<html:submit property="downloadMarks" value="Download marks"/>
+		  				</html:form>
+			  			</td>
+	  				</tr>
+				</table>
+				<br><br>
 			</logic:iterate>
+
   		</logic:notEmpty>  		
-		</table>
-		<html:errors/>
-  		<table class="forms">
-	  		<tr>
-		  			<td class="formcontrol">
-		  			<html:form  action="/monitoring">
-		  				<INPUT type="hidden" name="method" value="viewAllMarks">
-						<INPUT type="hidden" name="toolSessionID" value="<c:out value="${toolSessionID}" />"/>
-			  			<html:submit property="viewAllMarks" value="View all marks"/>
-	  				</html:form>
-		  			</td>
-		  			<td class="formcontrol">
-		  			<html:form  action="/monitoring">
-		  				<INPUT type="hidden" name="method" value="releaseMarks">
-						<INPUT type="hidden" name="toolSessionID" value="<c:out value="${toolSessionID}" />"/>
-			  			<html:submit property="releaseMarks" value="Release marks"/>
-	  				</html:form>
-		  			</td>
-		  			<td class="formcontrol">
-		  			<html:form  action="/monitoring">
-		  				<INPUT type="hidden" name="method" value="downloadMarks">
-						<INPUT type="hidden" name="toolSessionID" value="<c:out value="${toolSessionID}" />"/>
-			  			<html:submit property="downloadMarks" value="Download marks"/>
-	  				</html:form>
-		  			</td>
-	  		</tr>
-  		</table>
 	</div>
 					
   </body>
