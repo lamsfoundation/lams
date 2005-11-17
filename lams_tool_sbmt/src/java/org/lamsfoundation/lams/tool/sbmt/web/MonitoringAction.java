@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.sbmt.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,9 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
+import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
@@ -52,6 +55,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -80,6 +84,22 @@ public class MonitoringAction extends DispatchAction {
 	
 	public ISubmitFilesService submitFilesService;
 	
+    
+    /**
+     * Default ActionForward for Monitor
+     *  (non-Javadoc)
+     * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    public ActionForward unspecified(
+            ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+    {
+        return userList(mapping, form, request, response);
+    }
+    
+    
 	/**
 	 * List all user for monitor staff choose which user need to do report marking.
 	 * It is first step to do report marking.
@@ -93,11 +113,23 @@ public class MonitoringAction extends DispatchAction {
 			   ActionForm form,
 			   HttpServletRequest request,
 			   HttpServletResponse response){
-		Long sessionID =new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_SESSION_ID));		
+		//Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));		
+        Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		submitFilesService = getSubmitFilesService();
-		List userList = submitFilesService.getUsers(sessionID);
-		request.setAttribute(SbmtConstants.TOOL_SESSION_ID,sessionID);
-		request.setAttribute("userList",userList);
+		//List userList = submitFilesService.getUsers(sessionID);
+        List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
+        Map sessionUserMap = new HashMap();
+        
+        //build a map with all users in the submitFilesSessionList
+        Iterator it = submitFilesSessionList.iterator();
+        while(it.hasNext()){
+            Long sessionID = ((SubmitFilesSession)it.next()).getSessionID();
+            List userList = submitFilesService.getUsers(sessionID);
+            sessionUserMap.put(sessionID, userList);
+        }
+        
+		//request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+		request.setAttribute("sessionUserMap",sessionUserMap);
 		return mapping.findForward("userlist");
 	}
 	/**
@@ -112,7 +144,7 @@ public class MonitoringAction extends DispatchAction {
 							   ActionForm form,
 							   HttpServletRequest request,
 							   HttpServletResponse response){
-		Long sessionID =new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_SESSION_ID));
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
 
 		submitFilesService = getSubmitFilesService();
@@ -120,7 +152,7 @@ public class MonitoringAction extends DispatchAction {
 		List files = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		UserDTO userDto = submitFilesService.getUserDetails(userID);
 		
-		request.setAttribute(SbmtConstants.TOOL_SESSION_ID,sessionID);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		request.setAttribute("user",userDto);
 		request.setAttribute("userReport",files);
 		return mapping.findForward("userMarks");
@@ -138,13 +170,13 @@ public class MonitoringAction extends DispatchAction {
 			  HttpServletRequest request,
 			  HttpServletResponse response){
 		
-		Long sessionID =new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_SESSION_ID));
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
 		Long detailID = new Long(WebUtil.readLongParam(request,"detailID"));
 		
 		submitFilesService = getSubmitFilesService();
 		
-		request.setAttribute(SbmtConstants.TOOL_SESSION_ID,sessionID);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		request.setAttribute("user",submitFilesService.getUserDetails(userID));
 		request.setAttribute("fileDetails",submitFilesService.getFileDetails(detailID));
 		return mapping.findForward("updateMarks");
@@ -179,7 +211,7 @@ public class MonitoringAction extends DispatchAction {
 		if(!StringUtils.isEmpty(reportIDStr))
 			reportID = Long.valueOf(reportIDStr);
 
-		Long sessionID =new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_SESSION_ID));
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		Long userID = new Long(WebUtil.readLongParam(request,"userID"));
 		
 		//get service then update report table
@@ -188,7 +220,7 @@ public class MonitoringAction extends DispatchAction {
 		submitFilesService.updateMarks(reportID,marks,comments);
 		List report = submitFilesService.getFilesUploadedByUser(userID,sessionID);
 		request.setAttribute("userReport",report);
-		request.setAttribute(SbmtConstants.TOOL_SESSION_ID,sessionID);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 		UserDTO userDto = submitFilesService.getUserDetails(userID);
 		request.setAttribute("user",userDto);
 		return mapping.findForward("userMarks");
@@ -198,11 +230,11 @@ public class MonitoringAction extends DispatchAction {
 			   HttpServletRequest request,
 			   HttpServletResponse response){
 		
-		Long sessionID =new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_SESSION_ID));
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		submitFilesService = getSubmitFilesService();
 		//return FileDetailsDTO list according to the given sessionID
-		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);		
-		request.setAttribute(SbmtConstants.TOOL_SESSION_ID,sessionID);
+		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 //		request.setAttribute("user",submitFilesService.getUserDetails(userID));
 		request.setAttribute("report",userFilesMap);
 		return mapping.findForward("allUserMarks");
@@ -215,7 +247,7 @@ public class MonitoringAction extends DispatchAction {
 
 		//get service then update report table
 		submitFilesService = getSubmitFilesService();
-		Long sessionID =new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_SESSION_ID));
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		submitFilesService.releaseMarksForSession(sessionID);
 		//todo: need display some success info
 		return mapping.findForward("userMarks");
@@ -225,7 +257,7 @@ public class MonitoringAction extends DispatchAction {
 			   HttpServletRequest request,
 			   HttpServletResponse response){
 		
-		Long sessionID =new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_SESSION_ID));
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		submitFilesService = getSubmitFilesService();
 		//return FileDetailsDTO list according to the given sessionID
 		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
@@ -308,7 +340,7 @@ public class MonitoringAction extends DispatchAction {
 
 		if(!errors.isEmpty()){
 			saveErrors(request,errors);
-			request.setAttribute(SbmtConstants.TOOL_SESSION_ID,sessionID);
+			request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 			return mapping.findForward("userlist");
 		}
 			
@@ -327,7 +359,7 @@ public class MonitoringAction extends DispatchAction {
 			   HttpServletRequest request,
 			   HttpServletResponse response){
 		
-		Long contentID = new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_CONTENT_ID));
+		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		
 		//get back the upload file list and display them on page
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
@@ -386,7 +418,7 @@ public class MonitoringAction extends DispatchAction {
 			   ActionForm form,
 			   HttpServletRequest request,
 			   HttpServletResponse response){
-		Long contentID = new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_CONTENT_ID));
+		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		String title = WebUtil.readStrParam(request,"title");
 		String instructions = WebUtil.readStrParam(request,"instructions");
 
@@ -416,7 +448,7 @@ public class MonitoringAction extends DispatchAction {
 			   HttpServletRequest request,
 			   HttpServletResponse response){
 		
-		Long sessionID =new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_SESSION_ID));
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		submitFilesService = getSubmitFilesService();
 		//return FileDetailsDTO list according to the given sessionID
 		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
@@ -447,7 +479,7 @@ public class MonitoringAction extends DispatchAction {
 	 * @param request
 	 */
 	private void getAuthoringActivity(ActionForm form, HttpServletRequest request) {
-		Long contentID = new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_CONTENT_ID));
+		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		
 		//get back the upload file list and display them on page
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
