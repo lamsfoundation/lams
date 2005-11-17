@@ -35,8 +35,52 @@ class ToolActivity extends Activity{
 	
 	//todo ADD A VALIDATE() FUNCTION
 	
+	/**
+	 * Pass an object with all the fields of a ToolActivity into this function to populate:
+	 * <pre><code>
+	 * //activity properties:
+	 * _activityTypeID = dto.activityTypeID;
+	 * _activityID = dto.activityID;
+	 * _activityCategoryID = dto.activityCategoryID;
+	 * _activityUIID = dto.activityUIID;
+	 * _learningLibraryID = dto.learningLibraryID;
+	 * _learningDesignID = dto.learningDesignID;
+	 * _libraryActivityID = dto.libraryActivityID;
+	 * _parentActivityID = dto.parentActivityID;
+	 * _parentUIID = dto.parentUIID;
+	 * _orderID = dto.orderID;
+	 * _groupingID = dto.groupingID;
+	 * _groupingUIID = dto.groupingUIID;
+	 * _title = dto.title;
+	 * _description = dto.description;
+	 * _helpText =  dto.helpText;
+	 * _yCoord = dto.yCoord;
+	 * _xCoord = dto.xCoord;
+	 * _libraryActivityUIImage = dto.libraryActivityUIImage;
+	 * _applyGrouping = dto.applyGrouping;
+	 * _runOffline = dto.runOffline;
+	 * //now removed
+	 * //_offlineInstructions = dto.offlineInstructions;
+	 * //_onlineInstructions = dto.onlineInstructions;
+	 * _defineLater = dto.defineLater;
+	 * _createDateTime = dto.createDateTime;
+	 * _groupingSupportType = dto.groupingSupportType;
+	 * 
+	 * //Toolactivity class props
+	 * _authoringURL = dto.authoringURL;
+	 * _toolDisplayName = dto.toolDisplayName;
+	 * _toolContentID = dto.toolContentID;
+	 * _toolID = dto.toolID;
+	 * _supportsContribute = dto.supportsContribute;
+	 * _supportsDefineLater = dto.supportsDefineLater;
+	 * _supportsModeration = dto.supportsRunOffline;
+	 * </code></pre>
+	 * @usage   
+	 * @param   dto Object containing all ToolActivity fields:
+	 * @return  Noting
+	 */
 	public function populateFromDTO(dto:Object):Void{
-			
+			/*
 			//activity properties:
 			_activityTypeID = dto.activityTypeID;
 			_activityID = dto.activityID;
@@ -58,13 +102,14 @@ class ToolActivity extends Activity{
 			_libraryActivityUIImage = dto.libraryActivityUIImage;
 			_applyGrouping = dto.applyGrouping;
 			_runOffline = dto.runOffline;
-			//now removed
-			//_offlineInstructions = dto.offlineInstructions;
-			//_onlineInstructions = dto.onlineInstructions;
 			_defineLater = dto.defineLater;
 			_createDateTime = dto.createDateTime;
 			_groupingSupportType = dto.groupingSupportType;
+			*/
 			
+			
+			//first do the super method for activity props
+			super.populateFromDTO(dto);
 			//Toolactivity class props
 			_authoringURL = dto.authoringURL;
 			_toolDisplayName = dto.toolDisplayName;
