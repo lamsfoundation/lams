@@ -71,6 +71,7 @@
 					<property name="qaUploadedFileDAO"><ref bean="qaUploadedFileDAO"/></property>								
 					<property name="toolService"><ref bean="lamsToolService"/></property>
 					<property name="repositoryService"><ref bean="repositoryService"/></property>
+					<property name="learnerService"><ref bean="learnerService"/></property>			
 				</bean>
 			</property>
 			<property name="transactionAttributes">

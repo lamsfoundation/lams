@@ -1324,10 +1324,10 @@ public class McServicePOJO implements
      * Call controller service to complete the qa session
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long)
      */
-    public String leaveToolSession(Long toolSessionId,User learner) throws DataMissingException, ToolException 
+    public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException 
     {
         logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId);
-        logger.debug("start of leaveToolSession with learner:" + learner);
+        logger.debug("start of leaveToolSession with learner:" + learnerId);
         
         if (toolSessionId == null)
     	{
@@ -1335,10 +1335,10 @@ public class McServicePOJO implements
     		throw new DataMissingException("toolSessionId is missing");
     	}
         
-        if (learner == null)
+        if (learnerId == null)
     	{
-    		logger.debug("learner is null");
-    		throw new DataMissingException("learner is missing");
+    		logger.debug("learnerId is null");
+    		throw new DataMissingException("learnerId is missing");
     	}
         
     	try

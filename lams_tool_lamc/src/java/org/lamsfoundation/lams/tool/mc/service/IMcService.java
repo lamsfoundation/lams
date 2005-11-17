@@ -160,7 +160,7 @@ public interface IMcService
     
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 
-    public String leaveToolSession(Long toolSessionId,User learner) throws DataMissingException, ToolException; 
+    public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException; 
 
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 

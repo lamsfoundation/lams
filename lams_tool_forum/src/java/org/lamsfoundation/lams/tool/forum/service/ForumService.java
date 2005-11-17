@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -363,7 +362,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException {
 	}
 
-	public String leaveToolSession(Long toolSessionId, User learner) throws DataMissingException, ToolException {
+	public String leaveToolSession(Long toolSessionId, Long learnerID) throws DataMissingException, ToolException {
 		return null;
 	}
 

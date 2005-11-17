@@ -465,13 +465,13 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long,
 	 *      org.lamsfoundation.lams.usermanagement.User)
 	 */
-	public String leaveToolSession(Long toolSessionId, User learner)
+	public String leaveToolSession(Long toolSessionId, Long learnerId)
 		   throws DataMissingException, ToolException{
 			if(toolSessionId == null){
 				log.error("Fail to leave tool Session based on null tool session id.");
 				throw new ToolException("Fail to remove tool Session based on null tool session id.");
 			}
-			if(learner == null){
+			if(learnerId == null){
 				log.error("Fail to leave tool Session based on null learner.");
 				throw new ToolException("Fail to remove tool Session based on null learner.");
 			}
@@ -486,7 +486,7 @@ public class SubmitFilesService implements ToolContentManager,
 				throw new DataMissingException("Fail to leave tool Session." +
 						"Could not find submit file session by given session id: "+toolSessionId);
 			}
-			return learnerService.completeToolSession(toolSessionId,learner);
+			return learnerService.completeToolSession(toolSessionId,learnerId);
 	}
 
 	/**
