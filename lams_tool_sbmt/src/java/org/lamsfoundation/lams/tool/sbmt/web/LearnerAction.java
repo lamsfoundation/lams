@@ -97,7 +97,7 @@ public class LearnerAction extends DispatchAction {
 									HttpServletResponse response){
 		
 		DynaActionForm authForm= (DynaActionForm)form;
-		Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
+		Long sessionID =(Long) authForm.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		//get session from shared session.
 		HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
@@ -136,7 +136,7 @@ public class LearnerAction extends DispatchAction {
 		
 		DynaActionForm authForm= (DynaActionForm)form;
 		if(!isTokenValid(request,true)){
-			Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
+			Long sessionID =(Long) authForm.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 			//get session from shared session.
 			HttpSession ss = SessionManager.getSession();
 			//get back login user DTO
@@ -154,7 +154,7 @@ public class LearnerAction extends DispatchAction {
 			return returnErrors(mapping,request,"submit.upload.twice","upload");
 		}
 		
-		Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
+		Long sessionID =(Long) authForm.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		//get session from shared session.
 		HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
@@ -195,7 +195,7 @@ public class LearnerAction extends DispatchAction {
 			HttpServletRequest request,
 			HttpServletResponse response){
 		DynaActionForm authForm= (DynaActionForm)form;
-		Long sessionID =(Long) authForm.get(SbmtConstants.TOOL_SESSION_ID);
+		Long sessionID =(Long) authForm.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 		Long userID = (Long)authForm.get(SbmtConstants.USER_ID);
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 		submitFilesService.finishSubmission(sessionID,userID);

@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Manpreet Minhas
@@ -178,7 +179,7 @@ public class AuthoringAction extends LookupDispatchAction {
 	protected ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		Long contentID = new Long(WebUtil.readLongParam(request,SbmtConstants.TOOL_CONTENT_ID));
+		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		
 		//get back the upload file list and display them on page
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
@@ -199,7 +200,7 @@ public class AuthoringAction extends LookupDispatchAction {
 		
 		//set back STRUTS component value
 		DynaActionForm authForm = (DynaActionForm) form;
-		authForm.set(SbmtConstants.TOOL_CONTENT_ID,contentID);
+		authForm.set(AttributeNames.PARAM_TOOL_CONTENT_ID,contentID);
 		authForm.set("title",persistContent.getTitle());
 		authForm.set("lockOnFinished",persistContent.isLockOnFinished()?"1":null);
 		return mapping.getInputForward();
@@ -224,7 +225,7 @@ public class AuthoringAction extends LookupDispatchAction {
 	 */
 	private SubmitFilesContent getContent(ActionForm form) {
 		DynaActionForm authForm = (DynaActionForm) form;
-		Long contentID = (Long) authForm.get(SbmtConstants.TOOL_CONTENT_ID);
+		Long contentID = (Long) authForm.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		String title = (String) authForm.get("title");
 		String instructions = (String) authForm.get("instructions");
 		String online_instruction = (String) authForm.get("onlineInstruction");
