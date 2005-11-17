@@ -85,6 +85,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
 		}
 		//Create XML response object 
         var responseXML = new XML();
+		responseXML.ignoreWhite = ignoreWhite;
         //Assign onLoad handler
         responseXML.onLoad = Proxy.create(this,onServerResponse,queueID);
         //Add handler to queue
@@ -124,6 +125,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
 		
 		//Serialise the Data Transfer Object
         var xmlToSend:XML = serializeObj(rawDto);
+		xmlToSend.ignoreWhite = ignoreWhite;
 		//xmlToSend.contentType="dave";
         
 		//Create XML response object 
@@ -160,11 +162,8 @@ class org.lamsfoundation.lams.common.comms.Communication {
         trace('XML loaded success:'+ success);
         //Load ok?
         if(success){
-            var responseObj:Object = wddx.deserialize(wrappedPacketXML);
-
-            
-			
-			if(responseObj.messageType == null){
+		   var responseObj:Object = wddx.deserialize(wrappedPacketXML);
+            if(responseObj.messageType == null){
 				Debugger.log('Message type was:'+responseObj.messageType+' , cannot continue',Debugger.CRITICAL,'getRequest','Communication');			
 				Debugger.log('xml recieved is:'+wrappedPacketXML.toString(),Debugger.CRITICAL,'getRequest','Communication');			
 				return -1;
@@ -261,7 +260,7 @@ class org.lamsfoundation.lams.common.comms.Communication {
     private function setOnData(xmlObject:XML){
         //Set ondata handler to validate data returned in XML object
         xmlObject.onData = function(src){
-			Debugger.log('src:'+src,Debugger.GEN,' xmlObject.onData ','Communication');		
+			//Debugger.log('src:'+src,Debugger.GEN,' xmlObject.onData ','Communication');		
 			if(Application != null){
 				Cursor.showCursor(Application.C_DEFAULT);
             }
