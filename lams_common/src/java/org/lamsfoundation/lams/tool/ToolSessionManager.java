@@ -46,7 +46,7 @@ public interface ToolSessionManager
      * @throws DataMissingException if no tool session matches the toolSessionId 
      * @throws ToolException if any other error occurs
      */
-    public String leaveToolSession(Long toolSessionId, User learner) 
+    public String leaveToolSession(Long toolSessionId, Long learnerId) 
     	throws DataMissingException, ToolException;
 
     /**
