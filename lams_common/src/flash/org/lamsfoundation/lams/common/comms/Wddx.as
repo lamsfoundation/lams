@@ -267,8 +267,13 @@ class org.lamsfoundation.lams.common.comms.Wddx {
 				++temp;
 			}
 			// if we found a data node then deserialize its contents
+			var i=0;
+			//trace('temp:'+temp);
+			//trace('wddxChildren.length:'+wddxChildren.length);
 			if (temp<wddxChildren.length) {
 				dataObj = this.deserializeNode(wddxChildren[temp].firstChild);
+				i++;
+				//trace('i:'+i);
 				return dataObj;
 			} else {
 				return null;
@@ -281,6 +286,7 @@ class org.lamsfoundation.lams.common.comms.Wddx {
 	function deserializeNode(node:XMLNode) {
 		// get the name of the node
 		var nodeType:String = node.nodeName.toLowerCase();
+		//trace('nodeType:'+nodeType);
 		// number node 
 		if (nodeType == "number") {
 			var dataObj:Object = node.firstChild.nodeValue;
@@ -351,6 +357,7 @@ class org.lamsfoundation.lams.common.comms.Wddx {
 			// struct node
 		} else if (nodeType == "struct") {
 			var dataObj:Object = new Object();
+			//trace('struct node.childNodes.length:'+node.childNodes.length);
 			for (var i = 0; i<node.childNodes.length; i++) {
 				if (node.childNodes[i].nodeName.toLowerCase() == "var") {
 					dataObj[this.deserializeAttr(node.childNodes[i].attributes["name"])] = this.deserializeNode(node.childNodes[i].firstChild);
