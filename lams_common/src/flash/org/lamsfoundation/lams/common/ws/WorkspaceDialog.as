@@ -6,6 +6,7 @@ import org.lamsfoundation.lams.common.ws.*
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.style.*
+import it.sephiroth.XML2Object
 
 /**
 * @author      DI
@@ -28,6 +29,10 @@ class WorkspaceDialog extends MovieClip{
     
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
+	
+	private var _workspaceView:WorkspaceView;
+
+
     
     //Dimensions for resizing
     private var xOkOffset:Number;
@@ -59,15 +64,14 @@ class WorkspaceDialog extends MovieClip{
     /**
     * Called a frame after movie attached to allow components to initialise
     */
-    private function init(){
+	private function init(){
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
         
         //TODO DI 25/05/05 ID set as 1 is just a stub, selected id from dialog should replace
         //_selectedDesignId = 1;
         
-        //Set up the treeview
-        setUpTreeview();
+       
         
         //set the reference to the StyleManager
         themeManager = ThemeManager.getInstance();
@@ -97,8 +101,10 @@ class WorkspaceDialog extends MovieClip{
         _container.addEventListener('click',this);
         //Register for LFWindow size events
         _container.addEventListener('size',this);
+		
+		
         
-        Debugger.log('setting offsets',Debugger.GEN,'init','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+        //Debugger.log('setting offsets',Debugger.GEN,'init','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
 
         //work out offsets from bottom RHS of panel
         xOkOffset = panel._width - ok_btn._x;
@@ -108,11 +114,71 @@ class WorkspaceDialog extends MovieClip{
         
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
-        setStyles();
+		//TODO: Make setStyles more efficient
+		//setStyles();
         
         //Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
         _container.contentLoaded();
     }
+	
+	/**
+	 * Called by the worspaceView after the content has loaded
+	 * @usage   
+	 * @return  
+	 */
+	public function setUpContent():Void{
+		
+		
+		//register to recive updates form the model
+		WorkspaceModel(_workspaceView.getModel()).addEventListener('viewUpdate',this);
+		
+		//Set up the treeview
+        setUpTreeview();
+		
+	}
+	
+	/**
+	 * Recieved update events from the WorkspaceModel. Dispatches to relevent handler depending on update.Type
+	 * @usage   
+	 * @param   event
+	 */
+	public function viewUpdate(event:Object):Void{
+		Debugger.log('Recived an Event dispather UPDATE!, updateType:'+event.updateType+', target'+event.target,4,'viewUpdate','WorkspaceView');
+		 //Update view from info object
+        //Debugger.log('Recived an UPDATE!, updateType:'+infoObj.updateType,4,'update','CanvasView');
+       var wm:WorkspaceModel = event.target;
+	   //set a ref to the controller for ease (sorry mvc guru)
+	  
+	   switch (event.updateType){
+
+			case 'REFRESH_TREE' :
+                refreshTree(event.data,wm);
+                break;
+           
+            default :
+                Debugger.log('unknown update type :' + event.updateType,Debugger.GEN,'viewUpdate','org.lamsfoundation.lams.WorkspaceDialog');
+		}
+
+	}
+	
+	public function refreshTree(changedNode:XMLNode,wm:WorkspaceModel){
+		 Debugger.log('Refreshing tree....:' ,Debugger.GEN,'refreshTree','org.lamsfoundation.lams.WorkspaceDialog');
+		 //we have to set the new nodes to be branches, if they are branches
+		if(changedNode.attributes.isBranch){
+			treeview.setIsBranch(changedNode,true);
+			//do its kids
+			for(var i=0; i<changedNode.childNodes.length; i++){
+				var cNode:XMLNode = changedNode.getTreeNodeAt(i);
+				if(cNode.attributes.isBranch){
+					treeview.setIsBranch(cNode,true);
+				}
+			}
+		}
+		 
+		 treeview.refresh();
+	}
+	
+	
     
     /**
     * Event fired by StyleManager class to notify listeners that Theme has changed
@@ -190,24 +256,104 @@ class WorkspaceDialog extends MovieClip{
         e.target.deletePopUp();
     }
     
-    //Sets up the treeview to load initial data
-    private function setUpTreeview(){
-        //TODO DI 12/05/05 Make call to server to get inital workspace root folders Stub for now uses dummy XML
-        var menuXML:XML = new XML();
-        menuXML.ignoreWhite = true;
-        menuXML.load("workspace_tree.xml");
-        menuXML.onLoad = Proxy.create(this,tvXMLLoaded,menuXML);
+	/**
+	 * Recursive function to set any folder with children to be a branch
+	 * TODO: Might / will have to change this behaviour once designs are being returned into the mix
+	 * @usage   
+	 * @param   node 
+	 * @return  
+	 */
+    private function setBranches(node:XMLNode){
+		if(node.hasChildNodes()){
+			treeview.setIsBranch(node, true);
+			for (var i = 0; i<node.childNodes.length; i++) {
+				var cNode = node.getTreeNodeAt(i);
+				treeview.setIsBranch(cNode, true);
+				setBranches(cNode);
+			}
+		}
+	}
+	
+
+	
+	
+	/**
+	 * Sets up the treeview with whatever datya is in the treeDP
+	 * TODO - extend this to make it recurse all the way down the tree
+	 * @usage   
+	 * @return  
+	 */
+	private function setUpTreeview(){
+			
+		var converter:XML2Object = new XML2Object();
+	
+		//Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		treeview.dataProvider = WorkspaceModel(_workspaceView.getModel()).treeDP;
+		
+		Debugger.log('WorkspaceModel(_workspaceView.getModel()).treeDP:'+WorkspaceModel(_workspaceView.getModel()).treeDP.toString(),Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		
+		//get the 1st child
+		var fNode = treeview.dataProvider.firstChild;
+		
+		
+		
+			/*
+	* 
+	
+		//loop thorigh th childresn to see if they are branches
+		for (var i = 0; i<fNode.childNodes.length; i++) {
+			var node:XMLNode = fNode.getTreeNodeAt(i);
+			// Set each of the 3 initial child nodes to be branches
+			if(node.attributes.isBranch){
+				treeview.setIsBranch(node,true);
+				//also check this branches children to see if they have isBranch set
+				if(node.hasChildNodes()){
+					for(var j=0; j<node.childNodes.length; j++){
+						var cNode:XMLNode = node.getTreeNodeAt(j);
+						if(cNode.attributes.isBranch){
+							treeview.setIsBranch(cNode,true);
+							
+						}
+						
+					}
+					
+					
+				}
+				
+				
+				
+			}
+			
+			
+		}
+	*/
+		
+		setBranches(fNode);
+		
+		
+		
+		Debugger.log('_workspaceView:'+_workspaceView,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		var wsc:WorkspaceController = _workspaceView.getController();
+		Debugger.log('wsc:'+wsc,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		Debugger.log('wsc.onTreeNodeOpen:'+wsc.onTreeNodeOpen,Debugger.GEN,'setUpTreeview','org.lamsfoundation.lams.common.ws.WorkspaceDialog');
+		
+		
+		treeview.addEventListener("nodeOpen", Delegate.create(wsc, wsc.onTreeNodeOpen));
+		treeview.addEventListener("nodeClose", Delegate.create(wsc, wsc.onTreeNodeClose));
+		treeview.refresh();
+		
     }
     
     /**
     * XML onLoad handler for treeview data
-    */
+ */
     private function tvXMLLoaded (ok:Boolean,rootXML:XML){
         if(ok){
-            //Set the XML as the data provider for the tree
+            /*
+			//Set the XML as the data provider for the tree
             treeview.dataProvider = rootXML.firstChild;
             treeview.addEventListener("change", Delegate.create(this, onTvChange));
-            /*
+            
             //Add this function to prevent displaying [type function],[type function] when label attribute missing from XML
             treeview.labelFunction = function(node) {
                     return node.nodeType == 1 ? node.nodeName : node.nodeValue;
@@ -216,29 +362,7 @@ class WorkspaceDialog extends MovieClip{
         }
     }
     
-    /**
-    * Treeview data changed event handler
-    */
-    private function onTvChange (event:Object){
-        if (treeview == event.target) {
-            var node = treeview.selectedItem;
-            
-            // If this is a branch, expand/collapse it
-            if (treeview.getIsBranch(node)) {
-                treeview.setIsOpen(node, !treeview.getIsOpen(node), true);
-            }
-            
-            // If this is a hyperlink, jump to it
-            var url = node.attributes.url;
-            if (url) {
-                getURL(url, "_top");
-            }
-            
-            // Clear any selection
-            treeview.selectedNode = null;
-        }
-    }
-    
+     
     /**
     * Main resize method, called by scrollpane container/parent
     */
@@ -259,6 +383,26 @@ class WorkspaceDialog extends MovieClip{
     function set container(value:MovieClip){
         _container = value;
     }
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newworkspaceView 
+	 * @return  
+	 */
+	public function set workspaceView (newworkspaceView:WorkspaceView):Void {
+		_workspaceView = newworkspaceView;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get workspaceView ():WorkspaceView {
+		return _workspaceView;
+	}
+	
     
     function get selectedDesignId():Number { 
         return _selectedDesignId;
