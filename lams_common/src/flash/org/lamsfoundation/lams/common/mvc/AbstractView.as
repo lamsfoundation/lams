@@ -20,7 +20,7 @@ class org.lamsfoundation.lams.common.mvc.AbstractView extends MovieClip implemen
   }
 
   /**
-   * Returns the default controller for this view.
+   * Returns the default controller for this view. Must be overridden!
    */
   public function defaultController (model:Observable):Controller {
     return null;
