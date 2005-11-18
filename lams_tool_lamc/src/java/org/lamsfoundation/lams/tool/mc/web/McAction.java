@@ -2122,16 +2122,26 @@ public class McAction extends DispatchAction implements McAppConstants
     	else if (mcLearningForm.getContinueOptions() != null)
 	 	{
     		logger.debug("requested continue options...");
+    		mcLearningForm.resetCommands();
     		return continueOptions(request, mcLearningForm, mapping);
 	 	}
     	else if (mcLearningForm.getOptionCheckBoxSelected() != null)
     	{
     		logger.debug("requested selectOptionsCheckBox...");
+    		mcLearningForm.resetCommands();
     		LearningUtil.selectOptionsCheckBox(request,mcLearningForm, mcLearningForm.getQuestionIndex());
     	}
     	else if (mcLearningForm.getRedoQuestions() != null)
     	{
     		logger.debug("requested redoQuestions...");
+    		mcLearningForm.resetCommands();
+    		return (mapping.findForward(REDO_QUESTIONS));
+    		//return redoQuestions(request, mcLearningForm, mapping);
+    	}
+    	else if (mcLearningForm.getRedoQuestionsOk() != null)
+    	{
+    		logger.debug("requested redoQuestionsOk, user is sure to redo the questions.");
+    		mcLearningForm.resetCommands();
     		return redoQuestions(request, mcLearningForm, mapping);
     	}
     	else if (mcLearningForm.getViewSummary() != null)

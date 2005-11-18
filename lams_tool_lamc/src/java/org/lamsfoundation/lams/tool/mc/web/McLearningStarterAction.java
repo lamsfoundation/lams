@@ -131,6 +131,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     * By now, the passed tool session id MUST exist in the db through the calling of:
 	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
 	     *  
+	     * 
 	     * make sure this session exists in tool's session table by now.
 	     */
 		

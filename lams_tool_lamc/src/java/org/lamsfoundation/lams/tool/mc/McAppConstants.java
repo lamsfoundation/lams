@@ -98,8 +98,8 @@ public interface McAppConstants {
     public static final String LOAD_LEARNER								="loadLearner";
     public static final String INDIVIDUAL_REPORT						="individualReport";
     public static final String VIEW_SUMMARY								="viewSummary";
-    
-    
+    public static final String REDO_QUESTIONS							="redoQuestions";
+
     
     public static final String ALL_INSTRUCTIONS							="allInstructions";
     public static final String EDIT_OPTS_CONTENT						="editOptsContent";

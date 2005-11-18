@@ -63,11 +63,9 @@
 									  		<c:forEach var="subEntry" items="${mainEntry.value}">
 				  								<tr> 
 													<td align=left class="input" valign=top> 
-					   								    <img src="images/dot.jpg" align=left>
+					   								    <img src="images/dot.jpg" align=left> &nbsp
+														<font size=2 color="#669966">	<c:out value="${subEntry.value}"/> </font>					   								    
 													</td> 
-													<td align=left class="input" valign=top> 
-														<font size=2 color="#669966">	<c:out value="${subEntry.value}"/> </font>
-													</td>
 												</tr>	
 											</c:forEach>
 
@@ -98,18 +96,32 @@
 												  			</c:forEach>											
 														</table>
 													</td>
-	
-													<td  align=right class="input" valign=top> 											
+
+													<td  align=left class="input" valign=top> 											
 														<c:forEach var="mainEntry" items="${sessionScope.mapLearnerAssessmentResults}">
 																<c:if test="${mainEntry.key == sessionScope.queIndex}"> 		
-																	<c:out value="${mainEntry.value}"/>
+																	<c:if test="${mainEntry.value == 'true'}"> 		
+																		<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackCorrect}">
+																			<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
+																				    <img src="images/success.gif" align=right width=20 height=20>
+																			</c:if> 																																				
+																		</c:forEach>											
+																	</c:if> 														
+																	
+																	<c:if test="${mainEntry.value == 'false'}"> 		
+																		<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackIncorrect}">
+																			<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
+																				    <img src="images/error.jpg" align=right width=20 height=20>
+																			</c:if> 																																				
+																		</c:forEach>											
+																	</c:if> 														
 																</c:if> 																		
-											  			</c:forEach>											
+														</c:forEach>		
 													</td>
 												</tr>
 
 												<tr>
-												<td bgcolor="#006633" colspan=2 align=left class="input" valign=top> 											
+												<td bgcolor="#CCCC33" colspan=2 align=left class="input" valign=top> 											
 													<c:forEach var="mainEntry" items="${sessionScope.mapLearnerAssessmentResults}">
 															<c:if test="${mainEntry.key == sessionScope.queIndex}"> 		
 																<c:if test="${mainEntry.value == 'true'}"> 		
@@ -149,7 +161,7 @@
 	  	   		  <tr>
 				  	<td colspan=2 align=center class="input" valign=top> 
 			  			<html:submit property="redoQuestions" styleClass="a.button">
-							<bean:message key="label.redo.question"/>
+							<bean:message key="label.redo.questions"/>
 						</html:submit>	 		
    						&nbsp&nbsp&nbsp&nbsp&nbsp
    						<html:submit property="viewSummary" styleClass="a.button">

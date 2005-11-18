@@ -142,6 +142,12 @@
 	  	/>
 	  	
 	  	<forward
+		    name="redoQuestions"
+		    path=".redoQuestions"
+		    redirect="true"
+	  	/>
+
+	  	<forward
 		    name="viewSummary"
 		    path=".viewSummary"
 		    redirect="true"

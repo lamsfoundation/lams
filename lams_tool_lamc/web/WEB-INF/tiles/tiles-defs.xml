@@ -99,4 +99,10 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/ViewSummary.jsp" />	
 	</definition>
 	
+	<definition name=".redoQuestions" extends=".baseDef" >
+		<put name="title" value="Redo Questions?"/>
+		<put name="pageHeader" value = "Redo Questions?"/>
+		<put name="content" value="/RedoQuestions.jsp" />	
+	</definition>
+	
 </tiles-definitions>
