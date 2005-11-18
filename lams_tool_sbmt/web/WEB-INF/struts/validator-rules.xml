@@ -50,7 +50,7 @@
    <global>
    
       <validator name="maxFileSize"
-            classname="org.lamsfoundation.lams.util.FileValidator"
+            classname="org.lamsfoundation.lams.util.FileValidatorUtil"
                method="validateFileSize"
          methodParams="java.lang.Object,
                        org.apache.commons.validator.ValidatorAction,
