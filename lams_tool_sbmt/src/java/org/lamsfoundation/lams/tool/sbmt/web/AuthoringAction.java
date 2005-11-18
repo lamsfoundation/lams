@@ -22,8 +22,13 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +43,7 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.LookupDispatchAction;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
@@ -89,7 +95,41 @@ public class AuthoringAction extends LookupDispatchAction {
 			if(content.getContentID().equals(persistContent.getContentID())){
 				//keep Set type attribute for persist content becuase this update only 
 				//include updating simple properties from web page(i.e. text value, list value, etc)
-				content.setInstructionFiles(persistContent.getInstructionFiles());
+				Set attPOSet = persistContent.getInstructionFiles();
+				List attachmentList = getAttachmentList(request);
+				List deleteAttachmentList = getDeletedAttachmentList(request);
+				Iterator iter = attachmentList.iterator();
+				while(iter.hasNext()){
+					InstructionFiles newAtt = (InstructionFiles) iter.next();
+					//add new attachment, UID is not null
+					if(newAtt.getUid() == null)
+						attPOSet.add(newAtt);
+				}
+				attachmentList.clear();
+				
+				iter = deleteAttachmentList.iterator();
+				while(iter.hasNext()){
+					InstructionFiles delAtt = (InstructionFiles) iter.next();
+					//delete from repository
+					submitFilesService.deleteFromRepository(delAtt.getUuID(),delAtt.getVersionID());
+					//it is an existed att, then delete it from current attachmentPO
+					if(delAtt.getUid() != null){
+						Iterator attIter = attPOSet.iterator();
+						while(attIter.hasNext()){
+							InstructionFiles att = (InstructionFiles) attIter.next();
+							if(delAtt.getUid().equals(att.getUid())){
+								attIter.remove();
+								break;
+							}
+						}
+						submitFilesService.deleteInstructionFile(content.getContentID(), delAtt.getUuID(), delAtt
+								.getVersionID(), delAtt.getType());
+					}//end remove from persist value
+				}
+				deleteAttachmentList.clear();
+				
+				//copy back
+				content.setInstructionFiles(attPOSet);
 				content.setToolSession(persistContent.getToolSession());
 				//copy web page value into persist content, as above, the "Set" type value kept.
 				PropertyUtils.copyProperties(persistContent,content);
@@ -150,18 +190,32 @@ public class AuthoringAction extends LookupDispatchAction {
 		SubmitFilesContent content = getContent(form);
 		//Call setUp() as early as possible , so never loss the screen value if any exception happen.
 		setUp(request,content);
-		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this
-				.getServlet().getServletContext());
-		//send back the upload file list and display them on page
-		SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(content.getContentID());
-		content.setInstructionFiles(persistContent.getInstructionFiles());
-		//content change, so call setup again.
-		setUp(request,content);
+
+		//upload to repository
+		InstructionFiles att = submitFilesService.uploadFileToContent(content.getContentID(), file, type);
 		
-		submitFilesService.uploadFileToContent(content.getContentID(), file, type);
+		//handle session value
+		List attachmentList = getAttachmentList(request);
+		List deleteAttachmentList = getDeletedAttachmentList(request);
+		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
+		Iterator iter = attachmentList.iterator();
+		InstructionFiles existAtt;
+		while(iter.hasNext()){
+			existAtt = (InstructionFiles) iter.next();
+			if(StringUtils.equals(existAtt.getName(),att.getName())){
+				//if there is same name attachment, delete old one
+				deleteAttachmentList.add(existAtt);
+				iter.remove();
+				break;
+			}
+		}
+		//add to attachmentList
+		attachmentList.add(att);
+		
 		//add new uploaded file into DTO becuase content instruction file list comes from persistCotent.
 		//so it is not need refresh content again.
 		//content change, so call setup again.
+		content.setInstructionFiles(new HashSet(attachmentList));
 		setUp(request,content);
 		return mapping.getInputForward();
 
@@ -197,6 +251,10 @@ public class AuthoringAction extends LookupDispatchAction {
 			persistContent.setContentID(contentID);
 		}
 		setUp(request,persistContent);
+
+		//initialize attachmentList
+		List attachmentList = getAttachmentList(request);
+		attachmentList.addAll(persistContent.getInstructionFiles());
 		
 		//set back STRUTS component value
 		DynaActionForm authForm = (DynaActionForm) form;
@@ -259,5 +317,33 @@ public class AuthoringAction extends LookupDispatchAction {
 		AuthoringDTO authorDto = new AuthoringDTO(content);
 		request.setAttribute(SbmtConstants.AUTHORING_DTO,authorDto);
 	}
-
+	/**
+	 * @param request
+	 * @return
+	 */
+	private List getAttachmentList(HttpServletRequest request) {
+		return getListFromSession(request,SbmtConstants.ATTACHMENT_LIST);
+	}
+	/**
+	 * @param request
+	 * @return
+	 */
+	private List getDeletedAttachmentList(HttpServletRequest request) {
+		return getListFromSession(request,SbmtConstants.DELETED_ATTACHMENT_LIST);
+	}
+	/**
+	 * Get <code>java.util.List</code> from HttpSession by given name.
+	 * 
+	 * @param request
+	 * @param name
+	 * @return
+	 */
+	private List getListFromSession(HttpServletRequest request,String name) {
+		List list = (List) request.getSession().getAttribute(name);
+		if(list == null){
+			list = new ArrayList();
+			request.getSession().setAttribute(name,list);
+		}
+		return list;
+	}
 }

@@ -33,4 +33,6 @@ public class SbmtConstants {
 	
 	//TODO: hard code, need to read from config file/db
 	public static final String TOOL_URL_BASE = "/lams/tool/lasbmt11/";
+	public static final String ATTACHMENT_LIST = "attachmentList";
+	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
 }

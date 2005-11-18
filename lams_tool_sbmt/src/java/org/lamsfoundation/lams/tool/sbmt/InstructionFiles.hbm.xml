@@ -12,8 +12,8 @@
     >
 
         <id
-            name="fileID"
-            column="file_id"
+            name="uid"
+            column="uid"
             type="java.lang.Long"
         >
             <generator class="identity">

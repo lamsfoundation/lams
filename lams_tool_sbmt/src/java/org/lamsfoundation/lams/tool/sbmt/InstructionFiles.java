@@ -32,24 +32,24 @@ public class InstructionFiles implements Serializable,Cloneable{
 	private static final long serialVersionUID = 3555065437595925246L;
 	private static Logger log = Logger.getLogger(InstructionFiles.class);
 	
-	private Long fileID;
+	private Long uid;
 	private Long uuID;
 	private Long versionID;
 	private String name;
 	private String type;
 
 	/**
-     * @hibernate.id generator-class="identity" type="java.lang.Long" column="file_id"
-	 * @return Returns the fileID.
+     * @hibernate.id generator-class="identity" type="java.lang.Long" column="uid"
+	 * @return Returns the uid.
 	 */
-	public Long getFileID() {
-		return fileID;
+	public Long getUid() {
+		return uid;
 	}
 	/**
-	 * @param fileID The fileID to set.
+	 * @param uid The uid to set.
 	 */
-	public void setFileID(Long fileID) {
-		this.fileID = fileID;
+	public void setUid(Long fileID) {
+		this.uid = fileID;
 	}
 	/**
 	 * 

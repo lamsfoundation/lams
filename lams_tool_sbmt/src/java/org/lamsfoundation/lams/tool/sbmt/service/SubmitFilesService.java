@@ -24,19 +24,16 @@ package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
@@ -91,118 +88,18 @@ public class SubmitFilesService implements ToolContentManager,
 	private static Logger log = Logger.getLogger(SubmitFilesService.class);
 	
 	private ISubmitFilesContentDAO submitFilesContentDAO;
-
 	private ISubmitFilesReportDAO submitFilesReportDAO;
-
 	private ISubmitFilesSessionDAO submitFilesSessionDAO;
-	
 	private ISubmissionDetailsDAO submissionDetailsDAO;
-
 	private ILearnerDAO learnerDAO;
-	
+	private IUserDAO userDAO;
 	
 	private SbmtToolContentHandler toolContentHandler;
-	private IUserDAO userDAO;
 	
 	private ILamsToolService toolService;
 	private ILearnerService learnerService;
 	private IRepositoryService repositoryService;
 
-	/***************************************************************************
-	 * Property Injection Methods
-	 **************************************************************************/
-
-	/**
-	 * @param submitFilesContentDAO
-	 *            The submitFilesContentDAO to set.
-	 */
-	public void setSubmitFilesContentDAO(
-			ISubmitFilesContentDAO submitFilesContentDAO) {
-		this.submitFilesContentDAO = submitFilesContentDAO;
-	}
-
-	/**
-	 * @param submitFilesReportDAO
-	 *            The submitFilesReportDAO to set.
-	 */
-	public void setSubmitFilesReportDAO(
-			ISubmitFilesReportDAO submitFilesReportDAO) {
-		this.submitFilesReportDAO = submitFilesReportDAO;
-	}
-
-	/**
-	 * @param submitFilesSessionDAO
-	 *            The submitFilesSessionDAO to set.
-	 */
-	public void setSubmitFilesSessionDAO(
-			ISubmitFilesSessionDAO submitFilesSessionDAO) {
-		this.submitFilesSessionDAO = submitFilesSessionDAO;
-	}
-	
-	/**
-	 * @param submissionDetailsDAO The submissionDetailsDAO to set.
-	 */
-	public void setSubmissionDetailsDAO(
-			ISubmissionDetailsDAO submissionDetailsDAO) {
-		this.submissionDetailsDAO = submissionDetailsDAO;
-	}
-	
-
-	/**
-	 * @return Returns the toolContentHandler.
-	 */
-	public SbmtToolContentHandler getToolContentHandler() {
-		return toolContentHandler;
-	}
-
-	/**
-	 * @param toolContentHandler The toolContentHandler to set.
-	 */
-	public void setToolContentHandler(SbmtToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
-	}
-	
-	/**
-	 * @param userDAO The userDAO to set.
-	 */
-	public void setUserDAO(IUserDAO userDAO) {
-		this.userDAO = userDAO;
-	}
-
-	/**
-	 * @return Returns the learnerDAO.
-	 */
-	public ILearnerDAO getLearnerDAO() {
-		return learnerDAO;
-	}
-
-	/**
-	 * @param learnerDAO The learnerDAO to set.
-	 */
-	public void setLearnerDAO(ILearnerDAO learnerDAO) {
-		this.learnerDAO = learnerDAO;
-	}
-
-	public Learner getLearner(Long sessionID, Long userID) {
-		return learnerDAO.getLearner(sessionID,userID);
-	}
-
-	public ILearnerService getLearnerService() {
-		return learnerService;
-	}
-
-	public void setLearnerService(ILearnerService learnerService) {
-		this.learnerService = learnerService;
-	}
-
-	public ILamsToolService getToolService() {
-		return toolService;
-	}
-
-	public void setToolService(ILamsToolService toolService) {
-		this.toolService = toolService;
-	}
-	
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -536,40 +433,18 @@ public class SubmitFilesService implements ToolContentManager,
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToContent(Long,FormFile ) 
 	 */
 	public InstructionFiles uploadFileToContent(Long contentID, FormFile uploadFile,String fileType) throws SubmitFilesException{
-		InstructionFiles refile = null;
 		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
 			throw new SubmitFilesException("Could not find upload file: " + uploadFile);
 		
-        SubmitFilesContent content = getSubmitFilesContent(contentID);
-        if ( content == null || !contentID.equals(content.getContentID())) {
-        	content  = new SubmitFilesContent();
-        	content.setContentID(contentID);
-        	//user firstly upload file without any other input, even the not-null 
-        	//field "title". Set title as default title.
-        	content.setTitle(SbmtConstants.DEFAULT_TITLE);
-        }
 		NodeKey nodeKey = processFile(uploadFile,fileType);
 		
-		Set fileSet = content.getInstructionFiles();
-		if(fileSet == null){
-			fileSet = new HashSet();
-			content.setInstructionFiles(fileSet);
-		}
 		InstructionFiles file = new InstructionFiles();
 		file.setType(fileType);
 		file.setUuID(nodeKey.getUuid());
 		file.setVersionID(nodeKey.getVersion());
 		file.setName(uploadFile.getFileName());
-		fileSet.add(file);
-		submitFilesContentDAO.save(content);
 		
-		refile = new InstructionFiles();
-		try {
-			PropertyUtils.copyProperties(refile,file);
-		} catch (Exception e) {
-			throw new SubmitFilesException("Could not get return InstructionFile instance" +e.getMessage());
-		}
-		return refile;
+		return file;
 	}
 	/**
 	 * (non-Javadoc)
@@ -821,7 +696,6 @@ public class SubmitFilesService implements ToolContentManager,
     	content = (SubmitFilesContent) defaultContent.clone();
 		content.setContentID(contentID);
 		saveSubmitFilesContent(content);
-		
     	
 		return content;
 	}
@@ -832,4 +706,101 @@ public class SubmitFilesService implements ToolContentManager,
             learners = new ArrayList(); //return sized 0 list rather than null value
         return learners;
     }
+    
+	/***************************************************************************
+	 * Property Injection Methods
+	 **************************************************************************/
+
+	/**
+	 * @param submitFilesContentDAO
+	 *            The submitFilesContentDAO to set.
+	 */
+	public void setSubmitFilesContentDAO(
+			ISubmitFilesContentDAO submitFilesContentDAO) {
+		this.submitFilesContentDAO = submitFilesContentDAO;
+	}
+
+	/**
+	 * @param submitFilesReportDAO
+	 *            The submitFilesReportDAO to set.
+	 */
+	public void setSubmitFilesReportDAO(
+			ISubmitFilesReportDAO submitFilesReportDAO) {
+		this.submitFilesReportDAO = submitFilesReportDAO;
+	}
+
+	/**
+	 * @param submitFilesSessionDAO
+	 *            The submitFilesSessionDAO to set.
+	 */
+	public void setSubmitFilesSessionDAO(
+			ISubmitFilesSessionDAO submitFilesSessionDAO) {
+		this.submitFilesSessionDAO = submitFilesSessionDAO;
+	}
+	
+	/**
+	 * @param submissionDetailsDAO The submissionDetailsDAO to set.
+	 */
+	public void setSubmissionDetailsDAO(
+			ISubmissionDetailsDAO submissionDetailsDAO) {
+		this.submissionDetailsDAO = submissionDetailsDAO;
+	}
+	
+
+	/**
+	 * @return Returns the toolContentHandler.
+	 */
+	public SbmtToolContentHandler getToolContentHandler() {
+		return toolContentHandler;
+	}
+
+	/**
+	 * @param toolContentHandler The toolContentHandler to set.
+	 */
+	public void setToolContentHandler(SbmtToolContentHandler toolContentHandler) {
+		this.toolContentHandler = toolContentHandler;
+	}
+	
+	/**
+	 * @param userDAO The userDAO to set.
+	 */
+	public void setUserDAO(IUserDAO userDAO) {
+		this.userDAO = userDAO;
+	}
+
+	/**
+	 * @return Returns the learnerDAO.
+	 */
+	public ILearnerDAO getLearnerDAO() {
+		return learnerDAO;
+	}
+
+	/**
+	 * @param learnerDAO The learnerDAO to set.
+	 */
+	public void setLearnerDAO(ILearnerDAO learnerDAO) {
+		this.learnerDAO = learnerDAO;
+	}
+
+	public Learner getLearner(Long sessionID, Long userID) {
+		return learnerDAO.getLearner(sessionID,userID);
+	}
+
+	public ILearnerService getLearnerService() {
+		return learnerService;
+	}
+
+	public void setLearnerService(ILearnerService learnerService) {
+		this.learnerService = learnerService;
+	}
+
+	public ILamsToolService getToolService() {
+		return toolService;
+	}
+
+	public void setToolService(ILamsToolService toolService) {
+		this.toolService = toolService;
+	}
+	
+
 }

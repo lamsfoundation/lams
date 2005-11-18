@@ -23,13 +23,13 @@ create table tl_lasbmt11_content (
    primary key (content_id)
 );
 create table tl_lasbmt11_instruction_files (
-   file_id bigint not null auto_increment,
+   uid bigint not null auto_increment,
    uuid bigint,
    version_id bigint,
    type varchar(20),
    name varchar(255),
    content_id bigint,
-   primary key (file_id)
+   primary key (uid)
 );
 create table tl_lasbmt11_report (
    report_id bigint not null auto_increment,

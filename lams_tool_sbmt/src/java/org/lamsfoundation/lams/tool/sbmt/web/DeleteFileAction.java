@@ -22,6 +22,7 @@ package org.lamsfoundation.lams.tool.sbmt.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,10 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
-import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
-import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -76,23 +73,29 @@ public class DeleteFileAction extends DispatchAction {
 		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		Long versionID = new Long(WebUtil.readLongParam(request,"versionID"));
 		Long uuID = new Long(WebUtil.readLongParam(request,"uuID"));
-		
-		ISubmitFilesService service = SubmitFilesServiceProxy.getSubmitFilesService(this
-				.getServlet().getServletContext());
+		//handle session value
+		List attachmentList = getAttachmentList(request);
+		List deleteAttachmentList = getDeletedAttachmentList(request);
+		//first check exist attachment and delete old one (if exist) to deletedAttachmentList
+		Iterator iter = attachmentList.iterator();
+		InstructionFiles existAtt;
+		while(iter.hasNext()){
+			existAtt = (InstructionFiles) iter.next();
+			if(existAtt.getUuID().equals(uuID) && existAtt.getVersionID().equals(versionID)){
+				//if there is same name attachment, delete old one
+				deleteAttachmentList.add(existAtt);
+				iter.remove();
+				break;
+			}
+		}
 
-		service.deleteFromRepository(uuID,versionID);
-		service.deleteInstructionFile(contentID,uuID,versionID,type);
-		SubmitFilesContent content = service.getSubmitFilesContent(contentID);
-		AuthoringDTO authorDto = new AuthoringDTO(content);
-		List list;
-		if(StringUtils.equals(type,IToolContentHandler.TYPE_OFFLINE))
-			list = authorDto.getOfflineFiles();
-		else
-			list = authorDto.getOnlineFiles();
-		Iterator iter = list.iterator();
+		iter = attachmentList.iterator();
 		StringBuffer sb = new StringBuffer();
 		while(iter.hasNext()){
 			InstructionFiles file = (InstructionFiles) iter.next();
+			if(!StringUtils.equals(type,file.getType()))
+				continue;
+			
 			sb.append("<li>").append(file.getName()).append("\r\n");
 			sb.append(" <a href=\"javascript:launchInstructionsPopup('download/?uuid=").append(file.getUuID()).append("&preferDownload=false')\">");
 			sb.append(this.getResources(request).getMessage("label.view"));
@@ -130,5 +133,33 @@ public class DeleteFileAction extends DispatchAction {
 		}
 		return null;
 	}
-		
+	/**
+	 * @param request
+	 * @return
+	 */
+	private List getAttachmentList(HttpServletRequest request) {
+		return getListFromSession(request,SbmtConstants.ATTACHMENT_LIST);
+	}
+	/**
+	 * @param request
+	 * @return
+	 */
+	private List getDeletedAttachmentList(HttpServletRequest request) {
+		return getListFromSession(request,SbmtConstants.DELETED_ATTACHMENT_LIST);
+	}
+	/**
+	 * Get <code>java.util.List</code> from HttpSession by given name.
+	 * 
+	 * @param request
+	 * @param name
+	 * @return
+	 */
+	private List getListFromSession(HttpServletRequest request,String name) {
+		List list = (List) request.getSession().getAttribute(name);
+		if(list == null){
+			list = new ArrayList();
+			request.getSession().setAttribute(name,list);
+		}
+		return list;
+	}
 }
