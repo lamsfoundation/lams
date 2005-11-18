@@ -1324,6 +1324,42 @@ public class McServicePOJO implements
      * Call controller service to complete the qa session
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long)
      */
+    public String leaveToolSession(Long toolSessionId,User user) throws DataMissingException, ToolException 
+    {
+        logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId);
+        //logger.debug("start of leaveToolSession with learner:" + learnerId);
+        
+        if (toolSessionId == null)
+    	{
+    		logger.debug("toolSessionId is null");
+    		throw new DataMissingException("toolSessionId is missing");
+    	}
+        
+        /*
+        if (learnerId == null)
+    	{
+    		logger.debug("learnerId is null");
+    		throw new DataMissingException("learnerId is missing");
+    	}
+    	*/
+        
+    	try
+		{
+    		/*
+    		String nextUrl=learnerService.completeToolSession(toolSessionId,learner);
+    		logger.debug(logger + " " + this.getClass().getName() +  " " + "nextUrl: " + nextUrl);
+    		return nextUrl;
+    		*/
+    		return "nextUrl";
+    	}
+    	catch(DataAccessException e)
+		{
+    		throw new ToolException("Exception occured when user is leaving tool session: " + e);
+		}
+        
+    }
+
+    
     public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException 
     {
         logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId);
@@ -1335,11 +1371,13 @@ public class McServicePOJO implements
     		throw new DataMissingException("toolSessionId is missing");
     	}
         
+        
         if (learnerId == null)
     	{
     		logger.debug("learnerId is null");
     		throw new DataMissingException("learnerId is missing");
     	}
+    	
         
     	try
 		{

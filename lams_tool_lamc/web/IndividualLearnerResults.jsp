@@ -66,7 +66,7 @@
 					   								    <img src="images/dot.jpg" align=left>
 													</td> 
 													<td align=left class="input" valign=top> 
-														<font size=2 color="#006666">	<c:out value="${subEntry.value}"/> </font>
+														<font size=2 color="#669966">	<c:out value="${subEntry.value}"/> </font>
 													</td>
 												</tr>	
 											</c:forEach>
@@ -78,31 +78,57 @@
 												</tr>
 												
 												<tr>
-												<td colspan=2 align=left class="input" valign=top> 											
-													<table align=left>
-												  		<c:forEach var="subEntry" items="${mainEntry.value}">
-					  											<c:forEach var="selectedMainEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
-																			<c:if test="${selectedMainEntry.key == sessionScope.queIndex}"> 		
-																		  		<c:forEach var="selectedSubEntry" items="${selectedMainEntry.value}">
-																					<c:if test="${subEntry.key == selectedSubEntry.key}"> 		
-																							<tr> 
-																								<td align=left class="input" valign=top> 
-																									<b> <c:out value="${subEntry.value}"/> </b>
-																								</td> 
-																							</tr>
-									  												</c:if> 			
-																				</c:forEach>																						
-						  													</c:if> 			
-																</c:forEach>		
-															</tr>																			
+													<td  align=left class="input" valign=top> 											
+														<table align=left>
+													  		<c:forEach var="subEntry" items="${mainEntry.value}">
+						  											<c:forEach var="selectedMainEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
+																				<c:if test="${selectedMainEntry.key == sessionScope.queIndex}"> 		
+																			  		<c:forEach var="selectedSubEntry" items="${selectedMainEntry.value}">
+																						<c:if test="${subEntry.key == selectedSubEntry.key}"> 		
+																								<tr> 
+																									<td align=left class="input" valign=top> 
+																										<b> <c:out value="${subEntry.value}"/> </b>
+																									</td> 
+																								</tr>
+										  												</c:if> 			
+																					</c:forEach>																						
+							  													</c:if> 			
+																	</c:forEach>		
+																</tr>																			
+												  			</c:forEach>											
+														</table>
+													</td>
+	
+													<td  align=right class="input" valign=top> 											
+														<c:forEach var="mainEntry" items="${sessionScope.mapLearnerAssessmentResults}">
+																<c:if test="${mainEntry.key == sessionScope.queIndex}"> 		
+																	<c:out value="${mainEntry.value}"/>
+																</c:if> 																		
 											  			</c:forEach>											
-													</table>
-												</td>
+													</td>
 												</tr>
-												
-												<tr>
-												<td colspan=2 align=left class="input" valign=top> 											
 
+												<tr>
+												<td bgcolor="#006633" colspan=2 align=left class="input" valign=top> 											
+													<c:forEach var="mainEntry" items="${sessionScope.mapLearnerAssessmentResults}">
+															<c:if test="${mainEntry.key == sessionScope.queIndex}"> 		
+																<c:if test="${mainEntry.value == 'true'}"> 		
+																	<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackCorrect}">
+																		<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
+																				<c:out value="${feedbackEntry.value}"/>
+																		</c:if> 																																				
+																	</c:forEach>											
+																</c:if> 														
+																
+																<c:if test="${mainEntry.value == 'false'}"> 		
+																	<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackIncorrect}">
+																		<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
+																				<c:out value="${feedbackEntry.value}"/>
+																		</c:if> 																																				
+																	</c:forEach>											
+																</c:if> 														
+															</c:if> 																		
+													</c:forEach>											
 												</td>
 												</tr>
 											

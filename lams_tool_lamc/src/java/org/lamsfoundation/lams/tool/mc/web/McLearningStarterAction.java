@@ -182,12 +182,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     */
 	    setupAttributes(request, mcContent);
 	    
-	    Map mapLeanerFeedbackIncorrect=AuthoringUtil.buildInCorrectFeedbackMap(request, mcContent.getMcContentId());
-	    request.getSession().setAttribute(MAP_LEARNER_FEEDBACK_INCORRECT, mapLeanerFeedbackIncorrect);
-	    
-	    Map mapLeanerFeedbackCorrect=AuthoringUtil.buildInCorrectFeedbackMap(request, mcContent.getMcContentId());
-	    request.getSession().setAttribute(MAP_LEARNER_FEEDBACK_CORRECT, mapLeanerFeedbackCorrect);
-	    
 	    
 	    /*
     	 * fetch question content from content
@@ -342,15 +336,13 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    Map mapLeanerAssessmentResults= new TreeMap(new McComparator());
 	    request.getSession().setAttribute(MAP_LEARNER_ASSESSMENT_RESULTS, mapLeanerAssessmentResults);
 	    
-	    Map mapLeanerFeedbackIncorrect= new TreeMap(new McComparator());
+	    Map mapLeanerFeedbackIncorrect=AuthoringUtil.buildInCorrectFeedbackMap(request, mcContent.getMcContentId());
 	    request.getSession().setAttribute(MAP_LEARNER_FEEDBACK_INCORRECT, mapLeanerFeedbackIncorrect);
+	    logger.debug("MAP_LEARNER_FEEDBACK_INCORRECT: " + mapLeanerFeedbackIncorrect);
 	    
-	    
-	    
-	    
-	    
-	    Map mapLeanerFeedbackCorrect= new TreeMap(new McComparator());
+	    Map mapLeanerFeedbackCorrect=AuthoringUtil.buildCorrectFeedbackMap(request, mcContent.getMcContentId());
 	    request.getSession().setAttribute(MAP_LEARNER_FEEDBACK_CORRECT, mapLeanerFeedbackCorrect);
+	    logger.debug("MAP_LEARNER_FEEDBACK_CORRECT: " + mapLeanerFeedbackCorrect);
 	    
 	    /* .. till here */
 	}
