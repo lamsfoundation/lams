@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -70,7 +71,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private ForumToolSessionDao forumToolSessionDao;
 	//system level handler and service 
 	private ILamsToolService toolService;
-	private ForumToolContentHandler toolContentHandler;
+	private ForumToolContentHandler forumToolContentHandler;
 	private IRepositoryService repositoryService;
 	
 
@@ -362,7 +363,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException {
 	}
 
-	public String leaveToolSession(Long toolSessionId, Long learnerID) throws DataMissingException, ToolException {
+	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 		return null;
 	}
 
@@ -412,7 +413,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
             String fileName = file.getFileName();
             try {
-				node = getToolContentHandler().uploadFile(file.getInputStream(), fileName, 
+				node = getForumToolContentHandler().uploadFile(file.getInputStream(), fileName, 
 				        file.getContentType(), fileType);
 			} catch (InvalidParameterException e) {
 				throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
@@ -439,11 +440,11 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	 */
 	private ITicket getRepositoryLoginTicket() throws ForumException {
 		ICredentials credentials = new SimpleCredentials(
-				toolContentHandler.getRepositoryUser(),
-				toolContentHandler.getRepositoryId());
+				forumToolContentHandler.getRepositoryUser(),
+				forumToolContentHandler.getRepositoryId());
 		try {
 			ITicket ticket = repositoryService.login(credentials,
-					toolContentHandler.getRepositoryWorkspaceName());
+					forumToolContentHandler.getRepositoryWorkspaceName());
 			return ticket;
 		} catch (AccessDeniedException ae) {
 			throw new ForumException("Access Denied to repository."
@@ -523,12 +524,13 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setRepositoryService(IRepositoryService repositoryService) {
 		this.repositoryService = repositoryService;
 	}
-	public ForumToolContentHandler getToolContentHandler() {
-		return toolContentHandler;
+	public ForumToolContentHandler getForumToolContentHandler() {
+		return forumToolContentHandler;
 	}
 
-	public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
+	public void setForumToolContentHandler(ForumToolContentHandler toolContentHandler) {
+		this.forumToolContentHandler = toolContentHandler;
 	}
+
 
 }

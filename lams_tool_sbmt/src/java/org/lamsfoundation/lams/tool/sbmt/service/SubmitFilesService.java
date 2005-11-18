@@ -94,7 +94,7 @@ public class SubmitFilesService implements ToolContentManager,
 	private ILearnerDAO learnerDAO;
 	private IUserDAO userDAO;
 	
-	private SbmtToolContentHandler toolContentHandler;
+	private SbmtToolContentHandler sbmtToolContentHandler;
 	
 	private ILamsToolService toolService;
 	private ILearnerService learnerService;
@@ -505,7 +505,7 @@ public class SubmitFilesService implements ToolContentManager,
         if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
             String fileName = file.getFileName();
             try {
-				node = getToolContentHandler().uploadFile(file.getInputStream(), fileName, 
+				node = getSbmtToolContentHandler().uploadFile(file.getInputStream(), fileName, 
 				        file.getContentType(), fileType);
 			} catch (InvalidParameterException e) {
 				throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
@@ -748,17 +748,17 @@ public class SubmitFilesService implements ToolContentManager,
 	
 
 	/**
-	 * @return Returns the toolContentHandler.
+	 * @return Returns the sbmtToolContentHandler.
 	 */
-	public SbmtToolContentHandler getToolContentHandler() {
-		return toolContentHandler;
+	public SbmtToolContentHandler getSbmtToolContentHandler() {
+		return sbmtToolContentHandler;
 	}
 
 	/**
-	 * @param toolContentHandler The toolContentHandler to set.
+	 * @param sbmtToolContentHandler The sbmtToolContentHandler to set.
 	 */
-	public void setToolContentHandler(SbmtToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
+	public void setSbmtToolContentHandler(SbmtToolContentHandler toolContentHandler) {
+		this.sbmtToolContentHandler = toolContentHandler;
 	}
 	
 	/**

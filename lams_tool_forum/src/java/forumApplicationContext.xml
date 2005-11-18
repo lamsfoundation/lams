@@ -56,7 +56,7 @@
     </bean>
 
     <!-- Managers -->
-	<bean id="toolContentHandler" class="org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler">
+	<bean id="forumToolContentHandler" class="org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler">
 	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean> 
 	
@@ -79,8 +79,8 @@
         <property name="forumToolSessionDao">
             <ref local="forumToolSessionDao"/>
         </property>
-        <property name="toolContentHandler">
-            <ref local="toolContentHandler"/>
+        <property name="forumToolContentHandler">
+            <ref local="forumToolContentHandler"/>
         </property>
         <property name="repositoryService">
             <ref bean="repositoryService"/>

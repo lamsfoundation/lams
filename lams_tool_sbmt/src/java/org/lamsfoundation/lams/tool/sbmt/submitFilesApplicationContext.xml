@@ -50,7 +50,7 @@
 		<property name="submitFilesReportDAO"><ref bean="submitFilesReportDAO"/></property>
 		<property name="submissionDetailsDAO"><ref bean="submissionDetailsDAO"/></property>
 		<property name="learnerDAO"><ref bean="learnerDAO"/></property>
-		<property name="toolContentHandler"><ref bean="toolContentHandler"/></property>
+		<property name="sbmtToolContentHandler"><ref bean="sbmtToolContentHandler"/></property>
 		<property name="userDAO"><ref bean="userDAO"/></property>
 		<property name="learnerService"><ref bean="learnerService"/></property>
 		<property name="toolService"><ref bean="lamsToolService"/></property>
@@ -74,7 +74,7 @@
 			</props>
 		</property>
 	</bean>	
-	<bean id="toolContentHandler" class="org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler">
+	<bean id="sbmtToolContentHandler" class="org.lamsfoundation.lams.tool.sbmt.util.SbmtToolContentHandler">
  		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean> 
 	
