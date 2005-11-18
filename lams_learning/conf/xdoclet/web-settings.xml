@@ -31,6 +31,7 @@ http://www.gnu.org/licenses/gpl.txt
 		classpath:/org/lamsfoundation/lams/tool/toolApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
+		classpath:forumApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/tool/mc/mcApplicationContext.xml 
 		classpath:/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml 
 		classpath:/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml 
