@@ -177,6 +177,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    request.getSession().setAttribute(TOOL_CONTENT_ID, mcContent.getMcContentId());
 	    logger.debug("using TOOL_CONTENT_ID: " + mcContent.getMcContentId());
 	    
+	    request.getSession().setAttribute(TOOL_CONTENT_UID, mcContent.getUid());
+	    logger.debug("using TOOL_CONTENT_UID: " + mcContent.getUid());
+	    
 	    /*
 	     * The content we retrieved above must have been created before in Authoring time. 
 	     * And the passed tool session id already refers to it.

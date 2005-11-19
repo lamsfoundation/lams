@@ -51,6 +51,81 @@ public abstract class McUtils implements McAppConstants {
 		IMcService mcService=(IMcService)request.getSession().getAttribute(TOOL_SERVICE);
 	    return mcService;
 	}
+
+	/**
+	 * 
+	 * getGMTDateTime(HttpServletRequest request)
+	 * 
+	 * @param request
+	 * @return
+	 */
+	/* fix this */
+    public static Date getGMTDateTime()
+    {
+    	Date date=new Date(System.currentTimeMillis());
+    	logger.debug("date: " + date);
+    	return date;
+    }
+
+	
+	public static UserDTO getToolUser()
+	{
+		/*obtain user object from the session*/
+	    HttpSession ss = SessionManager.getSession();
+	    /* get back login user DTO */
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		logger.debug("retrieving toolUser: " + toolUser);
+		return 	toolUser;
+	}
+	
+	
+	public static Long getUserId()
+	{
+		UserDTO toolUser=getToolUser();
+		long userId=toolUser.getUserID().longValue();
+		logger.debug("userId: " + userId);
+		return new Long(userId);
+	}
+	
+	public static String getUserName()
+	{
+		/* double check if username and login is the same */
+		UserDTO toolUser=getToolUser();
+		String userName=toolUser.getLogin();
+		logger.debug("userName: " + userName);
+		return userName;
+	}
+	
+	public static String getUserFullName()
+	{
+		UserDTO toolUser=getToolUser();
+		String fullName=toolUser.getFirstName() + " " + toolUser.getLastName();  
+		logger.debug("fullName: " + fullName);
+		return fullName;
+	}
+	
+	public static String getFormattedDateString(Date date)
+	{
+		logger.debug(logger + " " + " McUtils getFormattedDateString: " +  
+				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
+		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
+	}
+	
+	public static void persistTimeZone(HttpServletRequest request)
+	{
+		TimeZone timeZone=TimeZone.getDefault();
+	    logger.debug("current timezone: " + timeZone.getDisplayName());
+	    request.getSession().setAttribute(TIMEZONE, timeZone.getDisplayName());
+	    logger.debug("current timezone id: " + timeZone.getID());
+	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
+	}
+	
+	public static String getCurrentTimeZone()
+	{
+		TimeZone timeZone=TimeZone.getDefault();
+	    logger.debug("current timezone: " + timeZone.getDisplayName());
+	    return timeZone.getDisplayName();
+	}
 	
 	
 	/**
@@ -134,23 +209,6 @@ public abstract class McUtils implements McAppConstants {
     	return mapOptionsContent;
 	}
 
-	
-	public static String getFormattedDateString(Date date)
-	{
-		logger.debug(logger + " " + " McUtils getFormattedDateString: " +  
-				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
-		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
-	}
-	
-	public static void persistTimeZone(HttpServletRequest request)
-	{
-		TimeZone timeZone=TimeZone.getDefault();
-	    logger.debug("current timezone: " + timeZone.getDisplayName());
-	    request.getSession().setAttribute(TIMEZONE, timeZone.getDisplayName());
-	    logger.debug("current timezone id: " + timeZone.getID());
-	    request.getSession().setAttribute(TIMEZONE_ID, timeZone.getID());
-	}
-	
 	
 	public static void persistRichText(HttpServletRequest request)
 	{

@@ -79,6 +79,8 @@ public class McUsrAttempt implements Serializable {
     }
     
     
+      
+    
     /** default constructor */
     public McUsrAttempt() {
     }

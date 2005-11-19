@@ -172,6 +172,20 @@ public class McServicePOJO implements
         }
     }
     
+    public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid) throws McApplicationException
+	{
+        try
+        {
+        	return mcQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, mcContentUid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting mc que content by display order: "
+                                                         + e.getMessage(),
+														   e);
+        }    	
+	}
+    
     
     public void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException
 	{

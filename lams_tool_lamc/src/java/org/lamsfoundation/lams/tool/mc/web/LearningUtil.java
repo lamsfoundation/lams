@@ -3,10 +3,12 @@
  */
 package org.lamsfoundation.lams.tool.mc.web;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,6 +18,9 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
+import org.lamsfoundation.lams.tool.mc.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.McSession;
+import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 
@@ -361,4 +366,131 @@ public class LearningUtil implements McAppConstants {
     	return false;
     }
 	
+    
+    /**
+     * creates the user in the db
+     * createUser(HttpServletRequest request)
+     * 
+     * @param request
+     */
+    public static void createUser(HttpServletRequest request)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+	    Long queUsrId=McUtils.getUserId();
+		logger.debug("queUsrId: " + queUsrId);
+		
+		String username=McUtils.getUserName();
+		logger.debug("userName: " + username);
+		
+		String fullname=McUtils.getUserFullName();
+		logger.debug("fullName: " + fullname);
+		
+		Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+		logger.debug("toolSessionId: " + toolSessionId);
+		
+		McSession mcSession=mcService.retrieveMcSession(toolSessionId);
+	    logger.debug("retrieving mcSession: " + mcSession);
+		
+		McQueUsr mcQueUsr= new McQueUsr(queUsrId, 
+										username, 
+										fullname,  
+										mcSession, 
+										new TreeSet());		
+		logger.debug("created mcQueUsr : " + mcQueUsr);
+		mcService.createMcQueUsr(mcQueUsr);
+		logger.debug("created mcQueUsr in the db: " + mcQueUsr);
+	}
+
+    
+    /**
+     * checks if the user is in the db
+     * doesUserExists(HttpServletRequest request)
+     * 
+     * @param request
+     */
+    public static boolean doesUserExists(HttpServletRequest request)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+	    Long queUsrId=McUtils.getUserId();
+		logger.debug("queUsrId: " + queUsrId);
+		
+		McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(queUsrId);
+		logger.debug("mcQueUsr: " + mcQueUsr);
+		
+		if (mcQueUsr != null)
+			return true;
+		
+		return false;
+	}
+    
+    
+    public static McQueUsr getUser(HttpServletRequest request)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+	    Long queUsrId=McUtils.getUserId();
+		logger.debug("queUsrId: " + queUsrId);
+		
+		McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(queUsrId);
+		logger.debug("mcQueUsr: " + mcQueUsr);
+		
+		return mcQueUsr;
+	}
+    
+    
+
+    /**
+     * creates a user attempt in the db
+     * createAttempt(HttpServletRequest request)
+     * 
+     * @param request
+     */
+    public static void createAttempt(HttpServletRequest request, McQueUsr mcQueUsr, Map mapGeneralCheckedOptionsContent)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+		Date attempTime=McUtils.getGMTDateTime();
+		logger.debug("attempTime: " + attempTime);
+		
+		String timeZone= McUtils.getCurrentTimeZone();
+		logger.debug("timeZone: " + timeZone);
+		
+		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
+		logger.debug("toolContentUID: " + toolContentUID);
+		 	
+		Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
+        while (itCheckedMap.hasNext()) 
+        {
+        	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
+            logger.debug("using the  pair: " +  checkedPairs.getKey() + " = " + checkedPairs.getValue());
+            
+            Map mapCheckedOptions=(Map) checkedPairs.getValue();
+            logger.debug("question index:" + checkedPairs.getKey()+ " options: "+  mapCheckedOptions);
+            Long questionDisplayOrder=new Long(checkedPairs.getKey().toString()); 
+            logger.debug("questionDisplayOrder:" + questionDisplayOrder);
+            
+            McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(questionDisplayOrder, toolContentUID);
+            logger.debug("mcQueContent:" + mcQueContent);
+            createIndividualOptions(request, mapCheckedOptions, mcQueContent, mcQueUsr, attempTime, timeZone);
+        }
+	 }
+    
+    
+    public static void createIndividualOptions(HttpServletRequest request, Map mapCheckedOptions, McQueContent mcQueContent, McQueUsr mcQueUsr, Date attempTime, String timeZone)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+		
+    	Iterator itCheckedMap = mapCheckedOptions.entrySet().iterator();
+        while (itCheckedMap.hasNext()) 
+        {
+        	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
+        	logger.debug("option value :" + checkedPairs.getValue());
+        	McOptsContent mcOptsContent= mcService.getOptionContentByOptionText(checkedPairs.getValue().toString(), mcQueContent.getUid());
+        	logger.debug("mcOptsContent :" + mcOptsContent);
+        	McUsrAttempt mcUsrAttempt=new McUsrAttempt(attempTime, timeZone, mcQueContent, mcQueUsr, mcOptsContent);
+        	logger.debug("mcUsrAttempt :" + mcUsrAttempt);
+        	mcService.createMcUsrAttempt(mcUsrAttempt);
+        	logger.debug("created mcUsrAttempt in the db :" + mcUsrAttempt);
+        }
+    }
+    
+    
  }

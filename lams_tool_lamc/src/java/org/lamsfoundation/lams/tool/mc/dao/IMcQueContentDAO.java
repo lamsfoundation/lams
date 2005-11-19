@@ -53,6 +53,8 @@ public interface IMcQueContentDAO
 	 */
 	public McQueContent getToolDefaultQuestionContent(final long mcContentId);
 	
+	
+	
 	/**
 	 *  * <p>Return the persistent instance of a McQueContent  
 	 * with the given identifier <code>question</code> and <code>mcContentUid</code>, returns null if not found. </p>
@@ -62,6 +64,16 @@ public interface IMcQueContentDAO
 	 * @return McQueContent
 	 */	
 	public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
+	
+	/**
+	 *  * <p>Return the persistent instance of a McQueContent  
+	 * with the given identifier <code>displayOrder</code> and <code>mcContentUid</code>, returns null if not found. </p>
+	 * 
+	 * @param displayOrder
+	 * @param mcContentUid
+	 * @return McQueContent
+	 */	
+	public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid);
 	
 	/**
 	 *  * <p>Return a list of McQueContent  

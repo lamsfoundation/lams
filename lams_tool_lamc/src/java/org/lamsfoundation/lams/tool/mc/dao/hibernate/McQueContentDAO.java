@@ -49,6 +49,10 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	 	private static final String REFRESH_QUESTION_CONTENT 			= "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId and mcQueContent.disabled=false order by mcQueContent.displayOrder";
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from mcQueContent in class McQueContent where mcQueContent.question=:question and mcQueContent.mcContentId=:mcContentUid";
+	 	
+	 	private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.displayOrder=:displayOrder and mcQueContent.mcContentId=:mcContentUid";
+	 	
+	 	
 	 		 	
 	 	
 	 	public McQueContent getMcQueContentByUID(Long uid)
@@ -71,6 +75,7 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 			}
 			return null;
 	    }
+	 	
 	 	
 	 	public List getAllQuestionEntries(final long mcContentId)
 	    {
@@ -107,6 +112,23 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 			}
 			return null;
 	    }
+	 	
+	 	
+	 	public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER)
+				.setLong("displayOrder", displayOrder.longValue())
+				.setLong("mcContentUid", mcContentUid.longValue())				
+				.list();
+			
+			if(list != null && list.size() > 0){
+				McQueContent mcq = (McQueContent) list.get(0);
+				return mcq;
+			}
+			return null;
+	    }
+	 	
 	 	
 	 	public void removeQuestionContentByMcUid(final Long mcContentUid)
 	    {

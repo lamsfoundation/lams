@@ -65,6 +65,7 @@ public interface McAppConstants {
 	/* these constants are from org.lamsfoundation.lams.web.util.AttributeNames  */
 	public static final String USER										= "user";
 	public static final String TOOL_CONTENT_ID 							= "toolContentID";
+	public static final String TOOL_CONTENT_UID							= "toolContentUID";
 	public static final String TOOL_SESSION_ID 							= "toolSessionID"; 
 	public static final String MODE 									= "mode";
 	public static final String USER_ID 									= "userID";

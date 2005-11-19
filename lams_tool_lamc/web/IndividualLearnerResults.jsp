@@ -97,7 +97,7 @@
 														</table>
 													</td>
 
-													<td  align=left class="input" valign=top> 											
+													<td  align=right class="input" valign=top> 											
 														<c:forEach var="mainEntry" items="${sessionScope.mapLearnerAssessmentResults}">
 																<c:if test="${mainEntry.key == sessionScope.queIndex}"> 		
 																	<c:if test="${mainEntry.value == 'true'}"> 		
@@ -121,7 +121,7 @@
 												</tr>
 
 												<tr>
-												<td bgcolor="#CCCC33" colspan=2 align=left class="input" valign=top> 											
+												<td bgcolor="#CCCC99" colspan=2 align=left class="input" valign=top> 											
 													<c:forEach var="mainEntry" items="${sessionScope.mapLearnerAssessmentResults}">
 															<c:if test="${mainEntry.key == sessionScope.queIndex}"> 		
 																<c:if test="${mainEntry.value == 'true'}"> 		

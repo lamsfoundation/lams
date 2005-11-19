@@ -58,11 +58,13 @@ public interface IMcService
     
     public void createMcQue(McQueContent mcQueContent) throws McApplicationException;
     
+    public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid) throws McApplicationException;
+    
     public void createMcSession(McSession mcSession) throws McApplicationException;
   
     public void createMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
     
-    public McQueUsr retrieveMcQueUsr(Long userId) throws McApplicationException;
+ 	public McQueUsr retrieveMcQueUsr(Long userId) throws McApplicationException;
     
     public void createMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
     

@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
+import org.lamsfoundation.lams.tool.mc.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -2114,7 +2115,18 @@ public class McAction extends DispatchAction implements McAppConstants
         	logger.debug("will assess");
         	LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
         	logger.debug("assesment complete");
-		    		
+        	
+        	boolean isUserDefined=LearningUtil.doesUserExists(request);
+        	logger.debug("isUserDefined");
+        	if (isUserDefined == false)
+        	{
+        		LearningUtil.createUser(request);
+        		logger.debug("created user in the db");
+        	}
+        	McQueUsr mcQueUsr=LearningUtil.getUser(request);
+        	logger.debug("mcQueUsr: " + mcQueUsr);
+        	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent);
+        	logger.debug("created user attempt in the db");
     		
     		mcLearningForm.resetCommands();
     		return (mapping.findForward(INDIVIDUAL_REPORT));
