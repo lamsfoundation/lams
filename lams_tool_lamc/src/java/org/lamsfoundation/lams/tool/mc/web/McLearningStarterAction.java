@@ -348,6 +348,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    request.getSession().setAttribute(MAP_LEARNER_FEEDBACK_CORRECT, mapLeanerFeedbackCorrect);
 	    logger.debug("MAP_LEARNER_FEEDBACK_CORRECT: " + mapLeanerFeedbackCorrect);
 	    
+	    Map mapQuestionWeights=LearningUtil.buildWeightsMap(request, mcContent.getMcContentId());
+	    request.getSession().setAttribute(MAP_QUESTION_WEIGHTS, mapQuestionWeights);
+	    logger.debug("MAP_QUESTION_WEIGHTS: " + mapQuestionWeights);
 	    /* .. till here */
 	}
 	

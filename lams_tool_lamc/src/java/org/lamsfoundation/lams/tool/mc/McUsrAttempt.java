@@ -48,6 +48,11 @@ public class McUsrAttempt implements Serializable {
 
     /** nullable persistent field */
     private String timeZone;
+    
+    private Integer mark;
+    
+    private boolean passed;
+    
 
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent;
@@ -78,6 +83,16 @@ public class McUsrAttempt implements Serializable {
         this.mcOptionsContent = mcOptionsContent;
     }
     
+    public McUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, 
+    		org.lamsfoundation.lams.tool.mc.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.McOptsContent mcOptionsContent, Integer mark, boolean passed) {
+        this.attemptTime = attemptTime;
+        this.timeZone = timeZone;
+        this.mcQueContent = mcQueContent;
+        this.mcQueUsr = mcQueUsr;
+        this.mcOptionsContent = mcOptionsContent;
+        this.mark = mark;
+        this.passed = passed;
+    }
     
       
     
@@ -155,4 +170,28 @@ public class McUsrAttempt implements Serializable {
             .toString();
     }
 
+	/**
+	 * @return Returns the mark.
+	 */
+	public Integer getMark() {
+		return mark;
+	}
+	/**
+	 * @param mark The mark to set.
+	 */
+	public void setMark(Integer mark) {
+		this.mark = mark;
+	}
+	/**
+	 * @return Returns the passed.
+	 */
+	public boolean isPassed() {
+		return passed;
+	}
+	/**
+	 * @param passed The passed to set.
+	 */
+	public void setPassed(boolean passed) {
+		this.passed = passed;
+	}
 }

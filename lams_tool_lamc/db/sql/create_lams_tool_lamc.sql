@@ -85,6 +85,8 @@ CREATE TABLE lams.tl_lamc11_usr_attempt (
      , mc_que_option_id BIGINT(20) NOT NULL
      , attempt_time DATETIME
      , time_zone VARCHAR(255)
+     , mark VARCHAR(255) NOT NULL DEFAULT '0'
+     , passed TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_lamc11_usr_attempt_1 FOREIGN KEY (que_usr_id)
@@ -109,5 +111,3 @@ CREATE TABLE lams.tl_lamc11_uploadedFile (
                   REFERENCES lams.tl_lamc11_content (uid)
 )TYPE=InnoDB;
 
-
-	

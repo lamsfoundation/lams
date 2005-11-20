@@ -154,8 +154,8 @@ public interface McAppConstants {
     public static final String MAP_LEARNER_ASSESSMENT_RESULTS			="mapLearnerAssessmentResults";
     public static final String MAP_LEARNER_FEEDBACK_INCORRECT			="mapLeanerFeedbackIncorrect";
     public static final String MAP_LEARNER_FEEDBACK_CORRECT				="mapLeanerFeedbackCorrect";
-    
-    
+    public static final String MAP_QUESTION_WEIGHTS						="mapQuestionWeights";
+        
     
     public static final String MAP_WEIGHTS								="mapWeights";
     public static final String MAP_CHECKBOX_STATES						="mapCheckBoxStates";
@@ -183,6 +183,7 @@ public interface McAppConstants {
     public static final String RETRIES									="retries";
     public static final String PASSMARK									="passMark";
     public static final String SHOW_FEEDBACK							="showFeedback";
+    public static final String USER_PASSED								="userPassed";
     
     public static final String ONLINE_INSTRUCTIONS						="onlineInstructions";
     public static final String OFFLINE_INSTRUCTIONS						="offlineInstructions";
@@ -284,6 +285,8 @@ public interface McAppConstants {
     public static final String MAP_QUESTION_CONTENT_LEARNER				="mapQuestionContentLearner";
     public static final String CURRENT_QUESTION_INDEX					="currentQuestionIndex";
     public static final String TOTAL_QUESTION_COUNT						="totalQuestionCount";
+    public static final String LEARNER_MARK								="learnerMark";
+    public static final String LEARNER_MARK_ATLEAST						="learnerMarkAtLeast";
     public static final String MAP_ANSWERS								="mapAnswers";
     public static final String CURRENT_ANSWER							="currentAnswer";
     public static final String USER_FEEDBACK							="userFeedback";

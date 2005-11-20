@@ -2113,9 +2113,42 @@ public class McAction extends DispatchAction implements McAppConstants
         	logger.debug("toolContentId: " + toolContentId);
         			
         	logger.debug("will assess");
-        	LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
+        	Integer passMark=(Integer) request.getSession().getAttribute(PASSMARK);
+        	logger.debug("passMark: " + passMark);
+        	
+        	Map mapLeanerAssessmentResults=LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
+        	logger.debug("mapLeanerAssessmentResults: " + mapLeanerAssessmentResults);
         	logger.debug("assesment complete");
         	
+        	int mark=LearningUtil.getMark(mapLeanerAssessmentResults);
+        	logger.debug("mark: " + mark);
+        	request.getSession().setAttribute(LEARNER_MARK, new Integer(mark).toString());
+        	request.getSession().setAttribute(LEARNER_MARK_ATLEAST, new Integer(mark+1).toString());
+        	
+        	Map mapQuestionWeights =(Map) request.getSession().getAttribute(MAP_QUESTION_WEIGHTS);
+        	logger.debug("mapQuestionWeights: " + mapQuestionWeights);
+        	
+        	boolean passed=false;
+        	if ((passMark != null) && (passMark.intValue() != 0)) 
+			{
+        		int totalUserWeight=LearningUtil.calculateWeights(mapLeanerAssessmentResults, mapQuestionWeights);
+        		logger.debug("totalUserWeight: " + totalUserWeight);
+        		
+        		if (totalUserWeight < passMark.intValue())
+        		{
+        			logger.debug("USER FAILED");
+        			request.getSession().setAttribute(USER_PASSED, new Boolean(false).toString());
+        			logger.debug("totalUserWeight is less than passmark: " + totalUserWeight + " < " + passMark.intValue());
+        			passed=false;
+        		}
+        		else
+        		{
+        			logger.debug("USER PASSED");
+        			request.getSession().setAttribute(USER_PASSED, new Boolean(true).toString());
+        			passed=true;
+        		}
+			}
+
         	boolean isUserDefined=LearningUtil.doesUserExists(request);
         	logger.debug("isUserDefined");
         	if (isUserDefined == false)
@@ -2125,7 +2158,9 @@ public class McAction extends DispatchAction implements McAppConstants
         	}
         	McQueUsr mcQueUsr=LearningUtil.getUser(request);
         	logger.debug("mcQueUsr: " + mcQueUsr);
-        	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent);
+        	
+        	logger.debug("passed: " + passed);
+        	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed);
         	logger.debug("created user attempt in the db");
     		
     		mcLearningForm.resetCommands();
@@ -2150,11 +2185,8 @@ public class McAction extends DispatchAction implements McAppConstants
         		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(true).toString());
         	}
     		
-    		
     		mcLearningForm.resetCommands();
-    		//return getNextOptions(request, mcLearningForm, mapping);
-    		
-    		
+   
         	int newQuestionIndex=new Integer(currentQuestionIndex).intValue() + 1;
         	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Integer(newQuestionIndex).toString());
         	logger.debug("updated questionIndex:" + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));

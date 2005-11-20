@@ -21,7 +21,7 @@
 					  </tr>
 					</c:if> 			
 				
-					<c:if test="${sessionScope.isRetries == 'false'}"> 		
+					<c:if test="${sessionScope.isRetries != 'true'}"> 		
 					  <tr>
 					  	<td align=center class="input" valign=top colspan=2> 
 						  	<font size=3> <b>  <bean:message key="label.withoutRetries"/> </b> </font>

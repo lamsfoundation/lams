@@ -35,6 +35,22 @@
     >
     </property>
 
+    <property
+        name="mark"
+        type="java.lang.Integer"
+        access="property"        
+        column="mark"
+    />
+
+    <property
+        name="passed"
+        type="boolean"
+        access="property"        
+        column="passed"
+        length="1"
+    />
+
+
     <many-to-one
         name="mcQueContent"
         class="org.lamsfoundation.lams.tool.mc.McQueContent"

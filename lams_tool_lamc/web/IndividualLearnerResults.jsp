@@ -20,7 +20,7 @@
 						  </tr>
   					</c:if> 			
 
-					<c:if test="${sessionScope.isRetries == 'false'}"> 							  
+					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
 						  <tr>
 						  	<td align=center class="input" valign=top colspan=2> 
 							  	<font size=3> <b>  <bean:message key="label.individual.results.withoutRetries"/> </b> </font>
@@ -31,7 +31,11 @@
 
 					  <tr>
 					  	<td align=right class="input" valign=top colspan=2> 
-						  	<font size=2 color="#000000"> <b>  <bean:message key="label.mark"/> </b> </font>
+						  	<font size=2 color="#000000"> <b>  <bean:message key="label.mark"/>  
+						  	<c:out value="${sessionScope.learnerMark}"/>  &nbsp
+							<bean:message key="label.outof"/> &nbsp
+						  	<c:out value="${sessionScope.totalQuestionCount}"/>
+						  	</b> </font>
 					  	</td>
 					  </tr>	
 
@@ -40,6 +44,20 @@
 							<hr>
 						</td> 
 					</tr>
+					
+					<c:if test="${sessionScope.userPassed != 'true'}">
+						 <tr>
+						  	<td align=left class="input" valign=top colspan=2> 
+							  	<font size=2 color="#FF0000"> <b>  <bean:message key="label.mustGet"/> &nbsp
+							  	<c:out value="${sessionScope.learnerMarkAtLeast}"/>  &nbsp
+								<bean:message key="label.outof"/> &nbsp
+							  	<c:out value="${sessionScope.totalQuestionCount}"/>
+								<bean:message key="label.toFinish"/>						  	
+							  	</b> </font>
+						  	</td>
+						  </tr>	
+  					</c:if> 			
+					
 					
   		  	 		<c:set var="mainQueIndex" scope="session" value="0"/>
 					<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
@@ -158,17 +176,30 @@
 			  	   </tr>
 
 			  	   
-	  	   		  <tr>
-				  	<td colspan=2 align=center class="input" valign=top> 
-			  			<html:submit property="redoQuestions" styleClass="a.button">
-							<bean:message key="label.redo.questions"/>
-						</html:submit>	 		
-   						&nbsp&nbsp&nbsp&nbsp&nbsp
-   						<html:submit property="viewSummary" styleClass="a.button">
-							<bean:message key="label.view.summary"/>
-						</html:submit>	 				 		  					
-				  	 </td>
-				  </tr>
+			 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
+		  	   		  <tr>
+					  	<td colspan=2 align=center class="input" valign=top> 
+				  			<html:submit property="redoQuestions" styleClass="a.button">
+								<bean:message key="label.redo.questions"/>
+							</html:submit>	 		
+	   						&nbsp&nbsp&nbsp&nbsp&nbsp
+	   						<html:submit property="viewSummary" styleClass="a.button">
+								<bean:message key="label.view.summary"/>
+							</html:submit>	 				 		  					
+					  	 </td>
+					  </tr>
+					</c:if> 																		
+
+					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
+		  	   		  <tr>
+					  	<td colspan=2 align=right class="input" valign=top> 
+	   						<html:submit property="viewSummary" styleClass="a.button">
+								<bean:message key="label.view.summary"/>
+							</html:submit>	 				 		  					
+					  	 </td>
+					  </tr>
+					</c:if> 																		
+					
 				</table>
 	</html:form>
 
