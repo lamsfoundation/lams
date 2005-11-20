@@ -100,7 +100,8 @@ public interface McAppConstants {
     public static final String INDIVIDUAL_REPORT						="individualReport";
     public static final String VIEW_SUMMARY								="viewSummary";
     public static final String REDO_QUESTIONS							="redoQuestions";
-
+    public static final String SINGLE_QUESTION_ANSWERS					="singleQuestionAnswers";
+    
     
     public static final String ALL_INSTRUCTIONS							="allInstructions";
     public static final String EDIT_OPTS_CONTENT						="editOptsContent";
@@ -290,6 +291,8 @@ public interface McAppConstants {
     public static final String MONITORING_REPORT_TITLE					="monitoringReportTitle"; 
     public static final String REPORT_TITLE_LEARNER						="reportTitleLearner"; 
     public static final String END_LEARNING_MESSAGE						="endLearningMessage";
+    public static final String TOTAL_COUNT_REACHED						="totalCountReached";
+    
     
     public static final String IS_TOOL_ACTIVITY_OFFLINE					="isToolActivityOffline";
     public static final String IS_USERNAME_VISIBLE						="isUsernameVisible";

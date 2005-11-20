@@ -104,5 +104,13 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageHeader" value = "Redo Questions?"/>
 		<put name="content" value="/RedoQuestions.jsp" />	
 	</definition>
+
+	<definition name=".singleQuestionAnswers" extends=".baseDef" >
+		<put name="title" value="Question Answers"/>
+		<put name="pageHeader" value = "Question Answers"/>
+		<put name="content" value="/SingleQuestionAnswersContent.jsp" />	
+	</definition>
+	
+	
 	
 </tiles-definitions>

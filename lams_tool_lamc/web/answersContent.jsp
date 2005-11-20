@@ -36,7 +36,7 @@ String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()
 <html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 		<c:choose> 
 		  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 
-				<jsp:include page="SequentialAnswersContent.jsp" /> 
+				<jsp:include page="SingleQuestionAnswersContent.jsp" /> 
 		  </c:when> 
 		  <c:otherwise>
 			  	<jsp:include page="CombinedAnswersContent.jsp" /> 

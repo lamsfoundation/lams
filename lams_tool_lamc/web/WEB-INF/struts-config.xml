@@ -154,6 +154,12 @@
 	  	/>
 	  	
 	  	<forward
+		    name="singleQuestionAnswers"
+		    path=".singleQuestionAnswers"
+		    redirect="true"
+	  	/>
+
+	  	<forward
 		    name="errorList"
 		    path=".errorList"
 		    redirect="true"

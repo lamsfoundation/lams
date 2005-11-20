@@ -2095,7 +2095,7 @@ public class McAction extends DispatchAction implements McAppConstants
                                       ServletException
    {
     	logger.debug("displayMc starting..");
-    	
+    	    	
     	McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
@@ -2131,11 +2131,34 @@ public class McAction extends DispatchAction implements McAppConstants
     		mcLearningForm.resetCommands();
     		return (mapping.findForward(INDIVIDUAL_REPORT));
     	}
-    	else if (mcLearningForm.getContinueOptions() != null)
+    	else if (mcLearningForm.getNextOptions() != null)
 	 	{
-    		logger.debug("requested continue options...");
+    		logger.debug("requested next options...");
+    		
+    		String currentQuestionIndex=(String)request.getSession().getAttribute(CURRENT_QUESTION_INDEX);
+        	logger.debug("currentQuestionIndex:" + currentQuestionIndex);
+        	
+        	String totalQuestionCount=(String)request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
+        	logger.debug("totalQuestionCount:" + totalQuestionCount);
+        	
+        	int intTotalQuestionCount=new Integer(totalQuestionCount).intValue();
+        	int intCurrentQuestionIndex=new Integer(currentQuestionIndex).intValue();
+        	
+        	if (intTotalQuestionCount-1 == intCurrentQuestionIndex)
+        	{
+        		logger.debug("totalQuestionCount has been reached :" + totalQuestionCount);
+        		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(true).toString());
+        	}
+    		
+    		
     		mcLearningForm.resetCommands();
-    		return continueOptions(request, mcLearningForm, mapping);
+    		//return getNextOptions(request, mcLearningForm, mapping);
+    		
+    		
+        	int newQuestionIndex=new Integer(currentQuestionIndex).intValue() + 1;
+        	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Integer(newQuestionIndex).toString());
+        	logger.debug("updated questionIndex:" + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+    		return (mapping.findForward(LOAD_LEARNER));
 	 	}
     	else if (mcLearningForm.getOptionCheckBoxSelected() != null)
     	{
@@ -2146,6 +2169,8 @@ public class McAction extends DispatchAction implements McAppConstants
     	else if (mcLearningForm.getRedoQuestions() != null)
     	{
     		logger.debug("requested redoQuestions...");
+    		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+    		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(false).toString());
     		mcLearningForm.resetCommands();
     		return (mapping.findForward(REDO_QUESTIONS));
     		//return redoQuestions(request, mcLearningForm, mapping);
@@ -2176,7 +2201,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param mapping
      * @return
      */
-    protected ActionForward continueOptions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
+    protected ActionForward getNextOptions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
     {
     	logger.debug("requested continueOptions...");
     	boolean continueOptions=LearningUtil.continueOptions(request);
