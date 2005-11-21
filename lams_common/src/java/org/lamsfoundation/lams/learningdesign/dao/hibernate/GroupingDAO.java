@@ -50,7 +50,7 @@ public class GroupingDAO extends BaseDAO implements IGroupingDAO {
 	 */
 	public Grouping getGroupingByUIID(Integer groupingUIID) {
 		List list = this.getHibernateTemplate().find(FIND_BY_UI_ID,groupingUIID);	
-		if(list!=null)
+		if(list!=null && list.size()>0)
 			return (Grouping)list.get(0);
 		else
 			return null;
