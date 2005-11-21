@@ -176,13 +176,20 @@
 			  	   </tr>
 
 			  	   
+
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
 		  	   		  <tr>
 					  	<td colspan=2 align=center class="input" valign=top> 
 				  			<html:submit property="redoQuestions" styleClass="a.button">
 								<bean:message key="label.redo.questions"/>
 							</html:submit>	 		
-	   						&nbsp&nbsp&nbsp&nbsp&nbsp
+		       
+							<c:if test="${sessionScope.userPassed == 'true'}">
+						  	   <html:submit property="learnerFinished" styleClass="a.button">
+									<bean:message key="label.finished"/>
+							   </html:submit>
+					  	   </c:if>
+
 	   						<html:submit property="viewSummary" styleClass="a.button">
 								<bean:message key="label.view.summary"/>
 							</html:submit>	 				 		  					
@@ -192,7 +199,13 @@
 
 					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
 		  	   		  <tr>
-					  	<td colspan=2 align=right class="input" valign=top> 
+		  	   		    <td colspan=2 align=right class="input" valign=top>
+			  	   		  	<c:if test="${sessionScope.userPassed == 'true'}">
+						  	   <html:submit property="learnerFinished" styleClass="a.button">
+											<bean:message key="label.finished"/>
+							   </html:submit>
+				  	   		</c:if>
+
 	   						<html:submit property="viewSummary" styleClass="a.button">
 								<bean:message key="label.view.summary"/>
 							</html:submit>	 				 		  					

@@ -109,6 +109,12 @@
 		    path=".answers"
 		    redirect="true"
 	  	/>
+
+	  	<forward
+		    name="redoQuestions"
+		    path=".redoQuestions"
+		    redirect="true"
+	  	/>
 	  	
 	  	<forward
 		    name="errorList"

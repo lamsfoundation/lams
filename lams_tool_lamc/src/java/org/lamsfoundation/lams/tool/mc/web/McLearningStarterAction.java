@@ -224,6 +224,16 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
     	
     	
+    	
+    	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+		logger.debug("final Options Map for the first question: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
+		
+		/*also prepare data into mapGeneralOptionsContent for combined answers view */
+		Map mapGeneralOptionsContent=AuthoringUtil.generateGeneralOptionsContentMap(request, mcContent);
+		logger.debug("returned mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    	
     	/*
 	     * Verify that userId does not already exist in the db.
 	     * If it does exist, that means, that user already responded to the content and 
@@ -235,23 +245,20 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(new Long(userID));
 	    logger.debug("mcQueUsr:" + mcQueUsr);
 	    
+	    Long queUsrId=mcQueUsr.getUid();
+		logger.debug("queUsrId: " + queUsrId);
+		
+		int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId);
+		logger.debug("learnerBestMark: " + learnerBestMark);
+		request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(learnerBestMark).toString());
+	    
 	    if (mcQueUsr != null)
 	    {
 	    	logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
 	    	return (mapping.findForward(REDO_QUESTIONS));
 	    }
 	    
-	    
-	    request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
-		logger.debug("final Options Map for the first question: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
-		
-		/*also prepare data into mapGeneralOptionsContent for combined answers view */
-		Map mapGeneralOptionsContent=AuthoringUtil.generateGeneralOptionsContentMap(request, mcContent);
-		logger.debug("returned mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
-		
-		return (mapping.findForward(LOAD_LEARNER));	
+	    return (mapping.findForward(LOAD_LEARNER));	
 	}
 	
 	

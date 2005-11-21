@@ -2227,6 +2227,13 @@ public class McAction extends DispatchAction implements McAppConstants
     		mcLearningForm.resetCommands();
     		return (mapping.findForward(VIEW_SUMMARY));
     	}
+    	else if (mcLearningForm.getLearnerFinished() != null)
+    	{
+    		logger.debug("requested learner finished, the learner should be directed to next activity.");
+    		mcLearningForm.resetCommands();
+    		//fix this
+    		return (mapping.findForward(VIEW_SUMMARY));
+    	}
 
     	mcLearningForm.resetCommands();	
  		return (mapping.findForward(LOAD_LEARNER));
