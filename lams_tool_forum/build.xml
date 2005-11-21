@@ -407,7 +407,7 @@
 		<delete>
 			<fileset dir="${jboss.deploy}">
 			    <include name="temp-${product}.war"/>
-			    <include name="${product}.jar"/>
+			 <!--   <include name="${product}.jar"/> -->
 			</fileset>
 		</delete>
 	
