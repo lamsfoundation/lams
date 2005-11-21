@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.tool.mc.dao;
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 
 
@@ -77,6 +79,15 @@ public interface IMcUsrAttemptDAO
 	 * @return 
 	 */
 	public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt);
+	
+	/**
+	 *  * <p>returns the highest mark of a learner  
+	 * with the given identifier <code>queUsrId</code> </p>
+	 * 
+	 * @param uid
+	 * @return 
+	 */
+	public List getHighestMark(Long queUsrId);
 }
 
 

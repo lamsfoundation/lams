@@ -44,8 +44,10 @@
 
 					  <tr>
 					  	<td align=center class="input" valign=top colspan=2> 
-						  	<font size=2>  <bean:message key="label.learner.bestMark"/> <b> 1 </b> 
-						  	<bean:message key="label.outof"/> <b> 2 </b> </font>
+						  	<font size=2>  <bean:message key="label.learner.bestMark"/>
+						  	<b>   <c:out value="${sessionScope.learnerBestMark}"/> </b> 
+						  	<bean:message key="label.outof"/> 
+						  	<b> <c:out value="${sessionScope.totalQuestionCount}"/> </b> </font>
 					  	</td>
 					  </tr>	
 					  

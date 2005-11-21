@@ -322,7 +322,21 @@ public class McServicePOJO implements
         }
     }
 	
-    
+   
+	public List getHighestMark(Long queUsrId) throws McApplicationException
+	{
+        try
+        {
+        	return mcUsrAttemptDAO.getHighestMark(queUsrId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting the learner's highest mark: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+	
     
     public McQueContent retrieveMcQueContentByUID(Long uid) throws McApplicationException
     {
@@ -1874,4 +1888,5 @@ public class McServicePOJO implements
 	public void setMcUploadedFileDAO(IMcUploadedFileDAO mcUploadedFileDAO) {
 		this.mcUploadedFileDAO = mcUploadedFileDAO;
 	}
+
 }

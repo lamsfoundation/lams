@@ -53,6 +53,7 @@ public class McUsrAttempt implements Serializable {
     
     private boolean passed;
     
+    private Long queUsrId;
 
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent;
@@ -193,5 +194,17 @@ public class McUsrAttempt implements Serializable {
 	 */
 	public void setPassed(boolean passed) {
 		this.passed = passed;
+	}
+	/**
+	 * @return Returns the queUsrId.
+	 */
+	public Long getQueUsrId() {
+		return queUsrId;
+	}
+	/**
+	 * @param queUsrId The queUsrId to set.
+	 */
+	public void setQueUsrId(Long queUsrId) {
+		this.queUsrId = queUsrId;
 	}
 }

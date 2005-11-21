@@ -201,5 +201,7 @@ public interface IMcService
     public void cleanUploadedFilesMetaData() throws McApplicationException;
     
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent) throws McApplicationException;
+    
+    public List getHighestMark(Long queUsrId) throws McApplicationException;
 }
 

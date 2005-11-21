@@ -286,6 +286,7 @@ public interface McAppConstants {
     public static final String CURRENT_QUESTION_INDEX					="currentQuestionIndex";
     public static final String TOTAL_QUESTION_COUNT						="totalQuestionCount";
     public static final String LEARNER_MARK								="learnerMark";
+    public static final String LEARNER_BEST_MARK						="learnerBestMark";
     public static final String LEARNER_MARK_ATLEAST						="learnerMarkAtLeast";
     public static final String MAP_ANSWERS								="mapAnswers";
     public static final String CURRENT_ANSWER							="currentAnswer";

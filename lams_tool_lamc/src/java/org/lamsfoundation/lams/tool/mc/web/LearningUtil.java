@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
@@ -304,7 +305,28 @@ public class LearningUtil implements McAppConstants {
 		}
 		return correctAnswerCount;
     }
+  
     
+    public static int getHighestMark(HttpServletRequest request, Long queUsrId)
+    {
+    	logger.debug("queUsrId : " + queUsrId);
+    	IMcService mcService =McUtils.getToolService(request);
+    	List listMarks=mcService.getHighestMark(queUsrId);
+    	
+    	Iterator itMarks=listMarks.iterator();
+    	int highestMark=0;
+    	while (itMarks.hasNext())
+		{
+    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itMarks.next();
+    		logger.debug("mcUsrAttempt mark: " + mcUsrAttempt.getMark());
+    		int currentMark=mcUsrAttempt.getMark().intValue();
+    		logger.debug("currentMark: " + currentMark);
+    		if (currentMark > highestMark)
+    			highestMark= currentMark;
+		}
+    	logger.debug("highestMark : " + highestMark);
+    	return highestMark;
+    }
     
     
     public static Map buildMapCorrectOptions(List correctOptions)

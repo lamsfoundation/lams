@@ -237,8 +237,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    
 	    if (mcQueUsr != null)
 	    {
-	    	logger.debug("the learner has already responsed to this content, just generate a read-only report.");
-	    	return (mapping.findForward(LEARNER_REPORT));
+	    	logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
+	    	return (mapping.findForward(REDO_QUESTIONS));
 	    }
 	    
 	    

@@ -2203,9 +2203,17 @@ public class McAction extends DispatchAction implements McAppConstants
     		logger.debug("requested redoQuestions...");
     		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
     		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(false).toString());
+    		
+    		McQueUsr mcQueUsr=LearningUtil.getUser(request);
+    		Long queUsrId=mcQueUsr.getUid();
+    		logger.debug("queUsrId: " + queUsrId);
+    		
+    		int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId);
+    		logger.debug("learnerBestMark: " + learnerBestMark);
+    		request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(learnerBestMark).toString());
+    		
     		mcLearningForm.resetCommands();
     		return (mapping.findForward(REDO_QUESTIONS));
-    		//return redoQuestions(request, mcLearningForm, mapping);
     	}
     	else if (mcLearningForm.getRedoQuestionsOk() != null)
     	{

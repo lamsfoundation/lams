@@ -22,10 +22,13 @@
 
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -34,6 +37,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
 	 	static Logger logger = Logger.getLogger(McUsrAttemptDAO.class.getName());
+	 	
+	 	private static final String LOAD_HIGHEST_MARK_BY_USER_ID = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId";
 	 	
 	 	public McUsrAttempt getMcUserAttemptByUID(Long uid)
 		{
@@ -46,6 +51,16 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	    	this.getHibernateTemplate().save(mcUsrAttempt);
 	    }
 	    
+		public List getHighestMark(Long queUsrId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_HIGHEST_MARK_BY_USER_ID)
+				.setLong("queUsrId", queUsrId.longValue())
+				.list();
+			
+			return list;
+	    }
+		
 		public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt)
 	    {
 	    	this.getHibernateTemplate().update(mcUsrAttempt);
