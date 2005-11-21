@@ -68,9 +68,6 @@ public abstract class Grouping implements Serializable
     /** nullable persistent field */
     private Integer groupingUIID;
     
-    private Integer groupingTypeId;
-    
-   
     /** persistent field */
     private Set groups;
     
@@ -139,20 +136,15 @@ public abstract class Grouping implements Serializable
      */
     public Integer getGroupingTypeId()
     {
-     /* if(this instanceof LessonClass)
+      if(this instanceof LessonClass)
             return CLASS_GROUPING_TYPE;
         else if(this instanceof ChosenGrouping)
             return CHOSEN_GROUPING_TYPE;
         else
-            return RANDOM_GROUPING_TYPE; */
-        return this.groupingTypeId;
+            return RANDOM_GROUPING_TYPE; 
         
     }
-    
-    public void setGroupingTypeId(Integer groupingTypeID)
-    {
-        this.groupingTypeId = groupingTypeID;
-    }
+  
 
     /**
      *            
@@ -349,16 +341,16 @@ public abstract class Grouping implements Serializable
 	
 	public boolean isRandomGrouping()
 	{
-	    return getGroupingTypeId().intValue() == RANDOM_GROUPING_TYPE.intValue();
+	    return getGroupingTypeId() == RANDOM_GROUPING_TYPE;
 	}
 	
 	public boolean isChosenGrouping()
 	{
-	    return getGroupingTypeId().intValue() == CHOSEN_GROUPING_TYPE.intValue();
+	    return getGroupingTypeId() == CHOSEN_GROUPING_TYPE;
 	}
 	
 	public boolean isClassGrouping()
 	{
-	    return getGroupingTypeId().intValue() == CLASS_GROUPING_TYPE.intValue();
+	    return getGroupingTypeId() == CLASS_GROUPING_TYPE;
 	}
 }
