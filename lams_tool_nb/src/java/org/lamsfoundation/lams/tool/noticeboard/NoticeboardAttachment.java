@@ -28,6 +28,7 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -40,9 +41,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * 
  * @author mtruong
  */
-public class NoticeboardAttachment implements Serializable {
+public class NoticeboardAttachment implements Serializable, Cloneable {
     
 	private static final long serialVersionUID = -3471513404550541296L;
+	private static Logger log = Logger.getLogger(NoticeboardAttachment.class);
 
 	/** identifier field */
     private Long attachmentId;
@@ -93,8 +95,16 @@ public class NoticeboardAttachment implements Serializable {
         this.onlineFile = isOnline;
     }
     
-    
-    
+    /** Clone this attachment, including the unique id */
+    public Object clone(){
+		Object obj = null;
+		try {
+			obj = super.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error("Clone " + NoticeboardAttachment.class + " not supported");
+		}
+		return obj;
+	}    
     /**
      * @return Returns the attachmentId.
      */

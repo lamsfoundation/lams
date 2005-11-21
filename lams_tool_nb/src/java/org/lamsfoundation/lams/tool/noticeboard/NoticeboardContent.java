@@ -22,6 +22,7 @@ package org.lamsfoundation.lams.tool.noticeboard;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -352,6 +353,10 @@ public class NoticeboardContent implements Serializable {
     
     
 	/** 
+	 * Creates a new NoticeboardContent object from the supplied object.
+	 * Assigns it the toContendId. Also copies all the items in the attachment set
+	 * to the new object's attachment set. So while the two contents have different
+	 * attachment records, they point to the same entries in the database.
 	 * 
 	 * @param nb			NoticeboardContent object containing the content to copy from
 	 * @param toContentId 	The new Id of the new noticeboard object
@@ -370,6 +375,20 @@ public class NoticeboardContent implements Serializable {
 														nb.getCreatorUserId(),
 														nb.getDateCreated(),
 														nb.getDateUpdated());
+		
+		if ( nb.getNbAttachments() != null && nb.getNbAttachments().size() > 0 ) {
+			HashSet newAttachmentSet = new HashSet();
+			Iterator iter = nb.getNbAttachments().iterator();
+			while (iter.hasNext()) {
+				NoticeboardAttachment element = (NoticeboardAttachment) iter.next();
+				NoticeboardAttachment newAttachment = (NoticeboardAttachment) element.clone();
+				newAttachment.setAttachmentId(null);
+				newAttachment.setNbContent(newContent);
+				newAttachmentSet.add(newAttachment);
+			} 
+			newContent.setNbAttachments(newAttachmentSet);
+		}
+		
 		return newContent;
 	}
    

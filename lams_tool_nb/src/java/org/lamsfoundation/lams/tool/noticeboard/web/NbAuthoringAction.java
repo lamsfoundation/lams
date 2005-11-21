@@ -194,7 +194,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 			nbForm.setOnlineInstructions(nb.getOnlineInstructions());
 			nbForm.setOfflineInstructions(nb.getOfflineInstructions());
 			
-			attachmentList = NbWebUtil.setupAttachmentList(nbService,null,null);
+			attachmentList = NbWebUtil.setupAttachmentList(nbService,null);
 		
 		}
 		else //content already exists on the database
@@ -229,7 +229,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 			}
 			
 			//Setup the map containing the files that have been uploaded for this particular tool content id
-			attachmentList = NbWebUtil.setupAttachmentList(nbService,attachmentList,nb);
+			attachmentList = NbWebUtil.setupAttachmentList(nbService,nb);
 		
 		}
 		NbWebUtil.addUploadsToSession(request, attachmentList, NbWebUtil.setupDeletedAttachmentList());

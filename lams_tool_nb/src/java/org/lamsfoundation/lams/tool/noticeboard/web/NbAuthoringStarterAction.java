@@ -211,7 +211,7 @@ public class NbAuthoringStarterAction extends LamsAction {
 			    
 			}
 			
-			attachmentList = NbWebUtil.setupAttachmentList(nbService, attachmentList, nb);
+			attachmentList = NbWebUtil.setupAttachmentList(nbService, nb);
 		
 		}
 		NbWebUtil.addUploadsToSession(request, attachmentList, NbWebUtil.setupDeletedAttachmentList());

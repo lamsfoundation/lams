@@ -160,25 +160,22 @@ public class NbWebUtil {
 		 * If NoticeboardContent content does not exist, set nb=null and an empty list will be created.
 		 *
 		 * @param nbService
-		 * @param attachmentMap
 		 * @param nb
-		 * @return the updated attachmentMap
+		 * @return the attachmentList
 		 */
-	    public static List setupAttachmentList(INoticeboardService nbService, List attachmentList, NoticeboardContent nb) {
+	    public static List setupAttachmentList(INoticeboardService nbService, NoticeboardContent nb) {
 
-			List updatedList = attachmentList != null ? attachmentList : new ArrayList();
+			List attachmentList = new ArrayList();
 
 			if ( nbService!=null && nb!=null ) {
 				List attachmentIdList = nbService.getAttachmentIdsFromContent(nb);
 				for (int i=0; i<attachmentIdList.size(); i++)
 				{
 				    NoticeboardAttachment file = nbService.retrieveAttachment((Long)attachmentIdList.get(i));
-				    updatedList.add(file);
+				    attachmentList.add(file);
 				}
-				return updatedList;
-			} else {
-				return new ArrayList();
-			}
+			} 
+			return attachmentList;
 		}
 
 		/** 

@@ -170,8 +170,7 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
 		
 		request.setAttribute(NoticeboardConstants.ONLINE_INSTRUCTIONS, content.getOnlineInstructions());
 		
-		List attachmentList = NbWebUtil.setupAttachmentList(nbService, null, content);
-		NbWebUtil.setupAttachmentList(nbService, attachmentList, content);
+		List attachmentList = NbWebUtil.setupAttachmentList(nbService, content);
 		NbWebUtil.addUploadsToSession(request, attachmentList, null);
 		
         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
