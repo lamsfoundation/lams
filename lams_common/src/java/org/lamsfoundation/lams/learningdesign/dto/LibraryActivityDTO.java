@@ -67,8 +67,6 @@ public class LibraryActivityDTO extends BaseDTO
 	private Date createDateTime;
 	private Integer groupingSupportType;
 	
-	private AuthoringToolDTO tool; //no longer used
-	
 	/* Properties Specific to ToolActivity */
 	private Long toolID;
 	private Long toolContentID;
@@ -146,8 +144,7 @@ public class LibraryActivityDTO extends BaseDTO
 		
 	}
 	private void addGroupingActivityAttributes(GroupingActivity groupingActivity){
-		Grouping grouping = groupingActivity.getCreateGrouping();
-		
+		Grouping grouping = groupingActivity.getCreateGrouping();		
 	/*	this.groupingDTO = grouping.getGroupingDTO();
 		this.createGroupingID = grouping.getGroupingId();
 		this.createGroupingUIID = grouping.getGroupingUIID();
@@ -194,8 +191,7 @@ public class LibraryActivityDTO extends BaseDTO
 	}
 	private void addPermissionGateActivityAttributes(PermissionGateActivity activity){		
 	}
-	private void addScheduleGateActivityAttributes(ScheduleGateActivity activity){
-	    
+	private void addScheduleGateActivityAttributes(ScheduleGateActivity activity){	    
 	    this.gateStartDateTime = activity.getGateStartDateTime();
 		this.gateStartTimeOffset = activity.getGateStartTimeOffset();
 		this.gateEndDateTime = activity.getGateEndDateTime();
@@ -328,12 +324,7 @@ public class LibraryActivityDTO extends BaseDTO
     public String getTitle() {
         return title;
     }
-    /**
-     * @return Returns the tool.
-     */
-    public AuthoringToolDTO getTool() {
-        return tool;
-    }
+   
     /**
      * @return Returns the xCoord.
      */
