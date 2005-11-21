@@ -581,26 +581,25 @@ public class ObjectExtractor {
 		}
 	    Grouping existingGrouping = groupingDAO.getGroupingByUIID(groupingUUID);
 	    if (existingGrouping != null)
-	        grouping = existingGrouping;
+	        grouping = existingGrouping;	   
 	    else
 	    {
 	        Object object = Grouping.getGroupingInstance(groupingTypeID);
-			grouping = (Grouping)object;
-						
-			grouping.setGroupingTypeId(groupingTypeID);
+			grouping = (Grouping)object;				
+			
 			if(keyExists(groupingDetails, WDDXTAGS.GROUPING_ID))
 				    grouping.setGroupingId(WDDXProcessor.convertToLong(groupingDetails,WDDXTAGS.GROUPING_ID));
 			if (keyExists(groupingDetails, WDDXTAGS.GROUPING_UIID))
 				    grouping.setGroupingUIID(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_UIID));
-	    }	    
+		}	    
 	   	    
-	  
+	 
 	    if(grouping.isRandomGrouping())
 			createRandomGrouping((RandomGrouping)grouping,groupingDetails);
 		else if(grouping.isChosenGrouping())
 			createChosenGrouping((ChosenGrouping)grouping,groupingDetails);
 		else
-			createLessonClass((LessonClass)grouping, groupingDetails); 
+			createLessonClass((LessonClass)grouping, groupingDetails);  
 		
 		if (keyExists(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS))
 		    grouping.setMaxNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS));
