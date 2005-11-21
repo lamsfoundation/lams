@@ -68,6 +68,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 /**
  * @author Manpreet Minhas
+ * modified by Mailing Truong
  * 
  * This is a utitlity class for extracting the
  * information from the WDDX packet sent by the FLASH.
@@ -226,14 +227,52 @@ public class ObjectExtractor {
 		learningDesignDAO.insert(learningDesign);
 	
 		// now process the "parts" of the learning design
+		//Vector v = (Vector)table.get(WDDXTAGS.GROUPINGS);
+		parseGroupings((Vector)table.get(WDDXTAGS.GROUPINGS), learningDesign);
 		parseActivities((Vector)table.get(WDDXTAGS.ACTIVITIES),learningDesign);
 		parseTransitions((Vector)table.get(WDDXTAGS.TRANSITIONS),learningDesign);
 
 		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
 		learningDesignDAO.update(learningDesign);
-
+		
 		return learningDesign;	
 		}
+	/**
+	 * Parses the groupings array sent from the WDDX packet. It will create
+	 * the groupings object (ChosenGrouping, RandomGrouping) so that when the
+	 * GroupingActivity is processed, it can link to the grouping object
+	 * that has been created by this method.
+	 * @param groupingsList
+	 * @param learningDesign
+	 * @throws WDDXProcessorConversionException
+	 * @throws ObjectExtractorException
+	 */
+	
+	private void parseGroupings(List groupingsList, LearningDesign learningDesign) 
+		throws WDDXProcessorConversionException, ObjectExtractorException 	
+	{
+	   //iterate through the list of groupings objects
+	    //each object should contain information groupingUUID, groupingID, groupingTypeID
+	    if (groupingsList != null)
+	    {
+	        Iterator iterator = groupingsList.iterator();
+	        while(iterator.hasNext())
+	        {
+	            Hashtable groupingDetails = (Hashtable)iterator.next();
+	            if( groupingDetails != null )
+	            {
+	    			Grouping grouping = extractGroupingObject(groupingDetails);	
+	    			groupingDAO.insert(grouping);	    			
+	            }
+	        }
+	        
+	    }
+	    
+	    
+	
+	}
+	
+	
 	
 	/**
 	 * Parses the list of activities sent from the WDDX packet. The current activities that 
@@ -259,7 +298,6 @@ public class ObjectExtractor {
 				activityDAO.insert(activity);
 				currentActivities.add(activity);
 				updatedSet.add(activity); //used to keep track of which ids that are still in use
-				
 			}
 		}
 		
@@ -335,13 +373,13 @@ public class ObjectExtractor {
 	public Activity extractActivityObject(Hashtable activityDetails, LearningDesign design) throws WDDXProcessorConversionException, ObjectExtractorException {
 		
 	    //it is assumed that the activityUUID will always be sent by flash.
-	    Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails,"activityUIID");
+	    Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.ACTIVITY_UIID);
 	    Activity activity = null;
 	    //get the activity with the particular activity uuid, if null, then new object needs to be created.
 	    Activity existingActivity = activityDAO.getActivityByUIID(activityUUID, design);
 	    if (existingActivity == null)
 	    {
-			Integer activityTypeID = WDDXProcessor.convertToInteger(activityDetails, "activityTypeID");
+			Integer activityTypeID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID);
 			if ( activityTypeID == null ) {
 				throw new ObjectExtractorException("activityTypeID missing");
 			}
@@ -465,7 +503,17 @@ public class ObjectExtractor {
 	}
 	private void buildGroupingActivity(GroupingActivity groupingActivity,Hashtable activityDetails) 
 		throws WDDXProcessorConversionException, ObjectExtractorException {
-		Hashtable groupingDetails = (Hashtable) activityDetails.get(WDDXTAGS.GROUPING_DTO); 
+		/**
+		 * read the createGroupingUUID, get the Grouping Object, and set CreateGrouping to that object
+		 */
+	    Integer createGroupingUIID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.CREATE_GROUPING_UIID);	    
+	    Grouping grouping = groupingDAO.getGroupingByUIID(createGroupingUIID);
+	    if (grouping!=null)
+	    {
+		    groupingActivity.setCreateGrouping(grouping);
+		    groupingActivity.setCreateGroupingUIID(createGroupingUIID);
+	    }
+	    /*Hashtable groupingDetails = (Hashtable) activityDetails.get(WDDXTAGS.GROUPING_DTO); 
 		if( groupingDetails != null ){
 			Grouping grouping = extractGroupingObject(groupingDetails);		
 			groupingActivity.setCreateGrouping(grouping);
@@ -473,7 +521,7 @@ public class ObjectExtractor {
 		} else {
 			groupingActivity.setCreateGrouping(null);
 			groupingActivity.setCreateGroupingUIID(null);
-		}
+		} */
 	}	
 
 	private void buildOptionsActivity(OptionsActivity optionsActivity,Hashtable activityDetails) throws WDDXProcessorConversionException{
@@ -523,25 +571,40 @@ public class ObjectExtractor {
 	
 
 	public Grouping extractGroupingObject(Hashtable groupingDetails) throws WDDXProcessorConversionException, ObjectExtractorException{
-		Integer groupingType=WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_TYPE_ID);
-		if ( groupingType == null ) { 
-			throw new ObjectExtractorException("groupingType missing");
+		
+	    //get grouping by uuid
+	    Grouping grouping;
+	    Integer groupingUUID = WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.GROUPING_UIID);	
+	    Integer groupingTypeID=WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_TYPE_ID);
+	    if (groupingTypeID== null) { 
+			throw new ObjectExtractorException("groupingTypeID is missing");
 		}
-		
-		Object object = Grouping.getGroupingInstance(groupingType);
-		
-		if(object instanceof RandomGrouping)
-			createRandomGrouping((RandomGrouping)object,groupingDetails);
-		else if(object instanceof ChosenGrouping)
-			createChosenGrouping((ChosenGrouping)object,groupingDetails);
+	    Grouping existingGrouping = groupingDAO.getGroupingByUIID(groupingUUID);
+	    if (existingGrouping != null)
+	        grouping = existingGrouping;
+	    else
+	    {
+	        Object object = Grouping.getGroupingInstance(groupingTypeID);
+			grouping = (Grouping)object;
+						
+			grouping.setGroupingTypeId(groupingTypeID);
+			if(keyExists(groupingDetails, WDDXTAGS.GROUPING_ID))
+				    grouping.setGroupingId(WDDXProcessor.convertToLong(groupingDetails,WDDXTAGS.GROUPING_ID));
+			if (keyExists(groupingDetails, WDDXTAGS.GROUPING_UIID))
+				    grouping.setGroupingUIID(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_UIID));
+	    }	    
+	   	    
+	  
+	    if(grouping.isRandomGrouping())
+			createRandomGrouping((RandomGrouping)grouping,groupingDetails);
+		else if(grouping.isChosenGrouping())
+			createChosenGrouping((ChosenGrouping)grouping,groupingDetails);
 		else
-			createLessonClass((LessonClass)object, groupingDetails);
+			createLessonClass((LessonClass)grouping, groupingDetails); 
 		
-		Grouping grouping = (Grouping)object;
-		grouping.setGroupingId(WDDXProcessor.convertToLong(groupingDetails,WDDXTAGS.GROUPING_ID));
-		grouping.setGroupingUIID(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.GROUPING_UIID));
-		grouping.setMaxNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS));
-		groupingDAO.insert(grouping);
+		if (keyExists(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS))
+		    grouping.setMaxNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.MAX_NUMBER_OF_GROUPS));
+		
 		return grouping;
 	}
 	private void createRandomGrouping(RandomGrouping randomGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
@@ -551,12 +614,15 @@ public class ObjectExtractor {
 		    randomGrouping.setNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails,WDDXTAGS.NUMBER_OF_GROUPS));
 	}
 	private void createChosenGrouping(ChosenGrouping chosenGrouping,Hashtable groupingDetails) throws WDDXProcessorConversionException{
-		
+		//no extra properties as yet
 	}
 	private void createLessonClass(LessonClass lessonClass, Hashtable groupingDetails) throws WDDXProcessorConversionException{
-		Group group = groupDAO.getGroupById(WDDXProcessor.convertToLong(groupingDetails,WDDXTAGS.STAFF_GROUP_ID));
-		if(group!=null)
-			lessonClass.setStaffGroup(group);
+	    if (keyExists(groupingDetails, WDDXTAGS.STAFF_GROUP_ID))
+	    {
+			Group group = groupDAO.getGroupById(WDDXProcessor.convertToLong(groupingDetails,WDDXTAGS.STAFF_GROUP_ID));
+			if(group!=null)
+				lessonClass.setStaffGroup(group);
+	    }
 	}
 
 	/** Create the transition from a WDDX based hashtable. It is easier to go 
@@ -595,6 +661,10 @@ public class ObjectExtractor {
 				Activity toActivity = activityDAO.getActivityByUIID(toUIID, learningDesign);
 				transition.setToActivity(toActivity);
 				transition.setToUIID(toUIID);
+				//update the transitionTo property for the activity
+				toActivity.setTransitionTo(transition);
+				activityDAO.update(toActivity);
+				
 			}
 	    }
 		
@@ -605,6 +675,10 @@ public class ObjectExtractor {
 				Activity fromActivity = activityDAO.getActivityByUIID(fromUIID, learningDesign);
 				transition.setFromActivity(fromActivity);
 				transition.setFromUIID(fromUIID);
+				//update the transitionFrom property for the activity
+				fromActivity.setTransitionFrom(transition);
+				activityDAO.update(fromActivity);
+				
 			}	
 	    }
 	    
