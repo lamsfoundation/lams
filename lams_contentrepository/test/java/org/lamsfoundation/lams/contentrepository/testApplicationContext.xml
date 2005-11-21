@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-	<bean id="toolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandlerImpl">
+	<bean id="testToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandlerImpl">
 		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean>  
 

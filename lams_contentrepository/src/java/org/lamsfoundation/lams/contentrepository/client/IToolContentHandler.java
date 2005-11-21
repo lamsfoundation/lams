@@ -36,8 +36,7 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
  * IToolContentHandler defines the ContentHandler interface used by the tools.
  * This interface exists so that the ToolDownload servlet can get to the 
  * Repository via ToolContentHandler. It needs to call the tool's 
- * concrete class,  which must be defined in the Spring context as "toolContentHandler" 
- * (see SPRING_BEAN_NAME). 
+ * concrete class,  which must be defined in the servlet's init parameters.
  * 
  * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler
  * @see org.lamsfoundation.lams.contentrepository.client.Download
@@ -52,10 +51,6 @@ public interface IToolContentHandler {
 
     /** The "name" used to store the online/offline property in the repository */
     public final static String FILE_TYPE_PROPERTY_NAME = "TYPE";
-
-    /** The concrete implementation must be configured as a bean in Spring, using 
-     * this value as the name. */
-    public final static String SPRING_BEAN_NAME = "toolContentHandler";
 
     /**
      * @return Returns the repositoryWorkspaceName.

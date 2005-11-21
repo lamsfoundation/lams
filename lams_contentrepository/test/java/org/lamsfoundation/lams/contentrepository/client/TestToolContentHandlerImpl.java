@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.contentrepository.service.BaseTestCase;
  */
 public class TestToolContentHandlerImpl extends BaseTestCase {
 
-    public static final String HANDLER_BEAN="toolContentHandler";
+    public static final String HANDLER_BEAN="testToolContentHandler";
     ToolContentHandlerImpl handler = null;
     
     /**

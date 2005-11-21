@@ -20,6 +20,8 @@ http://www.gnu.org/licenses/gpl.txt
 */
 package org.lamsfoundation.lams.contentrepository.client;
 
+import javax.servlet.ServletConfig;
+
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
@@ -34,18 +36,25 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * previously saved in the content repository.
  * <p>
  * The servlet accesses the content repository via a tool's ToolContentHandler 
- * implementation. It looks for the bean IToolContentHandler.SPRING_BEAN_NAME
- * in the web based Spring context. If you do not have a ToolContentHandler
- * implementation then this servlet will not work, or if you use a different 
- * name for the bean in the Spring context, then you should derive a new
- * concrete class from the Download servlet.
+ * implementation. It looks for the bean that implements IToolContentHandler
+ * in the web based Spring context. The name of the bean is specified
+ * using the "toolContentHandlerBeanName" parameter in the servlet definition
+ * in web.xml.
+ * 
+ * If you do not have a ToolContentHandler implementation then this servlet will not work.
+ * If you need to set up the content repository access differently to the implementation
+ * in the Tool Content Handler, then derive a new concrete class from the Download servlet.
  * <p>
  * Sample servlet definition:<BR><pre>
  *  &lt;servlet&gt;
- *      &lt;description&gt;Instructions Download&lt;/description&gt;
- *      &lt;display-name&gt;Instructions Download&lt;/display-name&gt;
+ *      &lt;description&gt;Noticeboard Instructions Download&lt;/description&gt;
+ *      &lt;display-name&gt;Noticeboard Instructions Download&lt;/display-name&gt;
  *      &lt;servlet-name&gt;download&lt;/servlet-name&gt;
  *      &lt;servlet-class&gt;org.lamsfoundation.lams.contentrepository.client.ToolDownload&lt;/servlet-class&gt;
+ *      &lt;init-param&gt;
+ *           &lt;param-name&gt;toolContentHandlerBeanName&lt;/param-name&gt;
+ *           param-value&gt;nbToolContentHandler&lt;/param-value&gt;
+ *      &lt;/init-param&gt;
  *      &lt;load-on-startup&gt;3&lt;/load-on-startup&gt;
  *  &lt;/servlet&gt;
  * </pre>
@@ -86,13 +95,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class ToolDownload extends Download {
 
-	protected IToolContentHandler toolContentHandler = null;
+    /** The name of the servlet parameter used to define the implementation bean name */
+    public final static String TOOL_CONTENT_HANDLER_BEAN_NAME = "toolContentHandlerBeanName";
+
 
     /* (non-Javadoc)
      * @see org.lamsfoundation.lams.contentrepository.client.Download#getTicket()
      */
     public ITicket getTicket() throws RepositoryCheckedException {
-        getToolContentHandler(); // make sure it is set up
+    	IToolContentHandler toolContentHandler = getToolContentHandler(); // make sure it is set up
         return toolContentHandler != null ? toolContentHandler.getTicket(false):null;
     }
 
@@ -100,16 +111,23 @@ public class ToolDownload extends Download {
      * @see org.lamsfoundation.lams.contentrepository.client.Download#getRepositoryService()
      */
     public IRepositoryService getRepositoryService() throws RepositoryCheckedException {
-        getToolContentHandler(); // make sure it is set up
+    	IToolContentHandler toolContentHandler = getToolContentHandler(); // make sure it is set up
         return toolContentHandler != null? toolContentHandler.getRepositoryService() : null;
     }
-
+    
     protected IToolContentHandler getToolContentHandler() {
+    	
     	log.debug("ToolDownload servlet calling context and getting repository singleton.");
+        
+    	String toolContentHandlerBeanName = getInitParameter(TOOL_CONTENT_HANDLER_BEAN_NAME);
+    	if ( toolContentHandlerBeanName == null ) {
+    		log.error("Accessing Download servlet but tool content handler bean has not been defined. Please define init parameter"
+    				+TOOL_CONTENT_HANDLER_BEAN_NAME+".");
+    		return null;
+    	}
+    	
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-    	toolContentHandler = (IToolContentHandler)wac.getBean(IToolContentHandler.SPRING_BEAN_NAME);
-
-    	return toolContentHandler;
+    	return (IToolContentHandler)wac.getBean(toolContentHandlerBeanName);
     }
 
 
