@@ -45,6 +45,10 @@
 		<display-name>Instructions Download</display-name>
 		<description>Instructions Download</description>		
 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
+	    <init-param>
+	      <param-name>toolContentHandlerBeanName</param-name>
+	      <param-value>nbToolContentHandler</param-value>
+	    </init-param>
 	    <load-on-startup>3</load-on-startup>
 	</servlet>
 	

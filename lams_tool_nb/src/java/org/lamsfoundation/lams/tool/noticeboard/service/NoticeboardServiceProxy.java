@@ -21,11 +21,12 @@
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import javax.servlet.ServletContext;
-import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.noticeboard.util.NbToolContentHandler;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -73,5 +74,15 @@ public class NoticeboardServiceProxy {
     {
         return (ToolContentManager)getNbDomainService(servletContext);
     }
-   
+
+    /*
+     * Get the Noticeboard's tool content handler 
+     * @param servletContext the servletContext for current application
+     * @return noticeboard service object. */
+    public static final NbToolContentHandler getToolContentHandler(ServletContext servletContext)
+    {
+		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+	    return (NbToolContentHandler) wac.getBean("nbToolContentHandler");
+    }
+
 }

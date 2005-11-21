@@ -47,21 +47,19 @@ import org.apache.struts.util.MessageResources;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NoticeboardServiceProxy;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbToolContentHandler;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author mtruong
@@ -102,17 +100,6 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());
     public final static String FORM="NbAuthoringForm";
     
-    private NbToolContentHandler toolContentHandler;
-    
-    private NbToolContentHandler getToolContentHandler()
-    {
-        if ( toolContentHandler == null ) {
-    	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-    	    toolContentHandler = (NbToolContentHandler) wac.getBean(NbToolContentHandler.SPRING_BEAN_NAME);
-    	    }
-    	    return toolContentHandler;
-   	} 
-   
     /** Get the user from the shared session */
 	public UserDTO getUser(HttpServletRequest request) {
 		// set up the user details
@@ -331,7 +318,8 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     	  				// shouldn't cause any errors.
 				    	try
 				    	{
-				    	    getToolContentHandler().deleteFile(attachment.getUuid());
+    			    		IToolContentHandler toolContentHandler = NoticeboardServiceProxy.getToolContentHandler(getServlet().getServletContext()); 
+    			    		toolContentHandler.deleteFile(attachment.getUuid());
 				    	}
 				    	catch (RepositoryCheckedException e) {
 				            logger.error("Unable to delete file",e);
@@ -415,8 +403,8 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     			    	{
 			    	        // This is a new file and so is saved to the content repository. Add it to the 
     			    		// attachments collection, but don't add it to the tool's tables yet.
-			    	        NodeKey node = getToolContentHandler().uploadFile(theFile.getInputStream(), theFile.getFileName(), 
-			                        theFile.getContentType(), fileType); 
+    			    		IToolContentHandler toolContentHandler = NoticeboardServiceProxy.getToolContentHandler(getServlet().getServletContext()); 
+			    	        NodeKey node = toolContentHandler.uploadFile(theFile.getInputStream(), theFile.getFileName(), theFile.getContentType(), fileType); 
 			    	        NoticeboardAttachment file = new NoticeboardAttachment();
 				    	    file.setFilename(theFile.getFileName());
 				    	   	file.setOnlineFile(isOnlineFile);

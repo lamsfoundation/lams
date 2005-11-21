@@ -70,7 +70,7 @@
 		<property name="sessionFactory"><ref local="nbSessionFactory"/></property>
 	</bean>
 	
-	<bean id="toolContentHandler" class="org.lamsfoundation.lams.tool.noticeboard.util.NbToolContentHandler">
+	<bean id="nbToolContentHandler" class="org.lamsfoundation.lams.tool.noticeboard.util.NbToolContentHandler">
  		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean> 
 
