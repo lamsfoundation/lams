@@ -179,7 +179,7 @@ public interface IQaService
     public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException;
     
     /**
-     * leaveToolSession(Long toolSessionId, User learner) should ideally should not be part this interface as it is
+     * leaveToolSession(Long toolSessionId, Long learnerId) should ideally should not be part this interface as it is
      * already part of the interface ToolSessionManager. It is here for development purposes.
      * 
      * It is also defined here since in development we want to be able call it directly from our web-layer 
@@ -187,7 +187,7 @@ public interface IQaService
      * @param toolSessionId
      * @param toolContentId
      */
-    public String leaveToolSession(Long toolSessionId,User learner) throws DataMissingException, ToolException;
+    public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException;
     
     public BasicToolVO getToolBySignature(String toolSignature);
     

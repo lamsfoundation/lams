@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -110,6 +111,7 @@ public class QaServicePOJO implements
     
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
+    private ILearnerService learnerService;
 
     public void configureContentRepository() throws QaApplicationException {
     	logger.debug("retrieved repService: " + repositoryService);
@@ -1319,10 +1321,10 @@ public class QaServicePOJO implements
      * Call controller service to complete the qa session
      * 
      */
-    public String leaveToolSession(Long toolSessionId,User learner) throws DataMissingException, ToolException 
+    public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException 
     {
         logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId);
-        logger.debug("start of leaveToolSession with learner:" + learner);
+        logger.debug("start of leaveToolSession with learnerId:" + learnerId);
         
         if (toolSessionId == null)
     	{
@@ -1330,20 +1332,17 @@ public class QaServicePOJO implements
     		throw new DataMissingException("toolSessionId is missing");
     	}
         
-        if (learner == null)
+        if (learnerId == null)
     	{
-    		logger.debug("learner is null");
-    		throw new DataMissingException("learner is missing");
+    		logger.debug("learnerId is null");
+    		throw new DataMissingException("learnerId is missing");
     	}
         
     	try
 		{
-    		/*
-    		String nextUrl=learnerService.completeToolSession(toolSessionId,learner);
+    		String nextUrl = learnerService.completeToolSession(toolSessionId,learnerId);
     		logger.debug(logger + " " + this.getClass().getName() +  " " + "nextUrl: " + nextUrl);
     		return nextUrl;
-    		*/
-    		return "nextUrl";
     	}
     	catch(DataAccessException e)
 		{
@@ -1612,5 +1611,15 @@ public class QaServicePOJO implements
 	 */
 	public IUserManagementService getUserManagementService() {
 		return userManagementService;
+	}
+
+
+	public ILearnerService getLearnerService() {
+		return learnerService;
+	}
+
+
+	public void setLearnerService(ILearnerService learnerService) {
+		this.learnerService = learnerService;
 	}
 }
