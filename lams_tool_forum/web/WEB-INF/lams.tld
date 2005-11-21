@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+<taglib>
+
+   <tlibversion>1.0</tlibversion>
+   <jspversion>1.1</jspversion>
+   <shortname>lams</shortname>
+
+   <info><![CDATA[LAMS custom tags]]></info>
+
+   <tag>
+
+      <name>LAMSURL</name>
+      <tagclass>org.lamsfoundation.lams.web.tag.LAMSURLTag</tagclass>
+      <info><![CDATA[Output the Server URL as defined in the lams.xml configuration file.]]></info>
+
+   </tag>
+   <tag>
+
+      <name>user</name>
+      <tagclass>org.lamsfoundation.lams.web.tag.UserTag</tagclass>
+      <info><![CDATA[Output details from the shared session UserDTO object]]></info>
+
+      <attribute>
+         <name>property</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <name>css</name>
+      <tagclass>org.lamsfoundation.lams.web.tag.CssTag</tagclass>
+      <info><![CDATA[Output stylesheet based on the user preferences.]]></info>
+
+   </tag>
+   <tag>
+
+      <name>WebAppURL</name>
+      <tagclass>org.lamsfoundation.lams.web.tag.WebAppURLTag</tagclass>
+      <info><![CDATA[Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/]]></info>
+
+   </tag>
+
+</taglib>
