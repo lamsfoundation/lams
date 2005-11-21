@@ -60,7 +60,7 @@ public interface WDDXTAGS {
 	public static final String HELP_TEXT ="helpText";
 	public static final String XCOORD="xCoord";
 	public static final String YCOORD="yCoord";	
-	public static final String GROUPING ="grouping";
+	public static final String GROUPINGS ="groupings";
 	public static final String TRANSITIONS ="transitions";
 	public static final String ACTIVITIES ="activities";
 	
@@ -110,13 +110,13 @@ public interface WDDXTAGS {
 	public static final String GATE_OPEN ="gateOpen";
 	
 	/** Grouping Activity specific tags */
-	public static final String CREATE_GROUPING_ID ="create_grouping_id";
-	public static final String CREATE_GROUPING_UIID ="create_grouping_ui_id";
+	public static final String CREATE_GROUPING_ID ="createGroupingID";
+	public static final String CREATE_GROUPING_UIID ="createGroupingUIID";
 	
 	/** Grouping specific tags */
 	public static final String GROUPING_ID ="groupingID";
 	public static final String GROUPING_UIID ="groupingUIID";
-	public static final String GROUPING_TYPE_ID ="groupingType";		
+	public static final String GROUPING_TYPE_ID ="groupingTypeID";		
 	public static final String LEARNERS_PER_GROUP ="learnersPerGroup";
 	public static final String MAX_NUMBER_OF_GROUPS ="maxNumberOfGroups";
 	public static final String NUMBER_OF_GROUPS ="numberOfGroups";	
