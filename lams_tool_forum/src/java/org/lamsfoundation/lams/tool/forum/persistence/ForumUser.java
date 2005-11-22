@@ -41,14 +41,18 @@ public class ForumUser implements Serializable,Cloneable{
 	private Long userId;
 	private String firstName;
 	private String lastName;
+	private ForumReport report;
+	private ForumToolSession session;
 	
 	public ForumUser(){
 	}
 	
-	public ForumUser(UserDTO user) {
+	public ForumUser(UserDTO user,  ForumToolSession session) {
 		this.userId = new Long(user.getUserID().intValue());
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
+		this.session = session;
+		this.report = new ForumReport();
 	}
 	
 
@@ -121,6 +125,31 @@ public class ForumUser implements Serializable,Cloneable{
 	}
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+	
+	/**
+	 * @hibernate.many-to-one column="session_id"
+	 * 			cascade="none"
+	 * @return
+	 */
+	public ForumToolSession getSession() {
+		return session;
+	}
+
+	public void setSession(ForumToolSession session) {
+		this.session = session;
+	}
+
+	/**
+	 * @hibernate.many-to-one column="report_id"
+	 * 			cascade="all"
+	 * @return
+	 */
+	public ForumReport getReport() {
+		return report;
+	}
+	public void setReport(ForumReport report) {
+		this.report = report;
 	}
 
 }

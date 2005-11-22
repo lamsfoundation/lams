@@ -175,7 +175,12 @@ public interface IForumService {
 	 * @param session
 	 */
 	public void updateSession(ForumToolSession session);
-
+	/**
+	 * Get session list according to content ID. 
+	 * @param contentID
+	 * @return List
+	 */
+	public List getSessionsByContentId(Long contentID);
 	//************************************************************************************
 	// User  Method
 	//************************************************************************************
@@ -189,5 +194,11 @@ public interface IForumService {
      * @param userId
      * @return
      */
-    public ForumUser getUserByUserId(Long userId);
+    public ForumUser getUserByUserId(Long userId,Long sessionId);
+    /**
+     * Get user list by given session ID.
+     * @param sessionID
+     * @return
+     */
+	public List getUsersBySessionId(Long sessionID);
 }

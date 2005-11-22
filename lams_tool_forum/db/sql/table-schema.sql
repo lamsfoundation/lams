@@ -1,5 +1,7 @@
 alter table tl_lafrum11_attachment drop foreign key FK389AD9A2FE939F2A;
 alter table tl_lafrum11_attachment drop foreign key FK389AD9A2131CE31E;
+alter table tl_lafrum11_forum_user drop foreign key FK7B83A4A85F0116B6;
+alter table tl_lafrum11_forum_user drop foreign key FK7B83A4A897F0DB46;
 alter table tl_lafrum11_message drop foreign key FK4A6067E8E42F4351;
 alter table tl_lafrum11_message drop foreign key FK4A6067E8131CE31E;
 alter table tl_lafrum11_message drop foreign key FK4A6067E824089E4D;
@@ -13,6 +15,7 @@ drop table if exists tl_lafrum11_forum;
 drop table if exists tl_lafrum11_forum_user;
 drop table if exists tl_lafrum11_message;
 drop table if exists tl_lafrum11_message_seq;
+drop table if exists tl_lafrum11_report;
 drop table if exists tl_lafrum11_tool_session;
 create table tl_lafrum11_attachment (
    uid bigint not null auto_increment,
@@ -34,9 +37,9 @@ create table tl_lafrum11_forum (
    allow_anonym bit,
    run_offline bit,
    lock_on_finished bit,
-   instructions varchar(255),
-   online_instructions varchar(255),
-   offline_instructions varchar(255),
+   instructions text,
+   online_instructions text,
+   offline_instructions text,
    content_in_use bit,
    define_later bit,
    content_id bigint unique,
@@ -49,6 +52,8 @@ create table tl_lafrum11_forum_user (
    user_id bigint,
    last_name varchar(255),
    first_name varchar(255),
+   session_id bigint,
+   report_id bigint,
    primary key (uid)
 );
 create table tl_lafrum11_message (
@@ -76,6 +81,13 @@ create table tl_lafrum11_message_seq (
    message_level smallint,
    primary key (uid)
 );
+create table tl_lafrum11_report (
+   uid bigint not null auto_increment,
+   comment text,
+   release_date datetime,
+   mark integer,
+   primary key (uid)
+);
 create table tl_lafrum11_tool_session (
    uid bigint not null auto_increment,
    session_end_date datetime,
@@ -87,6 +99,8 @@ create table tl_lafrum11_tool_session (
 );
 alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_attachment add index FK389AD9A2131CE31E (forum_uid), add constraint FK389AD9A2131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
+alter table tl_lafrum11_forum_user add index FK7B83A4A85F0116B6 (session_id), add constraint FK7B83A4A85F0116B6 foreign key (session_id) references tl_lafrum11_tool_session (uid);
+alter table tl_lafrum11_forum_user add index FK7B83A4A897F0DB46 (report_id), add constraint FK7B83A4A897F0DB46 foreign key (report_id) references tl_lafrum11_report (uid);
 alter table tl_lafrum11_message add index FK4A6067E8E42F4351 (create_by), add constraint FK4A6067E8E42F4351 foreign key (create_by) references tl_lafrum11_forum_user (uid);
 alter table tl_lafrum11_message add index FK4A6067E8131CE31E (forum_uid), add constraint FK4A6067E8131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 alter table tl_lafrum11_message add index FK4A6067E824089E4D (parent_uid), add constraint FK4A6067E824089E4D foreign key (parent_uid) references tl_lafrum11_message (uid);

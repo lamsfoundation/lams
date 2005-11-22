@@ -221,7 +221,7 @@ public class LearningAction extends Action {
 		message.setCreated(new Date());
 		message.setUpdated(new Date());
 		message.setLastReplyDate(new Date());
-		ForumUser forumUser = getCurrentUser();
+		ForumUser forumUser = getCurrentUser(request);
 		message.setCreatedBy(forumUser);
 		message.setModifiedBy(forumUser);
 		setAttachment(messageForm, message);
@@ -282,7 +282,7 @@ public class LearningAction extends Action {
 		message.setCreated(new Date());
 		message.setUpdated(new Date());
 		message.setLastReplyDate(new Date());
-		ForumUser forumUser = getCurrentUser();
+		ForumUser forumUser = getCurrentUser(request);
 		message.setCreatedBy(forumUser);
 		message.setModifiedBy(forumUser);
 		setAttachment(messageForm, message);
@@ -348,7 +348,7 @@ public class LearningAction extends Action {
 		messagePO.setSubject(message.getSubject());
 		messagePO.setBody(message.getBody());
 		messagePO.setUpdated(new Date());
-		messagePO.setModifiedBy(getCurrentUser());
+		messagePO.setModifiedBy(getCurrentUser(request));
 		setAttachment(messageForm, messagePO);
 		
 		//save message into database
@@ -384,7 +384,7 @@ public class LearningAction extends Action {
 //		get value from HttpSession
 		Message messagePO = forumService.getMessage(topicId);
 		messagePO.setUpdated(new Date());
-		messagePO.setModifiedBy(getCurrentUser());
+		messagePO.setModifiedBy(getCurrentUser(request));
 		messagePO.setAttachments(null);
 		//save message into database
 		forumService.updateTopic(messagePO);
@@ -409,19 +409,22 @@ public class LearningAction extends Action {
 	/**
 	 * Get login user information from system level session. Check it whether it exists in database or not, and save it
 	 * if it does not exists. Return an instance of PO of ForumUser.
+	 * @param request 
 	 * @return
 	 * 		Current user instance
 	 */
-	private ForumUser getCurrentUser() {
+	private ForumUser getCurrentUser(HttpServletRequest request) {
 //			get login user (author)
 		HttpSession ss = SessionManager.getSession();
 		//get back login user DTO
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		//check whether this user exist or not
-		ForumUser forumUser = forumService.getUserByUserId(new Long(user.getUserID().intValue()));
+		Long sessionId = (Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
+		ForumUser forumUser = forumService.getUserByUserId(new Long(user.getUserID().intValue()),sessionId);
 		if(forumUser == null){
 			//if user not exist, create new one in database
-			forumUser = new ForumUser(user);
+			ForumToolSession session = forumService.getSessionBySessionId(sessionId);
+			forumUser = new ForumUser(user,session);
 			forumService.createUser(forumUser);
 		}
 		return forumUser;

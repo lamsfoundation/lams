@@ -14,6 +14,7 @@
                <value>org/lamsfoundation/lams/tool/forum/persistence/Message.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/forum/persistence/Attachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/forum/persistence/ForumUser.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/forum/persistence/ForumReport.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/forum/persistence/ForumToolSession.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/forum/persistence/MessageSeq.hbm.xml</value>
             </list>

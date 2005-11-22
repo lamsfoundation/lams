@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
  * @hibernate.query name="allAuthoredMessagesOfForum" query="from Message m where is_authored=true and forum_uid=? order by create_date"
  */
 public class Message implements Cloneable{
-
+	
 	private static Logger log = Logger.getLogger(Message.class);
 	
 	private Long uid;

@@ -523,10 +523,10 @@ public class AuthoringAction extends Action {
 		message.setUpdated(new Date());
 		message.setLastReplyDate(new Date());
 		//check whether this user exist or not
-		ForumUser forumUser = forumService.getUserByUserId(new Long(user.getUserID().intValue()));
+		ForumUser forumUser = forumService.getUserByUserId(new Long(user.getUserID().intValue()),null);
 		if(forumUser == null){
 			//if user not exist, create new one in database
-			forumUser = new ForumUser(user);
+			forumUser = new ForumUser(user,null);
 			request.getSession().setAttribute(ForumConstants.NEW_FORUM_USER,forumUser);
 		}
 		message.setCreatedBy(forumUser);

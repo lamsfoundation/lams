@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
  * @hibernate.query name="forumByContentId" query="from Forum forum where forum.contentId=?"
  */
 public class Forum implements Cloneable{
+	
 	private static final Logger log = Logger.getLogger(Forum.class);
 	
 	//key 

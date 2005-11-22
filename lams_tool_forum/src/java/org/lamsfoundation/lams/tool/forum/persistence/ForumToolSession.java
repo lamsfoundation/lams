@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  * @version $Revision$
  */
 public class ForumToolSession implements Cloneable{
-
+	
 	private static Logger log = Logger.getLogger(ForumToolSession.class);
 	
 	private Long uid;

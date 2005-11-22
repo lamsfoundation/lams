@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -281,12 +280,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		
 	}
 
-	public ForumUser getUserByUserId(Long userId) {
-		List list =  forumUserDao.getUserByUserId(userId);
-		if(list == null || list.isEmpty())
-			return null;
-		
-		return (ForumUser) list.get(0);
+	public ForumUser getUserByUserId(Long userId,Long sessionId) {
+		return  forumUserDao.getByUserIdAndSessionId(userId,sessionId);
 	}
 
 	public void createUser(ForumUser forumUser) {
@@ -343,7 +338,15 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     	return forum;
 
     }
-	
+
+	public List getSessionsByContentId(Long contentID) {
+		return forumToolSessionDao.getByContentId(contentID);
+	}
+
+	public List getUsersBySessionId(Long sessionID) {
+		return forumUserDao.getBySessionId(sessionID);
+	}
+
 
     //***************************************************************************************************************
     // ToolContentManager and ToolSessionManager methods

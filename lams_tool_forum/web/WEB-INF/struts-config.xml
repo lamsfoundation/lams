@@ -22,6 +22,7 @@
       type="org.lamsfoundation.lams.tool.forum.web.forms.MessageForm"
     />
 
+<form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm"/>
   </form-beans>
 
   <!-- ========== Global Exceptions Definitions =================================== -->
@@ -159,7 +160,7 @@
 			<forward name="success" path="/jsps/authoring/authoring.jsp" />
 		</action>
 		<!-- ========== END: Authroing Definitions ============================== -->
-		<!-- Message related actions -->
+		<!-- ========== BEGIN: Learning Definitions ============================== -->
 		<action path="/learning/viewForum"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
 			parameter="viewForum" scope="request">
@@ -231,7 +232,46 @@
 			parameter="finish">
 			<forward name="success" path="tiles:/learning/forum/viewForum" />
 		</action>
-
+		<!-- ========== END: Learning  Definitions ============================== -->
+		<!-- ========== START: Monitoring  Definitions ============================== -->
+		<action path="/monitoring/listContentUsers"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			parameter="listContentUsers" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		<action path="/monitoring/releaseMarks"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			name="emptyForm"
+			scope="request"
+			validate="false"
+			parameter="viewUserMark" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		<action path="/monitoring/downloadMarks"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			name="emptyForm"
+			scope="request"
+			validate="false"
+			parameter="viewUserMark" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		<action path="/monitoring/viewUserMark"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			name="emptyForm"
+			scope="request"
+			validate="false"
+			parameter="viewUserMark" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		<action path="/monitoring/viewAllMarks"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			name="emptyForm"
+			scope="request"
+			validate="false"
+			parameter="viewUserMark" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		<!-- ========== END: Monitoring  Definitions ============================== -->
 		<!-- System level actions -->
 		<action path="/index" type="org.apache.struts.actions.ForwardAction"
 			parameter="tiles:/layout" />

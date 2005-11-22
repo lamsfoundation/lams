@@ -27,6 +27,9 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class ForumToolSessionDao extends HibernateDaoSupport {
 
 	private static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + ForumToolSession.class.getName() + " where session_id=?";
+	private static final String SQL_QUERY_FIND_BY_CONTENT_ID = "select s from " + Forum.class.getName()+ " as f, " +
+													ForumToolSession.class.getName() + " as s" + 
+													" where f.contentId=? and s.forum.uid=f.uid";
 	
 	public ForumToolSession getBySessionId(Long sessionId) {
 		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID,sessionId);
@@ -38,6 +41,11 @@ public class ForumToolSessionDao extends HibernateDaoSupport {
 	public void saveOrUpdate(ForumToolSession session){
 		this.getHibernateTemplate().saveOrUpdate(session);
 		this.getHibernateTemplate().flush();
+	}
+
+	public List getByContentId(Long contentID) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_CONTENT_ID,contentID);
+		return list;
 	}
 
 }

@@ -14,7 +14,7 @@
 <table-list>
 <table alias="" name="tl_lafrum11_attachment" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="132" y="286"/>
+<table-figure-bounds height="-1" width="-1" x="95" y="314"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -140,7 +140,7 @@
 </table>
 <table alias="" name="tl_lafrum11_forum" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="168" y="-10"/>
+<table-figure-bounds height="-1" width="-1" x="83" y="11"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -226,25 +226,22 @@
 <variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="instructions" remarks="">
+<column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="instructions" remarks="">
 <column-description></column-description>
-<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="online_instructions" remarks="">
+<column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="online_instructions" remarks="">
 <column-description></column-description>
-<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="offline_instructions" remarks="">
+<column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="offline_instructions" remarks="">
 <column-description></column-description>
-<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="content_in_use" remarks="">
@@ -332,7 +329,7 @@
 </table>
 <table alias="" name="tl_lafrum11_forum_user" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="915" y="323"/>
+<table-figure-bounds height="-1" width="-1" x="805" y="37"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -374,23 +371,72 @@
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="session_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="report_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key alias="" name="PRIMARY" remarks="">
 <primary-key-description></primary-key-description>
 <primary-key-column name="uid"/>
 </primary-key>
 <unique-key-list/>
-<foreign-key-list/>
+<foreign-key-list>
+<foreign-key alias="" name="FK7B83A4A897F0DB46" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_report" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="report_id" referenced-key-column-name="uid"/>
+</foreign-key>
+<foreign-key alias="" name="FK7B83A4A85F0116B6" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_tool_session" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="session_id" referenced-key-column-name="uid"/>
+</foreign-key>
+</foreign-key-list>
 <index-list>
 <index alias="" name="PRIMARY" remarks="" unique="false">
 <index-description></index-description>
 <index-column name="uid" sort="ASC"/>
 </index>
+<index alias="" name="FK7B83A4A85F0116B6" remarks="" unique="true">
+<index-description></index-description>
+<index-column name="session_id" sort="ASC"/>
+</index>
+<index alias="" name="FK7B83A4A897F0DB46" remarks="" unique="true">
+<index-description></index-description>
+<index-column name="report_id" sort="ASC"/>
+</index>
 </index-list>
 </table>
 <table alias="" name="tl_lafrum11_message" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="621" y="193"/>
+<table-figure-bounds height="-1" width="-1" x="405" y="281"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -625,7 +671,7 @@
 </table>
 <table alias="" name="tl_lafrum11_message_seq" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="849" y="154"/>
+<table-figure-bounds height="-1" width="-1" x="707" y="410"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -716,9 +762,65 @@
 </index>
 </index-list>
 </table>
+<table alias="" name="tl_lafrum11_report" remarks="">
+<table-description></table-description>
+<table-figure-bounds height="-1" width="-1" x="871" y="292"/>
+<column-list>
+<column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="comment" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="19" decimal-digits="0" default-value="" mandatory="false" name="release_date" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="mark" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
+<variant type-name-pattern="INT"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key alias="" name="PRIMARY" remarks="">
+<primary-key-description></primary-key-description>
+<primary-key-column name="uid"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list/>
+<index-list>
+<index alias="" name="PRIMARY" remarks="" unique="false">
+<index-description></index-description>
+<index-column name="uid" sort="ASC"/>
+</index>
+</index-list>
+</table>
 <table alias="" name="tl_lafrum11_tool_session" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="550" y="10"/>
+<table-figure-bounds height="-1" width="-1" x="381" y="49"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
