@@ -70,27 +70,31 @@
 												
 												<tr>
 													<td  align=left class="input" valign=top> 											
-													<c:forEach var="attemptEntry" items="${sessionScope.mapQueAttempts}">
-														<c:if test="${sessionScope.mainQueIndex == attemptEntry.key}"> 		
-														
-
-															 <c:forEach var="i" begin="1" end="10" step="1">
-			 													<c:forEach var="distinctAttemptEntry" items="${attemptEntry.value}">
-																		<c:if test="${distinctAttemptEntry.key == i}"> 	
-						 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
-							 													<c:out value="${singleAttemptEntry.value}"/> 
-																			</c:forEach>
-																		</c:if> 																			
+													<table align=left>
+														<c:forEach var="attemptEntry" items="${sessionScope.mapQueAttempts}">
+															<c:if test="${sessionScope.mainQueIndex == attemptEntry.key}"> 		
+																 <c:forEach var="i" begin="1" end="30" step="1">
+					 													<c:forEach var="distinctAttemptEntry" items="${attemptEntry.value}">
+																				<c:if test="${distinctAttemptEntry.key == i}"> 	
+																				<tr>
+																					<td align=left class="input" valign=top> 
+																						<b> <bean:message key="label.attempt"/> <c:out value="${distinctAttemptEntry.key}"/>: </b>
+																					</td>
+																					
+								 													<c:forEach var="singleAttemptEntry" items="${distinctAttemptEntry.value}">
+								 														<td align=left class="input" valign=top> 
+								 															<c:out value="${singleAttemptEntry.value}"/> 
+								 														</td>
+																					</c:forEach>
+																				</tr>		
+																				</c:if> 																																						
+																		</c:forEach>
 																</c:forEach>
-															</c:forEach>
-
-
-														</c:if> 																		
-													</c:forEach>
+															</c:if> 																		
+														</c:forEach>
+													</table>
 													</td>
-
-												</tr>
-
+											  </tr>
 										</c:if> 			
 								</c:forEach>
 							</table>

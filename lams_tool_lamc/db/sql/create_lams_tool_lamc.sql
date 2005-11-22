@@ -85,6 +85,7 @@ CREATE TABLE lams.tl_lamc11_usr_attempt (
      , mc_que_option_id BIGINT(20) NOT NULL
      , attempt_time DATETIME
      , time_zone VARCHAR(255)
+     , isAttemptCorrect TINYINT(1) NOT NULL DEFAULT 0
      , mark VARCHAR(255) NOT NULL DEFAULT '0'
      , passed TINYINT(1) NOT NULL DEFAULT 0
      , attemptOrder INTEGER NOT NULL DEFAULT 1

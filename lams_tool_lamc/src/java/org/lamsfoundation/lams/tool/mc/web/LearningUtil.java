@@ -512,13 +512,15 @@ public class LearningUtil implements McAppConstants {
      * 
      * @param request
      */
-    public static void createAttempt(HttpServletRequest request, McQueUsr mcQueUsr, Map mapGeneralCheckedOptionsContent, int mark,  boolean passed, int highestAttemptOrder)
+    public static void createAttempt(HttpServletRequest request, McQueUsr mcQueUsr, Map mapGeneralCheckedOptionsContent, int mark,  boolean passed, int highestAttemptOrder, Map mapLeanerAssessmentResults)
 	{
 		IMcService mcService =McUtils.getToolService(request);
 		Date attempTime=McUtils.getGMTDateTime();
 		String timeZone= McUtils.getCurrentTimeZone();
 		logger.debug("timeZone: " + timeZone);
+		
 		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
+		logger.debug("toolContentUID: " + toolContentUID);
 		 	
 		Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
         while (itCheckedMap.hasNext()) 
@@ -526,25 +528,31 @@ public class LearningUtil implements McAppConstants {
         	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
             
             Map mapCheckedOptions=(Map) checkedPairs.getValue();
-            Long questionDisplayOrder=new Long(checkedPairs.getKey().toString()); 
+            Long questionDisplayOrder=new Long(checkedPairs.getKey().toString());
+            
+            logger.debug("questionDisplayOrder: " + questionDisplayOrder);
+            String isAttemptCorrect=(String)mapLeanerAssessmentResults.get(questionDisplayOrder.toString());
+            logger.debug("isAttemptCorrect: " + isAttemptCorrect);
             
             McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(questionDisplayOrder, toolContentUID);
-            createIndividualOptions(request, mapCheckedOptions, mcQueContent, mcQueUsr, attempTime, timeZone, mark, passed, new Integer(highestAttemptOrder));
+            createIndividualOptions(request, mapCheckedOptions, mcQueContent, mcQueUsr, attempTime, timeZone, mark, passed, new Integer(highestAttemptOrder), isAttemptCorrect);
         }
 	 }
     
     
-    public static void createIndividualOptions(HttpServletRequest request, Map mapCheckedOptions, McQueContent mcQueContent, McQueUsr mcQueUsr, Date attempTime, String timeZone, int mark,  boolean passed, Integer highestAttemptOrder)
+    public static void createIndividualOptions(HttpServletRequest request, Map mapCheckedOptions, McQueContent mcQueContent, McQueUsr mcQueUsr, Date attempTime, String timeZone, int mark,  boolean passed, Integer highestAttemptOrder, String isAttemptCorrect)
     {
     	IMcService mcService =McUtils.getToolService(request);
     	Integer IntegerMark= new Integer(mark);
 		
+    	logger.debug("createIndividualOptions-> isAttemptCorrect: " + isAttemptCorrect);
+    	
     	Iterator itCheckedMap = mapCheckedOptions.entrySet().iterator();
         while (itCheckedMap.hasNext()) 
         {
         	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
         	McOptsContent mcOptsContent= mcService.getOptionContentByOptionText(checkedPairs.getValue().toString(), mcQueContent.getUid());
-        	McUsrAttempt mcUsrAttempt=new McUsrAttempt(attempTime, timeZone, mcQueContent, mcQueUsr, mcOptsContent, IntegerMark, passed, highestAttemptOrder);
+        	McUsrAttempt mcUsrAttempt=new McUsrAttempt(attempTime, timeZone, mcQueContent, mcQueUsr, mcOptsContent, IntegerMark, passed, highestAttemptOrder, new Boolean(isAttemptCorrect).booleanValue());
         	mcService.createMcUsrAttempt(mcUsrAttempt);
         	logger.debug("created mcUsrAttempt in the db :" + mcUsrAttempt);
         }

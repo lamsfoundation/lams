@@ -45,7 +45,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
@@ -2166,7 +2165,7 @@ public class McAction extends DispatchAction implements McAppConstants
             logger.debug("current highestAttemptOrder:" + highestAttemptOrder);
             
             logger.debug("passed: " + passed);
-        	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed, new Integer(highestAttemptOrder).intValue());
+        	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed, new Integer(highestAttemptOrder).intValue(), mapLeanerAssessmentResults);
         	logger.debug("created user attempt in the db");
         	
         	int intHighestAttemptOrder=new Integer(highestAttemptOrder).intValue()+ 1 ;
@@ -2245,41 +2244,81 @@ public class McAction extends DispatchAction implements McAppConstants
     		logger.debug("queUsrId: " + queUsrId);
     	
     		Map mapQueAttempts= new TreeMap(new McComparator());
+    		Map mapQueCorrectAttempts= new TreeMap(new McComparator());
+    		Map mapQueIncorrectAttempts= new TreeMap(new McComparator());
     		for (int i=1; i<=  new Integer(totalQuestionCount).intValue(); i++)
     		{
     			logger.debug("doing question with display order: " + i);
     			McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(new Long(i), toolContentUID);
     			logger.debug("mcQueContent uid: " + mcQueContent.getUid());
-    			//List attempts=mcService.getAttemptForQueContent(queUsrId, mcQueContent.getUid());
-    			//logger.debug("attempts for question: " + mcQueContent.getUid() + " are: " + attempts);
-    			
+
     			Map mapAttemptOrderAttempts= new TreeMap(new McComparator());
-    			for (int j=1; j < 11 ; j++ )
+    			Map mapAttemptOrderCorrectAttempts= new TreeMap(new McComparator());
+    			Map mapAttemptOrderIncorrectAttempts= new TreeMap(new McComparator());
+    			for (int j=1; j <= MAX_ATTEMPTY_HISTORY ; j++ )
 	    		{
 	    			List attemptsByAttemptOrder=mcService.getAttemptByAttemptOrder(queUsrId, mcQueContent.getUid(), new Integer(j));
     	    		logger.debug("attemptsByAttemptOrder: " + j + " is: " + attemptsByAttemptOrder);
     	    	
     	    		Map mapAttempts= new TreeMap(new McComparator());
+    	    		Map mapAttemptsIncorrect= new TreeMap(new McComparator());
+    	    		Map mapAttemptsCorrect= new TreeMap(new McComparator());
     	    		Iterator attemptIterator=attemptsByAttemptOrder.iterator();
     	    		Long mapIndex=new Long(1);
         	    	while (attemptIterator.hasNext())
         	    	{
         	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)attemptIterator.next();
-        	    		mapAttempts.put(mapIndex.toString(),mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+        	    		
+        	    		if (mcUsrAttempt.isAttemptCorrect())
+        	    		{
+        	    			mapAttemptsCorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+        	    		}
+        	    		else
+        	    		{
+        	    			mapAttemptsIncorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+        	    		}
+        	    		mapAttempts.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
     					
     	    			logger.debug("added attempt with order: " + mcUsrAttempt.getAttemptOrder() + " , option text is: " + mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
     	    			mapIndex=new Long(mapIndex.longValue()+1);
         	    	}    	    		
+
         	    	logger.debug("final mapAttempts is: " + mapAttempts);
-        	    	mapAttemptOrderAttempts.put(new Integer(j).toString(), mapAttempts);	
+        	    	if (mapAttempts.size() > 0)
+        	    	{
+        	    		mapAttemptOrderAttempts.put(new Integer(j).toString(), mapAttempts);	
+        	    	}
+        	    	if (mapAttemptsCorrect.size() > 0)
+        	    	{
+        	    		mapAttemptOrderCorrectAttempts.put(new Integer(j).toString(), mapAttemptsCorrect);	
+        	    	}
+        	    	if (mapAttemptsIncorrect.size() > 0)
+        	    	{
+        	    		mapAttemptOrderIncorrectAttempts.put(new Integer(j).toString(), mapAttemptsIncorrect);	
+        	    	}
 	    		}
+    			
     			logger.debug("final mapAttemptOrderAttempts is: " + mapAttemptOrderAttempts);
-    			mapQueAttempts.put(new Integer(i).toString(), mapAttemptOrderAttempts);
+    			if (mapAttemptOrderAttempts.size() > 0)
+    	    	{
+    				mapQueAttempts.put(new Integer(i).toString(), mapAttemptOrderAttempts);	
+    	    	}
+    			if (mapAttemptOrderCorrectAttempts.size() > 0)
+    	    	{
+    				mapQueCorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderCorrectAttempts);	
+    	    	}    			
+    			if (mapAttemptOrderIncorrectAttempts.size() > 0)
+    	    	{
+        			mapQueIncorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderIncorrectAttempts);	
+    	    	}    			
     		}
+    		request.getSession().setAttribute(MAP_QUE_ATTEMPTS, mapQueAttempts);
+    		request.getSession().setAttribute(MAP_QUE_CORRECT_ATTEMPTS, mapQueCorrectAttempts);
+    		request.getSession().setAttribute(MAP_QUE_INCORRECT_ATTEMPTS, mapQueIncorrectAttempts);
     		
     		logger.debug("final mapQueAttempts is: " + mapQueAttempts);
-    		request.getSession().setAttribute(MAP_QUE_ATTEMPTS, mapQueAttempts);
-    		
+    		logger.debug("final mapQueCorrectAttempts is: " + mapQueCorrectAttempts);
+    		logger.debug("final mapQueIncorrectAttempts is: " + mapQueIncorrectAttempts);
     		mcLearningForm.resetCommands();
     		return (mapping.findForward(VIEW_ANSWERS));
     	}

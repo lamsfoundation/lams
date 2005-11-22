@@ -51,6 +51,8 @@ public class McUsrAttempt implements Serializable {
     
     private Integer mark;
     
+    private boolean attemptCorrect;
+    
     private boolean passed;
     
     private Integer attemptOrder;
@@ -109,6 +111,19 @@ public class McUsrAttempt implements Serializable {
         this.mark = mark;
         this.passed = passed;
         this.attemptOrder=attemptOrder;
+    }
+    
+    public McUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, 
+    		org.lamsfoundation.lams.tool.mc.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.McOptsContent mcOptionsContent, Integer mark, boolean passed, Integer attemptOrder, boolean attemptCorrect) {
+        this.attemptTime = attemptTime;
+        this.timeZone = timeZone;
+        this.mcQueContent = mcQueContent;
+        this.mcQueUsr = mcQueUsr;
+        this.mcOptionsContent = mcOptionsContent;
+        this.mark = mark;
+        this.passed = passed;
+        this.attemptOrder=attemptOrder;
+        this.attemptCorrect=attemptCorrect;
     }
       
     
@@ -245,5 +260,18 @@ public class McUsrAttempt implements Serializable {
 	 */
 	public void setMcQueContentId(Long mcQueContentId) {
 		this.mcQueContentId = mcQueContentId;
+	}
+	
+	/**
+	 * @return Returns the attemptCorrect.
+	 */
+	public boolean isAttemptCorrect() {
+		return attemptCorrect;
+	}
+	/**
+	 * @param attemptCorrect The attemptCorrect to set.
+	 */
+	public void setAttemptCorrect(boolean attemptCorrect) {
+		this.attemptCorrect = attemptCorrect;
 	}
 }

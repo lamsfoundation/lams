@@ -88,6 +88,8 @@ public interface McAppConstants {
     public static final Long INITIAL_QUESTION_COUNT		=new Long(1);
     public static final long MAX_QUESTION_COUNT 		=20;
     public static final long MAX_OPTION_COUNT 			=10;
+    public static final int  MAX_ATTEMPTY_HISTORY 		=30;
+    
     
     
     /*
@@ -156,6 +158,8 @@ public interface McAppConstants {
     public static final String MAP_LEARNER_FEEDBACK_CORRECT				="mapLeanerFeedbackCorrect";
     public static final String MAP_QUESTION_WEIGHTS						="mapQuestionWeights";
     public static final String MAP_QUE_ATTEMPTS							="mapQueAttempts";
+    public static final String MAP_QUE_CORRECT_ATTEMPTS					="mapQueCorrectAttempts";
+    public static final String MAP_QUE_INCORRECT_ATTEMPTS				="mapQueIncorrectAttempts";
         
     
     public static final String MAP_WEIGHTS								="mapWeights";
