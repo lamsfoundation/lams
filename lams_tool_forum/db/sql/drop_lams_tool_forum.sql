@@ -5,6 +5,7 @@ drop table if exists tl_lafrum11_forum_user;
 drop table if exists tl_lafrum11_message;
 drop table if exists tl_lafrum11_message_seq;
 drop table if exists tl_lafrum11_tool_session;
+drop table if exists tl_lafrum11_report;
 SET FOREIGN_KEY_CHECKS=1;
 
 

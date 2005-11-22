@@ -52,4 +52,9 @@ public class ForumUserDao extends HibernateDaoSupport{
 		return (ForumUser) list.get(0);
 	}
 
+	public ForumUser getByUid(Long userUid) {
+		
+		return (ForumUser) this.getHibernateTemplate().get(ForumUser.class,userUid);
+	}
+
 }

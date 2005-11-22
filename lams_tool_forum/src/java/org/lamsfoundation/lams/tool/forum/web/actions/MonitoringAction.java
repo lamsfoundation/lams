@@ -33,9 +33,11 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
+import org.lamsfoundation.lams.tool.forum.web.forms.MarkForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -115,52 +117,60 @@ public class MonitoringAction extends Action {
 
 	private ActionForward viewAllMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		return mapping.findForward("success");
 	}
 
 	private ActionForward releaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		return mapping.findForward("success");
 	}
 
 	private ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		return mapping.findForward("success");
 	}
 
 	private ActionForward viewUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		return mapping.findForward("success");
 	}
 
 	private ActionForward editMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		MarkForm markForm = (MarkForm) form;
+		forumService = getForumService();
+		Long userId = new Long(WebUtil.readLongParam(request,"userID"));
+		ForumReport report = forumService.getReport(userId);
+		if(report != null){
+			markForm.setMark(new Integer(report.getMark()).toString());
+			markForm.setComment(report.getComment());
+		}
+		return mapping.findForward("success");
 	}
 
 	private ActionForward updateMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		return mapping.findForward("success");
 	}
 
 	private ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		return mapping.findForward("success");
 	}
 
 	private ActionForward updateActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		return mapping.findForward("success");
 	}
 
 	private ActionForward viewInstructions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		return mapping.findForward("success");
 	}
 
 	private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		return null;
+		return mapping.findForward("success");
 	}
 
 
