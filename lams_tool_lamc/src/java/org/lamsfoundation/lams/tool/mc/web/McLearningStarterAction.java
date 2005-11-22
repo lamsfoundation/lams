@@ -223,8 +223,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     	logger.debug("mcContent has : " + mapQuestionsContent.size() + " entries.");
     	request.getSession().setAttribute(TOTAL_QUESTION_COUNT, new Long(mapQuestionsContent.size()).toString());
     	
-    	
-    	
     	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
 		logger.debug("CURRENT_QUESTION_INDEX: " + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
 		logger.debug("final Options Map for the first question: " + request.getSession().getAttribute(MAP_OPTIONS_CONTENT));
@@ -242,15 +240,35 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	     */
     	String userID=(String) request.getSession().getAttribute(USER_ID);
     	logger.debug("userID:" + userID);
-	    McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(new Long(userID));
+	    
+    	McQueUsr mcQueUsr=mcService.retrieveMcQueUsr(new Long(userID));
 	    logger.debug("mcQueUsr:" + mcQueUsr);
 	    
-	    Long queUsrId=mcQueUsr.getUid();
-		logger.debug("queUsrId: " + queUsrId);
-		
-		int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId);
-		logger.debug("learnerBestMark: " + learnerBestMark);
-		request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(learnerBestMark).toString());
+	    if (mcQueUsr != null)
+	    {
+	    	logger.debug("mcQueUsr is available in the db:" + mcQueUsr);
+	    	Long queUsrId=mcQueUsr.getUid();
+			logger.debug("queUsrId: " + queUsrId);
+			
+			int highestAttemptOrder=LearningUtil.getHighestAttemptOrder(request, queUsrId);
+			logger.debug("highestAttemptOrder: " + highestAttemptOrder);
+			if (highestAttemptOrder == 0)
+				highestAttemptOrder=1;
+			logger.debug("highestAttemptOrder: " + highestAttemptOrder);
+			request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER,new Integer(highestAttemptOrder).toString());
+			
+			int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId);
+			logger.debug("learnerBestMark: " + learnerBestMark);
+			request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(learnerBestMark).toString());	
+	    }
+	    else
+	    {
+	    	logger.debug("mcQueUsr is not available in the db:" + mcQueUsr);
+	    	request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER,new Integer(1).toString());
+	    	request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(0).toString());
+	    	
+	    }
+	    
 	    
 	    if (mcQueUsr != null)
 	    {

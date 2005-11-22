@@ -111,6 +111,11 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/SingleQuestionAnswersContent.jsp" />	
 	</definition>
 	
+	<definition name=".viewAnswers" extends=".baseDef" >
+		<put name="title" value="View Previous Answers"/>
+		<put name="pageHeader" value = "View Previous Answers"/>
+		<put name="content" value="/ViewAnswers.jsp" />	
+	</definition>
 	
-	
+		
 </tiles-definitions>

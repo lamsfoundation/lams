@@ -337,6 +337,51 @@ public class McServicePOJO implements
         }
 	}
 	
+
+	public List getHighestAttemptOrder(Long queUsrId) throws McApplicationException
+	{
+        try
+        {
+        	return mcUsrAttemptDAO.getHighestAttemptOrder(queUsrId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting the learner's highest attempt order: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+
+	
+	public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId) throws McApplicationException
+	{
+        try
+        {
+        	return mcUsrAttemptDAO.getAttemptForQueContent(queUsrId, mcQueContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting the learner's attempts by user id and que content id: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+	
+	
+	public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder) throws McApplicationException
+	{
+        try
+        {
+        	return mcUsrAttemptDAO.getAttemptByAttemptOrder(queUsrId, mcQueContentId, attemptOrder);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+	
     
     public McQueContent retrieveMcQueContentByUID(Long uid) throws McApplicationException
     {

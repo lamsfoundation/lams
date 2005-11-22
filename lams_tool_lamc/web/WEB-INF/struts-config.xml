@@ -154,6 +154,12 @@
 	  	/>
 
 	  	<forward
+		    name="viewAnswers"
+		    path=".viewAnswers"
+		    redirect="true"
+	  	/>
+
+	  	<forward
 		    name="viewSummary"
 		    path=".viewSummary"
 		    redirect="true"

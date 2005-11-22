@@ -49,8 +49,29 @@
         column="passed"
         length="1"
     />
+    
+    
+    <property
+    name="attemptOrder"
+    type="java.lang.Integer"
+    access="property"        
+    column="attemptOrder"
+    />
+     
+     
+ 	<property
+        name="mcQueContentId"
+        type="java.lang.Long"
+        column="mc_que_content_id"
+        not-null="true"
+   	    update="false"
+	    insert="false"
+        length="20"
+    >
+    </property>
+     
 
- <property
+ 	<property
         name="queUsrId"
         type="java.lang.Long"
         column="que_usr_id"

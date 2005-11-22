@@ -203,5 +203,11 @@ public interface IMcService
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent) throws McApplicationException;
     
     public List getHighestMark(Long queUsrId) throws McApplicationException;
+    
+    public List getHighestAttemptOrder(Long queUsrId) throws McApplicationException;
+    
+	public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId) throws McApplicationException;
+	
+	public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder) throws McApplicationException;
 }
 

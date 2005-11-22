@@ -57,7 +57,7 @@ public interface IMcUsrAttemptDAO
 	 *  * <p>updates McUsrAttempt  
 	 * with the given identifier <code>mcUsrAttempt</code> </p>
 	 * 
-	 * @param uid
+	 * @param mcUsrAttempt
 	 * @return 
 	 */	
 	public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt);
@@ -75,7 +75,7 @@ public interface IMcUsrAttemptDAO
 	 *  * <p>removes McUsrAttempt  
 	 * with the given identifier <code>mcUsrAttempt</code> </p>
 	 * 
-	 * @param uid
+	 * @param mcUsrAttempt
 	 * @return 
 	 */
 	public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt);
@@ -84,10 +84,40 @@ public interface IMcUsrAttemptDAO
 	 *  * <p>returns the highest mark of a learner  
 	 * with the given identifier <code>queUsrId</code> </p>
 	 * 
-	 * @param uid
+	 * @param queUsrId
 	 * @return 
 	 */
 	public List getHighestMark(Long queUsrId);
+
+	/**
+	 *  * <p>returns the highest mark of a learner  
+	 * with the given identifier <code>queUsrId</code> </p>
+	 * 
+	 * @param queUsrId
+	 * @return 
+	 */	
+	public List getHighestAttemptOrder(Long queUsrId);
+	
+	/**
+	 *  * <p>returns a list of attempts  
+	 * with the given identifiers <code>queUsrId</code> and <code>mcQueContentId</code> </p>
+	 * 
+	 * @param queUsrId
+	 * @param mcQueContentId
+	 * @return 
+	 */
+	public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId);
+	
+	/**
+	 *  * <p>returns a list of attempts  
+	 * with the given identifiers <code>queUsrId</code> and <code>mcQueContentId</code> and <code>attemptOrder</code> </p>
+	 * 
+	 * @param queUsrId
+	 * @param mcQueContentId
+	 * @param attemptOrder
+	 * @return 
+	 */
+	public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder);
 }
 
 

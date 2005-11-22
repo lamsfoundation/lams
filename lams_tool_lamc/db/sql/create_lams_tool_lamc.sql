@@ -87,6 +87,7 @@ CREATE TABLE lams.tl_lamc11_usr_attempt (
      , time_zone VARCHAR(255)
      , mark VARCHAR(255) NOT NULL DEFAULT '0'
      , passed TINYINT(1) NOT NULL DEFAULT 0
+     , attemptOrder INTEGER NOT NULL DEFAULT 1
      , PRIMARY KEY (uid)
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_lamc11_usr_attempt_1 FOREIGN KEY (que_usr_id)

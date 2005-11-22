@@ -53,7 +53,11 @@ public class McUsrAttempt implements Serializable {
     
     private boolean passed;
     
+    private Integer attemptOrder;
+    
     private Long queUsrId;
+    
+    private Long mcQueContentId;
 
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent;
@@ -95,6 +99,17 @@ public class McUsrAttempt implements Serializable {
         this.passed = passed;
     }
     
+    public McUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.mc.McQueContent mcQueContent, 
+    		org.lamsfoundation.lams.tool.mc.McQueUsr mcQueUsr, org.lamsfoundation.lams.tool.mc.McOptsContent mcOptionsContent, Integer mark, boolean passed, Integer attemptOrder) {
+        this.attemptTime = attemptTime;
+        this.timeZone = timeZone;
+        this.mcQueContent = mcQueContent;
+        this.mcQueUsr = mcQueUsr;
+        this.mcOptionsContent = mcOptionsContent;
+        this.mark = mark;
+        this.passed = passed;
+        this.attemptOrder=attemptOrder;
+    }
       
     
     /** default constructor */
@@ -206,5 +221,29 @@ public class McUsrAttempt implements Serializable {
 	 */
 	public void setQueUsrId(Long queUsrId) {
 		this.queUsrId = queUsrId;
+	}
+	/**
+	 * @return Returns the attemptOrder.
+	 */
+	public Integer getAttemptOrder() {
+		return attemptOrder;
+	}
+	/**
+	 * @param attemptOrder The attemptOrder to set.
+	 */
+	public void setAttemptOrder(Integer attemptOrder) {
+		this.attemptOrder = attemptOrder;
+	}
+	/**
+	 * @return Returns the mcQueContentId.
+	 */
+	public Long getMcQueContentId() {
+		return mcQueContentId;
+	}
+	/**
+	 * @param mcQueContentId The mcQueContentId to set.
+	 */
+	public void setMcQueContentId(Long mcQueContentId) {
+		this.mcQueContentId = mcQueContentId;
 	}
 }

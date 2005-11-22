@@ -595,7 +595,7 @@
 </table>
 <table name="tl_lamc11_usr_attempt" alias="" remarks="">
 <table-description/>
-<table-figure-bounds x="889" y="66" width="206" height="127"/>
+<table-figure-bounds x="889" y="66" width="206" height="142"/>
 <column-list>
 <column name="uid" alias="" remarks="" mandatory="true" column-size="20" decimal-digits="0" default-value="" auto-increment="true">
 <column-description/>
@@ -672,14 +672,27 @@
 <column name="passed" alias="" remarks="" mandatory="true" column-size="1" decimal-digits="0" default-value="0" auto-increment="false">
 <column-description/>
 <data-type name="TINYINT" jdbc-type="-6" selected-variant-pattern="TINYINT(%n)">
-<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n)" precision-variable="%n" precision-min="0" precision-max="1"/>
+<variant type-name-pattern="TINYINT"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="1"/>
 <variant type-name-pattern="TINYINT UNSIGNED"/>
 <variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
 <variant type-name-pattern="TINYINT ZEROFILL"/>
+</data-type>
+</column>
+<column name="attemptOrder" alias="" remarks="" mandatory="true" column-size="0" decimal-digits="0" default-value="1" auto-increment="false">
+<column-description/>
+<data-type name="INTEGER" jdbc-type="4" selected-variant-pattern="INTEGER">
+<variant type-name-pattern="INTEGER"/>
+<variant type-name-pattern="INTEGER(%n)" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INTEGER(%n) UNSIGNED" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INTEGER(%n) UNSIGNED ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INTEGER(%n) ZEROFILL" precision-variable="%n" precision-min="0" precision-max="10"/>
+<variant type-name-pattern="INTEGER UNSIGNED"/>
+<variant type-name-pattern="INTEGER UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INTEGER ZEROFILL"/>
 </data-type>
 </column>
 </column-list>
