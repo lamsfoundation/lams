@@ -28,9 +28,14 @@ import java.util.Date;
 import java.util.Iterator;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
@@ -67,6 +72,10 @@ public class LearningDesignDTO extends BaseDTO{
 	private String offlineInstructions;
 	private String onlineInstructions;
 	
+	/* Groupings Array which contain the groupings objects, which had been created by the grouping activities
+	 * in this learning design.
+	 */
+	private ArrayList groupings;
 	private ArrayList activities;
 	private ArrayList transitions;
 	
@@ -129,6 +138,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.lessonName = lessonName;
 		this.lessonStartDateTime = lessonStartDateTime;
 		this.lastModifiedDateTime = lastModifiedDateTime;
+		this.groupings = new ArrayList();
 		this.activities = new ArrayList();
 		this.transitions = new ArrayList();
 	}	
@@ -182,6 +192,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.lessonName = learningDesign.getLessonName();
 		this.lessonStartDateTime = learningDesign.getLessonStartDateTime();
 		this.lastModifiedDateTime = learningDesign.getLastModifiedDateTime();
+		this.groupings = populateGroupings(learningDesign);
 		this.activities = populateActivities(learningDesign);
 		this.transitions = populateTransitions(learningDesign);
 	}
@@ -361,12 +372,36 @@ public class LearningDesignDTO extends BaseDTO{
 		//return workspaceFolderID!=null?workspaceFolderID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
 	    return workspaceFolderID;
 	}	
-	public ArrayList getActivities(){
-		return activities;
-	}
 	/**
 	 * @return Returns the activities.
 	 */
+	public ArrayList getActivities(){
+		return activities;
+	}
+	
+	/**
+	 * In order to get the Grouping objects, it will go through the parent 
+	 * activities in the learning design and for all grouping activities, it will 
+	 * then retrieve the Grouping object which was created by the GroupingActivity.
+	 * @param design
+	 * @return ArrayList the array of groupingDTOs
+	 */
+	public ArrayList populateGroupings(LearningDesign design)
+	{
+	    ArrayList groupingList = new ArrayList();
+	  //go through list of activities, get the createGrouping objects
+	    Iterator parentIterator = design.getParentActivities().iterator();
+	    while (parentIterator.hasNext())
+	    {
+	        Activity object = (Activity) parentIterator.next();			
+			if(object.isGroupingActivity()){
+			    GroupingActivity groupingActivity = (GroupingActivity)object;
+			    Grouping grouping = groupingActivity.getCreateGrouping();
+			    groupingList.add(grouping.getGroupingDTO());			    
+			}
+	    }
+	    return groupingList;
+	}
 
 	public ArrayList populateActivities(LearningDesign design) {
 		ArrayList activities = new ArrayList();		
@@ -593,7 +628,8 @@ public class LearningDesignDTO extends BaseDTO{
 	 * @return Returns the firstActivityUIID.
 	 */
 	public Integer getFirstActivityUIID() {		
-		return firstActivityUIID!=null?firstActivityUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+		//return firstActivityUIID!=null?firstActivityUIID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+	    return firstActivityUIID;
 	}
 	/**
 	 * @param firstActivityUIID The firstActivityUIID to set.
@@ -629,5 +665,16 @@ public class LearningDesignDTO extends BaseDTO{
 		return offlineInstructions;
 	}
 
-
+    /**
+     * @return Returns the groupings.
+     */
+    public ArrayList getGroupings() {
+        return groupings;
+    }
+    /**
+     * @param groupings The groupings to set.
+     */
+    public void setGroupings(ArrayList groupings) {
+        this.groupings = groupings;
+    }
 }
