@@ -214,7 +214,7 @@
 			name="emptyForm"
 			scope="request"
 			validate="false"
-			parameter="viewUserMark" >
+			parameter="releaseMarks" >
 			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
 		</action>
 		<action path="/monitoring/downloadMarks"
@@ -222,7 +222,7 @@
 			name="emptyForm"
 			scope="request"
 			validate="false"
-			parameter="viewUserMark" >
+			parameter="downloadMarks" >
 			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
 		</action>
 		<action path="/monitoring/viewUserMark"
@@ -238,7 +238,44 @@
 			name="emptyForm"
 			scope="request"
 			validate="false"
-			parameter="viewUserMark" >
+			parameter="viewAllMarks" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		<action path="/monitoring/editMark"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			parameter="editMark" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		<action path="/monitoring/updateMark"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			name="markForm"
+			scope="request"
+			validate="true"
+			parameter="updateMark" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		
+		<action path="/monitoring/editActivity"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			parameter="editActivity" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		<action path="/monitoring/updateActivity"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			name="emptyForm"
+			scope="request"
+			validate="false"
+			parameter="updateActivity" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		<action path="/monitoring/viewInstructions"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			parameter="viewInstructions" >
+			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+		</action>
+		<action path="/monitoring/statistic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			parameter="statistic" >
 			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
 		</action>
 		
