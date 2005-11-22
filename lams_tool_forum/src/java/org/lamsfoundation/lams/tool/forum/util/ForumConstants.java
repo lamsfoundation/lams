@@ -6,7 +6,7 @@ package org.lamsfoundation.lams.tool.forum.util;
  * Time: 10:33:00
  */
 public interface ForumConstants {
-	public static final String TOOLSIGNNATURE = "lafrm11";
+	public static final String TOOLSIGNNATURE = "lafrum11";
 	
     public final static int MAX_FILE_SIZE = 250 * 1000;
     public final static String FORUM_SERVICE = "forumService";

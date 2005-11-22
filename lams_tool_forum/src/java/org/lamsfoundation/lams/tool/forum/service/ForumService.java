@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
@@ -323,7 +324,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     }
     public Forum getDefaultForum(){
     	Long defaultForumId = getToolDefaultContentIdBySignature(ForumConstants.TOOLSIGNNATURE);
-    	Forum defaultForum = getForum(defaultForumId);
+    	Forum defaultForum = getForumByContentId(defaultForumId);
     	if(defaultForum == null)
     	{
     	    String error="Could not retrieve default content record for this tool";
@@ -535,5 +536,12 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		this.forumToolContentHandler = toolContentHandler;
 	}
 
+	public ForumReport getReport(Long userUid) {
+		ForumUser user = forumUserDao.getByUid(userUid);
+		if(user != null){
+			return user.getReport();
+		}
+		return null;
+	}
 
 }
