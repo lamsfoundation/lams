@@ -155,7 +155,11 @@ public class AuthoringActivityDTO extends BaseDTO{
 	
 	private Integer createGroupingUIID;
 	
-	private GroupingDTO groupingDTO;
+	/* Server will send Grouping objects as an array (in the Groupings array)
+	 * rather than being part of the GroupingActivity. For the groupings array
+	 * see LearningDesignDTO.
+	 */
+	//private GroupingDTO groupingDTO;
 	
 	
 	/** Single Library can have one or more activities
@@ -219,7 +223,7 @@ public class AuthoringActivityDTO extends BaseDTO{
 		this.applyGrouping = applyGrouping;
 		this.groupingSupportType = groupingSupportType;
 		this.groupingType = groupingType;
-		this.groupingDTO = groupingDTO;
+		//this.groupingDTO = groupingDTO;
 	}
 	public AuthoringActivityDTO(Activity activity){
 		processActivityType(activity);
@@ -284,10 +288,10 @@ public class AuthoringActivityDTO extends BaseDTO{
 	private void addGroupingActivityAttributes(GroupingActivity groupingActivity){
 		Grouping grouping = groupingActivity.getCreateGrouping();
 		
-		this.groupingDTO = grouping.getGroupingDTO();
+		//this.groupingDTO = grouping.getGroupingDTO();
 		this.createGroupingID = grouping.getGroupingId();
 		this.createGroupingUIID = grouping.getGroupingUIID();
-		this.groupingType = grouping.getGroupingTypeId();
+		//this.groupingType = grouping.getGroupingTypeId();
 	}
 	private void addOptionsActivityAttributes(OptionsActivity optionsActivity){
 		this.maxOptions = optionsActivity.getMaxNumberOfOptions();
@@ -811,15 +815,13 @@ public class AuthoringActivityDTO extends BaseDTO{
 			this.groupingType = groupingType;
 	}
 	/**
-	 * @return Returns the groupingDTO.
-	 */
+	 * GroupingDTO removed and is now part of the "groupings" array located in LearningDesignDTO
+	 * 
 	public GroupingDTO getGroupingDTO() {
 		return groupingDTO;
 	}
-	/**
-	 * @param groupingDTO The groupingDTO to set.
-	 */
+	
 	public void setGroupingDTO(GroupingDTO groupingDTO) {
 		this.groupingDTO = groupingDTO;
-	}	
+	}	 */
 }
