@@ -65,13 +65,11 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * <LI>Define your Handler class as a bean in your own Spring context file.
  * It <em>must</em> include a parameter repositoryService, which references a local
  * value of repositoryService. The "repositoryService" is defined in the 
- * Content Repository's applicationContext.xml. The name "toolContentHandler" 
- * (IToolContentHandler.SPRING_BEAN_NAME) is also essential as the ToolDownload servlet 
- * looks for it by this name.
+ * Content Repository's applicationContext.xml. The name must be unique to this project.
  * </UL>
  * For example:
  * <pre>
- * 	&lt;bean id="toolContentHandler" class="your class name here"&gt;
+ * 	&lt;bean id="blahToolContentHandler" class="your class name here"&gt;
  * 		&lt;property name="repositoryService"&gt; &lt;ref bean="repositoryService"/&lt;/property&gt;
  *	&lt;/bean&gt; 
  * </pre>
