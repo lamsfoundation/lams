@@ -46,6 +46,8 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	 	
 	 	private static final String LOAD_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrId and mcUsrAttempt.mcQueContentId=:mcQueContentId and attemptOrder=:attemptOrder";
 	 	
+	 	private static final String LOAD_MARK = "from mcUsrAttempt in class McUsrAttempt";
+	 	
 	 	public McUsrAttempt getMcUserAttemptByUID(Long uid)
 		{
 			 return (McUsrAttempt) this.getHibernateTemplate()
@@ -66,6 +68,17 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 			
 			return list;
 	    }
+		
+
+		public List getMarks()
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(LOAD_MARK)
+				.list();
+			
+			return list;
+	    }
+		
 		
 		public List getHighestAttemptOrder(Long queUsrId)
 	    {

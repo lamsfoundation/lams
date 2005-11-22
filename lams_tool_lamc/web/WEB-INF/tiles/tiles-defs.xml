@@ -116,6 +116,11 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageHeader" value = "View Previous Answers"/>
 		<put name="content" value="/ViewAnswers.jsp" />	
 	</definition>
-	
-		
+
+	<definition name=".resultsSummary" extends=".baseDef" >
+		<put name="title" value="Results Summary"/>
+		<put name="pageHeader" value = "Results Summary"/>
+		<put name="content" value="/ResultsSummary.jsp" />	
+	</definition>
+
 </tiles-definitions>

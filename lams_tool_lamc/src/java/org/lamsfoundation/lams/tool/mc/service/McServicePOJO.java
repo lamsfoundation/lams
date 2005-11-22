@@ -590,6 +590,32 @@ public class McServicePOJO implements
         }
     }
 
+	public int countSessionComplete() throws McApplicationException
+	{
+		try
+        {
+			return mcSessionDAO.countSessionComplete();
+        }
+		catch(DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is counting incomplete sessions"
+                                                 + e.getMessage(),e);
+        }		
+	}
+
+    public int countSessionIncomplete() throws McApplicationException
+	{
+		try
+        {
+			return mcSessionDAO.countSessionIncomplete();
+        }
+		catch(DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is counting incomplete sessions"
+                                                 + e.getMessage(),e);
+        }    	
+	}
+    
     public void deleteMcSession(McSession mcSession) throws McApplicationException 
 	{
 		try
@@ -620,6 +646,19 @@ public class McServicePOJO implements
 	}
     
     
+    public List getMarks() throws McApplicationException
+	{
+    	try
+        {
+    		return mcUsrAttemptDAO.getMarks();
+        }
+        catch(DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting marks "
+                                                 + e.getMessage(),e);
+        }
+	}
+    
     public void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException
     {
     	try
@@ -633,7 +672,8 @@ public class McServicePOJO implements
                                                  + e.getMessage(),e);
         }
     }
-
+    
+    
     public void saveMcContent(McContent mc) throws McApplicationException
     {
         try

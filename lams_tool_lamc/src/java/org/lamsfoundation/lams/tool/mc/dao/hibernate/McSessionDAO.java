@@ -47,7 +47,11 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
     private static final String LOAD_MCSESSION_BY_USER = "select ms from McSession ms left join fetch "
         + "ms.mcQueUsers user where user.queUsrId=:userId";
     
-    private static final String GET_SESSIONS_FROM_CONTENT = "select ms.mcSessionId from McSession ms where ms.mcContent= :mcContent";
+    private static final String GET_SESSIONS_FROM_CONTENT = "select ms.mcSessionId from McSession ms where ms.mcContent=:mcContent";
+    
+    private static final String COUNT_SESSION_COMPLETE = "from mcSession in class McSession where mcSession.sessionStatus='COMPLETE'";
+    
+    private static final String COUNT_SESSION_INCOMPLETE = "from mcSession in class McSession where mcSession.sessionStatus='INCOMPLETE'";
     
     public McSession getMcSessionByUID(Long uid)
 	{
@@ -69,6 +73,30 @@ public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
 			return mcs;
 		}
 		return null;
+	}
+    
+    public int countSessionComplete()
+    {
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(COUNT_SESSION_COMPLETE)
+		.list();
+		
+		if(list != null && list.size() > 0){
+			return list.size();
+		}
+		else return 0;
+	}
+
+    public int countSessionIncomplete()
+    {
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(COUNT_SESSION_INCOMPLETE)
+		.list();
+		
+		if(list != null && list.size() > 0){
+			return list.size();
+		}
+		else return 0;
 	}
     
     

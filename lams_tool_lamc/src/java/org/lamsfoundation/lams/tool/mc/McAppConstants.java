@@ -103,7 +103,7 @@ public interface McAppConstants {
     public static final String VIEW_SUMMARY								="viewSummary";
     public static final String REDO_QUESTIONS							="redoQuestions";
     public static final String SINGLE_QUESTION_ANSWERS					="singleQuestionAnswers";
-    
+    public static final String RESULTS_SUMMARY							="resultsSummary";
     
     public static final String ALL_INSTRUCTIONS							="allInstructions";
     public static final String EDIT_OPTS_CONTENT						="editOptsContent";
@@ -229,6 +229,11 @@ public interface McAppConstants {
     public static final String LIST_UPLOADED_ONLINE_FILES_NAME			="listUploadedOnlineFilesName";
     public static final String POPULATED_UPLOADED_FILESDATA				="populateUploadedFilesData";
     
+    public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";
+    public static final String TOP_MARK									="topMark";
+    public static final String LOWEST_MARK								="lowestMark";
+    public static final String AVERAGE_MARK								="averageMark";
+
     
     /*
      * the author's current content id

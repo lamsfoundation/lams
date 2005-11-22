@@ -2324,9 +2324,25 @@ public class McAction extends DispatchAction implements McAppConstants
     	}
     	else if (mcLearningForm.getViewSummary() != null)
     	{
-    		logger.debug("requested view summary...");
+    		logger.debug("requested results summary...");
+    		
+    		int countSessionComplete=mcService.countSessionComplete();
+    		int topMark=LearningUtil.getTopMark(request);
+    		int lowestMark=LearningUtil.getLowestMark(request);
+    		int averageMark=LearningUtil.getAverageMark(request);
+    		
+    		logger.debug("countSessionComplete: " + countSessionComplete);
+    		logger.debug("topMark: " + topMark);
+    		logger.debug("lowestMark: " + lowestMark);
+    		logger.debug("averageMark: " + averageMark);
+    		
+    		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
+    		request.getSession().setAttribute(TOP_MARK, new Integer(topMark).toString());
+    		request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
+    		request.getSession().setAttribute(AVERAGE_MARK, new Integer(averageMark).toString());
+    		
     		mcLearningForm.resetCommands();
-    		return (mapping.findForward(VIEW_SUMMARY));
+    		return (mapping.findForward(RESULTS_SUMMARY));
     	}
     	else if (mcLearningForm.getLearnerFinished() != null)
     	{

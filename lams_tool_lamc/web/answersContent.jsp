@@ -24,15 +24,6 @@ String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()
 </head>
 <body>
 
-	<table align=center> 	  
-	<tr>   
-	<td class=error>
-		<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
-	</td>
-	</tr> 
-	</table>
-
-
 <html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 		<c:choose> 
 		  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 

@@ -172,6 +172,12 @@
 	  	/>
 
 	  	<forward
+		    name="resultsSummary"
+		    path=".resultsSummary"
+		    redirect="true"
+	  	/>
+
+	  	<forward
 		    name="errorList"
 		    path=".errorList"
 		    redirect="true"

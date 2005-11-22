@@ -209,5 +209,11 @@ public interface IMcService
 	public List getAttemptForQueContent(final Long queUsrId, final Long mcQueContentId) throws McApplicationException;
 	
 	public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder) throws McApplicationException;
+	
+	public List getMarks() throws McApplicationException;
+	
+	public int countSessionComplete() throws McApplicationException;
+
+    public int countSessionIncomplete() throws McApplicationException;
 }
 

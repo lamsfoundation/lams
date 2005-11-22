@@ -118,6 +118,13 @@ public interface IMcUsrAttemptDAO
 	 * @return 
 	 */
 	public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder);
+	
+	/**
+	 *  * <p>returns a list of marks
+	 * 
+	 * @return 
+	 */
+	public List getMarks();
 }
 
 

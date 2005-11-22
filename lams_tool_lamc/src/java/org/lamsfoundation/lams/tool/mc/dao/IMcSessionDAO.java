@@ -27,6 +27,7 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.McSession;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
 
 /**
@@ -114,4 +115,9 @@ public interface IMcSessionDAO {
      * @return a list of tool session Ids
      */
     public List getSessionsFromContent(McContent mcContent);
+    
+    
+    public int countSessionComplete();
+
+    public int countSessionIncomplete();
 }

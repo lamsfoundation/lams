@@ -322,6 +322,14 @@ public class LearningUtil implements McAppConstants {
     }
     
     
+    /**
+     * returns the highest mark a learner has achieved
+     * getHighestMark(HttpServletRequest request, Long queUsrId)
+     * 
+     * @param request
+     * @param queUsrId
+     * @return
+     */
     public static int getHighestMark(HttpServletRequest request, Long queUsrId)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -337,6 +345,85 @@ public class LearningUtil implements McAppConstants {
     			highestMark= currentMark;
 		}
     	return highestMark;
+    }
+    
+    /**
+     * return the top mark for all learners
+     * getTopMark(HttpServletRequest request)
+     * 
+     * @param request
+     * @return
+     */
+    public static int getTopMark(HttpServletRequest request)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	List listMarks=mcService.getMarks();
+    	
+    	Iterator itMarks=listMarks.iterator();
+    	int highestMark=0;
+    	while (itMarks.hasNext())
+		{
+    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itMarks.next();
+    		int currentMark=mcUsrAttempt.getMark().intValue();
+    		if (currentMark > highestMark)
+    			highestMark= currentMark;
+		}
+    	return highestMark;
+    }
+
+    
+    /**
+     * return the lowest mark for all learners
+     * getTopMark(HttpServletRequest request)
+     * 
+     * @param request
+     * @return
+     */
+    public static int getLowestMark(HttpServletRequest request)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	List listMarks=mcService.getMarks();
+    	
+    	Iterator itMarks=listMarks.iterator();
+    	int lowestMark=100;
+    	while (itMarks.hasNext())
+		{
+    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itMarks.next();
+    		int currentMark=mcUsrAttempt.getMark().intValue();
+    		if (currentMark < lowestMark)
+    			lowestMark= currentMark;
+		}
+    	return lowestMark;
+    }
+    
+    /**
+     * return the average mark for all learners
+     * getTopMark(HttpServletRequest request)
+     * 
+     * @param request
+     * @return
+     */
+    public static int getAverageMark(HttpServletRequest request)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	List listMarks=mcService.getMarks();
+    	
+    	Iterator itMarks=listMarks.iterator();
+    	int marksTotal=0;
+    	int count=0;
+    	while (itMarks.hasNext())
+		{
+    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)itMarks.next();
+    		int currentMark=mcUsrAttempt.getMark().intValue();
+    		marksTotal=marksTotal + currentMark;
+			count++;
+		}
+    	logger.debug("marksTotal: " + marksTotal);
+    	logger.debug("count: " + count);
+    	
+    	int averageMark= (marksTotal / count);
+    	logger.debug("averageMark: " + averageMark);
+    	return averageMark;
     }
     
     
