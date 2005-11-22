@@ -35,7 +35,7 @@ public class GroupingDTO extends BaseDTO{
 	
 	private Long groupingID;
 	private Integer groupingUIID;
-	private Integer groupingType;
+	private Integer groupingTypeID;
 	private Integer numberOfGroups;
 	private Integer learnersPerGroup;
 	private Long staffGroupID;
@@ -49,7 +49,7 @@ public class GroupingDTO extends BaseDTO{
 			Integer maxNumberOfGroups) {		
 		this.groupingID = groupingID;
 		this.groupingUIID = groupingUIID;
-		this.groupingType = groupingType;
+		this.groupingTypeID = groupingType;
 		this.numberOfGroups = numberOfGroups;
 		this.learnersPerGroup = learnersPerGroup;
 		this.staffGroupID = staffGroupID;
@@ -59,9 +59,13 @@ public class GroupingDTO extends BaseDTO{
 		this.groupingID = grouping.getGroupingId();
 		this.groupingUIID = grouping.getGroupingUIID();
 		this.maxNumberOfGroups = grouping.getMaxNumberOfGroups();		
-		this.groupingType = grouping.getGroupingTypeId();
-		Object object = Grouping.getGroupingInstance(groupingType);
-		processGroupingActivity(object);
+		this.groupingTypeID = grouping.getGroupingTypeId();
+		/*The two lines of code below are commented out, because it creates a new grouping instance and then tries to 
+		 get the attributes for it , in which the values are null. So the grouping object is passed straight into
+		 the processGroupingActivity() function. */
+		//Object object = Grouping.getGroupingInstance(groupingTypeID);
+		//processGroupingActivity(object);
+		processGroupingActivity(grouping);
 	}
 	public void processGroupingActivity(Object object){
 		if(object instanceof RandomGrouping)
@@ -97,15 +101,15 @@ public class GroupingDTO extends BaseDTO{
 	/**
 	 * @return Returns the groupingType.
 	 */
-	public Integer getGroupingType() {
-		return groupingType;
+	public Integer getGroupingTypeID() {
+		return groupingTypeID;
 	}
 	/**
 	 * @param groupingType The groupingType to set.
 	 */
-	public void setGroupingType(Integer groupingType) {
+	public void setGroupingTypeID(Integer groupingType) {
 		if(!groupingType.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			this.groupingType = groupingType;
+			this.groupingTypeID = groupingType;
 	}
 	/**
 	 * @return Returns the groupingUIID.
