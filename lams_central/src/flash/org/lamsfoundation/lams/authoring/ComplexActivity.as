@@ -24,6 +24,12 @@ class ComplexActivity extends Activity{
 	}
 	
 	
+	/**
+	 * Creates a complex activity from a dto... which is nice
+	 * @usage   
+	 * @param   dto 
+	 * @return  
+	 */
 	public function populateFromDTO(dto:Object){
 		super.populateFromDTO(dto);
 		if(_activityTypeID == Activity.OPTIONS_ACTIVITY_TYPE){
@@ -32,6 +38,35 @@ class ComplexActivity extends Activity{
 			//TODO: This is missing in the Library packet - tell mai.
 			_optionsInstructions = dto.optionsInstructions;
 		}
+	}
+	
+	/**
+	 * Creates an object containing all the props of the ComplexActivity.  
+	 * If a value is null then it is ommitted... if itsd the null value from const 
+	 * then its included
+	 * @usage   
+	 * @return  the DTO
+	 */
+	public function toData():Object{
+		var dto:Object = super.toData();
+		if(_activityTypeID == Activity.OPTIONS_ACTIVITY_TYPE){
+			if(_maxOptions){	dto.maxOptions = _maxOptions;		}
+			if(_minOptions){	dto.minOptions = _minOptions;		}
+			if(_optionsInstructions){	dto.optionsInstructions = _optionsInstructions;		}
+		}
+		return dto;
+	}
+	
+	/**
+	 * Creates an exact copy of this ComplexActivity
+	 * @usage   
+	 * @return  the copy
+	 */
+	public function clone():ComplexActivity{
+		var dto:Object = toData();
+		var ca = new ComplexActivity();
+		ca.populateFromDTO(dto);
+		return ca;
 	}
 	
 	/**
