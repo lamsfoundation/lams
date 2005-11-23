@@ -41,7 +41,7 @@ public class ForumUser implements Serializable,Cloneable{
 	private Long userId;
 	private String firstName;
 	private String lastName;
-	private ForumReport report;
+	private String loginName;
 	private ForumToolSession session;
 	
 	public ForumUser(){
@@ -51,8 +51,8 @@ public class ForumUser implements Serializable,Cloneable{
 		this.userId = new Long(user.getUserID().intValue());
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
+		this.loginName = user.getLogin();
 		this.session = session;
-		this.report = new ForumReport();
 	}
 	
 
@@ -141,15 +141,15 @@ public class ForumUser implements Serializable,Cloneable{
 	}
 
 	/**
-	 * @hibernate.many-to-one column="report_id"
-	 * 			cascade="all"
+	 * @hibernate.property column="login_name"
 	 * @return
 	 */
-	public ForumReport getReport() {
-		return report;
+	public String getLoginName() {
+		return loginName;
 	}
-	public void setReport(ForumReport report) {
-		this.report = report;
+
+	public void setLoginName(String loginName) {
+		this.loginName = loginName;
 	}
 
 }

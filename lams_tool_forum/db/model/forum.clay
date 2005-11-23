@@ -14,7 +14,7 @@
 <table-list>
 <table alias="" name="tl_lafrum11_attachment" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="95" y="314"/>
+<table-figure-bounds height="-1" width="-1" x="107" y="375"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -140,7 +140,7 @@
 </table>
 <table alias="" name="tl_lafrum11_forum" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="83" y="11"/>
+<table-figure-bounds height="-1" width="-1" x="50" y="8"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -329,7 +329,7 @@
 </table>
 <table alias="" name="tl_lafrum11_forum_user" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="805" y="37"/>
+<table-figure-bounds height="-1" width="-1" x="336" y="175"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -384,19 +384,6 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="report_id" remarks="">
-<column-description></column-description>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
 </column-list>
 <primary-key alias="" name="PRIMARY" remarks="">
 <primary-key-description></primary-key-description>
@@ -404,13 +391,6 @@
 </primary-key>
 <unique-key-list/>
 <foreign-key-list>
-<foreign-key alias="" name="FK7B83A4A897F0DB46" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_report" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
-<foreign-key-description></foreign-key-description>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="report_id" referenced-key-column-name="uid"/>
-</foreign-key>
 <foreign-key alias="" name="FK7B83A4A85F0116B6" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_tool_session" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
 <foreign-key-figure>
@@ -428,15 +408,11 @@
 <index-description></index-description>
 <index-column name="session_id" sort="ASC"/>
 </index>
-<index alias="" name="FK7B83A4A897F0DB46" remarks="" unique="true">
-<index-description></index-description>
-<index-column name="report_id" sort="ASC"/>
-</index>
 </index-list>
 </table>
 <table alias="" name="tl_lafrum11_message" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="405" y="281"/>
+<table-figure-bounds height="-1" width="-1" x="377" y="324"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -599,6 +575,19 @@
 <variant type-name-pattern="TINYINT ZEROFILL"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="report_id" remarks="">
+<column-description></column-description>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key alias="" name="PRIMARY" remarks="">
 <primary-key-description></primary-key-description>
@@ -634,6 +623,13 @@
 </foreign-key-figure>
 <foreign-key-column column-name="forum_session_uid" referenced-key-column-name="uid"/>
 </foreign-key>
+<foreign-key alias="" name="FK4A6067E897F0DB46" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_report" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
+<foreign-key-description></foreign-key-description>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="report_id" referenced-key-column-name="uid"/>
+</foreign-key>
 <foreign-key alias="" name="FK4A6067E8E42F4351" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_lafrum11_forum_user" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="">
 <foreign-key-description></foreign-key-description>
 <foreign-key-figure>
@@ -650,6 +646,10 @@
 <index alias="" name="FK4A6067E8E42F4351" remarks="" unique="true">
 <index-description></index-description>
 <index-column name="create_by" sort="ASC"/>
+</index>
+<index alias="" name="FK4A6067E897F0DB46" remarks="" unique="true">
+<index-description></index-description>
+<index-column name="report_id" sort="ASC"/>
 </index>
 <index alias="" name="FK4A6067E8131CE31E" remarks="" unique="true">
 <index-description></index-description>
@@ -671,7 +671,7 @@
 </table>
 <table alias="" name="tl_lafrum11_message_seq" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="707" y="410"/>
+<table-figure-bounds height="-1" width="-1" x="689" y="313"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -764,7 +764,7 @@
 </table>
 <table alias="" name="tl_lafrum11_report" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="871" y="292"/>
+<table-figure-bounds height="-1" width="-1" x="673" y="474"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>
@@ -820,7 +820,7 @@
 </table>
 <table alias="" name="tl_lafrum11_tool_session" remarks="">
 <table-description></table-description>
-<table-figure-bounds height="-1" width="-1" x="381" y="49"/>
+<table-figure-bounds height="-1" width="-1" x="595" y="11"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="">
 <column-description></column-description>

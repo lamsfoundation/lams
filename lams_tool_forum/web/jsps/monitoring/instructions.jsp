@@ -1,17 +1,5 @@
-<%@include file="../sharing/share.jsp" %>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html:html locale="true">
-  <head>
-    
-    <title>Monitoring Instructions</title>    
-    <html:base />
-    <link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/common.js"></script>
-  </head>
-  
-  	<h1><fmt:message key="label.monitoring.heading.instructions" /></h1>
-	<h2><fmt:message key="label.monitoring.heading.instructions.desc" /></h2>
+	<h1><fmt:message key="label.authoring.heading.instructions" /></h1>
+	<h2><fmt:message key="label.authoring.heading.instructions.desc" /></h2>
 	<table class="forms">
 		<!--hidden field contentID passed by flash-->
 		<tr>
@@ -21,50 +9,79 @@
 			<td class="formlabel"><fmt:message
 				key="label.authoring.online.instruction" />:</td>
 			<td class="formcontrol">
-				<c:out value="${authoring.onlineInstruction}" escapeXml="false"/>
+				<c:out value="${formBean.forum.onlineInstructions}" escapeXml="false"/>
 			</td>
 		</tr>
 		<tr>
-			<td class="formlabel"><fmt:message key="label.authoring.online.filelist"/>:</td>
+			<td></td>
 			<td class="formcontrol">
-				<c:forEach var="file" items="${authoring.onlineFiles}">
-					<li><c:out value="${file.name}"/>
-					<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
+				
+				<div id="onlinefile">
+				<c:forEach var="file" items="${formBean.onlineFileList}">
+					<li><c:out value="${file.fileName}"/>
+					<c:set var="viewURL">
+						<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=false"/>
+					</c:set>
+					<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
 						<fmt:message key="label.view"/>
-					</html:link>
-					<html:link href="../download/?uuid=${file.uuID}&preferDownload=true">
+					</a>&nbsp;
+					<c:set var="downloadURL">
+							<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true"/>
+					</c:set>
+					<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
 						<fmt:message key="label.download"/>
-					</html:link>
+					</a>&nbsp;
+					<c:set var="deleteonline">
+					<html:rewrite page="/authoring/deleteOnline.do?toolContentID=${formBean.toolContentID}&uuID=${file.fileUuid}&versionID=${file.fileVersionId}"/>
+					</c:set>
+					<html:link href="javascript:loadDoc('${deleteonline}','onlinefile')">
+						<fmt:message key="label.authoring.online.delete"/>
+					</html:link>					
 					</li>
 				</c:forEach>
+				</div>
 			</td>
 		</tr>
-		<tr><td colspan="2"><hr></td></tr>
+		<!------------Offline Instructions ----------------------->
 		<tr>
-			<td class="formlabel">
-			<fmt:message
+			<td class="formlabel"><fmt:message
 				key="label.authoring.offline.instruction" />:</td>
 			<td class="formcontrol">
-				<c:out value="${authoring.offlineInstruction}" escapeXml="false"/>
+				<c:out value="${formBean.forum.offlineInstructions}" escapeXml="false"/>
 			</td>
 		</tr>
 		<tr>
-			<td class="formlabel"><fmt:message key="label.authoring.offline.filelist"/>:</td>
+			<td></td>
 			<td class="formcontrol">
-				<c:forEach var="file" items="${authoring.offlineFiles}">
-					<li><c:out value="${file.name}"/></li>
-					<html:link href="javascript:launchInstructionsPopup('download/?uuid=${file.uuID}&preferDownload=false')">
+				<div id="offlinefile">
+				<c:forEach var="file" items="${formBean.offlineFileList}">
+					<li><c:out value="${file.fileName}"/>
+   				    <c:set var="viewURL">
+						<html:rewrite page="/download/?uuid=${file.fileUuid}&preferDownload=false"/>
+					</c:set>
+					<html:link href="javascript:launchInstructionsPopup('${viewURL}')">
 						<fmt:message key="label.view"/>
 					</html:link>
-					<html:link href="../download/?uuid=${file.uuID}&preferDownload=true">
+					<c:set var="downloadURL">
+							<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true"/>
+					</c:set>
+					<html:link href="${downloadURL}">
 						<fmt:message key="label.download"/>
 					</html:link>
+					<c:set var="deleteoffline">
+					<html:rewrite page="/authoring/deleteOffline.do?toolContentID=${formBean.toolContentID}&uuID=${file.fileUuid}&versionID=${file.fileVersionId}"/>
+					</c:set>
+					<html:link href="javascript:loadDoc('${deleteoffline}','offlinefile')">
+						<fmt:message key="label.authoring.offline.delete"/>
+					</html:link>					
+					</li>
 				</c:forEach>
+				</div>
 			</td>
 		</tr>
+	
 		</tr>
-	</table>
-  <body>
 
-  </body>
-</html:html>
+	</table>
+	
+	

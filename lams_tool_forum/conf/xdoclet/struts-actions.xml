@@ -231,7 +231,7 @@
 			scope="request"
 			validate="false"
 			parameter="viewUserMark" >
-			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+			<forward name="success" path="tiles:/monitoring/forum/viewUserMark" />
 		</action>
 		<action path="/monitoring/viewAllMarks"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
@@ -243,6 +243,9 @@
 		</action>
 		<action path="/monitoring/editMark"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			name="markForm"
+			scope="request"
+			validate="true"			
 			parameter="editMark" >
 			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
 		</action>

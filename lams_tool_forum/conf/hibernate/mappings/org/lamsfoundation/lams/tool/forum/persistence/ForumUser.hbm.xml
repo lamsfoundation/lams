@@ -62,14 +62,12 @@
             column="session_id"
         />
 
-        <many-to-one
-            name="report"
-            class="org.lamsfoundation.lams.tool.forum.persistence.ForumReport"
-            cascade="all"
-            outer-join="auto"
+        <property
+            name="loginName"
+            type="java.lang.String"
             update="true"
             insert="true"
-            column="report_id"
+            column="login_name"
         />
 
         <!--

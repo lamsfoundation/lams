@@ -41,7 +41,8 @@ public class Message implements Cloneable{
 	private ForumUser createdBy;
 	private ForumUser modifiedBy;
 	private Set attachments;
-
+	private ForumReport report;
+	
 	public Message(){
 		attachments = new TreeSet();
 	}
@@ -388,6 +389,17 @@ public class Message implements Cloneable{
 
 	public void setHideFlag(boolean hideFlag) {
 		this.hideFlag = hideFlag;
+	}
+	/**
+	 * @hibernate.many-to-one column="report_id"
+	 * 			cascade="all"
+	 * @return
+	 */
+	public ForumReport getReport() {
+		return report;
+	}
+	public void setReport(ForumReport report) {
+		this.report = report;
 	}
 
 }

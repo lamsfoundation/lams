@@ -78,6 +78,10 @@
     	<put name="pageTitleKey" value="page.title.monitoring.content.userlist"/>
     	<put name="body" value="/jsps/monitoring/contentuserlist.jsp"/>
 	</definition>
+	<definition name="tiles:/monitoring/forum/viewUserMark" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.user.mark"/>
+    	<put name="body" value="/jsps/monitoring/usermarklist.jsp"/>
+	</definition>
 	<!-- E: Monitoring -->
 	
 </tiles-definitions>

@@ -1,8 +1,8 @@
 alter table tl_lafrum11_attachment drop foreign key FK389AD9A2FE939F2A;
 alter table tl_lafrum11_attachment drop foreign key FK389AD9A2131CE31E;
 alter table tl_lafrum11_forum_user drop foreign key FK7B83A4A85F0116B6;
-alter table tl_lafrum11_forum_user drop foreign key FK7B83A4A897F0DB46;
 alter table tl_lafrum11_message drop foreign key FK4A6067E8E42F4351;
+alter table tl_lafrum11_message drop foreign key FK4A6067E897F0DB46;
 alter table tl_lafrum11_message drop foreign key FK4A6067E8131CE31E;
 alter table tl_lafrum11_message drop foreign key FK4A6067E824089E4D;
 alter table tl_lafrum11_message drop foreign key FK4A6067E89357B45B;
@@ -53,7 +53,7 @@ create table tl_lafrum11_forum_user (
    last_name varchar(255),
    first_name varchar(255),
    session_id bigint,
-   report_id bigint,
+   login_name varchar(255),
    primary key (uid)
 );
 create table tl_lafrum11_message (
@@ -72,6 +72,7 @@ create table tl_lafrum11_message (
    forum_uid bigint,
    reply_number integer,
    hide_flag bit,
+   report_id bigint,
    primary key (uid)
 );
 create table tl_lafrum11_message_seq (
@@ -100,8 +101,8 @@ create table tl_lafrum11_tool_session (
 alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_attachment add index FK389AD9A2131CE31E (forum_uid), add constraint FK389AD9A2131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 alter table tl_lafrum11_forum_user add index FK7B83A4A85F0116B6 (session_id), add constraint FK7B83A4A85F0116B6 foreign key (session_id) references tl_lafrum11_tool_session (uid);
-alter table tl_lafrum11_forum_user add index FK7B83A4A897F0DB46 (report_id), add constraint FK7B83A4A897F0DB46 foreign key (report_id) references tl_lafrum11_report (uid);
 alter table tl_lafrum11_message add index FK4A6067E8E42F4351 (create_by), add constraint FK4A6067E8E42F4351 foreign key (create_by) references tl_lafrum11_forum_user (uid);
+alter table tl_lafrum11_message add index FK4A6067E897F0DB46 (report_id), add constraint FK4A6067E897F0DB46 foreign key (report_id) references tl_lafrum11_report (uid);
 alter table tl_lafrum11_message add index FK4A6067E8131CE31E (forum_uid), add constraint FK4A6067E8131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 alter table tl_lafrum11_message add index FK4A6067E824089E4D (parent_uid), add constraint FK4A6067E824089E4D foreign key (parent_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_message add index FK4A6067E89357B45B (forum_session_uid), add constraint FK4A6067E89357B45B foreign key (forum_session_uid) references tl_lafrum11_tool_session (uid);

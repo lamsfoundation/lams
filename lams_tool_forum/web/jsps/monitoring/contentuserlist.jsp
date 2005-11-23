@@ -3,20 +3,20 @@
 <html:errors/>
 	<div id="datatablecontainer">
 	<c:forEach var="element" items="${sessionUserMap}">
-		<c:set var="sessionID" value="${element.key}"/>
+		<c:set var="toolSessionID" value="${element.key}"/>
 		<c:set var="userlist" value="${element.value}"/>
 		
   		<table class="forms">
 		    <tr>
-		        <td style="border-bottom:1px #000 solid;" colspan="4"><b>SESSION ID: <c:out value="${sessionID}" /></td>
+		        <td style="border-bottom:1px #000 solid;" colspan="4"><b>SESSION ID: <c:out value="${toolSessionID}" /></td>
 		    </tr>
 			<c:forEach var="user" items="${userlist}">
 				<tr>
 				<html:form  action="/monitoring/viewUserMark">
-					<html:hidden property="toolSessionID" value="${sessionID}"/>
+					<html:hidden property="toolSessionID" value="${toolSessionID}"/>
 					<html:hidden property="userID" value="${user.userId}"/>
-					<td colspan="2"><b><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/></b></td>
-					<td><c:out value="${user.report.mark}"/> </td>
+					<td ><b><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/></b></td>
+					<td ><b><c:out value="${user.loginName}"/> </b></td>
 					<td class="formcontrol"><b><html:submit property="Mark" value="Mark"/></b></td>
 				</html:form>
 				</tr>		
@@ -48,4 +48,7 @@
 		</table>
 		<br><br>
 	</c:forEach>
+	<c:if test="${empty sessionUserMap}">
+		NO SESSION AVAILABLE
+	</c:if>
 </div>

@@ -126,7 +126,8 @@ public interface IForumService {
 	//************************************************************************************
 	/** 
 	 * Get topic and its children list by given root topic ID.  
-	 *  
+	 * Note that the return type is DTO.
+	 * 
 	 * @param rootTopicId
 	 * @return
 	 * 		List of MessageDTO
@@ -137,13 +138,15 @@ public interface IForumService {
 	 * posted in authoring page for this forum, which is related with the given sessionID value.
 	 * 
 	 * This method will used by  user to display initial topic page for a forum. 
+	 * 
+	 * Note that the return type is DTO.
 	 * @param sessionId
 	 * @return
 	 * 		List of MessageDTO
 	 */
 	public List getRootTopics(Long sessionId);
 	/**
-	 * Get topics posted by author role.
+	 * Get topics posted by author role. Note that the return type is DTO.
 	 * @return
 	 * 		List of MessageDTO
 	 */
@@ -157,11 +160,18 @@ public interface IForumService {
     /**
      * Get message by given message UID
      * @param messageUid
-     * @return
+     * @return 
+     * 		Message 
      * @throws PersistenceException
      */
     public Message getMessage(Long messageUid) throws PersistenceException;
-    
+    /**
+     * Get message list posted by given user.
+     * Note that the return type is DTO.
+     * @param userId
+     * @return
+     */
+    public List getMessagesByUserUid(Long userId);
 	//************************************************************************************
 	// Session Method
 	//************************************************************************************
@@ -206,5 +216,4 @@ public interface IForumService {
 	//************************************************************************************
 	// Report  Method
 	//************************************************************************************	
-	public ForumReport getReport(Long userId);
 }

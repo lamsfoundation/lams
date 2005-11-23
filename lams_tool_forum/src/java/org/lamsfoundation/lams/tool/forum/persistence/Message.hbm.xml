@@ -167,6 +167,16 @@
             column="hide_flag"
         />
 
+        <many-to-one
+            name="report"
+            class="org.lamsfoundation.lams.tool.forum.persistence.ForumReport"
+            cascade="all"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="report_id"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Message.xml

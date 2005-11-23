@@ -41,6 +41,10 @@ public interface ForumConstants {
 
 	public static final String DELETED_AUTHORING_TOPICS_LIST = "deletedAuthoringTopicList";
 
+	public static final String USER_UID = "userID";
+
+	public static final String MESSAGE_UID = "messageID";
+
 	
 	
 }

@@ -461,6 +461,11 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 	}
 
+
+	public List getMessagesByUserUid(Long userId) {
+		
+		return null;
+	}
     //***************************************************************************************************************
     // Get / Set methods
     //***************************************************************************************************************
@@ -536,12 +541,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		this.forumToolContentHandler = toolContentHandler;
 	}
 
-	public ForumReport getReport(Long userUid) {
-		ForumUser user = forumUserDao.getByUid(userUid);
-		if(user != null){
-			return user.getReport();
-		}
-		return null;
-	}
+
 
 }

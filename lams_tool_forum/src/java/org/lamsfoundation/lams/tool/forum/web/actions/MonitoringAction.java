@@ -33,10 +33,15 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
+import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
+import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
+import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MarkForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -97,7 +102,7 @@ public class MonitoringAction extends Action {
 			HttpServletResponse response) {
 		//get content ID from URL	
         Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-        
+		
 		forumService = getForumService();
         List sessionsList = forumService.getSessionsByContentId(contentID);
 
@@ -117,54 +122,124 @@ public class MonitoringAction extends Action {
 
 	private ActionForward viewAllMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		
+		
 		return mapping.findForward("success");
 	}
 
 	private ActionForward releaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		
+		
 		return mapping.findForward("success");
 	}
 
 	private ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		
+		
 		return mapping.findForward("success");
 	}
 
 	private ActionForward viewUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		Long userId = new Long(WebUtil.readLongParam(request,ForumConstants.USER_UID));
+		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		
+		forumService = getForumService();
+		List messageList = forumService.getMessagesByUserUid(userId);
+		ForumUser user = forumService.getUserByUserId(userId,sessionId);
+
+		//each back to web page
+		request.setAttribute("topicList",messageList);
+		request.setAttribute("user",user);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		return mapping.findForward("success");
 	}
 
 	private ActionForward editMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		MarkForm markForm = (MarkForm) form;
+		Long userId = new Long(WebUtil.readLongParam(request,ForumConstants.USER_UID));
+		Long messageId = new Long(WebUtil.readLongParam(request,ForumConstants.MESSAGE_UID));
+		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		
 		forumService = getForumService();
-		Long userId = new Long(WebUtil.readLongParam(request,"userID"));
-		ForumReport report = forumService.getReport(userId);
-		if(report != null){
-			markForm.setMark(new Integer(report.getMark()).toString());
-			markForm.setComment(report.getComment());
+		Message msg  = forumService.getMessage(messageId);
+		ForumUser user = forumService.getUserByUserId(userId,sessionId);
+		
+		//each back to web page
+		if(msg.getReport() != null){
+			MarkForm markForm = (MarkForm) form;
+			markForm.setMark(new Integer(msg.getReport().getMark()).toString());
+			markForm.setComment(msg.getReport().getComment());
 		}
+		request.setAttribute("message",MessageDTO.getMessageDTO(msg));
+		request.setAttribute("user",user);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		return mapping.findForward("success");
 	}
 
 	private ActionForward updateMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		Long messageId = new Long(WebUtil.readLongParam(request,ForumConstants.MESSAGE_UID));
+		
+		forumService = getForumService();
+		Message msg  = forumService.getMessage(messageId);
+		
+		MarkForm markForm = (MarkForm) form;
+		forumService = getForumService();
+		ForumReport report = msg.getReport();
+		if(report == null){
+			report = new ForumReport();
+			msg.setReport(report);
+		}
+		report.setMark(Integer.parseInt(markForm.getMark()));
+		report.setComment(markForm.getComment());
+		forumService.updateTopic(msg);
+		
 		return mapping.findForward("success");
 	}
 
 	private ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		forumService = getForumService();
+		Forum forum = forumService.getForum(contentId);
+		String title = forum.getTitle();
+		String instruction = forum.getInstructions();
+		
+		request.setAttribute("contentID",contentId);
+		request.setAttribute("title",title);
+		request.setAttribute("instruction",instruction);
 		return mapping.findForward("success");
 	}
 
 	private ActionForward updateActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		String title = request.getParameter("title");
+		String instruction = request.getParameter("instruction");
+		
+		forumService = getForumService();
+		Forum forum = forumService.getForum(contentId);
+		forum.setTitle(title);
+		forum.setInstructions(instruction);
+		forumService.updateForum(forum);
+		
 		return mapping.findForward("success");
 	}
 
 	private ActionForward viewInstructions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		
+		forumService = getForumService();
+		Forum forum = forumService.getForum(contentId);
+		
+		ForumForm forumForm = new ForumForm();
+		forumForm.setForum(forum);
+		
+		request.setAttribute("forumBean",forumForm);
 		return mapping.findForward("success");
 	}
 
