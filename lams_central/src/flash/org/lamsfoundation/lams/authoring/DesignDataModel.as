@@ -432,11 +432,42 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	
 	//helper methods
+	/**
+	 * Retreives a reference to an activity in the DDM using its UIID
+	 * @usage   
+	 * @param   UIID 
+	 * @return  
+	 */
 	public function getActivityByUIID(UIID:Number):Activity{
 		
 		var a:Activity = _activities.get(UIID);
 		Debugger.log('Returning activity:'+a.activityUIID,Debugger.GEN,'getActivityByUIID','DesignDataModel');
 		return a;
+	}
+	
+	/**
+	 * Retrieves all children of a complexy activity
+	 * E.g. child acts in an optional activity
+	 * @usage   
+	 * @param   activityUIID 
+	 * @return  Array of refs to the child acts in the DDM
+	 */
+	public function getComplexActivityChildren(activityUIID):Array{
+		Debugger.log('Looking for chiildren of UIID:'+activityUIID,Debugger.GEN,'getComplexActivityChildren','DesignDataModel');
+		_global.breakpoint();
+		var k:Array = _activities.keys();
+		var children:Array = new Array();
+		for(var i=0;i<k.length;i++){
+			var a = _activities.get(k[i]);
+			if(a.parentUIID == activityUIID){
+				Debugger.log('Found a child! UIID:'+a.activityUIID,Debugger.GEN,'getComplexActivityChildren','DesignDataModel');
+				children.push(a);
+			}
+		}
+		return children;
+		
+		
+		
 	}
 	
 	
