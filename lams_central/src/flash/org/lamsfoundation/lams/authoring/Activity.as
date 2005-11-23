@@ -4,6 +4,38 @@ import org.lamsfoundation.lams.common.*
 import org.lamsfoundation.lams.common.util.*
 /*
 *Activity Data storage class. USed as a base class for extending to be Tool, Gate and Complex
+* <pre><code>
+* 
+* * static final variables indicating the type of activities
+* 	/******************************************************************
+	public static var TOOL_ACTIVITY_TYPE:Number = 1;
+	public static var GROUPING_ACTIVITY_TYPE:Number = 2;
+	public static var SYNCH_GATE_ACTIVITY_TYPE:Number = 3;
+	public static var SCHEDULE_GATE_ACTIVITY_TYPE:Number = 4;
+	public static var PERMISSION_GATE_ACTIVITY_TYPE:Number = 5;
+	public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
+	public static var OPTIONS_ACTIVITY_TYPE:Number = 7;
+	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
+
+	* static final variables indicating the the category of activities
+    *******************************************************************
+	public static var CATEGORY_SYSTEM:Number = 1;
+	public static var CATEGORY_COLLABORATION:Number = 2;
+	public static var CATEGORY_ASSESSMENT:Number = 3;
+	public static var CATEGORY_CONTENT:Number = 4;
+	public static var CATEGORY_SPLIT:Number = 5;
+	/******************************************************************
+	
+	
+	/**
+	 * static final variables indicating the grouping_support of activities
+	 *******************************************************************
+	 public static var GROUPING_SUPPORT_NONE:Number = 1;
+	 public static var GROUPING_SUPPORT_OPTIONAL:Number = 2;
+	 public static var GROUPING_SUPPORT_REQUIRED:Number = 3;
+	/******************************************************************
+
+* </code></pre>
 * @author      DC
 * @version     0.1  
 */
@@ -18,8 +50,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	/**
 	 * static final variables indicating the type of activities
 	 * available for a LearningDesign 
-	 * */
-	/******************************************************************/
+	******************************************************************/
 	public static var TOOL_ACTIVITY_TYPE:Number = 1;
 	public static var GROUPING_ACTIVITY_TYPE:Number = 2;
 	public static var SYNCH_GATE_ACTIVITY_TYPE:Number = 3;
@@ -28,7 +59,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
 	public static var OPTIONS_ACTIVITY_TYPE:Number = 7;
 	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
-	/******************************************************************/	
+	/******************************************************************/
+	
 	/**
 	* static final variables indicating the the category of activities
     *******************************************************************/
@@ -199,6 +231,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 	
 	public function toData(){
 		var dto:Object = new Object();
+		//DC - Changed mode of toData to be ommiting fields with undefined values
+		/*
 		dto.objectType = (_objectType) ?  _objectType : Config.STRING_NULL_VALUE;
 		dto.activityTypeID = (_activityTypeID) ?  _activityTypeID : Config.NUMERIC_NULL_VALUE;
 		dto.activityID = (_activityID) ?  _activityID : Config.NUMERIC_NULL_VALUE;
@@ -226,10 +260,38 @@ class org.lamsfoundation.lams.authoring.Activity {
 		dto.createDateTime= (_createDateTime) ?  _createDateTime : Config.DATE_NULL_VALUE;
 		//dto.groupingSupportType = (_groupingSupportType) ?  _groupingSupportType : Config.NUMERIC_NULL_VALUE;
 		dto.groupingSupportType = 2;
+		*/
+		if(_activityTypeID){		dto.activityTypeID 		= _activityTypeID;			}
+		if(_activityID){			dto.activityID			= _activityID;				}
+		if(_activityCategoryID){	dto.activityCategoryID	= _activityCategoryID;		}
+		if(_activityUIID){			dto.activityUIID		= _activityUIID;			}
+		if(_learningLibraryID){		dto.learningLibraryID	= _learningLibraryID;		}
+		if(_learningDesignID){		dto.learningDesignID	= _learningDesignID;		}
+		if(_libraryActivityID){		dto.libraryActivityID	= _libraryActivityID;		}
+		if(_parentActivityID){		dto.parentActivityID	= _parentActivityID;		}
+		if(_parentUIID){			dto.parentUIID			= _parentUIID;				}
+		if(_orderID){				dto.orderID				= _orderID;					}
+		if(_groupingID){			dto.groupingID			= _groupingID;				}
+		if(_groupingUIID){			dto.groupingUIID		= _groupingUIID;			}
+		if(_title){					dto.title				= _title;					}
+		if(_description){			dto.description			= _description;				}
+		if(_helpText){				dto.helpText			= _helpText;				}
+		if(_yCoord){				dto.yCoord				= _yCoord;					}
+		if(_xCoord){				dto.xCoord				= _xCoord;					}
+		if(_libraryActivityUIImage){dto.libraryActivityUIImage= _libraryActivityUIImage;}
+		if(_applyGrouping){			dto.applyGrouping		= _applyGrouping;			}
+		if(_runOffline){			dto.runOffline	 		= _runOffline;				}
+		if(_defineLater){			dto.defineLater			= _defineLater;				}
+		if(_createDateTime){		dto.createDateTime		= _createDateTime;			}
+		if(_groupingSupportType){	dto.groupingSupportType = _groupingSupportType;		}
+		
+		
+		
 		return dto;
 	}
 	
 	public function clone():Activity{
+		/*
 		var n = new Activity(null);
 		//objectType is in the constructor
 		n.activityTypeID = _activityTypeID;
@@ -256,8 +318,12 @@ class org.lamsfoundation.lams.authoring.Activity {
 		n.defineLater = _defineLater;
 		n.createDateTime = _createDateTime;
 		n.groupingSupportType = _groupingSupportType;
-		
+		*/
+		var dto:Object = toData();
+		var n = new Activity(null);
+		n.populateFromDTO(dto);
 		return n;
+
 	}
 	
 	
