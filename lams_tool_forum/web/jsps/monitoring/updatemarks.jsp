@@ -1,3 +1,4 @@
+<%@ include file="/includes/taglibs.jsp" %>
   <b>Please assign a mark and a comment for the report by 
   		 <c:out value="${user.login}" /> , <c:out value="${user.firstName}" />  <c:out value="${user.lastName}" /> 	
   </b></p>

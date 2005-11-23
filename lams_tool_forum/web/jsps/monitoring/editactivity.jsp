@@ -1,4 +1,6 @@
-	<html:form action="monitoring" method="post" >
+<%@ include file="/includes/taglibs.jsp" %>
+
+	<html:form action="/monitoring/updateActivity" method="post" >
 		<html:errors/>
 		<div id="basic">
 		<h1><fmt:message key="label.authoring.heading.basic" /></h1>
@@ -35,5 +37,3 @@
 		</table>
 		</div>
 	</html:form>
-</body>
-</html:html>

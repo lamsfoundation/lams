@@ -14,7 +14,7 @@
 				<tr>
 				<html:form  action="/monitoring/viewUserMark">
 					<html:hidden property="toolSessionID" value="${toolSessionID}"/>
-					<html:hidden property="userID" value="${user.userId}"/>
+					<html:hidden property="userID" value="${user.uid}"/>
 					<td ><b><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/></b></td>
 					<td ><b><c:out value="${user.loginName}"/> </b></td>
 					<td class="formcontrol"><b><html:submit property="Mark" value="Mark"/></b></td>

@@ -281,7 +281,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		
 	}
 
-	public ForumUser getUserByUserId(Long userId,Long sessionId) {
+	public ForumUser getUserByUserAndSession(Long userId,Long sessionId) {
 		return  forumUserDao.getByUserIdAndSessionId(userId,sessionId);
 	}
 
@@ -461,11 +461,16 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		}
 	}
 
-
-	public List getMessagesByUserUid(Long userId) {
+	public List getMessagesByUserUid(Long userId,Long sessionId) {
+		List list = messageDao.getByUserAndSession(userId,sessionId);
 		
-		return null;
+		return MessageDTO.getMessageDTO(list);
 	}
+
+	public ForumUser getUser(Long userUid) {
+		return forumUserDao.getByUid(userUid);
+	}
+
     //***************************************************************************************************************
     // Get / Set methods
     //***************************************************************************************************************

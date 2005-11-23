@@ -81,6 +81,9 @@ public class MonitoringAction extends Action {
 		 }
 		 
 		 //***************** Activity and Instructions ********************
+		 if (param.equals("viewActivity")) {
+			 return viewActivity(mapping,form, request, response);
+		 }
 		 if (param.equals("editActivity")) {
 			 return editActivity(mapping,form, request, response);
 		 }
@@ -143,12 +146,12 @@ public class MonitoringAction extends Action {
 
 	private ActionForward viewUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Long userId = new Long(WebUtil.readLongParam(request,ForumConstants.USER_UID));
+		Long userUid = new Long(WebUtil.readLongParam(request,ForumConstants.USER_UID));
 		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		
 		forumService = getForumService();
-		List messageList = forumService.getMessagesByUserUid(userId);
-		ForumUser user = forumService.getUserByUserId(userId,sessionId);
+		List messageList = forumService.getMessagesByUserUid(userUid,sessionId);
+		ForumUser user = forumService.getUser(userUid);
 
 		//each back to web page
 		request.setAttribute("topicList",messageList);
@@ -159,13 +162,13 @@ public class MonitoringAction extends Action {
 
 	private ActionForward editMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Long userId = new Long(WebUtil.readLongParam(request,ForumConstants.USER_UID));
+		Long userUid = new Long(WebUtil.readLongParam(request,ForumConstants.USER_UID));
 		Long messageId = new Long(WebUtil.readLongParam(request,ForumConstants.MESSAGE_UID));
 		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		
 		forumService = getForumService();
 		Message msg  = forumService.getMessage(messageId);
-		ForumUser user = forumService.getUserByUserId(userId,sessionId);
+		ForumUser user = forumService.getUser(userUid);
 		
 		//each back to web page
 		if(msg.getReport() != null){
@@ -199,8 +202,8 @@ public class MonitoringAction extends Action {
 		
 		return mapping.findForward("success");
 	}
-
-	private ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	
+	private ActionForward viewActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		forumService = getForumService();
@@ -208,9 +211,24 @@ public class MonitoringAction extends Action {
 		String title = forum.getTitle();
 		String instruction = forum.getInstructions();
 		
-		request.setAttribute("contentID",contentId);
+		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentId);
 		request.setAttribute("title",title);
 		request.setAttribute("instruction",instruction);
+		return mapping.findForward("success");
+	}
+	private ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		forumService = getForumService();
+		Forum forum = forumService.getForum(contentId);
+		
+		String title = forum.getTitle();
+		String instruction = forum.getInstructions();
+		
+		request.setAttribute("title",title);
+		request.setAttribute("instruction",instruction);
+		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentId);
 		return mapping.findForward("success");
 	}
 

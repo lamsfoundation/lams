@@ -171,7 +171,7 @@ public interface IForumService {
      * @param userId
      * @return
      */
-    public List getMessagesByUserUid(Long userId);
+    public List getMessagesByUserUid(Long userId, Long sessionId);
 	//************************************************************************************
 	// Session Method
 	//************************************************************************************
@@ -205,13 +205,19 @@ public interface IForumService {
      * @param userId
      * @return
      */
-    public ForumUser getUserByUserId(Long userId,Long sessionId);
+    public ForumUser getUserByUserAndSession(Long userId,Long sessionId);
     /**
      * Get user list by given session ID.
      * @param sessionID
      * @return
      */
 	public List getUsersBySessionId(Long sessionID);
+	/**
+	 * Get user by uid
+	 * @param userId
+	 * @return
+	 */
+	public ForumUser getUser(Long userUid);
 	
 	//************************************************************************************
 	// Report  Method

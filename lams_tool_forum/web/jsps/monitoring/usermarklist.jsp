@@ -1,5 +1,5 @@
-	<c:set var="filesUploaded" value ="${userReport}"/>
-	<c:set var="user" value="${user}" />
+<%@ include file="/includes/taglibs.jsp" %>
+	
 	<b>Following files have been submitted by 
 		 <c:out value="${user.loginName}" /> , <c:out value="${user.firstName}" />  <c:out value="${user.lastName}" /> 	
 	</b>
@@ -33,12 +33,13 @@
 			</tr>
 		 <tr>
 			<td colspan="2">
-			<form action="<html:rewrite page='/monitoring/editMark'/>" method="post">
+			<br>
+			<html:form action="/monitoring/editMark" method="post">
 					<input type="hidden" name="messageID" value=<c:out value='${topic.message.uid}' /> >
 					<input type="hidden" name="toolSessionID" value=<c:out value='${toolSessionID}' /> >
 					<input type="hidden" name="userID" value=<c:out value='${user.uid}' /> >
 					<input type="submit" value="Update Marks"/>
-			</form>
+			</html:form>
 			</td>
 		</tr>
 		</c:forEach>

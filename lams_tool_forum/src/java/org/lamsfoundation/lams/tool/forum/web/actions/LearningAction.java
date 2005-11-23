@@ -420,7 +420,7 @@ public class LearningAction extends Action {
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 		//check whether this user exist or not
 		Long sessionId = (Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
-		ForumUser forumUser = forumService.getUserByUserId(new Long(user.getUserID().intValue()),sessionId);
+		ForumUser forumUser = forumService.getUserByUserAndSession(new Long(user.getUserID().intValue()),sessionId);
 		if(forumUser == null){
 			//if user not exist, create new one in database
 			ForumToolSession session = forumService.getSessionBySessionId(sessionId);

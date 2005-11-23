@@ -1,3 +1,5 @@
+<%@ include file="/includes/taglibs.jsp" %>
+
 	<h1><fmt:message key="label.authoring.heading.instructions" /></h1>
 	<h2><fmt:message key="label.authoring.heading.instructions.desc" /></h2>
 	<table class="forms">
