@@ -419,7 +419,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward editOptions(ActionMapping mapping,
             ActionForm form,
@@ -1386,7 +1386,6 @@ public class McAction extends DispatchAction implements McAppConstants
 		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
 		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
 		
-		
 		mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
 	 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
@@ -1398,7 +1397,6 @@ public class McAction extends DispatchAction implements McAppConstants
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("mcContent:" + mcContent);
 		
-					
 		if (mcContent != null)
 		{
 			logger.debug("updating mcContent title and instructions:" + mcContent);
@@ -1476,7 +1474,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward viewFileItem(ActionMapping mapping,
             ActionForm form,
@@ -1562,7 +1560,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward doneAdvancedTab(ActionMapping mapping,
             ActionForm form,
@@ -1570,7 +1568,7 @@ public class McAction extends DispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	logger.debug("dispatching advancedTabDone...");
+    	logger.debug("dispatching doneAdvancedTab...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 
@@ -1593,7 +1591,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward doneInstructionsTab(ActionMapping mapping,
             ActionForm form,
@@ -1601,7 +1599,7 @@ public class McAction extends DispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
     {
-    	logger.debug("dispatching advancedTabDone...");
+    	logger.debug("dispatching doneInstructionsTab...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
@@ -1623,7 +1621,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward submitOfflineFiles(ActionMapping mapping,
             ActionForm form,
@@ -1659,7 +1657,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward submitOnlineFiles(ActionMapping mapping,
             ActionForm form,
@@ -1839,9 +1837,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		    redirect="true"
 	  	/>
 
-    </action>
-    */
-        /**
+     * </action>
      *  responds to learner activity in learner mode.
      * 
      * ActionForward displayMc(ActionMapping mapping,
@@ -1928,7 +1924,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward continueOptionsCombined(ActionMapping mapping,
             ActionForm form,
@@ -1936,11 +1932,11 @@ public class McAction extends DispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{                                         
+		logger.debug("dispatching continueOptionsCombined...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
-		logger.debug("continue options combined requested.");
-		/* process the answers */
+	 	/* process the answers */
 		Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
     	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
     	
@@ -2021,7 +2017,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward getNextOptions(ActionMapping mapping,
             ActionForm form,
@@ -2029,7 +2025,7 @@ public class McAction extends DispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-		logger.debug("requested next options...");
+		logger.debug("dispatching getNextOptions...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 		
@@ -2067,7 +2063,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward redoQuestions(ActionMapping mapping,
             ActionForm form,
@@ -2075,7 +2071,7 @@ public class McAction extends DispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-		logger.debug("requested redoQuestions...");
+		logger.debug("dispatching redoQuestions...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
  		IMcService mcService =McUtils.getToolService(request);
  		
@@ -2105,7 +2101,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward viewAnswers(ActionMapping mapping,
             ActionForm form,
@@ -2113,7 +2109,7 @@ public class McAction extends DispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-		logger.debug("requested view Answers, listall the answers user has given.");
+		logger.debug("dispatching viewAnswers...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
  		IMcService mcService =McUtils.getToolService(request);
 		String totalQuestionCount= (String) request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
@@ -2217,7 +2213,7 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param request
      * @param form
      * @param mapping
-     * @return
+     * @return ActionForward
      */
     public ActionForward viewSummary(ActionMapping mapping,
             ActionForm form,
@@ -2225,7 +2221,7 @@ public class McAction extends DispatchAction implements McAppConstants
             HttpServletResponse response) throws IOException,
                                          ServletException
 	{
-		logger.debug("requested results summary...");
+		logger.debug("dispatching viewSummary...");
 		McLearningForm mcLearningForm = (McLearningForm) form;
  		IMcService mcService =McUtils.getToolService(request);
 		
