@@ -1875,101 +1875,11 @@ public class McAction extends DispatchAction implements McAppConstants
     	
     	if (mcLearningForm.getContinueOptionsCombined() != null)
     	{
-    		logger.debug("continue options combined requested.");
-    		/* process the answers */
-    		Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
-        	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
-        	
-        	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-        	logger.debug("toolContentId: " + toolContentId);
-        			
-        	logger.debug("will assess");
-        	Integer passMark=(Integer) request.getSession().getAttribute(PASSMARK);
-        	logger.debug("passMark: " + passMark);
-        	
-        	Map mapLeanerAssessmentResults=LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
-        	logger.debug("mapLeanerAssessmentResults: " + mapLeanerAssessmentResults);
-        	logger.debug("assesment complete");
-        	
-        	int mark=LearningUtil.getMark(mapLeanerAssessmentResults);
-        	logger.debug("mark: " + mark);
-        	request.getSession().setAttribute(LEARNER_MARK, new Integer(mark).toString());
-        	request.getSession().setAttribute(LEARNER_MARK_ATLEAST, new Integer(mark+1).toString());
-        	
-        	Map mapQuestionWeights =(Map) request.getSession().getAttribute(MAP_QUESTION_WEIGHTS);
-        	logger.debug("mapQuestionWeights: " + mapQuestionWeights);
-        	
-        	boolean passed=false;
-        	if ((passMark != null) && (passMark.intValue() != 0)) 
-			{
-        		int totalUserWeight=LearningUtil.calculateWeights(mapLeanerAssessmentResults, mapQuestionWeights);
-        		logger.debug("totalUserWeight: " + totalUserWeight);
-        		
-        		if (totalUserWeight < passMark.intValue())
-        		{
-        			logger.debug("USER FAILED");
-        			request.getSession().setAttribute(USER_PASSED, new Boolean(false).toString());
-        			logger.debug("totalUserWeight is less than passmark: " + totalUserWeight + " < " + passMark.intValue());
-        			passed=false;
-        		}
-        		else
-        		{
-        			logger.debug("USER PASSED");
-        			request.getSession().setAttribute(USER_PASSED, new Boolean(true).toString());
-        			passed=true;
-        		}
-			}
-
-        	boolean isUserDefined=LearningUtil.doesUserExists(request);
-        	logger.debug("isUserDefined");
-        	if (isUserDefined == false)
-        	{
-        		LearningUtil.createUser(request);
-        		logger.debug("created user in the db");
-        	}
-        	McQueUsr mcQueUsr=LearningUtil.getUser(request);
-        	logger.debug("mcQueUsr: " + mcQueUsr);
-        	
-        	
-        	String highestAttemptOrder=(String)request.getSession().getAttribute(LEARNER_LAST_ATTEMPT_ORDER);
-            logger.debug("current highestAttemptOrder:" + highestAttemptOrder);
-            
-            logger.debug("passed: " + passed);
-        	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed, new Integer(highestAttemptOrder).intValue(), mapLeanerAssessmentResults);
-        	logger.debug("created user attempt in the db");
-        	
-        	int intHighestAttemptOrder=new Integer(highestAttemptOrder).intValue()+ 1 ;
-            logger.debug("updated highestAttemptOrder:" + intHighestAttemptOrder);
-            request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER, new Integer(intHighestAttemptOrder).toString());
-    		
-    		mcLearningForm.resetCommands();
-    		return (mapping.findForward(INDIVIDUAL_REPORT));
+    		return continueOptionsCombined(mapping, form, request, response);
     	}
     	else if (mcLearningForm.getNextOptions() != null)
 	 	{
-    		logger.debug("requested next options...");
-    		
-    		String currentQuestionIndex=(String)request.getSession().getAttribute(CURRENT_QUESTION_INDEX);
-        	logger.debug("currentQuestionIndex:" + currentQuestionIndex);
-        	
-        	String totalQuestionCount=(String)request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
-        	logger.debug("totalQuestionCount:" + totalQuestionCount);
-        	
-        	int intTotalQuestionCount=new Integer(totalQuestionCount).intValue();
-        	int intCurrentQuestionIndex=new Integer(currentQuestionIndex).intValue();
-        	
-        	if (intTotalQuestionCount-1 == intCurrentQuestionIndex)
-        	{
-        		logger.debug("totalQuestionCount has been reached :" + totalQuestionCount);
-        		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(true).toString());
-        	}
-    		
-    		mcLearningForm.resetCommands();
-   
-        	int newQuestionIndex=new Integer(currentQuestionIndex).intValue() + 1;
-        	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Integer(newQuestionIndex).toString());
-        	logger.debug("updated questionIndex:" + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
-    		return (mapping.findForward(LOAD_LEARNER));
+	 		return getNextOptions(mapping, form, request, response);
 	 	}
     	else if (mcLearningForm.getOptionCheckBoxSelected() != null)
     	{
@@ -1979,20 +1889,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	}
     	else if (mcLearningForm.getRedoQuestions() != null)
     	{
-    		logger.debug("requested redoQuestions...");
-    		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
-    		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(false).toString());
-    		
-    		McQueUsr mcQueUsr=LearningUtil.getUser(request);
-    		Long queUsrId=mcQueUsr.getUid();
-    		logger.debug("queUsrId: " + queUsrId);
-    		
-    		int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId);
-    		logger.debug("learnerBestMark: " + learnerBestMark);
-    		request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(learnerBestMark).toString());
-    		
-    		mcLearningForm.resetCommands();
-    		return (mapping.findForward(REDO_QUESTIONS));
+    		return redoQuestions(mapping, form, request, response);
     	}
     	else if (mcLearningForm.getRedoQuestionsOk() != null)
     	{
@@ -2002,117 +1899,11 @@ public class McAction extends DispatchAction implements McAppConstants
     	}
     	else if (mcLearningForm.getViewAnswers() != null)
     	{
-    		logger.debug("requested view Answers, listall the answers user has given.");
-    		String totalQuestionCount= (String) request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
-    		logger.debug("totalQuestionCount: " + totalQuestionCount);
-    		
-    		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
-    		logger.debug("toolContentUID: " + toolContentUID);
-        	
-    		McQueUsr mcQueUsr=LearningUtil.getUser(request);
-    		Long queUsrId=mcQueUsr.getUid();
-    		logger.debug("queUsrId: " + queUsrId);
-    	
-    		Map mapQueAttempts= new TreeMap(new McComparator());
-    		Map mapQueCorrectAttempts= new TreeMap(new McComparator());
-    		Map mapQueIncorrectAttempts= new TreeMap(new McComparator());
-    		for (int i=1; i<=  new Integer(totalQuestionCount).intValue(); i++)
-    		{
-    			logger.debug("doing question with display order: " + i);
-    			McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(new Long(i), toolContentUID);
-    			logger.debug("mcQueContent uid: " + mcQueContent.getUid());
-
-    			Map mapAttemptOrderAttempts= new TreeMap(new McComparator());
-    			Map mapAttemptOrderCorrectAttempts= new TreeMap(new McComparator());
-    			Map mapAttemptOrderIncorrectAttempts= new TreeMap(new McComparator());
-    			for (int j=1; j <= MAX_ATTEMPTY_HISTORY ; j++ )
-	    		{
-	    			List attemptsByAttemptOrder=mcService.getAttemptByAttemptOrder(queUsrId, mcQueContent.getUid(), new Integer(j));
-    	    		logger.debug("attemptsByAttemptOrder: " + j + " is: " + attemptsByAttemptOrder);
-    	    	
-    	    		Map mapAttempts= new TreeMap(new McComparator());
-    	    		Map mapAttemptsIncorrect= new TreeMap(new McComparator());
-    	    		Map mapAttemptsCorrect= new TreeMap(new McComparator());
-    	    		Iterator attemptIterator=attemptsByAttemptOrder.iterator();
-    	    		Long mapIndex=new Long(1);
-        	    	while (attemptIterator.hasNext())
-        	    	{
-        	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)attemptIterator.next();
-        	    		
-        	    		if (mcUsrAttempt.isAttemptCorrect())
-        	    		{
-        	    			mapAttemptsCorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
-        	    		}
-        	    		else
-        	    		{
-        	    			mapAttemptsIncorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
-        	    		}
-        	    		mapAttempts.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
-    					
-    	    			logger.debug("added attempt with order: " + mcUsrAttempt.getAttemptOrder() + " , option text is: " + mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
-    	    			mapIndex=new Long(mapIndex.longValue()+1);
-        	    	}    	    		
-
-        	    	logger.debug("final mapAttempts is: " + mapAttempts);
-        	    	if (mapAttempts.size() > 0)
-        	    	{
-        	    		mapAttemptOrderAttempts.put(new Integer(j).toString(), mapAttempts);	
-        	    	}
-        	    	if (mapAttemptsCorrect.size() > 0)
-        	    	{
-        	    		mapAttemptOrderCorrectAttempts.put(new Integer(j).toString(), mapAttemptsCorrect);	
-        	    	}
-        	    	if (mapAttemptsIncorrect.size() > 0)
-        	    	{
-        	    		mapAttemptOrderIncorrectAttempts.put(new Integer(j).toString(), mapAttemptsIncorrect);	
-        	    	}
-	    		}
-    			
-    			logger.debug("final mapAttemptOrderAttempts is: " + mapAttemptOrderAttempts);
-    			if (mapAttemptOrderAttempts.size() > 0)
-    	    	{
-    				mapQueAttempts.put(new Integer(i).toString(), mapAttemptOrderAttempts);	
-    	    	}
-    			if (mapAttemptOrderCorrectAttempts.size() > 0)
-    	    	{
-    				mapQueCorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderCorrectAttempts);	
-    	    	}    			
-    			if (mapAttemptOrderIncorrectAttempts.size() > 0)
-    	    	{
-        			mapQueIncorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderIncorrectAttempts);	
-    	    	}    			
-    		}
-    		request.getSession().setAttribute(MAP_QUE_ATTEMPTS, mapQueAttempts);
-    		request.getSession().setAttribute(MAP_QUE_CORRECT_ATTEMPTS, mapQueCorrectAttempts);
-    		request.getSession().setAttribute(MAP_QUE_INCORRECT_ATTEMPTS, mapQueIncorrectAttempts);
-    		
-    		logger.debug("final mapQueAttempts is: " + mapQueAttempts);
-    		logger.debug("final mapQueCorrectAttempts is: " + mapQueCorrectAttempts);
-    		logger.debug("final mapQueIncorrectAttempts is: " + mapQueIncorrectAttempts);
-    		mcLearningForm.resetCommands();
-    		return (mapping.findForward(VIEW_ANSWERS));
+    		return viewAnswers(mapping, form, request, response);
     	}
     	else if (mcLearningForm.getViewSummary() != null)
     	{
-    		logger.debug("requested results summary...");
-    		
-    		int countSessionComplete=mcService.countSessionComplete();
-    		int topMark=LearningUtil.getTopMark(request);
-    		int lowestMark=LearningUtil.getLowestMark(request);
-    		int averageMark=LearningUtil.getAverageMark(request);
-    		
-    		logger.debug("countSessionComplete: " + countSessionComplete);
-    		logger.debug("topMark: " + topMark);
-    		logger.debug("lowestMark: " + lowestMark);
-    		logger.debug("averageMark: " + averageMark);
-    		
-    		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
-    		request.getSession().setAttribute(TOP_MARK, new Integer(topMark).toString());
-    		request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
-    		request.getSession().setAttribute(AVERAGE_MARK, new Integer(averageMark).toString());
-    		
-    		mcLearningForm.resetCommands();
-    		return (mapping.findForward(RESULTS_SUMMARY));
+			return viewSummary(mapping, form, request, response);
     	}
     	else if (mcLearningForm.getLearnerFinished() != null)
     	{
@@ -2126,34 +1917,338 @@ public class McAction extends DispatchAction implements McAppConstants
  		return (mapping.findForward(LOAD_LEARNER));
    }
     
-    
+
     /**
-     * continueOptions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
+     * takes care of the assessment
+     * continueOptionsCombined(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
      * 
      * @param request
-     * @param mcLearningForm
+     * @param form
      * @param mapping
      * @return
      */
-    protected ActionForward getNextOptions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
-    {
-    	logger.debug("requested continueOptions...");
-    	boolean continueOptions=LearningUtil.continueOptions(request);
-    	if (continueOptions == true)
+    public ActionForward continueOptionsCombined(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{                                         
+		McLearningForm mcLearningForm = (McLearningForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+		logger.debug("continue options combined requested.");
+		/* process the answers */
+		Map mapGeneralCheckedOptionsContent=(Map) request.getSession().getAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT);
+    	logger.debug("final mapGeneralCheckedOptionsContent: " + mapGeneralCheckedOptionsContent);
+    	
+    	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	logger.debug("toolContentId: " + toolContentId);
+    			
+    	logger.debug("will assess");
+    	Integer passMark=(Integer) request.getSession().getAttribute(PASSMARK);
+    	logger.debug("passMark: " + passMark);
+    	
+    	Map mapLeanerAssessmentResults=LearningUtil.assess(request, mapGeneralCheckedOptionsContent, toolContentId);
+    	logger.debug("mapLeanerAssessmentResults: " + mapLeanerAssessmentResults);
+    	logger.debug("assesment complete");
+    	
+    	int mark=LearningUtil.getMark(mapLeanerAssessmentResults);
+    	logger.debug("mark: " + mark);
+    	request.getSession().setAttribute(LEARNER_MARK, new Integer(mark).toString());
+    	request.getSession().setAttribute(LEARNER_MARK_ATLEAST, new Integer(mark+1).toString());
+    	
+    	Map mapQuestionWeights =(Map) request.getSession().getAttribute(MAP_QUESTION_WEIGHTS);
+    	logger.debug("mapQuestionWeights: " + mapQuestionWeights);
+    	
+    	boolean passed=false;
+    	if ((passMark != null) && (passMark.intValue() != 0)) 
+		{
+    		int totalUserWeight=LearningUtil.calculateWeights(mapLeanerAssessmentResults, mapQuestionWeights);
+    		logger.debug("totalUserWeight: " + totalUserWeight);
+    		
+    		if (totalUserWeight < passMark.intValue())
+    		{
+    			logger.debug("USER FAILED");
+    			request.getSession().setAttribute(USER_PASSED, new Boolean(false).toString());
+    			logger.debug("totalUserWeight is less than passmark: " + totalUserWeight + " < " + passMark.intValue());
+    			passed=false;
+    		}
+    		else
+    		{
+    			logger.debug("USER PASSED");
+    			request.getSession().setAttribute(USER_PASSED, new Boolean(true).toString());
+    			passed=true;
+    		}
+		}
+
+    	boolean isUserDefined=LearningUtil.doesUserExists(request);
+    	logger.debug("isUserDefined");
+    	if (isUserDefined == false)
     	{
-    		/* get the next question */
-    		mcLearningForm.resetCommands();
-    		return (mapping.findForward(LOAD_LEARNER));
+    		LearningUtil.createUser(request);
+    		logger.debug("created user in the db");
     	}
-    	else
-    	{
-    		/* no more questions */
-    		mcLearningForm.resetCommands();
-    		return (mapping.findForward(INDIVIDUAL_REPORT));
-    	}	
+    	McQueUsr mcQueUsr=LearningUtil.getUser(request);
+    	logger.debug("mcQueUsr: " + mcQueUsr);
+    	
+    	
+    	String highestAttemptOrder=(String)request.getSession().getAttribute(LEARNER_LAST_ATTEMPT_ORDER);
+        logger.debug("current highestAttemptOrder:" + highestAttemptOrder);
+        
+        logger.debug("passed: " + passed);
+    	LearningUtil.createAttempt(request, mcQueUsr, mapGeneralCheckedOptionsContent, mark, passed, new Integer(highestAttemptOrder).intValue(), mapLeanerAssessmentResults);
+    	logger.debug("created user attempt in the db");
+    	
+    	int intHighestAttemptOrder=new Integer(highestAttemptOrder).intValue()+ 1 ;
+        logger.debug("updated highestAttemptOrder:" + intHighestAttemptOrder);
+        request.getSession().setAttribute(LEARNER_LAST_ATTEMPT_ORDER, new Integer(intHighestAttemptOrder).toString());
+		
+		mcLearningForm.resetCommands();
+		return (mapping.findForward(INDIVIDUAL_REPORT));
     }
-    
-    
+
+
+    /**
+     * takes care of the assessment
+     * continueOptionsCombined(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+     * 
+     * @param request
+     * @param form
+     * @param mapping
+     * @return
+     */
+    public ActionForward getNextOptions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+		logger.debug("requested next options...");
+		McLearningForm mcLearningForm = (McLearningForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+		
+		String currentQuestionIndex=(String)request.getSession().getAttribute(CURRENT_QUESTION_INDEX);
+    	logger.debug("currentQuestionIndex:" + currentQuestionIndex);
+    	
+    	String totalQuestionCount=(String)request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
+    	logger.debug("totalQuestionCount:" + totalQuestionCount);
+    	
+    	int intTotalQuestionCount=new Integer(totalQuestionCount).intValue();
+    	int intCurrentQuestionIndex=new Integer(currentQuestionIndex).intValue();
+    	
+    	if (intTotalQuestionCount-1 == intCurrentQuestionIndex)
+    	{
+    		logger.debug("totalQuestionCount has been reached :" + totalQuestionCount);
+        		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(true).toString());
+        	}
+    		
+    		mcLearningForm.resetCommands();
+   
+        	int newQuestionIndex=new Integer(currentQuestionIndex).intValue() + 1;
+        	request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Integer(newQuestionIndex).toString());
+        	logger.debug("updated questionIndex:" + request.getSession().getAttribute(CURRENT_QUESTION_INDEX));
+		return (mapping.findForward(LOAD_LEARNER));
+    }
+
+
+    /**
+     * allows the learner to take the activity again
+     * redoQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+     * 
+     * @param request
+     * @param form
+     * @param mapping
+     * @return
+     */
+    public ActionForward redoQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+		logger.debug("requested redoQuestions...");
+		McLearningForm mcLearningForm = (McLearningForm) form;
+ 		IMcService mcService =McUtils.getToolService(request);
+ 		
+		request.getSession().setAttribute(CURRENT_QUESTION_INDEX, "1");
+		request.getSession().setAttribute(TOTAL_COUNT_REACHED, new Boolean(false).toString());
+		
+		McQueUsr mcQueUsr=LearningUtil.getUser(request);
+		Long queUsrId=mcQueUsr.getUid();
+		logger.debug("queUsrId: " + queUsrId);
+		
+		int learnerBestMark=LearningUtil.getHighestMark(request, queUsrId);
+		logger.debug("learnerBestMark: " + learnerBestMark);
+		request.getSession().setAttribute(LEARNER_BEST_MARK,new Integer(learnerBestMark).toString());
+		
+		mcLearningForm.resetCommands();
+		return (mapping.findForward(REDO_QUESTIONS));
+    }
+        
+
+    /**
+     * allows the learner to take the activity again
+     * viewAnswers(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+     * 
+     * @param request
+     * @param form
+     * @param mapping
+     * @return
+     */
+    public ActionForward viewAnswers(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+		logger.debug("requested view Answers, listall the answers user has given.");
+		McLearningForm mcLearningForm = (McLearningForm) form;
+ 		IMcService mcService =McUtils.getToolService(request);
+		String totalQuestionCount= (String) request.getSession().getAttribute(TOTAL_QUESTION_COUNT);
+		logger.debug("totalQuestionCount: " + totalQuestionCount);
+		
+		Long toolContentUID= (Long) request.getSession().getAttribute(TOOL_CONTENT_UID);
+		logger.debug("toolContentUID: " + toolContentUID);
+    	
+		McQueUsr mcQueUsr=LearningUtil.getUser(request);
+		Long queUsrId=mcQueUsr.getUid();
+		logger.debug("queUsrId: " + queUsrId);
+	
+		Map mapQueAttempts= new TreeMap(new McComparator());
+		Map mapQueCorrectAttempts= new TreeMap(new McComparator());
+		Map mapQueIncorrectAttempts= new TreeMap(new McComparator());
+		for (int i=1; i<=  new Integer(totalQuestionCount).intValue(); i++)
+		{
+			logger.debug("doing question with display order: " + i);
+			McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(new Long(i), toolContentUID);
+			logger.debug("mcQueContent uid: " + mcQueContent.getUid());
+
+			Map mapAttemptOrderAttempts= new TreeMap(new McComparator());
+			Map mapAttemptOrderCorrectAttempts= new TreeMap(new McComparator());
+			Map mapAttemptOrderIncorrectAttempts= new TreeMap(new McComparator());
+			for (int j=1; j <= MAX_ATTEMPTY_HISTORY ; j++ )
+    		{
+    			List attemptsByAttemptOrder=mcService.getAttemptByAttemptOrder(queUsrId, mcQueContent.getUid(), new Integer(j));
+	    		logger.debug("attemptsByAttemptOrder: " + j + " is: " + attemptsByAttemptOrder);
+	    	
+	    		Map mapAttempts= new TreeMap(new McComparator());
+	    		Map mapAttemptsIncorrect= new TreeMap(new McComparator());
+	    		Map mapAttemptsCorrect= new TreeMap(new McComparator());
+	    		Iterator attemptIterator=attemptsByAttemptOrder.iterator();
+	    		Long mapIndex=new Long(1);
+    	    	while (attemptIterator.hasNext())
+    	    	{
+    	    		McUsrAttempt mcUsrAttempt=(McUsrAttempt)attemptIterator.next();
+    	    		
+    	    		if (mcUsrAttempt.isAttemptCorrect())
+    	    		{
+    	    			mapAttemptsCorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+    	    		}
+    	    		else
+    	    		{
+    	    			mapAttemptsIncorrect.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+    	    		}
+    	    		mapAttempts.put(mapIndex.toString(), mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+					
+	    			logger.debug("added attempt with order: " + mcUsrAttempt.getAttemptOrder() + " , option text is: " + mcUsrAttempt.getMcOptionsContent().getMcQueOptionText());
+	    			mapIndex=new Long(mapIndex.longValue()+1);
+    	    	}    	    		
+
+    	    	logger.debug("final mapAttempts is: " + mapAttempts);
+    	    	if (mapAttempts.size() > 0)
+    	    	{
+    	    		mapAttemptOrderAttempts.put(new Integer(j).toString(), mapAttempts);	
+    	    	}
+    	    	if (mapAttemptsCorrect.size() > 0)
+    	    	{
+    	    		mapAttemptOrderCorrectAttempts.put(new Integer(j).toString(), mapAttemptsCorrect);	
+    	    	}
+    	    	if (mapAttemptsIncorrect.size() > 0)
+    	    	{
+    	    		mapAttemptOrderIncorrectAttempts.put(new Integer(j).toString(), mapAttemptsIncorrect);	
+    	    	}
+    		}
+			
+			logger.debug("final mapAttemptOrderAttempts is: " + mapAttemptOrderAttempts);
+			if (mapAttemptOrderAttempts.size() > 0)
+	    	{
+				mapQueAttempts.put(new Integer(i).toString(), mapAttemptOrderAttempts);	
+	    	}
+			if (mapAttemptOrderCorrectAttempts.size() > 0)
+	    	{
+				mapQueCorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderCorrectAttempts);	
+	    	}    			
+			if (mapAttemptOrderIncorrectAttempts.size() > 0)
+	    	{
+    			mapQueIncorrectAttempts.put(new Integer(i).toString(), mapAttemptOrderIncorrectAttempts);	
+	    	}    			
+		}
+		request.getSession().setAttribute(MAP_QUE_ATTEMPTS, mapQueAttempts);
+		request.getSession().setAttribute(MAP_QUE_CORRECT_ATTEMPTS, mapQueCorrectAttempts);
+		request.getSession().setAttribute(MAP_QUE_INCORRECT_ATTEMPTS, mapQueIncorrectAttempts);
+		
+		logger.debug("final mapQueAttempts is: " + mapQueAttempts);
+		logger.debug("final mapQueCorrectAttempts is: " + mapQueCorrectAttempts);
+		logger.debug("final mapQueIncorrectAttempts is: " + mapQueIncorrectAttempts);
+		mcLearningForm.resetCommands();
+		return (mapping.findForward(VIEW_ANSWERS));
+	}
+
+
+    /**
+     * allows the learner to view all the other learners' activity summary 
+     * viewSummary(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+     * 
+     * @param request
+     * @param form
+     * @param mapping
+     * @return
+     */
+    public ActionForward viewSummary(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+	{
+		logger.debug("requested results summary...");
+		McLearningForm mcLearningForm = (McLearningForm) form;
+ 		IMcService mcService =McUtils.getToolService(request);
+		
+		int countSessionComplete=mcService.countSessionComplete();
+		int topMark=LearningUtil.getTopMark(request);
+		int lowestMark=LearningUtil.getLowestMark(request);
+		int averageMark=LearningUtil.getAverageMark(request);
+		
+		logger.debug("countSessionComplete: " + countSessionComplete);
+		logger.debug("topMark: " + topMark);
+		logger.debug("lowestMark: " + lowestMark);
+		logger.debug("averageMark: " + averageMark);
+		
+		request.getSession().setAttribute(COUNT_SESSION_COMPLETE, new Integer(countSessionComplete).toString());
+		request.getSession().setAttribute(TOP_MARK, new Integer(topMark).toString());
+		request.getSession().setAttribute(LOWEST_MARK, new Integer(lowestMark).toString());
+		request.getSession().setAttribute(AVERAGE_MARK, new Integer(averageMark).toString());
+		
+		mcLearningForm.resetCommands();
+		return (mapping.findForward(RESULTS_SUMMARY));	
+    }
+        
+        
     /**
      * redoQuestions(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
      * 

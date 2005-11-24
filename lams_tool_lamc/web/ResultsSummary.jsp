@@ -47,7 +47,7 @@
 					 <td> 
 		 				<table align=center bgcolor="#FFFFFF">
 						  <tr>
-						  	<td align=left class="input" valign=top> 
+						  	<td align=left class="input" valign=top colspan=2> 
 							  	<font size=2> <b>  <bean:message key="label.topMark"/> </b> </font> 
 							 </td> 
 							 <td align=right>	
@@ -72,6 +72,7 @@
 							  	<c:out value="${sessionScope.lowestMark}"/>
 						  	</td>
 						  </tr>	
+						  
 						 </table>
 					</td>
 					</tr>
