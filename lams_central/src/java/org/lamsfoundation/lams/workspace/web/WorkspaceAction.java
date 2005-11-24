@@ -136,6 +136,30 @@ public class WorkspaceAction extends DispatchAction {
 	}
 	
 	/**
+	 * For details please refer to 
+	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
+	 *  
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return ActionForward
+	 * @throws ServletException
+	 * @throws Exception
+	 */
+	public ActionForward getFolderContentsExcludeHome(ActionMapping mapping,
+										   ActionForm form,
+										   HttpServletRequest request,
+										   HttpServletResponse response)throws ServletException,Exception{
+		Integer folderID = new Integer(WebUtil.readIntParam(request,"folderID"));
+		Integer mode = new Integer(WebUtil.readIntParam(request,"mode"));		
+		Integer userID = new Integer(WebUtil.readIntParam(request,"userID"));
+		IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
+		String wddxPacket = workspaceManagementService.getFolderContentsExcludeHome(userID,folderID,mode);		
+		return outputPacket(mapping, request, response, wddxPacket, "details");		
+	}
+
+	/**
 	 * For details please refer to
 	 * org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService 
 	 * 

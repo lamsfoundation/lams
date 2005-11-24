@@ -196,12 +196,33 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			return false;
 		}
 	}
+	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getFolderContentsExcludeHome(java.lang.Integer, java.lang.Integer, java.lang.Integer)
+	 */
+	public String getFolderContentsExcludeHome(Integer userID, Integer workspaceFolderID, Integer mode)throws Exception{
+		User user = userDAO.getUserById(userID);
+		WorkspaceFolder folder = user.getWorkspace().getRootFolder();
+		return getFolderContentsInternal(user, workspaceFolderID, mode, "getFolderContentsExcludeHome", 
+				folder != null ? folder.getWorkspaceFolderId() : null);
+	}
+	 
+	
 	/**
 	 * (non-Javadoc)
 	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getFolderContents(java.lang.Integer, java.lang.Integer, java.lang.Integer)
 	 */
 	public String getFolderContents(Integer userID, Integer workspaceFolderID, Integer mode)throws Exception{
 		User user = userDAO.getUserById(userID);
+		return getFolderContentsInternal(user, workspaceFolderID, mode, "getFolderContents", null);
+	}
+	
+	/**
+	 * Get the contents of a folder. Internal method used for both getFolderContentsExcludeHome() and getFolderContents().
+	 * If skipContentId is not null, then skip any contents found with this id. 
+	 */
+	public String getFolderContentsInternal(User user, Integer workspaceFolderID, Integer mode, String methodName, Integer skipContentId)throws Exception{
 		WorkspaceFolder workspaceFolder = null;
 		Integer permissions = null;
 		if(user!=null){
@@ -212,31 +233,28 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					Vector contentDTO = new Vector();
 					getFolderContent(workspaceFolder,permissions,mode,contentDTO);
 					if(workspaceFolder.hasSubFolders())
-						getSubFolderDetails(workspaceFolder,permissions,contentDTO);	
+						getSubFolderDetails(workspaceFolder,permissions,contentDTO, skipContentId);	
 					Vector repositoryContent = getContentsFromRepository(new Long(workspaceFolderID.intValue()),permissions);
 					if(repositoryContent!=null)
 						contentDTO.addAll(repositoryContent);
-					flashMessage = new FlashMessage("getFolderContents",createFolderContentPacket(workspaceFolder,contentDTO));
+					flashMessage = new FlashMessage(methodName,createFolderContentPacket(workspaceFolder,contentDTO));
 				}
 				else
-					flashMessage = new FlashMessage("getFolderContents",
-													"Access Denied for user with user_id:" + userID,
+					flashMessage = new FlashMessage(methodName,
+													"Access Denied for user with user_id:" + user.getUserId(),
 													FlashMessage.ERROR);
 			}
 			else
-				flashMessage = new FlashMessage("getFolderContents",
+				flashMessage = new FlashMessage(methodName,
 												"No such workspaceFolder with workspace_folder_id of:" + workspaceFolderID + " exists",
 												FlashMessage.ERROR);
 		}else
-			flashMessage = FlashMessage.getNoSuchUserExists("getFolderContents",userID);
+			flashMessage = FlashMessage.getNoSuchUserExists(methodName,user.getUserId());
 		return flashMessage.serializeMessage();
 		
 	}	
 	private void getFolderContent(WorkspaceFolder workspaceFolder, Integer permissions, Integer mode,Vector contentDTO){
 		
-		Integer parentFolderId = workspaceFolder.getParentWorkspaceFolder()!=null?
-								 workspaceFolder.getParentWorkspaceFolder().getWorkspaceFolderId():
-								 WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;	
 		List designs = null;
 		
 		if(mode==AUTHORING)
@@ -246,11 +264,16 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		
 		getFolderContentDTO(designs,permissions,contentDTO);
 	}
-	private void getSubFolderDetails(WorkspaceFolder workspaceFolder,Integer permissions, Vector subFolderContent){				
+	/** 
+	 * Get the folders in the given workspaceFolder. If skipContentId is not null, then skip any contents found with this id.
+	 */ 
+	private void getSubFolderDetails(WorkspaceFolder workspaceFolder,Integer permissions, Vector subFolderContent, Integer skipContentId){				
 		Iterator iterator = workspaceFolder.getChildWorkspaceFolders().iterator();
 		while(iterator.hasNext()){
 			WorkspaceFolder subFolder = (WorkspaceFolder)iterator.next();
-			subFolderContent.add(new FolderContentDTO(subFolder,permissions));
+			if ( skipContentId==null || ! skipContentId.equals(subFolder.getWorkspaceFolderId()) ) {
+				subFolderContent.add(new FolderContentDTO(subFolder,permissions));
+			}
 		}		
 	}
 	/**
@@ -761,10 +784,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public String deleteWorkspaceFolderContent(Long folderContentID)throws Exception{
 		WorkspaceFolderContent workspaceFolderContent = workspaceFolderContentDAO.getWorkspaceFolderContentByID(folderContentID);
 		if(workspaceFolderContent!=null){
-			Long uuid = workspaceFolderContent.getUuid();
-			Long versionID = workspaceFolderContent.getVersionID();
-			ITicket ticket = getRepositoryLoginTicket();
-			String files[] = repositoryService.deleteNode(ticket,uuid);
 			workspaceFolderContentDAO.delete(workspaceFolderContent);
 			flashMessage = new FlashMessage("deleteWorkspaceFolderContent","Content deleted");
 		}else
@@ -817,7 +836,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		if (user != null) {
 			//add the user's own folder to the list
 			table.put("PRIVATE", new UserAccessFoldersDTO(user.getWorkspace().getRootFolder()));
-			table.put("RUN_SEQUENCES", new UserAccessFoldersDTO(workspaceFolderDAO.getRunSequencesFolderForUser(user.getUserId())));
 			
 			// Get a list of organisations of which the given user is a member
 			List userMemberships = userOrganisationDAO.getUserOrganisationsByUser(user);

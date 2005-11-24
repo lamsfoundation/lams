@@ -83,6 +83,21 @@ public interface IWorkspaceManagementService {
 	public String getFolderContents(Integer userID, Integer workspaceFolderID, Integer mode)throws Exception;
 	
 	/**
+	 * This method does the same as getFolderContents() except that it doesn't return
+	 * the home directory as a content of the folder. This is useful to Flash as when the user's organisation 
+	 * is listed, the client doesn't want the home directory returned as the client already knows about the 
+	 * folder from the getAccessibleWorkspaceFolders() call.
+	 * 
+	 * @param userID The <code>user_id</code> of the <code>User</code> who has requested the contents
+	 * @param workspaceFolderID The <code>workspace_folder_id</code> of the <code>WorkspaceFolder</code>
+	 * 							whose contents are requested
+	 * @param mode It can be either 1(AUTHORING) or 2(MONITORING)
+	 * @return String The required information in WDDX format 
+	 * @throws Exception
+	 */
+	public String getFolderContentsExcludeHome(Integer userID, Integer workspaceFolderID, Integer mode)throws Exception;
+	
+	/**
 	 * This method creates a new folder under the given parentFolder
 	 * inside the user's default workspace.
 	 * 
@@ -282,7 +297,6 @@ public interface IWorkspaceManagementService {
 	 * The information returned is categorized under 3 main heads
 	 * <ul>
 	 * <li>PRIVATE The folder which belongs to the given User</li>
-	 * <li>RUN_SEQUENCES The folder in which user stores his lessons</li>
 	 * <li>ORGANISATIONS List of folders(root folder only) which belong 
 	 * to organisations of which user is a member.</li>
 	 * </ul>
