@@ -28,19 +28,19 @@
 				<tr>
 	  			<td class="formcontrol">
 	  			<html:form  action="/monitoring/viewAllMarks">
-					<html:hidden property="toolSessionID" value="${sessionID}"/>
+					<html:hidden property="toolSessionID" value="${toolSessionID}"/>
 		  			<html:submit property="viewAllMarks" value="View all marks"/>
   				</html:form>
 	  			</td>
 	  			<td class="formcontrol">
 	  			<html:form  action="/monitoring/releaseMarks">
-					<html:hidden property="toolSessionID" value="${sessionID}"/>
+					<html:hidden property="toolSessionID" value="${toolSessionID}"/>
 		  			<html:submit property="releaseMarks" value="Release marks"/>
   				</html:form>
 	  			</td>
 	  			<td class="formcontrol">
 	  			<html:form  action="/monitoring/downloadMarks">
-					<html:hidden property="toolSessionID" value="${sessionID}"/>
+					<html:hidden property="toolSessionID" value="${toolSessionID}"/>
 		  			<html:submit property="downloadMarks" value="Download marks"/>
   				</html:form>
 	  			</td>

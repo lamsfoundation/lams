@@ -1,4 +1,5 @@
 <%@ include file="/includes/taglibs.jsp" %>
+<script type="text/javascript" src="<html:rewrite page='/includes/scripts.jsp'/>"></script>
 	
 	<b>Following files have been submitted by 
 		 <c:out value="${user.loginName}" /> , <c:out value="${user.firstName}" />  <c:out value="${user.lastName}" /> 	
@@ -9,9 +10,9 @@
 			<tr>
 				<td valign="MIDDLE" width="48%">
 					<c:set var="viewtopic">
-						<html:rewrite page="/learning/viewTopic.do?topicId=${topic.message.uid}&create=${topic.message.created.time}" />
+						<html:rewrite page="/monitoring/viewTopic.do?messageID=${topic.message.uid}&create=${topic.message.created.time}" />
 					</c:set> 
-					<html:link href="${viewtopic}">
+					<html:link href="javascript:launchPopup('${viewtopic}');">
 						<c:out value="${topic.message.subject}" />
 					</html:link>
 				</td>

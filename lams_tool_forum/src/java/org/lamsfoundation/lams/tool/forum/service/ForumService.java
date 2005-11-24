@@ -546,6 +546,16 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		this.forumToolContentHandler = toolContentHandler;
 	}
 
-
+	public void releaseMarksForSession(Long sessionID) {
+		List list = messageDao.getBySession(sessionID);
+		Iterator iter = list.iterator();
+		while(iter.hasNext()){
+			Message msg = (Message) iter.next();
+			ForumReport report = msg.getReport();
+			if(report != null)
+				report.setDateMarksReleased(new Date());
+			messageDao.saveOrUpdate(msg);
+		}
+	}
 
 }

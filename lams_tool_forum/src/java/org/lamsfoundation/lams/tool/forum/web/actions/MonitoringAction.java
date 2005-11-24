@@ -20,6 +20,10 @@
  */
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,8 +33,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.util.StringUtil;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -102,9 +110,13 @@ public class MonitoringAction extends Action {
 		 if (param.equals("statistic")) {
 			 return statistic(mapping,form, request, response);
 		 }
-		 
+		 //***************** Miscellaneous ********************		 
+		 if (param.equals("viewTopic")) {
+			 return viewTopic(mapping,form, request, response);
+		 }
 		 return mapping.findForward("error");
 	 }
+
 
 	private ActionForward listContentUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -130,23 +142,135 @@ public class MonitoringAction extends Action {
 
 	private ActionForward viewAllMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		forumService = getForumService();
+		List topicList = forumService.getRootTopics(sessionID);
 		
-		
+		Map topicsByUser = getTopicsSortedByAuthor(topicList);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+		request.setAttribute("report",topicsByUser);
 		return mapping.findForward("success");
 	}
 
+
 	private ActionForward releaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+
 		
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		//get service then update report table
+		forumService = getForumService();
+		forumService.releaseMarksForSession(sessionID);
 		
 		return mapping.findForward("success");
 	}
 
 	private ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+		forumService = getForumService();
+		List topicList = forumService.getRootTopics(sessionID);
+		//construct Excel file format and download
+		ActionMessages errors = new ActionMessages();
+		try {
+			//create an empty excel file
+			HSSFWorkbook wb = new HSSFWorkbook();
+			HSSFSheet sheet = wb.createSheet("Marks");
+			sheet.setColumnWidth((short)0,(short)5000);
+			HSSFRow row,row1=null,row2=null,row3=null,row4=null,row5=null;
+			HSSFCell cell;
+			Iterator iter = getTopicsSortedByAuthor(topicList).values().iterator();
+			Iterator dtoIter; 
+			boolean first = true;
+			int idx = 0;
+			int fileCount = 0;
+			while(iter.hasNext()){
+				List list = (List) iter.next();
+				dtoIter = list.iterator();
+				first = true;
+				
+				while(dtoIter.hasNext()){
+					MessageDTO dto = (MessageDTO) dtoIter.next();
+					if(first){
+						first = false;
+						row1 = sheet.createRow(0);
+						cell = row1.createCell((short) idx);
+						cell.setCellValue("Subject");
+						sheet.setColumnWidth((short)idx,(short)8000);
+						++idx;
+						
+						cell = row1.createCell((short) idx);
+						cell.setCellValue("Author");
+						sheet.setColumnWidth((short)idx,(short)8000);
+						++idx;
+						
+						cell = row1.createCell((short) idx);
+						cell.setCellValue("Date");
+						sheet.setColumnWidth((short)idx,(short)8000);
+						++idx;
+						
+						cell = row1.createCell((short) idx);
+						cell.setCellValue("Marks");
+						sheet.setColumnWidth((short)idx,(short)8000);
+						++idx;
+						
+						cell = row1.createCell((short) idx);
+						cell.setCellValue("Comments");
+						sheet.setColumnWidth((short)idx,(short)8000);
+						++idx;
+					}
+					++fileCount;
+					idx = 0;
+					row1 = sheet.createRow(fileCount);
+					cell = row1.createCell((short) idx++);
+					cell.setCellValue(dto.getMessage().getSubject());
+					
+					cell = row1.createCell((short) idx++);
+					cell.setCellValue(dto.getAuthor());
+					
+					cell = row1.createCell((short) idx++);
+					cell.setCellValue(DateFormat.getInstance().format(dto.getMessage().getCreated()));
+					
+					cell = row1.createCell((short) idx++);
+					
+					if(dto.getMessage() != null && dto.getMessage().getReport() != null)
+						cell.setCellValue(new Double(dto.getMessage().getReport().getMark()).doubleValue());
+					else
+						cell.setCellValue("");
+					
+					cell = row1.createCell((short) idx++);
+					if(dto.getMessage() != null && dto.getMessage().getReport() != null)
+						cell.setCellValue(dto.getMessage().getReport().getComment());
+					else
+						cell.setCellValue("");
+				}
+			}
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			wb.write(bos);
+			//construct download file response header
+			String fileName = "marks" + sessionID+".xls";
+			String mineType = "application/vnd.ms-excel";
+			String header = "attachment; filename=\"" + fileName + "\";";
+			response.setContentType(mineType);
+			response.setHeader("Content-Disposition",header);
+
+			byte[] data = bos.toByteArray();
+			response.getOutputStream().write(data,0,data.length);
+			response.getOutputStream().flush();
+		} catch (IOException e) {
+			log.error(e);
+			errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("monitoring.download.error",e.toString()));
+		}
+
+		if(!errors.isEmpty()){
+			saveErrors(request,errors);
+			request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+			return mapping.getInputForward();
+		}
+			
 		
-		
-		return mapping.findForward("success");
+		return null;
 	}
 
 	private ActionForward viewUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -321,6 +445,17 @@ public class MonitoringAction extends Action {
 		return mapping.findForward("success");
 	}
 
+	private ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+    	
+    	Long msgUid = new Long(WebUtil.readLongParam(request,ForumConstants.MESSAGE_UID));
+		
+    	forumService = getForumService();
+    	Message topic = forumService.getMessage(msgUid);
+    	
+		request.setAttribute(ForumConstants.AUTHORING_TOPIC,MessageDTO.getMessageDTO(topic));
+    	return mapping.findForward("success");
+	}
 
 	//==========================================================================================
 	// Utility methods
@@ -337,4 +472,28 @@ public class MonitoringAction extends Action {
   	    }
   	    return forumService;
   	}
+  	
+
+	/**
+	 * @param topicList
+	 * @return
+	 */
+	private Map getTopicsSortedByAuthor(List topicList) {
+		Map topicsByUser = new HashMap();
+		Iterator iter = topicList.iterator();
+		while(iter.hasNext()){
+			MessageDTO dto = (MessageDTO) iter.next();
+			ForumReport report = dto.getMessage().getReport();
+			if(report != null){
+				log.info("REPROT MARK" + report.getMark());
+			}
+			List list = (List) topicsByUser.get(dto.getMessage().getCreatedBy());
+			if(list == null){
+				list = new ArrayList();
+				topicsByUser.put(dto.getMessage().getCreatedBy(),list);
+			}
+			list.add(dto);
+		}
+		return topicsByUser;
+	}
 }

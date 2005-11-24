@@ -219,6 +219,7 @@
 		</action>
 		<action path="/monitoring/downloadMarks"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			input="tiles:/monitoring/forum/listContentUsers"
 			name="emptyForm"
 			scope="request"
 			validate="false"
@@ -231,7 +232,7 @@
 			scope="request"
 			validate="false"
 			parameter="viewAllMarks" >
-			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
+			<forward name="success" path="tiles:/monitoring/forum/viewAllMarks" />
 		</action>
 		
 		<!--  EDIT MARK		 -->
@@ -303,6 +304,11 @@
 			<forward name="success" path="tiles:/monitoring/forum/listContentUsers" />
 		</action>
 		
+		<action path="/monitoring/viewTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			parameter="viewTopic">
+			<forward name="success" path="tiles:/monitoring/forum/viewTopic" />
+		</action>
 		<!-- ========== END: Monitoring  Definitions ============================== -->
 		<!-- System level actions -->
 		<action path="/index" type="org.apache.struts.actions.ForwardAction"

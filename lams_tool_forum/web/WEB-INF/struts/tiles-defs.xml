@@ -78,6 +78,10 @@
     	<put name="pageTitleKey" value="page.title.monitoring.content.userlist"/>
     	<put name="body" value="/jsps/monitoring/contentuserlist.jsp"/>
 	</definition>
+	<definition name="tiles:/monitoring/forum/viewAllMarks" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
+    	<put name="body" value="/jsps/monitoring/viewallmarks.jsp"/>
+	</definition>
 	<definition name="tiles:/monitoring/forum/viewUserMark" extends="tiles:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
     	<put name="body" value="/jsps/monitoring/usermarklist.jsp"/>
@@ -97,6 +101,11 @@
 	<definition name="tiles:/monitoring/forum/viewInstructions" extends="tiles:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.instructions"/>
     	<put name="body" value="/jsps/monitoring/instructions.jsp"/>
+	</definition>
+	
+	<definition name="tiles:/monitoring/forum/viewTopic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
+    	<put name="body" value="/jsps/monitoring/viewtopic.jsp"/>
 	</definition>
 	<!-- E: Monitoring -->
 	

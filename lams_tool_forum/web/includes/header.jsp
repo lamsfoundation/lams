@@ -6,8 +6,8 @@
 <head>
 <title><bean:message key="appName" /></title>
 
-<link href="<c:out value="${lams}"/>/css/aqua.css" rel="stylesheet" type="text/css">
-<script src='<c:out value="${lams}"/>/includes/javascript/common.js'></script>
+<link href="<c:out value="${lams}"/>css/aqua.css" rel="stylesheet" type="text/css">
+<script src='<c:out value="${lams}"/>includes/javascript/common.js'></script>
 
 <script lang="javascript">
 <html:javascript dynamicJavascript="false" staticJavascript="true"/>

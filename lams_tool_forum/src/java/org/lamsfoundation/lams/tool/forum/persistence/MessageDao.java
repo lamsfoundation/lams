@@ -16,12 +16,18 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class MessageDao extends HibernateDaoSupport {
 	private static final String SQL_QUERY_FIND_ROOT_TOPICS = "from " + Message.class.getName() 
 					+ " where parent_uid is null and forum_session_uid=?";
+	
 	private static final String SQL_QUERY_FIND_TOPICS_FROM_AUTHOR = "from " + Message.class.getName()
 					+ " where is_authored = true and forum_uid=?";
+	
 	private static final String SQL_QUERY_FIND_CHILDREN = "from " + Message.class.getName()
 					+ " where parent=?";
+	
 	private static final String SQL_QUERY_BY_USER_SESSION = "from " + Message.class.getName() + " m "
 					+ " where m.createdBy.uid = ? and  m.toolSession.uid=?";
+	
+	private static final String SQL_QUERY_BY_SESSION = "from " + Message.class.getName() + " m "
+					+ " where m.toolSession.uid=?";
 	
 	public void saveOrUpdate(Message message) {
 		message.updateModificationData();
@@ -83,6 +89,11 @@ public class MessageDao extends HibernateDaoSupport {
 	public List getByUserAndSession(Long userId, Long sessionId) {
 		return this.getHibernateTemplate().find(SQL_QUERY_BY_USER_SESSION, new Object[]{userId,sessionId});
 	}
+	
+	public List getBySession(Long sessionId) {
+		return this.getHibernateTemplate().find(SQL_QUERY_BY_SESSION, sessionId);
+	}
+	
 
 
 }
