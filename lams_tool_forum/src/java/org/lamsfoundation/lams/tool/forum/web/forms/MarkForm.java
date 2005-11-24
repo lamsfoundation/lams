@@ -26,6 +26,8 @@ import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.validator.ValidatorForm;
+import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 /**
  * @struts.form name="markForm"
  * @author Steve.Ni
@@ -38,7 +40,11 @@ public class MarkForm  extends ValidatorForm{
 	
 	private String mark;
 	private String comment;
-    /**
+	private ForumUser user;
+	private MessageDTO messageDto;
+	private Long sessionId;
+
+	/**
      * MessageForm validation method from STRUCT interface.
      * 
      */
@@ -48,16 +54,16 @@ public class MarkForm  extends ValidatorForm{
         try{
             if ("".equals(mark)) {
               ActionMessage error = new ActionMessage("error.valueReqd");
-              errors.add("message.mark", error);
+              errors.add("report.mark", error);
             }else if(!NumberUtils.isNumber(mark)){
             	ActionMessage error = new ActionMessage("error.mark.needNumber");
-            	errors.add("message.mark", error);
+            	errors.add("report.mark", error);
             }else {
             	try{
             		Integer.parseInt(mark);
             	}catch(Exception e){
                   	ActionMessage error = new ActionMessage("error.mark.needInteger");
-                	errors.add("message.mark", error);
+                	errors.add("report.mark", error);
             	}
             }
         } catch (Exception e) {
@@ -77,5 +83,28 @@ public class MarkForm  extends ValidatorForm{
 	}
 	public void setMark(String mark) {
 		this.mark = mark;
+	}
+	
+    public MessageDTO getMessageDto() {
+		return messageDto;
+	}
+
+	public void setMessageDto(MessageDTO message) {
+		this.messageDto = message;
+	}
+
+	public ForumUser getUser() {
+		return user;
+	}
+
+	public void setUser(ForumUser user) {
+		this.user = user;
+	}
+	public Long getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(Long sessionId) {
+		this.sessionId = sessionId;
 	}
 }

@@ -1,5 +1,5 @@
 <%@include file="../sharing/share.jsp" %>
-<%@ taglib uri="fck-editor" prefix="FCK"%>
+<%@ taglib uri="tags-fck-editor" prefix="FCK"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale="true">

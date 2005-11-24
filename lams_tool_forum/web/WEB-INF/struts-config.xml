@@ -279,21 +279,23 @@
 		<action path="/monitoring/editMark"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
 			name="markForm"
-			scope="request"
+			scope="session"
 			validate="false"			
 			parameter="editMark" >
 			<forward name="success" path="tiles:/monitoring/forum/editUserMark" />
 		</action>
 		<action path="/monitoring/updateMark"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			input="tiles:/monitoring/forum/editUserMark"
 			name="markForm"
 			scope="request"
 			validate="true"
 			parameter="updateMark" >
-			<forward name="success" path="tiles:/monitoring/forum/editUserMark" />
+			<forward name="success" path="tiles:/monitoring/forum/viewUserMark" />
 		</action>
 		<action path="/monitoring/viewActivity"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			input="tiles:/monitoring/forum/viewActivity"
 			name="emptyForm"
 			scope="request"
 			validate="false"
@@ -302,11 +304,16 @@
 		</action>
 		<action path="/monitoring/editActivity"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			input="tiles:/monitoring/forum/editActivity"
+			name="emptyForm"
+			scope="request"
+			validate="false"			
 			parameter="editActivity" >
 			<forward name="success" path="tiles:/monitoring/forum/editActivity" />
 		</action>
 		<action path="/monitoring/updateActivity"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			input="tiles:/monitoring/forum/editActivity"
 			name="emptyForm"
 			scope="request"
 			validate="false"
@@ -314,6 +321,7 @@
 			<forward name="success" path="tiles:/monitoring/forum/viewActivity" />
 		</action>
 		<action path="/monitoring/viewInstructions"
+			input="tiles:/monitoring/forum/viewInstructions"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
 			parameter="viewInstructions" >
 			<forward name="success" path="tiles:/monitoring/forum/viewInstructions" />

@@ -95,7 +95,7 @@
     	<put name="body" value="/jsps/monitoring/editactivity.jsp"/>
 	</definition>
 	<definition name="tiles:/monitoring/forum/viewInstructions" extends="tiles:layout">
-    	<put name="pageTitleKey" value="page.title.monitoring.edit.activity"/>
+    	<put name="pageTitleKey" value="page.title.monitoring.view.instructions"/>
     	<put name="body" value="/jsps/monitoring/instructions.jsp"/>
 	</definition>
 	<!-- E: Monitoring -->

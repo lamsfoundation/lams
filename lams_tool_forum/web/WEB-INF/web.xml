@@ -225,17 +225,13 @@
     <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
 </taglib>
 
-	<!--  ======================================================== -->	
-	<!--   Customized Tag Library -->
-	<!--  ======================================================== -->	
-	<taglib>
-	    <taglib-uri>fck-editor</taglib-uri>
-	    <taglib-location>/WEB-INF/fckeditor/FCKeditor.tld</taglib-location>
-	</taglib>
-	<taglib>
-	   <taglib-uri>tags-lams</taglib-uri>
-	   <taglib-location>/WEB-INF/lams.tld</taglib-location>
-	</taglib>
+<!--  ======================================================== -->	
+<!--   Customized Tag Library -->
+<!--  ======================================================== -->	
+<taglib>
+   <taglib-uri>tags-lams</taglib-uri>
+   <taglib-location>/WEB-INF/lams.tld</taglib-location>
+</taglib>
 
    <!--
    To set up security settings for your web app, create a file named web-security.xml, put it in your project's mergedir.

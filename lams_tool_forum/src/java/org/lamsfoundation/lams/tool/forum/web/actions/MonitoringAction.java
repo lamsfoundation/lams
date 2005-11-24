@@ -28,11 +28,16 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.util.StringUtil;
 import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
@@ -166,29 +171,33 @@ public class MonitoringAction extends Action {
 		Long messageId = new Long(WebUtil.readLongParam(request,ForumConstants.MESSAGE_UID));
 		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		
+		//get Message and User from database
 		forumService = getForumService();
 		Message msg  = forumService.getMessage(messageId);
 		ForumUser user = forumService.getUser(userUid);
 		
-		//each back to web page
+		//echo back to web page
+		MarkForm markForm = (MarkForm) form;
 		if(msg.getReport() != null){
-			MarkForm markForm = (MarkForm) form;
 			markForm.setMark(new Integer(msg.getReport().getMark()).toString());
 			markForm.setComment(msg.getReport().getComment());
 		}
-		request.setAttribute("message",MessageDTO.getMessageDTO(msg));
-		request.setAttribute("user",user);
-		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
+		markForm.setUser(user);
+		markForm.setMessageDto(MessageDTO.getMessageDTO(msg));
+		markForm.setSessionId(sessionId);
 		return mapping.findForward("success");
 	}
 
 	private ActionForward updateMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long messageId = new Long(WebUtil.readLongParam(request,ForumConstants.MESSAGE_UID));
+		Long userUid = new Long(WebUtil.readLongParam(request,ForumConstants.USER_UID));
+		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		
 		forumService = getForumService();
 		Message msg  = forumService.getMessage(messageId);
 		
+		//save it into database
 		MarkForm markForm = (MarkForm) form;
 		forumService = getForumService();
 		ForumReport report = msg.getReport();
@@ -200,14 +209,29 @@ public class MonitoringAction extends Action {
 		report.setComment(markForm.getComment());
 		forumService.updateTopic(msg);
 		
+		//echo back to web page
+		forumService = getForumService();
+		List messageList = forumService.getMessagesByUserUid(userUid,sessionId);
+		ForumUser user = forumService.getUser(userUid);
+		request.setAttribute("topicList",messageList);
+		request.setAttribute("user",user);
+		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		return mapping.findForward("success");
+		
 	}
 	
 	private ActionForward viewActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		forumService = getForumService();
-		Forum forum = forumService.getForum(contentId);
+		Forum forum = forumService.getForumByContentId(contentId);
+		//if can not find out forum, echo back error message
+		if(forum == null){
+			ActionErrors errors = new ActionErrors();
+			errors.add("activity.globel", new ActionMessage("error.fail.get.forum"));
+			this.addErrors(request,errors);
+			return mapping.getInputForward();
+		}
 		String title = forum.getTitle();
 		String instruction = forum.getInstructions();
 		
@@ -221,11 +245,19 @@ public class MonitoringAction extends Action {
 		
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		forumService = getForumService();
-		Forum forum = forumService.getForum(contentId);
+		Forum forum = forumService.getForumByContentId(contentId);
+		//if can not find out forum, echo back error message
+		if(forum == null){
+			ActionErrors errors = new ActionErrors();
+			errors.add("activity.globel", new ActionMessage("error.fail.get.forum"));
+			this.addErrors(request,errors);
+			//echo back to screen
+			request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentId);
+			return mapping.getInputForward();
+		}
 		
 		String title = forum.getTitle();
 		String instruction = forum.getInstructions();
-		
 		request.setAttribute("title",title);
 		request.setAttribute("instruction",instruction);
 		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentId);
@@ -239,7 +271,23 @@ public class MonitoringAction extends Action {
 		String instruction = request.getParameter("instruction");
 		
 		forumService = getForumService();
-		Forum forum = forumService.getForum(contentId);
+		Forum forum = forumService.getForumByContentId(contentId);
+		//if can not find out forum, echo back error message
+		ActionErrors errors = new ActionErrors();
+		if(forum == null){
+			errors.add("activity.globel", new ActionMessage("error.fail.get.forum"));
+		}
+		if(StringUtils.isEmpty(title)){
+			errors.add("activity.title", new ActionMessage("error.title.empty"));
+		}
+		//echo back to screen
+		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentId);
+		request.setAttribute("title",title);
+		request.setAttribute("instruction",instruction);			
+		if(!errors.isEmpty()){
+			this.addErrors(request,errors);
+			return mapping.getInputForward();
+		}
 		forum.setTitle(title);
 		forum.setInstructions(instruction);
 		forumService.updateForum(forum);
@@ -252,7 +300,14 @@ public class MonitoringAction extends Action {
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 		
 		forumService = getForumService();
-		Forum forum = forumService.getForum(contentId);
+		Forum forum = forumService.getForumByContentId(contentId);
+		//if can not find out forum, echo back error message
+		if(forum == null){
+			ActionErrors errors = new ActionErrors();
+			errors.add("instruction.globel", new ActionMessage("error.fail.get.forum"));
+			this.addErrors(request,errors);
+			return mapping.getInputForward();
+		}
 		
 		ForumForm forumForm = new ForumForm();
 		forumForm.setForum(forum);

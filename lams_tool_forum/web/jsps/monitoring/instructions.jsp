@@ -81,7 +81,11 @@
 				</div>
 			</td>
 		</tr>
-	
+		<tr>
+			 <td class="formlabel" colspan="2">
+				  	<html:errors property="instruction.globel"/>
+			  </td>
+		</tr>					
 		</tr>
 
 	</table>
