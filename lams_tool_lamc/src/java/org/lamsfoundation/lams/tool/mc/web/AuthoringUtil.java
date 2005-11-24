@@ -3,21 +3,29 @@
  */
 package org.lamsfoundation.lams.tool.mc.web;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
+import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
@@ -27,6 +35,83 @@ import org.lamsfoundation.lams.tool.mc.service.IMcService;
  */
 public class AuthoringUtil implements McAppConstants {
 	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
+	
+	
+	/**
+     * populates request parameters
+     * populateParameters(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     */
+    protected static void populateParameters(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+    {
+        String selectedQuestion=request.getParameter(SELECTED_QUESTION);
+    	logger.debug("read parameter selectedQuestion: " + selectedQuestion);
+    	
+    	if ((selectedQuestion != null) && (selectedQuestion.length() > 0))
+    	{
+    		request.getSession().setAttribute(SELECTED_QUESTION,selectedQuestion);
+    		logger.debug("updated SELECTED_QUESTION");
+    	}
+    	
+    	
+    	mcAuthoringForm.setRemoveQuestion(null);
+    	mcAuthoringForm.setEditOptions(null);
+    	mcAuthoringForm.setMoveUp(null);
+    	mcAuthoringForm.setMoveDown(null);
+    	mcAuthoringForm.setRemoveOption(null);
+    	mcAuthoringForm.setViewFileItem(null);
+    	
+    	String editOptions=request.getParameter("editOptions");
+    	logger.debug("parameter editOptions" + editOptions);
+    	if ((editOptions != null) && editOptions.equals("1"))
+    	{
+    		logger.debug("parameter editOptions is selected " + editOptions);
+    		mcAuthoringForm.setEditOptions("1");
+    	}
+    	
+    	String removeQuestion=request.getParameter("removeQuestion");
+    	logger.debug("parameter removeQuestion" + removeQuestion);
+    	if ((removeQuestion != null) && removeQuestion.equals("1"))
+    	{
+    		logger.debug("parameter removeQuestion is selected " + removeQuestion);
+    		mcAuthoringForm.setRemoveQuestion("1");
+    	}
+    	
+    	String moveDown=request.getParameter("moveDown");
+    	logger.debug("parameter moveDown" + moveDown);
+    	if ((moveDown != null) && moveDown.equals("1"))
+    	{
+    		logger.debug("parameter moveDown is selected " + moveDown);
+    		mcAuthoringForm.setMoveDown("1");
+    	}
+
+    	String moveUp=request.getParameter("moveUp");
+    	logger.debug("parameter moveUp" + moveUp);
+    	if ((moveUp != null) && moveUp.equals("1"))
+    	{
+    		logger.debug("parameter moveUp is selected " + moveUp);
+    		mcAuthoringForm.setMoveUp("1");
+    	}
+    	
+    	String removeOption=request.getParameter("removeOption");
+    	logger.debug("parameter removeOption" + removeOption);
+    	if ((removeOption != null) && removeOption.equals("1"))
+    	{
+    		logger.debug("parameter removeOption is selected " + removeOption);
+    		mcAuthoringForm.setRemoveOption("1");
+    	}
+    	
+    	String viewFileItem=request.getParameter("viewFileItem");
+    	logger.debug("parameter viewFileItem" + viewFileItem);
+    	if ((viewFileItem != null) && viewFileItem.equals("1"))
+    	{
+    		logger.debug("parameter viewFileItem is selected " + viewFileItem);
+    		mcAuthoringForm.setViewFileItem("1");
+    	}
+    }
+
 	
 	 public static Map repopulateCurrentCheckBoxStatesMap(HttpServletRequest request)
 	    {
@@ -460,6 +545,386 @@ public class AuthoringUtil implements McAppConstants {
     	}
     	
     	return mapCorrectFeedback;
+    }
+
+    
+    /**
+     * creates the options for a particular question in the db
+     * persistOptionsFinal(HttpServletRequest request, Map currentOptions, Map selectedOptions, McQueContent mcQueContent)
+     * 
+     * @param request
+     * @param currentOptions
+     * @param selectedOptions
+     * @param mcQueContent
+     */
+    public static void persistOptionsFinal(HttpServletRequest request, Map currentOptions, Map selectedOptions, McQueContent mcQueContent)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+        logger.debug("passed currentOptions: " + currentOptions);
+        logger.debug("passed selectedOptions: " + selectedOptions);
+        
+        Iterator itCurrentOptions = currentOptions.entrySet().iterator();
+        
+        
+        boolean selected=false;
+        while (itCurrentOptions.hasNext()) 
+        {
+            Map.Entry pairs = (Map.Entry)itCurrentOptions.next();
+            logger.debug("checking the current options  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            selected=false;
+            Iterator itSelectedOptions = selectedOptions.entrySet().iterator();    
+            while (itSelectedOptions.hasNext())
+            {
+            	Map.Entry selectedPairs = (Map.Entry)itSelectedOptions.next();
+            	logger.debug("checking the selected options  pair: " +  selectedPairs.getKey() + " = " + selectedPairs.getValue());
+            	selected=false;
+            	if (pairs.getValue().equals(selectedPairs.getValue()))
+            	{
+            		selected=true;
+            		logger.debug("set selected to true for: " + pairs.getValue());
+            		break;
+            	}
+            }
+            
+            logger.debug("pre-persist mcOptionsContent: " + pairs.getValue() + " " + selected);
+            logger.debug("pre-persist mcOptionsContent, using mcQueContent: " + mcQueContent);
+            McOptsContent mcOptionsContent= new McOptsContent(selected,pairs.getValue().toString() , mcQueContent, new HashSet());
+	        logger.debug("created mcOptionsContent: " + mcOptionsContent);
+   	        mcService.saveMcOptionsContent(mcOptionsContent);
+   	        logger.debug("persisted the answer: " + pairs.getValue().toString());
+        }
+    }
+
+
+    
+    /**
+     * prepares the data to persist options in the db
+     * persistOptions(HttpServletRequest request, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, McQueContent mcQueContent, String questionIndex)
+     * 
+     * @param request
+     * @param mapGeneralOptionsContent
+     * @param mapGeneralSelectedOptionsContent
+     * @param mcQueContent
+     * @param questionIndex
+     */
+    public static void persistOptions(HttpServletRequest request, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, McQueContent mcQueContent, String questionIndex)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	logger.debug("passed questionIndex: " +  questionIndex);
+    	
+    	Iterator itOptionsMap = mapGeneralOptionsContent.entrySet().iterator();
+    	while (itOptionsMap.hasNext()) {
+            Map.Entry pairs = (Map.Entry)itOptionsMap.next();
+            logger.debug("checking the general options  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
+            {
+            	Iterator itSelectedOptionsMap = mapGeneralSelectedOptionsContent.entrySet().iterator();    	
+            	while (itSelectedOptionsMap.hasNext()) 
+            	{
+            		Map.Entry selectedPairs = (Map.Entry)itSelectedOptionsMap.next();
+                    logger.debug("checking the general selected options pair: " +  selectedPairs.getKey() + " = " + selectedPairs.getValue());
+                    
+                    logger.debug("dubuging: " +  pairs.getKey() + "---" + questionIndex);
+                    if (pairs.getKey().equals(selectedPairs.getKey())  && questionIndex.equals(pairs.getKey())) 
+            		{
+                    	logger.debug("using updated equal question: " +  pairs.getKey());
+                    	Map currentOptions=(Map) pairs.getValue();
+                    	Map selectedOptions=(Map) selectedPairs.getValue();
+             
+                    	persistOptionsFinal(request, currentOptions,selectedOptions,mcQueContent);
+            		}
+            	}
+            }
+        }
+    }
+    
+    
+    /**
+     * creates the questions content in the db.
+     * createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @return
+     */
+    public static McContent createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	/* the tool content id is passed from the container to the tool and placed into session in the McStarterAction */
+    	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	if ((toolContentId != null) && (toolContentId.longValue() != 0))
+    	{
+    		logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
+    		/*delete the existing content in the database before applying new content*/
+    		mcService.deleteMcById(toolContentId);  
+    		logger.debug("post-deletion existing content");
+		}
+    	
+		String title;
+    	String instructions;
+    	Long createdBy;
+    	String monitoringReportTitle="";
+    	String reportTitle="";
+    	
+    	String offlineInstructions="";
+    	String onlineInstructions="";
+    	String endLearningMessage="";
+    	String creationDate="";
+    	int passmark=0;
+    	
+    	boolean isQuestionsSequenced=false;
+    	boolean isSynchInMonitor=false;
+    	boolean isUsernameVisible=false;
+    	boolean isRunOffline=false;
+    	boolean isDefineLater=false;
+    	boolean isContentInUse=false;
+    	boolean isRetries=false;
+    	boolean isShowFeedback=false;
+    	boolean isSln=false;
+    	
+    	logger.debug("isQuestionsSequenced: " +  mcAuthoringForm.getQuestionsSequenced());
+    	if (mcAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
+    		isQuestionsSequenced=true;
+    	
+    	logger.debug("isSynchInMonitor: " +  mcAuthoringForm.getSynchInMonitor());
+    	if (mcAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
+    		isSynchInMonitor=true;
+    	
+    	logger.debug("isUsernameVisible: " +  mcAuthoringForm.getUsernameVisible());
+    	if (mcAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
+    		isUsernameVisible=true;
+    	
+    	logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
+    	if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
+    		isRetries=true;
+    	
+    	
+		logger.debug("isSln" +  mcAuthoringForm.getSln());
+		if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
+			isSln=true;
+    	
+    	logger.debug("passmark: " +  mcAuthoringForm.getPassmark());
+    	if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0)) 
+    		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
+    	
+    	logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
+    	if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
+    		isShowFeedback=true;
+    	    	
+    	logger.debug("MONITORING_REPORT_TITLE: " +  mcAuthoringForm.getMonitoringReportTitle());
+    	monitoringReportTitle=mcAuthoringForm.getMonitoringReportTitle();
+    	if ((monitoringReportTitle == null) || (monitoringReportTitle.length() == 0)) 
+    		monitoringReportTitle=(String)request.getSession().getAttribute(MONITORING_REPORT_TITLE);
+    	
+    	reportTitle=mcAuthoringForm.getReportTitle();
+    	logger.debug("REPORT_TITLE: " +  mcAuthoringForm.getReportTitle());
+    	if ((reportTitle == null) || (reportTitle.length() == 0)) 
+    		reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
+    	
+    			
+    	endLearningMessage=mcAuthoringForm.getEndLearningMessage();
+    	logger.debug("END_LEARNING_MESSAGE: " +  mcAuthoringForm.getEndLearningMessage());
+    	if ((endLearningMessage == null) || (endLearningMessage.length() == 0))
+    		endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSAGE);
+
+    	String richTextTitle="";
+    	richTextTitle = (String)request.getSession().getAttribute(RICHTEXT_TITLE);
+    	logger.debug("createContent richTextTitle from session: " + richTextTitle);
+    	if (richTextTitle == null) richTextTitle="";
+    	
+    	String richTextInstructions="";
+    	richTextInstructions = (String)request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
+    	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
+    	if (richTextInstructions == null) richTextInstructions="";
+
+    	String richTextOfflineInstructions="";
+    	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+    	logger.debug("createContent richTextOfflineInstructions from session: " + richTextOfflineInstructions);
+    	if (richTextOfflineInstructions == null) richTextOfflineInstructions="";
+    	
+    	String richTextOnlineInstructions="";
+    	richTextOnlineInstructions = (String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+    	logger.debug("createContent richTextOnlineInstructions from session: " + richTextOnlineInstructions);
+    	if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
+    	
+    	
+    	String richTextReportTitle=(String)request.getSession().getAttribute(RICHTEXT_REPORT_TITLE);
+		logger.debug("richTextReportTitle: " + richTextReportTitle);
+		
+		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
+		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
+    	
+    	creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
+		if (creationDate == null)
+			creationDate=new Date(System.currentTimeMillis()).toString();
+		
+    		
+    	/*obtain user object from the session*/
+	    HttpSession ss = SessionManager.getSession();
+	    /* get back login user DTO */
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    	logger.debug("retrieving toolUser: " + toolUser);
+    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
+    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
+    	logger.debug("retrieving toolUser fullname: " + fullName);
+    	long userId=toolUser.getUserID().longValue();
+    	logger.debug("userId: " + userId);
+    	
+    	/* create a new qa content and leave the default content intact*/
+    	McContent mc = new McContent();
+		mc.setMcContentId(toolContentId);
+		mc.setTitle(richTextTitle);
+		mc.setInstructions(richTextInstructions);
+		mc.setCreationDate(creationDate); /*preserve this from the db*/ 
+		mc.setUpdateDate(new Date(System.currentTimeMillis())); /* keep updating this one*/
+		mc.setCreatedBy(userId); /* make sure we are setting the userId from the User object above*/
+	    mc.setUsernameVisible(isUsernameVisible);
+	    mc.setQuestionsSequenced(isQuestionsSequenced); /* the default question listing in learner mode will be all in the same page*/
+	    mc.setOnlineInstructions(richTextOnlineInstructions);
+	    mc.setOfflineInstructions(richTextOfflineInstructions);
+	    mc.setRunOffline(false);
+	    mc.setDefineLater(false);
+	    mc.setSynchInMonitor(isSynchInMonitor);
+	    mc.setContentInUse(isContentInUse);
+	    mc.setEndLearningMessage(endLearningMessage);
+	    mc.setRunOffline(isRunOffline);
+	    mc.setReportTitle(richTextReportTitle);
+	    mc.setMonitoringReportTitle(monitoringReportTitle);
+	    mc.setEndLearningMessage(richTextEndLearningMessage);
+	    mc.setRetries(isRetries);
+	    mc.setPassMark(new Integer(passmark));
+	    mc.setShowReport(isSln);
+	    mc.setShowFeedback(isShowFeedback);
+	    mc.setMcQueContents(new TreeSet());
+	    mc.setMcSessions(new TreeSet());
+	    logger.debug("mc content :" +  mc);
+    	
+    	/*create the content in the db*/
+        mcService.createMc(mc);
+        logger.debug("mc created with content id: " + toolContentId);
+        
+        return mc;
+    }
+
+    
+    public static void cleanupExistingQuestions(HttpServletRequest request, McContent mcContent)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	logger.debug("remove questions by  mcQueContent uid : " + mcContent.getUid());
+    	mcService.cleanAllQuestionsSimple(mcContent.getUid());
+    }
+    
+    
+    /**
+     * creates the questions from the user in the db and makes a call to persist options.
+     * persistQuestions(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McContent mcContent)
+     *  
+     * @param request
+     * @param mapQuestionsContent
+     * @param mapFeedbackIncorrect
+     * @param mapFeedbackCorrect
+     * @param mcContent
+     */
+    public static void persistQuestions(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McContent mcContent)
+	{
+    	IMcService mcService =McUtils.getToolService(request);
+    	logger.debug("mapQuestionsContent to be persisted :" + mapQuestionsContent);
+    	logger.debug("mapFeedbackIncorrect :" + mapFeedbackIncorrect);
+    	logger.debug("mapFeedbackCorrect :" + mapFeedbackCorrect);
+
+    	
+  	    Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("final MAP_GENERAL_OPTIONS_CONTENT :" + mapGeneralOptionsContent);
+
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("final MAP_GENERAL_SELECTED_OPTIONS_CONTENT :" + mapGeneralSelectedOptionsContent);
+
+    	Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
+		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+		
+    	
+    	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+        while (itQuestionsMap.hasNext()) {
+            Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
+            {
+            	logger.debug("checking existing question text: " +  pairs.getValue().toString() + " and mcContent uid():" + mcContent.getUid());
+            	
+            	String currentFeedbackIncorrect=(String)mapFeedbackIncorrect.get(pairs.getKey());
+        	 	logger.debug("currentFeedbackIncorrect: " +  currentFeedbackIncorrect);
+        	 	if (currentFeedbackIncorrect == null) currentFeedbackIncorrect="";
+        	 	
+        	 	String currentFeedbackCorrect=(String)mapFeedbackCorrect.get(pairs.getKey());
+        	 	logger.debug("currentFeedbackCorrect: " +  currentFeedbackCorrect);
+        	 	if (currentFeedbackCorrect == null) currentFeedbackCorrect=""; 
+            	
+            	String currentWeight=(String) mapWeights.get(pairs.getKey().toString());
+            	logger.debug("currentWeight: " + currentWeight);
+
+            	McQueContent mcQueContent=  new McQueContent(pairs.getValue().toString(),
+              	        	 		new Integer(pairs.getKey().toString()),
+              	        	 		new Integer(currentWeight),
+									false,
+									currentFeedbackIncorrect,
+									currentFeedbackCorrect,
+									mcContent,
+									new HashSet(),
+									new HashSet()
+             						);
+       	        mcService.createMcQue(mcQueContent);
+       	        logger.debug("persisted mcQueContent: " + mcQueContent);
+           	
+        	    logger.debug("remove existing options for  mcQueContent : " + mcQueContent.getUid());
+           	    mcService.removeMcOptionsContentByQueId(mcQueContent.getUid());
+           	    logger.debug("removed all mcOptionsContents for mcQueContentId :" + mcQueContent.getUid());
+     			
+       	         if (mcQueContent != null)
+       	         {
+       	         	logger.debug("pre persistOptions for: " + mcQueContent);
+       	         	logger.debug("sending :" + pairs.getKey().toString());
+       	         	AuthoringUtil.persistOptions(request, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent, mcQueContent, pairs.getKey().toString());
+       	         	logger.debug("post persistOptions"); 	
+       	         }
+            }
+        }
+    	
+	}
+    
+    
+    /**
+     * includes the new question entry in the questions Map
+     * addQuestionMemory(HttpServletRequest request, McAuthoringForm mcAuthoringForm, Map mapQuestionsContent, boolean increaseMapSize)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @param mapQuestionsContent
+     * @param increaseMapSize
+     */
+    public static void addQuestionMemory(HttpServletRequest request, McAuthoringForm mcAuthoringForm, Map mapQuestionsContent, boolean increaseMapSize)
+    {
+    	if (increaseMapSize)
+    	{
+    		int mapSize=mapQuestionsContent.size();
+        	mapQuestionsContent.put(new Long(++mapSize).toString(), "");
+        	logger.debug("updated Questions Map size: " + mapQuestionsContent.size());
+        	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+        	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+        	
+        	
+        	Map mapWeights = (Map) request.getSession().getAttribute(MAP_WEIGHTS);
+        	logger.debug("current mapWeights: " + mapWeights);
+        	int mapWeightsSize=mapWeights.size();
+        	mapWeights.put(new Long(++mapWeightsSize).toString(), "");
+        	logger.debug("updated mapWeights size: " + mapWeights.size());
+        	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+        	logger.debug("updated mapWeights: " + request.getSession().getAttribute(MAP_WEIGHTS));
+    	}
     }
 
     
