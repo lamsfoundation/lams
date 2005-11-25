@@ -246,6 +246,21 @@ public class McServicePOJO implements
         }
 	}
     
+    
+    public List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException
+	{
+    	try
+        {
+        	return mcQueContentDAO.getNextAvailableDisplayOrder(mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting the next available display order: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+    
   
     public void createMcSession(McSession mcSession) throws McApplicationException
     {
@@ -414,16 +429,31 @@ public class McServicePOJO implements
     
     public List getAllQuestionEntries(final Long uid) throws McApplicationException
 	{
-    	   try
-	        {
-	            return mcQueContentDAO.getAllQuestionEntries(uid.longValue());
-	        }
-	        catch (DataAccessException e)
-	        {
-	            throw new McApplicationException("Exception occured when lams is getting by uid  mc question content: "
-	                                                         + e.getMessage(),
-															   e);
-	        }
+	   try
+        {
+            return mcQueContentDAO.getAllQuestionEntries(uid.longValue());
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting by uid  mc question content: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+    
+    
+    public void removeMcQueContentByUID(Long uid) throws McApplicationException
+	{
+ 	   try
+       {
+           mcQueContentDAO.removeMcQueContentByUID(uid);
+       }
+       catch (DataAccessException e)
+       {
+           throw new McApplicationException("Exception occured when lams is removing by uid  mc question content: "
+                                                        + e.getMessage(),
+														   e);
+       }
 	}
    
     

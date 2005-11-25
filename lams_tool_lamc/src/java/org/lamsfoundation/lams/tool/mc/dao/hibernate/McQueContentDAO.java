@@ -52,7 +52,7 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.displayOrder=:displayOrder and mcQueContent.mcContentId=:mcContentUid";
 	 	
-	 	
+	 	private static final String GET_NEXT_AVAILABLE_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId";
 	 		 	
 	 	
 	 	public McQueContent getMcQueContentByUID(Long uid)
@@ -190,6 +190,7 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 			}
 	    }
 
+	 	
 	 	public void cleanAllQuestionsSimple(final Long mcContentUid)
 	    {
 			HibernateTemplate templ = this.getHibernateTemplate();
@@ -209,7 +210,18 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 		    	}
 			}
 	    }
+
 	 	
+	 	public List getNextAvailableDisplayOrder(final long mcContentId)
+	    {
+	        HibernateTemplate templ = this.getHibernateTemplate();
+			List list = getSession().createQuery(GET_NEXT_AVAILABLE_DISPLAY_ORDER)
+				.setLong("mcContentId", mcContentId)
+				.list();
+			
+			return list;
+	    }
+
 	 	
 	 	public void saveMcQueContent(McQueContent mcQueContent)
 	    {

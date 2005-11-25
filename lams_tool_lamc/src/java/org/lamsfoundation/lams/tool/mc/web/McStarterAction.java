@@ -134,12 +134,12 @@ public class McStarterAction extends Action implements McAppConstants {
 			*/
 			if (!existsContent(toolContentId, request))
 			{
-				System.out.print("retrieving default content");
+				logger.debug("retrieving default content");
 				retrieveDefaultContent(request, mcAuthoringForm);
 			}
 			else
 			{
-				System.out.print("retrieving existing content for: " + toolContentId);
+				logger.debug("retrieving existing content for: " + toolContentId);
 				retrieveExistingContent(request, mcAuthoringForm, toolContentId);
 			}
 		}
@@ -433,30 +433,16 @@ public class McStarterAction extends Action implements McAppConstants {
 		McUtils.populateUploadedFilesData(request, mcContent);
 	    logger.debug("populated UploadedFilesData");
 	    
-		AuthoringUtil authoringUtil = new AuthoringUtil();
-		Map mapQuestionsContent=authoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
-		System.out.print("mapQuestionsContent:" + mapQuestionsContent);
+		Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
+		logger.debug("mapQuestionsContent:" + mapQuestionsContent);
 		
 		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 		logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
 		
-		Map mapWeights=authoringUtil.rebuildWeightsMapfromDB(request, new Long(toolContentId));
-		System.out.print("mapWeights:" + mapWeights);
-		
-		/*set the mapWeights */
-		Iterator itWeightsMap = mapWeights.entrySet().iterator();
-		long mapWeightsCounter=0;
-	    while (itWeightsMap.hasNext()) {
-	        Map.Entry pairs = (Map.Entry)itWeightsMap.next();
-	        if (pairs.getValue() != null) 
-	        {
-				System.out.print("the weight is:" + pairs.getValue());
-	        	mapWeightsCounter++;
-	        	mapWeights.put(new Long(mapWeightsCounter).toString(), new Integer(pairs.getValue().toString()));
-	        }
-	    }
+		Map mapWeights=AuthoringUtil.rebuildWeightsMapfromDB(request, new Long(toolContentId));
+		logger.debug("mapWeights:" + mapWeights);
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+		logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
 	}
 	
 	
@@ -526,7 +512,7 @@ public class McStarterAction extends Action implements McAppConstants {
 				
 		/* collect options for the default question content into a Map*/
 		McQueContent mcQueContent=mcService.getToolDefaultQuestionContent(mcContent.getUid().longValue());
-		System.out.print("mcQueContent:" + mcQueContent);
+		logger.debug("mcQueContent:" + mcQueContent);
 		
 		/* mcQueContent can not be null since here it was verified before*/ 
 		/* display a single sample question */
@@ -566,7 +552,7 @@ public class McStarterAction extends Action implements McAppConstants {
 			mapWeights.put(new Long(mapCounter).toString(), new Integer(0));
 		}	
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));	
+		logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));	
 	}
 	
 	
@@ -578,7 +564,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	 */
 	protected void initialiseAttributes(HttpServletRequest request)
 	{
-		System.out.print("starting initialiseAttributes...");
+		logger.debug("starting initialiseAttributes...");
 		/*  CURRENT_TAB == 1 defines Basic Tab
 		 *  CURRENT_TAB == 2 defines Avanced Tab
 		 *  CURRENT_TAB == 3 defines Instructions Tab

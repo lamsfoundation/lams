@@ -165,4 +165,14 @@ public interface IMcQueContentDAO
 	 * @return 
 	 */		
 	public void removeMcQueContent(McQueContent mcQueContent);
+	
+	/**
+	 *  * <p> used to get the next available display order  
+	 * with the given identifier <code>mcContentId</code> </p>
+	 * 
+	 * @param mcQueContent
+	 * @return 
+	 */	
+	public List getNextAvailableDisplayOrder(final long mcContentId);
+	
 }

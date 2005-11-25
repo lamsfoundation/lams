@@ -94,6 +94,8 @@ public interface IMcService
     
     public List getPersistedSelectedOptions(Long mcQueContentId);
     
+    public void removeMcQueContentByUID(Long uid) throws McApplicationException;
+    
     public List getCorrectOption(Long mcQueContentId);
     
     public List getAllQuestionEntries(final Long mcContentId) throws McApplicationException;
@@ -215,5 +217,7 @@ public interface IMcService
 	public int countSessionComplete() throws McApplicationException;
 
     public int countSessionIncomplete() throws McApplicationException;
+    
+    public List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
 }
 

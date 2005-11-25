@@ -199,7 +199,6 @@ public class LearningUtil implements McAppConstants {
     		mcLearningForm.setOptionValue(optionValue);
     	}
     	
-    	
     	String checked=request.getParameter("checked");
     	logger.debug("parameter checked: " + checked);
     	if (checked != null)
@@ -524,8 +523,6 @@ public class LearningUtil implements McAppConstants {
 	}
     
     
-    
-    
     public static boolean optionExists(String optionValue, Map generalMap)
     {
     	Iterator itMap = generalMap.entrySet().iterator();
@@ -592,7 +589,6 @@ public class LearningUtil implements McAppConstants {
 	}
     
     
-
     /**
      * creates a user attempt in the db
      * createAttempt(HttpServletRequest request)
@@ -613,7 +609,6 @@ public class LearningUtil implements McAppConstants {
         while (itCheckedMap.hasNext()) 
         {
         	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
-            
             Map mapCheckedOptions=(Map) checkedPairs.getValue();
             Long questionDisplayOrder=new Long(checkedPairs.getKey().toString());
             
@@ -662,8 +657,6 @@ public class LearningUtil implements McAppConstants {
     		mapWeights.put(mapIndex.toString(),mcQueContent.getWeight().toString());
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
-    	
     	return mapWeights;
     }
-    
  }

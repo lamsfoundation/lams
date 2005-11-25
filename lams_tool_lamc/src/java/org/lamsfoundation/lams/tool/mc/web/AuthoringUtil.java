@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
@@ -113,267 +114,264 @@ public class AuthoringUtil implements McAppConstants {
     }
 
 	
-	 public static Map repopulateCurrentCheckBoxStatesMap(HttpServletRequest request)
-	    {
-	    	Map mapTempContent= new TreeMap(new McComparator());
-	    	
-	    	long mapCounter=0;
-	    	for (long i=1; i <= MAX_OPTION_COUNT ; i++)
-			{
-				String candidateEntry =request.getParameter("checkBoxSelected" + i);
-				String optionText =request.getParameter("optionContent" + i);
-				
-				if (
-						(candidateEntry != null) && 
-						(candidateEntry.length() > 0)   
-						)
-					{
-						if (candidateEntry.equals("Correct"))
-						{
-							mapCounter++;
-							mapTempContent.put(new Long(mapCounter).toString(), optionText);
-						}
-					}
-			}
-	    	logger.debug("return repopulated currentCheckBoxStatesMap: " + mapTempContent);
-	    	return mapTempContent;
-	    }
-
-		
-	    public static boolean verifyDuplicatesOptionsMap(Map mapOptionsContent)
+    public static Map repopulateCurrentCheckBoxStatesMap(HttpServletRequest request)
+	{
+    	Map mapTempContent= new TreeMap(new McComparator());
+    	
+    	long mapCounter=0;
+    	for (long i=1; i <= MAX_OPTION_COUNT ; i++)
 		{
-	    	Map originalMapOptionsContent=mapOptionsContent;
-	    	Map backupMapOptionsContent=mapOptionsContent;
-	    	
-	    	int optionCount=0;
-	    	for (long i=1; i <= MAX_OPTION_COUNT ; i++)
-			{
-	    		String currentOption=(String)originalMapOptionsContent.get(new Long(i).toString());
-	    		logger.debug("verified currentOption  " + currentOption);
-	    		
-	    		optionCount=0;
-	    		for (long j=1; j <= MAX_OPTION_COUNT ; j++)
-	    		{
-	        		String backedOption=(String)backupMapOptionsContent.get(new Long(j).toString());
-	        		
-	        		if ((currentOption != null) && (backedOption !=null))
-	        		{
-	        			if (currentOption.equals(backedOption))
-	    				{
-	    					optionCount++;
-	    			    	logger.debug("optionCount for  " + currentOption + " is: " + optionCount);
-	    				}
-	    				
-	            		if (optionCount > 1)
-	            			return false;	
-	        		}
-	    		}	
-			}
-	    	return true;
-		}
-	    
-	    
-	    public static boolean validateQuestionsNotEmpty(Map mapQuestionsContent)
-	    {
-	    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
-	    	while (itMap.hasNext()) {
-	        	Map.Entry pairs = (Map.Entry)itMap.next();
-	            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	            
-	            if ((pairs.getValue() != null) && (pairs.getValue().toString().length() == 0))
-	            	return false;
-	            
-			}
-	    	return true;
-	    }
-
-	    public static Map repopulateCurrentWeightsMap(HttpServletRequest request, String parameterType)
-	    {
-	    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
-	    	logger.debug("parameterType: " + parameterType);
-	    	
-	    	long mapCounter=0;
-	    	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
-			{
-				String candidateEntry =request.getParameter(parameterType + i);
-				String questionText =request.getParameter("questionContent" + i);
-				if ((questionText != null) && (questionText.length() > 0))
-				{
-					logger.debug("questionText: " + questionText);
-					if (candidateEntry != null)
-					{
-						mapCounter++;
-						mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateEntry);
-					}	
-				}
-				
-			}
-	    	logger.debug("return repopulated Map: " + mapTempQuestionsContent);
-	    	return mapTempQuestionsContent;
-	    }
-
-
-	    /**
-	     * shrinks the size of the Map to only used entries
-	     * 
-	     * @param mapQuestionContent
-	     * @param request
-	     * @return
-	     */
-	    public static Map repopulateMap(HttpServletRequest request, String parameterType)
-	    {
-	    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
-	    	logger.debug("parameterType: " + parameterType);
-	    	
-	    	long mapCounter=0;
-	    	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
-			{
-				String candidateEntry =request.getParameter(parameterType + i);
-				if (
+			String candidateEntry =request.getParameter("checkBoxSelected" + i);
+			String optionText =request.getParameter("optionContent" + i);
+			
+			if (
 					(candidateEntry != null) && 
 					(candidateEntry.length() > 0)   
 					)
 				{
+					if (candidateEntry.equals("Correct"))
+					{
+						mapCounter++;
+						mapTempContent.put(new Long(mapCounter).toString(), optionText);
+					}
+				}
+		}
+    	logger.debug("return repopulated currentCheckBoxStatesMap: " + mapTempContent);
+    	return mapTempContent;
+	}
+
+		
+    public static boolean verifyDuplicatesOptionsMap(Map mapOptionsContent)
+	{
+    	Map originalMapOptionsContent=mapOptionsContent;
+    	Map backupMapOptionsContent=mapOptionsContent;
+    	
+    	int optionCount=0;
+    	for (long i=1; i <= MAX_OPTION_COUNT ; i++)
+		{
+    		String currentOption=(String)originalMapOptionsContent.get(new Long(i).toString());
+    		logger.debug("verified currentOption  " + currentOption);
+    		
+    		optionCount=0;
+    		for (long j=1; j <= MAX_OPTION_COUNT ; j++)
+    		{
+        		String backedOption=(String)backupMapOptionsContent.get(new Long(j).toString());
+        		
+        		if ((currentOption != null) && (backedOption !=null))
+        		{
+        			if (currentOption.equals(backedOption))
+    				{
+    					optionCount++;
+    			    	logger.debug("optionCount for  " + currentOption + " is: " + optionCount);
+    				}
+    				
+            		if (optionCount > 1)
+            			return false;	
+        		}
+    		}	
+		}
+    	return true;
+	}
+	    
+	    
+    public static boolean validateQuestionsNotEmpty(Map mapQuestionsContent)
+    {
+    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
+    	while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            if ((pairs.getValue() != null) && (pairs.getValue().toString().length() == 0))
+            	return false;
+            
+		}
+    	return true;
+    }
+
+    
+    public static Map repopulateCurrentWeightsMap(HttpServletRequest request, String parameterType)
+    {
+    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
+    	logger.debug("parameterType: " + parameterType);
+    	
+    	long mapCounter=0;
+    	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
+		{
+			String candidateEntry =request.getParameter(parameterType + i);
+			String questionText =request.getParameter("questionContent" + i);
+			if ((questionText != null) && (questionText.length() > 0))
+			{
+				logger.debug("questionText: " + questionText);
+				if (candidateEntry != null)
+				{
 					mapCounter++;
 					mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateEntry);
-				}
+				}	
 			}
-	    	logger.debug("return repopulated Map: " + mapTempQuestionsContent);
-	    	return mapTempQuestionsContent;
-	    }
+		}
+    	logger.debug("return repopulated Map: " + mapTempQuestionsContent);
+    	return mapTempQuestionsContent;
+    }
 
-	    
-	    public static Map shiftMap(Map mapQuestionsContent, String questionIndex , String movableQuestionEntry, String direction)
-	    {
-	    	logger.debug("movableQuestionEntry: " +  movableQuestionEntry);
-	    	/* map to be returned */
-	    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
-	    	
-	    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
-	    	String shiftableEntry=null;
-	    	
-	    	int shiftableIndex=0;
-	    	if (direction.equals("down"))
-	        {
-	    		logger.debug("moving map down");
-	    		shiftableIndex=new Integer(questionIndex).intValue() + 1;
-	        }
-	    	else
-	    	{
-	    		logger.debug("moving map up");
-	    		shiftableIndex=new Integer(questionIndex).intValue() - 1;
-	        
-	    	}
-	    		
-			logger.debug("shiftableIndex: " +  shiftableIndex);
-	    	shiftableEntry=(String)mapQuestionsContent.get(new Integer(shiftableIndex).toString());
-	    	logger.debug("shiftable entry: " +  shiftableEntry);
-	    	
-	    	if (shiftableEntry != null) 
-	    	{
-	    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
-	    		long mapCounter=0;
-	    		while (itQuestionsMap.hasNext()) {
-	            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
-	                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	                mapCounter++;
-	                logger.debug("mapCounter: " +  mapCounter);
-	                
-	                if (!pairs.getKey().equals(questionIndex) && !pairs.getKey().equals(new Integer(shiftableIndex).toString()))
-	                {
-	                	logger.debug("normal copy " +  questionIndex);
-	                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), pairs.getValue());
-	                }
-	                else if (pairs.getKey().equals(questionIndex))
-	                {
-	                	logger.debug("move type 1 " +  questionIndex);
-	                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), shiftableEntry);
-	                }
-	                else if (pairs.getKey().equals(new Integer(shiftableIndex).toString()))
-	                {
-	                	logger.debug("move type 2 " +  shiftableIndex);
-	                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), movableQuestionEntry);
-	                }
-	            }
-	    	}
-	    	else
-	    	{
-	    		logger.debug("no change to map");
-	    		mapTempQuestionsContent=mapQuestionsContent;
-	    	}
-	    		return mapTempQuestionsContent;
-	    }
-	    
-	    
-	    public static boolean validateTotalWeight(HttpServletRequest request)
-	    {
-	    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
-	    	logger.debug("mapWeights: " + mapWeights);
-	    	
-	    	Iterator itMap = mapWeights.entrySet().iterator();
-	    	int totalWeight=0;
-			while (itMap.hasNext()) {
-	        	Map.Entry pairs = (Map.Entry)itMap.next();
-	            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	            
-	            if ((pairs.getValue() != null) || (pairs.getValue().toString().length() > 0)) 
-	            {
-	            	totalWeight=totalWeight+ new Integer(pairs.getValue().toString()).intValue();
-	            }
+
+    /**
+     * shrinks the size of the Map to only used entries
+     * 
+     * @param mapQuestionContent
+     * @param request
+     * @return
+     */
+    public static Map repopulateMap(HttpServletRequest request, String parameterType)
+    {
+    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
+    	logger.debug("parameterType: " + parameterType);
+    	
+    	long mapCounter=0;
+    	for (long i=1; i <= MAX_QUESTION_COUNT ; i++)
+		{
+			String candidateEntry =request.getParameter(parameterType + i);
+			if (
+				(candidateEntry != null) && 
+				(candidateEntry.length() > 0)   
+				)
+			{
+				mapCounter++;
+				mapTempQuestionsContent.put(new Long(mapCounter).toString(), candidateEntry);
 			}
-
-	            logger.debug("totalWeight: " +  totalWeight);
-	            
-	        if (totalWeight != 100)
-	        {
-	        	return false;
-	        }
-
-	        return true;
-	    }
+		}
+    	logger.debug("return repopulated Map: " + mapTempQuestionsContent);
+    	return mapTempQuestionsContent;
+    }
 
 	    
-	    public static boolean validateSubTotalWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
-	    {
-	    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
-	    	logger.debug("mapWeights: " + mapWeights);
-	    	
-	    	int totalWeight=0;
-	    	Iterator itMap = mapWeights.entrySet().iterator();
-			while (itMap.hasNext()) {
-	        	Map.Entry pairs = (Map.Entry)itMap.next();
-	            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	            
-	            int currentWeight=new Integer(pairs.getValue().toString()).intValue();
-	            totalWeight= totalWeight + currentWeight;
-	            logger.debug("sub totalWeight: " +  totalWeight);
-			}
-	        logger.debug("final totalWeight: " +  totalWeight);
-	        
-	        if (totalWeight > 100)
-	        	return false;
-	        else
-	        	return true;
-	    }
+    public static Map shiftMap(Map mapQuestionsContent, String questionIndex , String movableQuestionEntry, String direction)
+    {
+    	logger.debug("movableQuestionEntry: " +  movableQuestionEntry);
+    	/* map to be returned */
+    	Map mapTempQuestionsContent= new TreeMap(new McComparator());
+    	
+    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
+    	String shiftableEntry=null;
+    	
+    	int shiftableIndex=0;
+    	if (direction.equals("down"))
+        {
+    		logger.debug("moving map down");
+    		shiftableIndex=new Integer(questionIndex).intValue() + 1;
+        }
+    	else
+    	{
+    		logger.debug("moving map up");
+    		shiftableIndex=new Integer(questionIndex).intValue() - 1;
+    	}
+    		
+		logger.debug("shiftableIndex: " +  shiftableIndex);
+    	shiftableEntry=(String)mapQuestionsContent.get(new Integer(shiftableIndex).toString());
+    	logger.debug("shiftable entry: " +  shiftableEntry);
+    	
+    	if (shiftableEntry != null) 
+    	{
+    		Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+    		long mapCounter=0;
+    		while (itQuestionsMap.hasNext()) {
+            	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+                logger.debug("comparing the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                mapCounter++;
+                logger.debug("mapCounter: " +  mapCounter);
+                
+                if (!pairs.getKey().equals(questionIndex) && !pairs.getKey().equals(new Integer(shiftableIndex).toString()))
+                {
+                	logger.debug("normal copy " +  questionIndex);
+                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), pairs.getValue());
+                }
+                else if (pairs.getKey().equals(questionIndex))
+                {
+                	logger.debug("move type 1 " +  questionIndex);
+                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), shiftableEntry);
+                }
+                else if (pairs.getKey().equals(new Integer(shiftableIndex).toString()))
+                {
+                	logger.debug("move type 2 " +  shiftableIndex);
+                	mapTempQuestionsContent.put(new Long(mapCounter).toString(), movableQuestionEntry);
+                }
+            }
+    	}
+    	else
+    	{
+    		logger.debug("no change to map");
+    		mapTempQuestionsContent=mapQuestionsContent;
+    	}
+    		return mapTempQuestionsContent;
+    }
+	    
+	    
+    public static boolean validateTotalWeight(HttpServletRequest request)
+    {
+    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
+    	logger.debug("mapWeights: " + mapWeights);
+    	
+    	Iterator itMap = mapWeights.entrySet().iterator();
+    	int totalWeight=0;
+		while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            if ((pairs.getValue() != null) || (pairs.getValue().toString().length() > 0)) 
+            {
+            	totalWeight=totalWeight+ new Integer(pairs.getValue().toString()).intValue();
+            }
+		}
+
+        logger.debug("totalWeight: " +  totalWeight);
+        if (totalWeight != 100)
+        {
+        	return false;
+        }
+        return true;
+    }
 
 	    
-	    public static  boolean validateOptions(HttpServletRequest request)
-	    {
-	    	logger.debug("will validateOptions");
-	    	String parameterType="checkBoxSelected";
-	    	for (int i=1; i <= MAX_OPTION_COUNT ; i++)
-	    	{
-	    		String isCorrect=request.getParameter(parameterType + i);
-	    		logger.debug("isCorrect: " + isCorrect);
-	    		
-	    		if (isCorrect != null)
-	    		{
-	    			if (isCorrect.equals("Correct"))
-	        			return true;	
-	    		}
-	    	}
-	    	return false;
-	    }
+    public static boolean validateSubTotalWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+    {
+    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
+    	logger.debug("mapWeights: " + mapWeights);
+    	
+    	int totalWeight=0;
+    	Iterator itMap = mapWeights.entrySet().iterator();
+		while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            int currentWeight=new Integer(pairs.getValue().toString()).intValue();
+            totalWeight= totalWeight + currentWeight;
+            logger.debug("sub totalWeight: " +  totalWeight);
+		}
+        logger.debug("final totalWeight: " +  totalWeight);
+        
+        if (totalWeight > 100)
+        	return false;
+        else
+        	return true;
+    }
+
+	    
+    public static  boolean validateOptions(HttpServletRequest request)
+    {
+    	logger.debug("will validateOptions");
+    	String parameterType="checkBoxSelected";
+    	for (int i=1; i <= MAX_OPTION_COUNT ; i++)
+    	{
+    		String isCorrect=request.getParameter(parameterType + i);
+    		logger.debug("isCorrect: " + isCorrect);
+    		
+    		if (isCorrect != null)
+    		{
+    			if (isCorrect.equals("Correct"))
+        			return true;	
+    		}
+    	}
+    	return false;
+    }
 
 	
     public static Map rebuildQuestionMapfromDB(HttpServletRequest request, Long toolContentId)
@@ -432,8 +430,6 @@ public class AuthoringUtil implements McAppConstants {
     }
  
     
-    
-    
     /**
      * returns all the options for all the questions for a content
      * generateGeneralOptionsContentMap(HttpServletRequest request, McContent mcContent)
@@ -470,7 +466,7 @@ public class AuthoringUtil implements McAppConstants {
     }
     
 
-    public Map rebuildWeightsMapfromDB(HttpServletRequest request, Long toolContentId)
+    public static Map rebuildWeightsMapfromDB(HttpServletRequest request, Long toolContentId)
     {
     	Map mapWeightsContent= new TreeMap(new McComparator());
     	
@@ -489,7 +485,7 @@ public class AuthoringUtil implements McAppConstants {
     	{
     		McQueContent mcQueContent=(McQueContent)listIterator.next();
     		logger.debug("mcQueContent:" + mcQueContent);
-    		mapWeightsContent.put(mapIndex.toString(),mcQueContent.getWeight());
+    		mapWeightsContent.put(mapIndex.toString(),mcQueContent.getWeight().toString());
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
     	
@@ -518,7 +514,6 @@ public class AuthoringUtil implements McAppConstants {
     		mapIncorrectFeedback.put(mapIndex.toString(),mcQueContent.getFeedbackIncorrect());
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
-    	
     	return mapIncorrectFeedback;
     }
     
@@ -543,7 +538,6 @@ public class AuthoringUtil implements McAppConstants {
     		mapCorrectFeedback.put(mapIndex.toString(),mcQueContent.getFeedbackCorrect());
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
-    	
     	return mapCorrectFeedback;
     }
 
@@ -560,13 +554,10 @@ public class AuthoringUtil implements McAppConstants {
     public static void persistOptionsFinal(HttpServletRequest request, Map currentOptions, Map selectedOptions, McQueContent mcQueContent)
     {
     	IMcService mcService =McUtils.getToolService(request);
-    	
         logger.debug("passed currentOptions: " + currentOptions);
         logger.debug("passed selectedOptions: " + selectedOptions);
         
         Iterator itCurrentOptions = currentOptions.entrySet().iterator();
-        
-        
         boolean selected=false;
         while (itCurrentOptions.hasNext()) 
         {
@@ -612,7 +603,6 @@ public class AuthoringUtil implements McAppConstants {
     public static void persistOptions(HttpServletRequest request, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, McQueContent mcQueContent, String questionIndex)
     {
     	IMcService mcService =McUtils.getToolService(request);
-    	
     	logger.debug("passed questionIndex: " +  questionIndex);
     	
     	Iterator itOptionsMap = mapGeneralOptionsContent.entrySet().iterator();
@@ -652,6 +642,7 @@ public class AuthoringUtil implements McAppConstants {
      */
     public static McContent createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {
+    	logger.debug("called createContent");
     	IMcService mcService =McUtils.getToolService(request);
     	
     	/* the tool content id is passed from the container to the tool and placed into session in the McStarterAction */
@@ -701,7 +692,6 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("isRetries: " +  mcAuthoringForm.getRetries());
     	if (mcAuthoringForm.getRetries().equalsIgnoreCase(ON))
     		isRetries=true;
-    	
     	
 		logger.debug("isSln" +  mcAuthoringForm.getSln());
 		if (mcAuthoringForm.getSln().equalsIgnoreCase(ON))
@@ -817,6 +807,182 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("remove questions by  mcQueContent uid : " + mcContent.getUid());
     	mcService.cleanAllQuestionsSimple(mcContent.getUid());
     }
+
+    
+    public static void cleanupRedundantQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent, McContent mcContent)
+    {
+    	logger.debug("will cleanupRedundantQuestions... ");
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+        /*remove ununsed question entries from the db */
+        boolean questionFound=false;
+        Iterator itExistingQuestions = existingQuestions.iterator();
+        while (itExistingQuestions.hasNext()) 
+        {
+        	McQueContent mcQueContent=(McQueContent)itExistingQuestions.next();
+    		logger.debug("mcQueContent:" + mcQueContent);
+    		
+    		Iterator itNewQuestionsMap = mapQuestionsContent.entrySet().iterator();
+    		questionFound=false;
+            while (itNewQuestionsMap.hasNext()) 
+            {
+            	Map.Entry pairs = (Map.Entry)itNewQuestionsMap.next();
+                logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+                logger.debug("mcQueContent.getQuestion(): " + mcQueContent.getQuestion() + "--" + pairs.getValue());
+	    		
+	    		if (mcQueContent.getQuestion().equals(pairs.getValue().toString()))
+				{
+	    			logger.debug("equals mcQueContent.getQuestion(): " + mcQueContent.getQuestion() + "--" + pairs.getValue());
+	    			questionFound=true;
+	            	break;
+				}
+            }
+            
+            if (questionFound == false)
+    		{
+    			String deletableQuestion=mcQueContent.getQuestion();
+    			logger.debug("found is false, delete this question " + deletableQuestion);
+    			mcQueContent=mcService.getQuestionContentByQuestionText(deletableQuestion, mcContent.getUid());
+    			logger.debug("found is false, delete this question " + mcQueContent);
+    			if (mcQueContent != null)
+    			{
+    				mcService.removeMcQueContent(mcQueContent);
+        			logger.debug("removed mcQueContent from the db: " + mcQueContent);	
+    			}
+    		}
+        }    		
+    }
+    
+    
+    public static void selectAndPersistQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McContent mcContent)
+	{
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+		boolean questionContentFound=false;
+        while (itQuestionsMap.hasNext()) 
+        {
+            Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            questionContentFound = false;
+            String displayOrder="1";
+            McQueContent mcQueContent=null;
+            Iterator itExistingQuestions = existingQuestions.iterator();
+            while (itExistingQuestions.hasNext()) 
+            {
+            	mcQueContent=(McQueContent)itExistingQuestions.next();
+        		logger.debug("mcQueContent:" + mcQueContent);
+        		
+        		if (mcQueContent.getQuestion().equals(pairs.getValue()))
+				{
+                	logger.debug("existing mcQueContent found :" + mcQueContent);
+                	questionContentFound=true;
+                	displayOrder=pairs.getKey().toString(); 
+                	logger.debug("new display order for " + mcQueContent.getQuestion()+ " will be: "  + displayOrder);
+                	break;
+				}
+            }
+
+            if (questionContentFound == true)
+            {
+            	logger.debug("questionContentFound is true: " + mcQueContent);
+            	updateExistingQuestionContent(request,mapFeedbackIncorrect, mapFeedbackCorrect, mcQueContent, displayOrder);
+            }
+            else
+            {
+            	logger.debug("questionContentFound is false: " + mcQueContent);
+            	createQuestionContent(request,mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect,  pairs.getValue().toString(), mcContent);
+            }
+        }
+    }
+    
+    
+    public static void updateExistingQuestionContent(HttpServletRequest request, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McQueContent mcQueContent, String displayOrder)
+    {
+    	logger.debug("using updateExisitingQuestionContent: " + mcQueContent);
+    	logger.debug("using displayOrder: " + displayOrder);
+    	
+    	Map mapWeights= (Map)request.getSession().getAttribute(MAP_WEIGHTS);
+    	logger.debug("MAP_WEIGHTS:" + mapWeights);
+    	
+    	String incorrectFeedback=(String)mapFeedbackIncorrect.get(displayOrder);
+    	logger.debug("new  incorrectFeedback will be :" + incorrectFeedback);
+    	String correctFeedback=(String)mapFeedbackCorrect.get(displayOrder);
+    	logger.debug("new correctFeedback will be :" + correctFeedback);
+    	
+    	String weight=(String)mapWeights.get(displayOrder);
+    	logger.debug("new weight will be:" + weight);
+    	
+    	IMcService mcService =McUtils.getToolService(request);
+    	mcQueContent.setDisplayOrder(new Integer(displayOrder));
+    	mcQueContent.setDisabled(false);
+    	mcQueContent.setWeight(new Integer(weight));
+    	
+    	if ((incorrectFeedback != null) && !(incorrectFeedback.equals("")))  
+    		mcQueContent.setFeedbackIncorrect(incorrectFeedback);
+    	
+    	if ((correctFeedback != null) && !(correctFeedback.equals("")))  
+    		mcQueContent.setFeedbackCorrect(correctFeedback);
+    	
+    	mcService.saveOrUpdateMcQueContent(mcQueContent);
+		logger.debug("updated mcQueContent in the db: " + mcQueContent);
+    }
+
+    
+    public static void createQuestionContent(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, String question, McContent mcContent)
+    {
+    	logger.debug("using createQuestionContent with question: " + question);
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	int displayOrder= getNewDisplayOrder(mapQuestionsContent, question);
+    	logger.debug("displayOrder: " + displayOrder);
+    	
+    	Map mapWeights= (Map)request.getSession().getAttribute(MAP_WEIGHTS);
+    	logger.debug("MAP_WEIGHTS: " + MAP_WEIGHTS);
+    	
+    	String weight=(String)mapWeights.get(new Integer(displayOrder).toString());
+    	logger.debug("new weight will be:" + weight);
+    	
+    	String incorrectFeedback=(String)mapFeedbackIncorrect.get(new Integer(displayOrder).toString());
+    	logger.debug("new  incorrectFeedback will be :" + incorrectFeedback);
+
+    	String correctFeedback=(String)mapFeedbackCorrect.get(new Integer(displayOrder).toString());
+    	logger.debug("new correctFeedback will be :" + correctFeedback);
+    	
+    	McQueContent mcQueContent=  new McQueContent(question,
+      	 		new Integer(displayOrder),
+      	 		new Integer(weight),
+				false,
+				incorrectFeedback,
+				correctFeedback,
+				mcContent,
+				new HashSet(),
+				new HashSet()
+				);
+    	
+    	mcService.saveOrUpdateMcQueContent(mcQueContent);
+		logger.debug("created a new mcQueContent in the db: " + mcQueContent);
+    }
+    
+
+    public static int getNewDisplayOrder(Map mapQuestionsContent, String question)
+    {
+    	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+    	int displayOrder=0;
+        while (itQuestionsMap.hasNext()) 
+        {
+            Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            if (pairs.getValue().equals(question))
+            {
+            	logger.debug("question found:" + question);
+            	displayOrder=new Integer(pairs.getKey().toString()).intValue();
+            	logger.debug("displayOrder:" + displayOrder);
+            }
+        }    
+        return displayOrder;
+    }
     
     
     /**
@@ -836,8 +1002,7 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("mapFeedbackIncorrect :" + mapFeedbackIncorrect);
     	logger.debug("mapFeedbackCorrect :" + mapFeedbackCorrect);
 
-    	
-  	    Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+        Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
 		logger.debug("final MAP_GENERAL_OPTIONS_CONTENT :" + mapGeneralOptionsContent);
 
 		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
@@ -845,9 +1010,8 @@ public class AuthoringUtil implements McAppConstants {
 
     	Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+		logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
 		
-    	
     	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
         while (itQuestionsMap.hasNext()) {
             Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
@@ -893,7 +1057,6 @@ public class AuthoringUtil implements McAppConstants {
        	         }
             }
         }
-    	
 	}
     
     
@@ -916,7 +1079,6 @@ public class AuthoringUtil implements McAppConstants {
         	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
         	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
         	
-        	
         	Map mapWeights = (Map) request.getSession().getAttribute(MAP_WEIGHTS);
         	logger.debug("current mapWeights: " + mapWeights);
         	int mapWeightsSize=mapWeights.size();
@@ -928,9 +1090,29 @@ public class AuthoringUtil implements McAppConstants {
     }
 
     
+    public static int getNextAvailableDisplayOrder(HttpServletRequest request, Long mcContentId)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	List listDisplayOrder=mcService.getNextAvailableDisplayOrder(mcContentId.longValue());
+    	
+    	Iterator itListDisplayOrder = listDisplayOrder.iterator();
+    	int maxDisplayOrder=1;
+        while (itListDisplayOrder.hasNext())
+        {
+        	McQueContent mcQueContent=(McQueContent)itListDisplayOrder.next();
+        	logger.debug("mcQueContent:" + mcQueContent);
+        	int currentDisplayOrder=mcQueContent.getDisplayOrder().intValue();
+        	if (currentDisplayOrder > maxDisplayOrder)
+        		 maxDisplayOrder = currentDisplayOrder;
+        }
+        logger.debug("current biggest displayOrder is: " + maxDisplayOrder);
+        return maxDisplayOrder+1;
+    	
+    }
+    
     public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
     {
-    	IMcService qaService =McUtils.getToolService(request);
+    	IMcService mcService =McUtils.getToolService(request);
     	
     	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (!toolContentId.equals("")))
@@ -938,7 +1120,7 @@ public class AuthoringUtil implements McAppConstants {
     		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
     		try
 			{
-    			qaService.setAsRunOffline(new Long(toolContentId));	
+    			mcService.setAsRunOffline(new Long(toolContentId));	
 			}
     		catch(ToolException e)
 			{
@@ -957,7 +1139,7 @@ public class AuthoringUtil implements McAppConstants {
      */
     public void simulatePropertyInspector_setAsDefineLater(HttpServletRequest request)
     {
-    	IMcService qaService =McUtils.getToolService(request);
+    	IMcService mcService =McUtils.getToolService(request);
     	
     	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (!toolContentId.equals("")))
@@ -965,7 +1147,7 @@ public class AuthoringUtil implements McAppConstants {
     		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
     		try
 			{
-    			qaService.setAsDefineLater(new Long(toolContentId));	
+    			mcService.setAsDefineLater(new Long(toolContentId));	
     		}
     		catch(ToolException e)
 			{

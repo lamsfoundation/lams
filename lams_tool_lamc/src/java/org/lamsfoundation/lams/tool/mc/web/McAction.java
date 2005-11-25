@@ -41,6 +41,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
@@ -282,7 +283,10 @@ public class McAction extends DispatchAction implements McAppConstants
     	}
     		
     	logger.debug("will validate weights");
-    	boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
+    	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
+    	logger.debug("mapWeights: " + mapWeights);
+    	
+    	boolean weightsValid=validateQuestionWeights(request,mapWeights, mcAuthoringForm);
     	logger.debug("weightsValid:" + weightsValid);
     	if (weightsValid == false)
     	{
@@ -310,7 +314,6 @@ public class McAction extends DispatchAction implements McAppConstants
     		mcAuthoringForm.resetUserAction();
     		persistError(request,"error.question.weight.total");
     		
-    		
     		int maxQuestionIndex=mapQuestionsContent.size();
     		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
     		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
@@ -319,11 +322,8 @@ public class McAction extends DispatchAction implements McAppConstants
     		mcAuthoringForm.setSubmitQuestions(null);
     		return (mapping.findForward(LOAD_QUESTIONS));
     	}
-    		
-    		
-     	Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
     	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-    	System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+    	logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
     	
     	AuthoringUtil.addQuestionMemory(request, mcAuthoringForm, mapQuestionsContent, true);
     	logger.debug("after addQuestionMemory");
@@ -371,7 +371,7 @@ public class McAction extends DispatchAction implements McAppConstants
  		
  		Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-		System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+		logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
 		
  		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
@@ -448,7 +448,7 @@ public class McAction extends DispatchAction implements McAppConstants
      	
      	Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
     	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-    	System.out.print("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+    	logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
      	
     	String questionIndex =mcAuthoringForm.getQuestionIndex();
     	logger.debug("questionIndex:" + questionIndex);
@@ -1190,7 +1190,9 @@ public class McAction extends DispatchAction implements McAppConstants
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
 
-		boolean weightsValid=validateQuestionWeights(request,mcAuthoringForm);
+		Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
+    	logger.debug("mapWeights: " + mapWeights);
+    	boolean weightsValid=validateQuestionWeights(request,mapWeights, mcAuthoringForm);
 		logger.debug("weightsValid:" + weightsValid);
 		if (weightsValid == false)
 		{
@@ -1226,6 +1228,8 @@ public class McAction extends DispatchAction implements McAppConstants
 			mcAuthoringForm.setSubmitQuestions(null);
 			return (mapping.findForward(LOAD_QUESTIONS));
 		}
+		logger.debug("MAP_WEIGHTS is valid, persist it to session");
+		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
 		
 		boolean isQuestionsSequenced=false;
 		boolean isSynchInMonitor=false;
@@ -1395,7 +1399,7 @@ public class McAction extends DispatchAction implements McAppConstants
 		    logger.debug("toolContentId:" + toolContentId);
 			
 		McContent mcContent=mcService.retrieveMc(toolContentId);
-		logger.debug("mcContent:" + mcContent);
+		logger.debug("existing mcContent:" + mcContent);
 		
 		if (mcContent != null)
 		{
@@ -1432,11 +1436,23 @@ public class McAction extends DispatchAction implements McAppConstants
 		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
 		logger.debug("Submit final MAP_FEEDBACK_CORRECT :" + mapFeedbackCorrect);
 		
-		AuthoringUtil.cleanupExistingQuestions(request, mcContent);
-		logger.debug("post cleanupExistingQuestions");
+		//AuthoringUtil.cleanupExistingQuestions(request, mcContent);
+		//logger.debug("post cleanupExistingQuestions");
 		
-		AuthoringUtil.persistQuestions(request, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mcContent);
-		logger.debug("post persistQuestions");
+		logger.debug("start processing questions content...");
+		Long mcContentId =mcContent.getUid();
+		List existingQuestions = mcService.refreshQuestionContent(mcContentId);
+		logger.debug("existingQuestions: " + existingQuestions);
+		
+		logger.debug("will cleanupRedundantQuestions");
+		AuthoringUtil.cleanupRedundantQuestions(request, existingQuestions, mapQuestionsContent, mcContent);
+		
+		logger.debug("existingQuestions: " + existingQuestions);
+		logger.debug("calling selectAndPersistQuestions: " + existingQuestions);
+		AuthoringUtil.selectAndPersistQuestions(request, existingQuestions, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mcContent);
+		
+		existingQuestions = mcService.refreshQuestionContent(mcContentId);
+		logger.debug("last set of existingQuestions: " + existingQuestions);
 		
 		logger.debug("will do addUploadedFilesMetaData");
 		McUtils.addUploadedFilesMetaData(request,mcContent);
@@ -1682,7 +1698,7 @@ public class McAction extends DispatchAction implements McAppConstants
    	    return (mapping.findForward(ALL_INSTRUCTIONS));
     }
     
-	
+    
 	/**
      * ensures that the weight valued entered are valid
      * validateQuestionWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
@@ -1691,9 +1707,8 @@ public class McAction extends DispatchAction implements McAppConstants
      * @param mcAuthoringForm
      * @return
      */
-    protected boolean validateQuestionWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+    protected boolean validateQuestionWeights(HttpServletRequest request, Map mapWeights, McAuthoringForm mcAuthoringForm)
     {
-    	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
     	logger.debug("mapWeights: " + mapWeights);
     	
     	Iterator itMap = mapWeights.entrySet().iterator();
