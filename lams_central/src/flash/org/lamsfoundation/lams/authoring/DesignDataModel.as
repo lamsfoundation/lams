@@ -102,42 +102,29 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	* Adds a template activity to the model. 
 	* 
 	*/
-	public function addActivity(activity:Activity):Boolean{
+	public function addActivity(activity:Activity):Object{
 		var success = false;
 		//create an Activity from the template actvity.
 		Debugger.log('activity:'+activity.title+':'+activity.activityUIID,4,'addActivity','DesignDataModel');
 		
-		
-		//validate the activity ??
-		
+		//validate the activity ?		
 		//validate if we can do it?
-		
-		
-		
-		//TODO: 2nd time, after undo, in this is failing....;
-			
-		
 		//dispatch an event before the design  has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
-		
-		//ObjectUtils.printObject(activity);
-		
-		//TODO: MAYBE the UIID being created is the same as an existing activity after an undo, therefore overwriting in the hash table
 		_activities.put(activity.activityUIID, activity);
-		
+		//pull it out to check it
 		var tmp:Activity = _activities.get(activity.activityUIID)
-		Debugger.log('Succesfully added:'+tmp.title+':'+tmp.activityUIID,4,'addActivity','DesignDataModel');
 		
-		
+		if(tmp){
+			Debugger.log('Succesfully added:'+tmp.title+':'+tmp.activityUIID,4,'addActivity','DesignDataModel');
+		}else{
+			return new LFError("Adding activity failed","addActivity",this,'activityUIID:'+activity.activityUIID);
+		}
 		//dispatch an event now the design  has changed
 		dispatchEvent({type:'ddmUpdate',target:this});
 		
-		//TODO: Better validation of the addition
-		success = true;
 		
 		
-		
-		return success;
 	}
 	
 	/**
