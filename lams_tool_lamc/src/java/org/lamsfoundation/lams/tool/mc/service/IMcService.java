@@ -74,9 +74,13 @@ public interface IMcService
 	
     public void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
     
+    public McQueContent getMcQueContentByUID(Long uid) throws McApplicationException;
+    
     public void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
     
     public void removeQuestionContentByMcUid(final Long mcContentUid) throws McApplicationException;
+    
+    public McOptsContent getMcOptionsContentByUID(Long uid) throws McApplicationException;
     
     public void cleanAllQuestionsSimple(final Long mcContentUid) throws McApplicationException;
     
@@ -125,7 +129,7 @@ public interface IMcService
     public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
     
     public void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
-	    
+        
     public void deleteMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
 	
     public void deleteMcOptionsContentByUID(Long uid) throws McApplicationException;

@@ -432,17 +432,16 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		McUtils.populateUploadedFilesData(request, mcContent);
 	    logger.debug("populated UploadedFilesData");
-	    
-		Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
-		logger.debug("mapQuestionsContent:" + mapQuestionsContent);
-		
-		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-		logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-		
-		Map mapWeights=AuthoringUtil.rebuildWeightsMapfromDB(request, new Long(toolContentId));
-		logger.debug("mapWeights:" + mapWeights);
-		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-		logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+	    Map mapWeights= AuthoringUtil.rebuildWeightsMapfromDB(request, new Long(toolContentId));
+    	logger.debug("mapWeights: " + mapWeights);
+    	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+    	
+    	Map mapQuestionsContent=AuthoringUtil.rebuildQuestionMapfromDB(request, new Long(toolContentId));
+    	logger.debug("mapQuestionsContent:" + mapQuestionsContent);
+    	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+    	logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
+    	
+	    AuthoringUtil.refreshMaps(request, toolContentId);
 	}
 	
 	
@@ -599,6 +598,12 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		Map mapGeneralSelectedOptionsContent= new TreeMap(new McComparator());
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		
+		Map mapStartupGeneralOptionsContent= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT, mapStartupGeneralOptionsContent);
+		
+		Map mapStartupGeneralSelectedOptionsContent= new TreeMap(new McComparator());
+		request.getSession().setAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT, mapStartupGeneralSelectedOptionsContent);
 		
 		Map mapDisabledQuestions= new TreeMap(new McComparator());
 		request.getSession().setAttribute(MAP_DISABLED_QUESTIONS, mapDisabledQuestions);

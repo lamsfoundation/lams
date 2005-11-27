@@ -692,6 +692,27 @@ public class McAction extends DispatchAction implements McAppConstants
     	    	logger.debug("MAP_SELECTED_OPTIONS set as empty list :" + mapSelectedOptions);
         	}
         }
+    	
+    	logger.debug("final mapOptionsContent used is: " + mapOptionsContent);
+    	if (mapOptionsContent.isEmpty())
+    	{
+    		logger.debug("mapOptionsContent is empty");
+    		mapOptionsContent.put("1","sample answer 1");
+    		mapSelectedOptions = mapOptionsContent;
+    		request.getSession().setAttribute(MAP_OPTIONS_CONTENT, mapOptionsContent);
+    		request.getSession().setAttribute(MAP_SELECTED_OPTIONS, mapSelectedOptions);
+    		
+    		
+    		mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+    		logger.debug("current mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+    		mapGeneralOptionsContent.put(questionIndex,mapOptionsContent);
+    		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    		
+    		Map mapGeneralSelectedOptionsContent=mapGeneralOptionsContent;
+    		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+    	}
+    	
+    	
      	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
     	logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
     	mcAuthoringForm.resetUserAction();
@@ -1168,7 +1189,6 @@ public class McAction extends DispatchAction implements McAppConstants
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 	
 		ActionMessages errors= new ActionMessages();
-		
 		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent before submit: " + mapQuestionsContent);
 	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
@@ -1292,7 +1312,6 @@ public class McAction extends DispatchAction implements McAppConstants
 				return (mapping.findForward(LOAD_QUESTIONS));
 			}
 		}
-		
 		
 		if ((mcAuthoringForm.getPassmark() != null) && (mcAuthoringForm.getPassmark().length() > 0))
 		{
@@ -1436,23 +1455,40 @@ public class McAction extends DispatchAction implements McAppConstants
 		Map mapFeedbackCorrect =(Map)request.getSession().getAttribute(MAP_FEEDBACK_CORRECT);
 		logger.debug("Submit final MAP_FEEDBACK_CORRECT :" + mapFeedbackCorrect);
 		
-		//AuthoringUtil.cleanupExistingQuestions(request, mcContent);
-		//logger.debug("post cleanupExistingQuestions");
+		AuthoringUtil.refreshMaps(request, toolContentId.longValue());
+		logger.debug("refreshed maps...");
 		
 		logger.debug("start processing questions content...");
 		Long mcContentId =mcContent.getUid();
 		List existingQuestions = mcService.refreshQuestionContent(mcContentId);
 		logger.debug("existingQuestions: " + existingQuestions);
 		
-		logger.debug("will cleanupRedundantQuestions");
+		logger.debug("will cleanupRedundantQuestions:");
+		/* Removes only unused question entries from the db. It keeps the valid entries since they get updated. */
 		AuthoringUtil.cleanupRedundantQuestions(request, existingQuestions, mapQuestionsContent, mcContent);
 		
-		logger.debug("existingQuestions: " + existingQuestions);
 		logger.debug("calling selectAndPersistQuestions: " + existingQuestions);
 		AuthoringUtil.selectAndPersistQuestions(request, existingQuestions, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mcContent);
+		logger.debug("finished processing questions content...");
 		
-		existingQuestions = mcService.refreshQuestionContent(mcContentId);
-		logger.debug("last set of existingQuestions: " + existingQuestions);
+		logger.debug("start processing options content...");
+		Map mapStartupGeneralOptionsContent= (Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapStartupGeneralOptionsContent: " + mapStartupGeneralOptionsContent);
+		Map mapStartupGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapStartupGeneralSelectedOptionsContent: " + mapStartupGeneralSelectedOptionsContent);
+		Map mapStartupGeneralOptionsQueId=(Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_QUEID);
+		logger.debug("mapStartupGeneralOptionsQueId: " + mapStartupGeneralOptionsQueId);
+		
+		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+		
+		logger.debug("calling cleanupRedundantOptions");
+		AuthoringUtil.cleanupRedundantOptions(request, mapStartupGeneralOptionsContent, mapStartupGeneralSelectedOptionsContent, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent, mapStartupGeneralOptionsQueId);
+		logger.debug("calling selectAndPersistOptions");
+		AuthoringUtil.selectAndPersistOptions(request, mapStartupGeneralOptionsContent, mapStartupGeneralSelectedOptionsContent, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent, mapStartupGeneralOptionsQueId);
+		
 		
 		logger.debug("will do addUploadedFilesMetaData");
 		McUtils.addUploadedFilesMetaData(request,mcContent);
@@ -2277,5 +2313,7 @@ public class McAction extends DispatchAction implements McAppConstants
     	mcLearningForm.resetCommands();
     	return (mapping.findForward(LOAD_LEARNER));
     }
+    
+    
 }
     

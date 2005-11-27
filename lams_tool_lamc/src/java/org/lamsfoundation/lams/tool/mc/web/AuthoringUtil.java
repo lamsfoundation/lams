@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -17,7 +18,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
@@ -373,7 +373,108 @@ public class AuthoringUtil implements McAppConstants {
     	return false;
     }
 
+
+	public static Map rebuildStartupGeneralOptionsQueIdfromDB(HttpServletRequest request, Map mapQuestionsUidContent)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+		Map map= new TreeMap(new McComparator());
+    	
+    	Iterator itMap = mapQuestionsUidContent.entrySet().iterator();
+    	Long mapIndex=new Long(1);
+		while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            String currentQuestionUid=pairs.getValue().toString();
+            logger.debug("currentQuestionUid: " +  currentQuestionUid);
+            List listQuestionOptions=mcService.findMcOptionsContentByQueId(new Long(currentQuestionUid));
+            logger.debug("listQuestionOptions: " +  listQuestionOptions);
+            Map mapQuestionOptions=generateOptionsQueIdMap(listQuestionOptions);
+            map.put(mapIndex.toString(),mapQuestionOptions);
+            mapIndex=new Long(mapIndex.longValue()+1);
+		}
+		return map;
+	}
+
+
+	public static Map rebuildStartupGeneralSelectedOptionsContentMapfromDB(HttpServletRequest request, Map mapQuestionsUidContent)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+		Map mapStartupGeneralOptionsContent= new TreeMap(new McComparator());
+    	
+    	Iterator itMap = mapQuestionsUidContent.entrySet().iterator();
+    	Long mapIndex=new Long(1);
+		while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            String currentQuestionUid=pairs.getValue().toString();
+            logger.debug("currentQuestionUid: " +  currentQuestionUid);
+            List listQuestionOptions=mcService.getPersistedSelectedOptions(new Long(currentQuestionUid));
+            logger.debug("listQuestionOptions: " +  listQuestionOptions);
+            Map mapQuestionOptions=generateOptionsMap(listQuestionOptions);
+            mapStartupGeneralOptionsContent.put(mapIndex.toString(),mapQuestionOptions);
+            mapIndex=new Long(mapIndex.longValue()+1);
+		}
+		return mapStartupGeneralOptionsContent;
+	}
+
 	
+    public static Map rebuildStartupGeneralOptionsContentMapfromDB(HttpServletRequest request, Map mapQuestionsUidContent)
+	{
+		IMcService mcService =McUtils.getToolService(request);
+		Map mapStartupGeneralOptionsContent= new TreeMap(new McComparator());
+    	
+    	Iterator itMap = mapQuestionsUidContent.entrySet().iterator();
+    	Long mapIndex=new Long(1);
+		while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            String currentQuestionUid=pairs.getValue().toString();
+            logger.debug("currentQuestionUid: " +  currentQuestionUid);
+            List listQuestionOptions=mcService.findMcOptionsContentByQueId(new Long(currentQuestionUid));
+            logger.debug("listQuestionOptions: " +  listQuestionOptions);
+            Map mapQuestionOptions=generateOptionsMap(listQuestionOptions);
+            mapStartupGeneralOptionsContent.put(mapIndex.toString(),mapQuestionOptions);
+            mapIndex=new Long(mapIndex.longValue()+1);
+		}
+		return mapStartupGeneralOptionsContent;
+	}
+	
+	
+	public static Map generateOptionsMap(List listQuestionOptions)
+	{
+		Map mapOptsContent= new TreeMap(new McComparator());
+		
+		Iterator listIterator=listQuestionOptions.iterator();
+    	Long mapIndex=new Long(1);
+    	while (listIterator.hasNext())
+    	{
+    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+    		logger.debug("mcOptsContent: " +  mcOptsContent);
+    		mapOptsContent.put(mapIndex.toString(),mcOptsContent.getMcQueOptionText());
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	return mapOptsContent;
+	}
+	
+	
+	public static Map generateOptionsQueIdMap(List listQuestionOptions)
+	{
+		Map mapOptsContent= new TreeMap(new McComparator());
+		
+		Iterator listIterator=listQuestionOptions.iterator();
+    	Long mapIndex=new Long(1);
+    	while (listIterator.hasNext())
+    	{
+    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
+    		logger.debug("mcOptsContent: " +  mcOptsContent);
+    		mapOptsContent.put(mapIndex.toString(),mcOptsContent.getMcQueContentId().toString());
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	return mapOptsContent;
+	}
+	
+	
+
     public static Map rebuildQuestionMapfromDB(HttpServletRequest request, Long toolContentId)
     {
     	Map mapQuestionsContent= new TreeMap(new McComparator());
@@ -553,6 +654,7 @@ public class AuthoringUtil implements McAppConstants {
      */
     public static void persistOptionsFinal(HttpServletRequest request, Map currentOptions, Map selectedOptions, McQueContent mcQueContent)
     {
+    	logger.debug("doing persistOptionsFinal...");
     	IMcService mcService =McUtils.getToolService(request);
         logger.debug("passed currentOptions: " + currentOptions);
         logger.debug("passed selectedOptions: " + selectedOptions);
@@ -602,6 +704,7 @@ public class AuthoringUtil implements McAppConstants {
      */
     public static void persistOptions(HttpServletRequest request, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, McQueContent mcQueContent, String questionIndex)
     {
+    	logger.debug("doing persistOptions...");
     	IMcService mcService =McUtils.getToolService(request);
     	logger.debug("passed questionIndex: " +  questionIndex);
     	
@@ -642,7 +745,7 @@ public class AuthoringUtil implements McAppConstants {
      */
     public static McContent createContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {
-    	logger.debug("called createContent");
+    	logger.debug("doing createContent...");
     	IMcService mcService =McUtils.getToolService(request);
     	
     	/* the tool content id is passed from the container to the tool and placed into session in the McStarterAction */
@@ -811,7 +914,7 @@ public class AuthoringUtil implements McAppConstants {
     
     public static void cleanupRedundantQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent, McContent mcContent)
     {
-    	logger.debug("will cleanupRedundantQuestions... ");
+    	logger.debug("doing cleanupRedundantQuestions...");
     	IMcService mcService =McUtils.getToolService(request);
     	
         /*remove ununsed question entries from the db */
@@ -856,6 +959,7 @@ public class AuthoringUtil implements McAppConstants {
     
     public static void selectAndPersistQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McContent mcContent)
 	{
+    	logger.debug("doing selectAndPersistQuestions...");
     	IMcService mcService =McUtils.getToolService(request);
     	
     	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
@@ -900,7 +1004,7 @@ public class AuthoringUtil implements McAppConstants {
     
     public static void updateExistingQuestionContent(HttpServletRequest request, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McQueContent mcQueContent, String displayOrder)
     {
-    	logger.debug("using updateExisitingQuestionContent: " + mcQueContent);
+    	logger.debug("doing updateExistingQuestionContent...");
     	logger.debug("using displayOrder: " + displayOrder);
     	
     	Map mapWeights= (Map)request.getSession().getAttribute(MAP_WEIGHTS);
@@ -929,7 +1033,354 @@ public class AuthoringUtil implements McAppConstants {
 		logger.debug("updated mcQueContent in the db: " + mcQueContent);
     }
 
+
+	public static void removeRedundantOptionEntry(HttpServletRequest request, Map mapSGO, Map mapGO, Map options)
+	{
+		logger.debug("doing removeRedundantOptionEntry...");
+		IMcService mcService =McUtils.getToolService(request);
+		Iterator itSGOMap = mapSGO.entrySet().iterator();
+    	boolean optionFound=false;
+        while (itSGOMap.hasNext()) 
+        {
+            Map.Entry pairsSGO = (Map.Entry)itSGOMap.next();
+            optionFound=false;
+            Iterator itGOMap = mapGO.entrySet().iterator();
+	    	while (itGOMap.hasNext()) 
+	        {
+	        	Map.Entry pairsGO = (Map.Entry)itGOMap.next();
+	        	if (pairsSGO.getValue().equals(pairsGO.getValue()))
+	        	{
+	        		logger.debug("equal option found: " + pairsGO.getValue());
+	        		optionFound=true;
+	        		break;
+	        	}
+	        }
+	    	
+	    	if (optionFound == false)
+        	{
+        		logger.debug("options optionFound is false: remove this option");
+        		int optionSize=options.size();
+        		logger.debug("optionSize:" + optionSize);
+        		String mcQueContentUid=(String)options.get(new Integer(optionSize).toString()); 
+        		
+        		logger.debug("mcQueContentUid: " + mcQueContentUid);
+        		
+        		String deletableOptionText=pairsSGO.getValue().toString();
+        		logger.debug("deletableOptionText: " + deletableOptionText);
+	        	
+        		if (deletableOptionText != null && (!deletableOptionText.equals("")))
+        		{
+        			McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(deletableOptionText, new Long(mcQueContentUid));
+		        	logger.debug("mcOptsContent: " + mcOptsContent);
+            		mcService.removeMcOptionsContent(mcOptsContent);
+            		logger.debug("removed mcOptsContent from db: " + mcOptsContent);	
+        		}
+        		else
+        		{
+        			logger.debug("This should not happen: deletableOptionText is null..");
+        		}
+        	}
+        }
+	}
+
+	
+	public static void cleanupRedundantOptions(HttpServletRequest request, Map mapStartupGeneralOptionsContent, Map mapStartupGeneralSelectedOptionsContent, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, Map mapStartupGeneralOptionsQueId)
+	{
+		logger.debug("doing cleanupRedundantOptions...");
+		logger.debug("starting cleanupRedundantOptions...:" + mapStartupGeneralOptionsContent);
+		logger.debug("using mapGeneralOptionsContent..: "+ mapGeneralOptionsContent);
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	Iterator itSGOMap = mapStartupGeneralOptionsContent.entrySet().iterator();
+    	int displayOrder=0;
+    	boolean optionFound=false;
+        while (itSGOMap.hasNext()) 
+        {
+            Map.Entry pairsSGO = (Map.Entry)itSGOMap.next();
+
+			optionFound=false;
+            Iterator itGOMap = mapGeneralOptionsContent.entrySet().iterator();
+	    	while (itGOMap.hasNext()) 
+	        {
+	            Map.Entry pairsGO = (Map.Entry)itGOMap.next();
+	            if (pairsSGO.getKey().equals(pairsGO.getKey()))
+	            {
+	            	logger.debug("equal keys found: " + pairsSGO.getKey());
+	            	Map mapSGO=(Map)pairsSGO.getValue();
+	            	Map mapGO=(Map)pairsGO.getValue();
+	            	logger.debug("mapSGO: " + mapSGO);
+	            	logger.debug("mapGO: " + mapGO);
+	            	
+	            	Map options=(Map)mapStartupGeneralOptionsQueId.get(pairsSGO.getKey());
+	            	logger.debug("options: " + options);
+	            	removeRedundantOptionEntry(request, mapSGO, mapGO,options); 
+	            }
+	        }
+        }
+    }
     
+
+	public static void selectAndPersistOptions(HttpServletRequest request, Map mapStartupGeneralOptionsContent, Map mapStartupGeneralSelectedOptionsContent, 
+			Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, Map mapStartupGeneralOptionsQueId)
+	{
+		logger.debug("doing selectAndPersistOptions...");
+		logger.debug("starting selectAndPersistOptions..: "+ mapStartupGeneralOptionsContent);
+		logger.debug("using mapGeneralOptionsContent..: "+ mapGeneralOptionsContent);
+		IMcService mcService =McUtils.getToolService(request);
+    	
+    	Iterator itSGOMap = mapStartupGeneralOptionsContent.entrySet().iterator();
+    	int displayOrder=0;
+    	boolean optionFound=false;
+        while (itSGOMap.hasNext()) 
+        {
+            Map.Entry pairsSGO = (Map.Entry)itSGOMap.next();
+
+			optionFound=false;
+            Iterator itGOMap = mapGeneralOptionsContent.entrySet().iterator();
+	    	while (itGOMap.hasNext()) 
+	        {
+	            Map.Entry pairsGO = (Map.Entry)itGOMap.next();
+	            if (pairsSGO.getKey().equals(pairsGO.getKey()))
+	            {
+	            	
+	            	logger.debug("equal keys found: " + pairsSGO.getKey());
+	            	String questionIndex=pairsSGO.getKey().toString();
+	            	Map mapSGO=(Map)pairsSGO.getValue();
+	            	Map mapGO=(Map)pairsGO.getValue();
+	            	logger.debug("mapSGO: " + mapSGO);
+	            	logger.debug("mapGO: " + mapGO);
+	            	
+	            	Map options=(Map)mapStartupGeneralOptionsQueId.get(pairsSGO.getKey());
+	            	logger.debug("options: " + options);
+	            	updateOrCreateOptions(request, mapSGO, mapGO,options, questionIndex, mapGeneralSelectedOptionsContent); 
+	            }
+	        }
+        }
+        
+    	logger.debug("will do writePendingOptions for the new questions..");
+    	writePendingOptions(request, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent);    	
+    }
+    
+    
+    public static void updateOrCreateOptions(HttpServletRequest request, Map mapSGO, Map mapGO, Map options, String questionIndex, Map mapGeneralSelectedOptionsContent)
+    {
+    	logger.debug("doing updateOrCreateOptions...");
+    	Iterator itOptionsGoMap = mapGO.entrySet().iterator();
+		boolean optionContentFound=false;
+        while (itOptionsGoMap.hasNext()) 
+        {
+            Map.Entry pairs = (Map.Entry)itOptionsGoMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            optionContentFound = false;
+            Iterator itOptionsSGO = mapSGO.entrySet().iterator();
+            while (itOptionsSGO.hasNext()) 
+            {
+            	Map.Entry pairsSGO = (Map.Entry)itOptionsSGO.next();
+            	if (pairsSGO.getValue().equals(pairs.getValue()))
+				{
+				    optionContentFound = true;
+                	break;
+				}
+            }
+
+            if (optionContentFound == false)
+            {
+            	String optionText=pairs.getValue().toString();
+            	logger.debug("optionContentFound is false and option is: " + optionText);
+            	createOptionContent(request, options, optionText,  questionIndex, mapGeneralSelectedOptionsContent);
+            }
+        }
+    }
+
+
+	public static void updateExistingOptionContent(HttpServletRequest request, Map options, String optionText)
+    {
+		logger.debug("doing updateExistingOptionContent...");
+    	IMcService mcService =McUtils.getToolService(request);
+    	int optionSize=options.size();
+		logger.debug("optionSize:" + optionSize);
+		String mcQueContentUid=(String)options.get(new Integer(optionSize).toString()); 
+		logger.debug("mcQueContentUid: " + mcQueContentUid);
+		
+		McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(optionText, new Long(mcQueContentUid));
+		logger.debug("mcOptsContent: " + mcOptsContent);
+		mcService.removeMcOptionsContent(mcOptsContent);
+		logger.debug("removed mcOptsContent from db: " + mcOptsContent);
+    }
+
+	
+	public static void writePendingOptions(HttpServletRequest request, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent)
+	{
+		logger.debug("doing writePendingQuestions...");
+		Iterator itGO = mapGeneralOptionsContent.entrySet().iterator();
+        while (itGO.hasNext()) 
+        {
+        	Map.Entry pairsGO = (Map.Entry)itGO.next();
+           	Map pendingOptions=(Map) pairsGO.getValue();
+           	logger.debug("pendingOptions: " + pendingOptions);
+           	writePendingOption(request, pairsGO.getKey().toString(), pendingOptions, mapGeneralSelectedOptionsContent);
+        }
+	}
+
+	
+	public static void writePendingOption(HttpServletRequest request, String questionIndex, Map pendingOptions, Map mapGeneralSelectedOptionsContent)
+	{
+    	logger.debug("doing writePendingOption...");
+		logger.debug("questionIndex: " + questionIndex);
+		logger.debug("pendingOptions: " + pendingOptions);
+		IMcService mcService =McUtils.getToolService(request);
+		
+		Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+		logger.debug("getting existing content with id:" + toolContentId);
+		McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("existing mcContent:" + mcContent);
+		McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(new Long(questionIndex), mcContent.getUid());
+		logger.debug("exracted mcQueContent:" + mcQueContent);
+		
+		if (mcQueContent != null)
+		{
+			Long mcQueContentUid=mcQueContent.getUid();
+			logger.debug("mcQueContentUid:" + mcQueContentUid);
+			
+			Iterator itPQ = pendingOptions.entrySet().iterator();
+			boolean isOptionSelected=false;
+	        while (itPQ.hasNext())
+	        {
+	        	Map.Entry pairsPQ = (Map.Entry)itPQ.next();
+	        	String optionText=pairsPQ.getValue().toString() ;
+	        	logger.debug("optionText: " + optionText);
+	        	isOptionSelected=false;
+	        	isOptionSelected=isOptionSelected(mapGeneralSelectedOptionsContent, optionText, questionIndex);
+	    		logger.debug("isOptionSelected: " + isOptionSelected);
+	    		
+	    		McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(optionText, mcQueContentUid);
+	    		logger.debug("mcOptsContent: " + mcOptsContent);
+	    		
+	    		if (mcOptsContent == null)
+	    		{
+	    			mcOptsContent = new McOptsContent(isOptionSelected, pairsPQ.getValue().toString(),mcQueContent , new TreeSet());
+	    			logger.debug("created new mcOptsContent:" + mcOptsContent);
+	    		}
+	        	else
+	        	{
+	        		logger.debug("this option is already persisted mcQueContent, just look after isOptionSelected:" + mcQueContent);
+	        		mcOptsContent.setCorrectOption(isOptionSelected);
+	        	}
+	    		mcService.saveMcOptionsContent(mcOptsContent);
+				logger.debug("persisted mcQueContent: " + mcQueContent);
+	        }
+		}
+	}
+	
+	
+	public static void createOptionContent(HttpServletRequest request, Map options, String optionText, 
+			String questionIndex, Map mapGeneralSelectedOptionsContent)
+    {
+       	IMcService mcService =McUtils.getToolService(request);
+    	logger.debug("doing createOptionContent...");
+		int optionSize=options.size();
+		logger.debug("optionSize:" + optionSize);
+		logger.debug("optionText:" + optionText);
+		
+		String mcQueContentUid=(String)options.get(new Integer(optionSize).toString()); 
+		logger.debug("mcQueContentUid: " + mcQueContentUid);
+
+		boolean isOptionSelected=isOptionSelected(mapGeneralSelectedOptionsContent, optionText, questionIndex);
+		logger.debug("isOptionSelected: " + isOptionSelected);
+		
+		if (mcQueContentUid != null)
+		{
+			McQueContent mcQueContent= mcService.getMcQueContentByUID(new Long(mcQueContentUid));
+			logger.debug("mcQueContent: " + mcQueContent);
+			
+			McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(optionText, new Long(mcQueContentUid));
+			if (mcOptsContent == null)
+			{
+				mcOptsContent = new McOptsContent(isOptionSelected, optionText,mcQueContent , new TreeSet());
+				mcService.saveMcOptionsContent(mcOptsContent);
+				logger.debug("persisted mcQueContent: " + mcQueContent);	
+			}
+			else
+			{
+				logger.debug("mcOptsContent already exists: " + mcQueContent);
+			}	
+		}
+		else
+		{
+			Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+			logger.debug("getting existing content with id:" + toolContentId);
+			McContent mcContent=mcService.retrieveMc(toolContentId);
+			logger.debug("existing mcContent:" + mcContent);
+			logger.debug("mcOptsContent is null, get the mcQueContent in an alternative way, use pendingOptionsKey: " + questionIndex);
+			McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(new Long(questionIndex), mcContent.getUid());
+			logger.debug("exracted mcQueContent:" + mcQueContent);
+
+			if (mcQueContent != null)
+			{
+				McOptsContent mcOptsContent = new McOptsContent(isOptionSelected, optionText,mcQueContent , new TreeSet());
+				mcService.saveMcOptionsContent(mcOptsContent);
+				logger.debug("persisted mcQueContent: " + mcQueContent);	
+			}
+		}
+    }
+
+
+	public static boolean isOptionSelected(Map mapGeneralSelectedOptionsContent, String optionText, String questionIndex)
+	{
+	   Iterator itGSOMap = mapGeneralSelectedOptionsContent.entrySet().iterator();
+	   logger.debug("questionIndex: " + questionIndex);
+	   logger.debug("optionText: " + optionText);
+	   while (itGSOMap.hasNext()) 
+        {
+            Map.Entry pairs = (Map.Entry)itGSOMap.next();
+            if (pairs.getKey().toString().equals(questionIndex))
+            {
+            	Map currentOptionsMap= (Map)pairs.getValue();
+            	logger.debug("currentOptionsMap: " + currentOptionsMap);
+            	boolean isOptionSelectedInMap=isOptionSelectedInMap(optionText, currentOptionsMap);
+            	logger.debug("isOptionSelectedInMap: " + isOptionSelectedInMap);
+            	return isOptionSelectedInMap;
+            }
+        }
+	   return false;
+	}
+	
+	
+	public static boolean isOptionSelectedInMap(String optionText, Map currentOptionsMap)
+	{
+		logger.debug("optionText: " + optionText);
+		Iterator itCOMap = currentOptionsMap.entrySet().iterator();
+		while (itCOMap.hasNext()) 
+	    {
+			Map.Entry pairs = (Map.Entry)itCOMap.next();
+			if (pairs.getValue().toString().equals(optionText))
+			{
+				logger.debug("option text found in the map: " + optionText);
+				return true;
+			}
+	    }
+		return false;
+	}
+
+	
+	public static void createDefaultOptionContent(HttpServletRequest request, McQueContent mcQueContent)
+    {
+		logger.debug("doing createDefaultOptionContent...");
+       	IMcService mcService =McUtils.getToolService(request);
+    	
+		String mcQueContentUid=mcQueContent.getUid().toString();
+		logger.debug("mcQueContentUid:" + mcQueContentUid);
+		
+		if (mcQueContentUid != null)
+		{
+			McOptsContent mcOptsContent= new McOptsContent(true,"a sample answer", mcQueContent, new TreeSet());
+			mcService.saveMcOptionsContent(mcOptsContent);
+	    	logger.debug("created a new mcOptsContent in the db: " + mcOptsContent);
+		}
+    }
+
+	
     public static void createQuestionContent(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, String question, McContent mcContent)
     {
     	logger.debug("using createQuestionContent with question: " + question);
@@ -1109,6 +1560,26 @@ public class AuthoringUtil implements McAppConstants {
         return maxDisplayOrder+1;
     	
     }
+    
+    
+    public static void  refreshMaps(HttpServletRequest request, long toolContentId)
+    {
+    	Map mapQuestionsUidContent=AuthoringUtil.rebuildQuestionUidMapfromDB(request, new Long(toolContentId));
+    	logger.debug("mapQuestionsUidContent:" + mapQuestionsUidContent);
+    	
+    	Map mapStartupGeneralOptionsContent=AuthoringUtil.rebuildStartupGeneralOptionsContentMapfromDB(request, mapQuestionsUidContent);
+    	logger.debug("mapStartupGeneralOptionsContent:" + mapStartupGeneralOptionsContent);
+    	request.getSession().setAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT, mapStartupGeneralOptionsContent);
+    	
+    	Map mapStartupGeneralSelectedOptionsContent=AuthoringUtil.rebuildStartupGeneralSelectedOptionsContentMapfromDB(request, mapQuestionsUidContent);
+    	logger.debug("mapStartupGeneralSelectedOptionsContent:" + mapStartupGeneralSelectedOptionsContent);
+    	request.getSession().setAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT, mapStartupGeneralSelectedOptionsContent);
+    	
+    	Map mapStartupGeneralOptionsQueId=AuthoringUtil.rebuildStartupGeneralOptionsQueIdfromDB(request, mapQuestionsUidContent);
+    	logger.debug("mapStartupGeneralOptionsQueId:" + mapStartupGeneralOptionsQueId);
+    	request.getSession().setAttribute(MAP_STARTUP_GENERAL_OPTIONS_QUEID, mapStartupGeneralOptionsQueId);	
+    }
+    
     
     public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
     {

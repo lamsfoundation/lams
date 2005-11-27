@@ -187,6 +187,21 @@ public class McServicePOJO implements
 	}
     
     
+    public McQueContent getMcQueContentByUID(Long uid) throws McApplicationException
+    {
+        try
+        {
+        	return mcQueContentDAO.getMcQueContentByUID(uid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting mc que content by uid: "
+                                                         + e.getMessage(),
+														   e);
+        }	
+    }
+    
+    
     public void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException
 	{
     	try
@@ -733,6 +748,21 @@ public class McServicePOJO implements
                                                  + e.getMessage(),e);
         }
     }
+    
+    
+    public McOptsContent getMcOptionsContentByUID(Long uid) throws McApplicationException
+	{
+    	try
+        {
+            return getMcOptionsContentByUID(uid);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting opt content by uid"
+                                                 + e.getMessage(),e);
+        }
+	}
+    
     
     public void saveMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException
 	{
