@@ -302,6 +302,8 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 		Object obj = null;
 		try {
 			obj = super.clone();
+			//never clone key!
+			((SubmitFilesContent)obj).setContentID(null);
 			//clone SubmitFIleSession object
 			if(toolSession != null ){
 				Iterator iter = toolSession.iterator();
@@ -319,7 +321,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 				((SubmitFilesContent)obj).instructionFiles= set;
 			}
 		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + SubmissionDetails.class + " failed");
+			log.error("When clone " + SubmitFilesContent.class + " failed");
 		}
 		
 		return obj;

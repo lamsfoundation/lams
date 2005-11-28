@@ -103,6 +103,8 @@ public class SubmitFilesSession implements Serializable,Cloneable{
 		Object obj = null;
 		try {
 			obj = super.clone();
+			//never clone key!
+			((SubmitFilesSession)obj).setSessionID(null);
 			//clone SubmissionDetails object
 			if(submissionDetails != null){
 				Iterator iter = submissionDetails.iterator();

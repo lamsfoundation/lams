@@ -118,8 +118,9 @@ public class SubmitFilesService implements ToolContentManager,
 		SubmitFilesContent toContent = (SubmitFilesContent) fromContent.clone();
 		//reset some new attributes for toContent
 		toContent.setContentID(toContentId);
+		//clear ToolSession
 		toContent.setToolSession(new TreeSet());
-		
+
 		submitFilesContentDAO.insert(toContent);
 	}
     /**
@@ -345,7 +346,7 @@ public class SubmitFilesService implements ToolContentManager,
             submitSession.setStatus(new Integer(SubmitFilesSession.INCOMPLETE));
             submitSession.setContent(submitContent);
             submitFilesSessionDAO.createSession(submitSession);
-            log.debug("Survey session created");
+            log.debug("Submit File session created");
         }
         catch (DataAccessException e)
         {

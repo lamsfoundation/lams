@@ -175,6 +175,8 @@ public class SubmissionDetails implements Serializable,Cloneable{
 		Object obj = null;
 		try {
 			obj = super.clone();
+			//never clone key!
+			((SubmissionDetails)obj).setSubmissionID(null);
 			if(this.report != null)
 				((SubmissionDetails)obj).report = (SubmitFilesReport) this.report.clone();
 		} catch (CloneNotSupportedException e) {

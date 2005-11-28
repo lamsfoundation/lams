@@ -83,6 +83,8 @@ public class InstructionFiles implements Serializable,Cloneable{
 		Object obj = null;
 		try {
 			obj = super.clone();
+			//never clone key!
+			((InstructionFiles)obj).setUid(null);
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + InstructionFiles.class + " failed");
 		}

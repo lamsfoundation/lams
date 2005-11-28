@@ -101,6 +101,8 @@ public class SubmitFilesReport implements Serializable,Cloneable{
 		Object obj = null;
 		try {
 			obj = super.clone();
+			//never clone key!
+			((SubmitFilesReport)obj).setReportID(null);
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + SubmitFilesReport.class + " failed");
 		}
