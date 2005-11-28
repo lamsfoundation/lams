@@ -5,7 +5,7 @@
 	<!-- import properties from the shared and o/s specific files -->
 	<property file="common.properties" />
 	<property file="shared.properties" />
-	<property file="windows.properties" />
+	<property file="${osPropertiesName}.properties" />
 
 	<target name="init">
 		<mkdir dir="${assembly}" />
