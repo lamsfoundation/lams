@@ -67,7 +67,7 @@
 								  </tr>
 							</c:if> 			
 						</c:forEach>
-						<html:hidden property="toolContentId" value="${sessionScope.toolContentId}"/>
+						<html:hidden property="toolContentId" value="${sessionScope.toolContentID}"/>
 						<html:hidden property="questionIndex"/>
 						<html:hidden property="isRemoveContent"/>
 					</tr>
@@ -132,7 +132,7 @@
 								  </tr>
 							</c:if> 			
 						</c:forEach>
-						<html:hidden property="toolContentId" value="${sessionScope.toolContentId}"/>
+						<html:hidden property="toolContentId" value="${sessionScope.toolContentID}"/>
 						<html:hidden property="questionIndex"/>
 						<html:hidden property="isRemoveContent"/>
 					</table>
