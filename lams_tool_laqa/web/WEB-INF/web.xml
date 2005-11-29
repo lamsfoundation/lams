@@ -95,6 +95,18 @@
             </init-param>
             <load-on-startup>1</load-on-startup>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>download</servlet-name>
+		<display-name>Instructions Download</display-name>
+		<description>Instructions Download</description>		
+		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
+	    <init-param>
+	      <param-name>toolContentHandlerBeanName</param-name>
+	      <param-value>qaToolContentHandler</param-value>
+	    </init-param>
+	    <load-on-startup>3</load-on-startup>
+	</servlet>
 
   	<servlet-mapping>
 		<servlet-name>action</servlet-name>
@@ -104,7 +116,12 @@
   	<servlet-mapping>
 	        <servlet-name>Connector</servlet-name>
              <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
-	</servlet-mapping>             
+	</servlet-mapping>   
+	
+	<servlet-mapping>
+		<servlet-name>download</servlet-name>
+		<url-pattern>/download/*</url-pattern>
+  	</servlet-mapping>          
               	
 
    <session-config>
