@@ -23,6 +23,16 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
 
+<%
+String protocol = request.getProtocol();
+if(protocol.startsWith("HTTPS")){
+	protocol = "https://";
+}else{
+	protocol = "http://";
+}
+String LAMS_ROOT = protocol+request.getServerName()+":"+request.getServerPort()+"/lams/";
+%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">
     <head>
@@ -39,6 +49,7 @@ http://www.gnu.org/licenses/gpl.txt
 	        }
 	        //-->
 	  </script>
+      <script src="<%=LAMS_ROOT%>includes/javascript/common.js"></script>
 	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
     </head>
     
