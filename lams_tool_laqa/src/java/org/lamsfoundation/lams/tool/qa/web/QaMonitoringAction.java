@@ -49,6 +49,8 @@ import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+
 
 public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 {
@@ -402,7 +404,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 	    	    if (qaSession !=null)
 	    	    {
 	    	    	monitoredToolSessionsCounter++;
-	    	    	request.getSession().setAttribute(TOOL_SESSION_ID, new Long(strToolSessionId));
+	    	    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, new Long(strToolSessionId));
 		    	    logger.debug("TOOL_SESSION_ID in session");
 		    	    
 		    		if (READABLE_TOOL_SESSION_COUNT.equals(MAX_TOOL_SESSION_COUNT))
@@ -431,7 +433,7 @@ public class QaMonitoringAction extends DispatchAction implements QaAppConstants
 		    	     * place it into TOOL_CONTENT_ID session attribute since learningUtil.buidLearnerReport(request) depends on it
 		    	     * to generate a report
 		    	     */
-		    	    request.getSession().setAttribute(TOOL_CONTENT_ID,qaContent.getQaContentId());
+		    	    request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,qaContent.getQaContentId());
 		    	    
 		    	    /*
 		    	     * this is to convince jsp although usernameVisible applies only to learning mode

@@ -122,7 +122,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		if (useToolSessionId == true)
 		{
 			logger.debug("reading TOOL_SESSION_ID");
-			strToolSessionId=request.getParameter(TOOL_SESSION_ID);
+			strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 			logger.debug("toolSessionId :" + strToolSessionId);
 		
 		    try
@@ -130,7 +130,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			    if ((strToolSessionId != null) && (strToolSessionId.length() > 0)) 
 			    {
 			    	toolSessionId=new Long(strToolSessionId);
-			    	request.getSession().setAttribute(TOOL_SESSION_ID, toolSessionId);
+			    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 			    }
 			    else
 			    {
@@ -166,7 +166,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		if (useToolSessionId == false)
 		{
 			logger.debug("reading TOOL_CONTENT_ID");
-			strToolContentId=request.getParameter(TOOL_CONTENT_ID);
+			strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	    	logger.debug("TOOL_CONTENT_ID: " + strToolContentId);
 	    	
 		    try
@@ -180,7 +180,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 						logger.debug("forwarding to: " + PORTFOLIO_REPORT);
 						return (mapping.findForward(PORTFOLIO_REPORT));
 			    	}
-			    	request.getSession().setAttribute(TOOL_CONTENT_ID, new Long(strToolContentId));	
+			    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, new Long(strToolContentId));	
 			    }
 			    else
 			    {
@@ -211,14 +211,14 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 		
 		if (mode.equalsIgnoreCase(LEARNER))
 		{
-			toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+			toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
 			logger.debug("toolSessionId: " + toolSessionId);
 			
 			QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
 			QaContent qaContent=qaSession.getQaContent();
 		    logger.debug("using qaContent: " + qaContent);
 		    logger.debug("using qaContent id : " + qaContent.getQaContentId());
-		    request.getSession().setAttribute(TOOL_CONTENT_ID, qaContent.getQaContentId());
+		    request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, qaContent.getQaContentId());
 		    
 		    /* other learner's full name visible to this learner? */
 		    logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
@@ -246,13 +246,13 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			logger.debug("generate portfolio for mode: " + mode);
 			request.getSession().setAttribute(TARGET_MODE, TARGET_MODE_LEARNING);
 			/* a single toolSessionId */
-			request.getSession().setAttribute(TOOL_SESSION_ID, toolSessionId);
+			request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 			logger.debug("build a learner report:");
 			learningUtil.buidLearnerReport(request, 1);
 		}
 		else
 		{
-			toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+			toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 			logger.debug("toolContentId: " + toolContentId);
 			
 			List listToolSessions=null;
@@ -279,7 +279,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			{
 				toolSessionId=(Long)sessionListIterator.next();
 				logger.debug("toolSessionId: " + toolSessionId);
-				request.getSession().setAttribute(TOOL_SESSION_ID, toolSessionId);
+				request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 				learningUtil.buidLearnerReport(request, toolSessionCounter);
 				toolSessionCounter++;
 			}

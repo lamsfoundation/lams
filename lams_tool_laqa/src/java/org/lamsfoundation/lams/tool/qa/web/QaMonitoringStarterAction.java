@@ -100,7 +100,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		
 		logger.debug("TOOL_USER is:" + user);
 		
-		String toolContentId=request.getParameter(TOOL_CONTENT_ID);
+		String toolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	    logger.debug("TOOL_CONTENT_ID: " + toolContentId);
 	    
 	    Long initialMonitoringContentId=(Long) request.getSession().getAttribute(INITIAL_MONITORING_TOOL_CONTENT_ID);
@@ -308,14 +308,14 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	public boolean isOnlyContentIdAvailable(HttpServletRequest request)
 	{
 		boolean existsContentId=false;
-		String strToolContentId=request.getParameter(TOOL_CONTENT_ID);
+		String strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		if ((strToolContentId != null) && (strToolContentId.length() > 0))
 			existsContentId=true;
 		
 		boolean existsToolSession=false;
 		for (int toolSessionIdCounter=1; toolSessionIdCounter < MAX_TOOL_SESSION_COUNT.intValue(); toolSessionIdCounter++)
 		{
-			String strToolSessionId=request.getParameter(TOOL_SESSION_ID + toolSessionIdCounter);
+			String strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID + toolSessionIdCounter);
 			if ((strToolSessionId != null) && (strToolSessionId.length() > 0))
 			{
 				existsToolSession=true;
@@ -347,7 +347,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 		IQaService qaService =QaUtils.getToolService(request);
 		for (int toolSessionIdCounter=1; toolSessionIdCounter < MAX_TOOL_SESSION_COUNT.intValue(); toolSessionIdCounter++)
 		{
-			String strToolSessionId=request.getParameter(TOOL_SESSION_ID + toolSessionIdCounter);
+			String strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID + toolSessionIdCounter);
 		    logger.debug("TOOL_SESSION_ID: " + strToolSessionId);
 		    if ((strToolSessionId != null) && (strToolSessionId.length() > 0))
 		    {

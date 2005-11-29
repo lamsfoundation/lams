@@ -169,7 +169,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    /*
 	     * process incoming tool session id and later derive toolContentId from it. 
 	     */
-	    String strToolSessionId=request.getParameter(TOOL_SESSION_ID);
+	    String strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    long toolSessionId=0;
 	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
 	    {
@@ -184,7 +184,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			{
 	    		toolSessionId=new Long(strToolSessionId).longValue();
 		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
-		    	request.getSession().setAttribute(TOOL_SESSION_ID,new Long(toolSessionId));	
+		    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,new Long(toolSessionId));	
 			}
 	    	catch(NumberFormatException e)
 			{
@@ -242,7 +242,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     */
 		QaContent qaContent=qaSession.getQaContent();
 	    logger.debug("using qaContent: " + qaContent);
-	    request.getSession().setAttribute(TOOL_CONTENT_ID, qaContent.getQaContentId());
+	    request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, qaContent.getQaContentId());
 	    logger.debug("using TOOL_CONTENT_ID: " + qaContent.getQaContentId());
 	    	    
 	    

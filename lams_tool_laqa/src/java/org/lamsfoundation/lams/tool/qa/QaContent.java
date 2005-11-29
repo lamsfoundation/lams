@@ -486,6 +486,8 @@ public class QaContent implements Serializable {
 	 * @return Returns the qaUploadedFiles.
 	 */
 	public Set getQaUploadedFiles() {
+        if(qaUploadedFiles == null)
+            qaUploadedFiles = new TreeSet();
 		return qaUploadedFiles;
 	}
 	/**

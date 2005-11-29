@@ -51,8 +51,8 @@ public class LearningUtil implements QaAppConstants{
         /*
          * retrive contentId from the http session
          */
-        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
-        Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));
+        Long toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
         QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
         
         logger.debug("retrieving qaContent: " + qaContent);
@@ -96,8 +96,8 @@ public class LearningUtil implements QaAppConstants{
         /*
          * retrive contentId from the http session
          */
-        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
-        Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));
+        Long toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
         QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
         
         logger.debug("retrieving qaContent: " + qaContent);
@@ -174,8 +174,8 @@ public class LearningUtil implements QaAppConstants{
         /*
          * retrive contentId from the http session
          */
-        logger.debug("createUsers-attempt retrieving toolContentId: " + request.getSession().getAttribute(TOOL_CONTENT_ID));
-        Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+        logger.debug("createUsers-attempt retrieving toolContentId: " + request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));
+        Long toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
         /*
          * obtain QaContent to be used in creating QaQueUsr
          */  
@@ -185,7 +185,7 @@ public class LearningUtil implements QaAppConstants{
         /*
          * get QaSession to be used in creating QaQueUsr
          */
-        Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+        Long toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
         logger.debug("createUsers-retrieving toolSessionId: " + toolSessionId);
         QaSession qaSession = qaService.retrieveQaSessionOrNullById(toolSessionId.longValue()); 
         logger.debug("createUsers-retrieving qaSession: " + qaSession);
@@ -267,7 +267,7 @@ public class LearningUtil implements QaAppConstants{
     	/*
     	 * find out the current tool session
     	 */
-    	Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+    	Long toolSessionId=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
     	logger.debug("processUserResponses using toolSessionId: " + toolSessionId);
     	
     	/*
@@ -284,7 +284,7 @@ public class LearningUtil implements QaAppConstants{
     	Map mapMainReport= new TreeMap(new QaStringComparator());
     	logger.debug("mapMainReport created with QaStringComparator");
     	
-    	Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	Long toolContentId=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
     	logger.debug("current toolContentId: " + toolContentId);
     	QaContent qaContent=qaService.loadQa(toolContentId.longValue());
     	logger.debug("retrieve qaContent: " + qaContent);
@@ -383,7 +383,7 @@ public class LearningUtil implements QaAppConstants{
     	/*
     	 * find out the current tool session
     	 */
-    	Long toolSessionId=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+    	Long toolSessionId=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
     	logger.debug("processUserResponses using toolSessionId: " + toolSessionId);
     	
     	/*
@@ -588,7 +588,7 @@ public class LearningUtil implements QaAppConstants{
     public void lockContent(HttpServletRequest request)
     {
     	IQaService qaService =QaUtils.getToolService(request);
-        Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+        Long toolContentId=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
     	logger.debug("current toolContentId: " + toolContentId);
     	QaContent qaContent=qaService.loadQa(toolContentId.longValue());
     	logger.debug("retrieve qaContent: " + qaContent);

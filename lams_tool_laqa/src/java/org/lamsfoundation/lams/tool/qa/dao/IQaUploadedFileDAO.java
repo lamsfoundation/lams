@@ -45,16 +45,18 @@ public interface IQaUploadedFileDAO
 	    public void removeUploadFile(Long submissionId);
 	    
 	    public void deleteUploadFile(QaUploadedFile qaUploadedFile);
+        
+        public List retrieveQaUploadedFiles(QaContent qa);
 	    
-	    public List retrieveQaUploadedFiles(QaContent qa, boolean fileOnline);
+//	    public List retrieveQaUploadedFiles(QaContent qa, boolean fileOnline);
 	    
-	    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa);
-	    
-	    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa);
-	    
-	    public List retrieveQaUploadedOfflineFilesName(QaContent qa);
-	    
-	    public List retrieveQaUploadedOnlineFilesName(QaContent qa);
+//	    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa);
+//	    
+//	    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa);
+//	    
+//	    public List retrieveQaUploadedOfflineFilesName(QaContent qa);
+//	    
+//	    public List retrieveQaUploadedOnlineFilesName(QaContent qa);
 	    
 	    public void cleanUploadedFilesMetaData();
 	    

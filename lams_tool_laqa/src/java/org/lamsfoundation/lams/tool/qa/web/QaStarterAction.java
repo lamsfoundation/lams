@@ -67,6 +67,7 @@
 
 package org.lamsfoundation.lams.tool.qa.web;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -95,6 +96,7 @@ import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -117,23 +119,23 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		Map mapQuestionContent= new TreeMap(new QaComparator());
 		/* these two are for repository access */
 		/* holds the final offline files  list */
-		LinkedList listUploadedOfflineFiles= new LinkedList();
-		LinkedList listUploadedOnlineFiles= new LinkedList();
-		
-		/* these two are for jsp */
-		LinkedList listUploadedOfflineFileNames= new LinkedList();
-		LinkedList listUploadedOnlineFileNames= new LinkedList();
+//		LinkedList listUploadedOfflineFiles= new LinkedList();
+//		LinkedList listUploadedOnlineFiles= new LinkedList();
+//		
+//		/* these two are for jsp */
+//		LinkedList listUploadedOfflineFileNames= new LinkedList();
+//		LinkedList listUploadedOnlineFileNames= new LinkedList();
 		
 		QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 		qaAuthoringForm.resetRadioBoxes();
 		
 		request.getSession().setAttribute(IS_DEFINE_LATER,"false");
 		request.getSession().setAttribute(DISABLE_TOOL,"");
-		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
-		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
-		
-		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
-		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
+//		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
+//		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
+//		
+//		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
+//		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
 		
 		IQaService qaService = QaUtils.getToolService(request);
 		logger.debug("retrieving qaService from session: " + qaService);
@@ -238,6 +240,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	     * find out whether the request is coming from monitoring module for EditActivity tab or from authoring environment url
 	     */
 	    String strToolContentId="";
+        Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
 	    Boolean isMonitoringEditActivityVisited=(Boolean)request.getSession().getAttribute(MONITORING_EDITACTIVITY_VISITED);
 	    logger.debug("isMonitoringEditActivityVisited: " + isMonitoringEditActivityVisited);
 	    
@@ -268,7 +271,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    	/* request is from authoring environment */
 	    	request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(false));
 	    	logger.debug("request is from authoring environment: ");
-	    	strToolContentId=request.getParameter(TOOL_CONTENT_ID);
+	    	strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	    }
 	    logger.debug("usable strToolContentId: " + strToolContentId);
 
@@ -281,7 +284,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		{
 	    	toolContentId=new Long(strToolContentId).longValue();
 	    	logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
-	    	request.getSession().setAttribute(TOOL_CONTENT_ID,strToolContentId);
+	    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,strToolContentId);
     	}
     	catch(NumberFormatException e)
 		{
@@ -366,12 +369,15 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		mapQuestionContent.put(INITIAL_QUESTION_COUNT,request.getSession().getAttribute(DEFAULT_QUESTION_CONTENT));
 		logger.debug("Map initialized with default contentid to: " + mapQuestionContent);
 
-		/* set  uploaded offline file names to empty list*/
-		List listOfflineFileNames=new LinkedList();
-		
-		/* set  uploaded online file names to empty list*/
-		List listOnlineFileNames=new LinkedList();
+//		/* set  uploaded offline file names to empty list*/
+//		List listOfflineFileNames=new LinkedList();
+//		
+//		/* set  uploaded online file names to empty list*/
+//		List listOnlineFileNames=new LinkedList();
 	
+        
+        request.getSession().setAttribute(ATTACHMENT_LIST, new ArrayList());
+        
 	    logger.debug("callling presentInitialUserInterface for the default content.");
 		return presentInitialUserInterface(request, mapping, qaAuthoringForm, mapQuestionContent);
 	}
@@ -456,7 +462,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    logger.debug("IS_DEFINE_LATER: " + request.getSession().getAttribute(IS_DEFINE_LATER));
 	    
 	    QaUtils.populateUploadedFilesData(request, defaultQaContent);
-	    logger.debug("populated UploadedFilesData");
+	    
 	    
 	    /*
 		 * get the existing question content

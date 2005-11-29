@@ -104,32 +104,33 @@ public interface QaAppConstants {
     public static final String RICHTEXT_TITLE							="richTextTitle";
     public static final String RICHTEXT_INSTRUCTIONS					="richTextInstructions";
     public static final String RICHTEXT_BLANK							="<p>&nbsp;</p>";
-    public static final String THE_OFFLINE_FILE							="theOfflineFile";
-    public static final String THE_ONLINE_FILE							="theOnlineFile";
-    public static final String THE_OFFLINE_FILENAME						="theOfflineFileName";
-    public static final String THE_ONLINE_FILENAME						="theOnlineFileName";
+//    public static final String THE_OFFLINE_FILE							="theOfflineFile";
+//    public static final String THE_ONLINE_FILE							="theOnlineFile";
+//    public static final String THE_OFFLINE_FILENAME						="theOfflineFileName";
+//    public static final String THE_ONLINE_FILENAME						="theOnlineFileName";
     public static final String SUBMIT_OFFLINE_FILE						="submitOfflineFile";
     public static final String SUBMIT_ONLINE_FILE						="submitOnlineFile";
-    public static final String LIST_UPLOADED_OFFLINE_FILES				="listUploadedOfflineFiles";
-    public static final String LIST_UPLOADED_ONLINE_FILES				="listUploadedOnlineFiles";
-    public static final String LIST_UPLOADED_OFFLINE_FILENAMES			="listUploadedOfflineFileNames";
-    public static final String LIST_UPLOADED_ONLINE_FILENAMES			="listUploadedOnlineFileNames";
-    public static final String LIST_UPLOADED_OFFLINE_FILES_UUID			="listUploadedOfflineFilesUuid";
-    public static final String LIST_UPLOADED_OFFLINE_FILES_NAME			="listUploadedOfflineFilesName";
-    public static final String LIST_UPLOADED_ONLINE_FILES_UUID			="listUploadedOnlineFilesUuid";
-    public static final String LIST_UPLOADED_ONLINE_FILES_NAME			="listUploadedOnlineFilesName";
+//    public static final String LIST_UPLOADED_OFFLINE_FILES				="listUploadedOfflineFiles";
+//    public static final String LIST_UPLOADED_ONLINE_FILES				="listUploadedOnlineFiles";
+//    public static final String LIST_UPLOADED_OFFLINE_FILENAMES			="listUploadedOfflineFileNames";
+//    public static final String LIST_UPLOADED_ONLINE_FILENAMES			="listUploadedOnlineFileNames";
+//    public static final String LIST_UPLOADED_OFFLINE_FILES_UUID			="listUploadedOfflineFilesUuid";
+//    public static final String LIST_UPLOADED_OFFLINE_FILES_NAME			="listUploadedOfflineFilesName";
+//    public static final String LIST_UPLOADED_ONLINE_FILES_UUID			="listUploadedOnlineFilesUuid";
+//    public static final String LIST_UPLOADED_ONLINE_FILES_NAME			="listUploadedOnlineFilesName";
     public static final String POPULATED_UPLOADED_FILESDATA				="populateUploadedFilesData";
     
     
     /*
      * the author's current content id
      */
-    public static final String TOOL_CONTENT_ID							="toolContentId";
+    //public static final String TOOL_CONTENT_ID							="toolContentId";
     
     /*
      * the learner or monitoring environment provides toolSessionId
      */
-    public static final String TOOL_SESSION_ID							="toolSessionId";
+    //public static final String TOOL_SESSION_ID							="toolSessionId";
+    
     public final long 	ONE_DAY 										=60 * 60 * 1000 * 24;
     public final static String NOT_ATTEMPTED 							="NOT_ATTEMPTED";
     public final static String INCOMPLETE 								="INCOMPLETE";
@@ -271,4 +272,9 @@ public interface QaAppConstants {
     public static final String DISPLAY_QUESTIONS 						="display";
     public static final String SUBMIT_QUESTIONS 						="submit";
     public static final String VIEW_INDIVIDUAL_SUMMARY 					="view";
+    
+    
+    public static final String ATTACHMENT_LIST                          ="attachmentList";
+    public static final String DELETED_ATTACHMENT_LIST                  ="deletedAttachmentList";
+    public static final String UUID                                     ="uuid";
 }

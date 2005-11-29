@@ -9,7 +9,9 @@ package org.lamsfoundation.lams.tool.qa.web;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -25,11 +27,14 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import sun.tools.jar.resources.jar;
 
 /**
  * 
@@ -245,211 +250,294 @@ public class AuthoringUtil implements QaAppConstants {
     }
     
     
-    /**
-     * QaContent createContent(Map mapQuestionContent, HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
-     * return QaContent
-     * At this stage, the Map is available from the presentaion layer and can be passed to services layer for persistance.
-     * We are making the content and question contents persistent.
-     * Id generation is "CURRENTLY" based on java.util.Random
-     */
-    protected QaContent createContent(Map mapQuestionContent, HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
-    {
-    	IQaService qaService =QaUtils.getToolService(request);
-    	
-    	/* the tool content id is passed from the container to the tool and placed into session in the QaStarterAction */
-    	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
-	    /*
-	    	if ((toolContentId != null) && (!toolContentId.equals("")))
-	    	{
-	    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
-	    		qaService.deleteQaById(new Long(toolContentId));
-	    		logger.debug("post-deletion existing content");
-			}
-	    */
-    	logger.debug("using TOOL_CONTENT_ID: " +  toolContentId);
-    	request.getSession().setAttribute(TOOL_CONTENT_ID,toolContentId);
-    	
-    	boolean isQuestionsSequenced=false;
-    	boolean isSynchInMonitor=false;
-    	boolean isUsernameVisible=false;
-    	String reportTitle="";
-    	String monitoringReportTitle="";
-    	String offlineInstructions="";
-    	String onlineInstructions="";
-    	String endLearningMessage="";
-    	String creationDate="";
-    	
-    	Boolean isQuestionsSequencedBoolean=new Boolean(false);
-	    Boolean isSynchInMonitorBoolean=new Boolean(false);
-	    Boolean isUsernameVisibleBoolean=new Boolean(false);
-    	
-	    Boolean renderMonitoringEditActivity=(Boolean)request.getSession().getAttribute(RENDER_MONITORING_EDITACTIVITY);
-		if ((renderMonitoringEditActivity != null) && (renderMonitoringEditActivity.booleanValue()))
-		{
-			logger.debug("getting properties based on editActivity: All properties available from the http session.");
-			isQuestionsSequencedBoolean=(Boolean)request.getSession().getAttribute(IS_QUESTIONS_SEQUENCED_MONITORING);
-		    isSynchInMonitorBoolean=(Boolean)request.getSession().getAttribute(IS_SYNCH_INMONITOR_MONITORING);
-		    isUsernameVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE_MONITORING);
-		    reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
-		    monitoringReportTitle=(String)request.getSession().getAttribute(MONITORING_REPORT_TITLE);
-		    offlineInstructions=(String)request.getSession().getAttribute(OFFLINE_INSTRUCTIONS);
-		    onlineInstructions=(String)request.getSession().getAttribute(ONLINE_INSTRUCTIONS);
-		    endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSSAGE);
-		    endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSSAGE);
-		    
-		    if (isQuestionsSequencedBoolean != null)
-		    	isQuestionsSequenced=isQuestionsSequencedBoolean.booleanValue();
-		    
-		    if (isSynchInMonitorBoolean != null)
-		    	isSynchInMonitor=isSynchInMonitorBoolean.booleanValue();
-		    
-		    if (isUsernameVisibleBoolean != null)
-		    	isUsernameVisible=isUsernameVisibleBoolean.booleanValue();
-		}
-		else
-		{
-			logger.debug("getting properties based on normal flow: Properties available from form and request parameters.");
-			logger.debug("isQuestionsSequenced: " +  qaAuthoringForm.getQuestionsSequenced());
-	    	if (qaAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
-	    		isQuestionsSequenced=true;
-	    	
-	    	logger.debug("isSynchInMonitor: " +  qaAuthoringForm.getSynchInMonitor());
-	    	if (qaAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
-	    		isSynchInMonitor=true;
-	    	
-	    	logger.debug("isUsernameVisible: " +  qaAuthoringForm.getUsernameVisible());
-	    	if (qaAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
-	    		isUsernameVisible=true;
-	    	
-	    	reportTitle=qaAuthoringForm.getReportTitle();
-		    monitoringReportTitle=qaAuthoringForm.getMonitoringReportTitle();
-		    offlineInstructions=qaAuthoringForm.getOnlineInstructions();
-		    onlineInstructions=qaAuthoringForm.getOfflineInstructions();
-		    endLearningMessage=qaAuthoringForm.getEndLearningMessage();
-		}
-		creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
-		if (creationDate == null)
-			creationDate=new Date(System.currentTimeMillis()).toString();
-		
-		/* read rich text values */
-		String richTextOfflineInstructions="";
-    	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
-    	logger.debug("createContent:  richTextOfflineInstructions from session: " + richTextOfflineInstructions);
-    	if (richTextOfflineInstructions == null) richTextOfflineInstructions="";
-    	
-    	String richTextOnlineInstructions="";
-    	richTextOnlineInstructions = (String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
-    	logger.debug("createContent richTextOnlineInstructions from session: " + richTextOnlineInstructions);
-    	if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
-    	
-    	String richTextTitle="";
-    	richTextTitle = (String)request.getSession().getAttribute(RICHTEXT_TITLE);
-    	logger.debug("createContent richTextTitle from session: " + richTextTitle);
-    	if (richTextTitle == null) richTextTitle="";
-    	
-    	String richTextInstructions="";
-    	richTextInstructions = (String)request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
-    	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
-    	if (richTextInstructions == null) richTextInstructions="";
-    	
-    		
-    	/* obtain user object from the session*/
-	    HttpSession ss = SessionManager.getSession();
-	    /* get back login user DTO*/
-	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-    	logger.debug("retrieving toolUser: " + toolUser);
-    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
-    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
-    	logger.debug("retrieving toolUser fullname: " + fullName);
-    	long userId=toolUser.getUserID().longValue();
-    	
-    	/* create a new qa content and leave the default content intact*/
-    	QaContent qa = new QaContent();
-		qa.setQaContentId(new Long(toolContentId));
-		qa.setTitle(richTextTitle);
-		qa.setInstructions(richTextInstructions);
-		qa.setCreationDate(creationDate); /**preserve this from the db*/ 
-		qa.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
-		qa.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
-	    qa.setUsernameVisible(isUsernameVisible);
-	    qa.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
-	    qa.setSynchInMonitor(isSynchInMonitor);
-	    qa.setOnlineInstructions(richTextOnlineInstructions);
-	    qa.setOfflineInstructions(richTextOfflineInstructions);
-	    qa.setEndLearningMessage(endLearningMessage);
-	    qa.setReportTitle(reportTitle);
-	    qa.setMonitoringReportTitle(monitoringReportTitle);
-	    qa.setQaQueContents(new TreeSet());
-	    qa.setQaSessions(new TreeSet());
-	    qa.setQaUploadedFiles(new TreeSet());
-	    logger.debug("qa content :" +  qa);
-    	
-    	/* create the content in the db*/
-        qaService.createQa(qa);
-        logger.debug("qa created with content id: " + toolContentId);
+//    /**
+//     * QaContent createContent(Map mapQuestionContent, HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
+//     * return QaContent
+//     * At this stage, the Map is available from the presentaion layer and can be passed to services layer for persistance.
+//     * We are making the content and question contents persistent.
+//     * Id generation is "CURRENTLY" based on java.util.Random
+//     */
+//    protected QaContent createContent(Map mapQuestionContent, HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
+//    {
+//    	IQaService qaService =QaUtils.getToolService(request);
+//    	
+//    	/* the tool content id is passed from the container to the tool and placed into session in the QaStarterAction */
+//    	String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+//	    /*
+//	    	if ((toolContentId != null) && (!toolContentId.equals("")))
+//	    	{
+//	    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
+//	    		qaService.deleteQaById(new Long(toolContentId));
+//	    		logger.debug("post-deletion existing content");
+//			}
+//	    */
+//    	logger.debug("using TOOL_CONTENT_ID: " +  toolContentId);
+//    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,toolContentId);
+//    	
+//    	boolean isQuestionsSequenced=false;
+//    	boolean isSynchInMonitor=false;
+//    	boolean isUsernameVisible=false;
+//    	String reportTitle="";
+//    	String monitoringReportTitle="";
+//    	String offlineInstructions="";
+//    	String onlineInstructions="";
+//    	String endLearningMessage="";
+//    	String creationDate="";
+//    	
+//    	Boolean isQuestionsSequencedBoolean=new Boolean(false);
+//	    Boolean isSynchInMonitorBoolean=new Boolean(false);
+//	    Boolean isUsernameVisibleBoolean=new Boolean(false);
+//    	
+//	    Boolean renderMonitoringEditActivity=(Boolean)request.getSession().getAttribute(RENDER_MONITORING_EDITACTIVITY);
+//		if ((renderMonitoringEditActivity != null) && (renderMonitoringEditActivity.booleanValue()))
+//		{
+//			logger.debug("getting properties based on editActivity: All properties available from the http session.");
+//			isQuestionsSequencedBoolean=(Boolean)request.getSession().getAttribute(IS_QUESTIONS_SEQUENCED_MONITORING);
+//		    isSynchInMonitorBoolean=(Boolean)request.getSession().getAttribute(IS_SYNCH_INMONITOR_MONITORING);
+//		    isUsernameVisibleBoolean=(Boolean)request.getSession().getAttribute(IS_USERNAME_VISIBLE_MONITORING);
+//		    reportTitle=(String)request.getSession().getAttribute(REPORT_TITLE);
+//		    monitoringReportTitle=(String)request.getSession().getAttribute(MONITORING_REPORT_TITLE);
+//		    offlineInstructions=(String)request.getSession().getAttribute(OFFLINE_INSTRUCTIONS);
+//		    onlineInstructions=(String)request.getSession().getAttribute(ONLINE_INSTRUCTIONS);
+//		    endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSSAGE);
+//		    endLearningMessage=(String)request.getSession().getAttribute(END_LEARNING_MESSSAGE);
+//		    
+//		    if (isQuestionsSequencedBoolean != null)
+//		    	isQuestionsSequenced=isQuestionsSequencedBoolean.booleanValue();
+//		    
+//		    if (isSynchInMonitorBoolean != null)
+//		    	isSynchInMonitor=isSynchInMonitorBoolean.booleanValue();
+//		    
+//		    if (isUsernameVisibleBoolean != null)
+//		    	isUsernameVisible=isUsernameVisibleBoolean.booleanValue();
+//		}
+//		else
+//		{
+//			logger.debug("getting properties based on normal flow: Properties available from form and request parameters.");
+//			logger.debug("isQuestionsSequenced: " +  qaAuthoringForm.getQuestionsSequenced());
+//	    	if (qaAuthoringForm.getQuestionsSequenced().equalsIgnoreCase(ON))
+//	    		isQuestionsSequenced=true;
+//	    	
+//	    	logger.debug("isSynchInMonitor: " +  qaAuthoringForm.getSynchInMonitor());
+//	    	if (qaAuthoringForm.getSynchInMonitor().equalsIgnoreCase(ON))
+//	    		isSynchInMonitor=true;
+//	    	
+//	    	logger.debug("isUsernameVisible: " +  qaAuthoringForm.getUsernameVisible());
+//	    	if (qaAuthoringForm.getUsernameVisible().equalsIgnoreCase(ON))
+//	    		isUsernameVisible=true;
+//	    	
+//	    	reportTitle=qaAuthoringForm.getReportTitle();
+//		    monitoringReportTitle=qaAuthoringForm.getMonitoringReportTitle();
+//		    offlineInstructions=qaAuthoringForm.getOnlineInstructions();
+//		    onlineInstructions=qaAuthoringForm.getOfflineInstructions();
+//		    endLearningMessage=qaAuthoringForm.getEndLearningMessage();
+//		}
+//		creationDate=(String)request.getSession().getAttribute(CREATION_DATE);
+//		if (creationDate == null)
+//			creationDate=new Date(System.currentTimeMillis()).toString();
+//		
+//		/* read rich text values */
+//		String richTextOfflineInstructions="";
+//    	richTextOfflineInstructions = (String)request.getSession().getAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
+//    	logger.debug("createContent:  richTextOfflineInstructions from session: " + richTextOfflineInstructions);
+//    	if (richTextOfflineInstructions == null) richTextOfflineInstructions="";
+//    	
+//    	String richTextOnlineInstructions="";
+//    	richTextOnlineInstructions = (String)request.getSession().getAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
+//    	logger.debug("createContent richTextOnlineInstructions from session: " + richTextOnlineInstructions);
+//    	if (richTextOnlineInstructions == null) richTextOnlineInstructions="";
+//    	
+//    	String richTextTitle="";
+//    	richTextTitle = (String)request.getSession().getAttribute(RICHTEXT_TITLE);
+//    	logger.debug("createContent richTextTitle from session: " + richTextTitle);
+//    	if (richTextTitle == null) richTextTitle="";
+//    	
+//    	String richTextInstructions="";
+//    	richTextInstructions = (String)request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
+//    	logger.debug("createContent richTextInstructions from session: " + richTextInstructions);
+//    	if (richTextInstructions == null) richTextInstructions="";
+//    	
+//    		
+//    	/* obtain user object from the session*/
+//	    HttpSession ss = SessionManager.getSession();
+//	    /* get back login user DTO*/
+//	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+//    	logger.debug("retrieving toolUser: " + toolUser);
+//    	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
+//    	String fullName= toolUser.getFirstName() + " " + toolUser.getLastName();
+//    	logger.debug("retrieving toolUser fullname: " + fullName);
+//    	long userId=toolUser.getUserID().longValue();
+//    	
+//    	/* create a new qa content and leave the default content intact*/
+//    	QaContent qa = new QaContent();
+//		qa.setQaContentId(new Long(toolContentId));
+//		qa.setTitle(richTextTitle);
+//		qa.setInstructions(richTextInstructions);
+//		qa.setCreationDate(creationDate); /**preserve this from the db*/ 
+//		qa.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
+//		qa.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
+//	    qa.setUsernameVisible(isUsernameVisible);
+//	    qa.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
+//	    qa.setSynchInMonitor(isSynchInMonitor);
+//	    qa.setOnlineInstructions(richTextOnlineInstructions);
+//	    qa.setOfflineInstructions(richTextOfflineInstructions);
+//	    qa.setEndLearningMessage(endLearningMessage);
+//	    qa.setReportTitle(reportTitle);
+//	    qa.setMonitoringReportTitle(monitoringReportTitle);
+//	    qa.setQaQueContents(new TreeSet());
+//	    qa.setQaSessions(new TreeSet());
+//	    qa.setQaUploadedFiles(new TreeSet());
+//	    logger.debug("qa content :" +  qa);
+//    	
+//    	/* create the content in the db*/
+//        qaService.createQa(qa);
+//        logger.debug("qa created with content id: " + toolContentId);
+//        
+//        logger.debug("attempt cleaning files meta data from the db");
+//        qaService.cleanUploadedFilesMetaData();
+//		logger.debug("cleaned up files meta data from the db");
+	
         
-        logger.debug("attempt cleaning files meta data from the db");
-        qaService.cleanUploadedFilesMetaData();
-		logger.debug("cleaned up files meta data from the db");
-		
-        LinkedList listUploadedOfflineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILES);
-    	logger.debug("final listUploadedOfflineFiles: " + listUploadedOfflineFiles);
-    	LinkedList listUploadedOnlineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES);
-    	logger.debug("final listUploadedOnlineFiles: " + listUploadedOnlineFiles);
+        
+//        List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
+//        logger.debug("final attachmentList: " + attachmentList);
+//        List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
+//        logger.debug("final deletedAttachmentList: " + deletedAttachmentList);
+//        
+//        try{
+//            logger.debug("start persisting offline file information to db...");
+//            Iterator iter=attachmentList.iterator();
+//            while (iter.hasNext())
+//            {
+//                QaUploadedFile file=(QaUploadedFile) iter.next();
+//                qaService.persistFile(file);
+//
+//            }
+//            logger.debug("all offline files data has been persisted");  
+//        }
+//        catch(Exception e)
+//        {
+//            logger.debug("error persisting offline files data: " + attachmentList);
+//        }
+        
+//        LinkedList listUploadedOfflineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILES);
+//    	logger.debug("final listUploadedOfflineFiles: " + listUploadedOfflineFiles);
+//    	LinkedList listUploadedOnlineFiles = (LinkedList) request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILES);
+//    	logger.debug("final listUploadedOnlineFiles: " + listUploadedOnlineFiles);
+//    	
+//    	try{
+//    		logger.debug("start persisting offline file information to db...");
+//        	Iterator offlineFilesIterator=listUploadedOfflineFiles.iterator();
+//        	while (offlineFilesIterator.hasNext())
+//        	{
+//        		String uuidAndFileName=(String) offlineFilesIterator.next();
+//        		logger.debug("iterated uuidAndFileName: " + uuidAndFileName);
+//        		if ((uuidAndFileName != null) && (uuidAndFileName.indexOf('~') > 0))
+//        		{
+//        			int separator=uuidAndFileName.indexOf('~');
+//        			logger.debug("separator: " + separator);
+//        			String uuid=uuidAndFileName.substring(0,separator);
+//        			String fileName=uuidAndFileName.substring(separator+1);
+//        			logger.debug("using uuid: " + uuid);
+//        			logger.debug("using fileName: " + fileName);
+//        			qaService.persistFile(uuid,false, fileName,qa);
+//        		}
+//        	}
+//        	logger.debug("all offline files data has been persisted");	
+//    	}
+//    	catch(Exception e)
+//		{
+//    		logger.debug("error persisting offline files data: " + listUploadedOfflineFiles);
+//		}
+//    	
+//    	try{
+//	    	logger.debug("start persisting online file information to db...");
+//	    	Iterator onlineFilesIterator=listUploadedOnlineFiles.iterator();
+//	    	while (onlineFilesIterator.hasNext())
+//	    	{
+//	    		String uuidAndFileName=(String) onlineFilesIterator.next();
+//	    		logger.debug("iterated uuidAndFileName: " + uuidAndFileName);
+//	    		if ((uuidAndFileName != null) && (uuidAndFileName.indexOf('~') > 0))
+//	    		{
+//	    			int separator=uuidAndFileName.indexOf('~');
+//	    			logger.debug("separator: " + separator);
+//	    			String uuid=uuidAndFileName.substring(0,separator);
+//	    			String fileName=uuidAndFileName.substring(separator+1);
+//	    			logger.debug("using uuid: " + uuid);
+//	    			logger.debug("using fileName: " + fileName);
+//	    			qaService.persistFile(uuid,true, fileName,qa);
+//	    		}
+//	    	}
+//	    	logger.debug("all online files data has been persisted");
+//    	}
+//    	catch(Exception e)
+//		{
+//    		logger.debug("error persisting offline files data: " + listUploadedOnlineFiles);
+//		}
     	
-    	try{
-    		logger.debug("start persisting offline file information to db...");
-        	Iterator offlineFilesIterator=listUploadedOfflineFiles.iterator();
-        	while (offlineFilesIterator.hasNext())
-        	{
-        		String uuidAndFileName=(String) offlineFilesIterator.next();
-        		logger.debug("iterated uuidAndFileName: " + uuidAndFileName);
-        		if ((uuidAndFileName != null) && (uuidAndFileName.indexOf('~') > 0))
-        		{
-        			int separator=uuidAndFileName.indexOf('~');
-        			logger.debug("separator: " + separator);
-        			String uuid=uuidAndFileName.substring(0,separator);
-        			String fileName=uuidAndFileName.substring(separator+1);
-        			logger.debug("using uuid: " + uuid);
-        			logger.debug("using fileName: " + fileName);
-        			qaService.persistFile(uuid,false, fileName,qa);
-        		}
-        	}
-        	logger.debug("all offline files data has been persisted");	
-    	}
-    	catch(Exception e)
-		{
-    		logger.debug("error persisting offline files data: " + listUploadedOfflineFiles);
-		}
-    	
-    	try{
-	    	logger.debug("start persisting online file information to db...");
-	    	Iterator onlineFilesIterator=listUploadedOnlineFiles.iterator();
-	    	while (onlineFilesIterator.hasNext())
-	    	{
-	    		String uuidAndFileName=(String) onlineFilesIterator.next();
-	    		logger.debug("iterated uuidAndFileName: " + uuidAndFileName);
-	    		if ((uuidAndFileName != null) && (uuidAndFileName.indexOf('~') > 0))
-	    		{
-	    			int separator=uuidAndFileName.indexOf('~');
-	    			logger.debug("separator: " + separator);
-	    			String uuid=uuidAndFileName.substring(0,separator);
-	    			String fileName=uuidAndFileName.substring(separator+1);
-	    			logger.debug("using uuid: " + uuid);
-	    			logger.debug("using fileName: " + fileName);
-	    			qaService.persistFile(uuid,true, fileName,qa);
-	    		}
-	    	}
-	    	logger.debug("all online files data has been persisted");
-    	}
-    	catch(Exception e)
-		{
-    		logger.debug("error persisting offline files data: " + listUploadedOnlineFiles);
-		}
-    	
+//        return qa;
+//    }
+
+    //doesn't update files
+    public QaContent saveOrUpdateQaContent(Map mapQuestionContent, HttpServletRequest request, QaAuthoringForm qaAuthoringForm){
+        
+        UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);//request.getSession().getAttribute(AttributeNames.USER);
+        IQaService qaService =QaUtils.getToolService(request);
+        
+        boolean isQuestionsSequenced=false;
+        boolean isSynchInMonitor=false;
+        boolean isUsernameVisible=false;
+        String reportTitle = qaAuthoringForm.getReportTitle();
+        String richTextTitle = qaAuthoringForm.getTitle(); //??
+        String monitoringReportTitle = qaAuthoringForm.getMonitoringReportTitle();
+        String richTextOfflineInstructions = qaAuthoringForm.getOnlineInstructions(); //??
+        String richTextInstructions = qaAuthoringForm.getInstructions(); //??
+        String richTextOnlineInstructions = qaAuthoringForm.getOfflineInstructions(); //??
+        String endLearningMessage = qaAuthoringForm.getEndLearningMessage();
+        long userId = toolUser.getUserID().longValue();
+        
+       
+        QaContent qa = qaService.loadQa(Long.parseLong(qaAuthoringForm.getToolContentId()));
+        if(qa==null)
+            qa = new QaContent();
+        
+        
+        qa.setTitle(richTextTitle);
+        qa.setInstructions(richTextInstructions);
+        qa.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
+        qa.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
+        qa.setUsernameVisible(isUsernameVisible);
+        qa.setQuestionsSequenced(isQuestionsSequenced); /**the default question listing in learner mode will be all in the same page*/
+        qa.setSynchInMonitor(isSynchInMonitor);
+        qa.setOnlineInstructions(richTextOnlineInstructions);
+        qa.setOfflineInstructions(richTextOfflineInstructions);
+        qa.setEndLearningMessage(endLearningMessage);
+        qa.setReportTitle(reportTitle);
+        qa.setMonitoringReportTitle(monitoringReportTitle);
+        
+        /**
+         * TODO: right now the code simply remove all the questions and recreate them.
+         *       Ideally, when existing questions changed it should be updated accordingly
+         *       and when new questions is added it should be created in the in the database.  
+         */
+        //Remove all question contents;
+        qa.getQaQueContents().clear();
+
+        //qa.setQaSessions(new TreeSet());
+        //qa.setQaUploadedFiles(new TreeSet());
+        
+        if(qa.getQaContentId() == null){
+            qa.setQaContentId(new Long(qaAuthoringForm.getToolContentId()));
+            qaService.createQa(qa);
+        }
+        else
+            qaService.updateQa(qa);
+        
+        //recreate all question contents
+        createQuestionContent(mapQuestionContent, request, qa);
+        
         return qa;
     }
-
     
     /**
      * createQuestionContent(TreeMap mapQuestionContent, HttpServletRequest request)
@@ -485,42 +573,41 @@ public class AuthoringUtil implements QaAppConstants {
 	    logger.debug("all questions in the Map persisted:");
     }
     
-    
-    /** remove existing content data from the db
-     * 
-     * qaService.removeToolContent(Long toolContentId) gets automatically called only in monitoring mode when
-     * the author chooses to delete a lesson. 
-     * 
-     * In here we act as another client of this contact method since we want to clear q/a tool's content tables based on
-     * author's UI interactions. We are removing content + question's content + relavant tool sessions from the db. 
-     * 
-     * removeAllDBContent(TreeMap mapQuestionContent, HttpServletRequest request)
-     * return void
-     * removes content for a specific content Id
-     */
-    protected void removeAllDBContent(HttpServletRequest request)
-    {
-    	IQaService qaService =QaUtils.getToolService(request);
-    	logger.debug("retrieve qaService: " + qaService);
-    	String toolContentId=null;
-    	
-    	if (request.getSession().getAttribute(TOOL_CONTENT_ID) != null)
-    		toolContentId=(String)(request.getSession().getAttribute(TOOL_CONTENT_ID));	
-    	
-    	if ((toolContentId != null) && (!toolContentId.equals(""))) 
-		{
-    		logger.debug("simulate container behaviour by calling: removeToolContent with: " + new Long(toolContentId));
-    		/*
-    		 * we are calling removeToolContent to clear content tables although this method normally 
-    		 * gets called only in the monitoring mode automatically by the core.
-    		 * 
-    		 * Having this method here also makes sure that this contract has implemented and tested properly. 
-    		 */
-    		qaService.removeToolContent(new Long(toolContentId));
-    		logger.debug("simulated container behaviour by calling: removeToolContent with: " + toolContentId);
-    		logger.debug("removed content from database for content id:" + toolContentId);
-		}
-    }
+//    /** remove existing content data from the db
+//     * 
+//     * qaService.removeToolContent(Long toolContentId) gets automatically called only in monitoring mode when
+//     * the author chooses to delete a lesson. 
+//     * 
+//     * In here we act as another client of this contact method since we want to clear q/a tool's content tables based on
+//     * author's UI interactions. We are removing content + question's content + relavant tool sessions from the db. 
+//     * 
+//     * removeAllDBContent(TreeMap mapQuestionContent, HttpServletRequest request)
+//     * return void
+//     * removes content for a specific content Id
+//     */
+//    protected void removeAllDBContent(HttpServletRequest request)
+//    {
+//    	IQaService qaService =QaUtils.getToolService(request);
+//    	logger.debug("retrieve qaService: " + qaService);
+//    	String toolContentId=null;
+//    	
+//    	if (request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID) != null)
+//    		toolContentId=(String)(request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));	
+//    	
+//    	if ((toolContentId != null) && (!toolContentId.equals(""))) 
+//		{
+//    		logger.debug("simulate container behaviour by calling: removeToolContent with: " + new Long(toolContentId));
+//    		/*
+//    		 * we are calling removeToolContent to clear content tables although this method normally 
+//    		 * gets called only in the monitoring mode automatically by the core.
+//    		 * 
+//    		 * Having this method here also makes sure that this contract has implemented and tested properly. 
+//    		 */
+//    		qaService.removeToolContent(new Long(toolContentId));
+//    		logger.debug("simulated container behaviour by calling: removeToolContent with: " + toolContentId);
+//    		logger.debug("removed content from database for content id:" + toolContentId);
+//		}
+//    }
     
     /**
      * Normally, a request to set runOffline property of the content comes directly from container through the property inspector.
@@ -532,7 +619,7 @@ public class AuthoringUtil implements QaAppConstants {
     {
     	IQaService qaService =QaUtils.getToolService(request);
     	
-    	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (!toolContentId.equals("")))
     	{
     		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
@@ -559,7 +646,7 @@ public class AuthoringUtil implements QaAppConstants {
     {
     	IQaService qaService =QaUtils.getToolService(request);
     	
-    	String toolContentId=(String)request.getSession().getAttribute(TOOL_CONTENT_ID);
+    	String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
     	if ((toolContentId != null) && (!toolContentId.equals("")))
     	{
     		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));

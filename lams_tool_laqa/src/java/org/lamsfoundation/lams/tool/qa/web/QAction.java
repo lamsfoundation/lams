@@ -20,8 +20,12 @@
  */
 package org.lamsfoundation.lams.tool.qa.web;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -37,15 +41,26 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.util.QaToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
@@ -172,6 +187,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class QAction extends DispatchAction implements QaAppConstants
 {
 	static Logger logger = Logger.getLogger(QAction.class.getName());
+    
+    private QaToolContentHandler toolContentHandler;
 	
     /** 
      * <p>Struts dispatch method.</p> 
@@ -271,17 +288,17 @@ public class QAction extends DispatchAction implements QaAppConstants
         	request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
         	authoringUtil.reconstructQuestionContentMapForRemove(mapQuestionContent, request, qaAuthoringForm);
 		} /* remove selected content*/
-        else if (userAction.equalsIgnoreCase(REMOVE_ALL_CONTENT))
-		{
-        	authoringUtil.removeAllDBContent(request);
-        	QaUtils.cleanupSession(request);
-            qaAuthoringForm.resetUserAction();
-        	return (mapping.findForward(LOAD_STARTER));
-		}
+//        else if (userAction.equalsIgnoreCase(REMOVE_ALL_CONTENT))
+//		{
+//        	authoringUtil.removeAllDBContent(request);
+//        	QaUtils.cleanupSession(request);
+//            qaAuthoringForm.resetUserAction();
+//        	return (mapping.findForward(LOAD_STARTER));
+//		}
         else if (userAction.equalsIgnoreCase(SUBMIT_OFFLINE_FILE))
         {
             logger.debug("will submit offline file: " + userAction);
-            QaUtils.addFileToContentRepository(request, qaAuthoringForm, true);
+            addFileToContentRepository(request, qaAuthoringForm, true);
             logger.debug("offline file added to repository successfully.");
             qaAuthoringForm.resetUserAction();
             request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
@@ -291,7 +308,7 @@ public class QAction extends DispatchAction implements QaAppConstants
         else if (userAction.equalsIgnoreCase(SUBMIT_ONLINE_FILE))
         {
         	logger.debug("will submit online file: " + userAction);
-        	QaUtils.addFileToContentRepository(request, qaAuthoringForm, false);
+        	addFileToContentRepository(request, qaAuthoringForm, false);
         	logger.debug("online file added to repository successfully.");
         	qaAuthoringForm.resetUserAction();
         	request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
@@ -327,13 +344,22 @@ public class QAction extends DispatchAction implements QaAppConstants
 		    	qaService.unsetAsDefineLater(monitoredContentId);
 			    logger.debug("MONITORED_CONTENT_ID has been unset as defineLater: ");
 		    }
-		    
-    		authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
+            
+            List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
+            List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
+
+            
         	/*delete existing content from the database*/
-        	authoringUtil.removeAllDBContent(request);
-        	/*create-recreate the content in the db*/ 
-        	QaContent qaContent=authoringUtil.createContent(mapQuestionContent, request, qaAuthoringForm);
-        	authoringUtil.createQuestionContent(mapQuestionContent, request, qaContent);
+//          authoringUtil.removeAllDBContent(request);
+            
+//            QaContent qaContent=authoringUtil.createContent(mapQuestionContent, request, qaAuthoringForm);            
+
+        	/*delete-recreate the questions in the db*/
+            authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
+            
+            QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, request, qaAuthoringForm);            
+
+            saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
         	
         	/*give the user a feedback*/
             errors.clear();
@@ -585,7 +611,7 @@ public class QAction extends DispatchAction implements QaAppConstants
             	 * The learner is done with the tool session. The tool needs to clean-up.
             	 */
             	
-                Long toolSessionId=(Long)request.getSession().getAttribute(TOOL_SESSION_ID);
+                Long toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
         	    HttpSession ss = SessionManager.getSession();
         	    /*get back login user DTO*/
         	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -717,4 +743,165 @@ public class QAction extends DispatchAction implements QaAppConstants
 		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
 	} 
+    
+    
+    public void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm, boolean isOfflineFile)
+    {
+        logger.debug("attempt addFileToContentRepository");
+        IQaService qaService =QaUtils.getToolService(request);
+        logger.debug("qaService: " + qaService);
+        
+        List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
+        List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
+        
+        if(attachmentList == null)
+            attachmentList = new ArrayList();
+        
+        if(deletedAttachmentList == null)
+            deletedAttachmentList = new ArrayList();
+        
+        FormFile uploadedFile = (isOfflineFile)?qaAuthoringForm.getTheOfflineFile():qaAuthoringForm.getTheOnlineFile();
+        String fileType = isOfflineFile ? IToolContentHandler.TYPE_OFFLINE : IToolContentHandler.TYPE_ONLINE;
+        logger.debug("uploadedFile.getFileName(): " + uploadedFile.getFileName());
+        
+        //String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+        //QaContent qaContent = qaService.loadQa(Long.parseLong(toolContentId));
+        
+//      if a file with the same name already exists then move the old one to deleted
+        deletedAttachmentList = QaUtils.moveToDelete(uploadedFile.getFileName(), !isOfflineFile, attachmentList, deletedAttachmentList );
+//        Iterator iter = attachmentList.iterator();
+//        while(iter.hasNext()){
+//            QaUploadedFile file = (QaUploadedFile)iter.next();
+//            //if uploaded file already exist in the attachmentList then, remove it
+//            if(file.getFileName().equals(uploadedFile.getFileName())){
+//                //if file exist in contentRepository then, move it to deleteAttachmentList else, just remove it.
+//                if(file.getUuid() != null){
+//                    
+//                }
+//                else
+//                    iter.remove();
+//            }
+//        }
+        
+        try
+        {
+            // This is a new file and so is saved to the content repository. Add it to the 
+            // attachments collection, but don't add it to the tool's tables yet.
+            NodeKey node = getToolContentHandler().uploadFile(uploadedFile.getInputStream(), uploadedFile.getFileName(), 
+                    uploadedFile.getContentType(), fileType); 
+            QaUploadedFile file = new QaUploadedFile();
+            file.setFileName(uploadedFile.getFileName());
+            file.setFileOnline(!isOfflineFile);
+            //file.setQaContent(qaContent);
+            file.setUuid(node.getUuid().toString());
+            //file.setVersionId(node.getVersion()); 
+            
+            // add the files to the attachment collection - if one existed, it should have already been removed.
+            attachmentList.add(file);
+            
+            QaUtils.addUploadsToSession(request, attachmentList, deletedAttachmentList);
+            //reset the fields so that more files can be uploaded
+            qaAuthoringForm.setTheOfflineFile(null);
+            qaAuthoringForm.setTheOnlineFile(null);
+        }
+        catch (FileNotFoundException e) {
+            logger.error("Unable to uploadfile",e);
+            throw new RuntimeException("Unable to upload file, exception was "+e.getMessage());
+        } catch (IOException e) {
+            logger.error("Unable to uploadfile",e);
+            throw new RuntimeException("Unable to upload file, exception was "+e.getMessage());
+        } catch (RepositoryCheckedException e) {
+            logger.error("Unable to uploadfile",e);
+            throw new RuntimeException("Unable to upload file, exception was "+e.getMessage());
+        }
+    }
+        
+    
+    private QaToolContentHandler getToolContentHandler()
+    {
+        if ( toolContentHandler == null ) {
+              WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+//            toolContentHandler = (QaToolContentHandler) wac.getBean(QaToolContentHandler.SPRING_BEAN_NAME);
+              toolContentHandler = (QaToolContentHandler) wac.getBean("qaToolContentHandler");
+            }
+            return toolContentHandler;
+    }
+
+    /** 
+    * Go through the attachments collections. Remove any content repository or tool objects
+    * matching entries in the the deletedAttachments collection, add any new attachments in the
+    * attachments collection. Clear the deletedAttachments collection, ready for new editing.
+    */ 
+    private List saveAttachments (QaContent qaContent, 
+            List attachmentList, List deletedAttachmentList,
+            ActionMapping mapping, HttpServletRequest request) {
+
+        if(attachmentList==null || deletedAttachmentList==null)
+            return null;
+        
+        IQaService qaService =QaUtils.getToolService(request);
+        
+        if ( deletedAttachmentList != null ) {
+            Iterator iter = deletedAttachmentList.iterator();
+            while (iter.hasNext()) {
+                QaUploadedFile attachment = (QaUploadedFile) iter.next();
+                
+                // remove entry from content repository. deleting a non-existent entry 
+                // shouldn't cause any errors.
+                try {
+                    if(attachment.getUuid()!= null)
+                        getToolContentHandler().deleteFile(Long.getLong(attachment.getUuid()));
+                }
+                catch (RepositoryCheckedException e) {
+                    logger.error("Unable to delete file",e);
+                    ActionMessages am = new ActionMessages(); 
+                    am.add( ActionMessages.GLOBAL_MESSAGE,  
+                           new ActionMessage( "error.contentrepository" , 
+                                              attachment.getFileName())); 
+                    saveErrors( request, am ); 
+                }
+
+                // remove tool entry from db
+                if ( attachment.getSubmissionId() != null ) {
+                    qaService.removeFile(attachment.getSubmissionId());
+                }
+            }
+            deletedAttachmentList.clear();
+        }
+        
+        if ( attachmentList != null ) {
+            Iterator iter = attachmentList.iterator();
+            while (iter.hasNext()) {
+                QaUploadedFile attachment = (QaUploadedFile) iter.next();
+
+                if ( attachment.getSubmissionId() == null ) {
+                    // add entry to tool table - file already in content repository
+                    //FIXME: qaService.saveAttachment(nbContent, attachment);
+                    qaService.persistFile(qaContent, attachment);
+                }
+            }
+        }
+            
+        return deletedAttachmentList;
+    }
+    
+    public ActionForward deleteFile(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+        long uuid = WebUtil.readLongParam(request, UUID);
+        
+        // move the file's details from the attachment collection to the deleted attachments collection
+        // the attachment will be delete on saving.
+        List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
+        List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
+        if(deletedAttachmentList == null)
+            deletedAttachmentList = new ArrayList();
+        
+        deletedAttachmentList = QaUtils.moveToDelete(Long.toString(uuid), attachmentList, deletedAttachmentList );
+
+        return (mapping.findForward(LOAD_QUESTIONS));
+    }    
 }

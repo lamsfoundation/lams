@@ -536,77 +536,88 @@ public class QaServicePOJO implements
         }
     }
     
-    public List retrieveQaUploadedFiles(QaContent qa, boolean fileOnline) throws QaApplicationException
-    {
-        try
-        {
-            return qaUploadedFileDAO.retrieveQaUploadedFiles(qa, fileOnline);
+    public List retrieveQaUploadedFiles(QaContent qa) throws QaApplicationException {
+        try {
+            return qaUploadedFileDAO.retrieveQaUploadedFiles(qa);
         }
-        catch (DataAccessException e)
-        {
+        catch (DataAccessException e) {
             throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: "
-                                                         + e.getMessage(),
-														   e);
+                                                       + e.getMessage(),
+                                                         e);
         }
     }
     
-    
-    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa)
-    {
-    	try
-        {
-            return qaUploadedFileDAO.retrieveQaUploadedOfflineFilesUuid(qa);
-        }
-        catch (DataAccessException e)
-        {
-            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: offline + uuids "
-                                                         + e.getMessage(),
-														   e);
-        }
-    }
-    
-    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa)
-    {
-    	try
-        {
-            return qaUploadedFileDAO.retrieveQaUploadedOnlineFilesUuid(qa);
-        }
-        catch (DataAccessException e)
-        {
-            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: online + uuids "
-                                                         + e.getMessage(),
-														   e);
-        }
-    }
-    
-    public List retrieveQaUploadedOfflineFilesName(QaContent qa)
-    {
-    	try
-        {
-            return qaUploadedFileDAO.retrieveQaUploadedOfflineFilesName(qa);
-        }
-        catch (DataAccessException e)
-        {
-            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: offline + fileNames "
-                                                         + e.getMessage(),
-														   e);
-        }
-    }
-    
-    public List retrieveQaUploadedOnlineFilesName(QaContent qa)
-    {
-    	try
-        {
-            return qaUploadedFileDAO.retrieveQaUploadedOnlineFilesName(qa);
-        }
-        catch (DataAccessException e)
-        {
-            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: online + fileNames "
-                                                         + e.getMessage(),
-														   e);
-        }
-    	
-    }
+//    public List retrieveQaUploadedFiles(QaContent qa, boolean fileOnline) throws QaApplicationException
+//    {
+//        try
+//        {
+//            return qaUploadedFileDAO.retrieveQaUploadedFiles(qa, fileOnline);
+//        }
+//        catch (DataAccessException e)
+//        {
+//            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: "
+//                                                         + e.getMessage(),
+//														   e);
+//        }
+//    }
+//    
+//    
+//    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa)
+//    {
+//    	try
+//        {
+//            return qaUploadedFileDAO.retrieveQaUploadedOfflineFilesUuid(qa);
+//        }
+//        catch (DataAccessException e)
+//        {
+//            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: offline + uuids "
+//                                                         + e.getMessage(),
+//														   e);
+//        }
+//    }
+//    
+//    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa)
+//    {
+//    	try
+//        {
+//            return qaUploadedFileDAO.retrieveQaUploadedOnlineFilesUuid(qa);
+//        }
+//        catch (DataAccessException e)
+//        {
+//            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: online + uuids "
+//                                                         + e.getMessage(),
+//														   e);
+//        }
+//    }
+//    
+//    public List retrieveQaUploadedOfflineFilesName(QaContent qa)
+//    {
+//    	try
+//        {
+//            return qaUploadedFileDAO.retrieveQaUploadedOfflineFilesName(qa);
+//        }
+//        catch (DataAccessException e)
+//        {
+//            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: offline + fileNames "
+//                                                         + e.getMessage(),
+//														   e);
+//        }
+//    }
+//    
+//    public List retrieveQaUploadedOnlineFilesName(QaContent qa)
+//    {
+//    	try
+//        {
+//            return qaUploadedFileDAO.retrieveQaUploadedOnlineFilesName(qa);
+//        }
+//        catch (DataAccessException e)
+//        {
+//            throw new QaApplicationException("Exception occured when lams is loading qa uploaded files: online + fileNames "
+//                                                         + e.getMessage(),
+//														   e);
+//        }
+//    	
+//    }
     
     
     
@@ -1087,9 +1098,41 @@ public class QaServicePOJO implements
             
             logger.debug("removed all existing responses of toolContent with toolContentId:" + 
             																toolContentId);                
-            qaDAO.removeQa(toolContentId);        
+            qaDAO.removeQa(toolContentId);
             logger.debug("removed qaContent:" + qaContent);
     	}
+    }
+    
+    public void removeQuestions(Long toolContentId){
+        QaContent qaContent = qaDAO.loadQaById(toolContentId.longValue());
+        qaContent.setQaQueContents(new TreeSet());
+        
+        
+        if (qaContent != null)
+        {
+            Iterator sessionIterator=qaContent.getQaSessions().iterator();
+            while (sessionIterator.hasNext())
+            {
+                QaSession qaSession=(QaSession)sessionIterator.next(); 
+                logger.debug("iterated qaSession : " + qaSession);
+                
+                Iterator sessionUsersIterator=qaSession.getQaQueUsers().iterator();
+                while (sessionUsersIterator.hasNext())
+                {
+                    QaQueUsr qaQueUsr=(QaQueUsr) sessionUsersIterator.next();
+                    logger.debug("iterated qaQueUsr : " + qaQueUsr);
+                    
+                    Iterator sessionUsersResponsesIterator=qaQueUsr.getQaUsrResps().iterator();
+                    while (sessionUsersResponsesIterator.hasNext())
+                    {
+                        QaUsrResp qaUsrResp=(QaUsrResp)sessionUsersResponsesIterator.next();
+                        logger.debug("iterated qaUsrResp : " + qaUsrResp);
+                        removeUserResponse(qaUsrResp);
+                        logger.debug("removed qaUsrResp : " + qaUsrResp);
+                    }
+                }
+            }
+        }
     }
     
     
@@ -1465,37 +1508,37 @@ public class QaServicePOJO implements
 	}
 	
 	
-	/**
-	 * This method is called everytime a new content has to be added to the
-	 * repository. In order to do so first of all a valid ticket is obtained
-	 * from the Repository hence authenticating the tool(SubmitFiles) and then
-	 * the corresponding file is added to the repository.
-	 * 
-	 * @param stream
-	 *            The <code>InputStream</code> representing the data to be
-	 *            added
-	 * @param fileName
-	 *            The name of the file being added
-	 * @param mimeType
-	 *            The MIME type of the file (eg. TXT, DOC, GIF etc)
-	 * @return NodeKey Represents the two part key - UUID and Version.
-	 * @throws SubmitFilesException
-	 */
-	public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws QaApplicationException {
-		logger.debug("attempt getting the ticket");
-		ITicket ticket = getRepositoryLoginTicket();
-		logger.debug("retrieved ticket: " + ticket);
-		
-		try {
-			NodeKey nodeKey = repositoryService.addFileItem(ticket, stream,
-					fileName, null, null);
-			logger.debug("retrieved nodeKey from repository service: " + nodeKey);
-			return nodeKey;
-		} catch (Exception e) {
-			throw new QaApplicationException("Exception occured while trying to"
-					+ " upload file into the repository" + e.getMessage());
-		}
-	}
+//	/**
+//	 * This method is called everytime a new content has to be added to the
+//	 * repository. In order to do so first of all a valid ticket is obtained
+//	 * from the Repository hence authenticating the tool(SubmitFiles) and then
+//	 * the corresponding file is added to the repository.
+//	 * 
+//	 * @param stream
+//	 *            The <code>InputStream</code> representing the data to be
+//	 *            added
+//	 * @param fileName
+//	 *            The name of the file being added
+//	 * @param mimeType
+//	 *            The MIME type of the file (eg. TXT, DOC, GIF etc)
+//	 * @return NodeKey Represents the two part key - UUID and Version.
+//	 * @throws SubmitFilesException
+//	 */
+//	public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws QaApplicationException {
+//		logger.debug("attempt getting the ticket");
+//		ITicket ticket = getRepositoryLoginTicket();
+//		logger.debug("retrieved ticket: " + ticket);
+//		
+//		try {
+//			NodeKey nodeKey = repositoryService.addFileItem(ticket, stream,
+//					fileName, null, null);
+//			logger.debug("retrieved nodeKey from repository service: " + nodeKey);
+//			return nodeKey;
+//		} catch (Exception e) {
+//			throw new QaApplicationException("Exception occured while trying to"
+//					+ " upload file into the repository" + e.getMessage());
+//		}
+//	}
 
 	
 	public InputStream downloadFile(Long uuid, Long versionID)throws QaApplicationException{
@@ -1523,6 +1566,33 @@ public class QaServicePOJO implements
 		qaUploadedFileDAO.saveUploadFile(qaUploadedFile);
 		logger.debug("persisted qaUploadedFile: " + qaUploadedFile);
 	}
+    
+    
+    /**
+     * adds a new entry to the uploaded files table
+     */
+    public void persistFile(QaContent content, QaUploadedFile file) throws QaApplicationException {       
+        content.getQaUploadedFiles().add(file);
+        file.setQaContent(content);
+        if ( content.getQaContentId() == null ) {
+            qaDAO.saveQa(content);
+        } else {            
+            qaDAO.updateQa(content);
+        }
+        
+        //qaUploadedFileDAO.saveUploadFile(file);
+        logger.debug("persisted qaUploadedFile: " + file);
+    }
+    
+    
+    /**
+     * adds a new entry to the uploaded files table
+     */
+    public void removeFile(Long submissionId) throws QaApplicationException {
+        qaUploadedFileDAO.removeUploadFile(submissionId);
+        logger.debug("removed qaUploadedFile: " + submissionId);
+    }
+    
 
 	/**
 	 * removes all the entries in the uploaded files table

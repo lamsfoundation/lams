@@ -28,6 +28,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
+import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -71,7 +72,9 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	 	
 	 	public void updateQa(QaContent qa)
 	    {
+            //this.getSession().setFlushMode(FlushMode.AUTO);
 	        this.getHibernateTemplate().update(qa);
+            //this.getHibernateTemplate().saveOrUpdate(qa);
 	    }
 	 	
 

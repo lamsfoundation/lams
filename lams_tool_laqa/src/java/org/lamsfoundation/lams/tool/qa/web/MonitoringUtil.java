@@ -14,6 +14,7 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
@@ -77,7 +78,7 @@ public class MonitoringUtil implements QaAppConstants{
 		request.getSession().removeAttribute(REPORT_TITLE_MONITOR);
 		request.getSession().removeAttribute(IS_ALL_SESSIONS_COMPLETED);
 		request.getSession().removeAttribute(CHECK_ALL_SESSIONS_COMPLETED);
-		request.getSession().removeAttribute(TOOL_CONTENT_ID);
+		request.getSession().removeAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		request.getSession().removeAttribute(ATTR_USERDATA);
 		request.getSession().removeAttribute(TOOL_SERVICE);
 		request.getSession().removeAttribute(TARGET_MODE);

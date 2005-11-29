@@ -42,5 +42,5 @@ public interface IQaQueContentDAO
     public void createQueContent(QaQueContent queContent);
     
     public void removeQueContent(long qaQueContentId);
-    
+       
 }

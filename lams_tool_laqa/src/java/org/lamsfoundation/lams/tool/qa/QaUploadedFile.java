@@ -56,7 +56,7 @@ public class QaUploadedFile implements Serializable
     /** persistent field */
     private String fileName;
     
-    private Long qaContentId;
+    //private Long qaContentId;
     
     /** persistent field */
     private QaContent qaContent;
@@ -136,18 +136,20 @@ public class QaUploadedFile implements Serializable
 	public void setQaContent(QaContent qaContent) {
 		this.qaContent = qaContent;
 	}
-	/**
-	 * @return Returns the qaContentId.
-	 */
-	public Long getQaContentId() {
-		return qaContentId;
-	}
-	/**
-	 * @param qaContentId The qaContentId to set.
-	 */
-	public void setQaContentId(Long qaContentId) {
-		this.qaContentId = qaContentId;
-	}
+//	/**
+//	 * @return Returns the qaContentId.
+//	 */
+//	public Long getQaContentId() {
+//        if(this.qaContent != null)
+//            return qaContent.getQaContentId();
+//        return null;
+//	}
+//	/**
+//	 * @param qaContentId The qaContentId to set.
+//	 */
+//	public void setQaContentId(Long qaContentId) {
+//		this.qaContentId = qaContentId;
+//	}
 	/**
 	 * @return Returns the submissionId.
 	 */

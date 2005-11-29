@@ -34,7 +34,9 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.usermanagement.User;
+
 
 
 /**
@@ -206,22 +208,28 @@ public interface IQaService
     
     public void deleteFromRepository(Long uuid, Long versionID) throws QaApplicationException;
 
-    public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws QaApplicationException;
+//    public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws QaApplicationException;
     
     public InputStream downloadFile(Long uuid, Long versionID)throws QaApplicationException;
 	
 	/** repository access related methods  till here */
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, QaContent qaContent) throws QaApplicationException;
     
-    public List retrieveQaUploadedFiles(QaContent qa, boolean fileOnline) throws QaApplicationException;
+    public void persistFile(QaContent content, QaUploadedFile file) throws QaApplicationException;
     
-    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa);
+    public void removeFile(Long submissionId) throws QaApplicationException;
     
-    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa);
+    public List retrieveQaUploadedFiles(QaContent qa) throws QaApplicationException;
     
-    public List retrieveQaUploadedOfflineFilesName(QaContent qa);
+//    public List retrieveQaUploadedFiles(QaContent qa, boolean fileOnline) throws QaApplicationException;
     
-    public List retrieveQaUploadedOnlineFilesName(QaContent qa);
+//    public List retrieveQaUploadedOfflineFilesUuid(QaContent qa);
+//    
+//    public List retrieveQaUploadedOnlineFilesUuid(QaContent qa);
+//    
+//    public List retrieveQaUploadedOfflineFilesName(QaContent qa);
+//    
+//    public List retrieveQaUploadedOnlineFilesName(QaContent qa);
     
     public void cleanUploadedFilesMetaData() throws QaApplicationException;
     
