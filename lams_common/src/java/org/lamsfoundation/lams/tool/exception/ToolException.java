@@ -29,4 +29,28 @@ public class ToolException extends java.lang.Exception
     {
         super(msg);
     }
+    
+    /**
+     * Constructs an instance of <code>ToolException</code>
+     * for wrapping both the customized error message and 
+     * throwable exception object.
+     * @param message
+     * @param cause
+     */
+    public ToolException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
+
+    /**
+     * Constructs an instance of <code>ToolException</code>
+     * for wrapping an throwable exception object.
+     * @param message
+     * @param cause
+     */
+    public ToolException(Throwable cause)
+    {
+        super(cause);
+    }
+
 }

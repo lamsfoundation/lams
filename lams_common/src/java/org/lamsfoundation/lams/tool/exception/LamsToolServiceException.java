@@ -31,4 +31,27 @@ public class LamsToolServiceException extends ToolException
         super(msg);
     }
     
+    /**
+     * Constructs an instance of <code>LamsToolServiceException</code>
+     * for wrapping both the customized error message and 
+     * throwable exception object.
+     * @param message
+     * @param cause
+     */
+    public LamsToolServiceException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
+
+    /**
+     * Constructs an instance of <code>LamsToolServiceException</code>
+     * for wrapping an throwable exception object.
+     * @param message
+     * @param cause
+     */
+    public LamsToolServiceException(Throwable cause)
+    {
+        super(cause);
+    }
+
 }
