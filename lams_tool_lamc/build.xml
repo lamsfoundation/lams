@@ -423,7 +423,7 @@
 		</fileset>
 	</path> 
 
-	<echo>Deploying the Question and Answer tool</echo>
+	<echo>Deploying the Multiple Choice Tool</echo>
 
 	<java
 		classname="org.lamsfoundation.lams.tool.deploy.Deploy"
