@@ -21,8 +21,11 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
+import java.io.InputStream;
 import java.util.List;
 
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
@@ -300,15 +303,14 @@ public interface INoticeboardService {
      * @param content The overall noticeboard content object to which the attachment is to be added
      * @param attachment The instance of NoticeboardAttachment to delete.
      */
-    public void removeAttachment(NoticeboardContent content, NoticeboardAttachment attachment);
+    public void removeAttachment(NoticeboardContent content, NoticeboardAttachment attachment) throws RepositoryCheckedException;
     
-    /* Not used?
-     * Removes the NoticeboardAttachment object from the database
-     * with uuid <code>uuid</code>
-     * @param uuid The uuid of the file
-    public void removeAttachmentByUuid(Long uuid);
-     */
-    
+	/** 
+	 * Add a file to the content repository. Does not add a record to the noticeboard tables.
+	 * @throws RepositoryCheckedException 
+	 */
+	public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException;
+
     /**
      * This method retrieves the default content id.
      * @param toolSignature The tool signature which is defined in lams_tool table.

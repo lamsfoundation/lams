@@ -75,14 +75,4 @@ public class NoticeboardServiceProxy {
         return (ToolContentManager)getNbDomainService(servletContext);
     }
 
-    /*
-     * Get the Noticeboard's tool content handler 
-     * @param servletContext the servletContext for current application
-     * @return noticeboard service object. */
-    public static final NbToolContentHandler getToolContentHandler(ServletContext servletContext)
-    {
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-	    return (NbToolContentHandler) wac.getBean("nbToolContentHandler");
-    }
-
 }

@@ -22,9 +22,14 @@ package org.lamsfoundation.lams.tool.noticeboard;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.HashSet;
+
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 
 /**
@@ -361,8 +366,10 @@ public class NoticeboardContent implements Serializable {
 	 * @param nb			NoticeboardContent object containing the content to copy from
 	 * @param toContentId 	The new Id of the new noticeboard object
 	 * @return newContent	The new noticeboard content object
+	 * @throws RepositoryCheckedException 
+	 * @throws ItemNotFoundException 
 	 */
-	public static NoticeboardContent newInstance(NoticeboardContent nb, Long toContentId)
+	public static NoticeboardContent newInstance(NoticeboardContent nb, Long toContentId, IToolContentHandler toolContentHandler) throws ItemNotFoundException, RepositoryCheckedException
 	{
 		NoticeboardContent newContent = new NoticeboardContent(toContentId,
 														nb.getTitle(),
@@ -381,9 +388,10 @@ public class NoticeboardContent implements Serializable {
 			Iterator iter = nb.getNbAttachments().iterator();
 			while (iter.hasNext()) {
 				NoticeboardAttachment element = (NoticeboardAttachment) iter.next();
-				NoticeboardAttachment newAttachment = (NoticeboardAttachment) element.clone();
-				newAttachment.setAttachmentId(null);
-				newAttachment.setNbContent(newContent);
+				NoticeboardAttachment newAttachment = new NoticeboardAttachment(newContent, element.getFilename(), element.isOnlineFile());
+				NodeKey keys = toolContentHandler.copyFile(element.getUuid());
+				newAttachment.setUuid(keys.getUuid());
+				newAttachment.setVersionId(keys.getVersion());
 				newAttachmentSet.add(newAttachment);
 			} 
 			newContent.setNbAttachments(newAttachmentSet);

@@ -29,6 +29,7 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 
 
 /**
@@ -95,7 +96,8 @@ public class NoticeboardAttachment implements Serializable, Cloneable {
         this.onlineFile = isOnline;
     }
     
-    /** Clone this attachment, including the unique id */
+    /** Clone this attachment, including the unique id. This leaves two records pointing to the same item 
+     * in the content repository.  */
     public Object clone(){
 		Object obj = null;
 		try {
@@ -105,6 +107,7 @@ public class NoticeboardAttachment implements Serializable, Cloneable {
 		}
 		return obj;
 	}    
+
     /**
      * @return Returns the attachmentId.
      */

@@ -314,26 +314,21 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     	  			while (iter.hasNext()) {
 						NoticeboardAttachment attachment = (NoticeboardAttachment) iter.next();
 						
-				    	// remove entry from content repository. deleting a non-existent entry 
-    	  				// shouldn't cause any errors.
 				    	try
 				    	{
-    			    		IToolContentHandler toolContentHandler = NoticeboardServiceProxy.getToolContentHandler(getServlet().getServletContext()); 
-    			    		toolContentHandler.deleteFile(attachment.getUuid());
-				    	}
-				    	catch (RepositoryCheckedException e) {
+				    	// remove tool entry from db, includies removing entry from the content repository
+				    	// deleting a non-existent entry shouldn't cause any errors.
+							if ( attachment.getAttachmentId() != null ) {
+								nbService.removeAttachment(nbContent, attachment);
+							}
+				    	} catch (RepositoryCheckedException e) {
 				            logger.error("Unable to delete file",e);
 				    		ActionMessages am = new ActionMessages(); 
 				    		am.add( ActionMessages.GLOBAL_MESSAGE,  
 				    	           new ActionMessage( NoticeboardConstants.ERROR_FILE_UPLOAD_CONTENT_REPOSITORY , 
 				    	        		   			  attachment.getFilename())); 
-				    		saveErrors( request, am ); 
+				    		saveErrors( request, am );
 				    	}
-
-				    	// remove tool entry from db
-						if ( attachment.getAttachmentId() != null ) {
-							nbService.removeAttachment(nbContent, attachment);
-						}
     	  			}
     	  			deletedAttachmentList.clear();
     	  		}
@@ -403,8 +398,7 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     			    	{
 			    	        // This is a new file and so is saved to the content repository. Add it to the 
     			    		// attachments collection, but don't add it to the tool's tables yet.
-    			    		IToolContentHandler toolContentHandler = NoticeboardServiceProxy.getToolContentHandler(getServlet().getServletContext()); 
-			    	        NodeKey node = toolContentHandler.uploadFile(theFile.getInputStream(), theFile.getFileName(), theFile.getContentType(), fileType); 
+    			    		NodeKey node = nbService.uploadFile(theFile.getInputStream(), theFile.getFileName(), theFile.getContentType(), fileType);
 			    	        NoticeboardAttachment file = new NoticeboardAttachment();
 				    	    file.setFilename(theFile.getFileName());
 				    	   	file.setOnlineFile(isOnlineFile);

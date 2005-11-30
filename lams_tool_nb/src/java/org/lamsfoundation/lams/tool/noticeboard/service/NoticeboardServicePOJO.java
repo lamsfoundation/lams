@@ -21,11 +21,15 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -44,7 +48,6 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardContentDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardSessionDAO;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.dao.DataAccessException;
 
 
@@ -71,7 +74,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	private INoticeboardUserDAO nbUserDAO=null;
 	
 	private INoticeboardAttachmentDAO nbAttachmentDAO = null;
-	
+	private IToolContentHandler nbToolContentHandler = null;
 	
 	private static Logger log = Logger.getLogger(NoticeboardServicePOJO.class);
 
@@ -721,13 +724,16 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    }
 	}
 	
-	/** @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeAttachment(org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment) */
-	public void removeAttachment(NoticeboardContent content, NoticeboardAttachment attachment)
+	/** @throws RepositoryCheckedException 
+	 * @throws  
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeAttachment(org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment) */
+	public void removeAttachment(NoticeboardContent content, NoticeboardAttachment attachment) throws RepositoryCheckedException
 	{
 	    try
 	    {
 			attachment.setNbContent(null);
 			content.getNbAttachments().remove(attachment);
+			nbToolContentHandler.deleteFile(attachment.getUuid());
 			saveNoticeboard(content);
 	    }
 	    catch (DataAccessException e)
@@ -737,29 +743,12 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    }
 	}
 	
-	/* Not used?
-	 @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#removeAttachmentByUuid(java.lang.Long) 
-	public void removeAttachmentByUuid(Long uuid)
+	/** @throws RepositoryCheckedException 
+	 * @see org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService#uploadFile(java.io.InputStream, java.lang.String, java.lang.String, java.lang.String) */
+	public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException
 	{
-	    if (uuid == null)
-	    {
-	        String error = "Unable to continue. The uuid is missing";
-	        log.error(error);
-	        throw new NbApplicationException(error);
-	    }
-	    try
-	    {
-	        nbAttachmentDAO.removeAttachment(uuid);
-	    }
-	    catch (DataAccessException e)
-	    {
-	        throw new NbApplicationException("EXCEPTION: An exception has occurred while trying to remove the attachment with UUid" + uuid + " "
-	                + e.getMessage(), e);
-	    }
+	    return nbToolContentHandler.uploadFile(istream, filename, contentType, fileType); 
 	}
-	*/
-	
-	
 	
 	/* ===============Methods implemented from ToolContentManager =============== */
 	
@@ -779,25 +768,30 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		//default content id might not have any contnet, throw exception
 		NoticeboardContent originalNb = null;
 		
-		if ((originalNb = retrieveNoticeboard(fromContentId))== null) //the id given does not have content, use default content
-		{
-		    //use default content id to grab contents
-		    NoticeboardContent defaultContent = retrieveNoticeboard(getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
-		    
-		    if (defaultContent != null)
-		    {
-		        NoticeboardContent newContent = NoticeboardContent.newInstance(defaultContent, toContentId);
-		        saveNoticeboard(newContent);
-		    }
-		    else
-		    {
-		        throw new ToolException("Default content is missing. Unable to copy tool content");
-		    }
-		}
-		else
-		{
-		    NoticeboardContent newNbContent = NoticeboardContent.newInstance(originalNb, toContentId);
-			saveNoticeboard(newNbContent);
+		try {
+			if ((originalNb = retrieveNoticeboard(fromContentId))== null) //the id given does not have content, use default content
+			{
+			    //use default content id to grab contents
+			    NoticeboardContent defaultContent = retrieveNoticeboard(getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
+			    
+			    if (defaultContent != null)
+			    {
+			        NoticeboardContent newContent = NoticeboardContent.newInstance(defaultContent, toContentId, nbToolContentHandler);
+			        saveNoticeboard(newContent);
+			    }
+			    else
+			    {
+			        throw new ToolException("Default content is missing. Unable to copy tool content");
+			    }
+			}
+			else
+			{
+			    NoticeboardContent newNbContent = NoticeboardContent.newInstance(originalNb, toContentId, nbToolContentHandler);
+				saveNoticeboard(newNbContent);
+			}
+		} catch (RepositoryCheckedException e) {
+			log.error("Unable to copy the tool content due to a content repository error. fromContentId "+fromContentId+" toContentId "+toContentId);
+			throw new ToolException(e);
 		}
 			
 		
@@ -1021,4 +1015,12 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     public void setToolService(ILamsToolService toolService) {
         this.toolService = toolService;
     }
+
+	public IToolContentHandler getNbToolContentHandler() {
+		return nbToolContentHandler;
+	}
+
+	public void setNbToolContentHandler(IToolContentHandler nbToolContentHandler) {
+		this.nbToolContentHandler = nbToolContentHandler;
+	}
 }

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Iterator;
 
 
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NbDataAccessTestCase;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
@@ -510,12 +511,16 @@ public class TestNoticeboardServicePOJO extends NbDataAccessTestCase
 	    
 	}
 	
-	public void testRemoveAttachment()
+	public void testRemoveAttachment() 
 	{
 	    initNbAttachmentData();
 	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
 	    
-	    nbService.removeAttachment(nbService.retrieveNoticeboard(TEST_NB_ID), attachment);
+	    try {
+			nbService.removeAttachment(nbService.retrieveNoticeboard(TEST_NB_ID), attachment);
+		} catch (RepositoryCheckedException e) {
+			fail("Repository exception thrown"+e.getMessage());
+		}
 	   
 	    attachment = nbService.retrieveAttachmentByUuid(TEST_UUID);
 	    
