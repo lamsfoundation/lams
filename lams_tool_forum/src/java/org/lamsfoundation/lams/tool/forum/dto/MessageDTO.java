@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
 
@@ -35,6 +36,8 @@ public class MessageDTO {
 	private short level;
 	private int threadNum;
 	private boolean isAuthor;
+	private Float mark;
+
 	/**
 	 * Get a <code>MessageDTO</code> instance from a given <code>Message</code>.
 	 * 
@@ -52,7 +55,11 @@ public class MessageDTO {
 			dto.setHasAttachment(false);
 		else
 			dto.setHasAttachment(true);
-				
+		
+		ForumReport report = msg.getReport();
+		if(report != null && report.getMark() != null)
+			dto.mark = report.getMark();
+		
 		return dto;
 	}
 
@@ -70,12 +77,16 @@ public class MessageDTO {
 		while(iter.hasNext()){
 			Message msg = (Message) iter.next();
 			MessageDTO msgDto = new MessageDTO();
+			msgDto.setMessage(msg);
+			msgDto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
+			
 			if(msg.getAttachments() == null || msg.getAttachments().isEmpty())
 				msgDto.setHasAttachment(false);
 			else
 				msgDto.setHasAttachment(true);
-			msgDto.setMessage(msg);
-			msgDto.setAuthor(msg.getCreatedBy().getFirstName()+" "+msg.getCreatedBy().getLastName());
+			ForumReport report = msg.getReport();
+			if(report != null && report.getMark() != null)
+				msgDto.mark = report.getMark();
 
 			retSet.add(msgDto);
 		}
@@ -121,4 +132,11 @@ public class MessageDTO {
 		this.isAuthor = isAuthor;
 	}
 	
+	public Float getMark() {
+		return mark;
+	}
+
+	public void setMark(Float mark) {
+		this.mark = mark;
+	}	
 }

@@ -60,9 +60,9 @@ public class MarkForm  extends ValidatorForm{
             	errors.add("report.mark", error);
             }else {
             	try{
-            		Integer.parseInt(mark);
+            		Float.parseFloat(mark);
             	}catch(Exception e){
-                  	ActionMessage error = new ActionMessage("error.mark.needInteger");
+                  	ActionMessage error = new ActionMessage("error.mark.invalid.number");
                 	errors.add("report.mark", error);
             	}
             }

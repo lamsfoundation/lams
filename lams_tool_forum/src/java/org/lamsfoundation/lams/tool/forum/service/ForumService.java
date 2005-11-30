@@ -348,40 +348,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		return forumUserDao.getBySessionId(sessionID);
 	}
 
-
-    //***************************************************************************************************************
-    // ToolContentManager and ToolSessionManager methods
-    //***************************************************************************************************************
-	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-	}
-
-	public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException {
-	}
-
-	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException {
-	}
-
-	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException {
-	}
-
-	public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException {
-	}
-
-	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-		return null;
-	}
-
-	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-		return null;
-	}
-
-	public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException {
-		return null;
-	}
-
-	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-	}
-
     //***************************************************************************************************************
     // Private methods
     //***************************************************************************************************************
@@ -471,6 +437,52 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		return forumUserDao.getByUid(userUid);
 	}
 
+	public void releaseMarksForSession(Long sessionID) {
+		List list = messageDao.getBySession(sessionID);
+		Iterator iter = list.iterator();
+		while(iter.hasNext()){
+			Message msg = (Message) iter.next();
+			ForumReport report = msg.getReport();
+			if(report != null)
+				report.setDateMarksReleased(new Date());
+			messageDao.saveOrUpdate(msg);
+		}
+	}
+
+
+    //***************************************************************************************************************
+    // ToolContentManager and ToolSessionManager methods
+    //***************************************************************************************************************
+	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
+	}
+
+	public void setAsDefineLater(Long toolContentId) throws DataMissingException, ToolException {
+	}
+
+	public void setAsRunOffline(Long toolContentId) throws DataMissingException, ToolException {
+	}
+
+	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException {
+	}
+
+	public void createToolSession(Long toolSessionId, Long toolContentId) throws ToolException {
+	}
+
+	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
+		return null;
+	}
+
+	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+		return null;
+	}
+
+	public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException {
+		return null;
+	}
+
+	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+	}
+	
     //***************************************************************************************************************
     // Get / Set methods
     //***************************************************************************************************************
@@ -546,16 +558,5 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		this.forumToolContentHandler = toolContentHandler;
 	}
 
-	public void releaseMarksForSession(Long sessionID) {
-		List list = messageDao.getBySession(sessionID);
-		Iterator iter = list.iterator();
-		while(iter.hasNext()){
-			Message msg = (Message) iter.next();
-			ForumReport report = msg.getReport();
-			if(report != null)
-				report.setDateMarksReleased(new Date());
-			messageDao.saveOrUpdate(msg);
-		}
-	}
 
 }

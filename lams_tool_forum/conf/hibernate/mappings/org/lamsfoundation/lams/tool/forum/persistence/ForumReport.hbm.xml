@@ -43,7 +43,7 @@
 
         <property
             name="mark"
-            type="int"
+            type="java.lang.Float"
             update="true"
             insert="true"
             column="mark"

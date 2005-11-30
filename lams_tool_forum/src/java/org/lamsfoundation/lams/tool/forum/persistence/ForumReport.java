@@ -30,7 +30,7 @@ import java.util.Date;
 public class ForumReport {
 	
 	private Long uid;
-	private int mark;
+	private Float mark;
 	private String comment;
 	private Date dateMarksReleased;
     /**
@@ -66,10 +66,10 @@ public class ForumReport {
 	 * @hibernate.property column="mark" 
 	 * @return
 	 */
-	public int getMark() {
+	public Float getMark() {
 		return mark;
 	}
-	public void setMark(int mark) {
+	public void setMark(Float mark) {
 		this.mark = mark;
 	}
 

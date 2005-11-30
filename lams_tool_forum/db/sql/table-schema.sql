@@ -86,7 +86,7 @@ create table tl_lafrum11_report (
    uid bigint not null auto_increment,
    comment text,
    release_date datetime,
-   mark integer,
+   mark float,
    primary key (uid)
 );
 create table tl_lafrum11_tool_session (

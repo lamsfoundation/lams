@@ -4,19 +4,6 @@ drop table if exists tl_lafrum11_forum;
 drop table if exists tl_lafrum11_forum_user;
 drop table if exists tl_lafrum11_message;
 drop table if exists tl_lafrum11_message_seq;
-drop table if exists tl_lafrum11_tool_session;
-drop table if exists tl_lafrum11_attachment;
-drop table if exists tl_lafrum11_forum;
-drop table if exists tl_lafrum11_forum_user;
-drop table if exists tl_lafrum11_message;
-drop table if exists tl_lafrum11_message_seq;
-drop table if exists tl_lafrum11_report;
-drop table if exists tl_lafrum11_tool_session;
-drop table if exists tl_lafrum11_attachment;
-drop table if exists tl_lafrum11_forum;
-drop table if exists tl_lafrum11_forum_user;
-drop table if exists tl_lafrum11_message;
-drop table if exists tl_lafrum11_message_seq;
 drop table if exists tl_lafrum11_report;
 drop table if exists tl_lafrum11_tool_session;
 create table tl_lafrum11_attachment (
@@ -88,7 +75,7 @@ create table tl_lafrum11_report (
    uid bigint not null auto_increment,
    comment text,
    release_date datetime,
-   mark integer,
+   mark float,
    primary key (uid)
 );
 create table tl_lafrum11_tool_session (

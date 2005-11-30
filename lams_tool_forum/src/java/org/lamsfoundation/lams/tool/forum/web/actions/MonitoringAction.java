@@ -23,6 +23,8 @@ package org.lamsfoundation.lams.tool.forum.web.actions;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -234,8 +235,9 @@ public class MonitoringAction extends Action {
 					
 					cell = row1.createCell((short) idx++);
 					
-					if(dto.getMessage() != null && dto.getMessage().getReport() != null)
-						cell.setCellValue(new Double(dto.getMessage().getReport().getMark()).doubleValue());
+					if(dto.getMessage() != null && dto.getMessage().getReport() != null 
+							&& dto.getMessage().getReport().getMark() != null)
+						cell.setCellValue(dto.getMessage().getReport().getMark().doubleValue());
 					else
 						cell.setCellValue("");
 					
@@ -302,8 +304,11 @@ public class MonitoringAction extends Action {
 		
 		//echo back to web page
 		MarkForm markForm = (MarkForm) form;
-		if(msg.getReport() != null){
-			markForm.setMark(new Integer(msg.getReport().getMark()).toString());
+		if(msg.getReport() != null ){
+			if(msg.getReport().getMark() != null)
+				markForm.setMark(msg.getReport().getMark().toString());
+			else
+				markForm.setMark("");
 			markForm.setComment(msg.getReport().getComment());
 		}
 		markForm.setUser(user);
@@ -329,7 +334,7 @@ public class MonitoringAction extends Action {
 			report = new ForumReport();
 			msg.setReport(report);
 		}
-		report.setMark(Integer.parseInt(markForm.getMark()));
+		report.setMark(new Float(Float.parseFloat(markForm.getMark())));
 		report.setComment(markForm.getComment());
 		forumService.updateTopic(msg);
 		
@@ -442,8 +447,51 @@ public class MonitoringAction extends Action {
 
 	private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+
+		forumService = getForumService();
+		List topicList = forumService.getRootTopics(sessionId);
+		Iterator iter = topicList.iterator();
+		int totalMsg = 0;
+		int msgNum;
+		float totalMsgMarkSum = 0;
+		float msgMarkSum = 0;
+		for(;iter.hasNext();){
+			MessageDTO msgDto = (MessageDTO) iter.next();
+			//get all message under this topic
+			List topicThread = forumService.getTopicThread(msgDto.getMessage().getUid());
+			//loop all message under this topic
+			msgMarkSum = 0;
+			Iterator threadIter = topicThread.iterator();
+			for(msgNum=0;threadIter.hasNext();msgNum++){
+				MessageDTO dto = (MessageDTO) threadIter.next();
+				if(dto.getMark() != null)
+					msgMarkSum += dto.getMark().floatValue();
+			}	
+			//summary to total mark
+			totalMsgMarkSum += msgMarkSum;
+			//set average mark to topic message DTO for display use
+			msgDto.setMark(getAverageFormat(msgMarkSum/(float)msgNum));
+			totalMsg += msgNum;
+		}
+		
+		float averMark = totalMsg == 0 ? 0: (totalMsgMarkSum/(float)totalMsg);
+		request.setAttribute("topicList",topicList);
+		request.setAttribute("markAverage",getAverageFormat(averMark));
+		request.setAttribute("totalMessage",new Integer(totalMsg));
 		return mapping.findForward("success");
 	}
+
+	private Float getAverageFormat(float aver) {
+		try {
+			NumberFormat format = NumberFormat.getInstance();
+			format.setMaximumFractionDigits(1);
+			return new Float(Float.parseFloat(format.format(aver)));
+		} catch (Exception e) {
+			return new Float(0);
+		}
+	}
+
 
 	private ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -484,9 +532,6 @@ public class MonitoringAction extends Action {
 		while(iter.hasNext()){
 			MessageDTO dto = (MessageDTO) iter.next();
 			ForumReport report = dto.getMessage().getReport();
-			if(report != null){
-				log.info("REPROT MARK" + report.getMark());
-			}
 			List list = (List) topicsByUser.get(dto.getMessage().getCreatedBy());
 			if(list == null){
 				list = new ArrayList();

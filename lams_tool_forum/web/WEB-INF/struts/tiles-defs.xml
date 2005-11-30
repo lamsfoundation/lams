@@ -103,6 +103,11 @@
     	<put name="body" value="/jsps/monitoring/instructions.jsp"/>
 	</definition>
 	
+	<definition name="tiles:/monitoring/forum/statistic" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.statistic"/>
+    	<put name="body" value="/jsps/monitoring/statistic.jsp"/>
+	</definition>
+	
 	<definition name="tiles:/monitoring/forum/viewTopic" extends="tiles:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
     	<put name="body" value="/jsps/monitoring/viewtopic.jsp"/>

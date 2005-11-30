@@ -22,6 +22,8 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 /**
@@ -150,6 +152,25 @@ public class ForumUser implements Serializable,Cloneable{
 
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof ForumUser))
+			return false;
+
+		final ForumUser user = (ForumUser) obj;
+		
+		return new EqualsBuilder().append(this.uid, user.uid).append(this.firstName, user.firstName)
+			.append(this.lastName,user.lastName).append(this.loginName, user.loginName).isEquals();
+		
+	}
+
+	public int hashCode() {
+		return new HashCodeBuilder().append(uid).append(firstName)
+		.append(lastName).append(loginName)
+		.toHashCode();
 	}
 
 }
