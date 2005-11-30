@@ -1,14 +1,18 @@
 package org.lamsfoundation.lams.tool.sbmt;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 
 /**
@@ -54,6 +58,8 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	/** persistent field */
 	private boolean lockOnFinished;
 
+	private IToolContentHandler toolContentHandler;
+	
 	/** full constructor */
 	public SubmitFilesContent(String title, String instructions,
 							  Set toolSession) {
@@ -90,15 +96,14 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 	 * 
 	 * @param content The original tool content
 	 * @param newContentID The new <code>SubmitFiles</code> contentID
+	 * @param toolContentHandler 
 	 * @return SubmitFilesContent The new SubmitFilesContent object
 	 */
 	public static SubmitFilesContent newInstance(SubmitFilesContent content,
-			Long newContentID) {
-
-		SubmitFilesContent newContent = new SubmitFilesContent(newContentID,
-															   content.getTitle(), 
-															   content.getInstruction(),
-															   new TreeSet());		
+			Long newContentID, IToolContentHandler toolContentHandler) {
+		content.toolContentHandler  = toolContentHandler;
+		SubmitFilesContent newContent = (SubmitFilesContent) content.clone();
+		newContent.setContentID(newContentID);
 		return newContent;
 	}
 
@@ -307,7 +312,7 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 			//clone SubmitFIleSession object
 			if(toolSession != null ){
 				Iterator iter = toolSession.iterator();
-				Set set = new TreeSet();
+				Set set = new HashSet();
 				while(iter.hasNext())
 					set.add(((SubmitFilesSession)iter.next()).clone());
 				((SubmitFilesContent)obj).toolSession = set;
@@ -315,12 +320,23 @@ public class SubmitFilesContent implements Serializable,Cloneable {
 			//clone InstructionFiles object
 			if(instructionFiles != null ){
 				Iterator iter = instructionFiles.iterator();
-				Set set = new TreeSet();
-				while(iter.hasNext())
-					set.add(((InstructionFiles)iter.next()).clone());
+				Set set = new HashSet();
+				while(iter.hasNext()){
+					InstructionFiles file = (InstructionFiles)iter.next();
+					//duplicate file node in repository
+					NodeKey keys = toolContentHandler.copyFile(file.getUuID());
+					InstructionFiles newFile = (InstructionFiles) file.clone();
+					newFile.setUuID(keys.getUuid());
+					newFile.setVersionID(keys.getVersion());
+					set.add(newFile);
+				}
 				((SubmitFilesContent)obj).instructionFiles= set;
 			}
 		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + SubmitFilesContent.class + " failed");
+		} catch (ItemNotFoundException e) {
+			log.error("When clone " + SubmitFilesContent.class + " failed");
+		} catch (RepositoryCheckedException e) {
 			log.error("When clone " + SubmitFilesContent.class + " failed");
 		}
 		

@@ -28,11 +28,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -94,8 +94,7 @@ public class SubmitFilesService implements ToolContentManager,
 	private ILearnerDAO learnerDAO;
 	private IUserDAO userDAO;
 	
-	private SbmtToolContentHandler sbmtToolContentHandler;
-	
+	private IToolContentHandler sbmtToolContentHandler;
 	private ILamsToolService toolService;
 	private ILearnerService learnerService;
 	private IRepositoryService repositoryService;
@@ -115,11 +114,9 @@ public class SubmitFilesService implements ToolContentManager,
 		if ( fromContent == null ) {
 			fromContent = createDefaultContent(fromContentId);
 		}
-		SubmitFilesContent toContent = (SubmitFilesContent) fromContent.clone();
-		//reset some new attributes for toContent
-		toContent.setContentID(toContentId);
+		SubmitFilesContent toContent = SubmitFilesContent.newInstance(fromContent,toContentId,sbmtToolContentHandler);
 		//clear ToolSession
-		toContent.setToolSession(new TreeSet());
+		toContent.setToolSession(new HashSet());
 
 		submitFilesContentDAO.insert(toContent);
 	}
@@ -694,7 +691,8 @@ public class SubmitFilesService implements ToolContentManager,
     	
     	//save default content by given ID.
     	SubmitFilesContent content = new SubmitFilesContent();
-    	content = (SubmitFilesContent) defaultContent.clone();
+    	
+    	content = SubmitFilesContent.newInstance(defaultContent,contentID,sbmtToolContentHandler); 
 		content.setContentID(contentID);
 		saveSubmitFilesContent(content);
     	
@@ -751,15 +749,15 @@ public class SubmitFilesService implements ToolContentManager,
 	/**
 	 * @return Returns the sbmtToolContentHandler.
 	 */
-	public SbmtToolContentHandler getSbmtToolContentHandler() {
+	public IToolContentHandler getSbmtToolContentHandler() {
 		return sbmtToolContentHandler;
 	}
 
 	/**
 	 * @param sbmtToolContentHandler The sbmtToolContentHandler to set.
 	 */
-	public void setSbmtToolContentHandler(SbmtToolContentHandler toolContentHandler) {
-		this.sbmtToolContentHandler = toolContentHandler;
+	public void setSbmtToolContentHandler(IToolContentHandler sbmtToolContentHandler) {
+		this.sbmtToolContentHandler = sbmtToolContentHandler;
 	}
 	
 	/**

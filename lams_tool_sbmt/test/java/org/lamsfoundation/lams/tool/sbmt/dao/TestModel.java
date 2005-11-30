@@ -21,9 +21,9 @@
 package org.lamsfoundation.lams.tool.sbmt.dao;
 
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
 
 import junit.framework.TestCase;
 
@@ -196,7 +196,7 @@ public class TestModel extends TestCase {
 		//fill sessions
 		SubmitFilesSession session = new SubmitFilesSession();
 		fillSessionA(session);
-		Set sessions = new TreeSet();
+		Set sessions = new HashSet();
 		sessions.add(session);
 		content.setToolSession(sessions);
 	}
@@ -209,7 +209,7 @@ public class TestModel extends TestCase {
 		//fill sessions
 		SubmitFilesSession session = new SubmitFilesSession();
 		fillSessionB(session);
-		Set sessions = new TreeSet();
+		Set sessions = new HashSet();
 		sessions.add(session);
 		content.setToolSession(sessions);
 	}
@@ -219,7 +219,7 @@ public class TestModel extends TestCase {
 		//fill details
 		SubmissionDetails detail = new SubmissionDetails();
 		fillDetailA(detail);
-		Set details = new TreeSet();
+		Set details = new HashSet();
 		details.add(detail);
 		session.setSubmissionDetails(details);
 
@@ -230,7 +230,7 @@ public class TestModel extends TestCase {
 		//fill details
 		SubmissionDetails detail = new SubmissionDetails();
 		fillDetailB(detail);
-		Set details = new TreeSet();
+		Set details = new HashSet();
 		details.add(detail);
 		session.setSubmissionDetails(details);
 	}
