@@ -103,6 +103,7 @@
 							<TD><%=detail.getCreatedDateTime()%></TD>
 							<TD><%=detail.getDescription()%></TD>
 							<TD><input name="getNode" onClick="parent.location='download?uuid=<%=uuid.toString()%>&version=<%=detail.getVersionId()%>'" type="button" size="50" value="Get File"/></TD>
+							<TD><input name="copyNode" onClick="setActionSubmit('copyNode', '<%=uuid.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Copy Version"/>
 							<TD><input name="deleteVersion" onClick="setActionSubmit('deleteNode', '<%=uuid.toString()%>', '<%=detail.getVersionId()%>')" type="button" size="50" value="Delete Version"/>
 			<%
 						if ( node.isNodeType(NodeType.PACKAGENODE) ) {

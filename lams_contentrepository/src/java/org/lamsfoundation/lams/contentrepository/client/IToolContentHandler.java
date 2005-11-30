@@ -105,6 +105,16 @@ public interface IToolContentHandler {
     public abstract void deleteFile(Long uuid)
             throws InvalidParameterException, RepositoryCheckedException;
 
+    /**
+     * Copy an entry in the content repository.
+     * 
+     * @param uuid id of the file node. Mandatory
+     * @throws ItemNotFoundException Node to copy cannot be found 
+     * @throws RepositoryCheckedException Some other error occured.
+     */
+    public abstract NodeKey copyFile(Long uuid) 
+    		throws ItemNotFoundException, RepositoryCheckedException;
+
     /** Get a file node. 
      * @param uuid id of the file node. Mandatory
      * @throws FileException An error occured writing the input stream to disk.

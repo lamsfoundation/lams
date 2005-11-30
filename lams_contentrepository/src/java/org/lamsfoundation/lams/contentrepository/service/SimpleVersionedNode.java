@@ -22,6 +22,8 @@
 package org.lamsfoundation.lams.contentrepository.service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.CrNode;
@@ -45,7 +48,6 @@ import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.IVersionedNodeAdmin;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.NoSuchNodeTypeException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
@@ -55,9 +57,6 @@ import org.lamsfoundation.lams.contentrepository.ValidationException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.dao.IFileDAO;
 import org.lamsfoundation.lams.contentrepository.dao.INodeDAO;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 
 
 /**
@@ -90,22 +89,23 @@ import org.springframework.beans.factory.BeanFactoryAware;
  * 
  * @author Fiona Malikoff
  */
-public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmin {
-
-	private BeanFactory beanFactory = null;
+public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
 	protected Logger log = Logger.getLogger(SimpleVersionedNode.class);
 			
-	private INodeDAO nodeDAO = null;
-	private IFileDAO fileDAO = null;
-
 	private CrNode node = null;
 	private CrNodeVersion nodeVersion = null;
-	private List childNodes = null;
+	private List childNodes = null; // contains SimpleVersionedNode children
 	private InputStream newIStream = null;
 	private String filePath = null; // transient data - set when the input stream is written out.
 	private ITicket ticket = null; // transient data - using for grouping nodes in a session
 	
+	/* Spring configured varibles */
+	private INodeDAO nodeDAO = null;
+	private IFileDAO fileDAO = null;
+	private INodeFactory nodeFactory = null;
+
+
 	// TODO This is a case for AOP!
 	/** Check that all the necessary objects exists - node, nodeVersion, nodeDAO and fileDAO 
 	 * If one of them is missing, will throw an exception, appending the specialisedMessage
@@ -124,129 +124,15 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 			throw new RepositoryRuntimeException("Node details missing (fileDAO=null). "+specialisedMessage);
 	}
 
-	/**
-	 * Initialise the current node (which is assumed to be a newly created Spring
-	 * bean) with relPath and node type.
-	 * 
-     * If nodeTypeName is not recognized, then NoSuchNodeTypeException is thrown.
-     * See {@link NodeType} for possible node types.
-     * 
-     * This method belongs in a factory that creates nodes...
-     * 
-     * @param relPath The path of the new Node that is to be created,
-     * the last item of this path will be the name of the new Node.
-     * @param primaryNodeTypeName The name of the primary node type of the new node.
-     * @return new node
-	 * @throws NoSuchNodeTypeException if the node type is unknown.
-	 * @throws RepositoryRuntimeException if an internal error occurs.
-	 */
-	protected void initialiseNode(String relPath, String nodeTypeName, CrWorkspace workspace, SimpleVersionedNode parentNode)
-			throws NoSuchNodeTypeException {
 
-		if ( ! NodeType.isValidNodeType(nodeTypeName) ) {
-			throw new NoSuchNodeTypeException("Node type "+nodeTypeName+" is not a valid node type. ");
-		}
-		
-		CrNodeVersion parentNodeVersion = parentNode != null ? parentNode.nodeVersion : null; 
-		createCrNode(relPath, nodeTypeName, workspace, parentNodeVersion); 
-		if ( parentNode != null ) {
-			parentNode.addChildNode(this.node);
-		}
-	}
-
-	private void addChildNode(CrNode newChild) {
+	/** Add a child to the node. To be used by SimpleVersionedNode and the NodeFactory only */
+	protected void addChildNode(SimpleVersionedNode newChild) {
 		if ( childNodes == null ) {
 			childNodes = new ArrayList();
 		}
 		childNodes.add(newChild);
 	}
-	/** Load the data from the database (or other datastore).
-	 * Creates the CrNode and CrNodeVersion objects. 
-	 * Equivalent of initialiseNode for existing nodes
-	 * Checks that the workspace found in the database is the 
-	 * expected workspace.
-	 * 
-	 * If this node object is returned to a web app, then the
-	 * crNode and crNodeVersion objects will be disconnected
-	 * from the session, as the session will have been ended
-	 * with the Spring transaction.
-	 * 
-	 * If versionId is null, then gets the latest version
-	 */
-	protected void loadData(Long workspaceId, Long uuid, Long versionId) throws ItemNotFoundException {
-
-		if ( uuid == null ) {
-			throw new ItemNotFoundException("UUID is null, unable to find node.");
-		}
-		
-		if ( workspaceId == null ) {
-			throw new ItemNotFoundException("Workspace Id is null, unable to find node.");
-		}
-
-		node = null;
-		nodeVersion = null;
-
-		node = (CrNode) nodeDAO.find(CrNode.class, uuid);
-		if ( node == null ) {
-			
-			throw new ItemNotFoundException("Node "+uuid+" not found.");
-			
-		} else if ( ! workspaceId.equals(node.getCrWorkspace().getWorkspaceId()) ) {
-			
-			log.error("Security warning. User of workspace "+workspaceId
-					+" is trying to access node "+uuid+" which is in workspace "
-					+node.getCrWorkspace().getWorkspaceId()
-					+" Request for node will be rejected.");
-			throw new ItemNotFoundException("Node "+uuid+" does not exist in workspace "+workspaceId);
-		}
-		
-		/* TODO The node codes will trigger all the versions to be loaded
-		 * (ie counteract lazy loading but we probably don't need this!
-		 * Would it be better to restructure database to allow a map 
-		 * to be created? 
-		 */
-		nodeVersion = node.getNodeVersion(versionId);
-		if ( nodeVersion == null ) {
-			throw new ItemNotFoundException("No version " 
-					+ ( versionId != null ? "#"+versionId.toString() : "")
-					+ "found for node");
-		}
-
-	}
-
-
-	/**
-	 * Make the current node a new version of the given node.
-	 * <p>
-	 * This method does not work well here as it should be on a node
-	 * only object, not a node version object. But having a node object
-	 * requires another interface - some methods in this class are 
-	 * really node methods, some are version methods. So live with 
-	 * this for the moment.
-	 * <P>
-	 * If we ever pass the node back to the calling program, rather
-	 * than working with the restricted ticket calls, then this
-	 * method should be revisited and a new node object will be 
-	 * required - otherwise next version id could be wrong.
-     * <p> 
-     * Maybe put this method belongs in a factory that creates nodes...
-	 * <p>
-	 * @throws RepositoryRuntimeException if an internal error occurs.
-	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#createNewVersion(java.lang.String, java.lang.String)
-	 */
-	protected void initialiseNewVersionOfNode(SimpleVersionedNode existingNode) {
-
-		this.node = existingNode.node;
-		
-		// get next version id
-		Long nextVersionId = this.node.incrementNextVersionId();
-		
-		this.node.setParentNodeVersion(existingNode.node.getParentNodeVersion());
-		nodeVersion = createCrNodeVersion(node.getType(), 
-						new Date(System.currentTimeMillis()), nextVersionId);
-		node.getCrNodeVersions().add(nodeVersion);
-	}
-
+	
 	public NodeKey getNodeKey() {
 		return new NodeKey(getUUID(), getVersion());
 	}
@@ -403,6 +289,15 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 	}
 
 	/**
+	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#getVersionDescription()
+	 */
+	public String getVersionDescription()  {
+		nodeObjectInitilised("Unable to get version description.");
+		return nodeVersion.getVersionDescription();
+	}
+
+
+	/**
 	 * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#getCreatedDateTime()
 	 */
 	public Date getCreatedDateTime() {
@@ -494,33 +389,6 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 	 */
 
 
-	/** Create the CrNode, CrNodeVersion.  
-	 */
-	private void createCrNode(String relPath, String nodeTypeName, CrWorkspace workspace, CrNodeVersion parentNode)	{ 
-		
-		Date createdDate = new Date(System.currentTimeMillis());
-
-		// start the next version id at 1, which is used straight away by incrementNextVersionId()
-		node = new CrNode(relPath, nodeTypeName, createdDate, new Long(1), workspace, parentNode, null);
-		nodeVersion = createCrNodeVersion(nodeTypeName, createdDate, node.incrementNextVersionId());  
-		node.addCrNodeVersion(nodeVersion);
-	}
-
-	/** Create a version part of a node. 
-	 */
-	protected CrNodeVersion createCrNodeVersion(String nodeTypeName,  
-				Date createdDate, Long versionId) {
-		
-		nodeVersion = new CrNodeVersion();
-		nodeVersion.setCreatedDateTime(createdDate);
-		nodeVersion.setNode(node);
-		nodeVersion.setVersionId(versionId);
-		// nvId is set automatically on save.
-		// ??nodeId is set automatically on save
-		return nodeVersion; 
-		
-	}
-
 
 	/** Validate that this node is in a state that may be saved.
 	 * Rules: 
@@ -593,24 +461,22 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 	 * changes at the end as they cannot be rolled back if there is a db error.
 	 * 
 	 * This method only works as we know that we have two levels of nodes - the
-	 * childNodes can't have their own childNodes.
+	 * childNodes can't have their own childNodes. If this is no longer the case, 
+	 * this method and copy() will need to be changed.
+	 * 
 	 *
-	 * @param childNodes Set of SimpleVersionedNode objects - the children of a packaged
-	 * node. Will be empty for a file node, populated for a package node.   
-	 * @param versionDescription Optional. User description of this version of the node.
-	 * If null, it is not updated. 
 	 * TODO This needs a lot of testing
 	 */
-	protected Long save(String versionDescription, List childNodes) throws ValidationException, FileException{
+	protected Long save() throws ValidationException, FileException{
 
 		nodeObjectInitilised("Unable to save node.");
 		
-		this.saveDB(versionDescription);
+		this.saveDB();
 		if ( childNodes != null ) {
 			Iterator iter = childNodes.iterator();
 			while (iter.hasNext()) {
 				SimpleVersionedNode childNode = (SimpleVersionedNode) iter.next();
-				childNode.saveDB(versionDescription);
+				childNode.saveDB();
 			}
 		}
 
@@ -687,18 +553,14 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 
 
 	/** Validate the node and save the db changes to the current node.
-	 * @param versionDescription optional. If supplied will set the version description
 	 */
-	protected void saveDB(String versionDescription) throws ValidationException {
+	protected void saveDB() throws ValidationException {
 
 		validateNode();
 
 		// nodeDAO to take care of insert or update (uses saveOrUpdate)
 		// the nodeVersion and nodeVersionProperty collections cascade
 		// updates and deletes, so we can just save the node!
-		if ( versionDescription != null )
-			nodeVersion.setVersionDescription(versionDescription);
-	
 		nodeDAO.saveOrUpdate(node);
 		
 		// child nodes are done manually as the set is lazy loaded
@@ -707,8 +569,8 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		if ( childNodes != null ) {
 			Iterator iter = childNodes.iterator();
 			while ( iter.hasNext() ) {
-				CrNode node = (CrNode) iter.next();
-				nodeDAO.saveOrUpdate(node);
+				SimpleVersionedNode node = (SimpleVersionedNode) iter.next();
+				nodeDAO.saveOrUpdate(node.getNode());
 			}
 		}
 
@@ -756,10 +618,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		CrNode childNode = nodeDAO.findChildNode(nodeVersion, relPath);
 		
 		if ( childNode != null ) {
-			SimpleVersionedNode newNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
-			newNode.node = childNode;
-			newNode.nodeVersion = childNode.getNodeVersion(null); // get latest and only version
-			return (IVersionedNode) newNode;
+			return (IVersionedNode) nodeFactory.getNode(childNode,null);
 		} else {
     		throw new ItemNotFoundException("Unable to find node with path "+relPath
     				+" as a child of node "+getUUID());
@@ -778,9 +637,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
     		Iterator iter = childCrNodes.iterator();
     		while (iter.hasNext()) {
     			CrNode element = (CrNode) iter.next();
-				SimpleVersionedNode newNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
-				newNode.node = element;
-				newNode.nodeVersion = element.getNodeVersion(null);
+				SimpleVersionedNode newNode = nodeFactory.getNode(element,null);
 				childNodes.add(newNode);
 			}
     	}
@@ -840,9 +697,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
     	List problemPaths = new ArrayList();
     	for ( int i=0; i<versions.length; i++ ) {
     		// get the SimpleVersionedNode for this version
-			SimpleVersionedNode newNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
-			newNode.node = this.node;
-			newNode.nodeVersion = this.node.getNodeVersion(versions[i]);
+			SimpleVersionedNode newNode = nodeFactory.getNode(getNode(),versions[i]);
     		problemPaths.addAll(newNode.deleteVersion());
     	}
     	return problemPaths;
@@ -934,6 +789,160 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
     	
     }
     
+    /**
+     * Process files in the package. Create a List of file nodes but do not persist
+     * the nodes.
+     *  
+	 * @param dirPath: the directory from which to get files. Mandatory.
+	 * @param packageNode: node representing the package. Mandatory.
+	 * @parm versionDescription: version description for the child nodes. 
+	 * @return nodeSet: set of child nodes for the package node 
+	 * @throws InvalidParameterException
+	 * @throws FileException
+	 */
+	protected void addPackageFiles(CrWorkspace workspace, String dirPath, String versionDescription) 
+				throws InvalidParameterException, FileException, ValidationException {
+		
+    	File directory = new File(dirPath);
+    	if ( ! directory.exists() || ! directory.isDirectory() || ! directory.canRead() ) {
+    		throw new FileException("Directory "+dirPath+" does not exist, is not a directory or cannot be read.");
+    	}
+
+    	// set up the path to be removed from file paths, to make a relative path.
+    	// this is a directory but we may need to add the directory separator on the end
+    	String removePathToMakeRelPath = directory.getAbsolutePath();
+    	if ( removePathToMakeRelPath.charAt(removePathToMakeRelPath.length()-1) != File.separatorChar )
+    		removePathToMakeRelPath += File.separatorChar;
+		
+    	processDirectory(workspace, removePathToMakeRelPath, directory, versionDescription);
+	}
+
+	/** 
+	 * Process Directory of files. This method is called recursively to process
+     * files in the initial directory and in all subdirectories of this directory.
+     * 
+     * @param removePathToMakeRelPath: string to remove from a files absolute
+     * path to create relPath, the path relative to the package node. This is
+     * the absolute path to the directory that contains all the files for the package.
+     * This value stays the same across all recursive calls. Mandatory.
+	 * @param dirFile: the directory from which to get files. Initially this will
+	 * be the directory that contains the package but as recursive calls are made,
+	 * this value will change. Mandatory.
+	 * @param versionDescription: version description for node. Optional.
+	 * This value stays the same across all recursive calls.
+	 * @param nodeSet: set of nodes to update with the new nodes. Passed in through
+	 * the recursion for efficiency (rather than keep creating new collections). Must
+	 * not be null.
+	 * @throws FileException
+	 */
+	private void processDirectory(CrWorkspace workspace, String removePathToMakeRelPath, File dirFile, String versionDescription) 
+			throws InvalidParameterException, FileException, ValidationException {
+
+		if ( ! dirFile.exists() || ! dirFile.isDirectory() || ! dirFile.canRead() ) {
+			throw new FileException("Directory "+dirFile.getAbsolutePath()+" does not exist, is not a directory or cannot be read.");
+		}
+
+		File file = null; // declare outside try so available in catch
+		try {
+
+			File[] files = dirFile.listFiles();
+			for ( int i=0; i<files.length; i++ ) {
+				file = files[i];
+
+				log.debug("Processing file "+file.getAbsolutePath());
+				log.debug("Name is "+file.getName());
+	
+				if ( file.isDirectory() ) {
+					
+					// recurse to get files in this directory
+					processDirectory(workspace, removePathToMakeRelPath, file, versionDescription);
+					
+				} else {
+					
+					// get the name and relative path (from the package directory)
+					// for this node. convert any \ in the relative path to /
+					// as / is needed on retrieval.
+					String filename = file.getName();
+					String filePath = file.getPath();
+					String relPath = StringUtils.replace(filePath,removePathToMakeRelPath,"");
+					if ( filePath.length() == relPath.length() ) {
+						// path hasn't shortened so something has gone wrong!
+						throw new FileException("Unable to determine relative path of file. "
+								+"Path to package is "+removePathToMakeRelPath
+								+"Path to file is "+filePath
+								+"Attempted relPath is "+relPath);
+					}
+					relPath = relPath.replace(File.separatorChar,'/');
+					
+					// Open the file ready for reading then create
+					// the file node. Mime type is unknown.
+					// no need to the new node as a childe node, as createFileNode will do it.
+					FileInputStream istream = new FileInputStream(file);
+					nodeFactory.createFileNode(workspace, this, relPath, istream, filename, null, versionDescription);
+				}
+			}
+			
+	    } catch ( FileNotFoundException fe) {
+    		// how can this be when we just read them in? Maybe a privilege problem
+	    	String message = "FileNotFoundException thrown while trying to read file in package. File path=\""
+	    			+(file!=null?file.getAbsolutePath():"")+"\""; 
+    		log.error(message,fe);
+	    	throw new FileException("Internal error: unable to add package. "+message, fe);
+	    } catch ( FileException e) {
+	       	// catch this so we can document it against the file details (unknown
+	    	// further down in the guts) - make sure we rethrow it.
+	    	String message = "FileException thrown while trying to read file in package. File path=\""
+    			+(file!=null?file.getAbsolutePath():"")+"\""; 
+    		log.error(message,e);
+	    	throw e;
+    	}
+	    
+	}
+
+    
+	/** Copy the supplied node/version to a new node. Does not copy the history
+	 * of the node. Copies any child nodes of the current version. All files are duplicated.
+	 * 
+	 * This method only works as we know that we have two levels of nodes - the
+	 * childNodes can't have their own childNodes. If this is no longer the case, 
+	 * this method and SimpleVersionedNode.save() will need to be changed.
+	 * 
+	 * @throws FileException will occur if there is a problem reading a file from the repository
+	 * @throws InvalidParameterException will only occur if there is an internal bug as it will only happen if the 
+	 *   file, filename or mimetype properties are invalid.
+	 * @throws ValueFormatException will only occur if there is an internal bug as it will only happen if the filename or mimetype properties are not strings. 
+	 */
+	public SimpleVersionedNode copy( ) throws FileException, ValueFormatException, InvalidParameterException  {
+		
+		return nodeFactory.copy(this);
+
+	}
+
+	/* **********************************************************
+	 * Methods used by the Node Factory
+	 * **********************************************************
+	 */
+
+	/** Get the "internal" CrNode. Should only be used by the NodeFactory */
+	protected CrNode getNode() {
+		return node;
+	}
+
+	/** Set the "internal" CrNode. Should only be used by the NodeFactory */
+	public void setNode(CrNode node) {
+		this.node = node;
+	}
+
+	/** Get the "internal" CrNodeVersion. Should only be used by the NodeFactory */
+	public CrNodeVersion getNodeVersion() {
+		return nodeVersion;
+	}
+
+	/** Set the "internal" CrNodeVersion. Should only be used by thef */
+	public void setNodeVersion(CrNodeVersion nodeVersion) {
+		this.nodeVersion = nodeVersion;
+	}
+
     /* **********************************************************
 	 * Following methods are required for Spring framework to set up 
 	 * the DAO object(s) and to trigger a cleanup of the filestream 
@@ -967,6 +976,14 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 		this.fileDAO = fileDAO;
 	}
 	
+	public INodeFactory getNodeFactory() {
+		return nodeFactory;
+	}
+
+	public void setNodeFactory(INodeFactory nodeFactory) {
+		this.nodeFactory = nodeFactory;
+	}
+	
 	/**
 	 * Clean up any resources that will not be cleaned up by the garbage 
 	 * collector after this object is destroyed. At present, all it does is
@@ -982,11 +999,7 @@ public class SimpleVersionedNode implements BeanFactoryAware, IVersionedNodeAdmi
 			log.debug("Unable to close stream - was it already closed perhaps?",e);
 		}
 	}
-	
-	/* **** Method for BeanFactoryAware interface *****************/
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;	
-	}
+
 
 
 }	

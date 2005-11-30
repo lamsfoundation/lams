@@ -21,9 +21,6 @@
 
 package org.lamsfoundation.lams.contentrepository.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,7 +31,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.CrCredential;
@@ -50,19 +46,16 @@ import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.ItemExistsException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NoSuchNodeTypeException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
 import org.lamsfoundation.lams.contentrepository.ValidationException;
+import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 
 
 /**
@@ -92,14 +85,13 @@ import org.springframework.beans.factory.BeanFactoryAware;
  * 
  * @author Fiona Malikoff
  */
-public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
+public class SimpleRepository implements IRepositoryAdmin {
 
 	protected Logger log = Logger.getLogger(SimpleRepository.class);	
 
 	private ICredentialDAO credentialDAO = null;
 	private IWorkspaceDAO workspaceDAO = null;
-	
-	private BeanFactory beanFactory = null;
+	private INodeFactory nodeFactory = null;
 	
 	private Set ticketIdSet = new HashSet(); // set of currently known tickets.
 
@@ -172,8 +164,8 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 			throws AccessDeniedException, LoginException, ItemExistsException, RepositoryCheckedException {
 		
 		// call workspace dao to check the login and get the workspace
-		if ( workspaceDAO == null || credentialDAO == null || beanFactory == null ) 
-			throw new RepositoryRuntimeException("Workspace, Credential DAO or Bean Factory object missing. Unable to process login.");
+		if ( workspaceDAO == null || credentialDAO == null || nodeFactory == null ) 
+			throw new RepositoryRuntimeException("Workspace, Credential DAO or Node Factory object missing. Unable to process login.");
 		
 		CrWorkspace workspace = workspaceDAO.findByName(workspaceName);
 		if ( workspace != null ) {
@@ -355,38 +347,6 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 		return ( ticket != null &&  ticketIdSet.contains(ticket.getTicketId()) );
     }
 
-	/** Get an existing SimpleVersionedNode. Reads the node from the database.
-	 * Does not cache the node. If versionId is null, then gets the latest version.
-	 * @throws ItemNotFoundException*/
-	private SimpleVersionedNode getNode(Long workspaceId, Long uuid, Long versionId) throws ItemNotFoundException {
-		SimpleVersionedNode dbNode = (SimpleVersionedNode) beanFactory.getBean("node", SimpleVersionedNode.class);
-		dbNode.loadData(workspaceId, uuid,versionId);
-		return dbNode;
-	}
-	
-    /**
-     * Create a file node. Does not save the node.
-	 */
-	private SimpleVersionedNode createFileNode(CrWorkspace workspace, InputStream istream, String filename, 
-					String mimeType, String versionDescription,
-					String relPath, SimpleVersionedNode packageNode)
-				throws InvalidParameterException, FileException, ValidationException {
-		try {
-
-    		SimpleVersionedNode initialNodeVersion = (SimpleVersionedNode) beanFactory.getBean("node", 
-    				SimpleVersionedNode.class);
-    		initialNodeVersion.initialiseNode(relPath, NodeType.FILENODE, (CrWorkspace) workspace, packageNode);
-        	initialNodeVersion.setFile(istream, filename, mimeType);
-        	return initialNodeVersion;
-        	
-    	} catch ( NoSuchNodeTypeException e) {
-    		// if this is thrown, then it is bug - nothing external should cause it.
-    		throw new RepositoryRuntimeException("Internal error: unable to add file. "
-    				+e.getMessage(), e);
-		}
-	}
-
-
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#addFileItem(org.lamsfoundation.lams.contentrepository.ITicket, java.io.InputStream, java.lang.String, java.lang.String, java.lang.String)
 	 */
@@ -397,8 +357,9 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 		
     	try { 
     		CrWorkspace workspace = getWorkspace(ticket.getWorkspaceId());
-    		SimpleVersionedNode initialNodeVersion = createFileNode(workspace, istream, filename, mimeType, versionDescription, null, null);
-       		initialNodeVersion.save(versionDescription, null);
+    		SimpleVersionedNode initialNodeVersion = nodeFactory.createFileNode(workspace, 
+    				 null, null, istream, filename, mimeType, versionDescription); 
+       		initialNodeVersion.save();
     		return initialNodeVersion.getNodeKey();
 		} catch ( ValidationException e) {
 			// if this is thrown, then it is bug - nothing external should cause it.
@@ -411,117 +372,6 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 		}
     }
     
-   /**
-     * Process files in the package.
-     *  
-	 * @param dirPath: the directory from which to get files. Mandatory.
-	 * @param packageNode: node representing the package. Mandatory.
-	 * @return nodeSet: set of child nodes for the package node 
-	 * @throws InvalidParameterException
-	 * @throws FileException
-	 */
-	private List processPackageFilesSaveNode(CrWorkspace workspace, String dirPath, SimpleVersionedNode packageNode, String versionDescription) 
-				throws InvalidParameterException, FileException, ValidationException {
-		
-    	File directory = new File(dirPath);
-    	if ( ! directory.exists() || ! directory.isDirectory() || ! directory.canRead() ) {
-    		throw new FileException("Directory "+dirPath+" does not exist, is not a directory or cannot be read.");
-    	}
-
-    	// set up the path to be removed from file paths, to make a relative path.
-    	// this is a directory but we may need to add the directory separator on the end
-    	String removePathToMakeRelPath = directory.getAbsolutePath();
-    	if ( removePathToMakeRelPath.charAt(removePathToMakeRelPath.length()-1) != File.separatorChar )
-    		removePathToMakeRelPath += File.separatorChar;
-		
-    	List nodeList = new ArrayList();
-    	processDirectory(workspace, removePathToMakeRelPath, directory, packageNode, versionDescription, nodeList);
-    	return nodeList;
-	}
-
-	/** 
-	 * Process Directory of files. This method is called recursively to process
-     * files in the initial directory and in all subdirectories of this directory.
-     * 
-     * @param removePathToMakeRelPath: string to remove from a files absolute
-     * path to create relPath, the path relative to the package node. This is
-     * the absolute path to the directory that contains all the files for the package.
-     * This value stays the same across all recursive calls. Mandatory.
-	 * @param dirFile: the directory from which to get files. Initially this will
-	 * be the directory that contains the package but as recursive calls are made,
-	 * this value will change. Mandatory.
-	 * @param packageNode: node representing the package. Mandatory.
-	 * @param versionDescription: version description for node. Optional.
-	 * This value stays the same across all recursive calls.
-	 * @param nodeSet: set of nodes to update with the new nodes. Passed in through
-	 * the recursion for efficiency (rather than keep creating new collections). Must
-	 * not be null.
-	 * @throws FileException
-	 */
-	private void processDirectory(CrWorkspace workspace, String removePathToMakeRelPath, File dirFile, SimpleVersionedNode packageNode, String versionDescription, List nodeList) 
-			throws InvalidParameterException, FileException, ValidationException {
-
-		if ( ! dirFile.exists() || ! dirFile.isDirectory() || ! dirFile.canRead() ) {
-			throw new FileException("Directory "+dirFile.getAbsolutePath()+" does not exist, is not a directory or cannot be read.");
-		}
-
-		File file = null; // declare outside try so available in catch
-		try {
-
-			File[] files = dirFile.listFiles();
-			for ( int i=0; i<files.length; i++ ) {
-				file = files[i];
-
-				log.debug("Processing file "+file.getAbsolutePath());
-				log.debug("Name is "+file.getName());
-	
-				if ( file.isDirectory() ) {
-					
-					// recurse to get files in this directory
-					processDirectory(workspace, removePathToMakeRelPath, file, packageNode, versionDescription, nodeList);
-					
-				} else {
-					
-					// get the name and relative path (from the package directory)
-					// for this node. convert any \ in the relative path to /
-					// as / is needed on retrieval.
-					String filename = file.getName();
-					String filePath = file.getPath();
-					String relPath = StringUtils.replace(filePath,removePathToMakeRelPath,"");
-					if ( filePath.length() == relPath.length() ) {
-						// path hasn't shortened so something has gone wrong!
-						throw new FileException("Unable to determine relative path of file. "
-								+"Path to package is "+removePathToMakeRelPath
-								+"Path to file is "+filePath
-								+"Attempted relPath is "+relPath);
-					}
-					relPath = relPath.replace(File.separatorChar,'/');
-					
-					// Open the file ready for reading then create
-					// the file node. Mime type is unknown.
-					FileInputStream istream = new FileInputStream(file);
-					IVersionedNodeAdmin newNode = createFileNode(workspace, istream, filename, null, versionDescription,
-								relPath, packageNode);
-					nodeList.add(newNode);
-				}
-			}
-			
-	    } catch ( FileNotFoundException fe) {
-    		// how can this be when we just read them in? Maybe a privilege problem
-	    	String message = "FileNotFoundException thrown while trying to read file in package. File path=\""
-	    			+(file!=null?file.getAbsolutePath():"")+"\""; 
-    		log.error(message,fe);
-	    	throw new FileException("Internal error: unable to add package. "+message, fe);
-	    } catch ( FileException e) {
-	       	// catch this so we can document it against the file details (unknown
-	    	// further down in the guts) - make sure we rethrow it.
-	    	String message = "FileException thrown while trying to read file in package. File path=\""
-    			+(file!=null?file.getAbsolutePath():"")+"\""; 
-    		log.error(message,e);
-	    	throw e;
-    	}
-	    
-	}
 
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#addPackageItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.String, java.lang.String, java.lang.String)
@@ -542,23 +392,11 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 		}
 
     	SimpleVersionedNode packageNode = null;
-		try {
-
-    		packageNode = (SimpleVersionedNode) beanFactory.getBean("node",	SimpleVersionedNode.class);
-			packageNode.initialiseNode(null, NodeType.PACKAGENODE, (CrWorkspace) workspace, null);
-	    	packageNode.setProperty(PropertyName.INITIALPATH, startFile);
-    	} catch ( NoSuchNodeTypeException e) {
-    		// if this is thrown, then it is bug - nothing external should cause it.
-    		throw new RepositoryRuntimeException("Internal error: unable to add package." 
-    				+e.getMessage(), e);
-    	}
+   		packageNode = nodeFactory.createPackageNode(workspace, startFile, versionDescription); 
     	
 		try { 
-			// presave it to set the id. It will be resaved at the end of processing
-			// the child nodes to update everything.
-			packageNode.save(versionDescription, null);
-			List nodeList = processPackageFilesSaveNode(workspace, dirPath, packageNode, versionDescription );    	
-			packageNode.save(versionDescription, nodeList);
+			packageNode.addPackageFiles(workspace, dirPath, versionDescription); 
+			packageNode.save();
     	} catch ( ValidationException e) {
     		// if this is thrown, then it is bug - nothing external should cause it.
     		throw new RepositoryRuntimeException("Internal error: unable to add package."
@@ -573,8 +411,9 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 	public IVersionedNode getFileItem(ITicket ticket, Long uuid, Long version)
 			throws AccessDeniedException, ItemNotFoundException, FileException {
 		
-	   	return getNode(ticket.getWorkspaceId(), uuid, version);
+		return nodeFactory.getNode(ticket.getWorkspaceId(), uuid, version);
  	}
+	
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.contentrepository.IRepository#getFileItem(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.Long, java.lang.String)
 	 */
@@ -585,7 +424,7 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 		long start = System.currentTimeMillis();
 		String key = "getFileItem "+uuid;
 
-		IVersionedNode latestNodeVersion = getNode(ticket.getWorkspaceId(),uuid,version);
+		IVersionedNode latestNodeVersion = nodeFactory.getNode(ticket.getWorkspaceId(),uuid,version);
 		log.error(key+" latestNodeVersion "+(System.currentTimeMillis()-start));
 		
 		if ( relPath == null ) {
@@ -610,7 +449,7 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 			ItemNotFoundException, FileException {
 
 		long start = System.currentTimeMillis();
-		IVersionedNodeAdmin latestNodeVersion = getNode(ticket.getWorkspaceId(),uuid,version);
+		IVersionedNodeAdmin latestNodeVersion = nodeFactory.getNode(ticket.getWorkspaceId(),uuid,version);
 		log.error("getPackageNodes latestNodeVersion "+(System.currentTimeMillis()-start));
 		
 		Set childNodes = latestNodeVersion.getChildNodes();
@@ -652,7 +491,7 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 	public SortedSet getVersionHistory(ITicket ticket, Long uuid)
 			throws ItemNotFoundException, AccessDeniedException {
 		
-	  	IVersionedNode node = getNode(ticket.getWorkspaceId(),uuid, null);
+	  	IVersionedNode node = nodeFactory.getNode(ticket.getWorkspaceId(),uuid, null);
     	return node.getVersionHistory();
 	}
 	/* (non-Javadoc)
@@ -663,18 +502,16 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 			throws AccessDeniedException, ItemNotFoundException, FileException,
 			InvalidParameterException {
 	   	
-		// check that the previous version was a file node - error otherwise
-	   	SimpleVersionedNode latestNodeVersion = getNode(ticket.getWorkspaceId(),uuid,null);
-	   	if ( ! latestNodeVersion.isNodeType( NodeType.FILENODE) )
-	   		throw new InvalidParameterException("Node is not a file node - it is a "+latestNodeVersion.getNodeType()
+		SimpleVersionedNode newNodeVersion = nodeFactory.getNodeNewVersion(ticket.getWorkspaceId(), 
+				uuid, null, versionDescription);
+
+	   	if ( ! newNodeVersion.isNodeType( NodeType.FILENODE) )
+	   		throw new InvalidParameterException("Node is not a file node - it is a "+newNodeVersion.getNodeType()
 	   				+". Unable to update as a file.");
-		
-		SimpleVersionedNode newNodeVersion = (SimpleVersionedNode) beanFactory.getBean("node", 
-				SimpleVersionedNode.class);
-		newNodeVersion.initialiseNewVersionOfNode(latestNodeVersion);
 		newNodeVersion.setFile(istream, filename, mimeType);
+		
 		try {
-			newNodeVersion.save(versionDescription, null);
+			newNodeVersion.save();
     	} catch ( ValidationException e) {
     		// if this is thrown, then it is bug - nothing external should cause it.
     		throw new RepositoryRuntimeException("Internal error: unable to update file."
@@ -690,25 +527,21 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 			throws AccessDeniedException, ItemNotFoundException, FileException,
 			InvalidParameterException {
 		
-		// check that the previous version was a package node - error otherwise
-	   	SimpleVersionedNode latestNodeVersion = getNode(ticket.getWorkspaceId(),uuid,null);
-	   	if ( ! latestNodeVersion.isNodeType( NodeType.PACKAGENODE) )
-	   		throw new InvalidParameterException("Node is not a package node - it is a "+latestNodeVersion.getNodeType()
+		SimpleVersionedNode newNodeVersion = nodeFactory.getNodeNewVersion(ticket.getWorkspaceId(), 
+				uuid, null, versionDescription);
+
+	   	if ( ! newNodeVersion.isNodeType( NodeType.PACKAGENODE) )
+	   		throw new InvalidParameterException("Node is not a package node - it is a "+newNodeVersion.getNodeType()
 	   				+". Unable to update as a package.");
 		
-		SimpleVersionedNode newPackageNode = (SimpleVersionedNode) beanFactory.getBean("node", 
-				SimpleVersionedNode.class);
-		newPackageNode.initialiseNewVersionOfNode(latestNodeVersion);
-		newPackageNode.setProperty(PropertyName.INITIALPATH, startFile);
+	   	newNodeVersion.setProperty(PropertyName.INITIALPATH, startFile);
 		
 		try { 
 			CrWorkspace workspace = getWorkspace(ticket.getWorkspaceId());
 			
-			// presave it to set the id. It will be resaved at the end of processing
-			// the child nodes update everything.
-			newPackageNode.save(versionDescription, null);
-			List nodeList = processPackageFilesSaveNode(workspace, dirPath, newPackageNode, versionDescription);
-			newPackageNode.save(versionDescription, nodeList);
+			newNodeVersion.addPackageFiles(workspace, dirPath, versionDescription); 
+			newNodeVersion.save();
+
     	} catch ( ValidationException e) {
     		// if this is thrown, then it is bug - nothing external should cause it.
     		throw new RepositoryRuntimeException("Internal error: unable to add package."
@@ -718,7 +551,7 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 			throw new RepositoryRuntimeException("Internal error: unable to add file. "
 					+e.getMessage(), e);
 		}
-		return newPackageNode.getNodeKey();
+		return newNodeVersion.getNodeKey();
  	}
 
 	
@@ -736,9 +569,40 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
     		throws  AccessDeniedException, ItemNotFoundException, ValidationException {
 	
         // check that the previous version was a file node - error otherwise
-        SimpleVersionedNode node = getNode(ticket.getWorkspaceId(),uuid,versionId);
+        SimpleVersionedNode node = nodeFactory.getNode(ticket.getWorkspaceId(),uuid,versionId);
         node.setProperty(name, value, type);
-        node.saveDB(null);
+        node.saveDB();
+    }
+
+    /* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.contentrepository.IRepository#copyNodeVersion(org.lamsfoundation.lams.contentrepository.ITicket, java.lang.Long, java.lang.Long)
+	 */
+    public NodeKey copyNodeVersion(ITicket ticket, Long uuid, Long versionId) throws AccessDeniedException, ItemNotFoundException {
+
+        
+    	try { 
+            SimpleVersionedNode originalNode = nodeFactory.getNode(ticket.getWorkspaceId(),uuid,versionId);
+           	SimpleVersionedNode newNode = nodeFactory.copy(originalNode);
+           	newNode.save();
+    		return newNode.getNodeKey();
+    		 
+		} catch ( ValidationException e) {
+			// if this is thrown, then it is bug - nothing external should cause it.
+		    throw new RepositoryRuntimeException("Internal error: unable to copy node. "
+		    				+e.getMessage(), e);
+		} catch ( FileException e) {
+			// if this is thrown, then it is bug - nothing external should cause it.
+		    throw new RepositoryRuntimeException("Internal error: unable to copy node. "
+		    				+e.getMessage(), e);
+		} catch ( ValueFormatException e) {
+			// if this is thrown, then it is bug - nothing external should cause it.
+		    throw new RepositoryRuntimeException("Internal error: unable to copy node. "
+		    				+e.getMessage(), e);
+		} catch ( InvalidParameterException e) {
+			// if this is thrown, then it is bug - nothing external should cause it.
+		    throw new RepositoryRuntimeException("Internal error: unable to copy node. "
+		    				+e.getMessage(), e);
+		}
     }
 
     /* (non-Javadoc)
@@ -751,7 +615,7 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 			throw new InvalidParameterException("UUID is required for deleteItem.");
 
 		// get the first version of the node and delete from there.
-	   	SimpleVersionedNode latestNodeVersion = getNode(ticket.getWorkspaceId(),uuid,new Long(1));
+	   	SimpleVersionedNode latestNodeVersion = nodeFactory.getNode(ticket.getWorkspaceId(),uuid,new Long(1));
 	   	if ( latestNodeVersion.hasParentNode() ) {
 	   		throw new InvalidParameterException("You cannot delete a node that is in a package (ie has a parent). "
 	   				+"Please delete the parent. Node UUID "+uuid);
@@ -773,7 +637,7 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 			throw new InvalidParameterException("Both uuid and version are required for deleteVersion.");
 		
 		// get the first version of the node and delete from there.
-	   	SimpleVersionedNode nodeVersion = getNode(ticket.getWorkspaceId(),uuid,version);
+	   	SimpleVersionedNode nodeVersion = nodeFactory.getNode(ticket.getWorkspaceId(),uuid,version);
 	   	List problemPaths = nodeVersion.deleteVersion();
 	   	return problemPaths != null ? 
 	   			(String[]) problemPaths.toArray(new String[problemPaths.size()]) : 
@@ -808,8 +672,12 @@ public class SimpleRepository implements IRepositoryAdmin, BeanFactoryAware {
 		this.credentialDAO = credentialDAO;
 	}
 	
-	/* **** Method for BeanFactoryAware interface *****************/
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;	
+	public INodeFactory getNodeFactory() {
+		return nodeFactory;
 	}
+
+	public void setNodeFactory(INodeFactory nodeFactory) {
+		this.nodeFactory = nodeFactory;
+	}
+
 }

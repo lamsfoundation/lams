@@ -183,7 +183,7 @@ ticket.</P>
 	}
 </PRE>
 
-<P>Using the ticket, the tool can now add, retrieve and delete nodes. Deleting a package
+<P>Using the ticket, the tool can now add, retrieve, delete and copy nodes. Deleting a package
 node deletes all the files in the package. Warning: deleting 
 removes the node completely - from both the database and the file system.</P>
 <PRE>
@@ -207,11 +207,22 @@ removes the node completely - from both the database and the file system.</P>
 	IVersionedNode node = repositoryService.getFileItem(repositoryTicket, 
 							nodeKey2.getUuid(), nodeKey2.getVersion());
 	
+	Copy the initial version of the file node. CopyNodeVersion copies the specified version or last version (if not specified), duplicates the actual files.
+	NodeKey nodeKey3 = repositoryService.copyNodeVersion(repositoryTicket, 
+							nodeKey1.getUuId(),
+							nodeKey1.getVersion());
+
+	Copy the latest version of the file node. 
+	NodeKey nodeKey3 = repositoryService.copyNodeVersion(repositoryTicket, 
+							nodeKey1.getUuId(),
+							null);
+
 	Delete the second version of the file:
 	String[] problemFiles = repositoryService.deleteVersion(repositoryTicket,nodeKey2.getUuid(), nodeKey2.getVersion());
 
 	Delete all versions of the file:
 	String[] problemFiles = repositoryService.deleteNode(repositoryTicket, nodeKey2.getUuid());
+	
 </PRE>
 
 <p>Similar methods exist for packages of files. See IRepositoryService for all the available calls.</p>
@@ -263,16 +274,6 @@ to set the JBOSS directory. This is required for the database related ANT tasks.
 </LI>
 <LI><STRONG>JBOSS location</STRONG> Edit build.properties (in the root of the project)
 to set the JBOSS directory. This is required for the deploy and copyfiles ANT tasks.
-</LI>
-<LI><STRONG>JUNIT Testing</STRONG> Edit the TEXT_FILEPATH, TEXT_FILENAME, BINARY_FILEPATH
-BINARY_FILENAME, PACKAGE_DIR_PATH, PACKAGE_TEST_FILE in 
-org.lamsfoundation.lams.contentrepository.BaseTestCase ( in the test hierarchy).
-These must point to files on your PC. The TEXT* variables should point to a text file,
-the BINARY* to a binary file (e.g. jpeg, zip file). The allows you to check that <EM>manually</EM>
-that neither text nor binary files are corrupted. The PACKAGE_DIR_PATH should be 
-a directory containing an index.html file and a series of other files (e.g. images
-to go with the index.html file). The PACKAGE_TEST_FILE should be the relative 
-path to a file within the directory.
 </LI>
 </UL>
 

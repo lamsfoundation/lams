@@ -60,26 +60,37 @@ public class CrNodeVersion implements Serializable {
     /** persistent field */
     private Set crNodeVersionProperties;
 
-    /** full constructor */
-    public CrNodeVersion(Long versionId, Date createdDateTime, org.lamsfoundation.lams.contentrepository.CrNode node, Set crNodeVersionProperties) {
+    /* full constructor */
+/*    public CrNodeVersion(Long versionId, Date createdDateTime, org.lamsfoundation.lams.contentrepository.CrNode node, Set crNodeVersionProperties) {
         this.versionId = versionId;
         this.createdDateTime = createdDateTime;
         this.node = node;
         this.crNodeVersionProperties = crNodeVersionProperties;
         //this.childNodes = childNodes;
-    }
+    } */
 
-    /** default constructor */
+    /** default constructor - used by Hibernate */
     public CrNodeVersion() {
     }
 
-    /** minimal constructor */
-    public CrNodeVersion(Long versionId, org.lamsfoundation.lams.contentrepository.CrNode node,Set crNodeVersionProperties) {
+	/** Normal constructor 
+	 */
+	public CrNodeVersion (CrNode node, Date createdDate, Long versionId, String versionDescription) {
+		this.createdDateTime = createdDate;
+		this.node = node;
+		this.versionId = versionId;
+		setVersionDescription(versionDescription);
+	}
+
+
+
+    /* minimal constructor */
+    /*public CrNodeVersion(Long versionId, org.lamsfoundation.lams.contentrepository.CrNode node,Set crNodeVersionProperties) {
         this.versionId = versionId;
         this.node = node;
         this.crNodeVersionProperties = crNodeVersionProperties;
         //this.childNodes = childNodes;
-    }
+    } */
 
     /** 
      *            @hibernate.id

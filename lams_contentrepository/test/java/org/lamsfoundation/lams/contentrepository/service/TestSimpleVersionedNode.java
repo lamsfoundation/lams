@@ -31,9 +31,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty;
-import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.IValue;
 import org.lamsfoundation.lams.contentrepository.IVersionDetail;
@@ -47,7 +45,6 @@ import org.lamsfoundation.lams.contentrepository.PropertyType;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.ValidationException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
-import org.lamsfoundation.lams.contentrepository.dao.hibernate.WorkspaceDAO;
 import org.lamsfoundation.lams.contentrepository.data.CRResources;
 
 
@@ -58,9 +55,6 @@ import org.lamsfoundation.lams.contentrepository.data.CRResources;
  * 
  * Test the non-persistence related features of a SimpleVersionedNode.
  * Unable to test the ids as these are generated when written to the database.
- * 
- * When running tests, please make sure the FILEPATH is set to a file on your PC
- * or comment out the file tests.
  * 
  * Needs to be in the same package as SimpleVersionedNode
  * to access protected methods.
@@ -116,7 +110,7 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 		}
 		
 		try {
-			testNode.save(null, null);
+			testNode.save();
 		} catch (Exception e) {
 			failUnexpectedException(e);
 		} 
@@ -296,7 +290,7 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 		try {
 			SimpleVersionedNode testNode = getTestNode();
 			testNode.setProperty(name, value, PropertyType.STRING);
-			testNode.save(null, null);
+			testNode.save();
 
 			IValue iValue = null;
 			IVersionedNode rereadNode = getTestNode();
@@ -308,7 +302,7 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 			// delete the value. Row in db should be deleted.
 			testNode = getTestNode();
 			testNode.setProperty(name, null, PropertyType.STRING);
-			testNode.save(null, null);
+			testNode.save();
 			
 			iValue = null;
 			rereadNode = getTestNode();
@@ -409,15 +403,11 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 	}
 
 	public void testAddNode() {
-		Long fileNodeUUID = null;
-		Long dataNodeUUID = null;
-		Long packageNodeUUID = null;
 		try { 
 			// file nodes are tested in another test
-			SimpleVersionedNode dataNode = createNode(INITIAL_WORKSPACE_ID, NodeType.DATANODE);
+			SimpleVersionedNode dataNode = nodeFactory.createDataNode(getWorkspace(INITIAL_WORKSPACE_ID), null,"Initial Version");
 
-			SimpleVersionedNode packageNode = createNode(INITIAL_WORKSPACE_ID, NodeType.PACKAGENODE);
-			packageNode.setProperty(PropertyName.INITIALPATH,"index.html");
+			SimpleVersionedNode packageNode = nodeFactory.createPackageNode(getWorkspace(INITIAL_WORKSPACE_ID), "index.html", "Initial Version");
 			
 			assertTrue("2 nodes created, but not saved into database ", 
 					dataNode != null && dataNode.getUUID() == null
@@ -474,23 +464,28 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 						+e.getMessage(),e.getMessage().indexOf("Node must be of type FILE_NODE") != -1);
 			}
 			
-			// now try adding to a new filenode. Check that it enforces a file stream and the name,
+			// now try adding/updating  a filenode. Check that it enforces a file stream and the name,
 			// before writing it out properly
-			if ( newUuid  == null ) {
-				fileNode = createNode(INITIAL_WORKSPACE_ID, NodeType.FILENODE);
-			} else {
-				fileNode = (SimpleVersionedNode) getNode(INITIAL_WORKSPACE_ID, newUuid);
-			}
-
+				
 			try {
-				fileNode.setFile(null, filename, null);
+				if ( newUuid  == null ) {
+					fileNode = nodeFactory.createFileNode(getWorkspace(INITIAL_WORKSPACE_ID), null, null, null, filename, null, null);
+				} else {
+					fileNode = (SimpleVersionedNode) getNode(INITIAL_WORKSPACE_ID, newUuid);
+					fileNode.setFile(null, filename, null);
+				}
 			} catch (RepositoryCheckedException e) {
 				assertTrue("Exception thrown as input stream is missing", 
 						e.getMessage().indexOf("InputStream is required.")!=-1);
 			}
 
 			try {
-				fileNode.setFile(is, null, null);
+				if ( newUuid  == null ) {
+					fileNode = nodeFactory.createFileNode(getWorkspace(INITIAL_WORKSPACE_ID), null, null, is, null, null, null);
+				} else {
+					fileNode = (SimpleVersionedNode) getNode(INITIAL_WORKSPACE_ID, newUuid);
+					fileNode.setFile(is, null, null);
+				}
 			} catch (RepositoryCheckedException e) {
 				assertTrue("Exception thrown as filename is missing", 
 						e.getMessage().indexOf("Filename is required.")!=-1);
@@ -546,7 +541,7 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 	private void saveCheckNode(String nodeDesc, String expectedType, SimpleVersionedNode nodeToSave) 
 								throws ValidationException, RepositoryCheckedException {
 		Long nodeUUID;
-		nodeToSave.save(null, null);
+		nodeToSave.save();
 		nodeUUID = nodeToSave.getUUID();
 		assertTrue(nodeDesc+" Node saved in database, assigned a UUID",  nodeUUID != null);
 
@@ -558,9 +553,11 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 	}
 
 	public void testAddNodeBadType() {
-		try { 
-			SimpleVersionedNode newNode = createNode(INITIAL_WORKSPACE_ID, "XYZ");
-			newNode.save(null, null);
+		try {
+	
+			SimpleVersionedNode newNode = nodeFactory.createDataNode(getWorkspace(INITIAL_WORKSPACE_ID), null,"Initial Version");
+			newNode.getNode().setType("XYZ");
+			newNode.save();
 			fail("NoSuchNodeTypeException should have been thrown");
 		} catch (Exception e) {
 			if ( NoSuchNodeTypeException.class.isInstance(e) ) {
@@ -572,26 +569,5 @@ public class TestSimpleVersionedNode extends BaseTestCase {
 		}
 		
 	}
-	
-	/** Normally this functionality is handled by the repository object
-	 * but this test case is trying to test the stuff below the repository
-	 * object 
-	 * @return Node
-	 * @throws NoSuchNodeTypeException
-	 * @throws AccessDeniedException
-	 */
-	protected SimpleVersionedNode createNode(Long workspaceId, String nodeType) throws NoSuchNodeTypeException, AccessDeniedException {
-
-		SimpleVersionedNode newNode = (SimpleVersionedNode)context.getBean("node", SimpleVersionedNode.class);
-		WorkspaceDAO workspaceDAO = (WorkspaceDAO)context.getBean("workspaceDAO");
-		
-		CrWorkspace workspace = (CrWorkspace) workspaceDAO.find(CrWorkspace.class, workspaceId);
-		if ( workspace == null ) {
-			fail("Workspace id="+workspaceId+" does not exist.");
-		}
-
-		newNode.initialiseNode(null,nodeType,workspace,null);
-		return newNode;
-	} 
 
 }

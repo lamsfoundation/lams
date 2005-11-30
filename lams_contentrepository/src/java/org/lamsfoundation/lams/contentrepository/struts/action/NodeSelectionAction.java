@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
 
 
 /** 
@@ -254,4 +255,57 @@ public class NodeSelectionAction extends RepositoryDispatchAction {
 
 	}
 
+    /** 
+	 * Copy a version of a node.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return ActionForward
+     * @throws ItemNotFoundException
+     * @throws InvalidParameterException
+     * @throws AccessDeniedException
+     * @throws Exception
+	 */
+	public ActionForward copyNode(ActionMapping mapping, 
+        ActionForm form,
+        HttpServletRequest request, 
+        HttpServletResponse response) 
+	
+		throws ItemNotFoundException, InvalidParameterException, 
+				AccessDeniedException, FileException  {
+
+    	ITicket ticket = getTicket(request);
+		log.debug("In copyNode, ticket is "+ticket);
+		if ( ticket == null ) {
+			log.error("Ticket missing from session");
+        	return returnError(mapping, request, "error.noTicket");
+		} 
+		
+		Long uuid = getLong(request.getParameter(UUID_NAME));
+		Long version = getLong(request.getParameter(VERSION_NAME));
+	
+		if ( uuid == null ) {
+			log.error("UUID missing");
+        	return returnError(mapping, request, "error.uuidMissing");
+		} 
+
+
+		log.debug("Copy node "+uuid+" version "+version);
+
+		try {
+			NodeKey key = getRepository().copyNodeVersion(ticket,uuid,version);
+			log.info("Copy node, new ids "+key);
+			return getList(mapping,form,request,response);
+
+		} catch (AccessDeniedException e) {
+			log.error("Not allowed to do this exception occured ",e);
+			throw e;
+		} catch (ItemNotFoundException e) {
+			log.error("Item not found exception occured ",e);
+			throw e;
+		}
+
+	}
 }

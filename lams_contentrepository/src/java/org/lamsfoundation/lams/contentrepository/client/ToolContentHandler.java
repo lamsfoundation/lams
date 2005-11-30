@@ -225,6 +225,35 @@ public abstract class ToolContentHandler implements IToolContentHandler {
         return nodeKey;
     }
 
+    /**
+     * Copy an entry in the content repository.
+     * 
+     * @param uuid id of the file node. Mandatory
+     * @throws ItemNotFoundException Node to copy cannot be found 
+     * @throws RepositoryCheckedException Some other error occured.
+     */
+    public NodeKey copyFile(Long uuid) throws ItemNotFoundException, RepositoryCheckedException {
+        NodeKey nodeKey = null;
+        try {
+	        try {
+				nodeKey = getRepositoryService().copyNodeVersion(getTicket(false), uuid, null);
+		    } catch (AccessDeniedException e) {
+		        log.warn("Unable to access repository to add copy node "+uuid
+					+"AccessDeniedException: "+e.getMessage()+" Retrying login.");
+	            nodeKey = getRepositoryService().copyNodeVersion(getTicket(true), uuid, null);
+		    }
+	    } catch (ItemNotFoundException e) {
+	        log.warn("Unable to to copy node "+uuid
+					+" as the node cannot be found. Repository Exception: "+e.getMessage()+" Retry not possible.");
+	        throw e;
+	    } catch (RepositoryCheckedException e) {
+	        log.warn("Unable to to copy node "+uuid
+					+"Repository Exception: "+e.getMessage()+" Retry not possible.");
+	        throw e;
+	    }
+        return nodeKey;
+    }
+
     /** 
      * Delete a file node.  If the node does not exist, then nothing happens (ie ItemNotFoundException is NOT thrown). 
      * @param uuid id of the file node. Mandatory

@@ -27,10 +27,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -191,7 +193,7 @@ public class TestSimpleRepository extends BaseTestCase {
 			repository.createCredentials(cred1);
 			repository.assignCredentials(cred1, INITIAL_WORKSPACE);
 			ITicket newTicket = repository.login(cred1, INITIAL_WORKSPACE);
-			assertTrue("Login succeeded for new user to original workspace.",true);
+			assertTrue("Login succeeded for new user to original workspace.",newTicket!=null);
 		} catch ( ItemExistsException iee ) {
 		    log.error("Credential already exists - unable to check that it can be created.\n"
 		            +" The test should really be run with a newly rebuilt database & test data loaded");
@@ -206,7 +208,7 @@ public class TestSimpleRepository extends BaseTestCase {
 			cred1 = new SimpleCredentials(newUser, newPassword1);
 			repository.updateCredentials(cred1,cred2);
 			ITicket newTicket = repository.login(cred2, INITIAL_WORKSPACE);
-			assertTrue("Login succeeded for new user to original workspace with new password.",true);
+			assertTrue("Login succeeded for new user to original workspace with new password.",newTicket!=null);
 		} catch ( LoginException le ) {
 			assertTrue("Login exception unexpectededly - user password changed. Exception was "+le.getMessage(),true);
 		} catch ( Exception e ) {
@@ -232,13 +234,13 @@ public class TestSimpleRepository extends BaseTestCase {
 		
         try {
             NodeKey keys = testAddFileItem(CRResources.getSingleFile(), CRResources.singleFileName,null,one);
-	        checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+	        checkFileNodeExist(fileDAO, keys.getUuid(), one, 1, v1Description);
 			keys = testAddFileItem(CRResources.getZipFile(), CRResources.zipFileName,keys.getUuid(),two);
-			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
+			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2, v2Description);
 			
 			deleteVersion(keys.getUuid(), two);
 			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 1);
-			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1, v1Description);
 					
 			deleteVersion(keys.getUuid(), one);
 			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
@@ -256,9 +258,9 @@ public class TestSimpleRepository extends BaseTestCase {
 
 		try {
 			NodeKey keys = testAddFileItem(CRResources.getSingleFile(), CRResources.singleFileName ,null,one);
-			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1, v1Description);
 			testAddFileItem(CRResources.getZipFile(), CRResources.zipFileName,keys.getUuid(),two);
-			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
+			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2, v2Description);
 		
 			testSetPropertyFile(keys);
 
@@ -282,14 +284,13 @@ public class TestSimpleRepository extends BaseTestCase {
 		NodeKey keys = null;
 		try {
 			keys = testAddFileItem(CRResources.getSingleFile(), CRResources.singleFileName ,null,one);
-			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1);
+			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1, v1Description);
 			testAddFileItem(CRResources.getZipFile(), CRResources.zipFileName,keys.getUuid(),two);
-			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2);
+			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2, v2Description);
         } catch (FileNotFoundException e) {
             fail("Unexpected exception "+e.getMessage());
         }
 		
-		String expectProbPath = null;
 		try { 
 			File file = new File(fileDAO.getFilePath(keys.getUuid(), one));
 			boolean success = file.delete();
@@ -306,7 +307,7 @@ public class TestSimpleRepository extends BaseTestCase {
 
 	}
 	
-	private void checkFileNodeExist(IFileDAO fileDAO, Long uuid, Long version, int expectNumVersions) {
+	private void checkFileNodeExist(IFileDAO fileDAO, Long uuid, Long version, int expectNumVersions, String expectedDescription) {
 		
 		InputStream isOut = null;
 		try {
@@ -324,12 +325,12 @@ public class TestSimpleRepository extends BaseTestCase {
 				IVersionDetail element = (IVersionDetail) iter.next();
 				if ( element.getVersionId().longValue() == 1)
 					assertTrue("Description is "+element.getDescription()
-							+" as expected "+v1Description,
-							v1Description.equals(element.getDescription()));
+							+" as expected "+expectedDescription,
+							expectedDescription.equals(element.getDescription()));
 				else 
 					assertTrue("Description is "+element.getDescription()
-							+" as expected "+v2Description,
-							v2Description.equals(element.getDescription()));
+							+" as expected "+expectedDescription,
+							expectedDescription.equals(element.getDescription()));
 			}
 			
 			String filepath = fileDAO.getFilePath(uuid, version);
@@ -468,6 +469,80 @@ public class TestSimpleRepository extends BaseTestCase {
 
 	}
 
+	/** Tests that a file item can be added and copied, and that the two copies are separate */
+	public void testCopyFileItem() {
+		IFileDAO fileDAO = (FileDAO)context.getBean("fileDAO", FileDAO.class);
+	
+		NodeKey keys = null;
+		try {
+			keys = testAddFileItem(CRResources.getSingleFile(), CRResources.singleFileName ,null,one);
+			checkFileNodeExist(fileDAO, keys.getUuid(), one, 1, v1Description);
+			testAddFileItem(CRResources.getZipFile(), CRResources.zipFileName,keys.getUuid(),two);
+			checkFileNodeExist(fileDAO, keys.getUuid(), two, 2, v2Description);
+	    } catch (FileNotFoundException e) {
+	        fail("Unexpected exception "+e.getMessage());
+	    }
+
+	   // copy each version of the file node
+		try {
+			NodeKey copy1 = repository.copyNodeVersion(ticket, keys.getUuid(), one);
+			NodeKey copylatest = repository.copyNodeVersion(ticket, keys.getUuid(), null);
+
+			assertNotSame("Copy 1 is a different uuid to the original.", copy1.getUuid(), keys.getUuid());
+			checkFileNodeExist(fileDAO, copy1.getUuid(), one, 1, v1Description);
+			
+			assertNotSame("Copy Latest is a different uuid to the original.", copylatest.getUuid(), keys.getUuid());
+			checkFileNodeExist(fileDAO, copylatest.getUuid(), one, 1, v2Description);
+			
+			assertNotSame("Two copies have a different uuid.", copylatest.getUuid(), copy1.getUuid());
+			
+			// check that the properties are different ids, but have the same values
+			Set origProperties = repository.getFileItem(ticket, keys.getUuid(), one).getProperties();
+			Set copyProperties = repository.getFileItem(ticket, copy1.getUuid(), one).getProperties();
+			compareProperties(origProperties, copyProperties);
+			
+			copyProperties = repository.getFileItem(ticket, copylatest.getUuid(), one).getProperties();
+			compareProperties(origProperties, copyProperties);
+
+			// should be able to delete the original nodes, and the copies should still exist.
+			deleteNode(keys.getUuid());
+			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), one, 0);
+			checkFileNodeDoesNotExist(fileDAO, keys.getUuid(), two, 0);
+			checkFileNodeExist(fileDAO, copy1.getUuid(), one, 1, v1Description);
+			checkFileNodeExist(fileDAO, copylatest.getUuid(), one, 1, v2Description);
+
+		} catch (RepositoryCheckedException re) {
+			failUnexpectedException("testTextFileItem",re);
+		}
+	
+	}
+
+	/** The two properties sets should have the same values, but different ids */
+	private void compareProperties(Set origProperties, Set copyProperties) {
+		assertEquals("Same number of properties in each set", origProperties.size(), copyProperties.size());
+		Iterator iter = origProperties.iterator();
+		
+		while (iter.hasNext()) {
+			// check each property in origProperties, against the entries in copyProperties
+			// not the most efficient but there shouldn't be too many properties to check.
+			CrNodeVersionProperty origElement = (CrNodeVersionProperty) iter.next();
+
+			boolean found = false;
+			String name = origElement.getName();
+			Iterator copyIter = copyProperties.iterator();
+			while  ( copyIter.hasNext() && ! found ) {
+				CrNodeVersionProperty copyElement = (CrNodeVersionProperty) iter.next();
+				if ( name.equals(copyElement.getName()) ) {
+					found = true;
+					assertEquals("Element "+name+" same value",origElement.getValue(),copyElement.getValue());
+					assertTrue("Element "+name+" different id",!origElement.getId().equals(copyElement.getId()));
+				}
+			}
+			assertTrue("Copied elements contain element for "+name,found);
+		}
+
+	}
+	
 	/** Tests that a package item can be created, update and that at property can be set. */
 	public void testPackageItem() {
 		NodeKey keys = testPackageItem(null);
@@ -501,30 +576,7 @@ public class TestSimpleRepository extends BaseTestCase {
 						&& keys.getVersion().longValue() > 1);
 			}
 
-			// try getting the start file - index.html
-			checkFileInPackage(keys, null);
-			
-			// now try another file in the package
-			checkFileInPackage(keys, CRResources.zipFileIncludesFilename);
-			
-			// check that there is the expected number of files in pacakge.
-			// expect an extra node over the number of files (for the package node)
-			List nodes = repository.getPackageNodes(ticket, keys.getUuid(), null);
-			assertTrue("Expected number of nodes found. Expected " 
-					+(CRResources.zipFileNumFiles+1)+" got "
-					+(nodes != null ? nodes.size() : 0 ),
-					nodes != null && nodes.size() == (CRResources.zipFileNumFiles+1));
-			Iterator iter = nodes.iterator();
-			if ( iter.hasNext() ) {
-				SimpleVersionedNode packageNode = (SimpleVersionedNode) iter.next();
-				assertTrue("First node is the package node.",
-					packageNode.isNodeType(NodeType.PACKAGENODE));
-			}
-			while ( iter.hasNext() ) {
-				SimpleVersionedNode childNode = (SimpleVersionedNode) iter.next();
-				assertTrue("Child node is a file node.",
-						childNode.isNodeType(NodeType.FILENODE));
-			}
+			checkPackage(keys);
 					
 		} catch (RepositoryCheckedException re) {
 			failUnexpectedException("testPackageItem",re);
@@ -544,6 +596,57 @@ public class TestSimpleRepository extends BaseTestCase {
 		}
 		
 		return keys;
+	}
+
+	private void checkPackage(NodeKey keys) throws AccessDeniedException, ItemNotFoundException, FileException, IOException {
+		// try getting the start file - index.html
+		checkFileInPackage(keys, null);
+		
+		// now try another file in the package
+		checkFileInPackage(keys, CRResources.zipFileIncludesFilename);
+		
+		// check that there is the expected number of files in pacakge.
+		// expect an extra node over the number of files (for the package node)
+		List nodes = repository.getPackageNodes(ticket, keys.getUuid(), null);
+		assertTrue("Expected number of nodes found. Expected " 
+				+(CRResources.zipFileNumFiles+1)+" got "
+				+(nodes != null ? nodes.size() : 0 ),
+				nodes != null && nodes.size() == (CRResources.zipFileNumFiles+1));
+		Iterator iter = nodes.iterator();
+		if ( iter.hasNext() ) {
+			SimpleVersionedNode packageNode = (SimpleVersionedNode) iter.next();
+			assertTrue("First node is the package node.",
+				packageNode.isNodeType(NodeType.PACKAGENODE));
+		}
+		while ( iter.hasNext() ) {
+			SimpleVersionedNode childNode = (SimpleVersionedNode) iter.next();
+			assertTrue("Child node is a file node.",
+					childNode.isNodeType(NodeType.FILENODE));
+		}
+	}
+
+	/** Tests that a file item can be added and copied, and that the two copies are separate */
+	public void testCopyPackageItem() {
+	
+		NodeKey keys = testPackageItem(null);
+
+	    // copy the package node
+		try {
+			NodeKey copy = repository.copyNodeVersion(ticket, keys.getUuid(), null);
+
+			assertNotSame("Copy 1 is a different uuid to the original.", copy.getUuid(), keys.getUuid());
+			checkPackage(copy);
+			
+			// should be able to delete the original nodes, and the copies should still exist.
+			deleteNode(keys.getUuid());
+			checkPackage(copy);
+
+		} catch (RepositoryCheckedException re) {
+			failUnexpectedException("testCopyPackageItem",re);
+		} catch (IOException e) {
+			failUnexpectedException("testCopyPackageItem",e);
+		}
+
 	}
 
 	private void testSetPropertyPackage(NodeKey keys) {

@@ -35,6 +35,9 @@ import org.lamsfoundation.lams.learningdesign.dao.IBaseDAO;
  */
 public interface IWorkspaceDAO extends IBaseDAO {
 
+	/** String used to define node factory in Spring context */
+	public static final String WORKSPACE_DAO_ID = "workspaceDAO";
+
 	/** Get a workspace. 
 	 * 
 	 * @param workspaceName

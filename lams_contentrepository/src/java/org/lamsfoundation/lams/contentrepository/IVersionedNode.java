@@ -177,7 +177,14 @@ public interface IVersionedNode {
      */
     public Long getVersion();
     
-	/** Get the date/time of when this node was created. 
+    /**
+     * Get the version description.
+     * 
+     * @return The version description
+     */
+    public String getVersionDescription();
+
+    /** Get the date/time of when this node was created. 
 	 * @return date/time stamp of creation
 	 */
 	public Date getCreatedDateTime();

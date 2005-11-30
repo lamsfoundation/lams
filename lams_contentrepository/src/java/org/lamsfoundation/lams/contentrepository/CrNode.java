@@ -69,30 +69,40 @@ public class CrNode implements Serializable {
     /** versions of this node. persistent field */
     private Set crNodeVersions;
     
-    /** full constructor */
-    public CrNode(String path, String type, Date createdDateTime, Long nextVersionId, org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace, org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set crNodeVersions) {
-        this.path = path;
-        this.type = type;
-        this.createdDateTime = createdDateTime;
-        this.nextVersionId = nextVersionId;
-        this.crWorkspace = crWorkspace;
-        this.parentNodeVersion = parentNodeVersion;
-        this.crNodeVersions = crNodeVersions;
-    }
-
-    /** default constructor */
+    /** default constructor - used by Hibernate */
     public CrNode() {
     }
 
+	/** Create the CrNode and its initial CrNodeVersion.  
+	 */
+	public CrNode(String relPath, String nodeTypeName, Date createdDateTime, CrWorkspace workspace, 
+			CrNodeVersion parentNodeVersion, String versionDescription)	{ 
+		
+        this.path = relPath;
+        this.type = nodeTypeName;
+        this.createdDateTime = createdDateTime;
+        
+		// start the next version id at 1, which is used straight away by incrementNextVersionId()
+        this.nextVersionId = new Long(1);
+        
+        this.crWorkspace = workspace;
+        this.parentNodeVersion = parentNodeVersion;
+		this.addCrNodeVersion(new CrNodeVersion(this, createdDateTime, incrementNextVersionId(), versionDescription));
+	}
+
+    /** full constructor */
+/*    public CrNode(String path, String type, Date createdDateTime, Long nextVersionId, org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace, org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set crNodeVersions) {
+    } */
+
     /** minimal constructor */
-    public CrNode(String type, Long nextVersionId, org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace,  org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set crNodeVersions) {
+/*    public CrNode(String type, Long nextVersionId, org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace,  org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion, Set crNodeVersions) {
         this.type = type;
         this.nextVersionId = nextVersionId;
         this.crWorkspace = crWorkspace;
         this.parentNodeVersion = parentNodeVersion;
         this.crNodeVersions = crNodeVersions;
     }
-
+*/
     /** 
      *            @hibernate.id
      *             generator-class="identity"
@@ -289,6 +299,7 @@ public class CrNode implements Serializable {
     }
 
     /* ********* Manually added methods ****/
+    
     /** Get the next version id for this node and then 
      * increment it. All other ids come out of the database
      * but for the version we need the next id within a 
@@ -335,7 +346,8 @@ public class CrNode implements Serializable {
 		return nodeTypeName != null && nodeTypeName.equals(getType());		
 	}
 
-	/** Get a particular version of this node 
+	/** Get a particular version of this node. If versionId is null, then 
+	 * gets the latest version.
 	 */
 	public CrNodeVersion getNodeVersion(Long versionId) 
 		{

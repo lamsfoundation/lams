@@ -230,6 +230,25 @@ public interface IRepositoryService {
     public void setProperty(ITicket ticket, Long uuid, Long versionId, String name, Object value, int type) 
 		throws  AccessDeniedException, ItemNotFoundException, ValidationException ;
 
+    /** Copy node, copying the specified/latest version of the existing node
+     * to version 1 of the new node. 
+     * <p>
+     * Copies a node (identified by uuid/version). The file(s) attached to the
+     * supplied version are duplicated and become version 1 of the new node. Therefore
+     * any "history" of the original node is lost. If the version is not supplied, 
+     * then it uses the latest version of the node as the basis for the new node.
+     * <p>
+     * This method works for both file nodes and package nodes.
+     *  
+	 * @param ticket ticket issued on login. Identifies tool and workspace - mandatory 
+	 * @param uuid id of the file/package - mandatory
+	 * @param version desired version - if null gets latest version
+	 * @return nodeKey (uuid and version)
+	 * @throws AccessDeniedException if the ticket is invalid
+	 * @throws ItemNotFoundException if the node cannot be found
+     */
+    public NodeKey copyNodeVersion(ITicket ticket, Long uuid, Long versionId) throws AccessDeniedException, ItemNotFoundException;
+
 	/** 
 	 * Get an item from the repository based on the UUID. This
 	 * may be either a file or package node.  

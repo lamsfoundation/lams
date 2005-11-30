@@ -23,9 +23,11 @@ package org.lamsfoundation.lams.contentrepository.service;
 
 import junit.framework.TestCase;
 
+import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 
 
@@ -33,6 +35,8 @@ public class BaseTestCase extends AbstractLamsTestCase {
 	
 	protected static IRepositoryAdmin repository = null;
 	protected static ITicket ticket = null;
+	protected static INodeFactory nodeFactory = null;
+	protected static IWorkspaceDAO workspaceDAO = null;
 	
 	// two workspaces exist initially, and atool has access to both.
 	protected static final String INITIAL_WORKSPACE = "atoolWorkspace";
@@ -61,6 +65,8 @@ public class BaseTestCase extends AbstractLamsTestCase {
 		if ( repository == null ) {
 			// get repository object from bean factory
 			repository =(IRepositoryAdmin)context.getBean(IRepositoryService.REPOSITORY_SERVICE_ID);
+			nodeFactory = (INodeFactory)context.getBean(INodeFactory.NODE_FACTORY_ID);
+			workspaceDAO = (IWorkspaceDAO)context.getBean(IWorkspaceDAO.WORKSPACE_DAO_ID);
 			ICredentials cred = new SimpleCredentials(INITIAL_WORKSPACE_USER, INITIAL_WORKSPACE_PASSWORD);
 			try { 
 				ticket = repository.login(cred, INITIAL_WORKSPACE);
@@ -98,16 +104,25 @@ public class BaseTestCase extends AbstractLamsTestCase {
 	
 	/** Normally this functionality is handled by the ticket */
 	protected SimpleVersionedNode getNode(Long workspaceId, Long nodeId) {
-		SimpleVersionedNode loadNode =(SimpleVersionedNode)context.getBean("node", SimpleVersionedNode.class);
 		try {
-			loadNode.loadData(workspaceId, nodeId, null); // loads the latest version
+			return nodeFactory.getNode(workspaceId, nodeId, null);
 		} catch (ItemNotFoundException e) {
 			e.printStackTrace();
 			fail("Latest version of test node not found, id="+nodeId);
 		}
-		return loadNode;
+		return null;
 	}
-	
+
+	/** Normally this functionality is handled by repository service */
+	protected CrWorkspace getWorkspace(Long workspaceId) {
+		// call workspace dao to get the workspace
+		CrWorkspace workspace = (CrWorkspace) workspaceDAO.find(CrWorkspace.class, workspaceId);
+		if ( workspace == null ) {
+			fail("Workspace id "+workspaceId+" not found.");
+		}
+		return workspace;
+
+	}
 	protected SimpleVersionedNode getTestNode() {
 		return getNode(INITIAL_WORKSPACE_ID, TEST_DATA_NODE_ID);
 	}
