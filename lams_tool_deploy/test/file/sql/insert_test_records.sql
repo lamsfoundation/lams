@@ -5,6 +5,8 @@ tool_signature,
 service_name,
 tool_display_name,
 description,
+tool_identifier,
+tool_version,
 learning_library_id,
 default_tool_content_id,
 valid_flag,
@@ -28,21 +30,23 @@ VALUES
 'test.test.deploy.Test',
 'DEPLOY TEST TOOL 1',
 'TEST DATA FOR DEPLOY APP',
+'DPTST1',
+'1.1',
 NULL,
 NULL,
 0,
 1,
 1,
 1,
-1,
 0,
-'/lams/tool/dptst1/foo.jsp',
-'/lams/tool/dptst1/foo.jsp',
-'/lams/tool/dptst1/foo.jsp',
-'/lams/tool/dptst1/foo.jsp',
-'/lams/tool/dptst1/foo.jsp',
-'/lams/tool/dptst1/foo.jsp',
-'/lams/tool/dptst1/foo.jsp', 
+0,
+'tool/dptst1/foo.jsp',
+'tool/dptst1/foo.jsp',
+'tool/dptst1/foo.jsp',
+'tool/dptst1/foo.jsp',
+'tool/dptst1/foo.jsp',
+NULL,
+NULL,
 NOW()
 );
 
@@ -87,8 +91,6 @@ activity_ui_id
 , learning_library_id
 , create_date_time
 , run_offline_flag
-, offline_instructions
-, online_instructions
 , max_number_of_options
 , min_number_of_options
 , options_instructions
@@ -127,8 +129,6 @@ NULL
 , 1
 , NOW()
 , 0
-, 'Do it yourself'
-, 'Do it in LAMS'
 , NULL
 , NULL
 , NULL
