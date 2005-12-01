@@ -1,0 +1,20 @@
+<Deploy>
+	<dbUsername>lams</dbUsername>
+	<dbPassword>lamsdemo</dbPassword>
+	<dbDriverClass>com.mysql.jdbc.Driver</dbDriverClass>
+	<dbDriverUrl>jdbc:mysql://localhost/lams?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true</dbDriverUrl>
+	<toolSignature>lasbmt11</toolSignature>
+	<toolWebUri>test-dummy.war</toolWebUri>
+	<toolContext>/lams/tool/test</toolContext>
+	<lamsEarPath>test/file/lams.ear</lamsEarPath>
+	<toolInsertScriptPath>test/file/sql/tool_insert.sql</toolInsertScriptPath>
+	<toolLibraryInsertScriptPath>test/file/sql/library_insert.sql</toolLibraryInsertScriptPath>
+	<toolActivityInsertScriptPath>test/file/sql/activity_insert.sql</toolActivityInsertScriptPath>
+	<toolTablesScriptPath>test/file/sql/create_tool_tables.sql</toolTablesScriptPath>
+	<toolTablesDeleteScriptPath></toolTablesDeleteScriptPath>
+	<deployFiles>
+		<string>test/file/test-dummy.war</string>
+		<string>test/file/test-dummy.jar</string>
+	</deployFiles>
+</Deploy>
+

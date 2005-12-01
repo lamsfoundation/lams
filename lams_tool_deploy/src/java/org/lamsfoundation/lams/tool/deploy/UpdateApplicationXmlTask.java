@@ -93,10 +93,8 @@ public abstract class UpdateApplicationXmlTask implements Task
      * Sets the context root of the web app to be added.
      * @param contextroot New value of property contextroot.
      */
-    public void setContextRoot(final java.lang.String contextRoot)
-    
-    {
-        
+    public void setContextRoot(final java.lang.String contextRoot)    
+    {        
         this.contextRoot = contextRoot;
     }
     

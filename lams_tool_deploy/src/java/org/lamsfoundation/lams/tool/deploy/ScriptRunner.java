@@ -99,9 +99,11 @@ public class ScriptRunner
             stmt = conn.createStatement();
             for (int i = 0, length = statements.length; i < length; i++)
             {
-                stmt.addBatch(statements[i]);
+               stmt.addBatch(statements[i]);
             }
+           
             stmt.executeBatch();
+           
         }
         catch (SQLException sqlex)
         {
