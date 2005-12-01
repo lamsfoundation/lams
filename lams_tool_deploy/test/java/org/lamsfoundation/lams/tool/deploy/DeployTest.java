@@ -62,6 +62,8 @@ public class DeployTest extends ToolDBTest
     {
         //super.tearDown();
         //FileUtils.forceDelete(new File(props.getString("testEarPath")+"/META-INF/application.xml"));
+        super.tearDown();
+        dropTestToolTable("test/file/test.properties");
     }
     
     public static junit.framework.Test suite()
