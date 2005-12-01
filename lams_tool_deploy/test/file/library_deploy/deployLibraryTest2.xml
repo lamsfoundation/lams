@@ -1,0 +1,6 @@
+<Deploy>	
+	<dbUsername>root2</dbUsername>
+	<dbPassword>dag.Quiz2</dbPassword>
+	<dbDriverClass>com.mysql.jdbc.Driver2</dbDriverClass>
+	<dbDriverUrl>jdbc:mysql://localhost:3306/scratch2</dbDriverUrl>
+</Deploy>	

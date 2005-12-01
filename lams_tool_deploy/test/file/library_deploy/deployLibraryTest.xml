@@ -1,0 +1,36 @@
+<Deploy>
+	<dbUsername>lams</dbUsername>
+	<dbPassword>lamsdemo</dbPassword>
+	<dbDriverClass>com.mysql.jdbc.Driver</dbDriverClass>
+	<dbDriverUrl>jdbc:mysql://localhost/lams?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true</dbDriverUrl>
+	<learningLibraryList>
+		<learningLibrary>
+			<libraryInsertScriptPath>D:\deployTest\ParallelActivity\learninglibrary1_insert.sql</libraryInsertScriptPath>
+			<templateActivityInsertScriptPath>D:\deployTest\ParallelActivity\libraryActivity1_insert.sql</templateActivityInsertScriptPath>
+			<toolActivityList>
+				<toolActivity>
+					<toolSignature>lanb11</toolSignature>
+					<toolActivityInsertScriptPath>D:\deployTest\ParallelActivity\toolActivity1_insert.sql</toolActivityInsertScriptPath>	
+				</toolActivity>
+				<toolActivity>
+					<toolSignature>lasbmt11</toolSignature> 
+					<toolActivityInsertScriptPath>D:\deployTest\ParallelActivity\toolActivity2_insert.sql</toolActivityInsertScriptPath>	
+				</toolActivity>
+			</toolActivityList>
+		</learningLibrary>
+		<learningLibrary>
+			<libraryInsertScriptPath>D:\deployTest\ParallelActivity\learninglibrary2_insert.sql</libraryInsertScriptPath>
+			<templateActivityInsertScriptPath>D:\deployTest\ParallelActivity\libraryActivity2_insert.sql</templateActivityInsertScriptPath>
+			<toolActivityList>
+				<toolActivity>
+					<toolSignature>laqa11</toolSignature>
+					<toolActivityInsertScriptPath>D:\deployTest\ParallelActivity\toolActivity1_library2.sql</toolActivityInsertScriptPath>	
+				</toolActivity>
+				<toolActivity>
+					<toolSignature>lanb11</toolSignature> 
+					<toolActivityInsertScriptPath>D:\deployTest\ParallelActivity\toolActivity2_library2.sql</toolActivityInsertScriptPath>	
+				</toolActivity>
+			</toolActivityList>
+		</learningLibrary>
+	</learningLibraryList>
+</Deploy>
