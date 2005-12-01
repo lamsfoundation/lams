@@ -66,6 +66,7 @@ public abstract class ToolDBTest extends TestCase
             DBConnector connector =  new DBConnector(propsFilePath);
             conn = connector.connect();
             conn.setAutoCommit(false);
+           
             File createLamsTables = new File("test/file/sql/lams_common/create_lams_11_tables.sql");
             File insertTypesData = new File("test/file/sql/lams_common/insert_types_data.sql");
             
@@ -121,6 +122,54 @@ public abstract class ToolDBTest extends TestCase
             conn.setAutoCommit(false);
             File insertTestRecords = new File("test/file/sql/insert_test_records.sql");
             ScriptRunner insertRunner = new ScriptRunner(FileUtils.readFileToString(insertTestRecords , "UTF8"),conn);
+            insertRunner.run();
+            conn.commit();
+        }
+        catch (Exception ex)
+        {
+            conn.rollback();
+            throw ex;
+        }
+        finally
+        {
+            DbUtils.closeQuietly(conn);
+        }
+    }
+    
+    protected void insertTestRecordsForLibraryDeploy(String propsFilePath) throws Exception
+    {
+        Connection conn = null;
+        try
+        {
+            DBConnector connector =  new DBConnector(propsFilePath);
+            conn = connector.connect();
+            conn.setAutoCommit(false);
+            File insertTestRecords = new File("test/file/sql/insert_library_test_data.sql");
+            ScriptRunner insertRunner = new ScriptRunner(FileUtils.readFileToString(insertTestRecords , "UTF8"),conn);
+            insertRunner.run();
+            conn.commit();
+        }
+        catch (Exception ex)
+        {
+            conn.rollback();
+            throw ex;
+        }
+        finally
+        {
+            DbUtils.closeQuietly(conn);
+        }
+    }
+    
+    protected void dropTestToolTable(String propsFilePath) throws Exception
+    {
+        Connection conn = null;
+        try
+        {
+            DBConnector connector =  new DBConnector(propsFilePath);
+            conn = connector.connect();
+            conn.setAutoCommit(false);
+            File deleteToolTables = new File("test/file/sql/drop_tool_tables.sql");
+            ScriptRunner insertRunner = new ScriptRunner(FileUtils.readFileToString(deleteToolTables , "UTF8"),conn);
             insertRunner.run();
             conn.commit();
         }
