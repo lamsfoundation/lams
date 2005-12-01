@@ -1,11 +1,3 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-18 15:28:01
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-18 14:55:46
-# 
 INSERT INTO lams_role VALUES (1, 'SYSADMIN', 'LAMS System Adminstrator', NOW());
 INSERT INTO lams_role VALUES (2, 'ADMIN', 'Organization Adminstrator', NOW());
 INSERT INTO lams_role VALUES (3, 'AUTHOR', 'Authors Learning Designs', NOW());
@@ -89,6 +81,8 @@ INSERT INTO lams_log_event_type VALUES (4, 'LEARNER_LESSON_RESUME');
 INSERT INTO lams_log_event_type VALUES (5, 'LEARNER_ACTIVITY_START');
 INSERT INTO lams_log_event_type VALUES (6, 'LEARNER_ACTIVITY_FINISH');
 
+INSERT INTO lams_workspace_folder_content_type VALUES (1,'FILE');
+INSERT INTO lams_workspace_folder_content_type VALUES (2,'PACKAGE');
 
 
 

@@ -1,29 +1,3 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-04-07 15:19:11
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-18 15:25:57
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-18 15:04:50
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-15 13:43:35
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-03-10 14:16:48
-# 
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-02-16 16:04:11
-
-
-
 SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS lams_activity_category;
@@ -37,6 +11,9 @@ DROP TABLE IF EXISTS lams_cr_node_version;
 DROP TABLE IF EXISTS lams_cr_node_version_property;
 DROP TABLE IF EXISTS lams_cr_workspace;
 DROP TABLE IF EXISTS lams_cr_workspace_credential;
+DROP TABLE IF EXISTS lams_css_property;
+DROP TABLE IF EXISTS lams_css_style;
+DROP TABLE IF EXISTS lams_css_theme_ve;
 DROP TABLE IF EXISTS lams_gate_activity_level;
 DROP TABLE IF EXISTS lams_group;
 DROP TABLE IF EXISTS lams_grouping;
@@ -68,10 +45,12 @@ DROP TABLE IF EXISTS lams_user;
 DROP TABLE IF EXISTS lams_user_group;
 DROP TABLE IF EXISTS lams_user_organisation;
 DROP TABLE IF EXISTS lams_user_organisation_role;
+DROP TABLE IF EXISTS lams_user_preference;
 DROP TABLE IF EXISTS lams_workspace;
 DROP TABLE IF EXISTS lams_workspace_folder;
 DROP TABLE IF EXISTS lams_workspace_folder_type;
-
+DROP TABLE IF EXISTS lams_workspace_folder_content_type;
+DROP TABLE IF EXISTS lams_workspace_folder_content;
 
 
 SET FOREIGN_KEY_CHECKS=1;
