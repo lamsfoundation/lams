@@ -6,55 +6,54 @@
 <hibernate-mapping>
 
 <class 
-    name="org.lamsfoundation.lams.tool.qa.QaUploadedFile" 
-    table="tl_laqa11_uploadedFile"
+    name="org.lamsfoundation.lams.tool.mc.McUploadedFile" 
+    table="tl_lamc11_uploadedfile"
 >
-
     <id
-        name="submissionId"
+        name="uid"
         type="java.lang.Long"
-        column="submissionId"
+        column="uid"
     >
-	    <generator class="increment"/>
+        <generator class="native" />
     </id>
 
-
-    <property
+	<property
         name="uuid"
         type="java.lang.String"
-        access="property"
         column="uuid"
+        not-null="true"
         length="255"
-    />
-
+    >
+    </property>
+    
    <property
-            name="fileOnline"
-            type="boolean"
-            access="property"
-            column="isOnline_File"
-   />
-
-   <property
-            name="fileName"
-            type="java.lang.String"
-            access="property"
-            column="fileName"
+        name="fileOnline"
+        type="boolean"
+        access="property"
+        column="isOnline_File"
    />
    
-       <property
-        name="qaContentId"
+      <property
+        name="filename"
+        type="java.lang.String"
+        access="property"
+        column="filename"
+        length="255"
+   />
+   
+  <property
+        name="mcContentId"
         type="java.lang.Long"
         update="false"
         insert="false"
         access="property"
-        column="qa_content_id"
+        column="mc_content_id"
         length="20"
     />
-   
-
+    
    <many-to-one
-        name="qaContent"
-        class="org.lamsfoundation.lams.tool.qa.QaContent"
+        name="mcContent"
+        class="org.lamsfoundation.lams.tool.mc.McContent"
         not-null="true"        
         cascade="none"
         outer-join="auto"
@@ -63,7 +62,7 @@
         access="property"
     >
         <column
-            name="qa_content_id" 
+            name="mc_content_id" 
         />
     </many-to-one>
 

@@ -1,3 +1,3 @@
-Implementation-Title: LAMS QnA Tool 
+Implementation-Title: LAMS MCQ Tool 
 Implementation-Version: 0.1
 Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)

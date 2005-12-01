@@ -2,38 +2,47 @@
 <!DOCTYPE hibernate-mapping PUBLIC
     "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
-    
+
 <hibernate-mapping>
 <class 
-    name="org.lamsfoundation.lams.tool.qa.QaSession" 
-    table="tl_laqa11_session"
+    name="org.lamsfoundation.lams.tool.mc.McSession" 
+    table="tl_lamc11_session"
 >
     <id
-        name="qaSessionId"
+        name="uid"
         type="java.lang.Long"
-        column="qa_session_id"
+        column="uid"
     >
-		    <generator class="assigned"/>
+		    <generator class="native"/>
     </id>
 
     <property
-        name="session_start_date"
+        name="mcSessionId"
+        type="java.lang.Long"
+        column="mc_session_id"
+        not-null="true"
+        length="20"
+    >
+    </property>
+
+    <property
+        name="sessionStartDate"
         type="java.util.Date"
         access="property"
         column="session_start_date"
-        length="10"
+        length="20"
     />
     
     <property
-        name="session_end_date"
+        name="sessionEndDate"
         type="java.util.Date"
         access="property"
         column="session_end_date"
-        length="10"
+        length="20"
     />
     
     <property
-        name="session_status"
+        name="sessionStatus"
         type="java.lang.String"
         access="property"
         column="session_status"
@@ -41,19 +50,18 @@
     />
     
     <property
-        name="qaContentId"
+        name="mcContentId"
         type="java.lang.Long"
         update="false"
         insert="false"
         access="property"
-        column="qa_content_id"
+        column="mc_content_id"
         length="20"
     />
 
-    
    <many-to-one
-        name="qaContent"
-        class="org.lamsfoundation.lams.tool.qa.QaContent"
+        name="mcContent"
+        class="org.lamsfoundation.lams.tool.mc.McContent"
         not-null="true"        
         cascade="none"
         outer-join="auto"
@@ -62,22 +70,22 @@
         access="property"
     >
         <column
-            name="qa_content_id" 
+            name="mc_content_id" 
         />
     </many-to-one>
     
     <set
-        name="qaQueUsers"
+        name="mcQueUsers"
         lazy="true"
         inverse="true"
         cascade="all-delete-orphan"
         sort="unsorted"
     >
         <key>
-        	<column name="qa_session_id" />
+        	<column name="mc_session_id" />
    		</key>
         <one-to-many 
-            class="org.lamsfoundation.lams.tool.qa.QaQueUsr"
+            class="org.lamsfoundation.lams.tool.mc.McQueUsr"
         />
     </set>
     

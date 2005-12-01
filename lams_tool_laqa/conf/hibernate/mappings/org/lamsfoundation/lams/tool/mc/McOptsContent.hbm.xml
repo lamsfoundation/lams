@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.tool.mc.McOptsContent" 
+    table="tl_lamc11_options_content"
+>
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <generator class="native" />
+    </id>
+    
+    <property
+        name="correctOption"
+        type="boolean"
+        column="correct_option"
+        not-null="true"
+    >
+    </property>
+    
+    <property
+        name="mcQueOptionText"
+        type="java.lang.String"
+        column="mc_que_option_text"
+        length="250"
+    >
+    </property>
+    
+    <property
+        name="mcQueContentId"
+        type="java.lang.Long"
+        column="mc_que_content_id"
+        not-null="true"
+   	    update="false"
+	    insert="false"
+        length="20"
+    >
+    </property>
+    
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to TlLamc11QueContent -->
+    <many-to-one
+        name="mcQueContent"
+        class="org.lamsfoundation.lams.tool.mc.McQueContent"
+        not-null="true"        
+        cascade="none"
+        outer-join="auto"
+        update="true"
+        insert="true"
+        access="property"
+    >
+        <column name="mc_que_content_id" />
+    </many-to-one>
+    
+    <set
+        name="mcUsrAttempts"
+        lazy="true"
+        inverse="true"
+		cascade="all-delete-orphan"
+    >
+        <key>
+            <column name="mc_que_option_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
+        />
+    </set>
+   
+</class>
+</hibernate-mapping>

@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.lamsfoundation.lams.tool.mc.McQueContent" 
+    table="tl_lamc11_que_content"
+>
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <generator class="native" />
+    </id>
+    
+    <property
+        name="question"
+        type="java.lang.String"
+        column="question"
+        length="255"
+    >
+    </property>
+    
+    <property
+        name="displayOrder"
+        type="java.lang.Integer"
+        column="display_order"
+        length="5"
+    >
+    </property>
+    
+    <property
+        name="weight"
+        type="java.lang.Integer"
+        column="weight"
+        length="5"
+    >
+    </property>
+
+    <property
+        name="disabled"
+        type="boolean"
+        access="property"
+        column="disabled"
+   />
+    
+   <property
+        name="feedbackCorrect"
+        type="java.lang.String"
+        access="property"
+        column="feedbackCorrect"
+   />
+    
+       <property
+        name="feedbackIncorrect"
+        type="java.lang.String"
+        access="property"
+        column="feedbackIncorrect"
+   />
+    
+    
+    <property
+        name="mcContentId"
+        type="java.lang.Long"
+        column="mc_content_id"
+        not-null="true"
+   	    update="false"
+	    insert="false"
+        length="20"
+    >
+    </property>
+    
+    <many-to-one
+        name="mcContent"
+        class="org.lamsfoundation.lams.tool.mc.McContent"
+        not-null="true"        
+	    cascade="none"
+	    outer-join="auto"
+	    update="true"
+	    insert="true"
+	    access="property"
+    >
+        <column name="mc_content_id" />
+    </many-to-one>
+    
+    
+    <!-- bi-directional one-to-many association to TlLamc11OptionsContent -->
+    <set
+        name="mcOptionsContents"
+        lazy="true"
+        inverse="true"
+		cascade="all-delete-orphan"
+    >
+        <key>
+            <column name="mc_que_content_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.mc.McOptsContent"
+        />
+    </set>
+    
+    
+    <set
+        name="mcUsrAttempts"
+        lazy="true"
+        inverse="true"
+		cascade="all-delete-orphan"
+	>
+
+        <key>
+            <column name="mc_que_content_id" />
+        </key>
+        <one-to-many 
+            class="org.lamsfoundation.lams.tool.mc.McUsrAttempt"
+        />
+    </set>
+    
+    
+    
+</class>
+</hibernate-mapping>
