@@ -21,6 +21,7 @@
 
 package org.lamsfoundation.lams.tool.deploy;
 
+
 /**
  * Tool Deployer Main Class
  * 
@@ -59,7 +60,7 @@ public class Deploy
         try
         {
             System.out.println("Reading Configuration File"+args[0]);
-            DeployConfig config =  new DeployConfig(args[0],true);
+            DeployToolConfig config =  new DeployToolConfig(args[0]);
             
             Boolean forceDB = Boolean.FALSE;
             if ( args.length == 2 &&  args[1] != null) {
@@ -92,7 +93,7 @@ public class Deploy
             
             AddWebAppToApplicationXmlTask addWebAppTask =  new AddWebAppToApplicationXmlTask();
             addWebAppTask.setLamsEarPath(config.getLamsEarPath());
-            addWebAppTask.setContextRoot(config.getToolContextRoot());
+            addWebAppTask.setContextRoot(config.getToolContext());
             addWebAppTask.setWebUri(config.getToolWebUri());
             addWebAppTask.execute();
             
