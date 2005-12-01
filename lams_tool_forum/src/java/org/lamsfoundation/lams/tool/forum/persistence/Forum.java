@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 
 /**
  * Forum
@@ -408,5 +409,10 @@ public class Forum implements Cloneable{
 	}
 	public void setAllowRichEditor(boolean allowRichEditor) {
 		this.allowRichEditor = allowRichEditor;
+	}
+	
+	public static Forum newInstance(Forum defaultContent, Long contentID2, ForumToolContentHandler forumToolContentHandler) {
+		
+		return null;
 	}
 }

@@ -72,4 +72,8 @@ public class ForumDao extends HibernateDaoSupport {
 		this.getHibernateTemplate().flush();
 	}
 
+	public void flush() {
+		this.getHibernateTemplate().flush();
+	}
+
 }

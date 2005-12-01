@@ -48,4 +48,14 @@ public class ForumToolSessionDao extends HibernateDaoSupport {
 		return list;
 	}
 
+	public void remove(Long sessionId) {
+		ForumToolSession session = getBySessionId(sessionId);
+		this.getHibernateTemplate().delete(session);
+		this.getHibernateTemplate().flush();
+	}
+
+	public void delete(ForumToolSession session){
+		this.getHibernateTemplate().delete(session);
+		this.getHibernateTemplate().flush();
+	}
 }
