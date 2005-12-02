@@ -38,4 +38,13 @@ public class LibraryDBDeployTaskTest extends ToolDBTest {
         task.execute();
         
     }
+    
+    public void testLibraryDeployMain()
+    {
+        //DeployLibrary deployer = new DeployLibrary();
+        String[] args = {"test/file/library_deploy/deployLibraryTest.xml"};
+        DeployLibrary.main(args);
+    }
+    
+    
 }
