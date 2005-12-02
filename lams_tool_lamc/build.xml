@@ -429,7 +429,7 @@
 		classname="org.lamsfoundation.lams.tool.deploy.Deploy"
 		classpathref="deploy.classpath"
 		fork="true">
-			<arg file="${build.deploy}/deploy.properties"/>
+			<arg file="${build.deploy}/deploy.xml"/>
 			<arg value="True"/> 
 	</java>
 				
@@ -474,7 +474,7 @@
 	</copy>
 
 	<taskdef name="generateDeployProperties" 
-		classname="org.lamsfoundation.lams.tool.deploy.CreatePackageTask">
+		classname="org.lamsfoundation.lams.tool.deploy.CreateToolPackageTask">
 	    <classpath refid="deploy.lib.classpath"/>
 	</taskdef>
 
