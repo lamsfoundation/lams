@@ -428,7 +428,7 @@ public class MonitoringAction extends DispatchAction {
 		SubmitFilesContent content = submitFilesService.getSubmitFilesContent(contentID);
 		content.setTitle(title);
 		content.setInstruction(instructions);
-		submitFilesService.updateSubmitFilesContent(content);
+		submitFilesService.saveOrUpdateContent(content);
 		
 		return mapping.findForward("success");
 	}

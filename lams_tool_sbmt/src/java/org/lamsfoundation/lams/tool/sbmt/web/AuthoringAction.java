@@ -92,50 +92,57 @@ public class AuthoringAction extends LookupDispatchAction {
 				.getServlet().getServletContext());
 		try {
 			SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(content.getContentID());
-			if(content.getContentID().equals(persistContent.getContentID())){
-				//keep Set type attribute for persist content becuase this update only 
-				//include updating simple properties from web page(i.e. text value, list value, etc)
-				Set attPOSet = persistContent.getInstructionFiles();
-				List attachmentList = getAttachmentList(request);
-				List deleteAttachmentList = getDeletedAttachmentList(request);
-				Iterator iter = attachmentList.iterator();
-				while(iter.hasNext()){
-					InstructionFiles newAtt = (InstructionFiles) iter.next();
-					//add new attachment, UID is not null
-					if(newAtt.getUid() == null)
-						attPOSet.add(newAtt);
-				}
-				attachmentList.clear();
+			
+			if(persistContent == null || content.getContentID() == null 
+					|| !content.getContentID().equals(persistContent.getContentID())){
+				//new content
+				persistContent = content;
+			}
 				
-				iter = deleteAttachmentList.iterator();
-				while(iter.hasNext()){
-					InstructionFiles delAtt = (InstructionFiles) iter.next();
-					//delete from repository
-					submitFilesService.deleteFromRepository(delAtt.getUuID(),delAtt.getVersionID());
-					//it is an existed att, then delete it from current attachmentPO
-					if(delAtt.getUid() != null){
-						Iterator attIter = attPOSet.iterator();
-						while(attIter.hasNext()){
-							InstructionFiles att = (InstructionFiles) attIter.next();
-							if(delAtt.getUid().equals(att.getUid())){
-								attIter.remove();
-								break;
-							}
+			//keep Set type attribute for persist content becuase this update only 
+			//include updating simple properties from web page(i.e. text value, list value, etc)
+			Set attPOSet = persistContent.getInstructionFiles();
+			if(attPOSet == null)
+				attPOSet = new HashSet();
+			List attachmentList = getAttachmentList(request);
+			List deleteAttachmentList = getDeletedAttachmentList(request);
+			Iterator iter = attachmentList.iterator();
+			while(iter.hasNext()){
+				InstructionFiles newAtt = (InstructionFiles) iter.next();
+				//add new attachment, UID is not null
+				if(newAtt.getUid() == null)
+					attPOSet.add(newAtt);
+			}
+			attachmentList.clear();
+			
+			iter = deleteAttachmentList.iterator();
+			while(iter.hasNext()){
+				InstructionFiles delAtt = (InstructionFiles) iter.next();
+				//delete from repository
+				submitFilesService.deleteFromRepository(delAtt.getUuID(),delAtt.getVersionID());
+				//it is an existed att, then delete it from current attachmentPO
+				if(delAtt.getUid() != null){
+					Iterator attIter = attPOSet.iterator();
+					while(attIter.hasNext()){
+						InstructionFiles att = (InstructionFiles) attIter.next();
+						if(delAtt.getUid().equals(att.getUid())){
+							attIter.remove();
+							break;
 						}
-						submitFilesService.deleteInstructionFile(content.getContentID(), delAtt.getUuID(), delAtt
-								.getVersionID(), delAtt.getType());
-					}//end remove from persist value
-				}
-				deleteAttachmentList.clear();
-				
-				//copy back
-				content.setInstructionFiles(attPOSet);
-				content.setToolSession(persistContent.getToolSession());
-				//copy web page value into persist content, as above, the "Set" type value kept.
-				PropertyUtils.copyProperties(persistContent,content);
-				submitFilesService.updateSubmitFilesContent(persistContent);
-			}else
-				submitFilesService.addSubmitFilesContent(content);
+					}
+					submitFilesService.deleteInstructionFile(content.getContentID(), delAtt.getUuID(), delAtt
+							.getVersionID(), delAtt.getType());
+				}//end remove from persist value
+			}
+			deleteAttachmentList.clear();
+			
+			//copy back
+			content.setInstructionFiles(attPOSet);
+			content.setToolSession(persistContent.getToolSession());
+			//copy web page value into persist content, as above, the "Set" type value kept.
+			PropertyUtils.copyProperties(persistContent,content);
+			
+			submitFilesService.saveOrUpdateContent(persistContent);
 		} catch (Exception e) {
 			log.error(e);
 		}

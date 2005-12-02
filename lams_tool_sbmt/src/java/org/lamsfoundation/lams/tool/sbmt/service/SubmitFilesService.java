@@ -136,7 +136,7 @@ public class SubmitFilesService implements ToolContentManager,
                 content = duplicateDefaultToolContent(toolContentId);
             }
             content.setRunOffline(true);
-            submitFilesContentDAO.save(content);
+            submitFilesContentDAO.saveOrUpdate(content);
         }
         catch (DataAccessException e)
         {
@@ -175,7 +175,7 @@ public class SubmitFilesService implements ToolContentManager,
                 content = duplicateDefaultToolContent(toolContentId);
             }
             content.setDefineLater(true);
-            submitFilesContentDAO.save(content);
+            submitFilesContentDAO.saveOrUpdate(content);
         }
         catch (DataAccessException e)
         {
@@ -210,25 +210,14 @@ public class SubmitFilesService implements ToolContentManager,
 		}
 	}
 
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#addSubmitFilesContent(SubmitFilesContent)
-	 */
-	public void addSubmitFilesContent(SubmitFilesContent content) {
-		submitFilesContentDAO.save(content);
-	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#updateSubmitFilesContent(org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent)
 	 */
-	public void updateSubmitFilesContent(SubmitFilesContent submitFilesContent) {
-		submitFilesContentDAO.update(submitFilesContent);
-	}
-	public void saveSubmitFilesContent(SubmitFilesContent submitFilesContent) {
-		submitFilesContentDAO.save(submitFilesContent);
+	public void saveOrUpdateContent(SubmitFilesContent submitFilesContent) {
+		submitFilesContentDAO.saveOrUpdate(submitFilesContent);
 	}
 
 	/*
@@ -694,7 +683,7 @@ public class SubmitFilesService implements ToolContentManager,
     	
     	content = SubmitFilesContent.newInstance(defaultContent,contentID,sbmtToolContentHandler); 
 		content.setContentID(contentID);
-		saveSubmitFilesContent(content);
+//		saveSubmitFilesContent(content);
     	
 		return content;
 	}

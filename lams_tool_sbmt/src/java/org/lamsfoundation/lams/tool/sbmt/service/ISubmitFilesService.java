@@ -39,21 +39,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 public interface ISubmitFilesService {
 
-
-	/**
-	 * This method adds a new content record to the database.
-	 * 
-	 */
-	public void addSubmitFilesContent(SubmitFilesContent content);
-
-	/**
-	 * Updates the record in the database
-	 * 
-	 * @param submitFilesContent
-	 *            The <code>SubmitFilesContent</code> to be updated
-	 */
-	public void updateSubmitFilesContent(SubmitFilesContent submitFilesContent);
-
 	/**
 	 * Returns the <code>SubmitFilesContent</code> object corresponding to the
 	 * given <code>contentID</code>. If could not find out corresponding 
@@ -201,4 +186,10 @@ public interface ISubmitFilesService {
      */
     //public List getSubmitFilesSessionsByContentID(Long contentID);
     public List getSubmitFilesSessionByContentID(Long contentID);
+    /**
+     * Save or update tool content into database.
+     * @param persistContent
+     * 			The <code>SubmitFilesContent</code> to be updated
+     */
+	public void saveOrUpdateContent(SubmitFilesContent persistContent);
 }

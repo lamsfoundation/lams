@@ -49,9 +49,9 @@ public class SubmitFilesContentDAO extends BaseDAO implements ISubmitFilesConten
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesContentDAO#save(org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent)
 	 */
-	public void save(SubmitFilesContent content) {
+	public void saveOrUpdate(SubmitFilesContent content) {
 		this.getSession().setFlushMode(FlushMode.COMMIT);
-		this.getHibernateTemplate().save(content);
+		this.getHibernateTemplate().saveOrUpdate(content);
 		this.getHibernateTemplate().flush();
 	}
 

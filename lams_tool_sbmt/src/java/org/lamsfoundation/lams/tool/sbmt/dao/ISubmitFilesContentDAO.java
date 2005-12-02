@@ -29,7 +29,7 @@ public interface ISubmitFilesContentDAO extends IBaseDAO{
 	 *  
 	 * @param content
 	 */
-	public void save(SubmitFilesContent content);
+	public void saveOrUpdate(SubmitFilesContent content);
 
 	public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);	
 	
