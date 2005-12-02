@@ -20,18 +20,14 @@ public interface IForumService {
 	//************************************************************************************
 	// Forum Method
 	//************************************************************************************
-	/**
-	 * Get default content ID by tool signature.
-	 * @param toolSignature
-	 * @return
-	 */
-    public Long getToolDefaultContentIdBySignature(String toolSignature);
     /**
-     * Get a default instance of Forum by signature of tool.
+     * Create a Forum instance according to the default content. <BR> 
+     * Note, this new insstance won't save into database until called persist method.
+     * 
+     * @param contentID
      * @return
      */
-    public Forum getDefaultForum();
-    
+    public Forum getDefaultContent(Long contentID);
 	/**
 	 * Update forum by given <code>Forum</code>. If forum does not exist, the create a new forum.
 	 * @param forum

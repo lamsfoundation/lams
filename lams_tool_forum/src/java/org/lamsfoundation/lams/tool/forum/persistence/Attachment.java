@@ -39,6 +39,7 @@ public class Attachment implements Cloneable{
 		Object obj = null;
 		try {
 			obj = super.clone();
+			((Attachment)obj).setUid(null);
 		} catch (CloneNotSupportedException e) {
 			log.error("When clone " + Attachment.class + " failed");
 		}

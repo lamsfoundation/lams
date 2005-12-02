@@ -144,7 +144,7 @@ public class AuthoringAction extends Action {
 			forum = forumService.getForumByContentId(contentId);
 			//if forum does not exist, try to use default content instead.
 			if(forum == null){
-				forum = forumService.getDefaultForum(); 
+				forum = forumService.getDefaultContent(contentId); 
 			}
 			topics = forumService.getAuthoredTopics(contentId);
 			//initialize attachmentList
@@ -196,54 +196,55 @@ public class AuthoringAction extends Action {
 			request.getSession().setAttribute(ForumConstants.NEW_FORUM_USER,null);
 			
 			Forum forumPO = forumService.getForumByContentId(forumForm.getToolContentID());
-			if(forumPO != null && forumForm.getToolContentID().equals(forum.getContentId()) ){
-				//merge web page change into PO
-				
-		    	//merge attachment info
-				Set attPOSet = forumPO.getAttachments();
-				List attachmentList = getAttachmentList(request);
-				List deleteAttachmentList = getDeletedAttachmentList(request);
-				Iterator iter = attachmentList.iterator();
-				while(iter.hasNext()){
-					Attachment newAtt = (Attachment) iter.next();
-					//add new attachment, UID is not null
-					if(newAtt.getUid() == null)
-						attPOSet.add(newAtt);
-				}
-				attachmentList.clear();
-				
-				iter = deleteAttachmentList.iterator();
-				while(iter.hasNext()){
-					Attachment delAtt = (Attachment) iter.next();
-					//delete from repository
-					forumService.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
-					//it is an existed att, then delete it from current attachmentPO
-					if(delAtt.getUid() != null){
-						Iterator attIter = attPOSet.iterator();
-						while(attIter.hasNext()){
-							Attachment att = (Attachment) attIter.next();
-							if(delAtt.getUid().equals(att.getUid())){
-								attIter.remove();
-								break;
-							}
-						}
-						forumService.deleteForumAttachment(delAtt.getUid());
-					}//end remove from persist value
-				}
-				deleteAttachmentList.clear();
-				
-				//copy back
-				forumPO.setAttachments(attPOSet);
-			}else{
+			if(forumPO == null || !forumForm.getToolContentID().equals(forum.getContentId()) ){
 				//new Forum, create it.
 				forumPO = forum;
 				forumPO.setContentId(forumForm.getToolContentID());
 			}
+			
+	    	//merge attachment info
+			Set attPOSet = forumPO.getAttachments();
+			if(attPOSet == null)
+				attPOSet = new HashSet();
+			List attachmentList = getAttachmentList(request);
+			List deleteAttachmentList = getDeletedAttachmentList(request);
+			Iterator iter = attachmentList.iterator();
+			while(iter.hasNext()){
+				Attachment newAtt = (Attachment) iter.next();
+				//add new attachment, UID is not null
+				if(newAtt.getUid() == null)
+					attPOSet.add(newAtt);
+			}
+			attachmentList.clear();
+			
+			iter = deleteAttachmentList.iterator();
+			while(iter.hasNext()){
+				Attachment delAtt = (Attachment) iter.next();
+				//delete from repository
+				forumService.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
+				//it is an existed att, then delete it from current attachmentPO
+				if(delAtt.getUid() != null){
+					Iterator attIter = attPOSet.iterator();
+					while(attIter.hasNext()){
+						Attachment att = (Attachment) attIter.next();
+						if(delAtt.getUid().equals(att.getUid())){
+							attIter.remove();
+							break;
+						}
+					}
+					forumService.deleteForumAttachment(delAtt.getUid());
+				}//end remove from persist value
+			}
+			deleteAttachmentList.clear();
+			
+			//copy back
+			forumPO.setAttachments(attPOSet);
 			forum = forumService.updateForum(forumPO);
 			
+			//********************************Handle topic*******************
 			//delete message attachment
 			List topicDeleteAttachmentList = getTopicDeletedAttachmentList(request);
-			Iterator iter = topicDeleteAttachmentList.iterator();
+			iter = topicDeleteAttachmentList.iterator();
 			while(iter.hasNext()){
 				Attachment delAtt = (Attachment) iter.next();
 				//delete from repository
@@ -270,7 +271,7 @@ public class AuthoringAction extends Action {
 	    	delTopics.clear();
 
 			//initialize attachmentList again
-			List attachmentList = getAttachmentList(request);
+			attachmentList = getAttachmentList(request);
 			attachmentList.addAll(forum.getAttachments());
 		} catch (Exception e) {
 			log.error(e);

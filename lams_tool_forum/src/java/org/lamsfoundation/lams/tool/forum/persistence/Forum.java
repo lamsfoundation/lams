@@ -4,11 +4,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 
 /**
@@ -45,6 +47,8 @@ public class Forum implements Cloneable{
 	
 	private Set messages;
 	private Set attachments;
+
+	private ForumToolContentHandler toolContentHandler;
     
 	/**
 	 * Default contruction method. 
@@ -62,6 +66,7 @@ public class Forum implements Cloneable{
   		Forum forum = null;
   		try{
   			forum = (Forum) super.clone();
+  			forum.setUid(null);
   			//clone message
   			if(messages != null){
 				Iterator iter = messages.iterator();
@@ -74,11 +79,22 @@ public class Forum implements Cloneable{
   			if(attachments != null){
   				Iterator iter = attachments.iterator();
   				Set set = new HashSet();
-  				while(iter.hasNext())
-  					set.add(((Attachment)iter.next()).clone());
+  				while(iter.hasNext()){
+  					Attachment file = (Attachment)iter.next(); 
+					//duplicate file node in repository
+					NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
+					Attachment newFile = (Attachment) file.clone();
+					newFile.setFileUuid(keys.getUuid());
+					newFile.setFileVersionId(keys.getVersion());
+					set.add(newFile);
+  				}
   				forum.attachments = set;
   			}
 		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + Forum.class + " failed");
+		} catch (ItemNotFoundException e) {
+			log.error("When clone " + Forum.class + " failed");
+		} catch (RepositoryCheckedException e) {
 			log.error("When clone " + Forum.class + " failed");
 		}
   		
@@ -411,8 +427,11 @@ public class Forum implements Cloneable{
 		this.allowRichEditor = allowRichEditor;
 	}
 	
-	public static Forum newInstance(Forum defaultContent, Long contentID2, ForumToolContentHandler forumToolContentHandler) {
-		
-		return null;
+	public static Forum newInstance(Forum fromContent, Long contentId, ForumToolContentHandler forumToolContentHandler){
+		Forum toContent = new Forum();
+		fromContent.toolContentHandler = forumToolContentHandler;
+		toContent = (Forum) fromContent.clone();
+		toContent.setContentId(contentId);
+		return toContent;
 	}
 }

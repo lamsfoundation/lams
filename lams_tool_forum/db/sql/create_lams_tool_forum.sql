@@ -101,5 +101,4 @@ alter table tl_lafrum11_message_seq add index FKD2C71F8845213B4D (root_message_u
 alter table tl_lafrum11_tool_session add index FK5A04D7AE131CE31E (forum_uid), add constraint FK5A04D7AE131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 
 INSERT INTO tl_lafrum11_forum (title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_edit,allow_rich_editor) VALUES("LAMS Forum","Instruction","Online instruction","Offline instruction",${default_content_id},0,0,0,0,0,1,0);
-INSERT INTO tl_lafrum11_tool_session (forum_uid,session_id,status) VALUES(1,1,0);
 SET FOREIGN_KEY_CHECKS=1;

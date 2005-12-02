@@ -10,6 +10,7 @@
     <link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
     <script lang="javascript">
 	    var imgRoot="<%=LAMS_WEB_ROOT%>/images/";
+	    var themeName="aqua";
 	    function setTab(curr){
 	    	var tag = document.getElementById("currentTab");
 	    	tag.value = curr;

@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -53,7 +54,6 @@ import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 
-
 /**
  * 
  * @author Steve.Ni
@@ -73,7 +73,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	private ILamsToolService toolService;
 	private ForumToolContentHandler forumToolContentHandler;
 	private IRepositoryService repositoryService;
-	
+	private ILearnerService learnerService;
 
     public Forum updateForum(Forum forum) throws PersistenceException {
         forumDao.saveOrUpdate(forum);
@@ -322,23 +322,6 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     	}
 	    return contentId;
     }
-    public Forum getDefaultForum(){
-    	Long defaultForumId = getToolDefaultContentIdBySignature(ForumConstants.TOOLSIGNNATURE);
-    	Forum defaultForum = getForumByContentId(defaultForumId);
-    	if(defaultForum == null)
-    	{
-    	    String error="Could not retrieve default content record for this tool";
-    	    log.error(error);
-    	    throw new ForumException(error);
-    	}
-    	
-    	//save default content by given ID.
-    	Forum forum = new Forum();
-    	forum = (Forum) defaultForum.clone();
-    	
-    	return forum;
-
-    }
 
 	public List getSessionsByContentId(Long contentID) {
 		return forumToolSessionDao.getByContentId(contentID);
@@ -346,6 +329,28 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	public List getUsersBySessionId(Long sessionID) {
 		return forumUserDao.getBySessionId(sessionID);
+	}
+    
+	public List getMessagesByUserUid(Long userId,Long sessionId) {
+		List list = messageDao.getByUserAndSession(userId,sessionId);
+		
+		return MessageDTO.getMessageDTO(list);
+	}
+
+	public ForumUser getUser(Long userUid) {
+		return forumUserDao.getByUid(userUid);
+	}
+
+	public void releaseMarksForSession(Long sessionID) {
+		List list = messageDao.getBySession(sessionID);
+		Iterator iter = list.iterator();
+		while(iter.hasNext()){
+			Message msg = (Message) iter.next();
+			ForumReport report = msg.getReport();
+			if(report != null)
+				report.setDateMarksReleased(new Date());
+			messageDao.saveOrUpdate(msg);
+		}
 	}
 
     //***************************************************************************************************************
@@ -426,28 +431,23 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			throw new ForumException("Login failed." + e.getMessage());
 		}
 	}
+    private Forum getDefaultForum(){
+    	Long defaultForumId = getToolDefaultContentIdBySignature(ForumConstants.TOOLSIGNNATURE);
+    	Forum defaultForum = getForumByContentId(defaultForumId);
+    	if(defaultForum == null)
+    	{
+    	    String error="Could not retrieve default content record for this tool";
+    	    log.error(error);
+    	    throw new ForumException(error);
+    	}
+    	
+    	//save default content by given ID.
+    	Forum forum = new Forum();
+    	forum = (Forum) defaultForum.clone();
+    	
+    	return forum;
 
-	public List getMessagesByUserUid(Long userId,Long sessionId) {
-		List list = messageDao.getByUserAndSession(userId,sessionId);
-		
-		return MessageDTO.getMessageDTO(list);
-	}
-
-	public ForumUser getUser(Long userUid) {
-		return forumUserDao.getByUid(userUid);
-	}
-
-	public void releaseMarksForSession(Long sessionID) {
-		List list = messageDao.getBySession(sessionID);
-		Iterator iter = list.iterator();
-		while(iter.hasNext()){
-			Message msg = (Message) iter.next();
-			ForumReport report = msg.getReport();
-			if(report != null)
-				report.setDateMarksReleased(new Date());
-			messageDao.saveOrUpdate(msg);
-		}
-	}
+    }
 
 
     //***************************************************************************************************************
@@ -460,7 +460,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 		Forum fromContent = forumDao.getByContentId(fromContentId);
 		if ( fromContent == null ) {
-			fromContent = createDefaultContent(fromContentId);
+			fromContent = getDefaultContent(fromContentId);
 		}
 		Forum toContent = Forum.newInstance(fromContent,toContentId,forumToolContentHandler);
 
@@ -508,7 +508,26 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	}
 
 	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-		return null;
+		if(toolSessionId == null){
+			log.error("Fail to leave tool Session based on null tool session id.");
+			throw new ToolException("Fail to remove tool Session based on null tool session id.");
+		}
+		if(learnerId == null){
+			log.error("Fail to leave tool Session based on null learner.");
+			throw new ToolException("Fail to remove tool Session based on null learner.");
+		}
+		
+		ForumToolSession session = forumToolSessionDao.getBySessionId(toolSessionId);
+		if(session != null){
+			session.setStatus(ForumConstants.COMPLETED);
+			forumToolSessionDao.saveOrUpdate(session);
+		}else{
+			log.error("Fail to leave tool Session.Could not find submit file " +
+					"session by given session id: "+toolSessionId);
+			throw new DataMissingException("Fail to leave tool Session." +
+					"Could not find submit file session by given session id: "+toolSessionId);
+		}
+		return learnerService.completeToolSession(toolSessionId,learnerId);
 	}
 
 	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
@@ -524,9 +543,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	}
     
     /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#createDefaultContent(java.lang.Long)
+	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getDefaultContent(java.lang.Long)
      */
-	public Forum createDefaultContent(Long contentID) {
+	public Forum getDefaultContent(Long contentID) {
     	if (contentID == null)
     	{
     	    String error="Could not retrieve default content id for Forum tool";
@@ -614,6 +633,14 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	public void setForumToolContentHandler(ForumToolContentHandler toolContentHandler) {
 		this.forumToolContentHandler = toolContentHandler;
+	}
+
+	public ILearnerService getLearnerService() {
+		return learnerService;
+	}
+
+	public void setLearnerService(ILearnerService learnerService) {
+		this.learnerService = learnerService;
 	}
 
 

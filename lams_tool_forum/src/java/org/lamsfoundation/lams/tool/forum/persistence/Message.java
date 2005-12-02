@@ -57,6 +57,7 @@ public class Message implements Cloneable{
   		Message msg = null;
   		try{
   			msg = (Message) super.clone();
+  			msg.setUid(null);
   			if(parent != null){
   				msg.parent = (Message) parent.clone();
   			}
