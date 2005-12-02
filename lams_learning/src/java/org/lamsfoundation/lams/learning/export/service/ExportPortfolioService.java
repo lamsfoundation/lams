@@ -297,12 +297,12 @@ public class ExportPortfolioService implements IExportPortfolioService {
 					}
 					mapOfValuesToAppend.put(AttributeNames.PARAM_MODE, ToolAccessMode.LEARNER.toString());
 					mapOfValuesToAppend.put(AttributeNames.PARAM_USER_ID, user.getUserId().toString());
-					mapOfValuesToAppend.put("toolSessionId", toolSession.getToolSessionId().toString());
+					mapOfValuesToAppend.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSession.getToolSessionId().toString());
 				}
 				else if (accessMode == ToolAccessMode.TEACHER)
 				{
 					mapOfValuesToAppend.put(AttributeNames.PARAM_MODE, ToolAccessMode.TEACHER.toString());
-					mapOfValuesToAppend.put("toolContentId", toolActivity.getToolContentId().toString());
+					mapOfValuesToAppend.put(AttributeNames.PARAM_TOOL_CONTENT_ID, toolActivity.getToolContentId().toString());
 				}
 				
 				String url = setupExportUrl(mapOfValuesToAppend, portfolio.getExportUrl());
@@ -413,7 +413,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		return zipfileName;
 	}
 	
-
+	/** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#doExport(Vector, Cookie[]) */
 	public Portfolio[] doExport(Vector portfolios, Cookie[] cookies)
 	{
 		Iterator i = portfolios.iterator();
