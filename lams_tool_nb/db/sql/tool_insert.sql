@@ -46,9 +46,9 @@ NULL,
 'tool/lanb11/starter/learner.do',
 'tool/lanb11/authoring.do',
 'tool/lanb11/starter/authoring.do?defineLater=true',
-'tool/lanb11/exportPortfolio.do',
+'tool/lanb11/portfolioExport',
 'tool/lanb11/starter/monitor.do',
 NULL,
 NULL,
 NOW()
-)
+);
