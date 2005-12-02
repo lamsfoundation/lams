@@ -286,7 +286,8 @@ public class LamsCoreToolService implements ILamsCoreToolService,ApplicationCont
     	
     	return serviceName.equals("ImscpService") || serviceName.equals("nbService")
 			|| serviceName.equals("qaService") || serviceName.equals("submitFilesService")
-			|| serviceName.equals("surveyService");
+			|| serviceName.equals("surveyService")
+	    	|| serviceName.equals("forumService");
     }
 
 
