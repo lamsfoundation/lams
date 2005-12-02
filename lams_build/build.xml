@@ -77,6 +77,7 @@
 			<fileset dir="../${lams_tool_deploy}/lib">
 				<include name="jakarta-commmons/*.jar" />
 				<include name="mysql/*.jar" />
+				<include name="xstream/*.jar" />
 			</fileset>
 		</copy>
 		
