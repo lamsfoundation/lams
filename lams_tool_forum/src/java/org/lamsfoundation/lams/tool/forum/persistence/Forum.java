@@ -71,8 +71,9 @@ public class Forum implements Cloneable{
   			if(messages != null){
 				Iterator iter = messages.iterator();
 				Set set = new HashSet();
-				while(iter.hasNext())
-					set.add(((Message)iter.next()).clone());
+				while(iter.hasNext()){
+					set.add(Message.newInstance((Message)iter.next(),toolContentHandler));
+				}
 				forum.messages = set;
   			}
   			//clone attachment
@@ -81,11 +82,14 @@ public class Forum implements Cloneable{
   				Set set = new HashSet();
   				while(iter.hasNext()){
   					Attachment file = (Attachment)iter.next(); 
-					//duplicate file node in repository
-					NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
-					Attachment newFile = (Attachment) file.clone();
-					newFile.setFileUuid(keys.getUuid());
-					newFile.setFileVersionId(keys.getVersion());
+  					Attachment newFile = (Attachment) file.clone();
+  					//if toolContentHandle is null, just clone old file without duplicate it in repository
+  					if(toolContentHandler != null){
+						//duplicate file node in repository
+						NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
+						newFile.setFileUuid(keys.getUuid());
+						newFile.setFileVersionId(keys.getVersion());
+  					}
 					set.add(newFile);
   				}
   				forum.attachments = set;

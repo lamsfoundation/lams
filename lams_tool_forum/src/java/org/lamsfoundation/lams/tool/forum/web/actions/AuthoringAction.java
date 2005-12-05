@@ -144,9 +144,10 @@ public class AuthoringAction extends Action {
 			forum = forumService.getForumByContentId(contentId);
 			//if forum does not exist, try to use default content instead.
 			if(forum == null){
-				forum = forumService.getDefaultContent(contentId); 
-			}
-			topics = forumService.getAuthoredTopics(contentId);
+				forum = forumService.getDefaultContent(contentId);
+				topics = forum.getMessages() != null? new ArrayList(forum.getMessages()):null;
+			}else
+				topics = forumService.getAuthoredTopics(forum.getUid());
 			//initialize attachmentList
 			List attachmentList = getAttachmentList(request);
 			attachmentList.addAll(forum.getAttachments());

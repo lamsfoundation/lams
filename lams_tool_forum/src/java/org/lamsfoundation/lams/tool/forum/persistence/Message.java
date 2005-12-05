@@ -8,6 +8,10 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 
 /**
  * @author conradb
@@ -42,6 +46,8 @@ public class Message implements Cloneable{
 	private ForumUser modifiedBy;
 	private Set attachments;
 	private ForumReport report;
+
+	private ForumToolContentHandler toolContentHandler;
 	
 	public Message(){
 		attachments = new TreeSet();
@@ -49,6 +55,12 @@ public class Message implements Cloneable{
 //  **********************************************************
   	//		Function method for Message
 //  **********************************************************
+	public static Message newInstance(Message fromMsg,ForumToolContentHandler toolContentHandler){
+		Message toMsg = new Message();
+		fromMsg.toolContentHandler = toolContentHandler;
+		toMsg = (Message) fromMsg.clone();
+		return toMsg;
+	}
 	/**
 	 * <em>This method DOES NOT deep clone <code>Forum</code> to avoid dead loop in clone.</em>
 	 */
@@ -60,6 +72,8 @@ public class Message implements Cloneable{
   			msg.setUid(null);
   			if(parent != null){
   				msg.parent = (Message) parent.clone();
+  				//try to keep parent uid, so avoid persistant a new instance in database for parent message 
+  				msg.parent.uid = parent.uid;
   			}
   			if(toolSession != null){
   				msg.toolSession = (ForumToolSession) toolSession.clone();
@@ -74,11 +88,24 @@ public class Message implements Cloneable{
   			if(attachments != null){
   				Iterator iter = attachments.iterator();
   				Set set = new TreeSet();
-  				while(iter.hasNext())
-  					set.add(((Attachment)iter.next()).clone());
+  				while(iter.hasNext()){
+  					Attachment file = (Attachment)iter.next();
+  					Attachment newFile = (Attachment) file.clone();
+  					if(toolContentHandler != null){
+						//duplicate file node in repository
+						NodeKey keys = toolContentHandler.copyFile(file.getFileUuid());
+						newFile.setFileUuid(keys.getUuid());
+						newFile.setFileVersionId(keys.getVersion());
+  					}
+  					set.add(newFile);
+  				}
   				msg.attachments = set;
   			}
 		} catch (CloneNotSupportedException e) {
+			log.error("When clone " + Forum.class + " failed");
+		} catch (ItemNotFoundException e) {
+			log.error("When clone " + Forum.class + " failed");
+		} catch (RepositoryCheckedException e) {
 			log.error("When clone " + Forum.class + " failed");
 		}
   		

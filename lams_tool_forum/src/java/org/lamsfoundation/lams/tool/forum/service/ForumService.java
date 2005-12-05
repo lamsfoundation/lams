@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -301,8 +302,8 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 		return seq.getRootMessage().getUid();
 	}
 
-	public List getAuthoredTopics(Long forumId) {
-		List list = messageDao.getAuthoredMessage(forumId);
+	public List getAuthoredTopics(Long forumUid) {
+		List list = messageDao.getAuthoredMessage(forumUid);
 		return MessageDTO.getMessageDTO(list);
 	}
 
@@ -441,11 +442,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     	    throw new ForumException(error);
     	}
     	
-    	//save default content by given ID.
-    	Forum forum = new Forum();
-    	forum = (Forum) defaultForum.clone();
-    	
-    	return forum;
+    	return defaultForum;
 
     }
 
@@ -463,8 +460,19 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			fromContent = getDefaultContent(fromContentId);
 		}
 		Forum toContent = Forum.newInstance(fromContent,toContentId,forumToolContentHandler);
-
 		forumDao.save(toContent);
+		
+		//save topics in this forum
+		Set topics = toContent.getMessages();
+		if(topics != null){
+			Iterator iter = topics.iterator();
+			while(iter.hasNext()){
+				Message msg = (Message) iter.next();
+				//set this message forum Uid as toContent
+				msg.setForum(toContent);
+				createRootTopic(toContent.getUid(),null,msg);
+			}
+		}
 
 	}
 
@@ -557,7 +565,17 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     	//save default content by given ID.
     	Forum content = new Forum();
     	content = Forum.newInstance(defaultContent,contentID,forumToolContentHandler);
-    	
+		//save topics in this forum
+		Set topics = content.getMessages();
+		if(topics != null){
+			Iterator iter = topics.iterator();
+			while(iter.hasNext()){
+				Message msg = (Message) iter.next();
+				//clear message forum so that they can be saved when persistent happens
+				msg.setForum(null);
+			}
+		}
+
 		return content;
 	}
     //***************************************************************************************************************
