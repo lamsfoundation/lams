@@ -329,7 +329,13 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		p.setActivityId(activity.getActivityId());
 		p.setActivityName(tool.getToolDisplayName());
 		p.setActivityDescription(activity.getTitle());
-		p.setExportUrl(tool.getExportPortfolioUrl()); 
+		
+		/* if the tool does not have an export url, use the url that points to the servlet that generates a page saying that the export is not supported */
+		String exportUrlForTool = tool.getExportPortfolioUrl();
+		if (exportUrlForTool == null || exportUrlForTool.equals(""))
+		    p.setExportUrl(ExportPortfolioConstants.URL_FOR_UNSUPPORTED_EXPORT);
+		else    
+		    p.setExportUrl(tool.getExportPortfolioUrl()); 
 		
 		return p;		
 	}
