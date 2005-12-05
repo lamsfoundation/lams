@@ -33,5 +33,10 @@ http://www.gnu.org/licenses/gpl.txt
 		<servlet-name>exportDownload</servlet-name>
 		<url-pattern>/exportDownload</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>exportNotSupported</servlet-name>
+	<url-pattern>/exportNotSupported</url-pattern>
+</servlet-mapping>
   	
 	

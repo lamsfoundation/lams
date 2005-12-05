@@ -60,6 +60,13 @@ http://www.gnu.org/licenses/gpl.txt
 		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportDownloadServlet</servlet-class>
 	</servlet>
 	
+	<servlet>
+		<servlet-name>exportNotSupported</servlet-name>
+		<display-name>Export Portfolio Unavailable</display-name>
+		<description>Tool does not support portfolio exports</description>
+		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportNotSupportedServlet</servlet-class>
+	</servlet>
+	
 
 	
 	
