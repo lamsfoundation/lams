@@ -86,11 +86,12 @@ public interface IForumService {
     /**
      * Reply a topic.
      * @param parentId
+     * @param sessionId ToolSessionID
      * @param message
      * @return
      * @throws PersistenceException
      */
-    public Message replyTopic(Long parentId, Message message) throws PersistenceException;
+    public Message replyTopic(Long parentId,  Long sessionId, Message message) throws PersistenceException;
 
     /**
      * Delete the topic by given topic ID. The function will delete all children topics under this topic.
@@ -188,6 +189,12 @@ public interface IForumService {
 	 * @return List
 	 */
 	public List getSessionsByContentId(Long contentID);
+	/**
+	 * Get all message according to the given session ID.
+	 * @param sessionID
+	 * @return
+	 */
+	public List getAllTopicsFromSession(Long sessionID);
 	//************************************************************************************
 	// User  Method
 	//************************************************************************************

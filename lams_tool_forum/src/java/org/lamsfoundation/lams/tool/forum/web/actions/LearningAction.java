@@ -275,7 +275,7 @@ public class LearningAction extends Action {
 	private ActionForward replyTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long parentId = (Long) request.getSession().getAttribute("parentId");
-		
+		Long sessionId = (Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
 		MessageForm messageForm = (MessageForm) form;
 		Message message = messageForm.getMessage();
 		message.setIsAuthored(false);
@@ -289,7 +289,7 @@ public class LearningAction extends Action {
 		
 		//save message into database
 		forumService = getForumManager();
-		forumService.replyTopic(parentId,message);
+		forumService.replyTopic(parentId,sessionId,message);
 		
 		//echo back this topic thread into page
 		forumService = getForumManager();

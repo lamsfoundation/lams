@@ -23,7 +23,6 @@ package org.lamsfoundation.lams.tool.forum.web.actions;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -146,7 +145,7 @@ public class MonitoringAction extends Action {
 
 		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		forumService = getForumService();
-		List topicList = forumService.getRootTopics(sessionID);
+		List topicList = forumService.getAllTopicsFromSession(sessionID);
 		
 		Map topicsByUser = getTopicsSortedByAuthor(topicList);
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
@@ -171,7 +170,7 @@ public class MonitoringAction extends Action {
 			HttpServletResponse response) {
 		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		forumService = getForumService();
-		List topicList = forumService.getRootTopics(sessionID);
+		List topicList = forumService.getAllTopicsFromSession(sessionID);
 		//construct Excel file format and download
 		ActionMessages errors = new ActionMessages();
 		try {
@@ -179,7 +178,7 @@ public class MonitoringAction extends Action {
 			HSSFWorkbook wb = new HSSFWorkbook();
 			HSSFSheet sheet = wb.createSheet("Marks");
 			sheet.setColumnWidth((short)0,(short)5000);
-			HSSFRow row,row1=null,row2=null,row3=null,row4=null,row5=null;
+			HSSFRow row=null;
 			HSSFCell cell;
 			Iterator iter = getTopicsSortedByAuthor(topicList).values().iterator();
 			Iterator dtoIter; 
@@ -195,45 +194,45 @@ public class MonitoringAction extends Action {
 					MessageDTO dto = (MessageDTO) dtoIter.next();
 					if(first){
 						first = false;
-						row1 = sheet.createRow(0);
-						cell = row1.createCell((short) idx);
+						row = sheet.createRow(0);
+						cell = row.createCell((short) idx);
 						cell.setCellValue("Subject");
 						sheet.setColumnWidth((short)idx,(short)8000);
 						++idx;
 						
-						cell = row1.createCell((short) idx);
+						cell = row.createCell((short) idx);
 						cell.setCellValue("Author");
 						sheet.setColumnWidth((short)idx,(short)8000);
 						++idx;
 						
-						cell = row1.createCell((short) idx);
+						cell = row.createCell((short) idx);
 						cell.setCellValue("Date");
 						sheet.setColumnWidth((short)idx,(short)8000);
 						++idx;
 						
-						cell = row1.createCell((short) idx);
+						cell = row.createCell((short) idx);
 						cell.setCellValue("Marks");
 						sheet.setColumnWidth((short)idx,(short)8000);
 						++idx;
 						
-						cell = row1.createCell((short) idx);
+						cell = row.createCell((short) idx);
 						cell.setCellValue("Comments");
 						sheet.setColumnWidth((short)idx,(short)8000);
 						++idx;
 					}
 					++fileCount;
 					idx = 0;
-					row1 = sheet.createRow(fileCount);
-					cell = row1.createCell((short) idx++);
+					row = sheet.createRow(fileCount);
+					cell = row.createCell((short) idx++);
 					cell.setCellValue(dto.getMessage().getSubject());
 					
-					cell = row1.createCell((short) idx++);
+					cell = row.createCell((short) idx++);
 					cell.setCellValue(dto.getAuthor());
 					
-					cell = row1.createCell((short) idx++);
+					cell = row.createCell((short) idx++);
 					cell.setCellValue(DateFormat.getInstance().format(dto.getMessage().getCreated()));
 					
-					cell = row1.createCell((short) idx++);
+					cell = row.createCell((short) idx++);
 					
 					if(dto.getMessage() != null && dto.getMessage().getReport() != null 
 							&& dto.getMessage().getReport().getMark() != null)
@@ -241,7 +240,7 @@ public class MonitoringAction extends Action {
 					else
 						cell.setCellValue("");
 					
-					cell = row1.createCell((short) idx++);
+					cell = row.createCell((short) idx++);
 					if(dto.getMessage() != null && dto.getMessage().getReport() != null)
 						cell.setCellValue(dto.getMessage().getReport().getComment());
 					else
@@ -531,7 +530,7 @@ public class MonitoringAction extends Action {
 		Iterator iter = topicList.iterator();
 		while(iter.hasNext()){
 			MessageDTO dto = (MessageDTO) iter.next();
-			ForumReport report = dto.getMessage().getReport();
+			dto.getMessage().getReport();
 			List list = (List) topicsByUser.get(dto.getMessage().getCreatedBy());
 			if(list == null){
 				list = new ArrayList();

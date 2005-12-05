@@ -27,7 +27,7 @@ public class MessageDao extends HibernateDaoSupport {
 					+ " where m.createdBy.uid = ? and  m.toolSession.uid=?";
 	
 	private static final String SQL_QUERY_BY_SESSION = "from " + Message.class.getName() + " m "
-					+ " where m.toolSession.uid=?";
+					+ " where m.toolSession.sessionId=?";
 	
 	public void saveOrUpdate(Message message) {
 		message.updateModificationData();

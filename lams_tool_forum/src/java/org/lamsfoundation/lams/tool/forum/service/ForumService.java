@@ -159,12 +159,14 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
         messageDao.deleteById(topicUid);
      }
 
-    public Message replyTopic(Long parentId, Message replyMessage) throws PersistenceException {
+    public Message replyTopic(Long parentId,Long sessionId, Message replyMessage) throws PersistenceException {
     	//set parent
         Message parent = this.getMessage(parentId);
         replyMessage.setParent(parent);
         replyMessage.setForum(parent.getForum());
-        replyMessage.setToolSession(parent.getToolSession());
+        //parent sessionID maybe empty if created by author role. So given sessionId is exactly value.
+        ForumToolSession session = getSessionBySessionId(sessionId);
+        replyMessage.setToolSession(session);
         messageDao.saveOrUpdate(replyMessage);
         
         //get root topic and create record in MessageSeq table
@@ -578,6 +580,9 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 		return content;
 	}
+	public List getAllTopicsFromSession(Long sessionID) {
+		return MessageDTO.getMessageDTO(messageDao.getBySession(sessionID));
+	}
     //***************************************************************************************************************
     // Get / Set methods
     //***************************************************************************************************************
@@ -660,6 +665,5 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
 	}
-
 
 }

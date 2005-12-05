@@ -189,13 +189,18 @@ public class AuthoringAction extends Action {
 		Forum forum = forumForm.getForum();
 		try {
 			forumService = getForumManager();
+			
+			//*******************************Handle user*******************
 			//if there are new user
+			boolean newUser = false;
 			ForumUser forumUser = (ForumUser) request.getSession().getAttribute(ForumConstants.NEW_FORUM_USER);
 			if(forumUser != null){
 				forumService.createUser(forumUser);
+				newUser = true;
 			}
 			request.getSession().setAttribute(ForumConstants.NEW_FORUM_USER,null);
 			
+			//**********************************Handle Attachement*********************
 			Forum forumPO = forumService.getForumByContentId(forumForm.getToolContentID());
 			if(forumPO == null || !forumForm.getToolContentID().equals(forum.getContentId()) ){
 				//new Forum, create it.
@@ -258,8 +263,14 @@ public class AuthoringAction extends Action {
 	    	iter = topics.iterator();
 	    	while(iter.hasNext()){
 	    		MessageDTO dto = (MessageDTO) iter.next();
-	    		if(dto.getMessage() != null)
+	    		if(dto.getMessage() != null){
+	    			if(newUser){
+	    				//This flushs user UID info to message if this user is a new user. 
+	    				dto.getMessage().setCreatedBy(forumUser);
+	    				dto.getMessage().setModifiedBy(forumUser);
+	    			}
 	    			forumService.createRootTopic(forum.getUid(),null,dto.getMessage());
+	    		}
 	    	}
 	    	//delete them from database.
 	    	List delTopics = getDeletedTopicList(request);
