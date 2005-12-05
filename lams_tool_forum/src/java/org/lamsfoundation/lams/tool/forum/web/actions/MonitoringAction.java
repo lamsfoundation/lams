@@ -117,7 +117,15 @@ public class MonitoringAction extends Action {
 		 return mapping.findForward("error");
 	 }
 
-
+	 /**
+	  * The initial method for monitoring. List all users according to given Content ID.
+	  * 
+	  * @param mapping
+	  * @param form
+	  * @param request
+	  * @param response
+	  * @return
+	  */
 	private ActionForward listContentUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		//get content ID from URL	
@@ -139,7 +147,14 @@ public class MonitoringAction extends Action {
 		request.setAttribute("sessionUserMap",sessionUserMap);
 		return mapping.findForward("success");
 	}
-
+	/**
+	 * View all user marks for a special Session ID
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward viewAllMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 
@@ -153,7 +168,15 @@ public class MonitoringAction extends Action {
 		return mapping.findForward("success");
 	}
 
-
+	/**
+	 * Release marks for all users in a special Session.   
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward releaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 
@@ -165,7 +188,15 @@ public class MonitoringAction extends Action {
 		
 		return mapping.findForward("success");
 	}
-
+	/**
+	 * Download marks for all users in a speical session.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
@@ -273,7 +304,14 @@ public class MonitoringAction extends Action {
 		
 		return null;
 	}
-
+	/**
+	 * View a special user's mark
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward viewUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long userUid = new Long(WebUtil.readLongParam(request,ForumConstants.USER_UID));
@@ -289,7 +327,14 @@ public class MonitoringAction extends Action {
 		request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionId);
 		return mapping.findForward("success");
 	}
-
+	/**
+	 * Edit a special user's mark.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward editMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long userUid = new Long(WebUtil.readLongParam(request,ForumConstants.USER_UID));
@@ -315,7 +360,14 @@ public class MonitoringAction extends Action {
 		markForm.setSessionId(sessionId);
 		return mapping.findForward("success");
 	}
-
+	/**
+	 * Update mark for a special user
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward updateMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long messageId = new Long(WebUtil.readLongParam(request,ForumConstants.MESSAGE_UID));
@@ -347,7 +399,14 @@ public class MonitoringAction extends Action {
 		return mapping.findForward("success");
 		
 	}
-	
+	/**
+	 * View activity for content.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward viewActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -368,6 +427,14 @@ public class MonitoringAction extends Action {
 		request.setAttribute("instruction",instruction);
 		return mapping.findForward("success");
 	}
+	/**
+	 * Show edit page for a content activity. 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		
@@ -391,7 +458,14 @@ public class MonitoringAction extends Action {
 		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentId);
 		return mapping.findForward("success");
 	}
-
+	/**
+	 * Update activity for a content.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward updateActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -422,7 +496,14 @@ public class MonitoringAction extends Action {
 		
 		return mapping.findForward("success");
 	}
-
+	/**
+	 * View instruction inforamtion for a content.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward viewInstructions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -443,7 +524,14 @@ public class MonitoringAction extends Action {
 		request.setAttribute("forumBean",forumForm);
 		return mapping.findForward("success");
 	}
-
+	/**
+	 * Show statisitc page for a session.
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
@@ -481,17 +569,15 @@ public class MonitoringAction extends Action {
 		return mapping.findForward("success");
 	}
 
-	private Float getAverageFormat(float aver) {
-		try {
-			NumberFormat format = NumberFormat.getInstance();
-			format.setMaximumFractionDigits(1);
-			return new Float(Float.parseFloat(format.format(aver)));
-		} catch (Exception e) {
-			return new Float(0);
-		}
-	}
-
-
+	/**
+	 * View topic subject, content and attachement.
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
     	
@@ -540,4 +626,19 @@ public class MonitoringAction extends Action {
 		}
 		return topicsByUser;
 	}
+	/**
+	 * Get formatted average mark.
+	 * @param aver
+	 * @return
+	 */
+	private Float getAverageFormat(float aver) {
+		try {
+			NumberFormat format = NumberFormat.getInstance();
+			format.setMaximumFractionDigits(1);
+			return new Float(Float.parseFloat(format.format(aver)));
+		} catch (Exception e) {
+			return new Float(0);
+		}
+	}
+
 }
