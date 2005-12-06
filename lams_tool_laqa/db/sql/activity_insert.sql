@@ -43,8 +43,8 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'MCQ Description'
-, 'MCQ'
+, 'Question and Answer Description'
+, 'Question and Answer'
 , 'Put some help text here.'
 , NULL
 , NULL
@@ -73,7 +73,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, 'tool/lamc11/images/icon_questionanswer.swf'
+, 'tool/laqa11/images/icon_questionanswer.swf'
 , NULL
 , NULL
 , NULL

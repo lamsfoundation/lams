@@ -11,8 +11,8 @@ create_date_time
 )
 VALUES
 (
-'MCQ Learning Library Description',
-'MCQ',
+'Question and Answer Learning Library Description',
+'Question and Answer',
 0,
 NOW()
 )
