@@ -62,6 +62,7 @@ http://www.gnu.org/licenses/gpl.txt
 				<prop key="initializeLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="createLessonClassForLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="startLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="archiveLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="openGate">PROPAGATION_REQUIRED</prop>
 				<prop key="closeGate">PROPAGATION_REQUIRED</prop>
 			</props>

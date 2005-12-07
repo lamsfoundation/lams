@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -76,11 +76,6 @@ public class MonitoringAction extends LamsDispatchAction
     //---------------------------------------------------------------------
     private static final String SCHEDULER = "scheduler";
 
-    //---------------------------------------------------------------------
-    // Class level constants - session attributes
-    //---------------------------------------------------------------------
-    private static final String PARAM_LESSON_ID = "lessonId";
-    
     /** If you want the output given as a jsp, set the request parameter "jspoutput" to 
      * some value other than an empty string (e.g. 1, true, 0, false, blah). 
      * If you want it returned as a stream (ie for Flash), do not define this parameter
@@ -143,7 +138,7 @@ public class MonitoringAction extends LamsDispatchAction
     {
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 
-        long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
+        long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
         monitoringService.startLesson(lessonId);
 
@@ -153,7 +148,41 @@ public class MonitoringAction extends LamsDispatchAction
         return null;
     }
     
-    public ActionForward getAllLessons(ActionMapping mapping,
+    /**
+     * The Struts dispatch method to archive a lesson.  A wddx
+     * acknowledgement message will be serialized and sent back to the flash
+     * component.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     *
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward archiveLesson(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+
+        long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+        monitoringService.archiveLesson(lessonId);
+
+        //TODO add the wddx acknowledgement code.
+        
+        //return mapping.findForward(SCHEDULER);
+        return null;
+    }
+    
+        public ActionForward getAllLessons(ActionMapping mapping,
                                      ActionForm form,
                                      HttpServletRequest request,
                                      HttpServletResponse response)throws IOException{

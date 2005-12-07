@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -203,6 +202,36 @@ public class DummyMonitoringAction extends LamsDispatchAction
         monitoringService.startLesson(testLesson.getLessonId().longValue());
 
     	return mapping.findForward(LESSON_STARTED_FORWARD);
+    }
+
+    /**
+     * The Struts dispatch method to archive a lesson.  Forwards to the control
+     * list jsp.
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     *
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward archiveLesson(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+
+        long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
+        monitoringService.archiveLesson(lessonId);
+
+        return unspecified(mapping, form, request, response);
     }
 
     /**

@@ -87,6 +87,13 @@ public interface IMonitoringService
     public void forceCompleteLessonByUser(long learnerProgressId);
     
     /**
+     * Archive the specified the lesson. When archived, the data is retained
+     * but the learners cannot access the details. 
+     * @param lessonId the specified the lesson id.
+     */
+    public void archiveLesson(long lessonId);
+
+    /**
      * Set the gate to open to let all the learners through. This learning service
      * is triggerred by the system scheduler. Will return true GateActivity (or subclass)
      * object, rather than a hibernate proxy. This is needed so that the class can 

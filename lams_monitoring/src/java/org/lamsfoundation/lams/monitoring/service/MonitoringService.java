@@ -328,7 +328,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
         for (Iterator i = activities.iterator(); i.hasNext();)
         {
             Activity activity = (Activity) i.next();
-            System.out.println(activity);
             if ( activity.getActivityTypeId().intValue() == Activity.TOOL_ACTIVITY_TYPE ) {
             	ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(activity.getActivityId()); 
 				if (shouldInitToolSessionFor(toolActivity))
@@ -351,6 +350,25 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
             log.debug("=============Lesson "+lessonId+" started===============");
     }
 
+    /**
+     * Archive the specified the lesson. When archived, the data is retained
+     * but the learners cannot access the details. 
+     * @param lessonId the specified the lesson id.
+     */
+    public void archiveLesson(long lessonId) {
+
+        Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+        if ( requestedLesson == null) {
+        	throw new MonitoringServiceException("Lesson for id="+lessonId+" is missing. Unable to start lesson.");
+        }
+
+        requestedLesson.setLessonStateId(Lesson.ARCHIVED_STATE);
+        lessonDAO.updateLesson(requestedLesson);
+
+    }
+
+
+    
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#openGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */

@@ -17,6 +17,8 @@
   <body>
   
 	<H2>Select a lesson</H2>
+	
+	<p>Note: If you archive a lesson, it can no longer be accessed. This is a temporary restriction.</p>
 		
 	<table width="100%" border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
 		<tr><td><A HREF="<lams:WebAppURL/>dummy.do?method=initStartScreen" target="contentFrame">Start new lesson</a></td></tr>	
@@ -33,6 +35,7 @@
 			</c:choose>
 			<BR><c:out value="${lesson.lessonDescription}"/>
 			<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=getLesson&lessonID=<c:out value="${lesson.lessonId}"/>" target="contentFrame">Monitor Lesson</A>
+			<BR><A HREF="<lams:WebAppURL/>/dummy.do?method=archiveLesson&lessonID=<c:out value="${lesson.lessonId}"/>">Archive Lesson</A>
 			</TD></TR>
 			<TR><TD><HR></TD></TR>
 		</c:forEach>
