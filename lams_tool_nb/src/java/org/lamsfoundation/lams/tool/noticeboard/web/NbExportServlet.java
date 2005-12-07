@@ -27,7 +27,7 @@ public class NbExportServlet extends AbstractExportPortfolioServlet {
 	{
 	
 		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
-		Long toolContentId, toolSessionId, userId;
+		//Long toolContentId, toolSessionId, userId;
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 
 		String url = basePath + "/exportPortfolio.do";
@@ -45,18 +45,24 @@ public class NbExportServlet extends AbstractExportPortfolioServlet {
 			urlWithParameters = appendParametersToTeacherExportURL(request, url);
 		}
 	
-		try
-		{
+		//try
+		//{
 			// Can generate other files here by calling writeResponseToFile and supplying different urls 
 			writeResponseToFile(urlWithParameters, directoryName, FILENAME, cookies);
 		
-		}
+	/*	}
 		catch(ExportPortfolioServletException e)
 		{
 			throw new NbApplicationException("An error has occurred while trying to generate files ",e);
-		} 
+		} */
 		return FILENAME;
 	}
+	
+	/**
+	 * TODO: create a checkParameters function, to check if any parameters are missing or not.
+	 * @author mtruong
+	 */
+	
 	
 	
 }
