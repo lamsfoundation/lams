@@ -14,8 +14,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author conradb
  */
 public class MessageDao extends HibernateDaoSupport {
-	private static final String SQL_QUERY_FIND_ROOT_TOPICS = "from " + Message.class.getName() 
-					+ " where parent_uid is null and forum_session_uid=?";
+	private static final String SQL_QUERY_FIND_ROOT_TOPICS = "from " + Message.class.getName() +" m "
+					+ " where parent_uid is null and m.toolSession.sessionId=?";
 	
 	private static final String SQL_QUERY_FIND_TOPICS_FROM_AUTHOR = "from " + Message.class.getName()
 					+ " where is_authored = true and forum_uid=?";
@@ -24,7 +24,7 @@ public class MessageDao extends HibernateDaoSupport {
 					+ " where parent=?";
 	
 	private static final String SQL_QUERY_BY_USER_SESSION = "from " + Message.class.getName() + " m "
-					+ " where m.createdBy.uid = ? and  m.toolSession.uid=?";
+					+ " where m.createdBy.uid = ? and  m.toolSession.sessionId=?";
 	
 	private static final String SQL_QUERY_BY_SESSION = "from " + Message.class.getName() + " m "
 					+ " where m.toolSession.sessionId=?";
@@ -70,8 +70,8 @@ public class MessageDao extends HibernateDaoSupport {
 	public List getRootTopics(Long sessionId) {
 		return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_TOPICS, sessionId);
 	}
-	public List getTopicsFromAuthor(Long forumId) {
-		return this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPICS_FROM_AUTHOR, forumId);
+	public List getTopicsFromAuthor(Long forumUid) {
+		return this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPICS_FROM_AUTHOR, forumUid);
 	}
 
 	public void deleteById(Long uid) {
