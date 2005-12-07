@@ -48,6 +48,7 @@ public class ExportPortfolioConstants {
 	public static final String PARAM_FILE_LOCATION = "fileLocation";
 	public static final String TEMP_DIRECTORY = FileUtil.TEMP_DIR;
 	public static final String URL_FOR_UNSUPPORTED_EXPORT = "learning/exportNotSupported";
+	public static final String EXPORT_ERROR_FILENAME = "export_error.html";
 	
 	private static String getServerURL()
 	{
