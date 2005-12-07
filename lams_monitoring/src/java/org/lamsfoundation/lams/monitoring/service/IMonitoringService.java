@@ -77,7 +77,7 @@ public interface IMonitoringService
      * 									lams and tool interaction to start a
      * 									lesson.
      */
-    public void startlesson(long lessonId);
+    public void startLesson(long lessonId);
     
     /**
      * Force the learner to complete all the activities for current lesson.
@@ -292,4 +292,8 @@ public interface IMonitoringService
      * @return
      */
     public String releaseGate(Long activityID) throws IOException;
+    
+    /* TODO Dummy methods - to be removed */
+    public List getOrganisationsUsers(Integer userId);
+    public List getLearningDesigns(Long userId);
 }

@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
@@ -310,7 +311,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startlesson(long)
      */
-    public void startlesson(long lessonId) 
+    public void startLesson(long lessonId) 
     {
         if(log.isDebugEnabled())
             log.debug("=============Starting Lesson "+lessonId+"==============");
@@ -1003,8 +1004,27 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 	    }
 	    return table;
     }
-    
+  
+    /* ** Temporary methods to support the dummy monitoring pages */
+    /** Get a map of organisations. Their users shoulc  and their users. */
+    public List getOrganisationsUsers(Integer userId) {
+    	
+    	User user = userManagementService.getUserById(userId);
+    	List orgs = userManagementService.getOrganisationsForUserByRole(user, Role.STAFF);
+    	// Make sure the users are loaded
+    	Iterator iter = orgs.iterator();
+    	while (iter.hasNext()) {
+			Organisation element = (Organisation) iter.next();
+			element.getUsers();
+		}
+    	return orgs;
+    }
    
+    /** Get all the learning designs for this user */
+    public List getLearningDesigns(Long userId) {
+    	
+    	return learningDesignDAO.getLearningDesignByUserId(userId);
+    }
   
 
 }

@@ -136,8 +136,23 @@ http://www.gnu.org/licenses/gpl.txt
         scope="request"
       />
       <forward
-        name="dummy"
-        path="/dummy.jsp"
+        name="detail"
+        path="/dummyDetail.jsp"
+        redirect="false"
+      />
+      <forward
+        name="start"
+        path="/dummyStart.jsp"
+        redirect="false"
+      />
+      <forward
+        name="started"
+        path="/dummyStarted.jsp"
+        redirect="false"
+      />
+      <forward
+        name="control"
+        path="/dummyControlFrame.jsp"
         redirect="false"
       />
     </action>

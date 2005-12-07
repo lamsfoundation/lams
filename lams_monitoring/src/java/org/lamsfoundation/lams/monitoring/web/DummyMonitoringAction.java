@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,7 +65,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *                          type="org.lamsfoundation.lams.monitoring.service.MonitoringServiceException"
  *                          path=".systemError"
  * 							handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
- * @struts:action-forward name="dummy" path="/dummy.jsp"
+ * @struts:action-forward name="detail" path="/dummyDetail.jsp"
+ * @struts:action-forward name="start" path="/dummyStart.jsp"
+ * @struts:action-forward name="started" path="/dummyStarted.jsp"
+ * @struts:action-forward name="control" path="/dummyControlFrame.jsp"
  * 
  * ----------------XDoclet Tags--------------------
  */
@@ -81,13 +85,50 @@ public class DummyMonitoringAction extends LamsDispatchAction
     //---------------------------------------------------------------------
 	// input parameters
     // output parameters
-    private static final String DUMMY_FORWARD = "dummy";
+    private static final String CONTROL_FORWARD = "control";
+    private static final String DETAIL_FORWARD = "detail";
+    private static final String START_LESSON_FORWARD = "start";
+    private static final String LESSON_STARTED_FORWARD = "started";
+
+    private static final String LESSON_PARAMETER = "lesson";
     private static final String LESSONS_PARAMETER = "lessons";
+    private static final String ORGS_PARAMETER = "organisations";
+    private static final String DESIGNS_PARAMETER = "designs";
     
     
-    private static final Integer ORGANIZATION_ID = new Integer(1);
+    /** Default method for this action. Gets all the current lessons and forwards to the control page */
+    public ActionForward unspecified(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response)throws IOException{
+
+    	setupServices();
+
+    	User user = getUser();
+    	List lessons = monitoringService.getAllLessons(user.getUserId());
+	    request.getSession().setAttribute(LESSONS_PARAMETER,lessons);
+    	return mapping.findForward(CONTROL_FORWARD);
+
+    }
     
-    
+    /** Sets up the "create a lesson" screen, forwarding to dummyStart.jsp */
+    public ActionForward initStartScreen(ActionMapping mapping,
+                                         ActionForm form,
+                                         HttpServletRequest request,
+                                         HttpServletResponse response)throws IOException{
+    	setupServices();
+
+    	User user = getUser();
+    	
+    	List designs = monitoringService.getLearningDesigns(new Long(user.getUserId().longValue()));
+	    request.getSession().setAttribute(DESIGNS_PARAMETER,designs);
+    	
+    	List organisations = monitoringService.getOrganisationsUsers(user.getUserId());
+	    request.getSession().setAttribute(ORGS_PARAMETER,organisations);
+	    
+    	return mapping.findForward(START_LESSON_FORWARD);
+    }
+
     //---------------------------------------------------------------------
     // Struts Dispatch Method
     //---------------------------------------------------------------------
@@ -117,26 +158,41 @@ public class DummyMonitoringAction extends LamsDispatchAction
     	
     	// set up all the data needed
     	DummyForm dummyForm = (DummyForm) form;
-    	Long ldId = dummyForm.getLearningDesignId();
+
+        User user = getUser();
+
+        Long ldId = dummyForm.getLearningDesignId();
     	if ( ldId == null )
     		throw new IOException("Learning design id must be set");
     	
-        String title = dummyForm.getTitle();
+        Integer organisationId = dummyForm.getOrganisationId();
+    	if ( organisationId == null )
+    		throw new IOException("Organisation must be set");
+        Organisation organisation = usermanageService.getOrganisationById(organisationId);
+    	if ( organisation == null )
+    		throw new IOException("Organisation cannot be found. Id was "+organisationId);
+
+    	String title = dummyForm.getTitle();
         if ( title == null ) title = "lesson";
         String desc = dummyForm.getDesc(); 
         if ( desc == null ) desc = "description";
 
-        User user = getUser();
-        Organisation organisation = usermanageService.getOrganisationById(ORGANIZATION_ID);
-
         // initialize the lesson
         Lesson testLesson = monitoringService.initializeLesson(title,desc,ldId.longValue(),user);
 
-        // create the lesson class
+        // create the lesson class - add all the users in this organisation to the lesson class
+        // add user as staff
         LinkedList learners = new LinkedList();
+        Iterator iter = organisation.getUsers().iterator();
         learners.add(user);
+        while (iter.hasNext()) {
+			User element = (User) iter.next();
+			learners.add(element);
+		}
+
         LinkedList staffs = new LinkedList();
         staffs.add(user);
+        
         testLesson = monitoringService.createLessonClassForLesson(testLesson.getLessonId().longValue(),
         		organisation,
 				learners,
@@ -144,24 +200,46 @@ public class DummyMonitoringAction extends LamsDispatchAction
 
         // start the lesson.
         this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-        monitoringService.startlesson(testLesson.getLessonId().longValue());
-        
-        // now got back to the dummy screen with an updated list of lessons to the user 
-        return unspecified(mapping, form, request, response);
+        monitoringService.startLesson(testLesson.getLessonId().longValue());
 
+    	return mapping.findForward(LESSON_STARTED_FORWARD);
     }
 
-    /** Default method for this action. Gets a list of all the current lessons for this user and forwards to dummy.jsp */
-    public ActionForward unspecified(ActionMapping mapping,
-                                     ActionForm form,
-                                     HttpServletRequest request,
-                                     HttpServletResponse response)throws IOException{
+    /**
+     * The Struts dispatch method that lists a lesson's details. Forwards to the detail screen
+     * 
+     * @param mapping An ActionMapping class that will be used by the Action class to tell
+     * the ActionServlet where to send the end-user.
+     *
+     * @param form The ActionForm class that will contain any data submitted
+     * by the end-user via a form.
+     * @param request A standard Servlet HttpServletRequest class.
+     * @param response A standard Servlet HttpServletResponse class.
+     * @return An ActionForward class that will be returned to the ActionServlet indicating where
+     *         the user is to go next.
+     * @throws IOException
+     * @throws ServletException
+     */
+    
+    public ActionForward getLesson(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException{
+    	
     	setupServices();
 
     	User user = getUser();
+    	Long lessonId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID));
     	List lessons = monitoringService.getAllLessons(user.getUserId());
-	    request.getSession().setAttribute(LESSONS_PARAMETER,lessons);
-    	return mapping.findForward(DUMMY_FORWARD);
+    	
+    	Iterator iter = lessons.iterator();
+    	while (iter.hasNext()) {
+			Lesson element = (Lesson) iter.next();
+			if ( element.getLessonId().equals(lessonId) )
+			    request.getSession().setAttribute(LESSON_PARAMETER,element);
+		}
+    	return mapping.findForward(DETAIL_FORWARD);
+
     }
 
     private void setupServices() {

@@ -145,7 +145,7 @@ public class MonitoringAction extends LamsDispatchAction
 
         long lessonId = WebUtil.readLongParam(request,PARAM_LESSON_ID);
 
-        monitoringService.startlesson(lessonId);
+        monitoringService.startLesson(lessonId);
 
         //TODO add the wddx acknowledgement code.
         

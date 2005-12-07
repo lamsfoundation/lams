@@ -37,6 +37,7 @@ public class DummyForm extends ActionForm {
 	private String title;
 	private String desc;
 	private Long learningDesignId;
+	private Integer organisationId;
 
 	
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
@@ -79,6 +80,16 @@ public class DummyForm extends ActionForm {
 	 */
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+
+	public Integer getOrganisationId() {
+		return organisationId;
+	}
+
+
+	public void setOrganisationId(Integer organisationId) {
+		this.organisationId = organisationId;
 	}
 
 

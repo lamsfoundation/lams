@@ -194,7 +194,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
     
     public void testStartlesson() throws LamsToolServiceException
     {
-        monitoringService.startlesson(TEST_LESSON_ID.longValue());
+        monitoringService.startLesson(TEST_LESSON_ID.longValue());
         assertTrue(true);
         
         Lesson startedLesson = lessonDao.getLesson(TEST_LESSON_ID);

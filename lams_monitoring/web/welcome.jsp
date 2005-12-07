@@ -20,34 +20,28 @@ http://www.gnu.org/licenses/gpl.txt
 --%>
 
 <%@ page language="java"%>
-<%@ taglib uri="tags-bean" prefix="bean"%> 
 <%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<lams:css/>
-		<title>Learner :: Staff</title>
-		<script language="JavaScript" type="text/JavaScript">
-			<!--
-			var serverURL = <lams:LAMSURL/>;
-			//-->
-		</script>
-	</head>
+	  </head>
 
-	<frameset rows="*" cols="178,*">
-		<frame src="dummy.do" name="controlFrame" scrolling="NO">
-		<frame src="welcome.jsp" name="contentFrame" scrolling="YES">
-	</frameset>
-	
-	<noframes>
-		<body>
-			<fmt:message key="message.activity.parallel.noFrames" />
-		</body>
-	</noframes>
-
+<body>
+<table width="100%" height="295" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
+	<tr> 
+		<td valign="middle"> 
+			<div align="center">
+				<p class="body">This is a dummy page for Lesson Management. It is to be used until the Flash interface is ready. </p>
+            	<p class="body">Select an option from the control frame on the left hand side.</p>
+          	</div>
+        </td>
+    </tr>
+</table>
+</body>
 </html:html>
