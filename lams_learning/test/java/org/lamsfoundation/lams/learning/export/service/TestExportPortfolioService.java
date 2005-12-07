@@ -158,7 +158,7 @@ public class TestExportPortfolioService extends AbstractLamsTestCase  {
     {
         testProgress=learnerProgressDao.getLearnerProgressByLearner(testUser,testLesson);
     	
-    	Vector sortedActivityList = exportService.getOrderedActivityList(testProgress.getLearnerProgressId());
+    	Vector sortedActivityList = exportService.getOrderedActivityList(testProgress);
     	Vector testActivityIdList = getTestOrderedCompletedActivityIdList();
     	Iterator i = sortedActivityList.iterator();
     	Iterator j = testActivityIdList.iterator();
