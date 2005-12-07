@@ -1,4 +1,10 @@
 SET FOREIGN_KEY_CHECKS=0;
+drop table if exists tl_lasbmt11_content;
+drop table if exists tl_lasbmt11_instruction_files;
+drop table if exists tl_lasbmt11_report;
+drop table if exists tl_lasbmt11_session;
+drop table if exists tl_lasbmt11_session_learners;
+drop table if exists tl_lasbmt11_submission_details;
 create table tl_lasbmt11_content (
    content_id bigint not null,
    title varchar(64) not null,
@@ -29,7 +35,7 @@ create table tl_lasbmt11_report (
    primary key (report_id)
 );
 create table tl_lasbmt11_session (
-   session_id bigint not null auto_increment,
+   session_id bigint not null,
    status integer not null,
    content_id bigint,
    primary key (session_id)

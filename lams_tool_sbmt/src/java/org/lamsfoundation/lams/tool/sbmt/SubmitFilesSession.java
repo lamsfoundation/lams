@@ -50,7 +50,7 @@ public class SubmitFilesSession implements Serializable,Cloneable{
     }
 
     /** 
-     * @hibernate.id generator-class="identity" type="java.lang.Long" column="session_id"
+     * @hibernate.id generator-class="assigned" type="java.lang.Long" column="session_id"
      */
     public Long getSessionID() {
         return this.sessionID;

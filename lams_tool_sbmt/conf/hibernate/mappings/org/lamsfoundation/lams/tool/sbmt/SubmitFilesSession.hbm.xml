@@ -16,7 +16,7 @@
             column="session_id"
             type="java.lang.Long"
         >
-            <generator class="identity">
+            <generator class="assigned">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
                   hibernate-generator-params-SubmitFilesSession.xml 

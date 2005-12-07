@@ -39,7 +39,7 @@ create table tl_lasbmt11_report (
    primary key (report_id)
 );
 create table tl_lasbmt11_session (
-   session_id bigint not null auto_increment,
+   session_id bigint not null,
    status integer not null,
    content_id bigint,
    primary key (session_id)
