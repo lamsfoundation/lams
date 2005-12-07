@@ -36,6 +36,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.export.Portfolio;
+import org.lamsfoundation.lams.learning.export.ToolPortfolio;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
 import org.lamsfoundation.lams.learning.export.service.IExportPortfolioService;
 import org.lamsfoundation.lams.learning.export.service.ExportPortfolioServiceProxy;
@@ -76,7 +77,8 @@ public class ExportPortfolioAction extends LamsAction {
 						            HttpServletRequest request,
 						            HttpServletResponse response) throws ExportPortfolioException
 	{
-		Portfolio[] portfolios = null;
+		//ToolPortfolio[] portfolios = null;
+	   Portfolio portfolio = null;
 		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
 		IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(getServlet().getServletContext());
 		
@@ -91,7 +93,7 @@ public class ExportPortfolioAction extends LamsAction {
 		    Integer userId = userDto.getUserID();
 		    
 		    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-		    portfolios = exportService.exportPortfolioForStudent(userId, lessonID, true, cookies);
+		    portfolio = exportService.exportPortfolioForStudent(userId, lessonID, true, cookies);
 		}
 		else if(mode.equals(ToolAccessMode.TEACHER.toString()))
 		{
@@ -99,10 +101,10 @@ public class ExportPortfolioAction extends LamsAction {
 			//done in the monitoring environment
 		    Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
 			
-			portfolios = exportService.exportPortfolioForTeacher(lessonID, cookies);
+			portfolio = exportService.exportPortfolioForTeacher(lessonID, cookies);
 		}
 		
-		request.setAttribute(PARAM_PORTFOLIO_LIST, portfolios);
+		request.setAttribute(PARAM_PORTFOLIO_LIST, portfolio.getToolPortfolios());
 		
 		return mapping.findForward("displayPortfolio");
 	}
