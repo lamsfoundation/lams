@@ -88,7 +88,8 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
             logger.error(error);
             throw new SubmitFilesException(error);
         }
-       
+        Map userFilesMap = sbmtService.getFilesUploadedBySession(toolSessionID);
+		request.getSession().setAttribute("report",userFilesMap);
     }
     
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)

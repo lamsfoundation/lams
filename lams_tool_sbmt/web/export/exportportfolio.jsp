@@ -75,18 +75,6 @@
 									</c:choose>
 					</td>
 				</tr>
-		
-				<tr>
-					<td colspan="2">
-					<form action="<html:rewrite page='/monitoring.do?method=markFile'/>" method="post">
-							<input type="hidden" name="detailID" value=<c:out value='${details.submissionID}' /> >
-							<input type="hidden" name="reportID" value=<c:out value='${details.reportID}' /> >
-							<input type="hidden" name="userID" value=<c:out value='${details.userID}' /> >
-							<input type="hidden" name="toolSessionID" value=<c:out value='${toolSessionID}' /> >
-							<input type="submit" value="Update Marks"/>
-					</form>
-					</td>
-				</tr>
 				</span>
 			</c:forEach>
 		</c:forEach>
