@@ -27,6 +27,11 @@
 </servlet>
 
 <servlet>
+		<servlet-name>exportPortfolio</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.tool.sbmt.web.ExportServlet</servlet-class>
+</servlet>
+
+<servlet>
 		<servlet-name>Connector</servlet-name>
 		<servlet-class>com.fredck.FCKeditor.connector.ConnectorServlet</servlet-class>
 		<init-param>

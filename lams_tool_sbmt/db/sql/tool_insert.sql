@@ -46,10 +46,10 @@ NULL,
 'tool/lasbmt11/learner.do',
 'tool/lasbmt11/authoring.do',
 'tool/lasbmt11/definelater.do',
-'tool/lasbmt11/export.do',
+'tool/lasbmt11/exportPortfolio',
 'tool/lasbmt11/monitoring.do',
-'tool/lasbmt11/monitoring.do',
-'tool/lasbmt11/monitoring.do',
+'tool/lasbmt11/contribute.do',
+'tool/lasbmt11/moderation.do',
 NOW()
 );
 

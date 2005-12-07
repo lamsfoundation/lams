@@ -43,7 +43,7 @@
 
     <filter-mapping>
     <filter-name>hibernateFilter</filter-name>
-     <url-pattern>*.do</url-pattern>
+     <url-pattern>/*</url-pattern>
   </filter-mapping>
     <filter-mapping>
     <filter-name>SystemSessionFilter</filter-name>
@@ -85,6 +85,11 @@
 </servlet>
 
 <servlet>
+		<servlet-name>exportPortfolio</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.tool.sbmt.web.ExportServlet</servlet-class>
+</servlet>
+
+<servlet>
 		<servlet-name>Connector</servlet-name>
 		<servlet-class>com.fredck.FCKeditor.connector.ConnectorServlet</servlet-class>
 		<init-param>
@@ -121,10 +126,15 @@
     <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 </servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>download</servlet-name>
-		<url-pattern>/download/*</url-pattern>
-  	</servlet-mapping>
+<servlet-mapping>
+	<servlet-name>download</servlet-name>
+	<url-pattern>/download/*</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>exportPortfolio</servlet-name>
+	<url-pattern>/exportPortfolio</url-pattern>
+</servlet-mapping>
 
    <session-config>
       <session-timeout>120</session-timeout>
