@@ -2,8 +2,6 @@
 
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
-<!--  This is a test comment to see if I can check in a file -->
-
 <web-app >
  <context-param>
   	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>

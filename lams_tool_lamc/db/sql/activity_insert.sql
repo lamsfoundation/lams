@@ -43,9 +43,9 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'Multiple Choice Description'
-, 'Multiple Choice'
-, 'Help text for Multiple Choice.'
+, 'MCQ Description'
+, 'MCQ'
+, 'Put some help text here.'
 , NULL
 , NULL
 , NULL
@@ -73,7 +73,7 @@ NULL
 , NULL
 , NULL
 , NULL
-, '/tool/lamc11/images/icon_questionanswer.swf'
+, 'tool/lamc11/images/icon_questionanswer.swf'
 , NULL
 , NULL
 , NULL

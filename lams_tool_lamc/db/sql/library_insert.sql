@@ -11,8 +11,8 @@ create_date_time
 )
 VALUES
 (
-'Multiple Choice Learning Library Description',
-'Multiple Choice',
+'MCQ Learning Library Description',
+'MCQ',
 0,
 NOW()
 )
