@@ -248,6 +248,7 @@ http://www.gnu.org/licenses/gpl.txt
 				<include name="struts/tlds/*"/>
 				<include name="jstl/*"/>
 				<include name="jstl/tlds/*"/>
+				<include name="lams.tld"/>
 				<exclude name="web.xml"/>
 			</webinf>
 			<lib dir="${conf.webinf.dir}/lib"/>
@@ -308,6 +309,14 @@ http://www.gnu.org/licenses/gpl.txt
 			</fileset>
 			<report todir="${build.report}/html" />
 		</junitreport>
+	</target>
+
+	<!-- deploy-war : for convenience during development. Should be deployed via the master build -->
+	<target name="deploy-war" depends="build-war">
+		<copy file="${build.lib}/${product}.jar"
+				todir="${jboss.deploy}"/>
+		<copy file="${build.lib}/${product}.war"
+				todir="${jboss.deploy}"/>
 	</target>
 
 </project>
