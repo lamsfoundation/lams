@@ -25,18 +25,21 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<link href="css/learner.css" rel="stylesheet" type="text/css">
+		<lams:css/>
 		<title>Learner :: LAMS</title>
 	</head>
 
 	<frameset rows="40,*" cols="*" framespacing="0" frameborder="NO" border="0">
 		<frame src="controlTopFrame.jsp" name="topFrame" scrolling="NO" noresize >
-		<frame src="controlBottomFrame.jsp" name="bottomFrame" scrolling="NO">
+		<!-- real frame, which uses Flash <frame src="controlBottomFrame.jsp" name="bottomFrame" scrolling="NO"> -->
+		<frame src="dummylearner.do?method=getActiveLessons" name="bottomFrame" scrolling="NO">
 	</frameset>
 	
 	<noframes>

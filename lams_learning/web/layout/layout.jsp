@@ -24,6 +24,8 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 
@@ -34,11 +36,12 @@ http://www.gnu.org/licenses/gpl.txt
 	<head>
 		<title>LAMS</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<lams:css/>
 		<link href="css/learner.css" rel="stylesheet" type="text/css">
 	</head>
 
 	<c:choose>
-		<c:when test="${includeBodyToag}">
+		<c:when test="${includeBodyTag}">
 		
 			<body>
 				<tiles:insert attribute="body" />

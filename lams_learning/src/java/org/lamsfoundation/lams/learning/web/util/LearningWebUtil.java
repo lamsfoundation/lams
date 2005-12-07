@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.learning.web.util;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -34,7 +35,10 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 /**
@@ -59,35 +63,29 @@ public class LearningWebUtil
 	public static final String PARAM_PROGRESS_ID = "progressId";
     
     /**
-     * Helper method to retrieve the user data. We always load up from http
-     * session first to optimize the performance. If no session cache available,
-     * we load it from data source.
+     * Helper method to retrieve the user data. Gets the id from the user details
+     * in the session then retrieves the real user object.
+     * 
      * @param request A standard Servlet HttpServletRequest class.
      * @param servletContext the servlet container that has all resources
      * @param surveyService the service facade of survey tool
      * @return the user data value object
      */
-    public static User getUserData(HttpServletRequest request, ServletContext servletContext)
+    public static User getUserData(ServletContext servletContext)
     {
-        //retrieve complete user data from http session
-        User currentUser = (User) request.getSession()
-                                              .getAttribute(ATTR_USER_DATA);
-        if(log.isDebugEnabled()&&currentUser!=null)
-            log.debug("user retrieved from http session:"+currentUser.getUserId());
-        
+        HttpSession ss = SessionManager.getSession();
+        UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
         //if no session cache available, retrieve it from data source
-        if (currentUser == null)
-        {
-            int userId = WebUtil.readIntParam(request,PARAM_USER_ID);
-            currentUser = LearnerServiceProxy.getUserManagementService(servletContext)
-            								 .getUserById(new Integer(userId));
-            if(log.isDebugEnabled()&&currentUser!=null)
-                log.debug("user retrieved from database:"+currentUser.getUserId());
-            
-            //create session cache
-            request.getSession().setAttribute(ATTR_USER_DATA, currentUser);
+        if ( learner != null ) {
+	        User currentUser = LearnerServiceProxy.getUserManagementService(servletContext)
+	        								 .getUserById(learner.getUserID());
+	        if(log.isDebugEnabled()&&currentUser!=null)
+	            log.debug("user retrieved from database:"+currentUser.getUserId());
+	        
+	        return currentUser;
         }
-        return currentUser;
+        return null;
     }
     
     /**
@@ -130,7 +128,7 @@ public class LearningWebUtil
             //initialize service object
             ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
 
-            User currentLearner = getUserData(request, servletContext);
+            User currentLearner = getUserData(servletContext);
             Lesson lesson = getLessonData(request,servletContext);
             LearnerProgress progress = learnerService.getProgress(currentLearner,lesson);
             bean = new SessionBean(currentLearner,lesson,progress);
@@ -179,7 +177,7 @@ public class LearningWebUtil
             //initialize service object
             ILearnerService learnerService = LearnerServiceProxy.getLearnerService(servletContext);
 		    
-            User currentLearner = getUserData(request, servletContext);
+            User currentLearner = getUserData(servletContext);
             Lesson lesson = getLessonData(request,servletContext);
             
             learnerProgress = learnerService.getProgress(currentLearner,lesson);

@@ -23,12 +23,14 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<link href="css/learner.css" rel="stylesheet" type="text/css">
+		<link href="<lams:LAMSURL/>/css/default.css" rel="stylesheet" type="text/css"/>
 		<title>Learner :: LAMS</title>
 		<SCRIPT LANGUAGE="VBScript">
 			<!-- 
@@ -94,19 +96,43 @@ http://www.gnu.org/licenses/gpl.txt
 		<!-- URL's used in the movie-->
 		<!-- text used in the movie-->
 		<!--Flash UI component-->
-		<OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+		<!-- OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 				codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" name="leftUI"
-				WIDTH="100%" HEIGHT="100%" ALIGN="" id="leftUI">
-			<PARAM NAME=movie VALUE="LearnerLeftUI.swf" />
-			<PARAM NAME=quality VALUE="high" />
-			<PARAM NAME=scale VALUE="noscale" />
-			<PARAM NAME=salign VALUE="LT" />
-			<PARAM NAME=flashvars VALUE="pollInterval=10000" />
-			<!--<PARAM NAME=bgcolor VALUE=#D0D0E8>-->
-			<EMBED src="LearnerLeftUI.swf?pollInterval=10000"  WIDTH="100%" HEIGHT="100%" ALIGN="" quality=high scale=noscale salign=LT
-					TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer" swliveconnect=true name="leftUI">
-			</EMBED> 
-		</OBJECT>
+				WIDTH="100%" HEIGHT="100%" ALIGN="" id="leftUI"-->
+			<!-- PARAM NAME=movie VALUE="LearnerLeftUI.swf" -->
+			<!-- PARAM NAME=quality VALUE="high" -->
+			<!-- PARAM NAME=scale VALUE="noscale" -->
+			<!-- PARAM NAME=salign VALUE="LT" -->
+			<!-- PARAM NAME=flashvars VALUE="pollInterval=10000" -->
+			<!--<PARAM NAME=bgcolor VALUE=#D0D0E8 -->
+			<!-- EMBED src="LearnerLeftUI.swf?pollInterval=10000"  WIDTH="100%" HEIGHT="100%" ALIGN="" quality=high scale=noscale salign=LT
+					TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer" swliveconnect=true name="leftUI"-->
+			<!-- /EMBED-->
+		<!-- /OBJECT-->
 		
+
+		<h2>Available Lessons</H2>
+		<p>[Flash component goes here]</p>
+		<p>Select a lesson from the list below.</p>
+		<table width="100%" border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
+		<c:forEach var="lesson" items="${lessons}">
+		<c:if test="${lesson.lessonStateId<6}">
+			<TR><TD>
+				<A HREF="<lams:WebAppURL/>/learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonId}"/>" target="contentFrame">
+				<STRONG><c:out value="${lesson.lessonName}"/></STRONG></A>
+			<c:choose>
+				<c:when test="${lesson.lessonStateId==1}">[Created]</c:when>
+				<c:when test="${lesson.lessonStateId==2}">[Scheduled]</c:when>
+				<c:when test="${lesson.lessonStateId==3}">[Started]</c:when>
+				<c:when test="${lesson.lessonStateId==4}">[Suspended]</c:when>
+				<c:when test="${lesson.lessonStateId==5}">[Finished]</c:when>
+			</c:choose>
+			<BR><c:out value="${lesson.lessonDescription}"/>
+			</TD></TR>
+			<TR><TD><HR></TD></TR>
+		</c:if>
+		</c:forEach>
+		</table>
+
 	</body>
 </html:html>

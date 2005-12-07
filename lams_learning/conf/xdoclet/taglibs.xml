@@ -86,3 +86,11 @@
 	<taglib-uri>tags-xml_rt</taglib-uri>
 	<taglib-location>/WEB-INF/jstl/tlds/x-rt.tld</taglib-location>
 </taglib>
+
+<!--  ======================================================== -->	
+<!--   LAMS Tag Library -->
+<!--  ======================================================== -->	
+<taglib>
+   <taglib-uri>tags-lams</taglib-uri>
+   <taglib-location>/WEB-INF/lams.tld</taglib-location>
+</taglib>

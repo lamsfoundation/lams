@@ -40,6 +40,7 @@ http://www.gnu.org/licenses/gpl.txt
 		classpath:/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml 
 		classpath:/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml 
 		classpath:/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml 
+		classpath:/org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml 
 	</param-value>
 </context-param>
 <listener>
@@ -189,6 +190,12 @@ http://www.gnu.org/licenses/gpl.txt
 		<description>Export Portfolio Download Page</description>		
 		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportDownloadServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>exportNotSupported</servlet-name>
+		<display-name>Export Portfolio Unavailable</display-name>
+		<description>Tool does not support portfolio exports</description>
+		<servlet-class>org.lamsfoundation.lams.learning.export.web.action.ExportNotSupportedServlet</servlet-class>
+	</servlet>
 
   <!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
@@ -224,6 +231,11 @@ http://www.gnu.org/licenses/gpl.txt
 <servlet-mapping>
 		<servlet-name>exportDownload</servlet-name>
 		<url-pattern>/exportDownload</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>exportNotSupported</servlet-name>
+	<url-pattern>/exportNotSupported</url-pattern>
 </servlet-mapping>
 
    <session-config>
@@ -325,6 +337,14 @@ http://www.gnu.org/licenses/gpl.txt
 <taglib>
 	<taglib-uri>tags-xml_rt</taglib-uri>
 	<taglib-location>/WEB-INF/jstl/tlds/x-rt.tld</taglib-location>
+</taglib>
+
+<!--  ======================================================== -->	
+<!--   LAMS Tag Library -->
+<!--  ======================================================== -->	
+<taglib>
+   <taglib-uri>tags-lams</taglib-uri>
+   <taglib-location>/WEB-INF/lams.tld</taglib-location>
 </taglib>
 
   	<!--  Security Constraint -->

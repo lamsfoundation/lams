@@ -130,7 +130,7 @@ public class TestGateAction extends AbstractTestAction
      */
     private void initializeUserMap(boolean singleUser)
     {
-        User testUser = LearningWebUtil.getUserData(request,context);
+        User testUser = LearningWebUtil.getUserData(context);
         Lesson lesson = LearningWebUtil.getLessonData(request,context);
         LessonLearnerDataManager.cacheLessonUser(context,lesson,testUser);
         
@@ -138,7 +138,7 @@ public class TestGateAction extends AbstractTestAction
         {
             request.getSession().removeAttribute("user");
             addRequestParameter(LearningWebUtil.PARAM_USER_ID, "1");
-            User testUser2 = LearningWebUtil.getUserData(request,context);
+            User testUser2 = LearningWebUtil.getUserData(context);
             LessonLearnerDataManager.cacheLessonUser(context,lesson,testUser2);
         }
 

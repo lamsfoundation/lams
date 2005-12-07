@@ -9,11 +9,4 @@
           	</div>
         </td>
     </tr>
-    <TR>
-		<TD>
-			<html:link href="/lams/learning/learner.do?method=joinLesson&userId=2&lessonId=2" target="_self" >
-				Join a started Lesson
-			</html:link>
-		</TD>
-    </TR>
 </table>

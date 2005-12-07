@@ -148,7 +148,7 @@ public class TestGroupingAction extends AbstractTestAction
      */
     private void initializeUserMap()
     {
-        User testUser = LearningWebUtil.getUserData(request,context);
+        User testUser = LearningWebUtil.getUserData(context);
         Lesson lesson = LearningWebUtil.getLessonData(request,context);
         
         LessonLearnerDataManager.cacheLessonUser(context,lesson,testUser);

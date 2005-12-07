@@ -155,7 +155,7 @@ public class GroupingAction extends LamsDispatchAction
         //get current user and lesson data via http. It ensures they are availabe
         //in the http session. If not, we assume parameters are coming from 
         //request or falsh and we can create learner and lesson objects.
-        User learner = LearningWebUtil.getUserData(request,getServlet().getServletContext());
+        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
         Lesson lesson = LearningWebUtil.getLessonData(request,getServlet().getServletContext());
         
         Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request,learnerService);

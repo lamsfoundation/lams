@@ -24,6 +24,8 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-tiles" prefix="tiles"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 
@@ -33,7 +35,7 @@ http://www.gnu.org/licenses/gpl.txt
 	<head>
 		<title><c:out value="${pageTitle}" /></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-		<link href="<c:url value="/css/learner.css" />" rel="stylesheet" type="text/css" />
+		<lams:css/>
 	  <script language="JavaScript" type="text/JavaScript">
 	        <!--
 	        function pviiClassNew(obj, new_style) { //v2.7 by PVII

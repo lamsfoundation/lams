@@ -58,12 +58,10 @@ String pathToShare = protocol+request.getServerName()+":"+request.getServerPort(
 		</script>
 		
 		<div align="center">
-			<table width="100%" border="0" align="center" bgcolor="#9DC5EC" summary="This table is being used for layout purposes">
+			<table width="100%" border="0" align="center" summary="This table is being used for layout purposes">
 				<tr>
 					<td valign="top">
-						<div align="center" class="heading">
-							<fmt:message key="message.activity.loading" />
-						</div>
+						<H1><fmt:message key="message.activity.loading" /></H1>
 					</td>
 				</tr>
 			</table>

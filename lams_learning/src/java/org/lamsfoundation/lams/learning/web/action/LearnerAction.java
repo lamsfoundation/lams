@@ -124,7 +124,7 @@ public class LearnerAction extends LamsDispatchAction
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //get learner.
-        User learner = LearningWebUtil.getUserData(request, getServlet().getServletContext());
+        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
         if(log.isDebugEnabled())
             log.debug("Getting active lessons for leaner:"+learner.getFullName()+"["+learner.getUserId()+"]");
 
@@ -169,7 +169,7 @@ public class LearnerAction extends LamsDispatchAction
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //get user and lesson based on request.
-        User learner = LearningWebUtil.getUserData(request, getServlet().getServletContext());
+        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
         Lesson lesson = LearningWebUtil.getLessonData(request,getServlet().getServletContext());
 
         
@@ -343,7 +343,7 @@ public class LearnerAction extends LamsDispatchAction
         ILearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 
         //getting requested object according to coming parameters
-        User learner = LearningWebUtil.getUserData(request, getServlet().getServletContext());
+        User learner = LearningWebUtil.getUserData(getServlet().getServletContext());
         Activity requestedActivity = learnerService.getActivity(new Long(activityId));
         
         //preparing tranfer object for flash

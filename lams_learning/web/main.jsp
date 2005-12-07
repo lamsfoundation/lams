@@ -24,16 +24,17 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html:html locale="true" xhtml="true">
 
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<link href="css/learner.css" rel="stylesheet" type="text/css">
+		<lams:css/>
 		<title>Learner :: LAMS</title>
-		<script language="JavaScript" type="text/JavaScript"><!--
-			// TODO: replace with proper URL
-			var serverURL = "http://127.0.0.1:8080/lams/learning/";
+		<script language="JavaScript" type="text/JavaScript">
+			<!--
+			var serverURL = <lams:LAMSURL/>;
 			//-->
 		</script>
 	</head>
