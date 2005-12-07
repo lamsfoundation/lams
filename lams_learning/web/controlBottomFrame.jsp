@@ -113,12 +113,12 @@ http://www.gnu.org/licenses/gpl.txt
 
 		<h2>Available Lessons</H2>
 		<p>[Flash component goes here]</p>
-		<p>Select a lesson from the list below.</p>
 		<table width="100%" border="0" cellspacing="2" cellpadding="2" summary="This table is being used for layout purposes only">
+			<TR><TD><A HREF="<lams:WebAppURL/>dummylearner.do?method=getActiveLessons">Refresh List</A></TD></TR>
 		<c:forEach var="lesson" items="${lessons}">
 		<c:if test="${lesson.lessonStateId<6}">
 			<TR><TD>
-				<A HREF="<lams:WebAppURL/>/learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonId}"/>" target="contentFrame">
+				<A HREF="<lams:WebAppURL/>learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonId}"/>" target="contentFrame">
 				<STRONG><c:out value="${lesson.lessonName}"/></STRONG></A>
 			<c:choose>
 				<c:when test="${lesson.lessonStateId==1}">[Created]</c:when>
