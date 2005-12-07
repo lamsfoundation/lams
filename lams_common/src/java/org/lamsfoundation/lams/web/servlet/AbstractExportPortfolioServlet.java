@@ -6,8 +6,10 @@
  */
 package org.lamsfoundation.lams.web.servlet;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
@@ -22,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
@@ -53,12 +56,19 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	
 	private static Logger log = Logger.getLogger(AbstractExportPortfolioServlet.class);
 	
+	private static final String EXPORT_ERROR_MSG = "This activity does not support portfolio export";
+	private static final String EXPORT_ERROR_FILENAME = "portfolioExportNotSupported.html";
+	protected Long userID = null;
+	protected Long toolSessionID = null;
+	protected Long toolContentID = null;
+	protected String mode = null;
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException, IOException {
 		
 		String mainFileName = null;
 		String directoryName = null;
-		String mode = null;
+		
 		
 		Cookie[] cookies = request.getCookies();		
 		
@@ -75,22 +85,33 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		directoryName = checkDirectoryName(directoryName);
 		
 	
-		//check if the directory exists, if not throw exception
+		//check if the directory exists
 		if (!FileUtil.directoryExist(absoluteDirectoryPath))
-			throw new IOException("The directory supplied " + absoluteDirectoryPath + " does not exist.");
-		
-		mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);			
-		
-		if (log.isDebugEnabled()) {
-			log.debug("Export is conducted in mode: " + mode);
-		}
-				
-		mainFileName = doExport(request, response, absoluteDirectoryPath, cookies);
-		
-		if (log.isDebugEnabled()) {
-			log.debug("The name of main html file is "+mainFileName);
+		{
+			//throw new IOException("The directory supplied " + absoluteDirectoryPath + " does not exist.");
+		    log.error("The directory supplied " + absoluteDirectoryPath + " does not exist.");
+		   
 		}
 		
+		//check whether the necessary parameters are all appended
+		if (parametersAreValid(request))
+		{
+		
+		    if (log.isDebugEnabled()) {
+				log.debug("Export is conducted in mode: " + mode);
+			}
+					
+			mainFileName = doExport(request, response, absoluteDirectoryPath, cookies);
+			
+			if (log.isDebugEnabled()) {
+				log.debug("The name of main html file is "+mainFileName);
+			}
+		}
+		else
+		{
+		    log.error("Cannot perform export for tool as some parameters are missing from the export url.");
+		    writeErrorMessageToFile(EXPORT_ERROR_MSG, directoryName, EXPORT_ERROR_FILENAME);
+		}
 		//return the name of the main html file
 		PrintWriter out = response.getWriter();
 		out.println(mainFileName);
@@ -134,30 +155,42 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	 * 
 	 * @param filename
 	 */
-	protected int writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename, Cookie[] cookies) throws ExportPortfolioServletException
+	protected int writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename, Cookie[] cookies) 
 	{
-	  
+	   // String errorMsg = null;
+	    int status = HttpUrlConnectionUtil.STATUS_ERROR; //default to error status
 	    try
 	    {
-	       int status = HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, filename, cookies);
+	       status = HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, filename, cookies);
 	       if (status != HttpUrlConnectionUtil.STATUS_OK)
 	       {
-	           throw new ExportPortfolioServletException("error");
+	           log.error("Error! The tools export servlet threw an exception");
+	           //throw new ExportPortfolioServletException(error);
+	           //instead of throwing an exception, write the error to file instead
+	           writeErrorMessageToFile(EXPORT_ERROR_MSG, directoryToStoreFile, EXPORT_ERROR_FILENAME);
 	       }
-	      return status;
+	     
 	    }
 	    catch(MalformedURLException e)
 		{
-			throw new ExportPortfolioServletException("The URL given is invalid. ",e);
+			//throw new ExportPortfolioServletException("The URL given is invalid. ",e);	        
+	        log.error("The URL given is invalid. Exception message is: " + e);
+	        writeErrorMessageToFile(EXPORT_ERROR_MSG, directoryToStoreFile, EXPORT_ERROR_FILENAME);
 		}
 		catch(FileNotFoundException e)
 		{
-			throw new ExportPortfolioServletException("The directory or file may not exist. ",e);
+			//throw new ExportPortfolioServletException("The directory or file may not exist. ",e);
+		    log.error("The directory or file may not exist. Exception message is: " + e);
+		    writeErrorMessageToFile(EXPORT_ERROR_MSG, directoryToStoreFile, EXPORT_ERROR_FILENAME);
 		}
 		catch(IOException e)
 		{
-			throw new ExportPortfolioServletException("A problem has occurred while writing file. ", e);
+		    log.error("A problem has occurred while writing file. Exception message is: " + e);
+		    writeErrorMessageToFile(EXPORT_ERROR_MSG, directoryToStoreFile, EXPORT_ERROR_FILENAME);
+			//throw new ExportPortfolioServletException("A problem has occurred while writing file. ", e);
 		}
+		
+		return status;
 		
 	} 
 	
@@ -196,5 +229,50 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		finalURL = WebUtil.appendParameterToURL(finalURL, AttributeNames.PARAM_TOOL_CONTENT_ID, WebUtil.readStrParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));		
 		return finalURL;
 	}
+	
+	protected void writeErrorMessageToFile(String errorMessage, String directoryToStoreFile, String filename)
+	{
+	    try
+	    {
+		    String filepath = directoryToStoreFile + File.separator + filename;
+		    BufferedWriter fileout = new BufferedWriter(new FileWriter(filepath));
+			fileout.write(errorMessage);
+			fileout.close();
+	    }
+	    catch(IOException e)
+	    {
+	       // throw new ExportPortfolioServletException("Could not write error message to a file");
+	    }
+	}
+	
+	protected boolean parametersAreValid(HttpServletRequest request)
+	{
+	    boolean valid = true;
+	    mode = request.getParameter(AttributeNames.PARAM_MODE);
+	    if (mode != null)
+	    {
+		    if (mode.equals(ToolAccessMode.LEARNER.toString()))
+		    {
+		        userID = new Long(request.getParameter(AttributeNames.PARAM_USER_ID));
+		        toolSessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
+		        if (userID == null || toolSessionID == null)
+		            valid = false;
+		    }
+		    else if(mode.equals(ToolAccessMode.TEACHER.toString()))
+		    {
+		        toolContentID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID));
+		        if (toolContentID == null)
+		            valid = false;
+		    }
+		    else 
+		        valid = false;
+	    }
+	    else
+	        valid = false;
+	    
+	    return valid;
+	}
+	
+	
 
 }
