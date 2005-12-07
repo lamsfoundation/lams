@@ -30,10 +30,12 @@ import java.util.Map;
 import java.util.Vector;
 import javax.servlet.http.Cookie;
 
+import org.lamsfoundation.lams.learning.export.ToolPortfolio;
 import org.lamsfoundation.lams.learning.export.Portfolio;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -65,26 +67,40 @@ public interface IExportPortfolioService {
     /**
 	 * This is the main method that performs the export for the teacher.
 	 * It will get the list of ordered activities from the learning design
-	 * and will setup the portfolios for each activity. Returns an array of 
-	 * Portfolio objects, in which the web layer can iterate through the array 
-	 * of portfolios to display the links to each activity.
+	 * and will setup the portfolios for each tool activity. Returns a Portfolio 
+	 * object which contains information about the temporary export directory
+	 * and an array of ToolPortfolio objects.
+	 * 
+	 * If a Lesson with <code>lessonId</code> cannot be found, a Portfolio
+	 * object will be created with attribute exportTmpDir set, and the array
+	 * of ToolPortfolio objects being set to null. The MainExportServlet will
+	 * detect that this array of ToolPortfolio objects is null, and will generate 
+	 * a main page indicating that the export cannot be performed.
+	 * 
 	 * @param lesson The specific instance of the LearningDesign and Class.
 	 * @param cookies. Are passed along to doExport, in order for access the export for other tools
-	 * @return Portfolio[] The array of portfolio objects.
+	 * @return Portfolio Portfolio object which contains the array of ToolPortfolio objects.
 	 */
-	public Portfolio[] exportPortfolioForTeacher(Long lessonId, Cookie[] cookies);
+	public Portfolio exportPortfolioForTeacher(Long lessonId, Cookie[] cookies);
 	
 	/**
 	 * The main method that performs the export for the student.
 	 * It will get the list of activities that the user has completed 
-	 * and will setup the portfolios for each activity. 
+	 * and will setup the portfolios for each tool activity. Much like the 
+	 * functionality for exportPortfolioForTeacher, this method returns
+	 * a Portfolio object. 
+	 * 
+	 * If the learner has not yet started this sequence (a null LearnerProgress)
+	 * then a Portfolio object will be created with the attribute exportTmpDir set
+	 * and the array of ToolPortfolio objects being set to null.
+	 * 
 	 * @param userId The learner id.
 	 * @param lessonID The lesson id of the lesson, the learner is doing the export for
 	 * @param anonymity The anonymity flag, is true, then anonymity is on, otherwise username would be visible.
 	 * @param cookies Are passed along to doExport, in order for access the export for other tools
-	 * @return Portfolio[] The array of portfolio objects.
+	 * @return Portfolio Portfolio object which contains the array of ToolPortfolio objects.
 	 */
-	public Portfolio[] exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity, Cookie[] cookies);
+	public Portfolio exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity, Cookie[] cookies);
 	
 	/**
 	 * A helper method that sets up the export url for the activity. Will go through all key-value pairs
@@ -103,7 +119,7 @@ public interface IExportPortfolioService {
 	 * @param activity The Tool Activity
 	 * @return a Portfolio object
 	 */
-	public Portfolio createPortfolio(ToolActivity activity);
+	public ToolPortfolio createToolPortfolio(ToolActivity activity);
 	
 	/**
 	 * This method will iterate through the list of ordered activities and create a Portfolio
@@ -112,6 +128,8 @@ public interface IExportPortfolioService {
 	 * the student. However, if the export is being done be the teacher, the User object should
 	 * be null.
 	 * 
+	 * If the list of ordered activities is null, then a Portfolio object will be created
+	 * with the attribute exportTmpDir set and the array of ToolPortfolios being null.
 	 * 
 	 * @param orderedActivityList The ordered activity list to iterate through
 	 * @param accessMode The tool access mode, either Teacher or Learner.
@@ -134,18 +152,16 @@ public interface IExportPortfolioService {
 	
 	/** 
 	 * Returns the ordered activity list (ordered by the ActivityOrderComparator)
-	 * containing the list of activities completed by the learner.
-	 * The reason why the learnerProgressId is passed as a parameter (as opposed
-	 * to an actual LearnerProgress object, is so that in the same transaction, we 
-	 * can obtain the LearnerProgress object (from the learnerProgressId) and then
-	 * copy the set of completedActivities into a Vector.
-	 * The above equivalent methods which take in LearnerProgress object/Lesson object
-	 * as a parameter, throws a "failed to lazily initialize collection" exception
-	 * when trying to copy the set of completed activities into the vector (as it cannot be accessed)
+	 * containing the list of activities completed by the learner. The list will
+	 * only contain Tool Activities. If it comes across a Complex Activity, it
+	 * will only add its child activities in the ordered list.
+	 * 
+	 * If the learner has not yet completed any activities, then it will return null.
+	 * 
 	 * @param learnerProgressId
 	 * @return
 	 */
-	public Vector getOrderedActivityList(Long learnerProgressId);
+	public Vector getOrderedActivityList(LearnerProgress learnerProgress);
 	
 	/**
 	 * Zips up the directory specified by <code>directoryToZip</code> and
@@ -168,7 +184,7 @@ public interface IExportPortfolioService {
 	 * @param cookies The cookies that are to be passed along 
 	 * @return An array of portfolios that can be used to generate the main export page.
 	 */
-	public Portfolio[] doExport(Vector portfolios, Cookie[] cookies);
+	public Portfolio doExport(Vector portfolios, Cookie[] cookies);
 	/**
 	 * This method is responsible for the call to the tool to export their portfolio via the export url.
 	 * It uses a HttpURLConnection to connect to the export url of each tool and returns the filename
@@ -177,14 +193,14 @@ public interface IExportPortfolioService {
 	 * @param tool The portfolio object, which contains the exportUrl in which to connect to.
 	 * @return The main file name of the tool's page.
 	 */
-	public String connectToToolViaExportURL(String exportURL, Cookie[] cookies);
+	public String connectToToolViaExportURL(String exportURL, Cookie[] cookies, String directoryToStoreErrorFile);
 	
-	public String getExportDir();
+//	public String getExportDir();
 	
 	/*	public Portfolio[] exportPortfolioForStudent(LearnerProgress learnerProgress, User user, boolean anonymity);
 	
 	public Portfolio[] exportPortfolioForStudent(Lesson lesson, User user, boolean anonymity); 
 	
-	public Vector getOrderedActivityList(LearnerProgress learnerProgress); */
+	public Vector getOrderedActivityList(Long learnerProgressId); */
 	
 }
