@@ -153,6 +153,10 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	 * the URL given by <code>urlToConnectTo</code> and write it to the
 	 * file given by <code>filename</code> in the directory <code>directoryToStoreFile</code>.
 	 * 
+	 * If the returned status code is not 200, then it will generate an export file
+	 * containing a warning message that the export is unsupported. If any exceptions occcur,
+	 * a similar export file will be generated in place of the activity's main export file.
+	 * 
 	 * @param filename
 	 */
 	protected int writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename, Cookie[] cookies) 
@@ -230,7 +234,21 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		return finalURL;
 	}
 	
-	protected void writeErrorMessageToFile(String errorMessage, String directoryToStoreFile, String filename)
+	/**
+	 * TODO: fix up this method so that it writes the error message
+	 * which is obtained from a resource file, and not hardcoded.
+	 * 
+	 * Temporary helper method that generates the export file containing
+	 * the warning message that the export could not be generated for this activity.
+	 * Will need to write out html contents instead, and the message should be
+	 * moved to a resource file.
+	 * 
+	 * This method 
+	 * @param errorMessage
+	 * @param directoryToStoreFile
+	 * @param filename
+	 */
+	private void writeErrorMessageToFile(String errorMessage, String directoryToStoreFile, String filename)
 	{
 	    try
 	    {
@@ -245,7 +263,16 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 	    }
 	}
 	
-	protected boolean parametersAreValid(HttpServletRequest request)
+	/**
+	 * Helper method that checks that the required request parameters are available.
+	 * If the mode=teacher, then it will check to see if toolContentID exists.
+	 * If mode = learner, then it will check to see if toolSessionID and userID exists.
+	 * Returns true if all needed parameters are there. False otherwise.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	private boolean parametersAreValid(HttpServletRequest request)
 	{
 	    boolean valid = true;
 	    mode = request.getParameter(AttributeNames.PARAM_MODE);
