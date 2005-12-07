@@ -31,14 +31,15 @@ public class HttpUrlConnectionUtil {
     
     public static final int STATUS_OK = 1;
     public static final int STATUS_ERROR = -1;
-    
+        
   
     /**
      * Mimics a browser connection and connects to the url <code>urlToConnectTo</code> and writes
      * the contents to the file with <code>filename</code> stored in <code>directoryToStoreFile</code>.
      * Also sets the necessary cookies needed in the form JSESSIONID=XXXX;JSESSIONIDSSO=XXXX;SYSSESSIONID=XXXX
      * If the Http Status-Code returned is 200, then it will proceed to write the contents to a file.
-     * Otherwise it will return the value -1 to indicate that an error has occurred.
+     * Otherwise it will return the value -1 to indicate that an error has occurred. It is up to the 
+     * calling function on how this error is dealt with.
      * 
      * @param urlToConnectTo The url in which the HttpUrlConnection is to be made
      * @param directoryToStoreFile The directory to place the saved html file
@@ -64,12 +65,14 @@ public class HttpUrlConnectionUtil {
 			if ( log.isDebugEnabled() ) {
 				log.debug("A connection has been established with "+urlToConnectTo);
 			}
-			InputStream inputStream = con.getInputStream();
+			
+			//get the code before retrieving the input stream
 			statusCode = con.getResponseCode();
 			status = getStatus(statusCode);
-			
+						
 			if (status == STATUS_OK)
 			{
+			    InputStream inputStream = con.getInputStream(); //start reading the input stream
 				OutputStream outStream = new FileOutputStream(absoluteFilePath);
 				   
 				int c = -1;
@@ -87,7 +90,7 @@ public class HttpUrlConnectionUtil {
 			}
 			else
 			{
-			    log.error("A problem has occurred while connecting to this url " + urlToConnectTo);
+			    log.error("URL Connection Error: A problem has occurred while connecting to this url " + urlToConnectTo);
 			}
 			
 			return status;
@@ -99,11 +102,13 @@ public class HttpUrlConnectionUtil {
      * connects to the tools export url via a HttpUrlConnection.
      * If the Http Status-Code returned is 200, then it will proceed to read the 
      * main file name returned by the tool.
-     * Otherwise it will return null to indicate that an error has occurred.
+     * 
+     * Otherwise this method will return null. It is up to the calling function to 
+     * deal with this.  
      * 
      * @param toolsExportUrl The url in which the HttpUrlConnection is to be made
      * @param cookies The Cookie objects which needs to be passed along with the request
-     * @return String the main file that was exported by the tool, null if an error has occurred
+     * @return String The filename of the file that was exported by the tool, returns null if any error has occurred
      * @throws MalformedURLException
      * @throws FileNotFoundException
      * @throws IOException
@@ -117,14 +122,14 @@ public class HttpUrlConnectionUtil {
 		
 	    URL url = new URL(toolsExportUrl);
 		HttpURLConnection con = (HttpURLConnection)url.openConnection();
-		con.setRequestProperty("Cookie", getCookieString(cookies));
+		con.setRequestProperty("Cookie", getCookieString(cookies)); //pass the cookies along as well. 
 			
-		InputStream inputStream = con.getInputStream();
 		statusCode = con.getResponseCode();
 		status = getStatus(statusCode);
 		
 		if (status == STATUS_OK)
 		{		
+		    InputStream inputStream = con.getInputStream();
 			BufferedReader input = new BufferedReader(new InputStreamReader(inputStream));
 			
 			mainFileName = input.readLine();
@@ -135,7 +140,8 @@ public class HttpUrlConnectionUtil {
 		}
 		else
 		{
-		    log.error("A problem has occurred while connecting to the tools export url " + toolsExportUrl);
+		    String errorMsg = "A problem has occurred while connecting to the tools export url " + toolsExportUrl;
+		    log.error(errorMsg);		   
 		    return null;
 		}
 		
@@ -162,6 +168,7 @@ public class HttpUrlConnectionUtil {
         
         return status;
     }
+       
     
     /**
      * This helper method sets up the string which is passed as a parameter to
