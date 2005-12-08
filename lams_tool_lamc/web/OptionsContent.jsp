@@ -42,13 +42,6 @@ function deleteOption(deletableOptionIndex, actionMethod) {
 								  	 <font size=2> <b> <bean:message key="label.mc.options"/> </b> </font>
 							  	</td>
 						 </tr>					
-					     <tr>
-							  	<td bgcolor="#EEEEEE" colspan=4 class="input" valign=top align=right>
-									<html:submit onclick="javascript:submitMethod('addOption');" styleClass="a.button" >
-										<bean:message key="label.add.option"/>
-									</html:submit>	 				 		  										  		
-						  	</td>
-						 </tr>							
 					
 						<c:set var="optionIndex" scope="session" value="1"/>
 			  	 		<c:set var="selectedOptionFound" scope="request" value="0"/>
@@ -126,6 +119,13 @@ function deleteOption(deletableOptionIndex, actionMethod) {
 						  		<input type=hidden name="checkBoxSelected<c:out value="${optionIndex}"/>">
 						</c:forEach>
 						
+						 <tr>
+							  	<td bgcolor="#EEEEEE" colspan=4 class="input" valign=top align=right>
+									<html:submit onclick="javascript:submitMethod('addOption');" styleClass="a.button" >
+										<bean:message key="label.add.option"/>
+									</html:submit>	 				 		  										  		
+						  	</td>
+						 </tr>							
 					</table> </td> </tr>	
 					
 					<html:hidden property="deletableOptionIndex"/>							
