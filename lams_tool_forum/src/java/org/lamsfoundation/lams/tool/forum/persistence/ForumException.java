@@ -1,11 +1,11 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
+import java.io.IOException;
+
 /**
- * Created by IntelliJ IDEA.
  * User: conradb
  * Date: 14/06/2005
  * Time: 12:33:12
- * To change this template use File | Settings | File Templates.
  */
 public class ForumException extends RuntimeException {
 
@@ -21,4 +21,15 @@ public class ForumException extends RuntimeException {
     public ForumException(String message, Throwable cause) {
         super(message, cause);
     }
+
+	public ForumException() {
+		super();
+		
+	}
+
+	public ForumException(Throwable cause) {
+		super(cause);
+		
+	}
+
 }

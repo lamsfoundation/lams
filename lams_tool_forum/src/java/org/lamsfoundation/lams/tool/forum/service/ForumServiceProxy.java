@@ -22,14 +22,27 @@ package org.lamsfoundation.lams.tool.forum.service;
 
 import javax.servlet.ServletContext;
 
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class ForumServiceProxy {
 	public static final IForumService getForumService(ServletContext servletContext){
-		WebApplicationContext context = WebApplicationContextUtils
-										.getRequiredWebApplicationContext(servletContext);
-		return (IForumService)context.getBean("forumService");
+		return (IForumService) getService(servletContext);
+	}
+
+	public static ToolSessionManager getToolSessionManager(ServletContext servletContext) {
+		return (ToolSessionManager) getService(servletContext);
 	}
 	
+	/**
+	 * @param servletContext
+	 * @return
+	 */
+	private static Object getService(ServletContext servletContext) {
+		WebApplicationContext context = WebApplicationContextUtils
+										.getRequiredWebApplicationContext(servletContext);
+		return context.getBean("forumService");
+	}
+
 }

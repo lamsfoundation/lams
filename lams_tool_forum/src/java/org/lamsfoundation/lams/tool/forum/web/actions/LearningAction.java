@@ -18,12 +18,18 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
+import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
@@ -145,17 +151,42 @@ public class LearningAction extends Action {
 	 */
 	private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-
-		//get sessionId from HttpServletRequest
 		Long sessionId = (Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
-		forumService = getForumManager();
-		ForumToolSession session = forumService.getSessionBySessionId(sessionId);
-		session.setStatus(ForumConstants.SESSION_STATUS_FINISHED);
-		forumService.updateSession(session);
-		
+		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+		if (mode == ToolAccessMode.LEARNER) {
+			//get sessionId from HttpServletRequest
+			forumService = getForumManager();
+			ForumToolSession session = forumService.getSessionBySessionId(sessionId);
+			session.setStatus(ForumConstants.SESSION_STATUS_FINISHED);
+			forumService.updateSession(session);
+			
+			ToolSessionManager sessionMgrService = ForumServiceProxy.getToolSessionManager(getServlet().getServletContext());
+
+			//get back login user DTO
+			//get session from shared session.
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			Long userID = new Long(user.getUserID().longValue());
+
+			String nextActivityUrl;
+			try {
+				nextActivityUrl = sessionMgrService.leaveToolSession(sessionId, userID);
+				response.sendRedirect(nextActivityUrl);
+			} catch (DataMissingException e) {
+				throw new ForumException(e);
+			} catch (ToolException e) {
+				throw new ForumException(e);
+			} catch (IOException e) {
+				throw new ForumException(e);
+			}
+			return null;
+			
+			
+		}
 		//get all root topic to display on init page
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST,rootTopics);
+		
 		return mapping.findForward("success");
 	}
 
