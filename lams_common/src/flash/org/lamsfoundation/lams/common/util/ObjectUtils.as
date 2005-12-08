@@ -29,6 +29,24 @@ class org.lamsfoundation.lams.common.util.ObjectUtils{
 		return str;  
 	}
 	
+	/**
+	* Recursively goes through and object and prints out property values
+	* @usage   printObject(_global);
+	* @param   target 
+	* @return  
+	*/
+	public static function toString(target):String{  
+		for(var o in target){  
+			//trace('object:' + o  + ' value:' + target[o]);  
+			var str:String = "";
+			
+			//Debugger.log(o  + ':' + target[o],Debugger.GEN,'printObject','org.lamsfoundation.lams.common.util.ObjectUtils');
+			str += o  + ':' + target[o];
+			printObject(target[o]);  
+		}  
+		return str;  
+	}
+	
 	public static function deNull(obj:Object):Object{
 		Debugger.log('FOR:'+printObject(obj),Debugger.GEN,'deNull','org.lamsfoundation.lams.common.util.ObjectUtils');
 			//Removes null values in objects suitable for sending XML to the Java WDDX deserialiser
