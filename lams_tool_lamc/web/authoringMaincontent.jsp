@@ -172,9 +172,6 @@ function submitMethod(actionMethod) {
 
 
 <SCRIPT language="JavaScript"> 
-
-<!--  addQuestion gets called everytime a new question content is added to the UI -->
-	
 	function removeQuestion(formIndex, questionIndex)
 	{
 		document.forms[formIndex].questionIndex.value=questionIndex;

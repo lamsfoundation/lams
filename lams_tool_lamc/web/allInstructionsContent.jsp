@@ -16,7 +16,6 @@ String root = protocol+request.getServerName()+":"+request.getServerPort()+reque
 String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
 %>
 
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html>
 <head>
@@ -56,13 +55,13 @@ function submitMethod(actionMethod) {
 
 //-->     
 </script>
-
 </head>
 <body onLoad="initTabs(); showTab('i');">
 
 
 <h1><bean:message key="label.authoring.mc"/></h1>
     
+
     <!-- start tabs -->
 <!-- tab holder table -->
 <table border="0" cellspacing="0" cellpadding="0">
@@ -107,23 +106,28 @@ function submitMethod(actionMethod) {
 
 <html:form  action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 
+ <!-- tab content one (basic)-->
+ 
 <html:hidden property="dispatch"/>
 
- <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >
 
 		<h2><bean:message key="label.authoring.mc.basic"/></h2>
-		
-		<table align=center> 	  
-		<tr>   
-		<td class=error>
-			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
-		</td>
-		</tr> 
-		</table>
-		
+			<table align=center> 	  
+			<tr>   
+			<td class=error>
+				<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+			</td>
+			</tr> 
+			</table>
+
 		<div id="formtablecontainer1">
+				<c:if test="${sessionScope.editOptionsMode == 0}"> 			
 					<jsp:include page="BasicContent.jsp" />
+				</c:if> 				
+				<c:if test="${sessionScope.editOptionsMode == 1}"> 			
+					<jsp:include page="OptionsContent.jsp" />
+				</c:if> 				
 		</div>
 		<a href="javascript:;" class="button">Cancel</a>
 			<!-- end of content_b -->
@@ -168,9 +172,6 @@ function submitMethod(actionMethod) {
 
 
 <SCRIPT language="JavaScript"> 
-
-<!--  addQuestion gets called everytime a new question content is added to the UI -->
-	
 	function removeQuestion(formIndex, questionIndex)
 	{
 		document.forms[formIndex].questionIndex.value=questionIndex;
