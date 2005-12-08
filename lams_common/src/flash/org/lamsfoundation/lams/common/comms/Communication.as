@@ -159,13 +159,14 @@ class org.lamsfoundation.lams.common.comms.Communication {
     * @param queueID:Number     ID of request handler on queue 
     */
     private function onServerResponse(success:Boolean,wrappedPacketXML:XML,queueID:Number){
-        trace('XML loaded success:'+ success);
+        //trace('XML loaded success:'+ success);
+		Debugger.log('xml recieved is:'+wrappedPacketXML.toString(),Debugger.VERBOSE,'onServerResponse','Communication');			
         //Load ok?
         if(success){
 		   var responseObj:Object = wddx.deserialize(wrappedPacketXML);
             if(responseObj.messageType == null){
-				Debugger.log('Message type was:'+responseObj.messageType+' , cannot continue',Debugger.CRITICAL,'getRequest','Communication');			
-				Debugger.log('xml recieved is:'+wrappedPacketXML.toString(),Debugger.CRITICAL,'getRequest','Communication');			
+				Debugger.log('Message type was:'+responseObj.messageType+' , cannot continue',Debugger.CRITICAL,'onServerResponse','Communication');			
+				Debugger.log('xml recieved is:'+wrappedPacketXML.toString(),Debugger.CRITICAL,'onServerResponse','Communication');			
 				return -1;
 			}
 			

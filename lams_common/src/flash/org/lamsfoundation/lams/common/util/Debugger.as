@@ -16,7 +16,9 @@ class org.lamsfoundation.lams.common.util.Debugger {
     public static var HIGH:Number = 2;
     public static var MED:Number = 3;
     public static var GEN:Number = 4;
-    public static var COMP:Number = 5;
+    public static var VERBOSE:Number = 4.5;
+	public static var COMP:Number = 5;
+	
     
     private static var _severityLevel:Number = 5;
 	private static var _allowDebug:Boolean = true;
