@@ -47,7 +47,7 @@ NULL,
 'tool/lafrum11/authoring/init.do',
 'tool/lafrum11/monitoring/listContentUsers.do',
 'tool/lafrum11/definelater.do',
-'tool/lafrum11/export.do',
+'tool/lafrum11/exportPortfolio',
 'tool/lafrum11/contribute.do',
 'tool/lafrum11/moderate.do',
 NOW()

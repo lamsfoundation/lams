@@ -47,6 +47,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class LearningAction extends Action {
   	private static Logger log = Logger.getLogger(LearningAction.class);
+    private static final boolean MODE_OPTIONAL = false;
 	private IForumService forumService;
 
 
@@ -98,6 +99,10 @@ public class LearningAction extends Action {
     */
 	private ActionForward viewForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+        //set the mode into http session 
+        ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,MODE_OPTIONAL);
+        request.getSession().setAttribute(AttributeNames.ATTR_MODE, mode);
+        
 		//get sessionId from HttpServletRequest
 		String sessionIdStr = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 		Long sessionId;

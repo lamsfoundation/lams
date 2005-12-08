@@ -5,6 +5,11 @@
 </servlet>
 
 <servlet>
+		<servlet-name>exportPortfolio</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.tool.forum.web.actions.ExportServlet</servlet-class>
+</servlet>
+
+<servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
     <init-param>
