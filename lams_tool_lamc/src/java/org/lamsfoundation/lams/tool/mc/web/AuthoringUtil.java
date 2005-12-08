@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -1277,9 +1276,9 @@ public class AuthoringUtil implements McAppConstants {
 	public static void createOptionContent(HttpServletRequest request, Map options, String optionText, 
 			String questionIndex, Map mapGeneralSelectedOptionsContent)
     {
+		logger.debug("doing createOptionContent...");
        	IMcService mcService =McUtils.getToolService(request);
-    	logger.debug("doing createOptionContent...");
-		int optionSize=options.size();
+    	int optionSize=options.size();
 		logger.debug("optionSize:" + optionSize);
 		logger.debug("optionText:" + optionText);
 		
@@ -1291,28 +1290,32 @@ public class AuthoringUtil implements McAppConstants {
 		
 		if (mcQueContentUid != null)
 		{
+			logger.debug("mcQueContentUid not null: " + mcQueContentUid);
 			McQueContent mcQueContent= mcService.getMcQueContentByUID(new Long(mcQueContentUid));
 			logger.debug("mcQueContent: " + mcQueContent);
 			
 			McOptsContent mcOptsContent = mcService.getOptionContentByOptionText(optionText, new Long(mcQueContentUid));
 			if (mcOptsContent == null)
 			{
+				logger.debug("mcOptsContent null: " + mcOptsContent);
 				mcOptsContent = new McOptsContent(isOptionSelected, optionText,mcQueContent , new TreeSet());
 				mcService.saveMcOptionsContent(mcOptsContent);
 				logger.debug("persisted mcQueContent: " + mcQueContent);	
 			}
 			else
 			{
+				logger.debug("mcOptsContent not null: " + mcOptsContent);
 				logger.debug("mcOptsContent already exists: " + mcQueContent);
 			}	
 		}
 		else
 		{
+			logger.debug("mcQueContentUid null: " + mcQueContentUid);
 			Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
 			logger.debug("getting existing content with id:" + toolContentId);
 			McContent mcContent=mcService.retrieveMc(toolContentId);
 			logger.debug("existing mcContent:" + mcContent);
-			logger.debug("mcOptsContent is null, get the mcQueContent in an alternative way, use pendingOptionsKey: " + questionIndex);
+			logger.debug("mcOptsContent is null, get the mcQueContent in an alternative way, use questionIndex: " + questionIndex);
 			McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(new Long(questionIndex), mcContent.getUid());
 			logger.debug("exracted mcQueContent:" + mcQueContent);
 
