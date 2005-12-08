@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.sbmt.service;
 
 import javax.servlet.ServletContext;
 
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -34,9 +35,21 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class SubmitFilesServiceProxy {
 	
 	public static final ISubmitFilesService getSubmitFilesService(ServletContext servletContext){
+		return (ISubmitFilesService) getService(servletContext);
+	}
+	
+	public static final ToolSessionManager getToolSessionManager(ServletContext servletContext){
+		return (ToolSessionManager) getService(servletContext);
+	}
+	
+	/**
+	 * @param servletContext
+	 * @return
+	 */
+	private static Object getService(ServletContext servletContext) {
 		WebApplicationContext context = WebApplicationContextUtils
 										.getRequiredWebApplicationContext(servletContext);
-		return (ISubmitFilesService)context.getBean("submitFilesService");
+		return context.getBean("submitFilesService");
 	}
 	
 

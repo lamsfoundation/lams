@@ -28,7 +28,7 @@
 				<tr>
 					<td>File Path: </td>
 						<td>
-						File Path: </td><td><c:out value="${details.filePath}" /> 
+						</td><td><c:out value="${details.filePath}" /> 
 						<c:set var="viewURL">
 							<html:rewrite page="/download/?uuid=${details.uuID}&versionID=${details.versionID}&preferDownload=false"/>
 						</c:set>

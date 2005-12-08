@@ -35,4 +35,5 @@ public class SbmtConstants {
 	public static final String TOOL_URL_BASE = "/lams/tool/lasbmt11/";
 	public static final String ATTACHMENT_LIST = "attachmentList";
 	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
+	public static final String READ_ONLY_MODE = "readOnlyMode";
 }

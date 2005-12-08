@@ -6,6 +6,7 @@
  */
 package org.lamsfoundation.lams.tool.sbmt.web;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,6 +24,9 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.sbmt.Learner;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
@@ -194,22 +198,47 @@ public class LearnerAction extends DispatchAction {
 			ActionForm form,
 			HttpServletRequest request,
 			HttpServletResponse response){
-		DynaActionForm authForm= (DynaActionForm)form;
-		Long sessionID =(Long) authForm.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-		Long userID = (Long)authForm.get(SbmtConstants.USER_ID);
-		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
-		submitFilesService.finishSubmission(sessionID,userID);
+		
+		DynaActionForm authForm = (DynaActionForm) form;
+		ToolAccessMode mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+		if (mode == ToolAccessMode.LEARNER) {
+			ToolSessionManager sessionMgrService = SubmitFilesServiceProxy.getToolSessionManager(getServlet().getServletContext());
+			submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet().getServletContext());
 
+			Long sessionID = (Long) authForm.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+			//get back login user DTO
+			//get session from shared session.
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			Long userID = new Long(user.getUserID().longValue());
+			submitFilesService.finishSubmission(sessionID, userID);
+
+			String nextActivityUrl;
+			try {
+				nextActivityUrl = sessionMgrService.leaveToolSession(sessionID, userID);
+				response.sendRedirect(nextActivityUrl);
+			} catch (DataMissingException e) {
+				throw new SubmitFilesException(e);
+			} catch (ToolException e) {
+				throw new SubmitFilesException(e);
+			} catch (IOException e) {
+				throw new SubmitFilesException(e);
+			}
+			return null;
+		}
+		 request.getSession().setAttribute(SbmtConstants.READ_ONLY_MODE, "true");
 		return mapping.findForward("finish");
 	}
 	/**
-	 * This is a utily function for forwarding the errors to
-	 * the respective JSP page indicated by <code>forward</code>
+	 * This is a utily function for forwarding the errors to the respective JSP
+	 * page indicated by <code>forward</code>
 	 * 
-	 * @param mapping 
+	 * @param mapping
 	 * @param request
-	 * @param errorMessage The error message to be displayed
-	 * @param forward The JSP page to which the errors would be forwarded
+	 * @param errorMessage
+	 *            The error message to be displayed
+	 * @param forward
+	 *            The JSP page to which the errors would be forwarded
 	 * @return ActionForward
 	 */
 	private ActionForward returnErrors(ActionMapping mapping, 
