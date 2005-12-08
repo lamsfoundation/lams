@@ -43,38 +43,13 @@ function submitModifyQuestion(questionIndexValue, actionMethod) {
 					</tr>
 				
 					<tr> <td colspan=2 align=center valign=top>
-					
-
-
-				<!--
-					<tr>
-						<td class="formlabel" valign=top>
-						</td>
-						<td class="input" align="center" valign=top>
-							 <bean:message key="label.Questions"/> 
-						</td>
-						<td class="input" align="center" valign=top>
-							 <bean:message key="label.weight"/> 
-						</td>
-						<td class="input" colspan=2 align="center" valign=top>
-							 <bean:message key="label.actions"/> 
-						</td>
-					</tr>
-				-->
 				
 					<table align="center" border="1" summary="layout and Content" width="55%">
-				     <tr>
-							  	<td bgcolor="#A8C7DE" colspan=5 class="input" valign=top align=left>
-								  	 <font size=2> <b> <bean:message key="label.mc.questions"/> </b> </font>
-							  	</td>
-						 </tr>					
 					     <tr>
-							  	<td bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
-									<html:submit styleClass="a.button" onclick="javascript:submitMethod('addNewQuestion');">
-										<bean:message key="label.add.question"/>
-									</html:submit>	 				 		  										  		
-						  	</td>
-						 </tr>							
+								  	<td bgcolor="#A8C7DE" colspan=5 class="input" valign=top align=left>
+									  	 <font size=2> <b> <bean:message key="label.mc.questions"/> </b> </font>
+								  	</td>
+						 </tr>					
 					
 			  	 		<c:set var="queIndex" scope="session" value="0"/>
 						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
@@ -119,6 +94,15 @@ function submitModifyQuestion(questionIndexValue, actionMethod) {
 								  	</td>
 							  </tr>
 						</c:forEach>
+						
+						 <tr>
+							  	<td bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
+									<html:submit styleClass="a.button" onclick="javascript:submitMethod('addNewQuestion');">
+										<bean:message key="label.add.question"/>
+									</html:submit>	 				 		  										  		
+						  	</td>
+						 </tr>							
+						
 						
 					</table> </td> </tr>
 							<html:hidden property="questionIndex"/>
