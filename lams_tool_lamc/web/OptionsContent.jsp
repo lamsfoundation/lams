@@ -5,6 +5,17 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
+<script language="JavaScript" type="text/JavaScript">
+<!--
+// questionIndexValue: index of option affected
+// actionMethod: name of the method to be called in the DispatchAction
+function deleteOption(deletableOptionIndex, actionMethod) {
+	document.McAuthoringForm.deletableOptionIndex.value=deletableOptionIndex; 
+	submitMethod(actionMethod);
+}
+//-->     
+</script>
+
 				<table class="forms" align=center>
 					<tr>
 	 				 	<td class="formlabel" align=right valign=top> 
@@ -23,26 +34,6 @@
 					  	</td>
 					</tr>
 
-
-				<!--
-					<tr>
-					  	<td class="formlabel">  </td>
-						<td class=input colspan=3>
-							&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-							 <bean:message key="label.candidateAnswers"/> 
-
-							 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-
-							 <bean:message key="label.isCorrect"/>  
-							
-							&nbsp&nbsp&nbsp&nbsp
-
-
-							 <bean:message key="label.actions"/> 
-						</td>
-					</tr>
-					-->
-					
 					<tr> <td colspan=4 align=center valign=top width="100%">
 					
 					<table align="center" border="1">
@@ -53,7 +44,7 @@
 						 </tr>					
 					     <tr>
 							  	<td bgcolor="#EEEEEE" colspan=4 class="input" valign=top align=right>
-									<html:submit property="addOption" styleClass="a.button" >
+									<html:submit onclick="javascript:submitMethod('addOption');" styleClass="a.button" >
 										<bean:message key="label.add.option"/>
 									</html:submit>	 				 		  										  		
 						  	</td>
@@ -93,7 +84,7 @@
 										</td>
 	
 										<td bgcolor="#EEEEEE" class="input" valign=top>
-	       								    <img src="images/delete.gif" align=left onclick="javascript:document.forms[0].removeOption.value=1; document.forms[0].deletableOptionIndex.value=1; document.forms[0].submit();">
+	       								    <img src="images/delete.gif" align=left onclick="javascript:deleteOption(1,'removeOption');">
 									  	</td>
 							 </tr>
 							</c:if> 			
@@ -128,7 +119,7 @@
 										</td>
 	
 										<td bgcolor="#EEEEEE" class="input" valign=top>
-	       								    <img src="images/delete.gif" align=left onclick="javascript:document.forms[0].removeOption.value=1; document.forms[0].deletableOptionIndex.value=<c:out value="${optionIndex}"/>; document.forms[0].submit();">
+	       								    <img src="images/delete.gif" align=left onclick="javascript:deleteOption(<c:out value="${optionIndex}"/>,'removeOption');">
     								  	</td>
 								  </tr>
 							</c:if> 			
@@ -138,7 +129,6 @@
 					</table> </td> </tr>	
 					
 					<html:hidden property="deletableOptionIndex"/>							
-					<html:hidden property="removeOption"/>
 					
 					<tr>
 	 				 	<td colspan=4 align=center valign=top>								
@@ -177,7 +167,7 @@
 	 				 <tr>
 	 				 <td valign=top> </td>
 	 				 <td class="input" align=left colspan=3 valign=top>
-							<html:submit property="doneOptions" styleClass="a.button">
+							<html:submit onclick="javascript:submitMethod('doneOptions');" styleClass="a.button">
 								<bean:message key="button.done"/>
 							</html:submit>	 				 		  										  		
 		 			  	</td>

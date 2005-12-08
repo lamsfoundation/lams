@@ -16,6 +16,7 @@ String root = protocol+request.getServerName()+":"+request.getServerPort()+reque
 String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
 %>
 
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html>
 <head>
@@ -37,6 +38,25 @@ function MM_reloadPage(init) {  //reloads the window if Nav4 resized
 MM_reloadPage(true);
 //-->
 </script>
+
+<script language="JavaScript" type="text/JavaScript">
+<!--
+
+// The following method submit and the submit methods in the included jsp files submit the 
+// form as required for the DispatchAction. All form submissions must go via these scripts - do not
+// define an submit button with "dispatch" as the property or 
+// "document.McAuthoringForm.dispatch.value=buttonResourceText" will not work
+
+// general submit
+// actionMethod: name of the method to be called in the DispatchAction
+function submitMethod(actionMethod) {
+	document.McAuthoringForm.dispatch.value=actionMethod; 
+	document.McAuthoringForm.submit();
+}
+
+//-->     
+</script>
+
 </head>
 <body onLoad="initTabs(); showTab('i');">
 
@@ -85,7 +105,9 @@ MM_reloadPage(true);
 
 <!-- end tab buttons -->
 
-<html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
+<html:form  action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+
+<html:hidden property="dispatch"/>
 
  <!-- tab content one (basic)-->
 <div id='content_b' class="tabbody content_b" >

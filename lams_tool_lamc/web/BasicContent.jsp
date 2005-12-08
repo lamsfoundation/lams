@@ -5,6 +5,17 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
+<script language="JavaScript" type="text/JavaScript">
+<!--
+// move up/down, edit, remove question 
+// questionIndexValue: index of question affected
+// actionMethod: name of the method to be called in the DispatchAction
+function submitModifyQuestion(questionIndexValue, actionMethod) {
+	document.McAuthoringForm.questionIndex.value=questionIndexValue; 
+	submitMethod(actionMethod);
+}
+//-->     
+</script>
 					<table class="forms">
 					
  						<tr> 
@@ -59,7 +70,7 @@
 						 </tr>					
 					     <tr>
 							  	<td bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
-									<html:submit property="addQuestion" styleClass="a.button" >
+									<html:submit styleClass="a.button" onclick="javascript:submitMethod('addNewQuestion');">
 										<bean:message key="label.add.question"/>
 									</html:submit>	 				 		  										  		
 						  	</td>
@@ -79,16 +90,16 @@
 
 							  	<td bgcolor="#EEEEEE" class="input"  align=center valign=top>			
 							 		<c:if test="${sessionScope.queIndex == 1}"> 		
-	   								    <img src="images/down.gif" align=left onclick="javascript:document.forms[0].moveDown.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">
+	   								    <img src="images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">
 	   								</c:if> 			
 	
 					  				<c:if test="${sessionScope.maxQuestionIndex == sessionScope.queIndex}"> 			
-	     								 <img src="images/up.gif" align=left onclick="javascript:document.forms[0].moveUp.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">		  	
+	     								 <img src="images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
 	     							</c:if> 	    
 									
 	 				  				<c:if test="${(sessionScope.maxQuestionIndex != sessionScope.queIndex) && (sessionScope.queIndex != 1)}"> 			
-	   								    <img src="images/down.gif" align=left onclick="javascript:document.forms[0].moveDown.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">		  	   								 
-	       								<img src="images/up.gif" align=left onclick="javascript:document.forms[0].moveUp.value=1; document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].submit();">		  	
+	   								    <img src="images/down.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionDown');">		  	   								 
+	       								<img src="images/up.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','moveQuestionUp');">		  	
 									</c:if> 	           								 
                                 </td>
 
@@ -103,18 +114,14 @@
                                     </td>
 																					
                                    <td bgcolor="#EEEEEE" class="input" valign=top>								
-										<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].editOptions.value=1; document.forms[0].submit();">	                                            			  	
-										<img src="images/delete.gif" align=left onclick="javascript:document.forms[0].questionIndex.value=<c:out value="${queIndex}"/>; document.forms[0].removeQuestion.value=1; document.forms[0].submit();">                                               		  														
+										<img src="images/edit.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','editOptions');">	
+										<img src="images/delete.gif" align=left onclick="javascript:submitModifyQuestion('<c:out value="${queIndex}"/>','removeQuestion');">	
 								  	</td>
 							  </tr>
 						</c:forEach>
 						
 					</table> </td> </tr>
 							<html:hidden property="questionIndex"/>
-							<html:hidden property="editOptions"/>
-							<html:hidden property="removeQuestion"/>
-							<html:hidden property="moveDown"/>							
-							<html:hidden property="moveUp"/>														
 					<tr>
 	 				 	<td colspan=5 align=center>
 
@@ -145,7 +152,7 @@
 	 				 <tr>
  						<td valign=top> </td> 
 						<td class="input" colspan=3 align=left valign=top>								
-							<html:submit property="submitQuestions" styleClass="a.button">
+							<html:submit onclick="javascript:submitMethod('submitQuestions');" styleClass="a.button">
 								<bean:message key="button.submit"/>
 							</html:submit>	 				 		  					
 												  		

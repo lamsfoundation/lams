@@ -5,6 +5,20 @@
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
+<script language="JavaScript" type="text/JavaScript">
+<!--
+
+// view a particular item in a file
+// questionIndexValue: index of question affected
+// actionMethod: name of the method to be called in the DispatchAction
+function viewFileItem(fileItemValue, actionMethod) {
+	document.McAuthoringForm.fileItem.value=fileItemValue; 
+	submitMethod(actionMethod);
+}
+
+//-->     
+</script>
+
 				<table class="forms">
 				<tr> 
 					<td class="formlabel" valign=top>
@@ -23,8 +37,8 @@
           			</td>
           			<td colspan=3 NOWRAP valign=top> 
 						<html:file  property="theOfflineFile"></html:file>
-					 	<html:submit property="submitOfflineFile" styleClass="a.button">
-								<bean:message key="label.upload"/>
+					 	<html:submit styleClass="a.button" onclick="javascript:submitMethod('submitOfflineFiles');">
+								<bean:message key="button.upload"/>
 						</html:submit>
 					</td> 
 
@@ -39,7 +53,7 @@
 									<tr>
 								         <td valign=top><font size=2> <b> <c:out value='${item}'/> </b> </font> </td>
 								      	<td valign=top>
-								      		<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].fileItem.value='<c:out value='${item}'/>' ; document.forms[0].viewFileItem.value=1; document.forms[0].submit();">	  										  		
+								      		<img src="images/edit.gif" align=left onclick="javascript:viewFileItem('<c:out value="${item}"/>','viewFileItem');">
 								      	</td>
 								     </tr> 	
 				         			</c:forEach>
@@ -63,8 +77,8 @@
           			</td>
           			<td colspan=3 NOWRAP valign=top> 
 						<html:file  property="theOnlineFile"></html:file>
-					 	<html:submit property="submitOnlineFile" styleClass="a.button">
-								<bean:message key="label.upload"/>
+					 	<html:submit onclick="javascript:submitMethod('submitOnlineFiles');">
+								<bean:message key="button.upload"/>
 						</html:submit>
 					</td> 
 				</tr>
@@ -80,7 +94,7 @@
 										<tr>									
 									         <td valign=top><font size=2> <b> <c:out value='${item}'/> </b> </font> </td>
 									      	<td valign=top>
-									      		<img src="images/edit.gif" align=left onclick="javascript:document.forms[0].fileItem.value='<c:out value='${item}'/>' ; document.forms[0].viewFileItem.value=1; document.forms[0].submit();">	  										  		
+									      		<img src="images/edit.gif" align=left onclick="onclick="javascript:viewFileItem('<c:out value="${item}"/>','viewFileItem');">	  										  		
 									      	</td>
 					         			</tr>								      	
 				         			</c:forEach>
@@ -89,8 +103,6 @@
 				</tr>
 
 				<html:hidden property="fileItem"/>
-				<html:hidden property="viewFileItem"/>
-
 
 		  		<tr>
  				 	<td colspan=4 align=center valign=top>								
@@ -102,7 +114,7 @@
 				 	<td valign=top>								
 				  	</td>
 					 <td colspan=3 valign=top> 
-						 <html:submit property="instructionsTabDone" styleClass="a.button">
+						 <html:submit onclick="javascript:submitMethod('doneInstructionsTab');">
 							<bean:message key="button.done"/>
 						</html:submit>
 					</td> 

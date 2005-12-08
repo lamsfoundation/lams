@@ -37,12 +37,31 @@ function MM_reloadPage(init) {  //reloads the window if Nav4 resized
 MM_reloadPage(true);
 //-->
 </script>
+
+<script language="JavaScript" type="text/JavaScript">
+<!--
+
+// The following method submit and the submit methods in the included jsp files submit the 
+// form as required for the DispatchAction. All form submissions must go via these scripts - do not
+// define an submit button with "dispatch" as the property or 
+// "document.McAuthoringForm.dispatch.value=buttonResourceText" will not work
+
+// general submit
+// actionMethod: name of the method to be called in the DispatchAction
+function submitMethod(actionMethod) {
+	document.McAuthoringForm.dispatch.value=actionMethod; 
+	document.McAuthoringForm.submit();
+}
+
+//-->     
+</script>
 </head>
 <body onLoad="initTabs()">
 
 
 <h1><bean:message key="label.authoring.mc"/></h1>
     
+
     <!-- start tabs -->
 <!-- tab holder table -->
 <table border="0" cellspacing="0" cellpadding="0">
@@ -85,10 +104,12 @@ MM_reloadPage(true);
 
 <!-- end tab buttons -->
 
-<html:form  action="/authoring?method=loadQ&validate=false" enctype="multipart/form-data" method="POST" target="_self">
+<html:form  action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 
  <!-- tab content one (basic)-->
  
+<html:hidden property="dispatch"/>
+
 <div id='content_b' class="tabbody content_b" >
 
 		<h2><bean:message key="label.authoring.mc.basic"/></h2>

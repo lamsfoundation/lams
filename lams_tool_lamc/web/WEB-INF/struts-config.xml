@@ -71,7 +71,7 @@
       name="McAuthoringForm"
       scope="session"
       input=".questions"
-      parameter="method"
+      parameter="dispatch"
       unknown="false"
       validate="true"
     >
@@ -165,12 +165,6 @@
 		    redirect="true"
 	  	/>
 	  	
-	  	<forward
-		    name="singleQuestionAnswers"
-		    path=".singleQuestionAnswers"
-		    redirect="true"
-	  	/>
-
 	  	<forward
 		    name="resultsSummary"
 		    path=".resultsSummary"

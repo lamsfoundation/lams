@@ -84,7 +84,7 @@
 						&nbsp&nbsp
 				  	</td>
 					 <td valign=top> 
-						 <html:submit property="advancedTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+						 <html:submit onclick="javascript:submitMethod('doneAdvancedTab');" >
 							<bean:message key="button.done"/>
 						</html:submit>
 					</td> 

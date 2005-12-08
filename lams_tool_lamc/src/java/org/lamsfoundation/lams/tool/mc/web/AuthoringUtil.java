@@ -37,6 +37,17 @@ public class AuthoringUtil implements McAppConstants {
 	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
 	
 	
+    public static void readData(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+    {
+    	/** define the next tab as Basic tab by default*/
+     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+    	logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
+     	
+     	McUtils.persistRichText(request);
+     	AuthoringUtil.populateParameters(request, mcAuthoringForm);	
+    }
+ 	
+	
 	/**
      * populates request parameters
      * populateParameters(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
@@ -53,62 +64,6 @@ public class AuthoringUtil implements McAppConstants {
     	{
     		request.getSession().setAttribute(SELECTED_QUESTION,selectedQuestion);
     		logger.debug("updated SELECTED_QUESTION");
-    	}
-    	
-    	
-    	mcAuthoringForm.setRemoveQuestion(null);
-    	mcAuthoringForm.setEditOptions(null);
-    	mcAuthoringForm.setMoveUp(null);
-    	mcAuthoringForm.setMoveDown(null);
-    	mcAuthoringForm.setRemoveOption(null);
-    	mcAuthoringForm.setViewFileItem(null);
-    	
-    	String editOptions=request.getParameter("editOptions");
-    	logger.debug("parameter editOptions" + editOptions);
-    	if ((editOptions != null) && editOptions.equals("1"))
-    	{
-    		logger.debug("parameter editOptions is selected " + editOptions);
-    		mcAuthoringForm.setEditOptions("1");
-    	}
-    	
-    	String removeQuestion=request.getParameter("removeQuestion");
-    	logger.debug("parameter removeQuestion" + removeQuestion);
-    	if ((removeQuestion != null) && removeQuestion.equals("1"))
-    	{
-    		logger.debug("parameter removeQuestion is selected " + removeQuestion);
-    		mcAuthoringForm.setRemoveQuestion("1");
-    	}
-    	
-    	String moveDown=request.getParameter("moveDown");
-    	logger.debug("parameter moveDown" + moveDown);
-    	if ((moveDown != null) && moveDown.equals("1"))
-    	{
-    		logger.debug("parameter moveDown is selected " + moveDown);
-    		mcAuthoringForm.setMoveDown("1");
-    	}
-
-    	String moveUp=request.getParameter("moveUp");
-    	logger.debug("parameter moveUp" + moveUp);
-    	if ((moveUp != null) && moveUp.equals("1"))
-    	{
-    		logger.debug("parameter moveUp is selected " + moveUp);
-    		mcAuthoringForm.setMoveUp("1");
-    	}
-    	
-    	String removeOption=request.getParameter("removeOption");
-    	logger.debug("parameter removeOption" + removeOption);
-    	if ((removeOption != null) && removeOption.equals("1"))
-    	{
-    		logger.debug("parameter removeOption is selected " + removeOption);
-    		mcAuthoringForm.setRemoveOption("1");
-    	}
-    	
-    	String viewFileItem=request.getParameter("viewFileItem");
-    	logger.debug("parameter viewFileItem" + viewFileItem);
-    	if ((viewFileItem != null) && viewFileItem.equals("1"))
-    	{
-    		logger.debug("parameter viewFileItem is selected " + viewFileItem);
-    		mcAuthoringForm.setViewFileItem("1");
     	}
     }
 

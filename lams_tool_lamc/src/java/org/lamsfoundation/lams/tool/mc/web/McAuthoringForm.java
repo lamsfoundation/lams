@@ -13,16 +13,6 @@ import org.apache.struts.upload.FormFile;
 public class McAuthoringForm extends ActionForm implements McAppConstants {
 	/* form controllers */
 	protected String addOptionContent;	
-	protected String addQuestion;
-	protected String removeQuestion;
-	protected String submitQuestions;
-	
-	protected String editOptions;
-	protected String addOption;
-	protected String removeOption;
-	protected String doneOptions;
-	protected String moveDown;
-	protected String moveUp;
 	
 	protected String questionIndex;
 	protected String optionIndex;
@@ -31,11 +21,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	
 	protected String editDefaultQuestion;
 	protected String removeOptionContent;
-	protected String advancedTabDone;
-	protected String instructionsTabDone;
 	
 	protected String fileItem;
-	protected String viewFileItem;
 	protected FormFile receivedFile;
 	
 	protected String addContent;
@@ -46,7 +33,9 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String submitOfflineFile;
 	protected String submitOnlineFile;
 	
-		
+	// dispatch controls which method is called by the Lookup map */
+	protected String dispatch;	
+	
 	/* tab controller, these may go away once the Flash wraps the jsp */
 	protected String choice;
 	protected String choiceBasic;
@@ -96,20 +85,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.editDefaultQuestion=null;
 		this.addOptionContent=null;	
 		this.removeOptionContent=null;
-		this.addQuestion=null;
-		this.removeQuestion=null;
-		this.editOptions=null;
-		this.addOption=null;
-		this.removeOption=null;
-		this.doneOptions=null;
-		this.submitQuestions=null;
-		this.advancedTabDone=null;
-		this.instructionsTabDone=null;
-		this.moveDown=null;
-		this.moveUp=null;
 		
 		this.fileItem=null;
-		this.viewFileItem=null;
 		
     	this.addContent=null;	
     	this.removeContent=null;
@@ -118,6 +95,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
     	this.submitTabDone=null;
     	this.submitOfflineFile=null;
     	this.submitOnlineFile=null;
+    	
+    	this.dispatch=null;
     	
     	this.summaryMonitoring=null;
     	this.instructionsMonitoring=null;
@@ -131,20 +110,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.editDefaultQuestion=null;
 		this.addOptionContent=null;	
 		this.removeOptionContent=null;
-		this.addQuestion=null;
-		this.removeQuestion=null;
-		this.editOptions=null;
-		this.addOption=null;	
-		this.removeOption=null;
-		this.doneOptions=null;		
-		this.submitQuestions=null;
-		this.advancedTabDone=null;
-		this.instructionsTabDone=null;
-		this.moveDown=null;
-		this.moveUp=null;
 		
 		this.fileItem=null;
-		this.viewFileItem=null;
 		this.receivedFile=null;
 		
 		this.addContent=null;
@@ -155,7 +122,9 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.submitOfflineFile=null;
 		this.submitOnlineFile=null;
 
-		this.choice=null;
+    	this.dispatch=null;
+
+    	this.choice=null;
 		this.choiceBasic=null;
 		this.choiceAdvanced=null;
 		this.choiceInstructions=null;
@@ -642,54 +611,6 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.removeOptionContent = removeOptionContent;
 	}
 	/**
-	 * @return Returns the addQuestion.
-	 */
-	public String getAddQuestion() {
-		return addQuestion;
-	}
-	/**
-	 * @param addQuestion The addQuestion to set.
-	 */
-	public void setAddQuestion(String addQuestion) {
-		this.addQuestion = addQuestion;
-	}
-	/**
-	 * @return Returns the removeQuestion.
-	 */
-	public String getRemoveQuestion() {
-		return removeQuestion;
-	}
-	/**
-	 * @param removeQuestion The removeQuestion to set.
-	 */
-	public void setRemoveQuestion(String removeQuestion) {
-		this.removeQuestion = removeQuestion;
-	}
-	/**
-	 * @return Returns the editOptions.
-	 */
-	public String getEditOptions() {
-		return editOptions;
-	}
-	/**
-	 * @param editOptions The editOptions to set.
-	 */
-	public void setEditOptions(String editOptions) {
-		this.editOptions = editOptions;
-	}
-	/**
-	 * @return Returns the addOption.
-	 */
-	public String getAddOption() {
-		return addOption;
-	}
-	/**
-	 * @param addOption The addOption to set.
-	 */
-	public void setAddOption(String addOption) {
-		this.addOption = addOption;
-	}
-	/**
 	 * @return Returns the optionIndex.
 	 */
 	public String getOptionIndex() {
@@ -738,42 +659,6 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.passmark = passmark;
 	}
 	/**
-	 * @return Returns the removeOption.
-	 */
-	public String getRemoveOption() {
-		return removeOption;
-	}
-	/**
-	 * @param removeOption The removeOption to set.
-	 */
-	public void setRemoveOption(String removeOption) {
-		this.removeOption = removeOption;
-	}
-	/**
-	 * @return Returns the doneOptions.
-	 */
-	public String getDoneOptions() {
-		return doneOptions;
-	}
-	/**
-	 * @param doneOptions The doneOptions to set.
-	 */
-	public void setDoneOptions(String doneOptions) {
-		this.doneOptions = doneOptions;
-	}
-	/**
-	 * @return Returns the submitQuestions.
-	 */
-	public String getSubmitQuestions() {
-		return submitQuestions;
-	}
-	/**
-	 * @param submitQuestions The submitQuestions to set.
-	 */
-	public void setSubmitQuestions(String submitQuestions) {
-		this.submitQuestions = submitQuestions;
-	}
-	/**
 	 * @return Returns the selectedIndex.
 	 */
 	public String getSelectedIndex() {
@@ -784,30 +669,6 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setSelectedIndex(String selectedIndex) {
 		this.selectedIndex = selectedIndex;
-	}
-	/**
-	 * @return Returns the advancedTabDone.
-	 */
-	public String getAdvancedTabDone() {
-		return advancedTabDone;
-	}
-	/**
-	 * @param advancedTabDone The advancedTabDone to set.
-	 */
-	public void setAdvancedTabDone(String advancedTabDone) {
-		this.advancedTabDone = advancedTabDone;
-	}
-	/**
-	 * @return Returns the instructionsTabDone.
-	 */
-	public String getInstructionsTabDone() {
-		return instructionsTabDone;
-	}
-	/**
-	 * @param instructionsTabDone The instructionsTabDone to set.
-	 */
-	public void setInstructionsTabDone(String instructionsTabDone) {
-		this.instructionsTabDone = instructionsTabDone;
 	}
 	/**
 	 * @return Returns the deletableOptionIndex.
@@ -834,30 +695,6 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.sln = sln;
 	}
 	/**
-	 * @return Returns the moveDown.
-	 */
-	public String getMoveDown() {
-		return moveDown;
-	}
-	/**
-	 * @param moveDown The moveDown to set.
-	 */
-	public void setMoveDown(String moveDown) {
-		this.moveDown = moveDown;
-	}
-	/**
-	 * @return Returns the moveUp.
-	 */
-	public String getMoveUp() {
-		return moveUp;
-	}
-	/**
-	 * @param moveUp The moveUp to set.
-	 */
-	public void setMoveUp(String moveUp) {
-		this.moveUp = moveUp;
-	}
-	/**
 	 * @return Returns the fileItem.
 	 */
 	public String getFileItem() {
@@ -870,18 +707,6 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.fileItem = fileItem;
 	}
 	/**
-	 * @return Returns the viewFileItem.
-	 */
-	public String getViewFileItem() {
-		return viewFileItem;
-	}
-	/**
-	 * @param viewFileItem The viewFileItem to set.
-	 */
-	public void setViewFileItem(String viewFileItem) {
-		this.viewFileItem = viewFileItem;
-	}
-	/**
 	 * @return Returns the receivedFile.
 	 */
 	public FormFile getReceivedFile() {
@@ -892,5 +717,13 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setReceivedFile(FormFile receivedFile) {
 		this.receivedFile = receivedFile;
+	}
+
+	public String getDispatch() {
+		return dispatch;
+	}
+
+	public void setDispatch(String buttonValue) {
+		this.dispatch = buttonValue;
 	}
 }

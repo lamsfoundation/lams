@@ -121,7 +121,7 @@
 																	<c:if test="${mainEntry.value == 'true'}"> 		
 																		<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackCorrect}">
 																			<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
-																				    <img src="images/success.gif" align=right width=20 height=20>
+																				    <img src="images/tick.gif" align=right width=20 height=20>
 																			</c:if> 																																				
 																		</c:forEach>											
 																	</c:if> 														
@@ -129,7 +129,7 @@
 																	<c:if test="${mainEntry.value == 'false'}"> 		
 																		<c:forEach var="feedbackEntry" items="${sessionScope.mapLeanerFeedbackIncorrect}">
 																			<c:if test="${feedbackEntry.key == sessionScope.queIndex}"> 		
-																				    <img src="images/error.jpg" align=right width=20 height=20>
+																				    <img src="images/cross.gif" align=right width=20 height=20>
 																			</c:if> 																																				
 																		</c:forEach>											
 																	</c:if> 														

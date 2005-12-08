@@ -1,21 +1,21 @@
 CREATE TABLE lams.tl_lamc11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , content_id BIGINT(20) NOT NULL
-     , title VARCHAR(250) NOT NULL DEFAULT 'Multiple Choice'
-     , instructions VARCHAR(250) NOT NULL DEFAULT 'Please answer the questions until you reach the passmark.'
+     , title VARCHAR(250) NOT NULL
+     , instructions VARCHAR(250) NOT NULL
      , creation_date VARCHAR(100)
      , update_date DATETIME
      , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
      , username_visible TINYINT(1) NOT NULL DEFAULT 0
      , created_by BIGINT(20) NOT NULL DEFAULT 0
-     , monitoring_report_title VARCHAR(100) NOT NULL DEFAULT 'Combined Learner Results'
-     , report_title VARCHAR(100) NOT NULL DEFAULT 'Multiple Choice'
+     , monitoring_report_title VARCHAR(100) NOT NULL
+     , report_title VARCHAR(100) NOT NULL
      , run_offline TINYINT(1) NOT NULL DEFAULT 0
      , define_later TINYINT(1) NOT NULL DEFAULT 0
      , synch_in_monitor TINYINT(1) NOT NULL DEFAULT 0
-     , offline_instructions VARCHAR(250) NOT NULL DEFAULT 'offline instructions'
-     , online_instructions VARCHAR(250) NOT NULL DEFAULT 'online instructions'
-     , end_learning_message VARCHAR(150) NOT NULL DEFAULT 'Thank you!'
+     , offline_instructions TEXT
+     , online_instructions TEXT
+     , end_learning_message VARCHAR(150) NOT NULL
      , content_in_use TINYINT(1) NOT NULL DEFAULT 0
      , retries TINYINT(1) NOT NULL DEFAULT 0
      , show_feedback TINYINT(1) NOT NULL DEFAULT 0
@@ -114,7 +114,7 @@ CREATE TABLE lams.tl_lamc11_uploadedFile (
 )TYPE=InnoDB;
 
 
-INSERT INTO lams.tl_lamc11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report) VALUES (1, ${default_content_id} ,'Mc Title','Mc Instructions', NOW(), 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','instructions','Finished Activity...', 0, 0, 0, 0);
+INSERT INTO lams.tl_lamc11_content(uid, content_id , title , instructions , creation_date , questions_sequenced , username_visible , created_by , monitoring_report_title , report_title , run_offline , define_later, synch_in_monitor, offline_instructions, online_instructions, end_learning_message, content_in_use, retries, show_feedback, show_report) VALUES (1, ${default_content_id} ,'Mc Title','Mc Instructions', NOW(), 0, 0,1,'Monitoring Report','Report', 0, 0, 0,'offline instructions','online instructions','Finished Activity...', 0, 0, 0, 0);
 
 INSERT INTO lams.tl_lamc11_que_content  (uid,question, weight, disabled, display_order,  mc_content_id) VALUES (1, 'a sample question', 0, 1, 1,	1);
 	
