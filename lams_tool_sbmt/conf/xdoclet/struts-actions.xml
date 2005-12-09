@@ -1,0 +1,19 @@
+		<!-- ========== Action Mapping Definitions ============================== -->
+		<action path="/definelater"
+			type="org.lamsfoundation.lams.tool.sbmt.web.MonitoringAction"
+			name="emptyForm" 
+			scope="request" 
+			parameter="method" 
+			validate="false">
+			      <forward
+			        name="definelater"
+			        path="/monitoring/definelater.jsp"
+			        redirect="false"
+			      />
+			      <forward
+			        name="definelatersuccess"
+			        path="/monitoring/definelater.jsp"
+			        redirect="false"
+			      />
+		</action>
+

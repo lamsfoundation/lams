@@ -63,7 +63,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                scope="request" 
  *                validate="true"
  * 
- * @struts.action-forward name="success" path="/authoring/success.jsp"
+ * @struts.action-forward name="success" path="/authoring/authoring.jsp"
  * @struts.action-exception 
  * 				type="org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException" 
  * 				key="authoring.exception"

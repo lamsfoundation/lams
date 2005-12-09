@@ -20,7 +20,7 @@
 		<h1><fmt:message key="label.authoring.heading.basic.desc" /></h1>
 		<table class="forms">
 			<!--hidden field contentID passed by flash-->
-			<input type="hidden" name="toolContentID" value="<c:out value='${authoring.contentID}'/>"/>
+			<input type="hidden" name="toolContentID" value="<c:out value='${sessionScope.toolContentID}'/>"/>
 			<input type="hidden" name="method" value="editActivity"/>
 			<!-- Title Row -->
 			<tr>

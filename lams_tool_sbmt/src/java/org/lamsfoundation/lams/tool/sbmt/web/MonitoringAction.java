@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -71,12 +72,12 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action-forward name="allUserMarks" path="/monitoring/viewallmarks.jsp"
  * 
  * @struts.action-forward name="instructions" path="/monitoring/instructions.jsp"
- * 
  * @struts.action-forward name="showActivity" path="/monitoring/showactivity.jsp"
  * @struts.action-forward name="editActivity" path="/monitoring/editactivity.jsp"
- * @struts.action-forward name="success" path="/monitoring/success.jsp"
+ * @struts.action-forward name="success" path="/monitoring/showactivity.jsp"
  * 
  * @struts.action-forward name="statistic" path="/monitoring/statistic.jsp"
+ * 
  * 
  */
 public class MonitoringAction extends DispatchAction {
@@ -115,7 +116,7 @@ public class MonitoringAction extends DispatchAction {
 			   HttpServletRequest request,
 			   HttpServletResponse response){
 		//Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));		
-        Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+        Long contentID = (Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		submitFilesService = getSubmitFilesService();
 		//List userList = submitFilesService.getUsers(sessionID);
         List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
@@ -250,8 +251,9 @@ public class MonitoringAction extends DispatchAction {
 		submitFilesService = getSubmitFilesService();
 		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
 		submitFilesService.releaseMarksForSession(sessionID);
-		//todo: need display some success info
-		return mapping.findForward("userMarks");
+		
+		//echo message back
+		return userList(mapping, form, request, response);
 	}
 	public ActionForward downloadMarks(ActionMapping mapping,
 			   ActionForm form,
@@ -388,7 +390,8 @@ public class MonitoringAction extends DispatchAction {
 			   HttpServletRequest request,
 			   HttpServletResponse response){
 
-		getAuthoringActivity(form, request);
+		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		getAuthoringActivity(contentID, request);
 		return mapping.findForward("showActivity");
 	}
 	/**
@@ -403,9 +406,13 @@ public class MonitoringAction extends DispatchAction {
 			   ActionForm form,
 			   HttpServletRequest request,
 			   HttpServletResponse response){
-		
-		getAuthoringActivity(form, request);
-		return mapping.findForward("editActivity");
+		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		getAuthoringActivity(contentID, request);
+		String mode = request.getParameter("mode");
+		if(StringUtils.equals(mode,"definelater"))
+			return mapping.findForward("definelater");
+		else
+			return mapping.findForward("editActivity");
 	}
 	/**
 	 * Update activity to database. The information will be same with "Basic" tab in authoring page.
@@ -431,7 +438,13 @@ public class MonitoringAction extends DispatchAction {
 		content.setInstruction(instructions);
 		submitFilesService.saveOrUpdateContent(content);
 		
-		return mapping.findForward("success");
+		getAuthoringActivity(contentID, request);
+		
+		String mode = request.getParameter("mode");
+		if(StringUtils.equals(mode,"definelater"))
+			return mapping.findForward("definelatersuccess");
+		else
+			return mapping.findForward("success");
 	}
 	/**
 	 * Provide statistic information. Includes:<br>
@@ -487,11 +500,11 @@ public class MonitoringAction extends DispatchAction {
 		return mapping.findForward("statistic");
 	}
 	/**
+	 * @param request 
 	 * @param form
 	 * @param request
 	 */
-	private void getAuthoringActivity(ActionForm form, HttpServletRequest request) {
-		Long contentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+	private void getAuthoringActivity(Long contentID, ServletRequest request) {
 		
 		//get back the upload file list and display them on page
 		submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this

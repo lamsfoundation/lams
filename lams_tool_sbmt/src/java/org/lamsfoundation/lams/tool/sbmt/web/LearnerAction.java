@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 			validate="false"
  * 
  * @struts.action-forward name="upload" path="/learner/sbmtLearner.jsp"
- * @struts.action-forward name="finish" path="/learner/finish.jsp"
  * @struts.action-forward name="contentInUse" path="/learner/contentinuse.jsp"
  * 
  */
@@ -226,8 +225,10 @@ public class LearnerAction extends DispatchAction {
 			}
 			return null;
 		}
-		 request.getSession().setAttribute(SbmtConstants.READ_ONLY_MODE, "true");
-		return mapping.findForward("finish");
+		
+		request.getSession().setAttribute(SbmtConstants.READ_ONLY_MODE, "true");
+		return returnErrors(mapping,request,"error.read.only.mode","upload");
+		
 	}
 	/**
 	 * This is a utily function for forwarding the errors to the respective JSP

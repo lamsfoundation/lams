@@ -82,11 +82,6 @@
         redirect="false"
       />
       <forward
-        name="finish"
-        path="/learner/finish.jsp"
-        redirect="false"
-      />
-      <forward
         name="contentInUse"
         path="/learner/contentinuse.jsp"
         redirect="false"
@@ -138,7 +133,7 @@
       />
       <forward
         name="success"
-        path="/monitoring/success.jsp"
+        path="/monitoring/showactivity.jsp"
         redirect="false"
       />
       <forward
@@ -172,12 +167,30 @@
       />
       <forward
         name="success"
-        path="/authoring/success.jsp"
+        path="/authoring/authoring.jsp"
         redirect="false"
       />
     </action>
 
-    <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
+   		<!-- ========== Action Mapping Definitions ============================== -->
+		<action path="/definelater"
+			type="org.lamsfoundation.lams.tool.sbmt.web.MonitoringAction"
+			name="emptyForm" 
+			scope="request" 
+			parameter="method" 
+			validate="false">
+			      <forward
+			        name="definelater"
+			        path="/monitoring/definelater.jsp"
+			        redirect="false"
+			      />
+			      <forward
+			        name="definelatersuccess"
+			        path="/monitoring/definelater.jsp"
+			        redirect="false"
+			      />
+		</action>
+
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
