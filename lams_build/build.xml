@@ -28,13 +28,14 @@
 		<echo>   2. assemble-ear</echo>
 		<echo>   3. manually refresh the project</echo>
 		<echo>   4. deploy-ear</echo>
+		<echo>   5. deploy-tools</echo>
 		<echo>Do not try to assemble and deploy in the same run - if you do,</echo>
 		<echo>Eclipse may not deploy all of the newly created files.</echo>
 	</target>
 
 	<!-- clean dirs for this script only -->
 	<target name="clean" description="cleans assembly">
-		<delete includeEmptyDirs="true" dir="${assembly}"
+		<delete dir="${assembly}"
 			includes="**/*" />
 	</target>
 
@@ -168,7 +169,7 @@
 	<!-- Deploy IMS Content Package tool to the depoloyed ear 							-->
 	<!--  Relies on the tools using the parameter jboss.deploy							-->						
 	<!-- ============================================================================== -->
-	<target name="deploy-tools">
+	<target name="deploy-tools" description="Deploy the tools, including any special parallel activities">
  		<ant antfile="../${tool_forum_dir}/build.xml" target="deploy-tool"
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
@@ -197,6 +198,7 @@
 				inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 		</ant> -->
+		<ant target="deploy-learning-libraries"/>
 	</target>
 	
 	<!-- ============================================================================== -->
@@ -274,4 +276,91 @@
 		<ant antfile="../${tool_survey_dir}/build.xml" target="test-report" inheritAll="false"/>
 	-->
 	</target>
+	
+	
+	<!-- Build the parallel activities and other complex activities. Must be done after -->
+	<!-- the tools are deployed -->
+	
+	<!-- Generate the deployment package for nb/submit parallel activity. -->
+	<target name="create-nbsubmit-deploy-package-library" depends="">
+
+			<path id="deploy.lib.classpath">
+				<fileset dir="${deploy.tool.dir}">
+					<include name="lib/*.jar"/>
+				</fileset>
+			</path> 
+				  
+			<property name="assembly.activity" value="${basedir}/assembly/nbsubmit"/>
+			<property name="package.cfg" value="librarypackages/nbsubmit"/>
+		
+			<mkdir dir="${assembly.activity}/"/>
+			<mkdir dir="${assembly.activity}/lib"/> 
+			<mkdir dir="${assembly.activity}/sql"/> 
+		
+			<copy overwrite="yes" todir="${assembly.activity}/sql">
+				<fileset dir="${package.cfg}">
+					<include name="learninglibrary1_insert.sql"/>
+					<include name="libraryActivity1_insert.sql"/>
+					<include name="toolActivity1_insert.sql"/>
+					<include name="toolActivity2_insert.sql"/>
+				</fileset>
+			</copy>
+
+		   <copy overwrite="yes" file="${package.cfg}/deployLibrary.xml"
+					   	tofile="${assembly.activity}/deploy.xml" >
+			  <!-- replace @assemblydir@ in the xml template - this allows it to run under any directory structure -->
+		        <filterchain>
+		            <striplinecomments>
+		               <comment value="!"/>
+		            </striplinecomments>
+		           <replacetokens>
+		                <token key="assemblydir" value="${assembly.activity}/sql"/>
+		            </replacetokens>
+		        </filterchain>
+		    </copy>
+
+			<copy overwrite="yes" todir="${assembly.activity}/lib">
+				<fileset dir="${deploy.tool.dir}/lib">
+					<include name="*.jar"/>
+				</fileset>
+			</copy>
+
+			<taskdef name="generateDeployLibraryProperties" 
+				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.CreateLibraryPackageTask">
+			    <classpath refid="deploy.lib.classpath"/>
+			</taskdef>
+
+			<generateDeployLibraryProperties depends="compile" 
+				mode="development" 
+				outputPath="${assembly.activity}"
+				configFile="${assembly.activity}/deploy.xml"
+				dbPassword="${db.password}"
+				dbUsername="${db.username}"
+				dbDriverUrl="${db.url}"
+				dbDriverClass="com.mysql.jdbc.Driver"	
+				/>
+		
+		
+		</target>
+
+		<!-- deploy the complex activities to the library -->
+		<target name="deploy-learning-libraries" depends="create-nbsubmit-deploy-package-library">
+
+				<path id="deploy.classpath">
+					<fileset dir="${assembly.activity}">
+						<include name="lib/*.jar"/>
+					</fileset>
+				</path> 
+
+				<echo>Deploying Library Activities</echo>
+		
+				<java
+					classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.DeployLibrary"
+					classpathref="deploy.classpath"
+					fork="true">
+						<arg file="${assembly.activity}/deploy.xml"/>
+						
+				</java>
+							
+			</target>
 </project>
