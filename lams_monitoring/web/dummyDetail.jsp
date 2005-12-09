@@ -27,6 +27,9 @@
     <H1>Lesson Management</H1>
     
 	<H2>Lesson Details: <c:out value="${lesson.lessonName}"/></H2>
+
+	<p>If you want to participate in the lesson as a student, or view the portfolio as if you were a student, please use the learner screen.</p>
+
 	<TABLE border="0" summary="This table is being used for layout purposes only">
 		<TR>
 			<TD class="formlabel">Lesson Id:</TD>
@@ -55,14 +58,7 @@
 	<p>All the links below should pop-up in new windows.</p>
 	<TABLE border="0" summary="This table is being used for layout purposes only">
 		<TR>
-			<TD class="formcontrol" colspan="3"><A HREF=javascript:launchPopup('/lams/learning/exportWaitingPage.jsp?mode=teacher&lessonID=<c:out value="${lesson.lessonId}"/>');>Export Portfolio for all users</a></TD>
-		</TR>
-		<TR>
-			<TD class="formcontrol" colspan="3"><A HREF=javascript:launchPopup('/lams/learning/exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${lesson.lessonId}"/>');>Export Portfolio as <lams:user property="login"/></a>
-		</TR>
-		
-		<TR>
-			<TD class="formcontrol" colspan="3"><A HREF=javascript:launchPopup('/lams/learning/learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonId}"/>');>Join Lesson as <lams:user property="login"/></a>
+			<TD class="formcontrol" colspan="3"><A HREF=javascript:launchPopup('/lams/learning/exportWaitingPage.jsp?mode=teacher&lessonID=<c:out value="${lesson.lessonId}"/>');>Export Portfolio for all users</a> </TD>
 		</TR>
 		<TR>
 			<TD class="formcontrol" colspan="3">&nbsp;

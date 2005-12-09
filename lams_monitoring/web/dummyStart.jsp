@@ -54,7 +54,7 @@
 			<select name="organisationId">
 				<c:forEach items="${organisations}" var="org">
 					<option value="<c:out value="${org.organisationId}"/>"><c:out value="${org.name}"/>
-						(<c:forEach items="${org.users}" var="user"><c:out value="${user.login}"/></c:forEach>)
+						(<c:forEach items="${org.users}" var="user"  varStatus="status"><c:out value="${user.login}"/><c:if test="${not status.last}">,</c:if></c:forEach>)
 					</option>
 				</c:forEach>
 			</select>
