@@ -118,8 +118,7 @@ http://www.gnu.org/licenses/gpl.txt
 		<c:forEach var="lesson" items="${lessons}">
 		<c:if test="${lesson.lessonStateId<6}">
 			<TR><TD>
-				<A HREF="<lams:WebAppURL/>learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonId}"/>" target="contentFrame">
-				<STRONG><c:out value="${lesson.lessonName}"/></STRONG></A>
+				<STRONG><c:out value="${lesson.lessonName}"/></STRONG>
 			<c:choose>
 				<c:when test="${lesson.lessonStateId==1}">[Created]</c:when>
 				<c:when test="${lesson.lessonStateId==2}">[Scheduled]</c:when>
@@ -127,7 +126,11 @@ http://www.gnu.org/licenses/gpl.txt
 				<c:when test="${lesson.lessonStateId==4}">[Suspended]</c:when>
 				<c:when test="${lesson.lessonStateId==5}">[Finished]</c:when>
 			</c:choose>
-			<BR><c:out value="${lesson.lessonDescription}"/>
+			<c:if test="${lesson.lessonDescription}">
+				<BR><c:out value="${lesson.lessonDescription}"/>
+			</c:if>
+			<BR><A HREF="<lams:WebAppURL/>learner.do?method=joinLesson&userId=<lams:user property="userID"/>&lessonId=<c:out value="${lesson.lessonId}"/>" target="contentFrame">Participate</A>
+			<BR><A HREF=javascript:openPopUp('<lams:WebAppURL/>exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${lesson.lessonId}"/>');>Export Portfolio</A>
 			</TD></TR>
 			<TR><TD><HR></TD></TR>
 		</c:if>
