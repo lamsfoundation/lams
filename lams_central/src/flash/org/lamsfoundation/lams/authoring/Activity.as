@@ -279,9 +279,10 @@ class org.lamsfoundation.lams.authoring.Activity {
 		if(_yCoord){				dto.yCoord				= _yCoord;					}
 		if(_xCoord){				dto.xCoord				= _xCoord;					}
 		if(_libraryActivityUIImage){dto.libraryActivityUIImage= _libraryActivityUIImage;}
-		if(_applyGrouping){			dto.applyGrouping		= _applyGrouping;			}
-		if(_runOffline){			dto.runOffline	 		= _runOffline;				}
-		if(_defineLater){			dto.defineLater			= _defineLater;				}
+		//bnools need to be included - so do as follows:
+		dto.applyGrouping = (_applyGrouping==null) ? false : _applyGrouping;
+		dto.runOffline = (_runOffline==null) ? false : _runOffline;
+		dto.defineLater = (_defineLater==null) ? false : _defineLater;
 		if(_createDateTime){		dto.createDateTime		= _createDateTime;			}
 		if(_groupingSupportType){	dto.groupingSupportType = _groupingSupportType;		}
 		
