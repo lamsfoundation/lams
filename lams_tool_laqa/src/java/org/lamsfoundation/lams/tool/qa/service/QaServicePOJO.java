@@ -34,7 +34,6 @@ import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.ItemExistsException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
@@ -1355,13 +1354,11 @@ public class QaServicePOJO implements
 	}
 	
     
-    /**FIX THIS ONE!!!!
-     * String leaveToolSession(Long toolSessionId,User learner) throws DataMissingException, ToolException
+    /**
+     * Complete the tool session.
      * 
-     * TO BE TESTED
-     * ToolSessionManager CONTRACT
-     * gets called only in the Learner mode.
-     * Call controller service to complete the qa session
+     * Part of the ToolSessionManager contract. Called by controller service to force complete the qa session, or 
+     * by the web front end to complete the qa session
      * 
      */
     public String leaveToolSession(Long toolSessionId,Long learnerId) throws DataMissingException, ToolException 
@@ -1380,6 +1377,12 @@ public class QaServicePOJO implements
     		logger.debug("learnerId is null");
     		throw new DataMissingException("learnerId is missing");
     	}
+        
+        QaSession qaSession = retrieveQaSessionOrNullById(toolSessionId.longValue());
+        qaSession.setSession_end_date(new Date(System.currentTimeMillis()));
+        qaSession.setSession_status(COMPLETED); 
+        updateQaSession(qaSession);
+        logger.debug("tool session has been marked COMPLETE: " + qaSession);
         
     	try
 		{

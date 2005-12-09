@@ -23,7 +23,6 @@ package org.lamsfoundation.lams.tool.qa.web;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -42,19 +41,16 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QaToolContentHandler;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -507,12 +503,13 @@ public class QAction extends DispatchAction implements QaAppConstants
      *         the user is to go next.
      * @throws IOException
      * @throws ServletException
+     * @throws ToolException 
      */
     public ActionForward displayQ(ActionMapping mapping,
                                               ActionForm form,
                                               HttpServletRequest request,
                                               HttpServletResponse response) throws IOException,
-                                                                        ServletException
+                                                                        ServletException, ToolException
     {
     	/*
     	 * if the content is not ready yet, don't even proceed.
@@ -619,27 +616,11 @@ public class QAction extends DispatchAction implements QaAppConstants
 							 "leaveToolSession() with toolSessionId: " +  toolSessionId + " and user: " + user);
                 
                 IQaService qaService =QaUtils.getToolService(request);
-                QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId.longValue());
-                qaSession.setSession_end_date(new Date(System.currentTimeMillis()));
-                /*
-                 *  ?? mark the tool session as COMPLETE ??
-                 */
+                String nextActivityUrl = qaService.leaveToolSession(toolSessionId, new Long(user.getUserID().longValue()));
+                response.sendRedirect(nextActivityUrl);
+    	        return null;
+    		  
                 
-                /*
-                 * change the logic about completion status 
-                 */
-                
-                /* qaSession.setSession_status(COMPLETED); 
-                   qaService.updateQaSession(qaSession);
-                   logger.debug("tool session has been marked COMPLETE: " + qaSession);
-                */
-                
-                /*
-                ILearnerService learnerService =LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-                logger.debug(logger + " " + this.getClass().getName() +  "learnerService: " + learnerService);
-                learnerService.completeToolSession(toolSessionId, user);
-                logger.debug(logger + " " + this.getClass().getName() +  "completeToolSession on learnerService has finished: ");
-                */
         	}
         	
             /* Also cleanup session attributes */
