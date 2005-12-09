@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
  */
 public class AuthoringActivityDTO extends BaseDTO{
 	
+
 	/*****************************************************************************
 	 * Attributes
 	 *****************************************************************************/
@@ -124,6 +125,12 @@ public class AuthoringActivityDTO extends BaseDTO{
 	
 	/** The tool_content_id of the tool */
 	private Long toolContentID;
+	
+	/** The tool's display name */
+	private String toolDisplayName;
+
+	/** The url of the tool's authoring screen. */
+	private String authoringURL;
 	
 	/** The category of activity */
 	private Integer activityCategoryID;
@@ -305,7 +312,9 @@ public class AuthoringActivityDTO extends BaseDTO{
 	}
 	private void addToolActivityAttributes(ToolActivity toolActivity){
 		this.toolContentID = toolActivity.getToolContentId();
-		this.toolID = toolActivity.getTool().getToolId();													 
+		this.toolID = toolActivity.getTool().getToolId();	
+		this.authoringURL = toolActivity.getTool().getAuthorUrl();
+		this.toolDisplayName = toolActivity.getTool().getToolDisplayName();
 	}
 	private void addGateActivityAttributes(Object activity){
 		if(activity instanceof SynchGateActivity)
@@ -824,4 +833,19 @@ public class AuthoringActivityDTO extends BaseDTO{
 	public void setGroupingDTO(GroupingDTO groupingDTO) {
 		this.groupingDTO = groupingDTO;
 	}	 */
+	
+	/** Get the authoring url related to this tool */
+	public String getAuthoringURL() {
+		return authoringURL;
+	}
+	public void setAuthoringURL(String toolAuthoringURL) {
+		this.authoringURL = toolAuthoringURL;
+	}
+	/** Get the tool's display name */
+	public String getToolDisplayName() {
+		return toolDisplayName;
+	}
+	public void setToolDisplayName(String toolDisplayName) {
+		this.toolDisplayName = toolDisplayName;
+	}
 }
