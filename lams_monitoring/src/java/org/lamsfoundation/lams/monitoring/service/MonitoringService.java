@@ -868,7 +868,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     private boolean shouldInitToolSessionFor(ToolActivity activity)
     {
-        return activity.getApplyGrouping().booleanValue();
+        return ! activity.getApplyGrouping().booleanValue();
     }
 
     /**
