@@ -31,6 +31,7 @@ class MovieLoader {
 		_target_mc = target_mc;
 		_target_mc.cRef = this;
 		
+		Debugger.log('MovieLoader loading mcUrl:'+mcUrl,Debugger.COMP,'Constructor','org.lamsfoundation.lams.common.util.MovieLoader');
 		
 		_mcl = new MovieClipLoader();
 		_mcl.addListener(this);
@@ -40,7 +41,7 @@ class MovieLoader {
 	  
 	  public function onLoadInit(loaded_mc):Void{
 		  Debugger.log('mc:'+loaded_mc,Debugger.COMP,'onLoadInit','org.lamsfoundation.lams.common.util.MovieLoader');
-		  //Debugger.log('_fn:'+_fn,Debugger.COMP,'onLoadInit','org.lamsfoundation.lams.common.util.MovieLoader');
+		  
 		  //TODO: Make this actually cache the movie.
 		  MovieLoader.movieCache[_mcUrl] = loaded_mc;
 		  var myFn = Proxy.create(_scope,_fn,loaded_mc);
