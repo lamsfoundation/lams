@@ -22,17 +22,8 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
 <%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
-
-<%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String LAMS_ROOT = protocol+request.getServerName()+":"+request.getServerPort()+"/lams/";
-%>
-
+ <%@ taglib uri="tags-lams" prefix="lams" %>
+ 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">
     <head>
@@ -41,7 +32,7 @@ String LAMS_ROOT = protocol+request.getServerName()+":"+request.getServerPort()+
       <title><tiles:getAsString name="title"/></title>
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
-	  <link href="../learner.css" rel="stylesheet" type="text/css">
+	  <lams:css/>
 	  <script language="JavaScript" type="text/JavaScript">   
 	        <!--
 	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
@@ -49,7 +40,7 @@ String LAMS_ROOT = protocol+request.getServerName()+":"+request.getServerPort()+
 	        }
 	        //-->
 	  </script>
-      <script src="<%=LAMS_ROOT%>includes/javascript/common.js"></script>
+      <script src="<lams:LAMSURL/>includes/javascript/common.js"></script>
 	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
     </head>
     
