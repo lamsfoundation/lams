@@ -206,8 +206,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		success = true;
 		//_global.breakpoint();
 		Debugger.log('Setting design ID:'+design.learningDesignID,Debugger.GEN,'setDesign','DesignDataModel');
-		//Debugger.log('Printing the design revieced:...',Debugger.GEN,'setDesign','DesignDataModel');
-		//ObjectUtils.printObject(design);
+		Debugger.log('Printing the design revieced:...\n'+ObjectUtils.toString(design),Debugger.VERBOSE,'setDesign','DesignDataModel');
+		
 		
 		_learningDesignID = design.learningDesignID;
 		_title = design.title;
