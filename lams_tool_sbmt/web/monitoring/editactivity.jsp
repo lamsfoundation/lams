@@ -14,6 +14,9 @@
 </head>
 
 <body>
+    <div>
+    <%@ include file="tabmenu.jsp"%>
+    </div>
 	<html:form action="monitoring" method="post" >
 		<html:errors/>
 		<div id="basic">

@@ -9,6 +9,9 @@
   	<link href="<%=LAMS_WEB_ROOT%>/css/aqua.css" rel="stylesheet" type="text/css">
   </head>  
   <body>
+      <div>
+	    <%@ include file="tabmenu.jsp"%>
+	    </div>
 		  <c:set var="details" value="${fileDetails}"/>
 		  <c:set var="user" value="${user}" />
 		  <c:set var="toolSessionID" value="${toolSessionID}" />		  

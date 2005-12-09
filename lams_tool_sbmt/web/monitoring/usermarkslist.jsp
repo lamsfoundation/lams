@@ -9,7 +9,10 @@
 	<script type="text/javascript" src="<%=LAMS_WEB_ROOT%>/includes/javascript/common.js"></script>
 
   </head>  
-  <body>	  
+  <body>
+      <div>
+    <%@ include file="tabmenu.jsp"%>
+    </div>
 	<c:set var="filesUploaded" value ="${userReport}"/>
 	<c:set var="user" value="${user}" />
 	<b>Following files have been submitted by 

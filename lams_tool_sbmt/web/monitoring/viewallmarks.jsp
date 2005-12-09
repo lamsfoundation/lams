@@ -9,7 +9,9 @@
   	
   </head>  
   <body>
-
+    <div>
+    <%@ include file="tabmenu.jsp"%>
+    </div>
 		<table width="100%"  border="0" cellspacing="0" cellpadding="0">
 		<c:forEach items="${report}"  var ="user" >		
 			<c:set var="filesUploaded" value="${user.value}"/>

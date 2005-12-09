@@ -44,7 +44,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
@@ -96,6 +95,8 @@ public class MonitoringAction extends DispatchAction {
             HttpServletRequest request,
             HttpServletResponse response)
     {
+    	Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentID);
         return userList(mapping, form, request, response);
     }
     
@@ -447,31 +448,42 @@ public class MonitoringAction extends DispatchAction {
 			   ActionForm form,
 			   HttpServletRequest request,
 			   HttpServletResponse response){
-		
-		Long sessionID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
+	    Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 		submitFilesService = getSubmitFilesService();
-		//return FileDetailsDTO list according to the given sessionID
-		Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
-		Iterator iter = userFilesMap.values().iterator();
-		Iterator dtoIter; 
-		int notMarkedCount = 0;
-		int markedCount = 0;
-		while(iter.hasNext()){
-			List list = (List) iter.next();
-			dtoIter = list.iterator();
-			while(dtoIter.hasNext()){
-				FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
-				if(dto.getMarks() == null)
-					notMarkedCount++;
-				else
-					markedCount++;
+		// List userList = submitFilesService.getUsers(sessionID);
+		List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
+		Map sessionStatisticMap = new HashMap();
+
+		// build a map with all users in the submitFilesSessionList
+		Iterator it = submitFilesSessionList.iterator();
+		while (it.hasNext()) {
+			Long sessionID = ((SubmitFilesSession) it.next()).getSessionID();
+			submitFilesService = getSubmitFilesService();
+			//return FileDetailsDTO list according to the given sessionID
+			Map userFilesMap = submitFilesService.getFilesUploadedBySession(sessionID);
+			Iterator iter = userFilesMap.values().iterator();
+			Iterator dtoIter; 
+			int notMarkedCount = 0;
+			int markedCount = 0;
+			while(iter.hasNext()){
+				List list = (List) iter.next();
+				dtoIter = list.iterator();
+				while(dtoIter.hasNext()){
+					FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
+					if(dto.getMarks() == null)
+						notMarkedCount++;
+					else
+						markedCount++;
+				}
 			}
+			StatisticDTO dto = new StatisticDTO();
+			dto.setMarkedCount(markedCount);
+			dto.setNotMarkedCount(notMarkedCount);
+			dto.setTotalUploadedFiles(markedCount+notMarkedCount);
+			sessionStatisticMap.put(sessionID,dto);
 		}
-		StatisticDTO dto = new StatisticDTO();
-		dto.setMarkedCount(markedCount);
-		dto.setNotMarkedCount(notMarkedCount);
-		dto.setTotalUploadedFiles(markedCount+notMarkedCount);
-		request.setAttribute("statistic",dto);
+
+		request.setAttribute("statisticList",sessionStatisticMap);
 		return mapping.findForward("statistic");
 	}
 	/**

@@ -14,6 +14,9 @@
   </head>
   
   <body>
+    <div>
+    <%@ include file="tabmenu.jsp"%>
+    </div>
 	<html:errors/>
   	<div id="datatablecontainer">
   		<c:set var="sessionUserMap" scope="request" value="${sessionUserMap}"/>

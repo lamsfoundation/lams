@@ -11,6 +11,9 @@
 </head>
 
 <body>
+    <div>
+    <%@ include file="tabmenu.jsp"%>
+    </div>
 	<html:form action="monitoring" method="post" >
 		<div id="basic">
 		<h1><fmt:message key="label.authoring.heading.basic" /></h1>
