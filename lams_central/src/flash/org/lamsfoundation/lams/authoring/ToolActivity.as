@@ -131,6 +131,10 @@ class ToolActivity extends Activity{
 		dto.toolDisplayName = (_toolDisplayName) ?  _toolDisplayName: Config.STRING_NULL_VALUE;	
 		dto.toolContentID = (_toolContentID) ?  _toolContentID: Config.NUMERIC_NULL_VALUE;	
 		dto.toolID = (_toolID) ?  _toolID: Config.NUMERIC_NULL_VALUE;	
+		
+	
+		
+		
 		/* THESE are internal flags, not part of the design
 		dto.supportsContribute = (_supportsContribute!=null) ?  _supportsContribute: Config.BOOLEAN_NULL_VALUE;	
 		dto.supportsDefineLater = (_supportsDefineLater!=null) ?  _supportsDefineLater: Config.BOOLEAN_NULL_VALUE;	
