@@ -336,7 +336,9 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(OFFLINE_INSTRUCTIONS,mcContent.getOfflineInstructions());
 		request.getSession().setAttribute(ONLINE_INSTRUCTIONS,mcContent.getOnlineInstructions());
 		request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,mcContent.getOfflineInstructions());
+		request.getSession().setAttribute(RICHTEXT_REPORT_TITLE,mcContent.getReportTitle());
 	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,mcContent.getOnlineInstructions());
+	    request.getSession().setAttribute(RICHTEXT_END_LEARNING_MSG,mcContent.getEndLearningMessage());
 		request.getSession().setAttribute(END_LEARNING_MESSAGE,mcContent.getEndLearningMessage());
 		request.getSession().setAttribute(CONTENT_IN_USE, new Boolean(mcContent.isContentInUse()));
 		request.getSession().setAttribute(RETRIES, new Boolean(mcContent.isRetries()));
