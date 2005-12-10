@@ -24,6 +24,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	
 	protected String fileItem;
 	protected FormFile receivedFile;
+	protected String offlineFile;
 	
 	protected String addContent;
 	protected String removeContent;
@@ -121,6 +122,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.submitTabDone=null;
 		this.submitOfflineFile=null;
 		this.submitOnlineFile=null;
+		this.offlineFile=null;
 
     	this.dispatch=null;
 
@@ -725,5 +727,18 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 
 	public void setDispatch(String buttonValue) {
 		this.dispatch = buttonValue;
+	}
+	
+	/**
+	 * @return Returns the offlineFile.
+	 */
+	public String getOfflineFile() {
+		return offlineFile;
+	}
+	/**
+	 * @param offlineFile The offlineFile to set.
+	 */
+	public void setOfflineFile(String offlineFile) {
+		this.offlineFile = offlineFile;
 	}
 }

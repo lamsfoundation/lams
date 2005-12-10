@@ -8,21 +8,22 @@
 	-->
 <beans>
 
-	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 	
 	<!-- Hibernate SessionFactory -->
-	<bean id="qaSessionFactory" class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+	<bean id="mcSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="toolDataSource"/></property>
 		<property name="mappingResources">
 			<list>	
-				<value>/WEB-INF/McContent.hbm.xml</value>
-				<value>/WEB-INF/McSession.hbm.xml</value>
-				<value>/WEB-INF/McQueContent.hbm.xml</value>
-				<value>/WEB-INF/McQueUsr.hbm.xml</value>
-				<value>/WEB-INF/McUsrAttempt.hbm.xml</value>
-				<value>/WEB-INF/McOptionsContent.hbm.xml</value>
+  			  	<value>/org/lamsfoundation/lams/tool/mc/McContent.hbm.xml</value> 
+				<value>/org/lamsfoundation/lams/tool/mc/McQueContent.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/mc/McOptsContent.hbm.xml</value>
+			  	<value>/org/lamsfoundation/lams/tool/mc/McSession.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/mc/McQueUsr.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/mc/McUsrAttempt.hbm.xml</value>
+				<value>/org/lamsfoundation/lams/tool/mc/McUploadedFile.hbm.xml</value>				
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
@@ -31,60 +32,73 @@
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 
 	<!-- tool beans -->
-<!-- 
-	<bean id="qaContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaContentDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+
+
+	<bean id="mcContentDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McContentDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>  
 
-	<bean id="qaSessionDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaSessionDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	<bean id="mcSessionDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McSessionDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
 
-	<bean id="qaQueUsrDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueUsrDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	<bean id="mcUserDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUserDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
 	
-	<bean id="qaQueContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueContentDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	<bean id="mcQueContentDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McQueContentDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
 	
-	<bean id="qaUsrRespDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaUsrRespDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
+	<bean id="mcOptionsContentDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McOptionsContentDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
 	</bean>
 	
-	<bean id="qaUploadedFileDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaUploadedFileDAO">
-		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
-	</bean>
--->
 	
+	<bean id="mcUsrAttemptDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrAttemptDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>
+
+
+	<bean id="mcUploadedFileDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUploadedFileDAO">
+		<property name="sessionFactory"><ref local="mcSessionFactory"/></property>
+	</bean>
+	
+	<bean id="mcToolContentHandler" class="org.lamsfoundation.lams.tool.mc.util.McToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+
 	<!-- end of tool beans -->
-	
-<!-- 
-	<bean id="qaService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+
+	<bean id="mcService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 			<property name="target">
-				<bean class="org.lamsfoundation.lams.tool.qa.service.QaServicePOJO">
-					<property name="qaDAO"><ref bean="qaContentDAO"/></property>
-					<property name="qaSessionDAO"><ref bean="qaSessionDAO"/></property>
-					<property name="qaQueUsrDAO"><ref bean="qaQueUsrDAO"/></property>
-					<property name="qaQueContentDAO"><ref bean="qaQueContentDAO"/></property>
-					<property name="qaUsrRespDAO"><ref bean="qaUsrRespDAO"/></property>								
-					<property name="qaUploadedFileDAO"><ref bean="qaUploadedFileDAO"/></property>								
+				<bean class="org.lamsfoundation.lams.tool.mc.service.McServicePOJO">
+					<property name="mcContentDAO"><ref bean="mcContentDAO"/></property>
+					<property name="mcSessionDAO"><ref bean="mcSessionDAO"/></property>
+					<property name="mcUserDAO"><ref bean="mcUserDAO"/></property>
+					<property name="mcQueContentDAO"><ref bean="mcQueContentDAO"/></property>
+					<property name="mcOptionsContentDAO"><ref bean="mcOptionsContentDAO"/></property>								
+					<property name="mcUsrAttemptDAO"><ref bean="mcUsrAttemptDAO"/></property>													
+			 		<property name="mcUploadedFileDAO"><ref bean="mcUploadedFileDAO"/></property>
 					<property name="toolService"><ref bean="lamsToolService"/></property>
-					<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<!-- 		<property name="repositoryService"><ref bean="repositoryService"/></property> -->
+					<property name="learnerService"><ref bean="learnerService"/></property>			
+					<property name="mcToolContentHandler"><ref bean="mcToolContentHandler"/></property>			
 				</bean>
 			</property>
 			<property name="transactionAttributes">
 				<props>
-					<prop key="create*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="copy*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="save*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
-					<prop key="update*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="get*">PROPAGATION_REQUIRED,readOnly,-QacpApplicationException</prop>
-					<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="create*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="copy*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="save*">PROPAGATION_REQUIRED, -McApplicationException</prop>
+					<prop key="update*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="get*">PROPAGATION_REQUIRED,readOnly,-McApplicationException</prop>
+					<prop key="remove*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="leaveToolSession">PROPAGATION_REQUIRED, ,-McApplicationException</prop>
 				</props>
 			</property>
 	</bean>  
--->
-
 </beans>
+

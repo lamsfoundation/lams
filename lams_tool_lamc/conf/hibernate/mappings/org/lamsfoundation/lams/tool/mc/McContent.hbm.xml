@@ -222,6 +222,24 @@
               />
 
     </set>
+    
+    	<set
+            name="mcAttachments"
+            lazy="true"
+            inverse="true"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+              <key
+                  column="mc_content_id"
+              >
+              </key>
+
+              <one-to-many
+                  class="org.lamsfoundation.lams.tool.mc.McUploadedFile"
+              />
+
+    </set>
 
 
 </class>

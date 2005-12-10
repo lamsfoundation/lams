@@ -39,8 +39,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McAttachmentDTO;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
@@ -1422,10 +1424,14 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("calling selectAndPersistOptions");
 		AuthoringUtil.selectAndPersistOptions(request, mapStartupGeneralOptionsContent, mapStartupGeneralSelectedOptionsContent, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent, mapStartupGeneralOptionsQueId);
 		
+		logger.debug("start persisting offline files metadata");
+		AuthoringUtil.persistFilesMetaData(request, true, mcContent);
+		logger.debug("start persisting online files metadata");
+		AuthoringUtil.persistFilesMetaData(request, false, mcContent);
 		
-		logger.debug("will do addUploadedFilesMetaData");
-		McUtils.addUploadedFilesMetaData(request,mcContent);
-		logger.debug("done addUploadedFilesMetaData");
+		//logger.debug("will do addUploadedFilesMetaData");
+		//McUtils.addUploadedFilesMetaData(request,mcContent);
+		//logger.debug("done addUploadedFilesMetaData");
 		
 		errors.clear();
 		errors.add(Globals.ERROR_KEY,new ActionMessage("submit.successful"));
@@ -1529,10 +1535,57 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		request.getSession().setAttribute(FILE_NAME, filename);
  		
  		mcAuthoringForm.resetUserAction();
- 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
- 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
-   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+ 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
+   	    return (mapping.findForward(LOAD_QUESTIONS));
     }
+    
+
+    /**
+     * removes file data 
+     * deleteFileItem(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+     * 
+     * @param request
+     * @param form
+     * @param mapping
+     * @return ActionForward
+     */
+    public ActionForward deleteFileItem(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+
+    {
+    	logger.debug("dispatching deleteFileItem...");
+    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+	 	AuthoringUtil.readData(request, mcAuthoringForm);
+	 	
+    	String userAction="deleteFileItem";
+ 		request.setAttribute(USER_ACTION, userAction);
+ 		logger.debug("userAction:" + userAction);
+ 		
+ 		String filename= request.getParameter("fileItem");
+ 		logger.debug("filename:" + filename);
+ 		
+ 		String offlineFile= request.getParameter("offlineFile");
+ 		logger.debug("offlineFile:" + offlineFile);
+ 		
+ 		logger.debug("start removing file:" + filename + " it is an:" + offlineFile);
+ 		AuthoringUtil.removeFileItem(request, filename, offlineFile);
+ 		logger.debug("done removing offline file");
+ 		
+ 		mcAuthoringForm.resetUserAction();
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+ 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
+   	    return (mapping.findForward(LOAD_QUESTIONS));
+    }
+
     
     
     /**
@@ -1616,7 +1669,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
-                                         ServletException
+                                         ServletException,
+                                         RepositoryCheckedException
     {
     	logger.debug("dispatching submitOfflineFile...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -1628,13 +1682,20 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		request.setAttribute(USER_ACTION, userAction);
  		logger.debug("userAction:" + userAction);
  		
- 		McUtils.addFileToContentRepository(request, mcAuthoringForm, true);
-        logger.debug("offline file added to repository successfully.");
- 		
+ 		logger.debug("will uploadFile for offline file:");
+ 		McAttachmentDTO mcAttachmentDTO=AuthoringUtil.uploadFile(request, mcAuthoringForm, true);
+ 		logger.debug("returned mcAttachmentDTO:" + mcAttachmentDTO);
+ 		 		
+ 		List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		listOfflineFilesMetaData.add(mcAttachmentDTO);
+ 		logger.debug("listOfflineFilesMetaData after add:" + listOfflineFilesMetaData);
+ 		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+		
  		mcAuthoringForm.resetUserAction();
- 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
- 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2 );
-   	    return (mapping.findForward(ALL_INSTRUCTIONS));    
+ 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+ 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
+   	    return (mapping.findForward(LOAD_QUESTIONS));    
     }
     
     
@@ -1654,7 +1715,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
-                                         ServletException
+                                         ServletException,
+                                         RepositoryCheckedException
     {
     	logger.debug("dispatching submitOnlineFiles...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -1666,13 +1728,20 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		request.setAttribute(USER_ACTION, userAction);
  		logger.debug("userAction:" + userAction);
  		
- 		McUtils.addFileToContentRepository(request, mcAuthoringForm, false);
-        logger.debug("online file added to repository successfully.");
-        
+ 		logger.debug("will uploadFile for online file:");
+ 		McAttachmentDTO mcAttachmentDTO=AuthoringUtil.uploadFile(request, mcAuthoringForm, false);
+ 		logger.debug("returned mcAttachmentDTO:" + mcAttachmentDTO);
+ 		 		
+ 		List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		listOnlineFilesMetaData.add(mcAttachmentDTO);
+ 		logger.debug("listOnlineFilesMetaData after add:" + listOnlineFilesMetaData);
+ 		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+ 		
         mcAuthoringForm.resetUserAction();
- 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
- 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
-   	    return (mapping.findForward(ALL_INSTRUCTIONS));
+        request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+ 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
+   	    return (mapping.findForward(LOAD_QUESTIONS));
     }
     
     

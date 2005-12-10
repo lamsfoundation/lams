@@ -48,12 +48,6 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="authoringMaincontent.jsp" />	
 	</definition>
 	
-	<definition name=".allInstructions" extends=".baseDef" >
-		<put name="title" value="Multiple Choice"/>
-		<put name="pageHeader" value = "Multiple Choice"/>
-		<put name="content" value="allInstructionsContent.jsp" />	
-	</definition>
-
 		
 <!-- ============= Mc Authoring Starter Page Definitions ====================== -->	
 	<definition name=".starter" extends=".baseDef" >

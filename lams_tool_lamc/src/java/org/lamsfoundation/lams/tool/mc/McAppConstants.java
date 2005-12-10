@@ -231,6 +231,9 @@ public interface McAppConstants {
     public static final String LIST_UPLOADED_OFFLINE_FILES_NAME			="listUploadedOfflineFilesName";
     public static final String LIST_UPLOADED_ONLINE_FILES_UUID			="listUploadedOnlineFilesUuid";
     public static final String LIST_UPLOADED_ONLINE_FILES_NAME			="listUploadedOnlineFilesName";
+    
+    public static final String LIST_OFFLINEFILES_METADATA				="listOfflineFilesMetadata";
+    public static final String LIST_ONLINEFILES_METADATA				="listOnlineFilesMetadata";
     public static final String POPULATED_UPLOADED_FILESDATA				="populateUploadedFilesData";
     
     public static final String COUNT_SESSION_COMPLETE					="countSessionComplete";

@@ -589,6 +589,12 @@ public class McStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
 		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
 		
+		
+		LinkedList listOfflineFilesMetaData= new LinkedList();
+		LinkedList listOnlineFilesMetaData= new LinkedList();
+		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+		
 		Map mapQuestionsContent= new TreeMap(new McComparator());
 		Map mapOptionsContent= new TreeMap(new McComparator());
 		Map mapDefaultOptionsContent= new TreeMap(new McComparator());

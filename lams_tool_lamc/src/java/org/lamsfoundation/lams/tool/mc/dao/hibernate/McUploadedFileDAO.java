@@ -52,10 +52,11 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
  	
  	private static final String GET_FILES_UUID ="select mcUploadedFile.uuid from McUploadedFile mcUploadedFile where mcUploadedFile.filename=:filename";
  	
- 	
  	private static final String GET_OFFLINE_FILES_UUIDPLUSFILENAME = "select (mcUploadedFile.uuid + '~' + mcUploadedFile.filename)   from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
  	
  	private static final String FIND_ALL_UPLOADED_FILE_DATA = "from mcUploadedFile in class McUploadedFile";
+ 	
+ 	private static final String IS_UUID_PERSISTED ="select mcUploadedFile.uuid from McUploadedFile mcUploadedFile where mcUploadedFile.uuid=:uuid";
 	
  	
  	public McUploadedFile getUploadedFileById(long submissionId)
@@ -77,6 +78,7 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
  	
  	public void updateUploadFile(McUploadedFile mcUploadedFile)
     {
+ 		this.getSession().setFlushMode(FlushMode.AUTO);
         this.getHibernateTemplate().update(mcUploadedFile);
 		this.getSession().setFlushMode(FlushMode.AUTO);
     }
@@ -84,17 +86,20 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
      
     public void saveUploadFile(McUploadedFile mcUploadedFile) 
     {
+    	this.getSession().setFlushMode(FlushMode.AUTO);
     	this.getHibernateTemplate().save(mcUploadedFile);
 		this.getSession().setFlushMode(FlushMode.AUTO);
     }
     
     public void createUploadFile(McUploadedFile mcUploadedFile) 
     {
+    	this.getSession().setFlushMode(FlushMode.AUTO);
     	this.getHibernateTemplate().save(mcUploadedFile);
     }
     
     public void UpdateUploadFile(McUploadedFile mcUploadedFile)
     {
+    	this.getSession().setFlushMode(FlushMode.AUTO);
     	this.getHibernateTemplate().update(mcUploadedFile);	
     }
 
@@ -117,6 +122,20 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
 		}
     }
     
+    
+    public boolean isUuidPersisted(String uuid)
+    {
+      HibernateTemplate templ = this.getHibernateTemplate();
+      List list = getSession().createQuery(IS_UUID_PERSISTED)
+			.setString("uuid", uuid)
+			.list();
+      
+      if (list != null && list.size() > 0)
+      {
+      	return true;
+      }
+      return false;
+	}
     
     public String getFileUuid(String filename)
     {
@@ -237,6 +256,7 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
     
     public void deleteUploadFile(McUploadedFile mcUploadedFile)
     {
+    		this.getSession().setFlushMode(FlushMode.AUTO);
             this.getHibernateTemplate().delete(mcUploadedFile);
 	}
     

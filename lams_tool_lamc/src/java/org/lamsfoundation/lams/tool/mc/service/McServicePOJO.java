@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
@@ -103,6 +104,7 @@ public class McServicePOJO implements
 	
     private IUserManagementService userManagementService;
     private ILamsToolService toolService;
+    private IToolContentHandler mcToolContentHandler = null;
     
     public McServicePOJO(){}
     
@@ -1618,6 +1620,28 @@ public class McServicePOJO implements
     	return listToolSessionIds;
     }
     
+
+    public void removeAttachment(McContent content, McUploadedFile attachment) throws RepositoryCheckedException
+	{
+	    try
+	    {
+			attachment.setMcContent(null);
+			content.getMcAttachments().remove(attachment);
+			mcToolContentHandler.deleteFile(new Long(attachment.getUuid()));
+			saveMcContent(content);
+	    }
+	    catch (DataAccessException e)
+	    {
+	        throw new McApplicationException("EXCEPTION: An exception has occurred while trying to remove this attachment"
+	                + e.getMessage(), e);
+	    }
+	}
+    
+    
+    public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException
+	{
+	    return mcToolContentHandler.uploadFile(istream, filename, contentType, fileType); 
+	}
     
     
 	/**
@@ -1744,9 +1768,13 @@ public class McServicePOJO implements
         }
 	}
 	
+	
+	public boolean isUuidPersisted(String uuid) throws McApplicationException
+	{
+		return mcUploadedFileDAO.isUuidPersisted(uuid);
+	}
+	
 	/**
-	 *  !! COMPLETE THIS !!
-	 * 
 	 * adds a new entry to the uploaded files table
 	 */
 	public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent) throws McApplicationException {
@@ -2034,4 +2062,16 @@ public class McServicePOJO implements
 		this.mcUploadedFileDAO = mcUploadedFileDAO;
 	}
 
+	/**
+	 * @return Returns the mcToolContentHandler.
+	 */
+	public IToolContentHandler getMcToolContentHandler() {
+		return mcToolContentHandler;
+	}
+	/**
+	 * @param mcToolContentHandler The mcToolContentHandler to set.
+	 */
+	public void setMcToolContentHandler(IToolContentHandler mcToolContentHandler) {
+		this.mcToolContentHandler = mcToolContentHandler;
+	}
 }

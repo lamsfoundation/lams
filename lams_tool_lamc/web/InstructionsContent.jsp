@@ -16,6 +16,12 @@ function viewFileItem(fileItemValue, actionMethod) {
 	submitMethod(actionMethod);
 }
 
+function deleteFileItem(fileItemValue, actionMethod, offlineFile) {
+	document.McAuthoringForm.fileItem.value=fileItemValue; 
+	document.McAuthoringForm.offlineFile.value=offlineFile; 
+	submitMethod(actionMethod);
+}
+
 //-->     
 </script>
 
@@ -54,6 +60,9 @@ function viewFileItem(fileItemValue, actionMethod) {
 								         <td valign=top><font size=2> <b> <c:out value='${item}'/> </b> </font> </td>
 								      	<td valign=top>
 								      		<img src="images/edit.gif" align=left onclick="javascript:viewFileItem('<c:out value="${item}"/>','viewFileItem');">
+								      	</td>
+							      	  	<td valign=top>
+								      		<img src="images/delete.gif" align=left onclick="onclick="javascript:deleteFileItem('<c:out value="${item}"/>','deleteFileItem', '1');">	  										  		
 								      	</td>
 								     </tr> 	
 				         			</c:forEach>
@@ -95,6 +104,9 @@ function viewFileItem(fileItemValue, actionMethod) {
 									         <td valign=top><font size=2> <b> <c:out value='${item}'/> </b> </font> </td>
 									      	<td valign=top>
 									      		<img src="images/edit.gif" align=left onclick="onclick="javascript:viewFileItem('<c:out value="${item}"/>','viewFileItem');">	  										  		
+									      	</td>
+									      	<td valign=top>
+									      		<img src="images/delete.gif" align=left onclick="onclick="javascript:deleteFileItem('<c:out value="${item}"/>','deleteFileItem', '0');">	  										  		
 									      	</td>
 					         			</tr>								      	
 				         			</c:forEach>

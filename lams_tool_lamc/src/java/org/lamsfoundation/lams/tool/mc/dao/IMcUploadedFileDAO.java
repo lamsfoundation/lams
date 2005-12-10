@@ -165,6 +165,9 @@ public interface IMcUploadedFileDAO
 		 * @param mcContentId
 		 * @return List 
 		 */	    
+	    
+	    public boolean isUuidPersisted(String uuid);
+	    
 	    public void cleanUploadedFilesMetaData();
 	    
 	    public void flush();

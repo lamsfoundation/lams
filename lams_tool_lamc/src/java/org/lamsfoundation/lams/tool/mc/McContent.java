@@ -113,9 +113,12 @@ public class McContent implements Serializable {
 
     /** persistent field */
     private Set mcSessions;
+    
+    /** persistent field */
+    private Set mcAttachments;
 
     /** full constructor */
-    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, String endLearningMessage, Integer passMark, boolean showFeedback, boolean retries, Set mcQueContents, Set mcSessions) {
+    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, String endLearningMessage, Integer passMark, boolean showFeedback, boolean retries, Set mcQueContents, Set mcSessions, Set mcAttachments) {
         this.mcContentId = mcContentId;
         this.title = title;
         this.instructions = instructions;
@@ -138,6 +141,7 @@ public class McContent implements Serializable {
         this.showFeedback = showFeedback;
         this.mcQueContents = mcQueContents;
         this.mcSessions = mcSessions;
+        this.mcAttachments = mcAttachments;
     }
 
     /** default constructor */
@@ -187,7 +191,9 @@ public class McContent implements Serializable {
 					 mc.isRetries(),
 					 mc.isShowFeedback(),
          			 new TreeSet(),
-                     new TreeSet());
+                     new TreeSet(),
+                     new TreeSet()
+					 );
     	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
     	return newContent;
 	}
@@ -423,5 +429,17 @@ public class McContent implements Serializable {
 	 */
 	public void setShowReport(boolean showReport) {
 		this.showReport = showReport;
+	}
+	/**
+	 * @return Returns the mcAttachments.
+	 */
+	public Set getMcAttachments() {
+		return mcAttachments;
+	}
+	/**
+	 * @param mcAttachments The mcAttachments to set.
+	 */
+	public void setMcAttachments(Set mcAttachments) {
+		this.mcAttachments = mcAttachments;
 	}
 }

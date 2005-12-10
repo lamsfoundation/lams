@@ -94,11 +94,6 @@
         redirect="true"
       />
       
-       <forward
-        name="allInstructions"
-        path=".allInstructions"
-        redirect="true"
-      />
     </action>
     
    <!--Learning Starter  -->

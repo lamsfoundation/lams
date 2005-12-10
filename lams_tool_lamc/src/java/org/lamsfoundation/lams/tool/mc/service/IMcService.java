@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.BasicToolVO;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -223,5 +224,9 @@ public interface IMcService
     public int countSessionIncomplete() throws McApplicationException;
     
     public List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
+    
+    public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException;
+    
+    public boolean isUuidPersisted(String uuid) throws McApplicationException;
 }
 
