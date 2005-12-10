@@ -62,7 +62,7 @@ function deleteFileItem(fileItemValue, actionMethod, offlineFile) {
 								      		<img src="images/edit.gif" align=left onclick="javascript:viewFileItem('<c:out value="${item}"/>','viewFileItem');">
 								      	</td>
 							      	  	<td valign=top>
-								      		<img src="images/delete.gif" align=left onclick="onclick="javascript:deleteFileItem('<c:out value="${item}"/>','deleteFileItem', '1');">	  										  		
+								      		<img src="images/delete.gif" align=left onclick="javascript:deleteFileItem('<c:out value="${item}"/>','deleteFileItem', '1');">	  										  		
 								      	</td>
 								     </tr> 	
 				         			</c:forEach>
@@ -103,10 +103,10 @@ function deleteFileItem(fileItemValue, actionMethod, offlineFile) {
 										<tr>									
 									         <td valign=top><font size=2> <b> <c:out value='${item}'/> </b> </font> </td>
 									      	<td valign=top>
-									      		<img src="images/edit.gif" align=left onclick="onclick="javascript:viewFileItem('<c:out value="${item}"/>','viewFileItem');">	  										  		
+									      		<img src="images/edit.gif" align=left onclick="javascript:viewFileItem('<c:out value="${item}"/>','viewFileItem');">	  										  		
 									      	</td>
 									      	<td valign=top>
-									      		<img src="images/delete.gif" align=left onclick="onclick="javascript:deleteFileItem('<c:out value="${item}"/>','deleteFileItem', '0');">	  										  		
+									      		<img src="images/delete.gif" align=left onclick="javascript:deleteFileItem('<c:out value="${item}"/>','deleteFileItem', '0');">	  										  		
 									      	</td>
 					         			</tr>								      	
 				         			</c:forEach>
@@ -115,6 +115,7 @@ function deleteFileItem(fileItemValue, actionMethod, offlineFile) {
 				</tr>
 
 				<html:hidden property="fileItem"/>
+				<html:hidden property="offlineFile"/>				
 
 		  		<tr>
  				 	<td colspan=4 align=center valign=top>								

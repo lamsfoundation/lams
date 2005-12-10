@@ -1429,6 +1429,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("start persisting online files metadata");
 		AuthoringUtil.persistFilesMetaData(request, false, mcContent);
 		
+		/* making sure only the filenames in the session cache are persisted and the others in the db are removed*/ 
+		logger.debug("start removing redundant offline files metadata");
+		AuthoringUtil.removeRedundantOfflineFileItems(request, mcContent);
+		
+		logger.debug("start removing redundant online files metadata");
+		AuthoringUtil.removeRedundantOnlineFileItems(request, mcContent);
+		
+ 		logger.debug("done removing redundant files");
+		
 		//logger.debug("will do addUploadedFilesMetaData");
 		//McUtils.addUploadedFilesMetaData(request,mcContent);
 		//logger.debug("done addUploadedFilesMetaData");
@@ -1499,7 +1508,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			
 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
 	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
-			return (mapping.findForward(ALL_INSTRUCTIONS));
+			return (mapping.findForward(LOAD_QUESTIONS));
  		}
  		
  		InputStream fileInputStream=mcService.downloadFile(new Long(uuid), null);
@@ -1577,8 +1586,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		logger.debug("offlineFile:" + offlineFile);
  		
  		logger.debug("start removing file:" + filename + " it is an:" + offlineFile);
- 		AuthoringUtil.removeFileItem(request, filename, offlineFile);
- 		logger.debug("done removing offline file");
+ 		
+ 		if (!filename.equals(""))
+ 		{
+ 			AuthoringUtil.removeFileItem(request, filename, offlineFile);
+ 	 		logger.debug("done removing offline file");	
+ 		}
  		
  		mcAuthoringForm.resetUserAction();
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
@@ -1685,6 +1698,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		logger.debug("will uploadFile for offline file:");
  		McAttachmentDTO mcAttachmentDTO=AuthoringUtil.uploadFile(request, mcAuthoringForm, true);
  		logger.debug("returned mcAttachmentDTO:" + mcAttachmentDTO);
+ 		
+ 		if (mcAttachmentDTO == null)
+ 		{
+ 			ActionMessages errors= new ActionMessages();
+ 			errors= new ActionMessages();
+ 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.fileName.empty"));
+ 			saveErrors(request,errors);
+ 			mcAuthoringForm.resetUserAction();
+ 			persistError(request,"error.fileName.empty");
+ 			
+ 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+ 	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
+ 	   	    return (mapping.findForward(LOAD_QUESTIONS));	
+ 		}
+ 		
  		 		
  		List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
  		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
@@ -1731,6 +1759,20 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		logger.debug("will uploadFile for online file:");
  		McAttachmentDTO mcAttachmentDTO=AuthoringUtil.uploadFile(request, mcAuthoringForm, false);
  		logger.debug("returned mcAttachmentDTO:" + mcAttachmentDTO);
+ 		
+ 		if (mcAttachmentDTO == null)
+ 		{
+ 			ActionMessages errors= new ActionMessages();
+ 			errors= new ActionMessages();
+ 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.fileName.empty"));
+ 			saveErrors(request,errors);
+ 			mcAuthoringForm.resetUserAction();
+ 			persistError(request,"error.fileName.empty");
+ 			
+ 			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+ 	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
+ 	   	    return (mapping.findForward(LOAD_QUESTIONS));	
+ 		}
  		 		
  		List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
  		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);

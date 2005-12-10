@@ -442,6 +442,27 @@ public class McStarterAction extends Action implements McAppConstants {
     	logger.debug("starter initialized the existing Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
     	
 	    AuthoringUtil.refreshMaps(request, toolContentId);
+	    /*process offline files metadata*/
+	    List listOfflineFilesMetaData=mcService.getOfflineFilesMetaData(mcContent.getUid());
+	    logger.debug("existing listOfflineFilesMetaData, to be structured as McAttachmentDTO: " + listOfflineFilesMetaData);
+	    listOfflineFilesMetaData=AuthoringUtil.populateMetaDataAsAttachments(listOfflineFilesMetaData);
+	    logger.debug("populated listOfflineFilesMetaData: " + listOfflineFilesMetaData);
+	    request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+	    
+	    List listUploadedOfflineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOfflineFilesMetaData);
+	    logger.debug("returned from db listUploadedOfflineFileNames: " + listUploadedOfflineFileNames);
+	    request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES, listUploadedOfflineFileNames);
+	    
+	    /*process online files metadata*/
+	    List listOnlineFilesMetaData=mcService.getOnlineFilesMetaData(mcContent.getUid());
+	    logger.debug("existing listOnlineFilesMetaData, to be structured as McAttachmentDTO: " + listOnlineFilesMetaData);
+	    listOnlineFilesMetaData=AuthoringUtil.populateMetaDataAsAttachments(listOnlineFilesMetaData);
+	    logger.debug("populated listOnlineFilesMetaData: " + listOnlineFilesMetaData);
+	    request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+	    
+	    List listUploadedOnlineFileNames=AuthoringUtil.populateMetaDataAsFilenames(listOnlineFilesMetaData);
+	    logger.debug("returned from db listUploadedOnlineFileNames: " + listUploadedOnlineFileNames);
+	    request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES, listUploadedOnlineFileNames);
 	}
 	
 	
@@ -594,6 +615,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		LinkedList listOnlineFilesMetaData= new LinkedList();
 		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
 		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+		
+		
 		
 		Map mapQuestionsContent= new TreeMap(new McComparator());
 		Map mapOptionsContent= new TreeMap(new McComparator());

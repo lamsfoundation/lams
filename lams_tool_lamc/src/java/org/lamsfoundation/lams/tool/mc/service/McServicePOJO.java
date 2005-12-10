@@ -1752,6 +1752,61 @@ public class McServicePOJO implements
 	}
 	
 	
+	public void removeOffLineFile(String filename, Long mcContentId) throws McApplicationException
+	{
+	    try
+        {
+            mcUploadedFileDAO.removeOffLineFile(filename, mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is removing offline filename"
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+    
+    public void removeOnLineFile(String filename, Long mcContentId) throws McApplicationException
+	{
+	    try
+        {
+            mcUploadedFileDAO.removeOnLineFile(filename, mcContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is removing online filename"
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+	
+	public boolean isOffLineFilePersisted(String filename) throws McApplicationException
+	{
+	    try
+        {
+            return mcUploadedFileDAO.isOffLineFilePersisted(filename);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is checking if offline filename is persisted: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
+    
+    public boolean isOnLineFilePersisted(String filename) throws McApplicationException
+	{
+        try
+        {
+            return mcUploadedFileDAO.isOnLineFilePersisted(filename);
+        }
+        catch (DataAccessException e)
+        {
+        	throw new McApplicationException("Exception occured when lams is checking if online filename is persisted: "
+                                                         + e.getMessage(),
+														   e);
+        }
+	}
 	
 	
 	public String getFileUuid(String filename) throws McApplicationException
@@ -1768,6 +1823,17 @@ public class McServicePOJO implements
         }
 	}
 	
+	
+	public List getOnlineFilesMetaData(Long mcContentId) throws McApplicationException
+	{
+		return mcUploadedFileDAO.getOnlineFilesMetaData(mcContentId);
+	}
+    
+	
+    public List getOfflineFilesMetaData(Long mcContentId) throws McApplicationException
+	{
+    	return mcUploadedFileDAO.getOfflineFilesMetaData(mcContentId);
+	}
 	
 	public boolean isUuidPersisted(String uuid) throws McApplicationException
 	{

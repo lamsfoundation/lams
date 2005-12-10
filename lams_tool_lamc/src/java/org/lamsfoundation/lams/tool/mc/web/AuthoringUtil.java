@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,6 +30,7 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.McQueContent;
+import org.lamsfoundation.lams.tool.mc.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -1562,11 +1564,14 @@ public class AuthoringUtil implements McAppConstants {
     		FormFile theOfflineFile = mcAuthoringForm.getTheOfflineFile();
     		logger.debug("retrieved theOfflineFile: " + theOfflineFile);
     		
-    		
     		try
     		{
     			stream = theOfflineFile.getInputStream();
     			fileName=theOfflineFile.getFileName();
+    			if (fileName.length() == 0)      
+        		{
+        			return null;
+        		}
     			logger.debug("retrieved fileName: " + fileName);
     	    	fileProperty="OFFLINE";
     	    	
@@ -1580,11 +1585,20 @@ public class AuthoringUtil implements McAppConstants {
     			logger.debug("io exception occured in accessing the repository server for the offline file : " + e.getMessage());
     		}
     		
-    		List listUploadedOfflineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
-    		logger.debug("listUploadedOfflineFileNames:" + listUploadedOfflineFileNames);
-    		listUploadedOfflineFileNames.add(fileName);
-    		logger.debug("listUploadedOfflineFileNames after add :" + listUploadedOfflineFileNames);
-    		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
+    		if (fileName.length() > 0)     
+    		{
+    			List listUploadedOfflineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
+        		logger.debug("listUploadedOfflineFileNames:" + listUploadedOfflineFileNames);
+        		int index=findFileNameIndex(listUploadedOfflineFileNames, fileName);
+        		logger.debug("index:" + index);
+        		if (index == 0)
+        		{
+        			listUploadedOfflineFileNames.add(fileName);
+            		logger.debug("listUploadedOfflineFileNames after add :" + listUploadedOfflineFileNames);
+            		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);	
+        		}
+    		}
+    		
     	}
     	else
     	{
@@ -1595,6 +1609,12 @@ public class AuthoringUtil implements McAppConstants {
     		{
     			stream = theOnlineFile.getInputStream();
     			fileName=theOnlineFile.getFileName();
+    			
+    			if (fileName.length() == 0)      
+        		{
+        			return null;
+        		}
+    			
     			logger.debug("retrieved fileName: " + fileName);
     			fileProperty="ONLINE";
     	    	
@@ -1607,11 +1627,20 @@ public class AuthoringUtil implements McAppConstants {
     		{
     			logger.debug("io exception occured in accessing the repository server for the online file : " + e.getMessage());
     		}
-    		List listUploadedOnlineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
-    		logger.debug("listUploadedOnlineFileNames:" + listUploadedOnlineFileNames);
-    		listUploadedOnlineFileNames.add(fileName);
-    		logger.debug("listUploadedOnlineFileNames after add :" + listUploadedOnlineFileNames);
-    		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
+
+    		if (fileName.length() > 0)     
+    		{
+    			List listUploadedOnlineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
+        		logger.debug("listUploadedOnlineFileNames:" + listUploadedOnlineFileNames);
+        		int index=findFileNameIndex(listUploadedOnlineFileNames, fileName);
+        		logger.debug("index:" + index);
+        		if (index == 0)
+        		{
+        			listUploadedOnlineFileNames.add(fileName);
+            		logger.debug("listUploadedOnlineFileNames after add :" + listUploadedOnlineFileNames);
+            		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);	
+        		}
+    		}
     	}
     	
     	IMcService mcService =McUtils.getToolService(request);
@@ -1634,6 +1663,52 @@ public class AuthoringUtil implements McAppConstants {
 		return mcAttachmentDTO;
 	}
     
+
+    
+    public static List populateMetaDataAsAttachments(List listOfflineFilesMetaData)
+    {
+    	List listAttachments=new LinkedList();
+    	
+    	Iterator itList = listOfflineFilesMetaData.iterator();
+    	while (itList.hasNext())
+        {
+        	McUploadedFile mcUploadedFile=(McUploadedFile)itList.next();
+        	logger.debug("mcUploadedFile:" + mcUploadedFile);
+        	logger.debug("mcUploadedFile details, uid" + mcUploadedFile.getUid().toString());
+        	logger.debug("mcUploadedFile details, uuid" + mcUploadedFile.getUuid());
+        	logger.debug("mcUploadedFile details, filename" + mcUploadedFile.getFilename());
+        	logger.debug("mcUploadedFile details, isOfflineFile" + !mcUploadedFile.isFileOnline());
+        	
+        	McAttachmentDTO mcAttachmentDTO= new McAttachmentDTO();
+        	mcAttachmentDTO.setUid(mcUploadedFile.getUid().toString());
+     		mcAttachmentDTO.setUuid(mcUploadedFile.getUuid());
+     		mcAttachmentDTO.setFilename(mcUploadedFile.getFilename());
+     		mcAttachmentDTO.setOfflineFile(!mcUploadedFile.isFileOnline());
+     		
+     		listAttachments.add(mcAttachmentDTO);
+     		logger.debug("listAttachments after add" + listAttachments);
+        }
+ 		logger.debug("final listAttachments after populating all: " + listAttachments);
+    	return listAttachments;
+    }
+    
+    
+    public static List populateMetaDataAsFilenames(List listFilesMetaData)
+    {
+    	List listFilenames=new LinkedList();
+    	
+    	Iterator itList = listFilesMetaData.iterator();
+    	while (itList.hasNext())
+        {
+    		McAttachmentDTO mcAttachmentDTO=(McAttachmentDTO)itList.next();
+    		logger.debug("current filename" + mcAttachmentDTO.getFilename());
+     		listFilenames.add(mcAttachmentDTO.getFilename());
+     		logger.debug("listFilenames after add" + listFilenames);
+        }
+ 		logger.debug("final listFilenames after populating all: " + listFilenames);
+    	return listFilenames;
+    }
+    
     
     public static void removeFileItem(HttpServletRequest request, String filename, String offlineFile)
 	{
@@ -1643,9 +1718,10 @@ public class AuthoringUtil implements McAppConstants {
     		logger.debug("will remove an offline file");
     		List listUploadedOfflineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
     		logger.debug("listUploadedOfflineFileNames:" + listUploadedOfflineFileNames);
-    		int index=findFileNameIndex(listUploadedOfflineFileNames, filename);
-    		logger.debug("returned index:" + index);
-    		listUploadedOfflineFileNames.remove(index);
+    		
+    		listUploadedOfflineFileNames.remove(filename);
+    		logger.debug("removed offline filename:" + filename);
+    		
     		logger.debug("listUploadedOfflineFileNames after remove :" + listUploadedOfflineFileNames);
     		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
     	}
@@ -1654,9 +1730,10 @@ public class AuthoringUtil implements McAppConstants {
     		logger.debug("will remove an online file");
     		List listUploadedOnlineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
     		logger.debug("listUploadedOnlineFileNames:" + listUploadedOnlineFileNames);
-    		int index=findFileNameIndex(listUploadedOnlineFileNames, filename);
-    		logger.debug("returned index:" + index);
-    		listUploadedOnlineFileNames.remove(index);
+    		
+    		listUploadedOnlineFileNames.remove(filename);
+    		logger.debug("removed online filename:" + filename);
+    		
     		logger.debug("listUploadedOnlineFileNames after remove :" + listUploadedOnlineFileNames);
     		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
     	}
@@ -1665,12 +1742,12 @@ public class AuthoringUtil implements McAppConstants {
     
     public static int findFileNameIndex(List listUploadedFileNames, String filename)
     {
-    	Iterator itListUploadedOfflineFileNames = listUploadedFileNames.iterator();
+    	Iterator itListUploadedFileNames = listUploadedFileNames.iterator();
     	int mainIndex=0;
-    	while (itListUploadedOfflineFileNames.hasNext())
+    	while (itListUploadedFileNames.hasNext())
         {
     		mainIndex++;
-        	String currentFilename=(String) itListUploadedOfflineFileNames.next();
+        	String currentFilename=(String) itListUploadedFileNames.next();
         	logger.debug("currentFilename :" + currentFilename);
         	if (currentFilename.equals(filename))
 			{
@@ -1724,6 +1801,92 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    public static void removeRedundantOfflineFileItems(HttpServletRequest request, McContent mcContent)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	List allOfflineFilenames=mcService.retrieveMcUploadedOfflineFilesName(mcContent.getUid());
+    	logger.debug("allOfflineFilenames:" + allOfflineFilenames);
+    	
+    	List listUploadedOfflineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
+		logger.debug("listUploadedOfflineFileNames:" + listUploadedOfflineFileNames);
+    	
+		boolean matchFound=false;
+    	Iterator itAllOfflineFiles = allOfflineFilenames.iterator();
+        while (itAllOfflineFiles.hasNext())
+        {
+        	String filename =(String)itAllOfflineFiles.next();
+        	logger.debug("filename: " + filename);
+        
+        	matchFound=false;
+        	Iterator itFiles = listUploadedOfflineFileNames.iterator();
+            while (itFiles.hasNext())
+            {
+            	matchFound=false;
+            	String currentFilename =(String)itFiles.next();
+            	logger.debug("currentFilename: " + currentFilename);
+            	
+            	if (filename.equals(currentFilename))
+            	{
+            		logger.debug("filename match found : " + currentFilename);
+            		matchFound=true;
+            		break;
+            	}
+    		}
+            
+            logger.debug("matchFound : " + matchFound);
+            if (matchFound == false)
+            {
+            	logger.debug("matchFound is false for filename: " + filename);
+            	mcService.removeOffLineFile(filename, mcContent.getUid()); 
+            	logger.debug("filename removed: " + filename);
+            }
+		}
+    }
+    
+    
+    public static void removeRedundantOnlineFileItems(HttpServletRequest request, McContent mcContent)
+    {
+    	IMcService mcService =McUtils.getToolService(request);
+    	
+    	List allOnlineFilenames=mcService.retrieveMcUploadedOnlineFilesName(mcContent.getUid());
+    	logger.debug("allOnlineFilenames:" + allOnlineFilenames);
+    	
+    	List listUploadedOnlineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
+		logger.debug("listUploadedOnlineFileNames:" + listUploadedOnlineFileNames);
+    	
+		boolean matchFound=false;
+    	Iterator itAllOnlineFiles = allOnlineFilenames.iterator();
+        while (itAllOnlineFiles.hasNext())
+        {
+        	String filename =(String)itAllOnlineFiles.next();
+        	logger.debug("filename: " + filename);
+        
+        	matchFound=false;
+        	Iterator itFiles = listUploadedOnlineFileNames.iterator();
+            while (itFiles.hasNext())
+            {
+            	matchFound=false;
+            	String currentFilename =(String)itFiles.next();
+            	logger.debug("currentFilename: " + currentFilename);
+            	
+            	if (filename.equals(currentFilename))
+            	{
+            		logger.debug("filename match found : " + currentFilename);
+            		matchFound=true;
+            		break;
+            	}
+    		}
+            
+            logger.debug("matchFound : " + matchFound);
+            if (matchFound == false)
+            {
+            	logger.debug("matchFound is false for filename: " + filename);
+            	mcService.removeOnLineFile(filename, mcContent.getUid()); 
+            	logger.debug("filename removed: " + filename);
+            }
+		}
+    }
     
     
     public void simulatePropertyInspector_RunOffline(HttpServletRequest request)

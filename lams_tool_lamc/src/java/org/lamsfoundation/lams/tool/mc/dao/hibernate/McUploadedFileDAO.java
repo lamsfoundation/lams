@@ -47,7 +47,7 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
  	private static final String GET_ONLINE_FILES_UUID = "select mcUploadedFile.uuid from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=1";
  	private static final String GET_ONLINE_FILES_NAME ="select mcUploadedFile.filename from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=1 order by mcUploadedFile.uuid";
  	
- 	private static final String GET_OFFLINE_FILES_UUID = "select mcUploadedFile.uuid    from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
+ 	private static final String GET_OFFLINE_FILES_UUID = "select mcUploadedFile.uuid from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
  	private static final String GET_OFFLINE_FILES_NAME ="select mcUploadedFile.filename from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0 order by mcUploadedFile.uuid";
  	
  	private static final String GET_FILES_UUID ="select mcUploadedFile.uuid from McUploadedFile mcUploadedFile where mcUploadedFile.filename=:filename";
@@ -57,7 +57,15 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
  	private static final String FIND_ALL_UPLOADED_FILE_DATA = "from mcUploadedFile in class McUploadedFile";
  	
  	private static final String IS_UUID_PERSISTED ="select mcUploadedFile.uuid from McUploadedFile mcUploadedFile where mcUploadedFile.uuid=:uuid";
-	
+ 	
+ 	private static final String GET_ONLINE_FILES_METADATA = "from mcUploadedFile in class McUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=1";
+ 	
+ 	private static final String GET_OFFLINE_FILES_METADATA = "from mcUploadedFile in class McUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.fileOnline=0";
+ 	
+ 	private static final String IS_OFFLINE_FILENAME_PERSISTED ="select mcUploadedFile from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.filename=:filename and mcUploadedFile.fileOnline=0";
+ 	
+ 	private static final String IS_ONLINE_FILENAME_PERSISTED ="select mcUploadedFile from McUploadedFile mcUploadedFile where mcUploadedFile.mcContentId = :mcContentId and mcUploadedFile.filename=:filename and mcUploadedFile.fileOnline=1";
+ 	
  	
  	public McUploadedFile getUploadedFileById(long submissionId)
     {
@@ -104,6 +112,113 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
     }
 
     
+    public void removeOffLineFile(String filename, Long mcContentId)
+    {
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(IS_OFFLINE_FILENAME_PERSISTED)
+			.setString("filename", filename)
+			.setLong("mcContentId", mcContentId.longValue())
+			.list();
+		
+				if(list != null && list.size() > 0){
+			Iterator listIterator=list.iterator();
+	    	while (listIterator.hasNext())
+	    	{
+	    		McUploadedFile mcFile=(McUploadedFile)listIterator.next();
+				this.getSession().setFlushMode(FlushMode.AUTO);
+	    		templ.delete(mcFile);
+	    		templ.flush();
+	    	}
+		}
+    }
+
+    public void removeOnLineFile(String filename, Long mcContentId)
+    {
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(IS_ONLINE_FILENAME_PERSISTED)
+			.setString("filename", filename)
+			.setLong("mcContentId", mcContentId.longValue())
+			.list();
+
+		if(list != null && list.size() > 0){
+			Iterator listIterator=list.iterator();
+	    	while (listIterator.hasNext())
+	    	{
+	    		McUploadedFile mcFile=(McUploadedFile)listIterator.next();
+				this.getSession().setFlushMode(FlushMode.AUTO);
+	    		templ.delete(mcFile);
+	    		templ.flush();
+	    	}
+		}
+	}
+    
+    public boolean isOffLineFilePersisted(String filename)
+    {
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(IS_OFFLINE_FILENAME_PERSISTED)
+			.setString("filename", filename)
+			.list();
+
+		if (list != null && list.size() > 0)
+		{
+			return true;
+		}
+		return false;
+    }
+
+
+    public boolean isOnLineFilePersisted(String filename)
+    {
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(IS_ONLINE_FILENAME_PERSISTED)
+			.setString("filename", filename)
+			.list();
+
+		if (list != null && list.size() > 0)
+		{
+			return true;
+		}
+		return false;
+    }
+
+    
+    public List getOnlineFilesMetaData(Long mcContentId)
+    {
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(GET_ONLINE_FILES_METADATA)
+			.setLong("mcContentId", mcContentId.longValue())
+			.list();
+
+		return list;
+    }
+    
+
+    public List getOfflineFilesMetaData(Long mcContentId)
+    {
+    	HibernateTemplate templ = this.getHibernateTemplate();
+		List list = getSession().createQuery(GET_OFFLINE_FILES_METADATA)
+			.setLong("mcContentId", mcContentId.longValue())
+			.list();
+
+		return list;
+    }
+    
+    
+    public boolean isUuidPersisted(String uuid)
+    {
+      HibernateTemplate templ = this.getHibernateTemplate();
+      List list = getSession().createQuery(IS_UUID_PERSISTED)
+			.setString("uuid", uuid)
+			.list();
+      
+      if (list != null && list.size() > 0)
+      {
+      	return true;
+      }
+      return false;
+	}
+    
+    
     public void cleanUploadedFilesMetaData()
     {
     	HibernateTemplate templ = this.getHibernateTemplate();
@@ -121,21 +236,7 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
 	    	}
 		}
     }
-    
-    
-    public boolean isUuidPersisted(String uuid)
-    {
-      HibernateTemplate templ = this.getHibernateTemplate();
-      List list = getSession().createQuery(IS_UUID_PERSISTED)
-			.setString("uuid", uuid)
-			.list();
-      
-      if (list != null && list.size() > 0)
-      {
-      	return true;
-      }
-      return false;
-	}
+
     
     public String getFileUuid(String filename)
     {

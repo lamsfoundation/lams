@@ -166,7 +166,20 @@ public interface IMcUploadedFileDAO
 		 * @return List 
 		 */	    
 	    
+	    
+	    public void removeOffLineFile(String filename, Long mcContentId);
+	    
+	    public void removeOnLineFile(String filename, Long mcContentId);
+	    
+	    public boolean isOffLineFilePersisted(String filename);
+	    
+	    public boolean isOnLineFilePersisted(String filename);
+	    
 	    public boolean isUuidPersisted(String uuid);
+	    
+	    public List getOnlineFilesMetaData(Long mcContentId);
+	    
+	    public List getOfflineFilesMetaData(Long mcContentId);
 	    
 	    public void cleanUploadedFilesMetaData();
 	    

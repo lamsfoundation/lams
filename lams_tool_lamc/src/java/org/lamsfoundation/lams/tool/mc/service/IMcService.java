@@ -227,6 +227,18 @@ public interface IMcService
     
     public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException;
     
+    public void removeOffLineFile(String filename, Long mcContentId) throws McApplicationException;
+    
+    public void removeOnLineFile(String filename, Long mcContentId) throws McApplicationException;
+    
+    public boolean isOffLineFilePersisted(String filename) throws McApplicationException;
+    
+    public boolean isOnLineFilePersisted(String filename) throws McApplicationException;
+    
     public boolean isUuidPersisted(String uuid) throws McApplicationException;
+    
+    public List getOnlineFilesMetaData(Long mcContentId) throws McApplicationException;
+    
+    public List getOfflineFilesMetaData(Long mcContentId) throws McApplicationException;
 }
 
