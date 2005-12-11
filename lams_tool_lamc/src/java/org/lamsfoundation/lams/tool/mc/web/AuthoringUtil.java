@@ -1759,6 +1759,36 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    public static List removeFileItem(List listFilesMetaData, String uuid)
+    {
+    	McAttachmentDTO deletableAttachmentDTO=null;
+    	
+    	Iterator itList = listFilesMetaData.iterator();
+    	int mainIndex=0;
+    	while (itList.hasNext())
+        {
+    		mainIndex++;
+    		McAttachmentDTO currentAttachmentDTO=(McAttachmentDTO) itList.next();
+    		logger.debug("currentAttachmentDTO :" + currentAttachmentDTO);
+    		logger.debug("currentAttachmentDTO uuid :" + currentAttachmentDTO.getUuid());
+    		
+    		if (currentAttachmentDTO.getUuid().equals(uuid))
+			{
+    			logger.debug("equal uuid found uuid :" + uuid);
+    			deletableAttachmentDTO=currentAttachmentDTO;
+    			break;
+			}
+        }
+    	
+    	logger.debug("equal uuid found at index :" + mainIndex);
+    	logger.debug("deletable attachment is:" + deletableAttachmentDTO);
+    	
+    	listFilesMetaData.remove(deletableAttachmentDTO);
+    	logger.debug("listOfflineFilesMetaData after remove:" + listFilesMetaData);
+    	
+    	return listFilesMetaData;
+    }
+    
     public static void persistFilesMetaData(HttpServletRequest request, boolean isOfflineFile, McContent mcContent)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -1801,6 +1831,23 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    public static List extractFileNames(List listFilesMetaData)
+    {
+    	Iterator itList = listFilesMetaData.iterator();
+    	LinkedList listFilenames= new LinkedList();
+    	
+        while (itList.hasNext())
+        {
+        	McAttachmentDTO mcAttachmentDTO=(McAttachmentDTO)itList.next();
+        	String filename=mcAttachmentDTO.getFilename();
+        	logger.debug("extracted filename: " + filename);
+        	listFilenames.add(filename);
+        }
+    	logger.debug("final extracted listFilenames: " + listFilenames);
+    	return listFilenames;
+    }
+    
+    
     public static void removeRedundantOfflineFileItems(HttpServletRequest request, McContent mcContent)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -1808,7 +1855,10 @@ public class AuthoringUtil implements McAppConstants {
     	List allOfflineFilenames=mcService.retrieveMcUploadedOfflineFilesName(mcContent.getUid());
     	logger.debug("allOfflineFilenames:" + allOfflineFilenames);
     	
-    	List listUploadedOfflineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_OFFLINE_FILENAMES);
+    	List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		
+ 		List listUploadedOfflineFileNames=extractFileNames(listOfflineFilesMetaData);
 		logger.debug("listUploadedOfflineFileNames:" + listUploadedOfflineFileNames);
     	
 		boolean matchFound=false;
@@ -1852,8 +1902,12 @@ public class AuthoringUtil implements McAppConstants {
     	List allOnlineFilenames=mcService.retrieveMcUploadedOnlineFilesName(mcContent.getUid());
     	logger.debug("allOnlineFilenames:" + allOnlineFilenames);
     	
-    	List listUploadedOnlineFileNames=(List)request.getSession().getAttribute(LIST_UPLOADED_ONLINE_FILENAMES);
+    	List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		
+ 		List listUploadedOnlineFileNames=extractFileNames(listOnlineFilesMetaData);
 		logger.debug("listUploadedOnlineFileNames:" + listUploadedOnlineFileNames);
+    	
     	
 		boolean matchFound=false;
     	Iterator itAllOnlineFiles = allOnlineFilenames.iterator();

@@ -1463,95 +1463,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 
 
     /**
-     * prepares data to view the contents of uploaded files
-     * viewFileItem(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-     * 
-     * @param request
-     * @param form
-     * @param mapping
-     * @return ActionForward
-     */
-    public ActionForward viewFileItem(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-
-    {
-    	logger.debug("dispatching viewFileItem...");
-    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-	 	IMcService mcService =McUtils.getToolService(request);
-	 	
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
-	 	
-    	String userAction="viewFileItem";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
- 		String filename= request.getParameter("fileItem");
- 		logger.debug("filename:" + filename);
- 		
- 		String uuid=mcService.getFileUuid(filename);
- 		logger.debug("uuid:" + uuid);
- 		
- 		if (uuid == null)
- 		{
- 			ActionMessages errors= new ActionMessages();
-    		errors= new ActionMessages();
-			errors.add(Globals.ERROR_KEY,new ActionMessage("error.file.notPersisted"));
-			saveErrors(request,errors);
-			mcAuthoringForm.resetUserAction();
-			persistError(request,"error.file.notPersisted");
-			
-			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(2));
-	 		logger.debug("setting EDIT_OPTIONS_MODE :" + 2);
-			return (mapping.findForward(LOAD_QUESTIONS));
- 		}
- 		
- 		InputStream fileInputStream=mcService.downloadFile(new Long(uuid), null);
- 		logger.debug("fileInputStream:" + fileInputStream);
- 		
- 		DataInputStream dis = new DataInputStream(fileInputStream);
- 		logger.debug("dis:" + dis);
- 		
- 		String allFileText="";
- 		try 
-		{
- 			String input="";
- 			while ((input = dis.readLine()) != null) 
- 			{
- 				logger.debug("input:" + input);
- 				allFileText = allFileText + input + "\r\n";
- 			}    
- 		} catch (EOFException e) {
- 			logger.debug("error reading the file :" + e);
- 			logger.debug("error msg reading the file :" + e.getMessage());
- 		}
-    	catch (IOException e) {
-			logger.debug("error reading the file :" + e);
-			logger.debug("error msg reading the file :" + e.getMessage());
-		}
- 		
- 		logger.debug("allFileText:" + allFileText);
- 		request.getSession().setAttribute(FILE_CONTENT, allFileText);
- 		
- 		request.setAttribute(FILE_CONTENT_READY, new Integer(1));
- 		logger.debug("set FILE_CONTENT_READY to 1");
- 		
- 		request.getSession().setAttribute(FILE_NAME, filename);
- 		
- 		mcAuthoringForm.resetUserAction();
- 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
- 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
-   	    return (mapping.findForward(LOAD_QUESTIONS));
-    }
-    
-
-    /**
-     * removes file data 
+     * removes offline file data 
      * deleteFileItem(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -1562,81 +1474,41 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      * @param mapping
      * @return ActionForward
      */
-    public ActionForward deleteFileItem(ActionMapping mapping,
+    public ActionForward deleteOfflineFile(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
                                          ServletException
 
     {
-    	logger.debug("dispatching deleteFileItem...");
+    	logger.debug("dispatching deleteOfflineFile...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-    	String userAction="deleteFileItem";
- 		request.setAttribute(USER_ACTION, userAction);
- 		logger.debug("userAction:" + userAction);
- 		
- 		String filename= request.getParameter("fileItem");
- 		logger.debug("filename:" + filename);
- 		
- 		String offlineFile= request.getParameter("offlineFile");
- 		logger.debug("offlineFile:" + offlineFile);
- 		
- 		logger.debug("start removing file:" + filename + " it is an:" + offlineFile);
- 		
- 		if (!filename.equals(""))
- 		{
- 			AuthoringUtil.removeFileItem(request, filename, offlineFile);
- 	 		logger.debug("done removing offline file");	
- 		}
- 		
- 		mcAuthoringForm.resetUserAction();
- 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
- 		logger.debug("setting EDIT_OPTIONS_MODE :" + 0);
-   	    return (mapping.findForward(LOAD_QUESTIONS));
-    }
-
-    
-    
-    /**
-     * moves from Advanced Tab to Basic Tab
-     * doneAdvancedTab(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-     * 
-     * @param request
-     * @param form
-     * @param mapping
-     * @return ActionForward
-     */
-    public ActionForward doneAdvancedTab(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-    {
-    	logger.debug("dispatching doneAdvancedTab...");
-    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-	 	IMcService mcService =McUtils.getToolService(request);
-	 	
-	 	AuthoringUtil.readData(request, mcAuthoringForm);
-
-        String userAction="advancedTabDone";
+	 	String userAction="deleteOfflineFile";
     	request.setAttribute(USER_ACTION, userAction);
     	logger.debug("userAction:" + userAction);
-    	
-    	mcAuthoringForm.resetUserAction();
+
+	 	String uuid =mcAuthoringForm.getUuid();
+	 	logger.debug("uuid:" + uuid);
+	 	
+	 	List listOfflineFilesMetaData =(List)request.getSession().getAttribute(LIST_OFFLINEFILES_METADATA);
+ 		logger.debug("listOfflineFilesMetaData:" + listOfflineFilesMetaData);
+ 		listOfflineFilesMetaData=AuthoringUtil.removeFileItem(listOfflineFilesMetaData, uuid);
+ 		logger.debug("listOfflineFilesMetaData after remove:" + listOfflineFilesMetaData);
+ 		request.getSession().setAttribute(LIST_OFFLINEFILES_METADATA, listOfflineFilesMetaData);
+	 	
+        mcAuthoringForm.resetUserAction();
         return (mapping.findForward(LOAD_QUESTIONS));
+    	
     }
-    
-    
+
+
     /**
-     * moves from Instructions Tab to Basic Tab
-     * doneInstructionsTab(ActionMapping mapping,
+     * removes online file data 
+     * deleteFileItem(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)
@@ -1646,27 +1518,38 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      * @param mapping
      * @return ActionForward
      */
-    public ActionForward doneInstructionsTab(ActionMapping mapping,
+    public ActionForward deleteOnlineFile(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
                                          ServletException
+
     {
-    	logger.debug("dispatching doneInstructionsTab...");
+    	logger.debug("dispatching deleteOnlineFile...");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
 	 	AuthoringUtil.readData(request, mcAuthoringForm);
 	 	
-		String userAction="dispinstructionsTabDone";
-		request.setAttribute(USER_ACTION, userAction);
-		logger.debug("userAction:" + userAction);
-		mcAuthoringForm.resetUserAction();
-	    return (mapping.findForward(LOAD_QUESTIONS));
+	 	String userAction="deleteOnlineFile";
+    	request.setAttribute(USER_ACTION, userAction);
+    	logger.debug("userAction:" + userAction);
+
+	 	String uuid =mcAuthoringForm.getUuid();
+	 	logger.debug("uuid:" + uuid);
+	 	
+	 	List listOnlineFilesMetaData =(List)request.getSession().getAttribute(LIST_ONLINEFILES_METADATA);
+ 		logger.debug("listOnlineFilesMetaData:" + listOnlineFilesMetaData);
+ 		listOnlineFilesMetaData=AuthoringUtil.removeFileItem(listOnlineFilesMetaData, uuid);
+ 		logger.debug("listOnlineFilesMetaData after remove:" + listOnlineFilesMetaData);
+ 		request.getSession().setAttribute(LIST_ONLINEFILES_METADATA, listOnlineFilesMetaData);
+	 	
+        mcAuthoringForm.resetUserAction();
+        return (mapping.findForward(LOAD_QUESTIONS));
     }
 
-
-    /**
+    
+     /**
      * adds the offline file information in the content repository.
      * submitOfflineFiles(ActionMapping mapping,
             ActionForm form,
@@ -1786,6 +1669,71 @@ public class McAction extends LamsDispatchAction implements McAppConstants
    	    return (mapping.findForward(LOAD_QUESTIONS));
     }
     
+    
+    /**
+     * moves from Advanced Tab to Basic Tab
+     * doneAdvancedTab(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+     * 
+     * @param request
+     * @param form
+     * @param mapping
+     * @return ActionForward
+     */
+    public ActionForward doneAdvancedTab(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching doneAdvancedTab...");
+    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+	 	AuthoringUtil.readData(request, mcAuthoringForm);
+
+        String userAction="advancedTabDone";
+    	request.setAttribute(USER_ACTION, userAction);
+    	logger.debug("userAction:" + userAction);
+    	
+    	mcAuthoringForm.resetUserAction();
+        return (mapping.findForward(LOAD_QUESTIONS));
+    }
+    
+    
+    /**
+     * moves from Instructions Tab to Basic Tab
+     * doneInstructionsTab(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)
+     * 
+     * @param request
+     * @param form
+     * @param mapping
+     * @return ActionForward
+     */
+    public ActionForward doneInstructionsTab(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+    	logger.debug("dispatching doneInstructionsTab...");
+    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+	 	AuthoringUtil.readData(request, mcAuthoringForm);
+	 	
+		String userAction="dispinstructionsTabDone";
+		request.setAttribute(USER_ACTION, userAction);
+		logger.debug("userAction:" + userAction);
+		mcAuthoringForm.resetUserAction();
+	    return (mapping.findForward(LOAD_QUESTIONS));
+    }
+
     
 	/**
      * ensures that the weight valued entered are valid

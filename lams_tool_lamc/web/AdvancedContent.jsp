@@ -7,10 +7,10 @@
 
 			<table class="forms">
 				<tr>
-	      			<td class="formlabel" valign=top>
+	      			<td NOWRAP class="formlabel" valign=top>
 		      			<bean:message key="radiobox.sln"/>:
 					</td>
-					<td valign=top>
+					<td NOWRAP valign=top>
 						<html:radio property="sln"  value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -22,10 +22,10 @@
 		         </tr>
 		         
    				<tr>
-					<td class="formlabel" valign=top>
+					<td NOWRAP class="formlabel" valign=top>
 		      			<bean:message key="radiobox.onepq"/>:		      			
 					</td>
-					<td valign=top>
+					<td NOWRAP valign=top>
 						<html:radio property="questionsSequenced" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -37,10 +37,10 @@
 		        </tr>
 		         
 		         <tr>
-					<td class="formlabel" valign=top>
+					<td NOWRAP class="formlabel" valign=top>
 		      			<bean:message key="radiobox.retries"/>:		      			
 					</td>
-					<td valign=top>
+					<td NOWRAP valign=top>
 						<html:radio property="retries" value="ON">
 						 <bean:message key="option.on"/>
 						</html:radio>
@@ -53,10 +53,10 @@
 				</tr>	      			
 		        
 		         <tr> 
-					<td class="formlabel" valign=top>
+					<td NOWRAP class="formlabel" valign=top>
 				 			<bean:message key="label.report.title"/>: 
 				 	</td>
-	  				<td class="formcontrol" valign=top>
+	  				<td NOWRAP class="formcontrol" valign=top>
 						<FCK:editor id="richTextReportTitle" basePath="/lams/fckeditor/">
 							  <c:out value="${sessionScope.richTextReportTitle}" escapeXml="false" />						  
 						</FCK:editor>
@@ -64,10 +64,10 @@
 			  	</tr>
 			  	
 			  	<tr> 
-					<td class="formlabel" valign=top>
+					<td NOWRAP class="formlabel" valign=top>
 			 			<bean:message key="label.report.endLearningMessage"/>: 
 			 		</td>
-	  				<td class="formcontrol">
+	  				<td NOWRAP class="formcontrol">
 						<FCK:editor id="richTextEndLearningMsg" basePath="/lams/fckeditor/">
 							  <c:out value="${sessionScope.richTextEndLearningMsg}" escapeXml="false" />						  
 						</FCK:editor>
@@ -75,15 +75,15 @@
 			  	</tr>
 			  	
 		  		<tr>
- 				 	<td colspan=2 align=center valign=top>								
+ 				 	<td NOWRAP colspan=2 align=center valign=top>								
 						&nbsp&nbsp
 				  	</td>
 				</tr>
 				<tr>
-				 	<td valign=top>								
+				 	<td NOWRAP valign=top>								
 						&nbsp&nbsp
 				  	</td>
-					 <td valign=top> 
+					 <td NOWRAP valign=top> 
 						 <html:submit onclick="javascript:submitMethod('doneAdvancedTab');" >
 							<bean:message key="button.done"/>
 						</html:submit>

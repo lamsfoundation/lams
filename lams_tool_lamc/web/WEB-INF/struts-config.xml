@@ -87,13 +87,11 @@
         redirect="true"
       />
       
-      
       <forward
         name="editOptsContent"
         path=".editOptsContent"
         redirect="true"
       />
-      
     </action>
     
    <!--Learning Starter  -->

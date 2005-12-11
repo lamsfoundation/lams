@@ -115,7 +115,7 @@ function submitMethod(actionMethod) {
 		<h2><bean:message key="label.authoring.mc.basic"/></h2>
 			<table align=center> 	  
 			<tr>   
-			<td class=error>
+			<td NOWRAP class=error>
 				<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
 			</td>
 			</tr> 
@@ -139,7 +139,7 @@ function submitMethod(actionMethod) {
 	
 		<table align=center> 	  
 		<tr>   
-		<td class=error>
+		<td NOWRAP class=error>
 			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
 		</td>
 		</tr> 
@@ -156,7 +156,7 @@ function submitMethod(actionMethod) {
 
 		<table align=center> 	  
 		<tr>   
-		<td class=error>
+		<td NOWRAP class=error>
 			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
 		</td>
 		</tr> 

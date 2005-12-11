@@ -23,6 +23,8 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	protected String removeOptionContent;
 	
 	protected String fileItem;
+	protected String uuid;
+	
 	protected FormFile receivedFile;
 	protected String offlineFile;
 	
@@ -113,6 +115,7 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 		this.removeOptionContent=null;
 		
 		this.fileItem=null;
+		this.uuid=null;
 		this.receivedFile=null;
 		
 		this.addContent=null;
@@ -740,5 +743,17 @@ public class McAuthoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setOfflineFile(String offlineFile) {
 		this.offlineFile = offlineFile;
+	}
+	/**
+	 * @return Returns the uuid.
+	 */
+	public String getUuid() {
+		return uuid;
+	}
+	/**
+	 * @param uuid The uuid to set.
+	 */
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 }

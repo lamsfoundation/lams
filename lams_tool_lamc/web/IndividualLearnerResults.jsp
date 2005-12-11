@@ -7,14 +7,14 @@
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 				<table align=center bgcolor="#FFFFFF">
 					  <tr>
-					  	<td align=left class="input" valign=top bgColor="#333366" colspan=2> 
+					  	<td NOWRAP align=left class="input" valign=top bgColor="#333366" colspan=2> 
 						  	<font size=2 color="#FFFFFF"> <b>  <bean:message key="label.assessment"/> </b> </font>
 					  	</td>
 					  </tr>
 				
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 		
 						  <tr>
-						  	<td align=center class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
 							  	<font size=3> <b>  <bean:message key="label.individual.results.withRetries"/> </b> </font>
 						  	</td>
 						  </tr>
@@ -22,7 +22,7 @@
 
 					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
 						  <tr>
-						  	<td align=center class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=center class="input" valign=top colspan=2> 
 							  	<font size=3> <b>  <bean:message key="label.individual.results.withoutRetries"/> </b> </font>
 						  	</td>
 						  </tr>
@@ -30,7 +30,7 @@
 
 
 					  <tr>
-					  	<td align=right class="input" valign=top colspan=2> 
+					  	<td NOWRAP align=right class="input" valign=top colspan=2> 
 						  	<font size=2 color="#000000"> <b>  <bean:message key="label.mark"/>  
 						  	<c:out value="${sessionScope.learnerMark}"/>  &nbsp
 							<bean:message key="label.outof"/> &nbsp
@@ -40,14 +40,14 @@
 					  </tr>	
 
 					<tr>
-						<td align=right class="input" valign=top colspan=2> 
+						<td NOWRAP align=right class="input" valign=top colspan=2> 
 							<hr>
 						</td> 
 					</tr>
 					
 					<c:if test="${sessionScope.userPassed != 'true'}">
 						 <tr>
-						  	<td align=left class="input" valign=top colspan=2> 
+						  	<td NOWRAP align=left class="input" valign=top colspan=2> 
 							  	<font size=2 color="#FF0000"> <b>  <bean:message key="label.mustGet"/> &nbsp
 							  	<c:out value="${sessionScope.learnerMarkAtLeast}"/>  &nbsp
 								<bean:message key="label.outof"/> &nbsp
@@ -63,7 +63,7 @@
 					<c:forEach var="questionEntry" items="${sessionScope.mapQuestionContentLearner}">
 					<c:set var="mainQueIndex" scope="session" value="${mainQueIndex +1}"/>
 						  <tr>
-						  	<td align=left class="input" valign=top bgColor="#999966" colspan=2> 
+						  	<td NOWRAP align=left class="input" valign=top bgColor="#999966" colspan=2> 
 							  	<font color="#FFFFFF"> 
 							  		<c:out value="${questionEntry.value}"/> 
 							  	</font> 
@@ -72,7 +72,7 @@
 
 								  								  
 						  <tr>						 
-							<td align=left>
+							<td NOWRAP align=left>
 							<table align=left>
 			  		  	 		<c:set var="queIndex" scope="session" value="0"/>
 								<c:forEach var="mainEntry" items="${sessionScope.mapGeneralOptionsContent}">
@@ -80,7 +80,7 @@
 										<c:if test="${sessionScope.mainQueIndex == sessionScope.queIndex}"> 		
 									  		<c:forEach var="subEntry" items="${mainEntry.value}">
 				  								<tr> 
-													<td align=left class="input" valign=top> 
+													<td NOWRAP align=left class="input" valign=top> 
 					   								    <img src="images/dot.jpg" align=left> &nbsp
 														<font size=2 color="#669966">	<c:out value="${subEntry.value}"/> </font>					   								    
 													</td> 
@@ -88,13 +88,13 @@
 											</c:forEach>
 
 												<tr>												
-												<td colspan=2 align=left class="input" valign=top> 
+												<td NOWRAP colspan=2 align=left class="input" valign=top> 
 				   								    <bean:message key="label.you.answered"/>
 												</td> 
 												</tr>
 												
 												<tr>
-													<td  align=left class="input" valign=top> 											
+													<td NOWRAP align=left class="input" valign=top> 											
 														<table align=left>
 													  		<c:forEach var="subEntry" items="${mainEntry.value}">
 						  											<c:forEach var="selectedMainEntry" items="${sessionScope.mapGeneralCheckedOptionsContent}">
@@ -102,7 +102,7 @@
 																			  		<c:forEach var="selectedSubEntry" items="${selectedMainEntry.value}">
 																						<c:if test="${subEntry.key == selectedSubEntry.key}"> 		
 																								<tr> 
-																									<td align=left class="input" valign=top> 
+																									<td NOWRAP align=left class="input" valign=top> 
 																										<b> <c:out value="${subEntry.value}"/> </b>
 																									</td> 
 																								</tr>
@@ -115,7 +115,7 @@
 														</table>
 													</td>
 
-													<td  align=right class="input" valign=top> 											
+													<td NOWRAP align=right class="input" valign=top> 											
 														<c:forEach var="mainEntry" items="${sessionScope.mapLearnerAssessmentResults}">
 																<c:if test="${mainEntry.key == sessionScope.queIndex}"> 		
 																	<c:if test="${mainEntry.value == 'true'}"> 		
@@ -139,7 +139,7 @@
 												</tr>
 
 												<tr>
-												<td bgcolor="#CCCC99" colspan=2 align=left class="input" valign=top> 											
+												<td NOWRAP bgcolor="#CCCC99" colspan=2 align=left class="input" valign=top> 											
 													<c:forEach var="mainEntry" items="${sessionScope.mapLearnerAssessmentResults}">
 															<c:if test="${mainEntry.key == sessionScope.queIndex}"> 		
 																<c:if test="${mainEntry.value == 'true'}"> 		
@@ -170,7 +170,7 @@
 					</c:forEach>
 
 			  	   	<tr> 
-				 		<td colspan=2 class="input" valign=top> 
+				 		<td NOWRAP colspan=2 class="input" valign=top> 
 				 		&nbsp
 				 		</td>
 			  	   </tr>
@@ -179,7 +179,7 @@
 
 			 		<c:if test="${sessionScope.isRetries == 'true'}"> 					  	   
 		  	   		  <tr>
-					  	<td colspan=2 align=center class="input" valign=top> 
+					  	<td NOWRAP colspan=2 align=center class="input" valign=top> 
 				  			<html:submit property="redoQuestions" styleClass="a.button">
 								<bean:message key="label.redo.questions"/>
 							</html:submit>	 		
@@ -199,7 +199,7 @@
 
 					<c:if test="${sessionScope.isRetries != 'true'}"> 							  
 		  	   		  <tr>
-		  	   		    <td colspan=2 align=right class="input" valign=top>
+		  	   		    <td NOWRAP colspan=2 align=right class="input" valign=top>
 			  	   		  	<c:if test="${sessionScope.userPassed == 'true'}">
 						  	   <html:submit property="learnerFinished" styleClass="a.button">
 											<bean:message key="label.finished"/>
