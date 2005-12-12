@@ -8,6 +8,8 @@
  * For further information visit:
  * 		http://www.fckeditor.net/
  * 
+ * "Support Open Source software. What about a donation today?"
+ * 
  * File Name: fck_editor.css
  * 	Styles used by the editor IFRAME and Toolbar.
  * 
@@ -77,6 +79,11 @@ body
 	font-size: 11px;
 	cursor: default;
 	font-family: 'Microsoft Sans Serif' , Tahoma, Arial, Verdana, Sans-Serif;
+}
+
+.TB_SideBorder
+{
+	background-color: #696969;
 }
 
 .TB_Expand, .TB_Collapse
