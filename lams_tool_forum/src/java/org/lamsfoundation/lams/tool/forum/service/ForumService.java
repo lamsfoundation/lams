@@ -306,7 +306,15 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 
 	public List getAuthoredTopics(Long forumUid) {
 		List list = messageDao.getAuthoredMessage(forumUid);
-		return MessageDTO.getMessageDTO(list);
+		
+		TreeMap map = new TreeMap(new DateComparator());
+		//sorted by create date
+		Iterator iter = list.iterator();
+		while(iter.hasNext()){
+			Message topic = (Message) iter.next();
+			map.put(topic.getCreated(),topic);
+		}
+		return MessageDTO.getMessageDTO(new ArrayList(map.values()));
 	}
 
 	public void updateSession(ForumToolSession session) {

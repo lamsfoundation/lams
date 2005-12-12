@@ -26,7 +26,13 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 
-
+/**
+ * This class implementaion <code>java.util.Comparator</code> interface. It can sort meesage according to
+ * message post date and message level.
+ * @author Steve.Ni
+ * 
+ * @version $Revision$
+ */
 public class TopicComparator implements Comparator {
 	private static final Logger log = Logger.getLogger(TopicComparator.class);
 	

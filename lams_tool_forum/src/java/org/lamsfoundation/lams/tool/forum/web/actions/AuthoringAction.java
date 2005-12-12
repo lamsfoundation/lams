@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -50,6 +51,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
+import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
@@ -145,7 +147,17 @@ public class AuthoringAction extends Action {
 			//if forum does not exist, try to use default content instead.
 			if(forum == null){
 				forum = forumService.getDefaultContent(contentId);
-				topics = forum.getMessages() != null? new ArrayList(forum.getMessages()):null;
+				if(forum.getMessages() != null){
+					TreeMap map = new TreeMap(new DateComparator());
+					//sorted by create date
+					Iterator iter = forum.getMessages().iterator();
+					while(iter.hasNext()){
+						Message topic = (Message) iter.next();
+						map.put(topic.getCreated(),topic);
+					}
+					topics = new ArrayList(map.values());
+				}else
+					topics = null;
 			}else
 				topics = forumService.getAuthoredTopics(forum.getUid());
 			//initialize attachmentList
@@ -226,6 +238,7 @@ public class AuthoringAction extends Action {
 			iter = deleteAttachmentList.iterator();
 			while(iter.hasNext()){
 				Attachment delAtt = (Attachment) iter.next();
+				iter.remove();
 				//delete from repository
 				forumService.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
 				//it is an existed att, then delete it from current attachmentPO
@@ -241,7 +254,6 @@ public class AuthoringAction extends Action {
 					forumService.deleteForumAttachment(delAtt.getUid());
 				}//end remove from persist value
 			}
-			deleteAttachmentList.clear();
 			
 			//copy back
 			forumPO.setAttachments(attPOSet);
@@ -253,10 +265,10 @@ public class AuthoringAction extends Action {
 			iter = topicDeleteAttachmentList.iterator();
 			while(iter.hasNext()){
 				Attachment delAtt = (Attachment) iter.next();
+				iter.remove();
 				//delete from repository
 				forumService.deleteFromRepository(delAtt.getFileUuid(),delAtt.getFileVersionId());
 			}
-			topicDeleteAttachmentList.clear();
 			
 			//Handle message
 			List topics = getTopicList(request);
@@ -277,10 +289,10 @@ public class AuthoringAction extends Action {
 	    	iter = delTopics.iterator();
 	    	while(iter.hasNext()){
 	    		MessageDTO dto = (MessageDTO) iter.next();
-	    		if(dto.getMessage() != null)
+	    		iter.remove();
+	    		if(dto.getMessage() != null && dto.getMessage().getUid() != null)
 	    			forumService.deleteTopic(dto.getMessage().getUid());
 	    	}
-	    	delTopics.clear();
 
 			//initialize attachmentList again
 			attachmentList = getAttachmentList(request);
@@ -558,7 +570,7 @@ public class AuthoringAction extends Action {
 		message.setAttachments(attSet);
 		
 		//save the new message into HttpSession
-		topics.add(MessageDTO.getMessageDTO(message));
+		topics.add(0,MessageDTO.getMessageDTO(message));
 		
 		//echo back to web page
 		request.setAttribute(ForumConstants.SUCCESS_FLAG,"CREATE_SUCCESS");

@@ -14,9 +14,9 @@
 <div align="center">
 <html:form action="/authoring/createTopic.do" focus="message.subject"
 	onsubmit="return validateMessageForm(this);"  enctype="multipart/form-data">
-<fieldset>
-<%@ include file="/jsps/message/topiclist.jsp" %>
-<%@ include file="/jsps/message/topicform.jsp" %>
- </fieldset>
+	<fieldset>
+		<%@ include file="/jsps/message/topiclist.jsp" %>
+		<%@ include file="/jsps/message/topicform.jsp" %>
+	 </fieldset>
  </html:form>
 </div>
