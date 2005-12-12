@@ -115,7 +115,7 @@ function submitModifyQuestion(questionIndexValue, actionMethod) {
 					<tr>
 					  	<td NOWRAP class="formlabel" valign=top><bean:message key="radiobox.passmark"/>: </td>
 						<td NOWRAP class="input" valign=top> 
-							  <html:text property="passmark"  size="3" maxlength="3"/>							
+							  <html:text property="passmark"  size="3" maxlength="3"/><bean:message key="label.percent"/>
 						</td>
 						<td NOWRAP valign=top> </td> 
 						<td NOWRAP valign=top> </td>
