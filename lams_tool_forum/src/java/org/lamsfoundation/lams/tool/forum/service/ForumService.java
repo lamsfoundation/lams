@@ -305,7 +305,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	}
 
 	public List getAuthoredTopics(Long forumUid) {
-		List list = messageDao.getAuthoredMessage(forumUid);
+		List list = messageDao.getTopicsFromAuthor(forumUid);
 		
 		TreeMap map = new TreeMap(new DateComparator());
 		//sorted by create date
@@ -470,7 +470,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 			fromContent = getDefaultContent(fromContentId);
 		}
 		Forum toContent = Forum.newInstance(fromContent,toContentId,forumToolContentHandler);
-		forumDao.save(toContent);
+		forumDao.saveOrUpdate(toContent);
 		
 		//save topics in this forum
 		Set topics = toContent.getMessages();
@@ -557,7 +557,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
 	}
 
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-		forumToolSessionDao.remove(toolSessionId);
+		forumToolSessionDao.delete(toolSessionId);
 	}
     
     /* (non-Javadoc)

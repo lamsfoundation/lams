@@ -15,6 +15,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class ForumDao extends HibernateDaoSupport {
 	private static final String FIND_INSTRUCTION_FILE = "from " + Attachment.class.getName() 
 			+ " as i where forum_uid=? and i.fileUuid=? and i.fileVersionId=? and i.fileType=?";
+	private static final String FIND_FORUM_BY_CONTENTID = "from Forum forum where forum.contentId=?";
 	
 	public void saveOrUpdate(Forum forum) {
 		forum.updateModificationData();
@@ -37,18 +38,21 @@ public class ForumDao extends HibernateDaoSupport {
 		this.getHibernateTemplate().delete(forum);
 	}
 
-	public List findByNamedQuery(String name) {
-		return this.getHibernateTemplate().findByNamedQuery(name);
-	}
-
 	public Forum getByContentId(Long contentID) {
-		List list = getHibernateTemplate().findByNamedQuery("forumByContentId",contentID);
+		List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID,contentID);
 		if(list != null && list.size() > 0)
 			return (Forum) list.get(0);
 		else
 			return null;
 	}
-
+	/**
+	 * Delete content instruction files according to contentID, file version ID and its type.
+	 * 
+	 * @param contentID
+	 * @param uuid
+	 * @param versionID
+	 * @param type
+	 */
 	public void deleteInstrcutionFile(Long contentID, Long uuid, Long versionID, String type) {
 		HibernateTemplate templ = this.getHibernateTemplate();
 		if ( contentID != null && uuid != null && versionID != null ) {
@@ -65,11 +69,6 @@ public class ForumDao extends HibernateDaoSupport {
 				templ.flush();
 			}
 		}
-	}
-
-	public void save(Forum content) {
-		this.getHibernateTemplate().save(content);
-		this.getHibernateTemplate().flush();
 	}
 
 	public void flush() {

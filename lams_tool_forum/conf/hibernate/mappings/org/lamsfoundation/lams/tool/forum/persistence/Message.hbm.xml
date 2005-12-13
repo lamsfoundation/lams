@@ -185,14 +185,4 @@
 
     </class>
 
-        <query name="allMessages"><![CDATA[
-            from Message m
-        ]]></query>
-        <query name="allMessagesByForum"><![CDATA[
-            from Message m where forum_uid=? order by create_date
-        ]]></query>
-        <query name="allAuthoredMessagesOfForum"><![CDATA[
-            from Message m where is_authored=true and forum_uid=? order by create_date
-        ]]></query>
-
 </hibernate-mapping>

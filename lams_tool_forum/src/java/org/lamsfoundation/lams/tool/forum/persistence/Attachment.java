@@ -15,8 +15,6 @@ import org.apache.log4j.Logger;
  *
  * @hibernate.class table="tl_lafrum11_attachment"
  *
- * @hibernate.query name="allAttachments" query="from Attachment attachment"
- * @hibernate.query name="getAttachmentbyType" query="from Attachment attachment where file_type = ?"
  */
 public class Attachment implements Cloneable{
 	private static final Logger log = Logger.getLogger(Attachment.class);

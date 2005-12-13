@@ -18,7 +18,7 @@ public class MessageDao extends HibernateDaoSupport {
 					+ " where parent_uid is null and m.toolSession.sessionId=?";
 	
 	private static final String SQL_QUERY_FIND_TOPICS_FROM_AUTHOR = "from " + Message.class.getName()
-					+ " where is_authored = true and forum_uid=?";
+					+ " where is_authored = true and forum_uid=? order by create_date";
 	
 	private static final String SQL_QUERY_FIND_CHILDREN = "from " + Message.class.getName()
 					+ " where parent=?";
@@ -35,36 +35,8 @@ public class MessageDao extends HibernateDaoSupport {
 		this.getHibernateTemplate().flush();
 	}
 
-	public void save(Message message) {
-		message.updateModificationData();
-		this.getHibernateTemplate().save(message);
-		this.getHibernateTemplate().flush();
-	}
 	public Message getById(Long messageId) {
 		return (Message) getHibernateTemplate().get(Message.class,messageId);
-
-	}
-
-	public void delete(Message message) {
-		this.getHibernateTemplate().delete(message);
-	}
-
-	public List findByNamedQuery(String name, Long forumId) {
-		return this.getHibernateTemplate().findByNamedQuery(name, forumId);
-	}
-
-	/**
-	 * Delete all messages in special forum.
-	 * @param forumUuid 
-	 * 		The forum UUID which messages will be deleted in this method.
-	 */
-	public void deleteForumMessage(Long forumUuid) {
-		List list = findByNamedQuery("allMessagesByForum",forumUuid);
-		this.getHibernateTemplate().deleteAll(list);
-	}
-
-	public List getAuthoredMessage(Long forumId) {
-		return findByNamedQuery("allAuthoredMessagesOfForum", forumId);
 	}
 
 	public List getRootTopics(Long sessionId) {

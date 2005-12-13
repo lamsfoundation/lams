@@ -1,7 +1,5 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import java.util.List;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -29,10 +27,5 @@ public class AttachmentDao extends HibernateDaoSupport {
             }
         });
         return entity;
-	}
-
-
-	public List findByNamedQuery(String name) {
-		return this.getHibernateTemplate().findByNamedQuery(name);
 	}
 }

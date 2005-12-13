@@ -73,11 +73,4 @@
 
     </class>
 
-        <query name="allAttachments"><![CDATA[
-            from Attachment attachment
-        ]]></query>
-        <query name="getAttachmentbyType"><![CDATA[
-            from Attachment attachment where file_type = ?
-        ]]></query>
-
 </hibernate-mapping>

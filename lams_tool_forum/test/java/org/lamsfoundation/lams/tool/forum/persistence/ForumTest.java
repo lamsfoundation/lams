@@ -6,15 +6,10 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.lamsfoundation.lams.tool.forum.core.FactoryException;
-import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
-
 /**
- * Created by IntelliJ IDEA.
  * User: conradb
  * Date: 7/06/2005
  * Time: 10:38:21
- * To change this template use File | Settings | File Templates.
  */
 public class ForumTest extends TestCase {
 
@@ -22,7 +17,7 @@ public class ForumTest extends TestCase {
         super.setUp();
     }
 
-    public void testCreateAndDeleteForum() throws FactoryException {
+    public void testCreateAndDeleteForum()  {
         //Populate a Forum entity for test purposes
         Forum entity = new Forum();
         entity.setTitle("Lams Forum");
@@ -33,7 +28,7 @@ public class ForumTest extends TestCase {
 
         Set attachments = new HashSet();
 
-        AttachmentDao attachmentDao = (AttachmentDao) GenericObjectFactoryImpl.getTestInstance().lookup(AttachmentDao.class);
+        AttachmentDao attachmentDao = new AttachmentDao();
         Attachment instructions = new Attachment();
         //instructions.setType(true);
         attachments.add(instructions);
@@ -42,7 +37,7 @@ public class ForumTest extends TestCase {
         entity.setAttachments(attachments);
 
         //save
-        ForumDao dao = (ForumDao) GenericObjectFactoryImpl.getTestInstance().lookup(ForumDao.class);
+        ForumDao dao = new ForumDao();
         dao.saveOrUpdate(entity);
         assertNotNull(entity.getUid());
         assertNotNull("date created is null", entity.getCreated());

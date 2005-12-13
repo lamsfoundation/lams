@@ -5,9 +5,6 @@
 	<h1><fmt:message key="label.authoring.heading.basic" /></h1>
 	<h1><fmt:message key="label.authoring.heading.basic.desc" /></h1>
 	<table class="forms">
-		<!--hidden field contentID passed by flash-->
-		<input type="hidden" name="toolContentID"
-			value="<c:out value='${toolContentID}'/>" />
 		<!-- Title Row -->
 		<tr>
 			<td class="formlabel"><fmt:message key="label.authoring.basic.title" />:</td>

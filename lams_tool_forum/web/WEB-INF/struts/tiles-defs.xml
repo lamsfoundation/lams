@@ -16,6 +16,14 @@
     	<put name="footer" value="/includes/footer.jsp"/>
 	</definition>
 
+	<definition name="tiles:monioring:layout" path="/includes/tablayout.jsp">
+    	<put name="pageTitleKey" value=""/>
+    	<put name="body" value=""/>
+    	<put name="tab" value="/jsps/monitoring/tabmenu.jsp"/>
+    	<put name="header" value="/includes/header.jsp"/>
+    	<put name="footer" value="/includes/footer.jsp"/>
+	</definition>
+
 	<!-- B: Generic -->
 	<definition name="tiles:/error" extends="tiles:layout">
     	<put name="body" value="/includes/error.jsp"/>
@@ -74,41 +82,41 @@
 	<!-- E: Authoring -->
 	
 	<!-- B: Monitoring -->
-	<definition name="tiles:/monitoring/forum/listContentUsers" extends="tiles:layout">
+	<definition name="tiles:/monitoring/forum/listContentUsers" extends="tiles:monioring:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.content.userlist"/>
     	<put name="body" value="/jsps/monitoring/contentuserlist.jsp"/>
 	</definition>
-	<definition name="tiles:/monitoring/forum/viewAllMarks" extends="tiles:layout">
+	<definition name="tiles:/monitoring/forum/viewAllMarks" extends="tiles:monioring:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
     	<put name="body" value="/jsps/monitoring/viewallmarks.jsp"/>
 	</definition>
-	<definition name="tiles:/monitoring/forum/viewUserMark" extends="tiles:layout">
+	<definition name="tiles:/monitoring/forum/viewUserMark" extends="tiles:monioring:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
     	<put name="body" value="/jsps/monitoring/usermarklist.jsp"/>
 	</definition>
-	<definition name="tiles:/monitoring/forum/editUserMark" extends="tiles:layout">
+	<definition name="tiles:/monitoring/forum/editUserMark" extends="tiles:monioring:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.edit.user.mark"/>
     	<put name="body" value="/jsps/monitoring/updatemarks.jsp"/>
 	</definition>
-	<definition name="tiles:/monitoring/forum/viewActivity" extends="tiles:layout">
+	<definition name="tiles:/monitoring/forum/viewActivity" extends="tiles:monioring:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.activity"/>
     	<put name="body" value="/jsps/monitoring/viewactivity.jsp"/>
 	</definition>
-	<definition name="tiles:/monitoring/forum/editActivity" extends="tiles:layout">
+	<definition name="tiles:/monitoring/forum/editActivity" extends="tiles:monioring:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.edit.activity"/>
     	<put name="body" value="/jsps/monitoring/editactivity.jsp"/>
 	</definition>
-	<definition name="tiles:/monitoring/forum/viewInstructions" extends="tiles:layout">
+	<definition name="tiles:/monitoring/forum/viewInstructions" extends="tiles:monioring:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.instructions"/>
     	<put name="body" value="/jsps/monitoring/instructions.jsp"/>
 	</definition>
 	
-	<definition name="tiles:/monitoring/forum/statistic" extends="tiles:layout">
+	<definition name="tiles:/monitoring/forum/statistic" extends="tiles:monioring:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.statistic"/>
     	<put name="body" value="/jsps/monitoring/statistic.jsp"/>
 	</definition>
 	
-	<definition name="tiles:/monitoring/forum/viewTopic" extends="tiles:layout">
+	<definition name="tiles:/monitoring/forum/viewTopic" extends="tiles:monioring:layout">
     	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
     	<put name="body" value="/jsps/monitoring/viewtopic.jsp"/>
 	</definition>

@@ -19,8 +19,6 @@ import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
  *
  * @hibernate.class  table="tl_lafrum11_forum"
  *
- * @hibernate.query name="allForums" query="from Forum forum"
- * @hibernate.query name="forumByContentId" query="from Forum forum where forum.contentId=?"
  */
 public class Forum implements Cloneable{
 	

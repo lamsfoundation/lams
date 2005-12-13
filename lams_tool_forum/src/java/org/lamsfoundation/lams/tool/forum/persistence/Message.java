@@ -18,9 +18,6 @@ import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
  *
  * @hibernate.class table="tl_lafrum11_message"
  *
- * @hibernate.query name="allMessages" query="from Message m"
- * @hibernate.query name="allMessagesByForum" query="from Message m where forum_uid=? order by create_date"
- * @hibernate.query name="allAuthoredMessagesOfForum" query="from Message m where is_authored=true and forum_uid=? order by create_date"
  */
 public class Message implements Cloneable{
 	

@@ -1,20 +1,15 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import org.lamsfoundation.lams.tool.forum.core.FactoryException;
-import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
-
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 
 import junit.framework.TestCase;
 
 /**
- * Created by IntelliJ IDEA.
  * User: conradb
  * Date: 7/06/2005
  * Time: 12:42:05
- * To change this template use File | Settings | File Templates.
  */
 public class MessageTest extends TestCase {
 
@@ -22,12 +17,16 @@ public class MessageTest extends TestCase {
         super.setUp();
     }
 
-    public void testCreateAndDeleteMessage() throws FactoryException {
+    public void testCreateAndDeleteMessage()  {
         //Populate a Forum entity for test purposes
         Forum forum = new Forum();
+        ForumUser createUser = new ForumUser();
+        createUser.setFirstName("creator");
+        ForumUser modifyUser = new ForumUser();
+        modifyUser.setFirstName("updator");
 
         //save
-        ForumDao dao = (ForumDao) GenericObjectFactoryImpl.getTestInstance().lookup(ForumDao.class);
+        ForumDao dao = new ForumDao();
         dao.saveOrUpdate(forum);
 
         Message message = new Message();
@@ -37,10 +36,11 @@ public class MessageTest extends TestCase {
 //        message.setToolSession(forum);
         message.setIsAnonymous(false);
         message.setIsAuthored(true);
-        message.setCreatedBy(new Long(1000));
-        message.setModifiedBy(new Long(1002));
+        message.setCreatedBy(createUser);
+        
+        message.setModifiedBy(modifyUser);
 
-        MessageDao messageDao = (MessageDao) GenericObjectFactoryImpl.getTestInstance().lookup(MessageDao.class);
+        MessageDao messageDao = new MessageDao();
         messageDao.saveOrUpdate(message);
 
         assertNotNull(message.getUid());
@@ -69,8 +69,8 @@ public class MessageTest extends TestCase {
 //      message.setToolSession(forum);
         message2.setIsAnonymous(true);
         message2.setIsAuthored(true);
-        message2.setCreatedBy(new Long(1005));
-        message2.setModifiedBy(new Long(1006));
+        message2.setCreatedBy(createUser);
+        message2.setModifiedBy(modifyUser);
 
         messageDao.saveOrUpdate(message2);
         Message reloaded2 = (Message) messageDao.getById(message2.getUid());
@@ -99,11 +99,11 @@ public class MessageTest extends TestCase {
 //      message.setToolSession(forum);
         message3.setIsAnonymous(true);
         message3.setIsAuthored(true);
-        message3.setCreatedBy(new Long(1005));
-        message3.setModifiedBy(new Long(1006));
+        message3.setCreatedBy(createUser);
+        message3.setModifiedBy(modifyUser);
         Set replies = new HashSet();
         replies.add(message3);
-        reloaded.setReplies(replies);
+        reloaded.set(replies);
 
         messageDao.saveOrUpdate(reloaded);
 

@@ -1,8 +1,5 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import org.lamsfoundation.lams.tool.forum.core.FactoryException;
-import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
-
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -19,13 +16,13 @@ public class AttachmentTest extends TestCase {
         super.setUp();
     }
 
-    public void testCreateAndDeleteForum() throws FactoryException {
+    public void testCreateAndDeleteForum() {
         //Populate an Attachment entity for test purposes
-        AttachmentDao attachmentDao = (AttachmentDao) GenericObjectFactoryImpl.getTestInstance().lookup(AttachmentDao.class);
+        AttachmentDao attachmentDao = new AttachmentDao();
         Attachment instructions = new Attachment();
         attachmentDao.saveOrUpdate(instructions);
 
-        AttachmentDao dao = (AttachmentDao) GenericObjectFactoryImpl.getTestInstance().lookup(AttachmentDao.class);
+        AttachmentDao dao = new AttachmentDao();
         dao.saveOrUpdate(instructions);
         assertNotNull(instructions.getUid());
 

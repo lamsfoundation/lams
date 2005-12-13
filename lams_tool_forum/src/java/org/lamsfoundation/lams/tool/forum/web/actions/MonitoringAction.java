@@ -128,25 +128,14 @@ public class MonitoringAction extends Action {
 	  */
 	private ActionForward listContentUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
+    	Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentID);
+    	
 		//get content ID from URL	
-        Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		
-		forumService = getForumService();
-        List sessionsList = forumService.getSessionsByContentId(contentID);
-
-        Map sessionUserMap = new HashMap();
-        //build a map with all users in the submitFilesSessionList
-        Iterator it = sessionsList.iterator();
-        while(it.hasNext()){
-            Long sessionID = ((ForumToolSession)it.next()).getUid();
-            List userList = forumService.getUsersBySessionId(sessionID);
-            sessionUserMap.put(sessionID, userList);
-        }
-        
-		//request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
-		request.setAttribute("sessionUserMap",sessionUserMap);
-		return mapping.findForward("success");
+        return userList(mapping, request);
 	}
+
+
 	/**
 	 * View all user marks for a special Session ID
 	 * @param mapping
@@ -186,7 +175,8 @@ public class MonitoringAction extends Action {
 		forumService = getForumService();
 		forumService.releaseMarksForSession(sessionID);
 		
-		return mapping.findForward("success");
+		//echo back message to web page
+		return userList(mapping,request);
 	}
 	/**
 	 * Download marks for all users in a speical session.
@@ -409,7 +399,7 @@ public class MonitoringAction extends Action {
 	 */
 	private ActionForward viewActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		Long contentId =(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		forumService = getForumService();
 		Forum forum = forumService.getForumByContentId(contentId);
 		//if can not find out forum, echo back error message
@@ -422,7 +412,6 @@ public class MonitoringAction extends Action {
 		String title = forum.getTitle();
 		String instruction = forum.getInstructions();
 		
-		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentId);
 		request.setAttribute("title",title);
 		request.setAttribute("instruction",instruction);
 		return mapping.findForward("success");
@@ -437,8 +426,7 @@ public class MonitoringAction extends Action {
 	 */
 	private ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		
-		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		Long contentId =(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		forumService = getForumService();
 		Forum forum = forumService.getForumByContentId(contentId);
 		//if can not find out forum, echo back error message
@@ -447,7 +435,6 @@ public class MonitoringAction extends Action {
 			errors.add("activity.globel", new ActionMessage("error.fail.get.forum"));
 			this.addErrors(request,errors);
 			//echo back to screen
-			request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentId);
 			return mapping.getInputForward();
 		}
 		
@@ -455,7 +442,6 @@ public class MonitoringAction extends Action {
 		String instruction = forum.getInstructions();
 		request.setAttribute("title",title);
 		request.setAttribute("instruction",instruction);
-		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentId);
 		return mapping.findForward("success");
 	}
 	/**
@@ -468,7 +454,7 @@ public class MonitoringAction extends Action {
 	 */
 	private ActionForward updateActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		Long contentId =(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		String title = request.getParameter("title");
 		String instruction = request.getParameter("instruction");
 		
@@ -483,7 +469,6 @@ public class MonitoringAction extends Action {
 			errors.add("activity.title", new ActionMessage("error.title.empty"));
 		}
 		//echo back to screen
-		request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,contentId);
 		request.setAttribute("title",title);
 		request.setAttribute("instruction",instruction);			
 		if(!errors.isEmpty()){
@@ -506,7 +491,7 @@ public class MonitoringAction extends Action {
 	 */
 	private ActionForward viewInstructions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Long contentId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+		Long contentId =(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		
 		forumService = getForumService();
 		Forum forum = forumService.getForumByContentId(contentId);
@@ -534,38 +519,50 @@ public class MonitoringAction extends Action {
 	 */
 	private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Long sessionId = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_SESSION_ID));
-
-		forumService = getForumService();
-		List topicList = forumService.getRootTopics(sessionId);
-		Iterator iter = topicList.iterator();
-		int totalMsg = 0;
-		int msgNum;
-		float totalMsgMarkSum = 0;
-		float msgMarkSum = 0;
-		for(;iter.hasNext();){
-			MessageDTO msgDto = (MessageDTO) iter.next();
-			//get all message under this topic
-			List topicThread = forumService.getTopicThread(msgDto.getMessage().getUid());
-			//loop all message under this topic
-			msgMarkSum = 0;
-			Iterator threadIter = topicThread.iterator();
-			for(msgNum=0;threadIter.hasNext();msgNum++){
-				MessageDTO dto = (MessageDTO) threadIter.next();
-				if(dto.getMark() != null)
-					msgMarkSum += dto.getMark().floatValue();
-			}	
-			//summary to total mark
-			totalMsgMarkSum += msgMarkSum;
-			//set average mark to topic message DTO for display use
-			msgDto.setMark(getAverageFormat(msgMarkSum/(float)msgNum));
-			totalMsg += msgNum;
-		}
+		Long contentID = (Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		
-		float averMark = totalMsg == 0 ? 0: (totalMsgMarkSum/(float)totalMsg);
-		request.setAttribute("topicList",topicList);
-		request.setAttribute("markAverage",getAverageFormat(averMark));
-		request.setAttribute("totalMessage",new Integer(totalMsg));
+		forumService = getForumService();
+		Map sessionTopicsMap = new HashMap();
+		Map sessionAvaMarkMap = new HashMap();
+		Map sessionTotalMsgMap = new HashMap();
+		
+		List sessList = forumService.getSessionsByContentId(contentID);
+		Iterator sessIter = sessList.iterator();
+		while(sessIter.hasNext()){
+			ForumToolSession session = (ForumToolSession) sessIter.next();
+			List topicList = forumService.getRootTopics(session.getSessionId());
+			Iterator iter = topicList.iterator();
+			int totalMsg = 0;
+			int msgNum;
+			float totalMsgMarkSum = 0;
+			float msgMarkSum = 0;
+			for(;iter.hasNext();){
+				MessageDTO msgDto = (MessageDTO) iter.next();
+				//get all message under this topic
+				List topicThread = forumService.getTopicThread(msgDto.getMessage().getUid());
+				//loop all message under this topic
+				msgMarkSum = 0;
+				Iterator threadIter = topicThread.iterator();
+				for(msgNum=0;threadIter.hasNext();msgNum++){
+					MessageDTO dto = (MessageDTO) threadIter.next();
+					if(dto.getMark() != null)
+						msgMarkSum += dto.getMark().floatValue();
+				}	
+				//summary to total mark
+				totalMsgMarkSum += msgMarkSum;
+				//set average mark to topic message DTO for display use
+				msgDto.setMark(getAverageFormat(msgMarkSum/(float)msgNum));
+				totalMsg += msgNum;
+			}
+			
+			float averMark = totalMsg == 0 ? 0: (totalMsgMarkSum/(float)totalMsg);
+			sessionTopicsMap.put(session.getSessionId(),topicList);
+			sessionAvaMarkMap.put(session.getSessionId(),getAverageFormat(averMark));
+			sessionTotalMsgMap.put(session.getSessionId(),new Integer(totalMsg));
+		}
+		request.setAttribute("topicList",sessionTopicsMap);
+		request.setAttribute("markAverage",sessionAvaMarkMap);
+		request.setAttribute("totalMessage",sessionTotalMsgMap);
 		return mapping.findForward("success");
 	}
 
@@ -593,6 +590,31 @@ public class MonitoringAction extends Action {
 	//==========================================================================================
 	// Utility methods
 	//==========================================================================================
+	/**
+	 * Show all users in a ToolContentID.
+	 * @param mapping
+	 * @param request
+	 * @return
+	 */
+	private ActionForward userList(ActionMapping mapping, HttpServletRequest request) {
+		Long contentID =(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+		
+		forumService = getForumService();
+        List sessionsList = forumService.getSessionsByContentId(contentID);
+
+        Map sessionUserMap = new HashMap();
+        //build a map with all users in the submitFilesSessionList
+        Iterator it = sessionsList.iterator();
+        while(it.hasNext()){
+            Long sessionID = ((ForumToolSession)it.next()).getUid();
+            List userList = forumService.getUsersBySessionId(sessionID);
+            sessionUserMap.put(sessionID, userList);
+        }
+        
+		//request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
+		request.setAttribute("sessionUserMap",sessionUserMap);
+		return mapping.findForward("success");
+	}
 	/**
 	 * Get Forum Service.
 	 * 

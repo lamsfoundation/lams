@@ -5,6 +5,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.forum.core.GenericObjectFactoryImpl;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
@@ -16,12 +17,17 @@ import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
  * Date: 9/06/2005
  * Time: 10:59:06
  */
-public class ForumManagerImplTest extends TestCase {
-    protected IForumService forumManager;
+public class ForumManagerImplTest extends AbstractLamsTestCase  {
 
+	protected IForumService forumManager;
+
+	public ForumManagerImplTest(String name) {
+		super(name);
+		
+	}
     protected void setUp() throws Exception {
         super.setUp();
-        forumManager = (IForumService) GenericObjectFactoryImpl.getTestInstance().lookup("forumManager");
+        forumManager = (IForumService)context.getBean("forumService");
     }
 
     public void testCreateAndDeleteForum() throws PersistenceException {
@@ -221,5 +227,18 @@ public class ForumManagerImplTest extends TestCase {
         message.setIsAuthored(isAuthored);
         return message;
     }
+
+	protected String[] getContextConfigLocation() {
+		return new String[] {"org/lamsfoundation/lams/localApplicationContext.xml",
+				 "org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml",
+				 "org/lamsfoundation/lams/contentrepository/applicationContext.xml",
+				 "org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+				 "org/lamsfoundation/lams/learning/learningApplicationContext.xml",	
+				 "org/lamsfoundation/lams/tool/toolApplicationContext.xml"};
+	}
+
+	protected String getHibernateSessionFactoryName() {
+		return "fourmSessionFactory";
+	}
 
 }

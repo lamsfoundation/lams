@@ -1,6 +1,5 @@
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import java.io.IOException;
 
 /**
  * User: conradb

@@ -99,9 +99,18 @@ public class LearningAction extends Action {
     */
 	private ActionForward viewForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-        //set the mode into http session 
-        ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,MODE_OPTIONAL);
-        request.getSession().setAttribute(AttributeNames.ATTR_MODE, mode);
+        //set the mode into http session
+		ToolAccessMode mode = null;
+		try{
+	        mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,MODE_OPTIONAL);
+	        request.getSession().setAttribute(AttributeNames.ATTR_MODE, mode);
+		}catch(Exception exp){
+			//check wether it already existed in Session
+			mode = (ToolAccessMode) request.getSession().getAttribute(AttributeNames.ATTR_MODE);
+		}
+		if(mode == null){
+			throw new ForumException("Mode is required.");
+		}
         
 		//get sessionId from HttpServletRequest
 		String sessionIdStr = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -216,25 +225,13 @@ public class LearningAction extends Action {
 		//get root topic list
 		List msgDtoList = forumService.getTopicThread(topicId);
 		
-		//set current user to web page, so that can display "edit" button correct. Only author alow to edit.
-		HttpSession ss = SessionManager.getSession();
-		//get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		Long currUserId = new Long(user.getUserID().intValue());
-		Iterator iter = msgDtoList.iterator();
-		while(iter.hasNext()){
-			MessageDTO dto = (MessageDTO) iter.next();
-			if(dto.getMessage().getCreatedBy() != null 
-					&& currUserId.equals(dto.getMessage().getCreatedBy().getUserId()))
-				dto.setAuthor(true);
-			else
-				dto.setAuthor(false);
-		}
+		setAuthorMark(msgDtoList);
 		
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
 		return mapping.findForward("success");
 		
 	}
+
 	/**
 	 * Create a new root topic. 
 	 * 
@@ -331,6 +328,7 @@ public class LearningAction extends Action {
 		forumService = getForumManager();
 		Long rootTopicId = forumService.getRootTopicId(parentId);
 		List msgDtoList = forumService.getTopicThread(rootTopicId);
+		setAuthorMark(msgDtoList);
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
 		
 		return mapping.findForward("success");
@@ -431,6 +429,28 @@ public class LearningAction extends Action {
 	//==========================================================================================
 	// Utility methods
 	//==========================================================================================
+	/**
+	 * If this topic is created by current login user, then set Author mark true.
+	 * 
+	 * @param msgDtoList
+	 */
+	private void setAuthorMark(List msgDtoList) {
+		//set current user to web page, so that can display "edit" button correct. Only author alow to edit.
+		HttpSession ss = SessionManager.getSession();
+		//get back login user DTO
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
+		Long currUserId = new Long(user.getUserID().intValue());
+		Iterator iter = msgDtoList.iterator();
+		while(iter.hasNext()){
+			MessageDTO dto = (MessageDTO) iter.next();
+			if(dto.getMessage().getCreatedBy() != null 
+					&& currUserId.equals(dto.getMessage().getCreatedBy().getUserId()))
+				dto.setAuthor(true);
+			else
+				dto.setAuthor(false);
+		}
+	}
 	/**
 	 * @param topicId
 	 * @return
