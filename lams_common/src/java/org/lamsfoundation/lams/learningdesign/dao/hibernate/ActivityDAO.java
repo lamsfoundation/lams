@@ -63,11 +63,16 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	 */
 	public Activity getActivityByActivityId(Long activityId) {
 		Activity act = (Activity) super.find(Activity.class,activityId);
-		
-		// we must return the real activity, not a Hibernate proxy. So relook
-		// it up. This should be quick as it should be in the cache.
+		return getNonCGLibActivity(act);		
+	}
+
+	/** we must return the real activity, not a Hibernate proxy. So relook
+	* it up. This should be quick as it should be in the cache.
+	*/
+	private Activity getNonCGLibActivity(Activity act) {
 		if ( act != null ) {
 			Integer activityType = act.getActivityTypeId();
+			Long activityId = act.getActivityId();
 			if ( activityType != null ) {
 				switch ( activityType.intValue() ) {
 					case Activity.TOOL_ACTIVITY_TYPE: 
@@ -91,7 +96,7 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 			}
 			throw new DataRetrievalFailureException("Unable to get activity as the activity type is unknown or missing. Activity type is "+activityType);
 		}
-		return null;		
+		return null;
 	}
 
 	/* 
@@ -149,7 +154,7 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 	}
 
 	/**
-	 * @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getActivityByID(java.lang.Integer)
+	 * @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getActivityByUIID(java.lang.Integer, org.lamsfoundation.lams.learningdesign.LearningDesign)
 	 */
 	public Activity getActivityByUIID(Integer id, LearningDesign design) {
 		if ( id != null && design != null ) {
@@ -157,7 +162,7 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 			Query query = this.getSession().createQuery(FIND_BY_UI_ID);
 			query.setInteger(0,id.intValue());
 			query.setLong(1,designID.longValue());
-			return (Activity) query.uniqueResult();
+			return getNonCGLibActivity((Activity) query.uniqueResult());
 		}
 		return null;
 	}

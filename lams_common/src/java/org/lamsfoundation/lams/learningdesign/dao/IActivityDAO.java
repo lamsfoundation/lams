@@ -56,6 +56,12 @@ public interface IActivityDAO extends IBaseDAO{
 	public Activity getActivityByActivityId(Long activityId, Class clasz);
 
 	/**
+	 * Returns an object that may be assigned to Activity, based
+	 * on the UI id set by Flash.
+	 * <p>
+	 * This must return a true Activity object, rather than 
+	 * the Hibernate CGLIB proxy, or other code gets too difficult.
+	 * <p>
 	 * @param uiID The internal id (flash generated) of the activity 
 	 * 		  being looked for 
 	 * @param design The learning_design_id of the design 
