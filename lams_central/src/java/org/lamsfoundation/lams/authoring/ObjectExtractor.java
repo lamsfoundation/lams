@@ -63,8 +63,8 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.hibernate.WorkspaceFolderDAO;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 
 /**
  * @author Manpreet Minhas
@@ -308,7 +308,6 @@ public class ObjectExtractor {
 		while (itr.hasNext())
 		{
 		    Activity activity = (Activity)itr.next();
-		    Long activityId = activity.getActivityId();
 		    if (!updatedSet.contains(activity))
 		    { 
 			      itr.remove(); //removes object from collection;
@@ -352,7 +351,6 @@ public class ObjectExtractor {
 		while (itr.hasNext())
 		{
 		    Transition transition = (Transition)itr.next();
-		    Long transitionId = transition.getTransitionId();
 		    if (!updatedSet.contains(transition))
 		    {
 		       /* This will leave orphan content in the tool tables. It can be removed by the tool content cleaning job, 
@@ -385,13 +383,13 @@ public class ObjectExtractor {
 			}
 			
 			Activity activityObject = Activity.getActivityInstance(activityTypeID.intValue());
-			processActivityType(activityObject,activityDetails);
 			activity =(Activity)activityObject;
 	    }
 	    else
 	    {
 	        activity = existingActivity; //otherwise load existing activity
 	    }
+		processActivityType(activity,activityDetails);
 		
 		
 	    if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID))
