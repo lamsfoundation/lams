@@ -19,9 +19,6 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-<!DOCTYPE tiles-definitions PUBLIC
-   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
-   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
  
 <tiles-definitions>
 <!-- ============= template Definitions ====================== -->

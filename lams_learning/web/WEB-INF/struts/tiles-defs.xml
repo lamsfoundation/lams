@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
@@ -20,10 +21,6 @@ USA
 http://www.gnu.org/licenses/gpl.txt
 -->
 
-<!DOCTYPE tiles-definitions PUBLIC
-   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
-   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
- 
 <tiles-definitions>
 	
 	<!-- Standard layout with css. -->
