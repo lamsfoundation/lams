@@ -134,7 +134,7 @@ public interface McAppConstants {
     public static final String CHOICE_TYPE_ADVANCED						="choiceTypeAdvanced";
     public static final String CHOICE_TYPE_INSTRUCTIONS					="choiceTypeInstructions";
     public static final String EDIT_OPTIONS_MODE						="editOptionsMode";
-    public static final String SUBMIT_SUCCESS							="submitSuccess";
+    public static final String SUBMIT_SUCCESS							="sbmtSuccess";
     public static final String FILE_CONTENT								="fileContent";
     public static final String LOAD_FILE_CONTENT						="loadFileContent";
     public static final String FILE_CONTENT_READY						="fileContentReady";

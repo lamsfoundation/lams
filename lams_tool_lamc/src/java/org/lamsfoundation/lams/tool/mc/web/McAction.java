@@ -1398,12 +1398,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		List existingQuestions = mcService.refreshQuestionContent(mcContentId);
 		logger.debug("existingQuestions: " + existingQuestions);
 		
+		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		
+		/* remove from mapQuestionsContent the questions with no options */
+		mapQuestionsContent=AuthoringUtil.updateQuestionsMapForNoOptions(request, mapQuestionsContent, mapGeneralOptionsContent);
+		logger.debug("returned mapQuestionsContent: " + mapQuestionsContent);
+		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+		logger.debug("persisted MAP_QUESTIONS_CONTENT: " + mapQuestionsContent);
+		
 		logger.debug("will cleanupRedundantQuestions:");
 		/* Removes only unused question entries from the db. It keeps the valid entries since they get updated. */
 		AuthoringUtil.cleanupRedundantQuestions(request, existingQuestions, mapQuestionsContent, mcContent);
 		
 		logger.debug("calling selectAndPersistQuestions: " + existingQuestions);
-		AuthoringUtil.selectAndPersistQuestions(request, existingQuestions, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mcContent);
+		AuthoringUtil.selectAndPersistQuestions(request, existingQuestions, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mapGeneralOptionsContent, mcContent);
 		logger.debug("finished processing questions content...");
 		
 		logger.debug("start processing options content...");
@@ -1414,7 +1423,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		Map mapStartupGeneralOptionsQueId=(Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_QUEID);
 		logger.debug("mapStartupGeneralOptionsQueId: " + mapStartupGeneralOptionsQueId);
 		
-		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
 		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
 		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
 		logger.debug("mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
@@ -1438,13 +1446,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
  		logger.debug("done removing redundant files");
 		
-		//logger.debug("will do addUploadedFilesMetaData");
-		//McUtils.addUploadedFilesMetaData(request,mcContent);
-		//logger.debug("done addUploadedFilesMetaData");
-		
 		errors.clear();
-		errors.add(Globals.ERROR_KEY,new ActionMessage("submit.successful"));
-		logger.debug("add submit.successful to ActionMessages");
+		errors.add(Globals.ERROR_KEY,new ActionMessage("sbmt.successful"));
+		logger.debug("add sbmt.successful to ActionMessages");
 		saveErrors(request,errors);
 		request.setAttribute(SUBMIT_SUCCESS, new Integer(1));
 		logger.debug("set SUBMIT_SUCCESS to 1");

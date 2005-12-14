@@ -876,6 +876,49 @@ public class AuthoringUtil implements McAppConstants {
     }
 
     
+    public static Map updateQuestionsMapForNoOptions(HttpServletRequest request, Map mapQuestionsContent, Map mapGeneralOptionsContent)
+    {
+    	logger.debug("doing updateQuestionsMapForNoOptions...");
+    	IMcService mcService =McUtils.getToolService(request);
+    	Map mapUpdatedQuestionsContent= new TreeMap(new McComparator());
+    	
+    	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+    	logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+    	
+    	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+		boolean questionFound=false;
+        while (itQuestionsMap.hasNext()) 
+        {
+        	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+
+            questionFound=false;
+            Iterator itMapGOC = mapGeneralOptionsContent.entrySet().iterator();
+    		while (itMapGOC.hasNext()) 
+            {
+    		    Map.Entry pairsGOC = (Map.Entry)itMapGOC.next();
+    		    logger.debug("using the  pair: " +  pairsGOC.getKey() + " = " + pairsGOC.getValue());
+    		    logger.debug("comparing the pairs : " +  pairs.getKey() + " and "  + pairsGOC.getKey());
+    		    
+    		    if (pairs.getKey().toString().equals(pairsGOC.getKey().toString()))
+    		    {
+    		        logger.debug("question has options, keep this one: " +  pairs.getKey());
+    		        questionFound=true;
+    		    }
+            }
+    		logger.debug("questionFound: " +  questionFound);
+    		
+    		if (questionFound == true)
+    		{
+    		    logger.debug("will add this question to the the questionsMap:" + pairs.getKey().toString());
+    		    mapUpdatedQuestionsContent.put(pairs.getKey().toString(), pairs.getValue().toString());
+    		}
+    		logger.debug("final mapUpdatedQuestionsContent:" + mapUpdatedQuestionsContent);
+        }
+        return mapUpdatedQuestionsContent;
+    }
+    
+    
     public static void cleanupRedundantQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent, McContent mcContent)
     {
     	logger.debug("doing cleanupRedundantQuestions...");
@@ -921,7 +964,7 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
-    public static void selectAndPersistQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McContent mcContent)
+    public static void selectAndPersistQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent,Map mapFeedbackIncorrect, Map mapFeedbackCorrect, Map mapGeneralOptionsContent, McContent mcContent)
 	{
     	logger.debug("doing selectAndPersistQuestions...");
     	IMcService mcService =McUtils.getToolService(request);
@@ -960,7 +1003,7 @@ public class AuthoringUtil implements McAppConstants {
             else
             {
             	logger.debug("questionContentFound is false: " + mcQueContent);
-            	createQuestionContent(request,mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect,  pairs.getValue().toString(), mcContent);
+            	createQuestionContent(request,mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect,  pairs.getValue().toString(), mapGeneralOptionsContent, mcContent);
             }
         }
     }
@@ -1083,6 +1126,8 @@ public class AuthoringUtil implements McAppConstants {
         }
     }
     
+	
+	
 
 	public static void selectAndPersistOptions(HttpServletRequest request, Map mapStartupGeneralOptionsContent, Map mapStartupGeneralSelectedOptionsContent, 
 			Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, Map mapStartupGeneralOptionsQueId)
@@ -1106,7 +1151,6 @@ public class AuthoringUtil implements McAppConstants {
 	            Map.Entry pairsGO = (Map.Entry)itGOMap.next();
 	            if (pairsSGO.getKey().equals(pairsGO.getKey()))
 	            {
-	            	
 	            	logger.debug("equal keys found: " + pairsSGO.getKey());
 	            	String questionIndex=pairsSGO.getKey().toString();
 	            	Map mapSGO=(Map)pairsSGO.getValue();
@@ -1349,7 +1393,7 @@ public class AuthoringUtil implements McAppConstants {
     }
 
 	
-    public static void createQuestionContent(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, String question, McContent mcContent)
+    public static void createQuestionContent(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, String question, Map mapGeneralOptionsContent, McContent mcContent)
     {
     	logger.debug("using createQuestionContent with question: " + question);
     	IMcService mcService =McUtils.getToolService(request);
@@ -1357,31 +1401,43 @@ public class AuthoringUtil implements McAppConstants {
     	int displayOrder= getNewDisplayOrder(mapQuestionsContent, question);
     	logger.debug("displayOrder: " + displayOrder);
     	
-    	Map mapWeights= (Map)request.getSession().getAttribute(MAP_WEIGHTS);
-    	logger.debug("MAP_WEIGHTS: " + MAP_WEIGHTS);
+    	boolean isQuestionWithOptions=isQuestionWithOptions(mapGeneralOptionsContent, displayOrder);
+    	logger.debug("isQuestionWithOptions: " + isQuestionWithOptions);
     	
-    	String weight=(String)mapWeights.get(new Integer(displayOrder).toString());
-    	logger.debug("new weight will be:" + weight);
-    	
-    	String incorrectFeedback=(String)mapFeedbackIncorrect.get(new Integer(displayOrder).toString());
-    	logger.debug("new  incorrectFeedback will be :" + incorrectFeedback);
+    	if (isQuestionWithOptions == true)
+    	{
+    	    Map mapWeights= (Map)request.getSession().getAttribute(MAP_WEIGHTS);
+        	logger.debug("MAP_WEIGHTS: " + MAP_WEIGHTS);
+        	
+        	String weight=(String)mapWeights.get(new Integer(displayOrder).toString());
+        	logger.debug("new weight will be:" + weight);
+        	
+        	String incorrectFeedback=(String)mapFeedbackIncorrect.get(new Integer(displayOrder).toString());
+        	logger.debug("new  incorrectFeedback will be :" + incorrectFeedback);
 
-    	String correctFeedback=(String)mapFeedbackCorrect.get(new Integer(displayOrder).toString());
-    	logger.debug("new correctFeedback will be :" + correctFeedback);
-    	
-    	McQueContent mcQueContent=  new McQueContent(question,
-      	 		new Integer(displayOrder),
-      	 		new Integer(weight),
-				false,
-				incorrectFeedback,
-				correctFeedback,
-				mcContent,
-				new HashSet(),
-				new HashSet()
-				);
-    	
-    	mcService.saveOrUpdateMcQueContent(mcQueContent);
-		logger.debug("created a new mcQueContent in the db: " + mcQueContent);
+        	String correctFeedback=(String)mapFeedbackCorrect.get(new Integer(displayOrder).toString());
+        	logger.debug("new correctFeedback will be :" + correctFeedback);
+        	
+        	McQueContent mcQueContent=  new McQueContent(question,
+          	 		new Integer(displayOrder),
+          	 		new Integer(weight),
+    				false,
+    				incorrectFeedback,
+    				correctFeedback,
+    				mcContent,
+    				new HashSet(),
+    				new HashSet()
+    				);
+        	
+        	mcService.saveOrUpdateMcQueContent(mcQueContent);
+    		logger.debug("created a new mcQueContent in the db: " + mcQueContent);    
+    	}
+    	else
+    	{
+    	    logger.debug("we don't create this question's content since it doesn't have options associated with it.");
+    	    //mapCopyQuestionsContent.remove(new Long(displayOrder).toString());
+    	    //request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapCopyQuestionsContent);
+    	}
     }
     
 
@@ -1405,78 +1461,33 @@ public class AuthoringUtil implements McAppConstants {
     
     
     /**
-     * creates the questions from the user in the db and makes a call to persist options.
-     * persistQuestions(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McContent mcContent)
-     *  
-     * @param request
-     * @param mapQuestionsContent
-     * @param mapFeedbackIncorrect
-     * @param mapFeedbackCorrect
-     * @param mcContent
+     * finds out whether a question has options (candidate answers) or not.
+     * 
+     * isQuestionWithOptions(Map mapGeneralOptionsContent, int displayOrder)
+     * 
+     * @param mapGeneralOptionsContent
+     * @param displayOrder
+     * @return
      */
-    public static void persistQuestions(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McContent mcContent)
-	{
-    	IMcService mcService =McUtils.getToolService(request);
-    	logger.debug("mapQuestionsContent to be persisted :" + mapQuestionsContent);
-    	logger.debug("mapFeedbackIncorrect :" + mapFeedbackIncorrect);
-    	logger.debug("mapFeedbackCorrect :" + mapFeedbackCorrect);
-
-        Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-		logger.debug("final MAP_GENERAL_OPTIONS_CONTENT :" + mapGeneralOptionsContent);
-
-		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-		logger.debug("final MAP_GENERAL_SELECTED_OPTIONS_CONTENT :" + mapGeneralSelectedOptionsContent);
-
-    	Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
-		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
-		logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
-		
-    	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
-        while (itQuestionsMap.hasNext()) {
+    public static boolean isQuestionWithOptions(Map mapGeneralOptionsContent, int displayOrder)
+    {
+    	logger.debug("mapGeneralOptionsContent:" + mapGeneralOptionsContent);
+    	
+    	Iterator itQuestionsMap = mapGeneralOptionsContent.entrySet().iterator();
+        while (itQuestionsMap.hasNext()) 
+        {
             Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
             logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-            if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
+            logger.debug("current questionIndex: " + new Integer(pairs.getKey().toString()).intValue());
+            int questionIndex=new Integer(pairs.getKey().toString()).intValue();
+            if (questionIndex == displayOrder)
             {
-            	logger.debug("checking existing question text: " +  pairs.getValue().toString() + " and mcContent uid():" + mcContent.getUid());
-            	
-            	String currentFeedbackIncorrect=(String)mapFeedbackIncorrect.get(pairs.getKey());
-        	 	logger.debug("currentFeedbackIncorrect: " +  currentFeedbackIncorrect);
-        	 	if (currentFeedbackIncorrect == null) currentFeedbackIncorrect="";
-        	 	
-        	 	String currentFeedbackCorrect=(String)mapFeedbackCorrect.get(pairs.getKey());
-        	 	logger.debug("currentFeedbackCorrect: " +  currentFeedbackCorrect);
-        	 	if (currentFeedbackCorrect == null) currentFeedbackCorrect=""; 
-            	
-            	String currentWeight=(String) mapWeights.get(pairs.getKey().toString());
-            	logger.debug("currentWeight: " + currentWeight);
-
-            	McQueContent mcQueContent=  new McQueContent(pairs.getValue().toString(),
-              	        	 		new Integer(pairs.getKey().toString()),
-              	        	 		new Integer(currentWeight),
-									false,
-									currentFeedbackIncorrect,
-									currentFeedbackCorrect,
-									mcContent,
-									new HashSet(),
-									new HashSet()
-             						);
-       	        mcService.createMcQue(mcQueContent);
-       	        logger.debug("persisted mcQueContent: " + mcQueContent);
-           	
-        	    logger.debug("remove existing options for  mcQueContent : " + mcQueContent.getUid());
-           	    mcService.removeMcOptionsContentByQueId(mcQueContent.getUid());
-           	    logger.debug("removed all mcOptionsContents for mcQueContentId :" + mcQueContent.getUid());
-     			
-       	         if (mcQueContent != null)
-       	         {
-       	         	logger.debug("pre persistOptions for: " + mcQueContent);
-       	         	logger.debug("sending :" + pairs.getKey().toString());
-       	         	AuthoringUtil.persistOptions(request, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent, mcQueContent, pairs.getKey().toString());
-       	         	logger.debug("post persistOptions"); 	
-       	         }
+            	logger.debug("questionIndex found:" + questionIndex);
+            	return true;
             }
         }
-	}
+        return false;
+    }
     
     
     /**
