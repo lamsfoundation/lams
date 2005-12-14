@@ -31,6 +31,8 @@
 		<html:hidden property="toolContentID"/>
 		<html:hidden  property="currentTab" styleId="currentTab"/>
 
+<h1><fmt:message key="label.authoring.heading.basic" /></h1>
+
 <!-- start tabs -->
 <!-- tab holder table -->
 <table border="0" cellspacing="0" cellpadding="0">

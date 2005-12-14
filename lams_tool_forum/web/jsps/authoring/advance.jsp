@@ -1,6 +1,5 @@
 	<!---------------------------Advance Tab Content ------------------------>	
-	<div id='content_a'  class="tabbody content_a">
-	<h1><fmt:message key="label.authoring.heading.advance" /></h1>
+	<div id='content_a'  class="tabbody content_a" >
 	<h2><fmt:message key="label.authoring.heading.advance.desc" /></h2>
 	<table class="forms">
 		<!-- Instructions Row -->
@@ -25,16 +24,18 @@
 				</html:checkbox>
 			</td>
 		</tr>
-		<!-- Button Row -->
 		<tr><td colspan="2"><html:errors/></td></tr>
-		<tr>
-			<td><html:button property="cancel" onclick="window.close()" styleClass="button">
-				<fmt:message key="label.authoring.cancel.button" />
-			</html:button></td>
-			<td >
-			<html:submit property="save" styleClass="button">
-				<fmt:message key="label.authoring.save.button" />
-			</html:submit></td>
-		</tr>
 	</table>
+
+		<!-- Button Row -->
+		<HR>
+		<p align="right">
+			<html:submit property="save" styleClass="a.button">
+				<fmt:message key="label.authoring.save.button" />
+			</html:submit>
+			<html:button property="cancel"
+				onclick="window.close()" styleClass="a.button">
+				<fmt:message key="label.authoring.cancel.button" />
+			</html:button>
+		</p>
 	</div>

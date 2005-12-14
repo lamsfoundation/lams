@@ -19,8 +19,8 @@
 	}
 </script>
 <!---------------------------Basic Tab Content ------------------------>
+
 <div id='content_b' class="tabbody content_b">
-<h1><fmt:message key="label.authoring.heading.basic" /></h1>
 <h2><fmt:message key="label.authoring.heading.basic.desc" /></h2>
 <table class="forms">
 	<tr>
@@ -41,26 +41,28 @@
 			<%@ include file="/jsps/message/topiclist.jsp" %>
 		</c:if></td>
 	</tr>
-	<tr>
-		<td colspan="2" align="left">
+	<td colspan="2" align="left">
 			<a href="javascript:launchPopup('<html:rewrite page="/authoring/newTopic.do"/>');">
 				<fmt:message key="label.authoring.create.new.topic" />
 			</a>
 		</td>
 	</tr>
-	
-	<!-- Button Row -->
 	<tr>
 		<td colspan="2"><html:errors /></td>
 	</tr>
-	<tr>
-		<td colspan="2" class="formcontrol"><html:button property="cancel"
-			onclick="window.close()">
-			<fmt:message key="label.authoring.cancel.button" />
-		</html:button> <html:submit property="save">
-			<fmt:message key="label.authoring.save.button" />
-		</html:submit></td>
-	</tr>
+	</table>
+
+		<!-- Button Row -->
+		<HR>
+		<p align="right">
+			<html:submit property="save" styleClass="a.button">
+				<fmt:message key="label.authoring.save.button" />
+			</html:submit>
+			<html:button property="cancel"
+				onclick="window.close()" styleClass="a.button">
+				<fmt:message key="label.authoring.cancel.button" />
+			</html:button>
+		</p>
 </table>
 
 </div>
