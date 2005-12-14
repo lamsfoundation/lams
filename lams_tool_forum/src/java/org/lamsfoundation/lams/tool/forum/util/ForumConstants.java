@@ -47,6 +47,10 @@ public interface ForumConstants {
 
 	public static final String MESSAGE_UID = "messageID";
 
+	public static final String MODE = "mode";
+	public static final String AUTHOR_MODE = "author_mode";
+	public static final String MONITOR_MODE = "monitor_mode";
+
 
 	
 	

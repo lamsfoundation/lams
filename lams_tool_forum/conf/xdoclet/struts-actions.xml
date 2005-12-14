@@ -1,5 +1,13 @@
 		<!-- ========== Action Mapping Definitions ============================== -->
-		
+		<action path="/defineLater"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			name="forumForm" 
+			scope="session" 
+			validate="false"
+			parameter="defineLater">
+			<forward name="success" path="tiles:/monitoring/forum/defineLater" />
+		</action>
+   		
 		<!-- ========== BEGIN: Authroing Definitions ============================== -->
 		<action path="/authoring/init"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
@@ -16,7 +24,8 @@
 			scope="session" 
 			parameter="updateContent" 
 			validate="false">
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="author" path="/jsps/authoring/authoring.jsp" />
+			<forward name="monitor" path="tiles:/monitoring/forum/defineLater" />
 		</action>
 
 		<action path="/authoring/uploadOnline"
@@ -122,7 +131,8 @@
 			scope="session" 
 			validate="false"
 			parameter="finishTopic" >
-			<forward name="success" path="/jsps/authoring/authoring.jsp" />
+			<forward name="author" path="/jsps/authoring/authoring.jsp" />
+			<forward name="monitor" path="tiles:/monitoring/forum/defineLater" />
 		</action>
 		
 		<!-- ========== END: Authroing Definitions ============================== -->

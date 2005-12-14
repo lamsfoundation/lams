@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -76,8 +77,13 @@ public class AuthoringAction extends Action {
 		String param = mapping.getParameter();
 		//-----------------------Forum Author function ---------------------------
 	  	if (param.equals("initPage")) {
+	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.AUTHOR_MODE);
        		return initPage(mapping, form, request, response);
         }
+	  	if (param.equals("defineLater")) {
+	  		request.getSession().setAttribute(ForumConstants.MODE,ForumConstants.MONITOR_MODE);
+	  		return initPage(mapping, form, request, response);
+	  	}
         if (param.equals("updateContent")) {
        		return updateContent(mapping, form, request, response);
         }
@@ -218,6 +224,11 @@ public class AuthoringAction extends Action {
 				//new Forum, create it.
 				forumPO = forum;
 				forumPO.setContentId(forumForm.getToolContentID());
+			}else{
+				Long uid = forumPO.getUid();
+				PropertyUtils.copyProperties(forumPO,forum);
+				//get back UID
+				forumPO.setUid(uid);
 			}
 			
 	    	//merge attachment info
@@ -300,7 +311,12 @@ public class AuthoringAction extends Action {
 		} catch (Exception e) {
 			log.error(e);
 		}
-		return mapping.findForward("success");
+		
+    	String mode = (String) request.getSession().getAttribute(ForumConstants.MODE);
+    	if(StringUtils.equals(mode,ForumConstants.AUTHOR_MODE))
+    		return mapping.findForward("author");
+    	else
+    		return mapping.findForward("monitor");
 	}
 
 	/**
@@ -784,7 +800,11 @@ public class AuthoringAction extends Action {
 		}
     	forum.setMessages(msgSet);
     	
-    	return mapping.findForward("success");
+    	String mode = (String) request.getSession().getAttribute(ForumConstants.MODE);
+    	if(StringUtils.equals(mode,ForumConstants.AUTHOR_MODE))
+    		return mapping.findForward("author");
+    	else
+    		return mapping.findForward("monitor");
     	
     }
 

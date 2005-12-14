@@ -110,6 +110,7 @@ public class MonitoringAction extends Action {
 		 if (param.equals("statistic")) {
 			 return statistic(mapping,form, request, response);
 		 }
+
 		 //***************** Miscellaneous ********************		 
 		 if (param.equals("viewTopic")) {
 			 return viewTopic(mapping,form, request, response);
@@ -117,7 +118,8 @@ public class MonitoringAction extends Action {
 		 return mapping.findForward("error");
 	 }
 
-	 /**
+
+	/**
 	  * The initial method for monitoring. List all users according to given Content ID.
 	  * 
 	  * @param mapping
@@ -565,7 +567,6 @@ public class MonitoringAction extends Action {
 		request.setAttribute("totalMessage",sessionTotalMsgMap);
 		return mapping.findForward("success");
 	}
-
 	/**
 	 * View topic subject, content and attachement.
 	 * 

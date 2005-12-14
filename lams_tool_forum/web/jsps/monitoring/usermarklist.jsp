@@ -32,6 +32,33 @@
 					<fmt:formatDate value="${topic.message.updated}" type="date" dateStyle="full" />
 				</td>
 			</tr>
+			 <tr>
+			<tr>
+				<td>Marks:</td>
+				<td colspan="3"> 	
+						<c:choose>
+									<c:when test="${empty topic.message.report.mark}">
+										<c:out value="Not Available"/>
+									</c:when>
+									<c:otherwise>
+										<c:out value="${topic.message.report.mark}" escapeXml="false"/>
+									</c:otherwise>
+								</c:choose>
+				</td>
+			</tr>			
+			<tr>
+				<td>Comments:</td>
+				<td  colspan="3">
+								<c:choose>
+									<c:when test="${empty topic.message.report.comment}">
+										<c:out value="Not Available"/>								
+									</c:when>
+									<c:otherwise>
+										<c:out value="${topic.message.report.comment}" escapeXml="false"/>
+									</c:otherwise>
+								</c:choose>
+				</td>
+			</tr>
 		 <tr>
 			<td colspan="2">
 			<br>

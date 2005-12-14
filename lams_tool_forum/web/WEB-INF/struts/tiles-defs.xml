@@ -56,6 +56,11 @@ http://www.gnu.org/licenses/gpl.txt
 	<!-- E: Generic -->
 	
 	<!-- B: Authoring -->
+	<definition name="tiles:/monitoring/forum/defineLater" extends="tiles:layout">
+    	<put name="pageTitleKey" value="page.title.monitoring.definelater"/>
+    	<put name="body" value="/jsps/monitoring/definelater.jsp"/>
+	</definition>
+	
     <definition name="tiles:/authoring/forum/newTopic" extends="tiles:layout">
     	<put name="pageTitleKey" value="title.message.add"/>
     	<put name="body" value="/jsps/authoring/message/create.jsp"/>
@@ -141,6 +146,7 @@ http://www.gnu.org/licenses/gpl.txt
     	<put name="pageTitleKey" value="page.title.monitoring.view.topic"/>
     	<put name="body" value="/jsps/monitoring/viewtopic.jsp"/>
 	</definition>
+	
 	<!-- E: Monitoring -->
 	
 </tiles-definitions>

@@ -1,3 +1,4 @@
+
 <script lang="javascript">
 <!-- Common Javascript functions for LAMS -->
 

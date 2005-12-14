@@ -3,7 +3,8 @@
 	function popupable(url,name){
 	if(window.opener != null || (typeof popFobidden != "undefined"))
 		//it is already a popup window, then just load it
-		location.href=url;
+//		location.href=url;
+		launchPopup(url,name);
 	else
 		//it is not in popup window, so pops it up
 		launchPopup(url,name);
