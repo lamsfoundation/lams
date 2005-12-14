@@ -1,7 +1,6 @@
 
 	<!---------------------------Instruction Tab Content ------------------------>
 	<div id='content_i'  class="tabbody content_i">
-	<h1><fmt:message key="label.authoring.heading.instructions" /></h1>
 	<h2><fmt:message key="label.authoring.heading.instructions.desc" /></h2>
 	<table class="forms">
 		<!--hidden field contentID passed by flash-->
@@ -103,18 +102,16 @@
 				</html:submit>
 			</td>
 		</tr>			
-		</tr>
-		<!-- Button Row -->
 		<tr><td colspan="2"><html:errors/></td></tr>
-		<tr>
-			<td class="formcontrol"><html:button property="cancel"
-				onclick="window.close()">
-				<fmt:message key="label.authoring.cancel.button" />
-			</html:button></td>
-			<td class="formcontrol">
-			<html:submit property="action">
+		</table>		
+		<!-- Button Row -->
+		<p align="right">
+			<html:submit property="action" styleClass="button">
 				<fmt:message key="label.authoring.save.button" />
-			</html:submit></td>
-		</tr>
-	</table>
+			</html:submit>
+			<html:button property="cancel"
+				onclick="window.close()" styleClass="button">
+				<fmt:message key="label.authoring.cancel.button" />
+			</html:button>
+		</p>
 	</div>

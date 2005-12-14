@@ -122,7 +122,10 @@ MM_reloadPage(true);
 </div>
 
 <hr>
+<p align="right">
 <html:submit property="method" styleClass="button"><fmt:message key="button.save" /></html:submit>
+<html:button property="method" onclick="window.close()" styleClass="button"><fmt:message key="button.cancel" /></html:button>
+</p>
 <!-- end of content_b -->
 </div>
 
@@ -262,7 +265,10 @@ MM_reloadPage(true);
  </logic:notEqual>
  </logic:present>
 	<hr>
+<p align="right">
 <html:submit property="method" styleClass="button"><fmt:message key="button.save" /></html:submit>
+<html:button property="method" onclick="window.close()" styleClass="button"><fmt:message key="button.cancel" /></html:button>
+</p>
 
 
 <!-- end of content_a -->

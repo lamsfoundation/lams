@@ -1,6 +1,5 @@
 	<!---------------------------Basic Tab Content ------------------------>
 	<div id='content_b' class="tabbody content_b" >
-	<h1><fmt:message key="label.authoring.heading.basic" /></h1>
 	<h2><fmt:message key="label.authoring.heading.basic.desc" /></h2>
 	<table class="forms">
 		<tr>
@@ -14,19 +13,18 @@
 				<c:out value="${authoring.instruction}" escapeXml="false"/>
 			</FCK:editor></td>
 		</tr>
-		<!-- Button Row -->
 		<tr><td colspan="2"><html:errors/></td></tr>
-		<tr>
-			<td colspan="2" class="formcontrol"><html:button property="cancel"
-				onclick="window.close()">
+		</table>		
+		<!-- Button Row -->
+		<p align="right">
+			<html:submit property="action" styleClass="button">
+				<fmt:message key="label.authoring.save.button" />
+			</html:submit>
+			<html:button property="cancel"
+				onclick="window.close()" styleClass="button">
 				<fmt:message key="label.authoring.cancel.button" />
-				</html:button>
-				<html:submit property="action">
-					<fmt:message key="label.authoring.save.button" />
-				</html:submit>
-			</td>
-		</tr>
-	</table>
+			</html:button>
+		</p>
 
 	</div>
 	
