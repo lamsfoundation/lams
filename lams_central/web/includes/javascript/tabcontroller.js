@@ -86,6 +86,30 @@ function showTab(tabId){
 	
 }
 
+function showMonitoringTab(tabId)
+{
+	selectTab(tabId);
+	
+	if(tabId == "i"){
+		deSelectTab("su");
+		deSelectTab("st");
+		deSelectTab("e");
+	}else if(tabId == "su"){
+		deSelectTab("i");
+		deSelectTab("st");
+		deSelectTab("e");
+	}else if(tabId == "st"){
+		deSelectTab("i");
+		deSelectTab("su");
+		deSelectTab("e");
+	}else{
+		deSelectTab("st");
+		deSelectTab("su");
+		deSelectTab("i");
+	}
+	
+}
+
 function findPosX(obj)  {
     var curleft = 0;
     if(obj.offsetParent)
