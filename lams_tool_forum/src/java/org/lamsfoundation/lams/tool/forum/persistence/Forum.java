@@ -41,7 +41,7 @@ public class Forum implements Cloneable{
 	private boolean contentInUse;
 	private Date created;
 	private Date updated;
-	private Long createdBy;
+	private ForumUser createdBy;
 	
 	private Set messages;
 	private Set attachments;
@@ -174,18 +174,19 @@ public class Forum implements Cloneable{
     /**
      * @return Returns the userid of the user who created the Forum.
      *
-     * @hibernate.property
+     * @hibernate.many-to-one
+     *      cascade="none"
      * 		column="create_by"
      *
      */
-    public Long getCreatedBy() {
+    public ForumUser getCreatedBy() {
         return createdBy;
     }
 
     /**
      * @param createdBy The userid of the user who created this Forum.
      */
-    public void setCreatedBy(Long createdBy) {
+    public void setCreatedBy(ForumUser createdBy) {
         this.createdBy = createdBy;
     }
 

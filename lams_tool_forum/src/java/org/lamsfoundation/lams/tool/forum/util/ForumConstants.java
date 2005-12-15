@@ -39,8 +39,6 @@ public interface ForumConstants {
 
 	public static final String TOPIC_DELETED_ATTACHMENT_LIST = "topicDeletedAttachmentList";
 
-	public static final String NEW_FORUM_USER = "newUser";
-
 	public static final String DELETED_AUTHORING_TOPICS_LIST = "deletedAuthoringTopicList";
 
 	public static final String USER_UID = "userID";

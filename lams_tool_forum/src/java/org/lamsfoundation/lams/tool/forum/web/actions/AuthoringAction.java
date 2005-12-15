@@ -209,14 +209,15 @@ public class AuthoringAction extends Action {
 			forumService = getForumManager();
 			
 			//*******************************Handle user*******************
-			//if there are new user
-			boolean newUser = false;
-			ForumUser forumUser = (ForumUser) request.getSession().getAttribute(ForumConstants.NEW_FORUM_USER);
-			if(forumUser != null){
+			//try to get form system session
+			HttpSession ss = SessionManager.getSession();
+			//get back login user DTO
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			ForumUser forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
+			if(forumUser == null){
+				forumUser = new ForumUser(user,null);
 				forumService.createUser(forumUser);
-				newUser = true;
 			}
-			request.getSession().setAttribute(ForumConstants.NEW_FORUM_USER,null);
 			
 			//**********************************Handle Attachement*********************
 			Forum forumPO = forumService.getForumByContentId(forumForm.getToolContentID());
@@ -230,6 +231,7 @@ public class AuthoringAction extends Action {
 				//get back UID
 				forumPO.setUid(uid);
 			}
+			forumPO.setCreatedBy(forumUser);
 			
 	    	//merge attachment info
 			Set attPOSet = forumPO.getAttachments();
@@ -287,11 +289,9 @@ public class AuthoringAction extends Action {
 	    	while(iter.hasNext()){
 	    		MessageDTO dto = (MessageDTO) iter.next();
 	    		if(dto.getMessage() != null){
-	    			if(newUser){
-	    				//This flushs user UID info to message if this user is a new user. 
-	    				dto.getMessage().setCreatedBy(forumUser);
-	    				dto.getMessage().setModifiedBy(forumUser);
-	    			}
+    				//This flushs user UID info to message if this user is a new user. 
+    				dto.getMessage().setCreatedBy(forumUser);
+    				dto.getMessage().setModifiedBy(forumUser);
 	    			forumService.createRootTopic(forum.getUid(),null,dto.getMessage());
 	    		}
 	    	}
@@ -563,16 +563,17 @@ public class AuthoringAction extends Action {
 		message.setCreated(new Date());
 		message.setUpdated(new Date());
 		message.setLastReplyDate(new Date());
+		
 		//check whether this user exist or not
-		ForumUser forumUser = forumService.getUserByUserAndSession(new Long(user.getUserID().intValue()),null);
+		ForumUser forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
 		if(forumUser == null){
 			//if user not exist, create new one in database
 			forumUser = new ForumUser(user,null);
-			request.getSession().setAttribute(ForumConstants.NEW_FORUM_USER,forumUser);
 		}
 		message.setCreatedBy(forumUser);
 		//same person with create at first time
 		message.setModifiedBy(forumUser);
+		
 		//set attachment of this topic
 		Set attSet = null;
 		if(messageForm.getAttachmentFile() != null 

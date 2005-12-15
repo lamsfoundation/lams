@@ -217,11 +217,16 @@ public interface IForumService {
 	public List getUsersBySessionId(Long sessionID);
 	/**
 	 * Get user by uid
-	 * @param userId
+	 * @param userUid
 	 * @return
 	 */
 	public ForumUser getUser(Long userUid);
-	
+	/**
+	 * Get user by user ID
+	 * @param userId
+	 * @return
+	 */
+	public ForumUser getUserByID(Long userId);
 	
 	//************************************************************************************
 	// Report  Method

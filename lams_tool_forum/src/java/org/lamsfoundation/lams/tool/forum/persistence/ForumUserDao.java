@@ -26,12 +26,15 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class ForumUserDao extends HibernateDaoSupport{
 
-	private static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + ForumUser.class.getName() 
-									+ " where user_id=? and session_id=?";
+	private static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + ForumUser.class.getName() + " as f" 
+									+ " where user_id=? and f.session.sessionId=?";
+	
+	private static final String SQL_QUERY_FIND_BY_USER_ID = "from " + ForumUser.class.getName() + " as f" 
+							+ " where user_id=? and session_id is null";
 	
 	private static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + 
-									ForumUser.class.getName() + " as u " + 
-									" where u.session.sessionId=?";
+									ForumUser.class.getName() + " as f " + 
+									" where f.session.sessionId=?";
 
 
 	public List getBySessionId(Long sessionID) {
@@ -52,9 +55,18 @@ public class ForumUserDao extends HibernateDaoSupport{
 		return (ForumUser) list.get(0);
 	}
 
+	public ForumUser getByUserId(Long userId) {
+		List list =  this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_USER_ID, userId);
+		
+		if(list == null || list.isEmpty())
+			return null;
+		
+		return (ForumUser) list.get(0);
+	}
 	public ForumUser getByUid(Long userUid) {
 		
 		return (ForumUser) this.getHibernateTemplate().get(ForumUser.class,userUid);
 	}
+
 
 }
