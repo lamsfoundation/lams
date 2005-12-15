@@ -35,7 +35,8 @@
 	<definition name=".monitoringContent" extends=".baseDef" >
 		<put name="title" value="Noticeboard"/>
 		<put name="pageHeader" value = "Noticeboard"/>
-		<put name="content" value="/monitoringContent.jsp" />	
+	<!--  	<put name="content" value="/monitoringContent.jsp" />	-->
+		<put name="content" value="/monitor_page.jsp" />
 	</definition>
 
 	
