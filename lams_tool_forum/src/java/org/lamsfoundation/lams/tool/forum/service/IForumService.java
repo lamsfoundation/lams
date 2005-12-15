@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;

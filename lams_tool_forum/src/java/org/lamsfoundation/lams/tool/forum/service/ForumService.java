@@ -134,8 +134,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     	//if this message is root message, then actually, it will update itself lastReplayDate
     	MessageSeq msgSeq = messageSeqDao.getByTopicId(message.getUid());
     	Message root = msgSeq.getRootMessage();
-        //update last reply date for root message
-        root.setLastReplyDate(new Date());
+    	//update reply date
         messageDao.saveOrUpdate(root);
         
         return message;

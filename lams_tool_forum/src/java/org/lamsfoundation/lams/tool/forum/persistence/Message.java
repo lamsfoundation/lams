@@ -130,6 +130,8 @@ public class Message implements Cloneable{
       	.append(this.uid,genericEntity.uid)
       	.append(this.subject,genericEntity.subject)
       	.append(this.body,genericEntity.body)
+      	.append(this.replyNumber,genericEntity.replyNumber)
+      	.append(this.lastReplyDate,genericEntity.lastReplyDate)
       	.append(this.created,genericEntity.created)
       	.append(this.updated,genericEntity.updated)
       	.append(this.createdBy,genericEntity.createdBy)
