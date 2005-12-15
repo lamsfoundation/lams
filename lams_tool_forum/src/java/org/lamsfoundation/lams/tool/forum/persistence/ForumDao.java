@@ -2,8 +2,6 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.List;
 
-import org.hibernate.FlushMode;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -45,32 +43,6 @@ public class ForumDao extends HibernateDaoSupport {
 		else
 			return null;
 	}
-	/**
-	 * Delete content instruction files according to contentID, file version ID and its type.
-	 * 
-	 * @param contentID
-	 * @param uuid
-	 * @param versionID
-	 * @param type
-	 */
-	public void deleteInstrcutionFile(Long contentID, Long uuid, Long versionID, String type) {
-		HibernateTemplate templ = this.getHibernateTemplate();
-		if ( contentID != null && uuid != null && versionID != null ) {
-			List list = getSession().createQuery(FIND_INSTRUCTION_FILE)
-				.setLong(0,contentID.longValue())
-				.setLong(1,uuid.longValue())
-				.setLong(2,versionID.longValue())
-				.setString(3,type)
-				.list();
-			if(list != null && list.size() > 0){
-				Attachment file = (Attachment) list.get(0);
-				this.getSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(file);
-				templ.flush();
-			}
-		}
-	}
-
 	public void flush() {
 		this.getHibernateTemplate().flush();
 	}

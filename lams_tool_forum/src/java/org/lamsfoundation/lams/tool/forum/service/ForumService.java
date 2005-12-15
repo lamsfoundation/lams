@@ -156,7 +156,7 @@ public class ForumService implements IForumService,ToolContentManager,ToolSessio
     		}
     	}
     	messageSeqDao.deleteByTopicId(topicUid);
-        messageDao.deleteById(topicUid);
+        messageDao.delete(topicUid);
      }
 
     public Message replyTopic(Long parentId,Long sessionId, Message replyMessage) throws PersistenceException {

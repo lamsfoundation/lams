@@ -18,40 +18,40 @@
  *
  *http://www.gnu.org/licenses/gpl.txt
  */
-package org.lamsfoundation.lams.tool.forum.test.service;
+package org.lamsfoundation.lams.tool.forum.test.dao;
 
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
-import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.test.BaseTest;
 
-public class ForumServiceTest extends BaseTest{
-	private IForumService forumService;
-	
-	public ForumServiceTest(String name) {
+public class MessageDAOTest extends BaseTest{
+
+	public MessageDAOTest(String name) {
 		super(name);
 	}
-	public void setUp()throws Exception{
-		super.setUp();
-		forumService = (IForumService)context.getBean("forumService");
-
+	
+	public void testSave(){
+		
 	}
-	public void testUpdateForum(){
-		ForumUser user = new ForumUser();
-		user.setFirstName("Steve");
-		user.setUserId(new Long(1));
+	public void testDelete(){
 		
-		Forum forum = new Forum();
-		
-		forum.setContentId(new Long(1));
-		forum.setCreatedBy(user);
-		
-		forumService.updateForum(forum);
-		
-		Forum tForum = forumService.getForum(new Long(1));
-		
-		assertEquals(tForum.getContentId(),new Long(1));
-		assertEquals(tForum.getCreatedBy(),user);
 	}
+	public void testGetById(){
+		
+	}
+	public void testGetBySession(){
+		
+	}
+	public void testGetBySessionAndUser(){
+		
+	}
+	public void testGetFromAuthor(){
+		
+	}
+	public void testGetRootTopics(){
+		
+	}
+	public void testGetChildrenTopics(){
+		
+	}
+	
 
 }

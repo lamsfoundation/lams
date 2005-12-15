@@ -38,30 +38,52 @@ public class MessageDao extends HibernateDaoSupport {
 	public Message getById(Long messageId) {
 		return (Message) getHibernateTemplate().get(Message.class,messageId);
 	}
-
+	/**
+	 * Get all root (first level) topics in a special Session.
+	 * @param sessionId
+	 * @return
+	 */
 	public List getRootTopics(Long sessionId) {
 		return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_TOPICS, sessionId);
 	}
+	/**
+	 * Get all message posted by author role in a special forum.
+	 * @param forumUid
+	 * @return
+	 */
 	public List getTopicsFromAuthor(Long forumUid) {
 		return this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPICS_FROM_AUTHOR, forumUid);
 	}
 
-	public void deleteById(Long uid) {
+	public void delete(Long uid) {
 		Message msg = getById(uid);
 		if(msg != null){
 			this.getHibernateTemplate().delete(msg);
 			this.getHibernateTemplate().flush();
 		}
 	}
-
+	/**
+	 * Get all children message from the given parent topic ID. 
+	 * @param parentId
+	 * @return
+	 */
 	public List getChildrenTopics(Long parentId) {
 		return this.getHibernateTemplate().find(SQL_QUERY_FIND_CHILDREN, parentId);
 	}
-
+	/**
+	 * Get all messages according to special user and session.
+	 * @param userId
+	 * @param sessionId
+	 * @return
+	 */
 	public List getByUserAndSession(Long userId, Long sessionId) {
 		return this.getHibernateTemplate().find(SQL_QUERY_BY_USER_SESSION, new Object[]{userId,sessionId});
 	}
-	
+	/**
+	 * Get all messages according to special session.
+	 * @param sessionId
+	 * @return
+	 */
 	public List getBySession(Long sessionId) {
 		return this.getHibernateTemplate().find(SQL_QUERY_BY_SESSION, sessionId);
 	}

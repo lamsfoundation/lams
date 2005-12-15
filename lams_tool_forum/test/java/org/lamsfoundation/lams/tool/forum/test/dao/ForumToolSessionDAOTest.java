@@ -20,39 +20,28 @@
  */
 package org.lamsfoundation.lams.tool.forum.test.dao;
 
-import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.test.BaseTest;
 
-public class ForumDAOTest extends BaseTest{
+public class ForumToolSessionDAOTest extends BaseTest{
 
-	public ForumDAOTest(String name) {
+	public ForumToolSessionDAOTest(String name) {
 		super(name);
-	}
-	
-	public void testSave(){
-		ForumUser user = new ForumUser();
-		user.setFirstName("Steve");
-		user.setUserId(new Long(1));
 		
-		Forum forum = new Forum();
-		
-		forum.setContentId(new Long(1));
-		forum.setCreatedBy(user);
-		
-		ForumDao forumDao = new ForumDao();
-		forumDao.saveOrUpdate(forum);
-		
-		Forum tForum = forumDao.getById(forum.getUid());
-		assertEquals(tForum.getContentId(),new Long(1));
-		assertEquals(tForum.getCreatedBy(),user);
 	}
 	
 	public void testDelete(){
 		
 	}
-	public void testGetByContentId(){
-	}
 
+	public void testSave(){
+		
+	}
+	
+	public void testGetByContentId(){
+		
+	}
+	
+	public void testGetBySessionId(){
+		
+	}
 }
