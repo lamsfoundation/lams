@@ -153,101 +153,101 @@ public class AuthoringUtil implements QaAppConstants {
     }
 
 
-    /**
-     * findSelectedTab(ActionMapping mapping,
-					            ActionForm form,
-					            HttpServletRequest request,
-					            HttpServletResponse response)
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * 
-     * determines which tab in the UI is the active one
-     */
-    protected void findSelectedTab(ActionMapping mapping,
-					            ActionForm form,
-					            HttpServletRequest request,
-					            HttpServletResponse response) 
-    {
-    	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-    	String choiceBasic=qaAuthoringForm.getChoiceBasic();
-    	String choiceAdvanced=qaAuthoringForm.getChoiceAdvanced();
-    	String choiceInstructions=qaAuthoringForm.getChoiceInstructions();
-    	
-    	/* make the Basic tab the default one */
-    	request.getSession().setAttribute(CHOICE,CHOICE_TYPE_BASIC);
-    	
-		if (choiceBasic != null)
-		{
-    		logger.debug("CHOICE_TYPE_BASIC");
-    		request.getSession().setAttribute(CHOICE,CHOICE_TYPE_BASIC);
-		}
-    	else if (choiceAdvanced != null)
-    	{
-    		logger.debug("CHOICE_TYPE_ADVANCED");
-    		request.getSession().setAttribute(CHOICE,CHOICE_TYPE_ADVANCED);
-    	}
-    	else if (choiceInstructions != null)
-    	{
-    		logger.debug("CHOICE_TYPE_INSTRUCTIONS");
-    		request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
-    	}
-
-    	logger.debug("CHOICE is:" + request.getSession().getAttribute(CHOICE));
-    	/* reset tab controllers */
-		qaAuthoringForm.choiceBasic=null;
-		qaAuthoringForm.choiceAdvanced=null;
-		qaAuthoringForm.choiceInstructions=null;
-		
-		
-		/*
-		 * if the presentation is for monitoring EditActivity screen, keep preserving request scope START_MONITORING_SUMMARY_REQUEST
-		 */
-		Boolean renderMonitoringEditActivity=(Boolean)request.getSession().getAttribute(RENDER_MONITORING_EDITACTIVITY);
-		if ((renderMonitoringEditActivity != null) && (renderMonitoringEditActivity.booleanValue()))
-		{
-			request.setAttribute(FORM_INDEX, "1");
-			request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(true));
-		}
-		else
-		{
-			request.setAttribute(FORM_INDEX, "0");
-			request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(false));
-		}
-			
-		logger.debug("START_MONITORING_SUMMARY_REQUEST: " + request.getAttribute(START_MONITORING_SUMMARY_REQUEST));
-		logger.debug("formIndex:" + request.getAttribute(FORM_INDEX));
-
-		request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(false));
-		if (qaAuthoringForm.getEdit() != null)
-		{
-			logger.debug("request for editActivity - editmode");
-	    	IQaService qaService =QaUtils.getToolService(request);
-	    	Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
-		    logger.debug("MONITORED_CONTENT_ID: " + monitoredContentId);
-		    
-		    try
-			{
-		    	qaService.setAsDefineLater(monitoredContentId);
-			}
-		    catch (ToolException e)
-			{
-		    	logger.debug("We should never come here.");
-		    	logger.debug("Warning! ToolException occurred");
-			}
-			
-		    
-		    logger.debug("MONITORED_CONTENT_ID has been marked as defineLater: ");
-			request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
-		}
-		else
-		{
-			request.getSession().setAttribute(TITLE,qaAuthoringForm.getTitle());
-			request.getSession().setAttribute(INSTRUCTIONS,qaAuthoringForm.getInstructions());
-		}
-    }
+//    /**
+//     * findSelectedTab(ActionMapping mapping,
+//					            ActionForm form,
+//					            HttpServletRequest request,
+//					            HttpServletResponse response)
+//     * 
+//     * @param mapping
+//     * @param form
+//     * @param request
+//     * @param response
+//     * 
+//     * determines which tab in the UI is the active one
+//     */
+//    protected void findSelectedTab(ActionMapping mapping,
+//					            ActionForm form,
+//					            HttpServletRequest request,
+//					            HttpServletResponse response) 
+//    {
+//    	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+//    	String choiceBasic=qaAuthoringForm.getChoiceBasic();
+//    	String choiceAdvanced=qaAuthoringForm.getChoiceAdvanced();
+//    	String choiceInstructions=qaAuthoringForm.getChoiceInstructions();
+//    	
+//    	/* make the Basic tab the default one */
+//    	request.getSession().setAttribute(CHOICE,CHOICE_TYPE_BASIC);
+//    	
+//		if (choiceBasic != null)
+//		{
+//    		logger.debug("CHOICE_TYPE_BASIC");
+//    		request.getSession().setAttribute(CHOICE,CHOICE_TYPE_BASIC);
+//		}
+//    	else if (choiceAdvanced != null)
+//    	{
+//    		logger.debug("CHOICE_TYPE_ADVANCED");
+//    		request.getSession().setAttribute(CHOICE,CHOICE_TYPE_ADVANCED);
+//    	}
+//    	else if (choiceInstructions != null)
+//    	{
+//    		logger.debug("CHOICE_TYPE_INSTRUCTIONS");
+//    		request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
+//    	}
+//
+//    	logger.debug("CHOICE is:" + request.getSession().getAttribute(CHOICE));
+//    	/* reset tab controllers */
+//		qaAuthoringForm.choiceBasic=null;
+//		qaAuthoringForm.choiceAdvanced=null;
+//		qaAuthoringForm.choiceInstructions=null;
+//		
+//		
+//		/*
+//		 * if the presentation is for monitoring EditActivity screen, keep preserving request scope START_MONITORING_SUMMARY_REQUEST
+//		 */
+//		Boolean renderMonitoringEditActivity=(Boolean)request.getSession().getAttribute(RENDER_MONITORING_EDITACTIVITY);
+//		if ((renderMonitoringEditActivity != null) && (renderMonitoringEditActivity.booleanValue()))
+//		{
+//			request.setAttribute(FORM_INDEX, "1");
+//			request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(true));
+//		}
+//		else
+//		{
+//			request.setAttribute(FORM_INDEX, "0");
+//			request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(false));
+//		}
+//			
+//		logger.debug("START_MONITORING_SUMMARY_REQUEST: " + request.getAttribute(START_MONITORING_SUMMARY_REQUEST));
+//		logger.debug("formIndex:" + request.getAttribute(FORM_INDEX));
+//
+//		request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(false));
+//		if (qaAuthoringForm.getEdit() != null)
+//		{
+//			logger.debug("request for editActivity - editmode");
+//	    	IQaService qaService =QaUtils.getToolService(request);
+//	    	Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
+//		    logger.debug("MONITORED_CONTENT_ID: " + monitoredContentId);
+//		    
+//		    try
+//			{
+//		    	qaService.setAsDefineLater(monitoredContentId);
+//			}
+//		    catch (ToolException e)
+//			{
+//		    	logger.debug("We should never come here.");
+//		    	logger.debug("Warning! ToolException occurred");
+//			}
+//			
+//		    
+//		    logger.debug("MONITORED_CONTENT_ID has been marked as defineLater: ");
+//			request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
+//		}
+//		else
+//		{
+//			request.getSession().setAttribute(TITLE,qaAuthoringForm.getTitle());
+//			request.getSession().setAttribute(INSTRUCTIONS,qaAuthoringForm.getInstructions());
+//		}
+//    }
     
     
 //    /**

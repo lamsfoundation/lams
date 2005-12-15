@@ -169,18 +169,18 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		/*
 		 * retrieve the default content id based on tool signature
 		 */
-		long contentId=0;
+		long defaultContentID=0;
 		try
 		{
 			logger.debug("attempt retrieving tool with signatute : " + MY_SIGNATURE);
-			contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
-			logger.debug("retrieved tool default contentId: " + contentId);
-			if (contentId == 0)
+            defaultContentID=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+			logger.debug("retrieved tool default contentId: " + defaultContentID);
+			if (defaultContentID == 0)
 			{
 				logger.debug("default content id has not been setup");
 				persistError(request,"error.defaultContent.notSetup");
 		    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
-				return (mapping.findForward(LOAD_QUESTIONS));	
+				return (mapping.findForward(LOAD_QUESTIONS));	//TODO: forward to error page
 			}
 		}
 		catch(Exception e)
@@ -188,7 +188,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			logger.debug("error getting the default content id: " + e.getMessage());
 			persistError(request,"error.defaultContent.notSetup");
 	    	request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP, new Boolean(true));
-			return (mapping.findForward(LOAD_QUESTIONS));
+			return (mapping.findForward(LOAD_QUESTIONS)); //TODO: forward to error page
 		}
 
 		/*
@@ -196,8 +196,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		 */
 		try
 		{
-			logger.debug("retrieve the default question content based on default contentId: " + contentId);
-			QaQueContent qaQueContent=qaService.getToolDefaultQuestionContent(contentId);
+			logger.debug("retrieve the default question content based on default contentId: " + defaultContentID);
+			QaQueContent qaQueContent=qaService.getToolDefaultQuestionContent(defaultContentID);
 			logger.debug("using QaQueContent: " + qaQueContent);
 			if (qaQueContent == null)
 			{
@@ -227,13 +227,13 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    /*
 	     * define tab controllers for jsp
 	     */
-	    request.getSession().setAttribute(CHOICE_TYPE_BASIC,CHOICE_TYPE_BASIC);
-	    request.getSession().setAttribute(CHOICE_TYPE_ADVANCED,CHOICE_TYPE_ADVANCED);
-	    request.getSession().setAttribute(CHOICE_TYPE_INSTRUCTIONS,CHOICE_TYPE_INSTRUCTIONS);
+//	    request.getSession().setAttribute(CHOICE_TYPE_BASIC,CHOICE_TYPE_BASIC);
+//	    request.getSession().setAttribute(CHOICE_TYPE_ADVANCED,CHOICE_TYPE_ADVANCED);
+//	    request.getSession().setAttribute(CHOICE_TYPE_INSTRUCTIONS,CHOICE_TYPE_INSTRUCTIONS);
 	
 	    request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(false));
-	    request.getSession().setAttribute(FORM_INDEX, "0");
-	    logger.debug("FORM_INDEX set to: " +  request.getSession().getAttribute(FORM_INDEX));
+//	    request.getSession().setAttribute(FORM_INDEX, "0");
+//	    logger.debug("FORM_INDEX set to: " +  request.getSession().getAttribute(FORM_INDEX));
 		
 	    
 	    /*
@@ -241,6 +241,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	     */
 	    String strToolContentId="";
         Long contentID =new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
+        qaAuthoringForm.setToolContentId(contentID.toString());
 	    Boolean isMonitoringEditActivityVisited=(Boolean)request.getSession().getAttribute(MONITORING_EDITACTIVITY_VISITED);
 	    logger.debug("isMonitoringEditActivityVisited: " + isMonitoringEditActivityVisited);
 	    
@@ -275,24 +276,24 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    }
 	    logger.debug("usable strToolContentId: " + strToolContentId);
 
-	    /*
-	     * Process incoming tool content id
-	     * Either exists or not exists in the db yet, a toolContentId must be passed to the tool from the container 
-	     */
-	    long toolContentId=0;
-    	try
-		{
-	    	toolContentId=new Long(strToolContentId).longValue();
-	    	logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
-	    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,strToolContentId);
-    	}
-    	catch(NumberFormatException e)
-		{
-	    	persistError(request,"error.numberFormatException");
-			request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
-			logger.debug("forwarding to: " + LOAD_QUESTIONS);
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
+//	    /*
+//	     * Process incoming tool content id
+//	     * Either exists or not exists in the db yet, a toolContentId must be passed to the tool from the container 
+//	     */
+//	    long toolContentId=0;
+//    	try
+//		{
+//	    	toolContentId=new Long(strToolContentId).longValue();
+//	    	logger.debug("passed TOOL_CONTENT_ID : " + toolContentId);
+//	    	request.getSession().setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID,strToolContentId);
+//    	}
+//    	catch(NumberFormatException e)
+//		{
+//	    	persistError(request,"error.numberFormatException");
+//			request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
+//			logger.debug("forwarding to: " + LOAD_QUESTIONS);
+//			return (mapping.findForward(LOAD_QUESTIONS));
+//		}
 
 
 		/*
@@ -303,84 +304,76 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		 * there is no need to check if the content is locked in this case.
 		 * It is always unlocked since it is the default content.
 		*/
-		if (!existsContent(toolContentId, request)) 
+		if (!existsContent(contentID.longValue(), request)) 
 		{
-		    /* get default content from db, user never created any content before */
-			logger.debug("retrieve  default content: " + toolContentId);
-			return retrieveDefaultContent(request, mapping, qaAuthoringForm, mapQuestionContent);
+            return retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, defaultContentID);
 		}
-		else
-		{
-			/*
-			 * fetch the existing content from db, user will be presented with her previously created content data
-			 * Note that the content might have been LOCKED(content in use) if one or more learner has started activities with this content
-			 */
-			logger.debug("retrieve  existing content: " + toolContentId);
-			return retrieveExistingContent(request, mapping, qaAuthoringForm, mapQuestionContent, toolContentId);
-		}
+        else{
+            return retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, contentID.longValue());
+        }
 	} 
 	
-	/**
-	 * returns the default content to jsp
-	 * ActionForward retrieveDefaultContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent)
-	 *  
-	 * @param request
-	 * @param mapping
-	 * @param qaAuthoringForm
-	 * @param mapQuestionContent
-	 * @return ActionForward
-	 */
-	protected ActionForward retrieveDefaultContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent)
-	{
-		logger.debug("starting retrieveDefaultContent for toolContentId:");
-		IQaService qaService =QaUtils.getToolService(request);
-		
-		long contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
-	    logger.debug("getting default content with id:" + contentId);
-	    
-	    QaContent defaultQaContent = qaService.retrieveQa(contentId);
-		logger.debug("defaultQaContent: " + defaultQaContent);
-		
-		/*
-		 * this is a new content creation, the content must always be unlocked
-		 * CONTENT_LOCKED means CONTENT_IN_USE  
-		 */
-		request.getSession().setAttribute(CONTENT_LOCKED, new Boolean(false));
-	    logger.debug("CONTENT_LOCKED: " + request.getSession().getAttribute(CONTENT_LOCKED));
-		
-		if (defaultQaContent == null)
-		{
-			logger.debug("Exception occured: No default content");
-			request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE, new Boolean(true));
-			persistError(request,"error.defaultContent.notAvailable");
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
-			
-		QaUtils.setDefaultSessionAttributes(request, defaultQaContent, qaAuthoringForm);
-		qaAuthoringForm.setUsernameVisible(OFF);
-		logger.debug("UsernameVisible: " + qaAuthoringForm.getUsernameVisible());
-		qaAuthoringForm.setQuestionsSequenced(OFF);
-		qaAuthoringForm.setSynchInMonitor(OFF);
-		
-		mapQuestionContent.clear();
-		/*
-		 * place the default question as the first entry in the Map
-		 */
-		mapQuestionContent.put(INITIAL_QUESTION_COUNT,request.getSession().getAttribute(DEFAULT_QUESTION_CONTENT));
-		logger.debug("Map initialized with default contentid to: " + mapQuestionContent);
-
-//		/* set  uploaded offline file names to empty list*/
-//		List listOfflineFileNames=new LinkedList();
+//	/**
+//	 * returns the default content to jsp
+//	 * ActionForward retrieveDefaultContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent)
+//	 *  
+//	 * @param request
+//	 * @param mapping
+//	 * @param qaAuthoringForm
+//	 * @param mapQuestionContent
+//	 * @return ActionForward
+//	 */
+//	protected ActionForward retrieveDefaultContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent)
+//	{
+//		logger.debug("starting retrieveDefaultContent for toolContentId:");
+//		IQaService qaService =QaUtils.getToolService(request);
 //		
-//		/* set  uploaded online file names to empty list*/
-//		List listOnlineFileNames=new LinkedList();
-	
-        
-        request.getSession().setAttribute(ATTACHMENT_LIST, new ArrayList());
-        
-	    logger.debug("callling presentInitialUserInterface for the default content.");
-		return presentInitialUserInterface(request, mapping, qaAuthoringForm, mapQuestionContent);
-	}
+//		long contentId=qaService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+//	    logger.debug("getting default content with id:" + contentId);
+//	    
+//	    QaContent defaultQaContent = qaService.retrieveQa(contentId);
+//		logger.debug("defaultQaContent: " + defaultQaContent);
+//		
+//		/*
+//		 * this is a new content creation, the content must always be unlocked
+//		 * CONTENT_LOCKED means CONTENT_IN_USE  
+//		 */
+//		request.getSession().setAttribute(CONTENT_LOCKED, new Boolean(false));
+//	    logger.debug("CONTENT_LOCKED: " + request.getSession().getAttribute(CONTENT_LOCKED));
+//		
+//		if (defaultQaContent == null)
+//		{
+//			logger.debug("Exception occured: No default content");
+//			request.setAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOT_AVAILABLE, new Boolean(true));
+//			persistError(request,"error.defaultContent.notAvailable");
+//			return (mapping.findForward(LOAD_QUESTIONS));
+//		}
+//			
+//		QaUtils.setDefaultSessionAttributes(request, defaultQaContent, qaAuthoringForm);
+//		qaAuthoringForm.setUsernameVisible(OFF);
+//		logger.debug("UsernameVisible: " + qaAuthoringForm.getUsernameVisible());
+//		qaAuthoringForm.setQuestionsSequenced(OFF);
+//		qaAuthoringForm.setSynchInMonitor(OFF);
+//		
+//		mapQuestionContent.clear();
+//		/*
+//		 * place the default question as the first entry in the Map
+//		 */
+//		mapQuestionContent.put(INITIAL_QUESTION_COUNT,request.getSession().getAttribute(DEFAULT_QUESTION_CONTENT));
+//		logger.debug("Map initialized with default contentid to: " + mapQuestionContent);
+//
+////		/* set  uploaded offline file names to empty list*/
+////		List listOfflineFileNames=new LinkedList();
+////		
+////		/* set  uploaded online file names to empty list*/
+////		List listOnlineFileNames=new LinkedList();
+//	
+//        
+//        request.getSession().setAttribute(ATTACHMENT_LIST, new ArrayList());
+//        
+//	    logger.debug("callling presentInitialUserInterface for the default content.");
+//		return presentInitialUserInterface(request, mapping, qaAuthoringForm, mapQuestionContent);
+//	}
 	
 	
 	/**
@@ -394,16 +387,16 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	 * @param toolContentId
 	 * @return ActionForward
 	 */
-	protected ActionForward retrieveExistingContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent, long toolContentId)
+	protected ActionForward retrieveContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent, long toolContentId)
 	{
 		logger.debug("starting retrieveExistingContent for toolContentId: " + toolContentId);
 		IQaService qaService =QaUtils.getToolService(request);
 		
 		logger.debug("getting existing content with id:" + toolContentId);
-	    QaContent defaultQaContent = qaService.retrieveQa(toolContentId);
-		logger.debug("defaultQaContent: " + defaultQaContent);
+	    QaContent qaContent = qaService.retrieveQa(toolContentId);
+		logger.debug("QaContent: " + qaContent);
 		
-		boolean studentActivity=qaService.studentActivityOccurredGlobal(defaultQaContent);
+		boolean studentActivity=qaService.studentActivityOccurredGlobal(qaContent);
 		logger.debug("studentActivity on content: " + studentActivity);
 		if (studentActivity)
 		{
@@ -416,52 +409,33 @@ public class QaStarterAction extends Action implements QaAppConstants {
 			return (mapping.findForward(LOAD));
 		}
 		
-	    request.getSession().setAttribute(CONTENT_LOCKED, new Boolean(isContentLocked(defaultQaContent)));
+	    request.getSession().setAttribute(CONTENT_LOCKED, new Boolean(qaContent.isContentLocked()));
 	    logger.debug("CONTENT_LOCKED: " + request.getSession().getAttribute(CONTENT_LOCKED));
 		
-		QaUtils.setDefaultSessionAttributes(request, defaultQaContent, qaAuthoringForm);
-		
-		/*
-		 * determine the status of radio boxes
-		 */
-		logger.debug("IS_USERNAME_VISIBLE: " + defaultQaContent.isUsernameVisible());
-	    logger.debug("set UsernameVisible to : " + defaultQaContent.isUsernameVisible());
-	    if (defaultQaContent.isUsernameVisible())
-	    	qaAuthoringForm.setUsernameVisible(ON);
-	    else
-	    	qaAuthoringForm.setUsernameVisible(OFF);
-	    logger.debug("UsernameVisible: " + qaAuthoringForm.getUsernameVisible());
-	    if (defaultQaContent.isSynchInMonitor())
-	    	qaAuthoringForm.setSynchInMonitor(ON);
-	    else
-	    	qaAuthoringForm.setSynchInMonitor(OFF);
-	    	
-	    if (defaultQaContent.isQuestionsSequenced())
-	    	qaAuthoringForm.setQuestionsSequenced(ON);
-	    else
-	    	qaAuthoringForm.setQuestionsSequenced(OFF);
+		QaUtils.setDefaultSessionAttributes(request, qaContent, qaAuthoringForm);
+        QaUtils.populateUploadedFilesData(request, qaContent);
+			    
+//	    request.getSession().setAttribute(IS_USERNAME_VISIBLE_MONITORING, 	new Boolean(defaultQaContent.isUsernameVisible()));
+//	    request.getSession().setAttribute(IS_SYNCH_INMONITOR_MONITORING, 	new Boolean(defaultQaContent.isSynchInMonitor()));
+//	    request.getSession().setAttribute(IS_QUESTIONS_SEQUENCED_MONITORING,new Boolean(defaultQaContent.isQuestionsSequenced()));
+	    request.getSession().setAttribute(IS_DEFINE_LATER, 					new Boolean(qaContent.isDefineLater()));
+//	    request.getSession().setAttribute(REPORT_TITLE, 					defaultQaContent.getReportTitle());
+//	    request.getSession().setAttribute(MONITORING_REPORT_TITLE, 			defaultQaContent.getMonitoringReportTitle());
+//	    request.getSession().setAttribute(OFFLINE_INSTRUCTIONS, 			defaultQaContent.getOfflineInstructions());
+//	    request.getSession().setAttribute(ONLINE_INSTRUCTIONS, 				defaultQaContent.getOnlineInstructions());
+//	    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,		defaultQaContent.getOfflineInstructions());
+//	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,		defaultQaContent.getOnlineInstructions());
+//	    request.getSession().setAttribute(RICHTEXT_TITLE,					defaultQaContent.getTitle());
+//	    request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,			defaultQaContent.getInstructions());
+//	    logger.debug("QaStarter set all 4 rich text properties");
+//	    
+//	    request.getSession().setAttribute(END_LEARNING_MESSSAGE, 			defaultQaContent.getEndLearningMessage());
+//	    request.getSession().setAttribute(CREATION_DATE, 					defaultQaContent.getCreationDate());
+//	    
+//	    logger.debug("IS_QUESTIONS_SEQUENCED_MONITORING: " + request.getSession().getAttribute(IS_QUESTIONS_SEQUENCED_MONITORING));
+//	    logger.debug("IS_DEFINE_LATER: " + request.getSession().getAttribute(IS_DEFINE_LATER));
+//	    
 	    
-	    request.getSession().setAttribute(IS_USERNAME_VISIBLE_MONITORING, 	new Boolean(defaultQaContent.isUsernameVisible()));
-	    request.getSession().setAttribute(IS_SYNCH_INMONITOR_MONITORING, 	new Boolean(defaultQaContent.isSynchInMonitor()));
-	    request.getSession().setAttribute(IS_QUESTIONS_SEQUENCED_MONITORING,new Boolean(defaultQaContent.isQuestionsSequenced()));
-	    request.getSession().setAttribute(IS_DEFINE_LATER, 					new Boolean(defaultQaContent.isDefineLater()));
-	    request.getSession().setAttribute(REPORT_TITLE, 					defaultQaContent.getReportTitle());
-	    request.getSession().setAttribute(MONITORING_REPORT_TITLE, 			defaultQaContent.getMonitoringReportTitle());
-	    request.getSession().setAttribute(OFFLINE_INSTRUCTIONS, 			defaultQaContent.getOfflineInstructions());
-	    request.getSession().setAttribute(ONLINE_INSTRUCTIONS, 				defaultQaContent.getOnlineInstructions());
-	    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,		defaultQaContent.getOfflineInstructions());
-	    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,		defaultQaContent.getOnlineInstructions());
-	    request.getSession().setAttribute(RICHTEXT_TITLE,					defaultQaContent.getTitle());
-	    request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS,			defaultQaContent.getInstructions());
-	    logger.debug("QaStarter set all 4 rich text properties");
-	    
-	    request.getSession().setAttribute(END_LEARNING_MESSSAGE, 			defaultQaContent.getEndLearningMessage());
-	    request.getSession().setAttribute(CREATION_DATE, 					defaultQaContent.getCreationDate());
-	    
-	    logger.debug("IS_QUESTIONS_SEQUENCED_MONITORING: " + request.getSession().getAttribute(IS_QUESTIONS_SEQUENCED_MONITORING));
-	    logger.debug("IS_DEFINE_LATER: " + request.getSession().getAttribute(IS_DEFINE_LATER));
-	    
-	    QaUtils.populateUploadedFilesData(request, defaultQaContent);
 	    
 	    
 	    /*
@@ -469,7 +443,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		 */
 		logger.debug("setting existing content data from the db");
 		mapQuestionContent.clear();
-		Iterator queIterator=defaultQaContent.getQaQueContents().iterator();
+		Iterator queIterator=qaContent.getQaQueContents().iterator();
 		Long mapIndex=new Long(1);
 		logger.debug("mapQuestionContent: " + mapQuestionContent);
 		while (queIterator.hasNext())
@@ -537,19 +511,19 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		return true;	
 	}
 	
-	/**
-	 * find out if the content is locked or not. If it is a locked content, the author can not modify it.
-	 * The idea of content being locked is, once any one learner starts using a particular content
-	 * that content should become unmodifiable.
-	 * boolean isContentLocked(QaContent qaContent) 
-	 * @param qaContent
-	 * @return boolean
-	 */
-	protected boolean isContentLocked(QaContent qaContent)
-	{
-		logger.debug("is content locked: " + qaContent.isContentLocked());
-		return qaContent.isContentLocked();
-	}
+//	/**
+//	 * find out if the content is locked or not. If it is a locked content, the author can not modify it.
+//	 * The idea of content being locked is, once any one learner starts using a particular content
+//	 * that content should become unmodifiable.
+//	 * boolean isContentLocked(QaContent qaContent) 
+//	 * @param qaContent
+//	 * @return boolean
+//	 */
+//	protected boolean isContentLocked(QaContent qaContent)
+//	{
+//		logger.debug("is content locked: " + qaContent.isContentLocked());
+//		return qaContent.isContentLocked();
+//	}
 	
 	/**
 	 * mark the request scope to generate monitoring summary screen

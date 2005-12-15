@@ -38,10 +38,35 @@ function MM_reloadPage(init) {  //reloads the window if Nav4 resized
 MM_reloadPage(true);
 //-->
 </script>
+<script language="JavaScript" type="text/JavaScript">
+<!--
+
+// The following method submit and the submit methods in the included jsp files submit the 
+// form as required for the DispatchAction. All form submissions must go via these scripts - do not
+// define an submit button with "dispatch" as the property or 
+// "document.McAuthoringForm.dispatch.value=buttonResourceText" will not work
+
+// general submit
+// actionMethod: name of the method to be called in the DispatchAction
+function submitMethod(actionMethod) {
+	document.QaAuthoringForm.dispatch.value=actionMethod; 
+	document.QaAuthoringForm.submit();
+}
+//-->
+</script>
+<script language="JavaScript" type="text/JavaScript">   
+    <!--
+    function pviiClassNew(obj, new_style) { //v2.7 by PVII
+        obj.className=new_style;
+    }
+    //-->
+</script>
+
 </head>
 <body onLoad="initTabs()">
-
-<h1>Noticeboard</h1>
+<html:form action="/authoring" target="_self" enctype="multipart/form-data">
+<input type="hidden" name="dispatch" value=""/>
+<h1>Question & Answers</h1>
     
     <!-- start tabs -->
 <!-- tab holder table -->
@@ -92,10 +117,12 @@ MM_reloadPage(true);
 <div id='content_b' class="tabbody content_b" >
 <h2>Basic tab content</h2>
 <div id="formtablecontainer">
-The basic contents should go here
+<jsp:include page="BasicContent.jsp" />
 </div>
 <hr>
-<a href="javascript:;" class="button">Cancel</a>
+<a href="javascript:window.close()" class="button">Cancel</a>
+<a href="javascript:submitMethod('submitAllContent')" class="button">Save</a>
+
 
 <!-- end of content_b -->
 </div>
@@ -106,8 +133,10 @@ The basic contents should go here
 <div id='content_a'  class="tabbody content_a">
 <h2>Advanced tab content</h2>
 <div id="formtablecontainer">
-The advanced contents should go here
+  <jsp:include page="AdvancedContent.jsp" />
 </div>
+<a href="javascript:window.close()" class="button">Cancel</a>
+<a href="javascript:submitMethod('submitAllContent')" class="button">Save</a>
 
 <!-- end of content_b -->
 </div>
@@ -116,20 +145,17 @@ The advanced contents should go here
 <div id='content_i'  class="tabbody content_i">
 <h2>Instructions tab content </h2>
 <div id="formtablecontainer">
-Instructions are here
+<jsp:include page="InstructionsContent.jsp" />
 </div>
 	<hr>
-<a href="javascript:;" class="button">Cancel</a>
-
+<a href="javascript:window.close()" class="button">Cancel</a>
+<a href="javascript:submitMethod('submitAllContent')" class="button">Save</a>
 
 
 <!-- end of content_a -->
 </div>
 
-
-
-
-<p></p>
-
+</html:form>
 </body>
+
 </html:html>

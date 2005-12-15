@@ -73,17 +73,6 @@
 			 		</td>
 			  	</tr>
 			</table>	  	
-
-			<hr>
-			<table>
-				<tr>
-					 <td class="body" colspan=2> 
-						 <html:submit property="submitTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-							<bean:message key="button.done"/>
-						</html:submit>
-					</td> 
-				</tr>
-  			</table>
 		
 		</td></tr>
 </div>

@@ -20,6 +20,7 @@
  */
 package org.lamsfoundation.lams.tool.qa.service;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -88,8 +89,8 @@ import org.springframework.dao.DataAccessException;
  *  
  */
 
-public class QaServicePOJO implements
-                              IQaService, ToolContentManager, ToolSessionManager, QaAppConstants
+public class QaServicePOJO 
+        implements IQaService, ToolContentManager, ToolSessionManager, QaAppConstants
                
 {
 	static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());

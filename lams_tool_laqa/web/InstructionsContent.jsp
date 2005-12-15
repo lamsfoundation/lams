@@ -15,10 +15,10 @@
           				<fmt:message key="label.offlineInstructions" />:
           			</td>
 					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-					<FCK:editor id="richTextOfflineInstructions" basePath="/lams/fckeditor/"
+					<FCK:editor id="offlineInstructions" basePath="/lams/fckeditor/"
 					      height="200"
 						  width="100%">
-						  <c:out value="${sessionScope.richTextOfflineInstructions}" escapeXml="false" />						  
+						  <c:out value="${QaAuthoringForm.offlineInstructions}" escapeXml="false" />						  
 					</FCK:editor>
 					</td> 
 					
@@ -30,7 +30,11 @@
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOfflineFile"></html:file>
-					 	<html:submit property="submitOfflineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+					 	<html:submit property="submitOfflineFile" 
+                                     styleClass="linkbutton" 
+                                     onmouseover="pviiClassNew(this,'linkbutton')" 
+                                     onmouseout="pviiClassNew(this,'linkbutton')"
+                                     onclick="submitMethod('addNewFile');">
 								<bean:message key="label.upload"/>
 						</html:submit>
 					</td> 
@@ -49,10 +53,10 @@
           				<fmt:message key="label.onlineInstructions" />
           			</td>
 					<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-					<FCK:editor id="richTextOnlineInstructions" basePath="/lams/fckeditor/"
+					<FCK:editor id="onlineInstructions" basePath="/lams/fckeditor/"
 					      height="200"
 						  width="100%">
-  						  <c:out value="${sessionScope.richTextOnlineInstructions}" escapeXml="false" />						  
+  						  <c:out value="${QaAuthoringForm.onlineInstructions}" escapeXml="false" />						  
 					</FCK:editor>
 					</td> 
 				</tr>
@@ -63,7 +67,11 @@
           			</td>
           			<td NOWRAP> 
 						<html:file  property="theOnlineFile"></html:file>
-					 	<html:submit property="submitOnlineFile" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+					 	<html:submit property="submitOnlineFile" 
+                                     styleClass="linkbutton" 
+                                     onmouseover="pviiClassNew(this,'linkbutton')" 
+                                     onmouseout="pviiClassNew(this,'linkbutton')"
+                                     onclick="submitMethod('addNewFile');">
 								<bean:message key="label.upload"/>
 						</html:submit>
 					</td> 
@@ -79,16 +87,6 @@
 				
 				
           		</table>	  	
-			  	<hr>
-				<table>
-	          		<tr>
-						 <td colspan=2> 
-							 <html:submit property="submitTabDone" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-								<bean:message key="button.done"/>
-							</html:submit>
-						</td> 
-					</tr>
-				</table>
 
 		</td></tr>
 		<tr><td>
@@ -142,7 +140,7 @@
 							                </html:link>
 						                </td>
 						                <td>
-							            	<html:link page="/authoring.do?method=deleteFile" 
+							            	<html:link page="/authoring.do?dispatch=deleteFile" 
 							                         	paramId="uuid" paramName="attachment" paramProperty="uuid"
 							                         	onclick="javascript:return confirm('Are you sure you want to delete this file?')"
 							                         	target="_self" styleClass="button">

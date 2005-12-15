@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -98,7 +99,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 
 /** make sure the tool gets called on:
- *	setAsForceComplete(Long userId) throws QaApplicationException 
+ *  setAsForceComplete(Long userId) throws QaApplicationException 
  */
 
 
@@ -136,7 +137,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * Authoring environment: toolContentId
  * Learning environment: toolSessionId + toolContentId  
  * Monitoring environment: toolContentId / Contribute tab:toolSessionId(s)
- * 	 
+ *   
  * 
  */
 
@@ -180,12 +181,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author Ozgur Demirtas
  */
-public class QAction extends DispatchAction implements QaAppConstants
+public class QAction extends LamsDispatchAction implements QaAppConstants
 {
-	static Logger logger = Logger.getLogger(QAction.class.getName());
+    static Logger logger = Logger.getLogger(QAction.class.getName());
     
     private QaToolContentHandler toolContentHandler;
-	
+    
     /** 
      * <p>Struts dispatch method.</p> 
      * 
@@ -207,175 +208,298 @@ public class QAction extends DispatchAction implements QaAppConstants
      * 
      */
     
-	/**
-	 * loadQ(ActionMapping mapping,
-                               ActionForm form,
-                               HttpServletRequest request,
-                               HttpServletResponse response) throws IOException,
-                                                            ServletException
-                                                            
-	 * return ActionForward
-	 * main content/question content management and workflow logic
-	 * 
-	 * if the passed toolContentId exists in the db, we need to get the relevant data into the Map 
-	 * if not, create the default Map 
-	*/
-	
-    public ActionForward loadQ(ActionMapping mapping,
-                               ActionForm form,
-                               HttpServletRequest request,
-                               HttpServletResponse response) throws IOException,
-                                                            ServletException
-    {
-    	
-    	AuthoringUtil authoringUtil= new AuthoringUtil();
-    	
-    	authoringUtil.findSelectedTab(mapping,
-									form,
-						            request,
-						            response);
-    	
-    	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-    	IQaService qaService =QaUtils.getToolService(request);
-    	
-    	/*
-    	 * the status of define later is determined from the property inspector and 
-    	 * by now, we know whether it is on or off
-    	 * 
-    	 * enable-disable tool html elements based on "define later" status
-    	 */
-    	
-    	/*
-    	 * double check QaUtils.getDefineLaterStatus()
-    	 */
-    	boolean defineLaterStatus=QaUtils.getDefineLaterStatus();
-    	
-    	Boolean defineLater=new Boolean(defineLaterStatus);
-    	logger.debug("defineLater: " + defineLater);
-    	if (defineLater.equals(new Boolean(false)))
-		{
-    		request.getSession().setAttribute(IS_DEFINE_LATER,"false");
-    		request.getSession().setAttribute(DISABLE_TOOL,"");
-		}
-    	else
-    	{
-    		request.getSession().setAttribute(IS_DEFINE_LATER,"true");
-    		request.getSession().setAttribute(DISABLE_TOOL,"disabled");	
-    	}
-    	
-    	/*retrieve the default question content map */ 
-        Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
-        logger.debug("MAP_QUESTION_CONTENT:" + request.getSession().getAttribute(MAP_QUESTION_CONTENT));
-        
-        String userAction="";
-        userAction=getUserAction(qaAuthoringForm);
-        logger.debug("returned userAction:" + userAction);
-        
-        QaUtils.persistRichText(request);
-        
-        /* add a new question to Map */
-        if (userAction.equalsIgnoreCase(ADD_NEW_QUESTION)) 
-		{
-        	request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
-        	authoringUtil.reconstructQuestionContentMapForAdd(mapQuestionContent, request);
-        }/* delete a question*/
-        else if (userAction.equalsIgnoreCase(REMOVE_QUESTION))
-		{
-        	request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
-        	authoringUtil.reconstructQuestionContentMapForRemove(mapQuestionContent, request, qaAuthoringForm);
-		} /* remove selected content*/
-//        else if (userAction.equalsIgnoreCase(REMOVE_ALL_CONTENT))
-//		{
-//        	authoringUtil.removeAllDBContent(request);
-//        	QaUtils.cleanupSession(request);
+//  /**
+//   * loadQ(ActionMapping mapping,
+//                               ActionForm form,
+//                               HttpServletRequest request,
+//                               HttpServletResponse response) throws IOException,
+//                                                            ServletException
+//                                                            
+//   * return ActionForward
+//   * main content/question content management and workflow logic
+//   * 
+//   * if the passed toolContentId exists in the db, we need to get the relevant data into the Map 
+//   * if not, create the default Map 
+//  */
+//  
+//    public ActionForward loadQ(ActionMapping mapping,
+//                               ActionForm form,
+//                               HttpServletRequest request,
+//                               HttpServletResponse response) throws IOException,
+//                                                            ServletException
+//    {
+//      
+//      AuthoringUtil authoringUtil= new AuthoringUtil();
+//      
+//      authoringUtil.findSelectedTab(mapping,
+//                                  form,
+//                                  request,
+//                                  response);
+//      
+//      QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+//      IQaService qaService =QaUtils.getToolService(request);
+//      
+//      /*
+//       * the status of define later is determined from the property inspector and 
+//       * by now, we know whether it is on or off
+//       * 
+//       * enable-disable tool html elements based on "define later" status
+//       */
+//      
+//      /*
+//       * double check QaUtils.getDefineLaterStatus()
+//       */
+//      boolean defineLaterStatus=QaUtils.getDefineLaterStatus();
+//      
+//      Boolean defineLater=new Boolean(defineLaterStatus);
+//      logger.debug("defineLater: " + defineLater);
+//      if (defineLater.equals(new Boolean(false)))
+//      {
+//          request.getSession().setAttribute(IS_DEFINE_LATER,"false");
+//          request.getSession().setAttribute(DISABLE_TOOL,"");
+//      }
+//      else
+//      {
+//          request.getSession().setAttribute(IS_DEFINE_LATER,"true");
+//          request.getSession().setAttribute(DISABLE_TOOL,"disabled"); 
+//      }
+//      
+//      /*retrieve the default question content map */ 
+//        Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
+//        logger.debug("MAP_QUESTION_CONTENT:" + request.getSession().getAttribute(MAP_QUESTION_CONTENT));
+//        
+//        String userAction="";
+//        userAction=getUserAction(qaAuthoringForm);
+//        logger.debug("returned userAction:" + userAction);
+//        
+//        QaUtils.persistRichText(request);
+//        
+//        /* add a new question to Map */
+//        if (userAction.equalsIgnoreCase(ADD_NEW_QUESTION)) 
+//      {
+//          request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
+//          authoringUtil.reconstructQuestionContentMapForAdd(mapQuestionContent, request);
+//        }/* delete a question*/
+//        else if (userAction.equalsIgnoreCase(REMOVE_QUESTION))
+//      {
+//          request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
+//          authoringUtil.reconstructQuestionContentMapForRemove(mapQuestionContent, request, qaAuthoringForm);
+//      } /* remove selected content*/
+////        else if (userAction.equalsIgnoreCase(REMOVE_ALL_CONTENT))
+////        {
+////            authoringUtil.removeAllDBContent(request);
+////            QaUtils.cleanupSession(request);
+////            qaAuthoringForm.resetUserAction();
+////            return (mapping.findForward(LOAD_STARTER));
+////        }
+//        else if (userAction.equalsIgnoreCase(SUBMIT_OFFLINE_FILE))
+//        {
+//            logger.debug("will submit offline file: " + userAction);
+//            addFileToContentRepository(request, qaAuthoringForm, true);
+//            logger.debug("offline file added to repository successfully.");
 //            qaAuthoringForm.resetUserAction();
-//        	return (mapping.findForward(LOAD_STARTER));
-//		}
-        else if (userAction.equalsIgnoreCase(SUBMIT_OFFLINE_FILE))
-        {
-            logger.debug("will submit offline file: " + userAction);
-            addFileToContentRepository(request, qaAuthoringForm, true);
-            logger.debug("offline file added to repository successfully.");
-            qaAuthoringForm.resetUserAction();
-            request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
-            logger.debug("forward back to instructions screen");
-           	return (mapping.findForward(LOAD_QUESTIONS));
-        }
-        else if (userAction.equalsIgnoreCase(SUBMIT_ONLINE_FILE))
-        {
-        	logger.debug("will submit online file: " + userAction);
-        	addFileToContentRepository(request, qaAuthoringForm, false);
-        	logger.debug("online file added to repository successfully.");
-        	qaAuthoringForm.resetUserAction();
-        	request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
-        	logger.debug("forward back to instructions screen");
-           	return (mapping.findForward(LOAD_QUESTIONS));
-        }
-        else if (userAction.equalsIgnoreCase(SUBMIT_TAB_DONE))
-        {
-        	logger.debug("user is done with this tab.");
-    	    qaAuthoringForm.resetUserAction();
-        	return (mapping.findForward(LOAD_QUESTIONS));
-        }/*submit questions contained in the Map*/
-        else if (userAction.equalsIgnoreCase(SUBMIT_ALL_CONTENT))
-        {
-        	ActionMessages errors= new ActionMessages();
-        	/* full form validation should be performed only in standard authoring mode, but not in monitoring EditActivity */
-        	errors=validateSubmit(request, errors, qaAuthoringForm);
-
-        	if (errors.size() > 0)  
-    		{
-    			logger.debug("returning back to from to fix errors:");
-    			request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
-    			return (mapping.findForward(LOAD_QUESTIONS));
-    		}
-
-        	/*
-        	 * look after defineLater flag
-        	 */
-    		Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
-		    logger.debug("MONITORED_CONTENT_ID: " + monitoredContentId);
-		    if (monitoredContentId != null)
-		    {
-		    	qaService.unsetAsDefineLater(monitoredContentId);
-			    logger.debug("MONITORED_CONTENT_ID has been unset as defineLater: ");
-		    }
-            
-            List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
-            List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
-
-            
-        	/*delete existing content from the database*/
-//          authoringUtil.removeAllDBContent(request);
-            
-//            QaContent qaContent=authoringUtil.createContent(mapQuestionContent, request, qaAuthoringForm);            
-
-        	/*delete-recreate the questions in the db*/
-            authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
-            
-            QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, request, qaAuthoringForm);            
-
-            saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
-        	
-        	/*give the user a feedback*/
-            errors.clear();
-            errors.add(Globals.ERROR_KEY, new ActionMessage("submit.successful")); 
-    		logger.debug("submit successful.");
-    		saveErrors(request,errors);
-        }
-        else
-        {
-        	logger.debug("Warning!: Uncatered-for user action: " + userAction);
-        }
-
-        qaAuthoringForm.resetUserAction();
-    	
-        /*
-        ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, WebUtil.PARAM_MODE,MODE_OPTIONAL);
-        logger.debug("retrieving mode: " + mode);
-        */
+//            request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
+//            logger.debug("forward back to instructions screen");
+//              return (mapping.findForward(LOAD_QUESTIONS));
+//        }
+//        else if (userAction.equalsIgnoreCase(SUBMIT_ONLINE_FILE))
+//        {
+//          logger.debug("will submit online file: " + userAction);
+//          addFileToContentRepository(request, qaAuthoringForm, false);
+//          logger.debug("online file added to repository successfully.");
+//          qaAuthoringForm.resetUserAction();
+//          request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS);
+//          logger.debug("forward back to instructions screen");
+//              return (mapping.findForward(LOAD_QUESTIONS));
+//        }
+//        else if (userAction.equalsIgnoreCase(SUBMIT_TAB_DONE))
+//        {
+//          logger.debug("user is done with this tab.");
+//          qaAuthoringForm.resetUserAction();
+//          return (mapping.findForward(LOAD_QUESTIONS));
+//        }/*submit questions contained in the Map*/
+//        else if (userAction.equalsIgnoreCase(SUBMIT_ALL_CONTENT))
+//        {
+//          ActionMessages errors= new ActionMessages();
+//          /* full form validation should be performed only in standard authoring mode, but not in monitoring EditActivity */
+//          errors=validateSubmit(request, errors, qaAuthoringForm);
+//
+//          if (errors.size() > 0)  
+//          {
+//              logger.debug("returning back to from to fix errors:");
+//              request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
+//              return (mapping.findForward(LOAD_QUESTIONS));
+//          }
+//
+//          /*
+//           * look after defineLater flag
+//           */
+//          Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
+//          logger.debug("MONITORED_CONTENT_ID: " + monitoredContentId);
+//          if (monitoredContentId != null)
+//          {
+//              qaService.unsetAsDefineLater(monitoredContentId);
+//              logger.debug("MONITORED_CONTENT_ID has been unset as defineLater: ");
+//          }
+//            
+//            List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
+//            List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
+//
+//            
+//          /*delete existing content from the database*/
+////          authoringUtil.removeAllDBContent(request);
+//            
+////            QaContent qaContent=authoringUtil.createContent(mapQuestionContent, request, qaAuthoringForm);            
+//
+//          /*delete-recreate the questions in the db*/
+//            authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
+//            
+//            QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, request, qaAuthoringForm);            
+//
+//            saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
+//          
+//          /*give the user a feedback*/
+//            errors.clear();
+//            errors.add(Globals.ERROR_KEY, new ActionMessage("submit.successful")); 
+//          logger.debug("submit successful.");
+//          saveErrors(request,errors);
+//        }
+//        else
+//        {
+//          logger.debug("Warning!: Uncatered-for user action: " + userAction);
+//        }
+//
+//        qaAuthoringForm.resetUserAction();
+//      
+//        /*
+//        ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, WebUtil.PARAM_MODE,MODE_OPTIONAL);
+//        logger.debug("retrieving mode: " + mode);
+//        */
+//        return (mapping.findForward(LOAD_QUESTIONS));
+//    }
+    
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         return (mapping.findForward(LOAD_QUESTIONS));
     }
+    
+    public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+        throws IOException, ServletException {
+        QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+        IQaService qaService =QaUtils.getToolService(request);
+        AuthoringUtil authoringUtil= new AuthoringUtil();
+        Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
+        
+        ActionMessages errors= new ActionMessages();
+        /* full form validation should be performed only in standard authoring mode, but not in monitoring EditActivity */
+        errors=validateSubmit(request, errors, qaAuthoringForm);
+
+        if (errors.size() > 0)  
+        {
+            logger.debug("returning back to from to fix errors:");
+            request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));
+            return (mapping.findForward(LOAD_QUESTIONS));
+        }
+
+        /*
+         * look after defineLater flag
+         */
+        Long monitoredContentId=(Long)request.getSession().getAttribute(MONITORED_CONTENT_ID);
+        logger.debug("MONITORED_CONTENT_ID: " + monitoredContentId);
+        if (monitoredContentId != null)
+        {
+            qaService.unsetAsDefineLater(monitoredContentId);
+            logger.debug("MONITORED_CONTENT_ID has been unset as defineLater: ");
+        }
+        
+          List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
+          List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
+
+        
+        /*delete existing content from the database*/
+//        authoringUtil.removeAllDBContent(request);
+        
+//          QaContent qaContent=authoringUtil.createContent(mapQuestionContent, request, qaAuthoringForm);            
+
+        /*delete-recreate the questions in the db*/
+          authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
+        
+          QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, request, qaAuthoringForm);            
+
+          saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
+      
+        /*give the user a feedback*/
+          errors.clear();
+          errors.add(Globals.ERROR_KEY, new ActionMessage("submit.successful")); 
+        logger.debug("submit successful.");
+        saveErrors(request,errors);
+        
+        qaAuthoringForm.resetUserAction();
+        return mapping.findForward(LOAD_QUESTIONS);
+    }
+    
+//    public ActionForward submitTabDone(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+//        throws IOException, ServletException {
+//        QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+//        qaAuthoringForm.resetUserAction();
+//        return mapping.findForward(LOAD_QUESTIONS);
+//    }
+    
+    public ActionForward addNewQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+        throws IOException, ServletException {
+        AuthoringUtil authoringUtil= new AuthoringUtil();
+        Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
+        
+        request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  //FIXME: ??
+        authoringUtil.reconstructQuestionContentMapForAdd(mapQuestionContent, request);
+        
+        return (mapping.findForward(LOAD_QUESTIONS));
+    }
+    
+    public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+        throws IOException, ServletException {
+        AuthoringUtil authoringUtil= new AuthoringUtil();
+        QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+        Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
+        
+        request.getSession().setAttribute(EDITACTIVITY_EDITMODE, new Boolean(true));  //FIXME: ??
+        authoringUtil.reconstructQuestionContentMapForRemove(mapQuestionContent, request, qaAuthoringForm);
+        
+        return (mapping.findForward(LOAD_QUESTIONS));
+    }
+
+    public ActionForward addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
+        throws IOException, ServletException {
+        QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+        
+        addFileToContentRepository(request, qaAuthoringForm);
+        qaAuthoringForm.resetUserAction();
+//        request.getSession().setAttribute(CHOICE,CHOICE_TYPE_INSTRUCTIONS); //FIXME: ??
+        return (mapping.findForward(LOAD_QUESTIONS));
+    }
+    
+    public ActionForward deleteFile(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+    {
+        long uuid = WebUtil.readLongParam(request, UUID);
+        
+        // move the file's details from the attachment collection to the deleted attachments collection
+        // the attachment will be delete on saving.
+        List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
+        List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
+        if(deletedAttachmentList == null)
+            deletedAttachmentList = new ArrayList();
+        
+        deletedAttachmentList = QaUtils.moveToDelete(Long.toString(uuid), attachmentList, deletedAttachmentList );
+
+        return (mapping.findForward(LOAD_QUESTIONS));
+    }
+   
+
+
+    
     
 
     /**
@@ -389,98 +513,100 @@ public class QAction extends DispatchAction implements QaAppConstants
      */
     protected ActionMessages validateSubmit(HttpServletRequest request, ActionMessages errors, QaAuthoringForm qaAuthoringForm)
     {
-    	String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
-    	logger.debug("richTextTitle: " + richTextTitle);
-    	String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
-    	logger.debug("richTextInstructions: " + richTextInstructions);
-    	
-    	if ((richTextTitle == null) || (richTextTitle.length() == 0) || richTextTitle.equalsIgnoreCase(RICHTEXT_BLANK))
-		{
-    		errors.add(Globals.ERROR_KEY,new ActionMessage("error.title"));
-			logger.debug("add title to ActionMessages");
-		}
+//        String richTextTitle=(String) request.getSession().getAttribute(RICHTEXT_TITLE);
+        String title = qaAuthoringForm.getTitle();
+        logger.debug("title: " + title);
+//        String richTextInstructions=(String) request.getSession().getAttribute(RICHTEXT_INSTRUCTIONS);
+        String instructions = qaAuthoringForm.getInstructions();
+        logger.debug("instructions: " + instructions);
+        
+        if ((title == null) || (title.trim().length() == 0) || title.equalsIgnoreCase(RICHTEXT_BLANK))
+        {
+            errors.add(Globals.ERROR_KEY,new ActionMessage("error.title"));
+            logger.debug("add title to ActionMessages");
+        }
 
-		if ((richTextInstructions == null) || (richTextInstructions.length() == 0) || richTextInstructions.equalsIgnoreCase(RICHTEXT_BLANK))
-		{
-			errors.add(Globals.ERROR_KEY, new ActionMessage("error.instructions"));
-			logger.debug("add instructions to ActionMessages: ");
-		}
+        if ((instructions == null) || (instructions.trim().length() == 0) || instructions.equalsIgnoreCase(RICHTEXT_BLANK))
+        {
+            errors.add(Globals.ERROR_KEY, new ActionMessage("error.instructions"));
+            logger.debug("add instructions to ActionMessages: ");
+        }
 
-		/*
-		 * enforce that the first (default) question entry is not empty
-		 */
-		String defaultQuestionEntry =request.getParameter("questionContent0");
-		if ((defaultQuestionEntry == null) || (defaultQuestionEntry.length() == 0))
-		{
-			errors.add(Globals.ERROR_KEY, new ActionMessage("error.defaultquestion.empty"));
-			logger.debug("add error.defaultquestion.empty to ActionMessages: ");
-		}
-    	
-    	Boolean renderMonitoringEditActivity=(Boolean)request.getSession().getAttribute(RENDER_MONITORING_EDITACTIVITY);
-		if ((renderMonitoringEditActivity != null) && (!renderMonitoringEditActivity.booleanValue()))
-		{
+        /*
+         * enforce that the first (default) question entry is not empty
+         */
+        String defaultQuestionEntry =request.getParameter("questionContent0");
+        if ((defaultQuestionEntry == null) || (defaultQuestionEntry.length() == 0))
+        {
+            errors.add(Globals.ERROR_KEY, new ActionMessage("error.defaultquestion.empty"));
+            logger.debug("add error.defaultquestion.empty to ActionMessages: ");
+        }
+        
+        Boolean renderMonitoringEditActivity=(Boolean)request.getSession().getAttribute(RENDER_MONITORING_EDITACTIVITY);
+        if ((renderMonitoringEditActivity != null) && (!renderMonitoringEditActivity.booleanValue()))
+        {
 
-    		if ((qaAuthoringForm.getReportTitle() == null) || (qaAuthoringForm.getReportTitle().length() == 0))
-    		{
-    			errors.add(Globals.ERROR_KEY, new ActionMessage("error.reportTitle"));
-    			logger.debug("add reportTitle to ActionMessages: ");
-    		}
-    		
-    		if ((qaAuthoringForm.getMonitoringReportTitle() == null) || (qaAuthoringForm.getMonitoringReportTitle().length() == 0))
-    		{
-    			errors.add(Globals.ERROR_KEY, new ActionMessage("error.monitorReportTitle"));
-    			logger.debug("add monitorReportTitle to ActionMessages: ");
-    		}
-		}
-		
-		/* end of error validation */
-		
-		saveErrors(request,errors);
-    	return errors;
+            if ((qaAuthoringForm.getReportTitle() == null) || (qaAuthoringForm.getReportTitle().length() == 0))
+            {
+                errors.add(Globals.ERROR_KEY, new ActionMessage("error.reportTitle"));
+                logger.debug("add reportTitle to ActionMessages: ");
+            }
+            
+            if ((qaAuthoringForm.getMonitoringReportTitle() == null) || (qaAuthoringForm.getMonitoringReportTitle().length() == 0))
+            {
+                errors.add(Globals.ERROR_KEY, new ActionMessage("error.monitorReportTitle"));
+                logger.debug("add monitorReportTitle to ActionMessages: ");
+            }
+        }
+        
+        /* end of error validation */
+        
+        saveErrors(request,errors);
+        return errors;
     }
     
     
-	/**
-	 * determine the chosen user action
-	 * 
-	 * String getUserAction(QaAuthoringForm qaAuthoringForm)
-	 * @param qaAuthoringForm
-	 * @return
-	 */    
-    protected String getUserAction(QaAuthoringForm qaAuthoringForm)
-    {
-    	String userAction="";
-    	if (qaAuthoringForm.getAddContent() != null)
-        {
-        	userAction=ADD_NEW_QUESTION;
-        }
-        else if (qaAuthoringForm.getRemoveContent() != null)
-        {
-        	userAction=REMOVE_QUESTION;
-        }
-        else if (qaAuthoringForm.getRemoveAllContent() != null)
-        {
-        	userAction=REMOVE_ALL_CONTENT;
-        }
-        else if (qaAuthoringForm.getSubmitTabDone() != null)
-        {
-        	userAction=SUBMIT_TAB_DONE;
-        }
-        else if (qaAuthoringForm.getSubmitAllContent() != null)
-        {
-        	userAction=SUBMIT_ALL_CONTENT;
-        }
-        else if (qaAuthoringForm.getSubmitOfflineFile() != null)
-        {
-        	userAction=SUBMIT_OFFLINE_FILE;
-        }
-        else if (qaAuthoringForm.getSubmitOnlineFile() != null)
-    	{
-        	userAction=SUBMIT_ONLINE_FILE;
-    	}
-        logger.debug("user action is: " + userAction);
-        return userAction;
-    }
+//  /**
+//   * determine the chosen user action
+//   * 
+//   * String getUserAction(QaAuthoringForm qaAuthoringForm)
+//   * @param qaAuthoringForm
+//   * @return
+//   */    
+//    protected String getUserAction(QaAuthoringForm qaAuthoringForm)
+//    {
+//      String userAction="";
+//      if (qaAuthoringForm.getAddContent() != null)
+//        {
+//          userAction=ADD_NEW_QUESTION;
+//        }
+//        else if (qaAuthoringForm.getRemoveContent() != null)
+//        {
+//          userAction=REMOVE_QUESTION;
+//        }
+//        else if (qaAuthoringForm.getRemoveAllContent() != null)
+//        {
+//          userAction=REMOVE_ALL_CONTENT;
+//        }
+//        else if (qaAuthoringForm.getSubmitTabDone() != null)
+//        {
+//          userAction=SUBMIT_TAB_DONE;
+//        }
+//        else if (qaAuthoringForm.getSubmitAllContent() != null)
+//        {
+//          userAction=SUBMIT_ALL_CONTENT;
+//        }
+//        else if (qaAuthoringForm.getSubmitOfflineFile() != null)
+//        {
+//          userAction=SUBMIT_OFFLINE_FILE;
+//        }
+//        else if (qaAuthoringForm.getSubmitOnlineFile() != null)
+//      {
+//          userAction=SUBMIT_ONLINE_FILE;
+//      }
+//        logger.debug("user action is: " + userAction);
+//        return userAction;
+//    }
     
     
     /**
@@ -511,84 +637,84 @@ public class QAction extends DispatchAction implements QaAppConstants
                                               HttpServletResponse response) throws IOException,
                                                                         ServletException, ToolException
     {
-    	/*
-    	 * if the content is not ready yet, don't even proceed.
-    	 * check the define later status
-    	 */
-    	Boolean defineLater=(Boolean)request.getSession().getAttribute(IS_DEFINE_LATER);
-    	logger.debug("learning-defineLater: " + defineLater);
-    	if (defineLater.booleanValue() == true)
-    	{
-    		persistError(request,"error.defineLater");
-    		return (mapping.findForward(LOAD));
-    	}
-    	
-    	LearningUtil learningUtil= new LearningUtil();
-    	QaLearningForm qaLearningForm = (QaLearningForm) form;
-    	
-    	/*retrieve the default question content map*/ 
+        /*
+         * if the content is not ready yet, don't even proceed.
+         * check the define later status
+         */
+        Boolean defineLater=(Boolean)request.getSession().getAttribute(IS_DEFINE_LATER);
+        logger.debug("learning-defineLater: " + defineLater);
+        if (defineLater.booleanValue() == true)
+        {
+            persistError(request,"error.defineLater");
+            return (mapping.findForward(LOAD));
+        }
+        
+        LearningUtil learningUtil= new LearningUtil();
+        QaLearningForm qaLearningForm = (QaLearningForm) form;
+        
+        /*retrieve the default question content map*/ 
         Map mapQuestions=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER);
         logger.debug("MAP_QUESTION_CONTENT_LEARNER:" + request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER));
         
-    	Map mapAnswers=(Map)request.getSession().getAttribute(MAP_ANSWERS);
+        Map mapAnswers=(Map)request.getSession().getAttribute(MAP_ANSWERS);
         logger.debug("MAP_ANSWERS:" + mapAnswers);
 
         /*obtain author's question listing preference*/
-		String questionListingMode=(String) request.getSession().getAttribute(QUESTION_LISTING_MODE);
-		/* maintain Map either based on sequential listing or based on combined listing*/
-		if (questionListingMode.equalsIgnoreCase(QUESTION_LISTING_MODE_SEQUENTIAL))
-		{
-			logger.debug("QUESTION_LISTING_MODE_SEQUENTIAL");
-			
-			int currentQuestionIndex=new Long(qaLearningForm.getCurrentQuestionIndex()).intValue();
-	        logger.debug("currentQuestionIndex is: " + currentQuestionIndex);
-	        logger.debug("getting answer for question: " + currentQuestionIndex + "as: " +  qaLearningForm.getAnswer());
-	        logger.debug("mapAnswers size:" + mapAnswers.size());
-	        
-	        if  (mapAnswers.size() >= currentQuestionIndex)
-	        {
-	        	logger.debug("mapAnswers size:" + mapAnswers.size() + " and currentQuestionIndex: " + currentQuestionIndex);
-	        	mapAnswers.remove(new Long(currentQuestionIndex).toString());
-	        }
-	    	logger.debug("before adding to mapAnswers: " + mapAnswers);
-	    	mapAnswers.put(new Long(currentQuestionIndex).toString(), qaLearningForm.getAnswer());
-	        logger.debug("adding new answer:" + qaLearningForm.getAnswer() + " to mapAnswers.");
-			
-			if (qaLearningForm.getGetNextQuestion() != null)
-	        	currentQuestionIndex++;	
-	        else if (qaLearningForm.getGetPreviousQuestion() != null)
-	        	currentQuestionIndex--;
-	        
-			request.getSession().setAttribute(CURRENT_ANSWER, mapAnswers.get(new Long(currentQuestionIndex).toString()));
-	        logger.debug("currentQuestionIndex will be: " + currentQuestionIndex);
-	        request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Long(currentQuestionIndex));
-	        learningUtil.feedBackAnswersProgress(request,currentQuestionIndex);
-	        qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */ 
-		}
-		else
-		{
-			logger.debug(logger + " " + this.getClass().getName() +  "QUESTION_LISTING_MODE_COMBINED");
-			for (int questionIndex=INITIAL_QUESTION_COUNT.intValue(); questionIndex<= mapQuestions.size(); questionIndex++ )
-			{
-				String answer=request.getParameter("answer" + questionIndex);
-				logger.debug("answer for question " + questionIndex + " is:" + answer);
-				mapAnswers.put(new Long(questionIndex).toString(), answer);
-			}
-		}
+        String questionListingMode=(String) request.getSession().getAttribute(QUESTION_LISTING_MODE);
+        /* maintain Map either based on sequential listing or based on combined listing*/
+        if (questionListingMode.equalsIgnoreCase(QUESTION_LISTING_MODE_SEQUENTIAL))
+        {
+            logger.debug("QUESTION_LISTING_MODE_SEQUENTIAL");
+            
+            int currentQuestionIndex=new Long(qaLearningForm.getCurrentQuestionIndex()).intValue();
+            logger.debug("currentQuestionIndex is: " + currentQuestionIndex);
+            logger.debug("getting answer for question: " + currentQuestionIndex + "as: " +  qaLearningForm.getAnswer());
+            logger.debug("mapAnswers size:" + mapAnswers.size());
+            
+            if  (mapAnswers.size() >= currentQuestionIndex)
+            {
+                logger.debug("mapAnswers size:" + mapAnswers.size() + " and currentQuestionIndex: " + currentQuestionIndex);
+                mapAnswers.remove(new Long(currentQuestionIndex).toString());
+            }
+            logger.debug("before adding to mapAnswers: " + mapAnswers);
+            mapAnswers.put(new Long(currentQuestionIndex).toString(), qaLearningForm.getAnswer());
+            logger.debug("adding new answer:" + qaLearningForm.getAnswer() + " to mapAnswers.");
+            
+            if (qaLearningForm.getGetNextQuestion() != null)
+                currentQuestionIndex++; 
+            else if (qaLearningForm.getGetPreviousQuestion() != null)
+                currentQuestionIndex--;
+            
+            request.getSession().setAttribute(CURRENT_ANSWER, mapAnswers.get(new Long(currentQuestionIndex).toString()));
+            logger.debug("currentQuestionIndex will be: " + currentQuestionIndex);
+            request.getSession().setAttribute(CURRENT_QUESTION_INDEX, new Long(currentQuestionIndex));
+            learningUtil.feedBackAnswersProgress(request,currentQuestionIndex);
+            qaLearningForm.resetUserActions(); /*resets all except submitAnswersContent */ 
+        }
+        else
+        {
+            logger.debug(logger + " " + this.getClass().getName() +  "QUESTION_LISTING_MODE_COMBINED");
+            for (int questionIndex=INITIAL_QUESTION_COUNT.intValue(); questionIndex<= mapQuestions.size(); questionIndex++ )
+            {
+                String answer=request.getParameter("answer" + questionIndex);
+                logger.debug("answer for question " + questionIndex + " is:" + answer);
+                mapAnswers.put(new Long(questionIndex).toString(), answer);
+            }
+        }
         
-		/*
-		 *  At this point the Map holding learner responses is ready. So place that into the session.
-		 */
-		request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
-		
-		/*
-		 * Learner submits the responses to the questions. 
-		 */
+        /*
+         *  At this point the Map holding learner responses is ready. So place that into the session.
+         */
+        request.getSession().setAttribute(MAP_ANSWERS, mapAnswers);
+        
+        /*
+         * Learner submits the responses to the questions. 
+         */
         if (qaLearningForm.getSubmitAnswersContent() != null)
         {
-        	logger.debug(logger + " " + this.getClass().getName() +  "submit the responses: " + mapAnswers);
-        	/*recreate the users and responses*/
-        	learningUtil.createUsersAndResponses(mapAnswers, request);
+            logger.debug(logger + " " + this.getClass().getName() +  "submit the responses: " + mapAnswers);
+            /*recreate the users and responses*/
+            learningUtil.createUsersAndResponses(mapAnswers, request);
             qaLearningForm.resetUserActions();
             qaLearningForm.setSubmitAnswersContent(null);
             /*start generating a report for the Learner*/
@@ -596,38 +722,38 @@ public class QAction extends DispatchAction implements QaAppConstants
             
             learningUtil.lockContent(request);
             logger.debug("content has been locked");
-        	return (mapping.findForward(LEARNER_REPORT));
+            return (mapping.findForward(LEARNER_REPORT));
         }
         /*
-		 * Simulate learner leaving the current tool session. This will normally gets called by the container by 
-		 * leaveToolSession(toolSessionId, user) 
-		 */
+         * Simulate learner leaving the current tool session. This will normally gets called by the container by 
+         * leaveToolSession(toolSessionId, user) 
+         */
         else if (qaLearningForm.getEndLearning() != null) 
         {
-        		/*
-            	 * The learner is done with the tool session. The tool needs to clean-up.
-            	 */
-            	
+                /*
+                 * The learner is done with the tool session. The tool needs to clean-up.
+                 */
+                
                 Long toolSessionId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
-        	    HttpSession ss = SessionManager.getSession();
-        	    /*get back login user DTO*/
-        	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+                HttpSession ss = SessionManager.getSession();
+                /*get back login user DTO*/
+                UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
                 logger.debug("simulating container behaviour by calling  " +
-							 "leaveToolSession() with toolSessionId: " +  toolSessionId + " and user: " + user);
+                             "leaveToolSession() with toolSessionId: " +  toolSessionId + " and user: " + user);
                 
                 IQaService qaService =QaUtils.getToolService(request);
                 String nextActivityUrl = qaService.leaveToolSession(toolSessionId, new Long(user.getUserID().longValue()));
                 response.sendRedirect(nextActivityUrl);
-    	        return null;
-    		  
+                return null;
+              
                 
-        	}
-        	
+            }
+            
             /* Also cleanup session attributes */
             QaUtils.cleanupSession(request);
         
         qaLearningForm.resetUserActions();
-    	return (mapping.findForward(LOAD));
+        return (mapping.findForward(LOAD));
     }
     
     
@@ -654,10 +780,10 @@ public class QAction extends DispatchAction implements QaAppConstants
             HttpServletResponse response) throws IOException,
                                       ServletException
   {
-    	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-    	
-    	if (qaAuthoringForm.getSummaryMonitoring() != null) 
-    	{
+        QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+        
+        if (qaAuthoringForm.getSummaryMonitoring() != null) 
+        {
             logger.debug("request for getSummaryMonitoring, start proxying...");
             logger.debug("NO_AVAILABLE_SESSIONS: " + request.getSession().getAttribute(NO_AVAILABLE_SESSIONS));
             
@@ -666,47 +792,47 @@ public class QAction extends DispatchAction implements QaAppConstants
             qaAuthoringForm.resetUserAction();
             if ((noAvailableSessions != null) && (noAvailableSessions.booleanValue()))
             {
-            	persistError(request,"error.noStudentActivity");
-            	request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(true));
-        		request.setAttribute(STOP_RENDERING_QUESTIONS, new Boolean(true));
-        		return (mapping.findForward(LOAD));
+                persistError(request,"error.noStudentActivity");
+                request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(true));
+                request.setAttribute(STOP_RENDERING_QUESTIONS, new Boolean(true));
+                return (mapping.findForward(LOAD));
             }
             else
             {
-            	logger.debug("NO_AVAILABLE_SESSIONS: " +false);
-            	QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
-            	QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
-            	return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
+                logger.debug("NO_AVAILABLE_SESSIONS: " +false);
+                QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
+                QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
+                return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
             }
-    	}
-    	else if (qaAuthoringForm.getInstructionsMonitoring() != null)
-    	{
-    		logger.debug("QAction- request for getInstructionsMonitoring()");
-    		qaAuthoringForm.resetUserAction();
-    		QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
-        	QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
-        	qaMonitoringForm.setInstructions("instructions");
-        	return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
-    	}
-    	else if (qaAuthoringForm.getEditActivityMonitoring() != null) 
-    	{
-    		logger.debug("QAction-request for getEditActivityMonitoring()");
-			QaStarterAction qaStarterAction = new QaStarterAction();
-			logger.debug("forwarding to Authoring Basic tab.");
-			ActionForward actionForward=qaStarterAction.startMonitoringSummary(mapping, qaAuthoringForm, request, response);
-			logger.debug("actionForward: " + actionForward);
-			qaAuthoringForm.resetUserAction();
-			return (actionForward);
-    	}
-    	else if (qaAuthoringForm.getStatsMonitoring() != null)
-    	{
-    		qaAuthoringForm.resetUserAction();
-    		QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
-        	QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
-        	qaMonitoringForm.setStats("stats");
-        	return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
-    	}
-		return null;
+        }
+        else if (qaAuthoringForm.getInstructionsMonitoring() != null)
+        {
+            logger.debug("QAction- request for getInstructionsMonitoring()");
+            qaAuthoringForm.resetUserAction();
+            QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
+            QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
+            qaMonitoringForm.setInstructions("instructions");
+            return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
+        }
+        else if (qaAuthoringForm.getEditActivityMonitoring() != null) 
+        {
+            logger.debug("QAction-request for getEditActivityMonitoring()");
+            QaStarterAction qaStarterAction = new QaStarterAction();
+            logger.debug("forwarding to Authoring Basic tab.");
+            ActionForward actionForward=qaStarterAction.startMonitoringSummary(mapping, qaAuthoringForm, request, response);
+            logger.debug("actionForward: " + actionForward);
+            qaAuthoringForm.resetUserAction();
+            return (actionForward);
+        }
+        else if (qaAuthoringForm.getStatsMonitoring() != null)
+        {
+            qaAuthoringForm.resetUserAction();
+            QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
+            QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
+            qaMonitoringForm.setStats("stats");
+            return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
+        }
+        return null;
   }
     
 
@@ -718,15 +844,15 @@ public class QAction extends DispatchAction implements QaAppConstants
      * @param message
      */
     public void persistError(HttpServletRequest request, String message)
-	{
-		ActionMessages errors= new ActionMessages();
-		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-		logger.debug("add " + message +"  to ActionMessages:");
-		saveErrors(request,errors);	    	    
-	} 
+    {
+        ActionMessages errors= new ActionMessages();
+        errors.add(Globals.ERROR_KEY, new ActionMessage(message));
+        logger.debug("add " + message +"  to ActionMessages:");
+        saveErrors(request,errors);             
+    } 
     
     
-    public void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm, boolean isOfflineFile)
+    public void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
     {
         logger.debug("attempt addFileToContentRepository");
         IQaService qaService =QaUtils.getToolService(request);
@@ -741,28 +867,30 @@ public class QAction extends DispatchAction implements QaAppConstants
         if(deletedAttachmentList == null)
             deletedAttachmentList = new ArrayList();
         
-        FormFile uploadedFile = (isOfflineFile)?qaAuthoringForm.getTheOfflineFile():qaAuthoringForm.getTheOnlineFile();
-        String fileType = isOfflineFile ? IToolContentHandler.TYPE_OFFLINE : IToolContentHandler.TYPE_ONLINE;
+        FormFile uploadedFile = null;
+        boolean isOnlineFile = false;
+        String fileType = null;
+        if(qaAuthoringForm.getTheOfflineFile() != null && qaAuthoringForm.getTheOfflineFile().getFileSize() > 0 ){
+            uploadedFile = qaAuthoringForm.getTheOfflineFile();
+            fileType = IToolContentHandler.TYPE_OFFLINE;
+        }
+        else if(qaAuthoringForm.getTheOnlineFile() != null && qaAuthoringForm.getTheOnlineFile().getFileSize() > 0 ){
+            uploadedFile = qaAuthoringForm.getTheOnlineFile();
+            isOnlineFile = true;
+            fileType = IToolContentHandler.TYPE_ONLINE;
+        }
+        else
+            //no file uploaded
+            return;
+        
         logger.debug("uploadedFile.getFileName(): " + uploadedFile.getFileName());
         
-        //String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+        // String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
         //QaContent qaContent = qaService.loadQa(Long.parseLong(toolContentId));
         
-//      if a file with the same name already exists then move the old one to deleted
-        deletedAttachmentList = QaUtils.moveToDelete(uploadedFile.getFileName(), !isOfflineFile, attachmentList, deletedAttachmentList );
-//        Iterator iter = attachmentList.iterator();
-//        while(iter.hasNext()){
-//            QaUploadedFile file = (QaUploadedFile)iter.next();
-//            //if uploaded file already exist in the attachmentList then, remove it
-//            if(file.getFileName().equals(uploadedFile.getFileName())){
-//                //if file exist in contentRepository then, move it to deleteAttachmentList else, just remove it.
-//                if(file.getUuid() != null){
-//                    
-//                }
-//                else
-//                    iter.remove();
-//            }
-//        }
+        // if a file with the same name already exists then move the old one to deleted
+        deletedAttachmentList = QaUtils.moveToDelete(uploadedFile.getFileName(), isOnlineFile, attachmentList, deletedAttachmentList );
+
         
         try
         {
@@ -772,7 +900,7 @@ public class QAction extends DispatchAction implements QaAppConstants
                     uploadedFile.getContentType(), fileType); 
             QaUploadedFile file = new QaUploadedFile();
             file.setFileName(uploadedFile.getFileName());
-            file.setFileOnline(!isOfflineFile);
+            file.setFileOnline(isOnlineFile);
             //file.setQaContent(qaContent);
             file.setUuid(node.getUuid().toString());
             //file.setVersionId(node.getVersion()); 
@@ -866,23 +994,5 @@ public class QAction extends DispatchAction implements QaAppConstants
         return deletedAttachmentList;
     }
     
-    public ActionForward deleteFile(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException
-    {
-        long uuid = WebUtil.readLongParam(request, UUID);
-        
-        // move the file's details from the attachment collection to the deleted attachments collection
-        // the attachment will be delete on saving.
-        List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
-        List deletedAttachmentList = (List) request.getSession().getAttribute(DELETED_ATTACHMENT_LIST);
-        if(deletedAttachmentList == null)
-            deletedAttachmentList = new ArrayList();
-        
-        deletedAttachmentList = QaUtils.moveToDelete(Long.toString(uuid), attachmentList, deletedAttachmentList );
 
-        return (mapping.findForward(LOAD_QUESTIONS));
-    }    
 }

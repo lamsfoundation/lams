@@ -13,20 +13,20 @@
 						<tr> 
 					 		<td> <bean:message key="label.authoring.title"/>: </td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-							<FCK:editor id="richTextTitle" basePath="/lams/fckeditor/"
+							<FCK:editor id="title" basePath="/lams/fckeditor/"
 							      height="200"
 								  width="100%">
-								  <c:out value="${sessionScope.richTextTitle}" escapeXml="false" />						  
+								  <c:out value="${QaAuthoringForm.title}" escapeXml="false" />						  
 							</FCK:editor>
 							</td> 
 					  	</tr>
 					  	<tr> 
 					 		<td> <bean:message key="label.authoring.instructions"/>: </td>
 					 		<td NOWRAP width=700> <!-- Dave,I found width was necessary to present all the elements of the editor, feel free to change -->
-							<FCK:editor id="richTextInstructions" basePath="/lams/fckeditor/"
+							<FCK:editor id="instructions" basePath="/lams/fckeditor/"
 							      height="200"
 								  width="100%">
-								  <c:out value="${sessionScope.richTextInstructions}" escapeXml="false" />						  
+								  <c:out value="${QaAuthoringForm.instructions}" escapeXml="false" />						  
 							</FCK:editor>
 							</td>
 						</tr>
@@ -40,8 +40,12 @@
 								  	<input type="text" name="questionContent0" size="50" 
 								  	maxlength="255" value="<c:out value="${sessionScope.defaultQuestionContent}"/>"> 
 								  	&nbsp
-									<html:submit property="addContent" styleClass="linkbutton" disabled="${sessionScope.isDefineLater}"
-									onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+									<html:submit property="addContent" 
+                                                 styleClass="linkbutton" 
+                                                 disabled="${sessionScope.isDefineLater}"
+                                                 onmouseover="pviiClassNew(this,'linkbutton')" 
+                                                 onmouseout="pviiClassNew(this,'linkbutton')"
+                                                 onclick="submitMethod('addNewQuestion');">
 									<bean:message key="button.addNewQuestion"/>
 									</html:submit>
 						  	</td>
@@ -59,29 +63,22 @@
 								  		<td> <input type="text" name="questionContent<c:out value="${queIndex-1}"/>" value="<c:out value="${questionEntry.value}"/>"   
 									  		size="50" maxlength="255"> 
 									  	&nbsp
-		 								<html:submit property="removeContent" styleClass="linkbutton"  onclick="removeQuestion(${formIndex}, ${queIndex});"
-		 								disabled="${sessionScope.isDefineLater}" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+		 		 						<html:submit property="removeContent" 
+                                                     styleClass="linkbutton"  
+                                                     onclick="removeQuestion(${queIndex});"
+                                                     disabled="${sessionScope.isDefineLater}" 
+                                                     onmouseover="pviiClassNew(this,'linkbutton')" 
+                                                     onmouseout="pviiClassNew(this,'linkbutton')">
 											<bean:message key="button.removeQuestion"/>
 										</html:submit>
 									  	</td>
 								  </tr>
 							</c:if> 			
 						</c:forEach>
-						<html:hidden property="toolContentId" value="${sessionScope.toolContentID}"/>
+						<html:hidden property="toolContentId" value="${QaAuthoringForm.toolContentId}"/>
 						<html:hidden property="questionIndex"/>
-						<html:hidden property="isRemoveContent"/>
+
 					</tr>
-					</table>
-		
-					<hr>
-					<table>
-							<tr>
-									 <td> 
-										 <html:submit property="submitAllContent" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
-											<bean:message key="button.submitAllContent"/>
-										</html:submit>
-									</td> 
-							</tr>
 					</table>
 			</td></tr>			
 			</c:if>	
@@ -157,11 +154,12 @@
 
 <!--  addQuestion gets called everytime a new question content is added to the UI -->
 	
-	function removeQuestion(formIndex, questionIndex)
+	function removeQuestion(questionIndex)
 	{
-		document.forms[formIndex].questionIndex.value=questionIndex;
-		document.forms[formIndex].isRemoveQuestion.value='1';
-		document.forms[formIndex].submit();
+		document.QaAuthoringForm.questionIndex.value=questionIndex;
+		//document.QaAuthoringForm.isRemoveQuestion.value='1';
+        submitMethod('removeQuestion');
+		//document.forms[formIndex].submit();
 	}
 	
  </SCRIPT>

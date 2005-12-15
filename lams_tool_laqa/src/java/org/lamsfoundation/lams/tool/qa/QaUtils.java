@@ -154,24 +154,30 @@ public abstract class QaUtils implements QaAppConstants {
     public static void setDefaultSessionAttributes(HttpServletRequest request, QaContent defaultQaContent, QaAuthoringForm qaAuthoringForm)
 	{
 		/*should never be null anyway as default content MUST exist in the db*/
-		if (defaultQaContent != null)
-		{		
-			qaAuthoringForm.setTitle(defaultQaContent.getTitle());
-			qaAuthoringForm.setInstructions(defaultQaContent.getInstructions());
-			qaAuthoringForm.setReportTitle(defaultQaContent.getReportTitle());
-			qaAuthoringForm.setEndLearningMessage(defaultQaContent.getEndLearningMessage());
-			qaAuthoringForm.setOnlineInstructions(defaultQaContent.getOnlineInstructions());
-			qaAuthoringForm.setOfflineInstructions(defaultQaContent.getOfflineInstructions());
-			qaAuthoringForm.setMonitoringReportTitle(defaultQaContent.getMonitoringReportTitle());
-			
-			request.getSession().setAttribute(TITLE,qaAuthoringForm.getTitle());
-			request.getSession().setAttribute(INSTRUCTIONS,qaAuthoringForm.getInstructions());
-			
-			request.getSession().setAttribute(RICHTEXT_TITLE, defaultQaContent.getTitle());
-		    request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS, defaultQaContent.getInstructions());
-		    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,defaultQaContent.getOfflineInstructions());
-		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,defaultQaContent.getOnlineInstructions());
-		}
+        if(defaultQaContent == null)
+            throw new NullPointerException("Default QaContent cannot be null");
+
+		qaAuthoringForm.setTitle(defaultQaContent.getTitle());
+		qaAuthoringForm.setInstructions(defaultQaContent.getInstructions());
+		qaAuthoringForm.setReportTitle(defaultQaContent.getReportTitle());
+        qaAuthoringForm.setMonitoringReportTitle(defaultQaContent.getMonitoringReportTitle());
+		qaAuthoringForm.setEndLearningMessage(defaultQaContent.getEndLearningMessage());
+		qaAuthoringForm.setOnlineInstructions(defaultQaContent.getOnlineInstructions());
+		qaAuthoringForm.setOfflineInstructions(defaultQaContent.getOfflineInstructions());
+		qaAuthoringForm.setMonitoringReportTitle(defaultQaContent.getMonitoringReportTitle());
+		
+         //determine the status of radio boxes
+        qaAuthoringForm.setUsernameVisible(defaultQaContent.isUsernameVisible()?ON:OFF);
+        qaAuthoringForm.setSynchInMonitor(defaultQaContent.isSynchInMonitor()?ON:OFF);
+        qaAuthoringForm.setQuestionsSequenced(defaultQaContent.isQuestionsSequenced()?ON:OFF);
+            
+//			request.getSession().setAttribute(TITLE,qaAuthoringForm.getTitle());
+//			request.getSession().setAttribute(INSTRUCTIONS,qaAuthoringForm.getInstructions());
+//			
+//			request.getSession().setAttribute(RICHTEXT_TITLE, defaultQaContent.getTitle());
+//		    request.getSession().setAttribute(RICHTEXT_INSTRUCTIONS, defaultQaContent.getInstructions());
+//		    request.getSession().setAttribute(RICHTEXT_OFFLINEINSTRUCTIONS,defaultQaContent.getOfflineInstructions());
+//		    request.getSession().setAttribute(RICHTEXT_ONLINEINSTRUCTIONS,defaultQaContent.getOnlineInstructions());
 	}
     
     

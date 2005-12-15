@@ -47,17 +47,30 @@
   <action-mappings>
    
 	<!--Authoring Starter  -->
-   <action path="/authoringStarter" type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction" 
-   			name="QaAuthoringForm" input=".starter"> 
-	  	<forward
+   <!--  action path="/authoringStarter" type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction" 
+   			name="QaAuthoringForm" input=".starter" --> 
+    <action
+      path="/authoringStarter"
+      type="org.lamsfoundation.lams.tool.qa.web.QaStarterAction"
+      name="QaAuthoringForm"
+      scope="session"
+      unknown="false"
+      validate="false"
+    >
+	  	<!--  forward
 		    name="load"
 		    path=".questions"
 		    redirect="true"
-	  	/>
+	  	/ -->
+        <forward
+          name="load"
+          path="/author_page.jsp"
+          redirect="false"
+        />
 	  	<forward
-        name="monitoringReport"
-        path=".monitoringReport"
-        redirect="true"
+          name="monitoringReport"
+          path=".monitoringReport"
+          redirect="true"
    	  	/>
 	</action>  
 	<!--Learning Starter  -->
@@ -105,14 +118,14 @@
       type="org.lamsfoundation.lams.tool.qa.web.QAction"
       name="QaAuthoringForm"
       scope="session"
-      input=".questions"
-      parameter="method"
+      input="/author_page.jsp"
+      parameter="dispatch"
       unknown="false"
       validate="true"
     >
       <forward
         name="load"
-        path=".questions"
+        path="/author_page.jsp"
         redirect="true"
       />
       <forward
