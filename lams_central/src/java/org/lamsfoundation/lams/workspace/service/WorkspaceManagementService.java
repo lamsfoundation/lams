@@ -257,7 +257,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		
 		List designs = null;
 		
-		if(mode==AUTHORING)
+		if(AUTHORING.equals(mode))
 			designs = learningDesignDAO.getAllLearningDesignsInFolder(workspaceFolder.getWorkspaceFolderId());
 		else
 			designs = learningDesignDAO.getAllValidLearningDesignsInFolder(workspaceFolder.getWorkspaceFolderId());
