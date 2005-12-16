@@ -54,17 +54,45 @@
 		</TR>
 	</table>
 
-	<H2>Monitoring</H2>
+	<H2>Monitoring Activities</H2>
 	<p>All the links below should pop-up in new windows.</p>
-	<TABLE border="0" summary="This table is being used for layout purposes only">
-		<TR>
-			<TD class="formcontrol" colspan="3"><A HREF=javascript:launchPopup('/lams/learning/exportWaitingPage.jsp?mode=teacher&lessonID=<c:out value="${lesson.lessonId}"/>');>Export Portfolio for all users</a> </TD>
-		</TR>
-		<TR>
-			<TD class="formcontrol" colspan="3">&nbsp;
-		</TR>
 
+	<p><A HREF=javascript:launchPopup('/lams/learning/exportWaitingPage.jsp?mode=teacher&lessonID=<c:out value="${lesson.lessonId}"/>');>Export Portfolio for all users</a> </p>
+
+	<p>Note: These activities are in the order that they were created, not in the order in authoring. In the Flash based interface, they will be displayed in the same order used in authoring.</p>
+
+	<TABLE border="0" summary="This table is being used for layout purposes only">
 		<c:forEach var="activity" items="${lesson.learningDesign.activities}">
+		<c:choose>
+
+		<c:when test="${activity.complexActivity}">
+		<!-- show the complex activity as a heading, and its child activities. This code relies on the activities only being two deep at the moment. -->
+		<TR>
+			<TD class="formcontrol" colspan="3">
+				Complex Activity <c:out value="${activity.activityId}"/> <c:out value="${activity.title}"/>
+			</TD>
+		</TR>
+			<TABLE>
+			<c:forEach var="childActivity" items="${activity.activities}">
+			<TR>
+				<TD class="formcontrol">
+					--> Activity <c:out value="${childActivity.activityId}"/> <c:out value="${childActivity.title}"/>:
+				</TD>
+				<TD class="formcontrol">
+					 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&activityID=<c:out value="${childActivity.activityId}"/>');">
+					 Monitor</A>
+				</TD>
+				<TD class="formcontrol">
+					 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&activityID=<c:out value="${childActivity.activityId}"/>');">
+					 Define Later</A><BR>
+				</TD>
+			</TR>
+			</c:forEach>
+			</TABLE>
+		</c:when>
+
+		<c:when test="${activity.parentActivity == null}"> 
+		<!-- Only show the activities without a parent. Those with a parent will be displayed by the parent activity -->
 		<TR>
 			<TD class="formcontrol">
 				Activity <c:out value="${activity.activityId}"/> <c:out value="${activity.title}"/>:
@@ -78,6 +106,8 @@
 				 Define Later</A><BR>
 			</TD>
 		</TR>
+		</c:when> 
+		</c:choose>
 		</c:forEach>
 		</table>
 
