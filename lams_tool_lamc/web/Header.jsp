@@ -18,26 +18,10 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html-el" %>
-<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
-
-
-<c:if test="${submitSuccess == 1}"> 			
-	<logic:messagesPresent> 
-	 <html:messages id="error"> 
-		    <img src="images/success.gif" align="left" width=20 height=20>  <bean:write name="error"/> </img>
-	 </html:messages> 
-	</logic:messagesPresent>
-</c:if> 			
-
-
-<c:if test="${submitSuccess != 1}"> 			
-	<logic:messagesPresent> 
-	 <html:messages id="error"> 
-		    <img src="images/error.jpg" align="left" width=20 height=20>  <bean:write name="error"/> </img>
-	 </html:messages> 
-	</logic:messagesPresent>
-</c:if> 			
-
-
-
+<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
+<%@ taglib uri="tags-c" prefix="c" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
+<%@ page contentType="text/html; charset=iso-8859-1" language="java" %>

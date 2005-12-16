@@ -18,5 +18,27 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-<%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
-<%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
+<!-- taglib definition-->
+<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
+<%@ taglib uri="tags-c" prefix="c" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
+
+<!-- end of taglib definition -->
+<tr>
+	<td>
+		<table width="100%" height="190" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF" summary="This table is being used for layout purposes only">
+			<tr> 
+				<td height="138" valign="top"> 
+				 <table width="90%" border="0" cellspacing="0" cellpadding="0">
+				 	<br/>
+					<br/>
+   					<%@ include file="Errorbox.jsp" %>
+				 </table>
+				</td>
+			 </tr>
+		</table>
+	</td>
+</tr>

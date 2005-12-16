@@ -1,8 +1,8 @@
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts-logic-el.tld" prefix="logic-el" %>
-<%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
-<%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
+<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
+<%@ taglib uri="tags-c" prefix="c" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
 <%
@@ -116,7 +116,7 @@ function submitMethod(actionMethod) {
 			<table align=center> 	  
 			<tr>   
 			<td NOWRAP class=error>
-				<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+				<%@ include file="Errorbox.jsp" %> <!-- show any error messages here -->
 			</td>
 			</tr> 
 			</table>
@@ -140,7 +140,7 @@ function submitMethod(actionMethod) {
 		<table align=center> 	  
 		<tr>   
 		<td NOWRAP class=error>
-			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+			<%@ include file="Errorbox.jsp" %> <!-- show any error messages here -->
 		</td>
 		</tr> 
 		</table>
@@ -157,7 +157,7 @@ function submitMethod(actionMethod) {
 		<table align=center> 	  
 		<tr>   
 		<td NOWRAP class=error>
-			<%@ include file="errorbox.jsp" %> <!-- show any error messages here -->
+			<%@ include file="Errorbox.jsp" %> <!-- show any error messages here -->
 		</td>
 		</tr> 
 		</table>

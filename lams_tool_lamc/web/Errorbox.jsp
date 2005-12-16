@@ -18,21 +18,30 @@ USA
 
 http://www.gnu.org/licenses/gpl.txt
 -->
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts-logic-el.tld" prefix="logic-el" %>
-<%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
-<%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
+<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
+<%@ taglib uri="tags-c" prefix="c" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
 
-	<table align="center" border="0" width="100%">
-	<tr> <td NOWRAP align=center>
-		    <img src="images/error.jpg" align="left" width=20 height=20> </img> 
-				<bean:message key="error.default.content.notSetup"/>			    
-	</td> </tr>
-	</table>
+<c:if test="${submitSuccess == 1}"> 			
+	<logic-el:messagesPresent> 
+	 <html:messages id="error"> 
+		    <img src="images/success.gif" align="left" width=20 height=20>  <bean:write name="error"/> </img>
+	 </html:messages> 
+	</logic-el:messagesPresent>
+</c:if> 			
 
+
+<c:if test="${submitSuccess != 1}"> 			
+	<logic-el:messagesPresent> 
+	 <html:messages id="error"> 
+		    <img src="images/error.jpg" align="left" width=20 height=20>  <bean:write name="error"/> </img>
+	 </html:messages> 
+	</logic-el:messagesPresent>
+</c:if> 			
 
 
 

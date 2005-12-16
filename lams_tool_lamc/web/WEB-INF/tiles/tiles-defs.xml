@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!DOCTYPE tiles-definitions PUBLIC
+   "-//Apache Software Foundation//DTD Tiles Configuration//EN"
+   "http://jakarta.apache.org/struts/dtds/tiles-config.dtd">
+
+
 <!--
 Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 
@@ -23,25 +28,25 @@ http://www.gnu.org/licenses/gpl.txt
  
 <tiles-definitions>
 <!-- ============= template Definitions ====================== -->
-	<definition name=".baseDef" path="/template.jsp">
+	<definition name=".baseDef" path="/Template.jsp">
 		<put name="title" value="Base Template Page"/>
 		<put name="pageHeader" value = "Base Template"/>
-		<put name="header" value="/header.jsp"/>
-		<put name="content" value="/baseContent.jsp" />	
-		<put name="footer" value="/footer.jsp"/>	
+		<put name="header" value="/Header.jsp"/>
+		<put name="content" value="/BaseContent.jsp" />	
+		<put name="footer" value="/Footer.jsp"/>	
 	</definition>
 <!-- ============= Exception Page Definitions ====================== -->	
 	<definition name=".systemError" extends=".baseDef" >
 		<put name="title" value="System Error Page"/>
 		<put name="pageHeader" value = "System Exception"/>
-		<put name="content" value="/systemErrorContent.jsp" />	
+		<put name="content" value="/SystemErrorContent.jsp" />	
 	</definition>
 
 <!-- ============= Mc Authoring Page Definitions ====================== -->	
 	<definition name=".questions" extends=".baseDef" >
 		<put name="title" value="Multiple Choice"/>
 		<put name="pageHeader" value = "Multiple Choice"/>
-		<put name="content" value="authoringMaincontent.jsp" />	
+		<put name="content" value="/AuthoringMaincontent.jsp" />	
 	</definition>
 	
 		
@@ -55,20 +60,20 @@ http://www.gnu.org/licenses/gpl.txt
 	<definition name=".error" extends=".baseDef" >
 		<put name="title" value="Error"/>
 		<put name="pageHeader" value = "Error"/>
-		<put name="content" value="errorbox.jsp" />	
+		<put name="content" value="/Errorbox.jsp" />	
 	</definition>
 	
 	<definition name=".errorList" extends=".baseDef" >
 		<put name="title" value="Error"/>
 		<put name="pageHeader" value = "Error"/>
-		<put name="content" value="errorList.jsp" />	
+		<put name="content" value="/ErrorList.jsp" />	
 	</definition>
 	
 <!-- ============= Mc Learning Starter Page Definitions ====================== -->		
 		<definition name=".answers" extends=".baseDef" >
 		<put name="title" value="Answers for MCQ"/>
 		<put name="pageHeader" value = "Answers for MCQ"/>
-		<put name="content" value="/answersContent.jsp" />	
+		<put name="content" value="/AnswersContent.jsp" />	
 	</definition>
 	
 	<definition name=".learningStarter" extends=".baseDef" >

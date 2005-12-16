@@ -1,8 +1,9 @@
-<%@ taglib uri="/WEB-INF/struts-html-el.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts-logic-el.tld" prefix="logic-el" %>
-<%@ taglib uri="/WEB-INF/c.tld" prefix="c" %>
-<%@ taglib uri="/WEB-INF/fmt.tld" prefix="fmt" %>
+<%@ taglib uri="tags-html-el" prefix="html" %>
+<%@ taglib uri="tags-bean" prefix="bean" %>
+<%@ taglib uri="tags-logic-el" prefix="logic-el" %>
+<%@ taglib uri="tags-c" prefix="c" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="fck-editor" prefix="FCK" %>
 
 		<html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 				<table align=center bgcolor="#FFFFFF">
@@ -69,7 +70,5 @@
 						</html:submit>	 				 		  					
 				  	 </td>
 				  </tr>
-				
-					  
 		</html:form>
 
