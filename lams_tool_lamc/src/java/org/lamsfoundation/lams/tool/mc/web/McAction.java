@@ -19,10 +19,7 @@
  */
 package org.lamsfoundation.lams.tool.mc.web;
 
-import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1139,6 +1136,34 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent before submit: " + mapQuestionsContent);
 	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+	 	
+	 	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		
+		logger.debug("remove from mapQuestionsContent the questions with no options");
+		/* remove from mapQuestionsContent the questions with no options */
+		mapQuestionsContent=AuthoringUtil.updateQuestionsMapForNoOptions(request, mapQuestionsContent, mapGeneralOptionsContent);
+		logger.debug("returned mapQuestionsContent: " + mapQuestionsContent);
+		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+		logger.debug("persisted MAP_QUESTIONS_CONTENT: " + mapQuestionsContent);
+		
+		
+		Boolean questionsWithNoOptions=(Boolean) request.getSession().getAttribute(QUESTIONS_WITHNO_OPTIONS);
+		logger.debug("questionsWithNoOptions: " + questionsWithNoOptions);
+		/*
+		if (questionsWithNoOptions.toString().equals("true"))
+		{
+		    errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.questions.withNoOptions"));
+			
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			persistError(request,"error.questions.withNoOptionse");
+			
+			return (mapping.findForward(LOAD_QUESTIONS));
+		}
+		*/
+	 	
 
 	 	/* make sure the questions Map is not empty*/ 
 	 	int mapSize=mapQuestionsContent.size();	 	
@@ -1148,6 +1173,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		{
 			errors= new ActionMessages();
 			errors.add(Globals.ERROR_KEY,new ActionMessage("error.questions.submitted.none"));
+			
 			saveErrors(request,errors);
 			mcAuthoringForm.resetUserAction();
 			persistError(request,"error.questions.submitted.none");
@@ -1169,6 +1195,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			
 	    	return (mapping.findForward(LOAD_QUESTIONS));
 		}
+		
 		
 		boolean isTotalWeightsValid=AuthoringUtil.validateTotalWeight(request);
 		logger.debug("isTotalWeightsValid:" + isTotalWeightsValid);
@@ -1344,10 +1371,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
 		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
 		
+		/*
 		mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
 	 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
 	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+	 	*/
 	 	
 	 	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
 	 	logger.debug("toolContentId:" + toolContentId);
@@ -1398,14 +1427,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		List existingQuestions = mcService.refreshQuestionContent(mcContentId);
 		logger.debug("existingQuestions: " + existingQuestions);
 		
-		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
-		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-		
-		/* remove from mapQuestionsContent the questions with no options */
-		mapQuestionsContent=AuthoringUtil.updateQuestionsMapForNoOptions(request, mapQuestionsContent, mapGeneralOptionsContent);
-		logger.debug("returned mapQuestionsContent: " + mapQuestionsContent);
-		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-		logger.debug("persisted MAP_QUESTIONS_CONTENT: " + mapQuestionsContent);
+		logger.debug("received MAP_QUESTIONS_CONTENT: " + mapQuestionsContent);
 		
 		logger.debug("will cleanupRedundantQuestions:");
 		/* Removes only unused question entries from the db. It keeps the valid entries since they get updated. */

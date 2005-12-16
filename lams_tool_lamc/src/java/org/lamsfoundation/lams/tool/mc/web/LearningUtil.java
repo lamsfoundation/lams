@@ -617,7 +617,11 @@ public class LearningUtil implements McAppConstants {
             logger.debug("isAttemptCorrect: " + isAttemptCorrect);
             
             McQueContent mcQueContent=mcService.getQuestionContentByDisplayOrder(questionDisplayOrder, toolContentUID);
-            createIndividualOptions(request, mapCheckedOptions, mcQueContent, mcQueUsr, attempTime, timeZone, mark, passed, new Integer(highestAttemptOrder), isAttemptCorrect);
+            logger.debug("mcQueContent: " + mcQueContent);
+            if (mcQueContent != null)
+            {
+                createIndividualOptions(request, mapCheckedOptions, mcQueContent, mcQueUsr, attempTime, timeZone, mark, passed, new Integer(highestAttemptOrder), isAttemptCorrect);    
+            }
         }
 	 }
     
@@ -628,16 +632,28 @@ public class LearningUtil implements McAppConstants {
     	Integer IntegerMark= new Integer(mark);
 		
     	logger.debug("createIndividualOptions-> isAttemptCorrect: " + isAttemptCorrect);
+    	logger.debug("mcQueContent: " + mcQueContent);
+    	logger.debug("mapCheckedOptions: " + mapCheckedOptions);
     	
-    	Iterator itCheckedMap = mapCheckedOptions.entrySet().iterator();
-        while (itCheckedMap.hasNext()) 
-        {
-        	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
-        	McOptsContent mcOptsContent= mcService.getOptionContentByOptionText(checkedPairs.getValue().toString(), mcQueContent.getUid());
-        	McUsrAttempt mcUsrAttempt=new McUsrAttempt(attempTime, timeZone, mcQueContent, mcQueUsr, mcOptsContent, IntegerMark, passed, highestAttemptOrder, new Boolean(isAttemptCorrect).booleanValue());
-        	mcService.createMcUsrAttempt(mcUsrAttempt);
-        	logger.debug("created mcUsrAttempt in the db :" + mcUsrAttempt);
-        }
+    	if (mcQueContent != null)
+    	{
+    	    if (mapCheckedOptions != null)
+        	{
+        	    Iterator itCheckedMap = mapCheckedOptions.entrySet().iterator();
+                while (itCheckedMap.hasNext()) 
+                {
+                	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
+                	McOptsContent mcOptsContent= mcService.getOptionContentByOptionText(checkedPairs.getValue().toString(), mcQueContent.getUid());
+                	logger.debug("mcOptsContent: " + mcOptsContent);
+                	if (mcOptsContent != null)
+                	{
+                	    McUsrAttempt mcUsrAttempt=new McUsrAttempt(attempTime, timeZone, mcQueContent, mcQueUsr, mcOptsContent, IntegerMark, passed, highestAttemptOrder, new Boolean(isAttemptCorrect).booleanValue());
+                    	mcService.createMcUsrAttempt(mcUsrAttempt);
+                    	logger.debug("created mcUsrAttempt in the db :" + mcUsrAttempt);    
+                	}
+                }    
+        	}    
+    	}
     }
     
     

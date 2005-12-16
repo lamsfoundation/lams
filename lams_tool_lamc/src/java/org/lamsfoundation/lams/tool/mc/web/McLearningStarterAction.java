@@ -109,6 +109,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		request.getSession().setAttribute(QUESTION_LISTING_MODE_SEQUENTIAL,QUESTION_LISTING_MODE_SEQUENTIAL);
 	    request.getSession().setAttribute(QUESTION_LISTING_MODE_COMBINED, QUESTION_LISTING_MODE_COMBINED);
 	    
+	    request.getSession().setAttribute(QUESTIONS_WITHNO_OPTIONS, new Boolean(false));
+	    
 	    /*
 	     * mark the http session as a learning activity 
 	     */
@@ -269,13 +271,12 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	
 	    }
 	    
-	    
 	    if (mcQueUsr != null)
 	    {
 	    	logger.debug("the learner has already responsed to this content, just generate a read-only report. Use redo questions for this.");
 	    	return (mapping.findForward(REDO_QUESTIONS));
 	    }
-	    
+	    logger.debug("mcQueUsr is null, user is a first timer, load questions..." + LOAD_LEARNER);
 	    return (mapping.findForward(LOAD_LEARNER));	
 	}
 	

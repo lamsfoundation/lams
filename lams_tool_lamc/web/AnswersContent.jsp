@@ -24,6 +24,10 @@ String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()
 </head>
 <body>
 
+answers here 1 : <c:out value="${sessionScope.questionListingMode}"/>
+
+answers here 2 : <c:out value="${sessionScope.questionListingModeSequential}"/>
+
 <html:form  action="/learning?method=displayMc&validate=false" method="POST" target="_self">
 		<c:choose> 
 		  <c:when test="${sessionScope.questionListingMode == sessionScope.questionListingModeSequential}" > 
@@ -37,3 +41,4 @@ String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()
 
 </body>
 </html:html>
+

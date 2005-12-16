@@ -153,6 +153,7 @@ public interface McAppConstants {
     public static final String MAP_STARTUP_GENERAL_OPTIONS_CONTENT		="mapStartupGeneralOptionsContent";
     public static final String MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT	="mapStartupGeneralSelectedOptionsContent";
     public static final String MAP_STARTUP_GENERAL_OPTIONS_QUEID		="mapStartupGeneralOptionsQueId";
+    public static final String QUESTIONS_WITHNO_OPTIONS					="questionsWithNoOptions";
     
     public static final String MAP_GENERAL_CHECKED_OPTIONS_CONTENT		="mapGeneralCheckedOptionsContent";
     public static final String MAP_LEARNER_QUESTIONS_CONTENT			="mapLearnerQuestionsContent";

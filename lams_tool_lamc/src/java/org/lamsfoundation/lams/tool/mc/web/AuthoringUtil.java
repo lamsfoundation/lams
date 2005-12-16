@@ -885,6 +885,8 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
     	logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
     	
+	    request.getSession().setAttribute(QUESTIONS_WITHNO_OPTIONS, new Boolean(false));
+	    
     	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
 		boolean questionFound=false;
         while (itQuestionsMap.hasNext()) 
@@ -912,6 +914,11 @@ public class AuthoringUtil implements McAppConstants {
     		{
     		    logger.debug("will add this question to the the questionsMap:" + pairs.getKey().toString());
     		    mapUpdatedQuestionsContent.put(pairs.getKey().toString(), pairs.getValue().toString());
+    		}
+    		else
+    		{
+    		    request.getSession().setAttribute(QUESTIONS_WITHNO_OPTIONS, new Boolean(true));
+    		    logger.debug("setting QUESTIONS_WITHNO_OPTIONS to true.");
     		}
     		logger.debug("final mapUpdatedQuestionsContent:" + mapUpdatedQuestionsContent);
         }
