@@ -20,7 +20,12 @@
  */
 package org.lamsfoundation.lams.tool.forum.test.dao;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao;
 import org.lamsfoundation.lams.tool.forum.test.BaseTest;
+import org.lamsfoundation.lams.tool.forum.test.TestUtils;
 
 public class ForumToolSessionDAOTest extends BaseTest{
 
@@ -29,19 +34,56 @@ public class ForumToolSessionDAOTest extends BaseTest{
 		
 	}
 	
-	public void testDelete(){
+	public void testSave(){
+		ForumToolSession session = TestUtils.getSessionA();
+		ForumToolSessionDao dao = new ForumToolSessionDao();
+		dao.saveOrUpdate(session);
+		
+		ForumToolSession tSession = dao.getBySessionId(session.getSessionId());
+		
+		assertEquals(session,tSession);
+		
+		//remove test data
+		dao.delete(session);
 		
 	}
-
-	public void testSave(){
+	
+	public void testDelete(){
+		ForumToolSession session = TestUtils.getSessionA();
+		ForumToolSessionDao dao = new ForumToolSessionDao();
+		dao.saveOrUpdate(session);
+		dao.delete(session);
 		
+		assertNull(dao.getBySessionId(session.getSessionId()));
 	}
 	
 	public void testGetByContentId(){
+		ForumToolSessionDao dao = new ForumToolSessionDao();
+		ForumToolSession sessionA = TestUtils.getSessionA();
+		dao.saveOrUpdate(sessionA);
+		ForumToolSession sessionB = TestUtils.getSessionB();
+		dao.saveOrUpdate(sessionB);
 		
+		List list = dao.getByContentId(new Long(1));
+		
+		assertEquals(list.size(),2);
+		assertEquals(list.get(0),sessionA);
+		assertEquals(list.get(1),sessionB);
+		//remove test data
+		dao.delete(sessionA);
+		dao.delete(sessionB);
 	}
 	
 	public void testGetBySessionId(){
+		ForumToolSession session = TestUtils.getSessionA();
+		ForumToolSessionDao dao = new ForumToolSessionDao();
+		dao.saveOrUpdate(session);
 		
+		ForumToolSession tSession = dao.getBySessionId(session.getSessionId());
+		
+		assertEquals(session,tSession);
+		
+		//remove test data
+		dao.delete(session);
 	}
 }

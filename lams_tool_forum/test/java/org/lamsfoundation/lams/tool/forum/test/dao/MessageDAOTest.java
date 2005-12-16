@@ -20,7 +20,12 @@
  */
 package org.lamsfoundation.lams.tool.forum.test.dao;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.persistence.MessageDao;
 import org.lamsfoundation.lams.tool.forum.test.BaseTest;
+import org.lamsfoundation.lams.tool.forum.test.TestUtils;
 
 public class MessageDAOTest extends BaseTest{
 
@@ -29,28 +34,114 @@ public class MessageDAOTest extends BaseTest{
 	}
 	
 	public void testSave(){
+		Message msg = TestUtils.getMessageA();
+		MessageDao dao = new MessageDao();
+		dao.saveOrUpdate(msg);
+		Message tmsg = dao.getById(msg.getUid());
+		assertEquals(msg,tmsg);
 		
+		dao.delete(msg.getUid());
 	}
 	public void testDelete(){
+		Message msg = TestUtils.getMessageA();
+		MessageDao dao = new MessageDao();
+		dao.saveOrUpdate(msg);
+		dao.delete(msg.getUid());
+		
+		assertNull(dao.getById(msg.getUid()));
 		
 	}
-	public void testGetById(){
-		
-	}
+
 	public void testGetBySession(){
+		MessageDao dao = new MessageDao();
+		Message msgA = TestUtils.getMessageA();
+		dao.saveOrUpdate(msgA);
+		Message msgB = TestUtils.getMessageB();
+		dao.saveOrUpdate(msgB);
+		
+		List list = dao.getBySession(new Long(1));
+		
+		assertEquals(list.size(),2);
+		assertEquals(list.get(0),msgA);
+		assertEquals(list.get(1),msgB);
+		
+		//remove test data
+		dao.delete(msgA.getUid());
+		dao.delete(msgB.getUid());
 		
 	}
 	public void testGetBySessionAndUser(){
+		MessageDao dao = new MessageDao();
+		Message msgA = TestUtils.getMessageA();
+		dao.saveOrUpdate(msgA);
+		Message msgB = TestUtils.getMessageB();
+		dao.saveOrUpdate(msgB);
 		
+		List list = dao.getByUserAndSession(new Long(1),new Long(1));
+		
+		assertEquals(list.size(),1);
+		assertEquals(list.get(0),msgA);
+		
+		//remove test data
+		dao.delete(msgA.getUid());
+		dao.delete(msgB.getUid());
 	}
 	public void testGetFromAuthor(){
+		MessageDao dao = new MessageDao();
+		Message msgA = TestUtils.getMessageA();
+		msgA.setIsAuthored(true);
+		dao.saveOrUpdate(msgA);
+		Message msgB = TestUtils.getMessageB();
+		msgB.setIsAuthored(false);
+		dao.saveOrUpdate(msgB);
+		
+		List list = dao.getTopicsFromAuthor(new Long(1));
+		
+		assertEquals(list.size(),1);
+		assertEquals(list.get(0),msgA);
+		
+		//remove test data
+		dao.delete(msgA.getUid());
+		dao.delete(msgB.getUid());
 		
 	}
 	public void testGetRootTopics(){
+		MessageDao dao = new MessageDao();
+		Message msgA = TestUtils.getMessageA();
+		msgA.setIsAuthored(true);
+		dao.saveOrUpdate(msgA);
+		Message msgB = TestUtils.getMessageB();
+		msgB.setIsAuthored(false);
+		msgB.setParent(msgA);
+		dao.saveOrUpdate(msgB);
 		
+		List list = dao.getRootTopics(new Long(1));
+		
+		assertEquals(list.size(),1);
+		assertEquals(list.get(0),msgA);
+		
+		//remove test data
+		dao.delete(msgA.getUid());
+		dao.delete(msgB.getUid());
 	}
 	public void testGetChildrenTopics(){
+		MessageDao dao = new MessageDao();
+		Message msgA = TestUtils.getMessageA();
+		msgA.setIsAuthored(true);
+		dao.saveOrUpdate(msgA);
+		Message msgB = TestUtils.getMessageB();
+		msgB.setIsAuthored(false);
+		msgB.setParent(msgA);
+		dao.saveOrUpdate(msgB);
 		
+		List list = dao.getChildrenTopics(new Long(1));
+		
+		assertEquals(list.size(),1);
+		assertEquals(list.get(0),msgB);
+		
+		//remove test data
+		dao.delete(msgA.getUid());
+		dao.delete(msgB.getUid());
 	}
 	
 

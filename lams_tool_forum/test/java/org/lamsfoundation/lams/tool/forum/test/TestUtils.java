@@ -45,24 +45,44 @@ public class TestUtils {
 		ForumToolSession session = new ForumToolSession();
 		session.setSessionId(new Long(1));
 		session.setStatus(1);
+		Forum forum = new Forum();
+		forum.setUid(new Long(1));
+		forum.setContentId(new Long(1));
+		session.setForum(forum);
 		return session;
 	}
 	public static ForumToolSession getSessionB(){
 		ForumToolSession session = new ForumToolSession();
 		session.setSessionId(new Long(2));
 		session.setStatus(2);
+		Forum forum = new Forum();
+		forum.setUid(new Long(1));
+		forum.setContentId(new Long(1));
+		session.setForum(forum);
 		return session;
 	}
 	public static Message getMessageA() {
 		Message msg = new Message();
 		msg.setBody("bodyA");
+		ForumToolSession session = new ForumToolSession();
+		session.setUid(new Long(1));
+		msg.setToolSession(session);
 		msg.setSubject("subjectA");
+		Forum forum = new Forum();
+		forum.setUid(new Long(1));
+		msg.setForum(forum);
 		return msg;
 	}
 	public static Message getMessageB() {
 		Message msg = new Message();
 		msg.setBody("bodyB");
 		msg.setSubject("subjectB");
+		ForumToolSession session = new ForumToolSession();
+		session.setUid(new Long(1));
+		msg.setToolSession(session);
+		Forum forum = new Forum();
+		forum.setUid(new Long(1));
+		msg.setForum(forum);
 		return msg;
 	}
 
