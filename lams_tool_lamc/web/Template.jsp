@@ -32,7 +32,6 @@ http://www.gnu.org/licenses/gpl.txt
       <title><tiles:getAsString name="title"/></title>
       <meta http-equiv="pragma" content="no-cache">
       <meta http-equiv="cache-control" content="no-cache">
-<!--  <link href="../learner.css" rel="stylesheet" type="text/css">  -->
 	  <script language="JavaScript" type="text/JavaScript">   
 	        <!--
 	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
@@ -43,7 +42,7 @@ http://www.gnu.org/licenses/gpl.txt
 	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
     </head>
     
-    <body bgcolor="#9DC5EC" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+    <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
       <table width="900" border="0" cellspacing="0" cellpadding="0" align="center"> 
 	        <!-- header -->
 	        <c:set var="pageheader" scope="session"><tiles:getAsString name="pageHeader"/></c:set>
