@@ -320,6 +320,8 @@ public class McStarterAction extends Action implements McAppConstants {
 	{
 		IMcService mcService =McUtils.getToolService(request);
 		
+		request.getSession().setAttribute(IS_REVISITING_USER, new Boolean(true));
+		
 		logger.debug("getting existing content with id:" + toolContentId);
 		McContent mcContent=mcService.retrieveMc(new Long(toolContentId));
 		logger.debug("existing mcContent:" + mcContent);
@@ -362,9 +364,11 @@ public class McStarterAction extends Action implements McAppConstants {
 		logger.debug("existing listUploadedOnlineFileNames:" + listUploadedOnFiles);
 		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnFiles);
 		
+		/*
 		List listUploadedOffFilesUuidPlusFilename= mcService.retrieveMcUploadedOfflineFilesUuidPlusFilename(mcContent.getUid());
 		logger.debug("existing listUploadedOffFilesUuidPlusFilename:" + listUploadedOffFilesUuidPlusFilename);
 		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOffFilesUuidPlusFilename);
+		*/
 		
 		if (mcContent.isUsernameVisible())
 		{
@@ -479,6 +483,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	protected void retrieveDefaultContent(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
 	{
 		IMcService mcService =McUtils.getToolService(request);
+		request.getSession().setAttribute(IS_REVISITING_USER, new Boolean(false));
 		
 		long contentId=0;
 		logger.debug("getting default content");
@@ -600,17 +605,17 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		/* these two are for repository access */
 		/* holds the final offline files  list */
-		LinkedList listUploadedOfflineFiles= new LinkedList();
-		LinkedList listUploadedOnlineFiles= new LinkedList();
+		//LinkedList listUploadedOfflineFiles= new LinkedList();
+		//LinkedList listUploadedOnlineFiles= new LinkedList();
 		
 		/* these two are for jsp */
 		LinkedList listUploadedOfflineFileNames= new LinkedList();
 		LinkedList listUploadedOnlineFileNames= new LinkedList();
 		
-		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
+		//request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILES,listUploadedOfflineFiles);
 		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
 		
-		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
+		//request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILES,listUploadedOnlineFiles);
 		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
 		
 		LinkedList listOfflineFilesMetaData= new LinkedList();

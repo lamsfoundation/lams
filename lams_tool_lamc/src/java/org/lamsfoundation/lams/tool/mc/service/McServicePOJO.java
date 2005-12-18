@@ -1934,6 +1934,7 @@ public class McServicePOJO implements
 	}
 	
 	
+	/*
 	public List retrieveMcUploadedOfflineFilesUuidPlusFilename(Long mcContentId) throws McApplicationException {
 		try
         {
@@ -1945,9 +1946,8 @@ public class McServicePOJO implements
                                                          + e.getMessage(),
 														   e);
         }
-		
-		
 	}
+	*/
 	
 	
 	/**

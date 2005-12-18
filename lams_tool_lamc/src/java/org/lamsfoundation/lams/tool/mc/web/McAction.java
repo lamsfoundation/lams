@@ -267,6 +267,24 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
     	logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
     	
+    	
+    	logger.debug("printing final maps...");
+    	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent " +  mapGeneralSelectedOptionsContent);
+		
+		
+		logger.debug("sequencing final maps...");
+		mapGeneralOptionsContent=AuthoringUtil.sequenceMap(mapGeneralOptionsContent);
+		logger.debug("sequenced mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    	
+		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
+		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		
     	return (mapping.findForward(LOAD_QUESTIONS));	
 	}
     
@@ -300,9 +318,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		request.setAttribute(USER_ACTION, userAction);
  		logger.debug("userAction:" + userAction);
  		
+ 	
  		Map mapWeights= AuthoringUtil.repopulateMap(request, "questionWeight");
 		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
 		logger.debug("MAP_WEIGHTS:" + request.getSession().getAttribute(MAP_WEIGHTS));
+	
 		
  		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent after shrinking: " + mapQuestionsContent);
@@ -329,6 +349,34 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
 		}
 		
+		
+		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		if (mapGeneralOptionsContent.size() > 0)
+    	{
+			logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+	    	mapGeneralOptionsContent= AuthoringUtil.removeFromMap(mapGeneralOptionsContent, questionIndex);
+	    	logger.debug("mapGeneralOptionsContent after remove: " + mapGeneralOptionsContent);
+	    	request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);	
+    	}
+		
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+    	if (mapGeneralSelectedOptionsContent.size() > 0)
+    	{
+    		logger.debug("initial test: current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+    		mapGeneralSelectedOptionsContent= AuthoringUtil.removeFromMap(mapGeneralSelectedOptionsContent, questionIndex);
+        	logger.debug("mapGeneralSelectedOptionsContent after remove: " + mapGeneralSelectedOptionsContent);
+        	request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);	
+    	}
+		
+    	mapWeights= (Map)request.getSession().getAttribute(MAP_WEIGHTS);
+    	if (mapWeights.size() > 0)
+    	{
+    		logger.debug("initial test: current mapWeights: " + mapWeights);
+    		mapWeights= AuthoringUtil.removeFromMap(mapWeights, questionIndex);
+        	logger.debug("mapWeights after remove: " + mapWeights);
+        	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);	
+    	}
+    	
 	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
 		mcAuthoringForm.resetUserAction();
@@ -336,6 +384,23 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		int maxQuestionIndex=mapQuestionsContent.size();
 		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+		
+		logger.debug("printing final maps...");
+    	mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		
+		mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent " +  mapGeneralSelectedOptionsContent);
+		
+		logger.debug("sequencing final maps...");
+		mapGeneralOptionsContent=AuthoringUtil.sequenceMap(mapGeneralOptionsContent);
+		logger.debug("sequenced mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    	
+		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
+		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
 
@@ -648,6 +713,23 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
     	logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
     	mcAuthoringForm.resetUserAction();
+    	
+    	logger.debug("printing final maps...");
+    	mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent " +  mapGeneralSelectedOptionsContent);
+		
+		logger.debug("sequencing final maps...");
+		mapGeneralOptionsContent=AuthoringUtil.sequenceMap(mapGeneralOptionsContent);
+		logger.debug("sequenced mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    	
+		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
+		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		
     	return (mapping.findForward(LOAD_QUESTIONS));
     }
 
@@ -703,6 +785,23 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			return (mapping.findForward(LOAD_QUESTIONS));	
  		}
 	 	
+	 	boolean verifyMapNoEmptyString=AuthoringUtil.verifyMapNoEmptyString(mapOptionsContent);
+	 	logger.debug("verifyMapNoEmptyString: " + verifyMapNoEmptyString);
+	 	if (verifyDuplicatesOptionsMap == false)
+ 		{
+ 			ActionMessages errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.answers.empty"));
+			logger.debug("add error.answers.empty to ActionMessages");
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			logger.debug("return to LOAD_QUESTIONS to fix error.");
+			
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 1");
+			return (mapping.findForward(LOAD_QUESTIONS));	
+ 		}
+	 	
+	 	
 	 	String selectedQuestionIndex=(String)request.getSession().getAttribute(SELECTED_QUESTION_INDEX);
 		logger.debug("selectedQuestionIndex:" + selectedQuestionIndex);
 		
@@ -756,6 +855,23 @@ public class McAction extends LamsDispatchAction implements McAppConstants
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
  		mcAuthoringForm.resetUserAction();
+ 		
+ 		logger.debug("printing final maps...");
+    	mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		
+		mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent " +  mapGeneralSelectedOptionsContent);
+		
+		logger.debug("sequencing final maps...");
+		mapGeneralOptionsContent=AuthoringUtil.sequenceMap(mapGeneralOptionsContent);
+		logger.debug("sequenced mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    	
+		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
+		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
     
@@ -872,7 +988,23 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
  	 	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(1));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 1");
-		mcAuthoringForm.resetUserAction();			
+		mcAuthoringForm.resetUserAction();
+		
+		logger.debug("printing final maps...");
+    	mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		
+		mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent " +  mapGeneralSelectedOptionsContent);
+		
+		logger.debug("sequencing final maps...");
+		mapGeneralOptionsContent=AuthoringUtil.sequenceMap(mapGeneralOptionsContent);
+		logger.debug("sequenced mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    	
+		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
+		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
     
@@ -915,17 +1047,59 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	
     	mapQuestionsContent= AuthoringUtil.shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "down");
     	logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
-    	
-     	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+    	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
     	logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
-    		
-		mcAuthoringForm.resetUserAction();
+    	
+    	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+    	if (mapGeneralOptionsContent.size() > 0)
+    	{
+    		logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+        	mapGeneralOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralOptionsContent, questionIndex, "down");
+        	logger.debug("mapGeneralOptionsContent after move down: " + mapGeneralOptionsContent);
+        	request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);	
+    	}
+    	
+    	Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+    	if (mapGeneralSelectedOptionsContent.size() > 0)
+    	{
+    		logger.debug("initial test: current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+    		mapGeneralSelectedOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralSelectedOptionsContent, questionIndex, "down");
+        	logger.debug("mapGeneralSelectedOptionsContent after move down: " + mapGeneralSelectedOptionsContent);
+        	request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);	
+    	}
+    	
+    	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
+    	if (mapWeights.size() > 0)
+    	{
+    		logger.debug("initial test: current mapWeights: " + mapWeights);
+    		mapWeights= AuthoringUtil.shiftWeightsMap(mapWeights, questionIndex, "down");
+        	logger.debug("mapWeights after move down: " + mapWeights);
+        	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);	
+    	}
+    	
+    	mcAuthoringForm.resetUserAction();
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
     	logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
         
         int maxQuestionIndex=mapQuestionsContent.size();
     	request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
     	logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+    	
+    	logger.debug("printing final maps...");
+    	mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		
+		mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent " +  mapGeneralSelectedOptionsContent);
+		
+		logger.debug("sequencing final maps...");
+		mapGeneralOptionsContent=AuthoringUtil.sequenceMap(mapGeneralOptionsContent);
+		logger.debug("sequenced mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    	
+		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
+		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
         return (mapping.findForward(LOAD_QUESTIONS));	
     }
     
@@ -968,10 +1142,36 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		
 		mapQuestionsContent= AuthoringUtil.shiftMap(mapQuestionsContent, questionIndex,movableQuestionEntry,  "up");
 		logger.debug("mapQuestionsContent after move down: " + mapQuestionsContent);
-		
-	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
+		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 		logger.debug("updated Questions Map: " + request.getSession().getAttribute(MAP_QUESTIONS_CONTENT));
- 		
+		
+		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		if (mapGeneralOptionsContent.size() > 0)
+    	{
+			logger.debug("initial test: current mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+	    	mapGeneralOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralOptionsContent, questionIndex, "up");
+	    	logger.debug("mapGeneralOptionsContent after move up: " + mapGeneralOptionsContent);
+	    	request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);	
+    	}
+		
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+    	if (mapGeneralSelectedOptionsContent.size() > 0)
+    	{
+    		logger.debug("initial test: current mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+    		mapGeneralSelectedOptionsContent= AuthoringUtil.shiftOptionsMap(mapGeneralSelectedOptionsContent, questionIndex, "up");
+        	logger.debug("mapGeneralSelectedOptionsContent after move down: " + mapGeneralSelectedOptionsContent);
+        	request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);	
+    	}
+    	
+    	Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
+    	if (mapWeights.size() > 0)
+    	{
+    		logger.debug("initial test: current mapWeights: " + mapWeights);
+    		mapWeights= AuthoringUtil.shiftWeightsMap(mapWeights, questionIndex, "up");
+        	logger.debug("mapWeights after move down: " + mapWeights);
+        	request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);	
+    	}
+    	
  		mcAuthoringForm.resetUserAction();
  		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
@@ -979,6 +1179,23 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	    int maxQuestionIndex=mapQuestionsContent.size();
 		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+		
+		logger.debug("printing final maps...");
+    	mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		
+		mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent " +  mapGeneralSelectedOptionsContent);
+		
+		logger.debug("sequencing final maps...");
+		mapGeneralOptionsContent=AuthoringUtil.sequenceMap(mapGeneralOptionsContent);
+		logger.debug("sequenced mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    	
+		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
+		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		
 	    return (mapping.findForward(LOAD_QUESTIONS));
     }
     
@@ -1095,6 +1312,23 @@ public class McAction extends LamsDispatchAction implements McAppConstants
     	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 		mcAuthoringForm.resetUserAction();
+		
+		logger.debug("printing final maps...");
+    	mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		
+		mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent " +  mapGeneralSelectedOptionsContent);
+		
+		logger.debug("sequencing final maps...");
+		mapGeneralOptionsContent=AuthoringUtil.sequenceMap(mapGeneralOptionsContent);
+		logger.debug("sequenced mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    	
+		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
+		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
 
@@ -1133,39 +1367,51 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
 	
 		ActionMessages errors= new ActionMessages();
+		
 		Map mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
 	 	logger.debug("mapQuestionsContent before submit: " + mapQuestionsContent);
 	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 	 	
-	 	Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+	 	
+	 	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+	 	logger.debug("toolContentId:" + toolContentId);
+	 	AuthoringUtil.refreshMaps(request, toolContentId.longValue());
+		logger.debug("refreshed maps...");
+	 	
+		Map mapStartupGeneralOptionsContent= (Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapStartupGeneralOptionsContent: " + mapStartupGeneralOptionsContent);
+		
+		Map mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
 		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		
+		Boolean isRevisitingUser= (Boolean) request.getSession().getAttribute(IS_REVISITING_USER);
+		logger.debug("isRevisitingUser: " + isRevisitingUser);
+		
+		Map mapTestableOptionsContent=new TreeMap(new McComparator()); 
+		if (isRevisitingUser.booleanValue() == true)
+		{
+			logger.debug("this is a RevisitingUser, include startup general options content in the test");
+			mapTestableOptionsContent=AuthoringUtil.mergeMaps(mapStartupGeneralOptionsContent, mapGeneralOptionsContent);
+			logger.debug("returned merged map: " + mapTestableOptionsContent);
+		}
+		else
+		{
+			logger.debug("this is a NOT RevisitingUser, don't include startup general options content in the test");	
+			mapTestableOptionsContent=mapGeneralOptionsContent;
+		}
+		logger.debug("final mapTestableOptionsContent: " + mapTestableOptionsContent);
 		
 		logger.debug("remove from mapQuestionsContent the questions with no options");
 		/* remove from mapQuestionsContent the questions with no options */
-		mapQuestionsContent=AuthoringUtil.updateQuestionsMapForNoOptions(request, mapQuestionsContent, mapGeneralOptionsContent);
+		mapQuestionsContent=AuthoringUtil.updateQuestionsMapForNoOptions(request, mapQuestionsContent, mapTestableOptionsContent);
 		logger.debug("returned mapQuestionsContent: " + mapQuestionsContent);
 		request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
 		logger.debug("persisted MAP_QUESTIONS_CONTENT: " + mapQuestionsContent);
 		
-		
 		Boolean questionsWithNoOptions=(Boolean) request.getSession().getAttribute(QUESTIONS_WITHNO_OPTIONS);
 		logger.debug("questionsWithNoOptions: " + questionsWithNoOptions);
-		/*
-		if (questionsWithNoOptions.toString().equals("true"))
-		{
-		    errors= new ActionMessages();
-			errors.add(Globals.ERROR_KEY,new ActionMessage("error.questions.withNoOptions"));
-			
-			saveErrors(request,errors);
-			mcAuthoringForm.resetUserAction();
-			persistError(request,"error.questions.withNoOptionse");
-			
-			return (mapping.findForward(LOAD_QUESTIONS));
-		}
-		*/
-	 	
-
-	 	/* make sure the questions Map is not empty*/ 
+		
+		/* make sure the questions Map is not empty*/ 
 	 	int mapSize=mapQuestionsContent.size();	 	
 	 	logger.debug("mapSize: " + mapSize);
 	 	
@@ -1182,8 +1428,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		}
 
 		Map mapWeights= AuthoringUtil.repopulateCurrentWeightsMap(request, "questionWeight");
-    	logger.debug("mapWeights: " + mapWeights);
-    	boolean weightsValid=validateQuestionWeights(request,mapWeights, mcAuthoringForm);
+		mapWeights= AuthoringUtil.updateCurrentWeightsMapForQuestionWithNoOptions(request, mapWeights, mapQuestionsContent);
+		logger.debug("returned updated mapWeights: " + mapWeights);
+		
+		logger.debug("MAP_WEIGHTS is valid, persist it to session");
+		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+		
+		boolean weightsValid=validateQuestionWeights(request,mapWeights, mcAuthoringForm);
 		logger.debug("weightsValid:" + weightsValid);
 		if (weightsValid == false)
 		{
@@ -1197,7 +1448,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		}
 		
 		
-		boolean isTotalWeightsValid=AuthoringUtil.validateTotalWeight(request);
+		boolean isTotalWeightsValid=AuthoringUtil.validateTotalWeight(mapWeights);
 		logger.debug("isTotalWeightsValid:" + isTotalWeightsValid);
 		if (isTotalWeightsValid == false)
 		{
@@ -1216,8 +1467,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 			
 	    	return (mapping.findForward(LOAD_QUESTIONS));
 		}
-		logger.debug("MAP_WEIGHTS is valid, persist it to session");
-		request.getSession().setAttribute(MAP_WEIGHTS, mapWeights);
+		
 		
 		boolean isQuestionsSequenced=false;
 		boolean isSynchInMonitor=false;
@@ -1303,6 +1553,28 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 	    	return (mapping.findForward(LOAD_QUESTIONS));
 		}
 		
+		passmark= new Integer(mcAuthoringForm.getPassmark()).intValue();
+		logger.debug("passmark: " + passmark);
+		if (passmark > 100)
+		{
+			errors= new ActionMessages();
+			errors.add(Globals.ERROR_KEY,new ActionMessage("error.passMark.greater100"));
+			logger.debug("add error.passMark.greater100to ActionMessages");
+			saveErrors(request,errors);
+			mcAuthoringForm.resetUserAction();
+			logger.debug("return to LOAD_QUESTIONS to fix error.");
+			
+			request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+			logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+
+			int maxQuestionIndex=mapQuestionsContent.size();
+			request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
+			logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+			
+	    	return (mapping.findForward(LOAD_QUESTIONS));
+		}
+		
+		
 		logger.debug("isShowFeedback: " +  mcAuthoringForm.getShowFeedback());
 		if (mcAuthoringForm.getShowFeedback().equalsIgnoreCase(ON))
 			isShowFeedback=true;
@@ -1371,16 +1643,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		String richTextEndLearningMessage=(String)request.getSession().getAttribute(RICHTEXT_END_LEARNING_MSG);
 		logger.debug("richTextEndLearningMessage: " + richTextEndLearningMessage);
 		
-		/*
-		mapQuestionsContent=AuthoringUtil.repopulateMap(request, "questionContent");
-	 	logger.debug("FINAL mapQuestionsContent after shrinking: " + mapQuestionsContent);
-	 	logger.debug("mapQuestionsContent size after shrinking: " + mapQuestionsContent.size());
-	 	request.getSession().setAttribute(MAP_QUESTIONS_CONTENT, mapQuestionsContent);
-	 	*/
-	 	
-	 	Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
-	 	logger.debug("toolContentId:" + toolContentId);
-			
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("existing mcContent:" + mcContent);
 		
@@ -1430,27 +1692,30 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		logger.debug("received MAP_QUESTIONS_CONTENT: " + mapQuestionsContent);
 		
 		logger.debug("will cleanupRedundantQuestions:");
-		/* Removes only unused question entries from the db. It keeps the valid entries since they get updated. */
 		AuthoringUtil.cleanupRedundantQuestions(request, existingQuestions, mapQuestionsContent, mcContent);
 		
 		logger.debug("calling selectAndPersistQuestions: " + existingQuestions);
-		AuthoringUtil.selectAndPersistQuestions(request, existingQuestions, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mapGeneralOptionsContent, mcContent);
+		AuthoringUtil.selectAndPersistQuestions(request, existingQuestions, mapQuestionsContent, mapFeedbackIncorrect, mapFeedbackCorrect, mapGeneralOptionsContent, mapWeights, mcContent);
 		logger.debug("finished processing questions content...");
 		
 		logger.debug("start processing options content...");
-		Map mapStartupGeneralOptionsContent= (Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
+		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
+		
+		logger.debug("will refresh maps...");
+		AuthoringUtil.refreshMaps(request, toolContentId.longValue());
+		
+		mapStartupGeneralOptionsContent= (Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT);
 		logger.debug("mapStartupGeneralOptionsContent: " + mapStartupGeneralOptionsContent);
 		Map mapStartupGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT);
 		logger.debug("mapStartupGeneralSelectedOptionsContent: " + mapStartupGeneralSelectedOptionsContent);
 		Map mapStartupGeneralOptionsQueId=(Map) request.getSession().getAttribute(MAP_STARTUP_GENERAL_OPTIONS_QUEID);
 		logger.debug("mapStartupGeneralOptionsQueId: " + mapStartupGeneralOptionsQueId);
 		
-		logger.debug("mapGeneralOptionsContent: " + mapGeneralOptionsContent);
-		Map mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
-		logger.debug("mapGeneralSelectedOptionsContent: " + mapGeneralSelectedOptionsContent);
-		
 		logger.debug("calling cleanupRedundantOptions");
 		AuthoringUtil.cleanupRedundantOptions(request, mapStartupGeneralOptionsContent, mapStartupGeneralSelectedOptionsContent, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent, mapStartupGeneralOptionsQueId);
+		
 		logger.debug("calling selectAndPersistOptions");
 		AuthoringUtil.selectAndPersistOptions(request, mapStartupGeneralOptionsContent, mapStartupGeneralSelectedOptionsContent, mapGeneralOptionsContent, mapGeneralSelectedOptionsContent, mapStartupGeneralOptionsQueId);
 		
@@ -1483,6 +1748,22 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		int maxQuestionIndex=mapQuestionsContent.size();
 		request.getSession().setAttribute(MAX_QUESTION_INDEX, new Integer(maxQuestionIndex));
 		logger.debug("MAX_QUESTION_INDEX: " +  request.getSession().getAttribute(MAX_QUESTION_INDEX));
+		
+		logger.debug("printing final maps...");
+    	mapGeneralOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_OPTIONS_CONTENT);
+		logger.debug("mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		
+		mapGeneralSelectedOptionsContent=(Map)request.getSession().getAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT);
+		logger.debug("mapGeneralSelectedOptionsContent " +  mapGeneralSelectedOptionsContent);
+		
+		logger.debug("sequencing final maps...");
+		mapGeneralOptionsContent=AuthoringUtil.sequenceMap(mapGeneralOptionsContent);
+		logger.debug("sequenced mapGeneralOptionsContent:"+ mapGeneralOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_OPTIONS_CONTENT, mapGeneralOptionsContent);
+    	
+		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
+		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
+		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
 		
 		return (mapping.findForward(LOAD_QUESTIONS));
     }

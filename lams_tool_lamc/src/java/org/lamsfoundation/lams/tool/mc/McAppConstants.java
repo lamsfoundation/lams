@@ -123,6 +123,7 @@ public interface McAppConstants {
     public static final String IS_ADD_QUESTION							="isAddQuestion";
     public static final String IS_REMOVE_QUESTION						="isRemoveQuestion";
     public static final String IS_REMOVE_CONTENT						="isRemoveContent";
+    public static final String IS_REVISITING_USER						="isRevisitingUser";
     
     public static final String QUESTIONS_SEQUENCED						="questionsSequenced";
         

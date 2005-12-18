@@ -24,7 +24,6 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McAttachmentDTO;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McContent;
@@ -46,7 +45,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class AuthoringUtil implements McAppConstants {
 	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
 	
-	
+	/**
+	 * populates data
+	 * readData(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+	 * 
+	 * @param request
+	 * @param mcAuthoringForm
+	 */
     public static void readData(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {
     	/** define the next tab as Basic tab by default*/
@@ -77,7 +82,14 @@ public class AuthoringUtil implements McAppConstants {
     	}
     }
 
-	
+    
+	/**
+	 * builds a candidate answers map for the selected question
+	 * repopulateCurrentCheckBoxStatesMap(HttpServletRequest request)
+	 * 
+	 * @param request
+	 * @return Map
+	 */
     public static Map repopulateCurrentCheckBoxStatesMap(HttpServletRequest request)
 	{
     	Map mapTempContent= new TreeMap(new McComparator());
@@ -105,6 +117,13 @@ public class AuthoringUtil implements McAppConstants {
 	}
 
 		
+    /**
+     * verifies whether there are any duplicate candidate answer entries in the mapOptionsContent  
+     * verifyDuplicatesOptionsMap(Map mapOptionsContent)
+     * 
+     * @param mapOptionsContent
+     * @return boolean
+     */
     public static boolean verifyDuplicatesOptionsMap(Map mapOptionsContent)
 	{
     	Map originalMapOptionsContent=mapOptionsContent;
@@ -136,8 +155,30 @@ public class AuthoringUtil implements McAppConstants {
 		}
     	return true;
 	}
+    
+    
+    public static boolean verifyMapNoEmptyString(Map map)
+	{
+    	Iterator itMap = map.entrySet().iterator();
+    	while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            if ((pairs.getValue() != null) && (pairs.getValue().toString().length() == 0))
+            	return false;
+            
+		}
+    	return true;
+	}
+    
 	    
-	    
+    /**
+     * validates if submitted questions map is empty or not
+     * validateQuestionsNotEmpty(Map mapQuestionsContent)
+     * 
+     * @param mapQuestionsContent
+     * @return boolean
+     */
     public static boolean validateQuestionsNotEmpty(Map mapQuestionsContent)
     {
     	Iterator itMap = mapQuestionsContent.entrySet().iterator();
@@ -153,6 +194,14 @@ public class AuthoringUtil implements McAppConstants {
     }
 
     
+    /**
+     * builds a weights map for all the questions
+     * repopulateCurrentWeightsMap(HttpServletRequest request, String parameterType)
+     * 
+     * @param request
+     * @param parameterType
+     * @return Map
+     */
     public static Map repopulateCurrentWeightsMap(HttpServletRequest request, String parameterType)
     {
     	Map mapTempQuestionsContent= new TreeMap(new McComparator());
@@ -177,13 +226,36 @@ public class AuthoringUtil implements McAppConstants {
     	return mapTempQuestionsContent;
     }
 
+    
+    public static Map sequenceMap(Map globalMap)
+	{
+    	logger.debug("globalMap:"+ globalMap);
+    	Map mapTemp= new TreeMap(new McComparator());
+    	
+    	long mapCounter=0;
+    	Iterator itMap = globalMap.entrySet().iterator();
+    	while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            Map optionsMap=(Map)pairs.getValue();
+            logger.debug("optionsMap:"+ optionsMap);
+            mapCounter++;
+            mapTemp.put(new Long(mapCounter).toString(), optionsMap);
+		}
+    	
+    	logger.debug("final mapTemp:"+ mapTemp);
+    	return mapTemp;
+	}
+	
+    
 
     /**
      * shrinks the size of the Map to only used entries
+     * repopulateMap(HttpServletRequest request, String parameterType)
      * 
      * @param mapQuestionContent
      * @param request
-     * @return
+     * @return Map
      */
     public static Map repopulateMap(HttpServletRequest request, String parameterType)
     {
@@ -207,14 +279,205 @@ public class AuthoringUtil implements McAppConstants {
     	return mapTempQuestionsContent;
     }
 
-	    
+    
+    public static String getRequiredWeightEntry(Map mapWeights, String questionIndex)
+    {
+    	logger.debug("mapWeights: " +  mapWeights);
+    	
+    	Iterator itMap = mapWeights.entrySet().iterator();
+    	while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            if (questionIndex.equals(pairs.getKey().toString()))
+    		{
+            	String weight=pairs.getValue().toString();
+            	logger.debug("required weight:" + weight);
+            	return weight;
+    		}
+		}
+    	return null;
+    }
+    
+    /**
+     * returns the options Map within mapGeneralOptionsContent indexed with the questionIndex parameter.
+     * getRequiredOptionsEntry(String questionIndex)
+     * 
+     * @param questionIndex
+     * @return Map
+     */
+    public static Map getRequiredOptionsEntry(Map mapGeneralOptionsContent, String questionIndex)
+	{
+    	logger.debug("mapGeneralOptionsContent: " +  mapGeneralOptionsContent);
+    	
+    	Iterator itMap = mapGeneralOptionsContent.entrySet().iterator();
+    	while (itMap.hasNext()) {
+        	Map.Entry pairs = (Map.Entry)itMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            if (questionIndex.equals(pairs.getKey().toString()))
+    		{
+            	Map tempOptionsMap=(Map)pairs.getValue();
+            	logger.debug("tempOptionsMap:" + tempOptionsMap);
+            	return tempOptionsMap;
+    		}
+		}
+    	return null;
+	}
+    
+    
+    public static Map shiftWeightsMap(Map mapWeights, String questionIndex , String direction)
+    {
+    	/* map to be returned */
+    	Map mapTempWeights= new TreeMap(new McComparator());
+    	mapTempWeights= mapWeights;
+    	
+    	String movableWeightEntry = getRequiredWeightEntry(mapWeights, questionIndex);
+    	logger.debug("movableWeightEntry: " +  movableWeightEntry);
+    	
+    	int shiftableIndex=0;
+    	if (direction.equals("down"))
+        {
+    		logger.debug("moving map down");
+    		shiftableIndex=new Integer(questionIndex).intValue() + 1;
+        }
+    	else
+    	{
+    		logger.debug("moving map up");
+    		shiftableIndex=new Integer(questionIndex).intValue() - 1;
+    	}
+    		
+    	String shiftableWeightEntry = getRequiredWeightEntry(mapWeights, new Integer(shiftableIndex).toString());
+    	logger.debug("shiftableWeightEntry: " +  shiftableWeightEntry);
+    	
+    	if (movableWeightEntry != null)
+    	{
+    		mapTempWeights.put(new Integer(shiftableIndex).toString(), movableWeightEntry);
+    		logger.debug("mapTempWeights has been updated with movableWeightEntry");
+    	}
+    	else
+    	{
+    		mapTempWeights.put(new Integer(shiftableIndex).toString(), "");
+    		logger.debug("mapTempWeights has been updated with a empty string");
+    	}
+    	
+    	
+    	if (shiftableWeightEntry != null)
+    	{
+    		mapTempWeights.put(questionIndex,shiftableWeightEntry);
+    		logger.debug("mapTempWeights has been updated with shiftableWeightEntry");
+    	}
+    	else
+    	{
+    		mapTempWeights.put(questionIndex, "");
+    		logger.debug("mapTempWeights has been updated with empty string");
+    	}
+		 
+    	logger.debug("final shifted mapTempWeights: " +  mapTempWeights);
+    	return mapTempWeights;
+    }
+    
+    /**
+     * shifts the options contents within mapGenaralOptionsContent and mapGeneralSelectedlOptionsContent
+	 * shiftOptionsMap(Map mapGlobalOptionsContent, String questionIndex , String direction)
+	 * 
+	 * @param mapGlobalOptionsContent
+	 * @param questionIndex
+	 * @param direction
+	 * @return Map
+	 */
+    public static Map shiftOptionsMap(Map mapGlobalOptionsContent, String questionIndex , String direction)
+    {
+    	/* mapGlobalOptionsContent refers to mapGenaralOptionsContent and mapGeneralSelectedlOptionsContent */
+    	
+    	/* map to be returned */
+    	Map mapTempGeneralOptionsContent= new TreeMap(new McComparator());
+    	mapTempGeneralOptionsContent= mapGlobalOptionsContent;
+    	
+    	Map  mapMovableOptionsEntry = getRequiredOptionsEntry(mapGlobalOptionsContent, questionIndex);
+    	logger.debug("mapMovableOptionsEntry: " +  mapMovableOptionsEntry);
+    	
+    	int shiftableIndex=0;
+    	if (direction.equals("down"))
+        {
+    		logger.debug("moving map down");
+    		shiftableIndex=new Integer(questionIndex).intValue() + 1;
+        }
+    	else
+    	{
+    		logger.debug("moving map up");
+    		shiftableIndex=new Integer(questionIndex).intValue() - 1;
+    	}
+    		
+    	Map  mapShiftableOptionsEntry = getRequiredOptionsEntry(mapGlobalOptionsContent, new Integer(shiftableIndex).toString());
+    	logger.debug("mapShiftableOptionsEntry: " +  mapShiftableOptionsEntry);
+    	
+    	if (mapMovableOptionsEntry != null)
+    	{
+    		mapTempGeneralOptionsContent.put(new Integer(shiftableIndex).toString(), mapMovableOptionsEntry);
+    		logger.debug("mapTempGeneralOptionsContent has been updated with mapMovableOptionsEntry");
+    	}
+    	else
+    	{
+    		mapTempGeneralOptionsContent.put(new Integer(shiftableIndex).toString(), new TreeMap(new McComparator()));
+    		logger.debug("mapTempGeneralOptionsContent has been updated with a new Map");
+    	}
+    	
+    	
+    	if (mapShiftableOptionsEntry != null)
+    	{
+    		mapTempGeneralOptionsContent.put(questionIndex,mapShiftableOptionsEntry);
+    		logger.debug("mapTempGeneralOptionsContent has been updated with mapShiftableOptionsEntry");
+    	}
+    	else
+    	{
+    		mapTempGeneralOptionsContent.put(questionIndex,new TreeMap(new McComparator()));
+    		logger.debug("mapTempGeneralOptionsContent has been updated with a new Map");
+    	}
+		 
+    	logger.debug("final shifted mapTempGeneralOptionsContent: " +  mapTempGeneralOptionsContent);
+    	return mapTempGeneralOptionsContent;
+    }
+    
+    
+    /**
+     * removes options from mapGlobalOptionsContent
+	 * removeFromOptionsMap(Map mapGlobalOptionsContent, String questionIndex )
+	 * 
+	 * @param mapGlobalOptionsContent
+	 * @param questionIndex
+	 * @param direction
+	 * @return Map
+	 */
+    public static Map removeFromMap(Map mapContent, String index)
+    {
+    	/* mapGlobalOptionsContent refers to mapGenaralOptionsContent and mapGeneralSelectedlOptionsContent */
+    	/* map to be returned */
+    	Map mapTempContent= new TreeMap(new McComparator());
+    	mapTempContent= mapContent;
+    	
+    	mapTempContent.remove(index);
+		logger.debug("entry at index removed from mapTempContent...");
+    	
+		logger.debug("final mapTempContent: " +  mapTempContent);
+    	return mapTempContent;
+    }
+    
+	
+    /**
+	 * shifs questions Map when moving up and down
+	 * shiftMap(Map mapQuestionsContent, String questionIndex , String movableQuestionEntry, String direction)
+	 * 
+	 * @param mapQuestionsContent
+	 * @param questionIndex
+	 * @param movableQuestionEntry
+	 * @param direction
+	 * @return Map
+	 */    
     public static Map shiftMap(Map mapQuestionsContent, String questionIndex , String movableQuestionEntry, String direction)
     {
     	logger.debug("movableQuestionEntry: " +  movableQuestionEntry);
     	/* map to be returned */
     	Map mapTempQuestionsContent= new TreeMap(new McComparator());
     	
-    	Iterator itMap = mapQuestionsContent.entrySet().iterator();
     	String shiftableEntry=null;
     	
     	int shiftableIndex=0;
@@ -268,10 +531,16 @@ public class AuthoringUtil implements McAppConstants {
     		return mapTempQuestionsContent;
     }
 	    
-	    
-    public static boolean validateTotalWeight(HttpServletRequest request)
+
+    /**
+     * validates if the total weight for the submitted questiona is 100 or not. 
+     * validateTotalWeight(Map mapWeights)
+     * 
+     * @param mapWeights
+     * @return boolean
+     */
+    public static boolean validateTotalWeight(Map mapWeights)
     {
-    	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
     	logger.debug("mapWeights: " + mapWeights);
     	
     	Iterator itMap = mapWeights.entrySet().iterator();
@@ -294,7 +563,15 @@ public class AuthoringUtil implements McAppConstants {
         return true;
     }
 
-	    
+	   
+    /**
+     * validates total question weight when adding new questions
+     * validateSubTotalWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
+     * 
+     * @param request
+     * @param mcAuthoringForm
+     * @return boolean
+     */
     public static boolean validateSubTotalWeights(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {
     	Map mapWeights= repopulateCurrentWeightsMap(request, "questionWeight");
@@ -318,8 +595,14 @@ public class AuthoringUtil implements McAppConstants {
         	return true;
     }
 
-	    
-    public static  boolean validateOptions(HttpServletRequest request)
+	   
+    /**
+     * checks candidate answers for a questions to see if there is at least one selected correct candidate answer 
+     * validateOptions(HttpServletRequest request)
+     * @param request
+     * @return boolean 
+     */
+    public static boolean validateOptions(HttpServletRequest request)
     {
     	logger.debug("will validateOptions");
     	String parameterType="checkBoxSelected";
@@ -338,6 +621,14 @@ public class AuthoringUtil implements McAppConstants {
     }
 
 
+    /**
+     * builds a map to hold all the candidate answers for all the questions by accessing the db 
+     * rebuildStartupGeneralOptionsQueIdfromDB(HttpServletRequest request, Map mapQuestionsUidContent)
+     * 
+     * @param request
+     * @param mapQuestionsUidContent
+     * @return Map
+     */
 	public static Map rebuildStartupGeneralOptionsQueIdfromDB(HttpServletRequest request, Map mapQuestionsUidContent)
 	{
 		IMcService mcService =McUtils.getToolService(request);
@@ -360,6 +651,14 @@ public class AuthoringUtil implements McAppConstants {
 	}
 
 
+	/**
+	 * builds a map to hold all the selected candidate answers for all the questions by accessing the db 
+	 * rebuildStartupGeneralSelectedOptionsContentMapfromDB(HttpServletRequest request, Map mapQuestionsUidContent)
+	 * 
+	 * @param request
+	 * @param mapQuestionsUidContent
+	 * @return Map
+	 */
 	public static Map rebuildStartupGeneralSelectedOptionsContentMapfromDB(HttpServletRequest request, Map mapQuestionsUidContent)
 	{
 		IMcService mcService =McUtils.getToolService(request);
@@ -382,6 +681,14 @@ public class AuthoringUtil implements McAppConstants {
 	}
 
 	
+	/**
+	 * builds a map to hold all the candidate answers for all the questions by accessing the db
+	 * rebuildStartupGeneralOptionsContentMapfromDB(HttpServletRequest request, Map mapQuestionsUidContent)
+	 * 
+	 * @param request
+	 * @param mapQuestionsUidContent
+	 * @return
+	 */
     public static Map rebuildStartupGeneralOptionsContentMapfromDB(HttpServletRequest request, Map mapQuestionsUidContent)
 	{
 		IMcService mcService =McUtils.getToolService(request);
@@ -404,6 +711,13 @@ public class AuthoringUtil implements McAppConstants {
 	}
 	
 	
+    /**
+	 * builds a questions map from questions list 
+	 * generateOptionsMap(List listQuestionOptions)
+	 * 
+	 * @param listQuestionOptions
+	 * @return Map
+	 */
 	public static Map generateOptionsMap(List listQuestionOptions)
 	{
 		Map mapOptsContent= new TreeMap(new McComparator());
@@ -420,7 +734,14 @@ public class AuthoringUtil implements McAppConstants {
     	return mapOptsContent;
 	}
 	
-	
+
+	/**
+	 * generates a map from the questions list 
+	 * generateOptionsQueIdMap(List listQuestionOptions)
+	 * 
+	 * @param listQuestionOptions
+	 * @return Map
+	 */
 	public static Map generateOptionsQueIdMap(List listQuestionOptions)
 	{
 		Map mapOptsContent= new TreeMap(new McComparator());
@@ -438,7 +759,14 @@ public class AuthoringUtil implements McAppConstants {
 	}
 	
 	
-
+	/**
+	 * builds a map to hold question texts 
+	 * rebuildQuestionMapfromDB(HttpServletRequest request, Long toolContentId)
+	 * 
+	 * @param request
+	 * @param toolContentId
+	 * @return Map
+	 */
     public static Map rebuildQuestionMapfromDB(HttpServletRequest request, Long toolContentId)
     {
     	Map mapQuestionsContent= new TreeMap(new McComparator());
@@ -467,6 +795,14 @@ public class AuthoringUtil implements McAppConstants {
     }
 
     
+    /**
+     * builds a map to hold persisted uid values for questions
+     * rebuildQuestionUidMapfromDB(HttpServletRequest request, Long toolContentId)
+     * 
+     * @param request
+     * @param toolContentId
+     * @return Map
+     */
     public static Map rebuildQuestionUidMapfromDB(HttpServletRequest request, Long toolContentId)
     {
     	Map mapQuestionsContent= new TreeMap(new McComparator());
@@ -477,20 +813,23 @@ public class AuthoringUtil implements McAppConstants {
 		McContent mcContent=mcService.retrieveMc(toolContentId);
 		logger.debug("mcContent:" + mcContent);
 		
-    	List list=mcService.refreshQuestionContent(mcContent.getUid());
-		logger.debug("refreshed list:" + list);
+		if (mcContent != null)
+		{
+			List list=mcService.refreshQuestionContent(mcContent.getUid());
+			logger.debug("refreshed list:" + list);
+			
+			Iterator listIterator=list.iterator();
+	    	Long mapIndex=new Long(1);
+	    	while (listIterator.hasNext())
+	    	{
+	    		McQueContent mcQueContent=(McQueContent)listIterator.next();
+	    		logger.debug("mcQueContent:" + mcQueContent);
+	    		mapQuestionsContent.put(mapIndex.toString(),mcQueContent.getUid());
+	    		mapIndex=new Long(mapIndex.longValue()+1);
+	    	}
+		}
 		
-		Iterator listIterator=list.iterator();
-    	Long mapIndex=new Long(1);
-    	while (listIterator.hasNext())
-    	{
-    		McQueContent mcQueContent=(McQueContent)listIterator.next();
-    		logger.debug("mcQueContent:" + mcQueContent);
-    		mapQuestionsContent.put(mapIndex.toString(),mcQueContent.getUid());
-    		mapIndex=new Long(mapIndex.longValue()+1);
-    	}
-    	
-    	logger.debug("refreshed Map:" + mapQuestionsContent);
+		logger.debug("refreshed Map:" + mapQuestionsContent);
     	return mapQuestionsContent;
     }
  
@@ -531,6 +870,14 @@ public class AuthoringUtil implements McAppConstants {
     }
     
 
+    /**
+     * builds a map to hold the weights for all the questions
+     * rebuildWeightsMapfromDB(HttpServletRequest request, Long toolContentId)
+     * 
+     * @param request
+     * @param toolContentId
+     * @return Map
+     */
     public static Map rebuildWeightsMapfromDB(HttpServletRequest request, Long toolContentId)
     {
     	Map mapWeightsContent= new TreeMap(new McComparator());
@@ -559,6 +906,14 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    /**
+     * builds a map to hold all the correct feedback entries
+     * buildInCorrectFeedbackMap(HttpServletRequest request, Long toolContentId)
+     * 
+     * @param request
+     * @param toolContentId
+     * @return Map
+     */
     public static Map buildInCorrectFeedbackMap(HttpServletRequest request, Long toolContentId)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -582,7 +937,15 @@ public class AuthoringUtil implements McAppConstants {
     	return mapIncorrectFeedback;
     }
     
-    
+
+    /**
+     * builds a map to hold all the incorrect feedback entries
+     * buildCorrectFeedbackMap(HttpServletRequest request, Long toolContentId)
+     * 
+     * @param request
+     * @param toolContentId
+     * @return Map
+     */
     public static Map buildCorrectFeedbackMap(HttpServletRequest request, Long toolContentId)
     {
     	IMcService mcService =McUtils.getToolService(request);
@@ -868,14 +1231,84 @@ public class AuthoringUtil implements McAppConstants {
     }
 
     
-    public static void cleanupExistingQuestions(HttpServletRequest request, McContent mcContent)
+    public static Map mergeMaps(Map map1, Map map2)
     {
-    	IMcService mcService =McUtils.getToolService(request);
-    	logger.debug("remove questions by  mcQueContent uid : " + mcContent.getUid());
-    	mcService.cleanAllQuestionsSimple(mcContent.getUid());
+    	Map mapMergedMap= new TreeMap(new McComparator());
+    	logger.debug("merging maps now...");
+    	
+    	Iterator itMap1 = map1.entrySet().iterator();
+		while (itMap1.hasNext()) 
+        {
+        	Map.Entry pairs = (Map.Entry)itMap1.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            mapMergedMap.put(pairs.getKey(), pairs.getValue());
+        }
+		
+		logger.debug("adding the other map...");
+		Iterator itMap2 = map2.entrySet().iterator();
+		while (itMap2.hasNext()) 
+        {
+        	Map.Entry pairs = (Map.Entry)itMap2.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            mapMergedMap.put(pairs.getKey(), pairs.getValue());
+        }
+		
+		logger.debug("final merged map: " + mapMergedMap);
+		return mapMergedMap;
     }
-
     
+    
+    /**
+     * builds a question weights map from only those questions with candidate answers
+     * updateCurrentWeightsMapForQuestionWithNoOptions(HttpServletRequest request, Map mapWeights, Map mapQuestionsContent)
+     * 
+     * @param request
+     * @param mapWeights
+     * @param mapQuestionsContent
+     * @return Map
+     */
+    public static Map updateCurrentWeightsMapForQuestionWithNoOptions(HttpServletRequest request, Map mapWeights, Map mapQuestionsContent)
+	{
+    	logger.debug("mapWeights: " + mapWeights);
+    	logger.debug("mapQuestionsContent: " + mapQuestionsContent);
+    	Map mapUpdatedWeightsMap= new TreeMap(new McComparator());
+    	
+    	boolean questionWithOptionsFound=false;
+    	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
+		while (itQuestionsMap.hasNext()) 
+        {
+        	Map.Entry pairs = (Map.Entry)itQuestionsMap.next();
+            logger.debug("using the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
+            
+            questionWithOptionsFound=false;
+            Iterator itWeightsMap = mapWeights.entrySet().iterator();
+            while (itWeightsMap.hasNext()) 
+            {
+            	Map.Entry pairsWeight = (Map.Entry)itWeightsMap.next();
+                logger.debug("using the pairsWeight: " +  pairsWeight.getKey() + " = " + pairsWeight.getValue());
+                
+                if (pairs.getKey().toString().equals(pairsWeight.getKey().toString()))
+                {
+                	logger.debug("this pair is  eligible to be added to the updated weights map since this question is with candidate answers");
+                	mapUpdatedWeightsMap.put(pairsWeight.getKey().toString(), pairsWeight.getValue().toString());
+                	break;
+                }
+            }
+        }
+		logger.debug("final mapUpdatedWeightsMap: " +  mapUpdatedWeightsMap);
+		return mapUpdatedWeightsMap;
+	}
+    
+    
+    /**
+     * builds a questions map from only those questions with candidate answers
+     * updateQuestionsMapForNoOptions(HttpServletRequest request, Map mapQuestionsContent, Map mapGeneralOptionsContent)
+     * 
+     * @param request
+     * @param mapQuestionsContent
+     * @param mapGeneralOptionsContent
+     * @return Map
+     */
     public static Map updateQuestionsMapForNoOptions(HttpServletRequest request, Map mapQuestionsContent, Map mapGeneralOptionsContent)
     {
     	logger.debug("doing updateQuestionsMapForNoOptions...");
@@ -926,6 +1359,16 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+    /**
+     * 
+     * removes only unused question entries from the db. It keeps the valid entries since they get updated. 
+     * cleanupRedundantQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent, McContent mcContent)
+     * 
+     * @param request
+     * @param existingQuestions
+     * @param mapQuestionsContent
+     * @param mcContent
+     */
     public static void cleanupRedundantQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent, McContent mcContent)
     {
     	logger.debug("doing cleanupRedundantQuestions...");
@@ -971,10 +1414,24 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
-    public static void selectAndPersistQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent,Map mapFeedbackIncorrect, Map mapFeedbackCorrect, Map mapGeneralOptionsContent, McContent mcContent)
+    /**
+     * helps persist questions
+     * selectAndPersistQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent,Map mapFeedbackIncorrect, Map mapFeedbackCorrect, Map mapGeneralOptionsContent, McContent mcContent)
+     * 
+     * @param request
+     * @param existingQuestions
+     * @param mapQuestionsContent
+     * @param mapFeedbackIncorrect
+     * @param mapFeedbackCorrect
+     * @param mapGeneralOptionsContent
+     * @param mcContent
+     */
+    public static void selectAndPersistQuestions(HttpServletRequest request, List existingQuestions, Map mapQuestionsContent,Map mapFeedbackIncorrect, Map mapFeedbackCorrect, Map mapGeneralOptionsContent, Map mapWeights, McContent mcContent)
 	{
     	logger.debug("doing selectAndPersistQuestions...");
+    	logger.debug("mapWeights: " + mapWeights);
     	IMcService mcService =McUtils.getToolService(request);
+    	
     	
     	Iterator itQuestionsMap = mapQuestionsContent.entrySet().iterator();
 		boolean questionContentFound=false;
@@ -985,6 +1442,7 @@ public class AuthoringUtil implements McAppConstants {
             
             questionContentFound = false;
             String displayOrder="1";
+            String weight="";
             McQueContent mcQueContent=null;
             Iterator itExistingQuestions = existingQuestions.iterator();
             while (itExistingQuestions.hasNext()) 
@@ -997,7 +1455,11 @@ public class AuthoringUtil implements McAppConstants {
                 	logger.debug("existing mcQueContent found :" + mcQueContent);
                 	questionContentFound=true;
                 	displayOrder=pairs.getKey().toString(); 
+                	weight=(String)mapWeights.get(displayOrder);
+                	logger.debug("weight :" + weight);
+                	
                 	logger.debug("new display order for " + mcQueContent.getQuestion()+ " will be: "  + displayOrder);
+                	logger.debug("new weight  for " + mcQueContent.getQuestion()+ " will be: "  + weight);
                 	break;
 				}
             }
@@ -1005,7 +1467,7 @@ public class AuthoringUtil implements McAppConstants {
             if (questionContentFound == true)
             {
             	logger.debug("questionContentFound is true: " + mcQueContent);
-            	updateExistingQuestionContent(request,mapFeedbackIncorrect, mapFeedbackCorrect, mcQueContent, displayOrder);
+            	updateExistingQuestionContent(request,mapFeedbackIncorrect, mapFeedbackCorrect, mcQueContent, displayOrder, weight);
             }
             else
             {
@@ -1016,21 +1478,36 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
-    public static void updateExistingQuestionContent(HttpServletRequest request, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McQueContent mcQueContent, String displayOrder)
+    /**
+     * updates existing questions while persisting the questions
+     * updateExistingQuestionContent(HttpServletRequest request, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McQueContent mcQueContent, String displayOrder)
+     *  
+     * @param request
+     * @param mapFeedbackIncorrect
+     * @param mapFeedbackCorrect
+     * @param mcQueContent
+     * @param displayOrder
+     */
+    public static void updateExistingQuestionContent(HttpServletRequest request, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, McQueContent mcQueContent, String displayOrder, String weight)
     {
     	logger.debug("doing updateExistingQuestionContent...");
     	logger.debug("using displayOrder: " + displayOrder);
+    	logger.debug("using weight: " + weight);
     	
+    	/*
     	Map mapWeights= (Map)request.getSession().getAttribute(MAP_WEIGHTS);
     	logger.debug("MAP_WEIGHTS:" + mapWeights);
+    	*/
     	
     	String incorrectFeedback=(String)mapFeedbackIncorrect.get(displayOrder);
     	logger.debug("new  incorrectFeedback will be :" + incorrectFeedback);
     	String correctFeedback=(String)mapFeedbackCorrect.get(displayOrder);
     	logger.debug("new correctFeedback will be :" + correctFeedback);
     	
+    	/*
     	String weight=(String)mapWeights.get(displayOrder);
     	logger.debug("new weight will be:" + weight);
+    	*/
     	
     	IMcService mcService =McUtils.getToolService(request);
     	mcQueContent.setDisplayOrder(new Integer(displayOrder));
@@ -1098,10 +1575,21 @@ public class AuthoringUtil implements McAppConstants {
 	}
 
 	
+	/**
+	 * removes the unused persisted candidate answers 
+	 * cleanupRedundantOptions(HttpServletRequest request, Map mapStartupGeneralOptionsContent, Map mapStartupGeneralSelectedOptionsContent, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, Map mapStartupGeneralOptionsQueId)
+	 *  
+	 * @param request
+	 * @param mapStartupGeneralOptionsContent
+	 * @param mapStartupGeneralSelectedOptionsContent
+	 * @param mapGeneralOptionsContent
+	 * @param mapGeneralSelectedOptionsContent
+	 * @param mapStartupGeneralOptionsQueId
+	 */
 	public static void cleanupRedundantOptions(HttpServletRequest request, Map mapStartupGeneralOptionsContent, Map mapStartupGeneralSelectedOptionsContent, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, Map mapStartupGeneralOptionsQueId)
 	{
 		logger.debug("doing cleanupRedundantOptions...");
-		logger.debug("starting cleanupRedundantOptions...:" + mapStartupGeneralOptionsContent);
+		logger.debug("starting mapStartupGeneralOptionsContent...:" + mapStartupGeneralOptionsContent);
 		logger.debug("using mapGeneralOptionsContent..: "+ mapGeneralOptionsContent);
     	IMcService mcService =McUtils.getToolService(request);
     	
@@ -1134,8 +1622,17 @@ public class AuthoringUtil implements McAppConstants {
     }
     
 	
-	
-
+	/**
+	 * help persist candidate answers
+	 * selectAndPersistOptions(HttpServletRequest request, Map mapStartupGeneralOptionsContent, Map mapStartupGeneralSelectedOptionsContent,
+	 *  
+	 * @param request
+	 * @param mapStartupGeneralOptionsContent
+	 * @param mapStartupGeneralSelectedOptionsContent
+	 * @param mapGeneralOptionsContent
+	 * @param mapGeneralSelectedOptionsContent
+	 * @param mapStartupGeneralOptionsQueId
+	 */
 	public static void selectAndPersistOptions(HttpServletRequest request, Map mapStartupGeneralOptionsContent, Map mapStartupGeneralSelectedOptionsContent, 
 			Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent, Map mapStartupGeneralOptionsQueId)
 	{
@@ -1177,6 +1674,17 @@ public class AuthoringUtil implements McAppConstants {
     }
     
     
+	/**
+	 * used to persist or update candidate answers
+	 * updateOrCreateOptions(HttpServletRequest request, Map mapSGO, Map mapGO, Map options, String questionIndex, Map mapGeneralSelectedOptionsContent)
+	 *  
+	 * @param request
+	 * @param mapSGO
+	 * @param mapGO
+	 * @param options
+	 * @param questionIndex
+	 * @param mapGeneralSelectedOptionsContent
+	 */
     public static void updateOrCreateOptions(HttpServletRequest request, Map mapSGO, Map mapGO, Map options, String questionIndex, Map mapGeneralSelectedOptionsContent)
     {
     	logger.debug("doing updateOrCreateOptions...");
@@ -1209,6 +1717,14 @@ public class AuthoringUtil implements McAppConstants {
     }
 
 
+    /**
+     * used to update existing candidate answers
+     * updateExistingOptionContent(HttpServletRequest request, Map options, String optionText)
+     * 
+     * @param request
+     * @param options
+     * @param optionText
+     */
 	public static void updateExistingOptionContent(HttpServletRequest request, Map options, String optionText)
     {
 		logger.debug("doing updateExistingOptionContent...");
@@ -1225,6 +1741,14 @@ public class AuthoringUtil implements McAppConstants {
     }
 
 	
+	/**
+	 * persists candidate answers
+	 * writePendingOptions(HttpServletRequest request, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent)
+	 * 
+	 * @param request
+	 * @param mapGeneralOptionsContent
+	 * @param mapGeneralSelectedOptionsContent
+	 */
 	public static void writePendingOptions(HttpServletRequest request, Map mapGeneralOptionsContent, Map mapGeneralSelectedOptionsContent)
 	{
 		logger.debug("doing writePendingQuestions...");
@@ -1239,6 +1763,15 @@ public class AuthoringUtil implements McAppConstants {
 	}
 
 	
+	/**
+	 * persists a candidate answer 
+	 * writePendingOption(HttpServletRequest request, String questionIndex, Map pendingOptions, Map mapGeneralSelectedOptionsContent)
+	 * 
+	 * @param request
+	 * @param questionIndex
+	 * @param pendingOptions
+	 * @param mapGeneralSelectedOptionsContent
+	 */
 	public static void writePendingOption(HttpServletRequest request, String questionIndex, Map pendingOptions, Map mapGeneralSelectedOptionsContent)
 	{
     	logger.debug("doing writePendingOption...");
@@ -1289,6 +1822,17 @@ public class AuthoringUtil implements McAppConstants {
 	}
 	
 	
+	/**
+	 * persists a candidate answer
+	 * createOptionContent(HttpServletRequest request, Map options, String optionText, 
+			String questionIndex, Map mapGeneralSelectedOptionsContent)
+	 * 
+	 * @param request
+	 * @param options
+	 * @param optionText
+	 * @param questionIndex
+	 * @param mapGeneralSelectedOptionsContent
+	 */
 	public static void createOptionContent(HttpServletRequest request, Map options, String optionText, 
 			String questionIndex, Map mapGeneralSelectedOptionsContent)
     {
@@ -1345,6 +1889,15 @@ public class AuthoringUtil implements McAppConstants {
     }
 
 
+	/**
+	 * finds whether a candidate answer is selected or not
+	 * isOptionSelected(Map mapGeneralSelectedOptionsContent, String optionText, String questionIndex)
+	 * 
+	 * @param mapGeneralSelectedOptionsContent
+	 * @param optionText
+	 * @param questionIndex
+	 * @return boolean
+	 */
 	public static boolean isOptionSelected(Map mapGeneralSelectedOptionsContent, String optionText, String questionIndex)
 	{
 	   Iterator itGSOMap = mapGeneralSelectedOptionsContent.entrySet().iterator();
@@ -1366,6 +1919,14 @@ public class AuthoringUtil implements McAppConstants {
 	}
 	
 	
+	/**
+	 * checks the existence of a candidate answer in the options map
+	 * isOptionSelectedInMap(String optionText, Map currentOptionsMap)
+	 * 
+	 * @param optionText
+	 * @param currentOptionsMap
+	 * @return
+	 */
 	public static boolean isOptionSelectedInMap(String optionText, Map currentOptionsMap)
 	{
 		logger.debug("optionText: " + optionText);
@@ -1383,23 +1944,18 @@ public class AuthoringUtil implements McAppConstants {
 	}
 
 	
-	public static void createDefaultOptionContent(HttpServletRequest request, McQueContent mcQueContent)
-    {
-		logger.debug("doing createDefaultOptionContent...");
-       	IMcService mcService =McUtils.getToolService(request);
-    	
-		String mcQueContentUid=mcQueContent.getUid().toString();
-		logger.debug("mcQueContentUid:" + mcQueContentUid);
-		
-		if (mcQueContentUid != null)
-		{
-			McOptsContent mcOptsContent= new McOptsContent(true,"a sample answer", mcQueContent, new TreeSet());
-			mcService.saveMcOptionsContent(mcOptsContent);
-	    	logger.debug("created a new mcOptsContent in the db: " + mcOptsContent);
-		}
-    }
-
-	
+	/**
+	 * persistw a question content 
+	 * createQuestionContent(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, String question, Map mapGeneralOptionsContent, McContent mcContent)
+	 *  
+	 * @param request
+	 * @param mapQuestionsContent
+	 * @param mapFeedbackIncorrect
+	 * @param mapFeedbackCorrect
+	 * @param question
+	 * @param mapGeneralOptionsContent
+	 * @param mcContent
+	 */
     public static void createQuestionContent(HttpServletRequest request, Map mapQuestionsContent, Map mapFeedbackIncorrect, Map mapFeedbackCorrect, String question, Map mapGeneralOptionsContent, McContent mcContent)
     {
     	logger.debug("using createQuestionContent with question: " + question);
@@ -1553,17 +2109,20 @@ public class AuthoringUtil implements McAppConstants {
     	Map mapQuestionsUidContent=AuthoringUtil.rebuildQuestionUidMapfromDB(request, new Long(toolContentId));
     	logger.debug("mapQuestionsUidContent:" + mapQuestionsUidContent);
     	
-    	Map mapStartupGeneralOptionsContent=AuthoringUtil.rebuildStartupGeneralOptionsContentMapfromDB(request, mapQuestionsUidContent);
-    	logger.debug("mapStartupGeneralOptionsContent:" + mapStartupGeneralOptionsContent);
-    	request.getSession().setAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT, mapStartupGeneralOptionsContent);
-    	
-    	Map mapStartupGeneralSelectedOptionsContent=AuthoringUtil.rebuildStartupGeneralSelectedOptionsContentMapfromDB(request, mapQuestionsUidContent);
-    	logger.debug("mapStartupGeneralSelectedOptionsContent:" + mapStartupGeneralSelectedOptionsContent);
-    	request.getSession().setAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT, mapStartupGeneralSelectedOptionsContent);
-    	
-    	Map mapStartupGeneralOptionsQueId=AuthoringUtil.rebuildStartupGeneralOptionsQueIdfromDB(request, mapQuestionsUidContent);
-    	logger.debug("mapStartupGeneralOptionsQueId:" + mapStartupGeneralOptionsQueId);
-    	request.getSession().setAttribute(MAP_STARTUP_GENERAL_OPTIONS_QUEID, mapStartupGeneralOptionsQueId);	
+    	if (mapQuestionsUidContent.size() > 0)
+    	{
+    		Map mapStartupGeneralOptionsContent=AuthoringUtil.rebuildStartupGeneralOptionsContentMapfromDB(request, mapQuestionsUidContent);
+        	logger.debug("mapStartupGeneralOptionsContent:" + mapStartupGeneralOptionsContent);
+        	request.getSession().setAttribute(MAP_STARTUP_GENERAL_OPTIONS_CONTENT, mapStartupGeneralOptionsContent);
+        	
+        	Map mapStartupGeneralSelectedOptionsContent=AuthoringUtil.rebuildStartupGeneralSelectedOptionsContentMapfromDB(request, mapQuestionsUidContent);
+        	logger.debug("mapStartupGeneralSelectedOptionsContent:" + mapStartupGeneralSelectedOptionsContent);
+        	request.getSession().setAttribute(MAP_STARTUP_GENERAL_SELECTED_OPTIONS_CONTENT, mapStartupGeneralSelectedOptionsContent);
+        	
+        	Map mapStartupGeneralOptionsQueId=AuthoringUtil.rebuildStartupGeneralOptionsQueIdfromDB(request, mapQuestionsUidContent);
+        	logger.debug("mapStartupGeneralOptionsQueId:" + mapStartupGeneralOptionsQueId);
+        	request.getSession().setAttribute(MAP_STARTUP_GENERAL_OPTIONS_QUEID, mapStartupGeneralOptionsQueId);	
+    	}
     }
     
     
