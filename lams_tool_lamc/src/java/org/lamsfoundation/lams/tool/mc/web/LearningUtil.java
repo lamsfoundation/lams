@@ -420,7 +420,12 @@ public class LearningUtil implements McAppConstants {
     	logger.debug("marksTotal: " + marksTotal);
     	logger.debug("count: " + count);
     	
-    	int averageMark= (marksTotal / count);
+    	int averageMark=0;
+    	if (count > 0)
+    	{
+    		averageMark= (marksTotal / count);
+    	}
+    	
     	logger.debug("averageMark: " + averageMark);
     	return averageMark;
     }
