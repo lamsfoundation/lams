@@ -44,8 +44,8 @@ http://www.gnu.org/licenses/gpl.txt
 
 <!-- ============= Mc Authoring Page Definitions ====================== -->	
 	<definition name=".questions" extends=".baseDef" >
-		<put name="title" value="Multiple Choice"/>
-		<put name="pageHeader" value = "Multiple Choice"/>
+		<put name="title" value="MCQ Tool Questions"/>
+		<put name="pageHeader" value = "MCQ Tool Questions"/>
 		<put name="content" value="/AuthoringMaincontent.jsp" />	
 	</definition>
 	
@@ -71,8 +71,8 @@ http://www.gnu.org/licenses/gpl.txt
 	
 <!-- ============= Mc Learning Starter Page Definitions ====================== -->		
 		<definition name=".answers" extends=".baseDef" >
-		<put name="title" value="Answers for MCQ"/>
-		<put name="pageHeader" value = "Answers for MCQ"/>
+		<put name="title" value="MCQ Tool Answers"/>
+		<put name="pageHeader" value = "MCQ Tool Answers"/>
 		<put name="content" value="/AnswersContent.jsp" />	
 	</definition>
 	
@@ -83,38 +83,38 @@ http://www.gnu.org/licenses/gpl.txt
 	</definition>
 
 	<definition name=".individualReport" extends=".baseDef" >
-		<put name="title" value="Individual Report"/>
-		<put name="pageHeader" value = "Individual Report"/>
+		<put name="title" value="MCQ Tool Individual Report"/>
+		<put name="pageHeader" value ="MCQ Tool Individual Report"/>
 		<put name="content" value="/IndividualLearnerResults.jsp" />	
 	</definition>
 	
 	<definition name=".viewSummary" extends=".baseDef" >
-		<put name="title" value="View Summary"/>
-		<put name="pageHeader" value = "View Summary"/>
+		<put name="title" value="MCQ Tool View Summary"/>
+		<put name="pageHeader" value ="MCQ Tool View Summary"/>
 		<put name="content" value="/ViewSummary.jsp" />	
 	</definition>
 	
 	<definition name=".redoQuestions" extends=".baseDef" >
-		<put name="title" value="Redo Questions?"/>
-		<put name="pageHeader" value = "Redo Questions?"/>
+		<put name="title" value="MCQ Tool Redo Questions"/>
+		<put name="pageHeader" value ="MCQ Tool Redo Questions"/>
 		<put name="content" value="/RedoQuestions.jsp" />	
 	</definition>
 
 	<definition name=".singleQuestionAnswers" extends=".baseDef" >
-		<put name="title" value="Question Answers"/>
-		<put name="pageHeader" value = "Question Answers"/>
+		<put name="title" value="MCQ Tool Answers"/>
+		<put name="pageHeader" value ="MCQ Tool Answers"/>
 		<put name="content" value="/SingleQuestionAnswersContent.jsp" />	
 	</definition>
 	
 	<definition name=".viewAnswers" extends=".baseDef" >
-		<put name="title" value="View Previous Answers"/>
-		<put name="pageHeader" value = "View Previous Answers"/>
+		<put name="title" value="MCQ Tool View Previous Answers"/>
+		<put name="pageHeader" value = "MCQ Tool View Previous Answers"/>
 		<put name="content" value="/ViewAnswers.jsp" />	
 	</definition>
 
 	<definition name=".resultsSummary" extends=".baseDef" >
-		<put name="title" value="Results Summary"/>
-		<put name="pageHeader" value = "Results Summary"/>
+		<put name="title" value="MCQ Tool Results Summary"/>
+		<put name="pageHeader" value = "MCQ Tool Results Summary"/>
 		<put name="content" value="/ResultsSummary.jsp" />	
 	</definition>
 
