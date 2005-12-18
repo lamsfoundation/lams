@@ -80,7 +80,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
 		}
 
-		setupPaths(request);
 		initialiseAttributes(request);
 		
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
@@ -282,29 +281,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	{
 		logger.debug("is content inuse: " + mcContent.isContentInUse());
 		return  mcContent.isContentInUse();
-	}
-	
-	
-	/**
-	 * sets up ROOT_PATH and PATH_TO_LAMS attributes for presentation purposes
-	 * setupPaths(HttpServletRequest request)
-	 * @param request
-	 */
-	protected void setupPaths(HttpServletRequest request)
-	{
-		String protocol = request.getProtocol();
-		if(protocol.startsWith("HTTPS")){
-			protocol = "https://";
-		}else{
-			protocol = "http://";
-		}
-		String root = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-		String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
-		request.getSession().setAttribute(ROOT, root);
-		request.getSession().setAttribute(ROOT_PATH, root);
-		request.getSession().setAttribute(PATH_TO_LAMS, pathToLams);
-		
-		logger.debug("setting root to: " + request.getSession().getAttribute(ROOT));
 	}
 	
 	
