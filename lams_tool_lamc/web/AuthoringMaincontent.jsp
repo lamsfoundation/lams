@@ -4,29 +4,28 @@
 <%@ taglib uri="tags-c" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="fck-editor" prefix="FCK" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
-<%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String root = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
-%>
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD hTML 4.01 Transitional//EN">
 <html:html>
 <head>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>Tool</title>
-<script type="text/javascript" src="<%=root%>author_page/js/tabcontroller.js"></script>
-<script src="<%=pathToLams%>/includes/javascript/common.js"></script>
+<title>MCQ tool</title>
+
+<script lang="javascript">
+var imgRoot="<c:out value="${lams}"/>images/";
+var themeName="aqua";
+</script>
+<script type="text/javascript" src="<c:out value="${lams}"/>includes/javascript/tabcontroller.js"></script>
+<script src="<c:out value="${lams}"/>includes/javascript/common.js"></script>
+
 <!-- this is the custom CSS for hte tool -->
-<link href="<%=root%>author_page/css/tool_custom.css" rel="stylesheet" type="text/css">
-<!-- depending on user / site preference this will get changed probbably use passed in variable from flash to select which one to use-->
-<link href="<%=root%>author_page/css/aqua.css" rel="stylesheet" type="text/css">
+<link href="<c:out value="${tool}"/>css/tool_custom.css" rel="stylesheet" type="text/css">
+<lams:css/>
 <script language="JavaScript" type="text/JavaScript">
 <!--
 function MM_reloadPage(init) {  //reloads the window if Nav4 resized
@@ -55,11 +54,11 @@ function submitMethod(actionMethod) {
 
 //-->     
 </script>
+
 </head>
 <body onLoad="initTabs()">
 
-
-<h1><bean:message key="label.authoring.mc"/></h1>
+<b> <bean:message key="label.authoring.mc"/> </b>
     
 
     <!-- start tabs -->
