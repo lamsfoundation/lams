@@ -26,7 +26,7 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="fck-editor" prefix="FCK" %>
 
 
-<c:if test="${submitSuccess == 1}"> 			
+<c:if test="${sbmtSuccess == 1}"> 			
 	<logic-el:messagesPresent> 
 	 <html:messages id="error"> 
 		    <img src="images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
@@ -35,7 +35,7 @@ http://www.gnu.org/licenses/gpl.txt
 </c:if> 			
 
 
-<c:if test="${submitSuccess != 1}"> 			
+<c:if test="${sbmtSuccess != 1}"> 			
 	<logic-el:messagesPresent> 
 	 <html:messages id="error"> 
 		    <img src="images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
