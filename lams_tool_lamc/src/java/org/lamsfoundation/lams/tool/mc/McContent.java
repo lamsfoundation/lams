@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 
 /**
  * <p>Persistent  object/bean that defines the content for the MCQ tool.
@@ -40,6 +41,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Ozgur Demirtas
  */
 public class McContent implements Serializable {
+	static Logger logger = Logger.getLogger(McContent.class.getName());
 
     /** identifier field */
     private Long uid;
@@ -118,7 +120,11 @@ public class McContent implements Serializable {
     private Set mcAttachments;
 
     /** full constructor */
-    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, String endLearningMessage, Integer passMark, boolean showFeedback, boolean retries, Set mcQueContents, Set mcSessions, Set mcAttachments) {
+    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, boolean runOffline, String creationDate, 
+    		Date updateDate, boolean questionsSequenced, boolean usernameVisible, String reportTitle, String monitoringReportTitle, 
+			long createdBy, boolean synchInMonitor, boolean contentInUse, String offlineInstructions, String onlineInstructions, 
+			String endLearningMessage, Integer passMark, boolean showReport, boolean showFeedback, boolean retries, Set mcQueContents, Set mcSessions, 
+			Set mcAttachments) {
         this.mcContentId = mcContentId;
         this.title = title;
         this.instructions = instructions;
@@ -137,6 +143,7 @@ public class McContent implements Serializable {
         this.onlineInstructions = onlineInstructions;
         this.endLearningMessage = endLearningMessage;
         this.passMark = passMark;
+        this.showReport = showReport;
         this.retries=retries;
         this.showFeedback = showFeedback;
         this.mcQueContents = mcQueContents;
@@ -170,7 +177,7 @@ public class McContent implements Serializable {
             Long newContentId)
     {
     	McContent newContent = new McContent(
-    				newContentId,
+    				 newContentId,
                      mc.getTitle(),
                      mc.getInstructions(),
                      mc.isDefineLater(),
@@ -188,6 +195,7 @@ public class McContent implements Serializable {
 					 mc.getOnlineInstructions(),
 					 mc.getEndLearningMessage(),
 					 mc.getPassMark(),
+					 mc.isShowReport(),
 					 mc.isRetries(),
 					 mc.isShowFeedback(),
          			 new TreeSet(),
@@ -202,17 +210,20 @@ public class McContent implements Serializable {
      * gets called as part of the copyToolContent
      * 
      * @param newQaContent
-     * @return
+     * @return Set
      */
-    public Set deepCopyMcQueContent(McContent newQaContent)
+    public Set deepCopyMcQueContent(McContent newMcContent)
     {
     	Set newMcQueContent = new TreeSet();
         for (Iterator i = this.getMcQueContents().iterator(); i.hasNext();)
         {
             McQueContent queContent = (McQueContent) i.next();
-            newMcQueContent.add(McQueContent.newInstance(queContent,
-            											newQaContent,
-														null));
+            if (queContent.getMcContent() != null)
+            {
+            	McQueContent mcQueContent=McQueContent.newInstance(queContent,
+															newMcContent);
+            	newMcQueContent.add(mcQueContent);
+            }
         }
         return newMcQueContent;
     }
