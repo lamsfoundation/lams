@@ -10,13 +10,22 @@
 	String userContentId="1234";
 	String userId="1111";
 	String toolUrl="/authoringStarter?userId=" + userId + "&toolContentID=" + userContentId;
+	
+	String strCopyToolContent="/authoringStarter?userId=" + userId + "&toolContentID=" + userContentId + "&copyToolContent=1";
 %>
 
-
+Start authoring module
 <html:form action="<%=toolUrl%>" method="post">
       <table border=1>
       </table><br/>
       <html:submit value="Tool Icon"/>
+</html:form>
+
+Copy Tool Content
+<html:form action="<%=strCopyToolContent%>" method="post">
+      <table border=1>
+      </table><br/>
+      <html:submit value="Copy Tool Content"/>
 </html:form>
 
 
