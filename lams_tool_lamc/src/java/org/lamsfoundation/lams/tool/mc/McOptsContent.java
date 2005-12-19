@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.mc;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -37,7 +39,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */ 
-public class McOptsContent implements Serializable {
+public class McOptsContent implements Serializable, Comparable {
+	static Logger logger = Logger.getLogger(McOptsContent.class.getName());
 	
     /** identifier field */
     private Long uid;
@@ -75,6 +78,17 @@ public class McOptsContent implements Serializable {
         this.mcQueContent = mcQueContent;
         this.mcUsrAttempts=mcUsrAttempts;
     }
+    
+    public static McOptsContent newInstance(McOptsContent mcOptsContent,
+											McQueContent newMcQueContent)
+											
+	{
+    	McOptsContent newMcOptsContent = new McOptsContent(mcOptsContent.isCorrectOption(),
+							    						  mcOptsContent.getMcQueOptionText(),
+							    						  newMcQueContent,
+														  new TreeSet());
+    	return newMcOptsContent;
+	}
     
     
     /** default constructor */
@@ -162,4 +176,14 @@ public class McOptsContent implements Serializable {
 	public void setMcQueContentId(Long mcQueContentId) {
 		this.mcQueContentId = mcQueContentId;
 	}
+	
+	public int compareTo(Object o)
+    {
+		McOptsContent optContent = (McOptsContent) o;
+        //if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+        if (mcQueOptionId == null)
+        	return 1;
+		else
+			return (int) (mcQueOptionId.longValue() - optContent.mcQueOptionId.longValue());
+    }
 }

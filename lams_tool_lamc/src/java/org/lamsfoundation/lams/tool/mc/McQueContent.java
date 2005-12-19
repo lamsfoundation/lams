@@ -24,10 +24,12 @@ package org.lamsfoundation.lams.tool.mc;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -38,7 +40,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class McQueContent implements Serializable {
+public class McQueContent implements Serializable, Comparable {
+	static Logger logger = Logger.getLogger(McQueContent.class.getName());
 
     /** identifier field */
     private Long uid;
@@ -178,18 +181,40 @@ public class McQueContent implements Serializable {
      * @return the new qa question content object
      */
     public static McQueContent newInstance(McQueContent queContent,
-    										McContent newMcContent,
-    										McQueContent parentQuestion)
+    										McContent newMcContent)
+    										
     {
     	McQueContent newQueContent = new McQueContent(queContent.getQuestion(),
 													  queContent.getDisplayOrder(),
 													  queContent.getWeight(),
-													  queContent.isDisabled(), 
+													  queContent.isDisabled(),
+													  queContent.getFeedbackCorrect(),
+													  queContent.getFeedbackCorrect(),
 													  newMcContent,
                                                       new TreeSet(),
                                                       new TreeSet());
+    	
+    	newQueContent.setMcOptionsContents(queContent.deepCopyMcOptionsContent(newQueContent));
     	return newQueContent;
     }
+    
+    
+    public Set deepCopyMcOptionsContent(McQueContent newQueContent)
+    {
+    	Set newMcOptionsContent = new TreeSet();
+        for (Iterator i = this.getMcOptionsContents().iterator(); i.hasNext();)
+        {
+            McOptsContent mcOptsContent = (McOptsContent) i.next();
+            McOptsContent mcNewOptsContent= McOptsContent.newInstance(mcOptsContent,newQueContent);
+            
+            if (mcNewOptsContent.getMcQueContent() != null)
+            {
+            	newMcOptionsContent.add(mcNewOptsContent);
+            }
+        }
+        return newMcOptionsContent;
+    }
+    
 
     public Long getUid() {
         return this.uid;
@@ -319,4 +344,14 @@ public class McQueContent implements Serializable {
 	public void setFeedbackIncorrect(String feedbackIncorrect) {
 		this.feedbackIncorrect = feedbackIncorrect;
 	}
+	
+	public int compareTo(Object o)
+    {
+        McQueContent queContent = (McQueContent) o;
+        //if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+        if (mcQueContentId == null)
+        	return 1;
+		else
+			return (int) (mcQueContentId.longValue() - queContent.mcQueContentId.longValue());
+    }
 }
