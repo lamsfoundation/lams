@@ -72,6 +72,7 @@ public interface McAppConstants {
     public static final String ACTIVITY_ID 								= "activityID";
     public static final String CURRENT_TAB 								= "currentTab";
     public static final String MAX_QUESTION_INDEX 						= "maxQuestionIndex";
+    public static final String COPY_TOOL_CONTENT 						= "copyToolContent";
     
 	
 	/*
