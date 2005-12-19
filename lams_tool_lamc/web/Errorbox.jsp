@@ -29,7 +29,7 @@ http://www.gnu.org/licenses/gpl.txt
 <c:if test="${submitSuccess == 1}"> 			
 	<logic-el:messagesPresent> 
 	 <html:messages id="error"> 
-		    <img src="images/success.gif" align="left" width=20 height=20>  <bean:write name="error"/> </img>
+		    <img src="images/success.gif" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
 	 </html:messages> 
 	</logic-el:messagesPresent>
 </c:if> 			
@@ -38,7 +38,7 @@ http://www.gnu.org/licenses/gpl.txt
 <c:if test="${submitSuccess != 1}"> 			
 	<logic-el:messagesPresent> 
 	 <html:messages id="error"> 
-		    <img src="images/error.jpg" align="left" width=20 height=20>  <bean:write name="error"/> </img>
+		    <img src="images/error.jpg" align="left" width=20 height=20>  <font size=2> <bean:write name="error"/> </font> </img>
 	 </html:messages> 
 	</logic-el:messagesPresent>
 </c:if> 			
