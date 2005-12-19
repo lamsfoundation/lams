@@ -230,6 +230,7 @@ public class ObjectExtractor {
 		//Vector v = (Vector)table.get(WDDXTAGS.GROUPINGS);
 		parseGroupings((Vector)table.get(WDDXTAGS.GROUPINGS), learningDesign);
 		parseActivities((Vector)table.get(WDDXTAGS.ACTIVITIES),learningDesign);
+		parseActivitiesToMatchUpParentActivityByParentUIID((Vector)table.get(WDDXTAGS.ACTIVITIES),learningDesign);
 		parseTransitions((Vector)table.get(WDDXTAGS.TRANSITIONS),learningDesign);
 
 		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
@@ -318,6 +319,50 @@ public class ObjectExtractor {
 		learningDesign.setActivities(currentActivities);
 		learningDesignDAO.update(learningDesign);
 	}
+	
+	/**
+	 * Because the activities list was processed before by the method parseActivities, it is assumed that 
+	 * all activities have already been saved into the database. Because the parent activity is already
+	 * created and saved, this method will go through the activity list and will match up the parentActivityID 
+	 * based on the parentUIID.
+	 * 
+	 * @param activitiesList
+	 * @param learningDesign
+	 * @throws WDDXProcessorConversionException
+	 * @throws ObjectExtractorException
+	 */
+	private void parseActivitiesToMatchUpParentActivityByParentUIID(List activitiesList, LearningDesign learningDesign) throws WDDXProcessorConversionException, ObjectExtractorException
+	{
+		if (activitiesList != null)
+		{
+			Iterator iterator = activitiesList.iterator();
+			while(iterator.hasNext()){
+				
+				Hashtable activityDetails = (Hashtable)iterator.next();
+				
+				Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails,WDDXTAGS.ACTIVITY_UIID);
+				Activity existingActivity = activityDAO.getActivityByUIID(activityUUID, learningDesign);
+				
+				//match up id to parent based on UIID
+				if (keyExists(activityDetails, WDDXTAGS.PARENT_UIID))
+			    {
+					Integer parentUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.PARENT_UIID);
+					if( parentUIID!=null ) {
+						Activity parentActivity = activityDAO.getActivityByUIID(parentUIID,learningDesign);
+						existingActivity.setParentActivity(parentActivity);
+						existingActivity.setParentUIID(parentUIID);
+					} else {
+						existingActivity.setParentActivity(null);
+						existingActivity.setParentUIID(null);
+					}
+			    }
+				activityDAO.update(existingActivity);
+				
+			}
+		}
+	}
+	
+	
 	
 	/**
 	 * Like parseActivities, parseTransitions parses the list of transitions from the wddx packet. 
