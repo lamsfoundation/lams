@@ -49,6 +49,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
@@ -122,7 +123,35 @@ public class McStarterAction extends Action implements McAppConstants {
 				logger.debug("forwarding to: " + LOAD_QUESTIONS);
 				return (mapping.findForward(LOAD_QUESTIONS));
 			}
-		
+	
+	    	
+	    	/* 	test whether the authoring level tool contract:
+	    	 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
+	    	 * 	is working or not 
+	    	 */	
+	    	String copyToolContent= (String) request.getParameter(COPY_TOOL_CONTENT);
+	    	logger.debug("copyToolContent: " + copyToolContent);
+	    	
+	    	if ((copyToolContent != null) && (copyToolContent.equals("1")))
+			{
+		    	logger.debug("user request to copy the content");
+		    	Long fromContentId=new Long(strToolContentId);
+		    	logger.debug("fromContentId: " + fromContentId);
+		    	
+		    	Long toContentId=new Long(McUtils.generateId());
+		    	logger.debug("toContentId: " + toContentId);
+		    	
+		    	try
+				{
+		    		mcService.copyToolContent(fromContentId, toContentId);	
+				}
+		    	catch(ToolException e)
+				{
+		    		logger.debug("error copying the content: " + e);
+				}
+			}
+	    	
+	    	
 	    	/*
 			 * find out if the passed tool content id exists in the db 
 			 * present user either a first timer screen with default content data or fetch the existing content.
