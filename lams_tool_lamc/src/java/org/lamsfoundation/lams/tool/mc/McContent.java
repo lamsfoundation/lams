@@ -203,6 +203,8 @@ public class McContent implements Serializable {
                      new TreeSet()
 					 );
     	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
+    	newContent.setMcAttachments(mc.deepCopyMcAttachments(newContent));
+    	
     	return newContent;
 	}
     
@@ -227,6 +229,29 @@ public class McContent implements Serializable {
         }
         return newMcQueContent;
     }
+    
+    /**
+     * gets called as part of the copyToolContent
+     * 
+     * @param newMcContent
+     * @return Set
+     */
+    public Set deepCopyMcAttachments(McContent newMcContent)
+    {
+    	Set newMcQueContent = new TreeSet();
+        for (Iterator i = this.getMcAttachments().iterator(); i.hasNext();)
+        {
+        	McUploadedFile mcUploadedFile = (McUploadedFile) i.next();
+            if (mcUploadedFile.getMcContent() != null)
+            {
+            	McUploadedFile newMcUploadedFile=McUploadedFile.newInstance(mcUploadedFile,
+															newMcContent);
+            	newMcQueContent.add(newMcUploadedFile);
+            }
+        }
+        return newMcQueContent;
+    }
+    
 
     public Long getUid() {
         return this.uid;
