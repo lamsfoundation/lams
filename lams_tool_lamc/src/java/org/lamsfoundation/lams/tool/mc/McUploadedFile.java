@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class McUploadedFile implements Serializable
+public class McUploadedFile implements Serializable, Comparable
 {
 	/** identifier field */
     private Long uid;
@@ -83,12 +83,24 @@ public class McUploadedFile implements Serializable
 			boolean fileOnline, 
 			String filename,
 			Long mcContentId)  
-		{
+    {
 		this.uuid = uuid;
 		this.fileOnline = fileOnline;
 		this.filename = filename;
 		this.mcContentId=mcContentId;
-}
+    }
+    
+    
+    public static McUploadedFile newInstance(McUploadedFile mcUploadedFile,
+			McContent newMcContent)
+			
+	{
+    	McUploadedFile newMcUploadedFile = new McUploadedFile(mcUploadedFile.getUuid(),
+									mcUploadedFile.isFileOnline(),
+									mcUploadedFile.getFilename(),
+									newMcContent);
+		return newMcUploadedFile;
+	}
     
     
     public String toString() {
@@ -182,4 +194,14 @@ public class McUploadedFile implements Serializable
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}
+	
+	public int compareTo(Object o)
+    {
+		McUploadedFile optContent = (McUploadedFile) o;
+        //if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+        if (uid == null)
+        	return 1;
+		else
+			return (int) (uid.longValue() - optContent.uid.longValue());
+    }
 }
