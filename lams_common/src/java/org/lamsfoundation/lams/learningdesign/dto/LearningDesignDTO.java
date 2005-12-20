@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learningdesign.dto;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
@@ -405,13 +406,14 @@ public class LearningDesignDTO extends BaseDTO{
 
 	public ArrayList populateActivities(LearningDesign design) {
 		ArrayList activities = new ArrayList();		
-		ArrayList childActivities = null;
+		//ArrayList childActivities = null;
 		Iterator parentIterator = design.getParentActivities().iterator();
 		while(parentIterator.hasNext()){
 			Activity object = (Activity) parentIterator.next();
-			
-			if(object.isComplexActivity()){
-				ComplexActivity complexActivity = (ComplexActivity)object;
+			//method commented out below because error occurs when opening a a learning design with a complex activity. Some hibernate casting exception
+			/*	if(object.isComplexActivity()) 
+			{
+			ComplexActivity complexActivity = (ComplexActivity)object;
 				Iterator childIterator = complexActivity.getActivities().iterator();
 				childActivities = new ArrayList();
 				while(childIterator.hasNext()){
@@ -422,7 +424,19 @@ public class LearningDesignDTO extends BaseDTO{
 				activities.addAll(childActivities);
 			}else{
 				activities.add(object.getAuthoringActivityDTO());
-			}			
+			}		
+				
+			
+		}*/
+			if (object.isComplexActivity())
+			{
+				Set dtoSet = object.getAuthoringActivityDTOSet();
+				activities.addAll(dtoSet);
+			}
+			else
+			{
+				activities.addAll(object.getAuthoringActivityDTOSet());
+			}
 		}
 		return activities;
 	}	
