@@ -24,12 +24,14 @@ package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
@@ -179,5 +181,19 @@ public abstract class ComplexActivity extends Activity implements Serializable {
             child.getToolActivitiesInActivity(toolActivities);
         }
 	    
+	}
+	
+	public Set getAuthoringActivityDTOSet()
+	{
+		HashSet dtoSet = new HashSet();
+		dtoSet.add(new AuthoringActivityDTO(this)); //add parent activity
+		
+		//add the DTO for all child activities
+		for(Iterator i = this.getActivities().iterator();i.hasNext();) {
+            Activity child = (Activity)i.next();
+            dtoSet.add(new AuthoringActivityDTO(child));
+		}
+		
+		return dtoSet;
 	}
 }
