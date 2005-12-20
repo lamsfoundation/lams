@@ -40,7 +40,7 @@ http://www.gnu.org/licenses/gpl.txt
 	</head>
 
 	<frameset rows="*" cols="178,*">
-		<frame src="dummy.do" name="controlFrame" scrolling="NO">
+		<frame src="dummy.do" name="controlFrame" scrolling="YES">
 		<frame src="welcome.jsp" name="contentFrame" scrolling="YES">
 	</frameset>
 	
