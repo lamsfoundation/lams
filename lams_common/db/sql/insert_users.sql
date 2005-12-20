@@ -193,28 +193,28 @@ insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,wor
 values(12,10,'Movies',6,4,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(13,4,'One Test Workspace',6,4,'20041223','20041223',1);
+values(13,4,'One Test Workspace',7,5,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(14,13,'One Text Run Sequences Folder',6,4,'20041223','20041223',2);
+values(14,13,'One Test Run Sequences Folder',7,5,'20041223','20041223',2);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(15,4,'Two Test Workspace',6,4,'20041223','20041223',1);
+values(15,4,'Two Test Workspace',8,6,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(16,15,'Two Text Run Sequences Folder',6,4,'20041223','20041223',2);
+values(16,15,'Two Test Run Sequences Folder',8,6,'20041223','20041223',2);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(17,4,'Three Test Workspace',6,4,'20041223','20041223',1);
+values(17,4,'Three Test Workspace',9,7,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(18,17,'Three Text Run Sequences Folder',6,4,'20041223','20041223',2);
+values(18,17,'Three Test Run Sequences Folder',9,7,'20041223','20041223',2);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(19,4,'Four Test Workspace',6,4,'20041223','20041223',1);
+values(19,4,'Four Test Workspace',10,8,'20041223','20041223',1);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,workspace_id,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(20,19,'Four Text Run Sequences Folder',6,4,'20041223','20041223',2);
+values(20,19,'Four Test Run Sequences Folder',10,8,'20041223','20041223',2);
 
 update lams_workspace set root_folder_id = 1 where workspace_id = 1;
 update lams_workspace set root_folder_id = 2 where workspace_id = 2;
