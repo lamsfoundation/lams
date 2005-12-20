@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.web.tag;
 
 import javax.servlet.jsp.JspException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.taglib.html.TextareaTag;
 /**
  * Customerized HTML textarea tag. This tag must used with /lams_web_root/includes/javascript/common.js. 
@@ -50,9 +51,10 @@ public class MultiLinesTextareaTag extends TextareaTag {
     	if(this.property == null)
     		return super.renderTextareaElement();
     	String tagName = prepareName();
+    	String hiddenId = tagName + "__lamshidden";
     	
     	//add Javascript event handler
-    	String chbr ="filterData(this,document.getElementById('" + tagName + "'));"; 
+    	String chbr ="filterData(this,document.getElementById('" + hiddenId + "'));"; 
     	String onChange = this.getOnchange();
     	if(onChange == null)
     		onChange = chbr;
@@ -67,24 +69,35 @@ public class MultiLinesTextareaTag extends TextareaTag {
     	//reset some values to another in order to use them in hidden field. 
     	String oldProperty= this.property;
     	String oldValue = this.value;
-    		
+    	String oldId = this.getStyleId();
+    	
     	this.value=getDataNoBr(this.value);
     	this.property +="__textarea";
+    	if(StringUtils.isEmpty(this.getStyleId()))
+    		this.setStyleId(tagName + "__lamstextarea");
     	StringBuffer results = new StringBuffer(super.renderTextareaElement());
     	this.property = oldProperty;
+    	
     	
     	//construct hidden variable
     	results.append("<input type=\"hidden\"");
         prepareAttribute(results, "name", prepareName());
-        prepareAttribute(results, "id", prepareName());
-        //string without BR
-        String renderHidden = this.renderData();
-        //value save string with BR
-        prepareAttribute(results,"value",getDataWithBr(renderHidden));
+        prepareAttribute(results, "id", hiddenId);
         results.append("/>");
         
-        this.value = oldValue;
+        //onload script to reset hidden value, so it can works even onChange event does not happen when edit. 
+        //the reason of why not directly assign value to hidden variable is
+        //hidden variable treat < and &lt; are same value when submit to form. The only way is use Javascript 
+        //reset it value.
+        StringBuffer filterScript = new StringBuffer("<script language='javascript'>filterData(");
+        filterScript.append("document.getElementById('").append(this.getStyleId()).append("'),document.getElementById('");
+        filterScript.append(hiddenId);
+        filterScript.append("'));</script>");
+        results.append(filterScript);
         
+        //restore value
+        this.value = oldValue;
+        this.setStyleId(oldId);
         return results.toString();
     }
     /**
@@ -105,23 +118,6 @@ public class MultiLinesTextareaTag extends TextareaTag {
     			data = data.replaceAll("<BR>","\n");
     	}
     	return data == null?"":data;
-    }
-    /**
-     * Change input string \n or \r\n (dependent on OS) into &lt;BR&gt; tag.
-     * @param data
-     * @return
-     * @throws JspException
-     */
-    private String getDataWithBr(String data) throws JspException{
-
-    	if(data != null){
-    		//change back
-    		if(os.toLowerCase().indexOf("win") != -1)
-    			data = data.replaceAll("\r\n","<BR>");
-    		else
-    			data = data.replaceAll("\n","<BR>");
-    	}
-    	return data;
     }
 
     /**
