@@ -275,15 +275,22 @@ public class DummyMonitoringAction extends LamsDispatchAction
 			    // can't just use the activities out of the learning design
 				// as we get CGLIB objects! If this was permanent code,
 				// then we would generate the data properly in the service level.
-				log.debug("Found lesson "+lessonId+" "+element.getLessonName());
 				Set activities = element.getLearningDesign().getActivities();
 				Set activityDTOSet= new HashSet();
+				Set processedActivityIds = new HashSet();
+
 				Iterator actIterator = activities.iterator();
 				while (actIterator.hasNext()) {
 					Activity activity = (Activity) actIterator.next();
-					AuthoringActivityDTO dto = activity.getAuthoringActivityDTO();
-					activityDTOSet.add(dto);
-					log.debug("Activity "+activity);
+					Set dtos = activity.getAuthoringActivityDTOSet();
+					Iterator dtoIterator = dtos.iterator();
+					while (dtoIterator.hasNext()) {
+						AuthoringActivityDTO dto= (AuthoringActivityDTO) dtoIterator.next();
+						if ( ! processedActivityIds.contains(dto.getActivityID()) ) {
+							activityDTOSet.add(dto);
+							processedActivityIds.add(dto.getActivityID());
+						}
+					}
 				}
 				// now that all the activities are loaded, we can copy them into our own set.
 				
