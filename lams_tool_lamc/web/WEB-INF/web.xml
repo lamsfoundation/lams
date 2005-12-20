@@ -44,7 +44,7 @@
 
     <filter-mapping>
 	    <filter-name>hibernateFilter</filter-name>
-    	 <url-pattern>*.do</url-pattern>
+    	 <url-pattern>/*</url-pattern>
   	</filter-mapping>
     <filter-mapping>
     	<filter-name>SystemSessionFilter</filter-name>
@@ -77,7 +77,8 @@
 	    </init-param>
 	    <load-on-startup>2</load-on-startup>
     </servlet>
-    
+   
+ <!--    
     <servlet>
             <servlet-name>Connector</servlet-name>
             <servlet-class>com.fredck.FCKeditor.connector.ConnectorServlet</servlet-class>
@@ -91,6 +92,7 @@
             </init-param>
             <load-on-startup>1</load-on-startup>
 	</servlet>
+-->
 
 <!--  The download servlet, reused from the content repository jar -->
 	<servlet>
@@ -115,10 +117,12 @@
 		<url-pattern>/download/*</url-pattern>
   	</servlet-mapping>
 
+<!--
   	<servlet-mapping>
 	        <servlet-name>Connector</servlet-name>
              <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 	</servlet-mapping>             
+-->
               	
 
    <session-config>
@@ -197,6 +201,8 @@
     <taglib-location>/WEB-INF/jstl/tlds/c-rt.tld</taglib-location>
   </taglib>
   
+  
+  
 	<!--  ======================================================== -->	
 	<!--   LAMS Tag Library -->
 	<!--  ======================================================== -->	
@@ -205,9 +211,8 @@
 	   <taglib-location>/WEB-INF/lams.tld</taglib-location>
 	</taglib>
 	
-	
 	<taglib>
-	    <taglib-uri>fck-editor</taglib-uri>
+	    <taglib-uri>tags-fck-editor</taglib-uri>
 	    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
 	</taglib>
 
