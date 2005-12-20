@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" %>
+<%@ page language="java" %>
 <%@ taglib uri="tags-html-el" prefix="html" %>
 <%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
@@ -7,6 +7,8 @@
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- two input values: lesson (Lesson) and activities (set of AuthoringActivityDTO objects) -->
 
 <html>
   <head>
@@ -59,50 +61,55 @@
 
 	<p><A HREF=javascript:launchPopup('/lams/learning/exportWaitingPage.jsp?mode=teacher&lessonID=<c:out value="${lesson.lessonId}"/>');>Export Portfolio for all users</a> </p>
 
-	<p>Note: These activities are in the order that they were created, not in the order in authoring. In the Flash based interface, they will be displayed in the same order used in authoring.</p>
+	<p>Note: These activities are in an arbitrary order, not in the order in authoring. In the Flash based interface, they will be displayed in the same order used in authoring.</p>
 
 	<TABLE border="0" summary="This table is being used for layout purposes only">
-		<c:forEach var="activity" items="${lesson.learningDesign.activities}">
+		<c:forEach var="activity" items="${activities}">
 		<c:choose>
 
-		<c:when test="${activity.complexActivity}">
-		<!-- show the complex activity as a heading, and its child activities. This code relies on the activities only being two deep at the moment. -->
+		<c:when test="${activity.activityTypeID eq 6}">
+		<!-- show the parallel activity as a heading, and its child activities. This code relies on the activities only being two deep at the moment. -->
+		<!-- should use Activity.PARALLEL_ACTIVITY_TYPE but that doesn't work -->
 		<TR>
 			<TD class="formcontrol" colspan="3">
-				Complex Activity <c:out value="${activity.activityId}"/> <c:out value="${activity.title}"/>
+				Parallel Activity <c:out value="${activity.activityID}"/>: <c:out value="${activity.title}"/><BR/>
+
+				<TABLE border="0" summary="This table is being used for layout purposes only">
+				<!-- go through all the activities and see if any are the child of the parallel activity -->
+				<c:forEach var="possibleChildActivity" items="${activities}">
+				<c:if test="${possibleChildActivity.parentActivityID eq activity.activityID}">
+				<TR>
+					<TD class="formcontrol">
+						--> Activity <c:out value="${possibleChildActivity.activityID}"/> <c:out value="${possibleChildActivity.title}"/>:
+					</TD>
+					<TD class="formcontrol">
+						 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&activityID=<c:out value="${possibleChildActivity.activityID}"/>');">
+						 Monitor</A>
+					</TD>
+					<TD class="formcontrol">
+						 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&activityID=<c:out value="${possibleChildActivity.activityID}"/>');">
+						 Define Later</A><BR>
+					</TD>
+				</TR>
+				</c:if>
+				</c:forEach>
+				</TABLE>
 			</TD>
 		</TR>
-			<TABLE>
-			<c:forEach var="childActivity" items="${activity.activities}">
-			<TR>
-				<TD class="formcontrol">
-					--> Activity <c:out value="${childActivity.activityId}"/> <c:out value="${childActivity.title}"/>:
-				</TD>
-				<TD class="formcontrol">
-					 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&activityID=<c:out value="${childActivity.activityId}"/>');">
-					 Monitor</A>
-				</TD>
-				<TD class="formcontrol">
-					 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&activityID=<c:out value="${childActivity.activityId}"/>');">
-					 Define Later</A><BR>
-				</TD>
-			</TR>
-			</c:forEach>
-			</TABLE>
 		</c:when>
 
-		<c:when test="${activity.parentActivity == null}"> 
+		<c:when test="${empty activity.parentActivityID}"> 
 		<!-- Only show the activities without a parent. Those with a parent will be displayed by the parent activity -->
 		<TR>
 			<TD class="formcontrol">
-				Activity <c:out value="${activity.activityId}"/> <c:out value="${activity.title}"/>:
+				Activity <c:out value="${activity.activityID}"/> <c:out value="${activity.title}"/>:
 			</TD>
 			<TD class="formcontrol">
-				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&activityID=<c:out value="${activity.activityId}"/>');">
+				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoMonitoringActivityURL&activityID=<c:out value="${activity.activityID}"/>');">
 				 Monitor</A>
 			</TD>
 			<TD class="formcontrol">
-				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&activityID=<c:out value="${activity.activityId}"/>');">
+				 <A HREF="javascript:launchPopup('/lams/monitoring/dummy.do?method=gotoDefineLaterActivityURL&activityID=<c:out value="${activity.activityID}"/>');">
 				 Define Later</A><BR>
 			</TD>
 		</TR>

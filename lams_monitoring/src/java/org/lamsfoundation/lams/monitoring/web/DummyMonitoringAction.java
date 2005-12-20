@@ -23,9 +23,11 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +37,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
@@ -91,6 +95,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
 
     private static final String LESSON_PARAMETER = "lesson";
     private static final String LESSONS_PARAMETER = "lessons";
+    private static final String ACTIVITIES_PARAMETER = "activities";
     private static final String ORGS_PARAMETER = "organisations";
     private static final String DESIGNS_PARAMETER = "designs";
     
@@ -262,10 +267,31 @@ public class DummyMonitoringAction extends LamsDispatchAction
     	List lessons = monitoringService.getAllLessons(user.getUserId());
     	
     	Iterator iter = lessons.iterator();
-    	while (iter.hasNext()) {
+		boolean found = false;
+    	while (iter.hasNext() && !found) {
 			Lesson element = (Lesson) iter.next();
-			if ( element.getLessonId().equals(lessonId) )
+			if ( element.getLessonId().equals(lessonId) ) {
+				// this is nasty code but it will do for the dummy screen.
+			    // can't just use the activities out of the learning design
+				// as we get CGLIB objects! If this was permanent code,
+				// then we would generate the data properly in the service level.
+				log.debug("Found lesson "+lessonId+" "+element.getLessonName());
+				Set activities = element.getLearningDesign().getActivities();
+				Set activityDTOSet= new HashSet();
+				Iterator actIterator = activities.iterator();
+				while (actIterator.hasNext()) {
+					Activity activity = (Activity) actIterator.next();
+					AuthoringActivityDTO dto = activity.getAuthoringActivityDTO();
+					activityDTOSet.add(dto);
+					log.debug("Activity "+activity);
+				}
+				// now that all the activities are loaded, we can copy them into our own set.
+				
+				
+				// add desired lesson and activities to the session
 			    request.getSession().setAttribute(LESSON_PARAMETER,element);
+			    request.getSession().setAttribute(ACTIVITIES_PARAMETER, activityDTOSet);
+			}
 		}
     	return mapping.findForward(DETAIL_FORWARD);
 
