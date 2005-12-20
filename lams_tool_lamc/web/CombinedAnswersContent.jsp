@@ -3,7 +3,8 @@
 <%@ taglib uri="tags-logic-el" prefix="logic-el" %>
 <%@ taglib uri="tags-c" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
+<%@ taglib uri="tags-fck-editor" prefix="FCK" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 	<!--options content goes here-->
 				<table align=center bgcolor="#FFFFFF">
