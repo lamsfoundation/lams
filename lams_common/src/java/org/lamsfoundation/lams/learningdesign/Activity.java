@@ -493,8 +493,11 @@ public abstract class Activity implements Serializable,Nullable {
 	}	
 	
 	public String toString() {
-		return new ToStringBuilder(this).append("activityId", getActivityId())
-				.toString();
+		return new ToStringBuilder(this)
+			.append("activityId", activityId)
+			.append("activityUIID", activityUIID)
+			.append("description", description)
+			.toString();
 	}
 
 	public boolean equals(Object other) {
