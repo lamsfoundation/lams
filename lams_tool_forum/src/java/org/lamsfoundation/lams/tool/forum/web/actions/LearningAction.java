@@ -392,6 +392,7 @@ public class LearningAction extends Action {
 		forumService = getForumManager();
 		Long rootTopicId = forumService.getRootTopicId(topicId);
 		List msgDtoList = forumService.getTopicThread(rootTopicId);
+		setAuthorMark(msgDtoList);
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD,msgDtoList);
 		
 		return mapping.findForward("success");

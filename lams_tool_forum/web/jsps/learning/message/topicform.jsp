@@ -7,8 +7,8 @@
 	</tr>
 	<tr>
 		<td valign="MIDDLE"><b><bean:message key="message.label.body" /></b></td>
-		<td valign="TOP"><b class="required">*</b><html:textarea rows="10" cols="60"
-			tabindex="2" property="message.body" /> 
+		<td valign="TOP"><b class="required">*</b><lams:STRUTS-textarea rows="10" cols="60"
+			tabindex="2" property="message.body"/> 
 			<BR><html:errors property="message.body" /></td>
 	</tr>
 	<tr>
