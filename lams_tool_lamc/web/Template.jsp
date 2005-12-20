@@ -22,25 +22,12 @@ http://www.gnu.org/licenses/gpl.txt
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-c" prefix="c" %>
+<%@ taglib uri="tags-fck-editor" prefix="FCK" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html locale = "true">
-    <head>
-       <html:base/>
-	  <fmt:setBundle basename = "org.lamsfoundation.lams.tool.mc.McResources" />
-      <title><tiles:getAsString name="title"/></title>
-      <meta http-equiv="pragma" content="no-cache">
-      <meta http-equiv="cache-control" content="no-cache">
-	  <script language="JavaScript" type="text/JavaScript">   
-	        <!--
-	        function pviiClassNew(obj, new_style) { //v2.7 by PVII
-	            obj.className=new_style;
-	        }
-	        //-->
-	  </script>
-	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
-    </head>
     
     <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
       <table width="900" border="0" cellspacing="0" cellpadding="0" align="center"> 
