@@ -100,6 +100,11 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());
     public final static String FORM="NbAuthoringForm";
     
+    public static final String AUTHOR_MODE = "authorMode";
+    public static final String DEFINE_LATER_MODE = "defineLaterMode";    
+    public static final String SHOW_BASIC_TAB = "showBasicContent";
+    
+    
     /** Get the user from the shared session */
 	public UserDTO getUser(HttpServletRequest request) {
 		// set up the user details
@@ -146,11 +151,17 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		
 		/* if there is a defineLater request parameter, set the form value
 		 * If a defineLater request parameter is not present, then it is just set to null.
-		 * This is used in the basic screen, if defineLater is set, then in the basic page,
-		 * the three tabs {Basic, Advanced, Instructions} are not visible.
+		 * This is used in the basic screen, if defineLater is set, then in the authoring page,
+		 * the two tabs {Advanced, Instructions} are not visible.
+		 * 
+		 * If defineLater is set to true, then mode is set to Monitor. The request scope parameter
+		 * showBasicContent is set to true so that the authoring page will only show the basic tab.
+		 * 
+		 * If defineLater is not set, then mode is set to Author
 		 */
 		nbForm.setDefineLater((String)request.getParameter(NoticeboardConstants.DEFINE_LATER));
-
+		setModeOfUse(request, nbForm.getDefineLater());
+		
 		request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, contentId);
 							
 		/*
@@ -297,8 +308,14 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
 		    	deletedAttachmentList = saveAttachments(nbService, nbContent, attachmentList, deletedAttachmentList, mapping, request);
 		    	NbWebUtil.addUploadsToSession(request, attachmentList, deletedAttachmentList);
 
+		    	if (request.getSession().getAttribute(NoticeboardConstants.MODE).equals(DEFINE_LATER_MODE))
+		    		request.setAttribute(SHOW_BASIC_TAB, "true");
+		    		
 		    	return mapping.findForward(NoticeboardConstants.AUTHOR_PAGE);
+		    	
     		}
+    	  
+    	
     		
 	  		/** 
 	  		* Go through the attachments collections. Remove any content repository or tool objects
@@ -552,6 +569,24 @@ public class NbAuthoringAction extends LamsLookupDispatchAction {
     		    nbContent.setOfflineInstructions((String)request.getParameter(NoticeboardConstants.RICH_TEXT_OFFLINE_INSTRN));
     		    
     		} */
+    		
+    		/**
+    		 * 
+    		 */
+    		private void setModeOfUse(HttpServletRequest request, String defineLater)
+    		{    			
+    			if (defineLater != null )
+    			{
+    				if (defineLater.equals("true"))
+    				{
+    					request.getSession().setAttribute(NoticeboardConstants.MODE, DEFINE_LATER_MODE);
+    					request.setAttribute(SHOW_BASIC_TAB, "true");	
+    				}
+    			}
+    			else
+    				request.getSession().setAttribute(NoticeboardConstants.MODE, AUTHOR_MODE);
+
+    		}
     		
 
 }	
