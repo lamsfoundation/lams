@@ -111,5 +111,4 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageHeader" value = "MCQ Tool Results Summary"/>
 		<put name="content" value="/learning/ResultsSummary.jsp" />	
 	</definition>
-
 </tiles-definitions>
