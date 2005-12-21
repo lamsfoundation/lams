@@ -73,8 +73,9 @@ public interface McAppConstants {
     public static final String CURRENT_TAB 								= "currentTab";
     public static final String MAX_QUESTION_INDEX 						= "maxQuestionIndex";
     public static final String COPY_TOOL_CONTENT 						= "copyToolContent";
+    public static final String REMOVE_TOOL_CONTENT 						= "removeToolContent";
     
-	
+   
 	/*
 	 * Mock constants below are temporary until the tool gets a User object from the container.
 	 */
@@ -117,6 +118,7 @@ public interface McAppConstants {
     public static final boolean MODE_OPTIONAL 							= false;
     public static final String DISABLE_TOOL								="disabled";
     public static final String IS_DEFINE_LATER							="isDefineLater";
+    public static final String DEFINE_LATER_CONTENT						="defineLaterContent";
     
     /*
      * authoring mode controllers
@@ -135,6 +137,7 @@ public interface McAppConstants {
     public static final String CHOICE_TYPE_BASIC						="choiceTypeBasic";
     public static final String CHOICE_TYPE_ADVANCED						="choiceTypeAdvanced";
     public static final String CHOICE_TYPE_INSTRUCTIONS					="choiceTypeInstructions";
+    public static final String IS_DEFINE_LATER_URL						="isDefineLaterUrl";
     public static final String EDIT_OPTIONS_MODE						="editOptionsMode";
     public static final String SUBMIT_SUCCESS							="sbmtSuccess";
     public static final String FILE_CONTENT								="fileContent";
