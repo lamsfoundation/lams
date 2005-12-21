@@ -3,30 +3,32 @@
  * 
  * McStarterAction loads the default content and initializes the presentation Map.
  * Initializes the tool's authoring mode
- * Requests can come either from authoring envuironment or from the monitoring environment for Edit Activity screen
+ * Requests can come either from authoring environment or from the monitoring environment for Edit Activity screen
  * 
  * Tool path The URL path for the tool should be <lamsroot>/tool/$TOOL_SIG.  
  * 
-<action path="/authoringStarter" type="org.lamsfoundation.lams.tool.mc.web.McStarterAction" 
-		name="McAuthoringForm" input=".starter"> 
-	<forward
-    name="load"
-    path=".questions"
-    redirect="true"
-	/>
-	
-	<forward
-    name="error"
-    path=".error"
-    redirect="true"
-	/>
+	<!--Authoring Starter  -->
+   <action path="/authoringStarter" type="org.lamsfoundation.lams.tool.mc.web.McStarterAction" 
+   			name="McAuthoringForm" input=".starter"> 
+	  	<forward
+		    name="load"
+		    path=".questions"
+		    redirect="true"
+	  	/>
+	  	
+	  	<forward
+		    name="error"
+		    path=".error"
+		    redirect="true"
+	  	/>
 
-	<forward
-    name="errorList"
-    path=".errorList"
-    redirect="true"
-	/>
-</action>  
+	  	<forward
+		    name="errorList"
+		    path=".errorList"
+		    redirect="true"
+	  	/>
+	</action>  
+  
 */
 
 package org.lamsfoundation.lams.tool.mc.web;
@@ -60,6 +62,7 @@ import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 
+
 public class McStarterAction extends Action implements McAppConstants {
 	/*
 	 * CONTENT_LOCKED refers to content being in use or not: Any students answered that content?
@@ -72,13 +75,24 @@ public class McStarterAction extends Action implements McAppConstants {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {
-		IMcService mcService = McUtils.getToolService(request);
-		logger.debug("retrieving mcService from session: " + mcService);
+		
+		IMcService mcService = (IMcService)request.getSession().getAttribute(TOOL_SERVICE);
+		logger.debug("will retrieve mcService"  + mcService);
+		
+		Boolean isDefineLaterUrl =(Boolean)request.getAttribute(IS_DEFINE_LATER_URL);
+		logger.debug("isDefineLaterUrl in request"  + isDefineLaterUrl);
+		
+		if ((isDefineLaterUrl != null) && (isDefineLaterUrl.booleanValue() == true))
+			request.getSession().setAttribute(IS_DEFINE_LATER_URL, new Boolean(true));
+		else
+			request.getSession().setAttribute(IS_DEFINE_LATER_URL, new Boolean(false));
+		
 		if (mcService == null)
 		{
+			logger.debug("will retrieve mcService");
 			mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 		    logger.debug("retrieving mcService from proxy: " + mcService);
-		    request.getSession().setAttribute(TOOL_SERVICE, mcService);		
+		    request.getSession().setAttribute(TOOL_SERVICE, mcService);	
 		}
 
 		initialiseAttributes(request);
@@ -151,6 +165,18 @@ public class McStarterAction extends Action implements McAppConstants {
 				}
 			}
 	    	
+	    	String removeToolContent= (String) request.getParameter(REMOVE_TOOL_CONTENT);
+	    	logger.debug("removeToolContent: " + removeToolContent);
+	    	
+	    	if ((removeToolContent != null) && (removeToolContent.equals("1")))
+			{
+		    	logger.debug("user request to remove the content");
+		    	Long fromContentId=new Long(strToolContentId);
+		    	logger.debug("fromContentId: " + fromContentId);
+		    	
+		    	mcService.removeToolContent(fromContentId);	
+			}
+
 	    	
 	    	/*
 			 * find out if the passed tool content id exists in the db 
@@ -666,6 +692,18 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
+	}
+	
+	
+	public ActionForward executeDefineLater(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest request, HttpServletResponse response, IMcService mcService) 
+		throws IOException, ServletException, McApplicationException {
+		logger.debug("passed mcService: " + mcService);
+		request.getSession().setAttribute(TOOL_SERVICE, mcService);
+		
+		request.getSession().setAttribute(IS_DEFINE_LATER_URL, new Boolean(true));
+		request.setAttribute(IS_DEFINE_LATER_URL,new Boolean(true));
+		return execute(mapping, form, request, response);
 	}
 	
 	
