@@ -75,6 +75,8 @@ import org.lamsfoundation.lams.web.action.LamsLookupDispatchAction;
 public class NbMonitoringAction extends LamsLookupDispatchAction {
     
     static Logger logger = Logger.getLogger(NbMonitoringAction.class.getName());
+    
+    public final static String FORM="NbMonitoringForm";
    
     protected Map getKeyMethodMap()
 	{
@@ -87,16 +89,45 @@ public class NbMonitoringAction extends LamsLookupDispatchAction {
 	}
 
     /**
-     * If no method parameter, or an unknown key, it will default to displaying
-     * the summary page.
-     */
+     * If no method parameter, or an unknown key, it will 
+	 * Setup the monitoring environment, and places values in the
+	 * formbean in session scope.
+	 */
     public ActionForward unspecified(
     		ActionMapping mapping,
     		ActionForm form,
     		HttpServletRequest request,
     		HttpServletResponse response) throws NbApplicationException
     {
-        return summary(mapping, form, request, response);
+        //return summary(mapping, form, request, response);
+    	 NbMonitoringForm monitorForm = new NbMonitoringForm();
+         
+         INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
+         NbWebUtil.cleanMonitoringSession(request);
+         Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
+         
+         if (toolContentId == null)
+ 		{
+ 		    String error = "Unable to continue. Tool content id missing";
+ 		    logger.error(error);
+ 			throw new NbApplicationException(error);
+ 		}
+         monitorForm.setToolContentID(toolContentId.toString());
+         
+       //  request.getSession().setAttribute(NoticeboardConstants.TOOL_CONTENT_ID_INMONITORMODE, toolContentId);
+         
+         NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
+         if (content == null)
+         {
+             String error = "Unable to continue. Data is missing from the database. Tool content id " + toolContentId + " does not exist";
+ 		    logger.error(error);
+ 			throw new NbApplicationException(error);
+         }
+         NbWebUtil.copyValuesIntoSession(request, content);
+         
+         request.getSession().setAttribute(FORM, monitorForm);
+      
+         return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
   
     /**
