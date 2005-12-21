@@ -151,7 +151,7 @@
 		<java>struts-el.jar</java>
 	</module>
 	<module>
-		<java>wddx-1.0a-lfl-0.2.jar</java>
+		<java>wddx.jar</java>
 	</module>
 	<module>
 		<java>quartz.jar</java>
