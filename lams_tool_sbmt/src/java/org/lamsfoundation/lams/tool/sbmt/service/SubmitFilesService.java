@@ -118,7 +118,7 @@ public class SubmitFilesService implements ToolContentManager,
 		//clear ToolSession
 		toContent.setToolSession(new HashSet());
 
-		submitFilesContentDAO.insert(toContent);
+		submitFilesContentDAO.saveOrUpdate(toContent);
 	}
     /**
      * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsRunOffline(java.lang.Long)
