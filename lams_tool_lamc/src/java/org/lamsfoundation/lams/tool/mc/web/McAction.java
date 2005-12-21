@@ -67,13 +67,13 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * <code>CustomStrutsExceptionHandler<code>.
  * 
  
-	<action
+		<action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.mc.web.McAction"
       name="McAuthoringForm"
       scope="session"
       input=".questions"
-      parameter="method"
+      parameter="dispatch"
       unknown="false"
       validate="true"
     >
@@ -89,16 +89,9 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
         redirect="true"
       />
       
-      
       <forward
         name="editOptsContent"
         path=".editOptsContent"
-        redirect="true"
-      />
-      
-       <forward
-        name="allInstructions"
-        path=".allInstructions"
         redirect="true"
       />
     </action>
