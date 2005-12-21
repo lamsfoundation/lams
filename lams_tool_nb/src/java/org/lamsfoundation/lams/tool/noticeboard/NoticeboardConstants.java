@@ -69,6 +69,8 @@ public class NoticeboardConstants
     // Session Attributes
     // --------------------------------------------
     
+  
+    
     //used in monitoring
     public static final String TITLE = "title";
     public static final String CONTENT = "content";
@@ -83,6 +85,7 @@ public class NoticeboardConstants
     public static final String EXPORT_PORTFOLIO = "exportPortfolio";
     
     //used in authoring
+    public static final String MODE = "mode";
     public static final String TOOL_CONTENT_ID = "toolContentID";  //request + session variable
     public static final String RICH_TEXT_TITLE = "richTextTitle";
     public static final String RICH_TEXT_CONTENT = "richTextContent";
