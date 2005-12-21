@@ -4,22 +4,22 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 
-insert into lams_workspace values(1,null,'ROOT');
-insert into lams_workspace values(2,null,'MACQUIRE UNIVERSITY');
-insert into lams_workspace values(3,null,'MELCOE');
-insert into lams_workspace values(4,null,'LAMS');
-insert into lams_workspace values(5,null,'MAMS');
-insert into lams_workspace values(6,null,'Mary Morgan');
-insert into lams_workspace values(7,null,'One Test');
-insert into lams_workspace values(8,null,'Two Test');
-insert into lams_workspace values(9,null,'Three Test');
-insert into lams_workspace values(10,null,'Four Test');
+insert into lams_workspace values(1,null,null,'ROOT');
+insert into lams_workspace values(2,null,null,'Macquarie University');
+insert into lams_workspace values(3,null,null,'MELCOE');
+insert into lams_workspace values(4,null,null,'LAMS');
+insert into lams_workspace values(5,null,null,'MAMS');
+insert into lams_workspace values(6,null,null,'Mary Morgan');
+insert into lams_workspace values(7,null,null,'One Test');
+insert into lams_workspace values(8,null,null,'Two Test');
+insert into lams_workspace values(9,null,null,'Three Test');
+insert into lams_workspace values(10,null,null,'Four Test');
 
 INSERT INTO lams_organisation VALUES (1, 'Root', 'Root Organisation',null,1,NOW(),1);
 INSERT INTO lams_organisation VALUES (2, 'Maquarie Uni', 'Macquarie University',1,2,NOW(),2);
-INSERT INTO lams_organisation VALUES (3, 'MELCOE', 'Macquarie E-learning Center',2,3,NOW(),3);
-INSERT INTO lams_organisation VALUES (4, 'LAMS', 'Lams Project Team',3,3,NOW(),4);
-INSERT INTO lams_organisation VALUES (5, 'MAMS', 'Mams Project Team',3,3,NOW(),5);
+INSERT INTO lams_organisation VALUES (3, 'MELCOE', 'Macquarie E-Learning Centre Of Excellence',2,3,NOW(),3);
+INSERT INTO lams_organisation VALUES (4, 'LAMS', 'LAMS Project Team',3,3,NOW(),4);
+INSERT INTO lams_organisation VALUES (5, 'MAMS', 'MAMS Project Team',3,3,NOW(),5);
 
 
 INSERT INTO lams_user_organisation VALUES (1, 1, 1);
@@ -226,5 +226,11 @@ update lams_workspace set root_folder_id = 13 where workspace_id = 7;
 update lams_workspace set root_folder_id = 15 where workspace_id = 8;
 update lams_workspace set root_folder_id = 17 where workspace_id = 9;
 update lams_workspace set root_folder_id = 19 where workspace_id = 10;
+
+update lams_workspace set def_run_seq_fld_id = 7 where workspace_id = 6;
+update lams_workspace set def_run_seq_fld_id = 14 where workspace_id = 7;
+update lams_workspace set def_run_seq_fld_id = 16 where workspace_id = 8;
+update lams_workspace set def_run_seq_fld_id = 18 where workspace_id = 9;
+update lams_workspace set def_run_seq_fld_id = 20 where workspace_id = 10;
 
 SET FOREIGN_KEY_CHECKS=1;
