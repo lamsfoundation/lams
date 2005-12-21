@@ -61,6 +61,11 @@
 						                   		<fmt:message key="link.view" />
 						                    </a>
 						               	</td>
+						                <td>
+							            	<html:link page="<%=download%>" styleClass="button">
+							                	<fmt:message key="link.download" />
+							                </html:link>
+						                </td>
 						                
 						           	</tr>
 					            </table>
