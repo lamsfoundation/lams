@@ -94,6 +94,29 @@
       />
     </action>
     
+    
+    <!--Define Later Starter  -->
+   <action path="/defineLaterStarter" type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
+   			name="McAuthoringForm" input=".starter"> 
+	  	<forward
+		    name="load"
+		    path=".questions"
+		    redirect="true"
+	  	/>
+	  	
+	  	<forward
+		    name="error"
+		    path=".error"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+		    name="errorList"
+		    path=".errorList"
+		    redirect="true"
+	  	/>
+	</action>  
+    
    <!--Learning Starter  -->
    <action path="/learningStarter" type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
    			name="McLearningForm" input=".learningStarter"> 
