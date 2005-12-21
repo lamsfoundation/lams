@@ -1341,6 +1341,31 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
 
+   
+    
+    public ActionForward editActivityQuestions(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException,
+                                         ServletException
+
+    {
+    	logger.debug("dispatching editActivityQuestions...");
+    	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+	 	IMcService mcService =McUtils.getToolService(request);
+	 	
+	 	AuthoringUtil.readData(request, mcAuthoringForm);
+	 	
+     	String userAction="editActivityQuestions";
+		request.setAttribute(USER_ACTION, userAction);
+		logger.debug("userAction:" + userAction);
+		
+		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
+		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
+		
+		return (mapping.findForward(LOAD_QUESTIONS));
+    }
+    
     
     /**
      * submits questions Map and persists questions as well as options information in the db.
