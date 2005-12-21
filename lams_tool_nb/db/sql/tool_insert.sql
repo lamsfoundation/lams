@@ -47,7 +47,7 @@ NULL,
 'tool/lanb11/authoring.do',
 'tool/lanb11/authoring.do?defineLater=true',
 'tool/lanb11/portfolioExport',
-'tool/lanb11/starter/monitor.do',
+'tool/lanb11/monitoring.do',
 NULL,
 NULL,
 NOW()
