@@ -72,47 +72,47 @@
 <body onLoad="initTabs()">
 
 	<b> <bean:message key="label.authoring.mc"/> </b>
-	    
 	
-	<!-- start tabs -->
-	<!-- tab holder table -->
-	<table border="0" cellspacing="0" cellpadding="0">
-	  <tr>
-	    <td valign="bottom">
-		<!-- table for tab 1 (basic)-->
+		<!-- start tabs -->
+		<!-- tab holder table -->
 		<table border="0" cellspacing="0" cellpadding="0">
 		  <tr>
-			<td><a href="#"  onClick="showTab('b');return false;" ><img src="author_page/images/aqua_tab_s_left.gif" name="tab_left_b" width="8" height="25" border="0" id="tab_left_b"/></a></td>
-			<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_b"  onClick="showTab('b');return false;" ><label for="b" accesskey="b"><a href="#" onClick="showTab('b');return false;" id="b" >Basic</a></label></td>
-			<td><a href="#" onClick="showTab('b');return false;"><img src="author_page/images/aqua_tab_s_right.gif"  name="tab_right_b" width="8" height="25" border="0" id="tab_right_b"/></a></td>
+			    <td valign="bottom">
+					<!-- table for tab 1 (basic)-->
+					<table border="0" cellspacing="0" cellpadding="0">
+					  <tr>
+						<td><a href="#"  onClick="showTab('b');return false;" ><img src="author_page/images/aqua_tab_s_left.gif" name="tab_left_b" width="8" height="25" border="0" id="tab_left_b"/></a></td>
+						<td class="tab tabcentre_selected" width="90" id="tab_tbl_centre_b"  onClick="showTab('b');return false;" ><label for="b" accesskey="b"><a href="#" onClick="showTab('b');return false;" id="b" >Basic</a></label></td>
+						<td><a href="#" onClick="showTab('b');return false;"><img src="author_page/images/aqua_tab_s_right.gif"  name="tab_right_b" width="8" height="25" border="0" id="tab_right_b"/></a></td>
+					  </tr>
+					</table>
+				</td>
+				
+				<c:if test="${sessionScope.isDefineLaterUrl != 'true'}"> 			
+				    <td valign="bottom">
+						<!-- table for tab 2 (advanced) -->
+						<table border="0" cellspacing="0" cellpadding="0">
+						  <tr>
+							<td><a href="#" onClick="showTab('a');return false;"><img src="author_page/images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
+							<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');return false;"><label for="a" accesskey="a"><a href="#" onClick="showTab('a');return false;" id="a" >Advanced</a></label></td>
+							<td><a href="#" onClick="showTab('a');return false;"><img src="author_page/images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
+						  </tr>
+						</table>
+					</td>
+				    <td valign="bottom">
+						<!-- table for ab 3 (instructions) -->
+						<table border="0" cellspacing="0" cellpadding="0">
+						  <tr>
+							<td ><a href="#" onClick="showTab('i');return false;"><img border="0" src="author_page/images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
+							<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');return false;" ><label for="i" accesskey="i"><a href="#" onClick="showTab('i');return false;" id="i" >Instructions</a></label></td>
+							<td ><a href="#" onClick="showTab('i');return false;"><img src="author_page/images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
+						  </tr>
+						</table>
+					</td>
+				</c:if> 				
 		  </tr>
 		</table>
-	
-	</td>
-	    <td valign="bottom">
-		<!-- table for tab 2 (advanced) -->
-		<table border="0" cellspacing="0" cellpadding="0">
-		  <tr>
-			<td><a href="#" onClick="showTab('a');return false;"><img src="author_page/images/aqua_tab_left.gif" name="tab_left_a" width="8" height="22" border="0" id="tab_left_a" /></a></td>
-			<td class="tab tabcentre" width="90" id="tab_tbl_centre_a" onClick="showTab('a');return false;"><label for="a" accesskey="a"><a href="#" onClick="showTab('a');return false;" id="a" >Advanced</a></label></td>
-			<td><a href="#" onClick="showTab('a');return false;"><img src="author_page/images/aqua_tab_right.gif" name="tab_right_a" width="9" height="22" border="0" id="tab_right_a" /></a></td>
-		  </tr>
-		</table>
-	
-	</td>
-	    <td valign="bottom">
-		<!-- table for ab 3 (instructions) -->
-		<table border="0" cellspacing="0" cellpadding="0">
-		  <tr>
-			<td ><a href="#" onClick="showTab('i');return false;"><img border="0" src="author_page/images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
-			<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');return false;" ><label for="i" accesskey="i"><a href="#" onClick="showTab('i');return false;" id="i" >Instructions</a></label></td>
-			<td ><a href="#" onClick="showTab('i');return false;"><img src="author_page/images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
-		  </tr>
-		</table>
-	
-	</td>
-	  </tr>
-	</table>
+
 	
 	<!-- end tab buttons -->
 	
@@ -145,43 +145,42 @@
 				<!-- end of content_b -->
 	</div>
 		
-	
-	<div id='content_a'  class="tabbody content_a">
-		<h2>Advanced Definitions </h2>
-		
-			<table align=center> 	  
-			<tr>   
-			<td NOWRAP class=error>
-				<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
-			</td>
-			</tr> 
-			</table>
-		
-		<div id="formtablecontainer2">
-					<jsp:include page="/authoring/AdvancedContent.jsp" />
-		</div>
-	</div>
-	
-	
-	<div id='content_i'  class="tabbody content_i">
-			<h2>Instructions</h2>
-	
-			<table align=center> 	  
-			<tr>   
-			<td NOWRAP class=error>
-				<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
-			</td>
-			</tr> 
-			</table>
+	<c:if test="${sessionScope.isDefineLaterUrl != 'true'}"> 			
+		<div id='content_a'  class="tabbody content_a">
+			<h2>Advanced Definitions </h2>
 			
-			<div id="formtablecontainer3">
-					<jsp:include page="/authoring/InstructionsContent.jsp" />
+				<table align=center> 	  
+				<tr>   
+				<td NOWRAP class=error>
+					<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
+				</td>
+				</tr> 
+				</table>
+			
+			<div id="formtablecontainer2">
+						<jsp:include page="/authoring/AdvancedContent.jsp" />
 			</div>
-	</div>
-	
+		</div>
+		
+		
+		<div id='content_i'  class="tabbody content_i">
+				<h2>Instructions</h2>
+		
+				<table align=center> 	  
+				<tr>   
+				<td NOWRAP class=error>
+					<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
+				</td>
+				</tr> 
+				</table>
+				
+				<div id="formtablecontainer3">
+						<jsp:include page="/authoring/InstructionsContent.jsp" />
+				</div>
+		</div>
+	</c:if> 				
 	</html:form>
 	<p></p>
- 
 </body>
 </html:html>
 
