@@ -75,6 +75,7 @@ public class Workspace implements Serializable {
         this.rootFolder = workspaceFolder;
     }
 
+    
     /** 
      *            @hibernate.set
      *             lazy="true"
@@ -125,6 +126,10 @@ public class Workspace implements Serializable {
         return new EqualsBuilder()
             .append(this.getWorkspaceId(), castOther.getWorkspaceId())
             .isEquals();
+    }
+
+    public WorkspaceFolder getDefaultRunSequenceFolder() {
+        return null;	
     }
 
     public int hashCode() {
