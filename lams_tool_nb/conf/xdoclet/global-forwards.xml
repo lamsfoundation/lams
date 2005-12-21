@@ -1,4 +1,4 @@
 <global-forwards>
  	<forward name="forwardToAuthorPage"
-          path="/starter/authoring.do"/>
+          path="/authoring.do"/>
  </global-forwards> 
