@@ -7,6 +7,25 @@
 
 <beans>
 
+ 	<!-- Hibernate Properties. Should be used by all Hibernate session factories unless -->
+  	<!--  the tool has a specific need for a different setting. 						-->			
+  	<!-- If you change hibernate.treecache.objectName, you will also need to change the -->
+  	<!--  cacheManager object 															-->
+  	<bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+	  	<property name="properties">
+		<props>
+			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+			<prop key="hibernate.show_sql">false</prop>
+			<prop key="hibernate.c3p0.minPoolSize">5</prop>
+			<prop key="hibernate.c3p0.maxPoolSize">20</prop>
+			<prop key="hibernate.c3p0.timeout">1800</prop>
+			<prop key="hibernate.c3p0.max_statement">50</prop>
+  			<prop key="hibernate.cache.provider_class">org.jboss.hibernate.cache.DeployedTreeCacheProvider</prop>
+			<prop key="hibernate.treecache.objectName">jboss.cache:service=TreeCache</prop>
+		</props>
+		</property>
+  	</bean>
+  	
 	<import resource="commonContext.xml"/>
 
 	<!-- JNDI DataSource for all "core" components 		  -->
