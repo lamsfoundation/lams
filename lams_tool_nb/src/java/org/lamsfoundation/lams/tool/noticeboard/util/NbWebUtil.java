@@ -63,6 +63,7 @@ public class NbWebUtil {
 	 	public static void cleanAuthoringSession(HttpServletRequest request)
 	 	{
 	 	    request.getSession().removeAttribute(NoticeboardConstants.TOOL_CONTENT_ID);
+	 	    request.getSession().removeAttribute(NoticeboardConstants.MODE);
 	 	    request.getSession().removeAttribute(NoticeboardConstants.ATTACHMENT_LIST);
 	 	    request.getSession().removeAttribute(NoticeboardConstants.DELETED_ATTACHMENT_LIST);
 	 	}
