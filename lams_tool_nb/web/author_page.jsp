@@ -56,6 +56,7 @@ MM_reloadPage(true);
 	</table>
 
 </td>
+<c:if test="${requestScope.showBasicContent != 'true'}">
     <td valign="bottom">
 	<!-- table for tab 2 (advanced) -->
 	<table border="0" cellspacing="0" cellpadding="0">
@@ -68,7 +69,7 @@ MM_reloadPage(true);
 
 </td>
     <td valign="bottom">
-	<!-- table for ab 3 (instructions) -->
+	<!-- table for tab 3 (instructions) -->
 	<table border="0" cellspacing="0" cellpadding="0">
 	  <tr>
 		<td ><a href="#" onClick="showTab('i');return false;"><img border="0" src="<c:out value="${lams}"/>images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
@@ -78,6 +79,8 @@ MM_reloadPage(true);
 	</table>
 
 </td>
+</c:if>
+
   </tr>
 </table>
     <!-- end tab buttons -->
