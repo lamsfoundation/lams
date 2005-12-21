@@ -3,7 +3,7 @@
 <%@ taglib uri="tags-logic-el" prefix="logic-el" %>
 <%@ taglib uri="tags-c" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="fck-editor" prefix="FCK" %>
+<%@ taglib uri="tags-fck-editor" prefix="FCK" %>
 
 	<!-- this form  exists temporarily to represent tool icon, remove this form once the tool is deployed into authoring environment -->
 <%
@@ -12,6 +12,8 @@
 	String toolUrl="/authoringStarter?userId=" + userId + "&toolContentID=" + userContentId;
 	
 	String strCopyToolContent="/authoringStarter?userId=" + userId + "&toolContentID=" + userContentId + "&copyToolContent=1";
+	String strRemoveToolContent="/authoringStarter?userId=" + userId + "&toolContentID=" + userContentId + "&removeToolContent=1";
+	String strDefineLater="/defineLaterStarter?userId=" + userId + "&toolContentID=" + userContentId;
 %>
 
 Start authoring module
@@ -28,6 +30,19 @@ Copy Tool Content
       <html:submit value="Copy Tool Content"/>
 </html:form>
 
+Remove Tool Content
+<html:form action="<%=strRemoveToolContent%>" method="post">
+      <table border=1>
+      </table><br/>
+      <html:submit value="Remove Tool Content"/>
+</html:form>
+
+Define Later Url
+<html:form action="<%=strDefineLater%>" method="post">
+      <table border=1>
+      </table><br/>
+      <html:submit value="Define Later URL"/>
+</html:form>
 
 
 
