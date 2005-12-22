@@ -32,7 +32,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -57,9 +56,8 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dao.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IWorkspaceFolderDAO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -97,10 +95,8 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     
     private ILessonDAO lessonDAO;    
     private ILessonClassDAO lessonClassDAO;        
-    private IOrganisationDAO organisationDAO;
     private ITransitionDAO transitionDAO;
     private IActivityDAO activityDAO;
-    private IUserDAO userDAO;        
     private IWorkspaceFolderDAO workspaceFolderDAO;
     private ILearningDesignDAO learningDesignDAO;
     private IAuthoringService authoringService;
@@ -109,7 +105,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     private Scheduler scheduler;
     private ApplicationContext applicationContext;
     
-    private ILearnerService learnerService;
     //---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     //---------------------------------------------------------------------
@@ -140,12 +135,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
 		this.transitionDAO = transitionDAO;
 	}
 
-	/**
-	 * @param userDAO The userDAO to set.
-	 */
-	public void setUserDAO(IUserDAO userDAO) {
-		this.userDAO = userDAO;
-	}
     /**
      * @param authoringService The authoringService to set.
      */
@@ -192,9 +181,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     {
         this.applicationContext=applicationContext;
     }
-	public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
-		this.organisationDAO = organisationDAO;
-	}
 	
     /**
      * @param scheduler The scheduler to set.
@@ -202,14 +188,6 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
-    }
-    
-    /**
-     * @param learnerService The learnerService to set
-     */
-    public void setLearnerService(ILearnerService learnerService)
-    {
-        this.learnerService = learnerService;
     }
     
     //---------------------------------------------------------------------
@@ -223,23 +201,37 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      * <li>2. Go through all the tool activities defined in the learning design,
      * 		  create a runtime copy of all tool's content.</li>
      * 
+     * <P>Tries to copy the design into the user's default runtime sequence folder. If
+     * this is not available, then it is copied into the existing folder.</P>
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLesson(long, org.lamsfoundation.lams.usermanagement.User, java.util.List, java.util.List)
      */
     public Lesson initializeLesson(String lessonName,
                                String lessonDescription,
                                long learningDesignId,
-                               User user) 
+                               Integer userID) 
     {
+    	
         LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
         if ( originalLearningDesign == null) {
         	throw new MonitoringServiceException("Learning design for id="+learningDesignId+" is missing. Unable to initialize lesson.");
+        }
+        
+        // The duplicated sequence should go in the run sequences folder, so we had better 
+        // wourk out what the folder is!
+    	User user = (userID != null ? userManagementService.getUserById(userID) : null);
+        Workspace workspace = (user != null ? user.getWorkspace() : null);
+        WorkspaceFolder destinationFolder = ( workspace!=null ? workspace.getDefaultRunSequencesFolder() : null);
+        if ( destinationFolder == null ) {
+        	log.error("initializeLesson: Copying learning design "+learningDesignId+" for userID "+userID
+        			+". Unable to determine runtime sequence folder - copying into folder of the original design");
+        	destinationFolder = originalLearningDesign.getWorkspaceFolder(); 
         }
         
         //copy the current learning design
         LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
                                                                                   new Integer(LearningDesign.COPY_TYPE_LESSON),
                                                                                   user,
-                                                                                  originalLearningDesign.getWorkspaceFolder());
+                                                                                  destinationFolder);
         // copy the tool content
         // unfortuanately, we have to reaccess the activities to make sure we get the
         // subclass, not a hibernate proxy.
@@ -530,7 +522,7 @@ public class MonitoringService implements IMonitoringService,ApplicationContextA
      */
     public String getLearnerActivityURL(Long activityID,Integer userID)throws IOException, LamsToolServiceException{    	
     	Activity activity = activityDAO.getActivityByActivityId(activityID);
-    	User user = userDAO.getUserById(userID);
+    	User user = userManagementService.getUserById(userID);
     	FlashMessage flashMessage;
     	if(activity==null || user==null){
     		flashMessage = new FlashMessage("getLearnerActivityURL",

@@ -46,7 +46,6 @@ http://www.gnu.org/licenses/gpl.txt
 		<property name="authoringService"><ref bean="authoringService"/></property>	
 		<property name="transitionDAO"><ref bean="transitionDAO"/></property>	
 		<property name="activityDAO"><ref bean="activityDAO"/></property>	
-		<property name="userDAO"><ref bean="userDAO"/></property>
 		<property name="workspaceFolderDAO"><ref bean="workspaceFolderDAO"/></property>
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			

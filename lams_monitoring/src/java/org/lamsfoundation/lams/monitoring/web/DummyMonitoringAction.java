@@ -163,6 +163,8 @@ public class DummyMonitoringAction extends LamsDispatchAction
     	// set up all the data needed
     	DummyForm dummyForm = (DummyForm) form;
 
+    	// Must have User, rather than UserDTO as the createLessonClassForLesson must have 
+    	// a proper user objcet in the staffs list.
         User user = getUser();
 
         Long ldId = dummyForm.getLearningDesignId();
@@ -182,7 +184,7 @@ public class DummyMonitoringAction extends LamsDispatchAction
         if ( desc == null ) desc = "description";
 
         // initialize the lesson
-        Lesson testLesson = monitoringService.initializeLesson(title,desc,ldId.longValue(),user);
+        Lesson testLesson = monitoringService.initializeLesson(title,desc,ldId.longValue(),user.getUserId());
 
         // create the lesson class - add all the users in this organisation to the lesson class
         // add user as staff

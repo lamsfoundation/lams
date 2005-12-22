@@ -28,7 +28,6 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.User;
 
 
 /**
@@ -54,7 +53,7 @@ public interface IMonitoringService
      * @param user user the user who want to create this lesson.
      * @return the lesson initialized.
      */
-    public Lesson initializeLesson(String lessonName, String lessonDescription,long learningDesignId,User user);
+    public Lesson initializeLesson(String lessonName, String lessonDescription,long learningDesignId,Integer userID);
     
     
     /**

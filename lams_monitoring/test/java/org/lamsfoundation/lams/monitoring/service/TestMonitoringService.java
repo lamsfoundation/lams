@@ -25,7 +25,6 @@ import java.util.LinkedList;
 
 import javax.sql.DataSource;
 
-import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -34,6 +33,7 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -148,7 +148,7 @@ public class TestMonitoringService extends AbstractLamsTestCase
         Lesson testLesson = monitoringService.initializeLesson("Test_Lesson",
                                                                "Test_Description",
                                                                TEST_LEARNING_DESIGN_ID,
-                                                               testUser);
+                                                               testUser.getUserId());
         TEST_LESSON_ID=testLesson.getLessonId();
         Lesson createdLesson = lessonDao.getLesson(TEST_LESSON_ID);
         assertNotNull(createdLesson);
