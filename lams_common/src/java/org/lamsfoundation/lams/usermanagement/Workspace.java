@@ -21,6 +21,9 @@ public class Workspace implements Serializable {
     private WorkspaceFolder rootFolder;
 
     /** persistent field */
+    private WorkspaceFolder defaultRunSequencesFolder;
+
+    /** persistent field */
     private Set users;
 
     /** persistent field */
@@ -64,6 +67,7 @@ public class Workspace implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
+     *			   lazy="false"
      *            @hibernate.column name="root_folder_id"         
      *         
      */
@@ -76,6 +80,22 @@ public class Workspace implements Serializable {
     }
 
     
+    /** 
+     *            @hibernate.many-to-one
+     *             not-null="true"
+     *			   lazy="false"
+     *            @hibernate.column name="def_run_seq_fld_id"         
+     *         
+     */
+    public WorkspaceFolder getDefaultRunSequencesFolder() {
+        return defaultRunSequencesFolder;	
+    }
+
+    public void setDefaultRunSequencesFolder(WorkspaceFolder defaultRunSequencesFolder) {
+        this.defaultRunSequencesFolder = defaultRunSequencesFolder;	
+    }
+
+
     /** 
      *            @hibernate.set
      *             lazy="true"
@@ -126,10 +146,6 @@ public class Workspace implements Serializable {
         return new EqualsBuilder()
             .append(this.getWorkspaceId(), castOther.getWorkspaceId())
             .isEquals();
-    }
-
-    public WorkspaceFolder getDefaultRunSequenceFolder() {
-        return null;	
     }
 
     public int hashCode() {

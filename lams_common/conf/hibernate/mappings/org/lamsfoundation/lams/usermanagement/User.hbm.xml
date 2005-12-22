@@ -270,10 +270,12 @@
     <!-- bi-directional many-to-one association to Workspace -->
     <many-to-one
         name="workspace"
+        lazy="false"
         class="org.lamsfoundation.lams.usermanagement.Workspace"     
     >
         <meta attribute="field-description">
            @hibernate.many-to-one
+	         lazy="false"
            @hibernate.column name="workspace_id"         
         </meta>
         <column name="workspace_id" />

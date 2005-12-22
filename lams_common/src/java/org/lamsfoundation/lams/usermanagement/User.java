@@ -108,7 +108,6 @@ public class User implements Serializable {
     /** persistent field */
     private Set lessons;
     
-    private String fullName;
     /** full constructor */
     public User(String login, String password, String title, String firstName, String lastName, String addressLine1, String addressLine2, String addressLine3, String city, String state, String country, String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag, Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod, CSSThemeVisualElement theme, Set userOrganisations, Organisation baseOrganisation, Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
         this.login = login;
@@ -441,6 +440,7 @@ public class User implements Serializable {
     /** 
      *            @hibernate.many-to-one
      *             not-null="true"
+     *			   lazy="false"
      *            @hibernate.column name="workspace_id"         
      *         
      */
