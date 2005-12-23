@@ -40,9 +40,7 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
  */
 public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
 	
-	private NoticeboardSessionDAO nbSessionDAO;
-	private NoticeboardContentDAO nbContentDAO;
-	private NoticeboardUserDAO nbUserDAO;
+	
 	private NoticeboardSession nbSession = null;
 	private NoticeboardContent nbContent = null;
 	
@@ -60,18 +58,14 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
      */
 	 protected void setUp() throws Exception {
 	 	super.setUp();
-        
-        nbContentDAO = (NoticeboardContentDAO) this.context.getBean("nbContentDAO");
-        nbSessionDAO = (NoticeboardSessionDAO) this.context.getBean("nbSessionDAO");
-        nbUserDAO = (NoticeboardUserDAO) this.context.getBean("nbUserDAO");
-        super.initAllData();
+       initAllData();
     }
 	 
 	/**
 	 * @see NbDataAccessTestCase#tearDown()
 	 */
     protected void tearDown() throws Exception {
-        super.tearDown();
+        
         if(cleanContentData)
         {
         	super.cleanNbContentData(TEST_NB_ID);
@@ -79,14 +73,14 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
        
     }
 
-   public void testgetNbSessionByUID()
+  /* public void testgetNbSessionByUID()
     {
        nbSession = nbSessionDAO.getNbSessionByUID(new Long(1)); //default test data which is always in db
         
        assertEquals(nbSession.getNbSessionId(), DEFAULT_SESSION_ID);
        assertEquals(nbSession.getSessionStatus(), DEFAULT_SESSION_STATUS);
         
-    }
+    } */
     
     public void testfindNbSessionById()
     {
@@ -99,7 +93,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
     
     public void testsaveNbSession()
     {
-        NoticeboardContent nbContentToReference = nbContentDAO.findNbContentById(TEST_NB_ID);
+        NoticeboardContent nbContentToReference = noticeboardDAO.findNbContentById(TEST_NB_ID);
         
         Long newSessionId = new Long(2222);
         Date newDateCreated = new Date(System.currentTimeMillis());
@@ -109,7 +103,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
                 													NoticeboardSession.NOT_ATTEMPTED);
         
         nbContentToReference.getNbSessions().add(newSessionObject);
-        nbContentDAO.updateNbContent(nbContentToReference);
+        noticeboardDAO.updateNbContent(nbContentToReference);
         
         nbSessionDAO.saveNbSession(newSessionObject);
         
@@ -135,7 +129,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         assertEquals(updatedSession.getSessionStatus(), NoticeboardSession.COMPLETED);
     } 
     
-    public void testremoveNbSessionByUID()
+  /*  public void testremoveNbSessionByUID()
     {
         NoticeboardSession existingSession = nbSessionDAO.findNbSessionById(TEST_SESSION_ID);
         Long uid = existingSession.getUid();
@@ -145,10 +139,10 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         nbSessionDAO.removeNbSessionByUID(uid);
         referencedContent.getNbSessions().remove(existingSession);
         
-        nbContentDAO.updateNbContent(referencedContent);
+        noticeboardDAO.updateNbContent(referencedContent);
         
         assertSessionObjectIsNull(TEST_SESSION_ID);
-    }
+    } */
     
     
     public void testremoveNbSessionById()
@@ -159,7 +153,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         
         nbSessionDAO.removeNbSession(TEST_SESSION_ID);
         
-        nbContentDAO.updateNbContent(nbContent);
+        noticeboardDAO.updateNbContent(nbContent);
         
         assertSessionObjectIsNull(TEST_SESSION_ID);
         
@@ -173,7 +167,7 @@ public class TestNoticeboardSessionDAO extends NbDataAccessTestCase {
         
         nbSessionDAO.removeNbSession(nbSession);
         
-        nbContentDAO.updateNbContent(nbContent);
+        noticeboardDAO.updateNbContent(nbContent);
         
         assertSessionObjectIsNull(TEST_SESSION_ID);
     } 

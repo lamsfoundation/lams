@@ -34,15 +34,11 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
  */
 public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
     
-    private NoticeboardUserDAO nbUserDAO;
-    private NoticeboardSessionDAO nbSessionDAO;
-    
     private NoticeboardUser nbUser;
     private NoticeboardSession nbSession;
     
     private NoticeboardContent content;
-    private NoticeboardContentDAO nbContentDao;
-    
+   
     private boolean cleanContentData = true;
     
     public TestNoticeboardUserDAO(String name)
@@ -55,19 +51,16 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
      */
 	 protected void setUp() throws Exception {
 	 	super.setUp();
-        nbSessionDAO = (NoticeboardSessionDAO) this.context.getBean("nbSessionDAO");
-        nbUserDAO = (NoticeboardUserDAO) this.context.getBean("nbUserDAO");
-        nbContentDao = (NoticeboardContentDAO) this.context.getBean("nbContentDAO");
-        super.initAllData();
+       
+        initAllData();
      
     }
 	 
 	 protected void tearDown() throws Exception {
-	        
-	     super.tearDown();
+	    
 	     if(cleanContentData)
 	     {
-	     	super.cleanNbContentData(TEST_NB_ID);
+	     	cleanNbContentData(TEST_NB_ID);
 	     }
 	 }
 	 
@@ -82,7 +75,6 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	     Long nonExistentUserId = new Long(23321);
 	     assertUserObjectIsNull(nonExistentUserId);
 	 }
-	 
 	 
 	 public void testSaveNbUser()
 	 {
@@ -104,9 +96,6 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	     assertEquals(nbUser.getUserId(), newUserId);
 	     assertEquals(nbUser.getNbSession().getNbSessionId(),TEST_SESSION_ID);
 	 } 
-	 
-	
-	 
 	 public void testUpdateNbUser()
 	 {
 	     nbUser = nbUserDAO.getNbUserByID(TEST_USER_ID);
@@ -154,11 +143,11 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	 {
 	 	Long newSessionId = new Long(3456);
 	 	
-	 	NoticeboardContent content = nbContentDao.findNbContentById(TEST_NB_ID);
+	 	NoticeboardContent content = noticeboardDAO.findNbContentById(TEST_NB_ID);
 	 	
 	 	NoticeboardSession newSession = new NoticeboardSession(newSessionId, content);
 	 	content.getNbSessions().add(newSession);
-	 	nbContentDao.updateNbContent(content);
+	 	noticeboardDAO.updateNbContent(content);
 	 	nbSessionDAO.saveNbSession(newSession);
 	 	
 	 	//add the test user to a new session
@@ -185,6 +174,10 @@ public class TestNoticeboardUserDAO extends NbDataAccessTestCase {
 	 	assertEquals(retrievedUser.getNbSession().getNbSessionId(), newSessionId);
 	 	
 	 } 
+	 
+	 
+	 
+	
 
 
 }
