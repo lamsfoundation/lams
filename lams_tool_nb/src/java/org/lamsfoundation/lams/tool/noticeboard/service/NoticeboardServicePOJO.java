@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -825,7 +826,22 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    if ((!nbContent.getNbSessions().isEmpty()) && !removeSessionData)
 	        throw new SessionDataExistsException("Delete failed: There is session data that belongs to this tool content id");
 	    
-	    removeNoticeboard(toolContentId);
+	   //remove any attachments that belong to this tool entry
+	   Set attachments = nbContent.getNbAttachments();
+	   Iterator i = attachments.iterator();
+	   while(i.hasNext())
+	   {
+		   try
+		   {
+			   removeAttachment(nbContent, (NoticeboardAttachment)i.next());
+		   }
+		   catch(RepositoryCheckedException e)
+		   {
+			   //TODO: not sure if suppose to throw another type of exception or not
+		   }
+	   }
+	    
+	   removeNoticeboard(toolContentId);
 	}
 
 	private NoticeboardContent getAndCheckIDandObject(Long toolContentId) throws ToolException, DataMissingException
@@ -885,7 +901,9 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 		                												defaultContent,
 		                												new Date(System.currentTimeMillis()),
 		                												NoticeboardSession.NOT_ATTEMPTED);
-		        saveNoticeboardSession(newSession);
+		        //saveNoticeboardSession(newSession);
+		        defaultContent.getNbSessions().add(newSession);
+		        saveNoticeboard(defaultContent);
 		       
 		    }
 		    else
@@ -899,8 +917,10 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 												  nbContent,
 												  new Date(System.currentTimeMillis()),
 												  NoticeboardSession.NOT_ATTEMPTED);
-
-	        saveNoticeboardSession(nbSession);
+	        
+	        nbContent.getNbSessions().add(nbSession);
+	        saveNoticeboard(nbContent);
+	        //saveNoticeboardSession(nbSession);
 	    }
 	    
 	    
