@@ -63,24 +63,23 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 		this.nbSession = null;
 		nbContentManager = (ToolContentManager)this.context.getBean("nbService");
 		nbService = (INoticeboardService)this.context.getBean("nbService");
-		this.initNbContentData();
-	    this.initNbSessionContent();
+		initNbContentData();
+	    initNbSessionContent();
 	}
 	
 	protected void tearDown() throws Exception
 	{
-		super.tearDown();
 		
 		//delete data
 		if(cleanContentData)
         {
-        	super.cleanNbContentData(TEST_NB_ID);
+        	cleanNbContentData(TEST_NB_ID);
         }
        
 	     
 		 if(cleanCopyContent)
 	     {
-	     	super.cleanNbContentData(TEST_COPYNB_ID);
+	     	cleanNbContentData(TEST_COPYNB_ID);
 	     }
      }
 	/*

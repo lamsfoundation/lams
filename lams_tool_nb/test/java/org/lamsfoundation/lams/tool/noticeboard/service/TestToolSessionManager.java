@@ -59,21 +59,18 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 		this.nbSession = null;
 		nbSessionManager = (ToolSessionManager)this.context.getBean("nbService");
 		nbService = (INoticeboardService)this.context.getBean("nbService");
-		this.initNbContentData();
-	    this.initNbSessionContent();
+		initNbContentData();
+	    initNbSessionContent();
 	}
 	
 	protected void tearDown() throws Exception
 	{
-		super.tearDown();
-		
 		//delete data
 		if(cleanContentData)
         {
-        	super.cleanNbContentData(TEST_NB_ID);
+        	cleanNbContentData(TEST_NB_ID);
         }
 	
-       
      }
 	
 	/* Normal case: with valid toolSessionId and toolContentId */
