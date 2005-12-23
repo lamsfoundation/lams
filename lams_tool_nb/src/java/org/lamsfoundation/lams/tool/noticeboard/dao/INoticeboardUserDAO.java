@@ -36,14 +36,6 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
  */
 public interface INoticeboardUserDAO {
     
-    /**
-	 * <p>Return the persistent instance of a NoticeboardUser 
-	 * with the given identifier <code>uid</code>, returns null if not found. </p>
-	 * 
-	 * @param uid an identifier for the NoticeboardUser.
-	 * @return the persistent instance of a NoticeboardUser or null if not found
-	 */
-    public NoticeboardUser getNbUserByUID(Long uid);
    
     /**
 	 * <p> Return the persistent instance of a NoticeboardUser

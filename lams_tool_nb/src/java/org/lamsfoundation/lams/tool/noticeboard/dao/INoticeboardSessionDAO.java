@@ -45,15 +45,6 @@ public interface INoticeboardSessionDAO {
 	 */
     public NoticeboardSession findNbSessionById(Long nbSessionId);
 	
-    /**
-	 * <p>Return the persistent instance of a NoticeboardSession  
-	 * with the given identifier <code>uid</code>, returns null if not found. </p>
-	 * 
-	 * @param uid an identifier for the NoticeboardSession object.
-	 * @return the persistent instance of a NoticeboardSession or null if not found
-	 */
-    public NoticeboardSession getNbSessionByUID(Long uid);
-	
 	
     /**
 	 * <p>Persist the given persistent instance of NoticeboardSession.</p>
@@ -68,14 +59,7 @@ public interface INoticeboardSessionDAO {
      * @param nbContent The instance of NoticeboardSession to persist.
      */
     public void updateNbSession(NoticeboardSession nbSession);
-
-    /**
-     * <p>Delete the given instance of NoticeboardSession with the
-     * given identifier <code>uid</code>
-     * 
-     * @param uid an identifier for the NoticeboardSession instance. 
-     */
-    public void removeNbSessionByUID(Long uid);
+    
     
     /**
      * <p>Delete the given instance of NoticeboardSession</p>
