@@ -22,6 +22,7 @@
 				<c:out value="${NbLearnerForm.content}" escapeXml="false"/>
 			</td>
 		</tr>
+		
 	</table>
 </div>
 
