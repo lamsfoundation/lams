@@ -146,7 +146,7 @@ Ant build file.
 			</sql>
 		</target>	
 	
-		<target name="insert-test-data" depends="build-db" description="Inserts test data for noticeboard tool in order for test cases to run">
+	<!--	<target name="insert-test-data" depends="build-db" description="Inserts test data for noticeboard tool in order for test cases to run">
 				<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 									password="${db.password}">
 								<classpath>
@@ -154,7 +154,28 @@ Ant build file.
 								</classpath>
 						<transaction src="${db.scripts}/insert_lams_tool_nb_data.sql"/>
 				</sql>
-		</target>	
+		</target>	 -->
+	
+	<target name="insert-test-data" 
+			description="Insert some dummy test data. Removes any data that was in the tables first.">
+			   <copy overwrite="yes" file="${db.scripts}/create_lams_tool_nb.sql"
+						   	tofile="${build.sql}/create_lams_tool_nb_test.sql" >
+				  <!-- replace ${default_content_id} sql file with a hardcoded value  -->
+			        <filterset begintoken="$${" endtoken="}">
+		                <filter token="default_content_id" value="${test.contentid}"/>
+			        </filterset>
+			    </copy>
+				<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+					password="${db.password}">
+				<classpath>
+					<pathelement location="${db.driver.jar}"/>
+				</classpath>
+				<transaction src="${db.scripts}/drop_lams_tool_nb.sql"/>
+				<transaction src="${build.sql}/create_lams_tool_nb_test.sql"/>
+				<transaction src="${db.scripts}/insert_test_data.sql"/>
+			</sql>
+	</target>
+
 	
 	
 	<!-- ================================================================ -->
@@ -265,7 +286,7 @@ Ant build file.
 		<!-- =================================================================== -->
 		<!-- Run JUnit Tests                                                     -->
 		<!-- =================================================================== -->
-		<target name="test" depends="compile-test, insert-test-data"> 
+		<target name="test" depends="compile-test"> 
 			<mkdir dir="${build.report}"/>
 			<junit printsummary="yes" haltonerror="no" haltonfailure="no"
 				   fork="yes">
@@ -405,7 +426,47 @@ Ant build file.
 							
 			</target>
 	
-			
+	<target name="delete-exploded-tool-folder" description="delete old tool exploded tool folder">
+			<!-- delete old war folder tree -->
+			<delete quiet="true" includeemptydirs="true">
+				<fileset dir="${jboss.deploy}/${product}.war">
+				    <include name="**"/>
+				</fileset>
+			</delete>
+			<!-- if use explode tool target when jboss is running, explode may be failed and left the the temp folder. Here try to delete the temp folder -->
+			<delete quiet="true" includeemptydirs="true">
+				<fileset dir="${jboss.deploy}/temp-${product}.war">
+				    <include name="**"/>
+				</fileset>
+			</delete>
+		</target>
+		
+		<target name="explode-tool" depends="" description="explode tool jar and war package to a war folder">
+			<!-- rename war file to avoid name conflict -->
+			<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war"/>
+			<!-- explode the ear -->
+			<!-- Don't explode jar file, becuase classes in jar will conflict with those same classes files in war -->
+			<!--<unjar src="${jboss.deploy}/${product}.jar" dest="${jboss.deploy}/${product}.war" />-->
+			<unjar src="${jboss.deploy}/temp-${product}.war" dest="${jboss.deploy}/${product}.war" />
+			<!-- delete war and jar files -->
+			<delete>
+				<fileset dir="${jboss.deploy}">
+				    <include name="temp-${product}.war"/>
+				    <!--<include name="${product}.jar"/>-->
+				</fileset>
+			</delete>
+		</target>
+		
+	    <!-- ================================= 
+	          target: synchronize-jsp              
+	         ================================= -->
+	    <target name="synchronize-deploy" description="copy non-java file into deploy folder">
+	        <copy verbose="yes" todir="${jboss.deploy}/${product}.war">
+	        	<fileset dir="${conf.web.dir}">
+	        		<include name="**/*.*"/>
+	        	</fileset>
+	        </copy>
+	    </target>
 
 	
 </project>
