@@ -6,6 +6,7 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardAttachment;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO;
@@ -18,8 +19,10 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * instruction files </p>
  */
 public class NoticeboardAttachmentDAO extends HibernateDaoSupport implements INoticeboardAttachmentDAO {
-    
-    private static final String GET_ATTACHMENT_FROM_CONTENT = "select na.attachmentId from NoticeboardAttachment na where na.nbContent= :nbContent";
+	
+	private static final String FIND_NB_ATTACHMENT_BY_UUID = "from " + NoticeboardAttachment.class.getName() + " as nb where nb.uuid=?";
+	private static final String FIND_NB_ATTACHMENT_BY_FILENAME = "from " + NoticeboardAttachment.class.getName() + " as nb where nb.filename=?";
+	private static final String GET_ATTACHMENT_FROM_CONTENT = "select nb.attachmentId from " + NoticeboardAttachment.class.getName() + " as nb where nb.nbContent= :nbContent";
     
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO#retrieveAttachment(java.lang.Long) */
     public NoticeboardAttachment retrieveAttachment(Long attachmentId)
@@ -30,31 +33,33 @@ public class NoticeboardAttachmentDAO extends HibernateDaoSupport implements INo
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO#retrieveAttachmentByUuid(java.lang.Long) */
     public NoticeboardAttachment retrieveAttachmentByUuid(Long uuid)
     {
-        String query = "from NoticeboardAttachment na where na.uuid=?";
-        List attachments = getHibernateTemplate().find(query,uuid);
-        if (attachments!= null && attachments.size() == 0)
-        {
-            return null;
-        }
-        else
-        {
-            return (NoticeboardAttachment)attachments.get(0);
-        }
+        List attachments = getSession().createQuery(FIND_NB_ATTACHMENT_BY_UUID)
+		.setLong(0,uuid.longValue())
+		.list();
+
+		if(attachments != null && attachments.size() > 0){
+			NoticeboardAttachment nb = (NoticeboardAttachment) attachments.get(0);
+			return nb;
+		}
+		else
+			return null;
+	    	
+    	
     }
     
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO#retrieveAttachmentByFilename(java.lang.String) */
     public NoticeboardAttachment retrieveAttachmentByFilename(String filename)
     {
-        String query= "from NoticeboardAttachment na where na.filename=?";
-        List attachments = getHibernateTemplate().find(query,filename);
-        if (attachments!= null && attachments.size() == 0)
-        {
-            return null;
-        }
-        else
-        {
-            return (NoticeboardAttachment)attachments.get(0);
-        }
+    	List attachments = getSession().createQuery(FIND_NB_ATTACHMENT_BY_FILENAME)
+		.setString(0, filename)
+		.list();
+
+		if(attachments != null && attachments.size() > 0){
+			NoticeboardAttachment nb = (NoticeboardAttachment) attachments.get(0);
+			return nb;
+		}
+		else
+			return null;
     }
     
     
@@ -75,12 +80,24 @@ public class NoticeboardAttachmentDAO extends HibernateDaoSupport implements INo
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO#removeAttachment(org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent) */
     public void removeAttachment(NoticeboardAttachment attachment)
     {
-        this.getHibernateTemplate().delete(attachment);
+    	//this.getHibernateTemplate().delete(attachment);
+    	removeAttachment(attachment.getUuid());
     }
     
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardAttachmentDAO#removeAttachment(java.lang.Long) */
     public void removeAttachment(Long uuid)
     {
-        this.getHibernateTemplate().delete(retrieveAttachmentByUuid(uuid));
+        //this.getHibernateTemplate().delete(retrieveAttachmentByUuid(uuid));
+    	List attachments = getSession().createQuery(FIND_NB_ATTACHMENT_BY_UUID)
+		.setLong(0,uuid.longValue())
+		.list();
+
+		if(attachments != null && attachments.size() > 0){
+			NoticeboardAttachment nb = (NoticeboardAttachment) attachments.get(0);
+			this.getSession().setFlushMode(FlushMode.AUTO);
+			this.getHibernateTemplate().delete(nb);
+			this.getHibernateTemplate().flush();
+		}
+    	
     }
 }

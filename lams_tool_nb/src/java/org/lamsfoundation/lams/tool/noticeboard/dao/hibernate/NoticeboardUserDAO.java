@@ -26,8 +26,11 @@ package org.lamsfoundation.lams.tool.noticeboard.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
+import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
 
@@ -37,17 +40,13 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession;
  */
 public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticeboardUserDAO {
     
+	private static final String FIND_NB_USER = "from " + NoticeboardUser.class.getName() + " as nb where nb.userId=?";
+	
+	private static final String FIND_NB_USER_BY_SESSION = "from " + NoticeboardUser.class.getName() + " as nb where nb.userId=? and nb.nbSession.nbSessionId=?";
+	
     private static final String COUNT_USERS_IN_SESSION = "select nu.userId from NoticeboardUser nu where nu.nbSession= :nbSession";
    
-    
-    
-    /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserByUID(java.lang.Long) */
-	public NoticeboardUser getNbUserByUID(Long uid)
-	{
-		 return (NoticeboardUser) this.getHibernateTemplate()
-         .get(NoticeboardUser.class, uid);
-	}
-	
+  
 	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserByID(java.lang.Long) */
 	public NoticeboardUser getNbUserByID(Long userId)
 	{
@@ -66,21 +65,18 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
 	
 	/** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNbUserBySession(java.lang.Long, java.lang.Long)*/
 	public NoticeboardUser getNbUserBySession(Long userId, Long sessionId)
-	{
-		String query = "select nu from NoticeboardUser nu where nu.userId=? and nu.nbSession.nbSessionId=?";
-		Long[] bindingValues = new Long[2];
-		bindingValues[0] = userId;
-		bindingValues[1] = sessionId;
-		List usersReturned = getHibernateTemplate().find(query, bindingValues); //although only one or no users should be returned
-		
-		if (usersReturned!= null && usersReturned.size() == 0)
-		{
-			return null;
+	{	
+		List usersReturned = getSession().createQuery(FIND_NB_USER_BY_SESSION)
+			.setLong(0,userId.longValue())
+			.setLong(1, sessionId.longValue())
+			.list();
+	
+		if(usersReturned != null && usersReturned.size() > 0){
+			NoticeboardUser nb = (NoticeboardUser) usersReturned.get(0);
+			return nb;
 		}
 		else
-		{
-			return (NoticeboardUser)usersReturned.get(0);
-		}
+			return null;
 
 	}
 
@@ -99,20 +95,27 @@ public class NoticeboardUserDAO extends HibernateDaoSupport implements INoticebo
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#removeNbUser(java.lang.Long) */
     public void removeNbUser(Long userId)
     {
-        String query = "from NoticeboardUser as user where user.userId =";
-        StringBuffer sb = new StringBuffer(query);
-        sb.append(userId.longValue());
-        
-        String queryString = sb.toString();
-           
-        this.getHibernateTemplate().delete(queryString);
+		if ( userId != null) {
+			//String query = "from org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent as nb where nb.nbContentId=?";
+			List list = getSession().createQuery(FIND_NB_USER)
+				.setLong(0,userId.longValue())
+				.list();
+			
+			if(list != null && list.size() > 0){
+				NoticeboardUser nb = (NoticeboardUser) list.get(0);
+				this.getSession().setFlushMode(FlushMode.AUTO);
+				this.getHibernateTemplate().delete(nb);
+				this.getHibernateTemplate().flush();
+			}
+		}
       
     }
     
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#removeNbUser(org.lamsfoundation.lams.tool.noticeboard.NoticeboardUser) */
     public void removeNbUser(NoticeboardUser nbUser)
     {
-        this.getHibernateTemplate().delete(nbUser);
+       // this.getHibernateTemplate().delete(nbUser);
+    	removeNbUser(nbUser.getUserId());
     }
     
     /** @see org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO#getNumberOfUsers((org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession) */
