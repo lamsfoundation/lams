@@ -2,11 +2,11 @@
 <%@ taglib uri="tags-html-el" prefix="html" %>
 <%
 
-String authorUrl = "/starter/authoring?toolContentID="+355;
+String authorUrl = "/authoring?toolContentID="+355;
 String learnerUrl = "/starter/learner?toolSessionID="+455+"&mode=learner";
 String learnerUrlTeacher = "/starter/learner?userId="+555+"&toolSessionID="+455+"&mode=teacher";
 String learnerUrlAuthor = "/starter/learner?&toolSessionID="+455+"&mode=author";
-String monitoringUrl = "/starter/monitor?toolContentID="+355;	
+String monitoringUrl = "/monitoring?toolContentID="+355;	
 String exportPortfolioTeacher ="/exportPortfolio.do?mode=teacher&toolContentID=355";
 String exportPortfolioStudent = "/exportPortfolio.do?mode=learner&toolSessionID=455&userID=555";
 %>
