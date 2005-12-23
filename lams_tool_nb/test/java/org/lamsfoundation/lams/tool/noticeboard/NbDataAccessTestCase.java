@@ -45,10 +45,10 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     //---------------------------------------------------------------------
     // DAO instances for initializing data
     //---------------------------------------------------------------------
-    private NoticeboardContentDAO noticeboardDAO;
-    private NoticeboardSessionDAO nbSessionDAO;
-    private NoticeboardUserDAO nbUserDAO;
-    private NoticeboardAttachmentDAO attachmentDAO;
+    protected NoticeboardContentDAO noticeboardDAO;
+    protected NoticeboardSessionDAO nbSessionDAO;
+    protected NoticeboardUserDAO nbUserDAO;
+    protected NoticeboardAttachmentDAO attachmentDAO;
    
     //---------------------------------------------------------------------
     // Domain Object instances
@@ -56,6 +56,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     protected NoticeboardContent nbContent;
     protected NoticeboardSession nbSession;
     protected NoticeboardUser nbUser;
+    protected NoticeboardAttachment nbAttachment;
 
     
     //---------------------------------------------------------------------
@@ -85,7 +86,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
 	
 	protected final Long TEST_USER_ID = new Long(1600);
 	protected final String TEST_USERNAME = "testUsername";
-	protected final String TEST_FULLNAME = "Hamish Andy";
+	protected final String TEST_FULLNAME = "Test User Fullname";
 	protected final String TEST_USER_STATUS = NoticeboardUser.INCOMPLETE;
 	
 	protected final String TEST_FILENAME = "testFilename";
@@ -125,15 +126,16 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     //---------------------------------------------------------------------
 	
     protected void setUp() throws Exception {
-        super.setUp();
+    	super.setUp();
         noticeboardDAO = (NoticeboardContentDAO) this.context.getBean("nbContentDAO");
         nbSessionDAO = (NoticeboardSessionDAO) this.context.getBean("nbSessionDAO");
         nbUserDAO = (NoticeboardUserDAO) this.context.getBean("nbUserDAO");
         attachmentDAO = (NoticeboardAttachmentDAO)this.context.getBean("nbAttachmentDAO");
     }
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    protected void tearDown() throws Exception 
+    {
+    	super.tearDown();
     }
 
 	 /** Define the context files. Overrides method in AbstractLamsTestCase */
@@ -215,6 +217,7 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
         ns.getNbUsers().add(user);
     }
     
+    /* TODO: have to upload attachment to repository */
     protected void initNbAttachmentData()
     {
         NoticeboardAttachment attachment = new NoticeboardAttachment();
@@ -226,7 +229,8 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
         attachment.setUuid(TEST_UUID);
 	     
 	    attachmentDAO.saveAttachment(attachment);
-        
+	    
+	    nb.getNbAttachments().add(attachment);        
     }
    
     protected void initAllData()
