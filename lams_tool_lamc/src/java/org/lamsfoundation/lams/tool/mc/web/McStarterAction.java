@@ -79,13 +79,18 @@ public class McStarterAction extends Action implements McAppConstants {
 		IMcService mcService = (IMcService)request.getSession().getAttribute(TOOL_SERVICE);
 		logger.debug("will retrieve mcService"  + mcService);
 		
-		Boolean isDefineLaterUrl =(Boolean)request.getAttribute(IS_DEFINE_LATER_URL);
-		logger.debug("isDefineLaterUrl in request"  + isDefineLaterUrl);
+		String activeModule=(String) request.getSession().getAttribute(ACTIVE_MODULE);
+		logger.debug("activeModule: "  + activeModule);
 		
-		if ((isDefineLaterUrl != null) && (isDefineLaterUrl.booleanValue() == true))
-			request.getSession().setAttribute(IS_DEFINE_LATER_URL, new Boolean(true));
-		else
-			request.getSession().setAttribute(IS_DEFINE_LATER_URL, new Boolean(false));
+		if ( (activeModule == null) || 
+			 (!activeModule.equals(DEFINE_LATER))
+			)
+		{
+			request.getSession().setAttribute(ACTIVE_MODULE, AUTHORING);
+			logger.debug("activeModule set to Authoring: "  + activeModule);
+			//request.getSession().setAttribute(IS_DEFINE_LATER_URL, new Boolean(true));
+		}
+		logger.debug("final active activeModule is: "  + request.getSession().getAttribute(ACTIVE_MODULE));
 		
 		if (mcService == null)
 		{
@@ -516,6 +521,9 @@ public class McStarterAction extends Action implements McAppConstants {
 		IMcService mcService =McUtils.getToolService(request);
 		request.getSession().setAttribute(IS_REVISITING_USER, new Boolean(false));
 		
+		request.getSession().setAttribute(DEFINE_LATER_EDIT_ACTIVITY, new Boolean(false));
+		logger.debug("setting DEFINE_LATER_EDIT_ACTIVITY to false.");
+		
 		long contentId=0;
 		logger.debug("getting default content");
 		contentId=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
@@ -700,9 +708,13 @@ public class McStarterAction extends Action implements McAppConstants {
 		throws IOException, ServletException, McApplicationException {
 		logger.debug("passed mcService: " + mcService);
 		request.getSession().setAttribute(TOOL_SERVICE, mcService);
+
+		//to indicate that Edit button is enabled in the define later screen
+		request.getSession().setAttribute(DEFINE_LATER_EDIT_ACTIVITY, new Boolean(true));
 		
-		request.getSession().setAttribute(IS_DEFINE_LATER_URL, new Boolean(true));
-		request.setAttribute(IS_DEFINE_LATER_URL,new Boolean(true));
+		request.getSession().setAttribute(ACTIVE_MODULE, DEFINE_LATER);
+		//present the view-only screen first
+		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(false));
 		return execute(mapping, form, request, response);
 	}
 	
