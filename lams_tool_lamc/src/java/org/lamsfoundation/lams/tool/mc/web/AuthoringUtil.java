@@ -59,7 +59,7 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
      	
      	McUtils.persistRichText(request);
-     	AuthoringUtil.populateParameters(request, mcAuthoringForm);	
+     	AuthoringUtil.populateParameters(request, mcAuthoringForm);
     }
  	
 	
