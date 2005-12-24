@@ -127,6 +127,7 @@ public interface McAppConstants {
     public static final String IS_REMOVE_QUESTION						="isRemoveQuestion";
     public static final String IS_REMOVE_CONTENT						="isRemoveContent";
     public static final String IS_REVISITING_USER						="isRevisitingUser";
+    public static final String DEFINE_LATER_EDIT_ACTIVITY				="defineLaterEditActivity";
     
     public static final String QUESTIONS_SEQUENCED						="questionsSequenced";
         
@@ -138,7 +139,10 @@ public interface McAppConstants {
     public static final String CHOICE_TYPE_ADVANCED						="choiceTypeAdvanced";
     public static final String CHOICE_TYPE_INSTRUCTIONS					="choiceTypeInstructions";
     public static final String IS_DEFINE_LATER_URL						="isDefineLaterUrl";
+    public static final String ACTIVE_MODULE							="activeModule";
+    public static final String AUTHORING								="authoring";
     public static final String EDIT_OPTIONS_MODE						="editOptionsMode";
+    public static final String DEFINE_LATER_IN_EDIT_MODE				="defineLaterInEditMode";
     public static final String SUBMIT_SUCCESS							="sbmtSuccess";
     public static final String FILE_CONTENT								="fileContent";
     public static final String LOAD_FILE_CONTENT						="loadFileContent";
