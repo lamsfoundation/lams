@@ -8,7 +8,9 @@
 
 					<table class="forms">
 					
-					<c:if test="${sessionScope.isDefineLaterUrl != 'true'}"> 			
+				<c:if test="${ (sessionScope.activeModule == 'authoring') ||  
+							   (sessionScope.defineLaterInEditMode == 'true') 
+							  }"> 			
  						<tr> 
 					 		<td NOWRAP class="formlabel" valign=top> <bean:message key="label.authoring.title"/>: </td>
 							<td NOWRAP class="formcontrol" valign=top>
@@ -28,7 +30,9 @@
 						</tr>
 					</c:if> 										
 					
-					<c:if test="${sessionScope.isDefineLaterUrl == 'true'}"> 			
+				<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
+							   (sessionScope.defineLaterInEditMode != 'true') 
+							  }"> 			
  						<tr> 
 					 		<td NOWRAP class="formlabel" valign=top align=left> <bean:message key="label.authoring.title"/>: </td>
 							<td NOWRAP class="formcontrol" valign=top align=left>
@@ -61,7 +65,10 @@
 			  	 		<c:set var="queIndex" scope="session" value="0"/>
 						<c:forEach var="questionEntry" items="${sessionScope.mapQuestionsContent}">
 							<c:set var="queIndex" scope="session" value="${queIndex +1}"/>
-							<c:if test="${sessionScope.isDefineLaterUrl != 'true'}"> 										
+							<c:if test="${ (sessionScope.activeModule == 'authoring') ||  
+								   (sessionScope.defineLaterInEditMode == 'true') 
+								  }"> 			
+
 								  <tr>
 								  	<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b>  </font> </td>
 								  	
@@ -102,7 +109,10 @@
 								  </tr>
 							</c:if> 																		  								  
 							
-							<c:if test="${sessionScope.isDefineLaterUrl == 'true'}"> 										
+							<c:if test="${ (sessionScope.activeModule == 'defineLater') &&
+										   (sessionScope.defineLaterInEditMode != 'true') 
+										  }"> 			
+
 								  <tr>
 								  	<td NOWRAP bgcolor="#EEEEEE" class="input" valign=top>  <font size=2> <b> <c:out value="Question ${queIndex}"/> : </b>  </font> </td>
 								  	
@@ -141,7 +151,9 @@
 							</c:if> 																		  								  
 						</c:forEach>
 
-						<c:if test="${sessionScope.isDefineLaterUrl != 'true'}"> 																
+						<c:if test="${ (sessionScope.activeModule == 'authoring') ||  
+							   			(sessionScope.defineLaterInEditMode == 'true') 
+							  }"> 			
 							 <tr>
 								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
 										<html:submit styleClass="a.button" onclick="javascript:submitMethod('addNewQuestion');">
@@ -151,7 +163,9 @@
 							 </tr>							
 						</c:if> 							
 
-						<c:if test="${sessionScope.isDefineLaterUrl == 'true'}"> 																
+							<c:if test="${ (sessionScope.activeModule == 'defineLater') &&  
+										   (sessionScope.defineLaterInEditMode != 'true') 
+										  }"> 			
 							 <tr>
 								  	<td NOWRAP bgcolor="#EEEEEE" colspan=5 class="input" valign=top align=right>
 										<html:submit styleClass="a.button" disabled="true" onclick="javascript:alert('This button is disabled in this [view-only] mode.');" >
@@ -169,7 +183,10 @@
 					  	</td>
 					</tr>		
 					
-					<c:if test="${sessionScope.isDefineLaterUrl != 'true'}"> 																					
+					<c:if test="${ (sessionScope.activeModule == 'authoring') ||  
+						   			(sessionScope.defineLaterInEditMode == 'true') 
+						  }"> 			
+
 						<tr>
 						  	<td NOWRAP class="formlabel" valign=top><bean:message key="radiobox.passmark"/>: </td>
 							<td NOWRAP class="input" valign=top> 
@@ -202,7 +219,10 @@
 						</tr>
 					</c:if> 													
 					
-					<c:if test="${sessionScope.isDefineLaterUrl == 'true'}"> 	
+					<c:if test="${ (sessionScope.activeModule == 'defineLater') &&
+								   (sessionScope.defineLaterInEditMode != 'true') 
+								  }"> 			
+
 						<tr>
 						  	<td NOWRAP class="formlabel" valign=top align=left><bean:message key="radiobox.passmark"/>: </td>
 							<td NOWRAP class="input" valign=top align=left> 
@@ -221,16 +241,38 @@
 						  	</td>
 						</tr>
 						
-						 <tr>
-	 						<td NOWRAP valign=top> </td> 
-							<td NOWRAP class="input" colspan=3 align=left valign=top>								
-								<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="a.button">
-									<bean:message key="label.edit"/>
-								</html:submit>	 				 		  					
-													  		
-			 			  	</td>
-							<td NOWRAP valign=top> </td> 
-							<td NOWRAP valign=top> </td>
-						</tr>
+						
+					<c:if test="${ (sessionScope.activeModule == 'defineLater') &&
+								   (sessionScope.defineLaterEditActivity == 'false') 
+								  }"> 			
+							 <tr>
+		 						<td NOWRAP valign=top> </td> 
+								<td NOWRAP class="input" colspan=3 align=left valign=top>								
+									<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="a.button" disabled="true">
+										<bean:message key="label.edit"/>
+									</html:submit>	 				 		  					
+														  		
+				 			  	</td>
+								<td NOWRAP valign=top> </td> 
+								<td NOWRAP valign=top> </td>
+							</tr>
+						</c:if> 													
+					<c:if test="${ (sessionScope.activeModule == 'defineLater') &&
+								   (sessionScope.defineLaterEditActivity != 'false') 
+								  }"> 			
+
+							 <tr>
+		 						<td NOWRAP valign=top> </td> 
+								<td NOWRAP class="input" colspan=3 align=left valign=top>								
+									<html:submit onclick="javascript:submitMethod('editActivityQuestions');" styleClass="a.button">
+										<bean:message key="label.edit"/>
+									</html:submit>	 				 		  					
+														  		
+				 			  	</td>
+								<td NOWRAP valign=top> </td> 
+								<td NOWRAP valign=top> </td>
+							</tr>
+						</c:if> 						
+						
 					</c:if> 																																						
  				</table> 	 
