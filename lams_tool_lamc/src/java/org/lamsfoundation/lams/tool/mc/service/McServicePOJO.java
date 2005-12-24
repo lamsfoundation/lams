@@ -134,11 +134,12 @@ public class McServicePOJO implements
     {
         try
         {
+        	logger.debug("using mcContent defineLater:" + mcContent.isDefineLater());
         	mcContentDAO.saveMcContent(mcContent);
         }
         catch (DataAccessException e)
         {
-            throw new McApplicationException("Exception occured when lams is loading mc content: "
+            throw new McApplicationException("Exception occured when lams is creating mc content: "
                                                          + e.getMessage(),
 														   e);
         }
@@ -1146,6 +1147,7 @@ public class McServicePOJO implements
     	}
     }
     
+    
     public void unsetAsDefineLater(Long toolContentId) throws McApplicationException
     {
     	logger.debug("request for unsetAsDefineLater with toolContentId: " + toolContentId);
@@ -1163,8 +1165,8 @@ public class McServicePOJO implements
                     + " based on null mcContent.");
     	}
     	mcContent.setDefineLater(false);
-    	updateMc(mcContent);
-    	logger.debug("qaContent has been updated for unsetAsDefineLater: " + mcContent);
+    	createMc(mcContent);
+    	logger.debug("mcContent has been updated for unsetAsDefineLater: " + mcContent);
     }
     
     /**
@@ -1184,14 +1186,19 @@ public class McServicePOJO implements
     	}
     	
     	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
+    	logger.debug("mcContent: " + mcContent);
     	if (mcContent == null)
     	{
     		logger.debug("throwing DataMissingException: WARNING!: retrieved mcContent is null.");
             throw new DataMissingException("mcContent is missing");
     	}
+    	logger.debug("is define later: " + mcContent.isDefineLater());
     	mcContent.setDefineLater(true);
-    	updateMc(mcContent);
-    	logger.debug("mcContent has been updated for defineLater: " + mcContent);
+    	logger.debug("is define later: " + mcContent.isDefineLater());
+    	logger.debug("creating mc");
+    	createMc(mcContent);
+    	logger.debug("is define later: " + mcContent.isDefineLater());
+    	logger.debug("mcContent has been updated to true for defineLater: " + mcContent);
     }
 
     /**
