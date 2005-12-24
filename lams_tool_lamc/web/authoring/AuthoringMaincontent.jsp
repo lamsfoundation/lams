@@ -88,7 +88,7 @@
 					</table>
 				</td>
 				
-				<c:if test="${sessionScope.isDefineLaterUrl != 'true'}"> 			
+				<c:if test="${ sessionScope.activeModule != 'defineLater'}"> 			
 				    <td valign="bottom">
 						<!-- table for tab 2 (advanced) -->
 						<table border="0" cellspacing="0" cellpadding="0">
@@ -145,7 +145,7 @@
 				<!-- end of content_b -->
 	</div>
 		
-	<c:if test="${sessionScope.isDefineLaterUrl != 'true'}"> 			
+	<c:if test="${ sessionScope.activeModule != 'defineLater'}"> 			
 		<div id='content_a'  class="tabbody content_a">
 			<h2>Advanced Definitions </h2>
 			
