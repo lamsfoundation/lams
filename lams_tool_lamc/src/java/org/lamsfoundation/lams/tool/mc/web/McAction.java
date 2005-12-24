@@ -4,7 +4,6 @@
  *it under the terms of the GNU General Public License as published by
  *the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- *
  *This program is distributed in the hope that it will be useful,
  *but WITHOUT ANY WARRANTY; without even the implied warranty of
  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -37,6 +36,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McAttachmentDTO;
@@ -1340,10 +1340,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException,
-                                         ServletException
-
+                                         ServletException,
+                                         ToolException
     {
-    	logger.debug("dispatching editActivityQuestions...");
+    	logger.debug("dispatching editActivityQuestions.");
     	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 	 	IMcService mcService =McUtils.getToolService(request);
 	 	
@@ -1352,6 +1352,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants
      	String userAction="editActivityQuestions";
 		request.setAttribute(USER_ACTION, userAction);
 		logger.debug("userAction:" + userAction);
+
+		request.getSession().setAttribute(DEFINE_LATER_IN_EDIT_MODE, new Boolean(true));
+		
+		Long toolContentId=(Long)request.getSession().getAttribute(TOOL_CONTENT_ID);
+		logger.debug("current toolContentId: " + toolContentId);
+		mcService.setAsDefineLater(toolContentId);
+		logger.debug("done setting defineLater with toolContentId to true" + toolContentId);
 		
 		request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
 		logger.debug("setting  EDIT_OPTIONS_MODE to 0");
@@ -1791,6 +1798,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants
 		mapGeneralSelectedOptionsContent=AuthoringUtil.sequenceMap(mapGeneralSelectedOptionsContent);
 		logger.debug("sequenced mapGeneralSelectedOptionsContent:"+ mapGeneralSelectedOptionsContent);
 		request.getSession().setAttribute(MAP_GENERAL_SELECTED_OPTIONS_CONTENT, mapGeneralSelectedOptionsContent);
+		
+		logger.debug("start unsetting define later with current toolContentId: " + toolContentId);
+		mcService.unsetAsDefineLater(toolContentId);
+		logger.debug("unset defineLater with toolContentId to true: " + toolContentId);
 		
 		return (mapping.findForward(LOAD_QUESTIONS));
     }
