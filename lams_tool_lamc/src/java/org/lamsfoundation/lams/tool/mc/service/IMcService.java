@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.mc.service;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
@@ -148,6 +150,8 @@ public interface IMcService
 	public boolean studentActivityOccurred(McContent mc) throws McApplicationException;
 	
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
+    
+    public void copyToolContent(Long fromContentId, Long toContentId, HttpServletRequest request) throws ToolException;
 
     public void setAsForceCompleteSession(Long toolSessionId) throws McApplicationException;
 
@@ -226,6 +230,8 @@ public interface IMcService
     public List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
     
     public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType) throws RepositoryCheckedException;
+    
+    public NodeKey copyFile(Long uuid) throws RepositoryCheckedException;
     
     public void removeOffLineFile(String filename, Long mcContentId) throws McApplicationException;
     

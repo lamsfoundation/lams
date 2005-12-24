@@ -29,6 +29,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 
@@ -174,7 +176,7 @@ public class McContent implements Serializable {
      * @return the new mc content object.
      */
     public static McContent newInstance(McContent mc,
-            Long newContentId)
+            Long newContentId, HttpServletRequest request)
     {
     	McContent newContent = new McContent(
     				 newContentId,
@@ -203,7 +205,9 @@ public class McContent implements Serializable {
                      new TreeSet()
 					 );
     	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
-    	newContent.setMcAttachments(mc.deepCopyMcAttachments(newContent));
+    	newContent.setMcAttachments(mc.deepCopyMcAttachments(newContent, request));
+    	
+    	 
     	
     	return newContent;
 	}
@@ -236,7 +240,7 @@ public class McContent implements Serializable {
      * @param newMcContent
      * @return Set
      */
-    public Set deepCopyMcAttachments(McContent newMcContent)
+    public Set deepCopyMcAttachments(McContent newMcContent, HttpServletRequest request)
     {
     	Set newMcQueContent = new TreeSet();
         for (Iterator i = this.getMcAttachments().iterator(); i.hasNext();)
@@ -245,7 +249,7 @@ public class McContent implements Serializable {
             if (mcUploadedFile.getMcContent() != null)
             {
             	McUploadedFile newMcUploadedFile=McUploadedFile.newInstance(mcUploadedFile,
-															newMcContent);
+															newMcContent, request);
             	newMcQueContent.add(newMcUploadedFile);
             }
         }
