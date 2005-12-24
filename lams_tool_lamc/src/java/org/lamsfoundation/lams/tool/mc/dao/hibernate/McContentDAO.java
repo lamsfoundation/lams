@@ -89,6 +89,7 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 
 	public void saveMcContent(McContent mcContent)
     {
+		this.getSession().setFlushMode(FlushMode.AUTO);
     	this.getHibernateTemplate().save(mcContent);
     }
     
