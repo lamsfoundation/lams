@@ -126,7 +126,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	return validateParameters;
 	    }
   
-	    Long toolSessionID=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+	    //Long toolSessionID=(Long) request.getSession().getAttribute(TOOL_SESSION_ID);
+	    Long toolSessionID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    logger.debug("retrieved toolSessionID: " + toolSessionID);
 	    /*
 	     * By now, the passed tool session id MUST exist in the db through the calling of:
@@ -407,7 +408,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    /*
 	     * process incoming tool session id and later derive toolContentId from it. 
 	     */
-	    String strToolSessionId=request.getParameter(TOOL_SESSION_ID);
+	    //String strToolSessionId=request.getParameter(TOOL_SESSION_ID);
+    	String strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    long toolSessionId=0;
 	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
 	    {
