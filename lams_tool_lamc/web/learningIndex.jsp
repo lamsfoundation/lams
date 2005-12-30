@@ -6,9 +6,6 @@
 <%@ taglib uri="tags-fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-	<!-- this form temporarily represents tool icon in monitoring environment, 
-	remove this form once the tool is deployed into monitoring environment -->
-
 <%
 	String toolSessionID="88888888";
 	String toolUrl="/learningStarter?toolSessionID=" + toolSessionID;
