@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.tool.mc.McQueContent;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 
 public class McStarterAction extends Action implements McAppConstants {
@@ -124,7 +125,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		
 		    logger.debug("will render authoring screen");
 		    String strToolContentId="";
-		    strToolContentId=request.getParameter(TOOL_CONTENT_ID);
+		    //strToolContentId=request.getParameter(TOOL_CONTENT_ID);
+		    strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		    
 		    /* Process incoming tool content id. 
 		     * Either exists or not exists in the db yet, a toolContentId must be passed to the tool from the container */
