@@ -86,7 +86,7 @@
 	<!-- =================================================================== -->
 	<!-- Run Middlegen For LearningDesign                                                       -->
 	<!-- =================================================================== -->
-		<target name="middlegen" description="Run Middlegen For Submit Fiiles Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
+		<target name="middlegen" description="Run Middlegen For MCQ Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
 			<taskdef name="middlegen" classname="middlegen.MiddlegenTask" classpathref="all-libs" />
 			
 			<middlegen appname="lams_tool_lamc11" 
@@ -256,6 +256,7 @@
 	   					<include name="author_page/**"/>
 						<include name="authoring/*"/>
 						<include name="learning/*"/>
+		   				<include name="monitoring/*"/>
 	   					<include name="images/**"/>
 				</fileset>
 				<!--
@@ -289,7 +290,7 @@
 		<!-- Clean and rebuild the database. 									 -->
 		<!-- =================================================================== -->
 		<target name="rebuild-db"
-			description="rebuild Submit Files tables">
+			description="rebuild MCQ tables">
 			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
 					password="${db.password}">
 				<classpath>
@@ -441,6 +442,5 @@
 				</junitreport>
 
 			</target>
-	
 	
 </project>
