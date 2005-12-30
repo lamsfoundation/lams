@@ -6,17 +6,6 @@
 <%@ taglib uri="tags-fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String root = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-String pathToLams = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/../..";
-%>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html:html>
 <head>
