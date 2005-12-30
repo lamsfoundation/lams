@@ -1,51 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd">
-
 <struts-config>
+	  <!-- ========== Form Bean Definitions =================================== -->
+	<form-beans>
+		<form-bean name="McAuthoringForm" type="org.lamsfoundation.lams.tool.mc.web.McAuthoringForm"/>
+		<form-bean name="McLearningForm" type="org.lamsfoundation.lams.tool.mc.web.McLearningForm"/>
+		<form-bean name="McMonitoringForm" type="org.lamsfoundation.lams.tool.mc.web.McMonitoringForm"/>
+	</form-beans>
+	
+  	<!-- ========== Global Exception Definitions =================================== -->
+	<global-exceptions>
+	      <exception
+	        key="error.system.mc"
+	        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
+	        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
+	        path=".systemError"
+	        scope="request"
+	      />
+	</global-exceptions>
 
-  <!-- ========== Data Sources Definitions =================================== -->
-  <!--
-    Define your Struts data sources in a file called struts-data-sources.xml and place
-    it in your merge directory.
-  -->
-
-  <!-- ========== Form Bean Definitions =================================== -->
-
-<form-beans>
-	<form-bean name="McAuthoringForm" type="org.lamsfoundation.lams.tool.mc.web.McAuthoringForm"/>
-	<form-bean name="McLearningForm" type="org.lamsfoundation.lams.tool.mc.web.McLearningForm"/>
-</form-beans>
-
-  <!-- ========== Global Exceptions Definitions =================================== -->
-  <!--
-    Define your exceptions in a file called global-exceptions.xml and place
-    it in your merge directory.
-  -->
-
-<!-- 
-<global-exceptions>
-      <exception
-        key="error.system.mc"
-        type="org.lamsfoundation.lams.tool.mc.McApplicationException"
-        handler="org.lamsfoundation.lams.util.CustomStrutsExceptionHandler"
-        path=".systemError"
-        scope="request"
-      />
-</global-exceptions>
--->
-
-  <!-- ========== Global Forward Definitions =================================== -->
-   <global-forwards>
-     <forward name="starter" path="/authoringStarter"/>   
- </global-forwards>
-
+ 	<!-- ========== Global Forward Definitions =================================== -->
+   	<global-forwards>
+		<forward name="starter" path="/authoringStarter"/>   
+	</global-forwards>
+	
   <!-- ========== Action Mapping Definitions =================================== -->
   <action-mappings>
-   
-	<!--Authoring Starter  -->
-   <action path="/authoringStarter" type="org.lamsfoundation.lams.tool.mc.web.McStarterAction" 
-   			name="McAuthoringForm" input=".starter"> 
+	<!--Authoring Starter Action: initializes the authoring module -->
+   <action path="/authoringStarter" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McStarterAction" 
+   			name="McAuthoringForm" 
+   			input=".starter"> 
+
 	  	<forward
 		    name="load"
 		    path=".questions"
@@ -65,39 +52,43 @@
 	  	/>
 	</action>  
 	
-	<action
-      path="/authoring"
-      type="org.lamsfoundation.lams.tool.mc.web.McAction"
-      name="McAuthoringForm"
-      scope="session"
-      input=".questions"
-      parameter="dispatch"
-      unknown="false"
-      validate="true"
-    >
-      <forward
-        name="load"
-        path=".questions"
-        redirect="true"
-      />
-    
-      <forward
-        name="starter"
-        path=".starter"
-        redirect="true"
-      />
-      
-      <forward
-        name="editOptsContent"
-        path=".editOptsContent"
-        redirect="true"
-      />
+
+	<!--Authoring Main Action : interacts with the authoring module user-->
+	<action path="/authoring"
+	      	type="org.lamsfoundation.lams.tool.mc.web.McAction"
+    	  	name="McAuthoringForm"
+	      	scope="session"
+    	  	input=".questions"
+      		parameter="dispatch"
+      		unknown="false"
+      		validate="true">
+    	
+	      <forward
+	        name="load"
+	        path=".questions"
+	        redirect="true"
+	      />
+	    
+	      <forward
+	        name="starter"
+	        path=".starter"
+	        redirect="true"
+	      />
+	      
+	      <forward
+	        name="editOptsContent"
+	        path=".editOptsContent"
+	        redirect="true"
+	      />
     </action>
     
     
-    <!--Define Later Starter  -->
-   <action path="/defineLaterStarter" type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
-   			name="McAuthoringForm" input=".starter"> 
+   <!--Define Later Starter Action: initializes the DefineLater module -->
+   <action path="/defineLaterStarter" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
+   			name="McAuthoringForm" 
+   			input=".starter"> 
+
 	  	<forward
 		    name="load"
 		    path=".questions"
@@ -117,9 +108,13 @@
 	  	/>
 	</action>  
     
-   <!--Learning Starter  -->
-   <action path="/learningStarter" type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
-   			name="McLearningForm" input=".learningStarter"> 
+
+   <!--Learning Starter Action: initializes the Learning module -->
+   <action 	path="/learningStarter" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
+   			name="McLearningForm" 
+   			input=".learningStarter"> 
+
 	  	<forward
 		    name="loadLearner"
 		    path=".answers"
@@ -140,16 +135,15 @@
 	</action>  
 	
 	
-	<action
-      path="/learning"
-      type="org.lamsfoundation.lams.tool.mc.web.McAction"
-      name="McLearningForm"
-      scope="session"
-      input=".answers"
-      parameter="method"
-      unknown="false"
-      validate="true"
-    >
+   <!--Learning Main Action: interacts with the Learning module user -->
+	<action	path="/learning"
+		    type="org.lamsfoundation.lams.tool.mc.web.McAction"
+			name="McLearningForm"
+      		scope="session"
+      		input=".answers"
+      		parameter="method"
+      		unknown="false"
+      		validate="true">
 
 	  	<forward
 		    name="loadLearner"
@@ -188,19 +182,55 @@
 	  	/>
     </action>
     
+    
+    <!--Monitoring Starter Action: initializes the Monitoring module -->
+   <action 	path="/monitoringStarter" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringStarterAction" 
+   			name="McMonitoringForm" 
+   			input=".monitoringStarter"> 
+
+	  	<forward
+		    name="loadMonitoring"
+		    path=".monitoringContent"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+		    name="errorList"
+		    path=".errorList"
+		    redirect="true"
+	  	/>
+	</action>  
+    
+   
+   <!--Monitoring Main Action: interacts with the Monitoring module user -->
+   <action 	path="/monitoring" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction" 
+   			name="McMonitoringForm" 
+   			input=".monitoringContent"> 
+
+	  	<forward
+		    name="loadMonitoring"
+		    path=".monitoringContent"
+		    redirect="true"
+	  	/>
+
+	  	<forward
+		    name="errorList"
+		    path=".errorList"
+		    redirect="true"
+	  	/>
+	</action>  
+   
+    
  </action-mappings>
-
-  <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
- <message-resources parameter="org.lamsfoundation.lams.tool.mc.McResources"/>
-
-<!-- StrutsTestCase doesn't support tile well at the moment, Have to be 
-commented out for testing-->
-<plug-in className="org.apache.struts.tiles.TilesPlugin">
-	<set-property property="definitions-config"
-		value="/WEB-INF/tiles/tiles-defs.xml" />
-	<set-property property="definitions-debug" value="0" />
-	<set-property property="definitions-parser-details" value="0" />
-	<set-property property="definitions-parser-validate" value="true" />
-</plug-in>
-
+	
+	<message-resources parameter="org.lamsfoundation.lams.tool.mc.McResources"/>
+	<plug-in className="org.apache.struts.tiles.TilesPlugin">
+		<set-property property="definitions-config"
+			value="/WEB-INF/tiles/tiles-defs.xml" />
+		<set-property property="definitions-debug" value="0" />
+		<set-property property="definitions-parser-details" value="0" />
+		<set-property property="definitions-parser-validate" value="true" />
+	</plug-in>
 </struts-config>
