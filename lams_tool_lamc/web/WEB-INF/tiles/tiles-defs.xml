@@ -42,15 +42,13 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/SystemErrorContent.jsp" />	
 	</definition>
 
-<!-- ============= Mc Authoring Page Definitions ====================== -->	
+<!-- ============= Mc Authoring Module Definitions ====================== -->	
 	<definition name=".questions" extends=".baseDef" >
 		<put name="title" value="MCQ Tool Questions"/>
 		<put name="pageHeader" value = "MCQ Tool Questions"/>
 		<put name="content" value="/authoring/AuthoringMaincontent.jsp" />	
 	</definition>
 	
-		
-<!-- ============= Mc Authoring Starter Page Definitions ====================== -->	
 	<definition name=".starter" extends=".baseDef" >
 		<put name="title" value="Starter for Multiple Choice Authoring"/>
 		<put name="pageHeader" value = "Starter for Multiple Choice Authoring"/>
@@ -69,16 +67,16 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="content" value="/ErrorList.jsp" />	
 	</definition>
 	
-<!-- ============= Mc Learning Starter Page Definitions ====================== -->		
-		<definition name=".answers" extends=".baseDef" >
+<!-- ============= Mc Learning Module Definitions ====================== -->		
+	<definition name=".answers" extends=".baseDef" >
 		<put name="title" value="MCQ Tool Answers"/>
 		<put name="pageHeader" value = "MCQ Tool Answers"/>
 		<put name="content" value="/learning/AnswersContent.jsp" />	
 	</definition>
 	
 	<definition name=".learningStarter" extends=".baseDef" >
-		<put name="title" value="Starter for Q/A Learning"/>
-		<put name="pageHeader" value = "Starter for Q/A Learning"/>
+		<put name="title" value="Starter for MCQ Learning"/>
+		<put name="pageHeader" value = "Starter for MCQ Learning"/>
 		<put name="content" value="/learningIndex.jsp" />	
 	</definition>
 
@@ -111,4 +109,20 @@ http://www.gnu.org/licenses/gpl.txt
 		<put name="pageHeader" value = "MCQ Tool Results Summary"/>
 		<put name="content" value="/learning/ResultsSummary.jsp" />	
 	</definition>
+	
+	<!-- ============= Mc Monitoring Module Definitions ====================== -->		
+	<definition name=".monitoringStarter" extends=".baseDef" >
+		<put name="title" value="Starter for MCQ Monitoring"/>
+		<put name="pageHeader" value = "Starter for MCQ Monitoring"/>
+		<put name="content" value="/monitoringIndex.jsp" />	
+	</definition>
+	
+	<definition name=".monitoringContent" extends=".baseDef" >
+		<put name="title" value="MCQ Monitoring"/>
+		<put name="pageHeader" value = "MCQ Monitoring"/>
+		<put name="content" value="/monitoring/MonitoringMaincontent.jsp" />	
+	</definition>
+	
+	
+	
 </tiles-definitions>
