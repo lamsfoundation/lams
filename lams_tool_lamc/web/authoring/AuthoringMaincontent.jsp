@@ -147,15 +147,15 @@
 		
 	<c:if test="${ sessionScope.activeModule != 'defineLater'}"> 			
 		<div id='content_a'  class="tabbody content_a">
-			<h2>Advanced Definitions </h2>
+			<h2><bean:message key="label.advanced.definitions"/></h2>
 			
-				<table align=center> 	  
-				<tr>   
-				<td NOWRAP class=error>
-					<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
-				</td>
-				</tr> 
-				</table>
+			<table align=center> 	  
+			<tr>   
+			<td NOWRAP class=error>
+				<%@ include file="/Errorbox.jsp" %> <!-- show any error messages here -->
+			</td>
+			</tr> 
+			</table>
 			
 			<div id="formtablecontainer2">
 						<jsp:include page="/authoring/AdvancedContent.jsp" />
@@ -164,8 +164,8 @@
 		
 		
 		<div id='content_i'  class="tabbody content_i">
-				<h2>Instructions</h2>
-		
+				<h2><bean:message key="label.authoring.instructions"/></h2>
+				
 				<table align=center> 	  
 				<tr>   
 				<td NOWRAP class=error>
