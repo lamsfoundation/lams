@@ -6,7 +6,7 @@
 <%@ taglib uri="tags-fck-editor" prefix="FCK" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-					<table class="forms">
+				<table class="forms">
 					
 				<c:if test="${ (sessionScope.activeModule == 'authoring') ||  
 							   (sessionScope.defineLaterInEditMode == 'true') 
