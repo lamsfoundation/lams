@@ -6,7 +6,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.apache.struts.upload.FormFile;
 
 /**
- * @author ozgurd
+ * @author Ozgur Demirtas
  *
  * ActionForm for the Authoring environment
  */
