@@ -82,9 +82,9 @@
 					<!-- table for tab 4 (statistics) -->
 					<table border="0" cellspacing="0" cellpadding="0">
 					  <tr>
-						<td ><a href="#" onClick="showTab('i');return false;"><img border="0" src="author_page/images/aqua_tab_left.gif" width="8" height="22" id="tab_left_i"   name="tab_left_i" /></a></td>
-						<td class="tab tabcentre" width="90" id="tab_tbl_centre_i"  onClick="showTab('i');return false;" ><label for="i" accesskey="i"><a href="#" onClick="showTab('i');return false;" id="i" >Statistics</a></label></td>
-						<td ><a href="#" onClick="showTab('i');return false;"><img src="author_page/images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_i"  name="tab_right_i"/></a></td>
+						<td ><a href="#" onClick="showTab('s');return false;"><img border="0" src="author_page/images/aqua_tab_left.gif" width="8" height="22" id="tab_left_s"   name="tab_left_s" /></a></td>
+						<td class="tab tabcentre" width="90" id="tab_tbl_centre_s"  onClick="showTab('s');return false;" ><label for="s" accesskey="s"><a href="#" onClick="showTab('s');return false;" id="s" >Statistics</a></label></td>
+						<td ><a href="#" onClick="showTab('s');return false;"><img src="author_page/images/aqua_tab_right.gif"  width="9" height="22" border="0" id="tab_right_s"  name="tab_right_s"/></a></td>
 					  </tr>
 					</table>
 				</td>
@@ -144,7 +144,7 @@
 				</div>
 		</div>
 		
-		<div id='content_i'  class="tabbody content_i">
+		<div id='content_s'  class="tabbody content_i">
 				<h2><bean:message key="button.stats"/></h2>
 				
 				<table align=center> 	  
