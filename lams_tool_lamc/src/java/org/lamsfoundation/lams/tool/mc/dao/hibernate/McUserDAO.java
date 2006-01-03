@@ -19,9 +19,6 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
-/*
- * @author ozgurd
- */
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
@@ -34,7 +31,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
- * @author ozgurd
+ * @author Ozgur Demirtas
  * <p>Hibernate implementation for database access to Mc users (learners) for the mc tool.</p>
  */
 public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
