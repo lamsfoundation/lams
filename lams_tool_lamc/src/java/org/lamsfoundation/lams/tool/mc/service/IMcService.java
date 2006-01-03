@@ -246,5 +246,7 @@ public interface IMcService
     public List getOnlineFilesMetaData(Long mcContentId) throws McApplicationException;
     
     public List getOfflineFilesMetaData(Long mcContentId) throws McApplicationException;
+    
+    public List getSessionsFromContent(McContent mcContent) throws McApplicationException;
 }
 
