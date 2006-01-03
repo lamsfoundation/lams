@@ -106,7 +106,7 @@ public abstract class McUtils implements McAppConstants {
 	
 	public static String getFormattedDateString(Date date)
 	{
-		logger.debug(logger + " " + " McUtils getFormattedDateString: " +  
+		logger.debug("getFormattedDateString: " +  
 				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 	}
@@ -139,7 +139,7 @@ public abstract class McUtils implements McAppConstants {
 		IMcService mcService =McUtils.getToolService(request);
 	    
     	McContent mcContent=mcService.retrieveMc(toolContentId);
-	    logger.debug(logger + " " + "McUtils " +  "retrieving mcContent: " + mcContent);
+	    logger.debug("retrieving mcContent: " + mcContent);
 	    if (mcContent == null) 
 	    	return false;
 	    
@@ -810,5 +810,75 @@ public abstract class McUtils implements McAppConstants {
 	{
 		return false;
 	}
+	
+	
+	/**
+	 * builds a map from a list  
+	 * convertToMap(List sessionsList)
+	 * 
+	 * @param sessionsList
+	 * @return Map
+	 */
+	public static Map convertToMap(List sessionsList, String listType)
+	{
+		Map map= new TreeMap(new McComparator());
+		logger.debug("listType: " + listType);
 		
+		Iterator listIterator=sessionsList.iterator();
+    	Long mapIndex=new Long(1);
+    	
+    	
+    	while (listIterator.hasNext())
+    	{
+    		if (listType.equals("String"))
+    		{
+    			String text=(String)listIterator.next();
+    			map.put(mapIndex.toString(), text);
+    		}
+    		else if (listType.equals("Long"))
+    		{
+    			Long LongValue=(Long)listIterator.next();
+    			map.put(mapIndex.toString(), LongValue);
+    		}
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	return map;
+	}
+	
+	
+	/**
+	 * builds a String based map from a list 
+	 * convertToMap(List sessionsList)
+	 * 
+	 * @param sessionsList
+	 * @return Map
+	 */
+	public static Map convertToStringMap(List sessionsList, String listType)
+	{
+		Map map= new TreeMap(new McComparator());
+		logger.debug("listType: " + listType);
+		
+		Iterator listIterator=sessionsList.iterator();
+    	Long mapIndex=new Long(1);
+    	
+    	
+    	while (listIterator.hasNext())
+    	{
+    		if (listType.equals("String"))
+    		{
+    			logger.debug("listType String");
+    			String text=(String)listIterator.next();
+    			map.put(mapIndex.toString(), text);
+    		}
+    		else if (listType.equals("Long"))
+    		{
+    			logger.debug("listType Long");
+    			Long LongValue=(Long)listIterator.next();
+    			map.put(mapIndex.toString(), LongValue.toString());
+    		}
+    		mapIndex=new Long(mapIndex.longValue()+1);
+    	}
+    	return map;
+	}
+
 }
