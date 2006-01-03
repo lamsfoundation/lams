@@ -150,4 +150,4 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	    {
 	        this.getHibernateTemplate().flush();
 	    }
-} 
+	} 

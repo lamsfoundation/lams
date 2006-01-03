@@ -33,7 +33,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
 /**
- * @author ozgurd
+ * @author Ozgur Demirtas
  * 
  * <p>Hibernate implementation for database access to McQueContent for the mc tool.</p>
  */
@@ -178,7 +178,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 				.list();
 
 			if(list != null && list.size() > 0){
-				logger.debug("will iterate the list of McQueContent");
 				Iterator listIterator=list.iterator();
 		    	while (listIterator.hasNext())
 		    	{
@@ -199,7 +198,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 				.list();
 
 			if(list != null && list.size() > 0){
-				logger.debug("will iterate the list of McQueContent");
 				Iterator listIterator=list.iterator();
 		    	while (listIterator.hasNext())
 		    	{
@@ -256,5 +254,4 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 	    {
 	        this.getHibernateTemplate().flush();
 	    }
-		
-} 
+	} 
