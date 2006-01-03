@@ -378,10 +378,12 @@ public interface McAppConstants {
     public static final String IS_MONITORING_DEFINE_LATER  		   		="isMonitoringDefineLater";
     public static final String NO_TOOL_SESSIONS_AVAILABLE				="noToolSessionAvailable";
     public static final String ORIGINAL_TOOL_SESSIONS					="originalToolSessions";
+    public static final String SELECTION_CASE							="selectionCase";
     
     public static final String MONITORED_OFFLINE_INSTRUCTIONS			="monitoredOfflineInstructions";
     public static final String MONITORED_ONLINE_INSTRUCTIONS			="monitoredOnlineInstructions";
     public static final String MONITORING_INSTRUCTIONS_UPDATE_MESSAGE	="monitoringInstructionsUpdateMessage";
+    public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO		="listMonitoredAnswersContainerDto";
     
     /*
      * Monitor and Learning common constants - used in jsp reporting
