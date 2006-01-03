@@ -50,10 +50,6 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 		return (McContent) this.getHibernateTemplate().get(McContent.class, uid);
 	}
 	
-	
-	/** Finds a package via the tool content id. Returns
-	 * null if not found
-	 */
 	public McContent findMcContentById(Long mcContentId)
 	{
 		String query = "from McContent as mc where mc.mcContentId = ?";
@@ -86,14 +82,12 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	}
 	
 	
-
 	public void saveMcContent(McContent mcContent)
     {
 		this.getSession().setFlushMode(FlushMode.AUTO);
     	this.getHibernateTemplate().save(mcContent);
     }
     
-
 	public void updateMcContent(McContent mcContent)
     {
     	this.getHibernateTemplate().update(mcContent);
@@ -128,7 +122,6 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
     	this.getHibernateTemplate().deleteAll(mcContent.getMcSessions());
     }
     
-
     public void addMcSession(Long mcContentId, McSession mcSession)
     {
         McContent content = findMcContentById(mcContentId);
