@@ -12,6 +12,8 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 public class McMonitoringForm extends ActionForm implements McAppConstants {
 	// dispatch controls which method is called by the Lookup map */
 	protected String dispatch;
+	
+	protected String isToolSessionChanged;
 	/**
 	 * @return Returns the dispatch.
 	 */
@@ -23,5 +25,17 @@ public class McMonitoringForm extends ActionForm implements McAppConstants {
 	 */
 	public void setDispatch(String dispatch) {
 		this.dispatch = dispatch;
+	}
+	/**
+	 * @return Returns the isToolSessionChanged.
+	 */
+	public String getIsToolSessionChanged() {
+		return isToolSessionChanged;
+	}
+	/**
+	 * @param isToolSessionChanged The isToolSessionChanged to set.
+	 */
+	public void setIsToolSessionChanged(String isToolSessionChanged) {
+		this.isToolSessionChanged = isToolSessionChanged;
 	}
 }
