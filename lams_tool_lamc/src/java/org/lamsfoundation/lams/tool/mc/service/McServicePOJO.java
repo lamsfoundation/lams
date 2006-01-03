@@ -826,6 +826,20 @@ public class McServicePOJO implements
         }
 	}
 
+    public List getSessionsFromContent(McContent mcContent) throws McApplicationException
+	{
+    	try
+        {
+            return mcSessionDAO.getSessionsFromContent(mcContent);
+        }
+        catch (DataAccessException e)
+        {
+            throw new McApplicationException("Exception occured when lams is getting"
+                                                 + " the mc sessions list: "
+                                                 + e.getMessage(),e);
+        }
+	}
+    
     
     public void deleteMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException
 	{
