@@ -240,14 +240,10 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
     
     public String getFileUuid(String filename)
     {
-
-      logger.debug("starting getFileUuid :" + filename);	
       HibernateTemplate templ = this.getHibernateTemplate();
       List list = getSession().createQuery(GET_FILES_UUID)
 			.setString("filename", filename)
 			.list();
-      
-      logger.debug("list getFileUuid :" + list);
       
       if (list != null && list.size() > 0){
       	Iterator listIterator=list.iterator();
@@ -365,5 +361,4 @@ public class McUploadedFileDAO extends HibernateDaoSupport implements IMcUploade
     {
         this.getHibernateTemplate().flush();
     }
-	    
 } 
