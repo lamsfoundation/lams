@@ -56,7 +56,6 @@ public class AuthoringUtil implements McAppConstants {
     {
     	/** define the next tab as Basic tab by default*/
      	request.getSession().setAttribute(EDIT_OPTIONS_MODE, new Integer(0));
-    	logger.debug("resetting  EDIT_OPTIONS_MODE to 0");
      	
      	McUtils.persistRichText(request);
      	AuthoringUtil.populateParameters(request, mcAuthoringForm);
@@ -73,9 +72,8 @@ public class AuthoringUtil implements McAppConstants {
     protected static void populateParameters(HttpServletRequest request, McAuthoringForm mcAuthoringForm)
     {
         String selectedQuestion=request.getParameter(SELECTED_QUESTION);
-    	logger.debug("read parameter selectedQuestion: " + selectedQuestion);
-    	
-    	if ((selectedQuestion != null) && (selectedQuestion.length() > 0))
+  
+        if ((selectedQuestion != null) && (selectedQuestion.length() > 0))
     	{
     		request.getSession().setAttribute(SELECTED_QUESTION,selectedQuestion);
     		logger.debug("updated SELECTED_QUESTION");
@@ -386,7 +384,7 @@ public class AuthoringUtil implements McAppConstants {
 	 */
     public static Map shiftOptionsMap(Map mapGlobalOptionsContent, String questionIndex , String direction)
     {
-    	/* mapGlobalOptionsContent refers to mapGenaralOptionsContent and mapGeneralSelectedlOptionsContent */
+    	/* mapGlobalOptionsContent refers to mapGeneralOptionsContent and mapGeneralSelectedlOptionsContent */
     	
     	/* map to be returned */
     	Map mapTempGeneralOptionsContent= new TreeMap(new McComparator());
@@ -518,14 +516,12 @@ public class AuthoringUtil implements McAppConstants {
                 }
                 else if (pairs.getKey().equals(new Integer(shiftableIndex).toString()))
                 {
-                	logger.debug("move type 2 " +  shiftableIndex);
                 	mapTempQuestionsContent.put(new Long(mapCounter).toString(), movableQuestionEntry);
                 }
             }
     	}
     	else
     	{
-    		logger.debug("no change to map");
     		mapTempQuestionsContent=mapQuestionsContent;
     	}
     		return mapTempQuestionsContent;
@@ -1494,20 +1490,10 @@ public class AuthoringUtil implements McAppConstants {
     	logger.debug("using displayOrder: " + displayOrder);
     	logger.debug("using weight: " + weight);
     	
-    	/*
-    	Map mapWeights= (Map)request.getSession().getAttribute(MAP_WEIGHTS);
-    	logger.debug("MAP_WEIGHTS:" + mapWeights);
-    	*/
-    	
     	String incorrectFeedback=(String)mapFeedbackIncorrect.get(displayOrder);
     	logger.debug("new  incorrectFeedback will be :" + incorrectFeedback);
     	String correctFeedback=(String)mapFeedbackCorrect.get(displayOrder);
     	logger.debug("new correctFeedback will be :" + correctFeedback);
-    	
-    	/*
-    	String weight=(String)mapWeights.get(displayOrder);
-    	logger.debug("new weight will be:" + weight);
-    	*/
     	
     	IMcService mcService =McUtils.getToolService(request);
     	mcQueContent.setDisplayOrder(new Integer(displayOrder));
