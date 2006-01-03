@@ -2,6 +2,8 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +20,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McContent;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
@@ -29,6 +32,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * 
  * @author Ozgur Demirtas
+ * starts up the monitoring module
  *
  */
 
@@ -60,9 +64,45 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    	return validateParameters;
 	    }
   
-	    Long toolSessionID=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_SESSION_ID);
-	    logger.debug("retrieved toolSessionID: " + toolSessionID);
-    	
+	    Long toolContentId=(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
+	    logger.debug("toolContentId: " + toolContentId);
+	    McContent mcContent=mcService.retrieveMc(toolContentId);
+		logger.debug("existing mcContent:" + mcContent);
+		
+		if (mcContent == null)
+		{
+			persistError(request, "error.content.doesNotExist");
+	    	request.setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true));
+			return (mapping.findForward(ERROR_LIST));
+		}
+	    
+		Map summaryToolSessions=MonitoringUtil.populateToolSessions(request, mcContent);
+		logger.debug("summaryToolSessions: " + summaryToolSessions);
+		if (summaryToolSessions.isEmpty())
+		{
+			/* inform in the Summary tab that the tool has no active sessions */
+			request.setAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS, new Boolean(true));
+		}
+		
+		
+		request.getSession().setAttribute(SUMMARY_TOOL_SESSIONS, summaryToolSessions);
+	    logger.debug("SUMMARY_TOOL_SESSIONS: " + request.getSession().getAttribute(SUMMARY_TOOL_SESSIONS));
+	    
+	    /* SELECTION_CASE == 2 indicates start up */
+	    request.getSession().setAttribute(SELECTION_CASE, new Long(2));
+	    logger.debug("SELECTION_CASE: " + request.getSession().getAttribute(SELECTION_CASE));
+	    
+	    /* Default to All for tool Sessions so that all tool sessions' summary information gets displayed when the module starts up */
+	    request.getSession().setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
+	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getSession().getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+	    
+	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, mcContent);
+	    
+	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
+	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getSession().getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
+	    
+	    //MonitoringUtil.buildGroupsSessionData(request, mcContent);
+	    
 	    logger.debug("forwarding to: " + LOAD_MONITORING);
 	    return (mapping.findForward(LOAD_MONITORING));	
 	}
@@ -87,32 +127,28 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    
 	    logger.debug("retrieved userId: " + userID);
     	request.getSession().setAttribute(USER_ID, userID);
-		
-	    
-	    /*
-	     * process incoming tool session id and later derive toolContentId from it. 
-	     */
-	    //String strToolSessionId=request.getParameter(TOOL_SESSION_ID);
-    	String strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+
+    	
+    	String strToolContentId=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	    long toolSessionId=0;
-	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
+	    if ((strToolContentId == null) || (strToolContentId.length() == 0)) 
 	    {
-	    	persistError(request, "error.toolSessionId.required");
-	    	request.setAttribute(USER_EXCEPTION_TOOLSESSIONID_REQUIRED, new Boolean(true));
+	    	persistError(request, "error.contentId.required");
+	    	request.setAttribute(USER_EXCEPTION_CONTENTID_REQUIRED, new Boolean(true));
 			return (mapping.findForward(ERROR_LIST));
 	    }
 	    else
 	    {
 	    	try
 			{
-	    		toolSessionId=new Long(strToolSessionId).longValue();
-		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
-		    	request.getSession().setAttribute(TOOL_SESSION_ID,new Long(toolSessionId));	
+	    		long toolContentId=new Long(strToolContentId).longValue();
+		    	logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
+		    	request.getSession().setAttribute(TOOL_CONTENT_ID,new Long(toolContentId));	
 			}
 	    	catch(NumberFormatException e)
 			{
-	    		persistError(request, "error.sessionId.numberFormatException");
-	    		logger.debug("add error.sessionId.numberFormatException to ActionMessages.");
+	    		persistError(request, "error.contentId.numberFormatException");
+	    		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
 				request.setAttribute(USER_EXCEPTION_NUMBERFORMAT, new Boolean(true));
 				return (mapping.findForward(ERROR_LIST));
 			}
