@@ -32,7 +32,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
- * @author ozgurd
+ * @author Ozgur Demirtas
  * <p>Hibernate implementation for database access to McUsrAttempt for the mc tool.</p>
  */
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
