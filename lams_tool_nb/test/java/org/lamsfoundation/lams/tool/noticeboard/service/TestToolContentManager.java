@@ -82,6 +82,7 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	     	cleanNbContentData(TEST_COPYNB_ID);
 	     }
      }
+	
 	/*
 	 * Normal Use case
 	 */
@@ -166,9 +167,10 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	public void testCopyToolContentWithDefaultContentMissing() throws ToolException
 	{
 	   // cleanCopyContent = true;
-	    
+		Long defaultContentId = nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE);
+			    
 	    //remove the default content so it will trigger the exception
-	    nbService.removeNoticeboard(nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
+	    nbService.removeNoticeboard(defaultContentId);
 	    
 	    try
 	    {
@@ -182,8 +184,8 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 	        assertTrue(true); //an exception should not have been thrown since default content is there
 	    }
 	    
-	    this.restoreDefaultContent();
-	}
+	    restoreDefaultContent(defaultContentId);
+	} 
 	
 	/*
 	 * Normal case: 
@@ -360,6 +362,5 @@ public class TestToolContentManager extends NbDataAccessTestCase {
 		assertNull(nbContent);
   
 	}
-	
 	
 }
