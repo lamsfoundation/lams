@@ -54,8 +54,8 @@
 				<property name="nbSessionDAO"><ref bean="nbSessionDAO"/></property>
 				<property name="nbUserDAO"><ref bean="nbUserDAO"/></property>
 				<property name="nbAttachmentDAO"><ref bean="nbAttachmentDAO"/></property>
-			<!-- 	<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property> -->
+				<property name="toolService"><ref bean="lamsToolService"/></property>
+			<!-- 	<property name="learnerService"><ref bean="learnerService"/></property> -->
 				</bean>
 		</property>
 		<property name="transactionAttributes">
