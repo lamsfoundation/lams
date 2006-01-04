@@ -142,9 +142,9 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     protected String[] getContextConfigLocation() {
     	return new String[] {
     	        "org/lamsfoundation/lams/localApplicationContext.xml",
-    			//"org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-    			//"org/lamsfoundation/lams/tool/toolApplicationContext.xml",
-    			//"org/lamsfoundation/lams/learning/learningApplicationContext.xml",
+    			"org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+    			"org/lamsfoundation/lams/tool/toolApplicationContext.xml",
+    			"org/lamsfoundation/lams/learning/learningApplicationContext.xml",
     			"org/lamsfoundation/lams/tool/noticeboard/testApplicationContext.xml"};
     }
     
@@ -240,9 +240,9 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
     	initNbUserData();
     }
     
-    protected void restoreDefaultContent()
+    protected void restoreDefaultContent(Long defaultContentId)
     {
-        nbContent = new NoticeboardContent(DEFAULT_CONTENT_ID,	
+        nbContent = new NoticeboardContent(defaultContentId,	
                 DEFAULT_TITLE,
                 DEFAULT_CONTENT,
                 DEFAULT_ONLINE_INSTRUCTIONS,
@@ -250,17 +250,12 @@ public class NbDataAccessTestCase extends AbstractLamsTestCase
                 DEFAULT_DEFINE_LATER,
                 DEFAULT_FORCE_OFFLINE,
                 DEFAULT_CONTENT_IN_USE,
-				DEFAULT_CREATOR_USER_ID,
+				null,
 				TEST_DATE_CREATED,
-				TEST_DATE_UPDATED);
+				null);
 
         noticeboardDAO.saveNbContent(nbContent);
-        
-        nbSession = new NoticeboardSession(DEFAULT_SESSION_ID,
-                							nbContent,
-                							TEST_DATE_CREATED,
-                							DEFAULT_SESSION_STATUS);
-        nbSessionDAO.saveNbSession(nbSession);
+ 
     }
     
     //===========================
