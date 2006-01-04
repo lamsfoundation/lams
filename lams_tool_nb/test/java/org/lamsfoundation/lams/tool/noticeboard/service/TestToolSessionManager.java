@@ -149,14 +149,15 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 	        fail("An exception should not have been thrown");
 	        assertTrue(false);
 	    }
-	}
+	} 
 	/*
 	 * Error case: the default content is missing, throws ToolException
 	 */
 	
 	public void testCreateToolSessionDefaultContentMissing() throws ToolException
 	{
-	    nbService.removeNoticeboard(nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
+		Long defaultContentId = nbService.getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE);
+	    nbService.removeNoticeboard(defaultContentId);
 	    
 	    try
 	    {
@@ -169,8 +170,8 @@ public class TestToolSessionManager extends NbDataAccessTestCase {
 	        assertTrue(true);
 	    }
 	    
-	    this.restoreDefaultContent();
-	}
+	    restoreDefaultContent(defaultContentId);
+	} 
 	
 	/*
 	 * Normal case: 
