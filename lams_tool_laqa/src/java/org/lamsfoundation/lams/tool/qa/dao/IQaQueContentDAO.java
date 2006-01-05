@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 public interface IQaQueContentDAO
 {
     public QaQueContent getQaQueById(long qaQueContentId);
-    
+        
     public QaQueContent getToolDefaultQuestionContent(final long qaContentId);
     
     public List getQuestionIndsForContent(QaContent qa);
@@ -42,5 +42,7 @@ public interface IQaQueContentDAO
     public void createQueContent(QaQueContent queContent);
     
     public void removeQueContent(long qaQueContentId);
+    
+    public List getQaQueContentsByContentId(long qaContentId);
        
 }

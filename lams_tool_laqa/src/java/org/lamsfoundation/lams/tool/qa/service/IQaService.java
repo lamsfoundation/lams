@@ -233,5 +233,6 @@ public interface IQaService
     
     public void cleanUploadedFilesMetaData() throws QaApplicationException;
     
+    public List retrieveQaQueContentsByToolContentId(long toolContentId);
 }
 

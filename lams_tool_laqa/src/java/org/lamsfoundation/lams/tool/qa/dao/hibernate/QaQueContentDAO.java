@@ -91,4 +91,8 @@ public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueConten
 			this.getSession().setFlushMode(FlushMode.AUTO);
 	    	this.getHibernateTemplate().delete(qaQueContent);
 	    }
+        
+        public List getQaQueContentsByContentId(long qaContentId){
+            return getHibernateTemplate().findByNamedParam(LOAD_QUESTION_CONTENT_BY_CONTENT_ID, "qaContentId", new Long(qaContentId));
+        }
 } 

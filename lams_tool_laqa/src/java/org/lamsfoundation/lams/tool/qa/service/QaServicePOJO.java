@@ -1696,4 +1696,17 @@ public class QaServicePOJO
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
 	}
+    
+    public List retrieveQaQueContentsByToolContentId(long qaContentId){
+        try
+        {
+            return qaQueContentDAO.getQaQueContentsByContentId(qaContentId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new QaApplicationException("Exception occured when lams is loading qa que usr: "
+                                                         + e.getMessage(),
+                                                           e);
+        }
+    }
 }
