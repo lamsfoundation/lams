@@ -136,7 +136,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    
 		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	    logger.debug("retrieving qaService: " + qaService);
-	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
+//	    request.getSession().setAttribute(TOOL_SERVICE, qaService);
 	    
 	    /*
 	     * mark the http session as a learning activity 
@@ -203,7 +203,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	     * make sure this session exists in tool's session table by now.
 	     */
 		
-	    if (!QaUtils.existsSession(toolSessionId, request)) 
+	    if (!QaUtils.existsSession(toolSessionId, qaService)) 
 		{
 				logger.debug("tool session does not exist" + toolSessionId);
 				/*
@@ -337,7 +337,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    {
 	    	logger.debug("the learner has already responsed to this content, just generate a read-only report.");
 	    	LearningUtil learningUtil= new LearningUtil();
-	    	learningUtil.buidLearnerReport(request,1);    	
+	    	learningUtil.buidLearnerReport(request,1, qaService);    	
 	    	logger.debug("buidLearnerReport called successfully, forwarding to: " + LEARNER_REPORT);
 	    	return (mapping.findForward(LEARNER_REPORT));
 	    }

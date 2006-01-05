@@ -63,8 +63,8 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 	{
     	IQaService qaService=null;
    		qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-   	    logger.debug("retrieved qaService : " + qaService);
-   	    request.getSession().setAttribute(TOOL_SERVICE, qaService);	
+//   	    logger.debug("retrieved qaService : " + qaService);
+//   	    request.getSession().setAttribute(TOOL_SERVICE, qaService);	
 
     	/*
 	     * persist time zone information to session scope. 
@@ -173,7 +173,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			{
 			    if ((strToolContentId != null) && (strToolContentId.length() > 0)) 
 			    {
-			    	if (!QaUtils.existsContent(new Long(strToolContentId).longValue(), request))
+			    	if (!QaUtils.existsContent(new Long(strToolContentId).longValue(), qaService))
 			    	{
 			    		persistError(request,"error.content.doesNotExist");
 			    		request.setAttribute(USER_EXCEPTION_CONTENT_DOESNOTEXIST, new Boolean(true));
@@ -248,7 +248,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 			/* a single toolSessionId */
 			request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 			logger.debug("build a learner report:");
-			learningUtil.buidLearnerReport(request, 1);
+			learningUtil.buidLearnerReport(request, 1, qaService);
 		}
 		else
 		{
@@ -280,7 +280,7 @@ public class QaExportPortfolioStarterAction extends Action implements QaAppConst
 				toolSessionId=(Long)sessionListIterator.next();
 				logger.debug("toolSessionId: " + toolSessionId);
 				request.getSession().setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
-				learningUtil.buidLearnerReport(request, toolSessionCounter);
+				learningUtil.buidLearnerReport(request, toolSessionCounter, qaService);
 				toolSessionCounter++;
 			}
 		}

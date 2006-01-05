@@ -27,24 +27,38 @@
 				  requestScope.userExceptionToolSessionDoesNotExist != 'true' &&				  
 				  requestScope.userExceptionNumberFormat 			!= true}"> 	
 		<!-- this form is exists temporarily to represent tool icon, remove this form once the tool is deployed into authoring environment -->
-		<html:form  action="/monitoring?method=generateToolSessionDataMap&validate=false" method="POST" target="_self">
+        
+		<html:form action="/monitoring?method=generateToolSessionDataMap&validate=false" method="POST" target="_self">
+        <input type="hidden" name="dispatch" value=""/>
 		
 		<table align=center> <!-- Dave to take off-->
 			<tr>
 				<td>
-					<html:submit property="summary" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+					<html:submit styleClass="linkbutton" 
+					             onmouseover="pviiClassNew(this,'linkbutton')" 
+					             onmouseout="pviiClassNew(this,'linkbutton')"
+					             onclick="submitMethod('showSummary');">
 						<bean:message key="button.summary"/>
 					</html:submit> 
 				</td><td>
-					<html:submit property="instructions" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+					<html:submit styleClass="linkbutton" 
+					             onmouseover="pviiClassNew(this,'linkbutton')" 
+					             onmouseout="pviiClassNew(this,'linkbutton')"
+					             onclick="submitMethod('showInstructions');">
 						<bean:message key="button.instructions"/>
 					</html:submit> 
 				</td><td>
-					<html:submit property="editActivity" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+					<html:submit styleClass="linkbutton" 
+					             onmouseover="pviiClassNew(this,'linkbutton')" 
+					             onmouseout="pviiClassNew(this,'linkbutton')"
+					             onclick="submitMethod('showEditActivity');">
 						<bean:message key="button.editActivity"/>
 					</html:submit> 
 				</td><td>			
-					<html:submit property="stats" styleClass="linkbutton" onmouseover="pviiClassNew(this,'linkbutton')" onmouseout="pviiClassNew(this,'linkbutton')">
+					<html:submit styleClass="linkbutton" 
+					             onmouseover="pviiClassNew(this,'linkbutton')" 
+					             onmouseout="pviiClassNew(this,'linkbutton')"
+					             onclick="submitMethod('showStats');">
 						<bean:message key="button.stats"/>
 					</html:submit> 
 				</td>
@@ -73,28 +87,35 @@
 	</c:if>						
 	
 <SCRIPT language="JavaScript"> 
+
+    function submitMethod(actionMethod) {
+        document.QaMonitoringForm.dispatch.value=actionMethod; 
+        document.QaMonitoringForm.submit();
+    }
+
 	function selectToolSession()
 	{
-		document.forms[0].isToolSessionChanged.value='1';
-		document.forms[0].submit();
+		document.QaMonitoringForm.isToolSessionChanged.value='1';
+		submitMethod("selectToolSession");
 	}
 	
 	function selectResponse(responseId)
 	{
-		document.forms[0].responseId.value=responseId;
-		document.forms[0].submit();
+		document.QaMonitoringForm.responseId.value=responseId;
+		submitMethod("editResponse");
 	}
 	
 	function hideResponse(responseId)
 	{
-		document.forms[0].hiddenResponseId.value=responseId;
-		document.forms[0].submit();
+    
+        document.QaMonitoringForm.hiddenResponseId.value=responseId;
+		submitMethod("hideResponse");
 	}
 	
 	function unHideResponse(responseId)
 	{
-		document.forms[0].unHiddenResponseId.value=responseId;
-		document.forms[0].submit();
+		document.QaMonitoringForm.unHiddenResponseId.value=responseId;
+		submitMethod("unhideResponse");
 	}
 	
  </SCRIPT>	

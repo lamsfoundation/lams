@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -44,6 +45,7 @@ import sun.tools.jar.resources.jar;
  */
 public class AuthoringUtil implements QaAppConstants {
 	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
+    
 	
     /**
      * reconstructQuestionContentMapForAdd(TreeMap mapQuestionContent, HttpServletRequest request)
@@ -479,10 +481,9 @@ public class AuthoringUtil implements QaAppConstants {
 //    }
 
     //doesn't update files
-    public QaContent saveOrUpdateQaContent(Map mapQuestionContent, HttpServletRequest request, QaAuthoringForm qaAuthoringForm){
+    public QaContent saveOrUpdateQaContent(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm){
         
         UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);//request.getSession().getAttribute(AttributeNames.USER);
-        IQaService qaService =QaUtils.getToolService(request);
         
         boolean isQuestionsSequenced=false;
         boolean isSynchInMonitor=false;
@@ -534,7 +535,7 @@ public class AuthoringUtil implements QaAppConstants {
             qaService.updateQa(qa);
         
         //recreate all question contents
-        createQuestionContent(mapQuestionContent, request, qa);
+        createQuestionContent(mapQuestionContent, qaService, qa);
         
         return qa;
     }
@@ -545,10 +546,8 @@ public class AuthoringUtil implements QaAppConstants {
      * 
      * persist the questions in the Map the user has submitted 
      */
-    protected void createQuestionContent(Map mapQuestionContent, HttpServletRequest request, QaContent qaContent)
-    {
-    	IQaService qaService =QaUtils.getToolService(request);
-        
+    protected void createQuestionContent(Map mapQuestionContent, IQaService qaService, QaContent qaContent)
+    {        
         Iterator itMap = mapQuestionContent.entrySet().iterator();
         int diplayOrder=0;
         while (itMap.hasNext()) 
@@ -609,59 +608,59 @@ public class AuthoringUtil implements QaAppConstants {
 //		}
 //    }
     
-    /**
-     * Normally, a request to set runOffline property of the content comes directly from container through the property inspector.
-     * What we do below is simulate that for development purposes.
-     * @param request
-     */
-    
-    public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
-    {
-    	IQaService qaService =QaUtils.getToolService(request);
-    	
-    	String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-    	if ((toolContentId != null) && (!toolContentId.equals("")))
-    	{
-    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
-    		try
-			{
-    			qaService.setAsRunOffline(new Long(toolContentId));	
-			}
-    		catch(ToolException e)
-			{
-    			logger.debug("we should never come here");
-			}
-    		
-    		logger.debug("post-RunAsOffline");
-		}
-    	logger.debug("end of simulating RunOffline on content id: " + toolContentId);
-    }
-	
-    /**
-     * Normally, a request to set defineLaterproperty of the content comes directly from container through the property inspector.
-     * What we do below is simulate that for development purposes.
-     * @param request
-     */
-    public void simulatePropertyInspector_setAsDefineLater(HttpServletRequest request)
-    {
-    	IQaService qaService =QaUtils.getToolService(request);
-    	
-    	String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-    	if ((toolContentId != null) && (!toolContentId.equals("")))
-    	{
-    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
-    		try
-			{
-    			qaService.setAsDefineLater(new Long(toolContentId));	
-    		}
-    		catch(ToolException e)
-			{
-    			logger.debug("we should never come here");
-			}
-    		
-    		logger.debug("post-setAsDefineLater");
-		}
-    	logger.debug("end of simulating setAsDefineLater on content id: " + toolContentId);
-    }
+//    /**
+//     * Normally, a request to set runOffline property of the content comes directly from container through the property inspector.
+//     * What we do below is simulate that for development purposes.
+//     * @param request
+//     */
+//    
+//    public void simulatePropertyInspector_RunOffline(HttpServletRequest request)
+//    {
+//    	IQaService qaService =QaUtils.getToolService(request);
+//    	
+//    	String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+//    	if ((toolContentId != null) && (!toolContentId.equals("")))
+//    	{
+//    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
+//    		try
+//			{
+//    			qaService.setAsRunOffline(new Long(toolContentId));	
+//			}
+//    		catch(ToolException e)
+//			{
+//    			logger.debug("we should never come here");
+//			}
+//    		
+//    		logger.debug("post-RunAsOffline");
+//		}
+//    	logger.debug("end of simulating RunOffline on content id: " + toolContentId);
+//    }
+//	
+//    /**
+//     * Normally, a request to set defineLaterproperty of the content comes directly from container through the property inspector.
+//     * What we do below is simulate that for development purposes.
+//     * @param request
+//     */
+//    public void simulatePropertyInspector_setAsDefineLater(HttpServletRequest request)
+//    {
+//    	IQaService qaService =QaUtils.getToolService(request);
+//    	
+//    	String toolContentId=(String)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+//    	if ((toolContentId != null) && (!toolContentId.equals("")))
+//    	{
+//    		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
+//    		try
+//			{
+//    			qaService.setAsDefineLater(new Long(toolContentId));	
+//    		}
+//    		catch(ToolException e)
+//			{
+//    			logger.debug("we should never come here");
+//			}
+//    		
+//    		logger.debug("post-setAsDefineLater");
+//		}
+//    	logger.debug("end of simulating setAsDefineLater on content id: " + toolContentId);
+//    }
 	
 }

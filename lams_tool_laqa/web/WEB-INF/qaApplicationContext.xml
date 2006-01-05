@@ -113,7 +113,7 @@
 					<prop key="copy*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="save*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
 					<prop key="update*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="get*">PROPAGATION_REQUIRED,readOnly,-QacpApplicationException</prop>
+					<prop key="get*">PROPAGATION_REQUIRED,-QacpApplicationException</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<!--  <prop key="configureContentRepository">PROPAGATION_REQUIRED,-QaApplicationException</prop> -->
 				</props>

@@ -39,7 +39,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
@@ -50,6 +49,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QaToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -385,7 +385,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws IOException, ServletException {
         QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-        IQaService qaService =QaUtils.getToolService(request);
+        IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
         AuthoringUtil authoringUtil= new AuthoringUtil();
         Map mapQuestionContent=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT);
         
@@ -423,7 +423,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         /*delete-recreate the questions in the db*/
           authoringUtil.reconstructQuestionContentMapForSubmit(mapQuestionContent, request);
         
-          QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, request, qaAuthoringForm);            
+          QaContent qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, qaService, qaAuthoringForm);            
 
           saveAttachments(qaContent, attachmentList, deletedAttachmentList, mapping, request);
       
@@ -651,6 +651,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         
         LearningUtil learningUtil= new LearningUtil();
         QaLearningForm qaLearningForm = (QaLearningForm) form;
+        IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
         
         /*retrieve the default question content map*/ 
         Map mapQuestions=(Map)request.getSession().getAttribute(MAP_QUESTION_CONTENT_LEARNER);
@@ -714,13 +715,13 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         {
             logger.debug(logger + " " + this.getClass().getName() +  "submit the responses: " + mapAnswers);
             /*recreate the users and responses*/
-            learningUtil.createUsersAndResponses(mapAnswers, request);
+            learningUtil.createUsersAndResponses(mapAnswers, request, qaService);
             qaLearningForm.resetUserActions();
             qaLearningForm.setSubmitAnswersContent(null);
             /*start generating a report for the Learner*/
-            learningUtil.buidLearnerReport(request,1);
-            
-            learningUtil.lockContent(request);
+            learningUtil.buidLearnerReport(request,1, qaService);
+            Long toolContentId=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+            learningUtil.lockContent(toolContentId.longValue(), qaService);
             logger.debug("content has been locked");
             return (mapping.findForward(LEARNER_REPORT));
         }
@@ -741,7 +742,6 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
                 logger.debug("simulating container behaviour by calling  " +
                              "leaveToolSession() with toolSessionId: " +  toolSessionId + " and user: " + user);
                 
-                IQaService qaService =QaUtils.getToolService(request);
                 String nextActivityUrl = qaService.leaveToolSession(toolSessionId, new Long(user.getUserID().longValue()));
                 response.sendRedirect(nextActivityUrl);
                 return null;
@@ -757,83 +757,83 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     }
     
     
-    /**
-     * used to load Monitoring tabs back once the controller moves to Edit Activity.
-     * 
-     * ActionForward loadMonitoring(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                      ServletException
-                                      
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return ActionForward
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward loadMonitoring(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                      ServletException
-  {
-        QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-        
-        if (qaAuthoringForm.getSummaryMonitoring() != null) 
-        {
-            logger.debug("request for getSummaryMonitoring, start proxying...");
-            logger.debug("NO_AVAILABLE_SESSIONS: " + request.getSession().getAttribute(NO_AVAILABLE_SESSIONS));
-            
-            Boolean noAvailableSessions=(Boolean)request.getSession().getAttribute(NO_AVAILABLE_SESSIONS);
-            logger.debug("NO_AVAILABLE_SESSIONS: " +noAvailableSessions);
-            qaAuthoringForm.resetUserAction();
-            if ((noAvailableSessions != null) && (noAvailableSessions.booleanValue()))
-            {
-                persistError(request,"error.noStudentActivity");
-                request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(true));
-                request.setAttribute(STOP_RENDERING_QUESTIONS, new Boolean(true));
-                return (mapping.findForward(LOAD));
-            }
-            else
-            {
-                logger.debug("NO_AVAILABLE_SESSIONS: " +false);
-                QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
-                QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
-                return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
-            }
-        }
-        else if (qaAuthoringForm.getInstructionsMonitoring() != null)
-        {
-            logger.debug("QAction- request for getInstructionsMonitoring()");
-            qaAuthoringForm.resetUserAction();
-            QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
-            QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
-            qaMonitoringForm.setInstructions("instructions");
-            return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
-        }
-        else if (qaAuthoringForm.getEditActivityMonitoring() != null) 
-        {
-            logger.debug("QAction-request for getEditActivityMonitoring()");
-            QaStarterAction qaStarterAction = new QaStarterAction();
-            logger.debug("forwarding to Authoring Basic tab.");
-            ActionForward actionForward=qaStarterAction.startMonitoringSummary(mapping, qaAuthoringForm, request, response);
-            logger.debug("actionForward: " + actionForward);
-            qaAuthoringForm.resetUserAction();
-            return (actionForward);
-        }
-        else if (qaAuthoringForm.getStatsMonitoring() != null)
-        {
-            qaAuthoringForm.resetUserAction();
-            QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
-            QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
-            qaMonitoringForm.setStats("stats");
-            return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
-        }
-        return null;
-  }
+//    /**
+//     * used to load Monitoring tabs back once the controller moves to Edit Activity.
+//     * 
+//     * ActionForward loadMonitoring(ActionMapping mapping,
+//            ActionForm form,
+//            HttpServletRequest request,
+//            HttpServletResponse response) throws IOException,
+//                                      ServletException
+//                                      
+//     * @param mapping
+//     * @param form
+//     * @param request
+//     * @param response
+//     * @return ActionForward
+//     * @throws IOException
+//     * @throws ServletException
+//     */
+//    public ActionForward loadMonitoring(ActionMapping mapping,
+//            ActionForm form,
+//            HttpServletRequest request,
+//            HttpServletResponse response) throws IOException,
+//                                      ServletException
+//  {
+//        QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
+//        
+//        if (qaAuthoringForm.getSummaryMonitoring() != null) 
+//        {
+//            logger.debug("request for getSummaryMonitoring, start proxying...");
+//            logger.debug("NO_AVAILABLE_SESSIONS: " + request.getSession().getAttribute(NO_AVAILABLE_SESSIONS));
+//            
+//            Boolean noAvailableSessions=(Boolean)request.getSession().getAttribute(NO_AVAILABLE_SESSIONS);
+//            logger.debug("NO_AVAILABLE_SESSIONS: " +noAvailableSessions);
+//            qaAuthoringForm.resetUserAction();
+//            if ((noAvailableSessions != null) && (noAvailableSessions.booleanValue()))
+//            {
+//                persistError(request,"error.noStudentActivity");
+//                request.setAttribute(START_MONITORING_SUMMARY_REQUEST, new Boolean(true));
+//                request.setAttribute(STOP_RENDERING_QUESTIONS, new Boolean(true));
+//                return (mapping.findForward(LOAD));
+//            }
+//            else
+//            {
+//                logger.debug("NO_AVAILABLE_SESSIONS: " +false);
+//                QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
+//                QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
+//                return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
+//            }
+//        }
+//        else if (qaAuthoringForm.getInstructionsMonitoring() != null)
+//        {
+//            logger.debug("QAction- request for getInstructionsMonitoring()");
+//            qaAuthoringForm.resetUserAction();
+//            QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
+//            QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
+//            qaMonitoringForm.setInstructions("instructions");
+//            return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
+//        }
+//        else if (qaAuthoringForm.getEditActivityMonitoring() != null) 
+//        {
+//            logger.debug("QAction-request for getEditActivityMonitoring()");
+//            QaStarterAction qaStarterAction = new QaStarterAction();
+//            logger.debug("forwarding to Authoring Basic tab.");
+//            ActionForward actionForward=qaStarterAction.startMonitoringSummary(mapping, qaAuthoringForm, request, response);
+//            logger.debug("actionForward: " + actionForward);
+//            qaAuthoringForm.resetUserAction();
+//            return (actionForward);
+//        }
+//        else if (qaAuthoringForm.getStatsMonitoring() != null)
+//        {
+//            qaAuthoringForm.resetUserAction();
+//            QaMonitoringAction qaMonitoringAction=new QaMonitoringAction();
+//            QaMonitoringForm qaMonitoringForm=new QaMonitoringForm();
+//            qaMonitoringForm.setStats("stats");
+//            return qaMonitoringAction.generateToolSessionDataMap(mapping,qaMonitoringForm,request,response);
+//        }
+//        return null;
+//  }
     
 
     /**
@@ -855,7 +855,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
     public void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
     {
         logger.debug("attempt addFileToContentRepository");
-        IQaService qaService =QaUtils.getToolService(request);
+        IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
         logger.debug("qaService: " + qaService);
         
         List attachmentList = (List) request.getSession().getAttribute(ATTACHMENT_LIST);
@@ -948,7 +948,7 @@ public class QAction extends LamsDispatchAction implements QaAppConstants
         if(attachmentList==null || deletedAttachmentList==null)
             return null;
         
-        IQaService qaService =QaUtils.getToolService(request);
+        IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
         
         if ( deletedAttachmentList != null ) {
             Iterator iter = deletedAttachmentList.iterator();

@@ -8,6 +8,7 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -40,108 +41,108 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class LearningUtil implements QaAppConstants{
 	static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 
-	/**
-	 * NEVER USED: redundant method.
-	 * deleteSessionUsersAndResponses(HttpServletRequest request)
-	 * @param request
-	 */
-	protected void deleteSessionUsersAndResponses(HttpServletRequest request)
-    {
-        IQaService qaService =QaUtils.getToolService(request);
-        /*
-         * retrive contentId from the http session
-         */
-        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));
-        Long toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-        QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
-        
-        logger.debug("retrieving qaContent: " + qaContent);
-        Iterator sessionIterator=qaContent.getQaSessions().iterator();
-        while (sessionIterator.hasNext())
-        {
-        	QaSession qaSession=(QaSession)sessionIterator.next(); 
-        	logger.debug("iterated qaSession : " + qaSession);
-        	
-        	Iterator sessionUsersIterator=qaSession.getQaQueUsers().iterator();
-        	while (sessionUsersIterator.hasNext())
-        	{
-        		QaQueUsr qaQueUsr=(QaQueUsr) sessionUsersIterator.next();
-        		logger.debug("iterated qaQueUsr : " + qaQueUsr);
-        		
-        		Iterator sessionUsersResponsesIterator=qaQueUsr.getQaUsrResps().iterator();
-        		while (sessionUsersResponsesIterator.hasNext())
-            	{
-        			QaUsrResp qaUsrResp=(QaUsrResp)sessionUsersResponsesIterator.next();
-        			logger.debug("iterated qaUsrResp : " + qaUsrResp);
-        			qaService.removeUserResponse(qaUsrResp);
-        			logger.debug("removed qaUsrResp : " + qaUsrResp);
-            	}
-        	}
-        }
-        logger.debug("end of deleteSessionUsersAndResponses()");
-    }
-
-
-	/**
-	 * NEVER USED: redundant method.
-     * deletes the user of a particular question content and her responses
-     * deleteExistingUsersAndResponses(HttpServletRequest request)
-     * 
-     * return void
-     * @param request
-     */
-    protected void deleteExistingUsersAndResponses(HttpServletRequest request)
-    {
-        IQaService qaService =QaUtils.getToolService(request);
-        /*
-         * retrive contentId from the http session
-         */
-        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));
-        Long toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-        QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
-        
-        logger.debug("retrieving qaContent: " + qaContent);
-        
-    	Iterator contentIterator=qaContent.getQaQueContents().iterator();
-    	while (contentIterator.hasNext())
-    	{
-    		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
-    		logger.debug("retrieving qaQueContent: " + qaQueContent);
-    		if (qaQueContent != null)
-    		{
-    			Set qaQueUsers=qaQueContent.getQaQueUsers();
-    			logger.debug("qaQueUsers size: " + qaQueUsers.size());
-        		/*
-        		 * iterate users and delete them
-        		 */
-        		Iterator usersIterator=qaQueUsers.iterator();
-        		while (usersIterator.hasNext())
-            	{
-        			QaQueUsr qaQueUsr=(QaQueUsr) usersIterator.next();
-        			logger.debug("retrieving qaQueUsr: " + qaQueUsr);
-        			if (qaQueUsr != null)
-        			{
-        				Set qaUsrResps=qaQueUsr.getQaUsrResps();
-    					logger.debug("retrieving user's all responses : " + qaUsrResps);
-        				Iterator responsesIterator=qaUsrResps.iterator();
-        				while (responsesIterator.hasNext())
-        				{
-        					QaUsrResp qaUsrResp=(QaUsrResp)responsesIterator.next();
-        					if (qaUsrResp != null)
-        					{
-        						logger.debug("retrieving qaUsrResp: " + qaUsrResp);
-        						qaService.removeUserResponse(qaUsrResp);
-								logger.debug("removed qaUsrResp with id:"  + qaUsrResp.getResponseId());
-        					}
-        				}
-        				qaService.deleteQaQueUsr(qaQueUsr);
-        				logger.debug("deleted user: " + qaQueUsr);
-        			}
-            	}
-    		}
-    	}
-    	logger.debug("end of deleteExistingUsersAndResponses()");
-    }
+//	/**
+//	 * NEVER USED: redundant method.
+//	 * deleteSessionUsersAndResponses(HttpServletRequest request)
+//	 * @param request
+//	 */
+//	protected void deleteSessionUsersAndResponses(HttpServletRequest request)
+//    {
+//        IQaService qaService =QaUtils.getToolService(request);
+//        /*
+//         * retrive contentId from the http session
+//         */
+//        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));
+//        Long toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+//        QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
+//        
+//        logger.debug("retrieving qaContent: " + qaContent);
+//        Iterator sessionIterator=qaContent.getQaSessions().iterator();
+//        while (sessionIterator.hasNext())
+//        {
+//        	QaSession qaSession=(QaSession)sessionIterator.next(); 
+//        	logger.debug("iterated qaSession : " + qaSession);
+//        	
+//        	Iterator sessionUsersIterator=qaSession.getQaQueUsers().iterator();
+//        	while (sessionUsersIterator.hasNext())
+//        	{
+//        		QaQueUsr qaQueUsr=(QaQueUsr) sessionUsersIterator.next();
+//        		logger.debug("iterated qaQueUsr : " + qaQueUsr);
+//        		
+//        		Iterator sessionUsersResponsesIterator=qaQueUsr.getQaUsrResps().iterator();
+//        		while (sessionUsersResponsesIterator.hasNext())
+//            	{
+//        			QaUsrResp qaUsrResp=(QaUsrResp)sessionUsersResponsesIterator.next();
+//        			logger.debug("iterated qaUsrResp : " + qaUsrResp);
+//        			qaService.removeUserResponse(qaUsrResp);
+//        			logger.debug("removed qaUsrResp : " + qaUsrResp);
+//            	}
+//        	}
+//        }
+//        logger.debug("end of deleteSessionUsersAndResponses()");
+//    }
+//
+//
+//	/**
+//	 * NEVER USED: redundant method.
+//     * deletes the user of a particular question content and her responses
+//     * deleteExistingUsersAndResponses(HttpServletRequest request)
+//     * 
+//     * return void
+//     * @param request
+//     */
+//    protected void deleteExistingUsersAndResponses(HttpServletRequest request)
+//    {
+//        IQaService qaService =QaUtils.getToolService(request);
+//        /*
+//         * retrive contentId from the http session
+//         */
+//        logger.debug("attempt retrieving toolContentId: " + request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID));
+//        Long toolContentId=(Long)request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
+//        QaContent qaContent=qaService.retrieveQa(toolContentId.longValue());
+//        
+//        logger.debug("retrieving qaContent: " + qaContent);
+//        
+//    	Iterator contentIterator=qaContent.getQaQueContents().iterator();
+//    	while (contentIterator.hasNext())
+//    	{
+//    		QaQueContent qaQueContent=(QaQueContent)contentIterator.next();
+//    		logger.debug("retrieving qaQueContent: " + qaQueContent);
+//    		if (qaQueContent != null)
+//    		{
+//    			Set qaQueUsers=qaQueContent.getQaQueUsers();
+//    			logger.debug("qaQueUsers size: " + qaQueUsers.size());
+//        		/*
+//        		 * iterate users and delete them
+//        		 */
+//        		Iterator usersIterator=qaQueUsers.iterator();
+//        		while (usersIterator.hasNext())
+//            	{
+//        			QaQueUsr qaQueUsr=(QaQueUsr) usersIterator.next();
+//        			logger.debug("retrieving qaQueUsr: " + qaQueUsr);
+//        			if (qaQueUsr != null)
+//        			{
+//        				Set qaUsrResps=qaQueUsr.getQaUsrResps();
+//    					logger.debug("retrieving user's all responses : " + qaUsrResps);
+//        				Iterator responsesIterator=qaUsrResps.iterator();
+//        				while (responsesIterator.hasNext())
+//        				{
+//        					QaUsrResp qaUsrResp=(QaUsrResp)responsesIterator.next();
+//        					if (qaUsrResp != null)
+//        					{
+//        						logger.debug("retrieving qaUsrResp: " + qaUsrResp);
+//        						qaService.removeUserResponse(qaUsrResp);
+//								logger.debug("removed qaUsrResp with id:"  + qaUsrResp.getResponseId());
+//        					}
+//        				}
+//        				qaService.deleteQaQueUsr(qaQueUsr);
+//        				logger.debug("deleted user: " + qaQueUsr);
+//        			}
+//            	}
+//    		}
+//    	}
+//    	logger.debug("end of deleteExistingUsersAndResponses()");
+//    }
 
     
     /**
@@ -151,9 +152,8 @@ public class LearningUtil implements QaAppConstants{
      * return void
      *
      */
-    protected void createUsersAndResponses(Map mapAnswers, HttpServletRequest request)
+    protected void createUsersAndResponses(Map mapAnswers, HttpServletRequest request, IQaService qaService)
     {
-    	IQaService qaService =QaUtils.getToolService(request);
         logger.debug("createUsers-retrieving qaService: " + qaService);
         
 	    HttpSession ss = SessionManager.getSession();
@@ -260,10 +260,8 @@ public class LearningUtil implements QaAppConstants{
      * return void
      *
      */
-    protected void buidLearnerReport(HttpServletRequest request, int toolSessionIdCounter)
-    {
-    	IQaService qaService =QaUtils.getToolService(request);
-    	
+    protected void buidLearnerReport(HttpServletRequest request, int toolSessionIdCounter, IQaService qaService)
+    {    	
     	/*
     	 * find out the current tool session
     	 */
@@ -289,8 +287,19 @@ public class LearningUtil implements QaAppConstants{
     	QaContent qaContent=qaService.loadQa(toolContentId.longValue());
     	logger.debug("retrieve qaContent: " + qaContent);
     	
-    	Iterator contentIterator=qaContent.getQaQueContents().iterator();
-    	logger.debug("content iteration count: " + qaContent.getQaQueContents().size());
+        /*
+         * Reason for commentting the line below. When the user response is updated in monitor
+         * qaContent.getQaQueContents() would failed for some reason. Hence I've created a new
+         * method retrieveQaQueContentsByToolContentId() to work around this problem. I'm not
+         * sure why qaContent.getQaQueContents() fails but I assume it's a transation problem. 
+         * 
+         * Anthony
+         */
+        //Set qaQueContents = qaContent.getQaQueContents();
+        List qaQueContents = qaService.retrieveQaQueContentsByToolContentId(toolContentId.longValue());
+    	Iterator contentIterator=qaQueContents.iterator();
+        
+    	logger.debug("content iteration count: " + qaQueContents.size());
     	
     	int questionIndex=0;
     	/*
@@ -585,12 +594,9 @@ public class LearningUtil implements QaAppConstants{
     	request.getSession().setAttribute(USER_FEEDBACK, userFeedback);
     }
     
-    public void lockContent(HttpServletRequest request)
+    public void lockContent(long toolContentId, IQaService qaService)
     {
-    	IQaService qaService =QaUtils.getToolService(request);
-        Long toolContentId=(Long) request.getSession().getAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
-    	logger.debug("current toolContentId: " + toolContentId);
-    	QaContent qaContent=qaService.loadQa(toolContentId.longValue());
+    	QaContent qaContent=qaService.loadQa(toolContentId);
     	logger.debug("retrieve qaContent: " + qaContent);
     	
         qaContent.setContentLocked(true);

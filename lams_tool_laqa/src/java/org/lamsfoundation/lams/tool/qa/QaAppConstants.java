@@ -27,7 +27,7 @@ public interface QaAppConstants {
 	 * temporarily refers to an existing content id for an incoming tool session id, won't need it in deployment environment 
 	 */
 	public static final long THE_MOCKED_CONTENT_ID						=1803739427456570536L;  
-	public static final String TOOL_SERVICE								="tool_service";
+//	public static final String TOOL_SERVICE								="tool_service";
 	/*
 	 * indicates which mode the tool runs under between Authoring, Learning, Monitoring
 	 */
@@ -232,7 +232,7 @@ public interface QaAppConstants {
 //    public static final String FORM_INDEX	   		   			   		="formIndex";
     public static final String RENDER_MONITORING_EDITACTIVITY	   		="renderMonitoringEditActivity";
     public static final String NO_AVAILABLE_SESSIONS	   		   		="noAvailableSessions";
-    public static final String INITIAL_MONITORING_TOOL_CONTENT_ID  		="initialMonitoringToolContentId";
+//    public static final String INITIAL_MONITORING_TOOL_CONTENT_ID  		="initialMonitoringToolContentId";
     public static final String IS_MONITORING_DEFINE_LATER  		   		="isMonitoringDefineLater";
     public static final String NO_TOOL_SESSIONS_AVAILABLE				="noToolSessionAvailable";
     public static final String ORIGINAL_TOOL_SESSIONS					="originalToolSessions";

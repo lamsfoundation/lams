@@ -90,7 +90,7 @@
 															</td>  
 															<td>  
 																  	&nbsp&nbsp&nbsp  
-													  				<html:submit property="updateReport" styleClass="linkbutton">
+													  				<html:submit property="updateReport" styleClass="linkbutton" onclick="submitMethod('updateReport');">
 																		<fmt:message key="label.update"/>
 																	</html:submit>
 															</td>  

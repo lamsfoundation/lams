@@ -78,7 +78,7 @@
 						<html:hidden property="toolContentId" value="${QaAuthoringForm.toolContentId}"/>
 						<html:hidden property="questionIndex"/>
 
-					</tr>
+					
 					</table>
 			</td></tr>			
 			</c:if>	

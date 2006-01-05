@@ -137,14 +137,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 //		request.getSession().setAttribute(LIST_UPLOADED_OFFLINE_FILENAMES,listUploadedOfflineFileNames);
 //		request.getSession().setAttribute(LIST_UPLOADED_ONLINE_FILENAMES,listUploadedOnlineFileNames);
 		
-		IQaService qaService = QaUtils.getToolService(request);
+        IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 		logger.debug("retrieving qaService from session: " + qaService);
-		if (qaService == null)
-		{
-			qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-		    logger.debug("retrieving qaService from proxy: " + qaService);
-		    request.getSession().setAttribute(TOOL_SERVICE, qaService);		
-		}
+
 	
 		/* double check if this is a good place to call */
 		/* needs to be called only once.  */ 
@@ -304,7 +299,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		 * there is no need to check if the content is locked in this case.
 		 * It is always unlocked since it is the default content.
 		*/
-		if (!existsContent(contentID.longValue(), request)) 
+		if (!existsContent(contentID.longValue(), qaService)) 
 		{
             return retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, defaultContentID);
 		}
@@ -390,7 +385,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	protected ActionForward retrieveContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent, long toolContentId)
 	{
 		logger.debug("starting retrieveExistingContent for toolContentId: " + toolContentId);
-		IQaService qaService =QaUtils.getToolService(request);
+		IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 		
 		logger.debug("getting existing content with id:" + toolContentId);
 	    QaContent qaContent = qaService.retrieveQa(toolContentId);
@@ -413,7 +408,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    logger.debug("CONTENT_LOCKED: " + request.getSession().getAttribute(CONTENT_LOCKED));
 		
 		QaUtils.setDefaultSessionAttributes(request, qaContent, qaAuthoringForm);
-        QaUtils.populateUploadedFilesData(request, qaContent);
+        QaUtils.populateUploadedFilesData(request, qaContent, qaService);
 			    
 //	    request.getSession().setAttribute(IS_USERNAME_VISIBLE_MONITORING, 	new Boolean(defaultQaContent.isUsernameVisible()));
 //	    request.getSession().setAttribute(IS_SYNCH_INMONITOR_MONITORING, 	new Boolean(defaultQaContent.isSynchInMonitor()));
@@ -501,9 +496,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	 * @return boolean
 	 * determine whether a specific toolContentId exists in the db
 	 */
-	protected boolean existsContent(long toolContentId, HttpServletRequest request)
+	protected boolean existsContent(long toolContentId, IQaService qaService)
 	{
-		IQaService qaService =QaUtils.getToolService(request);
 		QaContent qaContent=qaService.loadQa(toolContentId);
 	    if (qaContent == null) 
 	    	return false;

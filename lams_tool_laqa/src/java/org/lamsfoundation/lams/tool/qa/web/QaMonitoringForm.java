@@ -51,6 +51,8 @@ public class QaMonitoringForm extends ActionForm implements QaAppConstants {
 	
 	protected String offlineInstructions;
 	protected String onlineInstructions;
+    
+    private Long toolContentID;
 	
 	public void resetUserAction()
     {
@@ -288,4 +290,12 @@ public class QaMonitoringForm extends ActionForm implements QaAppConstants {
 			String submitMonitoringInstructions) {
 		this.submitMonitoringInstructions = submitMonitoringInstructions;
 	}
+    
+    
+    public Long getToolContentID() {
+        return toolContentID;
+    }
+    public void setToolContentID(Long toolContentID) {
+        this.toolContentID = toolContentID;
+    }
 }

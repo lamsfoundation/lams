@@ -63,11 +63,11 @@ import org.lamsfoundation.lams.tool.qa.util.QaToolContentHandler;
 public abstract class QaUtils implements QaAppConstants {
 	static Logger logger = Logger.getLogger(QaUtils.class.getName());
 	
-	public static IQaService getToolService(HttpServletRequest request)
-	{
-		IQaService qaService=(IQaService)request.getSession().getAttribute(TOOL_SERVICE);
-	    return qaService;
-	}
+//	public static IQaService getToolService(HttpServletRequest request)
+//	{
+//		IQaService qaService=(IQaService)request.getSession().getAttribute(TOOL_SERVICE);
+//	    return qaService;
+//	}
 	
 	public static long generateId()
 	{
@@ -140,7 +140,7 @@ public abstract class QaUtils implements QaAppConstants {
 		request.getSession().removeAttribute(CHECK_ALL_SESSIONS_COMPLETED);
 		request.getSession().removeAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID);
 		request.getSession().removeAttribute(ATTR_USERDATA);
-		request.getSession().removeAttribute(TOOL_SERVICE);
+//		request.getSession().removeAttribute(TOOL_SERVICE);
 		request.getSession().removeAttribute(TARGET_MODE);
     }
 
@@ -318,10 +318,8 @@ public abstract class QaUtils implements QaAppConstants {
 	 * @return boolean
 	 * determine whether a specific toolContentId exists in the db
 	 */
-	public static boolean existsContent(long toolContentId, HttpServletRequest request)
-	{
-		IQaService qaService =QaUtils.getToolService(request);
-	    
+	public static boolean existsContent(long toolContentId, IQaService qaService)
+	{    
     	QaContent qaContent=qaService.loadQa(toolContentId);
 	    logger.debug(logger + " " + "QaUtils " +  "retrieving qaContent: " + qaContent);
 	    if (qaContent == null) 
@@ -336,10 +334,9 @@ public abstract class QaUtils implements QaAppConstants {
 	 * @param toolSessionId
 	 * @return boolean
 	 */
-	public static boolean existsSession(long toolSessionId, HttpServletRequest request)
+	public static boolean existsSession(long toolSessionId, IQaService qaService)
 	{
 		logger.debug("existsSession");
-    	IQaService qaService =QaUtils.getToolService(request);
 	    QaSession qaSession=qaService.retrieveQaSessionOrNullById(toolSessionId);
 	    logger.debug("qaSession:" + qaSession);
     	
@@ -405,15 +402,15 @@ public abstract class QaUtils implements QaAppConstants {
 	}
 	
 	
-	public static void configureContentRepository(HttpServletRequest request)
-	{
-		logger.debug("attempt configureContentRepository");
-    	IQaService qaService =QaUtils.getToolService(request);
-    	logger.debug("retrieving qaService from session: " + qaService);
-    	logger.debug("calling configureContentRepository()");
-	    qaService.configureContentRepository();
-	    logger.debug("configureContentRepository ran successfully");
-	}
+//	public static void configureContentRepository(HttpServletRequest request)
+//	{
+//		logger.debug("attempt configureContentRepository");
+//    	IQaService qaService =QaUtils.getToolService(request);
+//    	logger.debug("retrieving qaService from session: " + qaService);
+//    	logger.debug("calling configureContentRepository()");
+//	    qaService.configureContentRepository();
+//	    logger.debug("configureContentRepository ran successfully");
+//	}
 	
 	
 	public static void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm, boolean isOfflineFile)
@@ -783,9 +780,8 @@ public abstract class QaUtils implements QaAppConstants {
 //	}
 
     
-    public static void populateUploadedFilesData(HttpServletRequest request, QaContent defaultQaContent) {
-        IQaService qaService =QaUtils.getToolService(request);
-        List attachmentList = qaService.retrieveQaUploadedFiles(defaultQaContent); 
+    public static void populateUploadedFilesData(HttpServletRequest request, QaContent qaContent, IQaService qaService) {
+        List attachmentList = qaService.retrieveQaUploadedFiles(qaContent); 
         request.getSession().setAttribute(ATTACHMENT_LIST, attachmentList);
         
         if(request.getSession().getAttribute(DELETED_ATTACHMENT_LIST)==null)

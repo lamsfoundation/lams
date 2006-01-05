@@ -89,7 +89,7 @@
       />
 	  	
 	</action>  
-	<!--Monitoring Starter  -->
+	<!--Monitoring Starter -->
 	<action path="/monitoringStarter" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction" 
    			name="QaMonitoringForm" input=".monitoringStarter"> 
       <forward
@@ -97,22 +97,19 @@
         path=".monitoringReport"
         redirect="true"
    	  	/>
-   	  	
-	   	<forward
+      <forward
         name="load"
         path=".questions"
         redirect="true"
-      />
-      
-       	<forward
+      />     
+      <forward
         name="monitoringError"
         path=".monitoringError"
         redirect="true"
       />	
-      
-      
 	</action>  
-
+	
+	
     <action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.qa.web.QAction"
@@ -177,8 +174,7 @@
       type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringAction"
       name="QaMonitoringForm"
       scope="session"
-      input=".monitoringReport"
-      parameter="method"
+      parameter="dispatch"
       unknown="false"
       validate="false"
     >
