@@ -16,6 +16,8 @@
  * 
  * File Authors:
  * 		Frederico Caldeira Knabben (fredck@fckeditor.net)
+ * 
+ * Version: 2.2
  */
 
 FCKConfig.CustomConfigurationsPath = '' ;
@@ -29,12 +31,13 @@ FCKConfig.BaseHref = '' ;
 FCKConfig.FullPage = false ;
 
 FCKConfig.Debug = false ;
+FCKConfig.AllowQueryStringDebug = true ;
 
 FCKConfig.SkinPath = FCKConfig.BasePath + 'skins/default/' ;
 
 FCKConfig.PluginsPath = FCKConfig.BasePath + 'plugins/' ;
 
-// FCKConfig.Plugins.Add( 'placeholder', 'en,it' ) ;
+// FCKConfig.Plugins.Add( 'placeholder', 'de,en,fr,it,pl' ) ;
 
 FCKConfig.ProtectedSource.Add( /<script[\s\S]*?\/script>/gi ) ;	// <SCRIPT> tags.
 // FCKConfig.ProtectedSource.Add( /<%[\s\S]*?%>/g ) ;	// ASP style server side code <%...%>
@@ -59,34 +62,20 @@ FCKConfig.FormatOutput		= true ;
 FCKConfig.FormatIndentator	= '    ' ;
 
 FCKConfig.ForceStrongEm = true ;
-// FCKConfig.GeckoUseSPAN	= false ; 
-FCKConfig.GeckoUseSPAN	= true ; //so that background text colour works
+FCKConfig.GeckoUseSPAN	= true ;
 FCKConfig.StartupFocus	= false ;
 FCKConfig.ForcePasteAsPlainText	= false ;
 FCKConfig.AutoDetectPasteFromWord = true ;	// IE only.
 FCKConfig.ForceSimpleAmpersand	= false ;
 FCKConfig.TabSpaces		= 0 ;
 FCKConfig.ShowBorders	= true ;
-FCKConfig.UseBROnCarriageReturn	= false ;
+FCKConfig.UseBROnCarriageReturn	= false ;	// IE only.
 FCKConfig.ToolbarStartExpanded	= false ;
 FCKConfig.ToolbarCanCollapse	= true ;
 FCKConfig.IEForceVScroll = false ;
 FCKConfig.IgnoreEmptyParagraphValue = true ;
-
-
-FCKConfig.ToolbarSets["Default"] = [
-	['Source','-','NewPage','Preview','-','Templates'],
-	['PasteText','PasteWord','-','Print'],
-	['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
-	['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript'],
-	['OrderedList','UnorderedList','-','Outdent','Indent'],
-	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
-	['Table','Rule','Smiley','SpecialChar','PageBreak','UniversalKey'],	
-	['Style','FontFormat','FontName','FontSize'],
-	['TextColor','BGColor'],
-	['About']
-] ;
-
+FCKConfig.PreserveSessionOnFileBrowser = false ;
+FCKConfig.FloatingPanelsZIndex = 10000 ;
 
 FCKConfig.ToolbarSets["Default_original"] = [
 	['Source','DocProps','-','Save','NewPage','Preview','-','Templates'],
@@ -98,6 +87,20 @@ FCKConfig.ToolbarSets["Default_original"] = [
 	['Link','Unlink','Anchor'],
 	['Image','Flash','Table','Rule','Smiley','SpecialChar','PageBreak','UniversalKey'],
 	['Form','Checkbox','Radio','TextField','Textarea','Select','Button','ImageButton','HiddenField'],
+	'/',
+	['Style','FontFormat','FontName','FontSize'],
+	['TextColor','BGColor'],
+	['About']
+] ;
+
+FCKConfig.ToolbarSets["Default"] = [
+	['Source','DocProps','-','Preview'],
+	['PasteWord','-','Print','SpellCheck'],
+	['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
+	['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript'],
+	['OrderedList','UnorderedList','-','Outdent','Indent'],
+	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
+	['Table','Rule','Smiley','SpecialChar','PageBreak','UniversalKey'],
 	'/',
 	['Style','FontFormat','FontName','FontSize'],
 	['TextColor','BGColor'],
@@ -135,57 +138,53 @@ FCKConfig.ImageDlgHideAdvanced	= false ;
 
 FCKConfig.FlashDlgHideAdvanced	= false ;
 
+// The following value defines which File Browser connector and Quick Upload 
+// "uploader" to use. It is valid for the default implementaion and it is here
+// just to make this configuration file cleaner. 
+// It is not possible to change this value using an external file or even 
+// inline when creating the editor instance. In that cases you must set the 
+// values of LinkBrowserURL, ImageBrowserURL and so on.
+// Custom implementations should just ignore it.
+var _FileBrowserLanguage	= 'asp' ;	// asp | aspx | cfm | lasso | perl | php | py
+var _QuickUploadLanguage	= 'asp' ;	// asp | aspx | cfm | lasso | php
+
+// Don't care about the following line. It just calculates the correct connector 
+// extension to use for the default File Browser (Perl uses "cgi").
+var _FileBrowserExtension = _FileBrowserLanguage == 'perl' ? 'cgi' : _FileBrowserLanguage ;
+
 FCKConfig.LinkBrowser = true ;
-FCKConfig.LinkBrowserURL = FCKConfig.BasePath + "filemanager/browser/default/browser.html?Connector=connectors/jsp/connector" ;
-//FCKConfig.LinkBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Connector=connectors/asp/connector.asp' ;
-//FCKConfig.LinkBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Connector=connectors/asp/connector.asp&ServerPath=/CustomFiles/' ;
-// ASP.Net		// FCKConfig.LinkBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Connector=connectors/aspx/connector.aspx' ;
-// ColdFusion	// FCKConfig.LinkBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Connector=connectors/cfm/connector.cfm' ;
-// Perl			// FCKConfig.LinkBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Connector=connectors/perl/connector.cgi' ;
-// PHP			// FCKConfig.LinkBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Connector=connectors/php/connector.php' ;
-// PHP - mcpuk	// FCKConfig.LinkBrowserURL = FCKConfig.BasePath + 'filemanager/browser/mcpuk/browser.html?Connector=connectors/php/connector.php' ;
-FCKConfig.LinkBrowserWindowWidth	= FCKConfig.ScreenWidth * 0.7 ;	// 70%
-FCKConfig.LinkBrowserWindowHeight	= FCKConfig.ScreenHeight * 0.7 ;// 70%
+//FCKConfig.LinkBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Connector=connectors/' + _FileBrowserLanguage + '/connector.' + _FileBrowserExtension ;
+FCKConfig.LinkBrowserURL = FCKConfig.BasePath + "filemanager/browser/default/browser.html?Connector=connectors/jsp/connector";
+FCKConfig.LinkBrowserWindowWidth	= FCKConfig.ScreenWidth * 0.7 ;		// 70%
+FCKConfig.LinkBrowserWindowHeight	= FCKConfig.ScreenHeight * 0.7 ;	// 70%
 
 FCKConfig.ImageBrowser = true ;
-FCKConfig.ImageBrowserURL = FCKConfig.BasePath + "filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector" ;
-//FCKConfig.ImageBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Image&Connector=connectors/asp/connector.asp' ;
-// ASP.Net		// FCKConfig.ImageBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Image&Connector=connectors/aspx/connector.aspx' ;
-// ColdFusion	// FCKConfig.ImageBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Image&Connector=connectors/cfm/connector.cfm' ;
-// Perl			// FCKConfig.ImageBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Image&Connector=connectors/perl/connector.cgi' ;
-// PHP			// FCKConfig.ImageBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Image&Connector=connectors/php/connector.php' ;
-// PHP - mcpuk	// FCKConfig.ImageBrowserURL = FCKConfig.BasePath + 'filemanager/browser/mcpuk/browser.html?Type=Image&Connector=connectors/php/connector.php' ;
+FCKConfig.ImageBrowserURL = FCKConfig.BasePath + "filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector";
+//FCKConfig.ImageBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Image&Connector=connectors/' + _FileBrowserLanguage + '/connector.' + _FileBrowserExtension ;
 FCKConfig.ImageBrowserWindowWidth  = FCKConfig.ScreenWidth * 0.7 ;	// 70% ;
 FCKConfig.ImageBrowserWindowHeight = FCKConfig.ScreenHeight * 0.7 ;	// 70% ;
 
 FCKConfig.FlashBrowser = true ;
-FCKConfig.FlashBrowserURL = FCKConfig.BasePath + "filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector" ;
-//FCKConfig.FlashBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/asp/connector.asp' ;
-// ASP.Net		// FCKConfig.FlashBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/aspx/connector.aspx' ;
-// ColdFusion	// FCKConfig.FlashBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/cfm/connector.cfm' ;
-// Perl			// FCKConfig.FlashBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/perl/connector.cgi' ;
-// PHP			// FCKConfig.FlashBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/php/connector.php' ;
-// PHP - mcpuk	// FCKConfig.FlashBrowserURL = FCKConfig.BasePath + 'filemanager/browser/mcpuk/browser.html?Type=Flash&Connector=connectors/php/connector.php' ;
+FCKConfig.FlashBrowserURL = FCKConfig.BasePath + "filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector";
+//FCKConfig.FlashBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/' + _FileBrowserLanguage + '/connector.' + _FileBrowserExtension ;
 FCKConfig.FlashBrowserWindowWidth  = FCKConfig.ScreenWidth * 0.7 ;	//70% ;
 FCKConfig.FlashBrowserWindowHeight = FCKConfig.ScreenHeight * 0.7 ;	//70% ;
 
 FCKConfig.LinkUpload = true ;
-FCKConfig.LinkUploadURL = FCKConfig.BasePath + 'filemanager/upload/simpleuploader?Type=File' ;
-//FCKConfig.LinkUploadURL = FCKConfig.BasePath + 'filemanager/upload/asp/upload.asp' ;
-// PHP // FCKConfig.LinkUploadURL = FCKConfig.BasePath + 'filemanager/upload/php/upload.php' ;
+FCKConfig.LinkUploadURL = FCKConfig.BasePath + 'filemanager/upload/simpleuploader?Type=File';
+//FCKConfig.LinkUploadURL = FCKConfig.BasePath + 'filemanager/upload/' + FCKConfig.QuickUploadLanguage + '/upload.' + _QuickUploadLanguage ;
 FCKConfig.LinkUploadAllowedExtensions	= "" ;			// empty for all
 FCKConfig.LinkUploadDeniedExtensions	= ".(php|php3|php5|phtml|asp|aspx|ascx|jsp|cfm|cfc|pl|bat|exe|dll|reg|cgi)$" ;	// empty for no one
 
 FCKConfig.ImageUpload = true ;
-FCKConfig.ImageUploadURL = FCKConfig.BasePath + 'filemanager/upload/asp/upload.asp?Type=Image' ;
-// PHP // FCKConfig.ImageUploadURL = FCKConfig.BasePath + 'filemanager/upload/php/upload.php?Type=Image' ;
+FCKConfig.ImageUploadURL = FCKConfig.BasePath + 'filemanager/upload/simpleuploader?Type=Image';
+//FCKConfig.ImageUploadURL = FCKConfig.BasePath + 'filemanager/upload/' + FCKConfig.QuickUploadLanguage + '/upload.' + _QuickUploadLanguage + '?Type=Image' ;
 FCKConfig.ImageUploadAllowedExtensions	= ".(jpg|gif|jpeg|png)$" ;		// empty for all
 FCKConfig.ImageUploadDeniedExtensions	= "" ;							// empty for no one
 
 FCKConfig.FlashUpload = true ;
-FCKConfig.FlashUploadURL = FCKConfig.BasePath + 'filemanager/upload/simpleuploader?Type=Flash' ;
-//FCKConfig.FlashUploadURL = FCKConfig.BasePath + 'filemanager/upload/asp/upload.asp?Type=Flash' ;
-// PHP // FCKConfig.FlashUploadURL = FCKConfig.BasePath + 'filemanager/upload/php/upload.php?Type=Flash' ;
+FCKConfig.FlashUploadURL = FCKConfig.BasePath + 'filemanager/upload/simpleuploader?Type=Flash';
+//FCKConfig.FlashUploadURL = FCKConfig.BasePath + 'filemanager/upload/' + FCKConfig.QuickUploadLanguage + '/upload.' + _QuickUploadLanguage + '?Type=Flash' ;
 FCKConfig.FlashUploadAllowedExtensions	= ".(swf|fla)$" ;		// empty for all
 FCKConfig.FlashUploadDeniedExtensions	= "" ;					// empty for no one
 
