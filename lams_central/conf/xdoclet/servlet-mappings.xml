@@ -24,8 +24,14 @@ http://www.gnu.org/licenses/gpl.txt
     <url-pattern>*.do</url-pattern>
 </servlet-mapping>
 
+<!--  FCKEditor Connector Configuration -->
 <servlet-mapping>
     <servlet-name>Connector</servlet-name>
-    <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+    <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 </servlet-mapping>
 
+<!--  FCKEditor SimpleUploader Configuration -->
+<servlet-mapping>
+  <servlet-name>SimpleUploader</servlet-name>
+  <url-pattern>/fckeditor/editor/filemanager/upload/simpleuploader</url-pattern>
+</servlet-mapping>
