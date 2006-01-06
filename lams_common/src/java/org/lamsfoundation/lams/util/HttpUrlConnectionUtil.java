@@ -31,25 +31,86 @@ public class HttpUrlConnectionUtil {
     
     public static final int STATUS_OK = 1;
     public static final int STATUS_ERROR = -1;
-        
-  
     /**
-     * Mimics a browser connection and connects to the url <code>urlToConnectTo</code> and writes
-     * the contents to the file with <code>filename</code> stored in <code>directoryToStoreFile</code>.
-     * Also sets the necessary cookies needed in the form JSESSIONID=XXXX;JSESSIONIDSSO=XXXX;SYSSESSIONID=XXXX
-     * If the Http Status-Code returned is 200, then it will proceed to write the contents to a file.
-     * Otherwise it will return the value -1 to indicate that an error has occurred. It is up to the 
-     * calling function on how this error is dealt with.
+     * Write URL connection repsonse to <code>OutputStream</code>.
      * 
-     * @param urlToConnectTo The url in which the HttpUrlConnection is to be made
-     * @param directoryToStoreFile The directory to place the saved html file
-     * @param filename	The name of the file, eg. export_main.html
-     * @param cookies The Cookie objects which needs to be passed along with the request
-     * @return int returns 1 if success, -1 otherwise.
-     * @throws MalformedURLException
-     * @throws FileNotFoundException
-     * @throws IOException
+     * @see writeResponseToFile(String , String , String filename, Cookie[] ) 
+	 * @param urlToConnectTo
+	 *            The url in which the HttpUrlConnection is to be made
+	 * @param directoryToStoreFile
+	 *            The directory to place the saved html file
+	 * @param filename
+	 *            The name of the file, eg. export_main.html
+	 * @param cookies
+	 *            The Cookie objects which needs to be passed along with the
+	 *            request
+	 * @return int returns 1 if success, -1 otherwise.
+	 * @throws MalformedURLException
+	 * @throws FileNotFoundException
+	 * @throws IOException
      */
+    public static int writeResponseToStream(String urlToConnectTo, OutputStream outStream, Cookie[] cookies)
+			throws MalformedURLException, FileNotFoundException, IOException {
+		int status;
+		int statusCode;
+
+		URL url = new URL(urlToConnectTo);
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		// send the necessary cookies along with the request
+		con.setRequestProperty("Cookie", getCookieString(cookies)); 
+
+		if (log.isDebugEnabled()) {
+			log.debug("A connection has been established with " + urlToConnectTo);
+		}
+
+		// get the code before retrieving the input stream
+		statusCode = con.getResponseCode();
+		status = getStatus(statusCode);
+
+		if (status == STATUS_OK) {
+			InputStream inputStream = con.getInputStream(); // start reading the
+															// input stream
+			int c = -1;
+			while ((c = inputStream.read()) != -1) {
+				outStream.write(c);
+			}
+
+			inputStream.close();
+			if (log.isDebugEnabled()) {
+				log.debug("A connection to " + urlToConnectTo + " has been closed");
+			}
+
+		} else {
+			log.error("URL Connection Error: A problem has occurred while connecting to this url " + urlToConnectTo);
+		}
+
+		return status;
+	}
+    /**
+	 * Mimics a browser connection and connects to the url
+	 * <code>urlToConnectTo</code> and writes the contents to the file with
+	 * <code>filename</code> stored in <code>directoryToStoreFile</code>.
+	 * Also sets the necessary cookies needed in the form
+	 * JSESSIONID=XXXX;JSESSIONIDSSO=XXXX;SYSSESSIONID=XXXX If the Http
+	 * Status-Code returned is 200, then it will proceed to write the contents
+	 * to a file. Otherwise it will return the value -1 to indicate that an
+	 * error has occurred. It is up to the calling function on how this error is
+	 * dealt with.
+	 * 
+	 * @param urlToConnectTo
+	 *            The url in which the HttpUrlConnection is to be made
+	 * @param directoryToStoreFile
+	 *            The directory to place the saved html file
+	 * @param filename
+	 *            The name of the file, eg. export_main.html
+	 * @param cookies
+	 *            The Cookie objects which needs to be passed along with the
+	 *            request
+	 * @return int returns 1 if success, -1 otherwise.
+	 * @throws MalformedURLException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
     public static int writeResponseToFile(String urlToConnectTo, String directoryToStoreFile, String filename, Cookie[] cookies) 
     	throws MalformedURLException, FileNotFoundException, IOException
     {
