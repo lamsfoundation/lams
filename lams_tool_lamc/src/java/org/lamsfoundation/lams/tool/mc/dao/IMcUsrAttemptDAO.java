@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 
 
 /**
@@ -124,6 +124,9 @@ public interface IMcUsrAttemptDAO
 	 * 
 	 * @return 
 	 */
+	
+	public List getAttemptsForUser(final Long queUsrId);
+	
 	public List getMarks();
 }
 

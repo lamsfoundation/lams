@@ -24,8 +24,8 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.mc.McContent;
-import org.lamsfoundation.lams.tool.mc.McSession;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 
 /**
  * @author Ozgur Demirtas

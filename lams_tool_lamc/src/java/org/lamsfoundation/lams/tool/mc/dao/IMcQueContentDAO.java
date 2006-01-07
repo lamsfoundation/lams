@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.mc.McQueContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 
 
 /**

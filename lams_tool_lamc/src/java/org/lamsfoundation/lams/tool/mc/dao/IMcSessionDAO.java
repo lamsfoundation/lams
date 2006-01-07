@@ -24,10 +24,9 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.mc.McContent;
-import org.lamsfoundation.lams.tool.mc.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.McSession;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 
 
 /**

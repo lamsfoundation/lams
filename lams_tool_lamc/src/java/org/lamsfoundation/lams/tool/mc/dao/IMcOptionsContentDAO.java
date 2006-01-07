@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.mc.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 
 /**
  * @author Ozgur Demirtas
@@ -102,6 +102,8 @@ public interface IMcOptionsContentDAO
 	 * @param mcOptionsContent
 	 */
 	public void removeMcOptionsContent(McOptsContent mcOptsContent);
+	
+	public List findMcOptionNamesByQueId(Long mcQueContentId);
 }
 
 

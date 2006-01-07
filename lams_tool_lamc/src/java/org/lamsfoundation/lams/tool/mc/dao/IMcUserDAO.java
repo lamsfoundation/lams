@@ -23,8 +23,10 @@
 
 package org.lamsfoundation.lams.tool.mc.dao;
 
-import org.lamsfoundation.lams.tool.mc.McQueUsr; 
-import org.lamsfoundation.lams.tool.mc.McSession;
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 
 /**
  * @author Ozgur Demirtas
@@ -85,5 +87,7 @@ public interface IMcUserDAO {
      * @return the number of users that are in this session
      */
     public int getNumberOfUsers(McSession mcSession);
+    
+    public List getMcUserBySessionOnly(final McSession mcSession);
    
 }
