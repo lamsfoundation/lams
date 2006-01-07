@@ -40,7 +40,9 @@
 		
 		<tr> <td NOWRAP class="formlabel" valign=top align=left> 
 			<table align=left>
+			
 				<c:forEach var="currentDto" items="${sessionScope.listMonitoredAnswersContainerDto}">
+		  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
 					<tr>			
 						<td NOWRAP valign=top align=left><b> <font size=2> <bean:message key="label.question.col"/> </b></font> </td>
 						<td NOWRAP valign=top align=left> <font size=2> <c:out value="${currentDto.question}"/> </font> </td>
@@ -73,12 +75,15 @@
 		  							<c:forEach var="questionAttemptData" items="${currentDto.questionAttempts}">
 										<c:forEach var="sData" items="${questionAttemptData.value}">
 								  	 		<c:set var="userData" scope="request" value="${sData.value}"/>
-											<tr> 
-												 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
-						  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
-						  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
-						  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
-								  			</tr>				 
+								  	 		
+	  	 									<c:if test="${currentQuestionId == userData.questionUid}"> 			
+												<tr> 
+													 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.userName}"/> </font>  </td>  
+							  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.attemptTime}"/> </font> </td>
+							  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.timeZone}"/> </font> </td>
+							  						 <td NOWRAP valign=top>  <font size=2> <c:out value="${userData.response}"/> </font> </td>
+									  			</tr>		
+										</c:if>														  					 
 	 									</c:forEach>		  	
 									</c:forEach>		  	
 							</table>
