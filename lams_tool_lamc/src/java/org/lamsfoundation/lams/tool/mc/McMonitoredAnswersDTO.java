@@ -21,21 +21,28 @@
 package org.lamsfoundation.lams.tool.mc;
 
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * <p> DTO that holds monitored question and candiate answers data for jsp purposes
+ * <p> DTO that holds question/candidate answers data as well as user attempts data for jsp purposes
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McMonitoredAnswersDTO 
+public class McMonitoredAnswersDTO implements Comparable
 {
 	private String questionUid;
 	
 	private String question;
 	
 	private List candidateAnswers;
+	
+	private Map questionAttempts;
+	
+	
 	/**
 	 * @return Returns the candidateAnswers.
 	 */
@@ -72,4 +79,34 @@ public class McMonitoredAnswersDTO
 	public void setQuestionUid(String questionUid) {
 		this.questionUid = questionUid;
 	}
+	
+	/**
+	 * @return Returns the questionAttempts.
+	 */
+	public Map getQuestionAttempts() {
+		return questionAttempts;
+	}
+	/**
+	 * @param questionAttempts The questionAttempts to set.
+	 */
+	public void setQuestionAttempts(Map questionAttempts) {
+		this.questionAttempts = questionAttempts;
+	}
+	
+	public String toString() {
+        return new ToStringBuilder(this)
+            .append("question", getQuestion())
+            .toString();
+    }
+	
+	public int compareTo(Object o)
+    {
+		McMonitoredAnswersDTO mcMonitoredAnswersDTO = (McMonitoredAnswersDTO) o;
+     
+        if (mcMonitoredAnswersDTO == null)
+        	return 1;
+		else
+			return (int) (new Long(questionUid).longValue() - new Long(mcMonitoredAnswersDTO.questionUid).longValue());
+    }
+	
 }
