@@ -26,11 +26,11 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McAttachmentDTO;
 import org.lamsfoundation.lams.tool.mc.McComparator;
-import org.lamsfoundation.lams.tool.mc.McContent;
-import org.lamsfoundation.lams.tool.mc.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.McQueContent;
-import org.lamsfoundation.lams.tool.mc.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.McUtils;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -1697,7 +1697,10 @@ public class AuthoringUtil implements McAppConstants {
             {
             	String optionText=pairs.getValue().toString();
             	logger.debug("optionContentFound is false and option is: " + optionText);
-            	createOptionContent(request, options, optionText,  questionIndex, mapGeneralSelectedOptionsContent);
+            	if ((optionText != null) && (!optionText.equals("")))
+            	{
+            		createOptionContent(request, options, optionText,  questionIndex, mapGeneralSelectedOptionsContent);            		
+            	}
             }
         }
     }
