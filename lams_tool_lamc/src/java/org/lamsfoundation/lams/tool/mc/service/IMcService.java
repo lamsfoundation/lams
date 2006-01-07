@@ -37,12 +37,12 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McContent;
-import org.lamsfoundation.lams.tool.mc.McOptsContent;
-import org.lamsfoundation.lams.tool.mc.McQueContent;
-import org.lamsfoundation.lams.tool.mc.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.McSession;
-import org.lamsfoundation.lams.tool.mc.McUsrAttempt;
+import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.usermanagement.User;
 
 
@@ -114,6 +114,8 @@ public interface IMcService
     public void updateMc(McContent mc) throws McApplicationException;
     
     public void updateMcSession(McSession mcSession) throws McApplicationException;
+    
+    public List getMcUserBySessionOnly(final McSession mcSession) throws McApplicationException;
     
     public void deleteMc(McContent mc) throws McApplicationException;
     
@@ -221,11 +223,15 @@ public interface IMcService
 	
 	public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder) throws McApplicationException;
 	
+	public List getAttemptsForUser(final Long queUsrId) throws McApplicationException;
+	
 	public List getMarks() throws McApplicationException;
 	
 	public int countSessionComplete() throws McApplicationException;
-
-    public int countSessionIncomplete() throws McApplicationException;
+	
+	public McSession findMcSessionById(Long mcSessionId) throws McApplicationException;
+	
+	public int countSessionIncomplete() throws McApplicationException;
     
     public List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
     
@@ -248,5 +254,7 @@ public interface IMcService
     public List getOfflineFilesMetaData(Long mcContentId) throws McApplicationException;
     
     public List getSessionsFromContent(McContent mcContent) throws McApplicationException;
+    
+    public List findMcOptionNamesByQueId(Long mcQueContentId) throws McApplicationException;
 }
 
