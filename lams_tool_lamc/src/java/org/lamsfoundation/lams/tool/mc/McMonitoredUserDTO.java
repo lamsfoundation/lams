@@ -20,18 +20,22 @@
  */
 package org.lamsfoundation.lams.tool.mc;
 
-import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * <p> DTO that holds monitored user data for jsp purposes
+ * <p> DTO that holds users attempt history data for jsp purposes
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McMonitoredUserDTO 
+public class McMonitoredUserDTO implements Comparable
 {
-	private String uid;
+	private String queUsrId;
+
+    private String uid;
 	
 	private String attemptTime;
 	
@@ -42,6 +46,49 @@ public class McMonitoredUserDTO
 	private String isCorrect;
 	
 	private String response;
+    
+    private Map usersAttempts;
+	
+	/**
+	 * @return Returns the queUsrId.
+	 */
+	public String getQueUsrId() {
+		return queUsrId;
+	}
+	/**
+	 * @param queUsrId The queUsrId to set.
+	 */
+	public void setQueUsrId(String queUsrId) {
+		this.queUsrId = queUsrId;
+	}
+	
+	public String toString() {
+        return new ToStringBuilder(this)
+            .append("queUsrId and username", getQueUsrId() + " and " + getUserName())
+            .toString();
+    }
+	/**
+	 * @return Returns the usersAttempts.
+	 */
+	public Map getUsersAttempts() {
+		return usersAttempts;
+	}
+	/**
+	 * @param usersAttempts The usersAttempts to set.
+	 */
+	public void setUsersAttempts(Map usersAttempts) {
+		this.usersAttempts = usersAttempts;
+	}
+	
+	public int compareTo(Object o)
+    {
+		McMonitoredUserDTO mcMonitoredUserDTO = (McMonitoredUserDTO) o;
+     
+        if (mcMonitoredUserDTO == null)
+        	return 1;
+		else
+			return (int) (new Long(queUsrId).longValue() - new Long(mcMonitoredUserDTO.queUsrId).longValue());
+    }
 	/**
 	 * @return Returns the attemptTime.
 	 */
